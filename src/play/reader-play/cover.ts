@@ -50,7 +50,6 @@ export function reachable(intent: PlayerIntent, sent: Sent): boolean {
     if (!family || other.type !== intent.type) return false;
     if (family.kind === "ids" && (intent.type === "Commit" || intent.type === "CommitHide" || intent.type === "CommitFortitude" || intent.type === "CommitEscape" || intent.type === "DeclareAttackers")) {
       if (intent.type === "DeclareAttackers" && other.type === "DeclareAttackers" && intent.enemyId !== other.enemyId) return false;
-      if (intent.type === "Commit" && other.type === "Commit" && intent.sideQuestId !== other.sideQuestId) return false;
       const picks = idsOf(intent);
       return (picks.length > 0 || family.allowEmpty) && picks.every((id) => family.allowed.has(id));
     }

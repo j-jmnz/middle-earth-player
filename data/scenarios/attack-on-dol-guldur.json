@@ -1,0 +1,214 @@
+{
+  "id": "attack-on-dol-guldur",
+  "name": "Attack on Dol Guldur",
+  "number": 8,
+  "stages": [
+    "50901",
+    "50902",
+    "50903",
+    "50904",
+    "50905",
+    "50906"
+  ],
+  "encounterSets": [
+    {
+      "name": "Attack on Dol Guldur",
+      "count": 36
+    }
+  ],
+  "cards": [
+    {
+      "code": "50914",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50915",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50916",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50917",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "50919",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "50920",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50921",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50922",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50923",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50924",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50925",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "50926",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "50927",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50928",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50929",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50930",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50901",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "50902",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "50903",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "50904",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "50905",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "50906",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "50907",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "50908",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "50918",
+      "normal": 4,
+      "easy": 4,
+      "pile": "staging",
+      "perPlayer": 1
+    },
+    {
+      "code": "50909",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "50910",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "50911",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "50912",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "50913",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q99.10",
+    "dragnEasy": "Q99.10",
+    "hobSlug": "Attack-on-Dol-Guldur"
+  },
+  "modeCard": "50931"
+}

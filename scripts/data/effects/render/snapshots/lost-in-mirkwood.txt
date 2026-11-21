@@ -263,7 +263,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     - the card with code 01096 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - shuffle the encounter deck
   18071:setup:2: Setup
-    - [json TakeControlOfSetAside {"verb":"TakeControlOfSetAside","code":"18070"}]
+    - the set-aside card with code 18070 enters play under the first player's control, ready
 
 18071:B:1 (back): Each player's threat cannot be reduced by player card effects.
   18071:constant:1: Constant
@@ -370,7 +370,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18076:A:1 (front): When Revealed: Remove Searching for a Way Out from the game. Search the remaining set-aside encounter set for the enemy with the most hit points and add it to the staging area. That enemy is the "nemesis" until it leaves play.
   18076:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RemoveCodeFromGame {"verb":"RemoveCodeFromGame","code":"18028"}]
+    - the card in play with code 18028 is removed from the game, wherever it is (in the staging area or attached)
     - [json SearchNemesis {"verb":"SearchNemesis"}]
 
 18076:B:1 (back): The nemesis gets +2 Threat, +2 Attack, +2 Defense and is immune to player card effects.
@@ -401,7 +401,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18077:A:1 (front): When Revealed: Remove Searching for a Way Out from the game. Starting with the first player, each player discards cards from the top of the encounter deck until he discards an enemy and puts that enemy into play engaged with him.
   18077:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RemoveCodeFromGame {"verb":"RemoveCodeFromGame","code":"18028"}]
+    - the card in play with code 18028 is removed from the game, wherever it is (in the staging area or attached)
     - for each player, first player first:
       - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
       - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
@@ -416,4 +416,4 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 250 by template, 44 as JSON)
+(rendered pieces: 253 by template, 41 as JSON)

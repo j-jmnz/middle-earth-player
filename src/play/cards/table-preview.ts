@@ -4,6 +4,8 @@ import { stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
 import { isLostIsland } from "../../rules/families/uncharted/pick.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import type { CardInstance } from "../../rules/core/state.ts";
+import { flagged } from "../../rules/core/state.ts";
+import { BLIZZARD_LIMIT } from "../../rules/families/quest/blizzard.ts";
 
 
 import { dungeonDetail } from "./dungeon-preview.ts";
@@ -16,6 +18,7 @@ import type { PreviewCard } from "./card-preview.tsx";
 import { stageDetail } from "../readouts/fortress.ts";
 import { advanceHold, questObjective, stagePoints } from "../readouts/objective.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
+import { forestScore, forestStageWords } from "../readouts/standalone-scenarios/old-forest-words.ts";
 import { headingLook, headingPreviewSteps, headingPreviewTitle, headingStepOf } from "../dream-chaser/heading.ts";
 import { inspectTargets } from "../store/selectors.ts";
 import { whyNotPlayable } from "../choice/why.ts";
@@ -45,17 +48,19 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   const detail = stageDetail(game, ctx, stage.code, points, hold, null).join(". ");
   if (points != null) return { title: `${name} · ${stage.progress} / ${points}`, ...(detail ? { detail } : {}) };
   const objective = questObjective(game, ctx, line);
-  return { title: name, detail: objective ? `To win: ${objective}` : "No quest points" };
+  // A stage 2 of The Old Forest has no quest points: it says what its Victory points test sends the quest to.
+  const forest = forestScore(game, ctx);
+  return { title: name, detail: objective ? `To win: ${objective}` : forest ? forestStageWords(forest) : "No quest points" };
 }
 
 /**
  * What lies on the card now, one phrase a counter: its damage, progress and resource tokens, and whether it is exhausted or committed to the
- * quest. Empty for a card with none (a card in the hand, a fresh enemy).
+ * quest. Empty for a card with none (a card in the hand, a fresh enemy). `progressLimit`: the progress is counted against a limit ("3 / 5 progress", Blinding Blizzard, 901307:A:2).
  */
-export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "resources" | "exhausted" | "committed">): string[] {
+export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "resources" | "exhausted" | "committed">, progressLimit?: number): string[] {
   return [
     ...(card.damage > 0 ? [`${card.damage} damage`] : []),
-    ...(card.progress > 0 ? [`${card.progress} progress`] : []),
+    ...(card.progress > 0 ? [`${card.progress}${progressLimit == null ? "" : ` / ${progressLimit}`} progress`] : []),
     ...(card.resources > 0 ? [`${card.resources} resource${card.resources === 1 ? "" : "s"}`] : []),
     ...(card.exhausted ? ["Exhausted"] : []),
     ...(card.committed ? ["Committed"] : []),
@@ -89,6 +94,9 @@ export function previewCards(
   // `ruleDoc`: the document whose wording a keyword's rule is quoted from first (the open scenario's own booklet; glossary.ts, scenarioRuleDoc), or null for the Rules Reference.
   options: { ruleDoc?: string | null } = {},
 ): { cards: PreviewCard[]; start: number } {
+  // A choice whose rows are card codes, not cards on the table (the random undiscovered treasures to choose among, 120165:A:3;
+  // a boon of the campaign pool): a long press shows the printed card.
+  if (!game.cards[cardId] && ctx.cards.has(cardId)) return { cards: [{ code: cardId, ...describe(cardId), effects: [] }], start: 0 };
   const earlier = earlierStages(game, ctx, cardId);
   const ids = [...inspectTargets(game, cardId), ...extra.filter((id) => id !== cardId), ...earlier];
   const groups = ids.map((id, index): PreviewCard[] => {
@@ -113,7 +121,7 @@ export function previewCards(
     const heading = game.sea?.headingCard === id ? headingStepOf(game.sea?.heading) : null;
     const turned = heading ? { title: headingPreviewTitle(heading), turn: headingLook(heading).turn } : {};
     const steps = heading ? { steps: headingPreviewSteps(heading).map((row) => ({ text: row.line, current: row.current })) } : {};
-    const tokens = tokenLines(card);
+    const tokens = tokenLines(card, flagged(game, id, "progressRedirect") ? BLIZZARD_LIMIT : undefined);
     const keywords = previewKeywords(game, ctx, id, described.text, options.ruleDoc ?? null);
     const sides = contractSides(printedOf(ctx.cards, card.code).type, described.text);
     if (sides) {

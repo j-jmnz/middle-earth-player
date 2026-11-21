@@ -2,7 +2,7 @@
 
 ## What and why
 
-<!-- What changed, and why. Link the issue it closes. The title is a line of the next release's notes. If players lose something saved or a feature, keep a `Breaking: <what players lose>` line in the squash body (.claude/rules/release-standards.md, Versioning). -->
+<!-- What changed, and why. Name each related issue on its own line: `Settles #<n>` when this finishes it, `Refs #<n>` when it does only part. Do not write `Closes`, `Fixes` or `Resolves` before an issue number: the issue stays open until the release that ships it closes it. The release notes link them. The title is a line of the next release's notes. If players lose something saved or a feature, keep a `Breaking: <what players lose>` line in the squash body (.claude/rules/release-standards.md, Versioning). -->
 
 ## Rules and sources
 

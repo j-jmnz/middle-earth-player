@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
+import { loadPrinted } from "../../../../test/harness/catalog.ts";
 import { fightEnemy, finish, first, idsOf, legalIntents, legalTargets, resolveRecords, revealFromTop, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { eliminateSeat } from "../../../rules/core/eliminate.ts";
@@ -372,9 +373,9 @@ describe("900608:A:2 Noxious Supplies and the heals", () => {
   };
   const attached = (state: ScenarioState) => idsOf(state, "900608").filter((id) => state.cards[id]?.zone === "attached");
 
-  it("900608:A:2 reduces a quiet heal (Elrond's Response) to 1 and discards a copy", () => {
+  it("900608:A:2 reduces a heal to 1 and discards a copy", () => {
     const { made, state } = poisoned(2, {});
-    const done = healWith(made, state, [{ verb: "Pick", pick: { type: "character", control: "any", names: ["Wilyador"] } }, { verb: "HealQuietly", amount: 3, target: "picked" }]);
+    const done = healWith(made, state, [{ verb: "Pick", pick: { type: "character", control: "any", names: ["Wilyador"] } }, { verb: "Heal", amount: 3, target: "picked" }]);
     expect(done.cards[first(done, WILYADOR)]?.damage).toBe(7);
     expect(attached(done)).toHaveLength(1);
   });
@@ -394,3 +395,16 @@ describe("900608:A:2 Noxious Supplies and the heals", () => {
   });
 });
 
+
+describe("02064:A:3 Wilyador leaves play by a player card's return to hand", () => {
+  it("02064:A:3 02076 Meneldor's Flight puts the scenario's card in the encounter discard pile, not a hand, and the players lose the game", async () => {
+    const t = table({ play: [WILYADOR], hand: ["02076"], phase: "Planning" });
+    for (const [code, card] of await loadPrinted(["02076"])) t.cards.set(code, card);
+    const wilyador = first(t.state, WILYADOR);
+    const run = finish(send({ state: t.state, steps: [] }, { type: "PlayCard", cardId: first(t.state, "02076"), payments: [] }, t.ctx), t.ctx);
+    expect(run.state.cards[wilyador]).toMatchObject({ zone: "encounterDiscard", controller: null });
+    expect(run.state.seats[0]?.hand).not.toContain(wilyador);
+    expect(run.state.lost).toBe(true);
+    expect(run.state.lossReason).toBe("Wilyador left play");
+  });
+});

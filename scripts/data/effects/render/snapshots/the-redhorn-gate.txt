@@ -1,0 +1,314 @@
+Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest: 04012 Snowdrifts; quest: 04013 The Mountains' Peaks; staging: 04015 Caradhras; setAside: 04014 Arwen Undómiel; setAside: 04022 Snowstorm)
+
+## 03054 Black Uruks
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03054:A:1 (front): When Revealed: The first player must choose and discard an attachment from a questing character, if able.
+  03054:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (any player controls) chosen by the first player, attached to a character (any player controls) committed to the quest
+    - discard the picked card
+
+03054:A:2 (shadow): Shadow: If this attack is undefended, deal 2 additional shadow cards to attacking enemy.
+  03054:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attack has no defender: the attacking enemy is dealt a shadow card
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt a shadow card
+
+## 03055 Mountain Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03055:A:1 (front): If Mountain Warg is dealt a shadow card with no effect, return Mountain Warg to the staging area after it attacks.
+  03055:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    - return this card to the staging area
+
+03055:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if a Mountain is the active location.)
+  03055:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the active location is a Mountain location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 03056 Bitter Wind
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03056:A:1 (front): When Revealed: The first player must discard 3 resources from each hero he controls.
+  03056:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - if the actor holds the first player token: for each hero (you control):
+        - 3 resource(s) come off the resource pool of the picked card (discarded, not spent)
+
+03056:A:2 (shadow): Shadow: Defending player must discard 2 resources from each hero he controls.
+  03056:shadow:1: Shadow
+    - for each hero (you control):
+      - 2 resource(s) come off the resource pool of the picked card (discarded, not spent)
+
+## 03057 Knees of the Mountain
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03057:A:1 (front): While Knees of the Mountain is in the staging area, it gains: "Forced: After an enemy engages a player, it gets +1 Attack until the end of the round."
+  03057:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls))
+    only if this card is in the staging area
+    - the card the event is about: stat attack 1, until the end of the round
+
+## 03058 Turbulent Waters
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03058:A:1 (front): While Turbulent Waters is the active location, players cannot optionally engage enemies.
+  03058:constant:1: Constant
+    only if this card is the active location
+    - the table: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+## 03059 Warg Lair
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+03059:A:1 (front): When Revealed: Search the encounter deck and discard pile for 1 copy of Mountain Warg and add it to the staging area, if able. Shuffle the encounter deck.
+  03059:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 03055 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+03059:A:2 (front): Response: After Warg Lair leaves play as an explored location, each player draws 1 card.
+  03059:response:1: Response after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - for each player, first player first:
+      - the acting player draws 1 card(s)
+
+## 04011 Up the Pass
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+04011:A:1 (front): Setup: Add Caradhras to the staging area. Remove all copies of Snowstorm from the encounter deck and set them aside, out of play. Put Arwen Undómiel into play under the control of the first player.
+  04011:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the set-aside card with code 04014 enters play under the first player's control, ready
+    - shuffle the encounter deck
+
+04011:B:1 (back): When Revealed: Reveal 1 card from the encounter deck per player, and add it to the staging area.
+  04011:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+## 04012 Snowdrifts
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+04012:B:1 (back): When Revealed: Shuffle 1 more copy of Snowstorm into the encounter deck than the number of players in the game.
+  04012:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - one set-aside copy of the card with code 04022 is shuffled into the encounter deck (nothing with none set aside)
+    - one set-aside copy of the card with code 04022 is shuffled into the encounter deck (nothing with none set aside)
+    - shuffle the encounter deck
+    - the table: stat heldCommitted 1, while this card is in play
+
+04012:B:2 (back): Forced: After placing the 11th progress token on Snowdrifts, discard any active location. Caradhras becomes the active location.
+  04012:forced:1: Forced on the event questCardDefeated (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the active location is a location (any player controls) named "Caradhras"): discard the active location
+    - then, if the encounter deck or its discard pile holds a card with code 04015 (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter deck
+    - the acting player finds one card with code 04015 in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed)
+    - then, if there is a location (any player controls) in the staging area only, named "Caradhras" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) in the staging area only, named "Caradhras"
+    - then, if there is a location (any player controls) in the staging area only, named "Caradhras" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
+
+## 04013 The Mountains' Peaks
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+04013:B:1 (back): When Revealed: Shuffle all copies of Snowstorm in the encounter discard pile back into the encounter deck.
+  04013:whenRevealed:1: When revealed
+    - shuffle every copy of Snowstorm in the encounter discard pile into the encounter deck
+
+04013:B:2 (back): Characters are discarded from play if their Willpower is ever 0.
+  04013:constant:1: Constant
+    - each character (any player controls): stat discardAtZeroWillpower (it is discarded from play as soon as its current Willpower is 0) 1, while this card is in play
+
+04013:B:3 (back): Players cannot defeat this stage unless they have 5 victory points.
+  04013:constant:2: Constant
+    only if the Victory points of the cards in the victory display added up (read live) is less than 5
+    - the players cannot defeat this stage while this holds
+
+04013:B:4 (back): If the players defeat this stage, they have won the game.
+  04013:constant:3: Constant
+    (no instructions)
+
+## 04014 Arwen Undómiel
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+04014:A:1 (front): The first player gains control of Arwen Undómiel, as an ally.
+  04014:constant:1: Constant
+    - this card is controlled by the first player while this holds
+
+04014:A:2 (front): Response: After Arwen Undómiel exhausts, choose a hero. Add 1 resource to that hero's resource pool.
+  04014:response:1: Response on the event exhausted (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (any player controls)
+    - add 1 resources to the picked card
+
+04014:A:3 (front): If Arwen Undómiel leaves play, the players are defeated.
+  04014:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    - the players lose the game
+
+## 04015 Caradhras
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+04015:A:1 (front): While Caradhras is the active location, questing characters get -1 Willpower.
+  04015:constant:1: Constant
+    only if this card is the active location
+    - each character (any player controls) committed to the quest: stat willpower -1, while this card is in play
+
+04015:A:2 (front): Players cannot travel to Caradhras except by quest card effects.
+  04015:constant:2: Constant
+    - the players cannot travel to the location with code 04015 while this holds
+
+## 04016 Fanuidhol
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04016:A:1 (front): While Fanuidhol is the active location, heroes must spend 1 resource from their resource pool to count their Willpower during the quest phase.
+  04016:constant:1: Constant
+    only if this card is the active location
+    - each hero (any player controls): stat willpowerCostsResource (its Willpower counts toward the quest only once it holds countsWillpower, which paying 1 resource from its pool gives until the end of the phase) 1, while this card is in play
+  04016:forced:1: Forced on the event questTotalCounted
+    only if this card is the active location
+    - for each player, first player first:
+      - for each hero (you control) committed to the quest, with resources on it:
+        - the acting player chooses one of:
+          * option "pay":
+            - 1 resource(s) are spent from the resource pool of the picked card (nothing is spent when the pool holds fewer)
+            - the picked card: stat countsWillpower 1, until the end of the phase
+          * option "keep":
+
+## 04017 Celebdil
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04017:A:1 (front): While Celebdil is the active location, remove 2 progress tokens from it at the end of each round.
+  04017:forced:1: Forced at the end of the round
+    only if this card is the active location
+    - remove 2 progress from this card
+
+## 04018 The Dimrill Stair
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04018:A:1 (front): Travel: Reshuffle all locations in the discard pile and victory display back into the encounter deck. If you reshuffled at least two locations, reduce each player's threat by 11 and discard all copies of Freezing Cold from play.
+  04018:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the location cards of the encounter discard pile and the victory display (the cards that went back are counted as returned) into the encounter deck
+    - then, if not (the running effect returned fewer than 2 cards (ReturnFromDiscard counts the cards it moved, only the treachery cards with `treacheries`; ShuffleEncounterDiscard `alsoVictory` the cards that went back into the deck)) (checked when this step runs, after the steps above; not tied to whether they did anything): lower threat by 11 (each player)
+    - then, if not (the running effect returned fewer than 2 cards (ReturnFromDiscard counts the cards it moved, only the treachery cards with `treacheries`; ShuffleEncounterDiscard `alsoVictory` the cards that went back into the deck)) (checked when this step runs, after the steps above; not tied to whether they did anything): for each attachment (any player controls) named "Freezing Cold":
+      - discard the picked card
+
+## 04019 Rocky Crags
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04019:A:1 (front): Travel: Each player must deal 2 damage to 1 character he controls to travel here.
+  04019:travel:1: Travel
+    - for each player, first player first:
+      - choose character (you control)
+      - deal 2 damage to the picked card
+
+04019:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each progress token on the active location.
+  04019:shadow:1: Shadow
+    - the attacking enemy: stat attack progress of the active location, until the end of the attack
+
+## 04020 Fell Voices
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04020:A:1 (front): When Revealed: Return the top 2 Snow cards in the encounter discard pile to the top of the encounter deck. If this effect returned less than 2 Snow treachery cards, Fell Voices gains surge.
+  04020:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the rest of the effect is carried out by the first player
+    - return the topmost 2 Snow card(s) of the encounter discard pile to the top of the encounter deck, facedown (the cards ArrangeEncounter may reorder) (they are not revealed: no When Revealed, no engagement; the number returned, the treachery cards only, is counted)
+    - the acting player puts the cards this effect looked at or returned, still on top of the encounter deck, back in the order they choose
+    - then, if the running effect returned fewer than 2 cards (ReturnFromDiscard counts the cards it moved, only the treachery cards with `treacheries`; ShuffleEncounterDiscard `alsoVictory` the cards that went back into the deck) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+## 04021 Fallen Stones
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04021:A:1 (front): When Revealed: The first player (choose 1): removes all progress tokens from play, or reveals 2 cards from the encounter deck and adds them to the staging area.
+  04021:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "remove":
+        - remove all the progress from each location (any player controls)
+        - remove all the progress from each card (any player controls) that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
+        - remove all the progress from each card (any player controls) named "Blinding Blizzard"
+      * option "reveal":
+        - the first player reveals 2 encounter cards, one after the other, each in a staging of its own
+
+04021:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each progress token on the active location.
+  04021:shadow:1: Shadow
+    - the attacking enemy: stat attack progress of the active location, until the end of the attack
+
+## 04022 Snowstorm
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+04022:A:1 (front): When Revealed: Each questing character gets -1 Willpower until the end of the phase.
+  04022:whenRevealed:1: When revealed
+    - every character committed to the quest, now and committing later while the effect lasts: stat willpower -1, until the end of the phase
+
+04022:A:2 (shadow): Shadow: Until the end of the phase, characters defending this attack get -1 Willpower and are discarded if their Willpower is 0.
+  04022:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the defender: stat willpower -1, until the end of the phase
+    - the defender: stat discardAtZeroWillpower (it is discarded from play as soon as its current Willpower is 0) 1, until the end of the phase
+
+## 04023 Freezing Cold
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04023:A:1 (front): When Revealed: The first player attaches this card to a hero he controls. Counts as a Condition attachment with the text: "Attached hero gets -2 Willpower and cannot commit to a quest. If attached hero has more than 1 copy of Freezing Cold attached, discard attached hero from play."
+  04023:whenRevealed:1: When revealed
+    - attach this card to a hero the first player controls, one that carries a copy of this card too (the first player chooses it; with none this card is discarded) (the attachment is announced as it attaches: a Forced effect on an attachment hears it)
+  04023:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - this attachment may be attached to a hero
+    - its host: stat willpower -2, while this card is in play
+    - its host: stat cannotQuest 1, while this card is in play
+  04023:triggered:1: Triggered (mandatory, not printed as Forced) on the event attached (heard about this card)
+    only if the number of attachment (any player controls) named "Freezing Cold", attached to this card's host is at least 2
+    - discard its host
+
+## 04024 Avalanche!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04024:A:1 (front): When Revealed: Exhaust each ready character and if it is the quest phase commit them to the quest.
+  04024:whenRevealed:1: When revealed
+    - for each ready character (any player controls):
+      - exhaust the picked card
+      - then, if it is the Quest phase (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is committed to the quest without exhausting (it counts as committing, so a "when a character commits" effect hears it; a character that cannot quest stays out)
+
+## 04025 Mountain Goblin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04025:A:1 (front): Mountain Goblin gets +1 Attack for each Mountain location in the staging area.
+  04025:constant:1: Constant
+    - this card: stat attack the number of Mountain location (any player controls) in the staging area only, while this card is in play
+
+04025:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if the active location is a Mountain.)
+  04025:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the active location is a Mountain location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 04026 Mountain Troll
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04026:A:1 (front): Mountain Troll gets +1 Attack for each Mountain location in the staging area.
+  04026:constant:1: Constant
+    - this card: stat attack the number of Mountain location (any player controls) in the staging area only, while this card is in play
+
+04026:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if the active location is a Mountain.)
+  04026:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the active location is a Mountain location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 04027 Snow Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+04027:A:1 (front): Allies cannot defend while Snow Warg is attacking.
+  04027:constant:1: Constant
+    - allies cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)
+
+04027:A:2 (front): Forced: After a character is declared as a defender against Snow Warg, deal 1 damage to the defending character, if able.
+  04027:forced:1: Forced after a character is declared as a defender (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    - deal 1 damage to the card the event is about
+
+(rendered pieces: 194 by template, 0 as JSON)

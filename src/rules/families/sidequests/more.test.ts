@@ -8,7 +8,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import { reduce } from "../../engine/reduce.ts";
 import { updateCard, withThreat } from "../../core/state.ts";
 import { attachTo, spawn } from "../../core/zones.ts";
-import { offered, play, put, questArea, run, seat, send, sideCtx, trigger } from "./fixture.ts";
+import { offered, play, put, stagedQuest, run, seat, send, sideCtx, trigger } from "./fixture.ts";
 import { defeatSideQuest } from "./quest.ts";
 
 const ctx = sideCtx(RECORDS);
@@ -84,7 +84,7 @@ describe("attachments that add themselves to the victory display", () => {
 describe("The Road Goes Ever On (16012:A:2)", () => {
   it("the first player chooses a player, who searches for a side quest, adds it to their hand and shuffles, when the attached side quest is defeated", () => {
     const table = seat(2, ["dwarf", "rohan"]);
-    const quest = questArea(table.state, "09014");
+    const quest = stagedQuest(table.state, "09014");
     const road = put(quest.state, "16012", "play");
     let state = attachTo(road.state, road.id, quest.id);
     state = put(state, "10034", "deck", 1).state;

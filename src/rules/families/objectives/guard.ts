@@ -16,13 +16,16 @@ export function attachGuard(state: ScenarioState, instruction: Extract<Instructi
   const scope = frameScope(state, focus.seat, focus.sourceId);
   const guardId = refCard(state, instruction.guard ?? "self", scope);
   const objectiveId = refCard(state, instruction.to ?? "picked", scope);
-  const guard = guardId ? state.cards[guardId] : undefined;
-  const objective = objectiveId ? state.cards[objectiveId] : undefined;
+  // An objective a character holds leaves it for the staging area, unclaimed (`detach`).
+  const held = objectiveId ? state.cards[objectiveId] : undefined;
+  const detached = instruction.detach === true && objectiveId && held?.host != null && held.guard !== true && (held.zone === "attached" || held.zone === "play") ? updateCard(moveCard(state, objectiveId, { zone: "staging" }), objectiveId, { face: "up", claimed: undefined, controller: null }) : state;
+  const guard = guardId ? detached.cards[guardId] : undefined;
+  const objective = objectiveId ? detached.cards[objectiveId] : undefined;
   if (!guardId || !objectiveId || !guard || !objective || guardId === objectiveId) return state;
   if (objective.zone !== "staging" || printedOf(ctx.cards, objective.code).type !== "objective") return state;
   if (guard.zone !== "staging" && guard.zone !== "engaged") return state;
   // The objective's own guards are detached first and stay in the staging area as the cards they are (900401:A:2).
-  const freed = instruction.replaceGuards ? objective.attachments.filter((id) => id !== guardId && state.cards[id]?.guard === true).reduce((current, id) => unhost(current, id), state) : state;
+  const freed = instruction.replaceGuards ? objective.attachments.filter((id) => id !== guardId && detached.cards[id]?.guard === true).reduce((current, id) => unhost(current, id), detached) : detached;
   return guardWith(freed, guardId, objectiveId, instruction.stayEngaged === true);
 }
 

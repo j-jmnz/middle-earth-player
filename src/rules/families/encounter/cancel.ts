@@ -22,5 +22,12 @@ export function cancelsReveal(state: ScenarioState, event: GameEvent, effect: Ef
 // Whether an offer in this window is barred: a Response that cancels the effect of an encounter card about to resolve (CancelEffect) is not
 // offered in the When Revealed or Shadow window. The window itself stays: a Response that only reacts (Round Shield's Defense) is still offered.
 export function cancelBarred(state: ScenarioState, event: GameEvent, effect: Effect): boolean {
-  return (event.trigger === "whenRevealedPending" || event.trigger === "shadowPending") && encounterUncancelable(state) && effect.instructions.some((instruction) => instruction.verb === "CancelEffect");
+  const cancels = effect.instructions.some((instruction) => instruction.verb === "CancelEffect");
+  // The Beast of Taur-nu-Fuin's own shadow cards cannot be canceled (50916:A:1): the enemy of the attack in progress holds the flag.
+  if (event.trigger === "shadowPending" && cancels && flagged(state, state.pendingAttack?.enemyId ?? "", "shadowsUncancelable")) return true;
+  // While Chieftain of the Pit is in play no shadow effect can be canceled, whoever's enemy it is on (51348:A:2).
+  if (event.trigger === "shadowPending" && cancels && flagged(state, "table", "allShadowsUncancelable")) return true;
+  // The card SearchTopReveal revealed (51003:A:1): its When Revealed effects cannot be canceled.
+  if (event.trigger === "whenRevealedPending" && cancels && flagged(state, event.subject ?? event.cardId ?? "", "revealUncancelable")) return true;
+  return (event.trigger === "whenRevealedPending" || event.trigger === "shadowPending") && encounterUncancelable(state) && cancels;
 }

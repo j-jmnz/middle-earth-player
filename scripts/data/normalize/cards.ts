@@ -35,6 +35,8 @@ const TYPE_BY_HOB: Readonly<Record<string, { type: string; typeName: string }>> 
   // The Sands of Harad's objective heroes (Kahliel, Firyal, Yazan, Jubayr): listed in the Cards tab, not dealt.
   Objective_Hero: { type: "objective", typeName: "Objective Hero" },
   Campaign: { type: "campaign", typeName: "Campaign" },
+  // The mode cards of the standalone scenarios (The Siege of Annúminas' Standard Game Mode and Epic Multiplayer Mode, The Hunt for the Dreadnaught's Easy, Standard and Hard Mode): DragnCards types them Campaign.
+  GenCon_Setup: { type: "campaign", typeName: "Campaign" },
   Nightmare_Setup: { type: "nightmare", typeName: "Nightmare" },
   // Ered Mithrin: an objective that is also a location (The Old Ford), and the treasure a discovered campaign card becomes (emce.treasure).
   Objective_Location: { type: "objective", typeName: "Objective Location" },
@@ -110,6 +112,8 @@ function keywordsOf(card: HobCard, dragn: DragnRow, report: BuildReport): { keyw
   for (const token of parsed.unknown) report.unknownKeywords[token] = (report.unknownKeywords[token] ?? 0) + 1;
   // A location or a built quest stage that prints X for its quest points (the number stays null; a record sets the value).
   if (locationPrintsX(card) || stagePrintsX(card)) parsed.keywords.questPointsX = true;
+  // An enemy that prints X for its hit points (the Nameless things of Foundations of Stone and its Nightmare deck): a record sets its Attack and hit points.
+  if (card.CardType === "Enemy" && card.Front.Stats.HitPoints === "X") parsed.keywords.statsX = true;
   return { keywords: parsed.keywords, victory };
 }
 
@@ -429,13 +433,17 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     const withBurden = set?.burdenSet ? { ...withKeywords, burdenSet: set.burdenSet } : withKeywords;
     const inSet = set?.encounterSet ? { ...withBurden, encounterSet: set.encounterSet } : withBurden;
     const named = set?.name ? { ...inSet, name: set.name } : inSet;
-    // A printed stat a source leaves out: Threat and engagement cost of a burden enemy (Hall of Beorn files its Threat icon as Willpower), and
-    // the stats and Victory of a ship, which Hall of Beorn has no field for.
-    const printedStats = { ...named, ...pickDefined(set, ["threat", "engagementCost", "willpower", "attack", "defense", "health", "victory"]) };
+    // A scan address a source misspells (Hall of Beorn's "The-Wiched-Willow-3A.jpg"): the printed card's pictures, for the first printing.
+    const pictured = set?.imageUrls ? { ...named, printings: named.printings.map((printing, index) => (index === 0 ? { ...printing, imageUrls: set.imageUrls } : printing)) } : named;
+    // A trait a source garbles (Hall of Beorn's "Nazg√l"): the printed traits, in print order.
+    const traited = set?.traits ? { ...pictured, traits: set.traits } : pictured;
+    // A printed stat a source leaves out: the cost box of a Wizard's Quest encounter card, Threat and engagement cost of a burden enemy (Hall of Beorn files its Threat icon as Willpower), and
+    // the stats and Victory of a ship, which Hall of Beorn has no field for. A Victory printed as X (Wall of Trees), which Hall of Beorn files as the number 254, is `null` in the override: the card carries none and its records read X.
+    const printedStats = { ...traited, ...pickDefined(set, ["threat", "engagementCost", "willpower", "attack", "defense", "health"]), ...(set?.cost !== undefined ? { cost: String(set.cost) } : {}), ...(set?.victory !== undefined ? { victory: set.victory } : {}) };
     // A quest stage that prints no quest points, which Hall of Beorn fills with 0 (a stage with 0 would be completed as it is revealed): both sides carry none.
     const stated = set?.questPoints !== undefined ? { ...printedStats, questPoints: set.questPoints, back: printedStats.back ? { ...printedStats.back, questPoints: set.questPoints } : printedStats.back } : printedStats;
-    // A card type a source files wrongly: a ship-enemy that Hall of Beorn lists as an enemy (the scan prints SHIP-ENEMY).
-    const typed = set?.type === "ship-enemy" ? { ...stated, type: set.type, typeName: "Ship-enemy" } : stated;
+    // A card type a source files wrongly: a ship-enemy that Hall of Beorn lists as an enemy (the scan prints SHIP-ENEMY), or an enemy it lists as a ship-enemy (The Hunt for the Dreadnaught's Sea Monster).
+    const typed = set?.type === "ship-enemy" ? { ...stated, type: set.type, typeName: "Ship-enemy" } : set?.type === "enemy" ? { ...stated, type: set.type, typeName: "Enemy" } : stated;
     // The stats of the Upgraded side, side B, which Hall of Beorn has no fields for either (dcce.scalable-upgradable).
     const backed = set?.back && typed.back ? { ...typed, back: { ...typed.back, ...set.back } } : typed;
     const next = outOfScope(overrides, backed) ? { ...backed, deckLegal: false } : backed;
@@ -445,5 +453,21 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     cards.push(cardSchema.parse({ ...next, backType }));
   }
   cards.sort((left, right) => left.code.localeCompare(right.code));
-  return { cards, report };
+  return { cards: oneTraitSpelling(cards), report };
+}
+
+// A trait folded to plain lowercase letters: "Dúnedain" and "Dunedain" are one key.
+export function traitKey(trait: string): string {
+  return trait.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+}
+
+// A trait two sources spell two ways (RingsDB's "Dunedain" on Thurindir, Hall of Beorn's and the card's "Dúnedain") takes the spelling
+// with the accent, the one the cards print, so a trait check finds every card that has it.
+function oneTraitSpelling(cards: Card[]): Card[] {
+  const accented = new Map<string, string>();
+  for (const trait of cards.flatMap((card) => card.traits)) if (/[^\x00-\x7f]/.test(trait)) accented.set(traitKey(trait), trait);
+  return cards.map((card) => {
+    const traits = card.traits.map((trait) => accented.get(traitKey(trait)) ?? trait);
+    return traits.some((trait, index) => trait !== card.traits[index]) ? { ...card, traits } : card;
+  });
 }

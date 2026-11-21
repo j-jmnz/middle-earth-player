@@ -1,5 +1,6 @@
 // The combat spotlight's particles laid out for Skia's Atlas (docs/design-system-table.md, Spotlight). Three draws, each
-// one buffer of sprites (spotlight/particles.ts, PARTICLE_DRAW): the glow (the charge's converging embers), the streaks (sparks, or the silver deflection of a block) and the ash. `spriteAt` works one slot's transform and color out from a time alone, so the
+// one buffer of sprites (spotlight/particles.ts, PARTICLE_DRAW): the glow (the charge's converging embers, then the sparks of the
+// gauge's lit hearts), the streaks (sparks, or the silver deflection of a block) and the ash. `spriteAt` works one slot's transform and color out from a time alone, so the
 // UI thread fills the buffers (useRSXformBuffer, useColorBuffer) from the frame; a slot with nothing alive has alpha 0. Pure and worklet-safe.
 import { PARTICLE_COUNT, particleAt, particleEnd, type Anchor, type ParticleKind } from "./particles.ts";
 
@@ -7,8 +8,8 @@ import { PARTICLE_COUNT, particleAt, particleEnd, type Anchor, type ParticleKind
 export const CELL = 64;
 export const TEXTURE = { width: 2 * CELL, height: CELL } as const;
 
-/** The slots of each draw: the converging embers, the larger of sparks and deflection, and the ash, each its own. */
-export const ATLAS_SLOTS: readonly [number, number, number] = [PARTICLE_COUNT.converge, Math.max(PARTICLE_COUNT.spark, PARTICLE_COUNT.deflect), PARTICLE_COUNT.ash];
+/** The slots of each draw: the larger of the converging embers and the heart sparks, the larger of sparks and deflection, and the ash. */
+export const ATLAS_SLOTS: readonly [number, number, number] = [Math.max(PARTICLE_COUNT.converge, PARTICLE_COUNT.ember), Math.max(PARTICLE_COUNT.spark, PARTICLE_COUNT.deflect), PARTICLE_COUNT.ash];
 /** The texture cell each draw reads: 0 the dot, 1 the streak. */
 export const ATLAS_CELL: readonly [number, number, number] = [0, 1, 0];
 /** How each draw meets the picture: the glow, the streaks and the ash are all added to it. */
@@ -22,6 +23,8 @@ const STREAK = 0.17;
 const WARM: Rgb = [1, 0.78, 0.4];
 const SILVER: Rgb = [0.82, 0.88, 0.92];
 const ASH: Rgb = [0.78, 0.42, 0.22];
+// The heart sparks: the gauge's lit heart, a little brighter (#F08A6C).
+const EMBER: Rgb = [0.94, 0.54, 0.42];
 type Rgb = readonly [number, number, number];
 
 /** A "#RRGGBB" color as a 0..1 triple. */
@@ -30,36 +33,51 @@ export function rgbOf(hex: string): [number, number, number] {
   return [((value >> 16) & 255) / 255, ((value >> 8) & 255) / 255, (value & 255) / 255];
 }
 
-/** What the emitters are: the anchors (screen points), whether the attack was blocked, the plan's seed, the burn's length, and the rim color of the charge. */
-export type Emitters = { seed: number; burnMs: number; blocked: boolean; converge: Anchor; hit: Anchor; ash: Anchor; rim: Rgb };
+/**
+ * What the emitters are: the anchors (screen points), whether the attack was blocked, the plan's seed, the burn's length, and the rim
+ * color of the charge. `ember` is the gauge's lit hearts (`xs`, in landing order) or null when no heart lights.
+ */
+export type Emitters = { seed: number; burnMs: number; blocked: boolean; converge: Anchor; hit: Anchor; ember: Anchor | null; ash: Anchor; rim: Rgb };
 
 /**
  * The effect clocks of a frame (ms since each began at Normal speed, -1 before) and the dark's ramp (0..1, the run's `darkAt`): the glow
  * fades with the dark, so it goes out with it as the cards go back and does not pop off when the layer unmounts.
  */
-export type Times = { convergeT: number; sparkT: number; ashT: number; dark: number };
+export type Times = { convergeT: number; sparkT: number; emberT: number; ashT: number; dark: number };
 
 /** One Atlas slot: the RSXform (`scos`, `ssin`, `tx`, `ty`) and the color's red, green, blue and alpha. */
 export type Slot = { scos: number; ssin: number; tx: number; ty: number; r: number; g: number; b: number; a: number };
 
 const NONE: Slot = { scos: 0, ssin: 0, tx: 0, ty: 0, r: 0, g: 0, b: 0, a: 0 };
 
+// Whether the heart sparks can show: once the first token has landed, until the last heart's sparks are out. Declared before the
+// worklets that call it (the worklet transform makes each one a constant that captures its callees).
+function emberLive(times: Times, e: Emitters): boolean {
+  "worklet";
+  return e.ember != null && times.emberT >= 0 && times.emberT < particleEnd("ember", e.burnMs);
+}
+
 /** Whether anything in a draw can show at these clocks: a draw that cannot is left empty without working a sprite out. */
 export function drawLive(draw: number, times: Times, e: Emitters): boolean {
   "worklet";
-  if (draw === 0) return times.convergeT >= 0 && times.convergeT < particleEnd("converge", e.burnMs) && times.dark > 0;
+  if (draw === 0) return emberLive(times, e) || (times.convergeT >= 0 && times.convergeT < particleEnd("converge", e.burnMs) && times.dark > 0);
   if (draw === 1) return times.sparkT >= 0 && times.sparkT < particleEnd(e.blocked ? "deflect" : "spark", e.burnMs);
   return times.ashT >= 0 && times.ashT < particleEnd("ash", e.burnMs);
 }
 
-/** Slot `i` of draw `draw` (0 glow, 1 streaks, 2 ash) at the given clocks. */
+/** Slot `i` of draw `draw` (0 glow, then the heart sparks; 1 streaks; 2 ash) at the given clocks. */
 export function spriteAt(draw: number, i: number, times: Times, e: Emitters): Slot {
   "worklet";
   let kind: ParticleKind;
   let t: number;
   let at: Anchor;
   let rgb: Rgb;
-  if (draw === 0) {
+  if (draw === 0 && e.ember != null && emberLive(times, e)) {
+    kind = "ember";
+    t = times.emberT;
+    at = e.ember;
+    rgb = EMBER;
+  } else if (draw === 0) {
     kind = "converge";
     t = times.convergeT;
     at = e.converge;
@@ -85,6 +103,6 @@ export function spriteAt(draw: number, i: number, times: Times, e: Emitters): Sl
   const ssin = scale * Math.sin(turn);
   const half = CELL / 2;
   // The glow fades with the dark.
-  const a = draw === 0 ? p.alpha * times.dark : p.alpha;
+  const a = kind === "converge" ? p.alpha * times.dark : p.alpha;
   return { scos, ssin, tx: p.x - (scos * half - ssin * half), ty: p.y - (ssin * half + scos * half), r: rgb[0], g: rgb[1], b: rgb[2], a };
 }

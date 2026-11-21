@@ -1,4 +1,4 @@
-// Rules: emce.boon-allies, emce.campaign-pool-encounter, rr.cancel, rr.damage (data/rules/entries.json); ledger lines 12166:A:2, 12167:A:2.
+// Rules: emce.boon-allies, emce.campaign-pool-encounter, rr.cancel, rr.damage, rr.exhausted (data/rules/entries.json); ledger lines 12166:A:2, 12167:A:2.
 // Turayn and A Growing Threat, the boon ally and the burden the campaign card of Journey Up the Anduin places, on the scenario's scene.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -8,7 +8,7 @@ import { expireModifiers } from "../../../rules/core/state.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce } from "../../../rules/engine/reduce.ts";
 import { openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
-import { CODES, idOf, loadUpanduinWorld, resolveRecords, upanduinTable, type UpanduinWorld } from "../../../../test/scenarios/journey-up-the-anduin/scene.ts";
+import { CODES, idOf, legalIntents, loadUpanduinWorld, resolveRecords, send, start, upanduinTable, type UpanduinWorld } from "../../../../test/scenarios/journey-up-the-anduin/scene.ts";
 
 let world: UpanduinWorld;
 beforeAll(async () => {
@@ -28,6 +28,21 @@ describe("12166 Turayn", () => {
     expect(first.modifiers.some((modifier) => modifier.stat === "damageShield")).toBe(false);
     const second = placeDamage(first, target!.id, 3, t.ctx.cards, steps, "combat", ruleCause("rr.damage"));
     expect(second.cards[target!.id]?.damage).toBe(5);
+  });
+
+  it("is offered when he exhausts to commit to the quest, and not when he is already exhausted", () => {
+    const t = upanduinTable(world, { play: [CODES.turayn] });
+    const turayn = idOf(t.state, CODES.turayn);
+    const offered = (state: typeof t.state): string[] => legalIntents(state, t.ctx).flatMap((intent) => (intent.type === "Trigger" ? [intent.effectId] : []));
+    const run = send(start(t.state), { type: "Commit", cardIds: [turayn] }, t.ctx);
+    expect(run.state.cards[turayn]).toMatchObject({ exhausted: true, committed: true });
+    expect(offered(run.state)).toEqual(["12166:response:1"]);
+    const used = send(run, { type: "Trigger", cardId: turayn, effectId: "12166:response:1" }, t.ctx);
+    const chosen = used.state.window?.kind === "choose" ? send(used, { type: "Choose", optionId: t.hero }, t.ctx) : used;
+    expect(chosen.state.modifiers.some((modifier) => modifier.stat === "damageShield" && modifier.instanceId === t.hero)).toBe(true);
+    // A card that is already exhausted does not exhaust again.
+    const tired = { ...t.state, cards: { ...t.state.cards, [turayn]: { ...t.state.cards[turayn]!, exhausted: true } } };
+    expect(offered(send(start(tired), { type: "Commit", cardIds: [t.hero] }, t.ctx).state)).toEqual([]);
   });
 
   it("does not cancel damage dealt to the card that was not chosen, and the shield ends with the round", () => {

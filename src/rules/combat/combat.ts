@@ -9,9 +9,10 @@ import { hasKeyword, modifiedStat, placeDamage } from "../core/keywords.ts";
 import { heldAmountByClass } from "../core/holder-classes.ts";
 import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../core/state.ts";
-import { flagged, heldAmount, livingSeats, updateCard } from "../core/state.ts";
+import { flagged, heldAmount, livingSeats } from "../core/state.ts";
 import { dealOneShadow, type ReduceContext } from "../interpret/interpret.ts";
 import { queueEvent } from "../windows/queue.ts";
+import { exhaustAnnounced } from "../windows/exhaust.ts";
 import { resolveAttack } from "./shadow.ts";
 import { engagementCostOf } from "../quest/quest.ts";
 import { enemyAttackWindow, playerAttackWindow } from "../engine/step-window.ts";
@@ -24,9 +25,11 @@ import { markDefender, moreDefenders, staysReadyToDefend } from "../families/def
 import { holdAttack, queueHeard } from "../families/defense/listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/attack/flow.ts";
 import { flightAttackBarred } from "../families/attack/flight.ts";
-import { countsDefense, struck } from "../families/attack/strike.ts";
-import { attackHere, dealForAttack, engagedWithAll, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
+import { countsDefense, rangedAttack, struck } from "../families/attack/strike.ts";
+import { attackStatAgainst } from "../families/attack/spectral.ts";
+import { attackHere, dealForAttack, engagedWithAll, engagedWithThreatening, noteBelowThreat, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
+import { barredFromDreadnaught } from "../families/sea/dreadnaught.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -93,7 +96,7 @@ export function characters(state: ScenarioState, seat: number, cards: Cards): st
 // Each seat's enemies in player order, the highest engagement cost first (rr.step-6-2). Equal costs keep the order
 // they engaged in.
 export function dealShadows(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  let next = state;
+  let next = noteBelowThreat(state);
   for (const seat of livingSeats(next)) {
     const cost = (id: string) => {
       const instance = next.cards[id];
@@ -137,7 +140,7 @@ export function beginEnemyAttack(
   if (!attacker || !here || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
   // An attack an effect makes from the staging area was dealt its shadow card already (attackFromStaging).
-  const dealt = shadow && (engagedWithAll(state, enemyId) || (viaRelay(state, enemyId) && !fromStaging)) ? dealForAttack(state, enemyId, steps, ctx) : state;
+  const dealt = shadow && (engagedWithAll(state, enemyId) || (viaRelay(state, enemyId) && !fromStaging)) ? dealForAttack(state, enemyId, steps, ctx, seat) : state;
   const declared: ScenarioState = { ...dealt, pendingAttack: { enemyId, seat, ...(fromStaging ? { fromStaging: true } : {}) }, activeSeat: seat, window: null };
   const fired = fireForced(declared, { trigger: "attacks", seat, cardId: enemyId }, ctx, steps);
   if (fired.stack.length > declared.stack.length && fired.pendingAttack) {
@@ -183,6 +186,8 @@ export function canDefend(state: ScenarioState, attackedSeat: number, defenderId
   const printed = printedOf(cards, instance.code);
   if (!isCharacterType(printed) || instance.host != null) return false;
   if (flagged(state, defenderId, "cannotDefend")) return false;
+  // A character that cannot exhaust (Shadow of Fear, 03027:A:1) defends only where it stays ready.
+  if (flagged(state, defenderId, "cannotExhaust") && !flagged(state, defenderId, "noExhaustDefend")) return false;
   // A ship-enemy's attack is defended only by a ship-objective, and a ship-objective defends only against one (dcce.ship-enemies).
   if (familyDefenseReason(state, printed, cards, defenderId)) return false;
   if (instance.controller === attackedSeat) return true;
@@ -200,7 +205,7 @@ export function applyDefense(
   // A character with "does not exhaust to defend" stays ready (rr.exhausted). Its declaration is announced ("After ~ is
   // declared as a defender").
   const ready = staysReadyToDefend(state, defenderId, ctx);
-  const declaredState = ready ? state : updateCard(state, defenderId, { exhausted: true });
+  const declaredState = ready ? state : exhaustAnnounced(state, defenderId, ctx);
   const exhausted: ScenarioState = markDefender(
     {
       ...queueEvent(declaredState, { trigger: "declaredDefender", seat: attack.seat, cardId: defenderId, other: attack.enemyId }),
@@ -215,7 +220,7 @@ export function applyDefense(
   if (more) return more;
   // 6.4.1: the defender is declared; an action window comes before the shadow card is turned up. The Responses to the
   // declaration ("After ~ is declared as a defender") come before the shadow card too.
-  return enemyAttackWindow(exhausted, ctx, "shadow") ?? holdAttack(exhausted, ctx, "shadow", ["declaredDefender"]) ?? resolveAttack(exhausted, ctx, steps);
+  return enemyAttackWindow(exhausted, ctx, "shadow") ?? holdAttack(exhausted, ctx, "shadow", ["declaredDefender", "exhausted"]) ?? resolveAttack(exhausted, ctx, steps);
 }
 
 export function applyUndefended(
@@ -248,6 +253,8 @@ export function canAttack(
   if (attacker.zone !== "heroes" && attacker.zone !== "play") return false;
   const printed = printedOf(cards, attacker.code);
   if (!isCharacterType(printed) || attacker.host != null) return false;
+  // A character that cannot exhaust (Shadow of Fear, 03027:A:1) attacks only where it stays ready.
+  if (flagged(state, attackerId, "cannotExhaust") && !flagged(state, attackerId, "noExhaustAttack")) return false;
   // A ship-objective attacks only ship-enemies (dcce.ship-objectives), and only Ship objectives can be declared as attackers against Raider Flagship (12124:A:3).
   if (familyAttackReason(state, enemyId, printed, printedOf(cards, enemy.code), attackerId)) return false;
   // "Only Eagle characters or characters with ranged can attack ... Mirkwood Flock" (02070:A:1), "cannot be attacked by characters with the ranged keyword" (900606:A:2).
@@ -255,6 +262,8 @@ export function canAttack(
   // "Ship enemies ... cannot be attacked" (11024:A:1), "characters you control cannot attack Ship enemies" (11063:A:1).
   if (flagged(state, enemyId, "cannotBeAttacked") || attackerLimitReached(state, enemyId)) return false;
   if (printedOf(cards, enemy.code).ship === "enemy" && flagged(state, attackerId, "cannotAttackShips")) return false;
+  // "Engaged player cannot attack the Dreadnaught" (40014:A:2).
+  if (barredFromDreadnaught(state, attackerId, enemyId, cards)) return false;
   // "You cannot attack ... enemies with a title other than Marshland Outlaws" (attackOnlyTitle, 900202:A:1).
   if (titleBarred(state, attacker.controller, enemyId, cards)) return false;
   // An enemy in the staging area that is considered engaged with the first player (the Balrog, 142044:A:2): only the first player declares
@@ -263,6 +272,18 @@ export function canAttack(
     if (flagged(state, attackerId, "cannotAttack") || seat !== state.firstPlayer) return false;
     return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
   }
+  // The Dreadnaught (Massive): in the staging area but engaged with every player, so each player attacks it with their own characters, and ranged characters of the others join (rr.ranged).
+  if (enemy.zone === "staging" && flagged(state, enemyId, "attackableEngagedWithAll")) {
+    if (flagged(state, attackerId, "cannotAttack") || state.phase !== "Combat") return false;
+    return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
+  }
+  // An enemy in the staging area that is considered engaged with each player whose threat is 1 or greater (Durin's Bane, 04150:A:2): such a player declares attackers against it, with their own characters and ranged characters of the others (rr.ranged).
+  if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithThreatening")) {
+    if (flagged(state, attackerId, "cannotAttack") || !engagedWithThreatening(state, enemyId, seat)) return false;
+    return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
+  }
+  // Goblin Archer (03032:A:2): in the staging area it is attacked by characters with ranged, of any player, in the combat phase.
+  if (enemy.zone === "staging" && flagged(state, enemyId, "attackableByRanged")) return !flagged(state, attackerId, "cannotAttack") && state.phase === "Combat" && hasKeyword(state, attackerId, "ranged", cards);
   // An enemy any character may choose as the target of an attack (attackableByAny) may be in the staging area; others there
   // only when a card lets the character attack it (families/attack/targets.ts).
   const open = flagged(state, enemyId, "attackableByAny");
@@ -324,7 +345,7 @@ export function applyPlayerAttack(
   let next: ScenarioState = { ...state, declaredAttacks: extra ? state.declaredAttacks : [...state.declaredAttacks, `${seat}:${enemyId}`], window: null };
   for (const attackerId of attackerIds) {
     if (!next.cards[attackerId]) continue;
-    if (!flagged(next, attackerId, "noExhaustAttack")) next = updateCard(next, attackerId, { exhausted: true });
+    if (!flagged(next, attackerId, "noExhaustAttack")) next = exhaustAnnounced(next, attackerId, ctx);
     next = queueEvent(next, { trigger: "declaredAttacker", seat, cardId: attackerId, other: enemyId });
   }
   const declared: ScenarioState = announceEnemyAttacked(declareStrike(next, { seat, enemyId, attackerIds: [...attackerIds], ...backAfter(state.window, enemyId) }), seat, enemyId, attackerIds, ctx);
@@ -362,25 +383,33 @@ export function strikeEnemy(
   const enemy = state.cards[enemyId];
   if (!enemy) return state;
   const next = state;
-  const attack = attackStrength(next, attackerIds, enemyId, ctx.cards);
+  // 6.8.2: the characters currently attacking. One that left play after it was declared (Beechbone pays his own last damage,
+  // 10118:A:2) adds nothing and takes no part in the attack's damage or its events.
+  const attacking = attackerIds.filter((id) => inPlay(state.cards[id]?.zone ?? "removed"));
+  const attack = attackStrength(next, attacking, enemyId, ctx.cards);
   // An attacker may say the enemy does not count its Defense (families/attack/strike.ts).
-  const defense = countsDefense(next, attackerIds) ? modifiedStat(next, enemy, "defense", ctx.cards) : 0;
-  steps.push({ kind: "attack", side: "player", seat, enemyId, attackerIds: [...attackerIds] });
+  const defense = countsDefense(next, attacking) ? modifiedStat(next, enemy, "defense", ctx.cards) : 0;
+  steps.push({ kind: "attack", side: "player", seat, enemyId, attackerIds: [...attacking] });
   const enemyNow = next.cards[enemyId];
   if (!enemyNow) return next;
   steps.push({ kind: "strike", side: "player", enemyId, targetId: enemyId, attack, defense, undefended: false, cause: ruleCause("rr.step-6-8-3") });
   const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
   // Each attacker hears that the attack damaged or destroyed the enemy ("After Merry participates in an attack that destroys
   // an enemy"), and excess damage goes where a card sends it (families/attack/strike.ts).
-  return struck(next, damaged, seat, enemyId, attackerIds, Math.max(0, attack - defense), ctx, steps);
+  return struck(next, damaged, seat, enemyId, attacking, Math.max(0, attack - defense), ctx, steps);
 }
 
 // The attack strength of characters attacking one enemy (rr.step-6-8-2): each attacker's attack, read against that enemy.
 export function attackStrength(state: ScenarioState, attackerIds: readonly string[], enemyId: string, cards: Cards): number {
   let attack = 0;
+  // "Immune to ranged damage" (Great Cave-troll, 03042:A:1; dwd.immune-to-ranged-damage): a character that takes part through the ranged keyword deals it no damage, a ranged character that attacks it another way does.
+  const strike = flagged(state, enemyId, "immuneToRangedDamage") && state.pendingStrike?.enemyId === enemyId ? state.pendingStrike : undefined;
+  // Against a Spectral enemy a character's Willpower is its attack strength (families/attack/spectral.ts).
+  const stat = attackStatAgainst(state, enemyId, cards);
   for (const attackerId of attackerIds) {
     const attacker = state.cards[attackerId];
-    if (attacker) attack += modifiedStat(state, attacker, "attack", cards, enemyId);
+    if (attacker && strike && rangedAttack(strike, attacker)) continue;
+    if (attacker) attack += modifiedStat(state, attacker, stat, cards, enemyId);
   }
   return attack;
 }

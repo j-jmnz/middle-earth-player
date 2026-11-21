@@ -115,6 +115,8 @@ function words(step: EngineStep, names: LogNames): string | null {
       return `${names.card(step.cardId)} commits to the escape test`;
     case "escapeTest":
       return `${escapeResultTitle(step.success, step.seat, true)}: ${escapeCountedWords(step.stat ?? "willpower", step.committed, step.escape)}`;
+    case "locateTest":
+      return `${step.success ? "Locate test passed" : "Locate test failed"}: ${plural(step.handIds.length, "card")} discarded from the hand, ${plural(step.dealtIds.length, "encounter card")} discarded`;
     case "fortitudeTest":
       return `Fortitude test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against ${plural(step.eyes, "Sauron's Eye icon")}`;
     case "hideTest":
@@ -128,7 +130,7 @@ function words(step: EngineStep, names: LogNames): string | null {
     case "attack":
       return step.side === "enemy" ? `${names.card(step.enemyId)} attacks ${player(step.seat)}` : `${player(step.seat)} attacks ${names.card(step.enemyId)}`;
     case "cancel":
-      return `${names.card(step.cardId)} is canceled`;
+      return step.by ? `${names.card(step.by)}: ${names.card(step.cardId)} is canceled and discarded` : `${names.card(step.cardId)} is canceled`;
     // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple).
     case "grapple":
       return grappleLine(names.card(step.enemyId), names.card(step.locationId));

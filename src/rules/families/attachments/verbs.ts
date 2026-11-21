@@ -13,8 +13,9 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { destroyCard } from "../../core/keywords.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { exhaustAnnounced } from "../../windows/exhaust.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { flagged, inPlay, updateCard } from "../../core/state.ts";
+import { flagged, inPlay } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { openStrike } from "../attack/index.ts";
 import { healBlocked } from "../burden/life.ts";
@@ -44,7 +45,7 @@ export function healAmong(state: ScenarioState, instruction: Extract<Instruction
   const card = state.cards[chosen];
   if (!card) return state;
   const healedBy = healDamage(state, chosen, 1, ctx, { sourceId: focus.sourceId });
-  const healedOne = queueEvent(healedBy.state, { trigger: "healed", seat: card.controller, cardId: chosen, ...(focus.sourceId && focus.sourceId !== chosen ? { other: focus.sourceId } : {}), ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
+  const healedOne = queueEvent(healedBy.state, { trigger: "healed", seat: card.controller, cardId: chosen, ...(focus.sourceId ? { other: focus.sourceId } : {}), ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
   // An attachment that cut the heal to 1 (Noxious Supplies) is discarded after it, and this effect heals that card no more: "the amount of damage healed is reduced to 1" holds for the whole effect.
   const reduced = healedBy.reducer ? destroyCard(healedOne, healedBy.reducer, ctx.cards, steps) : healedOne;
   return again(reduced, { ...instruction, healed: healed + 1, ...(healedBy.reducer ? { capped: [...capped, chosen] } : {}) }, focus.seat);
@@ -73,7 +74,7 @@ export function declareAttack(state: ScenarioState, instruction: Extract<Instruc
   if (chosen.length === 0) return state;
   let next = state;
   for (const id of chosen) {
-    if (!flagged(next, id, "noExhaustAttack")) next = updateCard(next, id, { exhausted: true });
+    if (!flagged(next, id, "noExhaustAttack")) next = exhaustAnnounced(next, id, ctx);
     next = queueEvent(next, { trigger: "declaredAttacker", seat: focus.seat, cardId: id, other: enemyId });
   }
   return openStrike(next, focus.seat, enemyId, chosen, topFrame(next)?.id, ctx, steps);

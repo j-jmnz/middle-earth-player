@@ -12,7 +12,8 @@ const VERBS = [
   // The source (a treachery being revealed) attaches to the current quest card ("When Revealed: Attach to the current quest", 906107:A:2).
   // It leaves play with that stage, which discards it (rr.attachment-cards). With no quest card in play it stays where it is and goes to the
   // encounter discard pile as a revealed treachery does.
-  z.strictObject({ verb: z.literal("AttachToQuest"), ...when }),
+  // `main`: the main quest card, never a side quest that is the current quest ("Attach to the main quest", mec108.side-quests, 51023:A:2).
+  z.strictObject({ verb: z.literal("AttachToQuest"), main: z.literal(true).optional(), ...when }),
   // The card with this code's printed title is searched for in the encounter deck, then its discard pile, then the victory display, and the
   // first copy found is added to the staging area ("searches the encounter deck, discard pile, and victory display for Khamûl the Easterling and
   // adds it to the staging area", 906101:A:2; rr.search). It is not revealed. Nothing happens when no copy is in those places. The deck is
@@ -98,6 +99,8 @@ const VERBS = [
   // Brambles and Thorns this round", 900704:A:1). When damage is dealt (the card's damage grew: a shield or cap that prevented it all leaves it undealt) the card is marked for the round by that title (the flag `damagedByTitle`), so each copy that resolves
   // afterwards finds it marked. Read by nightmare/damage-once.ts.
   z.strictObject({ verb: z.literal("DamageOncePerRound"), amount: z.number().int().positive(), target: cardRefSchema.optional(), ...when }),
+  // "Each player must also discard allies he controls until the total printed cost of allies he controls is 6 or less" (901701:A:2): the actor chooses and discards one ally he controls at a time (a card with no printed cost counting 0) until the allies he controls cost `cost` or less in all.
+  z.strictObject({ verb: z.literal("DiscardAlliesToCost"), cost: z.number().int().min(0), ...when }),
 ] as const;
 
 const TRIGGERS = [

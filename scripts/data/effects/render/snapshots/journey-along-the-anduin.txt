@@ -231,15 +231,15 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01130:A:3 (front): Response: After a Hill Troll is defeated, each player attaches 1 set-aside copy of Valor to a hero they control, if able.
   01130:response:1: Response after an enemy is destroyed (heard about enemy (any player controls) named "Hill Troll")
     - for each player, first player first:
-      - choose hero (you control) [also {"attachable":"01133"}]
-      - [json AttachSetAside {"verb":"AttachSetAside","code":"01133"}]
+      - choose hero (you control) that the card with code 01133 can be attached to
+      - the set-aside copy of the card with code 01133 is attached to the last picked hero
 
 01130:A:4 (front): Forced: After a character is destroyed by a Hill Troll, each player attaches 1 set-aside copy of Scarred to a hero they control. (Limit once per game.)
   01130:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls); limit once per game)
     only if the event's other card is a enemy (any player controls) named "Hill Troll"
     - for each player, first player first:
-      - choose hero (you control) [also {"attachable":"01138"}]
-      - [json AttachSetAside {"verb":"AttachSetAside","code":"01138"}]
+      - choose hero (you control) that the card with code 01138 can be attached to
+      - the set-aside copy of the card with code 01138 is attached to the last picked hero
 
 01130:A:5 (front): If Mendor leaves play, the players lose the game.
   01130:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about card (any player controls) named "Mendor")
@@ -251,4 +251,4 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
     - each copy of code 01133 and code 01138 attached to a hero in play joins the Campaign Pool attached to that hero
     - [json NamePrisoner {"verb":"NamePrisoner"}]
 
-(rendered pieces: 131 by template, 11 as JSON)
+(rendered pieces: 135 by template, 7 as JSON)

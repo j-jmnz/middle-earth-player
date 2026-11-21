@@ -27,6 +27,7 @@ import { cancelsReveal } from "../encounter/cancel.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { engageOutOfPlay, moveResourceFromHeroes, placeResourceTokens, returnToStage, takeHeroPrisoner, takeMorePrisoners } from "./dungeon.ts";
+import { discardAlliesToCost } from "./allies.ts";
 import { damageOncePerRound } from "./damage-once.ts";
 import { listenerInPlay } from "./guards.ts";
 import { seatThreat } from "../play/hooks.ts";
@@ -41,7 +42,9 @@ import { currentQuestId } from "../wilderland/night-quest.ts";
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "AttachToQuest":
-      return attachToQuest(state, focus);
+      return attachToQuest(state, focus, instruction.main === true);
+    case "DiscardAlliesToCost":
+      return discardAlliesToCost(state, instruction, focus, ctx, steps);
     case "DamageOncePerRound":
       return damageOncePerRound(state, instruction, focus, ctx, steps);
     case "SearchToStaging":
@@ -103,9 +106,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 // The source treachery goes onto the current quest card, faceup: the side quest that is the current quest now (09054:A:1; mec108.side-quests-in-play), else the main quest card. It is discarded with that stage when the quest advances (quest.ts
 // advanceStage releases a defeated stage's attachments, rr.attachment-cards).
-function attachToQuest(state: ScenarioState, focus: Focus): ScenarioState {
+function attachToQuest(state: ScenarioState, focus: Focus, main: boolean): ScenarioState {
   const source = focus.sourceId;
-  const quest = currentQuestId(state);
+  const quest = main ? state.questStage : currentQuestId(state);
   if (!source || !quest || !state.cards[source] || !state.cards[quest]) return state;
   return updateCard(attachTo(moveCard(state, source, { zone: "attached" }), source, quest), source, { face: "up", controller: null });
 }
@@ -320,4 +323,4 @@ function pickMost(
   return markPicked(state, chosen ?? "");
 }
 
-export const manifest: RulesFamily = { name: "nightmare", verbs: ["AttachToQuest", "SearchToStaging", "AttackActor", "AttachToDamagedDefender", "NotCanceledBy", "SetAsideFromDeck", "EngageSetAside", "PickLowestEngagement", "PickHighestThreat", "PickDiscardTop", "DealShadowFromDiscard", "EngageSeatWith", "PickMostHitPoints", "AttackOthersUndefended", "RemoveEnemyDamage", "MoveDamageTo", "TakeMorePrisoners", "TakeHeroPrisoner", "ReturnToStage", "EngageOutOfPlay", "MoveResourceFromHeroes", "PlaceResourceTokens", "DamageOncePerRound"], run };
+export const manifest: RulesFamily = { name: "nightmare", verbs: ["DiscardAlliesToCost", "AttachToQuest", "SearchToStaging", "AttackActor", "AttachToDamagedDefender", "NotCanceledBy", "SetAsideFromDeck", "EngageSetAside", "PickLowestEngagement", "PickHighestThreat", "PickDiscardTop", "DealShadowFromDiscard", "EngageSeatWith", "PickMostHitPoints", "AttackOthersUndefended", "RemoveEnemyDamage", "MoveDamageTo", "TakeMorePrisoners", "TakeHeroPrisoner", "ReturnToStage", "EngageOutOfPlay", "MoveResourceFromHeroes", "PlaceResourceTokens", "DamageOncePerRound"], run };

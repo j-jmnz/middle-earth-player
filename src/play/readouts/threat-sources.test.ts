@@ -38,6 +38,9 @@ describe("threat source words", () => {
     expect(threatSourceWords("Enemy", 2, "engaged")).toBe("Enemy · Engaged · 2 Threat");
     expect(threatSourceWords(null, 1, "active")).toBe("Active location · 1 Threat");
     expect(threatSourceSaid("Enemy", 2, "engaged")).toBe("Enemy, engaged, 2 threat");
+    expect(threatSourceWords("Location", 2, "elsewhere", 1)).toBe("Location · In Player 2's staging area · 2 Threat");
+    expect(threatSourceSaid("Location", 2, "elsewhere", 1)).toBe("Location, in player 2's staging area, 2 threat");
+    expect(threatSourceWords("Location", 2, "elsewhere")).toBe("Location · In another area · 2 Threat");
   });
 
   it("says what held effects add or take, and nothing when they change nothing", () => {

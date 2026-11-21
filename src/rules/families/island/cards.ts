@@ -76,7 +76,8 @@ export function flipSecret(state: ScenarioState, focus: Focus, ctx: ReduceContex
   steps.push({ kind: "reveal", seat: focus.seat, cardId: id, cause: currentCause(steps, UNATTRIBUTED) });
   const shown = updateCard(state, id, { face: "up" });
   if (printedOf(ctx.cards, card.code).type === "enemy") return engageWith(shown, focus.seat, id, steps);
-  return updateCard(moveCard(shown, id, { zone: "play", seat: focus.seat }), id, { face: "up", exhausted: false });
+  // The ally enters play, and the cards that hear an ally enter play hear it (Galadriel, 08112:A:1).
+  return queueEvent(updateCard(moveCard(shown, id, { zone: "play", seat: focus.seat }), id, { face: "up", exhausted: false }), { trigger: "enteredPlay", seat: focus.seat, cardId: id });
 }
 
 /** LookAtSecret: the actor sees the picked secret; it stays facedown (110078:B:3). */

@@ -35,7 +35,10 @@ const VERBS = [
   verbFlags(z.strictObject({ verb: z.literal("SetAsideEachPlayer"), code, ...when }), { setupRole: "dealt" }),
   // The last picked hero gets a set-aside copy of the card attached to it ("each player attaches 1 set-aside copy of Valor to a hero they
   // control, if able", 01130:A:3). With no set-aside copy left, or no hero picked, nothing happens. The `attached` event is announced.
-  verbFlags(z.strictObject({ verb: z.literal("AttachSetAside"), code, ...when }), { setupRuns: "top" }),
+  // `removeWhenLeaving`: the card leaves the game when it would leave play, not the discard pile ("If Cave Torch would leave play, then it is removed from the game", dwd.cave-torch-the-long-dark: the
+  // Into the Pit Setup carries it; the card keeps the `temporary` mark the engine reads in core/zones.ts and core/keywords.ts defeatedDestination).
+  // `claimed`: an objective card is attached as a claim attaches it, controlled by the hero's controller, and returns to the staging area when it is detached ("have the first player attach it to a hero of his choice", Book of Mazarbul, 03067:A:1; dwd.book-of-mazarbul).
+  verbFlags(z.strictObject({ verb: z.literal("AttachSetAside"), code, removeWhenLeaving: z.literal(true).optional(), claimed: z.literal(true).optional(), ...when }), { setupRuns: "top" }),
   // Resolution: each copy of these cards attached to a hero in play joins the Campaign Pool attached to that hero ("Add each copy of
   // Valor and Scarred in play to the Campaign Pool. Record the names of heroes with Valor and/or Scarred attached ... and attach them
   // to those heroes when setting up each subsequent scenario", 01130:B:1). A hero that fell takes its copies out of the pool (campaign/log.ts).

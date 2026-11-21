@@ -35,6 +35,11 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
     expect(notes.indexOf("Before you update")).toBeLessThan(notes.indexOf("## New"));
   });
 
+  it("adds the issues each change closes and refers to (.claude/rules/release-standards.md, Release notes)", () => {
+    const notes = renderNotes({ ...base, changes: [parseCommit("fix: Make Hasty Stroke cancel the shadow effect (#105)", "Settles #99\nRefs #94")] });
+    expect(notes).toContain("## Fixes\n\n- Make Hasty Stroke cancel the shadow effect (#105) · closes #99 · see #94\n");
+  });
+
   it("lists a subject from before the commit standards under Project", () => {
     expect(renderNotes({ ...base, changes: [parseCommit("Add open-source community files", "")] })).toContain("## Project (docs, tests, tooling, data refreshes)\n\n- Add open-source community files\n");
   });

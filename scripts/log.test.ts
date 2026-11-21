@@ -1,3 +1,6 @@
+import { spawnSync } from "node:child_process";
+import path from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { recordChanges, type SourceRecord } from "./data/sources/fetch.ts";
@@ -20,6 +23,17 @@ describe("script logs", () => {
     expect(describeError(error)).toBe("GET https://ringsdb.com/api/public/packs/ failed after 1.2 s\n  caused by: fetch failed\n  caused by: read ECONNRESET");
     expect(describeError(Object.assign(new Error("connect refused"), { code: "ECONNREFUSED" }))).toBe("connect refused (ECONNREFUSED)");
     expect(describeError("plain")).toBe("plain");
+  });
+});
+
+describe("log levels", () => {
+  it("keep a notice and drop info under --quiet", () => {
+    const script = `import { createLog } from ${JSON.stringify(path.join(import.meta.dirname, "log.ts"))}; const log = createLog("t"); log.info("an info line"); log.notice("a notice line"); log.warn("a warning line");`;
+    const run = spawnSync(process.execPath, ["--input-type=module", "-e", script, "--", "--quiet"], { encoding: "utf8", env: { ...process.env, VITEST: "", LOG_LEVEL: "", NO_COLOR: "1" } });
+    expect(run.stderr).toContain("a notice line");
+    expect(run.stderr).toContain("warning a warning line");
+    expect(run.stderr).not.toContain("an info line");
+    expect(run.stderr).not.toMatch(/warning a notice line/);
   });
 });
 

@@ -120,6 +120,29 @@ describe("pack scans", () => {
     expect(map).not.toContain("99999");
   });
 
+  it("reads a pin the cache misses from the mirror before its URL, and fetches the URL on a mirror miss", async () => {
+    const staged = stage();
+    const fetched: string[] = [];
+    const asked: string[] = [];
+    await packScans(
+      {
+        ...staged.options,
+        mirror: (hash) => {
+          asked.push(hash);
+          return Promise.resolve(hash === sha256(jpeg(560)) ? new Uint8Array(jpeg(560)) : null);
+        },
+        fetch: (url) => {
+          fetched.push(url);
+          return Promise.resolve(new Uint8Array(jpeg(560)));
+        },
+      },
+      log,
+    );
+    expect(asked).toEqual([sha256(jpeg(560))]);
+    expect(fetched).toEqual([]);
+    expect(readFileSync(path.join(staged.cache, "141022.A.jpg"))).toEqual(jpeg(560));
+  });
+
   it("keeps a picture packed from the same pin, and packs one again when its pin moves", async () => {
     const staged = stage();
     const fetch = () => Promise.resolve(new Uint8Array(jpeg(560)));
@@ -285,6 +308,9 @@ describe("pack scans", () => {
     expect(await darkTop(await shrinkToMaxSide(upright, "player-side-quest"))).toBe(false);
     // A quest's side B is filed the other way up.
     expect(await darkTop(await shrinkToMaxSide(upright, "quest", "B"))).toBe(false);
+    // The Hunt for the Dreadnaught's quest stages are filed the other way up from other quests.
+    expect(await darkTop(await shrinkToMaxSide(upright, "quest", "A", "40004"))).toBe(false);
+    expect(await darkTop(await shrinkToMaxSide(upright, "quest", "B", "40005"))).toBe(true);
     const png = await shrinkToMaxSide(upright, "ally");
     expect(await sharp(Buffer.from(png)).metadata()).toMatchObject({ format: "jpeg", width: 700, height: 1000 });
   });

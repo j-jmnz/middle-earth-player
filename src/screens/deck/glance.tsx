@@ -1,6 +1,7 @@
 // The deck editor's head (docs/design-system.md, Deck builder): the fan of the heroes' cards, the deck's name, the
 // deck at a glance (the sphere donut and count, the cost curve), its notes and the jump chips to its headings, which carry the counts by type.
-import { Platform, View } from "react-native";
+import { useRouter } from "expo-router";
+import { Platform, Pressable, View } from "react-native";
 
 import { cardCorner } from "../../ui/card-corner";
 import { dropShadowOf } from "../../ui/surfaces";
@@ -8,7 +9,9 @@ import { withAlphaHex } from "../../ui/tokens";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { SPHERE_TINT } from "../../ui/icon-map";
 import { BodyText, Label, markedSphere, SphereMark, sphereWord, TextButton, useTitleShadow } from "../kit/chrome";
-import { CardThumb } from "../images/picture";
+import { CardThumb, useCardPreview } from "../images/picture";
+import { longPressA11y } from "../../ui/long-press-action";
+import type { PictureSource } from "../../play/canvas/table-canvas-types";
 import { ArcRing } from "../../ui/arc-ring";
 import { costCurve, CURVE_LABELS, deckCardCount, DECK_MINIMUM, sphereSplit, type DeckFace } from "./status";
 import { JumpChips, type Jump } from "./grid";
@@ -31,12 +34,40 @@ function finishName(): void {}
 const FAN_CARD = { width: 112, height: 156 };
 const FAN_CARD_WIDE = { width: 150, height: 209 };
 
+// The large card preview the editor shows on a long press: the card's code, name and picture.
+type FanPreview = (code: string, name: string, source: PictureSource | null) => void;
+
+/** One hero card in the fan, a button: a tap opens the card, a long press shows it large, as the hero cards in the list below do. */
+function FanCard({ hero, width, height, onPreview }: { hero: HeroFace; width: number; height: number; onPreview: FanPreview }) {
+  const router = useRouter();
+  const picture = useCardPreview(hero.code, hero.imagesrc);
+  return (
+    <Pressable
+      testID={`fan-hero-${hero.code}`}
+      collapsable={false}
+      accessibilityRole="button"
+      accessibilityLabel={hero.name}
+      {...longPressA11y("Show card", () => onPreview(hero.code, hero.name, picture))}
+      accessibilityHint="Opens the card. Hold to show it large"
+      onPress={() => router.push({ pathname: "/card/[code]", params: { code: hero.code } })}
+      onLongPress={() => onPreview(hero.code, hero.name, picture)}
+      delayLongPress={350}
+    >
+      {({ pressed }) => (
+        <View style={{ opacity: pressed ? 0.8 : 1 }}>
+          <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={width} height={height} />
+        </View>
+      )}
+    </Pressable>
+  );
+}
+
 /**
  * The deck's heroes as a fan of their cards: the outer two turned 9° out and set back, the middle one raised and on top, a glow of the
- * fellowship's sphere behind them. Four heroes (a Fellowship deck) spread a little wider. A drawing of the heroes; the list below holds
- * them as buttons.
+ * fellowship's sphere behind them. Four heroes (a Fellowship deck) spread a little wider. Each card opens on a tap and shows large on a
+ * long press, as the hero cards in the list below do.
  */
-export function HeroFan({ heroes, wide }: { heroes: readonly HeroFace[]; wide: boolean }) {
+export function HeroFan({ heroes, wide, onPreview }: { heroes: readonly HeroFace[]; wide: boolean; onPreview: FanPreview }) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
@@ -49,7 +80,7 @@ export function HeroFan({ heroes, wide }: { heroes: readonly HeroFace[]; wide: b
   const lead = shown[Math.floor(middle)] ?? shown[0];
   const glow = lead ? palette[(SPHERE_TINT[lead.sphereCode ?? ""] ?? "accent") as keyof typeof palette] : palette.accent;
   return (
-    <View accessible accessibilityLabel={`Heroes: ${heroes.map((hero) => hero.name).join(", ")}`} style={{ height: h + 24 * s, alignItems: "center", justifyContent: "center" }}>
+    <View style={{ height: h + 24 * s, alignItems: "center", justifyContent: "center" }}>
       <View pointerEvents="none" style={{ position: "absolute", width: w * 3.2, height: h * 1.3, backgroundImage: `radial-gradient(50% 50% at 50% 55%, ${withAlphaHex(glow, 0.32)}, ${withAlphaHex(glow, 0)})` }} />
       {shown.map((hero, index) => {
         const offset = index - middle;
@@ -69,7 +100,7 @@ export function HeroFan({ heroes, wide }: { heroes: readonly HeroFace[]; wide: b
               transform: [{ translateX: offset * w * spread }, { translateY: centre ? -8 * s : 6 * s }, { rotate: `${offset * 9}deg` }],
             }}
           >
-            <CardThumb code={hero.code} imagesrc={hero.imagesrc} width={w} height={h} />
+            <FanCard hero={hero} width={w} height={h} onPreview={onPreview} />
           </View>
         );
       })}
@@ -183,6 +214,7 @@ export function DeckGlance({
   top,
   side,
   wide = false,
+  onPreview,
 }: {
   heroes: readonly HeroFace[];
   cards: readonly { code: string; count: number }[];
@@ -206,6 +238,8 @@ export function DeckGlance({
   side: { paddingLeft: number; paddingRight: number };
   // The larger fan of a tablet.
   wide?: boolean;
+  // The editor's large card preview, opened by a long press on a hero in the fan.
+  onPreview: FanPreview;
 }) {
   const palette = usePalette();
   const s = useUiScale();
@@ -213,7 +247,7 @@ export function DeckGlance({
   return (
     <View style={{ paddingTop: top + 56 * s }}>
       <View style={side}>
-        {heroes.length > 0 ? <HeroFan heroes={heroes} wide={wide} /> : null}
+        {heroes.length > 0 ? <HeroFan heroes={heroes} wide={wide} onPreview={onPreview} /> : null}
         {/* A long name wraps and the field grows with it, so the threat below never sits under the name's words. Return still finishes
             the name (no new line), and a pasted line break becomes a space. */}
         <TextInput

@@ -41,7 +41,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("EngageSelfWithPicked"), ...when }),
   // The seat whose stage the source is, when its own stage has no captured cards, joins another player: its staging cards move to that player's area, its active location is discarded, its stage leaves play and it shares that player's area and stage from then on; when no other
   // area exists every player advances together to the stage with this code, and the staging areas become the one shared area ("join another player ... If you cannot join another player, all players advance to stage 3A together", 10039:B:2; mec108.joining-another-player).
-  z.strictObject({ verb: z.literal("JoinAnotherPlayer"), advanceTo: code, ...when }),
+  // `holdsStage`: the stage with this Forced effect is complete at its quest points but does not advance by the ordinary rule: only this effect moves the players on ("After the 11th progress token is placed on Sheltered Rocks, join another player at the beginning of the travel phase", 04114:B:2).
+  z.strictObject({ verb: z.literal("JoinAnotherPlayer"), advanceTo: code, holdsStage: z.literal(true).optional(), ...when }),
   // After a hero enters play (campaign mode): each permanent boon set aside for that hero (SetAsideCapturedBoons) is attached to it, in the order they were set aside ("attach to that hero each set-aside permanent boon attachment assigned to that character in the Campaign Log", 10174:B:2).
   z.strictObject({ verb: z.literal("AttachHeroBoons"), ...when }),
   // Resolution (10174:B:3): for each player, the unique cards still in their captured deck are recorded in the Campaign Log's stolen cards; the campaign refuses them in that player's deck for the rest of the campaign (a recorded hero is not refused, rr.deckbuilding).

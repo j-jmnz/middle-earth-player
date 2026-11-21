@@ -192,7 +192,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
   142051:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true,"require":"142045"}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); while the card with code 142045 is there to be found, the search must take it (the first search of the effect that can) [also {"different":true}]
     - shuffle the encounter deck
 
 ## 142052 Mines of Moria
@@ -326,7 +326,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142086:A:2 (front): When Revealed: Each enemy engaged with a player, and not in the staging area, makes an immediate attack.
   142086:whenRevealed:1: When revealed
-    - [json ImmediateAttackEach {"verb":"ImmediateAttackEach"}]
+    - each enemy engaged with a player makes an immediate attack, each dealt a shadow card of its own
 
 142086:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   142086:shadow:1: Shadow
@@ -345,7 +345,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
   142087:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
-  142087:forced:2: Forced on the event characterDestroyed (heard about character (any player controls) [also {"controlledBy":"host"}])
+  142087:forced:2: Forced on the event characterDestroyed (heard about character (any player controls) controlled by the player who controls this card's host)
     only if not (this card is in the staging area)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust its host
@@ -367,4 +367,4 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     only if not (this card is in the staging area)
     - deal 1 damage to its host
 
-(rendered pieces: 196 by template, 12 as JSON)
+(rendered pieces: 198 by template, 10 as JSON)

@@ -327,7 +327,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
           heading={headingDial} island={island}
           onIsland={() => setReading({ kind: "island" })}
           onNightmare={nightmareId ? () => onPreview(nightmareId) : null}
-          rail={rail}
+          onDial={onPreview} onDialPile={onPile} onDialReading={(id) => setReading({ kind: "dial", id })} rail={rail}
           stopAhead={stopAhead} carouselOpen={carouselOpen}
           narrow={narrow} areas={game.separate === true}
           ticks={ticks}
@@ -400,7 +400,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
               guide={choice.guide}
               trayOpen={choice.panelOpen}
               count={trayCount(choice.sheet, choice.choice)}
-              tray={<ChoiceTray open={choice.panelOpen} sheet={choice.sheet} choice={choice.choice} picture={pictureOf} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} onStep={choice.onStep} />}
+              tray={<ChoiceTray open={choice.panelOpen} sheet={choice.sheet} choice={choice.choice} refusedRows={choice.refusedRows} picture={pictureOf} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} onStep={choice.onStep} />}
               onTop={setAnchor}
               onHeight={(height, hasNumbers) => {
                 setDockHeight(height);

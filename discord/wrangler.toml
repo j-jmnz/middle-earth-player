@@ -1,0 +1,13 @@
+# The Discord issue bot's Worker (docs/discord-issues.md). Deploy from this folder: npx wrangler deploy.
+# Secrets (wrangler secret put): DISCORD_PUBLIC_KEY, DISCORD_APPLICATION_ID, DISCORD_BOT_TOKEN, GITHUB_TOKEN,
+# GITHUB_WEBHOOK_SECRET; optional: RELEASES_CHANNEL_ID, RELEASES_ROLE_ID.
+name = "middle-earth-issues"
+main = "worker.ts"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[vars]
+GITHUB_REPO = "j-jmnz/middle-earth-player"
+
+[observability]
+enabled = true

@@ -152,6 +152,14 @@ describe("Hasty Stroke (01048:A:1)", () => {
     expect(run.state.pendingAttack).toBeNull();
   });
 
+  it("turns the shadow card face up before the response is offered, so the player sees the effect it would cancel", () => {
+    const tab = scene();
+    const run = defended(tab);
+    expect(run.state.window).toEqual({ kind: "response", seat: 0 });
+    const shadowId = run.state.cards[idsOf(tab, RIDER)]?.shadowId ?? "";
+    expect(run.state.cards[shadowId]?.face).toBe("up");
+  });
+
   it("lets the shadow effect resolve when the response is passed", () => {
     const tab = scene();
     let run = defended(tab);

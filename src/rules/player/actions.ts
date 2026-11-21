@@ -12,7 +12,7 @@ import { applyMulliganTrigger, mulliganTriggerReason } from "../families/deck/pl
 import { textBlank } from "../families/attachments/hold.ts";
 import { printedOf } from "../core/printed.ts";
 import { flagged, inPlay, type ScenarioState } from "../core/state.ts";
-import { payUsage, usable, usageReason } from "./usage.ts";
+import { hostLostToCost, payUsage, usable, usageReason } from "./usage.ts";
 import { announcePlayerAbility } from "../families/deck/pressure.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
@@ -32,10 +32,12 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
   if (textBlank(state, instance.id, ctx.cards)) return undefined;
   // A character that cannot trigger its effect cannot use its Actions (Sacked!, 02048:A:1).
   if (flagged(state, instance.id, "cannotTriggerEffects")) return undefined;
+  // A player held by a lasting effect ("players cannot trigger Action or Response effects", 148017:A:2) uses no Action, a shared card's included.
+  if (state.modifiers.length > 0 && flagged(state, `seat:${state.activeSeat}`, "cannotTriggerEffects")) return undefined;
   const effect = effectsOfCard(state, ctx, instance).find((entry) => entry.id === effectId && entry.timing === "action");
   // An objective, quest or location in play belongs to no player: any player may initiate its Action (rr.action).
-  // The campaign card next to the quest deck belongs to no player either, and its Action is any player's (11197:A:3, "Travel Action").
-  const shared = inPlay(instance.zone) && (SHARED_TYPES.has(printedOf(ctx.cards, instance.code).type) || instance.zone === "campaign");
+  // The campaign card next to the quest deck belongs to no player either, and its Action is any player's (11197:A:3, "Travel Action"); so is the Quest Action of a mode card (40002:B:1).
+  const shared = inPlay(instance.zone) && (SHARED_TYPES.has(printedOf(ctx.cards, instance.code).type) || instance.zone === "campaign" || instance.zone === "modeCard");
   // An Action used from the hand ("put ~ into play from your hand", effect.fromHand) is used there; any other in play.
   if (effect?.fromHand ? instance.zone !== "hand" : instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached" && !shared) return undefined;
   // Only the card's controller uses its Action, unless any player may (Éowyn's once a round each, "Any player may trigger").
@@ -101,6 +103,7 @@ export function applyTrigger(
       blockCancel: null,
       cause: effectCause(effect),
       resume: { window: state.window, seat },
+      ...hostLostToCost(state, paid, intent.cardId),
     },
     steps,
   );

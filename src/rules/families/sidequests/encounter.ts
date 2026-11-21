@@ -38,13 +38,14 @@ export function discardsAfterReveal(printed: PrintedCard): boolean {
   return printed.type === "event" || printed.type === "ally";
 }
 
-// ShuffleSetAsideIntoEncounterDeck: one set-aside copy of the card (the actor's own with `own`) is shuffled into the encounter deck.
+// ShuffleSetAsideIntoEncounterDeck: one set-aside copy of the card (every copy with `all`) (the actor's own with `own`) is shuffled into the encounter deck.
 export function shuffleSetAside(state: ScenarioState, instruction: Extract<Instruction, { verb: "ShuffleSetAsideIntoEncounterDeck" }>, focus: Focus): ScenarioState {
-  const found = state.setAside.find((id) => {
+  const matches = state.setAside.filter((id) => {
     const card = state.cards[id];
     return card != null && card.code === instruction.code && (!instruction.own || (card.owner ?? card.controller) === focus.seat);
   });
-  return found ? shuffleIntoEncounterDeck(state, found) : state;
+  // `all`: every set-aside copy ("each copy of Great Barrow", 148003:A:1); otherwise the first.
+  return (instruction.all ? matches : matches.slice(0, 1)).reduce(shuffleIntoEncounterDeck, state);
 }
 
 // TakeRevealedCard: the source card, an Encounter-keyword player card just revealed into the staging area, enters the chosen

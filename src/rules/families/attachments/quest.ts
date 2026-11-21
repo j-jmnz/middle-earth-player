@@ -7,12 +7,13 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { effectCause, ruleCause } from "../../core/cause.ts";
 import { stageOf } from "../breaking/areas.ts";
+import { redirectProgress } from "../quest/blizzard.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { destroyCard, modifiedStat } from "../../core/keywords.ts";
 import { effectsOf } from "../../windows/listen.ts";
-import { hasQuestPoints, printedOf, type PrintedCard } from "../../core/printed.ts";
+import { hasQuestPoints, isQuestCardType, printedOf, type PrintedCard } from "../../core/printed.ts";
 import { committedWillpower, stagingThreat } from "../../quest/quest.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
 import { flagged, heldAmount, inPlay, modifierActive, updateCard } from "../../core/state.ts";
@@ -22,7 +23,7 @@ import { flagged, heldAmount, inPlay, modifierActive, updateCard } from "../../c
 export function questHosts(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
   const stage = stageOf(state, seat);
   const others = Object.values(state.cards)
-    .filter((card) => card.id !== stage && inPlay(card.zone) && card.zone !== "questStage" && printedOf(ctx.cards, card.code).type === "quest")
+    .filter((card) => card.id !== stage && inPlay(card.zone) && card.zone !== "questStage" && isQuestCardType(printedOf(ctx.cards, card.code).type))
     .map((card) => card.id);
   return [...(stage ? [stage] : []), ...others];
 }
@@ -44,7 +45,13 @@ export function progressFirstLocations(state: ScenarioState, amount: number, car
     const location = next.cards[id];
     if (remaining <= 0 || !location || !(flagged(next, id, "progressFirstRequired") || (chosen && flagged(next, id, "takesProgressFirst"))) || !hasQuestPoints(printedOf(cards, location.code))) continue;
     const points = modifiedStat(next, location, "questPoints", cards);
-    const placed = Math.min(remaining, Math.max(0, points - location.progress));
+    const wanted = Math.min(remaining, Math.max(0, points - location.progress));
+    if (wanted <= 0) continue;
+    // A Blinding Blizzard takes the progress a Snow location would (families/quest/blizzard.ts).
+    const redirected = redirectProgress(next, id, wanted, cards, steps);
+    next = redirected.state;
+    const placed = redirected.remaining;
+    remaining -= wanted - placed;
     if (placed <= 0) continue;
     next = updateCard(next, id, { progress: location.progress + placed });
     steps.push({ kind: "progress", targetId: id, amount: placed, cause: ruleCause("rr.step-3-4") });

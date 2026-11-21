@@ -77,6 +77,8 @@ describe("the tokens on a previewed card", () => {
     expect(tokenLines({ damage: 2, progress: 0, resources: 1, exhausted: true, committed: false })).toEqual(["2 damage", "1 resource", "Exhausted"]);
     expect(tokenLines({ damage: 0, progress: 3, resources: 4, exhausted: false, committed: true })).toEqual(["3 progress", "4 resources", "Committed"]);
     expect(tokenLines({ damage: 0, progress: 0, resources: 0, exhausted: false, committed: false })).toEqual([]);
+    // 901307:A:2: Blinding Blizzard's progress is counted against its limit of 5.
+    expect(tokenLines({ damage: 0, progress: 3, resources: 0, exhausted: false, committed: false }, 5)).toEqual(["3 / 5 progress"]);
   });
 
   it("is on the previewed card", () => {
@@ -157,5 +159,20 @@ describe("the keyword chips of a previewed card", () => {
     expect(words("21002", response)).toEqual(["Response"]);
     // King Spider's catalog text has no shadow effect; its printed lines in the ledger (01074:A) open a line with each.
     expect(words("01074", null)).toEqual(["When Revealed", "Shadow"]);
+  });
+});
+
+describe("a card code that is not on the table", () => {
+  it("previews the printed card: a row of random undiscovered treasures to choose among (120165:A:3)", () => {
+    const table = buildTable(base, { stage: "141022" });
+    const code = FRODO;
+    expect(Object.values(table.state.cards).some((card) => card.id === code)).toBe(false);
+    const shown = previewCards(table.state, table.ctx, code, describeCode, (id) => id);
+    expect(shown).toEqual({ cards: [{ code, name: `name ${code}`, source: null, effects: [] }], start: 0 });
+  });
+
+  it("previews nothing for an id that is neither a card on the table nor a printed card", () => {
+    const table = buildTable(base, { stage: "141022" });
+    expect(previewCards(table.state, table.ctx, "no-such-card", describeCode, (id) => id).cards).toEqual([]);
   });
 });

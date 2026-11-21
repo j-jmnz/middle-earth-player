@@ -12,6 +12,44 @@ This builds the catalog and opens the app through Metro. Narrow the window to ph
 
 There's also a Codespaces devcontainer (`.devcontainer/devcontainer.json`) that installs the dependencies and builds the catalog. Run `pnpm web` there and open port 8081.
 
+## Checking a screen in a browser
+
+`pnpm browser` lets an agent, or you, see a screen without a phone: it opens the web build in headless Chromium, writes PNGs and prints what each page logged. Read the PNGs to see the screen and the printed list to see what broke.
+
+```bash
+pnpm browser shot /settings /decks --dark            # two screens, dark theme
+pnpm browser shot --fixture duo /table/{save} --landscape --ids
+pnpm browser shot /settings --tap app-settings-theme-dark --tap text=About
+pnpm browser run <scratchpad>/flow.ts                # a flow shot cannot express
+```
+
+- **What it opens.** The static web export with the e2e seed, so `--fixture <name>` writes a fixture save (names in `src/campaign/fixtures/registry.ts`) and `{save}` in a route is its save id. `--at <n>` keeps the fixture's first n intents, so the table opens on the moment `pnpm game show <name> --at <n>` prints. With no route it shoots where the fixture landed, or `/`. The export is made again only when its inputs changed (`scripts/browser/web-export.ts`): about 10 s on a warm Metro cache, a minute and a half cold. `--fresh` forces it, `--reuse` keeps the last one, and `--base http://localhost:8081` opens a running `pnpm web` instead.
+- **Taps.** `--tap` takes a testID (react-native-web writes it as `data-testid`), a Playwright selector (`text=Theme`, `[role=button]`) or `x,y` in CSS pixels for the table's canvas, which has no elements for its cards. Each tap is followed by a shot. A target that is not there fails after 5 s and lists the testIDs that are; `--ids` lists them on every shot, and `--text` prints the page's text.
+- **What it reports.** Console errors and warnings, uncaught errors, and requests that failed or answered 400 and over. Requests off localhost are blocked (card pictures come from the network unless `pnpm assets scans` ran), and `--net` lets them through. An uncaught error, a wait that times out or a missing tap target fails the run.
+- **Options.** `--dark` or `--both` themes, `--landscape` or `--size <w>x<h>` (phone portrait by default), `--full-page`, `--settle <ms>` after each load and tap (1000), `--wait <testID>` before the first shot, `--out <dir>`.
+- **Scripts.** `pnpm browser run <file>` imports a file that default-exports `async (app) => {}`, where `app` is the `App` of `scripts/browser/app.ts`: `open`, `seed`, `tap`, `shot`, `testIds`, `problems`, and Playwright's `context`. Keep the file in the scratchpad, not the repository. `app.open` closes the page it opened before, since a second tab waits forever on the app's database.
+- **Chromium.** `scripts/browser/chromium.ts` launches Playwright's own browser (`pnpm exec playwright install chromium`), else a cloud container's Chromium at `/opt/pw-browsers/chromium`; `CHROMIUM_PATH=<binary>` wins over both.
+
+## Reading a game as text
+
+`pnpm game` replays a save fixture or a scenario's golden through the reducer and prints it as text, for debugging the engine without a screen. A source is a fixture name (`duo`, `mirkwood-lost`), `<scenario-id>/<golden number or name>` (`pnpm game list` lists both), or a smoke run: `encounter:<scenario-id>:<game>` is one numbered game of `pnpm test encounter`, replayed in full, and `smoke:<code>[:<seed>[:<deal>]]` one card's run of `pnpm test smoke`, opened on the table its failing intent was sent on (that run deals copies of the card outside the reducer, so it has no replay from the start). A smoke failure prints the source that opens it.
+
+```bash
+pnpm game show mirkwood-lost --until round=3 --legal
+pnpm game show duo --at 5 --send '{"type":"Pass"}'
+pnpm game log passage-through-mirkwood/1 --from 40 --to 60 --steps
+pnpm game diff passage-through-mirkwood/1
+pnpm game show encounter:the-oath:7 --at 120 --legal
+pnpm game scene passage-through-mirkwood '{"phase":"Combat","engaged":["01096"],"hand":["01034"],"heroResources":3}' --legal
+```
+
+- **`show`** replays to a moment and prints the table: the round, the phase and the open window, the quest, the staging area and its threat, each seat's heroes, cards in play, engaged enemies and hand, and the stack. A stat a modifier moved shows its printed number beside it. `--at <n>` stops after n intents and `--until` at the first state a condition holds for (`lost`, `won`, `round=N`, `phase=X`, `mode=X`, `window=X`, `seat=N`, `code=X`). `--legal` lists the intents the engine offers, with the cards each may take and the JSON to send. `--send '<intent>'` (repeatable) sends one more intent and prints its engine steps, or the reducer's reason for refusing it. `--full` adds the modifiers, delayed effects and the decks' order; `--json` prints the raw state.
+- **`log`** prints one line per intent with its round, phase and seat. `--steps` adds the engine steps under each, with the rule or effect that caused every number. `--from`, `--to`, `--until` and `--grep <text>` narrow it.
+- **`diff`** plays a golden now and compares it with its `golden.json`. It names the first intent where they part and prints the table both reached, or the fields where the final states differ. A failing golden test names the goldens that moved and points here.
+- **`scene <scenario-id> '<layout>'`** builds the table a card's test would (`tableFromLayout`, `test/harness/layout.ts`) and reads it as `show` does, so `--legal` and `--send` try a card before its test is written. The layout is the kit's `Layout` as JSON, inline or `@<file>`; the heroes are the kit's stand-ins, and a player card it names that the scenario does not deal is loaded from `data/cards`.
+- A replay that the reducer refuses, or that throws, stops there, and `show` says which intent and why. The fixture tests point here when a fixture no longer replays.
+- Cards are named as `Title (code) #id`; an intent names cards by the id. Hidden cards are named too: this is for debugging, not the player's view.
+
 ## On a desktop
 
 ```bash
@@ -43,7 +81,7 @@ A build signed with a free Apple ID stops opening after 7 days. Run the command 
 
 ## Commands
 
-Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group>` on its own lists that group's commands (`scripts/cli.ts`). The exceptions are `pnpm test` and `pnpm assets`, which run everything in their group. The groups are `test`, `data`, `effects`, `scenario`, `assets`, `desktop`, `doc` and `release`, while `lint`, `typecheck`, `move` and `commit:check` stand alone. If the first argument to `pnpm test` isn't one of its commands, it goes to Vitest as a filter.
+Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group>` on its own lists that group's commands (`scripts/cli.ts`). The exceptions are `pnpm test` and `pnpm assets`, which run everything in their group. The groups are `test`, `data`, `effects`, `scenario`, `assets`, `browser`, `game`, `desktop`, `doc` and `release`, while `lint`, `typecheck`, `move` and `commit:check` stand alone. If the first argument to `pnpm test` isn't one of its commands, it goes to Vitest as a filter.
 
 | Command | What it does |
 | --- | --- |
@@ -54,10 +92,15 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm test smoke <codes>` | Plays a seeded game with those cards and reports errors and stalls. `--all` covers every card. |
 | `pnpm test encounter <scenario-id>...` | Plays every encounter-side card of a scenario (reveal, Shadow, travel, quest Setup) plus seeded games with random legal intents, and reports errors, stalls and replay differences. `--all` covers every playable scenario. |
 | `pnpm test phone-bundle` | Exports the Android and the iOS bundle (`--no-bytecode`; iOS needs no Xcode) in a temporary worktree at the merge base with `origin/main` and in this tree, and fails, naming the first modules that differ, unless each platform's two are byte-identical (it reports IDENTICAL per platform): the web and desktop work leaves the phone's bundle as it is (`docs/architecture.md`, Screens). It takes about four minutes, needs `pnpm assets catalog` first and the history of `origin/main`, and skips with a message without them. `--base <ref>` compares another commit; `--keep` keeps the exports; `--if-desktop-work` does nothing unless the diff touches desktop work, which is how the pull request job (`phone-bundle` in `.github/workflows/test.yml`) runs it. |
-| `pnpm test a11y` | Audits the main web screens with axe-core in Chromium and fails on serious or critical findings. It needs `pnpm exec playwright install chromium` once, or `A11Y_CHROMIUM=<path>`. |
+| `pnpm test a11y` | Audits the main web screens with axe-core in Chromium and fails on serious or critical findings. It finds Chromium as `pnpm browser` does. `--skip-export` reuses the last export even when its inputs changed. |
+| `pnpm game show <source>` | Replays a fixture or golden to a moment and prints the table as text (Reading a game as text). `pnpm game log` prints its intents and engine steps, `pnpm game diff` where a golden leaves `golden.json`, `pnpm game list` the sources. |
+| `pnpm browser shot [route...]` | Opens routes of the web build in Chromium, writes a PNG of each to `.agent/shots` and prints each page's errors (Checking a screen in a browser). |
+| `pnpm browser run <script.ts>` | Runs a scratch Playwright script against the web build. |
+| `pnpm browser serve` | Serves the web export on `127.0.0.1` until stopped and prints its address. |
 | `pnpm lint` | Runs Oxlint (`.oxlintrc.json`). |
 | `pnpm typecheck` | Type-checks with tsrs. |
-| `pnpm data sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes `data/raw/` and `.cache/`. It is the only command that uses the network. `scans` and `pictures` run only when you name them, after `data build`. |
+| `pnpm data sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes `data/raw/` and `.cache/` from the sources. It is the only command that reads the sources for new data. `scans` and `pictures` run only when you name them, after `data build`. |
+| `pnpm data mirror push\|pull [source...]` | `push` uploads every pinned file in `.cache/` that the asset mirror does not hold (`--fetch` downloads the ones `.cache/` lacks from their URLs first); `pull` fills `.cache/` from it (Asset mirror). |
 | `pnpm data build` | Builds `data/`, `src/effects/generated/` and the game icons from `data/raw/`, offline and deterministically. |
 | `pnpm data check` | Rebuilds into a temporary directory and fails on any difference. |
 | `pnpm data ledger-seed <scenario-id> [--nightmare]` | Writes the scenario's missing printed-text ledger entries from the source text, `readBy` empty and the pinned scan named. Each is read against its scan before the scenario is playable. `--nightmare` seeds its Nightmare deck into `data/printed/nightmare.json` (the proxy pictures `pnpm data sync nightmare` pins). |
@@ -84,7 +127,19 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm doc index` / `pnpm doc section <file> "<heading>"` | Regenerates `docs/INDEX.md`, or prints one section of a doc. |
 | `pnpm release plan --dry-run` | Prints the next tag and its release notes without changing anything. Run `git fetch --tags` first. |
 | `pnpm release source --tag <tag> --ipa <file> --notes <file> --out <file>` | Writes a release's SideStore and AltStore source. The release workflow runs it. |
+| `pnpm release installs --releases <file> --out <file>` | Writes the README's installs badge from a `gh api --paginate --slurp` dump of the releases. The release workflow runs it. |
 | `pnpm commit:check "<subject>"` | Checks commit subjects against `.claude/rules/commit-standards.md`, or a whole range with `--range <base>..<head>`. It is installed as the `commit-msg` hook. |
 | `pnpm move <old> <new>` | Moves files and rewrites every reference to them. Try `--dry-run` first. |
 
 Scripts log to stderr. Pass `--verbose` or `--quiet`, or set `LOG_LEVEL` to `debug`, `info`, `warn`, `error` or `silent`.
+
+## Asset mirror
+
+The asset mirror is a private Cloudflare R2 bucket that holds every file `data/sources.json` pins in `.cache/` (the card scans, the pictures and the PDFs), each at `sha256/<hash>` (`scripts/data/mirror/client.ts`). It is a cache in front of the sources, not a source: the pins keep the original URLs, and `data sync` still reads the sources.
+
+- `pnpm assets scans` and `pnpm assets booklets` read a file that `.cache/` misses from the mirror first, then from its URL. Every body is checked against its pin either way. After the first error (no network, a refused key) the run reads the sources and warns once.
+- `pnpm data mirror pull [source...]` fills `.cache/` from the mirror, so a fresh clone has the scans and PDFs without a sync. `pnpm data mirror push [source...]` uploads what the mirror lacks, with the write key. A pack reads only the files it bundles, so a scan that a picture stands in for reaches `.cache/` only through `data sync scans`; `push --fetch` downloads such files from their URLs first. A page rendered from a PDF is pushed only when a local render matches its pin.
+- The release and showcase workflows' pack (`.github/actions/pack-assets`) reads the mirror and pushes what it had to fetch (`docs/releasing.md`, Asset mirror secrets).
+- Each pack ends with one summary line, kept under `--quiet`: how many files came from the last pack, `.cache/`, the mirror and their sources, how many pages it rendered from a PDF, and the worker time spent loading and on the images.
+
+It needs four variables: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` and `R2_BUCKET`. Set them in your shell profile, never in a file in the repository. A read-only token is enough for builds and `pull`; `push` needs a token with Object Read & Write. Without all four, or with `ASSET_MIRROR=off`, every command reads the sources as before. The app never reads the mirror: its pictures and books are bundled.

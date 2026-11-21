@@ -54,7 +54,7 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
         return `${refused}.`;
     }
   }
-  if (printed.type === "attachment" && attachmentTargets(game, card.code, ctx).length === 0) return "No card can take it now.";
+  if (printed.type === "attachment" && attachmentTargets(game, cardId, ctx).length === 0) return "No card can take it now.";
   const request = playRequest(game, ctx, cardId);
   return request ? shortWords(request.total, request.pools.reduce((sum, pool) => sum + pool.max, 0), playSlack(game, ctx, cardId), printed.sphere) : null;
 }

@@ -244,7 +244,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144060:A:1 (front): When Revealed: Attach to a hero you control and exhaust that hero. (Counts as a Condition attachment with the text: "Limit 1 per hero. Treat attached hero's text box as blank, except for Traits. Attached hero cannot ready.").
   144060:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - attach this card to a hero
+    - attach this card to a hero the acting player controls that carries no copy of this card (the acting player, the first player in a When Revealed, chooses it; with none this card stays where it is)
     - exhaust its host
   144060:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
@@ -300,7 +300,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144070:A:1 (front): Setup: Set Cleft of Cirith Ungol, Shelob, and The Great Spider encounter set aside, out of play. Put Sméagol into play under the first player's control. Make Morgul Vale the active location. Add Sméagol's Secret Way to the staging area. Shuffle the encounter deck.
   144070:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json TakeControlOfSetAside {"verb":"TakeControlOfSetAside","code":"144076"}]
+    - the set-aside card with code 144076 enters play under the first player's control, ready
     - shuffle the encounter deck
 
 144070:B:1 (back): Progress cannot be placed on Underground locations.
@@ -317,7 +317,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144070:B:3 (back): Forced: At the end of the quest phase, if Sméagol's Secret Way is in the victory display, advance to stage 2A.
   144070:forced:1: Forced at the end of the phase
-    only if all of: (it is the Quest phase) and ([json condition {"kind":"inVictory","code":"144044","is":true}])
+    only if all of: (it is the Quest phase) and (the card with code 144044 is in the victory display)
     - advance to the next quest stage
 
 ## 144071 The Spider's Pass
@@ -367,7 +367,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144072:B:3 (back): The players cannot defeat this stage unless both Shelob and Gollum are in the victory display. If the players defeat this stage, they win the game.
   144072:constant:2: Constant
-    only if any of: ([json condition {"kind":"inVictory","code":"144040","is":false}]) or ([json condition {"kind":"inVictory","code":"144075","is":false}])
+    only if any of: (the card with code 144040 is not in the victory display) or (the card with code 144075 is not in the victory display)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 244 by template, 10 as JSON)
+(rendered pieces: 248 by template, 6 as JSON)

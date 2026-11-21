@@ -271,7 +271,7 @@ describe.each(LATER_PARTS)("$scenarioId (Dream-chaser part $part)", ({ scenarioI
       const world = worldFor(name);
       const save = fixtureSave(name, "s", CATALOG_VERSION);
       const resumed = resume(save, world);
-      expect(resumed.ok, name).toBe(true);
+      expect(resumed.ok, `${name}: \`pnpm game show ${name}\` names the intent the replay refuses`).toBe(true);
       if (!resumed.ok) continue;
       if (name === lost) {
         expect(resumed.state.lost).toBe(true);
@@ -290,7 +290,7 @@ describe.each(LATER_PARTS)("$scenarioId (Dream-chaser part $part)", ({ scenarioI
 describe("standalone fixtures (a cycle's scenarios)", () => {
   it("name only scenarios of a cycle, in the cycle's order", () => {
     for (const entry of STANDALONE_ENTRIES) {
-      const cycle = loadCampaign(standaloneFixtureCycle(entry.names));
+      const cycle = loadCampaign(standaloneFixtureCycle(entry));
       expect(cycle.kind, entry.scenarioId).toBe("cycle");
       expect(cycle.scenarios, entry.scenarioId).toContain(entry.scenarioId);
     }
@@ -306,7 +306,7 @@ describe("standalone fixtures (a cycle's scenarios)", () => {
       const game = fixtureStandalone(name, "s", CATALOG_VERSION);
       expect(game.active?.engineVersion, name).toBe(ENGINE_VERSION);
       const resumed = resumeStandalone(game, world);
-      expect(resumed.ok, name).toBe(true);
+      expect(resumed.ok, `${name}: \`pnpm game show ${name}\` names the intent the replay refuses`).toBe(true);
       if (!resumed.ok) continue;
       const ended = finishStandalone(game, world, resumed.state);
       expect(ended.result?.outcome, name).toBe(name.endsWith("-lost") ? "lost" : "won");
@@ -316,7 +316,9 @@ describe("standalone fixtures (a cycle's scenarios)", () => {
   }, 30_000);
 });
 
-function standaloneFixtureCycle(names: readonly string[]): string {
-  const first = (names as readonly FixtureName[]).find((name) => hasFixture(name));
-  return first ? standaloneFixture(first).campaignId : "shadows-of-mirkwood";
+// The cycle a standalone entry belongs to: its fixture's campaign once the file holds one, else the first cycle that lists the scenario.
+function standaloneFixtureCycle(entry: { scenarioId: string; names: readonly string[] }): string {
+  const first = (entry.names as readonly FixtureName[]).find((name) => hasFixture(name));
+  if (first) return standaloneFixture(first).campaignId;
+  return ["shadows-of-mirkwood", "dwarrowdelf"].find((id) => loadCampaign(id).scenarios.includes(entry.scenarioId)) ?? "shadows-of-mirkwood";
 }

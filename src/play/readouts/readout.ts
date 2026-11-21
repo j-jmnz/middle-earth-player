@@ -6,6 +6,7 @@
 // is going on (an enemy can attack during staging), the Hide numbers, otherwise willpower against threat while questing.
 // Every number is read with the engine's own functions on the current state; the picks only say whose numbers to add.
 import { attackStrength } from "../../rules/combat/combat.ts";
+import { hasSpectral } from "../../rules/families/attack/spectral.ts";
 import { DEFENDERS_FRAME, declaredDefenders, pooledDefense, standingDefenders } from "../../rules/families/defense/defenders.ts";
 import { hidePassed, hideWillpower } from "../../rules/quest/hide.ts";
 import { placedLimit } from "../../rules/families/uncharted/limit.ts";
@@ -21,6 +22,9 @@ import { damageOutcome, enemiesToFace, lossWords, outcomeWords } from "../store/
 import { defenseQuestResult } from "../words/scenarios/fortress.ts";
 import { defenseOutcome, stageHasDefense } from "./fortress.ts";
 import { companyProgressWords } from "./company.ts";
+import { erechQuestWords } from "./standalone-scenarios/erech.ts";
+import { downsHoldWords, downsQuestWords, downsRaise } from "./standalone-scenarios/barrow-downs.ts";
+import { forestHoldWords } from "./standalone-scenarios/old-forest.ts";
 import { lairProgressWords } from "./lair.ts";
 import { blackGateQuestEnd } from "./black-gate.ts";
 import { fortitudeNumbers } from "./fortitude.ts";
@@ -149,7 +153,10 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const outcome = attackers.length > 0 && !strike ? damageOutcome(game, ctx, enemyId, Math.max(0, total - defense)) : null;
     const after = outcome ? (outcome.destroyed ? `; ${cardName(enemyId)} is destroyed` : outcome.spare != null ? `; ${outcome.spare} more damage destroys it` : "") : "";
     const placed = placedLimit(game, enemyId, Number.POSITIVE_INFINITY);
-    return { kind: "attack", stats: [ATTACK(total), DEFENSE(defense)], result: `${damageWords(total, defense, placed)}${after}` };
+    // Against a Spectral enemy the attackers' Willpower is the strength (50312:A:1).
+    const spectral = hasSpectral(game, enemyId, ctx.cards);
+    const spectralNote = spectral ? "Willpower against a Spectral enemy. " : "";
+    return { kind: "attack", stats: [spectral ? WILL(total) : ATTACK(total), DEFENSE(defense)], result: `${spectralNote}${damageWords(total, defense, placed)}${after}` };
   }
   // Travel: the staging threat now and after the picked location leaves staging, and the progress it takes first (rr.travel).
   if (sheet?.kind === "pick" && game.window?.kind === "travel") {
@@ -187,10 +194,13 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const pelennor = pelennorQuestWords(game, ctx, willpower - threat);
     if (pelennor) return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: pelennor };
     // Shelob's Lair holds some progress back (stage 2B's cap, an Underground location on stage 1): the split the engine would place; stage 3B of The Passing of the Grey Company says the progress pays the Stone's travel; stage 1B of The Siege of Gondor says Great Corsair Ship holds it.
-    const held = lairProgressWords(game, ctx, willpower - threat) ?? companyProgressWords(game, ctx, willpower - threat);
+    const held = lairProgressWords(game, ctx, willpower - threat) ?? companyProgressWords(game, ctx, willpower - threat) ?? erechQuestWords(game, ctx, willpower - threat) ?? downsQuestWords(game, ctx, willpower - threat);
     // The Siege's words carry their own "if nothing changes" ("4 progress if nothing changes: held while Great Corsair Ship is in play").
     const siege = siegeProgressWords(game, ctx, willpower - threat);
-    return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${siege ?? (held ? `${held} if nothing changes` : questResult(willpower, threat))}${eliminationWords(game, threat - willpower, seat)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
+    // The Old Forest's stage 3B: progress that would fill it, and the card that holds the win.
+    // Fog on the Barrow-downs' stage 3B: the progress it takes none of while a Great Barrow is in play, and the defeat it holds until every player is at it with Standing Stones in the victory display.
+    const holds = forestHoldWords(game, ctx, willpower - threat) ?? downsHoldWords(game, ctx, willpower - threat);
+    return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${siege ?? (held ? `${held} if nothing changes` : questResult(willpower, threat))}${holds ? `; ${holds}` : ""}${eliminationWords(game, ctx, threat - willpower, seat)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
   }
   return null;
 }
@@ -218,17 +228,22 @@ function commitWords(game: ScenarioState, ctx: ReduceContext, picked: readonly s
 
 // A quest that would fail by `shortfall`, as the engine fails it on a copy (failQuest): a seat whose threat reaches 50 is
 // eliminated (rr.threat-elimination-level), and with no seat left the game is lost.
-function eliminationWords(game: ScenarioState, shortfall: number, only?: number): string {
+function eliminationWords(game: ScenarioState, ctx: ReduceContext, shortfall: number, only?: number): string {
   if (shortfall <= 0) return "";
   // The elimination level: 99 while the main quest is Dire (mec113.dire).
   const level = game.dire === true ? DIRE_THREAT : ELIMINATION_THREAT;
   const after = failQuest(game, shortfall, [], only == null ? undefined : [only]);
+  // Fog on the Barrow-downs' stage 3B hears an elimination: the players at it raise their threat by 10, which can end the game (148003:B:2).
+  const raise = downsRaise(game, ctx, after, level);
+  const raised = raise ? `; ${raise.text}${raise.ends ? `: ${lossWords("No seats remain")}` : ""}` : "";
   // Stages are separate: only the seat that quests raises its threat, so only it can be eliminated by this quest (mec109.multiple-staging-areas).
   if (only != null) {
     if (livingSeats(after).includes(only)) return "";
-    return livingSeats(game).length === 1 && after.lost && !game.lost ? `; threat reaches ${level}: ${lossWords(after.lossReason ?? "No seats remain")}` : `; threat reaches ${level}: Player ${only + 1} is eliminated`;
+    if (livingSeats(game).length === 1 && after.lost && !game.lost) return `; threat reaches ${level}: ${lossWords(after.lossReason ?? "No seats remain")}`;
+    return `; threat reaches ${level}: Player ${only + 1} is eliminated${raised}`;
   }
   if (after.lost && !game.lost) return `; threat reaches ${level}: ${lossWords(after.lossReason ?? "No seats remain")}`;
   const out = livingSeats(game).filter((seat) => !livingSeats(after).includes(seat));
-  return out.length === 0 ? "" : `; threat reaches ${level}: ${out.map((seat) => `Player ${seat + 1}`).join(" and ")} is eliminated`;
+  if (out.length === 0) return "";
+  return `; threat reaches ${level}: ${out.map((seat) => `Player ${seat + 1}`).join(" and ")} is eliminated${raised}`;
 }

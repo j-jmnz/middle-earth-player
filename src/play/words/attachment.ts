@@ -38,7 +38,7 @@ export function attachmentWords(instruction: Instruction, codeName?: (code: stri
       return "reveal encounter cards until this card is guarded";
     // Overcome by Fear (145016): the copy goes onto, or comes off, the acting player's threat dial; no code names the card the record sits on.
     case "AttachToDial":
-      return `attach ${verb.code && codeName ? codeName(verb.code) : "this card"} to your threat dial`;
+      return `attach ${verb.code && codeName ? codeName(verb.code) : "this card"} to ${verb.firstPlayer === true ? "the first player's" : "your"} threat dial`;
     case "DetachFromDial":
       return `detach ${verb.code && codeName ? codeName(verb.code) : "this card"} from your threat dial and set it aside`;
     case "PlayInto":

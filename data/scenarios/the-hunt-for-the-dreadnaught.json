@@ -1,0 +1,288 @@
+{
+  "id": "the-hunt-for-the-dreadnaught",
+  "name": "The Hunt for the Dreadnaught",
+  "number": 1,
+  "stages": [
+    "40004",
+    "40005"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Hunt for the Dreadnaught",
+      "count": 43
+    }
+  ],
+  "cards": [
+    {
+      "code": "40034",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "40035",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "40036",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "40037",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "40038",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "40039",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "40040",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "40041",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "40042",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "40043",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "40044",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "40045",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "40046",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "40026",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "40027",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "40028",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "40029",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "40030",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "40031",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "40032",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "40033",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "40004",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "40005",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "40014",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "40015",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "40016",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "40017",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "40018",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "40019",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "40006",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "40007",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "40008",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "40009",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "40010",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "40011",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "40012",
+      "normal": 4,
+      "easy": 4,
+      "pile": "setAside"
+    },
+    {
+      "code": "40013",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "40020",
+      "normal": 1,
+      "easy": 1,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "40021",
+      "normal": 3,
+      "easy": 3,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "40022",
+      "normal": 3,
+      "easy": 3,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "40023",
+      "normal": 3,
+      "easy": 3,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "40024",
+      "normal": 2,
+      "easy": 2,
+      "pile": "corsairDeck"
+    },
+    {
+      "code": "40025",
+      "normal": 1,
+      "easy": 1,
+      "pile": "corsairDeck"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q99.15",
+    "dragnEasy": "Q99.15",
+    "hobSlug": "The-Hunt-for-the-Dreadnaught"
+  },
+  "modeCard": "40002",
+  "easyModeCard": "40001"
+}

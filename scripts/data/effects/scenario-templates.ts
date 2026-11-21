@@ -51,6 +51,17 @@ export const SCENARIO_TEMPLATES: readonly Template[] = [
     },
   },
   {
+    // "Add 1 resource to each Goblin enemy in play" (901104:A:1, 901108:A:2, 901109:A:2): the enemies in the staging area and every player's engaged enemies each take the resource tokens.
+    id: "add-resources-to-each-enemy",
+    pattern: /^(When Revealed|Travel): Add (\d+|an?|one) resources? to each (\w+) enemy in play\.$/,
+    build: (match) => [
+      {
+        timing: match[1] === "Travel" ? "travel" : "whenRevealed",
+        instructions: [{ verb: "Each", pick: { type: "enemy", control: "any", staging: true, trait: match[3] ?? "" }, instructions: [{ verb: "PlaceResourceTokens", amount: count(match[2]), on: "picked" }] }],
+      },
+    ],
+  },
+  {
     id: "setup-add-self-to-staging",
     pattern: /^Setup: Add \{self\} to the staging area\.$/,
     build: (_match, { card }) => [{ timing: "setup", instructions: [{ verb: "AddToStaging", code: card.code }] }],

@@ -19,6 +19,7 @@ import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
 import { capturedOwners } from "../readouts/gram.ts";
+import { hiddenMark, isHeldFaceup, keptMark } from "../readouts/standalone-scenarios/wizards-quest.ts";
 import { areaStanding } from "../../rules/families/stormcaller/values.ts";
 import { placedLimit } from "../../rules/families/uncharted/limit.ts";
 import { modifiedStat, printedStat } from "../../rules/core/keywords.ts";
@@ -153,7 +154,9 @@ function effectsOnCard(game: ScenarioState, ctx: ReduceContext, cardId: string):
     const lasting = behind.length > 0 && behind.every((modifier) => TEMPORARY.has(modifier.until));
     stats.push({ stat, icon: STAT_ICON[stat], word: STAT_WORD[stat], value, delta: value - base, lasting });
   }
-  const flags = FLAGS.filter((entry) => flagged(game, cardId, entry.flag)).map((entry) => ({ ...entry, word: flagWord(entry.word, placedLimit(game, cardId, Number.POSITIVE_INFINITY)) }));
+  // A card engaged with each player is engaged, so "Cannot be engaged" would contradict it: its words say it (engagedWithAllWords).
+  const engagedWithAll = flagged(game, cardId, "engagedWithAll");
+  const flags = FLAGS.filter((entry) => flagged(game, cardId, entry.flag) && !(engagedWithAll && entry.flag === "cannotBeEngaged")).map((entry) => ({ ...entry, word: flagWord(entry.word, placedLimit(game, cardId, Number.POSITIVE_INFINITY)) }));
   return { stats, flags };
 }
 
@@ -221,6 +224,10 @@ function delayedWords(instruction: Instruction): string {
       return "is shuffled into its owner's deck";
     case "EngageAll":
       return "each enemy in staging engages the first player";
+    case "Discard":
+      return "is discarded";
+    case "ShuffleEncounterDiscard":
+      return "the encounter discard pile is shuffled into the encounter deck";
     // A hero Send for Help (Tactics) puts into play leaves the game at the end of the round (11212:A:2).
     case "MoveCard":
       return instruction.to === "removed" ? "is removed from the game" : "its effect resolves";
@@ -260,7 +267,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
   const card = game.cards[cardId];
   const effects = cardEffects(game, ctx, cardId);
   // The Stormcaller's current quest stage wears the strip a quest card does (dcce.stormcallers-area).
-  const questing = card != null && (stagedSideQuest(game, ctx, cardId) || card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || card.zone === "seatQuest" || areaRoleOf(game, cardId) === "stage");
+  const questing = card != null && (stagedSideQuest(game, ctx, cardId) || card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || areaRoleOf(game, cardId) === "stage");
   const enemy = card != null && card.zone === "staging" && card.face !== "down" && printedOf(ctx.cards, card.code).type === "enemy";
   const cost = enemy ? engagementCostOf(game, card, ctx.cards) : null;
   return {
@@ -323,6 +330,11 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
   // The cards captured underneath a card in Escape from Mount Gram: "3 captured", with their owners spoken (readouts/gram.ts).
   const owners = game.capture != null ? capturedOwners(game, cardId) : [];
   if (owners.length > 0) return capturedPill(owners);
+  // The player cards Carried Away, Necromancer's Pass and Nameless Thing hold faceup under them, and the cards Hidden Threat lays facedown under the main quest (readouts/standalone-scenarios/wizards-quest.ts): a card with both shows both.
+  const kept = keptMark(game, ctx, cardId, isHeldFaceup);
+  const hidden = hiddenMark(game, cardId);
+  if (kept && hidden) return { text: `${kept.text} · ${hidden.text}`, loses: false, speech: `${kept.speech}. ${hidden.speech}`, count: kept.count + hidden.count };
+  if (kept ?? hidden) return kept ?? hidden;
   const captives = captivesUnder(game, cardId);
   if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);

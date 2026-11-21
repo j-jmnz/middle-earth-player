@@ -7,8 +7,9 @@ import { beginEnemyAttack } from "../combat/combat.ts";
 import { attackBarred } from "./constants.ts";
 import { dealForAttack } from "../families/south/watcher.ts";
 import { askTarget, openBranch } from "../windows/choices.ts";
-import { holds } from "./conditions.ts";
-import { distinctByCode, targeted } from "./effect-targeted.ts";
+import { holds, shadowBlankOf } from "./conditions.ts";
+import { addModifier } from "../core/keywords.ts";
+import { targeted } from "./effect-targeted.ts";
 import { pushHide } from "../quest/hide.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { runInstruction, type ReduceContext } from "./interpret.ts";
@@ -18,11 +19,12 @@ import { lookedDeckSeat } from "../families/deck/rules.ts";
 import { feedsDiscard, pickCandidates } from "./pick.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "../core/state.ts";
-import { livingSeats, withSeat } from "../core/state.ts";
-import { sharing } from "../families/breaking/areas.ts";
+import { distinctChoices, livingSeats, withSeat } from "../core/state.ts";
+import { isolatedAreas, sharing } from "../families/breaking/areas.ts";
 import { guardianSeats, otherThanGuardian } from "../families/guardian/seats.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { holdsNow } from "./verbs.ts";
+import { releaseLooks } from "../families/encounter/looked.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "../windows/windows.ts";
 import { dealOut } from "../families/breaking/deal.ts";
 import { moveCard } from "../core/zones.ts";
@@ -51,6 +53,10 @@ export type EffectSpec = {
   // The card the answered event was about, and the other card it names.
   subject?: string;
   other?: string;
+  // The host the source lost to its own cost (EffectData.host).
+  host?: string;
+  // The active location when a Travel effect began (EffectData.activeAtStart).
+  activeAtStart?: string;
   // The damage the answered event dealt, and the card whose destruction waits while the effect resolves.
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip).
@@ -89,6 +95,8 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.picked ? { picked: spec.picked } : {}),
     ...(spec.subject ? { subject: spec.subject } : {}),
     ...(spec.other ? { other: spec.other } : {}),
+    ...(spec.host ? { host: spec.host } : {}),
+    ...(spec.activeAtStart ? { activeAtStart: spec.activeAtStart } : {}),
     ...(spec.dealt != null ? { dealt: spec.dealt } : {}),
     ...(spec.excess != null ? { excess: spec.excess } : {}),
     ...(spec.destroyedAlly ? { destroyedAlly: spec.destroyedAlly } : {}),
@@ -141,7 +149,7 @@ export function effectStep(state: ScenarioState, frame: Frame, ctx: ReduceContex
   const data = frame.data;
   if (data.kind !== "effect") throw new Error(`Frame ${frame.frame} lost its effect data`);
   if (frame.step === 0) {
-    if (data.canceled) return reopen(finishEvent(popFrame(state, steps), frame, data), data);
+    if (data.canceled) return reopen(releaseLooks(finishEvent(popFrame(state, steps), frame, data), data), data);
     // The "when revealed" effects of a card are about to resolve: a Response may cancel them first (rr.cancel). The only
     // such Response is A Test of Will, which cancels those "of a card that was just revealed from the encounter deck"
     // (01050:A:1); revealing from the encounter deck is staging (rr.staging), the `reveal` frame. A quest stage reached by
@@ -158,7 +166,7 @@ export function effectStep(state: ScenarioState, frame: Frame, ctx: ReduceContex
     return beginEffect(state, frame, data, ctx);
   }
   const [item, ...rest] = data.queue;
-  if (data.canceled || !item) return reopen(finishEvent(popFrame(state, steps), frame, data), data);
+  if (data.canceled || !item) return reopen(releaseLooks(finishEvent(popFrame(state, steps), frame, data), data), data);
   const advanced = patchTop(state, { data: { ...data, queue: rest } });
   return finishWhenDone(runItem(advanced, item, frame, data.returned, ctx, steps), frame.id);
 }
@@ -229,7 +237,7 @@ function runItemNow(
     case "HideTest":
       return pushHide(state, { cardId: frame.cardId, seat: item.seat, peril: frame.peril }, instruction.x, steps);
     case "ImmediateAttack":
-      return instruction.afterThis ? attackAfterThis(state, frame.cardId, steps) : immediateAttack(state, frame.cardId, item.seat, ctx, steps, { shadow: instruction.shadow !== false, keep: instruction.keepShadows === true });
+      return instruction.afterThis ? attackAfterThis(state, frame.cardId, steps) : immediateAttack(state, instruction.target === "subject" ? (frameScope(state, item.seat, frame.cardId).subject ?? null) : frame.cardId, item.seat, ctx, steps, { shadow: instruction.shadow !== false, keep: instruction.keepShadows === true, ...(instruction.blankBonus != null ? { blankBonus: instruction.blankBonus } : {}) });
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":
@@ -256,6 +264,12 @@ function runItemNow(
   }
 }
 
+// The player the enemy is engaged with (`seats: "engaged"`), or none.
+function engagedSeats(state: ScenarioState, id: string | null): number[] {
+  const card = id ? state.cards[id] : undefined;
+  return card?.zone === "engaged" && card.controller != null ? [card.controller] : [];
+}
+
 function expandPlayers(
   state: ScenarioState,
   item: QueueItem,
@@ -266,8 +280,9 @@ function expandPlayers(
   const data = topFrame(state)?.data;
   if (data?.kind !== "effect") return state;
   // The players sharing the acting player's staging area when areas are joined (families/captured/); every living player otherwise. `seats: "guardian"`: the player guarding Gollum, and the others while a card widens the effect (families/guardian/seats.ts).
-  const seats = instruction.seats === "guardian" ? guardianSeats(state, ctx, topFrame(state)?.cardId ?? null) : instruction.seats === "otherThanGuardian" ? otherThanGuardian(state) : state.capture && state.separate ? sharing(state, item.seat) : livingSeats(state);
-  const ordered = instruction.order === "lastFirst" ? [...seats].reverse() : seats;
+  const seats = instruction.seats === "guardian" ? guardianSeats(state, ctx, topFrame(state)?.cardId ?? null) : instruction.seats === "otherThanGuardian" ? otherThanGuardian(state) : instruction.seats === "engaged" ? engagedSeats(state, topFrame(state)?.cardId ?? null) : isolatedAreas(state) ? sharing(state, item.seat) : livingSeats(state);
+  const turned = instruction.order === "lastFirst" ? [...seats].reverse() : seats;
+  const ordered = instruction.limit == null ? turned : turned.slice(0, instruction.limit);
   const expanded = ordered.flatMap((seat) =>
     instruction.instructions.map((entry): QueueItem => ({ instruction: entry, seat, chosen: null, ...(cause ? { cause } : {}) })),
   );
@@ -326,12 +341,14 @@ function attackAfterThis(state: ScenarioState, sourceId: string | null, steps: E
   // The source is the attacking enemy, or the shadow card dealt to it for this attack (144039:A:2, 144057:A:2).
   const isItsShadowCard = source?.zone === "shadow" && source.host === attack?.enemyId;
   if (!attack || !sourceId || (attack.enemyId !== sourceId && !isItsShadowCard)) return state;
-  return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), { verb: "ImmediateAttack" }], afterCause: currentCause(steps, UNATTRIBUTED) } };
+  // Smaug's attack against Lake-town (50211:A:1) is followed by another against Lake-town (Esgaroth Wharf's Shadow, 50224:A:3; docs/brief.md, The Battle of Lake-town).
+  const next: Instruction = attack.toLakeTown === true ? { verb: "AttackLakeTown" } : { verb: "ImmediateAttack" };
+  return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), next], afterCause: currentCause(steps, UNATTRIBUTED) } };
 }
 
 // The enemy attacks the player it is engaged with, and the frame waits for the defense window. `shadow`: a shadow card is dealt for the attack (the default); `keep`: with none dealt, the shadow cards the enemy holds stay.
-function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], options: { readonly shadow?: boolean; readonly keep?: boolean } = {}): ScenarioState {
-  const { shadow = true, keep = false } = options;
+function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], options: { readonly shadow?: boolean; readonly keep?: boolean; readonly blankBonus?: number } = {}): ScenarioState {
+  const { shadow = true, keep = false, blankBonus } = options;
   const enemy = sourceId ? state.cards[sourceId] : undefined;
   // An enemy that attacked from the staging area (the Balrog, the Watcher in the Water, Uruk from Mordor, a Storm of Howls attacker) makes the
   // additional attack its shadow grants against the same player, dealt a shadow card of its own ("Attacking enemy makes an additional attack
@@ -344,7 +361,9 @@ function immediateAttack(state: ScenarioState, sourceId: string | null, seat: nu
   if (!sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
   // An attack an effect makes is dealt a shadow card of its own (families/defense/listen.ts), unless the card says it is not (`shadow: false`, 18022:A:1).
   const dealt = shadow ? dealAttackShadow(state, sourceId, ctx, steps) : keep ? state : discardShadowOf(state, sourceId);
-  const begun = beginEnemyAttack(dealt, enemy.controller, sourceId, ctx, steps);
+  // A shadow card with no shadow effect gives the enemy `blankBonus` Attack for this attack (51037:A:1).
+  const bonus = blankBonus != null && shadowBlankOf(dealt, sourceId, ctx) ? addModifier(dealt, sourceId, sourceId, "attack", blankBonus, "endOfAttack") : dealt;
+  const begun = beginEnemyAttack(bonus, enemy.controller, sourceId, ctx, steps);
   if (!begun.pendingAttack) return begun;
   return { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } };
 }
@@ -357,7 +376,7 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
   // The actor chooses, unless the card says the first player does.
   const chooser = instruction.pick.who === "firstPlayer" ? state.firstPlayer : item.seat;
   const found = pickCandidates(state, instruction.pick, chooser, data.picked ?? [], frame.cardId, ctx, data.x, data.participants, false, { discards: data.queue[0]?.instruction.verb === "DiscardPicked" });
-  const options = (instruction.pick.from ?? "play") === "play" ? found : distinctByCode(state, found);
+  const options = (instruction.pick.from ?? "play") === "play" ? found : distinctChoices(state, found);
   let chosen = item.chosen;
   if (!chosen) {
     if (options.length > 1) return askTarget(state, { ...item, seat: chooser }, options);
@@ -379,8 +398,8 @@ function arrangeTop(state: ScenarioState, item: QueueItem): ScenarioState {
   const offset = item.offset ?? 0;
   const count = (data.looked ?? []).filter((id) => seat.deck.includes(id)).length;
   const rest = seat.deck.slice(offset, count);
-  if (rest.length <= 1 || distinctByCode(state, rest).length <= 1) return state;
-  if (!item.chosen) return askTarget(state, { ...item, offset }, distinctByCode(state, rest));
+  if (rest.length <= 1 || distinctChoices(state, rest).length <= 1) return state;
+  if (!item.chosen) return askTarget(state, { ...item, offset }, distinctChoices(state, rest));
   const from = seat.deck.indexOf(item.chosen);
   if (from < offset) return state;
   const deck = [...seat.deck];

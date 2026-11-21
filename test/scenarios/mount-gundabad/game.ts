@@ -223,7 +223,7 @@ export const GUNDABAD_GOLDENS: readonly GundabadGolden[] = [
   { name: "two-handed, won, after the earlier parts, Misplaced Trust, no stage bypassed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "pool" },
   { name: "two-handed, won, after the earlier parts, Misplaced Trust, Dagnir hunted and engaged", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "pool", policy: HUNT },
   { name: "two-handed, won, after the earlier parts, Urdug's Cunning, Dragon-sickness in the encounter deck", seatCount: 2, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "cunning" },
-  { name: "two-handed, won, after the earlier parts, Urdug's Cunning, Dragon-sickness in the encounter deck, a stage bypassed", seatCount: 2, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "cunning", policy: BYPASS },
+  { name: "two-handed, won, after the earlier parts, Urdug's Cunning, Dragon-sickness in the encounter deck, a stage bypassed", seatCount: 2, seed: 9, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "cunning", policy: BYPASS },
   { name: "two-handed, Easy, won, the oath and guidance lines, a stage bypassed", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oath", policy: BYPASS },
   { name: "two-handed, Easy, won, the oath and guidance lines, Dagnir hunted and engaged", seatCount: 2, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oath", policy: HUNT },
   { name: "true solo, won, after the earlier parts, A Growing Threat in the pool removed by the Resolution", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "pool", growing: true },
@@ -238,7 +238,7 @@ export const GUNDABAD_GOLDENS: readonly GundabadGolden[] = [
   { name: "true solo, Easy, lost after the earlier parts, Melanwar's and Isolde's lines", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "lost", after: true, variant: "oathline", lossReason: "No seats remain" },
   { name: "two-handed, lost after the earlier parts, Urdug's Cunning, Dragon-sickness in the encounter deck", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, variant: "cunning", lossReason: "No seats remain" },
   { name: "two-handed, Easy, lost after the earlier parts, the oath and guidance lines, the hero who carries Wormsbane destroyed", seatCount: 2, seed: 64, difficulty: "Easy", decks: "strong", outcome: "lost", after: true, variant: "oath", lossReason: "q4 left play" },
-  { name: "two-handed, lost after the earlier parts, Misplaced Trust, A Growing Threat stays in the pool", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, variant: "pool", growing: true, lossReason: "q1 left play" },
+  { name: "two-handed, lost after the earlier parts, Misplaced Trust, A Growing Threat stays in the pool", seatCount: 2, seed: 13, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, variant: "pool", growing: true, lossReason: "q1 left play" },
   { name: "two-handed, lost with a stage bypassed, the threat of every player at 50", seatCount: 2, seed: 5, difficulty: "Easy", decks: "strong", outcome: "lost", policy: BYPASS, lossReason: "No seats remain" },
 ];
 

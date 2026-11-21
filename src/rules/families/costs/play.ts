@@ -16,6 +16,7 @@ import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { EngineStep, Payment, PlayerIntent } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { addModifier, raiseThreat, uniqueBlocked } from "../../core/keywords.ts";
+import { noteHandPlay } from "../wilderland/rounds.ts";
 import { playBlocked } from "../sidequests/contract.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { heroPays, hasResourceMatch } from "../../player/payments.ts";
@@ -59,13 +60,14 @@ export function extraCostReason(state: ScenarioState, cardId: string, seat: numb
 
 // Why an event cannot be played from a Response window now: a play restriction (rr.initiating-abilities-playing-cards, step
 // 1: "Play only if ..."), no resource match (rr.resource-match: a 0-cost card needs one too), or an additional cost it cannot
-// pay. The ordinary play checks the same in planning.ts's playWindowReason.
-export function eventPlayReason(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext): string | null {
+// pay. The ordinary play checks the same in planning.ts's playWindowReason. `free`: an effect plays it at no cost, so it is not
+// paid for and needs no resource match (docs/brief.md, Core round).
+export function eventPlayReason(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext, free?: boolean): string | null {
   const card = state.cards[cardId];
   if (!card) return "That card is not in hand";
   const scope = { actor: seat, sourceId: cardId, returned: 0 };
   if (cardRules(state, cardId, "PlayOnlyIf", ctx).some((rule) => !holds(state, rule.condition, scope, ctx))) return "That card's play restriction is not met";
-  if (!hasResourceMatch(state, seat, printedOf(ctx.cards, card.code).sphere, ctx, cardId)) return "No hero matches that card's sphere";
+  if (!free && !hasResourceMatch(state, seat, printedOf(ctx.cards, card.code).sphere, ctx, cardId)) return "No hero matches that card's sphere";
   return extraCostReason(state, cardId, seat, ctx);
 }
 
@@ -103,6 +105,8 @@ export function afterPlay(before: ScenarioState, state: ScenarioState, intent: P
   const seat = before.activeSeat;
   const printed = printedOf(ctx.cards, card.code);
   let next = noteSpent(state, intent.payments, ctx);
+  // A card played from the hand counts toward a per-round limit on cards from the hand (LimitHandPlaysPerRound, 00017:B:2); one played from the deck or the discard pile does not.
+  if (card.zone === "hand") next = noteHandPlay(next, ctx, seat, intent.cardId);
   const paid = intent.payments.filter((payment) => payment.amount > 0);
   const played = next.played ?? [];
   const last = played.at(-1);
@@ -163,13 +167,15 @@ function playableNow(state: ScenarioState, seat: number, cardId: string, terms: 
   // An ally, an event, or an attachment (on the source with `onSelf`, otherwise on a host it may be attached to: "search your deck
   // for a card and play it, reducing its cost by 3").
   if (printed.type !== "ally" && printed.type !== "event" && printed.type !== "attachment") return false;
-  if (printed.type === "event" && eventPlayReason(state, cardId, seat, ctx)) return false;
+  if (printed.type === "event" && eventPlayReason(state, cardId, seat, ctx, terms.free)) return false;
   if (printed.type === "attachment" && !terms.onSelf && attachmentHostIds(state, seat, card.code, ctx).length === 0) return false;
   if (printed.cost == null || uniqueBlocked(state, printed, ctx.cards) || playBlocked(state, cardId, seat, ctx)) return false;
   const scope = { actor: seat, sourceId: cardId, returned: 0 };
   if (cardRules(state, cardId, "PlayOnlyIf", ctx).some((rule) => !holds(state, rule.condition, scope, ctx))) return false;
   if (extraCostReason(state, cardId, seat, ctx)) return false;
-  if (!terms.noMatch && !hasResourceMatch(state, seat, printed.sphere, ctx, cardId)) return false;
+  // A card played at no cost is not paid for, so it needs no resource match (rr.resource-match covers a card that is paid
+  // for, a 0-cost one included; docs/brief.md, Core round). An event's other play checks still hold above.
+  if (!terms.noMatch && !terms.free && !hasResourceMatch(state, seat, printed.sphere, ctx, cardId)) return false;
   const hostId = terms.onSelf ? sourceId : null;
   if (terms.onSelf && (!sourceId || !attachmentHostIds(state, seat, card.code, ctx).includes(sourceId))) return false;
   const cost = termsCost(state, cardId, seat, terms, hostId, ctx);

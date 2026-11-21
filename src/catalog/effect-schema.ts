@@ -172,9 +172,10 @@ const delaySchema = z.strictObject({
   // `questSucceeded`: when the players quest successfully this phase, and never if they do not ("If the players quest
   // successfully, deal 1 damage to that enemy", 19112:A:1).
   // `startOfGame`: once the opening hands and mulligans are done, before the first round (a Setup that needs the players to choose).
+  // `beginningOfTravel`: when the next travel phase begins ("advance to stage 3B at the beginning of the travel phase", 148004:B:2; rr.delayed-effects).
   // `questFailed`: when the players quest unsuccessfully this phase, and never if they do not ("If the players quest unsuccessfully this phase,
   // put the Nazgûl of Dol Guldur into play", 900307:A:1; rr.step-3-4).
-  until: z.enum(["endOfPhase", "endOfRound", "questSucceeded", "questFailed", "endOfAttack", "startOfGame"]),
+  until: z.enum(["endOfPhase", "endOfRound", "questSucceeded", "questFailed", "endOfAttack", "startOfGame", "beginningOfTravel"]),
   uncancelable: conditionSchema.optional(),
   // The delayed instructions act on the card the last Pick chose (Sneak Attack's ally).
   subject: z.literal("picked").optional(),
@@ -195,6 +196,8 @@ const eachSchema = verbFlags(z.strictObject({
   upTo: z.union([z.number().int().positive(), z.literal("any"), amountExprSchema]).optional(),
   totalCost: amountSchema.optional(),
   taken: z.array(z.string()).optional(),
+  // With `upTo`: the actor must choose that many (or all of them when fewer match: nothing is asked then), and `rest` runs for each matching card he did not choose, as the picked card ("Discard all but X allies you control", 148004:A:1). The chosen cards get `instructions`.
+  rest: z.array(z.discriminatedUnion("verb", simpleVerbs)).optional(),
   ...when,
 }), { runsInFrame: true });
 
@@ -205,7 +208,10 @@ const forEachPlayerSchema = verbFlags(z.strictObject({
   // `guardian`: only the player guarding Gollum, the instructions run for him as the acting player ("Raise the threat of the player guarding Gollum by 8", 02135:A:1). While a card says an effect that targets him also targets each other player (Dry Watercourse, 02132:A:1;
   // Ambushing Orcs, 900902:A:1) the other players follow, in player order (src/rules/families/guardian/seats.ts).
   // `otherThanGuardian`: each player but him, in player order ("reduce the threat of each player not guarding Gollum by 2", 02133:A:2).
-  seats: z.enum(["guardian", "otherThanGuardian"]).optional(),
+  // `engaged`: only the player the source enemy is engaged with ("the engaged player chooses", 901703:A:2); nobody when it is not engaged.
+  seats: z.enum(["guardian", "otherThanGuardian", "engaged"]).optional(),
+  // At most this many players, in the order the effect runs ("one different 0 cost location per player (limit 2)", 51048:A:1).
+  limit: z.number().int().positive().optional(),
   // An Each runs for the player acting: "deal 1 damage to each character controlled by the player guarding Gollum" is an Each of the characters he controls (02138:A:2).
   instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, choiceSchema, eachSchema])),
 }), { runsInFrame: true });
@@ -318,6 +324,8 @@ export const effectSchema = z.strictObject({
   byEncounterDeck: z.literal(true).optional(),
   // A "revealed" event is not heard when the card was found in the encounter discard pile by a search ("revealed from the encounter deck" counts a search of the deck, 09016:A:3).
   notFromDiscard: z.literal(true).optional(),
+  // This Forced effect resolves before the other Forced effects of the same moment, whatever the age of their cards (the engine resolves the oldest card's first): "after resolving the Forced effect on each stage 3 in play" (50907:A:1; docs/brief.md, Attack on Dol Guldur, reading 5).
+  early: z.literal(true).optional(),
   cancel: cancelSchema.optional(),
   // While this holds, nothing may cancel the effect ("If The One Ring is exhausted, this effect cannot be canceled").
   uncancelable: conditionSchema.optional(),

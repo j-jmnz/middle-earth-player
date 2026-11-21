@@ -1,0 +1,280 @@
+{
+  "id": "shadow-and-flame",
+  "name": "Shadow and Flame",
+  "number": 6,
+  "stages": [
+    "04138",
+    "04139",
+    "04140"
+  ],
+  "encounterSets": [
+    {
+      "name": "Shadow and Flame",
+      "count": 27
+    },
+    {
+      "name": "Goblins of the Deep",
+      "count": 13
+    },
+    {
+      "name": "Deeps of Moria",
+      "count": 14
+    }
+  ],
+  "cards": [
+    {
+      "code": "04142",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04143",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04144",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "04145",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04146",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04147",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04148",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04149",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04151",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04152",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04153",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03060",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03061",
+      "normal": 5,
+      "easy": 5,
+      "pile": "encounter"
+    },
+    {
+      "code": "03062",
+      "normal": 3,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03063",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03042",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03043",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03044",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03045",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03046",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03047",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04138",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04139",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04140",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04150",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "04141",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q02.9",
+    "dragnEasy": "E02.9",
+    "hobSlug": "Shadow-and-Flame"
+  },
+  "nightmare": {
+    "setupCard": "901801",
+    "removed": [
+      {
+        "code": "03044",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03047",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03060",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03063",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "04151",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "04152",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "04153",
+        "copies": 1,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "901802",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901803",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901804",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901805",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901806",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901807",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901808",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901809",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901810",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
+  }
+}

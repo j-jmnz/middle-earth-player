@@ -4,17 +4,19 @@
 // ltp.engagement-checks-repeat (data/rules/entries.json).
 import { ruleCause, type Cause } from "../core/cause.ts";
 import { checkCost } from "../families/costs/stats.ts";
-import { engagementBarred, noteEngaged } from "../families/quest/engage.ts";
-import { currentQuestHas } from "../families/quest/conditions.ts";
+import { engagementBarred, noteEngaged, optionalThreatBarred } from "../families/quest/engage.ts";
+import { currentQuestHas, willpowerIgnored } from "../families/quest/conditions.ts";
 import { noteHostDefeated, withStagingThreat } from "../families/attachments/hold.ts";
 import { progressFirstLocations } from "../families/attachments/quest.ts";
+import { absorbFirst } from "../families/quest/blizzard.ts";
 import { passSorcery } from "../families/angmar/reanimate/stage.ts";
-import { seatThreat } from "../families/play/hooks.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { modifiedStat, raiseThreat, releaseAttachments } from "../core/keywords.ts";
 import { hasQuestPoints, isLocationCard, printedOf, type PrintedCard } from "../core/printed.ts";
-import type { CardInstance, Modifier, ScenarioState } from "../core/state.ts";
+import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { flagged, livingSeats, updateCard, updateCards, withMode } from "../core/state.ts";
+import { checkEngages } from "./check.ts";
+import { askSplit } from "../families/smaug/split.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { moveCard } from "../core/zones.ts";
 import { placeQuestingProgress } from "../families/defense/damage.ts";
@@ -22,17 +24,17 @@ import { travelsOverActive } from "../families/grapple/travel.ts";
 import { freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
 import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
 import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
-import { branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
-import { randomStageFrom } from "../families/wilderland/random-stage.ts";
+import { attachedStageFrom, branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
+import { leaveStage, randomStageFrom } from "../families/wilderland/random-stage.ts";
 import { headOf, sharing, viewOf, withView } from "../families/breaking/areas.ts";
-import { rescueRandom } from "../families/captured/rescue.ts";
-import { oweDiscards } from "../families/breaking/progress.ts";
-import { arrivalFace, orderedNext, stageToVictory } from "../families/quest/order.ts";
+import { threatFromOtherAreas } from "../families/breaking/threat.ts";
+import { engagedContributors } from "./engaged-threat.ts";
+import { arrivalFace, orderedNext } from "../families/quest/order.ts";
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
 import { reduceQuestProgress } from "../families/angmar/progress.ts";
-import { absorbProgress } from "../families/angmar/sponge.ts";
-import { currentSideQuest, hasSideQuests, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
+import { currentSideQuest, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
+import { replaceStageProgress } from "./progress-replaced.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -53,7 +55,8 @@ type Gate = (state: ScenarioState) => boolean;
 
 // One card's part of the total Threat in the staging area: where it stands (in staging, engaged but contributing, or the active location
 // that contributes) and the Threat it adds now.
-export type ThreatSource = { id: string; threat: number; from: "staging" | "engaged" | "active" };
+// `area`: for `elsewhere`, the seat whose staging area the card stands in.
+export type ThreatSource = { id: string; threat: number; from: "staging" | "engaged" | "active" | "elsewhere"; area?: number };
 
 // The cards that make up the total Threat in the staging area, and what the table's held effects add to or take from their sum
 // (withStagingThreat; the total never falls below 0). A card that "does not contribute its Threat" is left out.
@@ -69,21 +72,14 @@ export function stagingThreatSources(state: ScenarioState, cards: Cards, seat?: 
   // An enemy engaged with a player that contributes its Threat to the staging area's ("each Ship enemy engaged with you contributes its Threat", 11060:A:1; "While engaged with a player, Faithless Desecrator
   // contributes its Threat", 12075:A:1). Only the games with ships (`sea`) or an Uncharted deck (`uncharted`) have such a card, so no other game reads the engaged enemies here.
   // `engagedThreatSeat` on a seat ("each enemy engaged with you adds its Threat ... until the end of the round", 143065:A:2) is read live: an enemy that engages that seat later counts too (rr.lasting-effects).
-  const hasEngagedContributors = view.sea || view.uncharted || view.modifiers.some((modifier) => modifier.stat === "engagedThreat" || modifier.stat === "engagedThreatSeat");
-  if (hasEngagedContributors) {
-    view.seats.forEach((seat, index) => {
-      const whole = flagged(view, `seat:${index}`, "engagedThreatSeat");
-      for (const id of seat.engaged) {
-        const instance = view.cards[id];
-        if (instance && (whole || flagged(view, id, "engagedThreat")) && !flagged(view, id, "noThreatContribution")) sources.push({ id, threat: modifiedStat(view, instance, "threat", cards), from: "engaged" });
-      }
-    });
-  }
+  sources.push(...engagedContributors(view, cards));
   // An active location that contributes its Threat to the staging area's ("While Flooded Ruins is the active location, it contributes its Threat", 11072:A:1).
   for (const id of [view.activeLocation, view.secondActiveLocation]) {
     const instance = id ? view.cards[id] : undefined;
     if (instance && flagged(view, instance.id, "activeThreat") && !flagged(view, instance.id, "noThreatContribution")) sources.push({ id: instance.id, threat: modifiedStat(view, instance, "threat", cards), from: "active" });
   }
+  // A location in another player's staging area that contributes its Threat to this area's total (Shivering River, 901707:A:1).
+  for (const found of threatFromOtherAreas(state, seat, cards)) sources.push({ ...found, from: "elsewhere" });
   const sum = sources.reduce((total, source) => total + source.threat, 0);
   return { sources, adjust: withStagingThreat(view, sum, cards) - sum };
 }
@@ -113,8 +109,7 @@ export function committedWillpower(state: ScenarioState, cards: Cards, only?: nu
     if (seat.eliminated || (only != null && headOf(view, index) !== headOf(view, only))) continue;
     for (const id of [...seat.heroes, ...seat.play]) {
       const instance = view.cards[id];
-      // A character committed to a side quest places its Willpower on that quest, not against the staging area (families/sidequests/quest.ts).
-      if (!instance?.committed || instance.questTo != null) continue;
+      if (!instance?.committed || willpowerIgnored(view, id)) continue;
       // "Using its Attack instead of its Willpower" (11005:A:2).
       total += modifiedStat(view, instance, questStatOf(view, id, cards), cards);
     }
@@ -189,14 +184,6 @@ function advanceReady(state: ScenarioState, cards: Cards, steps: EngineStep[], c
   return advanceStage(state, cards, steps, canAdvance);
 }
 
-// The flags of a quest stage that replace the progress placed on it, tried in this order: the removal of damage from locations in play (families/aflame.ts, 11037:B:1), progress the players place on a location in the staging area instead (families/island.ts, 12067:B:2) and,
-// for progress from questing successfully only (a player card's is placed as usual), damage among the enemies in play (families/pelennor, 145076:B:1).
-const PROGRESS_REPLACED: readonly { flag: Modifier["stat"]; questingOnly: boolean }[] = [
-  { flag: "progressHeals", questingOnly: false },
-  { flag: "progressToStaging", questingOnly: false },
-  { flag: "progressAsDamage", questingOnly: true },
-];
-
 // Progress on the quest goes on the active location first, up to its quest points, and the rest on the current quest card
 // (rr.active-location). A full quest card advances when `canAdvance` allows it (rr.quest-advancement); progress beyond its
 // quest points is lost: "Additional progress tokens earned against the quest do not carry over to the next stage."
@@ -210,32 +197,16 @@ export function placeQuestProgress(
   questing = false,
 ): ScenarioState {
   const started = steps.length;
-  // The active locations take it first (rr.active-location); stage 4 of The Ring Goes South has two (families/south/locations.ts).
-  const placedOn = placeOnActive(state, amount, cards, steps);
-  let next = placedOn.state;
-  let remaining = placedOn.remaining;
+  // The active locations take it first (rr.active-location; two in The Ring Goes South stage 4); the players divide it between Fisherman's Dock and the other (families/smaug/split.ts).
+  const placedOn = askSplit(state, amount, cards, steps) ?? placeOnActive(state, amount, cards, steps);
+  let { state: next, remaining } = placedOn;
   if (remaining > 0) ({ state: next, remaining } = progressFirstLocations(next, remaining, cards, steps, questing));
-  // Progress a stage turns into discards from the encounter deck (families/breaking/progress.ts).
-  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "progressDiscards")) {
-    next = oweDiscards(next, remaining);
-    remaining = 0;
-  }
-  // Progress a stage turns into rescued captured cards, at random, instead of progress on it (families/captured/rescue.ts, 10039:B:1).
-  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "progressRescues")) {
-    next = rescueRandom(next, next.questStage, remaining);
-    remaining = 0;
-  }
-  // Progress a stage turns into an event its record hears (progressReplaced, with the amount) instead of progress on it.
-  const stage = next.questStage;
-  if (remaining > 0 && stage && PROGRESS_REPLACED.some((one) => (!one.questingOnly || questing) && flagged(next, stage, one.flag))) {
-    next = queueEvent(next, { trigger: "progressReplaced", seat: null, cardId: stage, amount: remaining });
-    remaining = 0;
-  }
-  // Assault (mec113.assault): no progress is placed on the stage by questing or by a player card effect; the active location above took its share as usual.
-  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "assault")) remaining = 0;
+  const onSide = currentSideQuest(next) != null; // the progress goes on the side quest, so the stage's replacements below read none (mec108.side-quests-in-play)
+  // The stage's own replacements: discards, rescues, an event its record hears, Assault (quest/progress-replaced.ts).
+  if (remaining > 0 && !onSide) ({ state: next, remaining } = replaceStageProgress(next, remaining, questing));
   // A side quest that is the current quest takes it instead of the main quest card; what it cannot take is discarded (emce.side-quests-in-play, families/wilderland/night-quest.ts).
-  if (remaining > 0 && hasSideQuests(next)) ({ state: next, remaining } = placeOnCurrentSideQuest(next, remaining, cards, steps));
-  // The main quest card takes none while it cannot be the current quest and no side quest was chosen (10094:B:3): the progress is lost.
+  if (remaining > 0 && onSide) ({ state: next, remaining } = placeOnCurrentSideQuest(next, remaining, cards, steps));
+  // The main quest card takes none while barred as the current quest with no side quest chosen (10094:B:3).
   if (remaining > 0 && next.questStage && !next.stageCleared && !mainQuestBarred(next)) {
     const stageId = next.questStage;
     const stage = next.cards[stageId];
@@ -267,8 +238,10 @@ export type PutOnStageOptions = { readonly counted: boolean; readonly reduced?: 
 // `reduced`: Orc Grunts reduce it, as progress placed on the current quest (false for progress placed on the main quest card while a side quest is the current quest).
 export function putOnStage(from: ScenarioState, stageId: string, wanted: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, options: PutOnStageOptions): ScenarioState {
   const { counted, reduced = true } = options;
+  // "Progress cannot be placed here" (148003:B:1, while a Great Barrow is in play): the stage takes none, whatever places it.
+  if (flagged(from, stageId, "noProgressPlaced")) return from;
   // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
-  const { state, remaining: absorbed } = absorbProgress(from, wanted, cards, steps);
+  const { state, remaining: absorbed } = absorbFirst(from, stageId, wanted, cards, steps);
   // Each Orc Grunts in play reduces the progress placed on the current quest by 1 (10130:A:2).
   const amount = reduced ? reduceQuestProgress(state, absorbed) : absorbed;
   const stage = state.cards[stageId];
@@ -296,7 +269,7 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     if (!currentId) return { ...next, stageCleared: true };
     const current = next.cards[currentId];
     if (!current) return { ...next, stageCleared: true };
-    // A defeated stage that waits for the first player to choose the next one (LookAtStages), or a final stage that holds the win (`holdsWin`, 02106:B:1) and waits for its own Forced effect, stays where it is.
+    // A defeated stage that waits for the first player to choose the next one (LookAtStages), or a final stage that holds the win (`holdsWin`, 02106:B:1, 148003:B:3: no stage follows it, though the quest's order lists one) and waits for its own Forced effect, stays where it is.
     if (next.stageChoice === "due" || next.stageHeld === currentId) return next;
     // Defeating a stage when the Stormcaller is at its stage means the players have caught up to it and win (families/stormcaller/values.ts, 12013:B:3).
     if (caughtUp(next, current.code)) return clearStage(next);
@@ -311,15 +284,18 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     // A stage that names AdvanceToRandomStage (19048:B:2) proceeds to one of the stages it lists at random, each played once.
     const rolled = ordered || branched ? null : randomStageFrom(next, current.code);
     if (rolled) next = rolled.state;
-    const nextId = ordered ? ordered.id : rolled ? rolled.id : (() => {
-      const nextCode = branched ? branched.code : index < 0 ? undefined : next.stages[index + 1]?.code;
+    // A stage that names AdvanceIfAttached (50601:B:3) proceeds to the stage its Loot condition names.
+    const attached = ordered || branched || rolled ? null : attachedStageFrom(next, current.code, cards);
+    if (attached) next = attached.state;
+    const nextId = ordered ? ordered.id : rolled ? rolled.id : attached ? attached.id : (() => {
+      const nextCode = branched ? branched.code : index < 0 || flagged(next, currentId, "holdsWin") ? undefined : next.stages[index + 1]?.code;
       return nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
     })();
     if (!nextId) return flagged(next, currentId, "holdsWin") ? holdStage(next, currentId) : clearStage(next);
     const nextCode = next.cards[nextId]?.code;
     // The defeated quest card leaves play: the cards attached to it hear it and are discarded (rr.attachment-cards), the Sorcery cards of a stage that hands them on excepted (10150:B:2).
     next = releaseAttachments(noteHostDefeated(passSorcery(next, currentId, nextId, cards), currentId), currentId, cards, steps);
-    next = moveCard(next, currentId, { zone: stageToVictory(next, cards, current.code) ? "victory" : rolled?.remove ? "removed" : "setAside" });
+    next = leaveStage(next, currentId, current.code, cards, rolled, steps);
     if (rolled || (ordered && next.stages.some((stage) => stage.deck === true))) next = { ...next, stageLeft: { to: nextId, from: currentId } };
     next = moveCard(next, nextId, { zone: "questStage" });
     next = updateCard(next, nextId, { face: arrivalFace(next, nextCode) });
@@ -351,9 +327,8 @@ export function travelTo(state: ScenarioState, locationId: string, cards: Cards,
   // Exploration: the active location stays where it lies and the players travel from it to the next (families/island/travel.ts).
   const mapped = islandTravelTo(state, locationId, cards, steps);
   if (mapped !== undefined) return mapped;
-  // A second active location slot may be free (families/south/locations.ts).
-  const slot = freeSlot(state);
-  // With no slot free the active location returns to the staging area when a stage lets the players travel anyway (12041:B:1).
+  // A second active location slot may be free (families/south/locations.ts); with none free the active location returns to the staging area when a stage lets the players travel anyway (12041:B:1).
+  const slot = freeSlot(state, locationId);
   if (!slot && !travelsOverActive(state)) return null;
   const instance = state.cards[locationId];
   if (!instance || instance.zone !== "staging") return null;
@@ -376,7 +351,7 @@ export function stagingLocations(state: ScenarioState, cards: Cards, seat?: numb
 export function optionalEnemies(state: ScenarioState, cards: Cards, seat?: number): string[] {
   const acting = seat ?? state.activeSeat;
   if (flagged(state, "table", "cannotBeOptionallyEngaged")) return [];
-  return stagingEnemies(state, cards, acting).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, acting, "engage") && !familyOptionalEngageBarred(state, id, acting, cards));
+  return stagingEnemies(state, cards, acting).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, acting, "engage") && !optionalThreatBarred(state, id, acting) && !familyOptionalEngageBarred(state, id, acting, cards));
 }
 
 // The enemies in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking/areas.ts).
@@ -414,18 +389,12 @@ export function engageWith(state: ScenarioState, seat: number, enemyId: string, 
 export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Cards): string[] {
   // "Do not make engagement checks during the encounter phase" (01127:B:1): the table holds noEngagementChecks.
   if (flagged(state, "table", "noEngagementChecks")) return [];
-  // The threat the seat is treated as having (families/play/hooks.ts).
-  const threat = seatThreat(state, seat);
   const found: { id: string; cost: number }[] = [];
   // Engagement checks use only the seat's own staging area once stages are separate (mec109.multiple-staging-areas).
   for (const id of stagingEnemies(state, cards, seat)) {
     const instance = state.cards[id];
-    // An enemy that "does not make engagement checks" is passed over (it can still be engaged optionally).
-    if (!instance || flagged(state, id, "cannotBeEngaged") || flagged(state, id, "noEngagementChecks") || engagementBarred(state, id, seat, "checks")) continue;
-    // With what the enemy gets while checking against this player (Orc Disguise, families/costs/stats.ts).
-    const cost = checkCost(state, instance, seat, cards);
-    if (cost == null || cost > threat) continue;
-    found.push({ id, cost });
+    if (!instance || !checkEngages(state, id, seat, cards)) continue;
+    found.push({ id, cost: checkCost(state, instance, seat, cards) ?? 0 });
   }
   // Highest cost first: the check engages the enemy with the highest cost at or below threat (Learn to Play p14).
   found.sort((left, right) => right.cost - left.cost || left.id.localeCompare(right.id));

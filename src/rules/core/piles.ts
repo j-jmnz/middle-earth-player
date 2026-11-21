@@ -5,8 +5,8 @@ import { shuffleIds } from "./seed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
 
-/** The zones of the decks beside the encounter deck that are kept in `ScenarioState.piles` (the Caves, Evil Creatures, Spiders, Orc, Side Quest, Harad, Great Spider and Angmar Orc decks). The one list the zone types (`PileZone`, `ZoneName`, `Destination`, the dealt zones of the Setup) and the zone guard derive from. */
-export const PILE_ZONES = ["cavesDeck", "evilCreaturesDeck", "evilCreaturesDiscard", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck"] as const;
+/** The zones of the decks beside the encounter deck that are kept in `ScenarioState.piles` (the Caves, Evil Creatures, Balrog, Smaug, Spiders, Orc, Side Quest, Harad, Great Spider, Angmar Orc and Investigation decks). The one list the zone types (`PileZone`, `ZoneName`, `Destination`, the dealt zones of the Setup) and the zone guard derive from. */
+export const PILE_ZONES = ["cavesDeck", "evilCreaturesDeck", "evilCreaturesDiscard", "balrogDeck", "balrogDiscard", "smaugDeck", "smaugDiscard", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "investigationDeck"] as const;
 export type PileZone = (typeof PILE_ZONES)[number];
 /** A zone that holds a list of card ids apart from the encounter deck: the Dream-chaser box's keep theirs in `corsairDeck`, `corsairDiscard` and `uncharted.deck`. */
 const DECK_ZONES = [...PILE_ZONES, "corsairDeck", "corsairDiscard", "unchartedDeck"] as const;
@@ -20,6 +20,10 @@ export type DeckZones = { readonly deck: DeckZone; readonly discard: DeckZone | 
 export const DECKS = {
   corsair: { deck: "corsairDeck", discard: "corsairDiscard" },
   evilCreatures: { deck: "evilCreaturesDeck", discard: "evilCreaturesDiscard" },
+  // The Balrog deck of Shadow and Flame's Nightmare deck (901801:A:2 to A:4): the shadow cards of Durin's Bane come from it and go to its discard pile.
+  balrog: { deck: "balrogDeck", discard: "balrogDiscard" },
+  // The Battle of Lake-town's Smaug deck: nine cards shuffled apart from the encounter deck, with a discard pile of its own (docs/brief.md, The Battle of Lake-town).
+  smaug: { deck: "smaugDeck", discard: "smaugDiscard" },
 } as const satisfies Record<string, DeckZones>;
 
 /** The decks with no discard pile: their cards are discarded to the encounter discard pile like any other encounter card (emce.caves-deck says nothing else), and an empty one stays empty. */
@@ -35,13 +39,15 @@ const PLAIN_PILES = {
   greatSpider: { deck: "greatSpiderDeck", discard: null },
   // The Weather Hills' Orc deck (mec108.orc-deck): the Angmar Orcs enemies and Concealed Orc-camps, shuffled beside the quest deck; its cards go to the encounter discard pile, an empty deck is ignored.
   angmarOrcs: { deck: "angmarOrcDeck", discard: null },
+  // Murder at the Prancing Pony's Investigation deck (50701:A:1; docs/brief.md, Murder at the Prancing Pony): eight Suspects and Hideouts and Taken by Surprise, facedown beside the quest deck, looked at and never drawn; a card of it that leaves goes to the encounter discard pile or into play.
+  investigation: { deck: "investigationDeck", discard: null },
 } as const satisfies Record<string, DeckZones>;
 
 /** The piles a record names (`pile` of the wilderland verbs): every deck of `piles`. */
-export const NAMED_PILES = { evilCreatures: DECKS.evilCreatures, ...PLAIN_PILES } as const;
+export const NAMED_PILES = { evilCreatures: DECKS.evilCreatures, smaug: DECKS.smaug, ...PLAIN_PILES } as const;
 
 /** The decks a card remembers it was dealt into (CardInstance.deck), so it goes back to that deck's own discard pile. */
-const MARK: Readonly<Partial<Record<DeckZone, CardInstance["deck"]>>> = { evilCreaturesDeck: "evilCreatures", evilCreaturesDiscard: "evilCreatures" };
+const MARK: Readonly<Partial<Record<DeckZone, CardInstance["deck"]>>> = { evilCreaturesDeck: "evilCreatures", evilCreaturesDiscard: "evilCreatures", balrogDeck: "balrog", balrogDiscard: "balrog", smaugDeck: "smaug", smaugDiscard: "smaug" };
 
 const NONE: readonly string[] = [];
 

@@ -251,7 +251,7 @@ family owns files that are composed by the `index.ts` next to them, so families 
   new pick filter, condition kind or amount field goes in the shared `effect-schema-*.ts` file, with a comment naming the family file that reads it.
 - `src/rules/families/<family>/index.ts` exports one `manifest` (`src/rules/interpret/family-manifest.ts`): its `name`, the `verbs` its `run`
   answers and `run`, which resolves them and returns `null` for any other. `src/rules/families/index.ts` lists the manifests in
-  `RULES_FAMILIES`, in play order (where two runners could answer, the first does); `interpret.ts` asks the families before the player verbs and
+  `rulesFamilies()`, in play order (where two runners could answer, the first does); `interpret.ts` asks the families before the player verbs and
   the core switch. `src/rules/interpret/family-manifest.test.ts` fails when a declared verb has no runner, when a runner answers a verb no family
   declares, or when a manifest lists a verb its `run` returns `null` for. A declared verb that no runner executes (a constant's marker read from the
   effect records) or a runner verb the core schema declares goes in that test's two lists, with the file that handles it. Bigger families split into
@@ -266,7 +266,7 @@ family owns files that are composed by the `index.ts` next to them, so families 
 - A campaign card's Setup verb that `src/campaign/start.ts` deals in Setup (`dealt`) or resolves after the quest card's Setup (`afterSetup`) is wrapped in
   flagged `setupRole: "dealt"` or `"afterSetup"` (`verbFlags`, `src/catalog/verb-flags.ts`) in its schema entry; `verb-sets.test.ts` pins the two sets.
 
-Adding a family is therefore: the three files, one line in each of the three lists (`CATALOG_FAMILIES`, `RULES_FAMILIES`, authored), a test, and `pnpm effects open`.
+Adding a family is therefore: the three files, one line in each of the three lists (`CATALOG_FAMILIES`, `rulesFamilies()`, authored), a test, and `pnpm effects open`.
 Adding a verb to an existing family is the schema entry with its comment, a case in the family's `run` and its name in the rules manifest's `verbs`, and a test. Adding a
 verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/engine/version.ts`) when the change can move a game replayed from its intents.
 A new verb extends an existing one where it can. Before adding one, read the draft's nearest records and run `git grep <rule-id> src/rules` for code that cites the same rule id. A new verb is flagged in its schema entry (`src/catalog/verb-flags.ts`): `setupRuns` when a quest card's Setup uses it, `runsInFrame` when a Shadow line uses it and it asks a player or pushes effects, and `collection` when it takes a hero or a card from the player's collection; `verb-sets.test.ts` pins the sets. `scripts/checks/record-routes.test.ts` (in `pnpm test scenario`) fails, naming the record, on a quest card's Setup record that is neither run nor placed by the scenario's data, on a Shadow record with a verb only a frame runs that is not in `runsInFrame`, and on a campaign card's Setup verb nothing reads. It does not catch a Shadow verb that runs outside a frame but pushes effects: a golden that reaches the card does.
@@ -275,6 +275,7 @@ A new verb extends an existing one where it can. Before adding one, read the dra
 
 Read each new record against these before the review. Each one is a card bug a review has found.
 
+- **"Side quest".** The words mean either kind, a player side quest or an encounter side quest (`mec108.side-quests`): a record counts or picks them with the pick filter `sideQuest: true`, not `cardType`.
 - **"Then".** The part after "then" resolves only if the part before it did (`rr.then`). Give the later instructions the same condition, or put them on a `then` branch.
 - **"One player" or "any player".** Either phrase lets any player take it, not the first player: use a `Pick` of a player, or `ChooseCards` `who: "onePlayer"` in a Campaign Setup. "The first player" is the only phrase that means seat order.
 - **"After a 'When Revealed' effect is canceled".** It hears only a cancel of a card that has a When Revealed effect: a revealed enemy with none, canceled by a Response, announces nothing (`announceCanceled`, nightmare family).
@@ -284,6 +285,7 @@ Read each new record against these before the review. Each one is a card bug a r
 - **The card's own name in a filter.** A count "for each copy of ~" or "~ chosen" counts cards with that printed title, not every chosen card.
 - **An optional ability whose whole effect is barred.** A Response or Action must not be offered while another card's flag stops everything it does (`noResourcesPlaced` on "place 1 resource here"): give it a `condition` on that flag. `pnpm effects render` prints a `note:` on such a record, saying whether it is offered while barred.
 - **A Shadow's condition.** A Shadow record runs on the `when` of its instructions only (`combat/shadow.ts`, `resolveShadowCard`); a record-level `condition` on a `timing: "shadow"` record is never read, and `scripts/checks/record-routes.test.ts` fails on one. Put the condition on each instruction that depends on it.
+- **A Travel cost gated by `when`.** A cost line that holds only in some state ("if there is 1 active location, exhaust a hero") carries the `when` on each of its instructions, and `travelCostUnpayable` (`interpret/restrictions.ts`) skips a line whose `when` does not hold: test that the location is a travel target in both states, with every hero exhausted.
 - **New core state.** Test it at its boundaries, not only on the normal path: a phase's end, an Undo, a save and load.
 - **The options of a choice.** Every new `Choose` or `Pick` gets words in `src/play/words` that name the number, the side and whose deck (`docs/design-system-table.md`, Choice tray).
 

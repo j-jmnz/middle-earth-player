@@ -1,0 +1,293 @@
+{
+  "id": "road-to-rivendell",
+  "name": "Road to Rivendell",
+  "number": 2,
+  "stages": [
+    "04038",
+    "04039",
+    "04040"
+  ],
+  "encounterSets": [
+    {
+      "name": "Road to Rivendell",
+      "count": 28
+    },
+    {
+      "name": "Misty Mountains",
+      "count": 15
+    },
+    {
+      "name": "Plundering Goblins",
+      "count": 13
+    }
+  ],
+  "cards": [
+    {
+      "code": "04042",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04043",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04044",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04045",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04046",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "04047",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04048",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "04049",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "04050",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04051",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04052",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03054",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "03055",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03056",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03057",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03058",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03059",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03030",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "03031",
+      "normal": 5,
+      "easy": 5,
+      "pile": "encounter"
+    },
+    {
+      "code": "03032",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03033",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03034",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04038",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04039",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04040",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04041",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q02.5",
+    "dragnEasy": "E02.5",
+    "hobSlug": "Road-to-Rivendell"
+  },
+  "nightmare": {
+    "setupCard": "901401",
+    "removed": [
+      {
+        "code": "03031",
+        "copies": 5,
+        "pile": "encounter"
+      },
+      {
+        "code": "03032",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03034",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "03054",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "03055",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03056",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03059",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "04039",
+        "copies": 1,
+        "pile": "quest"
+      },
+      {
+        "code": "04042",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "04045",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "04049",
+        "copies": 1,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "901403",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901404",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901405",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901406",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901407",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901408",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901409",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ],
+    "questCards": [
+      "901402"
+    ]
+  }
+}

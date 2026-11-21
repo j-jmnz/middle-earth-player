@@ -1,6 +1,7 @@
 // Rules: rr.active-location, rr.travel, rr.step-4-2, rr.explored, rr.modifiers, rr.lasting-effects (data/rules/entries.json).
 // Locations and progress for the quest family: making a location the active location (not traveling), traveling without the
 // Travel effect, moving progress, and a Threat reduction that reports whether it reached 0.
+import { immuneToSource } from "../misc/guards.ts";
 import type { Instruction, SimpleInstruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
@@ -18,6 +19,7 @@ import { updateCard } from "../../core/state.ts";
 import { fireForced } from "../../windows/triggers.ts";
 import { effectsOfCard } from "../misc/text.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
+import { shuffleIds } from "../../core/seed.ts";
 import type { Focus } from "../index.ts";
 import { removeProgressFromEachQuest } from "../angmar/excess.ts";
 import { makeActiveIn } from "../south/locations.ts";
@@ -28,9 +30,12 @@ type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name 
 // not traveling, so no Travel cost or effect resolves and nothing hears "traveled"; a Forced effect "after it becomes the active
 // location" does (131013:A:2, 19034:A:1, 02121:A:1).
 export function makeActive(state: ScenarioState, instruction: Verb<"MakeActive">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId));
+  // With `random` the location is one of the staging area's, chosen with the game's seed (the seed moves only when there is a location to choose).
+  const staged = instruction.random === true ? state.staging.filter((candidate) => isLocationId(state, candidate, ctx.cards)) : [];
+  const rolled = staged.length > 0 ? shuffleIds(staged, state.seed, state.seedCursor) : null;
+  const id = instruction.random === true ? rolled?.ids[0] : refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId));
   if (!id || !isLocationId(state, id, ctx.cards) || state.cards[id]?.zone !== "staging") return state;
-  const next = makeActiveIn(state, id);
+  const next = makeActiveIn(rolled ? { ...state, seedCursor: rolled.cursor } : state, id);
   return fireForced(next, { trigger: "becameActive", seat: null, cardId: id }, ctx, steps);
 }
 
@@ -100,7 +105,8 @@ export function removeProgressFromQuest(state: ScenarioState, instruction: Verb<
 
 // RemoveAllProgress: every progress token comes off the card named (the picked card by default), or off each card in play that matches the filter, read from the actor's side (02023:A:2, 900409:A:1).
 export function removeAllProgress(state: ScenarioState, instruction: Verb<"RemoveAllProgress">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const ids = instruction.pick ? pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx) : [refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId))];
+  // A card immune to card effects keeps its progress (East-gate, 03016:A:1; dwd.immune-to-card-effects).
+  const ids = (instruction.pick ? pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx) : [refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId))]).filter((id) => id == null || !immuneToSource(state, id, focus.sourceId, ctx));
   return ids.reduce((current, id) => takeProgressOff(current, id, current.cards[id ?? ""]?.progress ?? 0, steps), state);
 }
 

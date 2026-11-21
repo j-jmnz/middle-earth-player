@@ -14,23 +14,16 @@ import { addToVictory } from "../families/sidequests/victory.ts";
 import { eventPlayReason } from "../families/costs/play.ts";
 import { printedOf, type Sphere } from "../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../core/state.ts";
-import { inPlay, updateCard } from "../core/state.ts";
+import { flagged, inPlay, updateCard } from "../core/state.ts";
 import { moveCard } from "../core/zones.ts";
 import { queueEvent } from "../windows/queue.ts";
+import { exhaustAnnounced } from "../windows/exhaust.ts";
 import { announceTopDiscard } from "../families/deck/pressure.ts";
-import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
-import { areaHeadOf, firstOfArea } from "../families/breaking/areas.ts";
+import { currentCause, effectCause, UNATTRIBUTED } from "../core/cause.ts";
 import { campaignUsed, noteCampaignUse } from "../families/campaign/used.ts";
 
 // Costs and limits on an Action or a Response. A cost is paid when the effect is triggered, before
 // it resolves. A limit is spent by the use, whether or not the effect then does anything.
-
-export function controllerSeat(state: ScenarioState, source: CardInstance): number {
-  if (source.controller != null) return source.controller;
-  // Mount Gram: the first player of the card's own staging area answers for an encounter card while the areas are separate (mec108.create-staging-area).
-  const head = state.capture ? areaHeadOf(state, source.id) : null;
-  return head == null ? state.firstPlayer : firstOfArea(state, head);
-}
 
 type LimitRule = { times: number; per: "phase" | "round" | "attack" | "game"; eachPlayer?: boolean; group?: boolean; campaign?: boolean };
 
@@ -108,10 +101,10 @@ export function costSphere(cost: Extract<Cost, { kind: "resources" }>, source: C
 function payable(state: ScenarioState, cost: Cost, source: CardInstance, seat: number, ctx: ReduceContext): boolean {
   switch (cost.kind) {
     case "exhaustSelf":
-      return !source.exhausted;
+      return !source.exhausted && !flagged(state, source.id, "cannotExhaust");
     case "exhaustHost": {
       const host = source.host ? state.cards[source.host] : undefined;
-      return host != null && !host.exhausted;
+      return host != null && !host.exhausted && !flagged(state, host.id, "cannotExhaust");
     }
     case "exhaustCode":
       return Object.values(state.cards).some((card) => card.code === cost.code && inPlay(card.zone) && !card.exhausted && (card.controller ?? seat) === seat);
@@ -210,16 +203,16 @@ export function payUsage(
   for (const cost of costsOf(effect)) {
     switch (cost.kind) {
       case "exhaustSelf":
-        next = updateCard(next, sourceId, { exhausted: true });
+        next = exhaustAnnounced(next, sourceId, ctx);
         break;
       case "exhaustHost": {
         const host = next.cards[sourceId]?.host;
-        if (host) next = updateCard(next, host, { exhausted: true });
+        if (host) next = exhaustAnnounced(next, host, ctx);
         break;
       }
       case "exhaustCode": {
         const ring = Object.values(next.cards).find((card) => card.code === cost.code && inPlay(card.zone) && !card.exhausted && (card.controller ?? seat) === seat);
-        if (ring) next = updateCard(next, ring.id, { exhausted: true });
+        if (ring) next = exhaustAnnounced(next, ring.id, ctx);
         break;
       }
       case "addSelfToVictory":
@@ -237,7 +230,8 @@ export function payUsage(
         break;
       }
       case "raiseThreat":
-        next = raiseThreat(next, seat, cost.amount, steps, currentCause(steps, UNATTRIBUTED));
+        // The cost of a Response taken before its frame is pushed has no running effect: it is the record's own (40005:B:3, "raise your threat by 4").
+        next = raiseThreat(next, seat, cost.amount, steps, currentCause(steps, effectCause(effect)));
         break;
       case "discardDeckTop": {
         // Each card is announced ("After ~ is discarded from your deck", families/deck/moves.ts).
@@ -275,6 +269,12 @@ export function payUsage(
     ...(rule.per === "attack" && attack ? { attack } : {}),
   };
   return noteCampaignUse({ ...next, uses: [...next.uses, use] }, effect, sourceId);
+}
+
+/** The card the source was attached to before its cost was paid, when paying took it off ("Discard Cram to ready attached hero", 131011:A:2): the effect's "attached hero" still names it. */
+export function hostLostToCost(before: ScenarioState, paid: ScenarioState, sourceId: string): { host?: string } {
+  const host = before.cards[sourceId]?.host;
+  return host && paid.cards[sourceId]?.host !== host ? { host } : {};
 }
 
 // A Forced or triggered effect with a limit spends it when it resolves ("Limit once per game", 01130:A:4): the use is recorded as a

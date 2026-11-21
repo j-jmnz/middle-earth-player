@@ -12,9 +12,6 @@ const VERBS = [
   // Every living player draws `amount` cards (1 by default), the first player first ("each player draws 1 card"). Unlike
   // ForEachPlayer it can be one branch of a Choose.
   z.strictObject({ verb: z.literal("DrawEach"), amount: positiveAmountSchema.optional(), ...when }),
-  // Heals like Heal but announces no `healed` event: for a card whose Response is "After a character is healed by another card
-  // effect, heal 1 damage on it", so its own healing does not answer itself (04128:A:2).
-  z.strictObject({ verb: z.literal("HealQuietly"), amount: positiveAmountSchema, target: z.enum(["subject", "picked"]).optional(), ...when }),
   // Moves `amount` damage (all of it with `all`) from the card picked before the last to the last picked card. Damage that
   // reaches the card's hit points destroys it ("Move any number of damage from one enemy to another", 02058:A:1).
   z.strictObject({ verb: z.literal("MoveDamage"), amount: positiveAmountSchema.optional(), all: z.boolean().optional(), ...when }),
@@ -102,10 +99,15 @@ const FLAGS = [
   // The holder gains no resources from player card effects (1), or from cards that are not treasures (2).
   "noPlayerCardResources",
   "noNonTreasureResources",
+  // The holder, a hero, gains no resources from card effects ("that player's heroes cannot gain resources from card effects", 148013:A:1): the resources a hero collects in the resource phase are not a card effect (mayGainResources, families/misc/guards.ts).
+  "noCardResources",
   // The holder (an enemy) deals no damage in the attack it makes ("this attack deals no damage").
   "dealsNoDamage",
   // The holder loses the Eagle trait ("Attached character loses the Eagle trait", 900607:A:2): hasTrait reads no Eagle trait on it, whether printed or gained.
   "losesEagle",
+  // On "table": the player cards in the victory display are worth no victory points ("During this game, player cards in the victory display do not count their victory points", 901301:A:2): victoryPointsOf (core/printed-stat.ts) reads 0 for them, in the
+  // stage's bar, the amount and the score.
+  "playerVictoryIgnored",
 ] as const;
 
 export const manifest = { name: "misc", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -14,8 +14,8 @@ const VERBS = [
   // A location already active goes back to the staging area, unless a second active location slot is free (ExtraActiveLocation).
   z.strictObject({ verb: z.literal("MakeSetAsideActive"), code: z.string().min(1), ...when }),
   // Each player (`eachSeat`) assigns `amount` damage among the cards that match `pick` from their side, one damage at a time on the card
-  // they choose ("each player assigns X damage among characters he controls", 142029:A:2). `left` and `of` are engine use: the damage still to go, and the damage to assign in all.
-  verbFlags(z.strictObject({ verb: z.literal("AssignDamage"), amount: positiveAmountSchema, pick: pickSchema, who: z.literal("eachSeat").optional(), left: z.number().int().min(0).optional(), of: z.number().int().min(1).optional(), ...when }), { runsInFrame: true }),
+  // they choose ("each player assigns X damage among characters he controls", 142029:A:2). `single`: the player chooses one card and it takes all of the damage ("assigns 3 damage to 1 character he controls", 04072:A:3). `left` and `of` are engine use: the damage still to go, and the damage to assign in all.
+  verbFlags(z.strictObject({ verb: z.literal("AssignDamage"), amount: positiveAmountSchema, pick: pickSchema, who: z.literal("eachSeat").optional(), single: z.literal(true).optional(), left: z.number().int().min(0).optional(), of: z.number().int().min(1).optional(), ...when }), { runsInFrame: true }),
   // The actor discards each card that matches `pick` (from their side) to its owner's discard pile ("discard each ally he controls",
   // 142037:A:1).
   z.strictObject({ verb: z.literal("DiscardEach"), pick: pickSchema, ...when }),
@@ -59,9 +59,10 @@ const VERBS = [
   // `target: self`: the source enemy attacks (a When Revealed on the enemy, 142047:A:1). `who: firstPlayer`: the first player is attacked, whoever
   // the actor is ("The Balrog makes an attack", 142043:A:2, which is considered engaged with the first player). `raiseThreatIfDestroys`: the player attacked raises his threat by this much once the attack ends, if it destroyed a character ("If this attack destroys a character, raise your threat by 4", 146039:A:2). `who: eventSeat`: the player the answered event happened to is attacked ("The Mouth of Sauron makes an immediate attack against that player", 146031:A:2: the player who canceled the When Revealed).
   // `undefendedToStage`: "Undefended damage from this attack must be dealt to Hrogar's Hill" (19081:A:1): the damage of the attack if it is left undefended goes on the main quest card, not a hero (emce.side-quests).
+  // `excessToStage`: the damage beyond the remaining hit points of the defender goes on the main quest card too ("Any undefended or excess damage dealt by this attack must be placed here", 51307:B:2).
   // `orEngaged`: the picked enemy may be engaged with a player instead and attacks as it is, without leaving its engagement ("Fram's Shade makes an immediate attack against each player", 19097:A:3).
   // `target: host`: the enemy the source is attached to attacks ("Saruman attacks that player", 143048:A:1). `target: subject`: the enemy the event is about attacks ("After an Orc enemy is added to the staging area, it makes an immediate attack against the first player", 09026:A:2). `shadows`: it is dealt this many shadow cards for the attack ("Deal and resolve 2 shadow cards", 143048:A:1).
-  z.strictObject({ verb: z.literal("AttackFromStaging"), target: z.enum(["self", "host", "subject"]).optional(), shadows: z.number().int().min(2).max(4).optional(), who: z.enum(["firstPlayer", "eventSeat"]).optional(), raiseThreatIfDestroys: z.number().int().positive().optional(), undefendedToStage: z.literal(true).optional(), orEngaged: z.literal(true).optional(), ...when }),
+  z.strictObject({ verb: z.literal("AttackFromStaging"), target: z.enum(["self", "host", "subject"]).optional(), shadows: z.number().int().min(2).max(4).optional(), who: z.enum(["firstPlayer", "eventSeat"]).optional(), raiseThreatIfDestroys: z.number().int().positive().optional(), undefendedToStage: z.literal(true).optional(), excessToStage: z.literal(true).optional(), orEngaged: z.literal(true).optional(), ...when }),
   // Choose, among the enemies in the staging area with this trait, the one with the highest engagement cost (ties: the first player
   // chooses) and pick it, or pick nothing when there is none (142038:A:2).
   z.strictObject({ verb: z.literal("PickHighestEngagement"), trait: z.string().min(1), ...when }),
@@ -90,6 +91,9 @@ const FLAGS = [
   // attack against each player in the combat phase, in player order; each player may attack it; it adds no Threat to the staging
   // area (rr.engaged) (142024:A:2).
   "engagedWithAll",
+  // On an enemy in the staging area: as `engagedWithAll`, but it is considered engaged only with each player whose threat is 1 or greater, read live: it attacks each of them once in the combat phase and only they declare attackers against it; a player whose threat was below 1 when the combat phase began and is raised during it is attacked
+  // with no shadow card dealt (Durin's Bane, 04150:A:2, dwd.durins-bane).
+  "engagedWithThreatening",
   // On a location: at most this much progress can be placed on it each round (142036:A:1), and the progress placed on it this round
   // (engine use).
   "progressCap",

@@ -63,7 +63,7 @@ export const ENCOUNTER_CARDS = cardMap([
   ally("143004", "Gimli", "lore", ["Dwarf"]),
   event("17005", "Wait no Longer", "lore"),
   ally("17008", "Firyal", "lore", ["Harad", "Scout"]),
-  ally("17033", "Dunedain Pathfinder", "spirit", ["Dunedain", "Scout"]),
+  ally("17033", "Dunedain Pathfinder", "spirit", ["Dúnedain", "Scout"]),
   event("17057", "Hunting Party", "lore"),
   event("19007", "The Hidden Way", "lore"),
   event("21007", "The Gathering Storm", "lore"),

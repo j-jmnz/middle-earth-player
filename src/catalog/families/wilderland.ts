@@ -55,7 +55,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("Deep") }),
   // Constant on a card in play, usually the campaign card or the quest stage: "Ignore the deep keyword" / "Ignore the deep and discover keywords" (12187:A, 12195:A, 18080:B, 19023:B; emce.deep, emce.discover). While the card is in play the keywords
   // are not resolved: the scenario-level switch. It does nothing when run.
-  z.strictObject({ verb: z.literal("IgnoreKeyword"), keywords: z.array(z.enum(["deep", "discover"])).min(1) }),
+  z.strictObject({ verb: z.literal("IgnoreKeyword"), keywords: z.array(z.enum(["deep", "discover", "investigate"])).min(1) }),
   // Forced on a location, trigger becameActive with subject self: the Discover X keyword (emce.discover; 19102:A, 19104:A, 19105:A). The first player looks at the top X cards of the encounter deck (the discard pile is shuffled into it when it holds fewer),
   // attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile. Ignored while a card in play ignores the keyword.
   // `afterTravel` is engine use: the keyword the travel step held back to resolve once the Responses to the travel are done (families/wilderland/discover.ts, so a Response such as Crypt Key's, 19094:A:3, comes before it).
@@ -76,7 +76,10 @@ const VERBS = [
   z.strictObject({ verb: z.literal("SetAsideDiscardForPool"), exclude: z.array(z.enum(["unique", "objective", "burden"])), ...when }),
   // "Flip over Woodmen Village and attach Haldan to the just-added enemy as a guarded objective" (18069:A:2): the source card, wherever it lies, shows the card `into` and enters the staging area, faceup; with `guardedBy` the picked card (the enemy the last
   // AddFromPile added) guards it (rr.guarded). The old side is kept as the card's other side.
-  z.strictObject({ verb: z.literal("FlipOver"), into: code, guardedBy: z.literal("picked").optional(), ...when }),
+  // `target: "subject"` (51001:B:1, "When Rhosgobel is explored, flip it over and add Rider of Mirkwood to the staging area"): the card the event is about, the explored location, is the one that flips, not the source.
+  // `control: "firstPlayer"` (51101:B:1, "flip it over and put Mendor into play under the first player's control, ready"): the back is a player-side card, so it enters the first player's play area, faceup and ready, not the staging area; it enters play for that player (the trigger enteredPlay) and has no owner.
+  // `setAside` (51301:B:1, "When Dark Pit is explored, flip it over and set Durin's Bane aside, out of play"): the card, flipped to `into`, goes to the set-aside zone instead of the staging area, where a later AddSetAsideToStaging or EnterSetAsideStaging finds it.
+  z.strictObject({ verb: z.literal("FlipOver"), into: code, guardedBy: z.literal("picked").optional(), target: z.literal("subject").optional(), control: z.literal("firstPlayer").optional(), setAside: z.literal(true).optional(), ...when }),
   // "The player with the most cards in his hand without a copy of Lost in the Wild adds Lost in the Wild to his hand" (18026:A:1): of the players with no card of the source's title in hand, the one with the most cards in hand takes the source into
   // their hand (the first player chooses among players tied). Nothing happens when every player holds a copy.
   z.strictObject({ verb: z.literal("AddSourceToHandOfMost"), ...when }),
@@ -98,11 +101,26 @@ const VERBS = [
   z.strictObject({ verb: z.literal("PutObjectiveLocationAfterDiscard") }),
   // Carried Away (18074:A:1): "Each player chooses a hero he controls, discards each token and attachment from that hero, and places it in the staging area ... attaches that enemy to the hero he owns in the staging area, guarding it." After a Pick of the hero, a DiscardUntil enemy and a
   // MoveEncounterCard of that enemy to the staging area, the hero (the card picked before the last) loses its tokens and attachments and lies facedown under the enemy (the captive zone: in play, controlled by no one), flagged as guarded; the enemy guards it (guardsHero). Nothing happens when no enemy was found.
-  z.strictObject({ verb: z.literal("CarryAwayHero"), ...when }),
+  // `keepAttachments` (51008:B:1, "discard all tokens from the chosen hero"): only the hero's tokens are discarded; its attachments stay on it under the enemy (docs/brief.md, The Wizard's Quest, reading 10).
+  z.strictObject({ verb: z.literal("CarryAwayHero"), keepAttachments: z.literal(true).optional(), ...when }),
   // Carried Away (18074:B:2): "When an enemy guarding a hero is defeated, return that hero to its owner's control, exhausted." (user ruling, 2026-11-05: when it leaves play in any way) The hero the event's subject (the enemy) guarded comes back among its owner's heroes, faceup and exhausted.
   z.strictObject({ verb: z.literal("ReleaseGuardedHero"), ...when }),
   // Carried Away (18074:B:3): "When the players advance from this stage, discard each guarded hero." Each hero an enemy guards goes to its owner's discard pile; a player left with no hero is eliminated (rr.player-elimination).
   z.strictObject({ verb: z.literal("DiscardGuardedHeroes"), ...when }),
+  // Enemy Camp (50815:A:2, "discard 1 random facedown hero from under each stage 3"): of the heroes lying facedown under the current quest stage when it is stage number `stage`, one chosen with the game's seed goes to its owner's discard pile (a player left with no hero is eliminated).
+  // Nothing happens at another stage or with no hero under it (docs/brief.md, The Siege of Annúminas, reading 18: Standard Game Mode puts no hero there).
+  z.strictObject({ verb: z.literal("DiscardHeldHero"), stage: z.number().int().positive(), ...when }),
+  // Enemy Camp (50815:A:2, "return each hero under each stage 3 to its owner's control"): each hero lying facedown under the current quest stage, when it is stage number `stage`, returns among its owner's heroes, faceup and exhausted.
+  z.strictObject({ verb: z.literal("ReturnHeldHeroes"), stage: z.number().int().positive(), ...when }),
+  // Attack on Dol Guldur (standalone-scenarios part 9; ledger lines 50907:A:1, 50931:B:2; docs/brief.md, Attack on Dol Guldur, readings 4 and 6).
+  // On the event of an enemy destroyed or a location explored: the Siege value printed on that card (`siegeValue`, 0 when it prints none) joins the round's tally, which the amount `siegeTally` reads. Dol Guldur's Forced effect empties it by reading it at the end of the round.
+  z.strictObject({ verb: z.literal("TallySiege"), ...when }),
+  // "randomly select a stage 3 that was not in play this round" (50931:B:2): of the stages in `codes`, those but the current one, the game's seed picks one and the running effect notes its code as an option taken (the condition `optionTaken`), for the penalty records that follow.
+  z.strictObject({ verb: z.literal("SelectRandomStage"), codes: z.array(code).min(2), ...when }),
+  // "place it in his play area under his control" (50902:A:1, Power of Lórien): the card in the staging area with this code enters the first player's play area, faceup and ready. Nothing happens when it is not in the staging area.
+  z.strictObject({ verb: z.literal("TakeControlOfStaged"), code, ...when }),
+  // "Then, discard each copy of that card from play" (50911:A:2): after a DiscardFromDeck, each card in play with the title of the card it discarded last, whoever controls it, is discarded.
+  z.strictObject({ verb: z.literal("DiscardCopiesOfDiscarded"), ...when }),
   // Truly Lost (18075:A:1): "Each player places his hand of cards facedown under a different location in the staging area." The actor chooses a location in the staging area (an Objective-Location is one) that no player has put a hand under yet, and every card of their hand goes facedown under it, still theirs.
   // With an empty hand nothing is chosen.
   z.strictObject({ verb: z.literal("PlaceHandUnderLocation"), ...when }),
@@ -131,9 +149,12 @@ const VERBS = [
   // "The first player chooses a player to attach an Artifact attachment from his hand to Dragon Hoard. That attachment gains the guarded (location) keyword" (18043:A:3): the last picked card of a hand is guarded by a location of the encounter deck, found as the Guarded (location) keyword does (emce.guarded-x), and lies in the staging area; once nothing guards it the players claim it, the first player choosing the character it attaches to, as for a treasure. With no location to find it is claimed at once.
   z.strictObject({ verb: z.literal("GuardPickedAttachment"), types: z.array(z.enum(["enemy", "location"])).min(1), ...when }),
   // "The first player attaches the top card of his deck to Hobgoblin faceup as a guarded attachment" (18050:A:2): the first player's top deck card lies faceup under the source, which guards it (cardsUnder). Nothing happens with an empty deck.
-  z.strictObject({ verb: z.literal("GuardWithDeckTop"), ...when }),
+  // With `discards`: "when it leaves play, discard that card" (Nameless Thing, 51351:A:1): the card goes to its owner's discard pile, not to the hand (families/wilderland/kings.ts returnHeld).
+  z.strictObject({ verb: z.literal("GuardWithDeckTop"), discards: z.literal(true).optional(), ...when }),
   // A marker on Hobgoblin (18050:A:2, its Forced record on leftPlay): "When Hobgoblin leaves play, return the card it was guarding to its owner's hand". An enemy leaving play queues no event, so the settle sweep returns a card held under an enemy that is out of play (families/wilderland/kings.ts returnHeld). It does nothing when run.
   z.strictObject({ verb: z.literal("ReturnGuardedToHand") }),
+  // A marker on Nameless Thing (51351:A:1, its Forced record on leftPlay): "When Nameless Thing leaves play, discard that card". Like ReturnGuardedToHand it does nothing when run; the settle sweep discards the card (a GuardWithDeckTop `discards`).
+  z.strictObject({ verb: z.literal("DiscardGuarded") }),
   // "Cancel the attack" (18080:B:2): the player attack in progress deals no damage; its attackers stay exhausted. Run in the response to enemyAttacked, which resolves before the attack's strength is read.
   z.strictObject({ verb: z.literal("CancelStrike"), ...when }),
   // The Withered Heath (part 4, campaign card 12175; ledger lines 12175:A:2, 12175:B:7, 19012:A:3, 19015:A:1, 19018:A:1, 19022:A:1, 19022:B:1, 19024:A:1, 19024:B:2, 12176:A:4, 12179:A:4).
@@ -148,8 +169,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("VictoryWhenFree") }),
   // A constant marker, in play under the record's own condition: "While Mountain Pass is in the staging area, the 'when revealed' effects of Weather treachery cards cannot be canceled" (19015:A:1). A Response that cancels the When Revealed effects of an encounter card
   // with the trait is not offered while the marker's source is in play and its record holds (rr.cancel, families/wilderland/heath.ts). With `cardType` the effects of treachery cards ("The 'when revealed' effects of treachery cards cannot be canceled", 19048:B:1). It does nothing when run.
-  // With `firstRevealedEachRound`, only the first treachery revealed each round ("The 'when revealed' effects of the first treachery revealed each round cannot be canceled", 19137:B:1).
-  z.strictObject({ verb: z.literal("UncancelableWhenRevealed"), trait: z.string().min(1).optional(), cardType: z.literal("treachery").optional(), firstRevealedEachRound: z.literal(true).optional() }),
+  // With `firstRevealedEachRound`, only the first treachery revealed each round ("The 'when revealed' effects of the first treachery revealed each round cannot be canceled", 19137:B:1). With `doomed` (and `firstRevealedEachRound`) that treachery also gains Doomed X as it is revealed, on top of its printed Doomed ("The first treachery revealed each round gains doomed 1 and its effects cannot be canceled", 50721:A:2).
+  // With `surge` (and `firstRevealedEachRound`) that treachery also gains surge as it is revealed ("the first treachery revealed each round gains surge and its 'when revealed' effects cannot be canceled", 51240:A:1).
+  z.strictObject({ verb: z.literal("UncancelableWhenRevealed"), trait: z.string().min(1).optional(), cardType: z.literal("treachery").optional(), firstRevealedEachRound: z.literal(true).optional(), doomed: z.number().int().positive().optional(), surge: z.literal(true).optional() }),
   // "Look at the top 3 cards of the encounter deck. Reveal 1 of those cards and discard the rest" (19022:B:1, 19024:B:1): after LookAtTop and a PickEncounter of one looked card, the other looked cards that are still on top go to the encounter discard pile faceup; the picked card is then the top card, and the
   // RevealEncounter after it reveals it. The discard comes first, a deliberate order as Discover's (emce.discover): a Surge on the revealed card reveals the next card of the deck, not one of the looked ones.
   z.strictObject({ verb: z.literal("DiscardOtherLooked"), ...when }),
@@ -158,7 +180,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ArrangeLookedDeck"), kept: z.string().optional(), bottom: z.array(z.string()).optional(), ...when }),
   // "...it makes an immediate attack against you" (12179:A:4): the card the answered event is about (`target`, the subject by default), an enemy engaged with the actor, makes an immediate attack against them, dealt a shadow card of its own as any attack an effect makes is.
   // Nothing happens when it is not engaged or may not attack.
-  z.strictObject({ verb: z.literal("ImmediateAttackBy"), target: cardRefSchema.optional(), ...when }),
+  // `extraShadow`: that many more shadow cards are dealt to it for this attack, after its usual one ("Deal him 2 additional shadow cards for this attack", 40017:A:3).
+  z.strictObject({ verb: z.literal("ImmediateAttackBy"), target: cardRefSchema.optional(), extraShadow: z.number().int().positive().optional(), ...when }),
   // "For each ready character a player controls, he must choose: either exhaust that character, or deal 1 damage to it" (19021:A:1): the actor, run for each player in turn, is asked once for each ready character they control, in the order they entered play,
   // whether it is exhausted or takes `amount` damage. The characters are those ready when the verb starts.
   // With `or: "threat"` the other choice is to raise their threat by `amount` ("either exhaust that character or raise his threat by 1", 19045:A:1).
@@ -175,7 +198,9 @@ const VERBS = [
   // Roam Across Rhovanion (part 5, campaign card 12184; ledger lines 12184:A:2, 12184:B:1, 12184:B:3, 12184:B:4, 19036:A:1, 19037:A:1, 19044:A:1, 19047:B:2, 19048:B:2, 19051:A:1).
   // "Advance to a random stage 2A, if able. Otherwise, advance to stage 3A" (19047:B:2, 19048:B:2, 19049:B:2, 19050:B:2): the quest card names the stages it proceeds to, each played once in a random order (the game's seed): one of `codes` still in the quest deck, else `otherwise`; with `remove` the stage defeated
   // is removed from the game. The scenario definition copies it onto the stage (`stages[i].randomNext`) and the quest takes it when the stage is defeated, so run on a stage that was defeated it does nothing; run on the stage the quest is at (19047:B:2's Forced effect) it advances the quest at once.
-  z.strictObject({ verb: z.literal("AdvanceToRandomStage"), codes: z.array(code).min(2), otherwise: code.optional(), remove: z.literal(true).optional() }),
+  z.strictObject({ verb: z.literal("AdvanceToRandomStage"), codes: z.array(code).min(2), otherwise: code.optional(), remove: z.literal(true).optional(), different: z.literal(true).optional(), ...when }),
+  // With `different` ("advance to a different random stage 2A", 147002:B:2): the stage is never the one the quest is at, and that stage, when it is one of `codes`, goes back into the quest deck with its progress and attachments discarded (it can come up again later),
+  // instead of leaving the game or the deck's order; the stage it arrives at resolves its When Revealed. A stage that is not among `codes` (stage 1, 147001:B:1) leaves as an advanced stage does.
   // "The first player loses control of both Urdug and Tiny, flips them to their enemy sides, and adds them to the staging area. (Remove any damage that was on them.)" (19051:A:1): the card in play with this code becomes the card `into`, faceup and ready in the staging area, controlled by no one,
   // with no damage; it keeps its resource tokens and its attachments. Nothing happens when no such card is in play.
   z.strictObject({ verb: z.literal("FlipToEnemySide"), code, into: code, ...when }),
@@ -187,7 +212,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ClaimWhenFree"), host: z.string().min(1).optional() }),
   // "The first player loses control of Urdug, then attach Urdug to a location in the staging area as a guarded objective" (19044:A:1): the card in play with this code goes back to the staging area, controlled by no one, guarded by the last picked card (a location in the staging area). Nothing happens when no such card is
   // in play or nothing is picked.
-  z.strictObject({ verb: z.literal("GuardReturnedBy"), code, ...when }),
+  // `returns: "firstPlayer"` (an ally, "attaches her to Goblin Gate", 901402:B:1): the guard may be the active location too, and once nothing guards the card (the guard left play) it rejoins the first player's play area, as the ControlledBy constant it holds says (the flag `guardedAlly`,
+  // read by the play family's sweep). Its damage, tokens and attachments stay on it, and it stays in play.
+  z.strictObject({ verb: z.literal("GuardReturnedBy"), code, returns: z.literal("firstPlayer").optional(), ...when }),
   // Resolution: "Each player chooses a location in the staging area and adds a copy of it to the campaign pool. Players must choose different locations, if able" (12184:B:4): each player in turn, the first player first, chooses a location (by title) in the staging area that no earlier player chose, unless
   // every title is taken; a copy of each joins the Campaign Pool's encounter cards (never more than one collection holds). A burden location (Abandoned Ruin) is not offered: it joins the pool as a burden. Run by the Resolution (rules/setup/resolution.ts).
   z.strictObject({ verb: z.literal("ChooseStagedLocationForPool"), ...when }),
@@ -210,7 +237,11 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ResolveDiscover"), ...when }),
   // "Then, attach a Loot objective in the encounter discard pile to that enemy as a guarded objective" (19101:A:2): after a DiscardUntil and a MoveEncounterCard put the enemy in the staging area, a Loot objective of the encounter discard pile (the first player chooses among several) is added to the staging area
   // and the picked enemy guards it (rr.guarded). Nothing happens when no enemy was found or no Loot objective is in the discard pile.
-  z.strictObject({ verb: z.literal("AttachLootFromDiscard"), ...when }),
+  // `to: self` (50626:A:2, "search the encounter discard pile for a Loot objective and attach it to Secret Chamber as a guarded objective"): the guard is the source location, which need not be an enemy a DiscardUntil found.
+  z.strictObject({ verb: z.literal("AttachLootFromDiscard"), to: z.literal("self").optional(), ...when }),
+  // The Ruins of Belegost (standalone-scenarios part 6; ledger line 50601:A:1; rr.in-play-and-out-of-play): "Randomly select 1 of the 5 remaining Loot objectives and place it facedown underneath Stalking the Ruins (without looking). Shuffle the others into the encounter deck."
+  // Of the set-aside cards with these `codes` the game's seed picks one, which goes facedown under the card in play with the code `under`; the others go into the encounter deck, facedown, which the record's next ShuffleEncounterDeck shuffles. Nothing happens when `under` is not in play.
+  verbFlags(z.strictObject({ verb: z.literal("HideRandomLoot"), codes: z.array(code).min(2), under: code, ...when }), { setupRuns: "top" }),
   // Resolution: "Shuffle the encounter discard pile into the encounter deck and discard cards from the top until 2 Hazard cards are discarded. The players, as a group, must choose 1 of those cards and add it to the campaign pool" (12189:B:6; emce.campaign-pool-encounter): the discard
   // pile is shuffled in, cards come off the top into the discard pile until `count` Hazard cards are among them (or the deck is empty), and the first player chooses for the group one of those Hazard cards: an encounter card joins the Campaign Pool's encounter cards, a burden joins the pool as a burden.
   // Run by the Resolution (rules/setup/resolution.ts).
@@ -220,13 +251,28 @@ const VERBS = [
   // stage of the deck (rules/families/quest/order.ts). Run alone it does nothing.
   z.strictObject({ verb: z.literal("FlipAtQuestPhase") }),
   // "At the beginning of the quest phase" the current quest card shows side B (emce.gundabad-quest-deck). A stage that already shows side B changes nothing.
-  z.strictObject({ verb: z.literal("FlipCurrentQuest"), ...when }),
+  // With `resolve` the stage's side B is revealed now: its When Revealed effects resolve as the stage turns over (Flight from Moria's stage 2s are flipped at the beginning of the staging step, 03070:A:1; dwd.creating-the-quest-deck), the actor the first player.
+  z.strictObject({ verb: z.literal("FlipCurrentQuest"), resolve: z.literal(true).optional(), ...when }),
   // "The players may bypass this stage" (19135:B:3; emce.bypassing): the source stage loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving. Nothing happens
   // when the quest deck holds no other stage. A bypassed stage is not defeated: the Forced effects of "when this stage is defeated" do not hear it.
   z.strictObject({ verb: z.literal("BypassStage"), ...when }),
   // "Search the quest deck for a quest card and make it the current main quest. Then, flip it over. Shuffle the rest of the quest deck" (19124:A:1): the actor chooses a stage of the quest deck, it becomes the current quest in place of the stage now current (which goes back into
   // the quest deck with no progress, side A up, as a bypassed stage does), it is revealed and shows side B at once, and the quest deck is shuffled.
   z.strictObject({ verb: z.literal("SearchQuestDeck"), ...when }),
+  // Flight from Moria (dwarrowdelf part 3; dwd.creating-the-quest-deck, dwd.bypassing-a-quest-card; ledger lines 03026:A:1, 03074:B:1, 03075:B:3, 03070:B:1, 03071:B:1).
+  // "Shuffle the current quest card into the quest deck, then reveal a new quest card" (03026:A:1): the source of the stage now current is not it: the current stage loses its progress, returns to the quest deck with side A up (shuffled in, or at the bottom with `bottom`, 03075:B:3)
+  // and the top stage of the quest deck is revealed side A, its When Revealed effects resolving. The stage is not defeated and not bypassed: nothing that hears a defeat or a bypass is told. With `bottom` and no other stage in the quest deck nothing happens.
+  z.strictObject({ verb: z.literal("RevealNewStage"), bottom: z.literal(true).optional(), ...when }),
+  // "Reveal the top 2 cards of the quest deck. Choose 1 to become the active quest (flipped to side 2B) and put the other on the bottom of the quest deck" (03074:B:1): the actor chooses one of the top `count` stages (the only one without asking); it takes the place of the source stage
+  // and is flipped at once, its When Revealed effects resolving; the others go to the bottom of the quest deck, side A up. The stage replaced is set aside until the record's next instruction adds it to the victory display.
+  z.strictObject({ verb: z.literal("ChooseStageToFlip"), count: z.number().int().min(1), ...when }),
+  // "If Heading Up is in the player's victory display at the end of any quest phase, shuffle Heading Up back into the quest deck" (03070:B:1): the card with this code in the victory display goes into the quest deck, side A up, and the quest deck is shuffled. Nothing happens when it is not there.
+  z.strictObject({ verb: z.literal("ShuffleStageFromVictory"), code, ...when }),
+  // "Each player discards 1 card from the top of the encounter deck. If the card is a treachery card, the discarding player is eliminated from the game" (03075:B:2): each living player in turn order discards the top card of the encounter deck (a deck that ran out is reset first,
+  // rr.running-out-of-cards); the card is discarded, not revealed, and a card of `type` eliminates the player who discarded it before the next player discards.
+  z.strictObject({ verb: z.literal("DiscardTopEliminating"), type: z.literal("treachery"), ...when }),
+  // "If this attack destroys a character, add this card to the victory display" (901209:A:3): run by an AfterAttack, whose source is the attacking enemy, so the shadow card is found among the shadow cards the enemy holds, by its `code`.
+  z.strictObject({ verb: z.literal("AddShadowToVictory"), code, ...when }),
   // "Flip Wormsbane to its Reforged side" (19122:A:3): the card in play with the code `code` shows its other side `into`, staying where it lies with its tokens and attachments (the old side is kept as the card's other side).
   // With `attachTo: "picked"` it then moves to the hero last picked, leaving the card it was attached to.
   // With `entersPlay` the new side enters play: it hears "After X enters play" ("After Savage Counter-attack enters play", 09072:A:1; mec112.gollum-smeagol).
@@ -240,6 +286,13 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AttachTreasuresToHost"), ...when }),
   // A constant of a card in play: "Each player cannot play more than 1 card each phase" (19140:B:1). A player who has played `max` cards in the phase (the plays state.played records) may play no more; a card put into play is not played.
   z.strictObject({ verb: z.literal("LimitPlaysPerPhase"), max: z.number().int().min(1) }),
+
+  // A constant of a card in play: "Each player cannot play more than 1 card each round" (147016:A:1). Each player's own count of cards played this round (the plays state.played records, any phase); a card put into play is not played and does not count, unlike LimitHandPlaysPerRound.
+  z.strictObject({ verb: z.literal("LimitPlaysPerRound"), max: z.number().int().min(1) }),
+  // A constant of a card in play: "Each player cannot play or put into play more than 1 card from his hand each round" (00017:B:2). Every card a player plays from the hand (allies, attachments and events) and every card an effect puts into play
+  // from his hand counts, each player's own; a card played or put into play from the deck, the discard pile or out of play does not. The count (`handPlays`, a table modifier for the seat until the end of the round) is kept only in a game
+  // with such a card.
+  z.strictObject({ verb: z.literal("LimitHandPlaysPerRound"), max: z.number().int().min(1) }),
   // The Fate of Wilderland (part 9, campaign card 12195; ledger lines 12195:A:2, 19155 to 19170).
   // Campaign Setup: "Each player may search their deck for a boon or treasure card and add it to their hand" (12195:A:2). Each player in turn may take a boon or a treasure card of their deck (a pool card the checklist is about to shuffle into it is in the deck already) into their
   // starting hand, or decline; every player is asked, unlike the search for a boon ally. Dealt by the checklist (campaign/checklist.ts), so it changes nothing here.
@@ -254,12 +307,17 @@ const VERBS = [
 ] as const;
 
 const TRIGGERS = [
+  // About no card: the players bypassed the current stage (emce.bypassing, dwd.bypassing-a-quest-card): announced once for each living seat, as the stage has gone to the quest deck and before the next stage's When Revealed effects resolve ("Forced: When a quest card is bypassed", 901205:A:2).
+  // Use `eventSeat: "you"` for the player the listener is engaged with.
+  "stageBypassed",
   // About a side quest: it became the current quest at the beginning of the quest phase ("After Draw Her Fire becomes the current quest", 19066:A:2; emce.side-quests-in-play).
   "becameCurrentQuest",
   // About a location: its Discover keyword was just resolved (emce.discover). The event's amount is 1 when a Hazard card was revealed by it, else 0 ("After resolving the Discover keyword on Hidden Staircase", 19103:A:3).
   "discovered",
 ] as const;
 const FLAGS = [
+  // On the table, for a seat, until the end of the round: one card played or put into play from its hand (LimitHandPlaysPerRound, 00017:B:2); engine use, one modifier for each card.
+  "handPlays",
   // On a character: the next damage it would be dealt cancels this many points of it, and the flag is spent ("The next time that character would be dealt damage this round, cancel 1 of that damage", 12166:A:2). Set with a ModifyStat that lasts
   // until the end of the round or the phase; src/rules/families/wilderland/shield.ts takes it as damage is placed.
   "damageShield",
@@ -285,6 +343,9 @@ const FLAGS = [
   "dealtShadows",
   // On a location: the adjustment a Response made to its Discover value this phase, positive or negative ("increase or decrease its Discover value by 1 before resolving it", 19094:A:3). Read by the Discover keyword (families/wilderland/discover.ts).
   "discoverValue",
+  // On a location (a constant ModifyStat of the location itself): the number of cards its Discover keyword looks at beyond its value ("look at X additional cards", 50622:A:3), and the number of looked-at Hazard cards beyond the first it reveals ("the first player reveals an additional looked at Hazard card for each other player", 50623:A:3). Read by the Discover keyword (families/wilderland/discover.ts).
+  "discoverLooked",
+  "discoverHazards",
   // On an enemy: a player can optionally engage it only while a unique enemy is engaged with them ("cannot be optionally engaged except by a player who is engaged with a unique enemy", 12192:A:1). Read by the optional-engagement hook (families/wilderland/engage.ts).
   "optionalEngageUnique",
   // On a seat (target eachSeat): the most its threat can be reduced by player card effects each round ("each player's threat cannot be reduced by more than 1 via player card effects each round", 19104:A:2). Read by lowerThreatByEffect (families/quest/threat.ts).
@@ -300,6 +361,29 @@ const FLAGS = [
   "treacheryRevealed",
   // On a card in play: resource tokens cannot be placed on it ("resources cannot be placed on The Heroes' Defense", 19161:A:2). Read by PlaceResourceTokens (families/nightmare/dungeon.ts).
   "noResourcesPlaced",
+  // On the table, while the source is in play: each bypass costs every player this much threat, a raise that may eliminate him ("As an additional cost to bypass a quest card, each player must raise his threat by 2", 901207:A:1). The amounts of every card held add up.
+  "bypassThreat",
+  // On the table: a stage bypassed is shuffled into the quest deck with the rest, and the top of it is revealed (901201:A:2, Nightmare Flight from Moria); the bypassed stage can come back.
+  "bypassShuffles",
+  // On a character: it cannot exhaust, so it cannot commit to the quest, attack or defend, and a cost that exhausts it fails ("Attached hero cannot exhaust or ready", 03027:A:1). Read where a character exhausts (rules/interpret/constants.ts).
+  "cannotExhaust",
+  // On an enemy: a character that attacks it with the ranged keyword deals no damage to it, and a character that attacks it another way does ("Immune to ranged damage", 03042:A:1; dwd.immune-to-ranged-damage). Read where combat damage is dealt (rules/combat/).
+  "immuneToRangedDamage",
+  // On the table, until the modifier ends: a character committed to the quest does not count its Willpower, in the quest total and in what sums the Willpower of committed characters, unless it holds `countsWillpower` ("Each questing character not chosen does not count
+  // its Willpower until the end of the turn", 03073:B:1). Read by committedWillpower (rules/quest/quest.ts).
+  "ignoresWillpower",
+  // On a character: it counts its Willpower while the table holds `ignoresWillpower` (the character a player chose, 03073:B:1).
+  "countsWillpower",
+  // On the table: the Refresh Action of Abandoned Tools can be used once each round while Escape from Darkness is the current quest (901201:A:3), and the use made this round (engine use).
+  "refreshOnce",
+  "refreshUsed",
+  // On an enemy: it has no Indestructible, whatever it prints ("While Dol Guldur's city strength is 0, each Lieutenant enemy loses indestructible", 50931:B:1; docs/brief.md, Attack on Dol Guldur, reading 18). Its other keywords stay. Read by indestructible (rules/core/keywords.ts).
+  "losesIndestructible",
+  // On an enemy: no Response cancels a Shadow effect the enemy attacks with ("its shadow cards cannot be canceled", 50916:A:1). Read by cancelBarred (rules/families/encounter/cancel.ts).
+  "shadowsUncancelable",
+  // On an enemy (target `attacker`): it gets this much Attack (`attackAtFiveProgress`) or Defense (`defenseAtFiveProgress`) while the current quest stage holds 5 progress or more, read each time the stat is read ("+2 instead if there are at least 5 progress tokens on the quest", 50930:A:2: an encounter card's lasting effect, recalculated until the end of the phase, faq.lasting-effects). Read by questProgressBonus (rules/families/wilderland/dolguldur.ts).
+  "attackAtFiveProgress",
+  "defenseAtFiveProgress",
 ] as const;
 
 export const manifest = { name: "wilderland", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

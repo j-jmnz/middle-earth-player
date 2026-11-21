@@ -19,7 +19,7 @@ import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { DOORS, GREAT_WARG_CHIEF, LUST, loadSouthWorld, REDHORN_PASS, southTable, STING, type SouthLayout, type SouthWorld } from "../../../../test/scenarios/the-ring-goes-south/scene.ts";
 import { codesOf } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
-import { first } from "../../../../test/harness/scene-kit.ts";
+import { first, idOf } from "../../../../test/harness/scene-kit.ts";
 
 let world: SouthWorld;
 
@@ -62,7 +62,8 @@ function fire(table: Table, state: ScenarioState, cardId: string, effectId: stri
 function explore(table: Table, state: ScenarioState, code: string, damage: number): ScenarioState {
   const id = first(state, code);
   const hurt = { ...state, cards: { ...state.cards, [id]: { ...state.cards[id]!, damage } } };
-  return run(table, hurt, { verb: "PlaceProgressOn", amount: 6, target: "activeLocation" }, table.frodo);
+  // The quest card places the progress: the location is immune to player card effects, so a hero's effect would place none (rr.immune).
+  return run(table, hurt, { verb: "PlaceProgressOn", amount: 6, target: "activeLocation" }, hurt.questStage ?? table.frodo);
 }
 
 describe("the boons (142011 to 142014)", () => {
@@ -88,8 +89,8 @@ describe("the boons (142011 to 142014)", () => {
   it("Glamdring goes on a Warrior hero or Gandalf, Andúril on a Noble hero or Aragorn", () => {
     const table = make({ hand: ["142013", "142014"] });
     // Frodo and Sam are Hobbits: neither is a Warrior or a Noble.
-    expect(attachmentTargets({ ...table.state, activeSeat: 0 }, "142013", table.ctx)).toEqual([]);
-    expect(attachmentTargets({ ...table.state, activeSeat: 0 }, "142014", table.ctx)).toEqual([]);
+    expect(attachmentTargets({ ...table.state, activeSeat: 0 }, idOf(table.state, "142013"), table.ctx)).toEqual([]);
+    expect(attachmentTargets({ ...table.state, activeSeat: 0 }, idOf(table.state, "142014"), table.ctx)).toEqual([]);
   });
 
   it("Glamdring draws a card after the attached character destroys an Orc enemy, and not for another enemy", () => {

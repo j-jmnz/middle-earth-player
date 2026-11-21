@@ -85,7 +85,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11026:B:2 (back): The players cannot defeat this stage unless Shrine to Morgoth is in the victory display. When Shrine to Morgoth is added to the victory display, the players win the game.
   11026:constant:1: Constant
-    only if [json condition {"kind":"inVictory","code":"11027","is":true}]
+    only if the card with code 11027 is in the victory display
     - the players win the game
 
 ## 11027 Shrine to Morgoth
@@ -393,7 +393,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 11074:A:1 (front): While Cursed Temple is the active location, characters with less than 2 Willpower do not ready during the refresh phase.
   11074:constant:1: Constant
     only if this card is the active location
-    - each character (any player controls) [also {"maxWillpower":1}]: stat doesNotReady 1, while this card is in play
+    - each character (any player controls) with a current Willpower of 1 or less: stat doesNotReady 1, while this card is in play
 
 11074:B:1: Uncharted.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -463,4 +463,4 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
   11179:resolution:5: Resolution
     - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
 
-(rendered pieces: 206 by template, 73 as JSON)
+(rendered pieces: 208 by template, 71 as JSON)

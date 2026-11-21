@@ -5,6 +5,7 @@ import { cardMap, expectOk, fixtureDefinition, hero } from "../core/test-fixture
 import { legalIntents, legalTargets, reduce } from "../engine/reduce.ts";
 import { definePrinted } from "../core/printed.ts";
 import { blankScenario, updateCard, withThreat, type ScenarioState } from "../core/state.ts";
+import { destroyCard } from "../core/keywords.ts";
 import { spawn } from "../core/zones.ts";
 
 const leadership = hero("aragorn", "leadership");
@@ -346,5 +347,52 @@ describe("planning turns and passing", () => {
     const run = expectOk(reduce(state, { type: "Pass" }, local));
     expect(run.state.mode).not.toBe("planning");
     expect(run.state.planningSeat).toBeNull();
+  });
+});
+
+// rr.attachment-cards: "When an attachment enters play attached to a character under another player's control, that player
+// gains control of the attachment." Its owner stays the seat that played it (rr.ownership-and-control).
+describe("an attachment played on another player's character", () => {
+  const hitch = definePrinted({ code: "hitch", name: "Fast Hitch", type: "attachment", sphere: "tactics", cost: 1 });
+  const effects: Effect[] = [
+    { id: "hitch:constant:1", cardCode: "hitch", lines: ["fixture:A:1"], timing: "constant", instructions: [{ verb: "AttachesTo", host: { kind: "character" } }] },
+    { id: "hitch:action:1", cardCode: "hitch", lines: ["fixture:A:2"], timing: "action", cost: { kind: "exhaustSelf" }, instructions: [{ verb: "Ready", target: "host" }] },
+  ];
+  const local = { effects, cards: cardMap([hero("aragorn", "tactics"), hero("merry", "tactics"), hitch]) };
+
+  function played(): { state: ScenarioState; payer: string; merry: string; card: string } {
+    let state = blankScenario({ seatCount: 2, seed: 4, definition: fixtureDefinition(["stage"]) });
+    const payer = spawn(state, "aragorn", { zone: "heroes", seat: 0 });
+    state = updateCard(payer.state, payer.id, { resources: 2 });
+    const merry = spawn(state, "merry", { zone: "heroes", seat: 1 });
+    state = updateCard(merry.state, merry.id, { exhausted: true });
+    const card = spawn(state, "hitch", { zone: "hand", seat: 0 });
+    state = { ...card.state, phase: "Planning", mode: "planning", window: { kind: "pass" }, activeSeat: 0, firstPlayer: 0 };
+    const result = expectOk(reduce(state, { type: "PlayCard", cardId: card.id, hostId: merry.id, payments: [{ heroId: payer.id, amount: 1 }] }, local));
+    return { state: result.state, payer: payer.id, merry: merry.id, card: card.id };
+  }
+
+  it("passes to the host's controller, still owned by the player who played it", () => {
+    const { state, merry, card } = played();
+    expect(state.cards[card]).toMatchObject({ zone: "play", host: merry, controller: 1, owner: 0 });
+    expect(state.seats[1]?.play).toContain(card);
+    expect(state.seats[0]?.play).not.toContain(card);
+    expect(state.cards[merry]?.attachments).toEqual([card]);
+  });
+
+  it("offers its Action to the host's controller only", () => {
+    const { state, card } = played();
+    const trigger = { type: "Trigger" as const, cardId: card, effectId: "hitch:action:1" };
+    expect(legalIntents(state, local)).not.toContainEqual(trigger);
+    expect(reduce(state, trigger, local).ok).toBe(false);
+    const second = { ...state, activeSeat: 1 };
+    expect(legalIntents(second, local)).toContainEqual(trigger);
+  });
+
+  it("goes to its owner's discard pile when its host leaves play", () => {
+    const { state, merry, card } = played();
+    const left = destroyCard(state, merry, local.cards, []);
+    expect(left.cards[card]).toMatchObject({ zone: "discard", controller: 0 });
+    expect(left.seats[0]?.discard).toContain(card);
   });
 });

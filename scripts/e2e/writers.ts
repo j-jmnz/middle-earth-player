@@ -51,6 +51,29 @@ import { rhosgobelFixtures } from "./shadows-of-mirkwood/a-journey-to-rhosgobel.
 import { muilFixtures } from "./shadows-of-mirkwood/the-hills-of-emyn-muil.ts";
 import { deadmarshesFixtures } from "./shadows-of-mirkwood/the-dead-marshes.ts";
 import { returnmirkwoodFixtures } from "./shadows-of-mirkwood/return-to-mirkwood.ts";
+import { pitFixtures } from "./dwarrowdelf/into-the-pit.ts";
+import { levelFixtures } from "./dwarrowdelf/the-seventh-level.ts";
+import { frommoriaFixtures } from "./dwarrowdelf/flight-from-moria.ts";
+import { gateFixtures } from "./dwarrowdelf/the-redhorn-gate.ts";
+import { rivendellFixtures } from "./dwarrowdelf/road-to-rivendell.ts";
+import { waterFixtures } from "./dwarrowdelf/the-watcher-in-the-water.ts";
+import { darkFixtures } from "./dwarrowdelf/the-long-dark.ts";
+import { stoneFixtures } from "./dwarrowdelf/foundations-of-stone.ts";
+import { flameFixtures } from "./dwarrowdelf/shadow-and-flame.ts";
+import { osgiliathFixtures } from "./standalone-scenarios/the-massing-at-osgiliath.ts";
+import { townFixtures } from "./standalone-scenarios/the-battle-of-lake-town.ts";
+import { erechFixtures } from "./standalone-scenarios/the-stone-of-erech.ts";
+import { forestFixtures } from "./standalone-scenarios/the-old-forest.ts";
+import { downsFixtures } from "./standalone-scenarios/fog-on-the-barrow-downs.ts";
+import { belegostFixtures } from "./standalone-scenarios/the-ruins-of-belegost.ts";
+import { ponyFixtures } from "./standalone-scenarios/murder-at-the-prancing-pony.ts";
+import { annuminasFixtures } from "./standalone-scenarios/the-siege-of-annuminas.ts";
+import { guldurFixtures } from "./standalone-scenarios/attack-on-dol-guldur.ts";
+import { questFixtures } from "./standalone-scenarios/the-wizards-quest.ts";
+import { woodlandFixtures } from "./standalone-scenarios/the-woodland-realm.ts";
+import { minesFixtures } from "./standalone-scenarios/the-mines-of-moria.ts";
+import { khazadFixtures } from "./standalone-scenarios/escape-from-khazad-dum.ts";
+import { dreadnaughtFixtures } from "./standalone-scenarios/the-hunt-for-the-dreadnaught.ts";
 
 // The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -111,4 +134,27 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "the-hills-of-emyn-muil": () => muilFixtures(),
   "the-dead-marshes": () => deadmarshesFixtures(),
   "return-to-mirkwood": () => returnmirkwoodFixtures(),
+  "into-the-pit": () => pitFixtures(),
+  "the-seventh-level": () => levelFixtures(),
+  "flight-from-moria": () => frommoriaFixtures(),
+  "the-redhorn-gate": () => gateFixtures(),
+  "road-to-rivendell": () => rivendellFixtures(),
+  "the-watcher-in-the-water": () => waterFixtures(),
+  "the-long-dark": () => darkFixtures(),
+  "foundations-of-stone": () => stoneFixtures(),
+  "shadow-and-flame": () => flameFixtures(),
+  "the-massing-at-osgiliath": () => osgiliathFixtures(),
+  "the-battle-of-lake-town": () => townFixtures(),
+  "the-stone-of-erech": () => erechFixtures(),
+  "the-old-forest": () => forestFixtures(),
+  "fog-on-the-barrow-downs": () => downsFixtures(),
+  "the-ruins-of-belegost": () => belegostFixtures(),
+  "murder-at-the-prancing-pony": () => ponyFixtures(),
+  "the-siege-of-annuminas": () => annuminasFixtures(),
+  "attack-on-dol-guldur": () => guldurFixtures(),
+  "the-wizards-quest": () => questFixtures(),
+  "the-woodland-realm": () => woodlandFixtures(),
+  "the-mines-of-moria": () => minesFixtures(),
+  "escape-from-khazad-dum": () => khazadFixtures(),
+  "the-hunt-for-the-dreadnaught": () => dreadnaughtFixtures(),
 };

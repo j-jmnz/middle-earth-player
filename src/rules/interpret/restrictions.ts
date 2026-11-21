@@ -13,13 +13,17 @@ import { countMatching, pickCandidates } from "./pick.ts";
 import { spendablePools } from "../families/costs/verbs.ts";
 import { guardsTitled } from "../families/objectives/pick.ts";
 import { guardianSeat } from "../families/guardian/seats.ts";
+import { joiningStages } from "../families/captured/join.ts";
 import { guardedSafeLocation } from "../families/angmar/safe.ts";
 import { flightDefenseBarred } from "../families/attack/flight.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
-export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true };
+// The `exceptTrait` the template "Cannot have non-<X> attachments" reads from the printed phrase "non-objective player card attachments" (51012:A:1): a card kind, not a Trait.
+const OBJECTIVE_PLAYER_CARD = "objective player card";
+
+export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; withResources?: true; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; anyDefender?: true; exceptSelf?: boolean; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true; engagedPlayer?: true };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -37,9 +41,11 @@ export function restricted(state: ScenarioState, ctx: ReduceContext, what: Restr
 }
 
 function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict["what"]): Restriction[] {
-  const found: Restriction[] = [];
+  const found: Restriction[] = what === "advance" ? joiningStages(state, ctx) : [];
   for (const { source, instruction } of constantInstructions(state, ctx)) {
     if (instruction.verb !== "Restrict" || instruction.what !== what) continue;
+    // Once stages are separate "cannot defeat this stage" binds that stage only: another seat's stage does not hold this one back (148003:B:3 at stage 3B, 148004 at a trapped player's stage).
+    if (what === "advance" && state.separate && source.zone === "questStage" && source.id !== state.questStage) continue;
     found.push({
       sourceId: source.id,
       what,
@@ -47,13 +53,17 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
       ...(instruction.guarding ? { guarding: instruction.guarding } : {}),
       ...(instruction.trait ? { trait: instruction.trait } : {}),
       ...(instruction.exceptTrait ? { exceptTrait: instruction.exceptTrait } : {}),
+      ...(instruction.withResources ? { withResources: true as const } : {}),
       ...(instruction.exceptBoon ? { exceptBoon: true as const } : {}),
       ...(instruction.maxWillpower != null ? { maxWillpower: instruction.maxWillpower } : {}),
       ...(instruction.allies ? { allies: true } : {}),
       ...(instruction.belowSourceHitPoints ? { belowSourceHitPoints: true } : {}),
+      ...(instruction.anyDefender ? { anyDefender: true as const } : {}),
+      ...(instruction.exceptSelf ? { exceptSelf: true } : {}),
       ...(instruction.unlessControls ? { unlessControls: instruction.unlessControls } : {}),
       ...(instruction.guardian ? { guardian: true as const } : {}),
       ...(instruction.exceptAlone ? { exceptAlone: true as const } : {}),
+      ...(instruction.engagedPlayer ? { engagedPlayer: true as const } : {}),
     });
   }
   return found;
@@ -66,6 +76,10 @@ export function travelBlocked(state: ScenarioState, ctx: ReduceContext, location
   // A guarded safe objective-location waits for its guard to leave play (mec108.objective-locations).
   if (guardedSafeLocation(state, ctx, locationId)) return true;
   return restricted(state, ctx, "travel").some((rule) => {
+    // Every location but the source (South Pier, 50217:A:2: "players cannot travel to other locations").
+    if (rule.exceptSelf) return rule.sourceId !== locationId;
+    // Every location that holds a resource (A Fork in the Road, 51003:B:2).
+    if (rule.withResources) return (location?.resources ?? 0) > 0;
     // Every location with a trait (Grond's, 145044:A:1 and the Gate's kin).
     if (rule.trait != null) return printedOf(ctx.cards, location?.code ?? "").traits.includes(rule.trait);
     // A restriction on the location itself.
@@ -117,6 +131,8 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
   const shown = state.cards[locationId];
   const instructions = [...(shown ? recordsOfFace(shown, ctx.effects.filter((effect) => effect.cardCode === code)) : []).filter((effect) => effect.timing === "travel").flatMap((effect) => effect.instructions), ...grantedTravel(state, locationId)];
   return instructions.some((instruction) => {
+      // A cost line that is gated (`when`) is owed only while its condition holds: Fisherman's Dock's exhaust is owed with 1 active location (50223:A:2).
+      if ("when" in instruction && instruction.when != null && !holds(state, instruction.when, { actor: state.firstPlayer, sourceId: locationId, returned: 0 }, ctx)) return false;
       // "A player at this staging area must engage an enemy in any staging area to travel here" (142079:A:1): an enemy to engage must be in some staging area.
       // "Place 1 resource on Shelob to travel here" (144045:A:3): the card the resources go on is picked and must be in play.
       if ((instruction.verb === "Engage" && instruction.target === "picked") || (instruction.verb === "PlaceResourceTokens" && instruction.on === "picked")) {
@@ -158,7 +174,9 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       // "Exhaust a Ship objective to travel here" (12128:A:2): the card to exhaust is picked, so the cost cannot be paid without one.
       if (instruction.verb === "Exhaust" && instruction.target?.kind === "picked") {
         const pick = instructions.find((other) => other.verb === "Pick");
-        return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length === 0;
+        // "The first player must exhaust 2 characters to travel here" (04066:A:1): one ready card for each exhaust of the cost.
+        const needed = instructions.filter((other) => other.verb === "Exhaust" && other.target?.kind === "picked").length;
+        return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length < needed;
       }
       // "The first player must discard 1 event card from his hand to travel here" (02088:A:1): the card discarded is picked, so the cost cannot be paid without one.
       if (instruction.verb === "DiscardPicked") {
@@ -183,8 +201,11 @@ export function attachBlocked(state: ScenarioState, ctx: ReduceContext, hostId: 
   if (flagged(state, hostId, "noPlayerAttachments") && isPlayerType(printedOf(ctx.cards, attachmentCode))) return true;
   if (flagged(state, hostId, "cannotHaveTreachery") && printedOf(ctx.cards, attachmentCode).type === "treachery") return true;
   if (flagged(state, hostId, "cannotHaveRestricted") && printedOf(ctx.cards, attachmentCode).keywords.restricted) return true;
+  const printed = printedOf(ctx.cards, attachmentCode);
+  // "Cannot have non-objective player card attachments" (51012:A:1): only a player card that is not an objective is barred; an encounter card, an objective and a Condition an encounter card makes may attach.
+  const playerCard = isPlayerType(printed) && printed.type !== "objective";
   return restricted(state, ctx, "attach").some(
-    (rule) => rule.sourceId === hostId && !(rule.exceptTrait != null && traits.includes(rule.exceptTrait)) && !(rule.exceptBoon === true && printedOf(ctx.cards, attachmentCode).campaignKind === "boon"),
+    (rule) => rule.sourceId === hostId && (rule.exceptTrait === OBJECTIVE_PLAYER_CARD ? playerCard : !(rule.exceptTrait != null && traits.includes(rule.exceptTrait))) && !(rule.exceptBoon === true && printed.campaignKind === "boon"),
   );
 }
 
@@ -197,14 +218,17 @@ export function defenseBlocked(state: ScenarioState, ctx: ReduceContext, defende
   if (!attack || !defender) return false;
   // "Only Eagle characters or characters with ranged can ... defend against Mirkwood Flock" (02070:A:1).
   if (flightDefenseBarred(state, attack.enemyId, defenderId, ctx.cards)) return true;
+  // A defender an effect removed from this attack cannot be declared again (51335:A:2).
+  if (attack.removedDefenders?.includes(defenderId)) return true;
   return restricted(state, ctx, "defend").some(
     (rule) =>
       rule.sourceId === attack.enemyId &&
-      (rule.belowSourceHitPoints
-        ? printedOf(ctx.cards, defender.code).type === "ally" && (printedOf(ctx.cards, defender.code).health ?? 0) < (printedOf(ctx.cards, state.cards[rule.sourceId]?.code ?? "").health ?? 0)
-        : rule.allies
-          ? printedOf(ctx.cards, defender.code).type === "ally"
-          : modifiedStat(state, defender, "willpower", ctx.cards) <= (rule.maxWillpower ?? 0)),
+      (rule.anyDefender === true ||
+        (rule.belowSourceHitPoints
+          ? printedOf(ctx.cards, defender.code).type === "ally" && (printedOf(ctx.cards, defender.code).health ?? 0) < (printedOf(ctx.cards, state.cards[rule.sourceId]?.code ?? "").health ?? 0)
+          : rule.allies
+            ? printedOf(ctx.cards, defender.code).type === "ally"
+            : modifiedStat(state, defender, "willpower", ctx.cards) <= (rule.maxWillpower ?? 0))),
   );
 }
 
@@ -236,6 +260,7 @@ export function seatBarred(state: ScenarioState, ctx: ReduceContext, seat: numbe
   return restricted(state, ctx, what).some(
     (rule) =>
       (rule.unlessControls != null && countMatching(state, rule.unlessControls, seat, rule.sourceId, ctx) === 0) ||
-      (rule.guardian === true && guardianSeat(state) === seat && !(rule.exceptAlone === true && livingSeats(state).length === 1)),
+      (rule.guardian === true && guardianSeat(state) === seat && !(rule.exceptAlone === true && livingSeats(state).length === 1)) ||
+      (rule.engagedPlayer === true && state.cards[rule.sourceId]?.zone === "engaged" && state.cards[rule.sourceId]?.controller === seat),
   );
 }

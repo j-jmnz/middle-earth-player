@@ -97,7 +97,7 @@ export function framsburgAsk(instruction: Instruction, source: string | null, na
     const guard = data?.kind === "effect" && data.subject ? names.card(data.subject) : "The enemy";
     return group("Choose", `Choose 1 of ${facts.options.length || instruction.count || 3} random undiscovered treasures to attach as a guarded objective. ${guard} stays engaged. The players can claim the treasure once it is free of encounters, when ${guard} leaves play.`);
   }
-  if (instruction.verb === "AttachLootFromDiscard") return sentence("Attach", `choose a Loot objective in the encounter discard pile to attach to the enemy just added to the staging area, as its guarded objective.`);
+  if (instruction.verb === "AttachLootFromDiscard") return sentence("Attach", `choose a Loot objective in the encounter discard pile to attach to ${instruction.to === "self" ? card : "the enemy just added to the staging area"}, as its guarded objective.`);
   if (instruction.verb !== "Pick") return null;
   const pick = instruction.pick;
   if (pick.type === "location" && pick.active === true && next?.verb === "Choose" && next.options.some((option) => option.instructions.some((step) => step.verb === "ModifyStat" && step.stat === "discoverValue"))) {

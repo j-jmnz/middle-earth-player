@@ -1,0 +1,390 @@
+{
+  "id": "the-woodland-realm",
+  "name": "The Woodland Realm",
+  "number": 2,
+  "stages": [
+    "51101",
+    "51103",
+    "51104",
+    "51105",
+    "51107",
+    "51108",
+    "51109"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Woodland Realm",
+      "count": 0
+    },
+    {
+      "name": "The Woodland Realm 1",
+      "count": 5
+    },
+    {
+      "name": "The Woodland Realm 2",
+      "count": 5
+    },
+    {
+      "name": "The Woodland Realm 3",
+      "count": 5
+    },
+    {
+      "name": "The Woodland Realm 4",
+      "count": 5
+    },
+    {
+      "name": "The Woodland Realm 5",
+      "count": 5
+    },
+    {
+      "name": "The Woodland Realm 6",
+      "count": 5
+    },
+    {
+      "name": "The Woodland Realm 7",
+      "count": 5
+    },
+    {
+      "name": "The Woodland Realm 8",
+      "count": 5
+    },
+    {
+      "name": "The Woodland Realm 9",
+      "count": 5
+    },
+    {
+      "name": "The Woodland Realm 10",
+      "count": 5
+    },
+    {
+      "name": "The Woodland Realm 11",
+      "count": 5
+    },
+    {
+      "name": "The Woodland Realm 12",
+      "count": 5
+    },
+    {
+      "name": "The Woodland Realm 13",
+      "count": 5
+    },
+    {
+      "name": "The Woodland Realm 14",
+      "count": 5
+    }
+  ],
+  "cards": [
+    {
+      "code": "51112",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51113",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51114",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51115",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51116",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51117",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51118",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51119",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51120",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51121",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "51122",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51123",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51124",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "51125",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51126",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51127",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51128",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "51129",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51130",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51131",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51132",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51133",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51134",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51135",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51136",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51137",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51138",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51139",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51140",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51141",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51142",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51143",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51144",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51145",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51146",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51147",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51148",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51149",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51150",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51151",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "51152",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51153",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "51101",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "51103",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "51104",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "51105",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "51107",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "51108",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "51109",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "51110",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "back": "51111"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q99.12",
+    "dragnEasy": "Q99.12",
+    "hobSlug": "The-Woodland-Realm"
+  }
+}

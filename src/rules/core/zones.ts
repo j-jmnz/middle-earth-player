@@ -18,7 +18,6 @@ import { flagged, heldHero, inPlay, updateCard, updateCards, withSeat } from "./
 
 export type Destination =
   | { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging"; seat: number }
-  | { zone: "seatQuest"; seat: number }
   // `area`: with `staging`, once stages are separate, the seat whose staging area the card goes into (families/breaking/areas.ts); the card is in
   // `staging` and in that seat's list.
   | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "stormcallerArea" | "islandMap" | PileZone; area?: number }
@@ -30,6 +29,7 @@ export type Destination =
   | { zone: "campaign" }
   | { zone: "nightmare" }
   | { zone: "modeCard" }
+  | { zone: "nightObjective" }
   | { zone: "under"; locationId: string }
   // `hostId` null: a prisoner hero, held under no card (families/prisoner.ts).
   | { zone: "captive"; hostId: string | null }
@@ -84,12 +84,6 @@ function detach(state: ScenarioState, id: string): ScenarioState {
   // The decks beside the encounter deck (Corsair, Uncharted, Ered Mithrin's) leave through one accessor (piles.ts).
   if (isDeckZone(current.zone)) return leavePile(state, current.zone, id);
   switch (current.zone) {
-    case "seatQuest": {
-      if (current.controller == null) return state;
-      const seat = state.seats[current.controller];
-      if (!seat || seat.questStage !== id) return state;
-      return withSeat(state, current.controller, { ...seat, questStage: null });
-    }
     case "staging": {
       const left = { ...state, staging: without(state.staging, id) };
       if (!state.separate) return left;
@@ -206,7 +200,7 @@ export function unhost(state: ScenarioState, id: string): ScenarioState {
 
 // A destination that is one of a seat's own lists.
 function seatList(dest: Destination): dest is Extract<Destination, { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging" }> {
-  return "seat" in dest && dest.zone !== "captured" && dest.zone !== "seatQuest" && dest.zone !== "activeLocation" && dest.zone !== "secondActiveLocation" && dest.zone !== "questStage";
+  return "seat" in dest && dest.zone !== "captured" && dest.zone !== "activeLocation" && dest.zone !== "secondActiveLocation" && dest.zone !== "questStage";
 }
 
 function attach(state: ScenarioState, id: string, dest: Destination): ScenarioState {
@@ -219,12 +213,6 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
     if (!seat) return state;
     const listed = patchSeatList(state, dest.seat, key, append(seat[key], id));
     return updateCard(listed, id, { zone: dest.zone, controller: dest.seat });
-  }
-  if (dest.zone === "seatQuest") {
-    const seat = state.seats[dest.seat];
-    if (!seat) return state;
-    const seated = withSeat(state, dest.seat, { ...seat, questStage: id });
-    return updateCard(seated, id, { zone: "seatQuest", controller: dest.seat });
   }
   // Under a location: out of play, facedown, controlled by nobody, and not one of the location's attachments (141049:A:1).
   if (dest.zone === "under") {
@@ -338,9 +326,10 @@ function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioS
   return updateCard({ ...state, clock }, id, { enteredPlay: clock, damage: keeps ? now.damage : 0, progress: 0, resources: from === "setAside" ? now.resources : 0, exhausted: false, ...(keeps ? { keepsDamage: undefined } : {}) });
 }
 
-export type MoveOptions = { readonly released?: readonly string[]; readonly defeated?: boolean };
+export type MoveOptions = { readonly released?: readonly string[]; readonly defeated?: boolean; readonly supersedes?: boolean };
 
 // `released` (option): the attachments destroyCard discarded just before the card itself (keywords.ts), named with its leaving.
+// `supersedes` (option): an effect that overrides "cannot leave the staging area" moves the card (Dark Pit's discard of Durin's Bane, FAQ 3.026, families/flame/bane.ts).
 // `defeated` (option): the card is leaving because damage destroyed it; a card that holds `leavesStagingWhenDefeated` then leaves the staging area although it cannot leave it any other way (Thaurdir on stage 2B, 10126:B:1, 10126:B:3).
 export function moveCard(state: ScenarioState, id: string, requested: Destination, options: MoveOptions = {}): ScenarioState {
   const dead = state.cards[id];
@@ -351,7 +340,7 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
 }
 
 function moveCardTo(state: ScenarioState, id: string, requested: Destination, options: MoveOptions): ScenarioState {
-  const { released = [], defeated = false } = options;
+  const { released = [], defeated = false, supersedes = false } = options;
   const current = state.cards[id];
   if (!current) return state;
   // A temporary card leaves the game when it leaves play, whether it is defeated, returned to a hand or a deck or discarded ("If those heroes leave play, they are removed from the game", 11212:A:2).
@@ -364,7 +353,7 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   // A card that cannot enter the staging area stays where it is ("Shrine to Morgoth ... cannot enter the staging area", 12094:A:1).
   if (dest.zone === "staging" && flagged(state, id, "cannotEnterStaging")) return state;
   // A card that cannot leave the staging area stays in it, whatever moves it (Uglúk, 143069:B:2).
-  if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging") && !(defeated && flagged(state, id, "leavesStagingWhenDefeated"))) return state;
+  if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging") && !supersedes && !(defeated && flagged(state, id, "leavesStagingWhenDefeated"))) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);
@@ -393,7 +382,8 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   if (current.code === ORC_GUARD_CODE && inPlay(current.zone) && !inPlay(dest.zone)) moved = releaseOrcGuard(moved, id);
   // A player card that leaves play is announced to the abilities that hear it ("After ~ leaves play", "After a character
   // leaves play"). An encounter card's leaving is announced where it happens (stage-reveal.ts).
-  if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });
+  // An ally a guard holds in the staging area (Arwen under Goblin Gate, `guardedAlly`) leaves play the same way.
+  if ((current.zone === "play" || current.zone === "heroes" || (current.zone === "staging" && state.modifiers.length > 0 && flagged(state, id, "guardedAlly"))) && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });
   // A card that holds the sponge (Forbidden Descent, 10101:A:2) leaves play from the staging area: announced to its own Forced effect, whether it was explored there by progress or discarded.
   if (current.zone === "staging" && !inPlay(dest.zone) && flagged(state, id, "progressSponge")) moved = queueEvent(moved, { trigger: "leftStagingArea", seat: null, cardId: id });
   // An enemy that guards a hero (Carried Away, 18074:B:2) is announced when it leaves play in any way; only a game that holds such a hero asks.
@@ -452,7 +442,9 @@ export function spawn(
     nextId: state.nextId + 1,
     cards: { ...state.cards, [id]: instance },
   };
-  return { state: stampEntry(attach(recorded, id, dest), id, "removed"), id };
+  // A card dealt straight into play enters it like a moved one: it joins the cards in every area and captures (families/captured/entry.ts).
+  const entered = stampEntry(attach(recorded, id, dest), id, "removed");
+  return { state: entered.capture && inPlay(dest.zone) ? captureOnEntry(entered, id, dest) : entered, id };
 }
 
 /** The face a card shows when it is turned faceup from a deck, the encounter discard pile or the set-aside cards: its Upgraded side, side B, in a campaign that has upgraded it (dcce.scalable-upgradable), else faceup. */

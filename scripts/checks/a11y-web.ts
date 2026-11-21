@@ -1,28 +1,18 @@
-// `pnpm test a11y`: the web build audited with axe-core. The static web export (`expo export -p web`, with the e2e seed so the fixture route writes
-// saves) is served from a temporary folder on localhost and opened in Playwright's Chromium at phone width. Each main screen is opened in a fresh
-// page, waited on until its testID is there, and run through axe; a serious or critical violation fails the run. Nothing leaves localhost: every other
-// request is aborted (card pictures come from the network in the web build), so the check runs offline.
+// `pnpm test a11y`: the web build audited with axe-core. The static web export (scripts/browser/web-export.ts, with the e2e seed so the fixture route writes
+// saves) is served on localhost and opened in Chromium (scripts/browser/chromium.ts) at phone width. Each main screen is opened in a fresh page, waited
+// on until its testID is there, and run through axe; a serious or critical violation fails the run. Nothing leaves localhost: every other request is
+// aborted (card pictures come from the network in the web build), so the check runs offline.
 //
-// Env: A11Y_CHROMIUM is the Chromium binary to use (a cloud container has one; CI installs Playwright's own and leaves it unset). Flags: --skip-export
-// reuses the last export in the temporary folder.
+// Flags: --skip-export reuses the last export even when its inputs changed (an unchanged one is always reused).
 //
 // The web build is a development aid (ACCESSIBILITY.md, Known gaps): the native app is what the players use. This check finds what react-native-web's
 // output and the shared kit get wrong for a reader's tree (names, roles, contrast, targets), not what VoiceOver or TalkBack do.
-import { execFileSync } from "node:child_process";
-import { createReadStream, existsSync, mkdirSync } from "node:fs";
-import { createServer, type Server } from "node:http";
-import { tmpdir } from "node:os";
-import path from "node:path";
-import type { AddressInfo } from "node:net";
-
 import { AxeBuilder } from "@axe-core/playwright";
-import { chromium, type Browser, type BrowserContext } from "playwright";
+import type { Browser, BrowserContext } from "playwright";
 
-import { contentType, resolveFile } from "../../desktop/serve.ts";
+import { launchChromium } from "../browser/chromium.ts";
+import { ensureExport, serveExport } from "../browser/web-export.ts";
 import { runScript, type Log } from "../log.ts";
-
-const ROOT = path.resolve(import.meta.dirname, "..", "..");
-const DIST = path.join(tmpdir(), "middle-earth-player-a11y-web");
 
 // No rule is disabled: every rule axe runs applies to react-native-web's output, which is plain HTML.
 //
@@ -62,32 +52,6 @@ const SCREENS: readonly Screen[] = [
   { name: "Card", route: "/card/01001", ready: "card-text" },
   { name: "Table", route: `/table/${SAVE}`, ready: "table", landscape: true },
 ];
-
-// The database runs in a worker that needs a cross-origin isolated page (SharedArrayBuffer).
-function serve(root: string): Promise<Server> {
-  const server = createServer((request, response) => {
-    const pathname = decodeURIComponent(new URL(request.url ?? "/", "http://localhost").pathname);
-    const file = resolveFile(root, pathname);
-    response.writeHead(200, {
-      "content-type": contentType(file),
-      "cross-origin-opener-policy": "same-origin",
-      "cross-origin-embedder-policy": "credentialless",
-    });
-    createReadStream(file).pipe(response);
-  });
-  return new Promise((resolve) => server.listen(0, "127.0.0.1", () => resolve(server)));
-}
-
-function exportWeb(log: Log): void {
-  mkdirSync(DIST, { recursive: true });
-  log.step("expo export -p web", () => {
-    execFileSync("pnpm", ["exec", "expo", "export", "-p", "web", "--output-dir", DIST], {
-      cwd: ROOT,
-      stdio: ["ignore", "ignore", "inherit"],
-      env: { ...process.env, EXPO_PUBLIC_E2E_SEED: "1", EXPO_NO_TELEMETRY: "1", EXPO_OFFLINE: "1", CI: "1" },
-    });
-  });
-}
 
 type Finding = { screen: string; scheme: string; rule: string; impact: string; help: string; count: number; targets: string[] };
 
@@ -139,15 +103,10 @@ function verdict(findings: readonly Finding[]): string[] {
 }
 
 async function main(log: Log): Promise<void> {
-  if (process.argv.includes("--skip-export") && existsSync(DIST)) log.info(`reusing the export in ${DIST}`);
-  else exportWeb(log);
-  const server = await serve(DIST);
-  const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+  const { server, base } = await serveExport(ensureExport(log, { reuse: process.argv.includes("--skip-export") }));
   let browser: Browser | undefined;
   try {
-    // A container's Chromium (A11Y_CHROMIUM) runs as root and needs the sandbox off; CI's own Playwright browser keeps it.
-    const custom = process.env.A11Y_CHROMIUM || undefined;
-    browser = await chromium.launch({ executablePath: custom, args: custom ? ["--no-sandbox"] : [] });
+    browser = await launchChromium();
     const findings: Finding[] = [];
     for (const scheme of ["light", "dark"] as const) {
       const context = await browser.newContext({ viewport: { width: 390, height: 844 }, colorScheme: scheme, reducedMotion: "reduce" });

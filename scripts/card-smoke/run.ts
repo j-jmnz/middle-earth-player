@@ -45,7 +45,8 @@ export type SmokeOptions = {
  * triggered record moves no counter of its own unless it changes a number; the card's `frames` count it.
  */
 export type RecordTally = { id: string; timing: Effect["timing"]; offered: number; used: number; caused: number; active: number };
-export type SmokeProblem = { step: number; round: number; phase: string; window: string | null; intent: PlayerIntent | null; message: string };
+// `before`: the table the failing intent was sent on (or the stall was found on), which `pnpm game show smoke:<code>` opens (scripts/game/source.ts).
+export type SmokeProblem = { step: number; round: number; phase: string; window: string | null; intent: PlayerIntent | null; message: string; before: ScenarioState };
 export type SmokeSummary = {
   code: string;
   type: string;
@@ -159,7 +160,7 @@ export function smokeCard(code: string, options: SmokeOptions): SmokeSummary {
       for (const record of records.values()) if (state.modifiers.some((modifier) => modifier.origin === record.id)) record.active += 1;
       if (printed.type !== "hero" && summary.copies < (options.copies ?? 3) && ![...ids].some((id) => inHandOrPlay(state, id))) state = deal(state);
     } catch (error) {
-      summary.problems.push({ step, round: state.round, phase: state.phase, window: state.window?.kind ?? null, intent, message: describeError(error) });
+      summary.problems.push({ step, round: state.round, phase: state.phase, window: state.window?.kind ?? null, intent, message: describeError(error), before: state });
       summary.ended = "problem";
       break;
     } finally {
@@ -168,6 +169,12 @@ export function smokeCard(code: string, options: SmokeOptions): SmokeSummary {
   }
   summary.rounds = state.round;
   return summary;
+}
+
+/** The `pnpm game` source of one card's smoke run (scripts/game/source.ts): `smoke:<code>`, with the dice and deal seeds when they are not the defaults. */
+export function smokeSource(code: string, seed?: number, deal?: number): string {
+  if (deal !== undefined) return `smoke:${code}:${seed ?? SMOKE_SEED}:${deal}`;
+  return seed === undefined ? `smoke:${code}` : `smoke:${code}:${seed}`;
 }
 
 export function formatProblem(code: string, problem: SmokeProblem): string {
@@ -195,6 +202,7 @@ async function main(log: Log): Promise<void> {
     const summary = smokeCard(code, { world, seed: number("seed"), steps: number("steps") });
     if (summary.problems.length > 0) failed += 1;
     (summary.problems.length > 0 ? log.error : log.info)(formatSummary(summary));
+    if (summary.problems.length > 0) log.error(`  open it: pnpm game show ${smokeSource(code, number("seed"), number("deal"))} --legal`);
   }
   if (failed > 0) throw new Error(`${failed} of ${codes.length} cards had problems`);
 }

@@ -2,8 +2,8 @@
 import type { ModifierStat } from "../../catalog/boundary.ts";
 
 import { LOST_ISLAND_THREAT } from "../families/uncharted/pick.ts";
-import { printedOf, type PrintedCard } from "./printed.ts";
-import { heldAmount, type CardInstance, type ScenarioState } from "./state.ts";
+import { isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
+import { flagged, heldAmount, type CardInstance, type ScenarioState } from "./state.ts";
 
 type CardStat = "willpower" | "attack" | "defense" | "threat" | "questPoints" | "engagementCost";
 
@@ -51,9 +51,12 @@ export function victoryOf(instance: Pick<CardInstance, "face">, printed: Printed
   return (instance.face === "B" ? printed.upgraded?.victory : undefined) ?? printed.victory;
 }
 
-/** The Victory points a card on the victory display scores: the Victory printed on the side it lies, else a printed one, else the amount it holds as `gainsVictory`; 0 for an id the state does not hold. The score and the table's display both read this (ltp.scoring). */
+/** The Victory points a card on the victory display scores: the Victory printed on the side it lies, else a printed one, else the amount it holds as `gainsVictory`; 0 for an id the state does not hold. A player card in the display scores 0 while the table holds `playerVictoryIgnored`. The score and the table's display both read this (ltp.scoring). */
 export function victoryPointsOf(state: Pick<ScenarioState, "cards" | "modifiers">, id: string, cards: ReadonlyMap<string, PrintedCard>): number {
   const card = state.cards[id];
   if (!card) return 0;
-  return victoryOf(card, printedOf(cards, card.code)) ?? heldAmount(state as ScenarioState, id, "gainsVictory");
+  const printed = printedOf(cards, card.code);
+  // "During this game, player cards in the victory display do not count their victory points" (901301:A:2): the Nightmare setup card's flag on the table.
+  if (state.modifiers.length > 0 && isPlayerType(printed) && flagged(state as ScenarioState, "table", "playerVictoryIgnored")) return 0;
+  return victoryOf(card, printed) ?? heldAmount(state as ScenarioState, id, "gainsVictory");
 }

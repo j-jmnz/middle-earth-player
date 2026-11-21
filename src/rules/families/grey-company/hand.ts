@@ -3,16 +3,16 @@
 import { discardFromHand } from "../../core/zones.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { heldAmount } from "../../core/state.ts";
-import type { Focus } from "../index.ts";
 
-/** DiscardHand: the actor's whole hand goes to its owners' discard piles, in hand order, each announced as discarded from the hand. */
-export function discardHand(state: ScenarioState, focus: Focus): ScenarioState {
+/** DiscardHand: the whole hand of each seat named (the actor's, or the event seat's) goes to its owners' discard piles, in hand order, each announced as discarded from the hand. */
+export function discardHand(state: ScenarioState, seats: readonly number[]): ScenarioState {
   let next = state;
-  for (const id of [...(state.seats[focus.seat]?.hand ?? [])]) {
-    const card = next.cards[id];
-    if (!card || card.zone !== "hand") continue;
-    const owner = card.owner ?? focus.seat;
-    next = discardFromHand(next, id, owner);
+  for (const seat of seats) {
+    for (const id of [...(state.seats[seat]?.hand ?? [])]) {
+      const card = next.cards[id];
+      if (!card || card.zone !== "hand") continue;
+      next = discardFromHand(next, id, card.owner ?? seat);
+    }
   }
   return next;
 }

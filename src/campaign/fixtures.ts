@@ -59,6 +59,29 @@ import rhosgobelFixtures from "./fixtures/a-journey-to-rhosgobel.json";
 import muilFixtures from "./fixtures/the-hills-of-emyn-muil.json";
 import deadmarshesFixtures from "./fixtures/the-dead-marshes.json";
 import returnmirkwoodFixtures from "./fixtures/return-to-mirkwood.json";
+import pitFixtures from "./fixtures/into-the-pit.json";
+import levelFixtures from "./fixtures/the-seventh-level.json";
+import frommoriaFixtures from "./fixtures/flight-from-moria.json";
+import gateFixtures from "./fixtures/the-redhorn-gate.json";
+import rivendellFixtures from "./fixtures/road-to-rivendell.json";
+import waterFixtures from "./fixtures/the-watcher-in-the-water.json";
+import darkFixtures from "./fixtures/the-long-dark.json";
+import stoneFixtures from "./fixtures/foundations-of-stone.json";
+import flameFixtures from "./fixtures/shadow-and-flame.json";
+import osgiliathFixtures from "./fixtures/the-massing-at-osgiliath.json";
+import townFixtures from "./fixtures/the-battle-of-lake-town.json";
+import erechFixtures from "./fixtures/the-stone-of-erech.json";
+import forestFixtures from "./fixtures/the-old-forest.json";
+import downsFixtures from "./fixtures/fog-on-the-barrow-downs.json";
+import belegostFixtures from "./fixtures/the-ruins-of-belegost.json";
+import ponyFixtures from "./fixtures/murder-at-the-prancing-pony.json";
+import annuminasFixtures from "./fixtures/the-siege-of-annuminas.json";
+import guldurFixtures from "./fixtures/attack-on-dol-guldur.json";
+import questFixtures from "./fixtures/the-wizards-quest.json";
+import woodlandFixtures from "./fixtures/the-woodland-realm.json";
+import minesFixtures from "./fixtures/the-mines-of-moria.json";
+import khazadFixtures from "./fixtures/escape-from-khazad-dum.json";
+import dreadnaughtFixtures from "./fixtures/the-hunt-for-the-dreadnaught.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -136,6 +159,29 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-hills-of-emyn-muil": muilFixtures,
   "the-dead-marshes": deadmarshesFixtures,
   "return-to-mirkwood": returnmirkwoodFixtures,
+  "into-the-pit": pitFixtures,
+  "the-seventh-level": levelFixtures,
+  "flight-from-moria": frommoriaFixtures,
+  "the-redhorn-gate": gateFixtures,
+  "road-to-rivendell": rivendellFixtures,
+  "the-watcher-in-the-water": waterFixtures,
+  "the-long-dark": darkFixtures,
+  "foundations-of-stone": stoneFixtures,
+  "shadow-and-flame": flameFixtures,
+  "the-massing-at-osgiliath": osgiliathFixtures,
+  "the-battle-of-lake-town": townFixtures,
+  "the-stone-of-erech": erechFixtures,
+  "the-old-forest": forestFixtures,
+  "fog-on-the-barrow-downs": downsFixtures,
+  "the-ruins-of-belegost": belegostFixtures,
+  "murder-at-the-prancing-pony": ponyFixtures,
+  "the-siege-of-annuminas": annuminasFixtures,
+  "attack-on-dol-guldur": guldurFixtures,
+  "the-wizards-quest": questFixtures,
+  "the-woodland-realm": woodlandFixtures,
+  "the-mines-of-moria": minesFixtures,
+  "escape-from-khazad-dum": khazadFixtures,
+  "the-hunt-for-the-dreadnaught": dreadnaughtFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
@@ -163,15 +209,18 @@ export function fixture(name: FixtureName): Fixture {
   return { campaignId: stored.campaignId ?? FELLOWSHIP_ID, seatCount, loadout, seed: stored.seed, intents: stored.intents as PlayerIntent[], log: stored.log == null ? emptyLog(seatCount) : parseLog(stored.log), past };
 }
 
-/** A new save holding the fixture's open scenario, stamped with this build's engine version and catalog version. */
-export function fixtureSave(name: FixtureName, id: string, dataHash: number): Save {
+/**
+ * A new save holding the fixture's open scenario, stamped with this build's engine version and catalog version. `at` keeps only its first intents, so
+ * the save opens on an earlier moment of the same game (the e2e route's `?at=`, the same count `pnpm game show --at` prints).
+ */
+export function fixtureSave(name: FixtureName, id: string, dataHash: number, at?: number): Save {
   const found = fixture(name);
   return {
     id,
     campaignId: found.campaignId,
     seatCount: found.seatCount,
     log: found.log,
-    active: { engineVersion: ENGINE_VERSION, dataHash, world: null, seed: found.seed, intents: [...found.intents] },
+    active: { engineVersion: ENGINE_VERSION, dataHash, world: null, seed: found.seed, intents: found.intents.slice(0, at ?? found.intents.length) },
     loadout: found.loadout,
   };
 }
@@ -191,7 +240,7 @@ export function standaloneFixture(name: FixtureName): StandaloneFixture {
 }
 
 /** A new standalone game holding the fixture's open scenario, stamped with this build's engine version and catalog version. */
-export function fixtureStandalone(name: FixtureName, id: string, dataHash: number): StandaloneGame {
+export function fixtureStandalone(name: FixtureName, id: string, dataHash: number, at?: number): StandaloneGame {
   const found = standaloneFixture(name);
   return {
     id,
@@ -199,7 +248,7 @@ export function fixtureStandalone(name: FixtureName, id: string, dataHash: numbe
     scenarioId: found.loadout.scenarioId,
     seatCount: found.seatCount,
     loadout: found.loadout,
-    active: { engineVersion: ENGINE_VERSION, dataHash, world: null, seed: found.seed, intents: [...found.intents] },
+    active: { engineVersion: ENGINE_VERSION, dataHash, world: null, seed: found.seed, intents: found.intents.slice(0, at ?? found.intents.length) },
     result: null,
   };
 }

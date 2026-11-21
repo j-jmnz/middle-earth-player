@@ -9,13 +9,20 @@ export type Bump = "major" | "minor" | "patch";
 export type BumpRequest = Bump | "auto";
 export type CommitType = (typeof COMMIT_TYPES)[number];
 
-/** One commit since the last release: its type (undefined for a subject from before the commit standards), its summary and its `Breaking:` lines. */
-export type Change = { type: CommitType | undefined; summary: string; breaking: string[] };
+/**
+ * One commit since the last release: its type (undefined for a subject from before the commit standards), its summary, its
+ * `Breaking:` lines, and the issues its body names: `closes` from a `Settles` line, which the release closes (or a `Closes`,
+ * `Fixes` or `Resolves` line from before that rule, which GitHub closed at the merge), `refs` from a `Refs` line (the Issues
+ * rule of .claude/rules/agent-standards.md).
+ */
+export type Change = { type: CommitType | undefined; summary: string; breaking: string[]; closes: number[]; refs: number[] };
 
 export const BUMP_REQUESTS: readonly BumpRequest[] = ["auto", "patch", "minor", "major"];
 const TAG = /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const TYPED = new RegExp(`^(${COMMIT_TYPES.join("|")}): (.+)$`);
 const BREAKING = /^Breaking: *(.+)$/gm;
+// A line that names issues: `Settles #12`, `Settles: #12, #13`, `Refs #14`, and GitHub's closing keywords of older commits.
+const ISSUES = /^(settle[sd]?|close[sd]?|fix(?:e[sd])?|resolve[sd]?|refs?)\b:? *(#\d+(?:(?:, *| +and +| +)#\d+)*)/gim;
 // The branches a release may be cut from (release-standards.md, Branches).
 const RELEASE_BRANCH = /^(main|release\/v(0|[1-9]\d*)\.(0|[1-9]\d*))$/;
 
@@ -28,11 +35,23 @@ export function tagOf(version: Version): string {
   return `v${version.major}.${version.minor}.${version.patch}`;
 }
 
+/** The issues a body closes and the ones it only refers to, each once; an issue both closed and referred to counts as closed. */
+function issuesOf(body: string): { closes: number[]; refs: number[] } {
+  const closes = new Set<number>();
+  const refs = new Set<number>();
+  for (const [, keyword, list] of body.matchAll(ISSUES)) {
+    const into = /^ref/i.test(keyword) ? refs : closes;
+    for (const [, number] of list.matchAll(/#(\d+)/g)) into.add(Number(number));
+  }
+  return { closes: [...closes], refs: [...refs].filter((number) => !closes.has(number)) };
+}
+
 export function parseCommit(subject: string, body: string): Change {
   const match = TYPED.exec(subject.trim());
   const breaking = [...body.matchAll(BREAKING)].map((line) => line[1].trim());
-  if (!match) return { type: undefined, summary: subject.trim(), breaking };
-  return { type: match[1] as CommitType, summary: match[2], breaking };
+  const issues = issuesOf(body);
+  if (!match) return { type: undefined, summary: subject.trim(), breaking, ...issues };
+  return { type: match[1] as CommitType, summary: match[2], breaking, ...issues };
 }
 
 /** The bump the commits call for: a `Breaking:` line is major, a feat minor, a fix, style or refactor patch; repo alone none. */

@@ -40,8 +40,10 @@ export function discardShadowOf(state: ScenarioState, enemyId: string): Scenario
 }
 
 // DealShadowTo: one more shadow card for an engaged enemy; during its attack it resolves after those it has (rr.step-6-4-2).
-export function dealShadowTo(state: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
-  return state.cards[enemyId]?.zone === "engaged" ? dealAdditionalShadow(state, enemyId, steps, ctx) : state;
+// An enemy in the staging area that is considered engaged by threat (Durin's Bane) is dealt one too; `fromEncounter` deals it from the encounter deck, not the Balrog deck (901806:A:1).
+export function dealShadowTo(state: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext, fromEncounter = false): ScenarioState {
+  const here = state.cards[enemyId]?.zone === "engaged" || (state.modifiers.length > 0 && flagged(state, enemyId, "engagedWithThreatening") && state.cards[enemyId]?.zone === "staging");
+  return here ? dealAdditionalShadow(state, enemyId, steps, ctx, fromEncounter) : state;
 }
 
 // How a shadow card is dealt to the enemy: face up while the player it is engaged with holds shadowsFaceUp (Silver Lamp,

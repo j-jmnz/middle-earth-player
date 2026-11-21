@@ -50,8 +50,8 @@ const VERBS = [
   // `to: "actor"`: the player who uses the effect takes it ("Take control of 1 set aside copy of Dol Amroth Warship", 12136:A:3).
   verbFlags(z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), to: z.enum(["firstPlayer", "lastPlayer", "anyPlayer", "actor"]).optional(), ...when }), { setupRole: "afterSetup", setupRuns: "top" }),
   // Campaign Setup: "Attach Spyglass to Calphon" (11179:A:2): the set-aside copy of the card with this code is attached to the card in play with that name. A card dealt on its
-  // Upgraded side stays so.
-  verbFlags(z.strictObject({ verb: z.literal("AttachSetAsideTo"), code: z.string().min(1), to: z.string().min(1), ...when }), { setupRole: "afterSetup" }),
+  // Upgraded side stays so. `uncontrolled`: the card lies attached, controlled by nobody, not revealed, wherever its host lies (the staged Stone of Erech with Derufin attached, 50302:A:1), not in a play area.
+  verbFlags(z.strictObject({ verb: z.literal("AttachSetAsideTo"), code: z.string().min(1), to: z.string().min(1), uncontrolled: z.literal(true).optional(), ...when }), { setupRole: "afterSetup" }),
   // Campaign Setup: "For each character in play, its controller may deal 1 damage to it to reduce their threat by 1" (11179:A:2). In player order, each character in play is
   // offered to its controller (trade or keep); a trade deals `damage` to it and lowers that player's threat by `threat`. `character` is engine use: the character being decided.
   verbFlags(z.strictObject({ verb: z.literal("TradeDamageForThreat"), damage: z.number().int().positive(), threat: z.number().int().positive(), character: z.string().optional(), ...when }), { setupRole: "afterSetup" }),

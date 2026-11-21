@@ -5,6 +5,7 @@ import entries from "../../../data/rules/entries.json";
 import { parseRuleEntries, type RuleEntry } from "../../catalog/rule-entry";
 import { bookletName, type BookletId } from "../booklets/books";
 import { fold } from "../kit/fold";
+import { KEYWORD_RULES, LOCAL_RULE, type KeywordKey } from "../../play/cards/keyword-rules";
 import type { RuleTip } from "../../play/cards/keyword-tip-types";
 
 export type GlossaryEntry = RuleEntry & { source: string };
@@ -26,14 +27,20 @@ const DOC_NAMES: Readonly<Record<string, string>> = {
   tdm: "The Dead Marshes rules",
   rtm: "Return to Mirkwood rules",
   // Rulesheets the app does not carry as books: their rules open in the Rules tab, with no page to turn to.
+  kd: "Khazad-dûm rules insert",
   trg: "The Redhorn Gate rules",
+  rtr: "Road to Rivendell rules",
+  witw: "The Watcher in the Water rules",
+  tld: "The Long Dark rules",
+  fos: "Foundations of Stone rules",
+  saf: "Shadow and Flame rules",
   bts: "Beneath the Sands rules",
 };
 
 // A decklist, a scenario's setup or one scenario's stage is read on its own screen (deck import, briefing), not looked up.
 function inGlossary(entry: RuleEntry): boolean {
   if (!(entry.doc in DOC_NAMES)) return false;
-  return !/^(decklist\.|mec109\.(starter-|setup-|stage-)|ltp\.setup-|tdom\.setup-|dcce\.(campaign-)?setup-|emce\.setup-|mec108\.(campaign-)?setup-|mec11[23]\.setup-|sotm\.setup-)/.test(entry.id);
+  return !/^(decklist\.|mec109\.(starter-|setup-|stage-)|ltp\.setup-|tdom\.setup-|dcce\.(campaign-)?setup-|emce\.setup-|mec108\.(campaign-)?setup-|mec11[23]\.setup-|(?:sotm|dwd)\.setup-)/.test(entry.id);
 }
 
 // A title's words without what opens it: an FAQ entry number ("(1.11) Limitations on Attacks"), a framework step number
@@ -119,6 +126,11 @@ export function scenarioRuleDoc(scenarioId: string, bookletId: string | undefine
  * Rules tab can open it (a span of a document the glossary does not list cannot).
  */
 export function ruleTip(id: string): RuleTip | null {
+  // A keyword no rules span defines (Burn X) carries its own definition (play/cards/keyword-rules.ts).
+  if (id.startsWith(LOCAL_RULE)) {
+    const own = KEYWORD_RULES[id.slice(LOCAL_RULE.length) as KeywordKey]?.text;
+    return own ? { paragraphs: own.paragraphs, source: own.source, openable: false } : null;
+  }
   all ??= new Map(parsedEntries().map((entry) => [entry.id, entry]));
   const entry = all.get(id);
   const source = ruleSource(id);

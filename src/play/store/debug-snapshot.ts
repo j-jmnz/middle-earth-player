@@ -65,7 +65,6 @@ export function debugSnapshot(game: ScenarioState, input: DebugInput): Record<st
     hand: cards(seat.hand),
     deck: cards(seat.deck),
     discard: cards(seat.discard),
-    ...(seat.questStage ? { sideQuest: card(seat.questStage) } : {}),
     // The seat's own stage, active location and staging area while stages are separate (families/breaking/areas.ts).
     ...(seat.stage ? { stage: card(seat.stage) } : {}),
     ...(seat.active ? { activeLocation: card(seat.active) } : {}),

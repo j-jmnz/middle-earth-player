@@ -2,7 +2,7 @@
 // ltp.unique-cards, ltp.neutral-cards (data/rules/entries.json).
 import type { Effect } from "../../catalog/boundary.ts";
 
-import { attachmentHostIds, enforceRestricted, playCost } from "./attach.ts";
+import { attachmentHostIds, enforceRestricted, hostTakesControl, playCost } from "./attach.ts";
 import { discardGrantHosts, discardGranted, spendDiscardGrant } from "../families/angmar/discard-play.ts";
 import { discardsLocked } from "../families/angmar/lock.ts";
 import { announceEventAction } from "../families/deck/pressure.ts";
@@ -22,7 +22,7 @@ import { gainedDoomed } from "../families/deck/gains-doomed.ts";
 import { doomedRaise } from "../families/deck/rules.ts";
 import { chosenX } from "../families/misc/cost.ts";
 import { playBlocked } from "../families/sidequests/contract.ts";
-import { enterQuestArea, inPlayLimitReason, sideQuestPlayReason } from "../families/sidequests/play.ts";
+import { enterStaging, inPlayLimitReason } from "../families/sidequests/play.ts";
 import type { EngineStep, PlayerIntent } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { pickCandidates } from "../interpret/pick.ts";
@@ -81,15 +81,16 @@ export function playCard(
     const x = printed.costX ? intent.payments.reduce((sum, payment) => sum + payment.amount, 0) : undefined;
     return playEvent(queueEvent(next, { trigger: "played", seat, cardId: intent.cardId }), intent.cardId, seat, ctx, steps, x);
   }
-  // A player side quest enters its player's quest area (families/sidequests/play.ts).
-  if (printed.type === "player-side-quest") return enterQuestArea(next, intent.cardId, seat, steps);
+  // A player side quest is placed in the staging area (families/sidequests/play.ts).
+  if (printed.type === "player-side-quest") return enterStaging(next, intent.cardId, seat, steps);
   // An attachment played unattached, onto a threat dial, or guarded (families/attachments/play.ts).
   const elsewhere = printed.type === "attachment" ? playElsewhere(next, intent.cardId, intent.hostId, seat, ctx, steps) : null;
   if (elsewhere) return elsewhere;
   next = moveCard(next, intent.cardId, { zone: "play", seat });
   next = updateCard(next, intent.cardId, { exhausted: entersExhausted(ctx, instance.code) });
   if (printed.type === "attachment" && intent.hostId) {
-    next = attachTo(next, intent.cardId, intent.hostId);
+    // Played on another player's character, it is that player's to control (rr.attachment-cards).
+    next = hostTakesControl(attachTo(next, intent.cardId, intent.hostId), intent.cardId, ctx);
     next = queueEvent(next, { trigger: "played", seat, cardId: intent.cardId });
     // An attachment played enters play too (rr.in-play-and-out-of-play).
     next = queueEvent(next, { trigger: "enteredPlay", seat, cardId: intent.cardId });
@@ -101,7 +102,7 @@ export function playCard(
 }
 
 function actionRecords(ctx: ReduceContext, code: string): Effect[] {
-  return ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "action");
+  return effectsOf(ctx, code).filter((effect) => effect.timing === "action");
 }
 
 // The effects of an event whose condition holds now.
@@ -148,7 +149,7 @@ function eventReason(state: ScenarioState, cardId: string, seat: number, ctx: Re
   if (records.length === 0) {
     // An event whose only records are Responses is played from its Response window, never as an ordinary play.
     const code = state.cards[cardId]?.code ?? "";
-    const own = ctx.effects.filter((effect) => effect.cardCode === code);
+    const own = effectsOf(ctx, code);
     if (own.some((effect) => effect.timing === "response")) return "That card cannot be played";
     // An event with no record at all: as the engine applies it, its Action could not change the game state, so it is not
     // initiated (rr.triggered-ability: "can only be initiated if its effect has the potential to change the game state on
@@ -238,9 +239,6 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   const limit = playLimit(state, cardId, ctx);
   if (limit) return playLimitReason(limit);
   if (!hasResourceMatch(state, state.activeSeat, printed.sphere, ctx, cardId)) return "No hero matches that card's sphere";
-  // A player side quest needs a free quest area (families/sidequests/play.ts).
-  const area = printed.type === "player-side-quest" ? sideQuestPlayReason(state, state.activeSeat) : null;
-  if (area) return area;
   // "Limit 2 copies of ~ in play" (families/sidequests/play.ts).
   const limited = inPlayLimitReason(state, cardId, ctx);
   if (limited) return limited;
@@ -263,11 +261,7 @@ export function playReason(
   if (printed.type === "attachment") {
     if (!intent.hostId) return "Choose a host";
     const host = state.cards[intent.hostId];
-    // The staging area or a seat's play area, for a card that goes there (families/attachments/play.ts).
-    const targets = playTargets(state, state.activeSeat, instance.code, ctx) ?? attachmentHostIds(state, state.activeSeat, instance.code, ctx);
-    // An attachment played from the discard pile by Stalwart goes onto that hero only (the permission is the hero's).
-    const grantOnly = instance.zone === "discard" && !discardPlay(ctx, instance.code).allowed;
-    if (!targets.includes(intent.hostId) || (grantOnly && !discardGrantHosts(state, state.activeSeat).includes(intent.hostId))) {
+    if (!playHosts(state, instance, ctx).includes(intent.hostId)) {
       if (host && !playerCardEffectCanChoose(printedOf(ctx.cards, host.code), state, host.id, printed)) {
         return "Immune to player card effects";
       }
@@ -281,11 +275,20 @@ export function playReason(
   );
 }
 
-export function attachmentTargets(state: ScenarioState, code: string | undefined, ctx: ReduceContext): readonly string[] {
-  if (!code) return [];
-  const printed = ctx.cards.get(code);
-  if (!printed || printed.type !== "attachment") return [];
-  return playTargets(state, state.activeSeat, code, ctx) ?? attachmentHostIds(state, state.activeSeat, code, ctx);
+// The hosts the engine accepts for this attachment card: the staging area or a seat's play area for a card that goes there (families/attachments/play.ts),
+// else the cards it may attach to. One played from the discard pile by Stalwart goes onto that hero only (the permission is the hero's).
+function playHosts(state: ScenarioState, instance: { code: string; zone: string }, ctx: ReduceContext): readonly string[] {
+  const targets = playTargets(state, state.activeSeat, instance.code, ctx) ?? attachmentHostIds(state, state.activeSeat, instance.code, ctx);
+  const grantOnly = instance.zone === "discard" && !discardPlay(ctx, instance.code).allowed;
+  if (!grantOnly) return targets;
+  const granted = discardGrantHosts(state, state.activeSeat);
+  return targets.filter((id) => granted.includes(id));
+}
+
+export function attachmentTargets(state: ScenarioState, cardId: string | undefined, ctx: ReduceContext): readonly string[] {
+  const instance = cardId ? state.cards[cardId] : undefined;
+  if (!instance || ctx.cards.get(instance.code)?.type !== "attachment") return [];
+  return playHosts(state, instance, ctx);
 }
 
 function paymentReason(

@@ -20,6 +20,7 @@ import { firstShares, shareOf, sharesReady, tapShare, type Share } from "./pay.t
 import type { LegalIntent } from "../store/store.ts";
 import type { Sheet, SheetNames, SheetStat } from "./sheet-types.ts";
 import { fortitudeCommitCaution } from "../readouts/fortitude.ts";
+import { commitTap } from "./commit-limit.ts";
 
 /** What the player has picked for the open sheet. `key` is the sheet's: a new sheet starts a new choice. */
 export type Choice = { key: string; ids: readonly string[]; shares: readonly Share[] };
@@ -121,7 +122,8 @@ export function tappable(sheet: Sheet): ReadonlySet<string> {
   }
 }
 
-export type TapResult = { kind: "choice"; choice: Choice } | { kind: "open"; sheet: Sheet } | { kind: "none" };
+// `said`: a line for the dock beside the choice (the allies a hero's unpick put back); `refused`: a tap the table will not take, with its reason (commit-limit.ts).
+export type TapResult = { kind: "choice"; choice: Choice; said?: string } | { kind: "refused"; reason: string } | { kind: "open"; sheet: Sheet } | { kind: "none" };
 
 function toggle(ids: readonly string[], id: string): readonly string[] {
   return ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id];
@@ -144,7 +146,7 @@ export function tap(sheet: Sheet, held: Choice | null, id: string, table: TapCon
     }
     case "multi":
       if (!sheet.options.some((item) => item.id === id)) return { kind: "none" };
-      return { kind: "choice", choice: { ...choice, ids: toggle(choice.ids, id) } };
+      return sheet.build.kind === "Commit" ? commitTap(choice, id, table) : { kind: "choice", choice: { ...choice, ids: toggle(choice.ids, id) } };
     case "distribute": {
       const item = sheet.options.find((candidate) => candidate.id === id);
       if (!item) return { kind: "none" };
@@ -159,7 +161,7 @@ export function tap(sheet: Sheet, held: Choice | null, id: string, table: TapCon
       return { kind: "choice", choice: { ...choice, ids: next ? [next.id] : [] } };
     }
     case "window": {
-      if (sheet.commit?.options.some((item) => item.id === id)) return { kind: "choice", choice: { ...choice, ids: toggle(choice.ids, id) } };
+      if (sheet.commit?.options.some((item) => item.id === id)) return commitTap(choice, id, table);
       if (sheet.plays.includes(id)) {
         const opened = playSheet(table.game, table.ctx, table.legal, table.names, id);
         return opened ? { kind: "open", sheet: opened } : { kind: "none" };
@@ -351,10 +353,6 @@ export function dockFor(
       const count = choice.ids.length;
       if (sheet.commit && count > 0) {
         primary = { label: `Commit ${count}`, action: { kind: "intent", intent: { type: "Commit", cardIds: [...choice.ids] } }, arm: false, testID: "table-commit" };
-        // The same characters to a player side quest instead of the current quest.
-        for (const quest of sheet.sideQuests ?? []) {
-          secondary.push({ label: `To ${quest.label}`, action: { kind: "intent", intent: { type: "Commit", cardIds: [...choice.ids], sideQuestId: quest.id } }, arm: false, testID: `table-commit-side-${quest.id}` });
-        }
       } else if (sheet.mustCommit != null) {
         // A hero must commit (A Fell Dread): Pass is not legal, so the primary waits for a pick and says who.
         primary = { label: "Commit", action: { kind: "clear" }, arm: false, testID: "table-commit" };

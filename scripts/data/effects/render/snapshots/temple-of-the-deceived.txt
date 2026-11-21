@@ -49,6 +49,8 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     - choose ready hero (you control)
     - exhaust the picked card
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+  110078:constant:1: Constant
+    - this card: stat returnsToStagingArea 1, while this card is in play
 
 110078:A:2 (front): Action: Exhaust Gate Key and attached hero and spend 3 resources from attached hero's resource pool to look at the facedown side of a Temple of the Deceived location.
   110078:action:2: Action (cost: exhaust this card and exhaust the attached card and pay 3 resource(s) from the host's pool)
@@ -67,6 +69,8 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     - choose ready hero (you control)
     - exhaust the picked card
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+  110078:constant:2: Constant
+    - this card: stat returnsToStagingArea 1, while this card is in play
 
 110078:B:3 (back): Action: Exhaust Gate Key and attached hero to look at the facedown side of a Temple of the Deceived location or secret.
   110078:action:4: Action (cost: exhaust this card and exhaust the attached card)
@@ -263,6 +267,8 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     - choose ready hero (you control)
     - exhaust the picked card
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+  12071:constant:1: Constant
+    - this card: stat returnsToStagingArea 1, while this card is in play
 
 12071:A:2 (front): Action: Exhaust Gate Key and attached hero and spend 3 resources from attached hero's resource pool to look at the facedown side of a Temple of the Deceived.
   12071:action:2: Action (cost: exhaust this card and exhaust the attached card and pay 3 resource(s) from the host's pool)
@@ -460,4 +466,4 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each hero (any player controls) with resources on it:
       - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
 
-(rendered pieces: 252 by template, 60 as JSON)
+(rendered pieces: 258 by template, 60 as JSON)

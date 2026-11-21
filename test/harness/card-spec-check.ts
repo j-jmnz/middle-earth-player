@@ -1,3 +1,5 @@
+import { flaggedByClass } from "../../src/rules/core/holder-classes.ts";
+import { printedOf } from "../../src/rules/core/printed.ts";
 import { flagged, type ScenarioState } from "../../src/rules/core/state.ts";
 import { declaredDefenders } from "../../src/rules/families/defense/defenders.ts";
 import { modifiedStat } from "../../src/rules/core/keywords.ts";
@@ -40,13 +42,35 @@ export function failures(done: Done, wanted: readonly Expect[]): string[] {
           break;
         }
         case "flag": {
-          const got = flagged(state, idOf(state, item.code), item.name);
+          // "table" names the table's own flags (skipPlanning, noCollect, cannotPlayEvents, noQuestProgress), which no card holds.
+          const got = flagged(state, item.code === "table" ? "table" : idOf(state, item.code), item.name);
           if (got !== item.value) problems.push(`${item.code} ${item.name} is ${got}, not ${item.value}`);
+          break;
+        }
+        case "classFlag": {
+          const card = state.cards[idOf(state, item.code)];
+          const got = card != null && flaggedByClass(state, card, printedOf(done.table.cards, card.code), item.name);
+          if (got !== item.value) problems.push(`${item.code} ${item.name} by class is ${got}, not ${item.value}`);
           break;
         }
         case "zone": {
           const zones = idsOf(state, item.code).map((id) => state.cards[id]?.zone);
           if (!zones.includes(item.zone as never)) problems.push(`${item.code} is in ${zones.join(", ") || "no zone"}, not ${item.zone}`);
+          break;
+        }
+        case "committed": {
+          const got = state.cards[idOf(state, item.code)]?.committed === true;
+          if (got !== item.value) problems.push(`${item.code} is ${got ? "" : "not "}committed to the quest`);
+          break;
+        }
+        case "count": {
+          const got = idsOf(state, item.code).filter((id) => state.cards[id]?.zone === item.zone).length;
+          if (got !== item.value) problems.push(`${got} cards ${item.code} are in ${item.zone}, not ${item.value}`);
+          break;
+        }
+        case "side": {
+          const got = idsOf(state, item.code).map((id) => state.cards[id]?.face);
+          if (!got.includes(item.side)) problems.push(`${item.code} shows ${got.join(", ") || "no side"}, not ${item.side}`);
           break;
         }
         case "progressOn":
@@ -96,6 +120,11 @@ export function failures(done: Done, wanted: readonly Expect[]): string[] {
           if (held?.zone !== "captive" || held.host !== host) problems.push(`${item.code} is ${held?.zone === "captive" ? `held by ${state.cards[held.host ?? ""]?.code ?? "nothing"}` : `in ${held?.zone ?? "no zone"}`}, not held by ${item.host}`);
           break;
         }
+        case "window": {
+          const got = state.window?.kind === item.kind;
+          if (got !== item.value) problems.push(`the open window is ${state.window?.kind ?? "none"}, ${item.value ? "not" : "which is"} ${item.kind}`);
+          break;
+        }
         case "deckCount":
           if (state.encounterDeck.length !== item.value) problems.push(`the encounter deck holds ${state.encounterDeck.length} cards, not ${item.value}`);
           break;
@@ -134,7 +163,7 @@ export function failures(done: Done, wanted: readonly Expect[]): string[] {
         case "offers": {
           const id = item.code ? idOf(state, item.code) : undefined;
           const offered = legalIntents(state, done.table.ctx).some((intent) => intent.type === item.intent && (id === undefined || ("cardId" in intent && intent.cardId === id)));
-          if (!offered) problems.push(`${item.intent}${item.code ? ` of ${item.code}` : ""} is not offered`);
+          if (offered !== (item.value ?? true)) problems.push(`${item.intent}${item.code ? ` of ${item.code}` : ""} is ${offered ? "offered" : "not offered"}`);
           break;
         }
       }

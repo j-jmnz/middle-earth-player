@@ -16,7 +16,7 @@ import { exhaustCard, lastPicked, placePlayerDamage, readyCard, seatOf } from ".
 import { isCharacterType, isPlayerType, printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { Modifier, QueueItem, ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { topFrame } from "../../windows/windows.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
@@ -27,6 +27,7 @@ import { bottomStage, keepStage, lookedStages, shuffleStages } from "./order.ts"
 import { restricted } from "../../interpret/restrictions.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 import { placeProgressOnQuestCard } from "./quest-card.ts";
+import { announceEliminated } from "./eliminated.ts";
 import { resetSweep } from "./reset.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -80,6 +81,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return reattachSelf(state, instruction, focus);
     // Read when the scenario's definition is built (BranchStage, rules/families/quest/branch.ts); nothing to do when it runs.
     case "BranchStage":
+    case "AdvanceIfAttached":
       return state;
     case "ShuffleStages":
       return shuffleStages(state, instruction.codes);
@@ -125,13 +127,20 @@ function askNumber(state: ScenarioState, max: number, option: (n: number) => Sim
   return openBranch(state, item, 0, ctx);
 }
 
+// A character that cannot quest stays out of an effect's commitment too ("Attached hero ... cannot commit to a quest", 04023:A:1). Only a game that deals
+// Freezing Cold (04023, The Redhorn Gate) refuses it, so the earlier games' Hobbit Pony, Grappling Hook, Windfola and Late Adventurer replay as before.
+function barredFromCommitting(state: ScenarioState, id: string): boolean {
+  return flagged(state, id, "cannotQuest") && Object.values(state.cards).some((card) => card.code === "04023");
+}
+
 // The card commits to the quest without exhausting (rr.step-3-2 exhausts only for the commitment step itself), and the cards that
-// answer a commitment hear it. With `stat: "attack"` it quests with its Attack until the phase ends.
+// answer a commitment hear it; a character that cannot quest stays out. With `stat: "attack"` it quests with its Attack until the phase ends.
 function commitToQuest(state: ScenarioState, instruction: Verb<"CommitToQuest">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId));
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || card.committed || card.controller == null || (card.zone !== "heroes" && card.zone !== "play")) return state;
   if (!isCharacterType(printedOf(ctx.cards, card.code))) return state;
+  if (barredFromCommitting(state, id)) return state;
   let next = updateCard(state, id, { committed: true });
   steps.push({ kind: "commit", cardId: id });
   if (instruction.stat === "attack") next = addModifier(next, id, focus.sourceId ?? id, "questsWithAttack", 1, "endOfPhase");
@@ -180,4 +189,4 @@ function removeProgressUnpayable(state: ScenarioState, instruction: Instruction,
   return (state.questStage ? (state.cards[state.questStage]?.progress ?? 0) : 0) < needed;
 }
 
-export const manifest: RulesFamily = { name: "quest", settle: { sweep: resetSweep }, travel: { unpayable: removeProgressUnpayable }, verbs: ["CommitToQuest", "MakeActive", "MoveProgress", "LowerCardThreat", "DamageEach", "ExhaustEach", "ReadyAll", "BarEngagement", "WaiveQuestThreat", "SkipQuestPhase", "AdvanceStage", "RaiseQuestThreat", "ResetThreat", "ReattachSelf", "BranchStage", "ShuffleStages", "LookAtStages", "RemoveProgressFromQuest", "RemoveAllProgress", "RemoveProgressEach", "PlaceProgressOnQuestCard"], run };
+export const manifest: RulesFamily = { name: "quest", settle: { before: announceEliminated, sweep: resetSweep }, travel: { unpayable: removeProgressUnpayable }, verbs: ["CommitToQuest", "MakeActive", "MoveProgress", "LowerCardThreat", "DamageEach", "ExhaustEach", "ReadyAll", "BarEngagement", "WaiveQuestThreat", "SkipQuestPhase", "AdvanceStage", "RaiseQuestThreat", "ResetThreat", "ReattachSelf", "BranchStage", "AdvanceIfAttached", "ShuffleStages", "LookAtStages", "RemoveProgressFromQuest", "RemoveAllProgress", "RemoveProgressEach", "PlaceProgressOnQuestCard"], run };

@@ -7,7 +7,7 @@ import { islandHolds } from "../families/island/pick.ts";
 import { DIRE_VALOUR_SHIFT } from "../families/black-gate/dire.ts";
 import type { Condition } from "../../catalog/boundary.ts";
 
-import { resolveAmount, type AmountScope } from "./amounts.ts";
+import { hostOf, resolveAmount, type AmountScope } from "./amounts.ts";
 import { questSucceeded } from "../families/costs/pay.ts";
 import { discardedCost } from "../families/uncharted/cards.ts";
 import { spendablePools } from "../families/costs/verbs.ts";
@@ -17,7 +17,7 @@ import { seatThreat } from "../families/play/hooks.ts";
 import { distinctTraitCount, flaggedTrait, lostTrait } from "../families/misc/traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "../families/quest/conditions.ts";
-import { headOf, inAreaOf } from "../families/breaking/areas.ts";
+import { headOf, inAreaOf, isolatedAreas } from "../families/breaking/areas.ts";
 import { victoryPointsOf } from "../core/printed-stat.ts";
 import { modifiedStat, versusDefender, versusHighEngagement } from "../core/keywords.ts";
 import { defendingAgainst } from "../families/angmar/combat.ts";
@@ -78,12 +78,11 @@ export type Scope = {
 
 // The card a `matches` condition reads.
 function conditionCard(state: ScenarioState, card: Extract<Condition, { kind: "matches" }>["card"], scope: Scope): string | null {
-  const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
   switch (card) {
     case "self":
       return scope.sourceId;
     case "host":
-      return source?.host ?? null;
+      return hostOf(state, scope.sourceId);
     case "subject":
       return scope.subject ?? null;
     case "other":
@@ -109,8 +108,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   if (familial !== null) return familial;
   switch (condition.kind) {
     // A family's condition hook answers these before this switch (south: noneDiscarded; black-gate: embassy; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
-    case "noneDiscarded": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives":
-    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "questProgressNoted": case "guardianCanChange": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastEscapeFailed": case "lastEscapePassed": case "firstTreachery": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "setAsideHas":
+    case "noneDiscarded": case "lastPlayer": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives": case "discardedHasShadowOrTentacle": case "firstLetterMatches":
+    case "attackedThisPhase": case "optionTaken": case "namedFlag": case "discoverUnavailable": case "investigateIgnored": case "investigationTop": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "questProgressNoted": case "committedThisRound": case "guardianCanChange": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastEscapeFailed": case "lastEscapePassed": case "lastLocateFailed": case "lastLocatePassed": case "hasPass": case "playerWithoutReady": case "drew": case "engagedWithLastPlayer": case "firstTreachery": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "allAtStage": case "setAsideHas": case "exploredPending": case "night":
       return false;
     case "hideFailed":
       return state.hideFailures.some(
@@ -137,7 +136,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     case "island":
       return islandHolds(state, condition);
     case "handSize":
-      return livingSeats(state).every((seat) => (state.seats[seat]?.hand.length ?? 0) <= condition.max);
+      return (condition.actor === true ? [scope.actor] : livingSeats(state)).every((seat) => (state.seats[seat]?.hand.length ?? 0) <= condition.max);
     case "pursuit":
     case "picked":
     case "anyHand":
@@ -194,13 +193,22 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     case "noneReturned":
       return scope.returned === 0;
+    case "returnedBelow":
+      return scope.returned < condition.than;
     case "phase":
       // The action window after 7.4 (the engine's "End of round" step) is still in the refresh phase (rr.step-7-4,
       // rr.step-7-5): a Refresh Action may be used there. An ended phase an event names is read as it is.
       if (scope.phase == null && condition.is === "Refresh" && state.phase === "End of round") return true;
       return (scope.phase ?? state.phase) === condition.is;
-    case "undefended":
-      return state.pendingAttack != null && (state.pendingAttack.defenderId == null || state.pendingAttack.undefended === true);
+    case "phaseEnded":
+      return state.boundaryPhase === condition.is && state.phase !== condition.is;
+    case "undefended": {
+      // The attack in progress has no defender yet (or a shadow effect made it count as undefended); `is: false` asks for the defended one.
+      const attack = state.pendingAttack;
+      if (attack == null) return false;
+      const undefended = attack.defenderId == null || attack.undefended === true;
+      return undefended === (condition.is !== false);
+    }
     case "searchable":
       return searchable(state, condition, ctx).length > 0;
     case "stageReached":
@@ -227,8 +235,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return holder != null && versusHighEngagement(state, condition.role, holder, ctx.cards, scope.against);
     }
     case "hostNamed": {
-      const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
-      const host = source?.host ? state.cards[source.host] : undefined;
+      const hostId = hostOf(state, scope.sourceId);
+      const host = hostId ? state.cards[hostId] : undefined;
       return host != null && printedOf(ctx.cards, host.code).name === condition.name;
     }
     case "subjectExplored": {
@@ -249,7 +257,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return livingSeats(state).some((seat) => seat !== scope.actor);
     case "controls":
       return Object.values(state.cards).some(
-        (card) => card.code === condition.code && card.controller === scope.actor && (card.zone === "heroes" || card.zone === "play"),
+        (card) => card.code === condition.code && (condition.who === "anyPlayer" ? card.controller != null : card.controller === scope.actor) && (card.zone === "heroes" || card.zone === "play"),
       );
     case "outOfPlay":
       return outOfPlayCopies(state, condition.code).length > 0;
@@ -259,10 +267,11 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     case "enemyInPlay": {
       const trait = condition.trait;
-      // Mount Gram: while the staging areas are separate an enemy "in play" is one in the asking player's own area (mec108.create-staging-area).
-      const area = state.separate && state.capture ? headOf(state, scope.actor) : null;
+      // Isolated areas (isolatedAreas): an enemy "in play" is one in the asking player's own area (mec108.create-staging-area).
+      const area = isolatedAreas(state) ? headOf(state, scope.actor) : null;
       const found = Object.values(state.cards).some(
-        (card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).type === "enemy" && (trait == null || hasTrait(state, card.id, trait, ctx)) && (area == null || inAreaOf(state, card, area)),
+        (card) =>
+          inPlay(card.zone) && card.asAttachment == null && printedOf(ctx.cards, card.code).type === "enemy" && (condition.other !== true || card.id !== scope.sourceId) && (trait == null || hasTrait(state, card.id, trait, ctx)) && (area == null || inAreaOf(state, card, area)),
       );
       return found === condition.is;
     }
@@ -316,8 +325,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return questHasKeywords(state, ctx) === condition.is;
     // The attack family's conditions (families/attack/strike.ts, families/attack/events.ts).
     case "attacking": {
-      const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
-      const id = scope.holderId ?? (condition.card === "host" ? source?.host : condition.card === "subject" ? scope.subject : scope.sourceId);
+      const id = scope.holderId ?? (condition.card === "host" ? hostOf(state, scope.sourceId) : condition.card === "subject" ? scope.subject : scope.sourceId);
       return attackingHolds(state, condition, id ? state.cards[id] : undefined, ctx, scope.against);
     }
     case "engagedThisRound":
@@ -351,7 +359,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     case "stageProgress": {
       const stage = state.questStage ? state.cards[state.questStage] : undefined;
-      return stage != null && stage.progress >= condition.min;
+      return stage != null && stage.progress >= condition.min * (condition.perStartedPlayer === true ? state.seatCount : 1);
     }
     case "victoryPoints":
       return state.victory.reduce((sum, id) => sum + victoryPointsOf(state, id, ctx.cards), 0) >= condition.min;
@@ -391,7 +399,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
         }) === condition.is
       );
     case "hostActive": {
-      const host = scope.sourceId ? state.cards[scope.sourceId]?.host : null;
+      const host = hostOf(state, scope.sourceId);
       return host != null && (host === state.activeLocation || host === state.secondActiveLocation);
     }
     case "shadowBlank":
@@ -432,18 +440,23 @@ export function hasTrait(state: ScenarioState, id: string, trait: string, ctx: R
   );
 }
 
-// An encounter card its own text attached to a card "counts as" an attachment with a trait while it is attached ("Counts as a
-// Condition attachment", 141043:A:2, 141055:A:2; rr.attachment-cards): the traits its CountsAs records give it.
-function countedTraits(state: ScenarioState, id: string, ctx: ReduceContext): string[] {
+// An encounter card its own text attached to a card "counts as" an attachment, with a trait or none, while it is attached ("Counts as a
+// Condition attachment", 141043:A:2, 141055:A:2; "Counts as an attachment", 50208:A:2; rr.attachment-cards): its CountsAs records.
+function countsAsRecords(state: ScenarioState, id: string, ctx: ReduceContext): { trait?: string }[] {
   const instance = state.cards[id];
   if (!instance || instance.zone !== "attached" || instance.host == null) return [];
   return ctx.effects.flatMap((effect) =>
-    effect.cardCode === instance.code && effect.timing === "constant" ? effect.instructions.flatMap((instruction) => (instruction.verb === "CountsAs" ? [instruction.trait] : [])) : [],
+    effect.cardCode === instance.code && effect.timing === "constant" ? effect.instructions.flatMap((instruction) => (instruction.verb === "CountsAs" ? [instruction] : [])) : [],
   );
 }
 
+// The traits those records give it.
+function countedTraits(state: ScenarioState, id: string, ctx: ReduceContext): string[] {
+  return countsAsRecords(state, id, ctx).flatMap((record) => (record.trait ? [record.trait] : []));
+}
+
 export function countsAsAttachment(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
-  return countedTraits(state, id, ctx).length > 0;
+  return countsAsRecords(state, id, ctx).length > 0;
 }
 
 // What the constant records of a card's attachments give it: the Gondor trait from Steward of Gondor, a resource icon

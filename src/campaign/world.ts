@@ -119,7 +119,9 @@ export function worldFrom(campaign: CampaignData, scenario: AnyScenarioData, eff
   const printed = printedMap(rows);
   // The campaign card is dealt as an engine card only for the scenario being played, and only when it has an ability that works
   // while the scenario is played (141056:A:2), which the engine places beside the quest deck (families/burden/campaign.ts).
-  for (const row of rows) if (scenario.campaignCard !== undefined && row.code === scenario.campaignCard && row.typeCode === "campaign") printed.set(row.code, printedFromRow(row));
+  // The scenario's mode card (ScenarioData.modeCard, the Siege's Standard Game Mode) is dealt beside the quest deck the same way.
+  for (const row of rows) if (row.typeCode === "campaign" && row.code === scenario.campaignCard) printed.set(row.code, printedFromRow(row));
+  for (const row of rows) if (row.typeCode === "campaign" && "modeCard" in scenario && (row.code === scenario.modeCard || row.code === scenario.easyModeCard)) printed.set(row.code, printedFromRow(row));
   // The Orc Guard a deck card becomes (01107:A:1) is no card of the catalog: the engine makes it, and the table names it.
   printed.set(ORC_GUARD_CODE, printedOf(printed, ORC_GUARD_CODE));
   return { campaign, scenario, effects, cards: printed, sets, deckFacts, copies };
@@ -133,6 +135,19 @@ function namesCollection(effects: readonly Effect[], codes: ReadonlySet<string>)
     const verbs: string[] = [];
     walkInstructions(effect.instructions, (instruction) => verbs.push(String(instruction.verb)));
     return verbs.some((verb) => heroVerbs.has(verb));
+  });
+}
+
+// Whether a card among these codes has a record, at any depth, with a verb that chooses an event card from the collection (`collection: "event"`, src/catalog/verb-flags.ts).
+function namesCollectionEvents(effects: readonly Effect[], codes: ReadonlySet<string>): boolean {
+  const eventVerbs = collectionVerbs("event");
+  return effects.some((effect) => {
+    if (!codes.has(effect.cardCode)) return false;
+    let found = false;
+    walkInstructions(effect.instructions, (instruction) => {
+      if (typeof instruction.verb === "string" && eventVerbs.has(instruction.verb)) found = true;
+    });
+    return found;
   });
 }
 
@@ -191,8 +206,10 @@ export function loadWorld<TRun>(
   const withTreasures = treasures.length > 0 ? [...rows, ...treasures.filter((row) => !loaded.has(row.code))] : rows;
   // A card that names the player's collection (Helm of Secrecy, Thorongil) needs every hero card the player may own: the app
   // tracks no collection, so that is every deck-legal hero (families/misc/collection.ts).
-  if (!namesCollection(effects, new Set(codes))) return worldFrom(campaign, scenario, effects, withTreasures);
-  const known = new Set(withTreasures.map((row) => row.code));
+  // A card that chooses an event of the collection (Silent Mist) needs every deck-legal event: the app tracks no collection either.
+  const withEvents = namesCollectionEvents(effects, new Set(codes)) ? [...withTreasures, ...catalog.select().from(cards).where(and(eq(cards.typeCode, "event"), eq(cards.deckLegal, true))).all().filter((row) => !loaded.has(row.code))] : withTreasures;
+  if (!namesCollection(effects, new Set(codes))) return worldFrom(campaign, scenario, effects, withEvents);
+  const known = new Set(withEvents.map((row) => row.code));
   const heroes = catalog.select().from(cards).where(and(eq(cards.typeCode, "hero"), eq(cards.deckLegal, true))).all();
-  return worldFrom(campaign, scenario, effects, [...withTreasures, ...heroes.filter((row) => !known.has(row.code))]);
+  return worldFrom(campaign, scenario, effects, [...withEvents, ...heroes.filter((row) => !known.has(row.code))]);
 }

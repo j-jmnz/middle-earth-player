@@ -67,12 +67,20 @@ export function putTrust(state: ScenarioState, instruction: Verb<"PutTrust">, fo
   return queueFront(state, [{ instruction: choose, seat: focus.seat, chosen: null, cause }]);
 }
 
-/** GuardReturnedBy: the card in play with the code goes back to the staging area, controlled by no one, guarded by the last picked card, which must be in the staging area (19044:A:1). */
+/**
+ * GuardReturnedBy: the card in play with the code goes back to the staging area, controlled by no one, guarded by the last picked card, which must be in the staging area (19044:A:1). With `returns: "firstPlayer"` (Arwen under Goblin Gate, 901402:B:1) the guard may be the active location
+ * too, and the card is marked (`guardedAlly`) to rejoin the first player's play area once nothing guards it (families/play/sweep.ts); it keeps its damage, tokens and attachments.
+ */
 export function guardReturnedBy(state: ScenarioState, instruction: Verb<"GuardReturnedBy">): ScenarioState {
   const id = inPlayWithCode(state, instruction.code);
   const guard = lastPicked(state);
-  if (!id || !guard || state.cards[guard]?.zone !== "staging" || guard === id) return state;
-  return guardWith(updateCard(moveCard(state, id, { zone: "staging" }), id, { controller: null, face: "up" }), guard, id);
+  const where = guard ? state.cards[guard]?.zone : undefined;
+  const returns = instruction.returns === "firstPlayer";
+  if (!id || !guard || (where !== "staging" && !(returns && where === "activeLocation")) || guard === id) return state;
+  // An ally keeps its owner (it goes to that discard pile if it is destroyed in the staging area, as defeatedDestination reads).
+  const kept = returns ? { owner: state.cards[id]?.owner ?? state.cards[id]?.controller ?? undefined } : {};
+  const guarded = guardWith(updateCard(moveCard(state, id, { zone: "staging" }), id, { controller: null, face: "up", ...kept }), guard, id);
+  return returns ? { ...guarded, modifiers: [...guarded.modifiers, { instanceId: id, sourceId: guard, stat: "guardedAlly", amount: 1, until: "endOfGame" }] } : guarded;
 }
 
 const CLAIMERS = new WeakMap<readonly unknown[], readonly { code: string; host: string | undefined; id: string }[]>();

@@ -15,6 +15,11 @@ describe("card text on the card screen", () => {
     ]);
   });
 
+  it("says the player icon the source writes as PerPlayer in words", () => {
+    const [line] = cardTextParagraphs("Cannot take more than 5 PerPlayer damage each round.");
+    expect(line?.runs).toEqual([{ kind: "text", text: "Cannot take more than 5 per player damage each round.", bold: false, italic: false }]);
+  });
+
   it("marks a line that is italic throughout as flavor", () => {
     const [flavor, rule] = cardTextParagraphs("<i>The road goes ever on.</i>\n<b>Response:</b> Draw a card.");
     expect(flavor?.flavor).toBe(true);

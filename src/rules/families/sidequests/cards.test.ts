@@ -10,7 +10,7 @@ import { modifiedStat, placeDamage } from "../../core/keywords.ts";
 import { reduce } from "../../engine/reduce.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { attachTo, spawn } from "../../core/zones.ts";
-import { crossTo, inVictory, offered, passQuestWindow, play, put, questArea, questing, run, seat, send, sideCtx, synced, toVictory, trigger, triggers } from "./fixture.ts";
+import { asCurrentQuest, crossTo, inVictory, offered, passQuestWindow, play, put, stagedQuest, questing, run, seat, send, sideCtx, synced, toVictory, trigger, triggers } from "./fixture.ts";
 
 // A treachery whose When Revealed does something, so a cancel has an effect to cancel.
 const CURSE: Effect = { id: "curse:whenRevealed:1", cardCode: "curse", lines: ["curse:A:1"], timing: "whenRevealed", instructions: [{ verb: "RaiseThreat", amount: 3, who: "eachSeat" }] };
@@ -71,23 +71,26 @@ describe("a side quest in the victory display and an ally that reads it", () => 
   it("East Road Ranger gets +2 Willpower while committed to a side quest (10008:A:1)", () => {
     const table = seat(1, ["dwarf", "rohan"]);
     const ranger = put(table.state, "10008", "play");
-    const quest = questArea(ranger.state, "09014");
+    const quest = stagedQuest(ranger.state, "09014");
     let state = questing(synced(quest.state, ctx));
     expect(stat(state, ranger.id, "willpower")).toBe(1);
     // Committed to the current quest, it stays at 1.
     const main = send(state, { type: "Commit", cardIds: [ranger.id] }, ctx);
     expect(stat(synced(main, ctx), ranger.id, "willpower")).toBe(1);
-    state = send(state, { type: "Commit", cardIds: [ranger.id], sideQuestId: quest.id }, ctx);
+    state = send(asCurrentQuest(state, quest.id), { type: "Commit", cardIds: [ranger.id] }, ctx);
     expect(stat(synced(state, ctx), ranger.id, "willpower")).toBe(3);
   });
 
-  it("Legacy Blade gives +1 Attack for each side quest in the victory display, up to +3 (17117:A:2)", () => {
+  it("Legacy Blade gives +1 Attack for each side quest in the victory display, encounter side quests too, up to +3 (17117:A:2)", () => {
     const table = seat(1, ["dwarf", "rohan"]);
     const blade = put(table.state, "17117", "play");
     const hero = table.heroes[0] ?? "";
     let state = synced(attachTo(blade.state, blade.id, hero), ctx);
     const base = stat(state, hero, "attack");
-    for (const [index, code] of ["09014", "10034", "10009", "10058"].entries()) {
+    // An encounter side quest counts as a side quest (mec108.side-quests); a location in the display does not.
+    state = inVictory(state, "marsh", ctx).state;
+    expect(stat(state, hero, "attack")).toBe(base);
+    for (const [index, code] of ["wilds", "10034", "10009", "10058"].entries()) {
       state = inVictory(state, code, ctx).state;
       expect(stat(state, hero, "attack")).toBe(base + Math.min(index + 1, 3));
     }

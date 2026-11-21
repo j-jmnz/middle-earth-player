@@ -8,7 +8,8 @@ import { when } from "../effect-schema-conditions.ts";
 
 const VERBS = [
   // "Discard all cards in each player's hand" (145063:B:2): the actor discards their whole hand, no choice, each card announced as discarded from the hand. Nothing happens with an empty hand.
-  z.strictObject({ verb: z.literal("DiscardHand"), ...when }),
+  // `who: eventSeat`: the hand of the player the answered event happened to ("discard the event player's hand", 04145:A:1).
+  z.strictObject({ verb: z.literal("DiscardHand"), who: z.literal("eventSeat").optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;

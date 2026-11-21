@@ -9,8 +9,9 @@ import { SCENE_PICTURE } from "../../src/screens/art/crop.ts";
 import { sniffImage } from "../../src/screens/images/policy.ts";
 import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR } from "../data/paths.ts";
 import { fetchBytesRetrying, sha256, type SourceFile, type SourceRecord } from "../data/sources/fetch.ts";
+import { mirrorFromEnv, mirrorReader } from "../data/mirror/client.ts";
 import { renderPdfPage } from "../data/sources/pictures.ts";
-import { bytes, runScript, type Log } from "../log.ts";
+import { bytes, duration, runScript, type Log } from "../log.ts";
 
 // A bundled picture is at most this many pixels on its long side: about twice the 600 of a Hall of Beorn scan, which is
 // sharp on a phone's inspect screen. The 600 DPI pictures are about 2100.
@@ -39,11 +40,13 @@ export type PackScansOptions = {
   scansDir: string;
   mapPath: string;
   fetch?: (url: string) => Promise<Uint8Array>;
+  // The asset mirror, read before a pin's URL (scripts/data/mirror/client.ts, mirrorReader); null on a miss.
+  mirror?: (hash: string) => Promise<Uint8Array | null>;
   render?: (pdfFile: string, page: number) => Uint8Array;
-  shrink?: (body: Uint8Array, typeCode: string, side: "A" | "B") => Promise<Uint8Array>;
+  shrink?: (body: Uint8Array, typeCode: string, side: "A" | "B", code: string) => Promise<Uint8Array>;
   // The first quest card of each scenario: its scene is also bundled on its own, at the source's size (`<code>.scene`, sceneOf).
   sceneCodes?: ReadonlySet<string>;
-  scene?: (body: Uint8Array, typeCode: string) => Promise<Uint8Array>;
+  scene?: (body: Uint8Array, typeCode: string, code: string) => Promise<Uint8Array>;
   // How many pictures are loaded at once (PACK_CONCURRENCY when not given).
   concurrency?: number;
 };
@@ -55,11 +58,12 @@ type Pin = SourceFile & { cacheDir: string };
  * app needs no network (user decision, 2026-10-29) and a quest stage on its B side shows that side. Side B is written as
  * `<code>.B` and keyed so in the map (src/play/canvas/picture-key.ts). The file is the
  * card's `pictures` file of data/sources.json when it has one, else its `scans` file: the cached copy is used when its
- * hash matches the pin; otherwise the pinned URL is fetched (an EAS machine has no cache), and a PDF page is rendered from
- * the pinned PDF. Bytes that do not match the pin fail the build: run `pnpm data sync scans pictures` to move the pins.
+ * hash matches the pin; otherwise the asset mirror's copy, then the pinned URL (a release machine has no cache), and a PDF
+ * page the mirror does not hold is rendered from the pinned PDF. Bytes that do not match the pin fail the build: run `pnpm data sync scans pictures` to move the pins.
  * A picture larger than MAX_SIDE is scaled down to it. A card with neither is drawn as its text.
  */
 export async function packScans(options: PackScansOptions, log: Log): Promise<PackedScan[]> {
+  const begin = performance.now();
   const { sources } = JSON.parse(readFileSync(options.sourcesPath, "utf8")) as { sources: Partial<Record<string, SourceRecord>> };
   const scanPins = sidePins(sources.scans, "scans", options.scanCacheDir);
   // The Nightmare decks' pictures are pinned by their own source, cached beside the others (sources/nightmare.ts).
@@ -89,7 +93,10 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
   const stamp: Stamp = { version: PACK_VERSION, entries: {} };
   const packed: PackedScan[] = [];
   const missing: string[] = [];
-  let fetched = 0;
+  // Where each loaded pin came from, and the time the workers spent loading and on the image work, summed over them
+  // (PACK_CONCURRENCY at once), for the summary line a release log keeps.
+  const from: Record<LoadedFrom, number> = { cache: 0, mirror: 0, source: 0, render: 0 };
+  const spent = { load: 0, images: 0 };
   let kept = 0;
   let total = 0;
   const tick = log.progress(jobs.length, "picture");
@@ -117,7 +124,7 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
       // Packed before from the same pin (and with its scene when one is wanted): kept as it is, with nothing loaded.
       const earlier = before.entries[key];
       const first = picture ?? scan;
-      if (first && earlier?.pin === first.sha256 && earlier.scans.length === (wantsScene ? 2 : 1) && earlier.scans.every((entry) => existsSync(path.join(options.scansDir, entry.filename)))) {
+      if (first && earlier?.pin === stampPin(first.sha256, card.code) && earlier.scans.length === (wantsScene ? 2 : 1) && earlier.scans.every((entry) => existsSync(path.join(options.scansDir, entry.filename)))) {
         stamp.entries[key] = earlier;
         packed.push(...earlier.scans);
         kept += 1;
@@ -125,28 +132,32 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
         continue;
       }
       let body: Uint8Array | null = null;
-      let from: Pin | null = null;
+      let used: Pin | null = null;
+      const loading = performance.now();
       for (const pin of [picture, scan]) {
         if (!pin || body) continue;
         const loaded = await loadPin(pin, context, log);
-        if (loaded?.fetched) fetched += 1;
+        if (loaded) from[loaded.from] += 1;
         body = loaded?.body ?? null;
-        if (body) from = pin;
+        if (body) used = pin;
       }
-      if (!body || !from) {
+      spent.load += performance.now() - loading;
+      if (!body || !used) {
         missing.push(`${key} ${card.name}`);
         tick(`${key} has no picture`);
         continue;
       }
-      const shown = await shrink(body, card.type_code, key.endsWith(".B") ? "B" : "A");
+      const working = performance.now();
+      const shown = await shrink(body, card.type_code, key.endsWith(".B") ? "B" : "A", card.code);
       total += shown.byteLength;
       const scans = [writeScan(key, shown, options.scansDir)];
       if (wantsScene) {
-        const scene = await (options.scene ?? sceneOf)(body, card.type_code);
+        const scene = await (options.scene ?? sceneOf)(body, card.type_code, card.code);
         total += scene.byteLength;
         scans.push(writeScan(`${key}.scene`, scene, options.scansDir));
       }
-      stamp.entries[key] = { pin: from.sha256, scans };
+      spent.images += performance.now() - working;
+      stamp.entries[key] = { pin: stampPin(used.sha256, card.code), scans };
       packed.push(...scans);
       tick(`${key} ${bytes(shown.byteLength)}`);
     }
@@ -172,7 +183,10 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
     log.info(`${missing.length} card${missing.length === 1 ? "" : "s"} have no pinned picture or scan and show as text`);
     log.debug(missing.join(", "));
   }
-  log.info(`bundled ${packed.length} picture${packed.length === 1 ? "" : "s"} (${kept} cards kept from the last pack; ${bytes(total)} written, ${fetched} fetched) into ${options.scansDir}; map ${options.mapPath}`);
+  log.notice(
+    `bundled ${packed.length} picture${packed.length === 1 ? "" : "s"} in ${duration(performance.now() - begin)}: ${kept} kept from the last pack, ${from.cache} from .cache, ${from.mirror} from the mirror, ${from.source} from their sources, ${from.render} rendered from a PDF; ${bytes(total)} written; worker time ${duration(spent.load)} loading, ${duration(spent.images)} on the images`,
+  );
+  log.info(`wrote ${options.scansDir}; map ${options.mapPath}`);
   return packed;
 }
 
@@ -214,18 +228,27 @@ type RenderNotes = { noPdftoppm: string[]; rehashed: string[] };
 
 type LoadContext = PackScansOptions & { fetchScan: (url: string) => Promise<Uint8Array>; pdfPins: ReadonlyMap<string, SourceFile>; notes: RenderNotes };
 
-// The pinned bytes: the cache at the pin, else the URL, else the PDF page rendered again. A rendered page that hashes
+// The pinned bytes: the cache at the pin, else the mirror, else the URL, else the PDF page rendered again. A rendered page that hashes
 // differently (another poppler) is used with a warning; a page that cannot be rendered (no pdftoppm) returns null.
-async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body: Uint8Array; fetched: boolean } | null> {
+// Where a loaded pin came from: the cache, the asset mirror, its URL, or a page rendered from its PDF.
+type LoadedFrom = "cache" | "mirror" | "source" | "render";
+
+async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body: Uint8Array; from: LoadedFrom } | null> {
   const cached = path.join(pin.cacheDir, path.basename(pin.path));
-  if (existsSync(cached) && sha256(readFileSync(cached)) === pin.sha256) return { body: new Uint8Array(readFileSync(cached)), fetched: false };
+  if (existsSync(cached) && sha256(readFileSync(cached)) === pin.sha256) return { body: new Uint8Array(readFileSync(cached)), from: "cache" };
+  const mirrored = await context.mirror?.(pin.sha256);
+  if (mirrored) {
+    mkdirSync(pin.cacheDir, { recursive: true });
+    writeFileSync(cached, mirrored);
+    return { body: mirrored, from: "mirror" };
+  }
   const page = pageOf(pin.url);
   if (page) {
     const pdfPin = context.pdfPins.get(page.pdf);
     if (!pdfPin) throw new Error(`${pin.path} is a page of ${page.pdf}, which data/sources.json does not pin. Run pnpm data sync pictures.`);
     const pdfFile = path.join(context.pdfCacheDir, path.basename(pdfPin.path));
     if (!existsSync(pdfFile) || sha256(readFileSync(pdfFile)) !== pdfPin.sha256) {
-      const body = await context.fetchScan(pdfPin.url);
+      const body = (await context.mirror?.(pdfPin.sha256)) ?? (await context.fetchScan(pdfPin.url));
       if (sha256(body) !== pdfPin.sha256) throw new Error(`${pdfPin.url} has sha256 ${sha256(body)}, pinned ${pdfPin.sha256}. Run pnpm data sync pictures and check the change.`);
       mkdirSync(context.pdfCacheDir, { recursive: true });
       writeFileSync(pdfFile, body);
@@ -241,7 +264,7 @@ async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body
     if (sha256(body) !== pin.sha256) context.notes.rehashed.push(codeOf(pin.path));
     mkdirSync(pin.cacheDir, { recursive: true });
     writeFileSync(cached, body);
-    return { body, fetched: true };
+    return { body, from: "render" };
   }
   log.debug(`${pin.path} not in the cache at its pin, fetching ${pin.url}`);
   const body = await context.fetchScan(pin.url);
@@ -249,7 +272,7 @@ async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body
   if (hash !== pin.sha256) throw new Error(`${pin.url} has sha256 ${hash}, pinned ${pin.sha256}. Run pnpm data sync scans pictures and check the change.`);
   mkdirSync(pin.cacheDir, { recursive: true });
   writeFileSync(cached, body);
-  return { body, fetched: true };
+  return { body, from: "source" };
 }
 
 // A quest card and a side quest are printed sideways, and the app shows them so. JvZijp files them upright, a quest turned
@@ -258,13 +281,30 @@ async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body
 // "141022 - 1B" runs bottom to top), so it takes the opposite turn.
 const UPRIGHT_TURN: Readonly<Record<string, number>> = { quest: 90, "player-side-quest": 270, "encounter-side-quest": 270 };
 
+// The cards JvZijp files upright the other way from the rest of their kind (the text box on the left, its text running bottom to
+// top): The Hunt for the Dreadnaught's two quest stages (user report, 2026-11-20: shown upside down, and the scenario's scene cut
+// from the text box). They take the opposite turn.
+const TURNED_THE_OTHER_WAY: ReadonlySet<string> = new Set(["40004", "40005"]);
+
+// The pin a stamp records for a card: a card turned the other way is marked, so a pack stamped before it was turned packs that card
+// again while every other card keeps its earlier copy (no full repack, PACK_VERSION unchanged).
+function stampPin(sha: string, code: string): string {
+  return TURNED_THE_OTHER_WAY.has(code) ? `${sha} turned` : sha;
+}
+
+// The clockwise turn that lays a picture of `media`'s size down: none for a picture already wider than tall.
+function layDownTurn(media: { width: number; height: number }, typeCode: string, code: string): number {
+  const turn = media.height > media.width ? (UPRIGHT_TURN[typeCode] ?? 0) : 0;
+  return turn !== 0 && TURNED_THE_OTHER_WAY.has(code) ? (turn + 180) % 360 : turn;
+}
+
 // Scales a picture down to MAX_SIDE on its long side as a JPEG, laying an upright quest picture down first. A JPEG already
 // within MAX_SIDE, the right way round and at most KEEP_BYTES is kept byte for byte; a PNG, or a JPEG saved at a far higher
 // quality than the bundle needs (JvZijp's campaign pages run to 1.2 MB), is encoded again.
-export async function shrinkToMaxSide(body: Uint8Array, typeCode = "", side: "A" | "B" = "A"): Promise<Uint8Array> {
+export async function shrinkToMaxSide(body: Uint8Array, typeCode = "", side: "A" | "B" = "A", code = ""): Promise<Uint8Array> {
   const media = sniffImage(body);
   if (!media) throw new Error("Picture is not a JPEG or PNG");
-  const sideA = media.height > media.width ? (UPRIGHT_TURN[typeCode] ?? 0) : 0;
+  const sideA = layDownTurn(media, typeCode, code);
   const turn = side === "B" && sideA !== 0 ? (sideA + 180) % 360 : sideA;
   if (turn === 0 && media.extension === "jpg" && Math.max(media.width, media.height) <= MAX_SIDE && body.byteLength <= KEEP_BYTES) return body;
   const image = turn === 0 ? sharp(body) : sharp(body).rotate(turn);
@@ -281,10 +321,10 @@ const HALFTONE_BLUR = 1.2;
  * A scenario's scene from its first quest card's picture, laid down: the SCENE_PICTURE region at the source's own size, unscaled, so the
  * scene a page draws large is never a crop of the shrunk card. A print scan is softened (PRINT_SCAN_WIDTH).
  */
-export async function sceneOf(body: Uint8Array, typeCode = "quest"): Promise<Uint8Array> {
+export async function sceneOf(body: Uint8Array, typeCode = "quest", code = ""): Promise<Uint8Array> {
   const media = sniffImage(body);
   if (!media) throw new Error("A scene's picture is not a JPEG or PNG");
-  const turn = media.height > media.width ? (UPRIGHT_TURN[typeCode] ?? 0) : 0;
+  const turn = layDownTurn(media, typeCode, code);
   const width = turn % 180 === 0 ? media.width : media.height;
   const height = turn % 180 === 0 ? media.height : media.width;
   const laid = await sharp(body).rotate(turn).toBuffer();
@@ -350,6 +390,7 @@ if (isDirectRun()) {
         scansDir: path.join(root, "assets/scans"),
         mapPath: path.join(root, "src/screens/images/scan-map.ts"),
         sceneCodes: sceneCodesOf(path.join(DATA_DIR, "scenarios")),
+        mirror: mirrorReader(mirrorFromEnv(), log),
       },
       log,
     );

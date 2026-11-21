@@ -18,6 +18,10 @@ export type Step = { script: string; node?: string[]; args?: string[]; env?: Rec
 export type Command = { steps: Step[]; about: string };
 
 const catalog: Step = { script: "build/catalog.ts" };
+// The fixtures import their JSON as Metro and Vitest do, which Node allows only with this hook loaded before them (scripts/game/json-imports.ts).
+const GAME_NODE = ["--import", "./scripts/game/json-imports.ts", "--disable-warning=ExperimentalWarning"];
+// The temporary catalog the game is read against logs its build; only warnings reach the agent (--verbose shows the rest).
+const QUIET = { LOG_LEVEL: "warn" };
 const booklets: Step = { script: "build/pack-booklets.ts" };
 const scans: Step = { script: "build/pack-scans.ts" };
 const sounds: Step = { script: "build/pack-sounds.ts" };
@@ -39,6 +43,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
   },
   data: {
     sync: { steps: [{ script: "data/sync.ts" }], about: "refreshes data/raw and .cache (the only networked command)" },
+    mirror: { steps: [{ script: "data/mirror/run.ts" }], about: "push uploads .cache's pinned files to the R2 asset mirror (--fetch downloads the ones .cache lacks first), pull fills .cache from it ([source...]; needs the R2_* variables)" },
     build: { steps: [{ script: "data/build.ts" }], about: "builds data/ and the generated code from data/raw, offline" },
     check: { steps: [{ script: "data/check.ts" }], about: "rebuilds into a temporary directory and fails on any difference" },
     "ledger-seed": { steps: [{ script: "data/ledger-seed.ts" }], about: "writes a scenario's missing ledger entries from the source text, readBy empty (<scenario-id> [--nightmare] for its Nightmare deck)" },
@@ -71,6 +76,18 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     smoke: { steps: [{ script: "checks/desktop-smoke.ts" }], about: "launches the desktop app on a seeded export and checks it (--skip-build, --app <packed app>, --require-bundle, --expect-version)" },
     stage: { steps: [{ script: "desktop/stage.ts" }], about: "the release job's installers from desktop/out, with a .sha256 each and the 2 GiB check (--tag, --out, --suffix, --github-output)" },
   },
+  browser: {
+    shot: { steps: [catalog, canvaskit, { script: "browser/shot.ts" }], about: "opens routes of the web build in Chromium, writes PNGs to .agent/shots and prints each page's errors ([route...] --fixture <name> --tap <testID> --dark --landscape --ids --text --base <url>)" },
+    run: { steps: [catalog, canvaskit, { script: "browser/run.ts" }], about: "runs a scratch Playwright script against the web build (<script.ts>, default export (app) => …; scripts/browser/app.ts)" },
+    serve: { steps: [catalog, canvaskit, { script: "browser/serve.ts" }], about: "serves the web export on 127.0.0.1 until stopped (--port, --fresh, --reuse)" },
+  },
+  game: {
+    list: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["list"], env: QUIET }], about: "lists the fixtures and goldens pnpm game reads" },
+    show: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["show"], env: QUIET }], about: "a fixture or golden replayed to a moment, as text (<source> --at <n> | --until <cond>, --legal, --full, --send '<intent>', --json)" },
+    log: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["log"], env: QUIET }], about: "a fixture's or golden's intents, one line each, with their engine steps (<source> --from, --to, --until, --steps, --grep)" },
+    scene: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["scene"], env: QUIET }], about: "a table built from a test layout, read as show reads a game (<scenario-id> '<layout json>' | @<file>, then show's flags)" },
+    diff: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["diff"], env: QUIET }], about: "where a golden played now leaves its golden.json, with the table both reached (<scenario-id>/<golden>)" },
+  },
   doc: {
     index: { steps: [{ script: "docs/index.ts" }], about: "regenerates docs/INDEX.md" },
     section: { steps: [{ script: "docs/index.ts", args: ["section"] }], about: 'prints one doc section: <file> "<heading>"' },
@@ -78,6 +95,8 @@ export const GROUPS: Record<string, Record<string, Command>> = {
   release: {
     plan: { steps: [{ script: "release/plan.ts" }], about: "prints the next tag and its notes (--dry-run)" },
     source: { steps: [{ script: "release/sideload-source.ts" }], about: "writes a release's SideStore and AltStore source" },
+    issues: { steps: [{ script: "release/issue-comments.ts" }], about: "writes the comment each issue a release names gets (--tag, --out)" },
+    installs: { steps: [{ script: "release/installs.ts" }], about: "writes the README's installs badge from a dump of the releases (--releases, --out)" },
   },
 };
 

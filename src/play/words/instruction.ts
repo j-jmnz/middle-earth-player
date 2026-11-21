@@ -29,12 +29,13 @@ import { assaultWords } from "./scenarios/assault.ts";
 import { fortressWords } from "./scenarios/fortress.ts";
 import { companyWords } from "./scenarios/company.ts";
 import { angmarWords } from "./scenarios/angmar/angmar.ts";
+import { investigationWords } from "./scenarios/standalone-scenarios/investigation.ts";
 import type { ChoiceNames } from "./choice.ts";
 
 export const PICK_NOUNS: Readonly<Record<string, string>> = { hero: "hero", ally: "ally", attachment: "attachment", enemy: "enemy", character: "character", location: "location", player: "player", objective: "objective" };
 
 // The decks beside the encounter deck a record names (src/rules/core/piles.ts NAMED_PILES), as a sentence says them.
-const PILE_NAMES = { caves: "Caves", evilCreatures: "Evil Creatures", spiders: "Spiders of Mirkwood", orcs: "Orcs", sideQuests: "side quest", harad: "Harad", greatSpider: "Great Spider", angmarOrcs: "Orc" } as const;
+const PILE_NAMES = { caves: "Caves", evilCreatures: "Evil Creatures", spiders: "Spiders of Mirkwood", orcs: "Orcs", sideQuests: "side quest", harad: "Harad", greatSpider: "Great Spider", angmarOrcs: "Orc", smaug: "Smaug", investigation: "Investigation" } as const;
 
 export function article(noun: string): string {
   return /^[aeiou]/.test(noun) ? `an ${noun}` : `a ${noun}`;
@@ -94,6 +95,15 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       const amount = amountWords(instruction.amount);
       return `place ${amount} resource${amount === "1" ? "" : "s"} on ${instruction.on === "self" ? "this card" : "the card you chose"}`;
     }
+    // The Stone of Erech's Tarlang's Neck (the asks file words the choice again for the sheet).
+    case "EndPhase":
+      return "end the phase now";
+    case "EngageAll":
+      return instruction.who === "firstPlayer" && instruction.trait == null && instruction.inPlay == null ? "the first player engages every enemy in the staging area" : null;
+    case "SkipTravelPhase":
+      return "skip the travel phase";
+    case "PassHand":
+      return "pass your whole hand to the player on your left";
     case "FlipGollum":
       return instruction.to === "smeagol" ? "flip Gollum to Sméagol" : "flip Sméagol to Gollum";
     case "GollumAttacks":
@@ -134,6 +144,8 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
         const until = instruction.until === "endOfPhase" ? " until the end of the phase" : instruction.until === "endOfRound" ? " until the end of the round" : "";
         return `${refWords(instruction.target === "picked" || instruction.target == null ? undefined : instruction.target)} gains a ${capital(icon)} icon${until}`;
       }
+      if (instruction.stat === "skipPlanning") return "skip the planning phase";
+      if (instruction.stat === "noCollect") return "collect no resources this round";
       const flag = cavesFlagWords(instruction);
       if (flag) return flag;
       const stat = STAT_WORDS[instruction.stat] ?? instruction.stat;
@@ -244,7 +256,7 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return instruction.reveal ? `reveal the top card of ${deck} and ${where}` : `${instruction.to === "engaged" ? "put" : "add"} the top card of ${deck} ${instruction.to === "engaged" ? "into play engaged with you" : "to the staging area"}`;
     }
     case "PlaceFacedownUnder":
-      return `place ${instruction.target === "self" ? "the attacking enemy" : "it"} facedown under ${names.code(instruction.code)}${instruction.afterAttack ? " after this attack" : ""}`;
+      return `place ${instruction.target === "self" ? "the attacking enemy" : "it"} facedown under ${instruction.code != null ? names.code(instruction.code) : "this card"}${instruction.afterAttack ? " after this attack" : ""}`;
     case "ShuffleEncounterDeck":
       return null;
     // The quest family's verbs (src/catalog/families/quest.ts).
@@ -258,6 +270,8 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return "skip the quest phase this round";
     case "RemoveProgressFromQuest":
       return `remove ${amountWords(instruction.amount)} progress from the quest`;
+    case "RemoveAllProgress":
+      return instruction.pick ? "remove all progress from each matching card in play" : "remove all progress from it";
     case "MoveProgress":
       return instruction.all ? "move all its progress" : `move ${amountWords(instruction.amount)} progress`;
     case "CommitToQuest":
@@ -277,6 +291,8 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return instruction.who === "picked" ? "that player's engaged enemies cannot attack that player" : "that enemy cannot attack you";
     case "DiscardShadowOf":
       return `discard a shadow card from ${refWords(instruction.target)}`;
+    case "DealShadow":
+      return instruction.additional ? "deal it an additional shadow card" : "deal it a shadow card";
     case "DealShadowTo":
       return `deal ${refWords(instruction.target)} another shadow card`;
     case "LookAtShadow":
@@ -314,7 +330,7 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? fortressWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction, names.code) ?? encounterWords(instruction) ?? attachmentWords(instruction, names.code) ?? companyWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction, game) ?? pelennorWords(instruction) ?? blackGateWords(instruction) ?? angmarWords(instruction);
+      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? fortressWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction, names.code) ?? encounterWords(instruction) ?? attachmentWords(instruction, names.code) ?? companyWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction, game) ?? pelennorWords(instruction) ?? blackGateWords(instruction) ?? angmarWords(instruction) ?? investigationWords(instruction);
   }
 }
 

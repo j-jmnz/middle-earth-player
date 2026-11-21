@@ -9,6 +9,7 @@ import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
+import { capturedUnder } from "../../../rules/families/captured/pile.ts";
 import { moveCard, spawn } from "../../../rules/core/zones.ts";
 import { rescueRandom } from "../../../rules/families/captured/rescue.ts";
 import { resolveRecords } from "../../../../test/harness/scene-kit.ts";
@@ -27,7 +28,9 @@ describe("Separate staging areas", () => {
   const areaOf = (state: ScenarioState, seat: number, code: string) => state.seats[seat]?.staging.find((id) => state.cards[id]?.code === code) ?? "";
   // A card of the seat's area, with its own captured cards underneath it.
   function hostWith(state: ScenarioState, seat: number, code: string, held: readonly string[]): { state: ScenarioState; id: string } {
-    const made = spawn(state, code, { zone: "staging", area: seat }, "up");
+    // The card's own Capture X took cards on entering play; the test places the ones it wants under it.
+    const entered = spawn(state, code, { zone: "staging", area: seat }, "up");
+    const made = { id: entered.id, state: capturedUnder(entered.state, entered.id).reduce((next, taken) => moveCard(next, taken, { zone: "removed" }), entered.state) };
     return { id: made.id, state: held.reduce((next, held_) => spawn(next, held_, { zone: "captured", hostId: made.id, seat }, "down").state, made.state) };
   }
   const settled = (state: ScenarioState): ScenarioState => settle({ ...state, window: null }, ctx, []);

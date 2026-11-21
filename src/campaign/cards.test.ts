@@ -26,7 +26,9 @@ describe("printedFromRow", () => {
       } catch {
         continue;
       }
-      expect(printedFromRow(row), `${row.code} ${row.name}`).toEqual(expected);
+      // An event carries its deck limit from the catalog (Silent Mist, 40009:B:2); data/cards does not print it.
+      const { deckLimit: _limit, ...fromRow } = printedFromRow(row);
+      expect(fromRow, `${row.code} ${row.name}`).toEqual(expected);
     }
   });
 

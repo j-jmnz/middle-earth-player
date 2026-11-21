@@ -7,10 +7,12 @@ import { runScript, type Log } from "../log.ts";
 
 // Checks commit subjects against .claude/rules/commit-standards.md (Subject line): "<type>: <summary>", one of the
 // types below, at most 72 characters, no closing period, the summary an action (its first word an imperative verb). A message file and a range also have their bodies checked for a
-// Claude Code session link, which the repository is public enough to keep out (commit-standards.md, Body).
+// Claude Code session link, which the repository is public enough to keep out, and for a GitHub closing keyword before an issue
+// number, which would close the issue at the merge instead of at the release (commit-standards.md, Body).
 // Usage: pnpm commit:check "<subject>"... checks the subjects given; --range <base>..<head> checks every non-merge
 // commit in the range (CI checks a pull request's commits and its title, which becomes the squash commit's subject);
-// --file <path> checks a message file (the commit-msg hook, .githooks/commit-msg); --install points this checkout's
+// --file <path> checks a message file (the commit-msg hook, .githooks/commit-msg); --description <path> checks only the body
+// rules on a pull request's description, which becomes the squash commit's body (CI); --install points this checkout's
 // git at .githooks (pnpm install runs it; outside a git checkout it does nothing).
 
 export const COMMIT_TYPES = ["fix", "feat", "refactor", "style", "repo"] as const;
@@ -71,10 +73,19 @@ export function hookSubjects(message: string, merging: boolean): string[] {
 // A `Claude-Session:` trailer or any link to a claude.ai Claude Code session, outside git's "#" comment lines.
 const SESSION_LINK = /^claude-session:|claude\.ai\/code\/session/i;
 
-/** What is wrong with a commit message's body, or undefined when it names no Claude Code session. */
+// A GitHub closing keyword before an issue reference (`Closes #12`, `fixes: owner/repo#12`), anywhere in a line, as GitHub reads it
+// (https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue). The
+// release closes an issue instead (`Settles #12`; the Issues rule of .claude/rules/agent-standards.md).
+const CLOSING_KEYWORD = /\b(close[sd]?|fix(?:e[sd])?|resolve[sd]?)\b:?\s*(?:[\w.-]+\/[\w.-]+)?#\d+/i;
+
+/** What is wrong with a commit message's body, or undefined when it names no Claude Code session and closes no issue at the merge. */
 export function bodyProblem(message: string): string | undefined {
-  const line = message.split("\n").find((text) => !text.startsWith("#") && SESSION_LINK.test(text.trim()));
-  return line === undefined ? undefined : `"${subjectOf(message)}" names a Claude Code session ("${line.trim()}"); leave the link out`;
+  const lines = message.split("\n").filter((text) => !text.startsWith("#"));
+  const session = lines.find((text) => SESSION_LINK.test(text.trim()));
+  if (session !== undefined) return `"${subjectOf(message)}" names a Claude Code session ("${session.trim()}"); leave the link out`;
+  const closing = lines.map((text) => CLOSING_KEYWORD.exec(text)?.[0]).find((found) => found !== undefined);
+  if (closing !== undefined) return `"${subjectOf(message)}" has "${closing}", which closes the issue at the merge; write "Settles #<n>" so the release closes it`;
+  return undefined;
 }
 
 function git(args: string[]): string {
@@ -116,13 +127,15 @@ function messages(args: string[]): { subjects: string[]; bodies: string[] } {
     const message = readFileSync(file, "utf8");
     return { subjects: hookSubjects(message, merging()), bodies: [message] };
   }
+  const description = flag(args, "--description");
+  if (description) return { subjects: [], bodies: [readFileSync(description, "utf8")] };
   const range = flag(args, "--range");
   if (range) {
     const bodies = git(["log", "--no-merges", "--format=%B%x00", range]).split("\0").map((text) => text.trim()).filter((text) => text !== "");
     return { subjects: bodies.map(subjectOf), bodies };
   }
   const given = args.filter((arg) => !arg.startsWith("--"));
-  if (given.length === 0) throw new Error('usage: pnpm commit:check "<subject>"... | --range <base>..<head> | --file <path>');
+  if (given.length === 0) throw new Error('usage: pnpm commit:check "<subject>"... | --range <base>..<head> | --file <path> | --description <path>');
   return { subjects: given, bodies: [] };
 }
 

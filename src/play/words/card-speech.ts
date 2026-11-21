@@ -143,6 +143,9 @@ function labelOf(game: ScenarioState, seat: number, card: CardInstance, deps: Ca
   // The controller is told only when it is not the seat the zone is listed for.
   if (game.seatCount > 1 && card.controller != null && card.controller !== seat && (card.zone === "heroes" || card.zone === "play" || card.zone === "engaged")) {
     parts.push(card.zone === "engaged" && printed.type === "enemy" ? `engaged with player ${card.controller + 1}` : `controlled by player ${card.controller + 1}`);
+  } else if (game.seatCount > 1 && card.controller != null && card.zone === "staging" && printed.type === "player-side-quest") {
+    // A player side quest lies in the shared staging area, so it always says whose it is.
+    parts.push(`controlled by player ${card.controller + 1}`);
   }
   if (card.zone === "attached" && card.host && game.cards[card.host]) parts.push(`attached to ${nameOfCard(game.cards, card.host, deps.nameOf)}`);
   if (card.exhausted) parts.push("exhausted");

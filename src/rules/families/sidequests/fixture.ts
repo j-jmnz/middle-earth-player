@@ -29,10 +29,12 @@ export const SIDE_CARDS: ReadonlyMap<string, PrintedCard> = new Map([
     quest("09014", "Gather Information", "neutral", 0, 4),
     quest("10009", "Scout Ahead", "lore", 0, 4),
     quest("10034", "Double Back", "spirit", 0, 4),
-    quest("10058", "Delay the Enemy", "tactics", 0, 8),
+    quest("10058", "Delay the Enemy", "tactics", 0, 8, { keywords: { battle: true } }),
     quest("10086", "Send for Aid", "leadership", 1, 6),
     quest("16013", "The Storm Comes", "neutral", 0, 5),
     quest("17003", "Prepare for Battle", "leadership", 1, 6),
+    // An encounter side quest: a side quest too, for the cards that count the side quests in the victory display (mec108.side-quests).
+    definePrinted({ code: "wilds", name: "Wild Detour", type: "encounter-side-quest", questPoints: 4, victory: 1 }),
     quest("17036", "Explore Secret Ways", "lore", 1, 6, { victory: null }),
     quest("17059", "Keep Watch", "tactics", 1, 6),
     quest("17087", "Rally the West", "spirit", 1, 6),
@@ -46,7 +48,7 @@ export const SIDE_CARDS: ReadonlyMap<string, PrintedCard> = new Map([
     hero("scout", "Scout", "tactics", ["Ranger"], { willpower: 1, attack: 3 }),
     hero("12001", "Denethor", "leadership", ["Gondor", "Noble", "Steward"], { threat: 8, willpower: 1, attack: 1, defense: 3, health: 3 }),
     hero("145002", "Éowyn", "tactics", ["Rohan", "Noble"], { threat: 9, willpower: 4, attack: 1, defense: 1, health: 3 }),
-    hero("17028", "Thurindir", "lore", ["Dunedain", "Ranger"], { threat: 8, willpower: 2, attack: 2, defense: 0, health: 4 }),
+    hero("17028", "Thurindir", "lore", ["Dúnedain", "Ranger"], { threat: 8, willpower: 2, attack: 2, defense: 0, health: 4 }),
     definePrinted({ code: "142015", name: "Phial of Galadriel", type: "attachment", sphere: "neutral", cost: 0, victory: 3, isUnique: true, traits: ["Item", "Gift"] }),
     definePrinted({ code: "142016", name: "Three Golden Hairs", type: "attachment", sphere: "neutral", cost: 0, victory: 3, isUnique: true, traits: ["Item", "Gift"] }),
     definePrinted({ code: "142017", name: "Lórien Rope", type: "attachment", sphere: "neutral", cost: 0, victory: 3, isUnique: true, traits: ["Item", "Gift"] }),
@@ -113,10 +115,15 @@ export function questing(state: ScenarioState): ScenarioState {
   return { ...state, mode: "questCommit", phase: "Quest", boundaryPhase: "Quest", window: { kind: "pass" }, activeSeat: 0, passed: [], planningSeat: null };
 }
 
-// A side quest already in a seat's quest area.
-export function questArea(state: ScenarioState, code: string, seatIndex = 0) {
+// A player side quest already in play, in the staging area (The Lost Realm rules), in a game with side quests.
+export function stagedQuest(state: ScenarioState, code: string, seatIndex = 0) {
   const made = put(state, code, "hand", seatIndex);
-  return { ...made, state: moveCard(made.state, made.id, { zone: "seatQuest", seat: seatIndex }) };
+  return { ...made, state: { ...moveCard(made.state, made.id, { zone: "staging", area: seatIndex }), sideQuests: true as const } };
+}
+
+// The side quest is the current quest until the end of the phase, as the first player chose it at the beginning of the quest phase.
+export function asCurrentQuest(state: ScenarioState, id: string): ScenarioState {
+  return { ...state, modifiers: [...state.modifiers, { instanceId: id, sourceId: id, stat: "currentQuest", amount: 1, until: "endOfPhase" }] };
 }
 
 // Every seat passes the commit window of the quest phase.

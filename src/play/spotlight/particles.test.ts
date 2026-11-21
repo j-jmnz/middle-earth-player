@@ -3,11 +3,13 @@ import { describe, expect, it } from "vitest";
 
 import { MOTION } from "../../ui/motion-tokens.ts";
 import { frameAt, type ClashShape } from "./beats.ts";
-import { ashBirth, ashCell, ATLAS_DRAWS, hash, PARTICLE_BUDGET, PARTICLE_COUNT, PARTICLE_DRAW, particleAt, particleEnd, visibleCount, type Anchor, type ParticleKind } from "./particles.ts";
+import { ashBirth, ashCell, ATLAS_DRAWS, emberPer, hash, PARTICLE_BUDGET, PARTICLE_COUNT, PARTICLE_DRAW, particleAt, particleEnd, visibleCount, type Anchor, type ParticleKind } from "./particles.ts";
 
 const BURN_MS = MOTION.spotlightBurn.ms;
 const KINDS = Object.keys(PARTICLE_COUNT) as ParticleKind[];
 const AT: Anchor = { x: 400, y: 180, size: 234, dir: 0, w: 168 };
+// Nine lit hearts, one spark each: every heart-spark sprite has a heart to rise from.
+const HEARTS: Anchor = { ...AT, xs: Array.from({ length: 9 }, (_, index) => 380 + index * 20), gap: 90 };
 const at = (kind: ParticleKind, i: number, t: number, seed: number, anchor: Anchor) => particleAt(kind, i, t, seed, anchor, BURN_MS);
 const shown = (kind: ParticleKind, t: number, seed: number, anchor: Anchor) => visibleCount(kind, t, seed, anchor, BURN_MS);
 const range = (to: number, step = 1) => Array.from({ length: Math.floor(to / step) + 1 }, (_, index) => index * step);
@@ -39,14 +41,14 @@ describe("a particle", () => {
     for (const kind of KINDS) {
       for (let i = 0; i < PARTICLE_COUNT[kind]; i += 1) {
         expect(at(kind, i, -1, 5, AT).alpha, `${kind} ${i}`).toBe(0);
-        expect(at(kind, i, particleEnd(kind, BURN_MS), 5, AT).alpha, `${kind} ${i}`).toBe(0);
+        expect(at(kind, i, particleEnd(kind, BURN_MS), 5, kind === "ember" ? HEARTS : AT).alpha, `${kind} ${i}`).toBe(0);
       }
       expect(at(kind, PARTICLE_COUNT[kind], 100, 5, AT).alpha).toBe(0);
     }
     // Every sprite is visible at some moment of its life and never outside 0..1.
     for (const kind of KINDS) {
       for (let i = 0; i < PARTICLE_COUNT[kind]; i += 1) {
-        const seen = range(2600, 5).map((t) => at(kind, i, t, 5, AT).alpha);
+        const seen = range(2600, 5).map((t) => at(kind, i, t, 5, kind === "ember" ? HEARTS : AT).alpha);
         expect(Math.max(...seen), `${kind} ${i}`).toBeGreaterThan(0);
         expect(Math.min(...seen)).toBeGreaterThanOrEqual(0);
         expect(Math.max(...seen)).toBeLessThanOrEqual(1);
@@ -132,9 +134,27 @@ describe("a particle", () => {
   });
 });
 
+describe("a heart spark", () => {
+  it("rises from its heart, 3 a heart and at most 9 in all, the later hearts a token's gap later", () => {
+    expect([1, 2, 3, 4, 5, 9, 12].map(emberPer)).toEqual([3, 3, 3, 2, 1, 1, 1]);
+    expect(emberPer(0)).toBe(0);
+    const hearts: Anchor = { x: 0, y: 300, size: 234, xs: [500, 530, 560, 590], gap: 90 };
+    // Four hearts: two sparks each, sprites 0 and 1 from the first heart, 6 and 7 from the last; the ninth has no heart.
+    for (const [i, x] of [[0, 500], [1, 500], [6, 590], [7, 590]] as const) {
+      const born = Math.floor(i / 2) * 90;
+      expect(at("ember", i, born - 1, 3, hearts).alpha, `${i}`).toBe(0);
+      const p = at("ember", i, born + 200, 3, hearts);
+      expect(p.alpha, `${i}`).toBeGreaterThan(0);
+      expect(Math.abs(p.x - x)).toBeLessThan(0.06 * 234);
+      expect(p.y).toBeLessThan(300);
+    }
+    expect(range(1500, 10).every((t) => at("ember", 8, t, 3, hearts).alpha === 0)).toBe(true);
+  });
+});
+
 describe("the budgets", () => {
-  it("count 16 converging, 28 sparks, 18 deflecting and 36 ash, in at most three Atlas draws", () => {
-    expect(PARTICLE_COUNT).toEqual({ converge: 16, spark: 28, deflect: 18, ash: 36 });
+  it("count 16 converging, 28 sparks, 18 deflecting, 9 heart sparks and 36 ash, in at most three Atlas draws", () => {
+    expect(PARTICLE_COUNT).toEqual({ converge: 16, spark: 28, deflect: 18, ember: 9, ash: 36 });
     expect(new Set(Object.values(PARTICLE_DRAW)).size).toBeLessThanOrEqual(3);
     expect(ATLAS_DRAWS).toBeLessThanOrEqual(3);
   });
@@ -150,7 +170,8 @@ describe("the budgets", () => {
       for (const t of range(MOTION.spotlight.ms, 5)) {
         const f = frameAt(shape, t, 1, 7);
         const burst: ParticleKind = shape.damage === 0 ? "deflect" : "spark";
-        const alive = shown("converge", f.convergeT, 7, AT) + shown(burst, f.sparkT, 7, AT) + shown("ash", f.ashT, 7, AT);
+        const hearts: Anchor = { ...AT, xs: Array.from({ length: shape.damage }, (_, index) => AT.x + index * 30), gap: MOTION.spotlightBurstStep.ms };
+        const alive = shown("converge", f.convergeT, 7, AT) + shown(burst, f.sparkT, 7, AT) + shown("ember", f.emberT, 7, hearts) + shown("ash", f.ashT, 7, AT);
         most = Math.max(most, alive);
       }
       expect(most, JSON.stringify(shape)).toBeLessThanOrEqual(PARTICLE_BUDGET);

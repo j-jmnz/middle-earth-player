@@ -1,0 +1,219 @@
+{
+  "id": "the-watcher-in-the-water",
+  "name": "The Watcher in the Water",
+  "number": 3,
+  "stages": [
+    "04063",
+    "04064"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Watcher in the Water",
+      "count": 28
+    },
+    {
+      "name": "Misty Mountains",
+      "count": 15
+    }
+  ],
+  "cards": [
+    {
+      "code": "040076",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04066",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04067",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04068",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04069",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "04070",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "04071",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04073",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04074",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "04075",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03054",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "03055",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "03056",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "03057",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03058",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "03059",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "04063",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04064",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "04065",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "04072",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q02.6",
+    "dragnEasy": "E02.6",
+    "hobSlug": "The-Watcher-in-the-Water"
+  },
+  "nightmare": {
+    "setupCard": "901501",
+    "removed": [
+      {
+        "code": "03054",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "03055",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "03059",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "04068",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "04072",
+        "copies": 1,
+        "pile": "setAside"
+      }
+    ],
+    "cards": [
+      {
+        "code": "901502",
+        "copies": 1,
+        "pile": "setAside"
+      },
+      {
+        "code": "901503",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901504",
+        "copies": 4,
+        "pile": "encounter"
+      },
+      {
+        "code": "901505",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901506",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "901507",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "901508",
+        "copies": 3,
+        "pile": "encounter"
+      }
+    ]
+  }
+}

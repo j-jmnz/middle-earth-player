@@ -14,8 +14,9 @@ export const RECORDS: readonly Effect[] = [
   {"id":"04083:action:1","cardCode":"04083","lines":["04083:A:1"],"timing":"action","cost":{"kind":"exhaustSelf"},"instructions":[
     {"verb":"Each","pick":{"type":"character","control":"any","damaged":true},"upTo":2,"instructions":[{"verb":"Heal","amount":1}]},
     {"verb":"Choose","who":"actor","options":[{"id":"ready","requires":{"kind":"resources","min":2,"sphere":"lore"},"instructions":[{"verb":"SpendResources","amount":2,"sphere":"lore"},{"verb":"Ready","target":"self"}]},{"id":"skip","instructions":[]}]}]},
-  // 04128 Elrond: his own healing is quiet, so it does not answer itself.
-  {"id":"04128:response:1","cardCode":"04128","lines":["04128:A:2"],"timing":"response","trigger":"healed","subject":{"type":"character","control":"any"},"instructions":[{"verb":"HealQuietly","amount":1,"target":"subject"}]},
+  // 04128 Elrond: "healed by another card effect" is a heal with a card (the event's other card) that is not Elrond, a unique card, so his own heal,
+  // which other cards hear, does not answer itself.
+  {"id":"04128:response:1","cardCode":"04128","lines":["04128:A:2"],"timing":"response","trigger":"healed","subject":{"type":"character","control":"any"},"condition":{"kind":"matches","card":"other","pick":{"type":"card","control":"any","exceptNames":["Elrond"]}},"instructions":[{"verb":"Heal","amount":1,"target":"subject"}]},
   // 09011 Athelas: heal all damage on a character; then the controller may discard a Condition attachment from it.
   {"id":"09011:action:1","cardCode":"09011","lines":["09011:A:2"],"timing":"action","cost":[{"kind":"exhaustHost"},{"kind":"discardSelf"}],"instructions":[
     {"verb":"Pick","pick":{"type":"character","control":"any"}},{"verb":"Heal","all":true},

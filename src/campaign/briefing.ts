@@ -17,7 +17,7 @@ import { angmarAwakenedFacts } from "./log-angmar-awakened.ts";
 import { returnOfTheKingFacts } from "./log-return-of-the-king.ts";
 import { twoTowersFacts } from "./log-two-towers.ts";
 import { isNightmarePlayable, isPlayable } from "./playable.ts";
-import { printedScenarioName } from "./printed-name.ts";
+import { printedScenarioName, printedSetName } from "./printed-name.ts";
 import { sagaRoleOf, titleBansOf, type SagaRole } from "./saga.ts";
 import { buildStart, type PlayMode } from "./start.ts";
 import type { World } from "./world.ts";
@@ -265,7 +265,14 @@ export function scenarioFacts(world: World, difficulty: Difficulty, mode: PlayMo
     if (set) bySet.set(set, (bySet.get(set) ?? 0) + countOf(card));
   }
   // A set the catalog has no rows for keeps the booklet's count; on Nightmare a set the recipe empties is 0, not the booklet's.
-  const sets = scenario.encounterSets.map((set) => ({ name: set.name, count: bySet.get(set.name) ?? (difficulty === "Nightmare" ? 0 : set.count) }));
+  // A numbered packet of a Fellowship event kit counts under its printed set (printedSetName), in the order the sets are listed.
+  const listed = new Set(scenario.encounterSets.map((set) => set.name));
+  const folded = new Map<string, number>();
+  for (const set of scenario.encounterSets) {
+    const name = printedSetName(set.name, listed);
+    folded.set(name, (folded.get(name) ?? 0) + (bySet.get(set.name) ?? (difficulty === "Nightmare" ? 0 : set.count)));
+  }
+  const sets = [...folded].map(([name, count]) => ({ name, count }));
   // On Nightmare the deck's own set follows the booklet's, with the cards it shuffles in (the ones a Setup places are counted where
   // they replace a card, as the booklet's sets count theirs).
   const nightmareSet = difficulty === "Nightmare" ? world.sets.get(scenario.nightmare?.cards[0]?.code ?? "") : undefined;

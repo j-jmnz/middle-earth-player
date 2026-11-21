@@ -18,7 +18,7 @@ import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "../interpret/verbs.ts";
 import { attachTo, moveCard, turnedUp } from "../core/zones.ts";
-import { announceEntered, noteEncounterThreat, revealSeat, revealSkipped, revealsAllowed, spendSkippedReveal, watchReveal } from "../families/encounter/reveal.ts";
+import { announceEntered, listens, noteEncounterThreat, revealSeat, revealSkipped, revealsAllowed, spendSkippedReveal, watchReveal } from "../families/encounter/reveal.ts";
 import { discardsAfterReveal } from "../families/sidequests/encounter.ts";
 import { engageWith } from "../quest/quest.ts";
 import { sharing, stagingDest } from "../families/breaking/areas.ts";
@@ -160,14 +160,23 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // "After an enemy is added to the staging area" hears the card arrive.
       if (!engages) next = queueEvent(next, { trigger: "addedToStaging", seat, cardId: id });
       next = patchTop(next, { step: 1 });
+      // A Forced effect on the reveal of a location (148004:B:1) resolves before the Responses to the reveal are offered; one that cancels the reveal leaves none to offer.
+      if (printed.type === "location" && listens(next, ctx, "locationRevealed")) {
+        const forced = fireForced(next, { trigger: "locationRevealed", seat, cardId: id }, ctx, steps);
+        if (forced !== next) return forced;
+      }
       // A card just revealed from the encounter deck: a Response may cancel its effects before any of them resolves.
       return frame.data.fromDeck ? offerResponses(next, { trigger: "encounterRevealed", seat, subject: id }, ctx, steps) : next;
     }
     case 1: {
       let next = patchTop(state, { step: 2 });
       // The Doomed a card in play gives it (Troll-fells gives each Weather card Doomed 1, 10077:A:1) comes on top of the printed number.
-      // The Doomed the card gives itself (`gainsDoomed`, Wight of Rhudaur, 10099:A:2) comes on top as well.
-      const doomed = (printed.keywords.doomed ?? 0) + (gameReads(next, ctx, '"GainsDoomed"') ? gainedDoomed(next, id, seat, ctx) : 0) + (next.modifiers.length > 0 ? heldAmount(next, id, "gainsDoomed") : 0);
+      // The Doomed the card gives itself (`gainsDoomed`, Wight of Rhudaur, 10099:A:2) comes on top as well, and the Doomed a reveal marker or a lasting effect grants it as it is revealed (families/angmar/weather.ts).
+      const printedDoomed = printed.keywords.doomed ?? 0;
+      const gainedFromPlay = gameReads(next, ctx, '"GainsDoomed"') ? gainedDoomed(next, id, seat, ctx) : 0;
+      const heldDoomed = next.modifiers.length > 0 ? heldAmount(next, id, "gainsDoomed") : 0;
+      const revealDoomed = frame.data.kind === "reveal" ? (frame.data.extraDoomed ?? 0) : 0;
+      const doomed = printedDoomed + gainedFromPlay + heldDoomed + revealDoomed;
       if (doomed > 0) {
         // The players sharing the staging area it was added to, once stages are separate and the game has joined areas (families/captured/).
         const sharers = next.capture && next.separate ? sharing(next, seat) : null;
@@ -197,13 +206,16 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // (ltp.revealed-treachery, rr.treachery-cards, rr.step-3-3). A treachery whose text attached it (a Condition) has
       // left the staging area and stays where its text put it. A canceled treachery is discarded too (rr.cancel). Peril
       // covers that card's staging only, so the lock ends before surge (mec109.peril, rr.surge).
-      const resolved = (printed.type === "treachery" || discardsAfterReveal(printed)) && state.cards[id]?.zone === "staging" ? moveCard(state, id, { zone: "encounterDiscard" }) : state;
+      // A treachery that holds progressRedirect (Blinding Blizzard, 901307:A:2: "Add Blinding Blizzard to the staging area") stays in the staging area.
+      const stays = printed.type === "treachery" && flagged(state, id, "progressRedirect");
+      const resolved = (printed.type === "treachery" || discardsAfterReveal(printed)) && state.cards[id]?.zone === "staging" && !stays ? moveCard(state, id, { zone: "encounterDiscard" }) : state;
       const unlocked = frame.peril && resolved.perilSeat === seat ? { ...resolved, perilSeat: null } : resolved;
       // A card still in play has entered play (rr.staging, step 3): "After a location enters play" (04060:A:1).
       const next = patchTop(announceEntered(unlocked, id, seat, ctx), { step: 6 });
       const revealing = next.seats[seat];
       // Each separate instance of surge reveals 1 additional card (rr.surge): the printed keyword, each gain from a card in play and each grant made during this reveal.
-      const surges = (printed.keywords.surge ? 1 : 0) + heldAmount(next, id, "gainsSurge") + (frame.data.kind === "reveal" ? (frame.data.surge ? 1 : 0) + (frame.data.extraSurge ?? 0) : 0);
+      // The surge a card gives itself is read before a treachery leaves the staging area, while its constants still hold (Groping Horror, 50324:A:2).
+      const surges = (printed.keywords.surge ? 1 : 0) + heldAmount(state, id, "gainsSurge") + (frame.data.kind === "reveal" ? (frame.data.surge ? 1 : 0) + (frame.data.extraSurge ?? 0) : 0);
       if (surges <= 0 || !revealing || revealing.eliminated || frame.data.kind !== "reveal") return next;
       // The instances still to answer wait in the frame (step 6 reveals the next card when the one just revealed is done).
       return startReveal(surges > 1 ? patchTop(next, { data: { ...frame.data, surgeLeft: surges - 1 } }) : next, seat, ctx, steps);

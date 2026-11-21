@@ -45,6 +45,7 @@ function splitAbilities(line: string): string[] {
 
 function plain(line: string): string {
   return line
+    .replace(/\bPerPlayer\b/g, "per player")
     .replace(/\[([a-z_]+)\]/gi, (whole, icon: string) => ICONS[icon.toLowerCase()] ?? whole)
     .replace(/<b\.Response:<\/b>/g, "Response:")
     .replace(/<[^>]+>/g, "")

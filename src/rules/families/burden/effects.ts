@@ -28,6 +28,20 @@ export function endQuestPhase(state: ScenarioState): ScenarioState {
   return { ...withMode(next, "resolution"), questResolved: true };
 }
 
+// The acting player's quest phase ends while the areas are separate (148004:A:1): the seat reveals no more cards this staging step, its characters stop being committed, and `questEnded` makes the resolution leave its quest out.
+// The reveals the seat already made are taken off the cursor's count, so the other seats still reveal theirs. Without separate areas this is the whole phase ending.
+export function endOwnQuestPhase(state: ScenarioState, seat: number): ScenarioState {
+  if (state.mode !== "staging" || !state.separate) return endQuestPhase(state);
+  let next = state;
+  const cursor = state.revealCursor;
+  if (cursor) {
+    const made = Array.from({ length: cursor.index }, (_, at) => cursor.seats[at % Math.max(1, cursor.seats.length)]).filter((index) => index === seat).length;
+    next = { ...next, revealCursor: { seats: cursor.seats.filter((index) => index !== seat), index: Math.max(0, cursor.index - made) } };
+  }
+  for (const card of Object.values(state.cards)) if (card.committed && card.controller === seat) next = updateCard(next, card.id, { committed: false });
+  return { ...next, questEnded: [...(state.questEnded ?? []), seat] };
+}
+
 // The first player token goes to the next player in the game (rr.first-player); with no other player it stays. The token passing
 // is announced as at the end of the refresh phase.
 export function passFirstPlayer(state: ScenarioState): ScenarioState {
@@ -65,7 +79,10 @@ const SEEN = new WeakMap<object, number>();
 export function announceProgress(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   const from = Math.min(SEEN.get(steps) ?? 0, steps.length);
   SEEN.set(steps, steps.length);
-  if (steps.length === from || !listens(state, ctx, "progressPlaced")) return state;
+  // A card whose own record hears `progressPlacedOnSelf` (Bottomless Chasm, 901606:A:1) hears every placement on it, the one that explores it too; only a game that deals one raises it.
+  const heard = listens(state, ctx, "progressPlaced");
+  const onSelf = listens(state, ctx, "progressPlacedOnSelf");
+  if (steps.length === from || (!heard && !onSelf)) return state;
   // The player who placed the progress (the step's `seat`, stamped by the effect that placed it) is told only to a card that asks for it (`eventSeat`, 19102:A:2); every other game announces it with no seat.
   const reads = gameReadsOnTrigger(state, ctx, "progressPlaced", '"eventSeat"');
   // The amount just placed ("X is the amount of progress just placed", 146020:A:3) is told only to a card that reads X: the Forced record hears it as its `x`.
@@ -74,7 +91,8 @@ export function announceProgress(state: ScenarioState, steps: EngineStep[], ctx:
   for (const step of steps.slice(from)) {
     if (step.kind !== "progress" || step.amount <= 0) continue;
     const card = next.cards[step.targetId];
-    if (card && inPlay(card.zone)) next = queueEvent(next, { trigger: "progressPlaced", seat: reads ? (step.seat ?? null) : null, cardId: step.targetId, ...(amounts ? { amount: step.amount } : {}) });
+    if (card && onSelf) next = queueEvent(next, { trigger: "progressPlacedOnSelf", seat: null, cardId: step.targetId, amount: step.amount });
+    if (heard && card && inPlay(card.zone)) next = queueEvent(next, { trigger: "progressPlaced", seat: reads ? (step.seat ?? null) : null, cardId: step.targetId, ...(amounts ? { amount: step.amount } : {}) });
   }
   return next;
 }

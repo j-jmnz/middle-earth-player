@@ -1,7 +1,8 @@
 // Where the combat spotlight's cards stand (docs/design-system-table.md, Spotlight). Pure
 // geometry, like layout.ts, for the whole screen: the attacker (or a fan of up to three attackers, then "+n") at the left and the
-// target at the right, centered on the screen at 60% of its height (at most 340 pt), a medallion straddling each card's foot, a
-// turned shadow card beside the enemy, and a note chip above the bottom safe inset. The beats that move them are in
+// target at the right, centered on the screen at 60% of its height (at most 340 pt), the attack value under the attackers' feet,
+// the matchup line and the result in the middle of the stage over the gap between the cards, the gauge under them, a turned shadow
+// card beside the enemy, and the note under the top safe inset. The beats that move them are in
 // spotlight/beats.ts. At a UI `scale` (ui-scale.ts) the stage is worked out in logical points (the area and the card over the
 // scale) and every length comes back times the scale.
 import type { Rect } from "../layout/layout.ts";
@@ -27,20 +28,19 @@ export type Stage = {
   target: Rect;
   // The turned shadow card, at 72% and bottom-aligned, to the left of the fan; null when the attack turned none.
   shadow: Rect | null;
-  // The centers of the attack medallion (under the attackers), the defense medallion (under the target), and the medallions' radius.
+  // The centre of the attack value (under the attackers' feet); the middle of the stage, over the gap between the front attacker and
+  // the target at the cards' middle height, where the matchup line and the result stand; and the gauge's centre under it with the
+  // width it may take (spotlight/gauge.ts).
   badgeA: { cx: number; cy: number };
-  badgeD: { cx: number; cy: number };
-  radius: number;
+  focus: { cx: number; cy: number };
+  gauge: { cx: number; cy: number; room: number };
   // Where the attacker meets the target, and the target's damage corner: the damage tokens fly from one to the other. `token` is their size.
   contact: { x: number; y: number };
   corner: { cx: number; cy: number };
   token: number;
-  // The damage number at the target's center, and the stamp ("Blocked", "Destroyed") below it with its turn in radians.
-  number: { cx: number; cy: number };
-  stamp: { cx: number; cy: number; turn: number };
   // The "+n" for the attackers past the fan, at the top of the first card.
   more: { cx: number; cy: number } | null;
-  // The note chip ("2 of 3 · Tap to skip", "Tap to skip"), centered on the screen: its center and its height.
+  // The note (a dot for each attack, then "Tap to skip"), centered on the screen under the top inset: its center and its height.
   note: { cx: number; cy: number; h: number };
   // The card height, the gap between the fan and the target, how far the attacker draws back, how far it is knocked back when it is
   // blocked and the target when it is hit (all pt); the attackers' lunge reaches the target after `gap`.
@@ -54,7 +54,7 @@ export type Stage = {
 /**
  * The stage on an area of this size. `card` is the table's card size (its aspect is kept). With `attackers` characters the fan
  * shows up to three; with a `shadow` card an enemy's attack makes room for it at the left. The whole group is centered on the
- * screen, and shrinks when the screen is too narrow for it or a medallion would touch the note chip.
+ * screen, and shrinks when the screen is too narrow for it, or too short for the note above it and the attack value at its feet.
  */
 export function stageOf(area: StageArea, card: { w: number; h: number }, attackers: number, shadow: boolean, scale = 1): Stage {
   const safe = area.safe;
@@ -73,13 +73,11 @@ function scaledStage(stage: Stage, s: number): Stage {
     target: rect(stage.target),
     shadow: stage.shadow ? rect(stage.shadow) : null,
     badgeA: at(stage.badgeA),
-    badgeD: at(stage.badgeD),
-    radius: stage.radius * s,
+    focus: at(stage.focus),
+    gauge: { ...at(stage.gauge), room: stage.gauge.room * s },
     contact: { x: stage.contact.x * s, y: stage.contact.y * s },
     corner: at(stage.corner),
     token: stage.token * s,
-    number: at(stage.number),
-    stamp: { ...at(stage.stamp), turn: stage.stamp.turn },
     more: stage.more ? at(stage.more) : null,
     note: { ...at(stage.note), h: stage.note.h * s },
     cardH: stage.cardH * s,
@@ -97,11 +95,12 @@ function stageIn(area: StageArea, aspect: number, attackers: number, shadow: boo
   const room = width - 2 * Math.max(safe.left, safe.right) - SPOT.margin;
   const gapOf = (w: number) => Math.max(SPOT.gapMin, Math.round(SPOT.gapShare * w));
   const wide = (w: number) => (shadow ? Math.round(w * SPOT.shadow) + SPOT.shadowGap : 0) + w * (1 + SPOT.fanStep * (shown - 1)) + gapOf(w) + w;
-  // The note chip sits above the bottom safe inset, and no medallion may reach it.
+  // The note sits under the top safe inset and the cards keep clear of it; the attack value at the cards' feet keeps clear of the bottom inset.
   const noteH = SPOT.noteHeight;
-  const noteCy = height - safe.bottom - SPOT.noteRoom - noteH / 2;
+  const noteCy = safe.top + SPOT.noteRoom + noteH / 2;
   const centerY = Math.round(SPOT.centerY * height);
-  const tallest = Math.floor(2 * (noteCy - noteH / 2 - SPOT.noteClear - SPOT.medal - centerY));
+  const below = height - safe.bottom - SPOT.noteRoom - SPOT.footRoom;
+  const tallest = Math.floor(2 * Math.min(below - centerY, centerY - (noteCy + noteH / 2 + SPOT.noteClear)));
   let h = Math.max(1, Math.min(Math.round(SPOT.height * height), SPOT.maxHeight, tallest));
   let w = Math.max(1, Math.round(h * aspect));
   if (wide(w) > room) {
@@ -128,13 +127,11 @@ function stageIn(area: StageArea, aspect: number, attackers: number, shadow: boo
     target,
     shadow: shadow ? { x: left, y: top + (h - sh), w: sw, h: sh } : null,
     badgeA: { cx: fanLeft + (w * (1 + SPOT.fanStep * (shown - 1))) / 2, cy: foot },
-    badgeD: { cx: target.x + w / 2, cy: foot },
-    radius: SPOT.medal,
+    focus: { cx: target.x - gap / 2, cy: top + h / 2 },
+    gauge: { cx: target.x - gap / 2, cy: top + h / 2 + Math.round(SPOT.gaugeDrop * h), room: SPOT.gaugeRoom * w },
     contact: { x: target.x, y: top + h / 2 },
     corner: { cx: target.x + w - token / 2 - SPOT.tokenInset, cy: top + token / 2 + SPOT.tokenInset },
     token,
-    number: { cx: target.x + w / 2, cy: top + h / 2 },
-    stamp: { cx: target.x + w / 2, cy: top + Math.round(h * 0.72), turn: (SPOT.stampTurn * Math.PI) / 180 },
     more: attackers > shown ? { cx: fanLeft + 22, cy: top + 20 } : null,
     note: { cx: width / 2, cy: noteCy, h: noteH },
     cardH: h,

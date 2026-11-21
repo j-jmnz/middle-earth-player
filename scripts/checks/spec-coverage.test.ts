@@ -12,8 +12,14 @@ import { ROOT } from "./tracked.ts";
 // scenario's own folder (src/campaign/scenarios/<id>/), and a test file's header cannot claim a line no test of the folder covers (a header may point to a sibling file's test). It holds the scenarios that have a spec.test.ts (the card-spec track); an older scenario
 // with scene files is not held to it. `pnpm test scenario <id>` runs it (scripts/tools/test-scenario.ts, COVERAGE_TESTS). A line with no behaviour a test can show is listed in EXEMPT with its reason.
 
-/** Lines a test cannot show, by scenario: the reason each is left without a row or a titled test. */
-const EXEMPT: Readonly<Record<string, Readonly<Record<string, string>>>> = {};
+/** Lines with no row or titled test in the scenario's folder, by scenario: the reason each is left, either that no test can show it or the test that does (a flag's family test is next to its engine). */
+const EXEMPT: Readonly<Record<string, Readonly<Record<string, string>>>> = {
+  "the-massing-at-osgiliath": {
+    "00016:A:1": "the Setup is played and checked on every golden by the golden suite's opening check (golden.test.ts)",
+    "00017:B:2": "tested with LimitHandPlaysPerRound in src/rules/families/wilderland/hand-plays.test.ts",
+    "00018:B:1": "tested with the flag noEffectProgress in src/rules/families/quest/effect-progress.test.ts",
+  },
+};
 
 const LINE = String.raw`[0-9A-Za-z.\-]+:[A-Z]:\d+`;
 const SCENARIOS = path.join(ROOT, "src/campaign/scenarios");

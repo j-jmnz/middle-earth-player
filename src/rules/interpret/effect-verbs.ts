@@ -1,5 +1,9 @@
-import type { Instruction } from "../../catalog/boundary.ts";
+import type { Effect, Instruction } from "../../catalog/boundary.ts";
 
+import { redirectProgress } from "../families/quest/blizzard.ts";
+import { progressToQuest, sendsProgressToQuest } from "../families/quest/doors.ts";
+import { holdPlacement, holdsProgress } from "../families/long-dark/hold.ts";
+import { effectProgressBarredOn } from "../families/quest/effect-progress.ts";
 import { frameScope, resolveAmount } from "./amounts.ts";
 import { hasTrait } from "./conditions.ts";
 import { runQuestResolution } from "../quest/explore.ts";
@@ -14,10 +18,9 @@ import { notePlaced, progressRoom, reducedProgress } from "../families/south/loc
 import { announceLeftPlay } from "../quest/stage-reveal.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats, updateCard } from "../core/state.ts";
-import { readyBarred, readyPatch } from "../core/holder-classes.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
-import { byPlayerCards, lastPicked, seatOf } from "./player-verbs.ts";
-import { topFrame } from "../windows/windows.ts";
+import { lastPicked, readyCard, seatOf } from "./player-verbs.ts";
+import { patchTop, topFrame } from "../windows/windows.ts";
 import { exploring } from "../families/island/map.ts";
 import { gameReadsOnTrigger } from "../core/game-reads.ts";
 import { playerSource } from "../families/quest/threat.ts";
@@ -51,7 +54,22 @@ export function drawVerb(
   const trait = instruction.perHero;
   const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, seat, topFrame(state)?.cardId ?? null), ctx);
   const count = (trait == null ? 1 : (state.seats[target]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length) * amount;
-  return drawMany(state, target, count, steps, UNATTRIBUTED, ctx, instruction.from === "bottom", playerSource(state, topFrame(state)?.cardId ?? null, ctx));
+  const drawn = drawMany(state, target, count, steps, UNATTRIBUTED, ctx, instruction.from === "bottom", playerSource(state, topFrame(state)?.cardId ?? null, ctx));
+  // The effect notes that a card was drawn, for "Then" text that follows it (the `drew` condition, rr.then), in a game whose records read it.
+  const grew = (drawn.seats[target]?.hand.length ?? 0) > (state.seats[target]?.hand.length ?? 0);
+  return grew && data?.kind === "effect" && readsDrew(ctx) ? patchTop(drawn, { data: { ...data, drew: true } }) : drawn;
+}
+
+const READS_DREW = new WeakMap<readonly Effect[], boolean>();
+
+// Whether any record of the list holds the `drew` condition (04097:A:1 does, The Long Dark's); the list is never changed, so it is read once.
+function readsDrew(ctx: ReduceContext): boolean {
+  let reads = READS_DREW.get(ctx.effects);
+  if (reads === undefined) {
+    reads = JSON.stringify(ctx.effects).includes('"kind":"drew"');
+    READS_DREW.set(ctx.effects, reads);
+  }
+  return reads;
 }
 
 // The cards a player may pick for the verb.
@@ -90,7 +108,7 @@ export function applyTargetVerb(
   if (!id || !state.cards[id]) return state;
   switch (instruction.verb) {
     case "ReadyHero":
-      return readyBarred(state, id, byPlayerCards(state, sourceId, ctx)) ? state : updateCard(state, id, readyPatch(state, id));
+      return readyCard(state, id, playerSource(state, sourceId, ctx), ctx.cards);
     case "BarAttack": {
       const barred = instruction.scope === "any" ? (state.cards[id]?.controller ?? seat) : seat;
       if (!sourceId) return state;
@@ -112,15 +130,23 @@ export function progressPlacer(state: ScenarioState, ctx: ReduceContext, seat: n
 }
 
 // Progress on a location in play. A location that is full is explored and leaves play. `placedBy` is the player whose card effect placed it (progressPlacer).
-export function placeProgress(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[], placedBy?: number): ScenarioState {
+export function placeProgress(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[], placedBy?: number, held = false): ScenarioState {
   const location = state.cards[id];
-  if (!location) return state;
+  if (!location || effectProgressBarredOn(state, id)) return state;
+  // "Progress that would be placed on Doors of Durin is instead placed on the current quest card" (04065:A:1, families/quest/doors.ts).
+  if (sendsProgressToQuest(state, id)) return progressToQuest(state, amount, ctx, steps);
+  // "Before placing progress tokens on Twisting Passage" (04092:A:1, families/long-dark/hold.ts): the placement waits for the location's Forced effect, which places what is let through with `held`.
+  if (!held && holdsProgress(state, id)) return holdPlacement(state, id, Math.min(reducedProgress(state, id, amount), progressRoom(state, id, ctx.cards)));
   const points = questPointsOf(state, location, ctx.cards);
   // What a gate or a cap leaves out (Doors of Durin, Snowdrifts; families/south/locations.ts).
-  const placed = Math.min(reducedProgress(state, id, amount), progressRoom(state, id, ctx.cards));
-  if (placed <= 0) return state;
+  const wanted = Math.min(reducedProgress(state, id, amount), progressRoom(state, id, ctx.cards));
+  if (wanted <= 0) return state;
+  // A Blinding Blizzard in the staging area takes the progress a Snow location would (families/quest/blizzard.ts, 901307:A:2).
+  const redirected = redirectProgress(state, id, wanted, ctx.cards, steps);
+  const placed = redirected.remaining;
+  if (placed <= 0) return redirected.state;
   steps.push({ kind: "progress", targetId: id, amount: placed, cause: currentCause(steps, UNATTRIBUTED), ...(placedBy != null ? { seat: placedBy } : {}) });
-  const next = notePlaced(updateCard(state, id, { progress: location.progress + placed }), id, placed);
+  const next = notePlaced(updateCard(redirected.state, id, { progress: location.progress + placed }), id, placed);
   // Under Exploration a location with progress equal to its quest points is not explored; it remains in play (dcce.exploration).
   if (points == null || location.progress + placed < points || exploring(next)) return next;
   const explored = destroyCard(next, id, ctx.cards, steps, true);

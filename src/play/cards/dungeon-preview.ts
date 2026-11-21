@@ -12,8 +12,12 @@ import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts"
 import { ownerWords } from "../words/owner.ts";
 import { prisonerWords } from "../readouts/widgets.ts";
 import { pelennorDetail } from "./pelennor-preview.ts";
+import { keptDetail } from "../readouts/standalone-scenarios/wizards-quest.ts";
 import { angmarDetail } from "./angmar-preview.ts";
+import { barrowDetail } from "../readouts/standalone-scenarios/barrow-downs.ts";
 import { ungolDetail } from "./ungol-preview.ts";
+import { stoneDetail } from "./stone-preview.ts";
+import { flameDetail } from "./flame-preview.ts";
 import { rhovanionDetail } from "./rhovanion-preview.ts";
 
 /**
@@ -48,10 +52,18 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   // The Ring-bearer under Topmost Chamber, the boons on Shagrat and Last of the Company are told before the held-hero words of Lost in Mirkwood, which would call the Chamber an enemy that holds a hero facedown.
   const ungol = ungolDetail(game, card, name);
   if (ungol) return ungol;
+  const stone = stoneDetail(game, ctx, cardId, name);
+  if (stone) return stone;
+  const flame = flameDetail(game, cardId, name);
+  if (flame) return flame;
+  const kept = keptDetail(game, cardId, name);
+  if (kept) return kept;
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;
-  const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card);
+  const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card) ?? barrowDetail(game, ctx, cardId, name);
   if (lost) return lost;
+  const everyone = engagedWithAllWords(game, card);
+  if (everyone) return everyone;
   if (game.seats.some((seat) => seat.deckAttached?.includes(cardId))) return `${name(cardId)}: your next draw is discarded`;
   // A treasure attached as a guarded objective (AttachRandomTreasure) is told like an objective: who guards it, or that it is free of encounters (emce.treasure).
   const kind = ctx.cards.get(card.code)?.type;
@@ -110,7 +122,7 @@ function lostInMirkwoodDetail(game: ScenarioState, ctx: ReduceContext, card: Sce
 // The King's Quest's cards (ledger lines 18050:A:2, 18043:A:3, 12172:A:2): the card Hobgoblin holds faceup under it, an Artifact guarded in the staging area, and The Threat to Wilderland's resources. The engine decided each; this only says it.
 function kingsQuestDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioState["cards"][string], name: (id: string) => string): string | null {
   const held = cardsUnder(game, card.id).map((id) => game.cards[id]).find((other) => other?.held === true);
-  if (held) return `Holds ${name(held.id)}, ${held.owner != null ? ownerWords(game.seatCount, held.owner) : "a player's"} card, faceup. It returns to its owner's hand when ${name(card.id)} leaves play.`;
+  if (held) return `Holds ${name(held.id)}, ${held.owner != null ? ownerWords(game.seatCount, held.owner) : "a player's"} card, faceup. It ${held.heldDiscard === true ? "is discarded" : "returns to its owner's hand"} when ${name(card.id)} leaves play.`;
   if (card.zone !== "staging") return null;
   // The Artifact Dragon Hoard set up (GuardPickedAttachment remembers the record on it), not any attachment that lies in the staging area.
   if (ctx.cards.get(card.code)?.type === "attachment" && card.setUpBy != null) {
@@ -149,7 +161,8 @@ function heathDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioStat
   }
   if (card.zone !== "staging" && card.zone !== "engaged") return null;
   const lines: string[] = [];
-  if (flagged(game, card.id, "engagedWithAll")) lines.push("Engaged with each player from the staging area. It attacks every player in the combat phase, any player's characters can attack it, and it adds no Threat");
+  const all = engagedWithAllWords(game, card);
+  if (all) lines.push(all.replace(/\.$/, ""));
   const cap = heldAmount(game, card.id, "damageCap");
   // A cap that counts the Dragon Signs in the victory display (19025:B:1) says so; a fixed one (19023:B:2) does not.
   const stage = game.questStage ? game.cards[game.questStage]?.code : undefined;
@@ -158,6 +171,12 @@ function heathDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioStat
   const ceiling = heldAmount(game, card.id, "damageCeiling");
   if (ceiling > 0) lines.push(`Never has more than ${ceiling} damage${flagged(game, card.id, "indestructible") ? ", and stays in play even then" : ""}`);
   return lines.length > 0 ? `${lines.join(". ")}.` : null;
+}
+
+// A card held engaged with each player (Cold-Drake under a Withered Heath stage, Old Man Willow, the Carn Dûm, Cirith Ungol and Fate of Wilderland cards): the words that say what the flag does.
+function engagedWithAllWords(game: ScenarioState, card: ScenarioState["cards"][string]): string | null {
+  if ((card.zone !== "staging" && card.zone !== "engaged") || !flagged(game, card.id, "engagedWithAll")) return null;
+  return "Engaged with each player from the staging area. It attacks every player in the combat phase, any player's characters can attack it, and it adds no Threat.";
 }
 
 // "N of 4 Dragon Signs in the victory display; 4 discover a treasure." (12175:B:7): the signs of the game, and how many the Resolution's treasure takes, read from the record.

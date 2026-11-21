@@ -253,4 +253,32 @@ describe("141017 action", () => {
     expect(run.state.window?.kind).toBe("playerAttack");
     expect(run.state.cards[idsOf(table, FRODO)]?.damage).toBe(0);
   });
+
+  it("with two engaged copies of one enemy, the player chooses the one barred: the second Rider's attack ends", () => {
+    const heroes = [{ code: FRODO, seat: 0 }, { code: SAM, seat: 0 }, { code: MERRY, seat: 0 }];
+    const table = buildTable(base, { ...scene, heroes, engaged: [{ code: RIDER, seat: 0 }, { code: RIDER, seat: 0 }], deck: ["f0", "f0", "card", "card", "card", "card"] });
+    const underhill = idsOf(table, "141017");
+    const riders = Object.values(table.state.cards).filter((card) => card.code === RIDER).map((card) => card.id);
+    expect(riders).toHaveLength(2);
+    let run = begin(table.state);
+    // Up to the second Rider's attack: the first attacks first, undefended, and its damage destroys Merry.
+    for (let turn = 0; turn < 40 && run.state.pendingAttack?.enemyId !== riders[1]; turn += 1) {
+      if (run.state.window?.kind === "travel") run = send(run, { type: "DeclineTravel" }, table.ctx);
+      else if (run.state.window?.kind === "optionalEngage") run = send(run, { type: "DeclineEngage" }, table.ctx);
+      else if (run.state.window?.kind === "chooseEnemy") run = send(run, { type: "ChooseEnemy", enemyId: riders[0] ?? "" }, table.ctx);
+      else if (run.state.window?.kind === "defense") run = send(run, { type: "Undefended", heroId: idsOf(table, MERRY) }, table.ctx);
+      else run = send(run, { type: "Pass" }, table.ctx);
+    }
+    const second = riders[1] ?? "";
+    expect(run.state.pendingAttack?.enemyId).toBe(second);
+    run = send(run, { type: "Trigger", cardId: underhill, effectId: "141017:action:1" }, table.ctx);
+    expect(run.state.window).toEqual({ kind: "choose", seat: 0, options: riders });
+    run = send(run, { type: "Choose", optionId: second }, table.ctx);
+    expect(attackBarred(run.state, second, 0)).toBe(true);
+    expect(attackBarred(run.state, riders[0] ?? "", 0)).toBe(false);
+    for (let turn = 0; turn < 5 && run.state.pendingAttack; turn += 1) run = send(run, { type: "Pass" }, table.ctx);
+    expect(run.state.pendingAttack).toBeFalsy();
+    expect(run.state.cards[idsOf(table, FRODO)]?.damage).toBe(0);
+    expect(run.state.cards[idsOf(table, SAM)]?.damage).toBe(0);
+  });
 });

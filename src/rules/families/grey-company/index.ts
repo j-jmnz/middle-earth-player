@@ -8,11 +8,12 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { Focus } from "../index.ts";
+import { seatsFor } from "../../interpret/player-verbs.ts";
 import { highestThreat, playersAtThreat } from "./amounts.ts";
 import { discardHand, playsBarred, playsBarredReason } from "./hand.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, _ctx: ReduceContext, _steps: EngineStep[]): ScenarioState | null {
-  return instruction.verb === "DiscardHand" ? discardHand(state, focus) : null;
+  return instruction.verb === "DiscardHand" ? discardHand(state, instruction.who === "eventSeat" ? seatsFor(state, "eventSeat", focus.seat) : [focus.seat]) : null;
 }
 
 export const manifest: RulesFamily = {

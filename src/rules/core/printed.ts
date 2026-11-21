@@ -31,17 +31,19 @@ export type CardType =
   | "campaign"
   // The Nightmare setup card, next to the quest deck on Nightmare (zone `nightmare`): its side A's lines stay active all game.
   | "nightmare"
-  // A player card played in the planning phase into its player's quest area (families/sidequests/play.ts), and a contract
+  // A player card played in the planning phase into the staging area (families/sidequests/play.ts), and a contract
   // card that begins the game in its player's play area (families/sidequests/contract.ts).
   | "player-side-quest"
   | "contract"
-  // An encounter side quest (Fire in the Night, emce.side-quests): a quest card with an encounter card back. It is revealed into the staging area and may be the current quest (families/wilderland/night-quest.ts).
+  // An encounter side quest (Fire in the Night, emce.side-quests): a quest card with an encounter card back. It is revealed into the staging area and may be the current quest, as a player side quest in play may (families/sidequests/play.ts) (families/wilderland/night-quest.ts).
   | "encounter-side-quest";
 
 export type Keywords = {
   surge: boolean;
   hide: number | null;
   doomed: number | null;
+  // Regenerate X (dwd.regenerate): healed from the enemy itself after the first player token passes in the Refresh phase (families/encounter/regenerate.ts).
+  regenerate: number | null;
   peril: boolean;
   archery: number | null;
   immuneToPlayerCardEffects: boolean;
@@ -66,12 +68,25 @@ export type Keywords = {
   uncharted: boolean;
   // Aflame X (dcce.aflame): the damage on a location that destroys it, null when the card prints none.
   aflame: number | null;
+  // The Siege value the card prints (docs/brief.md, Attack on Dol Guldur, reading 2), null when it prints none.
+  siegeValue: number | null;
+  pillage: number | null;
+  // Burn X (The Battle of Lake-town): the burn damage a location adds to the pool "resolve all burn damage" deals, null when the card prints none.
+  burn: number | null;
   // Grapple (dcce.grapple): the location in the staging area the enemy attaches to, facedown, when it is revealed; null when the card prints none.
   grapple: "highestThreat" | "lowestThreat" | "highestQuestPoints" | "lowestQuestPoints" | null;
   // Phantom (mec113.phantom): the damage the enemy's attack would deal becomes a threat raise for the defending player (families/grey-company/).
   phantom: boolean;
+  // Spectral (docs/brief.md, The Stone of Erech): characters attacking the enemy use their Willpower instead of their Attack (families/attack/spectral.ts).
+  spectral: boolean;
   // Dire (mec113.dire): read from the current quest card by families/black-gate/dire.ts.
   dire: boolean;
+  // PASS (dwd.locate-test): the card passes a locate test it is discarded for (families/long-dark/).
+  pass: boolean;
+  // Ambush (dwd.ambush): the enemy makes the players engagement checks against it when it enters play (families/encounter/ambush.ts).
+  ambush: boolean;
+  // The enemy prints X for its Attack and its hit points (rr.attachment-cards): a record sets them (families/nameless).
+  statsX: boolean;
 };
 
 // A ship (dcce.ships): a ship-enemy is an enemy and a ship-objective an objective ally for every purpose (`type` says which), with the
@@ -106,6 +121,8 @@ export type PrintedCard = {
   backType: "player" | "encounter" | null;
   // An Objective-Location (Lost in Mirkwood, 18029 to 18032): an objective card that the players travel to, that takes progress as the active location and goes to the victory display explored. `type` stays "objective" (it is guarded, claimed and revealed as an objective).
   objectiveLocation: boolean;
+  // The copies the card allows in a deck, when the catalog states it (rr.deckbuilding; read by AddEventsToHand, 40009:B:2). Absent where the engine never needs it.
+  deckLimit?: number | null;
   // Null for a card that is not a ship.
   ship: ShipKind | null;
   // The encounter set the card belongs to, or null (the fleet: The Dream-chaser's Fleet; the Stormcaller Elite).
@@ -118,6 +135,7 @@ const EMPTY_KEYWORDS: Keywords = {
   surge: false,
   hide: null,
   doomed: null,
+  regenerate: null,
   peril: false,
   archery: null,
   immuneToPlayerCardEffects: false,
@@ -137,9 +155,16 @@ const EMPTY_KEYWORDS: Keywords = {
   eyeIcons: null,
   uncharted: false,
   aflame: null,
+  burn: null,
+  siegeValue: null,
+  pillage: null,
   grapple: null,
   phantom: false,
+  spectral: false,
   dire: false,
+  pass: false,
+  ambush: false,
+  statsX: false,
 };
 
 // The Upgraded side's stats of a data/cards record, when its side B prints all four (dcce.scalable-upgradable), or a location's side B that prints a Threat.
@@ -337,6 +362,22 @@ export function fromEncounterDeck(printed: PrintedCard): boolean {
   return !(printed.type === "hero" || printed.type === "ally" || printed.type === "attachment" || printed.type === "event" || printed.type === "treasure" || printed.type === "player-side-quest" || printed.type === "contract");
 }
 
+// A card the scenario owns (rr.ownership-and-control: "The scenario is considered to be the owner of the encounter deck and each encounter card"): an encounter card of an encounter set. An objective ally with no encounter set (Mendor, Gwaihir)
+// is a campaign card a player adds to their deck, so a player owns it.
+export function scenarioOwned(printed: PrintedCard): boolean {
+  return fromEncounterDeck(printed) && printed.encounterSet != null && printed.encounterSet !== "";
+}
+
+// A quest card (mec108.side-quests: "Side quests are a new type of quest card"): a quest stage, an encounter side quest or a player side quest.
+export function isQuestCardType(type: CardType): boolean {
+  return type === "quest" || isSideQuestType(type);
+}
+
+// A side quest, encounter or player (mec108.side-quests).
+export function isSideQuestType(type: CardType): boolean {
+  return type === "encounter-side-quest" || type === "player-side-quest";
+}
+
 // A treasure is a player card ("Treasure is a new type of player card", emce.treasure).
 export function isPlayerType(printed: PrintedCard): boolean {
   return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event" || printed.type === "player-side-quest" || printed.type === "contract" || printed.type === "treasure";
@@ -371,7 +412,8 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
     willpower: card.willpower,
     attack: card.attack,
     defense: card.defense,
-    health: card.health,
+    // An enemy that prints X for its hit points (`statsX`) has 0 until a record sets them, so the damage rule reads them as a number.
+    health: card.health ?? (keywords.statsX === true ? 0 : null),
     questPoints: card.questPoints,
     questPointsX: keywords.questPointsX === true,
     victory: card.victory,
@@ -389,6 +431,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       surge: keywords.surge === true,
       hide: keywords.hide ?? null,
       doomed: keywords.doomed ?? null,
+      regenerate: keywords.regenerate ?? null,
       peril: keywords.peril === true,
       archery: keywords.archery ?? null,
       immuneToPlayerCardEffects: keywords.immune === true,
@@ -407,9 +450,16 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       eyeIcons: keywords.eyeIcons ?? null,
       uncharted: keywords.uncharted === true,
       aflame: keywords.aflame ?? null,
+      burn: keywords.burn ?? null,
+      siegeValue: keywords.siegeValue ?? null,
+      pillage: keywords.pillage ?? null,
       grapple: keywords.grapple ?? null,
       phantom: keywords.phantom === true,
+      spectral: keywords.spectral === true,
       dire: keywords.dire === true,
+      pass: keywords.pass === true,
+      ambush: keywords.ambush === true,
+      statsX: keywords.statsX === true,
     },
   });
 }

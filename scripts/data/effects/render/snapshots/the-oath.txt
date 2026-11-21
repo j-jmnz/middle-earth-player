@@ -22,7 +22,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41002:B:2 (back): This stage cannot be defeated unless at least 1 copy of Goblin Trail is in the victory display.
   41002:constant:1: Constant
-    only if [json condition {"kind":"inVictory","code":"41014","is":false}]
+    only if the card with code 41014 is not in the victory display
     - the players cannot defeat this stage while this holds
 
 ## 41003 The Rearguard
@@ -148,7 +148,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41016:A:2 (shadow): Shadow: Choose and discard 1 attachment from the defending character. (If this attack is undefended, discard all attachments you control.)
   41016:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (the attack has no defender): choose attachment (any player controls) [also {"attachedTo":"defender"}]
+    - if not (the attack has no defender): choose attachment (any player controls) attached to the defending character
     - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each attachment (you control):
       - discard the picked card
@@ -317,4 +317,4 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41050:resolution:1: Resolution
     - [json Earn {"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]
 
-(rendered pieces: 185 by template, 6 as JSON)
+(rendered pieces: 187 by template, 4 as JSON)

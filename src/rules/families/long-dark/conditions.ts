@@ -1,0 +1,31 @@
+// Rules: dwd.locate-test (data/rules/entries.json); ledger lines 04087:B:1, 901602:A:2. The conditions the long-dark family reads (ledger line 04093:A:1 too): the result of the last locate test the running effect made, and a card that prints PASS.
+import type { Condition } from "../../../catalog/boundary.ts";
+
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import type { Scope } from "../../interpret/conditions.ts";
+import { characters } from "../../combat/combat.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { livingSeats } from "../../core/state.ts";
+import { topFrame } from "../../windows/windows.ts";
+import { lastPlayer } from "../sea/players.ts";
+import { printsPass } from "./locate.ts";
+
+/** `lastLocateFailed`, `lastLocatePassed` (the running effect's last locate test; false before it made one) `engagedWithLastPlayer`, `drew` (the running effect's Draw drew a card), `playerWithoutReady` (some living player controls no unexhausted character) and `hasPass` (the named card prints PASS). Null for any other condition. */
+export function longDarkCondition(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean | null {
+  if (condition.kind === "hasPass") {
+    const id = condition.card === "other" ? scope.other : condition.card === "subject" ? scope.subject : scope.picked?.at(-1);
+    return printsPass(state, id, ctx);
+  }
+  if (condition.kind === "drew") {
+    const data = topFrame(state)?.data;
+    return data?.kind === "effect" && data.drew === true;
+  }
+  if (condition.kind === "engagedWithLastPlayer") {
+    const enemy = scope.sourceId ? state.cards[scope.sourceId] : undefined;
+    return enemy?.zone === "engaged" && enemy.controller === lastPlayer(state);
+  }
+  if (condition.kind === "playerWithoutReady") return livingSeats(state).some((seat) => characters(state, seat, ctx.cards).every((id) => state.cards[id]?.exhausted === true));
+  if (condition.kind !== "lastLocateFailed" && condition.kind !== "lastLocatePassed") return null;
+  const data = topFrame(state)?.data;
+  return data?.kind === "effect" && data.locate === (condition.kind === "lastLocateFailed" ? "failed" : "passed");
+}

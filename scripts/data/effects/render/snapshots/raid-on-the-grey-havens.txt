@@ -45,7 +45,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11037:B:3 (back): If Captain Sahír is in the victory display and each location in play has no damage, the players win the game.
   11037:constant:2: Constant
-    only if all of: ([json condition {"kind":"inVictory","code":"11076","is":true}]) and (the number of damaged location (any player controls) is at most 0)
+    only if all of: (the card with code 11076 is in the victory display) and (the number of damaged location (any player controls) is at most 0)
     - the players win the game
 
 ## 11038 The Havens Burn
@@ -284,7 +284,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11066:A:2 (front): Forced: When Raid Leader engages you, move 1 resource from each of your heroes' resource pools to Raid Leader.
   11066:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
-    - [json MoveResourceFromHeroes {"verb":"MoveResourceFromHeroes","to":"self"}]
+    - 1 resource moves from the pool of each hero the acting player controls that has one to this card
 
 ## 11067 Battle-Hardened
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -294,7 +294,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each Raider enemy (any player controls) or in the staging area:
       - place 1 resource tokens on the picked card
-    - [json ImmediateAttackEach {"verb":"ImmediateAttackEach","notTrait":"Ship"}]
+    - each enemy engaged with a player without the trait Ship makes an immediate attack, each dealt a shadow card of its own
     - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 11067:A:2 (shadow): Shadow: If the attacking enemy is a Raider, place 2 resources on it.
@@ -349,7 +349,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11078:A:1 (front): Na'asiyah engages the last player.
   11078:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
-    - [json EngageLastPlayer {"verb":"EngageLastPlayer"}]
+    - the source enemy engages the last player
 
 11078:A:2 (front): Forced: When Na'asiyah engages you, discard each event in your hand. Add 1 resource to Na'asiyah for each event discarded in this way.
   11078:forced:2: Forced after an enemy engages a player (heard about this card; event happened to the controller)
@@ -421,7 +421,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11182:B:1 (back): Resolution: If Graxar is in the victory display, choose either Parrying Cutlass or Throwing Axe, add it to the Campaign Pool, and record which hero you attach it to.
   11182:resolution:1: Resolution
-    - if [json condition {"kind":"inVictory","code":"11188","is":true}]: the first player takes "11189" or "11190" attached to a hero [also {"anyHero":true}]
+    - if the card with code 11188 is in the victory display: the first player takes "11189" or "11190" attached to a hero [also {"anyHero":true}]
 
 11182:B:2 (back): Add the copies of Galdor's Counsel chosen during setup to the Campaign Pool.
   11182:resolution:2: Resolution
@@ -481,4 +481,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 296 by template, 40 as JSON)
+(rendered pieces: 301 by template, 35 as JSON)

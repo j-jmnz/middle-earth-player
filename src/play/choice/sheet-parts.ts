@@ -3,11 +3,13 @@
 import type { LegalIntent, ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
 import { isReanimatedCode, printedOf } from "../../rules/core/printed.ts";
+import { inPlay } from "../../rules/core/state.ts";
 
 import { pictureKey } from "../canvas/picture-key.ts";
 import { islandTell } from "../words/scenarios/uncharted.ts";
 import { STEP_WORDS } from "../phases/rail.ts";
 import type { SheetNames, SheetOption, SheetStat } from "./sheet-types.ts";
+import { pseudoHostWords } from "../cards/host-words.ts";
 
 export function step(game: ScenarioState): string {
   return STEP_WORDS[game.mode] ?? game.phase;
@@ -72,10 +74,10 @@ function seatOfCard(game: ScenarioState, id: string): number | null {
 /**
  * The row of a card in a pick of Intruders in Chetwood whose options belong to more than one player (Borders of Bree-land's enemy, Angmar Orc's ally): the owner is named on each row, "Angmar Orc \u00b7 engaged with Player 2",
  * "Gimli \u00b7 Player 1's ally". An attachment names the card it lies on and whose that is, so two of one name read apart ("A Fell Dread \u00b7 on Aragorn, Player 2's hero", "Possession \u00b7 on Reanimated Dead, Player 1's card", "... on Orc Archer, enemy engaged with Player 1");
- * one lying on a card no seat owns has no label. Undefined for any other row, and in a game with one seat or none of the side quest rules.
+ * one lying on a card no seat owns has no label. Undefined for any other row, and in a game with one seat or none of the side quest rules (or of the Setup line that has the first player pick among every player's heroes, `seatedRows`).
  */
 export function seatedLabel(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id: string, options: readonly string[]): string | undefined {
-  if (game.sideQuests !== true || game.seatCount < 2) return undefined;
+  if ((game.sideQuests !== true && game.seatedRows !== true) || game.seatCount < 2) return undefined;
   const seat = seatOfCard(game, id);
   if (seat == null || seat < 0) return undefined;
   const seats = new Set(options.map((other) => seatOfCard(game, other)).filter((other) => other != null && other >= 0));
@@ -108,10 +110,32 @@ export function tiedLabel(game: ScenarioState, ctx: ReduceContext, names: SheetN
   return `${name} \u00b7 ${place} \u00b7 ${threat} Threat`;
 }
 
+/**
+ * The row of a card in play that shares its name with another row of the pick, so copies read apart: Mr. Underhill's two
+ * engaged Black Riders (141017:A:3) read "Black Rider · attacking · engaged with you" and "Black Rider · engaged with you".
+ * It says whether the card is attacking, where it is, its damage and its attachments. Undefined when no other row has its name.
+ */
+export function copyLabel(game: ScenarioState, names: SheetNames, id: string, options: readonly string[]): string | undefined {
+  const card = game.cards[id];
+  if (!card || !inPlay(card.zone)) return undefined;
+  const name = names.card(id);
+  if (!options.some((other) => other !== id && game.cards[other] != null && names.card(other) === name)) return undefined;
+  const seat = game.seats.findIndex((one) => one.engaged.includes(id));
+  const engaged = game.seatCount > 1 && seat >= 0 ? `engaged with Player ${seat + 1}` : "engaged with you";
+  const places: Partial<Record<string, string>> = { engaged, staging: "staging area", activeLocation: "active location" };
+  const host = card.zone === "attached" && card.host ? `on ${names.card(card.host)}` : undefined;
+  const attachments = card.attachments.map((other) => names.card(other));
+  const attacking = game.pendingAttack?.enemyId === id ? "attacking" : undefined;
+  const damage = card.damage > 0 ? `${card.damage} damage` : undefined;
+  const withAttachments = attachments.length > 0 ? `with ${attachments.join(", ")}` : undefined;
+  const parts = [attacking, places[card.zone] ?? host, damage, withAttachments].filter((part): part is string => part != null);
+  return parts.length > 0 ? `${name} \u00b7 ${parts.join(" \u00b7 ")}` : undefined;
+}
+
 export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
-  if (id.startsWith("seat:")) return { id, label: `Player ${Number(id.slice(5)) + 1}`, code: null };
-  // The staging area, where a Trap or a Guarded attachment is played (src/rules/families/attachments/play.ts).
-  if (id === "staging") return { id, label: "The staging area", code: null };
+  // The staging area, where a Trap or a Guarded attachment is played, and a seat's play area (src/rules/families/attachments/play.ts).
+  const place = pseudoHostWords(id, false);
+  if (place) return { id, label: place, code: null };
   const card = game.cards[id];
   // Lost Islands share one name: what tells them apart (progress, place in staging) follows it.
   if (card) return { id, label: cardLabel(game, names, id), code: pictureKey(card) };

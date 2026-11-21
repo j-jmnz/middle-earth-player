@@ -40,7 +40,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("PassFirstPlayer"), ...when }),
   // The quest phase ends at once: the cards it has yet to reveal are not revealed and the quest is not resolved
   // (rr.step-3-3). Nothing happens outside the quest phase.
-  z.strictObject({ verb: z.literal("EndQuestPhase"), ...when }),
+  // `own`: only the acting player's quest phase ends, once the areas are separate ("End your quest phase (do not resolve the quest)", 148004:A:1): no more cards are revealed for that player, his characters stop being committed and his quest is not resolved
+  // (ScenarioState.questEnded); the other players finish theirs. With one shared staging area it ends the phase as it does without `own`.
+  z.strictObject({ verb: z.literal("EndQuestPhase"), own: z.literal(true).optional(), ...when }),
   // All the progress on the current quest card is removed: the encounter side quest that is the current quest while one is (mec108.side-quests-in-play: "If this attack destroys a character, remove all progress from the current quest", 10025:A:2), else the main quest card.
   // `of: stage` is the main quest card whatever the current quest is ("discard all progress from this stage", 10015:B:2).
   z.strictObject({ verb: z.literal("RemoveAllQuestProgress"), of: z.literal("stage").optional(), ...when }),

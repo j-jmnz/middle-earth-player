@@ -3,10 +3,11 @@
 //
 // The encounter family's verbs that ask a player to choose: they run from the effect frame (effect-frames.ts hands them the
 // queue item, so the choice comes back to them), and from anywhere else take the first option.
+import { announceLooked } from "./looked.ts";
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
-import { attachmentHostIds, enforceRestricted } from "../../player/attach.ts";
+import { attachmentHostIds, enforceRestricted, hostTakesControl } from "../../player/attach.ts";
 import { effectCause, ruleCause } from "../../core/cause.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { hasTrait, holds } from "../../interpret/conditions.ts";
@@ -22,23 +23,12 @@ import { isPlayerType, printedOf } from "../../core/printed.ts";
 import { lastPicked, putOnDeck } from "../../interpret/player-verbs.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { Frame, QueueItem, ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { distinctChoices, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { effectData, pushPicked } from "./moves.ts";
 
 type PickEncounter = Extract<Instruction, { verb: "PickEncounter" }>;
-
-// Copies of one card in a deck or a pile are the same choice.
-function distinctByCode(state: ScenarioState, ids: readonly string[]): string[] {
-  const seen = new Set<string>();
-  return ids.filter((id) => {
-    const code = state.cards[id]?.code ?? id;
-    if (seen.has(code)) return false;
-    seen.add(code);
-    return true;
-  });
-}
 
 // The cards a LookAtTop showed that are still on top of the encounter deck, top first.
 export function lookedOnTop(state: ScenarioState): string[] {
@@ -94,7 +84,7 @@ export function encounterCandidates(state: ScenarioState, instruction: PickEncou
     if (max != null && (inPlay(card.zone) ? modifiedStat(state, card, "threat", ctx.cards) : (printed.threat ?? 0)) > max) return false;
     return true;
   });
-  return instruction.from === "play" ? found : distinctByCode(state, found);
+  return instruction.from === "play" ? found : distinctChoices(state, found);
 }
 
 function pickEncounter(state: ScenarioState, item: QueueItem, sourceId: string | null, ctx: ReduceContext): ScenarioState {
@@ -102,7 +92,9 @@ function pickEncounter(state: ScenarioState, item: QueueItem, sourceId: string |
   if (instruction.verb !== "PickEncounter") return state;
   const options = encounterCandidates(state, instruction, item.seat, sourceId, ctx);
   if (!item.chosen && options.length > 1 && effectData(state)) return askTarget(state, item, options);
-  return pushPicked(state, item.chosen ?? options[0] ?? "");
+  const picked = pushPicked(state, item.chosen ?? options[0] ?? "");
+  // A search of the encounter deck looks at its cards (901506:A:1, looked.ts).
+  return instruction.from === "deck" || instruction.from === "deckAndDiscard" ? announceLooked(picked, ctx, item.seat) : picked;
 }
 
 // Puts the looked-at cards still on top of the encounter deck back in the order the actor chooses: the card for the top
@@ -113,8 +105,8 @@ function arrangeEncounter(state: ScenarioState, item: QueueItem): ScenarioState 
   const offset = item.offset ?? 0;
   const count = lookedOnTop(state).length;
   const rest = state.encounterDeck.slice(offset, count);
-  if (rest.length <= 1 || distinctByCode(state, rest).length <= 1) return state;
-  if (!item.chosen) return askTarget(state, { ...item, offset }, distinctByCode(state, rest));
+  if (rest.length <= 1 || distinctChoices(state, rest).length <= 1) return state;
+  if (!item.chosen) return askTarget(state, { ...item, offset }, distinctChoices(state, rest));
   const from = state.encounterDeck.indexOf(item.chosen);
   if (from < offset) return state;
   const deck = [...state.encounterDeck];
@@ -199,7 +191,7 @@ function playRevealedFree(state: ScenarioState, item: QueueItem, ctx: ReduceCont
     const host = item.chosen && hosts.includes(item.chosen) ? item.chosen : hosts[0];
     if (!host) return bottom;
     const placed = updateCard(moveCard(played(state, id, seat, ctx, steps), id, { zone: "play", seat }), id, { exhausted: entersExhausted(ctx, card.code) });
-    return enforceRestricted(queueEvent(attachTo(placed, id, host), { trigger: "played", seat, cardId: id }), host, ctx, steps);
+    return enforceRestricted(queueEvent(hostTakesControl(attachTo(placed, id, host), id, ctx), { trigger: "played", seat, cardId: id }), host, ctx, steps);
   }
   const running = playableActions(state, id, seat, ctx);
   const first = running[0];

@@ -13,22 +13,13 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { feedsDiscard, pickCandidates } from "../../interpret/pick.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { Frame, QueueItem, ScenarioState } from "../../core/state.ts";
+import { distinctChoices } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 
 type EachInstruction = Extract<Instruction, { verb: "Each" }>;
 
 /** The option that stops choosing. */
 export const DONE = "done";
-
-function distinctByCode(state: ScenarioState, ids: readonly string[]): string[] {
-  const seen = new Set<string>();
-  return ids.filter((id) => {
-    const code = state.cards[id]?.code ?? id;
-    if (seen.has(code)) return false;
-    seen.add(code);
-    return true;
-  });
-}
 
 function costOf(state: ScenarioState, id: string, ctx: ReduceContext): number {
   return printedOf(ctx.cards, state.cards[id]?.code ?? "").cost ?? 0;
@@ -59,13 +50,18 @@ export function chooseEach(state: ScenarioState, item: QueueItem, frame: Pick<Fr
   if (instruction.verb !== "Each" || instruction.upTo == null || data?.kind !== "effect") return state;
   const taken = item.chosen && item.chosen !== DONE ? [...(instruction.taken ?? []), item.chosen] : [...(instruction.taken ?? [])];
   const limit = instruction.upTo === "any" ? Number.POSITIVE_INFINITY : typeof instruction.upTo === "number" ? instruction.upTo : resolveAmount(state, instruction.upTo, frameScope(state, item.seat, frame.cardId), ctx);
-  const options = item.chosen === DONE || taken.length >= limit ? [] : remaining(state, instruction, taken, item.seat, frame.cardId, ctx);
-  if (options.length > 0) return askTarget(state, { ...item, instruction: { ...instruction, taken }, chosen: null }, [...distinctByCode(state, options), DONE]);
+  const found = remaining(state, instruction, taken, item.seat, frame.cardId, ctx);
+  const options = item.chosen === DONE || taken.length >= limit ? [] : found;
+  // `rest`: the actor keeps exactly `limit` cards (he cannot stop early) and the others matching are the rest; with no more than he may keep, all stay and nothing is asked.
+  const keepAll = instruction.rest != null && found.length <= limit - taken.length;
+  if (options.length > 0 && !keepAll) return askTarget(state, { ...item, instruction: { ...instruction, taken }, chosen: null }, instruction.rest ? distinctChoices(state, options) : [...distinctChoices(state, options), DONE]);
   const cause = item.cause ? { cause: item.cause } : {};
   const pick = { verb: "Pick" as const, pick: instruction.pick };
-  const expanded = taken.flatMap((id): QueueItem[] => [
+  const kept = keepAll ? [...taken, ...found] : taken;
+  const forEach = (ids: readonly string[], list: readonly Instruction[]): QueueItem[] => ids.flatMap((id): QueueItem[] => [
     { instruction: pick, seat: item.seat, chosen: id, ...cause },
-    ...instruction.instructions.map((entry): QueueItem => ({ instruction: entry, seat: item.seat, chosen: null, ...cause })),
+    ...list.map((entry): QueueItem => ({ instruction: entry, seat: item.seat, chosen: null, ...cause })),
   ]);
-  return patchTop(state, { data: { ...data, x: taken.length, queue: [...expanded, ...data.queue] } });
+  const expanded = [...forEach(kept, instruction.instructions), ...(instruction.rest && !keepAll ? forEach(found, instruction.rest) : [])];
+  return patchTop(state, { data: { ...data, x: kept.length, queue: [...expanded, ...data.queue] } });
 }

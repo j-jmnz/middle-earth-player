@@ -81,7 +81,8 @@ export function SeatPicker({
   const slot = index === 0 && needsRingBearer;
   const choosing = !pickedDeck || changing;
   const short = pickedDeck ? deckShortLine(pickedDeck) : null;
-  const title = seatCount === 1 ? (saga ? "Your fellowship" : "Your party") : `Seat ${index + 1}`;
+  // One word or a short "Seat 2": the folded header keeps the whole title and shrinks the deck name instead (FoldHeader's `lead`).
+  const title = seatCount === 1 ? (saga ? "Fellowship" : "Heroes") : `Seat ${index + 1}`;
   // The seat folds to its header line; the body is hidden, not unmounted, so the list's `changing` state and scroll stay. The fold is
   // stored per seat index in `sections`, like every FoldSection (fold-section.tsx); a seat that needs the player opens anyway (seat-state.ts).
   const folds = useFolds();
@@ -208,11 +209,11 @@ export function SeatPicker({
             {short ? <Label>{short}</Label> : null}
             <View className="mt-3.5 flex-row gap-2">
               {heroes.map((code) => (
-                <HeroTile key={code} hero={faceOf(code)} height={PARTY_TILE_HEIGHT * s} dense ringBearer={!slot && carries(code)} onPress={() => openCard(code)} />
+                <HeroTile key={code} hero={faceOf(code)} height={PARTY_TILE_HEIGHT * s} dense ringBearer={!slot && carries(code)} onPress={() => openCard(code)} onLongPress={() => openCard(code)} />
               ))}
               {slot ? (
                 ringBearer ? (
-                  <HeroTile hero={faceOf(ringBearer)} height={PARTY_TILE_HEIGHT * s} dense ringBearer onPress={() => openCard(ringBearer)} onRemove={() => onRingBearer(null)} />
+                  <HeroTile hero={faceOf(ringBearer)} height={PARTY_TILE_HEIGHT * s} dense ringBearer onPress={() => openCard(ringBearer)} onLongPress={() => openCard(ringBearer)} onRemove={() => onRingBearer(null)} />
                 ) : (
                   // The fourth place stays as room, so the tiles keep their width when the Ring-bearer is picked.
                   <View className="flex-1" />

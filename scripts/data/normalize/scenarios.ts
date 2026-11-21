@@ -40,7 +40,7 @@ const GROUP_PILE: Readonly<Record<string, Pile>> = {
 // ("Prepare the Corsair deck", "Prepare the Uncharted deck"), never by a line naming each card, and they count toward their encounter sets.
 // Ered Mithrin's decks (evilCreaturesDeck, cavesDeck, sideQuestDeck, spidersDeck, orcsDeck) are built by the Setup's deck steps the same way, and
 // The Two Towers' second encounter decks (haradDeck, greatSpiderDeck) by the Setup's encounter set that is shuffled under a card or set aside.
-const EXTRA_DECKS: ReadonlySet<string> = new Set(["corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck"]);
+const EXTRA_DECKS: ReadonlySet<string> = new Set(["corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "smaugDeck"]);
 
 // A scenario is written only when every check passes. The rest are listed in problems and stay unbuilt
 // until an override or a template resolves them.
@@ -102,8 +102,9 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       problems.push(`${id}: DragnCards has no ${def.deck?.normal ?? "Q0C"} deck labelled "${hob.Title}"`);
       continue;
     }
-    if (def.deck && entry?.[1]?.label !== hob.Title) {
-      problems.push(`${id}: DragnCards ${def.deck.normal} is labelled "${entry?.[1]?.label ?? ""}", not "${hob.Title}"`);
+    const deckLabel = def.deck?.label ?? hob.Title;
+    if (def.deck && entry?.[1]?.label !== deckLabel) {
+      problems.push(`${id}: DragnCards ${def.deck.normal} is labelled "${entry?.[1]?.label ?? ""}", not "${deckLabel}"`);
       continue;
     }
     const [normalKey, normalDeck] = entry ?? [null, null];
@@ -146,15 +147,25 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     // The Stormcaller's own stages (2C to 4C, `stormcallerQuests`) are listed with the others and leave `stages` once the load list is read.
     const questCodes = hob.QuestCards.flatMap((quest) => {
       const card = bySlug.get(quest.Slug);
-      return card && !isNightmareCard(card) ? [card.code] : [];
+      // A mode card (The Siege of Annúminas' Standard Game Mode) is listed with the quest cards but is no stage; a quest card the scenario never plays is excluded by an override (the Siege's Epic Multiplayer stages).
+      return card && card.type === "quest" && !isNightmareCard(card) && !overrides.scenarioExcluded.some((rule) => rule.scenario === id && rule.code === card.code) ? [card.code] : [];
     });
+    for (const rule of overrides.scenarioStages) if (rule.scenario === id && !questCodes.includes(rule.code)) questCodes.push(rule.code);
     let stages = questCodes;
 
     // The printed Setup of the first quest stage and of the campaign card.
     const questSetup = setupOf(byCode.get(stages[0] ?? "")?.text, false).setup;
     const campaignLines = setupOf(byCode.get(campaignCard ?? "")?.text, def.deck !== undefined || product.sagaStart === true);
     const campaignSetup = campaignLines.setup;
-    const quest: ParsedSetup = questSetup ? parseSetup(questSetup, names) : { clauses: [], unread: [] };
+    // A mode card's Setup (the Siege's Standard Game Mode: Annúminas to the staging area) runs before the quest card's: its sentences are read with the quest card's.
+    const modeCard = def.modeCard === undefined ? undefined : cards.find((card) => card.type === "campaign" && card.name === def.modeCard && card.printings.some((p) => cardPacks.includes(p.pack)));
+    const easyModeCard = def.easyModeCard === undefined ? undefined : cards.find((card) => card.type === "campaign" && card.name === def.easyModeCard && card.printings.some((p) => cardPacks.includes(p.pack)));
+    if (def.easyModeCard !== undefined && !easyModeCard) local.push(`${id}: no Easy mode card ${def.easyModeCard}`);
+    // The Hunt for the Dreadnaught's mode cards print the Setup as bulleted lines, which continue the "Setup:" line: the bullets are dropped, each line is one sentence.
+    const modeSetup = setupOf(modeCard?.text, true).setup?.replaceAll("• ", "") ?? null;
+    const modeParsed: ParsedSetup = modeSetup ? parseSetup(modeSetup, names) : { clauses: [], unread: [] };
+    const questParsed: ParsedSetup = questSetup ? parseSetup(questSetup, names) : { clauses: [], unread: [] };
+    const quest: ParsedSetup = { clauses: [...modeParsed.clauses, ...questParsed.clauses], unread: [...modeParsed.unread, ...questParsed.unread] };
     const camp: ParsedSetup = campaignSetup ? parseSetup(campaignSetup, names) : { clauses: [], unread: [] };
     for (const sentence of [...quest.unread, ...camp.unread]) local.push(`${id}: a Setup sentence no pattern reads: ${sentence}`);
     local.push(...burdenSetProblems(id, camp, cards, plain));
@@ -177,8 +188,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         let other = sided ? resolve(line.databaseId, "b", sided) : null;
         const name = (sided ? sideRow(line.databaseId, "a") : raw.dragn.get(line.databaseId))?.name ?? line.databaseId;
         if (!card) {
-          // The scenario overview card has no game text and no catalog row.
-          if (name !== hob.Title) local.push(`${deck.label}: no card for "${name}" (${line.databaseId})`);
+          // The scenario overview card has no game text and no catalog row; a Rules card (The Ruins of Belegost's Discover and Loot keyword card) is a reminder, not a card the scenario deals.
+          if (name !== hob.Title && raw.dragn.get(line.databaseId)?.type !== "Rules") local.push(`${deck.label}: no card for "${name}" (${line.databaseId})`);
           continue;
         }
         if (card.type === "campaign" || raw.dragn.get(line.databaseId)?.type === "Campaign") continue;
@@ -207,6 +218,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         const was = pile;
         const moved = overrides.scenarioPiles.find((rule) => rule.scenario === id && rule.code === card?.code && (rule.from === undefined || rule.from === was));
         if (moved) pile = moved.pile;
+        if (moved?.back !== undefined) other = byCode.get(moved.back) ?? null;
         if (pile === "campaign") {
           campaign.add(card.code);
           continue;
@@ -231,7 +243,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       }
       // "Players prepare their fleet" deals all six ship-objectives of The Dream-chaser's Fleet (dcce.prepare-your-fleet), set aside until
       // the players choose; the load list holds the four of the original box, so each ship it lacks (by name) is added, in both decks.
-      if (clausesOf(quest, "step").some((clause) => clause.step === "prepareFleet")) {
+      // (The Hunt for the Dreadnaught's fleet is its own six ship-objectives, which the load list holds.)
+      if (product.home === "dream-chaser" && clausesOf(quest, "step").some((clause) => clause.step === "prepareFleet")) {
         const dealt = new Set([...normal.placements.keys()].map((key) => byCode.get(key.split("\u0000")[0] ?? "")?.name));
         for (const ship of cards.filter((card) => card.type === "ship-objective" && canon(card.encounterSet ?? "") === canon("The Dream-chaser's Fleet") && !dealt.has(card.name))) {
           normal.placements.set(keyOf(ship.code, "setAside"), 1);
@@ -241,7 +254,10 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       const stormcallerStages = new Set([...normal.placements.keys()].filter((key) => key.endsWith("\u0000stormcallerQuests")).map((key) => key.split("\u0000")[0] ?? ""));
       stages = questCodes.filter((code) => !stormcallerStages.has(code));
       const deckStages = [...normal.placements.keys()].filter((key) => key.endsWith("\u0000quest")).map((key) => key.split("\u0000")[0] ?? "");
-      if (JSON.stringify(stages) !== JSON.stringify(deckStages)) local.push(`${id}: quest stages disagree: Hall of Beorn ${stages.join(",")} / DragnCards ${deckStages.join(",")}`);
+      // The variants of one stage (Flight from Moria's seven stage 2 cards, Foundations of Stone's four stage 4 cards) are dealt in no printed order, so the load list may list them in another order than Hall of Beorn's.
+      const stageNumber = (code: string) => Number.parseInt(byCode.get(code)?.stage ?? "", 10);
+      const sameStages = JSON.stringify(stages) === JSON.stringify(deckStages) || (stages.length === deckStages.length && [...stages].sort().join() === [...deckStages].sort().join() && stages.every((code, at) => stageNumber(code) === stageNumber(deckStages[at] ?? "")));
+      if (!sameStages) local.push(`${id}: quest stages disagree: Hall of Beorn ${stages.join(",")} / DragnCards ${deckStages.join(",")}`);
     } else {
       // No load list: Hall of Beorn's counts are the pile, and the quest card's printed Setup moves cards out of the deck.
       normal = fromSetup("Normal");
@@ -351,7 +367,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const booklet = bookletSetsOf(rule).filter((name) => !(def.deck && namesAnObjective(name)));
     const first = hob.QuestCards[0];
     const isCampaign = (code: string) => byCode.get(code)?.typeName === "Campaign" || byCode.get(code)?.campaignKind != null;
-    let hobSets = [first?.EncounterInfo?.EncounterSet, ...(first?.EncounterInfo?.IncludedEncounterSets ?? [])].filter((name): name is string => !!name).map((name) => name.replace(CAMPAIGN_SUFFIX, ""));
+    let hobSets = def.encounterSets ? [...def.encounterSets] : [first?.EncounterInfo?.EncounterSet, ...(first?.EncounterInfo?.IncludedEncounterSets ?? [])].filter((name): name is string => !!name).map((name) => name.replace(CAMPAIGN_SUFFIX, ""));
     if (def.setupSpan === undefined) {
       // No rules insert is pinned for this scenario (a cycle's Adventure Pack): Hall of Beorn's set list is the list, and the sets of the cards the load list deals must be exactly those.
       const dealtSets = new Set<string>();
@@ -425,8 +441,10 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const everything = placed.map((item) => textOf(item.code)).join("\n");
     const widgets = {
       hide: /\bHide (?:test|\d)/.test(everything) || placed.some((item) => byCode.get(item.code)?.keywords?.hide != null),
-      secondActiveLocation: stages.some((code) => /There can be 2 active locations/.test(textOf(code))),
-      perSeatStaging: stages.some((code) => /creates? (?:his|their) own staging area/.test(textOf(code))),
+      // A stage that says "There can be 2 active locations", or a dealt card that grants the slot (Fisherman's Dock: "There are now 2 active locations").
+      secondActiveLocation: stages.some((code) => /There can be 2 active locations/.test(textOf(code))) || /There are now 2 active locations/.test(everything),
+      // A stage that creates a staging area for each player (Breaking of the Fellowship, Escape from Mount Gram), or a dealt card that sends a player to a staging area of his own (Great Barrow, 148007).
+      perSeatStaging: stages.some((code) => /creates? (?:his|their|your) own staging area/i.test(textOf(code))) || /create your own staging area/.test(everything),
     };
 
     // DragnCards' decks, where a deck of the same cards exists (copy counts only, not piles).
@@ -466,10 +484,12 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         widgets,
         source: { dragnNormal: normalKey, dragnEasy: easyDeck ? easyKey : null, hobSlug: hob.Slug },
         ...(nightmare.data ? { nightmare: nightmare.data } : {}),
+        ...(modeCard ? { modeCard: modeCard.code } : {}),
+        ...(easyModeCard ? { easyModeCard: easyModeCard.code } : {}),
       }),
     );
   }
 
-  const campaigns = campaignsOf(campaignDefs, scenarios, campaignCards, preludes);
+  const campaigns = campaignsOf(campaignDefs, scenarios, campaignCards, preludes, raw.scenarioIndex);
   return { scenarios, campaigns, problems };
 }

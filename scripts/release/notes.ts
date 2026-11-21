@@ -44,6 +44,14 @@ export function obtainiumUrl(repository: string): string {
   return `https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/${encodeURIComponent(JSON.stringify(app))}`;
 }
 
+/** A change's line in its section: its summary, then the issues it closes and the ones it refers to (GitHub links each `#n`). */
+function changeLine(change: Change): string {
+  const parts = [change.summary];
+  if (change.closes.length > 0) parts.push(`closes ${change.closes.map((n) => `#${n}`).join(", ")}`);
+  if (change.refs.length > 0) parts.push(`see ${change.refs.map((n) => `#${n}`).join(", ")}`);
+  return `- ${parts.join(" · ")}`;
+}
+
 export function renderNotes(input: NotesInput): string {
   const out: string[] = [];
   const warnings = input.changes.flatMap((change) => change.breaking);
@@ -52,7 +60,7 @@ export function renderNotes(input: NotesInput): string {
   if (!input.previousTag) out.push("The first release.", "");
   if (warnings.length > 0) out.push("## Before you update", "", ...warnings.map((line) => `- ${line}`), "");
   for (const { types, title } of SECTIONS) {
-    const lines = input.changes.filter((change) => types.includes(change.type)).map((change) => `- ${change.summary}`);
+    const lines = input.changes.filter((change) => types.includes(change.type)).map(changeLine);
     if (lines.length > 0) out.push(`## ${title}`, "", ...lines, "");
   }
   out.push(

@@ -80,8 +80,8 @@ export type CardSlot = Rect & {
 export type CombatMark = { x: number; y: number; kind: FightKind; enemyId: string; preview: boolean };
 
 // The second slot's decks, which stand in its left place, and its discard piles, in its right one.
-const SECOND_DECKS = ["corsairDeck", "unchartedDeck", "grottoDeck", "evilCreaturesDeck", "cavesDeck", "haradDeck", "angmarOrcDeck"] as const;
-const SECOND_DISCARDS = ["corsairDiscard", "evilCreaturesDiscard"] as const;
+const SECOND_DECKS = ["corsairDeck", "unchartedDeck", "grottoDeck", "evilCreaturesDeck", "balrogDeck", "cavesDeck", "haradDeck", "angmarOrcDeck", "smaugDeck", "investigationDeck"] as const;
+const SECOND_DISCARDS = ["corsairDiscard", "evilCreaturesDiscard", "balrogDiscard", "smaugDiscard"] as const;
 // The four piles every table has, the second slot's when the game has one (the Corsair pair: dcce.corsair-deck; the Evil Creatures pair or the Caves deck: emce.evil-creatures-deck, emce.caves-deck), and the victory display while a card is in it.
 export type TablePiles<T> = Readonly<Record<BasePileId, T>> & Partial<Readonly<Record<SecondPileId | VictoryPileId, T>>>;
 

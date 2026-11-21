@@ -2,11 +2,11 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
+import { loadAnyScenario, loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { loadCards } from "../../scripts/data/load-cards.ts";
 import { EFFECTS } from "../effects/index.ts";
 import { scenarioDefinitionSchema } from "./boundary.ts";
-import { campaignDataSchema, encounterCodes, normalCopiesByCode, normalEncounterSize, parseScenarioData, scenarioCards, scenarioDefinition } from "./scenario-data.ts";
+import { campaignDataSchema, encounterCodes, normalCopiesByCode, normalEncounterSize, parseScenarioData, questDeckCodes, scenarioCards, scenarioDefinition } from "./scenario-data.ts";
 
 describe("a-shadow-of-the-past scenario data", () => {
   const scenario = loadScenario("a-shadow-of-the-past");
@@ -114,5 +114,20 @@ describe("The Two Towers scenario data", () => {
     expect(() => parseScenarioData({ ...base, sagaStart: { hero: "143001", ringBearer: true } })).toThrow();
     expect(() => parseScenarioData({ ...base, sagaStart: { ringBearer: true, attached: [] } })).toThrow();
     expect(campaignDataSchema.parse(JSON.parse(readFileSync("data/campaigns/the-two-towers.json", "utf8"))).prelude).toEqual([]);
+  });
+});
+
+describe("the Nightmare quest deck", () => {
+  // 901001:B:3 and 901001:B:11: the setup card removes Goblin Patrol from the quest deck and adds Goblin Ambush "in stage order", so it takes stage 2.
+  it("deals a quest card the setup card adds in the place of the stage it removes, and the Normal deck unchanged", () => {
+    const pit = loadAnyScenario("into-the-pit");
+    expect(questDeckCodes(pit, "Normal")).toEqual(["03064", "03065", "03066"]);
+    expect(questDeckCodes(pit, "Easy")).toEqual(["03064", "03065", "03066"]);
+    expect(questDeckCodes(pit, "Nightmare")).toEqual(["03064", "901002", "03066"]);
+  });
+
+  it("still appends a Nightmare quest card that removes no stage after the printed ones", () => {
+    const carrock = loadAnyScenario("conflict-at-the-carrock");
+    expect(questDeckCodes(carrock, "Nightmare")).toEqual([...carrock.stages, "900511"]);
   });
 });

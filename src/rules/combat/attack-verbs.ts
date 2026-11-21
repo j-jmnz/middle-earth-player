@@ -10,12 +10,13 @@ import { pickCandidates } from "../interpret/pick.ts";
 import { lastPicked, seatOf } from "../interpret/player-verbs.ts";
 import { topFrame } from "../windows/windows.ts";
 import { addModifier } from "../core/keywords.ts";
-import { headOf } from "../families/breaking/areas.ts";
-import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, ENEMIES_CLASS, isClassHolder, isTraitedEnemies, isTraitedLocations, isTraitedStaging, STAGING_CLASS, traitedEnemies, traitedLocations, traitedStaging, ownCharacters } from "../core/holder-classes.ts";
+import { headOf, isolatedAreas } from "../families/breaking/areas.ts";
+import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, ENEMIES_CLASS, QUESTING_CHARACTERS_CLASS, isClassHolder, isTraitedEnemies, isTraitedLocations, isTraitedStaging, STAGING_CLASS, traitedEnemies, traitedLocations, traitedStaging, ownCharacters } from "../core/holder-classes.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats } from "../core/state.ts";
 import type { VerbFocus } from "../interpret/verbs.ts";
 import { moveCard } from "../core/zones.ts";
+import { queueEvent } from "../windows/queue.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 
 // Verbs that read or change the enemy attack in progress.
@@ -27,15 +28,17 @@ export function runAttackVerb(state: ScenarioState, instruction: Instruction, fo
     case "AfterAttack":
       return attack ? { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), ...instruction.instructions], afterCause: currentCause(steps, UNATTRIBUTED) } } : state;
     case "EngageNextPlayer": {
-      const enemy = focus.sourceId ? state.cards[focus.sourceId] : undefined;
-      if (!focus.sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
+      const enemyId = instruction.target === "subject" ? frameScope(state, focus.seat, focus.sourceId).subject : focus.sourceId;
+      const enemy = enemyId ? state.cards[enemyId] : undefined;
+      if (!enemyId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
       // With no other player there is no next player to engage (faq.next-player).
       const seats = livingSeats(state);
       const at = seats.indexOf(enemy.controller);
       const next = seats[(at + 1) % seats.length];
       if (next == null || next === enemy.controller) return state;
-      steps.push({ kind: "engage", seat: next, enemyId: focus.sourceId });
-      return moveCard(state, focus.sourceId, { zone: "engaged", seat: next });
+      steps.push({ kind: "engage", seat: next, enemyId });
+      const moved = moveCard(state, enemyId, { zone: "engaged", seat: next });
+      return instruction.announces ? queueEvent(moved, { trigger: "engaged", seat: next, subject: enemyId }) : moved;
     }
     default:
       return state;
@@ -100,6 +103,10 @@ export function modifyStat(
     case "damagedCharacters":
       targets = [DAMAGED_CHARACTERS_CLASS];
       break;
+    // Every character committed to the quest, now and committing later (04022:A:1): the holder is the class, read by heldBy.
+    case "questingCharacters":
+      targets = [QUESTING_CHARACTERS_CLASS];
+      break;
     // Every enemy in play, staged or engaged, now and entering later (143041:A:2): the holder is the class, read by heldBy.
     case "enemies":
       targets = [instruction.trait != null ? traitedEnemies(instruction.trait) : ENEMIES_CLASS];
@@ -149,7 +156,7 @@ export function modifyStat(
   for (const id of targets) {
     if (trait != null && !id.startsWith("seat:") && !isTraitedEnemies(id) && !isTraitedStaging(id) && !isTraitedLocations(id) && !hasTrait(next, id, trait, ctx)) continue;
     if (id === "table") next = { ...next, modifiers: [...next.modifiers, { instanceId: "table", sourceId, stat: instruction.stat, amount, until: instruction.until }] };
-    else if (id.startsWith("seat:")) next = { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until }] };
+    else if (id.startsWith("seat:")) next = { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until, ...(trait != null && instruction.stat === "engagedThreatSeat" ? { trait } : {}) }] };
     else next = isClassHolder(id)
       ? addClassModifier(next, id, sourceId, instruction.stat, amount, instruction.until)
       : addModifier(next, id, sourceId, instruction.stat, amount, instruction.until);
@@ -157,8 +164,8 @@ export function modifyStat(
   // A condition read each time the stat is read stays on the modifiers it made ("+3 Attack while attacking an enemy with a
   // higher engagement cost than your threat", 04004:A:1).
   const kept = instruction.when;
-  // Mount Gram: an encounter card's lasting effect on each enemy reaches the enemies of its own staging area only while the areas are separate (mec108.create-staging-area).
-  if (state.separate && state.capture && instruction.target === "enemies" && !kept && next.modifiers.length > state.modifiers.length) {
+  // Isolated areas: an encounter card's lasting effect on each enemy reaches the enemies of its own staging area only (mec108.create-staging-area).
+  if (isolatedAreas(state) && instruction.target === "enemies" && !kept && next.modifiers.length > state.modifiers.length) {
     const area = { kind: "inArea" as const, seat: headOf(state, focus.seat) };
     return { ...next, modifiers: [...state.modifiers, ...next.modifiers.slice(state.modifiers.length).map((modifier) => ({ ...modifier, when: area }))] };
   }

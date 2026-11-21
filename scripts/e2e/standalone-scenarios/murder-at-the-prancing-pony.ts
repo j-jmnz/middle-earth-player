@@ -1,0 +1,27 @@
+// The save fixtures of Murder at the Prancing Pony (standalone-scenarios cycle part 7), written into src/campaign/fixtures/murder-at-the-prancing-pony.json by scripts/e2e/fixtures.ts: real standalone games of saved decklists (the One Deck and
+// Defenders of Gondor lists of data/decks), two-handed, Easy, so each is one open game. `pony-won` is the first seed that wins, parked on the win (the outcome screen is one tap away); `pony-lost` the first that loses,
+// parked on the loss. A cycle has no log and no earlier part. A game not found in the seeds is left out.
+// The saved decklists are played with the auto-player's card play on; the scenario's own answers are the golden game's (test/scenarios/murder-at-the-prancing-pony/game.ts): the engagements, the quest commitment, the defenders, the attacks (the Suspects first), the accusation and every choice.
+import { nextIntent } from "../../../test/harness/auto-player.ts";
+import { ponyIntent } from "../../../test/scenarios/murder-at-the-prancing-pony/game.ts";
+import { createLog } from "../../log.ts";
+import { standaloneWonLost } from "../seed-kit.ts";
+
+const say = createLog("e2e-pony");
+
+export const ponyFixtures = async () =>
+  standaloneWonLost(
+    say,
+    "pony",
+    {
+      campaignId: "standalone-scenarios",
+      scenarioId: "murder-at-the-prancing-pony",
+      seatCount: 2,
+      answer: (state, ctx, memory) => {
+        const kind = state.window?.kind;
+        const own = kind === "choose" || kind === "optionalEngage" || kind === "playerAttack" || kind === "defense" || (kind === "pass" && state.mode === "questCommit");
+        return own ? ponyIntent(state, ctx, memory) : nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory);
+      },
+    },
+    "PONY_SEEDS",
+  );

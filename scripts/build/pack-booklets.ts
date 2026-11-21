@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { BOOKLETS, type BookletId } from "../../src/screens/booklets/books.ts";
 import { BOOKLET_PACK_DIR, DATA_DIR, PDF_CACHE_DIR } from "../data/paths.ts";
+import { mirrorFromEnv, mirrorReader } from "../data/mirror/client.ts";
 import { fetchBytes, sha256, type SourceRecord } from "../data/sources/fetch.ts";
 import { bytes, describeError, runScript, type Log } from "../log.ts";
 
@@ -33,11 +34,14 @@ export type PackBookletsOptions = {
   /** Gets each `<id>.pdf` and the `bundled-map.ts` that requires them; metro.config.js puts that map in place of the stub. */
   outDir: string;
   fetch?: (url: string) => Promise<Uint8Array>;
+  // The asset mirror, read before a pin's URL (scripts/data/mirror/client.ts, mirrorReader); null on a miss.
+  mirror?: (hash: string) => Promise<Uint8Array | null>;
 };
 
 /**
  * Copies each book's pinned PDF into the app's assets and writes the map the reader installs from. The `.cache/pdf` copy
- * is used when its hash matches the pin; otherwise the pinned URL is fetched (an EAS machine has no cache). Bytes that do
+ * is used when its hash matches the pin; otherwise the asset mirror's copy, then the pinned URL (a release machine has no
+ * cache), and the fetched PDF is kept in the cache. Bytes that do
  * not match the pin fail the build: run `pnpm data sync rules` to move the pin.
  */
 export async function packBooklets(options: PackBookletsOptions, log: Log): Promise<PackedBooklet[]> {
@@ -46,6 +50,7 @@ export async function packBooklets(options: PackBookletsOptions, log: Log): Prom
   const fetchPdf = options.fetch ?? ((url: string) => fetchBytes(url, 300_000, log));
   mkdirSync(options.outDir, { recursive: true });
   const packed: PackedBooklet[] = [];
+  const from = { cache: 0, mirror: 0, source: 0 };
   for (const { id } of BOOKLETS) {
     const file = BOOKLET_SOURCES[id];
     const pin = files.find((entry) => entry.path === `pdf/${file}`);
@@ -55,18 +60,24 @@ export async function packBooklets(options: PackBookletsOptions, log: Log): Prom
     const cached = path.join(options.pdfCacheDir, file);
     if (existsSync(cached) && sha256(readFileSync(cached)) === pin.sha256) {
       copyFileSync(cached, target);
+      from.cache += 1;
       log.debug(`${id}: ${file} from the cache`);
     } else {
-      log.info(`${id}: ${file} not in the cache at its pin, fetching ${pin.url}`);
-      const body = await fetchPdf(pin.url);
+      const mirrored = await options.mirror?.(pin.sha256);
+      if (!mirrored) log.info(`${id}: ${file} not in the cache at its pin, fetching ${pin.url}`);
+      const body = mirrored ?? (await fetchPdf(pin.url));
+      from[mirrored ? "mirror" : "source"] += 1;
       const hash = sha256(body);
       if (hash !== pin.sha256) throw new Error(`${pin.url} has sha256 ${hash}, pinned ${pin.sha256}. Run pnpm data sync rules and check the change.`);
       writeFileSync(target, body);
+      mkdirSync(options.pdfCacheDir, { recursive: true });
+      writeFileSync(cached, body);
     }
     packed.push({ id, filename, bytes: pin.bytes, sha256: pin.sha256 });
   }
   writeBookletMap(path.join(options.outDir, "bundled-map.ts"), packed);
-  log.info(`packed ${packed.length} booklets (${bytes(packed.reduce((sum, book) => sum + book.bytes, 0))}) into ${options.outDir}; the next Metro bundle carries them`);
+  log.notice(`packed ${packed.length} booklets (${bytes(packed.reduce((sum, book) => sum + book.bytes, 0))}): ${from.cache} from .cache, ${from.mirror} from the mirror, ${from.source} from their sources`);
+  log.info(`wrote ${options.outDir}; the next Metro bundle carries them`);
   return packed;
 }
 
@@ -83,7 +94,7 @@ function writeBookletMap(mapPath: string, packed: readonly PackedBooklet[]): voi
 
 /** Packs from this checkout's pins and PDF cache into `assets/booklets`. `data sync rules` runs it after a fetch. */
 export function packBookletsHere(log: Log): Promise<PackedBooklet[]> {
-  return packBooklets({ sourcesPath: path.join(DATA_DIR, "sources.json"), pdfCacheDir: PDF_CACHE_DIR, outDir: BOOKLET_PACK_DIR }, log);
+  return packBooklets({ sourcesPath: path.join(DATA_DIR, "sources.json"), pdfCacheDir: PDF_CACHE_DIR, outDir: BOOKLET_PACK_DIR, mirror: mirrorReader(mirrorFromEnv(), log) }, log);
 }
 
 function isDirectRun(): boolean {

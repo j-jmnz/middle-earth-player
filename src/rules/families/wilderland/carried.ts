@@ -1,7 +1,9 @@
-// Rules: rr.player-elimination, rr.ownership-and-control, rr.guarded (data/rules/entries.json); ledger lines 18074:A:1, 18074:B:1, 18074:B:2, 18074:B:3.
+// Rules: rr.player-elimination, rr.ownership-and-control, rr.guarded (data/rules/entries.json); ledger lines 18074:A:1, 18074:B:1, 18074:B:2, 18074:B:3, 50815:A:2.
 // Carried Away: an enemy guards a hero. The hero is in play, facedown under the enemy and controlled by no one (the captive zone the Ring-bearer under the Watcher uses, families/south/captive.ts), flagged `guardedHero` so its
 // owner is not eliminated for want of heroes (core/eliminate.ts eliminateEmpties). The enemy that guards it is the card the hero lies under.
 import { releaseAttachments } from "../../core/keywords.ts";
+import { shuffleIds } from "../../core/seed.ts";
+import { stageNumber } from "../caves/progress.ts";
 import { eliminateEmpties } from "../../core/eliminate.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -17,8 +19,8 @@ export function heroGuardedBy(state: ScenarioState, enemyId: string): string | n
   return Object.values(state.cards).find((card) => card.guardedHero === true && card.zone === "captive" && card.host === enemyId)?.id ?? null;
 }
 
-/** CarryAwayHero: the hero picked before the last card (the enemy just discarded and added to the staging area) loses its tokens and attachments and lies under the enemy. Nothing happens when no enemy came or the hero is not a hero in play. */
-export function carryAwayHero(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+/** CarryAwayHero: the hero picked before the last card (the enemy just discarded and added to the staging area) loses its tokens and attachments (`keepAttachments`: its tokens only) and lies under the enemy. Nothing happens when no enemy came or the hero is not a hero in play. */
+export function carryAwayHero(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], keepAttachments = false): ScenarioState {
   const picked = pickedList(state);
   const enemyId = picked.at(-1);
   const heroId = picked.at(-2);
@@ -26,6 +28,8 @@ export function carryAwayHero(state: ScenarioState, ctx: ReduceContext, steps: E
   const hero = heroId ? state.cards[heroId] : undefined;
   if (!enemyId || !heroId || !enemy || !hero || hero.zone !== "heroes" || hero.controller == null || !inPlay(enemy.zone) || printedOf(ctx.cards, enemy.code).type !== "enemy") return state;
   const held = heldFrom(state, heroId);
+  // `keepAttachments` (51008:B:1): the attachments stay attached, faceup, with the hero under the enemy.
+  if (keepAttachments) return updateCard(captureHero(state, heroId, enemyId, { attachmentsDown: false, keepTokens: false }), heroId, { guardedHero: true, committed: false, ...held });
   const bare = releaseAttachments(state, heroId, ctx.cards, steps);
   return updateCard(captureHero(bare, heroId, enemyId), heroId, { guardedHero: true, committed: false, ...held });
 }
@@ -51,4 +55,40 @@ export function discardGuardedHeroes(state: ScenarioState, steps: EngineStep[]):
     next = updateCard(moveCard(next, card.id, { zone: "discard", seat: card.owner }), card.id, { face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined });
   }
   return next === state ? state : eliminateEmpties(next, steps);
+}
+
+// The heroes lying facedown under the current quest stage while it is stage number `stage` (the Siege's Epic stage 3 holds the captives Enemy Camp guards, 50815:A:2).
+function heldUnderStage(state: ScenarioState, stage: number): string[] {
+  const id = state.questStage;
+  if (!id || stageNumber(state) !== stage) return [];
+  return Object.values(state.cards).filter((card) => card.guardedHero === true && card.zone === "captive" && card.host === id).map((card) => card.id);
+}
+
+/** DiscardHeldHero: one of the heroes under the stage, chosen with the seed, goes to its owner's discard pile; a player with no hero left is eliminated. */
+export function discardHeldHero(state: ScenarioState, stage: number, steps: EngineStep[]): ScenarioState {
+  const held = heldUnderStage(state, stage);
+  if (held.length === 0) return state;
+  const shuffled = shuffleIds(held, state.seed, state.seedCursor);
+  const chosen = state.cards[shuffled.ids[0] ?? ""];
+  if (!chosen || chosen.owner == null) return state;
+  const moved = updateCard(moveCard({ ...state, seedCursor: shuffled.cursor }, chosen.id, { zone: "discard", seat: chosen.owner }), chosen.id, { face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined });
+  return eliminateEmpties(moved, steps);
+}
+
+/** ReturnHeldHeroes: each hero under the stage returns to its owner's control where it was, as a guarded hero released by a defeated enemy does (releaseGuardedHero). */
+export function returnHeldHeroes(state: ScenarioState, stage: number): ScenarioState {
+  let next = state;
+  for (const id of heldUnderStage(state, stage)) {
+    const hero = next.cards[id];
+    if (!hero || hero.owner == null) continue;
+    const seat = hero.owner;
+    if (next.seats[seat]?.eliminated) {
+      next = updateCard(moveCard(next, id, { zone: "discard", seat }), id, { face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined });
+      continue;
+    }
+    const slot = hero.heroSlot;
+    const released = releaseHero(next, id, seat, { exhausted: true, face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined, host: null });
+    next = slot == null ? released : backInPlace(released, seat, id, slot);
+  }
+  return next;
 }

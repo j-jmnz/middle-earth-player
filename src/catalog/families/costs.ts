@@ -6,6 +6,7 @@ import type { CatalogFamily } from "../family-manifest.ts";
 import { amountSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const icon = z.enum(["leadership", "tactics", "spirit", "lore"]);
 // The sphere a spent resource may be: an icon, or Fellowship ("Spend 1 Fellowship resource to travel here", 144020:A:3).
@@ -49,11 +50,12 @@ const VERBS = [
   // The actor spends this many resources from heroes with a matching icon (`sphere`; the source's sphere by default), choosing
   // a hero for each resource: their own heroes, or (`group`) any player's ("the players as a group may spend 2 Leadership
   // resources"). With fewer resources than that, nothing is spent: an option that spends names the `resources` condition.
-  // `paid` is engine use: the pools chosen so far, one entry per resource.
-  z.strictObject({ verb: z.literal("SpendResources"), amount: z.number().int().positive(), sphere: spendIcon.optional(), group: z.boolean().optional(), paid: z.array(z.string()).optional(), ...when }),
+  // `paid` is engine use: the pools chosen so far, one entry per resource. `target`: the resources come from that card's own pool, nobody chooses ("spend 1 resource from that hero's pool", 04016:A:1); a pool with fewer spends nothing.
+  z.strictObject({ verb: z.literal("SpendResources"), amount: z.number().int().positive(), target: z.enum(["picked", "subject", "host", "self"]).optional(), sphere: spendIcon.optional(), group: z.boolean().optional(), paid: z.array(z.string()).optional(), ...when }),
   // Each hero the actor (or the picked player) controls gains `amount` resources; with `unspent`, only each one that did not
   // spend a resource this round.
-  z.strictObject({ verb: z.literal("HeroesGainResources"), amount: positiveAmountSchema, who: z.enum(["actor", "picked"]).optional(), unspent: z.boolean().optional(), ...when }),
+  // Setup, in a top-level ForEachPlayer: "Each player adds 1 resource to each of his heroes' resource pools" (51201:A:1).
+  verbFlags(z.strictObject({ verb: z.literal("HeroesGainResources"), amount: positiveAmountSchema, who: z.enum(["actor", "picked"]).optional(), unspent: z.boolean().optional(), ...when }), { setupRuns: "inForEachPlayer" }),
   // The actor plays a card from their hand now, as part of the effect (a play: it is paid for and announced as played). The
   // card matches `pick` and can be played under these terms: `free` costs nothing; `reduce` lowers the cost, not below `min`;
   // `noMatch` needs no resource match; `onSelf` plays an attachment on the source. `picked`: each card the effect has picked
@@ -95,7 +97,8 @@ const TRIGGERS = ["attached", "resourcesSpent"] as const;
 // Resource icons a card has while it holds the flag (amount 1): "Amarthiúl gains the Tactics resource icon", "give attached
 // hero a Leadership icon until the end of the phase". `collectsResources`: a card that is not a hero collects this many
 // resources each resource phase (rr.step-1-2) into its own pool. `engagementCheckCost`: an enemy gets this much more
-// engagement cost while it makes an engagement check with the player who controls the modifier's source (Orc Disguise).
-const FLAGS = ["leadershipIcon", "loreIcon", "tacticsIcon", "spiritIcon", "collectsResources", "engagementCheckCost"] as const;
+// engagement cost while it makes an engagement check with the player who controls the modifier's source (Orc Disguise). `losesIcons`: on a hero, it has none of its Lore, Leadership, Spirit and
+// Tactics icons, printed or gained ("all ready heroes lose all Lore, Leadership, Spirit and Tactics icons", 50321:A:1); read by iconLost (rules/families/costs/pay.ts).
+const FLAGS = ["leadershipIcon", "loreIcon", "tacticsIcon", "spiritIcon", "collectsResources", "engagementCheckCost", "losesIcons"] as const;
 
 export const manifest = { name: "costs", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

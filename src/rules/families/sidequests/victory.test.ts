@@ -9,7 +9,7 @@ import { modifiedStat } from "../../core/keywords.ts";
 import { stagingThreat } from "../../quest/quest.ts";
 import { reduce } from "../../engine/reduce.ts";
 import { updateCard } from "../../core/state.ts";
-import { inVictory, play, put, questArea, seat, sideCtx, synced, toVictory } from "./fixture.ts";
+import { inVictory, play, put, stagedQuest, seat, sideCtx, synced, toVictory } from "./fixture.ts";
 import { defeatSideQuest } from "./quest.ts";
 import { addToVictory } from "./victory.ts";
 
@@ -19,7 +19,7 @@ describe("the copies a card limits in the victory display", () => {
   it("Rally the West holds one copy: a second one defeated goes to its owner's discard pile (17087:A:1)", () => {
     const table = seat(1, ["dwarf", "rohan"]);
     const first = inVictory(table.state, "17087", ctx);
-    const second = questArea(first.state, "17087");
+    const second = stagedQuest(first.state, "17087");
     const state = defeatSideQuest(updateCard(second.state, second.id, { progress: 6 }), second.id, ctx, []);
     expect(state.victory).toEqual([first.id]);
     expect(state.cards[second.id]?.zone).toBe("discard");
@@ -44,7 +44,7 @@ describe("a side quest in the victory display", () => {
   it("Rally the West gives each hero +1 Willpower, only from there (17087:A:1)", () => {
     const table = seat(2, ["dwarf", "rohan"]);
     const base = modifiedStat(table.state, table.state.cards[table.heroes[0] ?? ""]!, "willpower", ctx.cards);
-    const waiting = questArea(table.state, "17087");
+    const waiting = stagedQuest(table.state, "17087");
     const before = synced(waiting.state, ctx);
     for (const id of table.heroes) expect(modifiedStat(before, before.cards[id]!, "willpower", ctx.cards)).toBe(base);
     const shown = inVictory(table.state, "17087", ctx).state;

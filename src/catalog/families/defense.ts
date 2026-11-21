@@ -30,9 +30,12 @@ const VERBS = [
   }),
   // Discards a shadow card dealt to the enemy (`target`, the picked one by default): a facedown one if it has any. With `all`, each shadow card dealt to it ("discard each shadow card from that enemy", 10192:A:1).
   z.strictObject({ verb: z.literal("DiscardShadowOf"), target: cardRefSchema.optional(), all: z.literal(true).optional(), ...when }),
+  // The damage this attack deals beyond the remaining hit points of the character it damages must be assigned to the card in play with this title, wherever it lies, instead of staying lost: "Excess damage dealt by this attack must be assigned to Arwen Undómiel" (901407:A:2; rr.damage). An undefended attack has
+  // no excess. A Shadow effect: it is read as the damage is dealt, in families/defense/excess.ts.
+  z.strictObject({ verb: z.literal("ExcessToCard"), name: z.string().min(1), ...when }),
   // Deals the enemy (`target`) one more shadow card from the encounter deck ("deal the attacking enemy another shadow card"):
-  // during its attack it resolves after the ones it has.
-  z.strictObject({ verb: z.literal("DealShadowTo"), target: cardRefSchema, ...when }),
+  // during its attack it resolves after the ones it has. `from: encounter`: the card comes from the encounter deck even for an enemy that is dealt from another deck ("from the encounter deck (not the Balrog deck)", 901806:A:1).
+  z.strictObject({ verb: z.literal("DealShadowTo"), target: cardRefSchema, from: z.literal("encounter").optional(), ...when }),
   // Shows the actor a facedown shadow card dealt to the enemy (`target`, the picked one by default). `markEffect`: the effect's X
   // becomes 1 when that card has a shadow effect, else 0 ("If that card has a shadow effect, ~ gets +2 Defense").
   z.strictObject({ verb: z.literal("LookAtShadow"), target: cardRefSchema.optional(), markEffect: z.boolean().optional(), ...when }),
@@ -107,6 +110,8 @@ const TRIGGERS = [
 ] as const;
 
 const FLAGS = [
+  // On an enemy: the damage a player card's effect would place on it is not placed ("While The Watcher is in the staging area, it cannot be damaged by player card effects", 901502:A:1). The damage of a character's attack, and the damage an encounter card's effect deals, are.
+  "noPlayerEffectDamage",
   // Damage assigned to the holder goes to the host of the modifier's source instead ("attached hero takes all damage assigned
   // to the chosen hero").
   "damageToSourceHost",
@@ -129,6 +134,11 @@ const FLAGS = [
   // On an enemy: the combat damage its attack deals beyond the remaining hit points of the character it damages is assigned as an
   // increase to its controller's threat (Hill Troll, 01082:A:1). The damage still goes on the character.
   "excessToThreat",
+  // On an enemy: each point of the combat damage its attack deals beyond the remaining hit points of the character it damages is 1 damage the defending player assigns to another character he controls, once the attack ends (Cave-troll, 03020:A:1; families/defense/excess.ts).
+  "excessToDamage",
+  // On an enemy: each point of damage its attack places on a character raises the defending player's threat by 1 ("Each damage dealt by Wainriders raises the defending player's threat by 1", 00004:A:1). The player the attack is against is the
+  // defending player even when another player's Sentinel character defended; damage canceled or shielded is not dealt, and a shadow card's damage is not this enemy's attack.
+  "damageToThreat",
   // The holder does not exhaust to defend against enemies with the Trait of the modifier's `when` (`defendingAgainst`): "Grimbeorn the Old does not exhaust to defend against Troll enemies" (02037:A:1).
   "noExhaustDefendVersus",
   // On an enemy: its Defense cannot be reduced, whatever lowers it (900506:A:1); increases still count.

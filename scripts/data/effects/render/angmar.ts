@@ -22,10 +22,16 @@ export const ANGMAR_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Mad
       read: ["from", "count", "card", "who", "to"],
     };
   },
-  ResolveWhenRevealedOf: (i) => ({
-    text: i.of === "heldShadows" ? `the "when revealed" effects of each ${str(i.trait)} shadow card dealt to this enemy resolve, in the order dealt, the defending player revealing them (after the shadow effects)` : i.of === "looked" ? `the "when revealed" effects of each ${str(i.trait)} card this effect discarded from the top of the encounter deck resolve, in the order discarded, the acting player revealing them` : `the "when revealed" effects of the ${str(i.trait)} cards named by ${str(i.of)} resolve`,
-    read: ["of", "trait"],
-  }),
+  ResolveWhenRevealedOf: (i) => {
+    const titled = typeof i.name === "string";
+    return {
+      text: i.of === "heldShadows" ? `the "when revealed" effects of each ${titled ? `shadow card titled ${str(i.name)}` : `${str(i.trait)} shadow card`} dealt to this enemy resolve, in the order dealt, the defending player revealing them (after the shadow effects)` : i.of === "looked" ? `the "when revealed" effects of each ${titled ? `copy of ${str(i.name)}` : `${str(i.trait)} card`} this effect discarded from the top of the encounter deck resolve, in the order discarded, the acting player revealing them` : `the "when revealed" effects of the ${titled ? str(i.name) : str(i.trait)} cards named by ${str(i.of)} resolve`,
+      read: ["of", "trait", "name"],
+    };
+  },
   DealSourceAsShadow: () => ({ text: "this card, out of play, is dealt facedown as a shadow card to the card the effect picked last, an enemy in play (with no progress or damage on it; nothing when no enemy is picked)", read: [] }),
-  AttachEnemyToPicked: () => ({ text: "this enemy, out of play, attaches to the picked card as an attachment: it has no enemy text there and returns to the staging area as an enemy when that card leaves play", read: [] }),
+  AttachEnemyToPicked: (i) => ({
+    text: `${i.returns === "discard" ? "this enemy" : "this enemy, out of play,"} attaches to ${i.to === "other" ? "the event's other card (the defending character, when there was one and it is still in play)" : "the picked card"} as an attachment: it has no enemy text there and ${i.returns === "discard" ? "is discarded to the encounter discard pile with it when that card leaves play (it is no enemy while it lies there)" : "returns to the staging area as an enemy when that card leaves play"}`,
+    read: ["to", "returns"],
+  }),
 };

@@ -43,7 +43,6 @@ export type ZoneName =
   | "play"
   | "engaged"
   | "seatStaging"
-  | "seatQuest"
   | "staging"
   | "activeLocation"
   | "secondActiveLocation"
@@ -74,6 +73,8 @@ export type ZoneName =
   // The Hard/Expert Mode card next to the quest deck, on the side the players chose (dcce.hard-expert): in play all game. A zone of its own, so
   // nothing that reads the Nightmare setup card reads it.
   | "modeCard"
+  // The Night objective beside the current quest (docs/brief.md, The Stone of Erech): in play, controlled by nobody, one card at a time (families/erech/).
+  | "nightObjective"
   // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by nobody; the host is the Watcher.
   | "captive"
   // Out of play, facedown, under no player's control, still owned (`CardInstance.owner`): a card captured underneath another card (the host), or in a player's captured deck (no host, listed in `Seat.captured`; mec108.captured-cards, mec108.captured-deck).
@@ -96,9 +97,6 @@ export type CardInstance = {
   host: string | null;
   attachments: readonly string[];
   committed: boolean;
-  // The side quest a committed character quests on instead of the current quest (families/sidequests/quest.ts). Absent for the
-  // current quest.
-  questTo?: string;
   shadowId: string | null;
   // Shadow cards dealt beyond the first ("deal it an additional shadow card", 141069:A:2), in the order dealt. Absent
   // when there are none.
@@ -127,14 +125,28 @@ export type CardInstance = {
   heroSlot?: number;
   // A hero an enemy guards (Carried Away, 18074:A:1): in play, facedown under the guard (the captive zone), controlled by no one. Its owner stays in the game while it is held (families/wilderland/carried.ts); `owner` is the seat that gets it back.
   guardedHero?: true;
+  // A player card an encounter card holds faceup under it as a guarded objective (Carried Away's allies, a card under Necromancer's Pass, families/wizards-quest/held.ts): no copy of its title can be played or put into play while it lies there.
+  heldTitle?: true;
+  // With `heldTitle`: the title cannot be put into play either (Narrow Paths' guarded attachments, 51205:B:1: "cannot play or put into play").
+  heldPutting?: true;
+  // With `heldTitle`: the card returns to its owner's control in play, exhausted, when its holder leaves play (Goblin Dungeon's ally, 51340:A:1), not to the hand.
+  heldExhausted?: true;
+  // A card the encounter deck found and Hidden Threat placed facedown under the main quest (families/wizards-quest/hidden.ts, 51241:A:1): it is revealed after the next time the players quest successfully. The number is the order it was placed in.
+  hiddenAt?: number;
   // A Captive of The Uruk-hai (families/captives): a hero faceup in the captive zone under To Isengard! or an enemy, in play, controlled by nobody. `owner` is the seat it belongs to, `heroSlot` its place among that seat's heroes.
   captive?: true;
   // A player card an enemy holds, faceup: under it (Hobgoblin, 18050:A:2) or attached to it (a boon Shagrat guards, 146069:B:1). It returns to its owner's hand once the holder is out of play (families/wilderland/kings.ts returnHeld). Set by GuardWithDeckTop and GuardWithSetAside.
   held?: true;
+  // With `held`: the card is discarded, not returned to the hand, when its holder leaves play (Nameless Thing, 51351:A:1). Set by GuardWithDeckTop `discards`.
+  heldDiscard?: true;
   // The damage on a card set aside "out of play (Do not remove damage tokens from it)" (Cold-Drake, 19024:A:1) stays on it as it enters play again. Set only by SetAsideInPlay with keepDamage.
   keepsDamage?: true;
   // An enemy attached to a character as an attachment (Wraith of Carn Dûm, 101157:A:1): it has no enemy text while it lies there, hears no leaving of play, and returns to the staging area as an enemy when its host leaves play (families/angmar/reanimate/attached.ts).
-  asAttachment?: true;
+  // A card of the Investigation deck a look window has shown (families/investigation/look.ts): the Investigation List marks its name as checked off. The card stays facedown; nothing but the list reads it.
+  seen?: true;
+  asAttachment?: true | "discard";
+  // A player card lying faceup on an enemy as an attachment with no title and no game text, taken from the top of a deck (Nameless Thing, families/nameless): its printed cost is its only active part. Set only by AttachDeckTop, and cleared once the card has left the enemy.
+  nameless?: true;
   // The enemy Lost in Mirkwood's stage 4A named the nemesis, until it leaves play (18076:A:1, families/wilderland/nemesis.ts).
   nemesis?: true;
   // An objective a player claimed and attached to a hero: when it leaves that hero it returns to the staging area, uncontrolled
@@ -149,7 +161,7 @@ export type CardInstance = {
   carried?: true;
   // The named deck the card was dealt into, when that deck has a discard pile of its own (core/piles.ts): the card goes back to that discard pile, not the encounter discard pile, when it
   // leaves play (emce.evil-creatures-deck). Absent on every other card.
-  deck?: "evilCreatures";
+  deck?: "evilCreatures" | "balrog" | "smaug";
 };
 
 export type Seat = {
@@ -163,9 +175,7 @@ export type Seat = {
   // This seat's own staging area, once stage 2B has created the separate areas (`ScenarioState.separate`): the ids of its encounter cards, a
   // subset of `ScenarioState.staging`, which keeps every staging card in any area (families/breaking/areas.ts).
   staging: readonly string[];
-  // The seat's player side quest (zone seatQuest), not a stage of the scenario's quest.
-  questStage: string | null;
-  // The seat's own quest stage while stages are separate (the stage 3 and 4 cards, zone questStage); `ScenarioState.questStage` is then null.
+  // The seat's own quest stage while stages are separate (the stage 3 and 4 cards, zone questStage); `ScenarioState.questStage` is then null, unless a stage no player is at is parked in it (Fog on the Barrow-downs, `parkedStage`).
   // Absent in every other game (families/breaking/areas.ts).
   stage?: string;
   // The seat's own active location while stages are separate (the card, zone activeLocation); `ScenarioState.activeLocation` and `secondActiveLocation` then mirror the
@@ -311,6 +321,10 @@ export type ScenarioState = {
   // Stage 2B has created a staging area and a quest stage for each seat (`Seat.staging`, `Seat.stage`; families/breaking/areas.ts). Absent
   // in every other game and until then.
   separate?: true;
+  // The heroes a card shuffled into their owners' decks (Lost and Alone, 04124:A:1): each is put into play when its owner draws it, and its seat is not out of heroes while it waits (families/deck/hero.ts). Absent in every game that shuffles none.
+  heroesInDeck?: readonly string[];
+  // The areas are isolated outside Escape from Mount Gram too: set while a player of Fog on the Barrow-downs is trapped at a stage of his own, so "each player", "the first player", "in play" and a player card's Doomed read the area (`isolatedAreas`, families/breaking/areas.ts). Dropped when the areas combine into one. Absent otherwise.
+  isolated?: true;
   // Only on a seat's view of the state (families/breaking/areas.ts viewOf): the seat it is the view of. mergeView drops it.
   viewSeat?: number;
   // The seats whose stage has dealt its archery this combat phase while stages are separate (machine.ts startCombat).
@@ -328,9 +342,12 @@ export type ScenarioState = {
   // The seats that have had their travel opportunity this round while stages are separate: each seat in player order may travel to a location of its own
   // staging area (machine.ts, travel.ts).
   travelDone?: readonly number[];
+  // The seats whose own quest phase ended this round while stages are separate ("End your quest phase (do not resolve the quest)", 148004:A:1): no more cards are revealed for them and their quest is not resolved
+  // (quest/stage-reveal.ts resolveSeparate, which drops the list once every other seat has resolved). Absent otherwise.
+  questEnded?: readonly number[];
   // Progress a stage 3B turned into cards to discard from the encounter deck, until the progress step is over (families/breaking/progress.ts).
   progressOwed?: readonly { seat: number; amount: number }[];
-  stages: readonly { code: string; branch?: readonly string[]; look?: number; catchUp?: number; randomNext?: { codes: readonly string[]; otherwise?: string; remove?: true }; deck?: true }[];
+  stages: readonly { code: string; branch?: readonly string[]; look?: number; catchUp?: number; randomNext?: { codes: readonly string[]; otherwise?: string; remove?: true; different?: true }; attachedNext?: { code: string; then: string; otherwise: string }; deck?: true }[];
   // The part number of the scenario's campaign card, in a campaign with XP (the amount `part`), and the campaign Setup instructions that resolve once the
   // quest card's Setup is done (ScenarioDefinition.afterSetup).
   part?: number;
@@ -380,11 +397,17 @@ export type ScenarioState = {
   pendingAttack: PendingAttack | null;
   // The round the first player was asked whether a side quest is the current quest (families/wilderland/night.ts); kept only in a game with encounter side quests.
   sideAsked?: number;
+  // The round the first player chose where the next Smaug goes (families/smaug/deck.ts); kept only in a game with a Smaug deck.
+  smaugAsked?: number;
   // The game deals encounter side quests in its encounter deck, not in a side quest deck of its own (Intruders in Chetwood, mec108.side-quests): the side quest reads of families/wilderland/night-quest.ts apply. Set at the start (markSideQuests), absent in every other game.
   sideQuests?: true;
   // The game has a card that asks whether progress was placed on a side quest this round ("if no progress was placed on Lie Low this round", 10081:A:1): the engine notes each placement as `progressPlacedHere` (families/angmar/progress.ts). Set at the start (markProgressNoted), absent in every other game.
   progressNoted?: true;
+  // The codes of the cards whose Forced effect hears `progressWouldBePlaced` (Twisting Passage, 04092:A:1): progress that would be placed on one of them in play waits for that effect (families/long-dark/hold.ts). Set at the start, absent in every other game.
+  progressHeldBy?: readonly string[];
   pendingStrike: PendingStrike | null;
+  // The seats whose threat was below 1 when the combat phase began, kept only in a game with an enemy that is considered engaged by threat (Durin's Bane, families/south/watcher.ts noteBelowThreat): an attack by it on such a seat is dealt no shadow card.
+  belowThreat?: readonly number[];
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];
   // The cards in play that hear their own leaving by any route (`exitedPlay`); settle announces one once it is out of play (families/island/hand.ts). Kept only in a game with such a card.
@@ -395,6 +418,10 @@ export type ScenarioState = {
   // Set while some card in play or in a hand can answer damage just dealt ("cancel X damage just dealt"): a character's lethal
   // damage then waits for those Responses before it destroys the character (settle keeps it current).
   holdLethal?: true;
+  // The codes of the enemies dealt whose own Forced effect hears the damage dealt to them ("Before Patrol Leader is dealt damage, ...", 03014:A:1): the damage step offers them `damageDealt` like a character's. Absent in every other game (families/encounter/patrol.ts).
+  enemyDamageHeard?: readonly string[];
+  // The picks that span seats name the owner on each row of their sheet, as in the side quest games: a Setup line has the first player pick a hero of any player (Entering the Mines, 03064:A:1; families/encounter/seated.ts). Absent in every other game.
+  seatedRows?: true;
   // The Setup lines of the players' heroes and contracts have been pushed (families/sidequests/setup.ts).
   playerSetup?: true;
   // The loot decks (The Burglar's Turn, 22024): the cards each seat chose at deckbuilding (`lootPlan`, codes), and the ids of the
@@ -447,6 +474,10 @@ export type ScenarioState = {
   // The Embassy from the Dark Tower (146072:B:1, families/black-gate/embassy.ts): the player cards placed faceup in front of the players and the encounter cards placed faceup (all lie set aside, faceup, while the Embassy lasts), the pairs made in the order they were
   // paired, and how many pairs the running effect has taken (`at`: the pair it is on is `pairs[at - 1]`). Kept from EmbassyDeal to EmbassyEnd.
   embassy?: { readonly players: readonly string[]; readonly encounter: readonly string[]; readonly pairs: readonly { readonly player: string; readonly encounter: string }[]; readonly at: number };
+  // The Siege values of the enemies destroyed and the locations explored in `round` (TallySiege, families/wilderland/dolguldur.ts), for Dol Guldur's city strength. Kept only in a game with such a card; a tally of an earlier round counts as 0.
+  siegeTally?: { round: number; value: number };
+  // A card of the game holds a player card under it (HoldPickedUnder, families/wizards-quest/held.ts): the settle sweep that gives held cards back runs only then.
+  heldCards?: true;
   // The stage the quest left when it advanced to `to` past stages that were never played (AdvanceToStage, families/quest/branch.ts noteSkippedStage): "After a quest card is defeated" names it.
   stageLeft?: { to: string; from: string; bypassed?: true };
   // Escape from Mount Gram's captured cards (families/captured/): the Capture X each card prints by code, the codes that are "in each player's staging area" and the cards of those codes now in play (`here`), the rescue the running

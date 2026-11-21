@@ -17,16 +17,33 @@ import { lastPicked, seatsFor } from "../../interpret/player-verbs.ts";
 import { matchesPick } from "../../interpret/pick.ts";
 import type { PendingAttack, ScenarioState } from "../../core/state.ts";
 import { flagged, livingSeats } from "../../core/state.ts";
+import { shadowCards } from "../../core/zones.ts";
 import { discardResolvedShadowOf, discardShadowOf } from "../../combat/shadow.ts";
 import { patchTop } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
 import { effectData } from "../encounter/moves.ts";
 import { activeLocations } from "./locations.ts";
 
-// An enemy in the staging area that is considered engaged with each player (the Watcher in the Water), or with the first player only (the
-// Balrog, `engagedWithFirst`, 142044:A:2): it stays in the staging area and attacks from there.
+// An enemy in the staging area that is considered engaged with each player (the Watcher in the Water), with the first player only (the
+// Balrog, `engagedWithFirst`, 142044:A:2) or with each player whose threat is 1 or greater (Durin's Bane, `engagedWithThreatening`, 04150:A:2): it stays in the staging area and attacks from there.
 export function engagedWithAll(state: ScenarioState, id: string): boolean {
-  return state.cards[id]?.zone === "staging" && (flagged(state, id, "engagedWithAll") || flagged(state, id, "engagedWithFirst"));
+  return state.cards[id]?.zone === "staging" && (flagged(state, id, "engagedWithAll") || flagged(state, id, "engagedWithFirst") || flagged(state, id, "engagedWithThreatening"));
+}
+
+// Durin's Bane: considered engaged with a seat while its threat is 1 or greater, read live (04150:A:2, dwd.durins-bane).
+export function engagedWithThreatening(state: ScenarioState, id: string, seat: number): boolean {
+  return state.cards[id]?.zone === "staging" && flagged(state, id, "engagedWithThreatening") && (state.seats[seat]?.threat ?? 0) >= 1 && state.seats[seat]?.eliminated !== true;
+}
+
+// The combat phase begins: the seats whose threat is below 1 are noted when an enemy that is engaged by threat is in the staging area. A seat raised to 1 later in the phase is attacked too, with no shadow card dealt for the attack (dwd.durins-bane; docs/brief.md, Shadow and Flame). The note is cleared when no such enemy is in the staging area at the next combat phase; every other game's state stays as it was.
+export function noteBelowThreat(state: ScenarioState): ScenarioState {
+  if (state.modifiers.length === 0 || !state.staging.some((id) => flagged(state, id, "engagedWithThreatening"))) {
+    // The enemy has left the staging area: the seats noted for an earlier combat phase no longer apply.
+    if (state.belowThreat === undefined) return state;
+    const { belowThreat: _noted, ...rest } = state;
+    return rest;
+  }
+  return { ...state, belowThreat: livingSeats(state).filter((seat) => (state.seats[seat]?.threat ?? 0) < 1) };
 }
 
 // An enemy in the staging area that attacks, in the combat phase, each player who has an enemy engaged that relays its attack (`attacksViaRelay` on the Thing in the Depths, `relaysAttack` on Eye of the
@@ -42,7 +59,7 @@ function relayedTo(state: ScenarioState, seat: number): boolean {
 // Whether the enemy in the staging area is considered engaged with this seat: every seat for the Watcher, the first player for the Balrog, the seats with a relaying enemy engaged for the Thing.
 function engagedWithSeat(state: ScenarioState, id: string, seat: number): boolean {
   if (state.cards[id]?.zone !== "staging") return false;
-  return flagged(state, id, "engagedWithAll") || (flagged(state, id, "engagedWithFirst") && seat === state.firstPlayer) || (viaRelay(state, id) && relayedTo(state, seat));
+  return flagged(state, id, "engagedWithAll") || (flagged(state, id, "engagedWithFirst") && seat === state.firstPlayer) || engagedWithThreatening(state, id, seat) || (viaRelay(state, id) && relayedTo(state, seat));
 }
 
 // The enemy is where it can attack from: engaged, in the staging area but considered engaged with every player, or in the staging area
@@ -65,8 +82,14 @@ export function stagingAttackers(state: ScenarioState, seat: number): string[] {
 }
 
 // An enemy that is not engaged is dealt a shadow card of its own when it attacks; one dealt for an earlier attack is discarded first.
-export function dealForAttack(state: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
+// Durin's Bane: a card already dealt and not turned up belongs to the attack being made (an immediate attack dealt it first), so no second one is dealt; a seat that was below threat 1 when the combat phase began is attacked with no shadow card (`seat`, noteBelowThreat).
+export function dealForAttack(state: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext, seat?: number): ScenarioState {
   if (state.cards[enemyId]?.zone === "engaged") return state;
+  if (state.modifiers.length > 0 && flagged(state, enemyId, "engagedWithThreatening")) {
+    if (shadowCards(state.cards[enemyId]).some((id) => state.cards[id]?.face !== "up")) return state;
+    const raised = seat != null && state.phase === "Combat" && (state.belowThreat ?? []).includes(seat);
+    return raised ? discardShadowOf(state, enemyId) : dealOneShadow(discardShadowOf(state, enemyId), enemyId, steps, ctx);
+  }
   // Stage 1B of The Battle of Carn Dûm keeps the shadow cards dealt (10125:B:2): the enemy is dealt one more and all the facedown ones resolve; one an earlier attack turned up is discarded first, not resolved again.
   if (state.modifiers.length > 0 && flagged(state, "table", "keepShadowCards")) return dealAdditionalShadow(discardResolvedShadowOf(state, enemyId), enemyId, steps, ctx);
   // Thaurdir on stage 2B: the shadow cards he holds as his first attack begins resolve with it and go after it; each later attack is dealt and discards a card of its own (10126:B:1, rr.step-6-4-2).
@@ -90,12 +113,12 @@ export function attackFromStaging(state: ScenarioState, instruction: Extract<Ins
   const seat = instruction.who === "firstPlayer" ? state.firstPlayer : instruction.who === "eventSeat" ? seatsFor(state, "eventSeat", focus.seat)[0] : focus.seat;
   if (seat == null) return state;
   // "Undefended damage from this attack must be dealt to Hrogar's Hill" (19081:A:1): the main quest card takes it.
-  return attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true, ...(instruction.shadows ? { shadows: instruction.shadows } : {}), ...(instruction.undefendedToStage ? { toStage: true } : {}), ...(instruction.orEngaged ? { engaged: true } : {}), ...(instruction.raiseThreatIfDestroys ? { raiseIfDestroys: instruction.raiseThreatIfDestroys } : {}) });
+  return attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true, ...(instruction.shadows ? { shadows: instruction.shadows } : {}), ...(instruction.undefendedToStage ? { toStage: true } : {}), ...(instruction.excessToStage ? { excessToStage: true } : {}), ...(instruction.orEngaged ? { engaged: true } : {}), ...(instruction.raiseThreatIfDestroys ? { raiseIfDestroys: instruction.raiseThreatIfDestroys } : {}) });
 }
 
 // The enemy `id` in the staging area attacks `seat` outside the combat phase, now, and the running effect counts the attack (its frames wait for it). `shadow: false`: no shadow card is dealt. `toStage` and `excessToStage` mark the attack
 // in progress (PendingAttack): the main quest card takes the damage left undefended, and the excess past a defender. `engaged`: an enemy engaged with a player attacks too, as an engaged enemy does (its shadow card stays).
-export function attackNowFromStaging(state: ScenarioState, id: string, seat: number, ctx: ReduceContext, steps: EngineStep[], flags: { shadow: boolean; shadows?: number; toStage?: boolean; excessToStage?: boolean; engaged?: boolean; raiseIfDestroys?: number }): ScenarioState {
+export function attackNowFromStaging(state: ScenarioState, id: string, seat: number, ctx: ReduceContext, steps: EngineStep[], flags: { shadow: boolean; shadows?: number; toStage?: boolean; excessToStage?: boolean; toLakeTown?: boolean; excessToLakeTown?: boolean; engaged?: boolean; raiseIfDestroys?: number }): ScenarioState {
   const enemy = id ? state.cards[id] : undefined;
   const placed = enemy?.zone === "staging" || (flags.engaged === true && enemy?.zone === "engaged");
   if (!id || !placed || attackBarred(state, id, seat) || state.seats[seat]?.eliminated) return state;

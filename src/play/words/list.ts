@@ -27,14 +27,19 @@ export function victorySaid(kind: string | null, points: number): string {
 }
 
 // Where a card that adds to the staging threat stands, when that is not the staging area itself.
-const FROM_WORDS = { staging: null, engaged: "Engaged", active: "Active location" } as const;
+const FROM_WORDS = { staging: null, engaged: "Engaged", active: "Active location", elsewhere: "In another area" } as const;
 
-/** The staging threat list's line: the type, where the card stands when not in staging, then the Threat it adds, "Enemy · 3 Threat". */
-export function threatSourceWords(kind: string | null, threat: number, from: keyof typeof FROM_WORDS): string {
-  return [kind, FROM_WORDS[from], `${threat} Threat`].filter(Boolean).join(" · ");
+// Where the card stands: a card in another player's staging area names the player ("In Player 2's staging area"), else it is "In another area".
+function whereWords(from: keyof typeof FROM_WORDS, area?: number): string | null {
+  return from === "elsewhere" && area != null ? `In Player ${area + 1}'s staging area` : FROM_WORDS[from];
+}
+
+/** The staging threat list's line: the type, where the card stands when not in staging, then the Threat it adds, "Enemy · 3 Threat". `area` is the seat whose staging area holds a card that stands in another. */
+export function threatSourceWords(kind: string | null, threat: number, from: keyof typeof FROM_WORDS, area?: number): string {
+  return [kind, whereWords(from, area), `${threat} Threat`].filter(Boolean).join(" · ");
 }
 
 /** What a screen reader hears of that line: "Enemy, engaged, 3 threat". */
-export function threatSourceSaid(kind: string | null, threat: number, from: keyof typeof FROM_WORDS): string {
-  return [kind, FROM_WORDS[from]?.toLowerCase(), `${threat} threat`].filter(Boolean).join(", ");
+export function threatSourceSaid(kind: string | null, threat: number, from: keyof typeof FROM_WORDS, area?: number): string {
+  return [kind, whereWords(from, area)?.toLowerCase(), `${threat} threat`].filter(Boolean).join(", ");
 }

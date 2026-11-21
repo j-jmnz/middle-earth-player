@@ -7,6 +7,7 @@ import { nextIntent } from "../../test/harness/auto-player.ts";
 import { dice, playIntent, seedOf, triggerIntent, type Dice } from "./policy.ts";
 import { encounterStart, kept, type EncounterWorld, type Profile } from "./encounter-world.ts";
 import { POLICY } from "./world.ts";
+import { flagged } from "../../src/rules/core/state.ts";
 import { escapeCommitLimit } from "../../src/rules/families/escape/commit.ts";
 import { describeError } from "../log.ts";
 
@@ -107,7 +108,9 @@ function complete(state: ScenarioState, ctx: ReduceContext, offer: LegalIntent, 
       const enemyId = pickOne(roll, [...new Set(ready.flatMap((id) => legalAttackEnemies(state, seat, id, ctx.cards)))]);
       if (!enemyId) return null;
       const attackers = ready.filter((id) => legalAttackEnemies(state, seat, id, ctx.cards).includes(enemyId));
-      return { type: "DeclareAttackers", enemyId, attackerIds: subset(roll, attackers) };
+      // An enemy that cannot be attacked by more than 1 character at a time (The Great Bridge's lasting flag, 145050:A:1) gets one attacker.
+      const chosen = subset(roll, attackers);
+      return { type: "DeclareAttackers", enemyId, attackerIds: flagged(state, enemyId, "singleAttacker") ? chosen.slice(0, 1) : chosen };
     }
     case "Distribute": {
       const cardId = pickOne(roll, legalTargets(state, { type: "Distribute" }, ctx));
@@ -144,21 +147,39 @@ function difference(left: ScenarioState, right: ScenarioState): string {
 
 /** Plays one numbered game of the scenario with random legal intents and replays it. */
 export function playGame(world: EncounterWorld, number: number): GameSummary {
+  return recordGame(world, number).summary;
+}
+
+/**
+ * A numbered game with what it played: its start, its context, the intents the reducer accepted (the first seat's Keep first) and the one that failed, if any.
+ * `pnpm game show encounter:<scenario-id>:<game>` replays it (scripts/game/source.ts).
+ */
+export type GameRecord = { summary: GameSummary; start: StartScenario | null; ctx: ReduceContext; intents: PlayerIntent[]; failing: PlayerIntent | null };
+
+export function recordGame(world: EncounterWorld, number: number): GameRecord {
   const { profile, seats, seed } = gameOf(number);
   const ctx = world.contexts[profile];
-  const summary: GameSummary = { game: number, seed, profile, seats, steps: 0, rounds: 0, ended: "problem", problem: null };
+  const record: GameRecord = { summary: { game: number, seed, profile, seats, steps: 0, rounds: 0, ended: "problem", problem: null }, start: null, ctx, intents: [], failing: null };
+  record.summary = runGame(world, number, record);
+  return record;
+}
+
+function runGame(world: EncounterWorld, number: number, record: GameRecord): GameSummary {
+  const { profile, seats, seed } = gameOf(number);
+  const { ctx, summary, intents } = record;
   const roll = dice(seedOf(world.scenario.id, seed * 7919 + number));
   const memory = new Set<string>();
-  const intents: PlayerIntent[] = [];
   let start: StartScenario | null = null;
   let state: ScenarioState | null = null;
   let intent: PlayerIntent | null = null;
   const problem = (message: string): GameSummary => {
     summary.problem = { game: number, seed, profile, seats, step: intents.length, round: state?.round ?? 0, window: state?.window?.kind ?? null, intent, message };
+    record.failing = intent;
     return summary;
   };
   try {
     start = encounterStart(world, seats, seed);
+    record.start = start;
     state = kept(start, ctx);
     intents.push({ type: "Keep" });
     for (let step = 0; !ended(state); step += 1) {

@@ -29,6 +29,9 @@ const searchSelector = {
   type: z.enum(["enemy", "location", "treachery", "objective", "encounter-side-quest"]).optional(),
   // A card with the Safe keyword (Across the Ettenmoors, mec108.safe): "search the encounter deck and discard pile for a location with the safe keyword" (10077:A:2). With `type: "objective"` the pool's other objectives stay out.
   safe: z.literal(true).optional(),
+  // The Wizard's Quest (51001:A:1, 51003:B:1): a printed cost at most `maxCost` (`maxCostMulti` with two or more players), any of the printed `types`, only the top `top` cards of the encounter deck. `byChallenge`: "the opposing team" finds it, so nobody is asked:
+  // the card that gives the players the greatest challenge (docs/brief.md, The Wizard's Quest, reading 3): of enemies and locations the highest Threat (enemies: then the highest Attack), then the one nearest the top; of any other card the one nearest the top.
+  maxCost: z.number().int().min(0).optional(), maxCostMulti: z.number().int().min(0).optional(), types: z.array(z.enum(["enemy", "location", "treachery"])).min(2).optional(), top: z.number().int().positive().optional(), byChallenge: z.literal(true).optional(),
 };
 
 export const simpleVerbs = [
@@ -73,7 +76,8 @@ export const simpleVerbs = [
   // `eventSeat` is the player the answered event happened to.
   z.strictObject({ verb: z.literal("LowerThreat"), amount: positiveAmountSchema, who: z.enum(["actor", "picked", "eachSeat", "eventSeat"]), ...when }),
   // Places damage on the picked card (or `target`) as a player card effect (toughness and immunity apply).
-  z.strictObject({ verb: z.literal("DamageCard"), amount: positiveAmountSchema, target: cardRefSchema.optional(), ...when }),
+  // `uncancelable`: the damage cannot be canceled by an ability that cancels damage, though one that moves it to another card still can ("This effect cannot be canceled", 03028:A:1; docs/brief.md, Flight from Moria).
+  z.strictObject({ verb: z.literal("DamageCard"), amount: positiveAmountSchema, target: cardRefSchema.optional(), uncancelable: z.literal(true).optional(), ...when }),
   // Places progress tokens on the picked location, on every location in the staging area, on the source or the active
   // location. A full location is explored. `host`: the location the source is attached to.
   z.strictObject({ verb: z.literal("PlaceProgressOn"), amount: positiveAmountSchema, target: z.enum(["picked", "eachStagingLocation", "self", "activeLocation", "subject", "host"]), ...when }),
@@ -165,8 +169,8 @@ export const simpleVerbs = [
   // When copies are out of play in more than one zone, the first player chooses which (rr.first-player). Nothing happens
   // with no copy left.
   codeVerb("ShuffleOutOfPlayIntoEncounterDeck"),
-  // Removes progress from the current quest card, `perPlayer` for each player in the game. It stops at 0 (141026:B:2).
-  z.strictObject({ verb: z.literal("RemoveQuestProgress"), perPlayer: z.number().int().positive(), ...when }),
+  // Removes progress from the current quest card, `perPlayer` for each player in the game (`startedPlayers`: who started it, 40005:B:2). It stops at 0 (141026:B:2).
+  z.strictObject({ verb: z.literal("RemoveQuestProgress"), perPlayer: z.number().int().positive(), startedPlayers: z.literal(true).optional(), ...when }),
   // Places progress on the current quest, `perPlayer` for each player in the game. The active location takes it first
   // (rr.active-location), and a full quest card advances (rr.quest-advancement) unless something forbids it (141026:B:1).
   z.strictObject({ verb: z.literal("PlaceQuestProgress"), perPlayer: z.number().int().positive(), ...when }),
@@ -176,10 +180,12 @@ export const simpleVerbs = [
   // Setup: each player draws this many fewer cards in the starting hand (and in a mulligan redraw).
   z.strictObject({ verb: z.literal("ReduceOpeningHand"), amount: z.number().int().positive(), ...when }),
   // Moves one matching card from the encounter discard pile into the encounter deck, then shuffles. With `each`, every matching card goes and the deck is shuffled once ("shuffle all copies of the \"Sacked!\" card from the discard pile back into the encounter deck", 02041:A:1).
-  z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, each: z.literal(true).optional(), ...when }),
+  // `who: firstPlayer`: the first player chooses the card ("The first player chooses X Tentacle enemies", rr.first-player; Rippling From Beneath 901508:A:2); the actor does otherwise.
+  z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, each: z.literal(true).optional(), who: z.literal("firstPlayer").optional(), ...when }),
   // Finds a card in the encounter deck or discard pile and reveals it. `cost`: the search is a Travel cost the players must be able to pay, so it needs a card to find ("Travel: The first player searches ... for a Warg enemy", 10024:A:2; rr.travel); read by the angmar family. `to: "engaged"`: the enemy found is revealed and put into play engaged with the revealing player instead of staged ("reveal it, and put it into play engaged with you", 143065:A:2).
   // `deckOnly`: the encounter deck alone is searched, not its discard pile ("Search the encounter deck for 1 copy of Prison Cell", 10039:A:2).
-  z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, to: z.enum(["staging", "engaged"]).optional(), cost: z.literal(true).optional(), deckOnly: z.literal(true).optional(), ...when }),
+  // A Shadow effect with it runs in a frame, as its reveal waits for the card's When Revealed ("Search the encounter deck for a treachery card ... and reveal it", 901807:A:2).
+  verbFlags(z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, to: z.enum(["staging", "engaged"]).optional(), cost: z.literal(true).optional(), deckOnly: z.literal(true).optional(), ...when }), { runsInFrame: true }),
   // Finds a card in the encounter deck or discard pile and puts it out without revealing it. With `each`, every card that
   // matches goes ("add each Nazgûl enemy found to the staging area", 141027:A:1) and nobody chooses.
   verbFlags(z.strictObject({
@@ -198,6 +204,9 @@ export const simpleVerbs = [
     // While a card with this code is in the encounter deck or its discard pile, the search must take it, until an earlier search of the same effect has taken one ("one of those enemies must be
     // Great Warg Chief, if able", 142022:A:1; "one of those enemies must be Corsair Captain, if able", 145030:A:3: the first search takes it, the others are free).
     require: z.string().min(1).optional(),
+    // With `require`: only the search of the player an earlier Pick of this effect chose must take it ("each player searches ... the first player names which player's choice is Patrol Leader", 03065:B:1;
+    // rr.first-player); with no player picked (a game with one player) every search is held to it.
+    requireFor: z.literal("picked").optional(),
     // The card found is the effect's picked card afterward, for the instructions that follow ("add it to the staging area. Then, attach Heavy Cruiser to that objective", 12127:A:3).
     remember: z.literal(true).optional(),
     // With `to: "engaged"`: the card found comes into play engaged with the seat an earlier pick chose (PickHighestThreat), not with the searching player ("puts it into play engaged with the player with the highest threat", 10083:A:2).
@@ -216,7 +225,8 @@ export const simpleVerbs = [
     inPlay: z.literal(true).optional(),
     ...when,
   }),
-  z.strictObject({ verb: z.literal("Discard"), target: targetSchema, ...when }),
+  // `counted`: the running effect counts a card this discards out of play for its `noneDiscarded` condition ("discard Tom Bombadil. Then, shuffle ...", 147022:A:1: the part after "then" resolves only if the discard did, rr.then).
+  z.strictObject({ verb: z.literal("Discard"), target: targetSchema, counted: z.literal(true).optional(), ...when }),
   // The card is destroyed (rr.destroy), not discarded: a hero or ally lies in its owner's discard pile and the table hears it was destroyed ("Destroy all heroes with the card 'Sacked!' attached", 02049:A:1).
   z.strictObject({ verb: z.literal("Destroy"), target: targetSchema, ...when }),
   z.strictObject({
@@ -234,17 +244,22 @@ export const simpleVerbs = [
         // "Attach to a Warrior hero." (143015:A:2): only a hero with this printed trait (rr.attachment-cards: a play restriction is checked as the attachment enters play).
         trait: z.string().min(1).optional(),
         // "Attach it to a hero with 1 or more Willpower" (900806:A:1): only a hero whose current Willpower is at least this.
-        minWillpower: z.number().int().min(1).optional() }),
-      z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
+        minWillpower: z.number().int().min(1).optional(),
+        // The card has no limit per hero ("Driven by Fear", 50325:A:1: a second copy may go on the same hero): a hero that carries a copy is offered too.
+        unlimited: z.literal(true).optional() }),
+      // `challenge` (51017:A:1): the opposing team attaches it, nobody is asked: the enemy with the most hit points left (reading 3).
+      z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1), challenge: z.literal(true).optional() }),
       // The enemy making the attack in progress ("Shadow: Attach this card to attacking enemy", 18018:A:2).
       z.strictObject({ kind: z.literal("attackingEnemy") }),
       // A Ship objective the players control, chosen by the first player ("Attach to a Ship objective.", 12132:A:1), or (`defender`) the Ship objective defending the attack in progress
       // ("If defending character is a Ship, attach ~ to it.", 12132:A:2).
       z.strictObject({ kind: z.literal("ship"), defender: z.literal(true).optional() }),
       // A character (hero or ally, an objective ally included) of any player, chosen by the first player: with `trait`, one that has the Trait now ("Attach to an Eagle character", 900607:A:2; a character that lost it is not offered); with `name`, the
-      // character of that title ("Attach to Wilyador", 900608:A:2). A character that carries a copy is not offered, unless `unlimited` (the card has no limit per character). With none to host it the card is discarded.
-      z.strictObject({ kind: z.literal("character"), trait: z.string().min(1).optional(), name: z.string().min(1).optional(), unlimited: z.literal(true).optional() }),
+      // character of that title ("Attach to Wilyador", 900608:A:2). A character that carries a copy is not offered, unless `unlimited` (the card has no limit per character). With none to host it the card is discarded. `control: mostAttachments`: of the characters the card is not on yet, those holding the most attachments ("Attach to the character with the most attachments without Befouled Equipment attached", 51036:A:1); the first player chooses among those tied.
+      z.strictObject({ kind: z.literal("character"), trait: z.string().min(1).optional(), name: z.string().min(1).optional(), unlimited: z.literal(true).optional(), control: z.literal("mostAttachments").optional() }),
     ]),
+    // The attachment is announced as it attaches (the `attached` trigger, as a played attachment is, rr.attachment-cards): "more than 1 copy" on a hero is read as the second one attaches (04023:A:1).
+    announces: z.literal(true).optional(),
     ...when,
   }),
   z.strictObject({ verb: z.literal("UncommitAll"), who: whoSchema, ...when }),
@@ -253,8 +268,9 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("HideTest"), x: z.number().int().positive(), ...when }),
   // The source enemy attacks now, dealt a shadow card of its own; with `shadow: false` it is dealt none ("makes an additional attack after this one. (Do not deal it a shadow card.)", 18022:A:1).
   // `keepShadows` (with `shadow: false`): the shadow cards the enemy already holds are not discarded first, so they all resolve in this attack ("do not deal it another shadow card for this attack", 10131:A:2).
-  // `afterThis`: while the source enemy's attack is in progress the new attack is made once this one has ended ("makes an additional attack against you after this one", 143052:A:1); with no attack under way nothing happens.
-  verbFlags(z.strictObject({ verb: z.literal("ImmediateAttack"), shadow: z.literal(false).optional(), keepShadows: z.literal(true).optional(), afterThis: z.literal(true).optional(), ...when }), { runsInFrame: true }),
+  // `afterThis`: while the source enemy's attack is in progress the new attack is made once this one has ended ("makes an additional attack against you after this one", 143052:A:1); with no attack under way nothing happens. `blankBonus`: when the shadow card dealt for this attack has no shadow effect the attacking enemy gets this much Attack for the attack ("If Hunting Warg is dealt a shadow card with no shadow effect for this attack, it gets +2 Attack", 51037:A:1).
+  // `target: subject`: the enemy the answered event is about, engaged with a player, attacks that player, not the source (a Forced effect of the quest stage, "it makes an immediate attack. Do not deal it a shadow card", 50607:B:2).
+  verbFlags(z.strictObject({ verb: z.literal("ImmediateAttack"), shadow: z.literal(false).optional(), keepShadows: z.literal(true).optional(), afterThis: z.literal(true).optional(), target: z.literal("subject").optional(), blankBonus: z.number().int().positive().optional(), ...when }), { runsInFrame: true }),
   // The attack in progress counts as undefended, even if a defender was declared.
   verb("ConsiderUndefended"),
   // The actor readies one hero they control.
@@ -275,6 +291,8 @@ export const simpleVerbs = [
     // With "travel" and `location`: only the location with that code that guards the objective with this title ("the Grey Moorland guarding Tiny", 19048:B:3).
     guarding: z.string().min(1).optional(),
     exceptTrait: z.string().min(1).optional(),
+    // With "travel": the players cannot travel to a location that holds resource tokens (51003:B:2).
+    withResources: z.literal(true).optional(),
     // With "attach": the card may have boons attached though it has no other attachments ("Cannot have non-boon attachments", 146020:A:1). A boon is a card the campaign pool holds as one (`campaignKind`), which no trait names.
     exceptBoon: z.literal(true).optional(),
     // With "travel" on a card that is not the location: the players cannot travel to a location with this trait ("The players cannot travel to Pelennor locations", 145075:B:3).
@@ -285,7 +303,9 @@ export const simpleVerbs = [
     allies: z.boolean().optional(),
     // With "defend": only the allies whose printed hit points are fewer than the source's cannot defend ("Allies with fewer printed hit points than Uruk-hai
     // Captain cannot defend against Uruk-hai Captain", 142069:A:2).
-    belowSourceHitPoints: z.boolean().optional(),
+    belowSourceHitPoints: z.boolean().optional(), anyDefender: z.literal(true).optional(), // `anyDefender`: no character can defend against the source ("Players cannot declare defenders against Rock Adder", 51324:A:1).
+    // With "travel" on a card that is not the location: the players cannot travel to any location but the source ("players cannot travel to other locations", 50217:A:2).
+    exceptSelf: z.boolean().optional(),
     // With "commit" (a player who does not control a card that matches this cannot commit characters to the quest, 02013:B:1) and "draw" (such a player cannot draw cards through card effects, 900404:A:1: the resource phase's and the round's draws are framework
     // draws, not card effects). The pick is read from each player's side.
     unlessControls: pickSchema.optional(),
@@ -293,6 +313,8 @@ export const simpleVerbs = [
     // (rr.play-and-put-into-play). `exceptAlone`: unless he is the only player remaining in the game. Read by src/rules/interpret/restrictions.ts (seatBarred) and src/rules/families/guardian/.
     guardian: z.literal(true).optional(),
     exceptAlone: z.literal(true).optional(),
+    // With "draw" on an enemy: binds the player the source is engaged with, and only while it is ("While Sentinel of the Deep is engaged with a player, that player cannot draw cards from card effects", 901604:A:1).
+    engagedPlayer: z.literal(true).optional(),
     ...when,
   }),
   // Constant: the holder's stat is set to `value`, overriding every other modifier (rr.modifiers; "Reduce attached hero's
@@ -306,8 +328,8 @@ export const simpleVerbs = [
     ...when,
   }),
   // Constant on an encounter card attached by its own text: it counts as an attachment with this trait while attached
-  // ("Counts as a Condition attachment", 141043:A:2, 141055:A:2), so "a Condition attachment" finds it (01061:A:1).
-  z.strictObject({ verb: z.literal("CountsAs"), cardType: z.literal("attachment"), trait: z.string().min(1), ...when }),
+  // ("Counts as a Condition attachment", 141043:A:2, 141055:A:2), so "a Condition attachment" finds it (01061:A:1); with no trait it counts as an attachment only ("Counts as an attachment", 50208:A:2).
+  z.strictObject({ verb: z.literal("CountsAs"), cardType: z.literal("attachment"), trait: z.string().min(1).optional(), ...when }),
   // Deals damage to each ally in play, only those with willpower at most `maxWillpower` when it is named (a value below 0
   // counts as 0, rr.modifiers) ("Deal 2 damage to each ally with 0 Willpower", 141071:A:1).
   z.strictObject({
@@ -407,27 +429,30 @@ export const simpleVerbs = [
   // Constant on a hero: once per phase the actor may play the top card of their deck as if it were in their hand, and the
   // hero counts as having these resource icons while it pays for that card. The top card of the deck is faceup.
   z.strictObject({ verb: z.literal("PlayFromDeckTop"), icons: z.array(z.enum(["leadership", "tactics", "spirit", "lore"])).min(1), ...when }),
-  // The source enemy leaves the player it is engaged with and engages the next player.
-  verb("EngageNextPlayer"),
+  // The source enemy leaves the player it is engaged with and engages the next player. `announces`: the engagement is announced (`engaged`), as any engagement is, so the enemy's own "after ~ engages a player" Forced effect fires again (Goblin Sneak, 04098:A:1).
+  // `target: subject`: the enemy the answered event is about engages the next player, from a record on another card ("After Naurlhûg attacks ... it engages the next player", 50607:B:2, a Forced effect of the quest stage).
+  z.strictObject({ verb: z.literal("EngageNextPlayer"), announces: z.literal(true).optional(), target: z.literal("subject").optional(), ...when }),
   // The host of the source card, its resource pool, and every card attached to it pass to a seat.
   z.strictObject({ verb: z.literal("TransferHost"), who: whoSchema, ...when }),
   // The players win the scenario. The resolution choices follow.
   verb("WinGame"),
   // Discards cards from the top of the encounter deck until `perPlayer` enemies for each player in the game have been
   // discarded, or the deck is empty, and puts each of those enemies into play engaged with the first player (141045:A:2).
-  // `to: staging`: they are added to the staging area instead ("Add each enemy discarded this way to the staging area", 142056:A:2).
+  // `to: staging`: they are added to the staging area instead ("Add each enemy discarded this way to the staging area", 142056:A:2). `to: reveal`: each is revealed, in the order discarded, in full (RevealEnemies; "Reveal all enemies discarded by this effect", 901402:A:1).
   // As a quest card's Setup it is run in a frame of its own after the deal ("Shuffle the encounter deck and discard cards from the top until X enemies are discarded", 19168:A:1).
   // `cardType: location`: locations are counted instead, and with `to: staging` each is added to the staging area ("Discard cards from the top until X locations are discarded... Add each location discarded this way to the staging area", 146077:A:1).
-  verbFlags(z.strictObject({ verb: z.literal("DiscardUntilEnemies"), perPlayer: z.number().int().positive(), less: z.number().int().positive().optional(), trait: z.string().min(1).optional(), to: z.literal("staging").optional(), cardType: z.literal("location").optional(), ...when }), { setupRuns: "top" }),
+  verbFlags(z.strictObject({ verb: z.literal("DiscardUntilEnemies"), perPlayer: z.number().int().positive(), less: z.number().int().positive().optional(), atLeast: z.number().int().positive().optional(), returnOthers: z.literal(true).optional(), trait: z.string().min(1).optional(), to: z.enum(["staging", "reveal"]).optional(), cardType: z.literal("location").optional(), ...when }), { setupRuns: "top" }),
+  // `atLeast`: the count never falls below it ("X is one less than the number of players in the game (minimum of 1)", 04086:B:1, with `less: 1`). `returnOthers`: the cards the effect discarded that are not counted go back into the encounter deck, which is shuffled; the rest of the discard pile stays ("shuffle the other discarded cards back into the encounter deck").
   // The last picked card is placed facedown under the source location. While it is there it is out of play (141049:A:1).
   verb("PlaceUnderSelf"),
   // Each card under the source location returns to the staging area face up (141049:A:2). `to: "engaged"`: each is put into play engaged with the first player instead, and counts as engaging him ("put each enemy under it into play engaged with the first player", 146029:A:2).
-  z.strictObject({ verb: z.literal("ReturnUnderToStaging"), to: z.literal("engaged").optional(), ...when }),
+  // `from`: the cards under the card in play with this code, not under the source ("add the Loot objective from underneath Stalking the Ruins to the staging area faceup", 50621:A:3).
+  z.strictObject({ verb: z.literal("ReturnUnderToStaging"), to: z.literal("engaged").optional(), from: z.string().min(1).optional(), ...when }),
   // The source card (a shadow card) is shuffled into the encounter deck instead of being discarded (141069:A:3).
   verb("ShuffleSelfIntoEncounterDeck"),
   // The actor (or, with `who`, the first player) discards cards at random from their hand, `amount` (1 by default; read, so X works). The seed
-  // picks them (141047:A:2, 141084:A:2). `raiseByCost`: the discarding player's threat is raised by the discarded card's printed cost, 0 for a card with no printed cost or an X cost ("Discard a random card from your hand and raise your threat by its printed cost", 10052:A:2).
-  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: positiveAmountSchema.optional(), who: z.enum(["firstPlayer", "eachSeat"]).optional(), remember: z.literal(true).optional(), raiseByCost: z.literal(true).optional(), ...when }),
+  // picks them (141047:A:2, 141084:A:2). `raiseByCost`: the discarding player's threat is raised by the discarded card's printed cost, 0 for a card with no printed cost or an X cost ("Discard a random card from your hand and raise your threat by its printed cost", 10052:A:2). `raiseStagingByCost` (with `who: eachSeat`): "Until the end of the phase, add X Threat to the staging area, where X is the total cost of the discarded cards" (51238:A:1): the table's total Threat in the staging area is raised until the end of the phase by the printed costs of the cards every player discarded, 0 for a card with no printed cost.
+  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: positiveAmountSchema.optional(), who: z.enum(["firstPlayer", "eachSeat"]).optional(), remember: z.literal(true).optional(), raiseByCost: z.literal(true).optional(), raiseStagingByCost: z.literal(true).optional(), ...when }),
   // Setup: a card from the box joins the encounter deck. The deck is shuffled by the Setup step that says so.
   codeVerb("ShuffleIntoEncounterDeck"),
   // Campaign setup: the voluntary hero change costs no threat penalty on this scenario's card.

@@ -4,7 +4,8 @@
 // above them; the count stays in the title's spoken label. The readout, the refusal and the buttons are the dock's, once, under the
 // rows. A row is picked like a card on the table (the same pick, table-choice.ts); a long press on a card's row shows it large. A tap
 // outside folds it (use-table-choice.ts).
-import { ScrollView, useWindowDimensions, View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { CardImage } from "../../ui/card-image.tsx";
@@ -93,6 +94,7 @@ export function ChoiceTray({
   onTile,
   onRead,
   onStep,
+  refusedRows,
 }: {
   open: boolean;
   sheet: Sheet;
@@ -104,6 +106,8 @@ export function ChoiceTray({
   onRead: ((cardId: string) => void) | null;
   // A screen reader's increment or decrement action on a share row (use-table-choice.ts, onStep); a touch never calls it.
   onStep?: ((id: string, delta: 1 | -1) => void) | null;
+  // Rows of the sheet the rules refuse now (a commit's allies past the limit): listed as refused, not as choices.
+  refusedRows?: readonly Unavailable[];
 }) {
   const s = useUiScale();
   // A phone screen reader hears each row as a radio, a checkbox, a button or an adjustable share (tray-logic.ts, tileRole); no one else does.
@@ -115,13 +119,17 @@ export function ChoiceTray({
   const motion = useAnimatedStyle(() => ({ opacity: progress.get(), transform: [{ translateY: (1 - progress.get()) * RISE * s }] }));
   const shown = useHeld(open ? sheet : null) ?? sheet;
   const picked = useHeld(open ? choice : null) ?? choice;
-  const tiles = trayTiles(shown);
+  const refusedHere = new Set((refusedRows ?? []).map((item) => item.id));
+  const tiles = trayTiles(shown).filter((tile) => !refusedHere.has(tile.id));
   const marks = new Set(picked.ids);
-  const refused = shown.kind === "pick" ? (shown.unavailable ?? []) : [];
+  const refused = [...(shown.kind === "pick" ? (shown.unavailable ?? []) : []), ...(refusedRows ?? [])];
   if (!open && !leaving) return null;
   return (
     <Animated.View testID="sheet" collapsable={false} pointerEvents={open ? "auto" : "none"} style={[{ flexShrink: 1, minHeight: 0 }, motion]}>
       {/* The rows' focus ring has room inside the scroll (ringScroll); its margins take that room back, and trayRoom's row is counted from under it. */}
+      {/* The gesture handler's scroll view, not React Native's: on Android a touch on a row's transparent part otherwise passes through to
+          the table canvas under the command column, whose drag (6 pt) starts before the list scrolls and cancels it. Its own handler
+          makes the list the touch's target, so a swipe on the rows scrolls them and a tap still picks one. */}
       <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: tiles.length > 0 ? trayRoom(small, fontScale) * s + ringRoom(s) : 0, ...ringScroll(s).style }} contentContainerStyle={ringScroll(s).content} showsVerticalScrollIndicator={false} nestedScrollEnabled>
         {tiles.map((tile) => {
           const share = shareFor(shown, picked, tile.id);

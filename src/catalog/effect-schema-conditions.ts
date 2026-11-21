@@ -38,10 +38,16 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("engagedWithActor") }),
   // The running effect has returned no enemy to staging (or, for ImmediateAttackEach, made no attack).
   z.strictObject({ kind: z.literal("noneReturned") }),
+  // The running effect has returned fewer than `than` cards (ReturnFromDiscard `treacheries` counts the treachery cards only, ShuffleEncounterDiscard `alsoVictory` the cards that went back): "If this effect returned less than 2 Snow treachery cards" (04020:A:1), "If you reshuffled at least two locations" (04018:A:1, with `not`). Read by the encounter family.
+  z.strictObject({ kind: z.literal("returnedBelow"), than: z.number().int().positive() }),
   // The running effect has discarded no card with DiscardEach ("If no cards are discarded by this effect, ~ gains surge", 12106:A:1). Read by src/rules/families/south/damage.ts.
   z.strictObject({ kind: z.literal("noneDiscarded") }),
+  // The acting player is the last player: the one to the first player's right, the only player of a solo game ("attacking the last player", 03035:A:2; dcce.last-player). Read by the sea family (families/sea/index.ts).
+  z.strictObject({ kind: z.literal("lastPlayer") }),
   // The Embassy from the Dark Tower's pair the running effect is on (EmbassyNext): `pair`, there is one (its player card still lies faceup); `playable`, its player card can be played at no cost by its owner now (146072:B:1). Read by src/rules/families/black-gate/embassy.ts.
   z.strictObject({ kind: z.literal("embassy"), is: z.enum(["pair", "playable"]) }),
+  // The erech family's condition (src/rules/families/erech/index.ts). `night`: the Night objective lying beside the quest is Dusk, Midnight, or either ("Dusk. ...", "Midnight. ...", "Dusk/Midnight. ..."; docs/brief.md, The Stone of Erech); false with none in play.
+  z.strictObject({ kind: z.literal("night"), is: z.enum(["dusk", "midnight", "duskOrMidnight"]) }),
   // The mount-doom family's conditions (src/rules/families/mount-doom/conditions.ts). `lastFortitudeFailed`, `lastFortitudePassed`: the last Fortitude test the running effect made was failed, or passed ("If you fail this test", 146051:A:1; "If a player passes this test", 146076:B:1);
   // false before the effect has made one. `fortitudeFailed`: a player failed a Fortitude test this round, `who` the actor ("If you failed a Fortitude test this round", 146055:A:3) or any player ("If a player has failed a Fortitude test this round", 146046:A:1).
   z.strictObject({ kind: z.literal("lastFortitudeFailed") }),
@@ -49,6 +55,17 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The escape family's conditions (src/rules/families/escape/conditions.ts): the last escape test the running effect made was failed, or passed ("If this test is failed", 02109:A:1; "If this final Escape test is passed", 02106:B:2). False before the effect has made one.
   z.strictObject({ kind: z.literal("lastEscapeFailed") }),
   z.strictObject({ kind: z.literal("lastEscapePassed") }),
+  // The long-dark family's conditions (src/rules/families/long-dark/conditions.ts): the last locate test the running effect made was failed, or passed ("If this test is failed", 04087:B:1); false before the effect has made one. `hasPass`: the card the condition names (the other card of the event, the last picked card
+  // or the card the event is about) prints PASS in its text box ("dealt a shadow card with PASS printed in its text box", 901602:A:2).
+  z.strictObject({ kind: z.literal("lastLocateFailed") }),
+  z.strictObject({ kind: z.literal("lastLocatePassed") }),
+  z.strictObject({ kind: z.literal("hasPass"), card: z.enum(["other", "picked", "subject"]) }),
+  // Some living player controls no unexhausted character, hero or ally ("if any player controls no unexhausted characters", 04093:A:1; any player, not every player).
+  z.strictObject({ kind: z.literal("playerWithoutReady") }),
+  // A Draw the running effect ran drew at least 1 card ("draws 1 card. Then, ... discard 4 cards", 04097:A:1: what follows "then" resolves only when the draw did, rr.then).
+  z.strictObject({ kind: z.literal("drew") }),
+  // The source is an enemy engaged with the last player, the first player in a one-player game (dwd.last-player): "it engages the last player and attacks him" only when the engagement was made (901603:A:2).
+  z.strictObject({ kind: z.literal("engagedWithLastPlayer") }),
   z.strictObject({ kind: z.literal("fortitudeFailed"), scope: z.literal("round"), who: z.enum(["actor", "any"]) }),
   // The source card is attached to a card the actor controls ("After you fail a Fortitude test, exhaust attached hero", 146057:A:1): an encounter card attached to a hero is controlled by nobody, so the Forced effect's actor, the player the event happened to, is compared with the host's controller.
   z.strictObject({ kind: z.literal("hostControlledByActor") }),
@@ -56,6 +73,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // that hear the reveal, and only in a game with a record that reads this condition. Read by the mount-doom family.
   z.strictObject({ kind: z.literal("firstTreachery") }),
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
+  // The named phase has just ended: the engine has moved on and its boundary (Forced effects at the end of the phase) has not yet been crossed ("The players can only advance at the end of the quest phase", 40004:B:3).
+  z.strictObject({ kind: z.literal("phaseEnded"), is: phaseNameSchema }),
   // The encounter deck or discard pile holds a card with this code or trait.
   // Where the source card is now. `play` means any zone the source's controller plays from.
   // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2). `hand`: an Action
@@ -64,9 +83,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand", "stormcallerArea", "encounterDeck", "attached"]) }),
   // The source card shows this side (a contract, flipped by FlipCard; side A at the start).
   z.strictObject({ kind: z.literal("faceUp"), side: z.enum(["A", "B"]) }),
-  // The actor's seat (`seat`) or the source card (`self`) holds this flag, a modifier of that stat that is in force now (`is`: false
+  // The actor's seat (`seat`), the source card (`self`) or the table (`table`, the flags every seat holds: 901201:A:3) holds this flag, a modifier of that stat that is in force now (`is`: false
   // for not): "You can only choose each option once per round" records an option as taken on the seat until the end of the round.
-  z.strictObject({ kind: z.literal("flag"), stat: z.string().min(1), holder: z.enum(["seat", "self"]), is: z.boolean().optional() }),
+  z.strictObject({ kind: z.literal("flag"), stat: z.string().min(1), holder: z.enum(["seat", "self", "table"]), is: z.boolean().optional() }),
   // A card with this code is in the victory display (`is`) or is not.
   z.strictObject({ kind: z.literal("inVictory"), code: z.string().min(1), is: z.boolean() }),
   // The victory display holds a copy (a card with the same title) of the source, the card the answered event is about, the last
@@ -77,8 +96,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("otherLocationInPlay") }),
   // The actor controls a hero that is exhausted.
   z.strictObject({ kind: z.literal("heroExhausted") }),
-  // The attack in progress has no defender (declared or considered).
-  z.strictObject({ kind: z.literal("undefended") }),
+  // The attack in progress has no defender (declared or considered). `is: false`: it has one (an attack is in progress and defended): "Defending player must discard 1 ally card ... (2 allies instead if this attack is undefended)", 00012:A:3.
+  z.strictObject({ kind: z.literal("undefended"), is: z.boolean().optional() }),
   // `type`: only a card of this printed type counts ("discard cards from the top of the encounter deck until an enemy is discarded" is offered while an enemy is left in the deck, 146061:A:1). `victory`: the victory display is read too (146036:A:2).
   z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional(), type: z.enum(["enemy", "location", "treachery", "objective", "encounter-side-quest"]).optional(), deckOnly: z.literal(true).optional(), victory: z.literal(true).optional() }),
   // Some card matches this pick (for the actor now): a choice that could be made.
@@ -132,7 +151,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // with no Stormcaller's area. Read by the stormcaller family (src/rules/families/stormcaller/values.ts).
   z.strictObject({ kind: z.literal("stormcaller"), is: z.enum(["sameStage", "ahead"]) }),
   // No player holds more than `max` cards in hand ("If no cards were discarded by this effect": no player holds more than 3 cards, 12080:A:1).
-  z.strictObject({ kind: z.literal("handSize"), max: z.number().int().min(0) }),
+  z.strictObject({ kind: z.literal("handSize"), max: z.number().int().min(0), actor: z.boolean().optional() }),
+  // `actor`: only the acting player's hand is read, the defending player's in a Shadow effect ("if you have no cards in your hand", 901608:A:3), not every player's.
   // The Island Map (src/rules/families/island/pick.ts): at most `flippedAtMost` of its double-sided (Uncharted) locations are flipped over to the location side ("4 or fewer Uncharted locations are faceup", 11197:B:6, read as the flipped ones: a short route; user decision, 2026-11-01), and/or the last travel went to the right
   // ("When you travel to the right", 12077:A:1), and/or at least `revealed.min` copies of the card with this code are in the game and not secrets under a Temple location ("For each Recurring Nightmare that is not a secret", 11197:B:1).
   z.strictObject({ kind: z.literal("island"), flippedAtMost: z.number().int().min(0).optional(), movedRight: z.literal(true).optional(), revealed: z.strictObject({ code: z.string().min(1), min: z.number().int().positive() }).optional() }),
@@ -169,12 +189,18 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("canAttachToDial"), code: z.string().min(1) }),
   // The quest deck holds at least `min` stages (1 by default): the stage 2s Mount Gundabad's current quest can be bypassed in favor of (19135:B:3; emce.bypassing). Read by the wilderland family.
   z.strictObject({ kind: z.literal("questDeck"), min: z.number().int().positive().optional() }),
+  // The running effect took this option: a Choose with `different` (or SelectRandomStage, which notes the code of the stage it picked) records the ids of the options it took on the effect frame, so what follows reads them ("remove 5 progress from this stage or each player discards ...", 50903:B:2). Read by the wilderland family.
+  z.strictObject({ kind: z.literal("optionTaken"), id: z.string().min(1) }),
   // The enemy with this title has resolved an attack in the combat phase now under way ("unless he has resolved an attack this phase", 19155:A:1): false in any other phase. Read by the wilderland family.
   z.strictObject({ kind: z.literal("attackedThisPhase"), name: z.string().min(1) }),
   // The card in play with this title holds this flag, a modifier of that stat in force now: "resources cannot be placed on The Heroes' Defense" (19161:A:2) read by the Watchtower's option (19163:A:2). Read by the wilderland family.
   z.strictObject({ kind: z.literal("namedFlag"), name: z.string().min(1), stat: z.string().min(1) }),
   // The active location has no Discover keyword to resolve (none printed, or the keyword is ignored): "If they cannot, Abandoned Ruins gains surge and doomed 2" (19106:A:1; emce.discover). Read by the wilderland family.
   z.strictObject({ kind: z.literal("discoverUnavailable") }),
+  // Murder at the Prancing Pony (investigation family): a card in play says to ignore the Investigate keyword (IgnoreKeyword `investigate`, 50703:B:1).
+  z.strictObject({ kind: z.literal("investigateIgnored") }),
+  // The top card of the Investigation deck has one of these Traits: the card the Investigate keyword just showed when it looked at one card ("if the looked at card is a Suspect or a Hideout", 50720:A:2). Read by the investigation family.
+  z.strictObject({ kind: z.literal("investigationTop"), traits: z.array(z.string().min(1)).min(1) }),
   // A card with this code is attached to a hero (`is`) or is not.
   z.strictObject({ kind: z.literal("attachedToHero"), code: z.string().min(1), is: z.boolean() }),
   // Read while a stat is read, not when a constant effect is synced. `defending`: the holder is the declared defender
@@ -185,12 +211,12 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("defendingAgainst"), trait: z.string().min(1) }),
   // The holder is an enemy attacking a defender (declared, not undefended) whose printed hit points are at most `maxHitPoints` ("gets +2 Attack against
   // characters with 2 or fewer printed hit points", 142071:A:2). Read while a stat is read, like versusHighEngagement (src/rules/core/keywords.ts).
-  // `ally`: the defender is an ally ("gets +2 Attack when attacking allies", 12054:A:2).
-  z.strictObject({ kind: z.literal("versusDefender"), maxHitPoints: z.number().int().min(0).optional(), ally: z.literal(true).optional() }),
+  // `ally`: the defender is an ally ("gets +2 Attack when attacking allies", 12054:A:2). `maxWillpower`: its current Willpower is at most this ("if the defending character has less than 2 Willpower", 901303:A:1).
+  z.strictObject({ kind: z.literal("versusDefender"), maxHitPoints: z.number().int().min(0).optional(), maxWillpower: z.number().int().min(0).optional(), ally: z.literal(true).optional() }),
   // The source card is attached to a card with this name.
   z.strictObject({ kind: z.literal("hostNamed"), name: z.string().min(1) }),
-  // The actor controls a hero or ally in play with this code.
-  z.strictObject({ kind: z.literal("controls"), code: z.string().min(1) }),
+  // The actor controls a hero or ally in play with this code; with `who: "anyPlayer"`, any player does ("unless they control Derufin", 50303:B:2).
+  z.strictObject({ kind: z.literal("controls"), code: z.string().min(1), who: z.literal("anyPlayer").optional() }),
   // A copy of this card is out of play where an effect can take it from ("shuffle 1 out of play Ringwraith into the encounter
   // deck" on 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2): set aside, in the encounter discard pile or the victory display
   // (rr.in-play-and-out-of-play), or under a location (141049:A:1). See outOfPlayCopies in src/rules/interpret/conditions.ts.
@@ -198,7 +224,14 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The current quest card has progress on it (141026:B:2: removing progress is an effect that changes the game, rr.effects).
   z.strictObject({ kind: z.literal("questProgress") }),
   // An enemy (with this trait, if one is named) is in play (`is`) or none is (141027:B:1).
-  z.strictObject({ kind: z.literal("enemyInPlay"), trait: z.string().min(1).optional(), is: z.boolean() }),
+  // `other`: not the source card itself ("While there is another Tentacle enemy in play", 04072:A:2). An enemy lying on a character as an attachment is no enemy in play (families/angmar/reanimate/attached.ts).
+  z.strictObject({ kind: z.literal("enemyInPlay"), trait: z.string().min(1).optional(), other: z.literal(true).optional(), is: z.boolean() }),
+  // The card the running effect's last DiscardEncounterTop (MoveEncounterCard `deckTop` to `discard`) put in the encounter discard pile has a shadow effect (a printed Shadow line: a `shadow` record) or is a Tentacle enemy
+  // ("If that card has a shadow effect or is a Tentacle enemy", 04073:A:1, 04074:A:1, 04075:A:1, 901503:A:1, 901504:A:1). False when nothing was discarded. Read by the encounter family (src/rules/families/encounter/discard-check.ts).
+  z.strictObject({ kind: z.literal("discardedHasShadowOrTentacle") }),
+  // The title of the encounter card the effect discarded last starts with the same letter as the title of a card an earlier pick of the effect chose (the player cards discarded from the hands), case and accents aside ("If the first letter of the
+  // encounter card's title matches that of one of the discarded player cards", 04065:A:2). False when nothing was discarded. Read by the encounter family.
+  z.strictObject({ kind: z.literal("firstLetterMatches") }),
   // How many cards match the filter, from the actor's side, is at least `min` and at most `max` ("while you control at least
   // 5 Dwarf characters", "if there is at least 1 Gondor hero in play", "while you have no cards in your hand").
   z.strictObject({ kind: z.literal("count"), pick: pickSchema, min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional() }),
@@ -285,8 +318,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The answered damaged event placed the source's `nth` damage token: it holds at least that many now and held fewer before ("After
   // placing the 6th damage here", 142024:A:3).
   z.strictObject({ kind: z.literal("damageReached"), nth: z.number().int().positive() }),
-  // The current quest card holds at least `min` progress tokens ("While there are at least 8 progress tokens on this stage", 41007:B:1).
-  z.strictObject({ kind: z.literal("stageProgress"), min: z.number().int().positive() }),
+  // The current quest card holds at least `min` progress tokens (`perStartedPlayer`: for each player who started the game, "Remove 5 PerPlayer progress from this stage", 40005:B:2) ("While there are at least 8 progress tokens on this stage", 41007:B:1).
+  z.strictObject({ kind: z.literal("stageProgress"), min: z.number().int().positive(), perStartedPlayer: z.boolean().optional() }),
   // The cards in the victory display are worth at least `min` Victory points together ("they have collected at least 20 victory points", 02082:B:2; rr.victory). Read by rules/interpret/conditions.ts, the sum the score takes (src/campaign/score.ts).
   z.strictObject({ kind: z.literal("victoryPoints"), min: z.number().int().positive() }),
   // The running effect's X is at least the remaining hit points of the picked card (its hit points less its damage): "If the printed cost of the
@@ -300,8 +333,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // on top of what they name. Read by the aflame family (src/rules/families/aflame/values.ts).
   z.strictObject({ kind: z.literal("underBurn"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), players: z.literal(true).optional() }),
   // The encounter discard pile (`discard`), or the encounter deck and its discard pile (`deckAndDiscard`), holds a card of this printed type and/or with the Aflame keyword: the either/or of a search
-  // that has something to find ("search ... for the Aflame location", 11040:A:1; "the topmost enemy in the encounter discard pile", 11044:A:2; rr.effects). Read by the aflame family.
-  z.strictObject({ kind: z.literal("encounterHas"), piles: z.enum(["discard", "deckAndDiscard"]), cardType: z.enum(["enemy", "location", "treachery"]).optional(), aflame: z.literal(true).optional(), trait: z.string().min(1).optional() }),
+  // that has something to find ("search ... for the Aflame location", 11040:A:1; `code`: a copy of the card with this code, "While there is a copy of Eastern Crows in the discard pile", 51031:A:1; "the topmost enemy in the encounter discard pile", 11044:A:2; rr.effects). Read by the aflame family.
+  z.strictObject({ kind: z.literal("encounterHas"), piles: z.enum(["discard", "deckAndDiscard"]), cardType: z.enum(["enemy", "location", "treachery"]).optional(), aflame: z.literal(true).optional(), trait: z.string().min(1).optional(), code: z.string().min(1).optional() }),
   // A location in play with this trait has a total Threat of at least `min`, its grappled enemies' Threat included ("if the total Threat of any one Ship location is 9 or higher", 12041:B:2;
   // src/rules/families/grapple/values.ts).
   z.strictObject({ kind: z.literal("locationThreat"), trait: z.string().min(1), min: z.number().int().min(0) }),
@@ -311,6 +344,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The When Revealed effects of the source card are resolving now: a quest stage's side B holds from the moment it is revealed, but its text is not in force while side A's When Revealed is
   // ("Each Raider enemy revealed by the encounter deck enters play with 1 resource on it" does not reach the cards revealed by the stage's own When Revealed, 11037:B:2).
   z.strictObject({ kind: z.literal("revealing") }),
+  // Every living player is at the source stage, sharing its staging area, or not (`is: false`): "unless each player in the game is at this stage" (148003:B:3). With one shared staging area it holds; false for a stage no player is at. Read by the breaking family.
+  z.strictObject({ kind: z.literal("allAtStage"), is: z.boolean() }),
   // The current quest, read by the angmar family: `side` a side quest is the current quest ("If the current quest is a side quest", 09047:A:1), `self` the source is the side quest that is the current quest ("While Orc Rearguard is the current quest", 09023:A:2),
   // `other` there is a quest card besides the current one that may be chosen to be the current quest (09049:A:2: the main quest card, or an encounter side quest in the staging area).
   z.strictObject({ kind: z.literal("currentQuest"), is: z.enum(["side", "self", "other"]) }),
@@ -320,6 +355,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("questLeads") }),
   // The card in play with this code has any hit points remaining: its damage is below its hit points now ("cannot defeat this stage while Thaurdir has any hit points remaining", 09074:B:2). False while no such card is in play. Read by the angmar family.
   z.strictObject({ kind: z.literal("hitPointsLeft"), code: z.string().min(1) }),
+  // A hero of any player was committed to the quest this round, a hero that was committed when the commit step ended counting after a card removed it from the quest ("If at least 1 hero committed to the quest this round", 04139:B:1). Read by the flame family (src/rules/families/flame/index.ts); the commitments are kept only in a game with a record that reads it.
+  z.strictObject({ kind: z.literal("committedThisRound") }),
   // The time of day, read by the angmar family: the Time objective (Daybreak, Nightfall) shows the side the state is, `day` while Daybreak is faceup, `night` while Nightfall is ("While it is Night, Wolf of Angmar gets +2 Attack", 10022:A:2; mec108.day-and-night).
   // False while no Time objective is in play.
   z.strictObject({ kind: z.literal("timeOfDay"), is: z.enum(["day", "night"]) }),
@@ -327,6 +364,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("safeActive"), is: z.boolean() }),
   // A copy of the card with this code is set aside, out of play ("reveal 1 set-aside copy of Losing Time", 10182:A:3). Read by the angmar family.
   z.strictObject({ kind: z.literal("setAsideHas"), code: z.string().min(1) }),
+  // A copy of the card with this code was explored and the Forced effect with this record id has not finished: its "explored" event still waits to be heard, or the effect is running. The window between the explore and the flip of Dark Pit (51301:B:2, 51301:B:1). Read by the wizards-quest family.
+  z.strictObject({ kind: z.literal("exploredPending"), code: z.string().min(1), effect: z.string().min(1) }),
   // The pursuit value (mec112.pursuit, the pursuit tracker beside the quest deck) is at most `max` and at least `min`: "If the pursuit value is 25 or lower" (143071:B:1), "30 or greater" (143022:A:2). False while no tracker is set (ScenarioState.pursuit).
   z.strictObject({ kind: z.literal("pursuit"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),
   // Captured cards (Escape from Mount Gram, read by the captured family): `noneUnderAttacker` no card is captured underneath the attacking enemy ("+2 Attack instead if it has no captured cards underneath it", 10045:A:3), `noneUnderSelf` no card is captured underneath the source ("If there are no captured cards underneath Gornákh's Dungeons", 10039:B:2), `someoneEmpty` the Interrogation that is
@@ -348,7 +387,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The player guarding Gollum may choose a new player now: no card says the guard cannot change and another player is still in the game ("must choose a new player to guard Gollum, if able", 02135:A:1; the option is offered only then, rr.effects). Read by the guardian family.
   z.strictObject({ kind: z.literal("guardianCanChange") }),
   // Progress was placed on the current quest card itself this phase, the overflow of an explored active location included ("if no progress was placed on the current quest this phase", 900501:A:4, `is: false`); read from the note the table's `noteQuestProgress` flag keeps (src/rules/families/wizardry/progress.ts).
-  z.strictObject({ kind: z.literal("questProgressNoted"), is: z.boolean() }),
+  // `min`: and at least that much progress was noted in all ("if 10 or more progress was placed here this phase", 51108:B:3, docs/brief.md, The Woodland Realm, reading 14).
+  z.strictObject({ kind: z.literal("questProgressNoted"), is: z.boolean(), min: z.number().int().positive().optional() }),
   z.strictObject({ kind: z.literal("soleAttacker") }),
   // The Captives in play (the Uruk-hai's heroes under To Isengard! or held by an enemy; src/rules/families/captives): at least `min` and at most `max` of them, or with `of: "actor"` only the acting seat's ("a seat with no Captive chooses one", 143069:A:1; "if there are no Captives in play", 143022:A:1).
   z.strictObject({ kind: z.literal("captives"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), of: z.literal("actor").optional() }),
@@ -393,6 +433,8 @@ export const targetSchema = z.discriminatedUnion("kind", [
   z.strictObject({
     kind: z.literal("engagedEnemies"),
     trait: z.string().min(1).optional(),
+    // Only the enemies with the ambush keyword, printed or gained ("Return each engaged enemy with the ambush keyword to the staging area", 901409:A:1).
+    keyword: z.literal("ambush").optional(),
     who: z.enum(["actor", "each"]),
     pick: z.enum(["all", "choose"]),
   }),

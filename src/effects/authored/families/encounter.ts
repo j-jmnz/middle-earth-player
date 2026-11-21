@@ -89,10 +89,9 @@ export const RECORDS: readonly Effect[] = [
   {"id":"10036:action:1","cardCode":"10036","lines":["10036:A:1"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"canPick","pick":{"type":"character","control":"you","traits":["Ranger","Scout"],"state":"ready"}},{"kind":"matches","card":"activeLocation","pick":{"type":"location","control":"any","nonUnique":true}}]},"instructions":[
     {"verb":"Pick","pick":{"type":"character","control":"you","traits":["Ranger","Scout"],"state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},
     {"verb":"MoveEncounterCard","card":"activeLocation","to":"discard"},{"verb":"PickEncounter","from":"deckAndDiscard","type":"location","nonUnique":true},{"verb":"MoveEncounterCard","to":"activeLocation"},{"verb":"ShuffleEncounterDeck"}]},
-  // 10123 Quick Ears: canceling a card just revealed shuffles it back and reveals another (as 141001). data/cards spells the
-  // trait "Dúnedain" and "Dunedain".
-  {"id":"10123:response:1","cardCode":"10123","lines":["10123:A:1"],"timing":"response","trigger":"encounterRevealed","subject":{"type":"enemy","control":"any"},"cost":{"kind":"playEvent"},"condition":{"kind":"canPick","pick":{"type":"hero","control":"you","traits":["Dúnedain","Dunedain","Ranger"],"state":"ready"}},"instructions":[
-    {"verb":"Pick","pick":{"type":"hero","control":"you","traits":["Dúnedain","Dunedain","Ranger"],"state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},{"verb":"CancelEffect"}]},
+  // 10123 Quick Ears: canceling a card just revealed shuffles it back and reveals another (as 141001).
+  {"id":"10123:response:1","cardCode":"10123","lines":["10123:A:1"],"timing":"response","trigger":"encounterRevealed","subject":{"type":"enemy","control":"any"},"cost":{"kind":"playEvent"},"condition":{"kind":"canPick","pick":{"type":"hero","control":"you","traits":["Dúnedain","Ranger"],"state":"ready"}},"instructions":[
+    {"verb":"Pick","pick":{"type":"hero","control":"you","traits":["Dúnedain","Ranger"],"state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},{"verb":"CancelEffect"}]},
   // 11008 Mariner's Compass: the location found and a location in the staging area change places.
   {"id":"11008:response:1","cardCode":"11008","lines":["11008:A:2"],"timing":"response","trigger":"beginningOfPhase","cost":[{"kind":"exhaustSelf"},{"kind":"exhaustHost"}],"condition":{"kind":"all","conditions":[{"kind":"phase","is":"Travel"},{"kind":"canPick","pick":{"type":"location","control":"any","stagingOnly":true}}]},"instructions":[
     {"verb":"PickEncounter","from":"deck","top":5,"type":"location"},

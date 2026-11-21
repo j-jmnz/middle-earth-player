@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { bytes, createLog, type Log } from "../../log.ts";
-import { BUILT_SCENARIO_PRODUCTS } from "../campaign-defs.ts";
+import { BUILT_SCENARIO_PRODUCTS, isBuiltScenario } from "../campaign-defs.ts";
 import { combinedPin, fetchText, writeRaw, type SourceFile, type SourceRecord } from "./fetch.ts";
 
 const BASE = "https://hallofbeorn.com/Export";
@@ -90,7 +90,7 @@ export async function syncHallOfBeorn(log: Log = createLog("hallofbeorn")): Prom
   }
   const indexBody = await snapshot("Scenarios.json", "Scenarios", files, log);
   const index = checked(hobScenarioIndexSchema, indexBody, "Scenarios");
-  const wanted = index.filter((item) => BUILT_SCENARIO_PRODUCTS.has(item.Product));
+  const wanted = index.filter(isBuiltScenario);
   log.info(`Scenarios: ${index.length} listed, ${wanted.length} from ${[...BUILT_SCENARIO_PRODUCTS].join(", ")}`);
   const tick = log.progress(wanted.length, "scenario");
   for (const entry of wanted) {

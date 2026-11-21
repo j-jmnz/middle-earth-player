@@ -8,9 +8,9 @@ import { defendingAgainst } from "../families/angmar/combat.ts";
 import type { EngineStep } from "./intents.ts";
 import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "../windows/queue.ts";
-import type { CardInstance, ScenarioState } from "./state.ts";
+import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
-import { claimedDestination, returnedToDeck } from "../families/objectives/claimed.ts";
+import { claimedDestination, discardedDetached, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
 import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
@@ -23,12 +23,15 @@ import { reduceLife, takesLifeInstead } from "../families/burden/life.ts";
 import { placedLimit } from "../families/uncharted/limit.ts";
 import { grappleThreat } from "../families/grapple/values.ts";
 import { perDamage, threatPerHostWillpower } from "../families/cirith-ungol/values.ts";
+import { perShadow } from "../families/wizards-quest/khazad.ts";
+import { questProgressBonus } from "../families/wilderland/dolguldur.ts";
 import { printedStat, victoryOf } from "./printed-stat.ts";
 import { wallRoom } from "../families/pelennor/wall.ts";
 import { heldBy } from "./holder-classes.ts";
 import { inAreaOf } from "../families/breaking/areas.ts";
 import { versusVictoryTrait } from "../families/captured/values.ts";
 import { eliminateEmpties, markLoss } from "./eliminate.ts";
+import { announceAllyLeft } from "./ally-left.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
 // `quest`: an effect of a quest card or a side quest (framework damage that a card's "non-quest effects" limit does not count, 19074:A:2).
@@ -38,6 +41,12 @@ export { printedStat };
 
 // The stats of a card. A value below 0 is treated as 0 (rr.modifiers).
 const CARD_STATS: ReadonlySet<ModifierStat> = new Set(["willpower", "attack", "defense", "threat", "questPoints", "engagementCost", "hitPoints"]);
+
+// A modifier a player card gives: its source is a player card (an attachment's bonus, a hero's ability, an event).
+function fromPlayerCard(state: ScenarioState, modifier: Modifier, cards: ReadonlyMap<string, PrintedCard>): boolean {
+  const source = state.cards[modifier.sourceId];
+  return source != null && isPlayerType(printedOf(cards, source.code));
+}
 
 // `against` is the enemy the instance is attacking, for a modifier that only holds against some enemies.
 // A set modifier overrides every other one, the most recent set winning (rr.modifiers).
@@ -49,13 +58,15 @@ export function modifiedStat(
   against?: string,
 ): number {
   // "Use their Willpower instead of Defense" (06038).
-  if (stat === "defense" && defenseFromWillpower(state, instance.id)) return modifiedStat(state, instance, "willpower", cards, against);
+  if (stat === "defense" && defenseFromWillpower(state, instance, cards)) return modifiedStat(state, instance, "willpower", cards, against);
   // "During the encounter phase, treat each enemy's engagement cost as if it were 0" (41005:B:1).
   if (stat === "engagementCost" && state.phase === "Encounter" && flagged(state, "table", "engagementCostZero")) return 0;
   const printed = printedOf(cards, instance.code);
   // The Threat of the enemies grappled with a location is added to it (dcce.grapple).
   let total = printedStat(printed, stat, instance.face) + (stat === "threat" ? grappleThreat(state, instance.id) : 0);
   let set: number | null = null;
+  // The table's noWillpowerGain, read once and only if a raise of Willpower is met.
+  let gainBarred: boolean | undefined;
   // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2), or its Defense (900506:A:1).
   let floor = total;
   for (const modifier of state.modifiers) {
@@ -70,12 +81,17 @@ export function modifiedStat(
     if (modifier.against != null && modifier.against !== against) continue;
     // "+1 Attack when attacking an Orc" (families/attack/strike.ts).
     if (modifier.when?.kind === "attacking" && !attackingHolds(state, modifier.when, instance, { effects: [], cards }, against)) continue;
+    // "Characters cannot gain Willpower from player card effects" (901306:A:1): a raise from a player card is not counted; a reduction is.
+    if (stat === "willpower" && !modifier.set && modifier.amount > 0) {
+      gainBarred ??= flagged(state, "table", "noWillpowerGain");
+      if (gainBarred && fromPlayerCard(state, modifier, cards)) continue;
+    }
     if (modifier.set) set = modifier.amount;
     else total += modifier.amount;
     if (!modifier.set && modifier.amount > 0) floor += modifier.amount;
   }
   // Effects that count the damage on the card or the Willpower of its host (146023:A:1, 146022:A:3, 146014:A:2), recalculated as they change (faq.lasting-effects).
-  total += perDamage(state, instance, printed, stat);
+  total += perDamage(state, instance, printed, stat) + questProgressBonus(state, instance, printed, stat) + perShadow(state, instance, printed, stat);
   if (stat === "threat") total += threatPerHostWillpower(state, instance, printed, cards);
   const lowered = set ?? total;
   const value = lowered < floor && ((stat === "willpower" && flagged(state, instance.id, "cannotReduceWillpower")) || (stat === "defense" && flagged(state, instance.id, "cannotReduceDefense"))) ? floor : lowered;
@@ -108,12 +124,14 @@ export function versusHighEngagement(
 
 // The holder is the enemy making the attack in progress and the character defending it has at most this many printed hit points (142071:A:2).
 // With `ally`, the defender is an ally (12054:A:2).
-export function versusDefender(state: ScenarioState, holder: CardInstance, versus: { maxHitPoints?: number; ally?: true }, cards: ReadonlyMap<string, PrintedCard>): boolean {
+export function versusDefender(state: ScenarioState, holder: CardInstance, versus: { maxHitPoints?: number; maxWillpower?: number; ally?: true }, cards: ReadonlyMap<string, PrintedCard>): boolean {
   const attack = state.pendingAttack;
   if (!attack || attack.enemyId !== holder.id || attack.defenderId == null || attack.undefended) return false;
   const defender = state.cards[attack.defenderId];
   const printed = defender ? printedOf(cards, defender.code) : null;
   if (printed == null || (versus.ally === true && cardTypeOf(defender!, printed) !== "ally")) return false;
+  // "if the defending character has less than 2 Willpower" (901303:A:1): its current Willpower, modifiers counted.
+  if (versus.maxWillpower != null && modifiedStat(state, defender!, "willpower", cards) > versus.maxWillpower) return false;
   return versus.maxHitPoints == null || (printed.health != null && printed.health <= versus.maxHitPoints);
 }
 
@@ -211,9 +229,9 @@ export function isPlayerCardEffect(state: ScenarioState, cards: ReadonlyMap<stri
   return isPlayerType(printed) && printed.backType !== "encounter";
 }
 
-// An enemy with the Indestructible keyword, unless a card took its keywords away (`losesKeywords`, The Great Bridge, 142050:A:2).
+// An enemy with the Indestructible keyword, unless a card took its keywords away (`losesKeywords`, The Great Bridge, 142050:A:2), or only its Indestructible (`losesIndestructible`, 50931:B:1).
 export function indestructible(state: ScenarioState, id: string, printed: PrintedCard): boolean {
-  return printed.type === "enemy" && (printed.keywords.indestructible || flagged(state, id, "indestructible")) && !flagged(state, id, "losesKeywords");
+  return printed.type === "enemy" && (printed.keywords.indestructible || flagged(state, id, "indestructible")) && !flagged(state, id, "losesKeywords") && !flagged(state, id, "losesIndestructible");
 }
 
 export function placeDamage(state: ScenarioState, assigned: string, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], source: DamageSource, cause: Cause, sourceId?: string | null): ScenarioState {
@@ -233,6 +251,8 @@ function placeDamageHere(state: ScenarioState, assigned: string, amount: number,
   if (!instance || !inPlay(instance.zone)) return state;
   const printed = printedOf(cards, instance.code);
   if (source === "player" && !playerCardEffectCanChoose(printed, state, id, sourcePrinted(state, cards, sourceId))) return state;
+  // "While The Watcher is in the staging area, it cannot be damaged by player card effects" (901502:A:1): the damage of a player card's effect is not placed; an attack's combat damage and an encounter card's are.
+  if (source === "player" && flagged(state, id, "noPlayerEffectDamage")) return state;
   // "When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead" (141057:A:2).
   if (takesLifeInstead(state, id)) return reduceLife(state, amount, steps, cause);
   // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed.
@@ -248,6 +268,9 @@ function placeDamageHere(state: ScenarioState, assigned: string, amount: number,
   // "When attached enemy would take any amount of damage, cancel all of that damage. Then, discard Dragon Scales" (18059:A:2).
   const scaled = flagged(state, id, "cancelsDamage") ? cancelAllDamage(state, id, amount) : null;
   if (scaled) return scaled;
+  // "When attached enemy is dealt enough damage to destroy it, cancel the damage and discard Smoking Blood instead" (51017:A:1): only damage that would destroy the card is canceled.
+  const lethalCanceled = flagged(state, id, "cancelsLethalDamage") && printed.health != null && instance.damage + placedAmount(state, id, printed, amount) >= modifiedStat(state, instance, "hitPoints", cards) ? cancelAllDamage(state, id, amount, "cancelsLethalDamage") : null;
+  if (lethalCanceled) return lethalCanceled;
   // A card that takes no more than a number of damage each round ("cannot take more than 4 damage each round", 11177:A:4) takes what is left of it.
   const cap = source === "quest" && flagged(state, id, "damageCapSparesQuest") ? 0 : heldAmount(state, id, "damageCap");
   const taken = state.roundDamage?.[id] ?? 0;
@@ -267,7 +290,8 @@ function placeDamageHere(state: ScenarioState, assigned: string, amount: number,
   const lethal = printed.health != null && damage >= modifiedStat(next, instance, "hitPoints", cards);
   // Damage dealt to a character is first offered to the Responses that cancel it ("cancel X damage just dealt", rr.cancel).
   // A character it would destroy is destroyed by the sweep once they have had their chance (destroyOverwhelmed, damageHeld).
-  if (hurt && isCharacterType(printed)) {
+  // An enemy whose own Forced effect answers the damage dealt to it (Patrol Leader, 03014:A:1) is offered it the same way (families/encounter/patrol.ts markEnemyDamage).
+  if (hurt && (isCharacterType(printed) || (printed.type === "enemy" && state.enemyDamageHeard?.includes(instance.code) === true))) {
     next = queueEvent(next, { trigger: "damageDealt", seat: instance.controller, cardId: id, subject: id, amount: dealt });
     if (lethal && state.holdLethal) return next;
   }
@@ -334,22 +358,23 @@ function heroHostInPlay(state: ScenarioState, instance: CardInstance): boolean {
 export function defeatedDestination(
   instance: CardInstance,
   printed: PrintedCard,
+  state: ScenarioState,
 ): Destination {
   if ((printed.type === "enemy" || isLocationCard(printed)) && victoryOf(instance, printed) != null) {
     return { zone: "victory" };
   }
   // A card put into play for a time leaves the game when it leaves play (PutIntoPlay `then: removeFromGame`, 11212:A:2).
   if (instance.temporary) return { zone: "removed" };
-  // A claimed objective that is discarded or loses its hero returns to the staging area (01108:A:2, families/objectives/claimed.ts).
+  // A claimed objective whose text returns it (01108:A:2, 12071:A:1) goes back to the staging area when discarded or detached (families/objectives/claimed.ts).
   // A Captive destroyed under To Isengard! or an enemy goes to its owner's discard pile (families/captives).
   const usual: Destination =
-    // An ally in the staging area under nobody's control (Retreat from Osgiliath, 145074:B:2) is still its owner's: it goes to that discard pile.
-    !fromEncounterDeck(printed) && (instance.controller != null || ((instance.captive === true || instance.zone === "staging") && instance.owner != null))
+    // An ally in the staging area under nobody's control (Retreat from Osgiliath, 145074:B:2) and a player card lying on a Nameless enemy (families/nameless) are still their owner's: they go to that discard pile.
+    !fromEncounterDeck(printed) && (instance.controller != null || ((instance.captive === true || instance.zone === "staging" || instance.nameless === true) && instance.owner != null))
       ? { zone: "discard", seat: instance.owner ?? instance.controller ?? 0 }
       : printed.type === "quest"
         ? { zone: "setAside" }
         : { zone: "encounterDiscard" };
-  return claimedDestination(instance, usual);
+  return claimedDestination(state, instance, usual);
 }
 
 // Each card attached to a card that leaves play is discarded at the same time (rr.attachment-cards), to the discard pile of
@@ -386,11 +411,18 @@ export function releaseAttachments(
       steps.push({ kind: "destroy", targetId: attachmentId });
       continue;
     }
+    // A claimed objective that is discarded when it is detached (The Old Thrush, 50208:A:2).
+    const detached = discardedDetached(next, attachmentId);
+    if (detached) {
+      next = detached;
+      steps.push({ kind: "destroy", targetId: attachmentId });
+      continue;
+    }
     const printed = printedOf(cards, attachment.code);
     const dest: Destination =
       (cardTypeOf(host, hostPrinted) === "hero" && printed.keywords.permanent) || flagged(next, attachmentId, "removedWithHost")
         ? { zone: "removed" }
-        : defeatedDestination(attachment, printed);
+        : defeatedDestination(attachment, printed, next);
     next = moveCard(next, attachmentId, dest);
     steps.push({ kind: "destroy", targetId: attachmentId });
     if (printed.leavesPlayLoses) next = markLoss(next, `${printed.name} left play`);
@@ -428,9 +460,9 @@ export function destroyCard(
   // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck/rules.ts).
   // An enemy that "gains victory" (the flag gainsVictory, 11178:A:1) goes to the victory display as one that prints it does.
   const victorious = heldAmount(state, id, "gainsVictory") > 0 && printed.type === "enemy" && printed.victory == null ? { ...printed, victory: heldAmount(state, id, "gainsVictory") } : printed;
-  next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious), { released: instance.attachments, defeated: byDamage });
+  next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious, next), { released: instance.attachments, defeated: byDamage });
   steps.push({ kind: "destroy", targetId: id });
-  if (cardTypeOf(instance, printed) === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
+  next = announceAllyLeft(next, instance, cards);
   next = discardedFromPlay(next, instance, byDamage);
   // "If attached hero leaves play, the players lose the game" (19143:A:3): the hero holds the flag while Wormsbane is attached to it.
   if (printed.leavesPlayLoses || flagged(state, id, "lossOnLeavingPlay")) next = markLoss(next, `${printed.name} left play`);
@@ -439,9 +471,12 @@ export function destroyCard(
 
 // A keyword a card prints or has gained: a flag modifier of the same name ("Attached hero gains sentinel", rr.sentinel,
 // rr.ranged).
-export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel" | "ranged" | "restricted" | "doomed" | "surge", cards: ReadonlyMap<string, PrintedCard>): boolean {
+export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel" | "ranged" | "restricted" | "doomed" | "surge" | "ambush" | "gainedAmbush", cards: ReadonlyMap<string, PrintedCard>): boolean {
   const instance = state.cards[id];
   if (!instance) return false;
+  // Ambush a card gave the enemy (`gainsAmbush`, dwd.ambush; Goblin Gate 04043:A:1), in addition to a printed one.
+  if (keyword === "gainedAmbush") return flagged(state, id, "gainsAmbush");
+  if (keyword === "ambush" && flagged(state, id, "gainsAmbush")) return true;
   const printed = printedOf(cards, instance.code);
   const blank = printedKeywordsBlank(state, id, cards);
   if (keyword === "doomed") return !blank && (printed.keywords.doomed ?? 0) > 0;

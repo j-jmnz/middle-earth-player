@@ -77,7 +77,7 @@ describe("The Withered Heath in the ered-mithrin campaign", { timeout: 60_000 },
     expect(log.campaignPool.map((card) => card.code)).toEqual(expect.arrayContaining([CODES.turayn, CODES.melanwar, CODES.isolde, CODES.abandonedRuin, CODES.theThreatToWilderland]));
     expect(log.allyLines ?? []).toEqual([]);
     expect(log.treasures?.length).toBe(3);
-    expect(poolEncounterCopies(log.encounterPool ?? {})).toContain("01089");
+    expect(poolEncounterCopies(log.encounterPool ?? {})).toContain("01095");
     // The checklist reads the same log as the game does.
     const facts = wilderlandFacts(log, campaign.id);
     expect(facts.treasures).toEqual(log.treasures);

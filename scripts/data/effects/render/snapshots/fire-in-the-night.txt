@@ -160,18 +160,18 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 19074:A:1 (front): Immune to player card effects. X is 1 more than the number of side quests in the victory display.
   (the keyword part is owned by the card's keywords; the records cover: X is 1 more than the number of side quests in the victory display.)
   19074:constant:1: Constant
-    - this card: stat threat the number of card (any player controls) in the victory display, of card type encounter-side-quest + 1, while this card is in play
+    - this card: stat threat the number of card (any player controls) in the victory display, a side quest of either kind (player or encounter) + 1, while this card is in play
 
 19074:A:2 (front): Cannot leave the staging area or take more than X damage from non-quest effects each round.
   19074:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
-    - this card: stat damageCap the number of card (any player controls) in the victory display, of card type encounter-side-quest + 1, while this card is in play
+    - this card: stat damageCap the number of card (any player controls) in the victory display, a side quest of either kind (player or encounter) + 1, while this card is in play
     - this card: stat damageCapSparesQuest 1, while this card is in play
 
 19074:A:3 (front): While at least 3 side quests are in the victory display, Dagnir is considered to be engaged with each player.
   19074:constant:3: Constant
-    only if 2 is less than the number of card (any player controls) in the victory display, of card type encounter-side-quest
+    only if 2 is less than the number of card (any player controls) in the victory display, a side quest of either kind (player or encounter)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
     - this card: stat noThreatContribution 1, while this card is in play
@@ -186,7 +186,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
       * option "hill":
         - deal 3 damage to the current quest stage
       * option "attack":
-        - [json ImmediateAttackBy {"verb":"ImmediateAttackBy"}]
+        - the card the answered event was about (an enemy engaged with the actor) makes an immediate attack against the actor, dealt a shadow card of its own
 
 19075:A:2 (shadow): Shadow: If this attack destroys a character, deal 3 damage to Hrogar's Hill.
   19075:shadow:1: Shadow
@@ -247,11 +247,11 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19079:A:1 (front): X is 1 more than the number of side quests in the victory display.
   19079:constant:1: Constant
-    - this card: stat threat the number of card (any player controls) in the victory display, of card type encounter-side-quest + 1, while this card is in play
+    - this card: stat threat the number of card (any player controls) in the victory display, a side quest of either kind (player or encounter) + 1, while this card is in play
 
 19079:A:2 (front): Travel: Each player assigns X damage among characters he controls.
   19079:travel:1: Travel
-    - each player assigns the number of card (any player controls) in the victory display, of card type encounter-side-quest + 1 damage among the character (you control), one at a time
+    - each player assigns the number of card (any player controls) in the victory display, a side quest of either kind (player or encounter) + 1 damage among the character (you control), one at a time
 
 ## 19080 Powerful in Wrath
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -290,11 +290,11 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19082:A:1 (front): When Revealed: Each player assigns X damage among characters he controls, where X is 1 more than the number of side quests in the victory display.
   19082:whenRevealed:1: When revealed
-    - each player assigns the number of card (any player controls) in the victory display, of card type encounter-side-quest + 1 damage among the character (you control), one at a time
+    - each player assigns the number of card (any player controls) in the victory display, a side quest of either kind (player or encounter) + 1 damage among the character (you control), one at a time
 
 19082:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each side quest in the victory display.
   19082:shadow:1: Shadow
-    - the attacking enemy: stat attack the number of card (any player controls) in the victory display, of card type encounter-side-quest, until the end of the attack
+    - the attacking enemy: stat attack the number of card (any player controls) in the victory display, a side quest of either kind (player or encounter), until the end of the attack
 
 ## 19083 Hrogar's Hill
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -324,4 +324,4 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19083:constant:2: Constant
     - this card: stat loseAtDamage quest points of this card, while this card is in play
 
-(rendered pieces: 195 by template, 14 as JSON)
+(rendered pieces: 196 by template, 13 as JSON)

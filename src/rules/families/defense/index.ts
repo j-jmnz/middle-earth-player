@@ -11,6 +11,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import { isCharacterType, printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { exhaustAnnounced } from "../../windows/exhaust.ts";
 import type { Frame, Modifier, QueueItem, ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
@@ -45,7 +46,7 @@ function strikeBack(state: ScenarioState, instruction: Extract<Instruction, { ve
   const enemy = state.cards[enemyId];
   if (!attacker || !enemy || attacker.controller == null || !inPlay(attacker.zone) || enemy.zone !== "engaged") return state;
   if (!isCharacterType(printedOf(ctx.cards, attacker.code))) return state;
-  const exhausted = attacker.exhausted || flagged(state, attackerId, "noExhaustAttack") ? state : updateCard(state, attackerId, { exhausted: true });
+  const exhausted = attacker.exhausted || flagged(state, attackerId, "noExhaustAttack") ? state : exhaustAnnounced(state, attackerId, ctx);
   const declared = queueEvent(exhausted, { trigger: "declaredAttacker", seat: attacker.controller, cardId: attackerId, other: enemyId });
   const modifier: Modifier | null = instruction.defense ? { instanceId: enemyId, sourceId: focus.sourceId ?? attackerId, stat: "defense", amount: instruction.defense, until: "endOfPhase" } : null;
   const weakened = modifier ? { ...declared, modifiers: [...declared.modifiers, modifier] } : declared;
@@ -90,8 +91,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       for (let left = shadowCards(state.cards[enemyId]).length; left > 0; left -= 1) next = discardShadowOf(next, enemyId);
       return next;
     }
+    case "ExcessToCard":
+      return state.pendingAttack ? { ...state, pendingAttack: { ...state.pendingAttack, excessToCard: instruction.name } } : state;
     case "DealShadowTo":
-      return dealShadowTo(state, ref(state, instruction.target, focus), steps, ctx);
+      return dealShadowTo(state, ref(state, instruction.target, focus), steps, ctx, instruction.from === "encounter");
     case "LookAtShadow":
       return lookAtShadow(state, ref(state, instruction.target ?? "picked", focus), focus.seat, instruction.markEffect === true, ctx);
     case "ShadowAttacks":
@@ -131,4 +134,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "defense", verbs: ["ChooseAmount", "SpendFromPool", "RedirectDamage", "PreventAttacks", "DiscardShadowOf", "DealShadowTo", "LookAtShadow", "ShadowAttacks", "StartShadowAttack", "StrikeBack", "AddDefender", "EndDeclaring", "CancelAttack", "AssignAttackDamage", "ReadyUnharmed", "ReadyAfterAttack", "RedirectAttack", "ModifyStatVersus"], run };
+export const manifest: RulesFamily = { name: "defense", verbs: ["ChooseAmount", "SpendFromPool", "RedirectDamage", "PreventAttacks", "DiscardShadowOf", "ExcessToCard", "DealShadowTo", "LookAtShadow", "ShadowAttacks", "StartShadowAttack", "StrikeBack", "AddDefender", "EndDeclaring", "CancelAttack", "AssignAttackDamage", "ReadyUnharmed", "ReadyAfterAttack", "RedirectAttack", "ModifyStatVersus"], run };

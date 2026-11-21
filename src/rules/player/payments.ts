@@ -2,7 +2,7 @@
 import { grantedIcons } from "../interpret/conditions.ts";
 import { heroPaysFor } from "./cost-rules.ts";
 import { deckPlayIcons } from "./deck-play.ts";
-import { allyPools, cannotPay, flagIcons, payerOk, payingIcons } from "../families/costs/pay.ts";
+import { allyPools, cannotPay, flagIcons, iconLost, payerOk, payingIcons } from "../families/costs/pay.ts";
 import { openPools } from "../families/misc/guards.ts";
 import type { Payment } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
@@ -16,6 +16,7 @@ export function heroPays(state: ScenarioState, heroId: string, sphere: Sphere | 
   if (!hero) return false;
   // Icons held as flags, icons a hero has while paying for some cards, pools that cannot pay for some (families/costs/pay.ts).
   if (forCard != null && cannotPay(state, heroId, forCard, ctx)) return false;
+  if (iconLost(state, heroId, sphere)) return false;
   if (spherePays(printedOf(ctx.cards, hero.code).sphere, sphere)) return true;
   if (grantedIcons(state, heroId, ctx).some((icon) => spherePays(icon, sphere))) return true;
   if (flagIcons(state, heroId).some((icon) => spherePays(icon, sphere))) return true;

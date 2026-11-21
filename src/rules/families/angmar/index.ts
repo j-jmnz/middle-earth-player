@@ -23,7 +23,7 @@ import { destroyedWillpowerAmount } from "./last-known.ts";
 import { placeLoggedDamageOn } from "./logged.ts";
 import { endPhase } from "./phase.ts";
 import { travelUnpayable } from "./travel.ts";
-import { noteFirstTrait } from "./weather.ts";
+import { noteFirstTrait, noteRevealDoomed, revealedGainDoomed } from "./weather.ts";
 import { discardHeld, holdUnder } from "./hold.ts";
 import { chooseCurrentQuest, currentQuestHolds, hitPointsLeftHolds, questCardsAmount, questLeadsHolds } from "./quest.ts";
 import { advanceWhenFlagged, removeSideQuestsFromGame } from "./stage.ts";
@@ -56,6 +56,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     // A marker the reveal hook reads (weather.ts).
     case "FirstTraitSurge":
       return state;
+    case "RevealedGainDoomed":
+      return revealedGainDoomed(state, instruction, focus.sourceId);
     case "EndPhase":
       return endPhase(state, focus);
     case "PlaceLoggedDamageOn":
@@ -104,7 +106,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "DealSourceAsShadow":
       return dealSourceAsShadow(state, focus);
     case "AttachEnemyToPicked":
-      return attachEnemyToPicked(state, focus, ctx);
+      return attachEnemyToPicked(state, instruction, focus, ctx);
     case "DestroyHighestCostAlly":
       return destroyHighestCostAlly(state, instruction, focus, ctx, steps);
     case "DiscardOtherInPlay":
@@ -118,9 +120,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "angmar",
-  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "ReleaseGuards", "RevealSetAsideForTokens", "EarnEncounterCopies", "RemoveSideQuestsFromGame", "FlipWhenDefeated", "RemoveProgressAmong", "FlipTwoSided", "DealShadowInPlay", "DiscardCopiesFromDeck", "Reanimate", "ResolveWhenRevealedOf", "DealSourceAsShadow", "AttachEnemyToPicked", "DestroyHighestCostAlly", "DiscardOtherInPlay", "RemovePickedFromGame"],
+  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "RevealedGainDoomed", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "ReleaseGuards", "RevealSetAsideForTokens", "EarnEncounterCopies", "RemoveSideQuestsFromGame", "FlipWhenDefeated", "RemoveProgressAmong", "FlipTwoSided", "DealShadowInPlay", "DiscardCopiesFromDeck", "Reanimate", "ResolveWhenRevealedOf", "DealSourceAsShadow", "AttachEnemyToPicked", "DestroyHighestCostAlly", "DiscardOtherInPlay", "RemovePickedFromGame"],
   run,
-  revealed: (state, id, ctx) => noteFirstTrait(timeOnReveal(state, id, ctx), id, ctx),
+  revealed: (state, id, ctx) => noteRevealDoomed(noteFirstTrait(timeOnReveal(state, id, ctx), id, ctx), id),
   travel: { unpayable: travelUnpayable },
   pick: (state, id, spec, _at, ctx) => determinedMatches(state, id, spec) && safePickMatches(state, id, spec, ctx) && reanimatedPickMatches(state, id, spec, ctx),
   pool: (state, spec) => allInPlayPool(state, spec),

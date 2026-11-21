@@ -20,6 +20,7 @@ import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/scenarios/island.ts";
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/scenarios/grapple.ts";
 import { isBoonCode } from "../words/scenarios/angmar/angmar-table.ts";
+import { smaugChooseNote } from "../words/scenarios/standalone-scenarios/smaug.ts";
 import { isFreedTreasureClaim, isTreasureDraw, wilderlandBranchNow, wilderlandChooseNote, wilderlandOptionLabel, wilderlandTravel } from "../words/scenarios/wilderland.ts";
 import { embassyPairCards } from "../readouts/black-gate.ts";
 import { branchCaution, discardCaution } from "./wilderland-sheets.ts";
@@ -48,7 +49,7 @@ import { escapeCommitNote, escapeCountNote, escapePassCaution, escapeStat } from
 import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
 import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
-import { captiveLabel, cardLabel, has, option, seatedLabel, stagedAllyLabel, statOf, step, tiedLabel } from "./sheet-parts.ts";
+import { captiveLabel, cardLabel, copyLabel, has, option, seatedLabel, stagedAllyLabel, statOf, step, tiedLabel } from "./sheet-parts.ts";
 import { nightActionNote } from "../words/scenarios/night.ts";
 import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/framsburg.ts";
 import { fatePassCaution } from "../words/scenarios/fate.ts";
@@ -65,6 +66,17 @@ function lineOf(effect: Effect | undefined, names: SheetNames): string | null {
   return id ? names.line(id) : null;
 }
 
+/**
+ * The row of a card whose Action or Response can be used: an attachment says which card it lies on ("Unexpected Courage ·
+ * on Aragorn"), so two copies on two heroes read apart. A hero or an ally is named alone.
+ */
+function triggerLabel(game: ScenarioState, names: SheetNames, id: string): string {
+  // A card under a location also names a host; only a card in the host's attachments is attached to it.
+  const host = game.cards[id]?.host;
+  const label = cardLabel(game, names, id);
+  return host != null && game.cards[host]?.attachments.includes(id) === true ? `${label} \u00b7 on ${names.card(host)}` : label;
+}
+
 export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], names: SheetNames): TriggerOption[] {
   const options: TriggerOption[] = [];
   for (const intent of legal) {
@@ -75,7 +87,7 @@ export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: r
     const caution = framsburgActionCaution(game, effect);
     options.push({
       id: `${intent.cardId}|${intent.effectId}`,
-      label: cardLabel(game, names, intent.cardId),
+      label: triggerLabel(game, names, intent.cardId),
       code: pictureKey(card),
       effectId: intent.effectId,
       cardId: intent.cardId,
@@ -278,7 +290,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         // The record's asks entries (words/asks.ts) come before the families' words.
         const asked = { game, ctx, names: words, instruction: choose, ...(data?.effectId ? { effectId: data.effectId } : {}), ...(wait.item.cause ? { cause: wait.item.cause } : {}), source };
         const written = { ...asked, at: askAt(asked) };
-        const ask = asksChoose(written)?.note ?? torch?.note ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
+        const ask = asksChoose(written)?.note ?? torch?.note ?? smaugChooseNote(choose, game, ctx, words, window.seat) ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
         return {
           ...base,
           note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, line].filter((part) => part != null).join(" "),
@@ -328,7 +340,9 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const kingsCaution = wait?.kind === "target" ? discardCaution(game, ctx, source, wait.item.instruction, data?.queue[0]?.instruction, id, names.card) : undefined;
           // An asks entry's warning is the row's own (asks.ts): it arms the confirm on that row only.
           const rowCaution = asked.cautions?.[id] ?? fire?.caution ?? ship?.caution ?? kingsCaution;
-          const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
+          // A plain card row that shares its name with another row says what tells the copies apart (Mr. Underhill's two Black Riders).
+          const plainLabel = card.label === names.card(id) ? (copyLabel(game, names, id, window.options) ?? card.label) : card.label;
+          const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : plainLabel);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
           return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...(willpower.length > 0 || eyes.length > 0 ? { stats: [...willpower, ...eyes] } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };

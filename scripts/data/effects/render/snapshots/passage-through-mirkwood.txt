@@ -138,7 +138,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 01092:A:2 (shadow): Shadow: Choose and discard 1 attachment from the defending character. (If this attack is undefended, discard all attachments you control.)
   01092:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (the attack has no defender): choose attachment (any player controls) [also {"attachedTo":"defender"}]
+    - if not (the attack has no defender): choose attachment (any player controls) attached to the defending character
     - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each attachment (you control):
       - discard the picked card
@@ -272,4 +272,4 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
     - [json Earn {"verb":"Earn","codes":["01136"],"when":{"kind":"stageReached","code":"01122","is":true}}]
     - [json Earn {"verb":"Earn","codes":["01137"],"when":{"kind":"stageReached","code":"01121","is":true}}]
 
-(rendered pieces: 149 by template, 7 as JSON)
+(rendered pieces: 150 by template, 6 as JSON)

@@ -25,14 +25,15 @@ import { optionalEnemies, stagingLocations } from "../quest/quest.ts";
 import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable, travelProgressReason, seatBarred } from "../interpret/restrictions.ts";
 import { flagged, modifierActive, perilLock, type ScenarioState } from "../core/state.ts";
 import { attackRuleReason } from "../families/attack/targets.ts";
-import { sideQuestReason } from "../families/sidequests/quest.ts";
-import { familyAttackReason, familyDefenseReason, familyMayTravel, familyTravelReach } from "../interpret/family-hooks.ts";
+import { familyAttackReason, familyDefenseReason, familyMayTravel, familyTravelReach, familyTravelSecond } from "../interpret/family-hooks.ts";
 import { travelsOverActive } from "../families/grapple/travel.ts";
 import { exploring } from "../families/island/map.ts";
 import { islandMayTravel, islandReach } from "../families/island/travel.ts";
 import { freeSlot, mustTravel } from "../families/south/locations.ts";
 import { viewOf } from "../families/breaking/areas.ts";
+import { commitLimitReason } from "../families/play/commit-limit.ts";
 import { askingToCommit, sailingBlocks, sailingCommitReason, sailingCommitters, sailingIntents } from "../families/sea/sailing-legal.ts";
+import { flaggedByClass } from "../core/holder-classes.ts";
 import { printedOf } from "../core/printed.ts";
 
 const NUMBER = "The engine computes that number";
@@ -89,7 +90,7 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
 export function legalTargets(state: ScenarioState, selection: Selection, ctx: ReduceContext): readonly string[] {
   switch (selection.type) {
     case "PlayCard":
-      return attachmentTargets(state, state.cards[selection.cardId]?.code, ctx);
+      return attachmentTargets(state, selection.cardId, ctx);
     case "Commit":
       return askingToCommit(state) ? sailingCommitters(state, ctx) : committers(state, state.activeSeat, ctx);
     case "CommitHide":
@@ -227,8 +228,13 @@ function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
 
 // A slot is free for the traveling seat: its own active location once stages are separate (families/breaking/areas.ts).
 // Under Exploration the active location stays, and the players may travel from it once it holds progress equal to its quest points (families/island/travel.ts).
-function canTravel(state: ScenarioState, ctx: ReduceContext): boolean {
+function hasTravelSlot(state: ScenarioState, ctx: ReduceContext): boolean {
   return freeSlot(viewOf(state, state.activeSeat)) != null || travelsOverActive(state) || islandMayTravel(state, ctx.cards) || familyMayTravel(state, ctx);
+}
+
+// Besides a slot, a location a family lets the players travel to as a second active location (Fisherman's Dock, 50223:A:2) opens travel.
+function canTravel(state: ScenarioState, ctx: ReduceContext): boolean {
+  return hasTravelSlot(state, ctx) || stagingLocations(state, ctx.cards).some((id) => familyTravelSecond(state, id));
 }
 
 // The locations the players may travel to: those in the staging area, and the ones the active location lets them reach beyond it (Winding Caverns, 12073:A:2), then any a family's travel hook adds (interpret/family-hooks.ts).
@@ -241,7 +247,10 @@ function travelCandidates(state: ScenarioState, ctx: ReduceContext): string[] {
 
 function travelTargets(state: ScenarioState, ctx: ReduceContext): string[] {
   // Once stages are separate the seat that travels chooses among the locations of its own staging area.
-  const open = travelCandidates(state, ctx).filter((id) => !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
+  const candidates = travelCandidates(state, ctx);
+  // With no slot free and no stage that lets the players travel anyway, only a location a family lets them travel to as a second active location (Fisherman's Dock, 50223:A:2).
+  const slotless = !hasTravelSlot(state, ctx);
+  const open = (slotless ? candidates.filter((id) => familyTravelSecond(state, id)) : candidates).filter((id) => !travelBlocked(state, ctx, id) && !travelCostUnpayable(state, ctx, id));
   // A location that says the players must travel to it (01088:A:1) is the only one they may travel to.
   const forced = forcedTravel(state, ctx);
   return forced.length > 0 ? open.filter((id) => forced.includes(id)) : open;
@@ -269,7 +278,7 @@ function committers(state: ScenarioState, seat: number, ctx: ReduceContext): str
   return characters(state, seat, ctx.cards).filter((id) => {
     const instance = state.cards[id];
     // "Can commit to quests while exhausted" (11009:A:1).
-    return instance != null && (!instance.exhausted || flagged(state, id, "commitsExhausted")) && !instance.committed && !flagged(state, id, "cannotQuest");
+    return instance != null && (!instance.exhausted || flagged(state, id, "commitsExhausted")) && !instance.committed && !flaggedByClass(state, instance, printedOf(ctx.cards, instance.code), "cannotQuest") && (!flagged(state, id, "cannotExhaust") || flagged(state, id, "noExhaustQuest"));
   });
 }
 
@@ -284,7 +293,7 @@ function commitReason(
   for (const id of intent.cardIds) {
     if (!legal.has(id)) return "That character cannot commit";
   }
-  return intent.sideQuestId ? sideQuestReason(state, intent.sideQuestId) : null;
+  return commitLimitReason(state, state.activeSeat, intent.cardIds, ctx.cards);
 }
 
 function travelReason(

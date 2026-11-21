@@ -5,7 +5,7 @@
 import { BLACK_GATE } from "../../rules/families/harad/under.ts";
 import { isReanimatedCode } from "../../rules/core/printed.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
-import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
+import { flagged, type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
 import { cardsUnder, shadowCards } from "../../rules/core/zones.ts";
 import { lookedIds } from "../../rules/families/sea/sailing.ts";
 import { captivesOf, captivesUnder } from "../../rules/families/captives/values.ts";
@@ -14,10 +14,10 @@ import { capturedByHost } from "../../rules/families/captured/pile.ts";
 import { grappledWith } from "../../rules/families/grapple/values.ts";
 import { prisonersOfSeat } from "../../rules/families/prisoner/index.ts";
 import { declaredDefenders } from "../../rules/families/defense/defenders.ts";
-import { activeOf, areaOf, isSeparate, sharedStaging, stageOf, stagingOf } from "../../rules/families/breaking/areas.ts";
+import { activeOf, areaOf, isSeparate, parkedStage, sharedStaging, stageOf, stagingOf } from "../../rules/families/breaking/areas.ts";
 
 import { threatRows } from "./foresight.ts";
-import { isDiscardPile, opensList, PILE_WORDS, PILES, SECOND_PILES, secondPilesOf, type BasePileId, type PileId, type SecondPileId, type VictoryPileId } from "./pile-ids.ts";
+import { isDiscardPile, opensList, pileIds, PILE_WORDS, PILES, SECOND_PILES, secondPilesOf, type BasePileId, type PileId, type SecondPileId, type VictoryPileId } from "./pile-ids.ts";
 import { areaGroup, areaRoleOf, type AreaRole } from "./stormcaller-table.ts";
 
 export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActiveLocation" | "engaged" | "play" | "hand";
@@ -25,7 +25,7 @@ export type ZoneId = "questStage" | "staging" | "activeLocation" | "secondActive
 export const TABLE_ZONES: readonly ZoneId[] = ["questStage", "staging", "activeLocation", "secondActiveLocation", "engaged", "play", "hand"];
 
 // The piles, by name, live in pile-ids.ts and are read through here.
-export { isDiscardPile, opensList, PILE_WORDS, PILES, SECOND_PILES, secondPilesOf, type BasePileId, type PileId, type SecondPileId, type VictoryPileId };
+export { isDiscardPile, opensList, pileIds, PILE_WORDS, PILES, SECOND_PILES, secondPilesOf, type BasePileId, type PileId, type SecondPileId, type VictoryPileId };
 
 // How characters fight an engaged enemy in the attack in progress: defending it, hit by it undefended, or attacking it.
 export type FightKind = "defense" | "undefended" | "attack";
@@ -121,13 +121,11 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number, facts?:
         const card = game.cards[id];
         return card != null && card.host == null && !fighting.has(id);
       });
-      // The seat's player side quest stands first in its row: its quest area (families/sidequests/play.ts).
-      const quest = owner.questStage && game.cards[owner.questStage] ? [owner.questStage] : [];
       // Then its ships, the Dream-chaser before any other (dcce.ship-objectives), then its heroes and the rest.
       const ships = facts ? shipsFirst(game, here, facts) : [];
       const rest = facts ? here.filter((id) => !ships.includes(id)) : here;
       // The hero this seat's player holds as the prisoner is still in play: facedown beside the seat's cards, with Mendor under it.
-      return [...quest, ...ships, ...rest, ...prisonersOfSeat(game, seat)];
+      return [...ships, ...rest, ...prisonersOfSeat(game, seat)];
     }
     case "hand":
       return owner?.hand ?? NONE;
@@ -138,6 +136,8 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number, facts?:
 function areaOrShared(game: ScenarioState, seat: number): readonly string[] {
   const own = stagingOf(game, seat);
   if (!isSeparate(game)) return own;
+  // The staging cards of a parked stage (Fog on the Barrow-downs, stage 3B with no player at it) are in no player's area: the table draws them in none, and a dial and the stage's preview name them (readouts/standalone-scenarios/barrow-downs.ts).
+  if (parkedStage(game) != null) return own;
   const shared = sharedStaging(game);
   return shared.length > 0 ? [...own, ...shared] : own;
 }
@@ -156,9 +156,15 @@ function shipsFirst(game: ScenarioState, ids: readonly string[], facts: ZoneFact
   return ids.filter((id) => rank(id) != null).sort((a, b) => (rank(a) ?? 1) - (rank(b) ?? 1));
 }
 
+// An ally the active location guards (Arwen under Goblin Gate, 901402:B:1, the `guardedAlly` flag) is drawn under it in the active location's zone, not in the staging area.
+const guardedAllyOf = (game: ScenarioState, card: CardInstance | undefined): readonly string[] => (card?.guard === true && card.host != null && flagged(game, card.host, "guardedAlly") ? [card.host] : []);
+const heldUnderActive = (game: ScenarioState): string | null => guardedAllyOf(game, game.activeLocation ? game.cards[game.activeLocation] : undefined)[0] ?? null;
+
 // The staging area's cards in the order the table draws them: each guarded objective is followed by the encounter cards attached to it
 // (rr.guarded), so a guard stands beside the objective it guards.
 function stagingOrder(game: ScenarioState, staging: readonly string[]): readonly string[] {
+  const held = heldUnderActive(game);
+  if (held != null && staging.includes(held)) return stagingOrder(game, staging.filter((id) => id !== held));
   if (!staging.some((id) => game.cards[id]?.guard === true)) return staging;
   const ordered: string[] = [];
   for (const id of staging) {
@@ -222,7 +228,7 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     // The enemies grappled with a location are drawn facedown under it, as its attachments are (dcce.grapple).
     // The enemies facedown under The Black Gate lie under it, one counted peek (144027:A:2).
     const gated = card.code === BLACK_GATE ? cardsUnder(game, id) : NONE;
-    const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...under, ...gated, ...(card.zone === "staging" ? grappledWith(game, id) : [])]);
+    const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...under, ...gated, ...(card.zone === "staging" ? grappledWith(game, id) : []), ...(card.zone === "activeLocation" ? guardedAllyOf(game, card) : [])]);
     const pair = pairs.get(id);
     const rank = facts?.shipRank(card.code) ?? null;
     const area = game.sea?.stormcaller ? areaRoleOf(game, id) : null;
@@ -255,35 +261,6 @@ export function zoneSelector(zone: ZoneId, seat: number, facts?: ZoneFacts): (ga
 // A deck also carries the encounter cards attached to it (Iron Shackles, 01105:A:1), drawn under it. The victory display also carries
 // the two cards under its top, fanned behind it, and the Victory points its cards score (victoryPileSelector).
 export type PileView = { pile: PileId; seat: number; ids: readonly string[]; top: CardInstance | null; attached?: readonly CardInstance[]; fan?: readonly CardInstance[]; points?: number };
-
-/** The cards of a pile, bottom first: the shown seat's deck or discard pile, the encounter pair, the second slot's piles. */
-export function pileIds(game: ScenarioState, pile: PileId, seat: number): readonly string[] {
-  switch (pile) {
-    case "deck":
-      return game.seats[seat]?.deck ?? NONE;
-    case "discard":
-      return game.seats[seat]?.discard ?? NONE;
-    case "encounterDeck":
-      return game.encounterDeck;
-    case "encounterDiscard":
-      return game.encounterDiscard;
-    case "corsairDeck":
-      return game.corsairDeck ?? NONE;
-    case "corsairDiscard":
-      return game.corsairDiscard ?? NONE;
-    case "unchartedDeck":
-    case "grottoDeck":
-      return game.uncharted?.deck ?? NONE;
-    case "evilCreaturesDeck":
-    case "evilCreaturesDiscard":
-    case "cavesDeck":
-    case "haradDeck":
-    case "angmarOrcDeck":
-      return game.piles?.[pile] ?? NONE;
-    case "victory":
-      return game.victory;
-  }
-}
 
 /** A memoized selector for one pile: the same view while the pile's list and its top card are the same objects. */
 export function pileSelector(pile: PileId, seat: number): (game: ScenarioState) => PileView {
@@ -419,7 +396,8 @@ export function onTableFor(game: ScenarioState, seat: number, folded?: ReadonlyS
       // Once stages are separate the table draws the seat's own area, stage and active location: a card of another seat's is not on it.
       case "staging": {
         const area = areaOf(game, cardId);
-        return area == null || area === seat;
+        // A card of a parked stage's staging area is in no area: it is not on the table the seat sees.
+        return area == null ? parkedStage(game) == null : area === seat;
       }
       case "activeLocation":
       case "secondActiveLocation":

@@ -16,7 +16,7 @@ function backOf(value: string | null): "player" | "encounter" | null {
 }
 
 export function printedFromRow(row: CatalogRow): PrintedCard {
-  return printedFromCard({
+  const printed = printedFromCard({
     code: row.code,
     name: row.name,
     type: row.typeCode,
@@ -40,6 +40,8 @@ export function printedFromRow(row: CatalogRow): PrintedCard {
     typeName: row.typeName,
     encounterSet: row.encounterSet,
   });
+  // An event's own deck limit, which a card that adds events from the collection keeps (Silent Mist, 40009:B:2); only a card that can be added carries it.
+  return row.typeCode === "event" && row.deckLimit != null ? { ...printed, deckLimit: row.deckLimit } : printed;
 }
 
 // The row the engine cannot print (a nightmare card), with why. Undefined when it prints.

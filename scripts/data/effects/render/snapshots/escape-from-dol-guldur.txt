@@ -87,7 +87,9 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
   01108:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Item attachment while it is attached
+    - this card: stat returnsToStagingArea 1, while this card is in play
 
 01108:A:3 (front): Attached hero cannot attack or defend.
   01108:constant:2: Constant
@@ -109,7 +111,9 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
   01109:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Item attachment while it is attached
+    - this card: stat returnsToStagingArea 1, while this card is in play
 
 01109:A:3 (front): Forced: At the end of each round, raise attached hero's controller's threat by 2.
   01109:forced:1: Forced at the end of the round
@@ -130,7 +134,9 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
   01110:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Item attachment while it is attached
+    - this card: stat returnsToStagingArea 1, while this card is in play
 
 01110:A:3 (front): Forced: At the end of each round, attached hero suffers 1 damage.
   01110:forced:1: Forced at the end of the round
@@ -221,4 +227,4 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     - [json CarryOver {"verb":"CarryOver","codes":["01135"],"when":{"kind":"inPlay","code":"01135","is":true}}]
     - [json CarryOver {"verb":"CarryOver","codes":["01132"],"eachPlayer":true,"when":{"kind":"inPlay","code":"01135","is":true}}]
 
-(rendered pieces: 124 by template, 18 as JSON)
+(rendered pieces: 127 by template, 18 as JSON)

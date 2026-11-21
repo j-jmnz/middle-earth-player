@@ -47,7 +47,15 @@ export const announce = (trigger: GameEvent["trigger"], code?: string, extra: Pa
 
 export const stat = (code: string, name: StatName, value: number): Expect => ({ expect: "stat", code, name, value });
 export const flag = (code: string, name: FlagName, value = true): Expect => ({ expect: "flag", code, name, value });
+/** The card holds the flag through a class of cards (every damaged character, holder-classes.ts), which `flag` does not read: what `healDamage` checks. */
+export const classFlag = (code: string, name: FlagName, value = true): Expect => ({ expect: "classFlag", code, name, value });
 export const zone = (code: string, name: string): Expect => ({ expect: "zone", code, zone: name });
+/** The card is (or is not) committed to the quest. */
+export const committed = (code: string, value = true): Expect => ({ expect: "committed", code, value });
+/** This many cards with the code lie in the zone (a layout that places a stage in the victory display also deals it with the quest deck). */
+export const count = (code: string, name: string, value: number): Expect => ({ expect: "count", code, zone: name, value });
+/** The card shows this side (a quest stage: A before its flip, B after). */
+export const side = (code: string, name: "A" | "B"): Expect => ({ expect: "side", code, side: name });
 export const progressOn = (code: string, value: number): Expect => ({ expect: "progressOn", code, value });
 export const resourcesOn = (code: string, value: number): Expect => ({ expect: "resourcesOn", code, value });
 /** The card holds this much damage. */
@@ -82,8 +90,10 @@ export const won: Expect = { expect: "won" };
 export const notWon: Expect = { expect: "notWon" };
 /** A frame of this name was pushed while the action ran. */
 export const frame = (name: string): Expect => ({ expect: "frame", name });
+/** The window the actions left open is (or, with `value` false, is not) of this kind: the look window a look at the Investigation deck opens. */
+export const window = (kind: string, value = true): Expect => ({ expect: "window", kind, value });
 /** The intent is legal now (for a card, one of its own: a Response offered after the action). */
-export const offers = (intent: PlayerIntent["type"], code?: string): Expect => ({ expect: "offers", intent, ...(code ? { code } : {}) });
+export const offers = (intent: PlayerIntent["type"], code?: string, value = true): Expect => ({ expect: "offers", intent, ...(code ? { code } : {}), ...(value ? {} : { value }) });
 /**
  * What a row says is wrong when it runs on these records: the failed expectations, or the error an action threw. Empty when the row holds. `lenient` is the run without the row's records: an answer nobody asks
  * for is skipped there (the records that asked are gone), so only the expectation can pass the run.

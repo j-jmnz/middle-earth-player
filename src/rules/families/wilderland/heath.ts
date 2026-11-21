@@ -14,7 +14,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
 import { NAMED_PILES, pileDealt, pileOf, shufflePile } from "../../core/piles.ts";
 import type { GameEvent, ScenarioState } from "../../core/state.ts";
-import { flagged, updateCard, withSeat } from "../../core/state.ts";
+import { distinctChoices, flagged, updateCard, withSeat } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { attackWith } from "../attack/immediate.ts";
@@ -125,21 +125,11 @@ export function arrangeLookedDeck(state: ScenarioState, instruction: Verb<"Arran
   if (kept == null) kept = chosen;
   else if (chosen != null && chosen !== kept && !bottom.includes(chosen)) bottom.push(chosen);
   const cause = currentCause(steps, UNATTRIBUTED);
-  if (kept == null) return data ? askTarget(state, { instruction, seat: owner, chosen: null, cause }, distinct(state, looked)) : finish(state, owner, looked, looked[0] ?? "", []);
+  if (kept == null) return data ? askTarget(state, { instruction, seat: owner, chosen: null, cause }, distinctChoices(state, looked)) : finish(state, owner, looked, looked[0] ?? "", []);
   const left = looked.filter((id) => id !== kept && !bottom.includes(id));
-  const options = distinct(state, left);
+  const options = distinctChoices(state, left);
   if (options.length <= 1 || !data) return finish(state, owner, looked, kept, [...bottom, ...left]);
   return askTarget(state, { instruction: { ...instruction, kept, bottom }, seat: owner, chosen: null, cause }, options);
-}
-
-function distinct(state: ScenarioState, ids: readonly string[]): string[] {
-  const seen = new Set<string>();
-  return ids.filter((id) => {
-    const code = state.cards[id]?.code ?? id;
-    if (seen.has(code)) return false;
-    seen.add(code);
-    return true;
-  });
 }
 
 function finish(state: ScenarioState, owner: number, looked: readonly string[], kept: string, bottom: readonly string[]): ScenarioState {
@@ -154,7 +144,7 @@ export function immediateAttackBy(state: ScenarioState, instruction: Verb<"Immed
   const id = refCard(state, instruction.target ?? "subject", frameScope(state, focus.seat, focus.sourceId));
   const enemy = id ? state.cards[id] : undefined;
   if (!id || !enemy || enemy.zone !== "engaged" || enemy.controller !== focus.seat) return state;
-  return attackWith(state, id, ctx, steps);
+  return attackWith(state, id, ctx, steps, undefined, instruction.extraShadow);
 }
 
 /**

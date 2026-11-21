@@ -3,6 +3,7 @@
 //
 // Encounter cards that player card effects look at and move: the top of the encounter deck, its discard pile, the staging
 // area, the active location.
+import { announceLooked } from "./looked.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
@@ -18,7 +19,7 @@ import { travelBlocked } from "../../interpret/restrictions.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { fireForced } from "../../windows/triggers.ts";
 import type { EffectData, ScenarioState } from "../../core/state.ts";
-import { inPlay, updateCard } from "../../core/state.ts";
+import { flagged, heldHero, inPlay, updateCard } from "../../core/state.ts";
 import { travelNow } from "../../quest/travel.ts";
 import { shuffleEncounterDeck, shuffleIntoEncounterDeck } from "../../interpret/verbs.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
@@ -66,7 +67,13 @@ export function encounterCard(state: ScenarioState, card: MoveInstruction["card"
 export function leavePlay(state: ScenarioState, id: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = state.cards[id];
   if (!card || !inPlay(card.zone)) return state;
-  return updateCard(releaseAttachments(state, id, ctx.cards, steps), id, { damage: 0, progress: 0, resources: 0, exhausted: false });
+  const left = updateCard(releaseAttachments(state, id, ctx.cards, steps), id, { damage: 0, progress: 0, resources: 0, exhausted: false });
+  // The card is announced to the abilities that hear it leave play ("After this location leaves play", 141049:A:2). moveCard announces a card that leaves a
+  // player's area, an ally a guard holds in the staging area and an enemy that guards a hero; an explored location is announced where it is explored
+  // (quest/stage-reveal.ts).
+  const guardedAlly = card.zone === "staging" && state.modifiers.length > 0 && flagged(state, id, "guardedAlly");
+  const announcedElsewhere = card.zone === "play" || card.zone === "heroes" || guardedAlly || Object.values(state.cards).some((other) => heldHero(other) && other.host === id);
+  return announcedElsewhere ? left : queueEvent(left, { trigger: "leftPlay", seat: null, cardId: id });
 }
 
 /** A card in play goes facedown underneath a host, out of play (rr.in-play-and-out-of-play): what it had in play is lost, `placedUnder` is queued about it and the table is told it is destroyed. */
@@ -150,13 +157,25 @@ export function travelThere(state: ScenarioState, id: string, ctx: ReduceContext
   return travelNow(next, id, ctx, steps) ?? state;
 }
 
-// The encounter discard pile goes back into the encounter deck, which is shuffled; with a `trait`, only the cards with that trait do ("Shuffle all Hazard cards in the encounter discard pile back into the encounter deck", 900708:A:2).
+// The encounter discard pile goes back into the encounter deck, which is shuffled; with a `name`, only the copies of that title ("all copies of Balin's Doom", 901101:A:3); with a `trait`, only the cards with that trait do ("Shuffle all Hazard cards in the encounter discard pile back into the encounter deck", 900708:A:2); with a `type`, only the cards of that printed type ("Shuffle all locations ...", 03039:A:2).
 export function shuffleDiscardIn(state: ScenarioState): ScenarioState;
-export function shuffleDiscardIn(state: ScenarioState, ctx: ReduceContext, trait?: string): ScenarioState;
-export function shuffleDiscardIn(state: ScenarioState, ctx?: ReduceContext, trait?: string): ScenarioState {
+export function shuffleDiscardIn(state: ScenarioState, ctx: ReduceContext, trait?: string, type?: CardType, name?: string): ScenarioState;
+export function shuffleDiscardIn(state: ScenarioState, ctx?: ReduceContext, trait?: string, type?: CardType, name?: string): ScenarioState {
   let next = state;
-  for (const id of [...state.encounterDiscard]) if (trait == null || (ctx != null && hasTrait(state, id, trait, ctx))) next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
+  for (const id of [...state.encounterDiscard]) if ((trait == null || (ctx != null && hasTrait(state, id, trait, ctx))) && (type == null || (ctx != null && typeOf(state, id, ctx) === type)) && (name == null || (ctx != null && printedOf(ctx.cards, state.cards[id]?.code ?? "").name === name))) next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
   return shuffleEncounterDeck(next);
+}
+
+// The encounter discard pile and the victory display both go back into the encounter deck, which is shuffled once: the locations in them (`type`), or the cards that match the other filters ("Reshuffle all locations in the discard pile and victory display back into the encounter deck", 04018:A:1).
+// The cards that went back, from both, are the running effect's `returned` count (`returnedBelow`).
+export function shuffleDiscardAndVictoryIn(state: ScenarioState, ctx: ReduceContext, trait?: string, type?: CardType, name?: string): ScenarioState {
+  const wanted = (id: string) => (trait == null || hasTrait(state, id, trait, ctx)) && (type == null || typeOf(state, id, ctx) === type) && (name == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").name === name);
+  const moving = [...state.encounterDiscard, ...state.victory].filter(wanted);
+  let next = state;
+  for (const id of moving) next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
+  const shuffled = shuffleEncounterDeck(next);
+  const data = effectData(shuffled);
+  return data ? patchTop(shuffled, { data: { ...data, returned: data.returned + moving.length } }) : shuffled;
 }
 
 // Each location in the victory display goes into the encounter deck, which is shuffled once (144066:A:1).
@@ -167,16 +186,25 @@ export function shuffleVictoryIn(state: ScenarioState, ctx: ReduceContext): Scen
 }
 
 // Cards come off the top of the encounter deck into its discard pile until one of `type` is among them, or the deck is empty.
+// With `reshuffle`, a deck that runs out first has the discard pile shuffled back in when the discard pile holds one, and the discarding goes on (`rr.running-out-of-cards`,
+// `faq.last-encounter-card`: Trapped Inside a Barrow, 148004:A:1); with none in either pile the deck is emptied and nothing is found.
 // That card is the picked card ("" when none came). A list of types stops at a card of any of them.
-export function discardUntil(state: ScenarioState, wanted: CardType | readonly CardType[], ctx: ReduceContext, trait?: string): ScenarioState {
+export function discardUntil(state: ScenarioState, wanted: CardType | readonly CardType[], ctx: ReduceContext, trait?: string, reshuffle = false): ScenarioState {
   const types: readonly CardType[] = typeof wanted === "string" ? [wanted] : wanted;
+  const matches = (current: ScenarioState, id: string) => {
+    const kind = typeOf(current, id, ctx);
+    return kind != null && types.includes(kind) && (trait == null || hasTrait(current, id, trait, ctx));
+  };
   let next = state;
   for (;;) {
     const top = next.encounterDeck[0];
-    if (!top) return pushPicked(next, "");
+    if (!top) {
+      if (!reshuffle || !next.encounterDiscard.some((id) => matches(next, id))) return pushPicked(next, "");
+      next = shuffleDiscardIn(next);
+      continue;
+    }
     next = updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: "up", controller: null });
-    const kind = typeOf(next, top, ctx);
-    if (kind != null && types.includes(kind) && (trait == null || hasTrait(next, top, trait, ctx))) return pushPicked(next, top);
+    if (matches(next, top)) return pushPicked(next, top);
   }
 }
 
@@ -195,7 +223,9 @@ export function lookAtTop(state: ScenarioState, instruction: Extract<Instruction
   // Each card's frame goes on the stack above the effect, in the order of the deck: the first one found resolves first, so it is pushed last.
   const heard = [...acting].reverse().reduce((current, id) => fireForced(current, { trigger: "lookedAt", seat, cardId: id }, ctx, steps), noted);
   if (ids.length === 0) return heard;
-  return { ...heard, window: { kind: "look", seat, cardIds: ids }, activeSeat: seat, passed: [] };
+  // "After a player looks at one or more cards in the encounter deck" (901506:A:1): the cards are shown, then the deck's look is announced.
+  const looked = instruction.deck === "own" || instruction.deck === "picked" ? heard : announceLooked(heard, ctx, seat);
+  return { ...looked, window: { kind: "look", seat, cardIds: ids }, activeSeat: seat, passed: [] };
 }
 
 // How many of the top cards of the encounter deck are (or, with `not`, are not) of a type: the effect's X.

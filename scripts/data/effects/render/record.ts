@@ -49,6 +49,11 @@ const TRIGGER: Readonly<Record<string, string>> = {
   beginningOfPhase: "when a phase begins",
   stagingStepBegins: "when the staging step begins, before the first card is revealed",
   becameActive: "after this location becomes the active location",
+  lost: "when the \"Lost:\" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)",
+  progressWouldBePlaced: "before progress is placed on this location (the whole placement, the effect's X, waits for this effect)",
+  progressPlacedOnSelf: "after progress is placed on this card, the placement that explores it included (X is the amount placed; the card may have left play)",
+  questProgressPlacedOnStage: "once, after a quest that succeeded has placed progress on the stage itself",
+  questProgressPlaced: "once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)",
 };
 
 const LIMIT: Readonly<Record<string, string>> = {
@@ -101,9 +106,10 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   if (effect.fromVictory === true) notes.push("used from the victory display");
   if (effect.byEncounterDeck === true) notes.push("only when the encounter deck revealed it");
   if (effect.notFromDiscard === true) notes.push("not for a card found in the encounter discard pile");
+  if (effect.early === true) notes.push("resolves before the other Forced effects of the moment");
   if (isObj(effect.cancel)) notes.push(`may be canceled by paying ${str(effect.cancel.cost)}`);
   if (isObj(effect.uncancelable)) notes.push(`cannot be canceled while ${renderCondition(effect.uncancelable, ctx)}`);
-  const head = done(ctx, `${timing}${trigger}${notes.length > 0 ? ` (${notes.join("; ")})` : ""}`, effect, ["id", "cardCode", "lines", "timing", "trigger", "subject", "eventSeat", "limit", "cost", "anyPlayer", "answeredBy", "fromHand", "fromVictory", "byEncounterDeck", "notFromDiscard", "cancel", "uncancelable", "condition", "instructions"]);
+  const head = done(ctx, `${timing}${trigger}${notes.length > 0 ? ` (${notes.join("; ")})` : ""}`, effect, ["id", "cardCode", "lines", "timing", "trigger", "subject", "eventSeat", "limit", "cost", "anyPlayer", "answeredBy", "fromHand", "fromVictory", "byEncounterDeck", "notFromDiscard", "early", "cancel", "uncancelable", "condition", "instructions"]);
   const lines = [`${str(effect.id)}: ${head}`];
   if (effect.condition !== undefined) lines.push(`  only if ${renderCondition(effect.condition, ctx)}`);
   const instructions = Array.isArray(effect.instructions) ? effect.instructions : [];
@@ -111,6 +117,7 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   if (barred) lines.push(`  note: ${barred}`);
   if (instructions.length === 0) lines.push("  (no instructions)");
   if (instructions.length > 1) lines.push("  (steps run in order; a step depends on an earlier one only through its own condition)");
-  instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, ctx, 1, at > 0)));
+  const inner = effect.trigger === "engaged" ? { ...ctx, engagedSeat: true } : ctx;
+  instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, inner, 1, at > 0)));
   return lines;
 }

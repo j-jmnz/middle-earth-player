@@ -17,7 +17,9 @@ import { livingSeats, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { manifest as catalog } from "../../../catalog/families/breaking.ts";
-import { areaOf, mergeView, viewOf } from "./areas.ts";
+import { areaOf, mergeView, sharing, viewOf } from "./areas.ts";
+import { returnToSharedStage, splitOff } from "./barrow.ts";
+import { allAtStageHolds, eventFrozen } from "./conditions.ts";
 import { noteSkippedStage, questCardDefeatedHeard } from "../quest/branch.ts";
 import { addTableModifier } from "../encounter/index.ts";
 import { runCards } from "./cards.ts";
@@ -39,8 +41,16 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return placeDiscardUnderDeck(state);
     case "StartSeparateStage":
       return startSeparateStage(state, instruction.code, focus.seat, instruction.reveal === true ? { ctx, steps } : undefined);
+    case "StartRandomSeparateStage":
+      return startRandomSeparateStage(state, instruction.codes, focus.seat, ctx, steps);
+    case "RemoveUnusedStages":
+      return removeUnusedStages(state, instruction.codes);
     case "AdvanceToStage":
-      return advanceToStage(state, instruction.code, ctx, steps);
+      return advanceToStage(state, instruction.code, ctx, steps, instruction.again === true);
+    case "SplitToOwnStage":
+      return splitToOwnStage(state, instruction.code, focus.seat, ctx, steps);
+    case "ReturnToSharedStage":
+      return returnToSharedStage(state, instruction.code, stageController(state, focus));
     case "DealOutStaging":
       return state;
     case "MovePickedToOwnStaging":
@@ -63,8 +73,11 @@ export function isBreakingVerb(verb: string): boolean {
 
 // AdvanceToStage ("advance to stage 4A", 142063:B:2): runs on the acting seat's view, so the stage is that seat's. The stage left is defeated (its attachments are
 // released, rr.attachment-cards) and set aside, the new stage is side B up with no progress, and its When Revealed effects are pushed as frames for the seat.
-export function advanceToStage(state: ScenarioState, code: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const nextId = state.questDeck.find((id) => state.cards[id]?.code === code);
+export function advanceToStage(state: ScenarioState, code: string, ctx: ReduceContext, steps: EngineStep[], again = false): ScenarioState {
+  // With `again`, a stage the quest already left lies set aside and may come back to (Attack on Dol Guldur's four stage 3s), with no tokens left on it.
+  const fromDeck = state.questDeck.find((id) => state.cards[id]?.code === code);
+  const fromAside = fromDeck || !again ? undefined : state.setAside.find((id) => state.cards[id]?.code === code);
+  const nextId = fromDeck ?? fromAside;
   if (!nextId) return state;
   const before = steps.length;
   let next = state;
@@ -74,11 +87,26 @@ export function advanceToStage(state: ScenarioState, code: string, ctx: ReduceCo
     next = moveCard(next, currentId, { zone: "setAside" });
   }
   // The seat controls its own stage once stages are separate: the Forced effects and Responses of a stage are about its own seat (mec109.multiple-staging-areas).
-  next = updateCard(moveCard(next, nextId, { zone: "questStage" }), nextId, { face: "B", ...(state.viewSeat != null ? { controller: state.viewSeat } : {}) });
+  next = updateCard(moveCard(next, nextId, { zone: "questStage" }), nextId, { face: "B", ...(fromAside ? { progress: 0, resources: 0, damage: 0 } : {}), ...(state.viewSeat != null ? { controller: state.viewSeat } : {}) });
   steps.push({ kind: "advance", cardId: nextId });
   // Only a game with a card that hears "after a quest card is defeated" keeps the stage it left (Lost in Mirkwood's letters), so every other game's state stays as it was.
   if (currentId && questCardDefeatedHeard(next, ctx)) next = noteSkippedStage(next, nextId, currentId);
   return afterProgress(next, before, ctx, steps);
+}
+
+// The seat that is at the stage the source is (its controller), else the acting seat: the Forced effect of a stage resolves for the seat whose stage it is, and this holds for a delayed effect scheduled from it (148004:B:2) too.
+function stageController(state: ScenarioState, focus: Focus): number {
+  const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
+  return source?.zone === "questStage" && source.controller != null ? source.controller : focus.seat;
+}
+
+// SplitToOwnStage (148007:A:2): families/breaking/barrow.ts leaves the shared stage; the stage 4A copy is revealed for the seat as an advanced stage is.
+function splitToOwnStage(state: ScenarioState, code: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const split = splitOff(state, code, seat);
+  if (!split) return state;
+  const before = steps.length;
+  steps.push({ kind: "advance", cardId: split.stageId });
+  return afterProgress(split.state, before, ctx, steps);
 }
 
 // RemoveRingBearer (142062:A:1): the Ring-bearer, and each card attached to it, leave the game. The cards go to the removed zone directly: The One Ring
@@ -131,6 +159,25 @@ function startSeparateStage(state: ScenarioState, code: string, seat: number, re
   return afterProgress(started, before, reveal.ctx, reveal.steps);
 }
 
+// StartRandomSeparateStage (04113:B:1): one of the stage cards still in the quest deck, chosen with the game's seed, is the seat's stage, revealed for it. The areas of a game that does this follow the rules of Escape from Mount Gram's (the empty `capture` mark: the first player of an area, "each player" at the
+// area, a limit used once for each area; mec108.create-staging-area, dwd.creating-a-staging-area).
+function startRandomSeparateStage(state: ScenarioState, codes: readonly string[], seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const left = state.questDeck.filter((id) => codes.includes(state.cards[id]?.code ?? ""));
+  if (left.length === 0) return state;
+  const shuffled = shuffleIds(left, state.seed, state.seedCursor);
+  const chosen = state.cards[shuffled.ids[0] ?? ""]?.code;
+  if (!chosen) return state;
+  const marked: ScenarioState = { ...state, seedCursor: shuffled.cursor, capture: state.capture ?? { x: {}, everyArea: [], here: [], instead: [] } };
+  return startSeparateStage(marked, chosen, seat, { ctx, steps });
+}
+
+// RemoveUnusedStages (04113:B:1): the quest deck's cards with these codes leave the game.
+function removeUnusedStages(state: ScenarioState, codes: readonly string[]): ScenarioState {
+  let next = state;
+  for (const id of state.questDeck) if (codes.includes(state.cards[id]?.code ?? "")) next = moveCard(next, id, { zone: "removed" });
+  return next;
+}
+
 // MovePickedToOwnStaging (142062:B:1): the last picked card, in the shared staging area, goes to the acting seat's staging area.
 function movePickedToOwnStaging(state: ScenarioState, seat: number): ScenarioState {
   const id = lastPicked(state);
@@ -152,4 +199,4 @@ function discardSharedStage(state: ScenarioState): ScenarioState {
   return next;
 }
 
-export const manifest: RulesFamily = { name: "breaking", verbs: ["RemoveRingBearer", "SkipTravelPhase", "ZeroEngagementCosts", "ShuffleSetAsideIntoDiscard", "PlaceDiscardUnderDeck", "StartSeparateStage", "AdvanceToStage", "DealOutStaging", "MovePickedToOwnStaging", "DiscardSharedStage", "RevealIfDiscarded", "RaiseThreatAtStage", "MoveToLeftArea", "MoveToFirstStaging", "FallIntoEvil", "ReturnFallenHero", "RemoveFromGame", "LockFirstPlayer", "TakeRingBearer"], run };
+export const manifest: RulesFamily = { name: "breaking", amount: (state, amount, scope) => (amount.playersAtStage ? sharing(state, scope.actor).length : null), condition: (state, found, scope) => allAtStageHolds(state, found, scope.sourceId), play: (state, cardId, ctx, how) => how.putting !== true && eventFrozen(state, cardId, how.seat, ctx.cards), playReason: (state, cardId, ctx) => (eventFrozen(state, cardId, undefined, ctx.cards) ? "Players cannot trigger Action or Response effects until the end of the round" : null), verbs: ["SplitToOwnStage", "ReturnToSharedStage", "CancelRevealed", "RemoveRingBearer", "SkipTravelPhase", "ZeroEngagementCosts", "ShuffleSetAsideIntoDiscard", "PlaceDiscardUnderDeck", "StartSeparateStage", "StartRandomSeparateStage", "RemoveUnusedStages", "MoveToOtherPlayerArea", "AdvanceToStage", "DealOutStaging", "MovePickedToOwnStaging", "DiscardSharedStage", "RevealIfDiscarded", "RaiseThreatAtStage", "MoveToLeftArea", "MoveToFirstStaging", "FallIntoEvil", "ReturnFallenHero", "RemoveFromGame", "LockFirstPlayer", "TakeRingBearer"], run };

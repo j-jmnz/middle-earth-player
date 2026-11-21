@@ -16,6 +16,7 @@ import { drawOpeningHand, runInstruction, type ReduceContext } from "../interpre
 import type { PileZone } from "../core/piles.ts";
 import { printedOf } from "../core/printed.ts";
 import { shuffleIds } from "../core/seed.ts";
+import { modeAddsEasyResource, modeCardSetup, placeModeCard } from "./mode-card.ts";
 import { handSetup, searchSetup } from "./search.ts";
 import { attachPending } from "../families/angmar/burdens.ts";
 import { nightmareDuringSetup, nightmareSetup } from "../families/nightmare/setup.ts";
@@ -24,10 +25,13 @@ import type { CampaignFacts } from "../core/campaign-state.ts";
 import { placeCampaignCard } from "../families/burden/campaign.ts";
 import { snapshotOf } from "../engine/undo.ts";
 import { attachTo, moveCard, spawn } from "../core/zones.ts";
-import { stampRoutes } from "../families/sea/routes.ts";
+import { corsairTrait, stampRoutes } from "../families/sea/routes.ts";
 import { markSideQuests } from "../families/wilderland/night-quest.ts";
 import { markProgressNoted } from "../families/angmar/progress.ts";
+import { markProgressHeld } from "../families/long-dark/hold.ts";
 import { markCapture } from "../families/captured/entry.ts";
+import { markEnemyDamage } from "../families/encounter/patrol.ts";
+import { markSeatedRows } from "../families/encounter/seated.ts";
 import { dealDoubleSided, dealUnchartedDeck, type DoubleSidedCard } from "../families/uncharted/deal.ts";
 
 /** The prefix of an `afterMulligan` entry that is shuffled into the deck, not added to the hand, once the opening hands are final. */
@@ -59,7 +63,7 @@ export type StartSeat = {
 };
 
 // The zones a scenario deals: every pile but the Evil Creatures discard pile, which starts empty.
-type DealtZone = Exclude<PileZone, "evilCreaturesDiscard">;
+type DealtZone = Exclude<PileZone, "evilCreaturesDiscard" | "smaugDiscard">;
 
 export type StartScenario = {
   seatCount: 1 | 2;
@@ -129,14 +133,19 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     for (const code of codes) state = spawn(state, code, { zone }).state;
     // The Evil Creatures deck has a discard pile of its own, which exists from the start (emce.evil-creatures-deck).
     if (zone === "evilCreaturesDeck") state = { ...state, piles: { ...state.piles, evilCreaturesDiscard: state.piles?.evilCreaturesDiscard ?? [] } };
+    // So does the Smaug deck (docs/brief.md, The Battle of Lake-town).
+    if (zone === "smaugDeck") state = { ...state, piles: { ...state.piles, smaugDiscard: state.piles?.smaugDiscard ?? [] } };
   }
   if (input.unchartedDeck && input.unchartedDeck.length > 0) state = dealUnchartedDeck(state, input.unchartedDeck, ctx);
   if (input.doubleSided && input.doubleSided.length > 0) state = dealDoubleSided(state, input.doubleSided, ctx);
   // A game that deals encounter side quests in its encounter deck reads the side quest rules (families/wilderland/night-quest.ts).
   state = markSideQuests(state, ctx.cards);
   state = markProgressNoted(state, ctx);
+  state = markProgressHeld(state, ctx);
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
   state = markCapture(state, ctx);
+  state = markEnemyDamage(state, ctx);
+  state = markSeatedRows(state, ctx);
   // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/brief.md, Nightmare).
   if (input.definition.nightmareCard) state = spawn(state, input.definition.nightmareCard, { zone: "nightmare" }, "A").state;
   const chosen = input.seats.slice(0, input.seatCount).flatMap((seat, at) => (seat.chosen ?? []).map((code) => ({ code, seat: at })));
@@ -150,7 +159,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
       const placed = spawn(state, code, { zone: "heroes", seat: index });
       // Easy mode: "During step 2 of Setup, 'Place Heroes and Set Initial Threat Levels', add one resource to each hero's
       // resource pool" (easy-mode.easy-mode; ltp.easy-mode step 1, which says only "during setup").
-      const starting = (input.difficulty === "Easy" ? 1 : 0) + (seat.resources ?? 0);
+      const starting = (input.difficulty === "Easy" && !modeAddsEasyResource(input.definition, ctx) ? 1 : 0) + (seat.resources ?? 0);
       state = starting > 0 ? updateCard(placed.state, placed.id, { resources: starting }) : placed.state;
       threat += printedOf(ctx.cards, code).threat ?? 0;
     }
@@ -178,7 +187,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   }
   if (input.seats.some((seat) => (seat.loot?.length ?? 0) > 0)) state = { ...state, lootPlan: input.seats.slice(0, input.seatCount).map((seat) => seat.loot ?? []) };
   // The sea family's routes for the cards that do not go to the encounter discard pile (families/sea/routes.ts): only in a game with ships.
-  state = stampRoutes(state, ctx.cards);
+  state = stampRoutes(state, ctx.cards, corsairTrait(ctx.effects, input.definition.modeCard?.code));
   // The starting threat level, for a card that reduces threat back to it (04053:A:2).
   state = recordStartingThreat(state, ctx);
   // The raises of Setup step 7 come after the initial threat level is recorded.
@@ -219,6 +228,11 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
     );
     if (next.failure || next.lost) return next;
   }
+  // The scenario's mode card with a Setup of its own comes before the quest card's, once the piles have put Annúminas in the staging area (setup/mode-card.ts).
+  next = modeCardSetup(next, ctx, steps);
+  if (next.failure || next.lost) return next;
+  // The quest card's Setup can deal a card that reads progress on a side quest (Lie Low, shuffled in by Into the Ettenmoors, 10064:A:1): the game notes it now.
+  next = markProgressNoted(next, ctx);
   if (next.questStage) next = timeOnReveal(updateCard(next, next.questStage, { face: "B" }), next.questStage, ctx);
   // A pool card's Setup that waited for a host the quest card's Setup puts into play, and the campaign card's Setup that needs the quest card's Setup done first (ScenarioDefinition.afterSetup), go down first, so they resolve after it.
   next = attachPending(next, ctx, steps);
@@ -228,7 +242,7 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
   // The Nightmare setup card's Forced effects "During setup" (families/nightmare/setup.ts), on top: they resolve first.
   next = nightmareDuringSetup(next, ctx, steps);
   // The Hard/Expert Mode card is put next to the quest deck at the end of setup, faceup on the side the players chose, and stays all game (dcce.hard-expert).
-  if (next.modeCard) next = spawn(next, next.modeCard.code, { zone: "modeCard" }, next.modeCard.side).state;
+  next = placeModeCard(next);
   return withMode(next, "beginRound");
 }
 

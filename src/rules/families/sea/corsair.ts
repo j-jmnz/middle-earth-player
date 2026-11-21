@@ -5,7 +5,7 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
-import type { ReduceContext } from "../../interpret/interpret.ts";
+import { dealAdditionalShadow, dealOneShadow, type ReduceContext } from "../../interpret/interpret.ts";
 import { refillDeck } from "../../core/decks.ts";
 import { DECKS, shufflePile } from "../../core/piles.ts";
 import { printedOf } from "../../core/printed.ts";
@@ -35,12 +35,12 @@ function shuffledDeck(state: ScenarioState): ScenarioState {
 
 /** "Prepare the Corsair deck" (dcce.corsair-deck): the non-ship enemies of the encounter deck join those already dealt to the Corsair deck, the deck
  * is shuffled, and the Corsair discard pile exists, empty. */
-export function prepareCorsairDeck(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+export function prepareCorsairDeck(state: ScenarioState, ctx: ReduceContext, trait?: string): ScenarioState {
   let next: ScenarioState = { ...state, corsairDeck: state.corsairDeck ?? [], corsairDiscard: state.corsairDiscard ?? [] };
   for (const id of [...next.encounterDeck]) {
     const instance = next.cards[id];
     const printed = instance ? printedOf(ctx.cards, instance.code) : undefined;
-    if (printed?.type !== "enemy" || printed.ship != null) continue;
+    if (printed?.type !== "enemy" || printed.ship != null || (trait != null && !printed.traits.includes(trait))) continue;
     next = moveCard(next, id, { zone: "corsairDeck" });
   }
   return shuffledDeck(next);
@@ -58,12 +58,14 @@ export function revealOne(state: ScenarioState, seat: number, ctx: ReduceContext
 }
 
 /** Reveals `count` cards, one after the other (the deck refills between them), each into play engaged with the seat. */
-export function revealCorsair(state: ScenarioState, seat: number, count: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function revealCorsair(state: ScenarioState, seat: number, count: number, ctx: ReduceContext, steps: EngineStep[], shadows = 0): ScenarioState {
   let next = state;
   for (let revealed = 0; revealed < count; revealed += 1) {
     const one = revealOne(next, seat, ctx, steps);
     next = one.state;
     if (one.id == null) break;
+    // "deal each of them 1 shadow card" (Descendant of Castamir, Ramming Ship): the first is the enemy's shadow card, each other an additional one.
+    for (let dealt = 0; dealt < shadows; dealt += 1) next = dealt === 0 ? dealOneShadow(next, one.id, steps, ctx) : dealAdditionalShadow(next, one.id, steps, ctx);
   }
   return next;
 }

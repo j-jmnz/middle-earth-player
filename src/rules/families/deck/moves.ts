@@ -11,8 +11,9 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { releaseAttachments } from "../../core/keywords.ts";
 import { matchesPick } from "../../interpret/pick.ts";
 import { lastPicked, pickedList, putOnDeck, seatOf } from "../../interpret/player-verbs.ts";
-import { cardTypeOf, isPlayerType, printedOf } from "../../core/printed.ts";
+import { isPlayerType, printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { announceAllyLeft } from "../../core/ally-left.ts";
 import { discardLockedFor } from "../angmar/lock.ts";
 import { announceTopDiscard } from "./pressure.ts";
 import { shuffleIds } from "../../core/seed.ts";
@@ -58,7 +59,7 @@ function leavePlay(state: ScenarioState, id: string, ctx: ReduceContext, steps: 
   const card = state.cards[id];
   if (!card || !inPlay(card.zone)) return state;
   const released = updateCard(releaseAttachments(state, id, ctx.cards, steps), id, { damage: 0, progress: 0, resources: 0, exhausted: false, committed: false });
-  return cardTypeOf(card, printedOf(ctx.cards, card.code)) === "ally" ? queueEvent(released, { trigger: "allyLeftPlay", seat: card.controller, subject: id }) : released;
+  return announceAllyLeft(released, card, ctx.cards);
 }
 
 // MoveCard: the card goes to its owner's hand, deck or discard pile, or is removed from the game.
@@ -141,9 +142,10 @@ export function removeDiscardFromGame(state: ScenarioState, focus: Focus): Scena
   return next;
 }
 
-// ShuffleHandIntoDeck: the actor's hand (but the card resolving) goes into their deck, which is shuffled; X is how many.
-export function shuffleHandIn(state: ScenarioState, focus: Focus): ScenarioState {
-  const hand = (state.seats[focus.seat]?.hand ?? []).filter((id) => id !== focus.sourceId);
+// ShuffleHandIntoDeck: the actor's hand (but the card resolving, and with `keepPicked` the picked card) goes into their deck, which is shuffled; X is how many.
+export function shuffleHandIn(state: ScenarioState, focus: Focus, keepPicked = false): ScenarioState {
+  const kept = keepPicked ? lastPicked(state) : "";
+  const hand = (state.seats[focus.seat]?.hand ?? []).filter((id) => id !== focus.sourceId && id !== kept);
   let next = state;
   for (const id of hand) next = moveCard(next, id, { zone: "deck", seat: focus.seat });
   return patchData(shuffleSeatDeck(next, focus.seat), { x: hand.length });

@@ -54,9 +54,10 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
       found.push({ effect, instance });
     }
   }
-  // Oldest card first.
+  // An `early` effect first, then the oldest card first.
   return found.sort(
     (left, right) =>
+      Number(right.effect.early === true) - Number(left.effect.early === true) ||
       left.instance.enteredPlay - right.instance.enteredPlay ||
       left.instance.id.localeCompare(right.instance.id, undefined, { numeric: true }),
   );
@@ -136,6 +137,8 @@ export function crossBoundary(state: ScenarioState, ctx: ReduceContext, steps: E
   if (ctx.effects.length === 0 && next.delayed.length === 0) return next;
   next = pushDue(next, ended, "endOfRound", steps);
   next = pushDue(next, ended, "endOfPhase", steps);
+  // The effects delayed to the beginning of the travel phase (148004:B:2) come due as it begins.
+  if (next.phase === "Travel" && next.delayed.length > 0) next = pushDue(next, ended, "beginningOfTravel", steps);
   // Mire X: each Mire location in the staging area gets a mire token as the refresh phase ends, before the Forced effects of that moment (families/mire/index.ts).
   if (ended === "Refresh") next = mireAtRefreshEnd(next, ctx, steps);
   // Time X: a frame that takes one time counter off each Time card goes down under the Forced effects of this moment, so it resolves after them (families/angmar/time.ts).

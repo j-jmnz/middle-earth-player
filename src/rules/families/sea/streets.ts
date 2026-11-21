@@ -1,4 +1,4 @@
-// Rules: rr.travel, rr.first-player, rr.the-word-choose (data/rules/entries.json); ledger line 12160:A:1. "When faced with the option to travel, if Streets of Umbar is in the staging area, the players must either travel to a
+// Rules: rr.travel, rr.first-player, rr.the-word-choose (data/rules/entries.json); ledger lines 12160:A:1, 00010:A:1. "When faced with the option to travel, if Streets of Umbar is in the staging area, the players must either travel to a
 // location named Streets of Umbar or add 2 resources to a Raider enemy in play" (TravelOrAddResources, a constant of the location). Reading: adding the resources satisfies the "must", so the players may then decline to
 // travel or travel to another location; the first player chooses the Raider. With no Raider in play they cannot add the resources, so they must travel to a location with that title, if able.
 import type { Instruction } from "../../../catalog/boundary.ts";
@@ -11,12 +11,18 @@ import type { ScenarioState } from "../../core/state.ts";
 
 type Rule = { source: string; title: string; amount: number; instructions: readonly Instruction[]; payable: boolean };
 
-// The rules in force: a TravelOrAddResources constant whose location is in the staging area while the players are faced with the option to travel (no active location).
+// The rules in force: a TravelOrAddResources or TravelOrRaiseThreat constant whose location is in the staging area while the players are faced with the option to travel (no active location).
 function rules(state: ScenarioState, ctx: ReduceContext): Rule[] {
   if (state.activeLocation || state.secondActiveLocation) return [];
   const found: Rule[] = [];
   for (const { source, instruction } of constantInstructions(state, ctx)) {
-    if (instruction.verb !== "TravelOrAddResources" || source.zone !== "staging") continue;
+    if (source.zone !== "staging") continue;
+    // Pelennor Fields (00010:A:1): each player raises their threat, which can always be done.
+    if (instruction.verb === "TravelOrRaiseThreat") {
+      found.push({ source: source.id, title: printedOf(ctx.cards, source.code).name, amount: instruction.amount, instructions: [{ verb: "RaiseThreat", amount: instruction.amount, who: "eachSeat" }], payable: true });
+      continue;
+    }
+    if (instruction.verb !== "TravelOrAddResources") continue;
     found.push({
       source: source.id,
       title: printedOf(ctx.cards, source.code).name,

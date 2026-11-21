@@ -2,7 +2,9 @@
 import { threatSaved } from "../families/quest/threat.ts";
 import { GOLLUM, SMEAGOL, isGollum } from "../families/gollum/index.ts";
 import { DIRE_ELIMINATION_LEVEL } from "../families/black-gate/dire.ts";
+import { heroWaiting } from "../families/deck/hero.ts";
 import { discardArea } from "../families/breaking/areas.ts";
+import { discardIsolated } from "../families/breaking/barrow.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { gameReads } from "./game-reads.ts";
@@ -20,9 +22,23 @@ export function markLoss(state: ScenarioState, reason: string): ScenarioState {
   return { ...state, lost: true, lossReason: reason };
 }
 
+// "If X leaves play, the players lose the game" (printed `leavesPlayLoses`, or the flag `lossOnLeavingPlay` a card gives its host) holds however X leaves play: destroyed, discarded, eliminated with its controller,
+// or returned to a hand or a deck. `before` and `after` are the state either side of one intent, the flag is read from `before` (its modifier ends with the card), and a won scenario loses nothing. A card removed from the game by a stage's own text is not
+// one that left play for a player's effect: stage 2A of Breaking of the Fellowship removes the Ring-bearer with The One Ring's text blank (families/breaking/index.ts removeRingBearer), so the removed zone never loses.
+export function loseWhenLeftPlay(before: ScenarioState, after: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioState {
+  if (after.lost || after.stageCleared) return after;
+  for (const was of Object.values(before.cards)) {
+    const now = after.cards[was.id];
+    if (!inPlay(was.zone) || now === was || (now && (inPlay(now.zone) || now.zone === "removed"))) continue;
+    const printed = printedOf(cards, was.code);
+    if (printed.leavesPlayLoses || flagged(before, was.id, "lossOnLeavingPlay")) return markLoss(after, `${printed.name} left play`);
+  }
+  return after;
+}
+
 // An eliminated seat leaves the game (rr.player-elimination): its hand, its deck and every card it controls go to their
-// owners' discard piles, and the enemies engaged with it return to the staging area with their damage. An attack on
-// that seat ends, and a Peril lock it held is released. If it held the first player token, the token passes clockwise at once (rr.first-player,
+// owners' discard piles (a player side quest in the staging area is one it controls, and goes to its owner's pile, not the encounter discard pile), and the enemies engaged with it
+// return to the staging area with their damage. An attack on that seat ends, and a Peril lock it held is released. If it held the first player token, the token passes clockwise at once (rr.first-player,
 // faq.first-player-elimination). Nothing is cleared once the game is lost. With `ctx`, an enemy that returns to the staging area queues "returnedToStaging" in a game whose records name it (146017:A:1).
 export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, ctx?: ReduceContext): ScenarioState {
   if (state.lost) return state;
@@ -33,7 +49,7 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
     const seat = next.seats[index];
     if (!seat?.eliminated) continue;
     const controlled = Object.values(next.cards).filter(
-      (card) => !(heir != null && isGollum(card.code)) && card.controller === index && (inPlay(card.zone) || card.zone === "hand" || card.zone === "deck") && card.zone !== "engaged" && card.zone !== "staging" && card.zone !== "questStage",
+      (card) => !(heir != null && isGollum(card.code)) && card.controller === index && (inPlay(card.zone) || card.zone === "hand" || card.zone === "deck") && card.zone !== "engaged" && card.zone !== "questStage" && (card.zone !== "staging" || !fromEncounterDeck(printedOf(cards, card.code))),
     );
     const smeagol = heir == null ? undefined : Object.values(next.cards).find((card) => card.code === SMEAGOL && card.controller === index && card.zone === "play");
     if (controlled.length === 0 && seat.engaged.length === 0 && !smeagol) continue;
@@ -73,7 +89,8 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
   }
   // Stages that are separate: the stage of an eliminated seat is discarded with the encounter cards at it (mec109.multiple-staging-areas). The
   // enemies that were engaged with it returned to its staging area above.
-  if (next.separate) for (let index = 0; index < next.seatCount; index += 1) if (next.seats[index]?.eliminated) next = discardArea(next, index);
+  // Fog on the Barrow-downs' areas (`isolated`): the stage that stays in play is parked and a trapped player's stage goes back to the quest deck (families/breaking/barrow.ts).
+  if (next.separate) for (let index = 0; index < next.seatCount; index += 1) if (next.seats[index]?.eliminated) next = next.isolated ? discardIsolated(next, index) : discardArea(next, index);
   if (heir != null && heir !== next.firstPlayer) next = { ...next, firstPlayer: heir };
   return next;
 }
@@ -130,6 +147,8 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], fina
     // A hero in a captured deck or under a card is not killed (rr.player-elimination): a seat whose last hero in play left play stays in the game while one of its heroes is captured (families/captured/).
     const captured = seat.threat < level && seat.heroes.length === 0 && next.capture != null && Object.values(next.cards).some((card) => card.zone === "captured" && card.heroSlot != null && card.owner === index);
     if (captured) continue;
+    // A hero shuffled into the deck (Lost and Alone) is not killed: its seat stays while it waits to be drawn (families/deck/hero.ts).
+    if (seat.threat < level && seat.heroes.length === 0 && heroWaiting(next, index)) continue;
     if (seat.threat >= level || seat.heroes.length === 0) {
       // A card that keeps the seat in the game at its threat elimination level is asked instead (10124:A:2).
       const saved = seat.heroes.length > 0 ? threatSaved(next, index) : null;

@@ -114,7 +114,8 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, le
               <View className="w-3 items-center">
                 <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
               </View>
-              <Text className="shrink font-display text-moon" style={sectionTitleStyle(s, plain)}>
+              {/* Beside a `lead`, the title keeps its words and the lead shrinks; otherwise a long title wraps. */}
+              <Text className={`${lead && folded ? "shrink-0" : "shrink"} font-display text-moon`} style={sectionTitleStyle(s, plain)}>
                 {title}
               </Text>
               <View className="min-w-3 flex-1" />

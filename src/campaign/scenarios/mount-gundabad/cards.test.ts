@@ -4,11 +4,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
+import { definePrinted } from "../../../rules/core/printed.ts";
 import { modifiedStat, placeDamage } from "../../../rules/core/keywords.ts";
 import { pushEffectFrame } from "../../../rules/interpret/effect-frames.ts";
 import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
-import { CODES, STAGES, codesIn, finish, gundabadFight, gundabadTable, idOf, legalIntents, legalTargets, loadGundabadWorld, resolveRecords, send, start, type GundabadWorld } from "../../../../test/scenarios/mount-gundabad/scene.ts";
+import { CODES, STAGES, STAGE_TWOS, codesIn, finish, gundabadFight, gundabadTable, idOf, legalIntents, legalTargets, loadGundabadWorld, resolveRecords, send, start, type GundabadWorld } from "../../../../test/scenarios/mount-gundabad/scene.ts";
 
 let world: GundabadWorld;
 beforeAll(async () => {
@@ -92,6 +93,14 @@ describe("19126 Guardian of Gundabad", () => {
       expect(stat(t.state, CODES.guardianOfGundabad, "defense"), `${held} quest cards`).toBe(base + (held >= 3 ? 2 : 0));
       expect(bonusDefense).toBeDefined();
     }
+  });
+
+  it("19126:A:1 a player side quest in the victory display is a quest card and counts (mec108.side-quests)", () => {
+    world.cards.set("psq", definePrinted({ code: "psq", name: "Side Quest", type: "player-side-quest", questPoints: 3 }));
+    // The Side Door, one stage 2 and a player side quest lie in the victory display: 3 quest cards, so the +2 applies (it did not while only stages counted).
+    const t = gundabadTable(world, { stage: "19142", questDeck: STAGE_TWOS.filter((code) => code !== "19142" && code !== "19135"), staging: [CODES.guardianOfGundabad], victory: ["psq"] });
+    expect(codesIn(t.state, "victory").sort()).toEqual(["19134", "19135", "psq"]);
+    expect(stat(t.state, CODES.guardianOfGundabad, "defense")).toBe((world.cards.get(CODES.guardianOfGundabad)?.defense ?? 0) + 2);
   });
 
   it("19126:A:2 Shadow: the attacking enemy gets +2 Defense until the end of the phase", () => {
@@ -256,7 +265,8 @@ function frame(state: ScenarioState, instructions: readonly Instruction[], sourc
   const pushed = pushEffectFrame(state, { frame: "ResolveEffect", sourceId, actor: 0, peril: false, effectId: "test", instructions, cancel: null, blockCancel: null }, steps);
   return settle({ ...pushed, window: null }, ctx, steps);
 }
-const explore = (t: Table): ScenarioState => frame(t.state, [{ verb: "PlaceProgressOn", amount: 99, target: "activeLocation" }], t.hero, t.ctx);
+// The quest card places the progress: the location is immune to player card effects, so a hero's effect would place none (rr.immune).
+const explore = (t: Table): ScenarioState => frame(t.state, [{ verb: "PlaceProgressOn", amount: 99, target: "activeLocation" }], t.state.questStage ?? t.hero, t.ctx);
 const offerOf = (state: ScenarioState, t: Table, cardId: string) => legalIntents(state, t.ctx).find((intent) => intent.type === "Trigger" && intent.cardId === cardId);
 const answerAll = (run: ReturnType<typeof start>, t: Table, pick?: (state: ScenarioState) => string) => finish(run, t.ctx, pick);
 

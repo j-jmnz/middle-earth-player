@@ -8,8 +8,8 @@ import { when } from "../effect-schema-conditions.ts";
 
 const VERBS = [
   // "Remove 1 resource token from The Defense of Helm's Deep" (143045:A:2): up to `amount` resource tokens come off the card in play with this code, no more than it holds. With `on` (a card the record picked: "Remove 1 resource token from the Mission objective", 09029:A:2)
-  // they come off that card instead.
-  z.strictObject({ verb: z.literal("RemoveResourceTokens"), code: z.string().min(1).optional(), on: z.literal("picked").optional(), amount: positiveAmountSchema, ...when }).refine((verb) => (verb.code == null) !== (verb.on == null), "RemoveResourceTokens names a code or a picked card, not both"),
+  // they come off that card instead; `on: "subject"` is the card the answered event is about ("remove 1 resource from that enemy", 901104:A:2).
+  z.strictObject({ verb: z.literal("RemoveResourceTokens"), code: z.string().min(1).optional(), on: z.enum(["picked", "subject", "self"]).optional(), amount: positiveAmountSchema, ...when }).refine((verb) => (verb.code == null) !== (verb.on == null), "RemoveResourceTokens names a code or a picked card, not both"),
 ] as const;
 
 const TRIGGERS = [

@@ -117,15 +117,28 @@ const TRIGGERS = [
   // About a card that left play with attachments on it, which left with it (the event's attachments): "When a character
   // leaves play, return each attachment attached to that character".
   "leftPlayWithAttachments",
+  // About a hero: a card effect moved resources to its pool from another card. The hero gains them, but none are added: the total does not grow
+  // (Harbor Master, which hears resourcesAdded, does not hear it).
+  "resourcesMoved",
+  // Heard on either event: resources were added to a hero's pool, or moved to it ("After attached hero gains any number of resources", Heir of Mardil, 08113:A:2).
+  "resourcesGained",
 ] as const;
 
 // `heroType`: the holder loses the ally card type and gains the hero card type (Sword-thain): it is among its controller's
 // heroes while it holds the flag. `threatCeiling` (on "seat:N"): while the seat's threat is higher than the amount, it is
 // treated as the amount ("treat your threat as if it is 20"); the dial does not move.
-// `cannotTriggerEffects`: the holder cannot initiate its own Action and Response abilities ("Attached hero cannot ... trigger its effect", 02048:A:1); its constant and Forced abilities still work.
+// `cannotTriggerEffects`: the holder cannot initiate its own Action and Response abilities ("Attached hero cannot ... trigger its effect", 02048:A:1); its constant and Forced abilities still work. Held by a seat, the player triggers no Action or Response
+// of any card, and plays no event ("Until the end of the round, players cannot trigger Action or Response effects", 148017:A:2).
 // `healCapPerEffect` (on the card): no heal effect takes more than this much damage off it ("Wilyador cannot be healed of more than 5 wounds by a single effect", 02064:A:3). `healReducedToOne` (on the host, from an attachment): a heal
 // of the host by a card effect other than an Athelas heal takes off 1 damage, and then the attachment is discarded ("the amount of damage healed is reduced to 1. Then, discard Noxious Supplies", 900608:A:2).
 // `returnsWithoutActive` (on an enemy): while no location is the active location, an engaged holder goes back to the staging area at once, whatever engaged it ("If there is no active location, return ~ to the staging area", 900702:A:2; the settle sweep, families/play/sweep.ts).
-const FLAGS = ["heroType", "threatCeiling", "cannotTriggerEffects", "healCapPerEffect", "healReducedToOne", "returnsWithoutActive"] as const;
+// `discardAtZeroWillpower` (on a character): it is discarded from play as soon as its current Willpower is 0 ("Characters are discarded from play if their Willpower is ever 0", 04013:B:2, a constant on the stage with every character as holder; "characters defending this attack ... are discarded
+// if their Willpower is 0", 04022:A:2, set until the end of the phase by the Shadow); a state the settle sweep keeps true (families/play/sweep.ts), not an event. `noWillpowerGain` (on "table"): no character gains Willpower from a player card effect, whatever its printed Willpower: a modifier that raises
+// Willpower and comes from a player card is not counted, a reduction still is ("While Frozen Silverlode is in the staging area, characters cannot gain Willpower from player card effects", 901306:A:1; core/keywords.ts, modifiedStat).
+const FLAGS = [
+  "heroType", "threatCeiling", "cannotTriggerEffects", "healCapPerEffect", "healReducedToOne", "returnsWithoutActive", "discardAtZeroWillpower", "noWillpowerGain", "guardedAlly",
+  // On "table", while a card holds it: a player cannot commit more allies to the quest than the number of heroes he is also committing ("Each player cannot commit more allies to the quest than the number of heroes he is also committing to the quest", 04118:B:2; families/play/commit-limit.ts).
+  "commitAlliesLimitByHeroes",
+] as const;
 
 export const manifest = { name: "play", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

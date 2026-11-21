@@ -39,7 +39,14 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ShuffleDiscardIntoDeck"), who: z.enum(["actor", "picked"]).optional(), ...when }),
   // The actor's hand (but the source card) is shuffled into their deck. The effect's X becomes how many cards that was ("Count
   // the number of cards in your hand and shuffle your hand into your deck. Then, draw an equal number of cards").
-  z.strictObject({ verb: z.literal("ShuffleHandIntoDeck"), ...when }),
+  // `keepPicked`: the picked card stays in the hand and the rest is shuffled in ("Each player chooses 1 card in his hand and shuffles the rest into his deck", 51304:B:1); with no picked card in the hand, all of it goes.
+  z.strictObject({ verb: z.literal("ShuffleHandIntoDeck"), keepPicked: z.literal(true).optional(), ...when }),
+  // "Shuffles the card in his hand with the highest printed cost back into his deck" (901703:A:1): the actor's hand card with the highest printed cost (a card with no printed cost or an X cost counting 0) goes into the deck, which is shuffled; the actor chooses among cards tied for
+  // the highest. An empty hand does nothing.
+  z.strictObject({ verb: z.literal("ShuffleHighestCostIntoDeck"), ...when }),
+  // "Each player chooses and shuffles a hero he controls into his deck. When he draws that hero, he puts it into play" (04124:A:1): the last picked hero leaves play (it is not destroyed; its attachments are discarded) and is shuffled into its owner's deck, where it is marked; when the owner
+  // draws it, it is put into play at once among his heroes, ready, with no damage or resources (families/deck/hero.ts). A seat with no hero in play and one in its deck is not eliminated (rr.player-elimination).
+  z.strictObject({ verb: z.literal("ShuffleHeroIntoDeck"), ...when }),
   // Every card in the actor's discard pile leaves the game ("remove all cards in that player's discard pile from the game", 900908:A:1; sotm.removed-from-game): a hero among them goes with the rest, and the cards are announced to nothing.
   z.strictObject({ verb: z.literal("RemoveDiscardFromGame"), ...when }),
   // The top `amount` cards of the actor's deck (shuffled first with `shuffle`) go to their discard pile, each announced as
@@ -112,6 +119,9 @@ const FLAGS = [
   // Held by the table while a card in play says so: no player draws a card ("While Enchanted Stream is the active location, players
   // cannot draw cards", 01095:A:1). drawOne (rules/interpret/interpret.ts) reads it, so every draw is stopped, a resource phase draw included.
   "cannotDraw",
+  // Held by a seat: it cannot draw cards from card effects ("While Cold-wight is engaged with a player, that player cannot draw cards from card effects", 148012:A:1). The framework's draws (the opening hand, the resource phase's) are not card effects, so they still happen;
+  // drawMany (rules/interpret/interpret.ts) reads it.
+  "noCardDraw",
 ] as const;
 
 export const manifest = { name: "deck", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

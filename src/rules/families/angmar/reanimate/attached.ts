@@ -23,10 +23,13 @@ import type { Focus } from "../../index.ts";
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
 /** AttachEnemyToPicked: the source, an enemy that has left play, attaches to the card the effect picked last as an attachment (`asAttachment`): it has no enemy text while it lies there, and returns to the staging area as an enemy when its host leaves play ("attach it to a character in play", 101157:A:1). Nothing happens with no card picked. */
-export function attachEnemyToPicked(state: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
-  const host = lastPicked(state);
+export function attachEnemyToPicked(state: ScenarioState, instruction: Verb<"AttachEnemyToPicked">, focus: Focus, ctx: ReduceContext): ScenarioState {
+  // `to: other`: the card the answered event names (Writhing Tentacle, 901503:A:1: the defending character of the attack that just resolved), only while it is a character in play.
+  const host = instruction.to === "other" ? refCard(state, "other", frameScope(state, focus.seat, focus.sourceId)) : lastPicked(state);
   if (!focus.sourceId || !host || !state.cards[host] || !state.cards[focus.sourceId]) return state;
-  return updateCard(attachSelf(state, focus.sourceId, host, ctx), focus.sourceId, { asAttachment: true });
+  if (instruction.to === "other" && !(inPlay(state.cards[host].zone) && state.cards[host].host == null)) return state;
+  // A Tentacle attachment (`returns: discard`) has left the enemy's zones for good: it is discarded with the others when the host leaves play.
+  return updateCard(attachSelf(state, focus.sourceId, host, ctx), focus.sourceId, { asAttachment: instruction.returns === "discard" ? "discard" : true });
 }
 
 /** An enemy lying on its host as an attachment (`asAttachment`: the Wraith of Carn Dûm) goes back to the staging area as an enemy when the host leaves play ("return Wraith of Carn Dûm to the staging area as an enemy", 101157:A:1): detached from the host, faceup, uncontrolled. Its tokens are left as they lie (an attachment holds none). Null when the card is no such attachment, so the caller releases it as any other. */
@@ -39,7 +42,7 @@ export function returnAttachedEnemy(state: ScenarioState, id: string): ScenarioS
 /** A card that leaves its role as an attachment, called as `moveCard` moves it (`current` is the card as it was, `dest` where it goes, `before` the state it left: the flag is read there, while the attachment was still in play): an enemy lying as an attachment (Wraith of Carn Dûm) is no attachment once it leaves that role, and an attachment that takes its host with it (Possession, the flag `discardsHost`) leaves any way but the game's own removal, so its host's card hears it and is discarded (rr.removed-from-game). */
 export function attachmentLeaves(state: ScenarioState, id: string, current: CardInstance, dest: Destination, before: ScenarioState): ScenarioState {
   let next = state;
-  if (current.asAttachment === true && dest.zone !== "attached") next = updateCard(next, id, { asAttachment: undefined });
+  if (current.asAttachment != null && dest.zone !== "attached") next = updateCard(next, id, { asAttachment: undefined });
   if (current.zone === "attached" && current.host != null && dest.zone !== "removed" && dest.zone !== "attached" && flagged(before, id, "discardsHost")) {
     next = queueEvent(next, { trigger: "attachmentLeft", seat: null, cardId: id, subject: id, other: current.host });
   }

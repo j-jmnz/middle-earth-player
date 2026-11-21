@@ -6,14 +6,15 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { eliminateEmpties } from "../../core/eliminate.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
-import { lastPicked } from "../../interpret/player-verbs.ts";
+import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import { fallenBase, FALLEN_SUFFIX } from "../../core/printed.ts";
+import { announceAllyLeft } from "../../core/ally-left.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats, updateCard } from "../../core/state.ts";
 import { raiseFor } from "../../interpret/verbs.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
-import { areaOf, stagingDest } from "./areas.ts";
+import { areaOf, headOf, sharing, stageSeat, stagingDest } from "./areas.ts";
 import { addTableModifier } from "../encounter/index.ts";
 import { ringBearerId } from "../burden/deck.ts";
 
@@ -22,19 +23,28 @@ export function runCards(state: ScenarioState, instruction: Instruction, focus: 
   switch (instruction.verb) {
     case "RevealIfDiscarded":
       return state;
+    case "CancelRevealed":
+      return cancelRevealed(state, focus, steps);
     case "RaiseThreatAtStage":
       return raiseAtStage(state, instruction.amount, focus, ctx, steps);
     case "MoveToLeftArea":
       return moveToLeft(state, focus.sourceId);
     case "MoveToFirstStaging":
       return moveToFirstStaging(state, instruction.target === "picked" ? lastPicked(state) : focus.sourceId);
+    case "MoveToOtherPlayerArea":
+      return moveToOtherPlayerArea(state, focus.sourceId);
     case "FallIntoEvil":
       return fallIntoEvil(state, focus.sourceId, steps);
     case "ReturnFallenHero":
       return returnFallen(state);
-    case "RemoveFromGame":
-      if (instruction.card) return removeCard(state, refCard(state, instruction.card, frameScope(state, focus.seat, focus.sourceId)), steps);
-      return instruction.self ? (focus.sourceId ? moveCard(state, focus.sourceId, { zone: "removed" }) : state) : removeFromGame(state, lastPicked(state));
+    case "RemoveFromGame": {
+      const id = instruction.card ? refCard(state, instruction.card, frameScope(state, focus.seat, focus.sourceId)) : instruction.self ? focus.sourceId : lastPicked(state);
+      const card = id ? state.cards[id] : undefined;
+      if (!id || !card) return state;
+      const removed = instruction.card ? removeCard(state, id, steps) : instruction.self ? moveCard(state, id, { zone: "removed" }) : removeFromGame(state, id);
+      // An ally in play removed from the game leaves play (Radagast's Request removes the ally that healed Wilyador, 02061:B:2; core/ally-left.ts).
+      return removed === state ? removed : announceAllyLeft(removed, card, ctx.cards);
+    }
     case "LockFirstPlayer":
       return focus.sourceId ? addTableModifier(state, { stat: "firstPlayerLocked", amount: 1, until: "endOfGame" }, focus) : state;
     case "TakeRingBearer":
@@ -44,10 +54,23 @@ export function runCards(state: ScenarioState, instruction: Instruction, focus: 
   }
 }
 
-// "Each player at this stage raises his threat" (142077:A:1): the seat whose staging area holds the source; every living seat with one staging area.
+// CancelRevealed (148004:B:1): the reveal frame of the card the event is about is marked canceled and the card, in the staging area, goes to the encounter discard pile: the reveal is over (windows/frames.ts revealStep, a canceled reveal whose card left the staging area pops).
+function cancelRevealed(state: ScenarioState, focus: Focus, steps: EngineStep[]): ScenarioState {
+  const id = refCard(state, "subject", frameScope(state, focus.seat, focus.sourceId));
+  const at = id ? state.stack.findLastIndex((frame) => frame.cardId === id && frame.data.kind === "reveal") : -1;
+  const frame = state.stack[at];
+  if (!id || frame?.data.kind !== "reveal" || state.cards[id]?.zone !== "staging") return state;
+  const discarded = updateCard(moveCard(state, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
+  // The card that canceled it is named in the step: the table says "Trapped Inside a Barrow: <location> is canceled and discarded".
+  steps.push({ kind: "cancel", cardId: id, ...(focus.sourceId ? { by: focus.sourceId } : {}) });
+  return { ...discarded, stack: discarded.stack.map((entry, index) => (index === at && entry.data.kind === "reveal" ? { ...entry, data: { ...entry.data, canceled: true } } : entry)) };
+}
+
+// "Each player at this stage raises his threat" (142077:A:1): the seat whose staging area holds the source; every living seat with one staging area. A stage as the source (148003:B:2): the players that share its area, none while no player is at it.
 function raiseAtStage(state: ScenarioState, amount: number, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const owner = focus.sourceId ? areaOf(state, focus.sourceId) : null;
-  const seats = state.separate ? (owner == null ? [] : [owner]) : livingSeats(state);
+  const atStage = focus.sourceId && owner == null ? stageSeat(state, focus.sourceId) : null;
+  const seats = state.separate ? (owner != null ? [owner] : atStage != null ? sharing(state, atStage) : []) : livingSeats(state);
   let next = state;
   for (const seat of seats) {
     if (state.seats[seat]?.eliminated) continue;
@@ -74,6 +97,18 @@ function moveToFirstStaging(state: ScenarioState, id: string | null): ScenarioSt
   if (!id || !card || (card.zone !== "staging" && card.zone !== "engaged")) return state;
   const moved = moveCard(state, id, stagingDest(state, state.firstPlayer));
   return updateCard(moved, id, { controller: state.separate ? state.firstPlayer : null });
+}
+
+// MoveToOtherPlayerArea (901703:A:2): the engaged enemy goes to the staging area of the player the engaged player picked (a player of a different area), as a staging card. With no other area to pick, players who share an area send it to that shared area (not separate, or joined);
+// with one player it stays engaged.
+function moveToOtherPlayerArea(state: ScenarioState, id: string | null): ScenarioState {
+  const card = id ? state.cards[id] : undefined;
+  if (!id || !card || card.zone !== "engaged" || card.controller == null) return state;
+  const own = headOf(state, card.controller);
+  const picked = seatOf(lastPicked(state));
+  if (picked != null && state.separate && headOf(state, picked) !== own) return updateCard(moveCard(state, id, { zone: "staging", area: headOf(state, picked) }), id, { controller: headOf(state, picked) });
+  if (livingSeats(state).every((seat) => seat === card.controller)) return state;
+  return updateCard(moveCard(state, id, stagingDest(state, card.controller)), id, { controller: state.separate ? own : null });
 }
 
 // Fallen Into Evil, attached to a hero: the hero is an enemy in the first player's staging area, its player no longer controlling it.

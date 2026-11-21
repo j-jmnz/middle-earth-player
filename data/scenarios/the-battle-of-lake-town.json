@@ -1,0 +1,173 @@
+{
+  "id": "the-battle-of-lake-town",
+  "name": "The Battle of Lake-town",
+  "number": 2,
+  "stages": [
+    "50201",
+    "50202",
+    "50203"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Battle of Lake-town",
+      "count": 45
+    }
+  ],
+  "cards": [
+    {
+      "code": "50208",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "50209",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "50210",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "50211",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "50212",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "50213",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50214",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "50215",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "50216",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "50217",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "50218",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "50219",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "50220",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "50221",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "50222",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "50223",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "50224",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "50201",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "50202",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "50203",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "50207",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "50204",
+      "normal": 3,
+      "easy": 3,
+      "pile": "smaugDeck"
+    },
+    {
+      "code": "50205",
+      "normal": 3,
+      "easy": 3,
+      "pile": "smaugDeck"
+    },
+    {
+      "code": "50206",
+      "normal": 3,
+      "easy": 3,
+      "pile": "smaugDeck"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": true,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q99.02",
+    "dragnEasy": "Q99.02",
+    "hobSlug": "The-Battle-of-Lake-town"
+  }
+}

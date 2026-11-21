@@ -4,10 +4,12 @@ import { fileURLToPath } from "node:url";
 
 import { configDefaults, defineConfig, type Plugin } from "vitest/config";
 
+import { heavyFirst } from "./scripts/tools/test-sequencer.ts";
+
 const root = path.dirname(fileURLToPath(import.meta.url));
 
 // The files that play many whole games or compile every component.
-// `pnpm test fast` (VITEST_FAST=1) leaves them out; `pnpm test` and CI run them.
+// `pnpm test fast` (VITEST_FAST=1) leaves them out; `pnpm test` and CI run them, first and spread over the shards (scripts/tools/test-sequencer.ts).
 const slowFiles = [
   "scripts/card-smoke/**",
   "src/play/compiler.test.ts",
@@ -40,6 +42,7 @@ export default defineConfig({
       "src/**/*.test.ts",
       "scripts/**/*.test.ts",
       "desktop/**/*.test.ts",
+      "discord/**/*.test.ts",
       "test/**/*.test.ts",
     ],
     exclude: process.env.VITEST_FAST ? [...configDefaults.exclude, ...slowFiles] : configDefaults.exclude,
@@ -49,5 +52,6 @@ export default defineConfig({
     isolate: false,
     // The main process only collects results, so every core runs a worker (the card smoke sweep is split for them).
     maxWorkers: "100%",
+    sequence: { sequencer: heavyFirst(slowFiles) },
   },
 });

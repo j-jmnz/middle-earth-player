@@ -9,7 +9,10 @@ import { holdCaptive } from "../../src/rules/families/captives/index.ts";
 import { syncConstants } from "../../src/rules/interpret/constants.ts";
 import { markSideQuests } from "../../src/rules/families/wilderland/night-quest.ts";
 import { markProgressNoted } from "../../src/rules/families/angmar/progress.ts";
+import { markProgressHeld } from "../../src/rules/families/long-dark/hold.ts";
 import { markCapture } from "../../src/rules/families/captured/entry.ts";
+import { markEnemyDamage } from "../../src/rules/families/encounter/patrol.ts";
+import { markSeatedRows } from "../../src/rules/families/encounter/seated.ts";
 
 import { gameCodes, loadAnyScenario, loadCampaigns } from "../../scripts/data/load-scenarios.ts";
 import { loadCards } from "../../scripts/data/load-cards.ts";
@@ -20,7 +23,7 @@ import { addStandIns, entry, fillerRecord, HERO, HERO2, HERO3, idOf, idsOf, open
 // everything here, so a scenario's tests import it from there.
 
 /** A card the layout places: a code, or a code with its tokens (and the seat it belongs to, the first by default). */
-export type Placed = Entry | { code: string; seat: number; damage?: number; resources?: number };
+export type Placed = Entry | { code: string; seat: number; damage?: number; resources?: number; upgraded?: true };
 
 /** A card of a hand or a deck: a code (every seat gets one), or a code and the one seat that holds it. */
 export type Dealt = string | { code: string; seat: number };
@@ -39,8 +42,15 @@ export type Layout = {
   firstPlayer?: 0 | 1;
   seed?: number;
   stage?: string;
+  // The quest cards of the game, in order, as a Quick-build leaves them (the 1A card, one stage 2 and one stage 3): a stage number reads the card's place among them. Absent: every quest card of the scenario.
+  stages?: readonly string[];
   progress?: number;
-  active?: string;
+  // The side the current quest stage shows (B by default; A for a stage 2 of a quest deck that has not flipped yet, 03070:A:1).
+  side?: "A" | "B";
+  // A code, or a code with its tokens.
+  active?: Entry;
+  // The Nightmare setup card, side A faceup next to the quest deck, with its tokens (901001:A:2 counts on it).
+  nightmare?: Entry;
   deck?: readonly string[];
   discard?: readonly string[];
   staging?: readonly Entry[];
@@ -56,6 +66,9 @@ export type Layout = {
   heroResources?: number;
   // The campaign card is on the table (a campaign game).
   campaign?: boolean;
+  // The scenario's mode card lies beside the quest deck on its back, as a finished Setup leaves it (The Siege of Annúminas' Standard Game Mode, 50801:B:1).
+  // `"easy"`: the scenario's Easy Mode card instead (The Hunt for the Dreadnaught, 40001:B:1).
+  modeCard?: true | "easy";
   // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached).
   attached?: readonly { code: string; to: string }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
@@ -66,6 +79,8 @@ export type Layout = {
   captive?: { hero: string; under: string };
   // Cards lying facedown under the first card with the code `to` (the enemies under The Black Gate, 144027:A:2).
   under?: readonly { code: string; to: string }[];
+  // The Night objective in play beside the current quest (The Stone of Erech, 50301:A:1): a code, or a code with its progress.
+  night?: Entry;
   // Other zones that hold a list of cards (a second deck, a named pile).
   piles?: Partial<Record<PileZone, readonly Entry[]>>;
 };
@@ -80,6 +95,13 @@ export type LayoutTable = { state: ScenarioState; ctx: ReduceContext; hero: stri
 type Loaded = { data: AnyScenarioData; dealt: AnyScenarioData; campaign: CampaignData; cards: ReadonlyMap<string, PrintedCard> };
 const LOADED = new Map<string, Loaded>();
 
+// Every card of data/cards by code, read once.
+let byCode: ReadonlyMap<string, ReturnType<typeof loadCards>[number]> | null = null;
+function cardsByCode(): ReadonlyMap<string, ReturnType<typeof loadCards>[number]> {
+  byCode ??= new Map(loadCards().map((card) => [card.code, card]));
+  return byCode;
+}
+
 // The saga hero or the attachments the first player starts the scenario with (The One Ring in The Passage of the Marshes), so a layout can place them.
 const sagaStartCodes = (data: AnyScenarioData): string[] => (data.sagaStart ? ("hero" in data.sagaStart ? [data.sagaStart.hero] : [...data.sagaStart.attached]) : []);
 
@@ -92,10 +114,9 @@ function loadedWorld(scenarioId: string): Loaded {
   if (!campaign) throw new Error(`no campaign plays ${scenarioId}`);
   const dealt = campaignScenario(data);
   const codes = new Set([...dealt.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])), ...dealt.campaignPlaced, ...(dealt.campaignCard !== undefined ? [dealt.campaignCard] : []), ...dealt.stages, ...gameCodes(campaign, data), ...sagaStartCodes(data), ...(data.nightmare ? [data.nightmare.setupCard, ...data.nightmare.cards.map((card) => card.code), ...(data.nightmare.questCards ?? [])] : [])]);
-  const byCode = new Map(loadCards().map((card) => [card.code, card]));
   const cards = new Map<string, PrintedCard>();
   for (const code of codes) {
-    const card = byCode.get(code);
+    const card = cardsByCode().get(code);
     if (!card) throw new Error(`data/cards has no card ${code}`);
     cards.set(code, printedFromCard(card));
   }
@@ -113,16 +134,23 @@ export function printedIn(scenarioId: string, code: string): PrintedCard | undef
 
 /**
  * A table built from a layout, with no scene file: the scenario's codes are read from data/scenarios/<scenarioId>.json and data/cards.
- * `effects` are the records the table runs (the authored ones by default); the do-nothing Action for the filler event is added to them.
+ * `effects` are the records the table runs (the authored ones by default); the do-nothing Action for the filler event is added to them. `extra` names
+ * other cards of data/cards the layout places (a player card in the hand, `pnpm game scene`), added to this table's cards only.
  */
-export function tableFromLayout(scenarioId: string, layout: Layout = {}, options: { effects?: readonly Effect[] } = {}): LayoutTable {
+export function tableFromLayout(scenarioId: string, layout: Layout = {}, options: { effects?: readonly Effect[]; extra?: readonly string[] } = {}): LayoutTable {
   const world = loadedWorld(scenarioId);
   const effects = options.effects ?? EFFECTS;
   // A layout that names a Nightmare quest card as its stage (Grimbeorn's Folly) has it after the printed stages, as the Nightmare deal does (src/campaign/start.ts).
   const printedDefinition = scenarioDefinition(world.dealt, world.campaign, effects);
   const nightmareStages = world.dealt.nightmare?.questCards ?? [];
-  const definition = layout.stage != null && nightmareStages.includes(layout.stage) ? { ...printedDefinition, stages: [...printedDefinition.stages, ...nightmareStages.map((code) => stageOf(code, effects))] } : printedDefinition;
+  const withNightmare = layout.stage != null && nightmareStages.includes(layout.stage) ? { ...printedDefinition, stages: [...printedDefinition.stages, ...nightmareStages.map((code) => stageOf(code, effects))] } : printedDefinition;
+  const definition = layout.stages ? { ...withNightmare, stages: withNightmare.stages.filter((entry) => layout.stages?.includes(entry.code)) } : withNightmare;
   const cards = new Map(world.cards);
+  for (const code of options.extra ?? []) {
+    const card = cardsByCode().get(code);
+    if (!card) throw new Error(`data/cards has no card ${code}`);
+    if (!cards.has(code)) cards.set(code, printedFromCard(card));
+  }
   const ctx: ReduceContext = { effects: [...effects, fillerRecord("filler")], cards };
   const stages = definition.stages.map((stage) => stage.code);
   const stage = layout.stage ?? stages[0] ?? "";
@@ -132,7 +160,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   for (const code of stages) {
     const index = stages.indexOf(code);
     const placed = index === at ? { zone: "questStage" as const } : index > at ? { zone: "questDeck" as const } : { zone: "setAside" as const };
-    const spawned = spawn(state, code, placed, placed.zone === "questStage" ? "B" : "A");
+    const spawned = spawn(state, code, placed, placed.zone === "questStage" ? (layout.side ?? "B") : "A");
     state = code === stage ? updateCard(spawned.state, spawned.id, { progress: layout.progress ?? 0 }) : spawned.state;
   }
   const first = spawn(state, HERO, { zone: "heroes", seat: 0 });
@@ -153,7 +181,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   const put = (code: string, dest: Destination, tokens: Entry = code, face?: "up" | "down"): void => {
     const row = entry(tokens);
     const spawned = spawn(state, code, dest, face);
-    state = updateCard(spawned.state, spawned.id, { progress: row.progress, damage: row.damage, resources: row.resources });
+    state = updateCard(spawned.state, spawned.id, { progress: row.progress, damage: row.damage, resources: row.resources, ...(row.upgraded ? { face: "B" as const } : {}) });
   };
   for (const item of layout.play ?? []) put(entry(item).code, { zone: "play", seat: seatOf(item) }, item);
   for (const code of layout.deck ?? []) put(code, { zone: "encounterDeck" }, code, "down");
@@ -162,8 +190,15 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   for (const code of layout.setAside ?? []) put(code, { zone: "setAside" }, code, "up");
   for (const item of layout.engaged ?? []) put(entry(item).code, { zone: "engaged", seat: seatOf(item) }, item);
   for (const code of layout.victory ?? []) put(code, { zone: "victory" });
-  if (layout.active) put(layout.active, { zone: "activeLocation" });
+  if (layout.active) put(entry(layout.active).code, { zone: "activeLocation" }, layout.active);
+  if (layout.nightmare) put(entry(layout.nightmare).code, { zone: "nightmare" }, layout.nightmare, "up");
+  if (layout.night) put(entry(layout.night).code, { zone: "nightObjective" }, layout.night, "up");
   if (layout.campaign && world.dealt.campaignCard !== undefined) put(world.dealt.campaignCard, { zone: "campaign" });
+  const modeCode = layout.modeCard === "easy" && "easyModeCard" in world.data ? world.data.easyModeCard : layout.modeCard && "modeCard" in world.data ? world.data.modeCard : undefined;
+  if (modeCode !== undefined) {
+    const spawned = spawn(state, modeCode, { zone: "modeCard" });
+    state = updateCard(spawned.state, spawned.id, { face: "B" });
+  }
   for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item);
   for (const attachment of layout.attached ?? []) {
     const host = idOf(state, attachment.to);
@@ -184,8 +219,13 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   // A game that deals encounter side quests in its encounter deck reads the side quest rules, as its start notes (families/wilderland/night-quest.ts markSideQuests).
   state = markSideQuests(state, cards);
   state = markProgressNoted(state, ctx);
+  // A game that deals Twisting Passage holds the progress placed on it for its test, as the start notes it (families/long-dark/hold.ts markProgressHeld).
+  state = markProgressHeld(state, ctx);
   // The cards with Capture X, and the cards in every area, as Escape from Mount Gram's start notes them (families/captured/entry.ts markCapture).
   state = markCapture(state, ctx);
+  // The enemies whose own Forced effect hears the damage dealt to them (families/encounter/patrol.ts markEnemyDamage).
+  state = markEnemyDamage(state, ctx);
+  state = markSeatedRows(state, ctx);
   state = { ...state, ...opening(layout.phase ?? "Quest"), ...(layout.firstPlayer != null ? { firstPlayer: layout.firstPlayer } : {}) };
   return { state: syncConstants(state, ctx), ctx, hero: first.id, hero2: secondHero.id, seat1Hero, definition, cards };
 }

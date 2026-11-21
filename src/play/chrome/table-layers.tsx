@@ -28,7 +28,8 @@ import { kindWords, threatSourceSaid, threatSourceWords, victorySaid, victoryWor
 import { adjustWords, threatSourcesOf } from "../readouts/threat-sources.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { dialLimit } from "../readouts/threat-level.ts";
-import { LogPanel, PileList, RowList, SettingsPanel, ThreatPanel, ThreatSourceList, type ListCard } from "./reading-panels.tsx";
+import { scenarioDials } from "../readouts/scenario-dials.ts";
+import { DialPanel, LogPanel, PileList, RowList, SettingsPanel, ThreatPanel, ThreatSourceList, type ListCard } from "./reading-panels.tsx";
 import { IslandPanel } from "../dream-chaser/island-panel.tsx";
 import { WAITING, islandFit, islandPanelWidth, islandReadout, standingWords } from "../dream-chaser/island-table.ts";
 import { foldTitle } from "../layout/row-fold.ts";
@@ -123,7 +124,7 @@ function ThreatSourceReading({ store, ctx, names, picture, onRead, onClose }: { 
   const cards = read.sources.map((source) => {
     const card = game.cards[source.id];
     const made = listCard(source.id, card?.code ?? "", card && !hidesFace(card) ? pictureKey(card) : "", names, picture, ctx.cards);
-    return { ...made, detail: threatSourceWords(made.detail ?? null, source.threat, source.from), said: threatSourceSaid(made.detail ?? null, source.threat, source.from) };
+    return { ...made, detail: threatSourceWords(made.detail ?? null, source.threat, source.from, source.area), said: threatSourceSaid(made.detail ?? null, source.threat, source.from, source.area) };
   });
   const title = read.seat == null ? "Staging threat" : `Player ${read.seat + 1}'s staging threat`;
   return <ThreatSourceList title={title} total={read.total} cards={cards} adjust={adjustWords(read.adjust)} onRead={onRead} onClose={onClose} />;
@@ -143,6 +144,13 @@ function IslandReading({ store, ctx, width, maxHeight, onRead, onClose }: { stor
   const readout = useMemo(() => islandReadout(game, ctx.cards), [game, ctx]);
   const fit = useMemo(() => islandFit(width, maxHeight, s, readout ? standingWords(readout) : ""), [width, maxHeight, s, readout]);
   return readout ? <IslandPanel readout={readout} fit={fit} onRead={onRead} onClose={onClose} /> : null;
+}
+
+// A scenario dial's lists (the Investigation List's names), read from the dial as the game stands now; nothing renders once the dial is gone.
+function DialReading({ store, ctx, nameOf, id, onClose }: { store: TableStore; ctx: ReduceContext; nameOf: (code: string) => string; id: string; onClose: () => void }) {
+  const game = useStore(store, (state) => state.game);
+  const dial = useMemo(() => scenarioDials(game, ctx, nameOf).find((one) => one.id === id), [game, ctx, nameOf, id]);
+  return dial?.lists ? <DialPanel title={dial.name} lists={dial.lists} said={dial.said ?? dial.name} note={dial.foot ?? null} onClose={onClose} /> : null;
 }
 
 function ThreatReading({ store, ctx, names, seat, onClose }: { store: TableStore; ctx: ReduceContext; names: SheetNames; seat: number; onClose: () => void }) {
@@ -281,6 +289,7 @@ export function TableLayers({
         {held?.kind === "stagingThreat" ? <ThreatSourceReading store={store} ctx={ctx} names={names} picture={picture} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "log" ? <LogReading store={store} logNames={logNames} onClose={close} /> : null}
         {held?.kind === "threat" ? <ThreatReading store={store} ctx={ctx} names={names} seat={held.seat} onClose={close} /> : null}
+        {held?.kind === "dial" ? <DialReading store={store} ctx={ctx} nameOf={nameOf} id={held.id} onClose={close} /> : null}
         {held?.kind === "island" ? <IslandReading store={store} ctx={ctx} width={shown} maxHeight={room - (trayShown ? WAITING * s : 0)} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "settings" ? (
           <SettingsPanel

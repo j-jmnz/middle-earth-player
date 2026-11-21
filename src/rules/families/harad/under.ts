@@ -8,7 +8,8 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats } from "../../core/state.ts";
+import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { isPlayerType, printedOf } from "../../core/printed.ts";
 import { placeUnderHost } from "../encounter/moves.ts";
 import { facedownCount, facedownWithin } from "../misc/amounts.ts";
 import type { Focus } from "../index.ts";
@@ -26,14 +27,17 @@ export function placeFacedownUnder(state: ScenarioState, instruction: Extract<In
   // Once the attack in progress has ended, with the attacking enemy as the source (as AfterAttack queues its instructions, combat/attack-verbs.ts).
   const attack = state.pendingAttack;
   if (instruction.afterAttack && attack) {
-    const later: Instruction = { verb: "PlaceFacedownUnder", code: instruction.code, target: "self" };
+    const later: Instruction = { verb: "PlaceFacedownUnder", ...(instruction.code != null ? { code: instruction.code } : {}), ...(instruction.host != null ? { host: instruction.host } : {}), target: "self" };
     return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), later], afterCause: currentCause(steps, UNATTRIBUTED) } };
   }
   const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId));
   const card = id ? state.cards[id] : undefined;
-  const host = hostOf(state, instruction.code);
+  const host = instruction.host === "self" ? focus.sourceId : instruction.code != null ? hostOf(state, instruction.code) : null;
   if (!id || !card || host == null || host === id || !inPlay(card.zone)) return state;
-  return placeUnderHost(state, id, host, ctx, steps);
+  // A player card placed under a card stays its owner's (it returns to his hand when the host is explored), though its controller is cleared as it leaves play.
+  const owner = isPlayerType(printedOf(ctx.cards, card.code)) ? (card.owner ?? card.controller) : null;
+  const placed = placeUnderHost(state, id, host, ctx, steps);
+  return owner != null && placed.cards[id]?.zone === "under" ? updateCard(placed, id, { owner }) : placed;
 }
 
 /** The `facedownUnder` condition: the cards facedown under the card in play with this code number at least `min` and at most `max`, each plus the number of players with `players` (144027:A:2). */

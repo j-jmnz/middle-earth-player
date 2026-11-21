@@ -41,7 +41,9 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19036:A:1 (front): While Durin's Key is free of encounters, the first player attaches it to a hero he controls.
   19036:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - this card: stat returnsToStagingArea 1, while this card is in play
 
 19036:A:2 (front): Action: Exhaust Durin's Key to give each location -1 Threat until the end of the phase.
   19036:action:1: Action (cost: exhaust this card)
@@ -61,7 +63,9 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19037:A:1 (front): While Urdug's Horn is free of encounters, attach it to Urdug.
   19037:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - [json ClaimWhenFree {"verb":"ClaimWhenFree","host":"Urdug"}]
+    - this card: stat returnsToStagingArea 1, while this card is in play
 
 19037:A:2 (front): Forced: When Urdug attacks, discard the top card of the encounter deck and add its Threat to his Attack until the end of the phase.
   19037:forced:1: Forced after a character is declared as an attacker (heard about the host)
@@ -176,7 +180,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19044:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the number of card (you control) named "Urdug", chosen by the first player is at least 1: choose location (any player controls) in the staging area only, chosen by the first player
-    - [json GuardReturnedBy {"verb":"GuardReturnedBy","code":"19052","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"}}}]
+    - then, if the picked card is a location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the card in play with code 19052 goes back to the staging area, controlled by no one, guarded by the last picked card
     - then, if not (the picked card is a location (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): the total Threat in the staging area is 5 higher until the end of the phase
     - this card is removed from the game
 
@@ -215,7 +219,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 19047:A:1 (front): Setup: The first player takes control of Urdug, objective side face-up. Set each other objective and objective-ally aside, out of play. Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each discarded location to the staging area.
   19047:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json TakeControlOfSetAside {"verb":"TakeControlOfSetAside","code":"19052"}]
+    - the set-aside card with code 19052 enters play under the first player's control, ready
     - shuffle the encounter deck
     - for each player, first player first:
       - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
@@ -424,4 +428,4 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19055:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) named "Urdug")
     - engage this card
 
-(rendered pieces: 319 by template, 29 as JSON)
+(rendered pieces: 325 by template, 27 as JSON)

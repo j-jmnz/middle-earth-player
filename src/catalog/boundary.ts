@@ -44,6 +44,10 @@ const optionalInt = z.number().int().nullish();
 export const printedKeywordsSchema = z.strictObject({
   hide: z.number().int().positive().optional(),
   surge: z.boolean().optional(),
+  // Ambush (dwd.ambush): an enemy entering play makes each player, the first player first, an engagement check against it alone (src/rules/families/encounter/ambush.ts).
+  ambush: z.boolean().optional(),
+  // Regenerate X (dwd.regenerate): the enemy heals X damage from itself right after the first player token passes in the Refresh phase (src/rules/families/encounter/regenerate.ts).
+  regenerate: z.number().int().positive().optional(),
   doomed: z.number().int().positive().optional(),
   peril: z.boolean().optional(),
   archery: z.number().int().positive().optional(),
@@ -57,6 +61,10 @@ export const printedKeywordsSchema = z.strictObject({
   // Battle / Siege on a quest card: committed characters count Attack / Defense instead of Willpower (hon.battle, hon.siege).
   battle: z.boolean().optional(),
   siege: z.boolean().optional(),
+  // The Siege value box an Attack on Dol Guldur card prints at its bottom right (docs/brief.md, Attack on Dol Guldur, reading 2): what a destroyed enemy or an explored location adds to the round's tally. A printed mark, not a quest-card flag.
+  siegeValue: z.number().int().positive().optional(),
+  // Pillage X on an enemy (docs/brief.md, The Hunt for the Dreadnaught, reading 21): after the enemy's attack on a player has resolved, that player discards the top X cards of their deck (src/rules/families/sea/pillage.ts). Not in any source's keyword list for the box: `overrides.cards` sets it from the scan.
+  pillage: z.number().int().positive().optional(),
   // Secrecy X: the card costs X less to play while its player's threat is 20 or less.
   secrecy: z.number().int().positive().optional(),
   // Leaving play ends the game (flag).
@@ -71,12 +79,18 @@ export const printedKeywordsSchema = z.strictObject({
   uncharted: z.boolean().optional(),
   // Aflame X on a location (dcce.aflame): the damage that destroys it, and puts it facedown underneath The Havens Burn (src/rules/families/aflame/). A numbered keyword with a value of 0 does not exist.
   aflame: z.number().int().positive().optional(),
+  // Burn X on a location (docs/brief.md, The Battle of Lake-town): the burn damage "Resolve all burn damage" adds up (src/rules/families/smaug/). A numbered keyword with a value of 0 does not exist.
+  burn: z.number().int().positive().optional(),
   // Grapple (highest or lowest printed Threat or quest points) on an enemy (dcce.grapple): the staging-area location it attaches to, facedown, when it is revealed (src/rules/families/grapple/).
   grapple: z.enum(["highestThreat", "lowestThreat", "highestQuestPoints", "lowestQuestPoints"]).optional(),
   // Phantom on an enemy (mec113.phantom): the damage its attack would deal is canceled and the defending player raises their threat by that much (src/rules/families/grey-company/).
   phantom: z.boolean().optional(),
+  // Spectral on an enemy (docs/brief.md, The Stone of Erech): characters attacking it use their Willpower instead of their Attack to determine attack strength (src/rules/families/attack/spectral.ts).
+  spectral: z.boolean().optional(),
   // Dire on a quest card (mec113.dire): while the main quest has it, each player's elimination level is 99, non-boon player card effects lower a player's threat by at most 1 each round and Valour triggers at 80 threat (src/rules/families/black-gate/dire.ts).
   dire: z.boolean().optional(),
+  // PASS on a card (dwd.locate-test): the card passes a locate test it is discarded for, and the Goblin Stalker reads it on a shadow card dealt to it (src/rules/families/long-dark/).
+  pass: z.boolean().optional(),
   // Not a keyword but a printed mark, kept here with the rule flags: the Sailing success symbols an encounter card prints in the bottom left
   // corner of its text box, read from the scan into the ledger (dcce.sailing-tests). Absent when the card prints none.
   sailingSuccess: z.number().int().positive().optional(),
@@ -84,6 +98,8 @@ export const printedKeywordsSchema = z.strictObject({
   eyeIcons: z.number().int().positive().optional(),
   // Not a keyword either: the location prints X for its quest points (`quest` stays null), and a constant record sets them (Hills of Wilderland, Underground Lake): the engine lets it take progress and be explored.
   questPointsX: z.boolean().optional(),
+  // Also a printed mark: the enemy prints X for its Attack and its hit points (the Nameless things): their numbers stay null, a record sets them, and the engine reads the hit points as 0 until it does.
+  statsX: z.boolean().optional(),
 });
 
 export const ringsDbPackSchema = z
@@ -146,7 +162,9 @@ const stageSchema = z.strictObject({
   // Defeating this stage when the Stormcaller is at this stage number wins the game (CatchUpWins, 12013:B:3).
   catchUp: z.number().int().positive().optional(),
   // The stages defeating this one proceeds to in a random order, each played once: one of `codes` still in the quest deck, else `otherwise`; with `remove` the stage defeated leaves the game (AdvanceToRandomStage, 19048:B:2).
-  randomNext: z.strictObject({ codes: z.array(z.string()).min(2), otherwise: z.string().optional(), remove: z.literal(true).optional() }).optional(),
+  randomNext: z.strictObject({ codes: z.array(z.string()).min(2), otherwise: z.string().optional(), remove: z.literal(true).optional(), different: z.literal(true).optional() }).optional(),
+  // The stage defeating this one proceeds to when the card with the code `code` is attached to a hero (`then`), else `otherwise`; a stage already played comes back (AdvanceIfAttached, 50601:B:3).
+  attachedNext: z.strictObject({ code: z.string(), then: z.string(), otherwise: z.string() }).optional(),
   // A stage 2 of a quest deck that is not flipped when it is revealed: it arrives side A up and shows side B from the beginning of the quest phase (FlipAtQuestPhase, 19135:A:2; emce.gundabad-quest-deck).
   deck: z.literal(true).optional(),
 });

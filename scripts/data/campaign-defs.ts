@@ -5,6 +5,7 @@
 // `mirkwood-paths` (parts 4 and 5, tdom.mirkwood-paths) and `the-dark-of-mirkwood` (parts 1 and 2, tdom.mini-campaign).
 
 import type { Pile } from "../../src/catalog/scenario-data.ts";
+import { CYCLE_DEFS } from "./cycle-defs.ts";
 
 export type ScenarioDef = {
   // The file name: data/scenarios/<id>.json.
@@ -18,8 +19,15 @@ export type ScenarioDef = {
   // for a box that has no load list of its own: the cross-check compares the built piles with them, copy counts only.
   crossCheck?: { normal: string; easy: string };
   // The DragnCards decks that load the scenario (`Q06.1`, `E06.1`), for a `load: "dragncards"` box whose decks are not the numbered
-  // `Q0C` list of the Fellowship boxes. The deck's label must be the scenario's title.
-  deck?: { normal: string; easy: string };
+  // `Q0C` list of the Fellowship boxes. The deck's label must be the scenario's title, or `label` where DragnCards prefixes the mode
+  // (The Siege of Annúminas' Q99.08 is "Standard The Siege of Annúminas", its Epic mode Q99.09).
+  deck?: { normal: string; easy: string; label?: string };
+  // The title of the mode card whose printed Setup runs before the quest card's (The Siege of Annúminas' "Standard Game Mode"): the build reads its Setup sentences with the quest card's.
+  modeCard?: string;
+  // The title of the mode card the Easy difficulty deals instead (The Hunt for the Dreadnaught's "Easy Mode"); its Setup is not read with the quest card's, the engine runs its records.
+  easyModeCard?: string;
+  // The encounter sets of a kit whose Hall of Beorn scenario file lists none of them (The Wizard's Quest: its quest card names one set, the 14 sets of its encounter cards are in the box): the sets the load list deals, in booklet order.
+  encounterSets?: readonly string[];
   // The product whose campaign card, boons and burdens the scenario deals when it is not `product` (the Dream-chaser Campaign Expansion
   // reprints the nine scenarios of seven boxes and holds every campaign card).
   campaignProduct?: string;
@@ -90,6 +98,8 @@ export type ProductDef = {
   // The product's name in Hall of Beorn's Scenarios.json where it differs from its card set's name (Angmar Awakened's Treachery of Rhudaur: the card set is "The Treachery of Rhudaur"):
   // the sync snapshots the scenario files of a campaign's products by it, and the campaign index counts them by it.
   scenarioProduct?: string;
+  // Hall of Beorn lists more than one scenario under the product (the year 2014 holds The Old Forest and Fog on the Barrow-downs): only the one with this title is the product's.
+  scenarioTitle?: string;
 };
 
 const DCCE = "Dream-chaser Campaign Expansion";
@@ -113,6 +123,29 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "The Hills of Emyn Muil", packs: ["HoEM"], home: "shadows-of-mirkwood", load: "dragncards", easySheet: false, twinPack: null },
   { name: "The Dead Marshes", packs: ["TDM"], home: "shadows-of-mirkwood", load: "dragncards", easySheet: false, twinPack: null },
   { name: "Return to Mirkwood", packs: ["RtM"], home: "shadows-of-mirkwood", load: "dragncards", easySheet: false, twinPack: null },
+  // Dwarrowdelf: the Khazad-dûm deluxe expansion (three scenarios) and the six Adventure Packs, whose cards are Hall of Beorn's alone like the first cycle's.
+  { name: "Khazad-dûm", packs: ["KD"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Redhorn Gate", packs: ["TRG"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Road to Rivendell", packs: ["RtR"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Watcher in the Water", packs: ["WitW"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Long Dark", packs: ["TLD"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Foundations of Stone", packs: ["FoS"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Shadow and Flame", packs: ["SaF"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  // Standalone scenarios: each official scenario printed on its own, Hall of Beorn's cards of it alone. Hall of Beorn lists the event scenarios of 2011 to 2017 under the year (`scenarioProduct`).
+  { name: "The Massing at Osgiliath", packs: ["TMaO"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2011" },
+  { name: "The Battle of Lake-town", packs: ["TBoLT"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2012" },
+  { name: "The Stone of Erech", packs: ["TSoE"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2013" },
+  { name: "The Old Forest", packs: ["TOF"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2014", scenarioTitle: "The Old Forest" },
+  { name: "Fog on the Barrow-downs", packs: ["FotBd"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2014", scenarioTitle: "Fog on the Barrow-downs" },
+  { name: "The Ruins of Belegost", packs: ["TRoB"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2015", scenarioTitle: "The Ruins of Belegost" },
+  { name: "Murder at the Prancing Pony", packs: ["MatPP"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2015", scenarioTitle: "Murder at the Prancing Pony" },
+  { name: "The Siege of Annúminas", packs: ["TSoA"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2016", scenarioTitle: "The Siege of Annúminas" },
+  { name: "Attack on Dol Guldur", packs: ["AoDG"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2017", scenarioTitle: "Attack on Dol Guldur" },
+  { name: "The Wizard's Quest", packs: ["TWQ"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Woodland Realm", packs: ["TWR"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Mines of Moria", packs: ["TMoM"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Escape from Khazad-dûm", packs: ["EfKD"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Hunt for the Dreadnaught", packs: ["THftD"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },
   { name: "The Dark of Mirkwood", packs: ["TDoM"], home: "the-dark-of-mirkwood", load: "setup", easySheet: false, twinPack: null },
   // Dream-chaser: The Grey Havens and the six Adventure Packs are the base cards, the Campaign Expansion (MEC111, 2023) the campaign.
   { name: "The Grey Havens", packs: ["TGH"], home: "dream-chaser", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, sidedDragnRows: true },
@@ -191,7 +224,9 @@ type CampaignBase = {
 type PlayedCampaignDef = CampaignBase & { kind?: "campaign"; bookletId: string; bookletDoc: string };
 // A cycle (Shadows of Mirkwood) has no Campaign Mode: no campaign card, no booklet of its own, and its scenarios are played standalone. It names a booklet only
 // where its Adventure Packs' rules inserts are pinned (docs/brief.md, Data sources).
-type CycleDef = CampaignBase & { kind: "cycle"; bookletId?: string; bookletDoc?: string };
+// `later` names the Hall of Beorn products whose scenarios the cycle lists and the app has not built yet: the cycle's file carries their titles, which the hubs show under
+// Coming later. Each moves to `products` and `scenarios` as it is built.
+type CycleDef = CampaignBase & { kind: "cycle"; bookletId?: string; bookletDoc?: string; later?: readonly string[] };
 export type CampaignDef = PlayedCampaignDef | CycleDef;
 
 const OATH: ScenarioDef = { id: "the-oath", product: "The Dark of Mirkwood", setupSpan: "tdom.setup-the-oath", crossCheck: { normal: "Q00.01B", easy: "E00.01B" } };
@@ -220,13 +255,6 @@ function sagaScenario(doc: string, id: string, product: string, extra: Partial<S
 }
 const twoTowers = (id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => sagaScenario("mec112", id, product, extra);
 const returnOfTheKing = (id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => sagaScenario("mec113", id, product, extra);
-
-// A Shadows of Mirkwood scenario: its Adventure Pack, and the DragnCards decks (Q01.<n+3> / E01.<n+3>: the 2011 core decks are Q01.1 to Q01.3). The rulesheet of an Adventure Pack
-// (`sotm.setup-<id>`) prints its encounter sets; The Hunt for Gollum's and Conflict at the Carrock's rulesheets are outlines with no text layer, so those two have no `setupSpan`.
-// The piles are checked against the quest card's printed Setup.
-function cycleScenario(n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef {
-  return { id, product, deck: { normal: `Q01.${n + 3}`, easy: `E01.${n + 3}` }, ...extra };
-}
 
 // The three saga boxes of The Lord of the Rings, in book order. Every list keeps them together, placed by the Fellowship's release
 // (scripts/data/normalize/campaigns.ts, positions).
@@ -385,24 +413,7 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     ledger: "the-return-of-the-king",
     ownTitles: true,
   },
-  {
-    id: "shadows-of-mirkwood",
-    name: "Shadows of Mirkwood",
-    kind: "cycle",
-    released: "2011-07-22",
-    products: ["The Hunt for Gollum", "Conflict at the Carrock", "A Journey to Rhosgobel", "The Hills of Emyn Muil", "The Dead Marshes", "Return to Mirkwood"],
-    scenarios: [
-      cycleScenario(1, "the-hunt-for-gollum", "The Hunt for Gollum"),
-      cycleScenario(2, "conflict-at-the-carrock", "Conflict at the Carrock"),
-      // DragnCards loads Wilyador in player 1's play area; the printed Setup adds him to the staging area (the first player then gains control of him, his own text).
-      cycleScenario(3, "a-journey-to-rhosgobel", "A Journey to Rhosgobel", { setupSpan: "sotm.setup-a-journey-to-rhosgobel", groups: { player1Play1: "staging" } }),
-      cycleScenario(4, "the-hills-of-emyn-muil", "The Hills of Emyn Muil", { setupSpan: "sotm.setup-the-hills-of-emyn-muil" }),
-      cycleScenario(5, "the-dead-marshes", "The Dead Marshes", { setupSpan: "sotm.setup-the-dead-marshes" }),
-      cycleScenario(6, "return-to-mirkwood", "Return to Mirkwood", { setupSpan: "sotm.setup-return-to-mirkwood" }),
-    ],
-    saga: false,
-    ledger: "shadows-of-mirkwood",
-  },
+  ...CYCLE_DEFS,
 ];
 
 // The packs of the products built from Hall of Beorn alone (no twin pack): their boons and burdens have a pool file of their own.
@@ -420,6 +431,14 @@ export function scenarioProductOf(name: string): string {
   return productOf(name).scenarioProduct ?? name;
 }
 export const BUILT_SCENARIO_PRODUCTS: ReadonlySet<string> = new Set(CAMPAIGNS.flatMap((campaign) => campaign.products.map(scenarioProductOf)));
+// Whether a Scenarios.json entry is one of a product's scenarios: its product is the product's, and where the product names its one title, the title is it.
+export function productListsScenario(name: string, entry: { Product: string; Title: string }): boolean {
+  const def = productOf(name);
+  return (def.scenarioProduct ?? name) === entry.Product && (def.scenarioTitle === undefined || def.scenarioTitle === entry.Title);
+}
+export function isBuiltScenario(entry: { Product: string; Title: string }): boolean {
+  return CAMPAIGNS.some((campaign) => campaign.products.some((name) => productListsScenario(name, entry)));
+}
 
 // Hall of Beorn lists a scenario as "Passage Through Mirkwood (Campaign)" when it is the campaign-mode edition of a box
 // that also prints a Nightmare or standalone scenario. The suffix is not part of the scenario's name.

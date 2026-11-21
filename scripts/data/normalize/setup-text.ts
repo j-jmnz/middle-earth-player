@@ -2,7 +2,7 @@ import type { Card } from "../../../src/catalog/card-facts.ts";
 import { readAngmarAwakened } from "./setup-angmar-awakened.ts";
 import { readEredMithrin } from "./setup-ered-mithrin.ts";
 import { readReturnOfTheKing } from "./setup-return-of-the-king.ts";
-import { readShadowsOfMirkwood } from "./setup-shadows-of-mirkwood.ts";
+import { readCycles } from "./setup-cycles.ts";
 import { readTwoTowers } from "./setup-two-towers.ts";
 import { isNameList, namedBy, setsOf, stepWith } from "./setup-names.ts";
 
@@ -36,7 +36,7 @@ export type SetupClause =
   // "Attach 1 encounter card to each objective card."
   | { kind: "attachEncounterToObjectives"; count: number }
   // "Put Mendor into play."
-  | { kind: "putIntoPlay"; codes: string[]; under?: "dreamChaser" | "anyPlayer" | "engagedFirstPlayer" | "guardian" }
+  | { kind: "putIntoPlay"; codes: string[]; under?: "dreamChaser" | "anyPlayer" | "engagedFirstPlayer" | "guardian" | "firstPlayer" }
   // "Attach X to a hero of the first player's choice." / "The first player attaches X to one of his heroes."
   // `anyPlayer`: "Attach Wormsbane to a hero, Broken side face-up" names no player.
   | { kind: "attachChosen"; codes: string[]; who: "firstPlayer" | "anyPlayer" }
@@ -51,7 +51,7 @@ export type SetupClause =
   // "Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each
   // discarded location to the staging area." (`amount` "playersLessOne": "X is 1 less than the number of players in the game";
   // `eachPlayer`: "Each player discards cards from the top of the encounter deck until he discards an enemy or location and adds that card to the staging area".)
-  | { kind: "discardToStaging"; types: ("enemy" | "location")[]; amount: "players" | "playersLessOne"; eachPlayer: boolean; shuffleFirst: boolean }
+  | { kind: "discardToStaging"; types: ("enemy" | "location")[]; amount: "players" | "playersLessOne" | { count: number; manyCount: number; from: number }; eachPlayer: boolean; shuffleFirst: boolean }
   // "If \"Turayn has taken an oath of vigilance,\" search the encounter deck for 3 treacheries and remove them from the game" (`ifLogged` null: no condition):
   // `from` is the deck, `nonUnique` the "non-unique" qualifier, `except` "not named Grey Mountain Giant", `alsoCaves` "and the Caves deck for 1 location".
   | { kind: "removeCards"; ifLogged: string | null; count: number; what: "treachery" | "location" | "enemy"; nonUnique: boolean; except: string | null; alsoCaves: number | null }
@@ -68,7 +68,7 @@ export type SetupStep =
   | "prepareIslandMap" // dcce.island-map
   | "prepareStormcallerArea" // dcce.stormcallers-area
   | "prepareFleet" // dcce.prepare-your-fleet
-  | "shuffleStageTwos" // the quest deck's stage 2 cards in random order
+  | "shuffleStageTwos" // the quest deck's stage 2 cards in random order (Dream-chaser; Flight from Moria's "Prepare the quest deck", dwd.creating-the-quest-deck)
   | "damageTrade" // "its controller may deal N damage to it to ..."
   | "threatTrade" // "raise their threat by N to attach X to a hero"
   | "addFromDeck" // locations from the top of the Uncharted or Grotto deck to the staging area
@@ -128,6 +128,24 @@ export type SetupStep =
   | "placeDamageForResources" // "each player may place 4 damage on Protect the Innocent to add 1 resource to each of their heroes' resource pools": `count` the damage, `resources` the resources
   | "placeLoggedDamage" // "place damage on it equal to the amount of damage noted in the Campaign Log": `codes` the card (Protect the Innocent)
   | "buildOrcDeck" // "Create the Orc deck (see insert) and set it next to the quest deck": mec108.orc-deck
+  // The Battle of Lake-town: each quoted from the stage 1A card Setup.
+  | "buildSmaugDeck" // "Shuffle all copies of Smaug into a separate Smaug Deck": `codes` the three Smaug titles
+  // The Ruins of Belegost: each quoted from the stage 1A card Setup (50601).
+  | "hideLoot" // "Randomly select 1 of the 5 remaining Loot objectives and place it facedown underneath Stalking the Ruins": `codes` the five, `to` Stalking the Ruins
+  | "shuffleOthersIn" // "Shuffle the others into the encounter deck": `codes` the five Loot objectives
+  // Murder at the Prancing Pony: each quoted from the stage 1A card Setup (50701).
+  | "findSuspectsAndHideouts" // "Search the encounter deck for the 5 Suspect enemies and 5 Hideout locations": `codes` the ten
+  | "hideSuspectAndHideout" // "Randomly select 1 Suspect and 1 Hideout and set them aside out of play, facedown (without looking at them)": `codes` the ten
+  | "buildInvestigationDeck" // "Build the Investigation deck (see rules)": `codes` the ten and Taken by Surprise; the eight not hidden and Taken by Surprise are shuffled facedown into the deck
+  // The Siege of Annúminas: quoted from the stage 1A card Setup (50803).
+  | "arrangeQuestDecks" // "Arrange the quest cards into three separate quest decks: 1A-3A, 1C-3C, and 1E-3E" (Standard Game Mode, 50801)
+  | "removeQuestDecks" // "Remove the 1C-3C deck and 1E-3E deck from the game": the six quest cards of the other two decks
+  | "setCityStrength" // "set its city strength to 20": `codes` Annúminas, `count` the strength
+  | "flipModeCard" // "Flip this card over and place it next to the quest deck": the mode card's back (its Forced lines) is in play all game
+  | "raiseCityStrengthPerPlayer" // "Then, increase its value by 5 for each player" (Attack on Dol Guldur's Standard Game Mode, 50931): `codes` Dol Guldur, `count` the strength each player adds
+  | "eachHeroResources" // "Each player adds 1 resource to each of his heroes' resource pools": `resources` the resources for each hero (The Mines of Moria, 51201)
+  | "searchZeroCostPerPlayer" // "The opposing team searches the encounter deck for one different 0 cost enemy or 0 cost location per player and adds them to the staging area" (The Wizard's Quest, 51001)
+  | "gateAmongLocations" // "One of those locations must be Gate of Annúminas": `codes` Gate of Annúminas, one of the locations the players search for
   | "revealPerPlayer" // "Reveal 1 card from the encounter deck per player"
   | "addToStartingHand" // "Each player adds 1 copy of Determination to their starting hand"
   | "shuffleHandIntoDeck" // "Each player shuffles his starting hand into his deck"
@@ -142,8 +160,8 @@ export type SetupStep =
   | "reanimateTopCard" // "Each player reanimates the top card of his deck": mec108.reanimated-dead
   | "heroesBeginDamaged" // "Each hero begins the game with damage on them equal to the amount noted for them in the Campaign Log"
   | "chooseItemBoons" // "Each player chooses an Item boon (excluding Andúril) from the campaign pool and sets it aside, out of play": `codes` the excluded boon
-  // Shadows of Mirkwood (sotm.*, scripts/data/normalize/setup-shadows-of-mirkwood.ts).
-  | "shuffleAsideBack"; // "Then shuffle 1 'Sacked!' card per player back into the encounter deck": `count` cards, `players` for each player
+  // The cycles (scripts/data/normalize/setup-cycles.ts).
+  | "shuffleAsideBack"; // "Then shuffle 1 'Sacked!' card per player back into the encounter deck" (Shadows of Mirkwood), "... 1 copy of A Foe Beyond per player ..." (Dwarrowdelf): `count` cards, `players` for each player
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };
 
@@ -341,7 +359,7 @@ export function parseSetup(text: string, names: NameIndex, set: (name: string) =
   for (const raw of sentencesOf(text.replace(/^Setup:\s*/i, ""))) {
     const sentence = raw.replace(/\.$/, "");
     let match: RegExpExecArray | null;
-    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readAngmarAwakened(sentence, names, clauses) ?? readTwoTowers(sentence, names) ?? readReturnOfTheKing(sentence, names) ?? readShadowsOfMirkwood(sentence, names);
+    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readAngmarAwakened(sentence, names, clauses) ?? readTwoTowers(sentence, names) ?? readReturnOfTheKing(sentence, names) ?? readCycles(sentence, names);
     if (campaignStep) {
       clauses.push(...campaignStep);
     } else if ((match = /^Set (all copies of |each copy of )?(.+?) aside,? out of play$/i.exec(sentence))) {

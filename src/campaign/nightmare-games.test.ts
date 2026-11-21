@@ -40,6 +40,7 @@ const CAMPAIGN_OF: Readonly<Record<string, string>> = {
   "the-hills-of-emyn-muil": "shadows-of-mirkwood",
   "the-dead-marshes": "shadows-of-mirkwood",
   "return-to-mirkwood": "shadows-of-mirkwood",
+  "into-the-pit": "dwarrowdelf",
 };
 
 function seatFor(campaignId: string): { heroes: string[]; deck: string[]; protect: string } {

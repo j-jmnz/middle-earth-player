@@ -5,6 +5,7 @@ import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { attachmentHostIds } from "../player/attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "../combat/combat.ts";
+import { hostOf } from "./amounts.ts";
 import { countsAsAttachment, hasTrait } from "./conditions.ts";
 import { attachmentsPickMatches } from "../families/attachments/pick.ts";
 import { costsPickMatches, highestCost } from "../families/costs/pick.ts";
@@ -21,21 +22,23 @@ import { sidequestsPickMatches } from "../families/sidequests/pick.ts";
 import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
-import { cardTypeOf, isAllyLike, isPlayerType, printedOf } from "../core/printed.ts";
-import { activeFor, sharedStaging, sharing } from "../families/breaking/areas.ts";
+import { cardTypeOf, isAllyLike, isQuestCardType, isSideQuestType, isPlayerType, printedOf } from "../core/printed.ts";
+import { activeFor, headOf, sharedStaging, sharing } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { heldAmount, inPlay, livingSeats } from "../core/state.ts";
+import { flagged, heldAmount, inPlay, livingSeats } from "../core/state.ts";
 import { canDeclareDefender, isDefending } from "../families/defense/defenders.ts";
 import { facedownShadow } from "../families/defense/shadow.ts";
 import { deckPool, unchartedPickMatches } from "../families/uncharted/pick.ts";
 import { aflamePickMatches, lowestAflame } from "../families/aflame/pick.ts";
 import { lowestOf } from "../families/harad/pick.ts";
 import { highestAttack } from "../families/sea/ramming.ts";
+import { tiedExtreme } from "./tied-extreme.ts";
 import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { sidePickMatches } from "../families/grapple/values.ts";
 import { islandPool, outsideCells } from "../families/island/pick.ts";
 import { embassyPool, highestThreatOf } from "../families/black-gate/pick.ts";
+import { highestThreatPlusRemaining } from "../families/long-dark/pick.ts";
 import { fortitudePool } from "../families/mount-doom/pick.ts";
 import { seatPickMatches } from "../families/wilderland/seat-pick.ts";
 
@@ -60,6 +63,7 @@ function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[]
   if (spec.control === "you") return [asking];
   // "At this stage": the chooser's own once stages are separate (mec109.multiple-staging-areas).
   if (spec.atStage && state.separate) return sharing(state, asking);
+  if (spec.otherArea === true && state.separate) return livingSeats(state).filter((seat) => headOf(state, seat) !== headOf(state, asking));
   if (spec.control === "other") return livingSeats(state).filter((seat) => seat !== asking);
   return livingSeats(state);
 }
@@ -105,6 +109,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   if (spec.looked) return lookedPool(state, spec, seats);
   if (from === "hand") for (const index of seats) raw.push(...(state.seats[index]?.hand ?? []));
   else if (from === "victory") raw.push(...state.victory);
+  // The encounter discard pile, the most recently discarded card first ("the opposing team chooses a card in the encounter discard pile", 51116:A:1).
+  else if (from === "encounterDiscard") raw.push(...[...state.encounterDiscard].reverse());
   else if (from === "loot") raw.push(...Object.values(state.cards).filter((card) => card.zone === "under" && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
   else if (from === "discard") {
     for (const index of seats) {
@@ -126,7 +132,10 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       if (instance.host == null || (instance.zone !== "play" && instance.zone !== "attached")) continue;
       // A boon guarded on an enemy is held for its owner, not an attachment any player controls (146069:B:1).
       if (instance.held === true) continue;
-      // An encounter attachment (a Condition) has no controller: any player's filter sees it.
+      // A player card lying on a Nameless enemy is no attachment a player controls (rr.attachment-cards).
+      if (instance.nameless === true) continue;
+      // An encounter attachment (a Condition) has no controller: any player's filter sees it, `controlled` leaves it out (Whip Lash, 04148:A:1).
+      if (spec.controlled && instance.controller == null) continue;
       if (instance.controller != null && !seats.includes(instance.controller)) continue;
       raw.push(instance.id);
     }
@@ -159,6 +168,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     if (spec.control === "any") raw.push(...stagingFor(state, spec, asking), ...(state.separate ? activeFor(state, asking, spec.stagingArea === "any").slice(0, 1) : [state.activeLocation].filter((id): id is string => id != null)));
   } else {
     for (const index of seats) raw.push(...characters(state, index, ctx.cards));
+    // An ally a guard holds in the staging area (Arwen under Goblin Gate, 901402:B:1) is an ally in play that no player controls: any player's filter sees it, `controlled` leaves it out.
+    if (spec.control !== "you" && !spec.controlled && state.modifiers.length > 0) raw.push(...state.staging.filter((id) => flagged(state, id, "guardedAlly")));
   }
   if (spec.captive === "include" && spec.control !== "you") raw.push(...captiveIds(state, "include", ctx.cards));
   return raw;
@@ -185,9 +196,11 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
     const base = printed.type === "ally" && instance.host != null && instance.zone !== "heroes" ? "attachment" : cardTypeOf(instance, printed);
     // An objective ally with printed combat stats (Mendor, 01135) a player controls is an ally in play (isAllyLike), and still an objective card.
     const type = base === "objective" && instance.zone === "play" && instance.host == null && isAllyLike(printed) ? "ally" : base;
-    const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type || (spec.type === "objective" && printed.type === "objective") || (spec.type === "attachment" && countsAsAttachment(state, id, ctx));
+    // An Objective-Location counts as a location as the active location, travelled to, explored or in the victory display, and stays an objective in the staging area (docs/brief.md, Ered Mithrin): revealing one is no "revealed location".
+    const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type || (spec.type === "location" && printed.objectiveLocation && type === "objective" && instance.zone !== "staging") || (spec.type === "objective" && printed.type === "objective") || (spec.type === "attachment" && countsAsAttachment(state, id, ctx));
     if (!typed) return false;
   }
+  if (spec.affectable && immuneToSource(state, id, at.sourceId, ctx)) return false;
   if (spec.trait && !hasTrait(state, id, spec.trait, ctx)) return false;
   if (spec.traits && !spec.traits.some((trait) => hasTrait(state, id, trait, ctx))) return false;
   if (spec.notTraits && spec.notTraits.some((trait) => hasTrait(state, id, trait, ctx))) return false;
@@ -198,9 +211,14 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.nonNeutral && (printed.sphere == null || printed.sphere === "neutral")) return false;
   if (spec.exceptSphere && printed.sphere === spec.exceptSphere) return false;
   if (spec.cardType && printed.type !== spec.cardType) return false;
+  if (spec.enemyOrLocation && printed.type !== "enemy" && printed.type !== "location") return false;
+  if (spec.questCardType && !isQuestCardType(printed.type)) return false;
+  if (spec.sideQuest && !isSideQuestType(printed.type)) return false;
   if (spec.notCardType && printed.type === spec.notCardType) return false;
   if (spec.committed != null && instance.committed !== spec.committed) return false;
   if (spec.participating && !(at.participants ?? []).includes(id)) return false;
+  // No card is at another stage in a game with one stage (50805:B:2).
+  if (spec.atOtherStage) return false;
   if (spec.nonUnique && printed.isUnique) return false;
   if (spec.unique && !printed.isUnique) return false;
   if (spec.hasShadow && !instance.shadowId) return false;
@@ -210,9 +228,9 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   // The costs family's filters: a pool's size, a Valour ability, a lower threat cost, a pool that paid (families/costs/pick.ts).
   if (!costsPickMatches(state, id, spec, at.picked, ctx)) return false;
   if (spec.on && !onHost(state, instance.host, spec.on, asking, ctx)) return false;
-  if (spec.notHost && at.sourceId != null && state.cards[at.sourceId]?.host === id) return false;
+  if (spec.notHost && at.sourceId != null && hostOf(state, at.sourceId) === id) return false;
   if (spec.engagedThisRound && heldAmount(state, id, "engagedThisRound") <= 0) return false;
-  if (spec.isHost && (at.sourceId == null || state.cards[at.sourceId]?.host !== id)) return false;
+  if (spec.isHost && (at.sourceId == null || hostOf(state, at.sourceId) !== id)) return false;
   if (spec.active && !activeFor(state, asking, spec.stagingArea === "any").includes(id)) return false;
   // The attachments family's filters: attached or not, Guarded, progress tokens (families/attachments/pick.ts).
   if (!attachmentsPickMatches(state, id, spec, ctx)) return false;
@@ -241,6 +259,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   // Every defender of the attack in progress, the extra ones too (rr.multiple-defenders).
   if (spec.defending && !isDefending(state, id)) return false;
   if (spec.canDefend && !canDeclareDefender(state, id, ctx.cards)) return false;
+  if (spec.canExhaust && (instance.exhausted || flagged(state, id, "cannotExhaust"))) return false;
   if (spec.facedownShadow && !facedownShadow(state, id)) return false;
   if (spec.attackingEnemy != null && (state.pendingAttack?.enemyId === id) !== spec.attackingEnemy) return false;
   if (spec.hasAttachment) {
@@ -285,6 +304,7 @@ function onHost(state: ScenarioState, hostId: string | null, on: NonNullable<Pic
   const type = cardTypeOf(host, printedOf(ctx.cards, host.code));
   if (on.type === "hero" ? type !== "hero" : type !== "hero" && type !== "ally") return false;
   if (on.minWillpower != null && modifiedStat(state, host, "willpower", ctx.cards) < on.minWillpower) return false;
+  if (on.committed != null && host.committed !== on.committed) return false;
   return on.control === "any" || (on.control === "you") === (host.controller === asking);
 }
 
@@ -305,6 +325,28 @@ function attackingNow(state: ScenarioState, id: string): boolean {
 // Cards that are immune to player card effects cannot be chosen by a player card's Pick (mec109.immune-to-player-card-effects).
 // An encounter card's Pick (141049:A:1, 141054:A:2, 141071:A:2) is not a player card effect.
 export function pickCandidates(
+  state: ScenarioState,
+  spec: PickSpec,
+  seat: number,
+  picked: readonly string[],
+  sourceId: string | null,
+  ctx: ReduceContext,
+  x?: number,
+  participants?: readonly string[],
+  counting = false,
+  event?: { subject?: string | null; other?: string | null; discards?: boolean },
+): string[] {
+  const found = candidatesOf(state, spec, seat, picked, sourceId, ctx, x, participants, counting, event);
+  // "The opposing team chooses" (docs/brief.md, The Wizard's Quest, reading 3): the first of the cards the ranking fields left (with `highestThreat` on enemies, the one with the highest Attack among those level on Threat), the order of seats and then of play breaking a tie, and nobody is asked. A count is not a choice.
+  if (spec.challenge !== true || counting) return found;
+  // "the highest Threat, then the highest Attack" (docs/brief.md, The Woodland Realm, reading 3): level on Threat, the enemy with the highest Attack.
+  const level = spec.highestThreat === true && found.length > 1 ? tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "attack", ctx.cards) : 0), "highest") : found;
+  // "the highest Attack, then the highest Threat" (docs/brief.md, The Mines of Moria, reading 3: Denizen of the Deep): level on Attack, the enemy with the highest Threat.
+  const levelAttack = spec.highestAttack === true && level.length > 1 ? tiedExtreme(level, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "threat", ctx.cards) : 0), "highest") : level;
+  return levelAttack.slice(0, 1);
+}
+
+function candidatesOf(
   state: ScenarioState,
   spec: PickSpec,
   seat: number,
@@ -354,8 +396,16 @@ export function pickCandidates(
   if (spec.lowestThreat) return lowestOf(state, found, "threat", ctx);
   // "The highest threat encounter card remaining" (families/black-gate/pick.ts).
   if (spec.highestThreat) return highestThreatOf(state, found, ctx);
+  // "The location with the highest combined threat and remaining quest points" (families/long-dark/pick.ts).
+  if (spec.highestThreatPlusRemaining) return highestThreatPlusRemaining(state, found, ctx);
   // "The highest cost attachment you control" (families/costs/pick.ts).
   if (spec.highestCost) return highestCost(state, found, ctx);
+  // "The ally you control with the highest Willpower" (901304:A:2).
+  if (spec.highestWillpower) return tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "willpower", ctx.cards) : 0), "highest");
+  // "The enemy in the staging area with the highest engagement cost" (50926:A:2).
+  if (spec.highestEngagementCost) return tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "engagementCost", ctx.cards) : 0), "highest");
+  // "The lowest engagement cost enemy in the staging area" (51151:A:2).
+  if (spec.lowestEngagementCost) return tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "engagementCost", ctx.cards) : 0), "lowest");
   // "The engaged Ship enemy with the highest Attack" (families/sea/ramming.ts).
   return spec.highestAttack ? highestAttack(state, found, ctx) : found;
 }
@@ -363,9 +413,10 @@ export function pickCandidates(
 // The cards attached to the source, to the source's host, to the active location, or to the defending character.
 function attachedPool(state: ScenarioState, where: "source" | "host" | "activeLocation" | "defender", sourceId: string | null): string[] {
   const source = sourceId ? state.cards[sourceId] : undefined;
+  const hostId = hostOf(state, sourceId);
   const defender = state.pendingAttack?.defenderId && !state.pendingAttack.undefended ? state.cards[state.pendingAttack.defenderId] : undefined;
   const holder =
-    where === "defender" ? defender : where === "activeLocation" ? (state.activeLocation ? state.cards[state.activeLocation] : undefined) : where === "source" ? source : source?.host ? state.cards[source.host] : undefined;
+    where === "defender" ? defender : where === "activeLocation" ? (state.activeLocation ? state.cards[state.activeLocation] : undefined) : where === "source" ? source : hostId ? state.cards[hostId] : undefined;
   return holder ? holder.attachments.filter((id) => state.cards[id] != null && inPlay(state.cards[id]?.zone ?? "removed")) : [];
 }
 
