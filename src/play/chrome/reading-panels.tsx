@@ -18,7 +18,9 @@ import { withAlphaHex } from "../../ui/tokens.ts";
 import { logLineSpeech, type LogLine } from "../store/log.ts";
 import { CloseButton, TextButton } from "../../ui/buttons.tsx";
 import { LineMark } from "./table-chrome.tsx";
-import { SettingsRows } from "./setting-rows.tsx";
+import { SettingRows } from "./setting-rows.tsx";
+import { PANEL_ROWS, rowsFor } from "./settings-catalog.ts";
+import { SETTINGS_PLATFORM } from "./settings-platform.ts";
 import { ELIMINATION_THREAT } from "../readouts/threat-level.ts";
 import type { DialList } from "../readouts/dials.ts";
 import type { TableSettings } from "../../ui/table-settings.ts";
@@ -310,9 +312,9 @@ export function ThreatPanel({
 }
 
 /**
- * The table's settings, a night side panel from the menu's Table settings (user request, 2026-10-28): the Settings tab's own grouped rows
- * (setting-rows.tsx) under a left-aligned title, minus Stops on, which the rail's carousel carries. At the end of the rows, All settings opens the
- * Settings tab (the game is saved); the round ✕ closes the panel. Text and switches only; nothing here sends an intent.
+ * The table's settings, a night side panel from the menu's Table settings: the settings a player changes during a game (settings-catalog.ts,
+ * PANEL_ROWS; user decision, 2026-11-21), the Settings pages' own rows (setting-rows.tsx) under a left-aligned title. At the end of the rows,
+ * All settings opens Settings (the game is saved); the round ✕ closes the panel. Text and switches only; nothing here sends an intent.
  */
 export function SettingsPanel({
   settings,
@@ -339,7 +341,9 @@ export function SettingsPanel({
       </View>
       <PanelClose testID="settings-close" onPress={onClose} paper={false} />
       <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} showsVerticalScrollIndicator persistentScrollbar>
-        <SettingsRows settings={settings} onChange={onChange} always={always} testPrefix="settings" first />
+        <View style={{ gap: 4 * s }} testID="settings-rows">
+          <SettingRows rows={rowsFor(PANEL_ROWS, SETTINGS_PLATFORM)} settings={settings} onChange={onChange} always={always} testPrefix="settings" />
+        </View>
         {/* The last item of the scroll content, not a pinned footer: at Extra large on a short phone the rows take the room. */}
         <View className="-ml-3 items-start pt-2">
           <TextButton tone="accent" label="All settings" accessibilityLabel="All settings. Opens Settings and leaves the table" testID="settings-all" onPress={onAllSettings} />

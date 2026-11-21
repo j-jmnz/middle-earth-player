@@ -48,6 +48,9 @@ appId: com.middleearth.player
     visible:
       id: app-settings
     timeout: 30000
+# Theme and UI scale are on the Look page: pushed on the iPhone, opened at the right on the iPad.
+- tapOn:
+    id: app-settings-open-look
 - tapOn:
     id: "${'app-settings-theme-' + (typeof THEME !== 'undefined' ? THEME : 'dark')}"
 # UI scale Small on the iPhone and Large on the iPad (user decision, 2026-11-11), checked as chosen before the shot's link.
