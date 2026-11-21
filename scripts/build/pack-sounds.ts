@@ -1,12 +1,12 @@
-import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import { isSoundSlot, SOUND_SLOTS, type SoundSlot } from "../../src/ui/sound/slots.ts";
 import { mirrorFromEnv, mirrorReader } from "../data/mirror/client.ts";
 import { DATA_DIR, SOUND_CACHE_DIR, SOUND_PACK_DIR } from "../data/paths.ts";
 import { sha256, type SourceFile, type SourceRecord } from "../data/sources/fetch.ts";
-import { bytes, isDirectRun, runPack, type Log } from "../log.ts";
+import { isDirectRun, runPack, type Log } from "../log.ts";
+import { argument, audioSource, ffmpeg, packPinned, writeSource, type PackPinnedOptions } from "./pack-audio.ts";
 import { SOUND_PICKS, type SoundPick } from "./sound-picks.ts";
 
 // The sound effects are not in git and come from no online source: they are cut from the player's own Darkest Dungeon II install
@@ -23,21 +23,12 @@ const SITE = "Darkest Dungeon II (the player's own install, cut by pnpm assets s
 // The tail is kept until the level stays under 1% of the peak, plus this much, then faded out.
 const TAIL_SECONDS = 0.12;
 
-type Sources = { sources: Record<string, SourceRecord> };
-
 /** The pick's source file in the unpacked banks: `<bank>/<n>-<event>.ogg`. */
 export function findSource(from: string, pick: SoundPick): string | undefined {
   const folder = path.join(from, pick.bank);
   if (!existsSync(folder)) return undefined;
   const name = readdirSync(folder).find((file) => file.replace(/^[0-9]+-/, "") === `${pick.event}.ogg`);
   return name ? path.join(folder, name) : undefined;
-}
-
-function ffmpeg(args: string[]): Buffer {
-  const run = spawnSync("ffmpeg", ["-v", "error", ...args], { maxBuffer: 64 * 1024 * 1024 });
-  if (run.error) throw new Error(`ffmpeg is needed to cut the sounds (${run.error.message})`);
-  if (run.status !== 0) throw new Error(`ffmpeg ${args.join(" ")} failed: ${run.stderr.toString()}`);
-  return run.stdout;
 }
 
 /** Where the sound's tail falls under 1% of its peak, in seconds, read from a 8 kHz mono decode in 10 ms windows. */
@@ -74,72 +65,12 @@ export function cutSounds(from: string, cacheDir: string, log: Log): SourceRecor
     log.debug(`${slot}: ${pick.event}, ${end.toFixed(2)} s`);
   }
   log.info(`cut ${files.length} sounds into ${cacheDir}`);
-  return { id: SOUND_SOURCE, site: SITE, pin: { kind: "sha256", value: sha256(files.map((file) => file.sha256).join("\n")) }, fetchedAt: new Date().toISOString(), files };
+  return audioSource(SOUND_SOURCE, SITE, files);
 }
 
-/** Writes the `sounds` source into data/sources.json beside the others, in the same order and form `pnpm data sync` writes. */
-export function writeSoundSource(sourcesPath: string, record: SourceRecord): void {
-  const { sources } = JSON.parse(readFileSync(sourcesPath, "utf8")) as Sources;
-  const next = Object.fromEntries(Object.entries({ ...sources, [record.id]: record }).sort(([a], [b]) => a.localeCompare(b)));
-  writeFileSync(sourcesPath, `${JSON.stringify({ sources: next }, null, 2)}\n`);
-}
-
-export type PackSoundsOptions = {
-  sourcesPath: string;
-  cacheDir: string;
-  outDir: string;
-  /** The asset mirror's reader (mirrorReader): a body at the hash, or null. */
-  mirror?: (hash: string) => Promise<Uint8Array | null>;
-};
-
-/**
- * Copies every sound the `sounds` source pins into `outDir`, from `cacheDir` at its pin or else from the mirror (kept in `cacheDir`
- * after), and removes any other file there but `.gitkeep`. A sound in neither is left out with a warning; with no `sounds` source
- * nothing is bundled.
- */
-export async function packSounds(options: PackSoundsOptions, log: Log): Promise<SoundSlot[]> {
-  const { sourcesPath, cacheDir, outDir } = options;
-  mkdirSync(outDir, { recursive: true });
-  const { sources } = JSON.parse(readFileSync(sourcesPath, "utf8")) as Sources;
-  const pins = sources[SOUND_SOURCE]?.files ?? [];
-  const keep = new Set([".gitkeep"]);
-  const packed: SoundSlot[] = [];
-  const missing: string[] = [];
-  let fromMirror = 0;
-  let total = 0;
-  for (const pin of pins) {
-    const slot = /^sounds\/(.+)\.m4a$/.exec(pin.path)?.[1] ?? "";
-    if (!isSoundSlot(slot)) throw new Error(`${sourcesPath}: ${pin.path} is not a sound slot's file`);
-    const file = `${slot}.m4a`;
-    const cached = path.join(cacheDir, file);
-    let body: Uint8Array | null = existsSync(cached) ? new Uint8Array(readFileSync(cached)) : null;
-    if (body && sha256(body) !== pin.sha256) body = null;
-    if (!body && options.mirror) {
-      body = await options.mirror(pin.sha256);
-      if (body) {
-        mkdirSync(cacheDir, { recursive: true });
-        writeFileSync(cached, body);
-        fromMirror += 1;
-      }
-    }
-    if (!body) {
-      missing.push(slot);
-      continue;
-    }
-    writeFileSync(path.join(outDir, file), body);
-    keep.add(file);
-    packed.push(slot);
-    total += body.length;
-  }
-  for (const file of readdirSync(outDir)) if (!keep.has(file)) rmSync(path.join(outDir, file), { recursive: true, force: true });
-  if (pins.length === 0) log.warn(`${sourcesPath} pins no sounds, so this bundle carries none. Cut them with pnpm assets sounds --from <folder>.`);
-  if (missing.length > 0) log.warn(`${missing.length} pinned sound${missing.length === 1 ? " is" : "s are"} in neither ${cacheDir} nor the mirror, so this bundle plays none for ${missing.join(", ")}`);
-  if (packed.length > 0) log.notice(`packed ${packed.length} sounds (${bytes(total)}; ${fromMirror} from the mirror) into ${outDir}; restart Metro with --clear to bundle them`);
-  return packed;
-}
-function argument(name: string): string | undefined {
-  const at = process.argv.indexOf(name);
-  return at >= 0 ? process.argv[at + 1] : undefined;
+/** Copies every pinned sound into `outDir` (packPinned). */
+export function packSounds(options: PackPinnedOptions, log: Log): Promise<SoundSlot[]> {
+  return packPinned({ source: SOUND_SOURCE, isName: isSoundSlot, noun: "sound" }, options, log);
 }
 
 // --optional (pnpm assets all): a failed pack is a warning, so the other packs still run.
@@ -148,7 +79,7 @@ if (isDirectRun(import.meta.url)) {
     const sourcesPath = path.join(DATA_DIR, "sources.json");
     const from = argument("--from");
     if (from) {
-      writeSoundSource(sourcesPath, cutSounds(path.resolve(from), SOUND_CACHE_DIR, log));
+      writeSource(sourcesPath, cutSounds(path.resolve(from), SOUND_CACHE_DIR, log));
       log.notice(`pinned the sounds in ${sourcesPath}: commit it, then run pnpm data mirror push sounds`);
     }
     await packSounds({ sourcesPath, cacheDir: SOUND_CACHE_DIR, outDir: SOUND_PACK_DIR, mirror: mirrorReader(mirrorFromEnv(), log) }, log);

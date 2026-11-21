@@ -4,12 +4,13 @@
 // mirror and no cache: scripts/build/pack-sounds.ts) plays none, and so do the web and the desktop for now (bundled.ts). A failed sound is not an
 // error the player should see; a development build logs it. One player a slot is made the first time any sound plays and kept for the
 // app's life: the set is small and fixed.
-import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from "expo-audio";
+import { createAudioPlayer, type AudioPlayer } from "expo-audio";
 import { Platform } from "react-native";
 
 import { accessibility } from "../accessibility.ts";
 import { tableSettings } from "../table-settings.ts";
 import { bundledSounds } from "./bundled";
+import { audioFailed, startAudioSession } from "./session.ts";
 import type { SoundSlot } from "./slots.ts";
 
 // The same sound asked for again this soon (cards drawn in a row, tokens landing together) is not restarted: one plays for all.
@@ -22,7 +23,6 @@ const UNDO_QUIET_MS = 800;
 const players = new Map<SoundSlot, AudioPlayer>();
 let quietUntil = 0;
 const lastPlayed = new Map<SoundSlot, number>();
-let moded = false;
 
 /** Whether this bundle carries any sound and can play it: the Sound effects row shows only then. Fixed when the bundle loads. */
 export const SOUNDS_BUNDLED = Platform.OS !== "web" && Object.keys(bundledSounds).length > 0;
@@ -35,18 +35,12 @@ function playerOf(slot: SoundSlot, source: number): AudioPlayer {
   return player;
 }
 
-function failed(error: unknown): void {
-  if (typeof __DEV__ !== "undefined" && __DEV__) console.warn("sound effect failed", error);
-}
+let loaded = false;
 
 function startSession(): void {
-  if (moded) return;
-  moded = true;
-  // Respects the silent switch, never ducks or stops the player's music, and stops with the app. A failed call is asked again next time.
-  setAudioModeAsync({ playsInSilentMode: false, interruptionMode: "mixWithOthers", shouldPlayInBackground: false, allowsRecording: false, shouldRouteThroughEarpiece: false }).catch((error: unknown) => {
-    moded = false;
-    failed(error);
-  });
+  startAudioSession();
+  if (loaded) return;
+  loaded = true;
   // Every sound is loaded once the first one is asked for, so the next ones start on time.
   for (const [slot, source] of Object.entries(bundledSounds) as [SoundSlot, number][]) playerOf(slot, source);
 }
@@ -68,10 +62,10 @@ export function playSound(slot: SoundSlot): void {
     startSession();
     const player = playerOf(slot, source);
     player.volume = soundVolume;
-    player.seekTo(0).catch(failed);
+    player.seekTo(0).catch(audioFailed);
     player.play();
   } catch (error) {
-    failed(error);
+    audioFailed(error);
   }
 }
 

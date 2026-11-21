@@ -100,7 +100,7 @@ After the first release, set the variable `ANDROID_CERT_SHA256` to the certifica
 
 ### Asset mirror secrets
 
-Optional for the pictures and the PDFs, needed for the sound effects. With them, the `assets` job reads the card pictures and PDFs from the asset mirror before their sources and pushes what it had to fetch, and packs the sound effects, which only the mirror holds (`docs/development.md`, Asset mirror); without them a release's phone builds carry no sound. Secrets: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY`, from an R2 token with Object Read & Write on the bucket only; the bucket name goes in the variable `R2_BUCKET` (a secret of that name works too). The showcase workflow's pack uses the same ones. Without them the job reads the sources, and a failed push only warns.
+Optional for the pictures and the PDFs, needed for the sound effects and the music. With them, the `assets` job reads the card pictures and PDFs from the asset mirror before their sources and pushes what it had to fetch, and packs the sound effects and the music, which only the mirror holds (`docs/development.md`, Asset mirror); without them a release's phone builds carry no sound and no music. Secrets: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY`, from an R2 token with Object Read & Write on the bucket only; the bucket name goes in the variable `R2_BUCKET` (a secret of that name works too). The showcase workflow's pack uses the same ones. Without them the job reads the sources, and a failed push only warns.
 
 ### TestFlight (optional)
 

@@ -125,6 +125,7 @@ jobs:
             assets/booklets/
             assets/scans/
             assets/sounds/
+            assets/music/
             src/catalog/version.ts
             src/screens/images/scan-map.ts
           if-no-files-found: error

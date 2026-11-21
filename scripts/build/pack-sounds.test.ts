@@ -7,7 +7,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { SOUND_SLOTS } from "../../src/ui/sound/slots.ts";
 import { sha256, type SourceFile } from "../data/sources/fetch.ts";
 import { createLog } from "../log.ts";
-import { findSource, packSounds, SOUND_SOURCE, soundEnd, writeSoundSource } from "./pack-sounds.ts";
+import { writeSource } from "./pack-audio.ts";
+import { findSource, packSounds, SOUND_SOURCE, soundEnd } from "./pack-sounds.ts";
 import { SOUND_PICKS } from "./sound-picks.ts";
 
 const roots: string[] = [];
@@ -95,7 +96,7 @@ describe("pack sounds", () => {
   it("writes the sounds source beside the others, in order", () => {
     const root = folder();
     const sourcesPath = sources(root, null);
-    writeSoundSource(sourcesPath, { id: SOUND_SOURCE, site: "x", pin: { kind: "sha256", value: "v" }, fetchedAt: "", files: [] });
+    writeSource(sourcesPath, { id: SOUND_SOURCE, site: "x", pin: { kind: "sha256", value: "v" }, fetchedAt: "", files: [] });
     const written = JSON.parse(readFileSync(sourcesPath, "utf8")) as { sources: Record<string, unknown> };
     expect(Object.keys(written.sources)).toEqual(["rules", "sounds"]);
   });

@@ -669,6 +669,209 @@
         }
       ]
     },
+    "music": {
+      "id": "music",
+      "site": "The Lord of the Rings film trilogy's score (the player's own copy, cut by pnpm assets music --from)",
+      "pin": {
+        "kind": "sha256",
+        "value": "a349b44b5d61211acfab36507fdd882830d1c65dcc9f85f6c839440e5e3a7519"
+      },
+      "fetchedAt": "2026-11-21T11:39:40.108Z",
+      "files": [
+        {
+          "path": "music/menu.m4a",
+          "url": "01 - The Prophecy#t=137.46,197.6",
+          "sha256": "152ef918cfd7666399a7044ab0ca8850d95a9a83ff754cfd1bbac72dddc53cf6",
+          "bytes": 752609
+        },
+        {
+          "path": "music/shire.m4a",
+          "url": "02 The Shire#t=67.59,135.44",
+          "sha256": "a12c1277af6cba97e5ab8981601b8bfb3b354d3d39b0490989d2d7692729462b",
+          "bytes": 849520
+        },
+        {
+          "path": "music/bree.m4a",
+          "url": "06 - At The Sign Of The Prancing Pony#t=27.54,91.39",
+          "sha256": "e2813d4e327a7d8a1884c398a3e5daa3b28b9a251b2726a10c1d202a83a74e44",
+          "bytes": 798282
+        },
+        {
+          "path": "music/shadow.m4a",
+          "url": "03 - The Shadow Of The Past#t=130.59,194.54",
+          "sha256": "0ad1ee3b6c6c786eddecc90f9f5d67863b6859c1575167c7cf77adee7687dc5d",
+          "bytes": 799206
+        },
+        {
+          "path": "music/rivendell.m4a",
+          "url": "05 Rivendell#t=66.46,185.85",
+          "sha256": "6632b25db072a1103545a96bb83eeb997788b535f75f63e4a61b3d3efe4627e3",
+          "bytes": 1476362
+        },
+        {
+          "path": "music/moria.m4a",
+          "url": "12 Moria#t=39.73,110.97",
+          "sha256": "9d1acd748eedca248c85aedbf98f9894589f6f3186f91831375c64c00a24e1eb",
+          "bytes": 888208
+        },
+        {
+          "path": "music/river.m4a",
+          "url": "15 - The Great River#t=61.11,142.59",
+          "sha256": "2f79f280dfc605175a9ae1968d5abcf0f0882c06500060cfae5860096f7e467e",
+          "bytes": 1013262
+        },
+        {
+          "path": "music/rohan.m4a",
+          "url": "01 Edoras#t=124.85,187.39",
+          "sha256": "633427faae7445d90181a1cc84c5adb604295a7d8acca0152a13b41cc3b41c6d",
+          "bytes": 781885
+        },
+        {
+          "path": "music/fangorn.m4a",
+          "url": "10 - Treebeard#t=20.99,111.94",
+          "sha256": "24c798afa171405649fb64c2396f04f399a28161e5d0c1ce1c5cebdae993f7da",
+          "bytes": 1129421
+        },
+        {
+          "path": "music/marshes.m4a",
+          "url": "11 The Dead Marshes#t=112.71,221.36",
+          "sha256": "884f1b746647dcabbe1afc6e711cfe9ee40c36ca9466c1124583a00636cae049",
+          "bytes": 1345297
+        },
+        {
+          "path": "music/crossroads.m4a",
+          "url": "02 - The Taming of Smeagol#t=6.34,93.62",
+          "sha256": "d541d2aa855ec752d39aef78502a838e86b8b5bfb248004b6fe7e5239b44c52b",
+          "bytes": 1084188
+        },
+        {
+          "path": "music/greycompany.m4a",
+          "url": "08 The Passing Of The Grey Company#t=86.24,204.27",
+          "sha256": "366c250ce5fb026bfb40a7f389be70c182e56e366c2f8d45a30ff4cef58e739e",
+          "bytes": 1459703
+        },
+        {
+          "path": "music/gondor.m4a",
+          "url": "04 - The White Tree#t=93.2,157.43",
+          "sha256": "f07267de4f222e259914cac75f5d220dabb228d0ac77ba308361366d53228579",
+          "bytes": 802770
+        },
+        {
+          "path": "music/morgul.m4a",
+          "url": "06 - Minas Morgul#t=3.81,69.06",
+          "sha256": "ea814040840cf3cf1f5f1d33184e9e4f9ed6a57843774b48b06a31c8f9974091",
+          "bytes": 815368
+        },
+        {
+          "path": "music/cirith.m4a",
+          "url": "09 - Cirith Ungol#t=26.4,87.07",
+          "sha256": "d21b83c9e18d99aa785dbcce53fde60f82bb6b5b2ba70f7af51a3d5f432ee214",
+          "bytes": 759314
+        },
+        {
+          "path": "music/doom.m4a",
+          "url": "14 - Hope Fails#t=56.77,117.96",
+          "sha256": "52fa2c38af3ffd0a7e61d0289ec058bc894140cbe74de8f0984c008ac09ea23a",
+          "bytes": 765462
+        },
+        {
+          "path": "music/havens.m4a",
+          "url": "18 - The Grey Havens (feat. Sir James Galway)#t=200.32,278.52",
+          "sha256": "130b96769039ea82bd3e2dc7c813ea3620e40c67a80a0f6f5daabd1a0cc76c34",
+          "bytes": 973170
+        },
+        {
+          "path": "music/nazgul.m4a",
+          "url": "05 - The Black Rider#t=43.49,115.8",
+          "sha256": "1ac68b72dd17899a252edfa56436cf7bfca77ee88e5cd80bd845f476378a504d",
+          "bytes": 902283
+        },
+        {
+          "path": "music/weathertop.m4a",
+          "url": "01 Weathertop#t=21.06,85.17",
+          "sha256": "948ecab3a41be05661ab58146c41070bd1448192b3664485a67bf1027c095b7f",
+          "bytes": 801530
+        },
+        {
+          "path": "music/chase.m4a",
+          "url": "08 - Flight To The Ford#t=136.56,201.76",
+          "sha256": "9c81a03aa424f8d4bb484d3dc611ffe12f62a4d90930656c3f3538f4260d5e6d",
+          "bytes": 814587
+        },
+        {
+          "path": "music/isengard.m4a",
+          "url": "04 - The Treason Of Isengard#t=131.1,228.76",
+          "sha256": "5d24151c4c4325db2a0c53de32c397a8e1ec2d7b2d8cdc739db52f2593c460d9",
+          "bytes": 1211128
+        },
+        {
+          "path": "music/khazad.m4a",
+          "url": "14 Balin's Tomb#t=185.92,269.65",
+          "sha256": "7ac03d576f2653574e57d51edabfa1511236a2acd70c477fa2158db4e25e4fd9",
+          "bytes": 1041185
+        },
+        {
+          "path": "music/amonhen.m4a",
+          "url": "16 - Amon Hen#t=41.15,123.67",
+          "sha256": "8deab25c9608ddeb7d105a8175e4777eb2649ceb8bba0f7f80a12c8faaa19e20",
+          "bytes": 1026314
+        },
+        {
+          "path": "music/uruk.m4a",
+          "url": "05 - The Uruk-hai#t=89.56,149.77",
+          "sha256": "6b7b0991ce063b76386fafc291596d32bc75d682e7845707385fcd53c9328a31",
+          "bytes": 753585
+        },
+        {
+          "path": "music/helmsdeep.m4a",
+          "url": "12 - Helm's Deep#t=35.67,99.64",
+          "sha256": "e1f727da4cf29755f61fe04292de7e213767e53af7cd1f9a32f34221a005c687",
+          "bytes": 799900
+        },
+        {
+          "path": "music/ents.m4a",
+          "url": "10 The Last March Of The Ents#t=8.82,70.47",
+          "sha256": "5f8a5663c459bc8efcafe97f582b836651b2762353a660ba9234f1ab0fc9ed04",
+          "bytes": 771126
+        },
+        {
+          "path": "music/deadpaths.m4a",
+          "url": "11 The Paths Of The Dead#t=196.16,277.48",
+          "sha256": "7246dff90da00bbbecf39cdd70742a6b9bbcb95978c56c777b3b48c54b93b4f3",
+          "bytes": 1011279
+        },
+        {
+          "path": "music/siege.m4a",
+          "url": "12 The Siege Of Gondor#t=223.52,338.04",
+          "sha256": "fceac6141051cd67bf36e00531ea1d6983e04c88952306a63f2e3aea9ffe1c40",
+          "bytes": 1417070
+        },
+        {
+          "path": "music/pelennor.m4a",
+          "url": "13 - The Fields of the Pelennor#t=95.32,188.1",
+          "sha256": "8e9dff47738342476d5d1ff7f9522a7d0c75d561efd51e396012da2b8ccc24fa",
+          "bytes": 1151462
+        },
+        {
+          "path": "music/shelob.m4a",
+          "url": "11 - Shelob's Lair#t=153.02,217.25",
+          "sha256": "c193810e9a19bf08540bbaf6d875140da2368911af99c2e1f07131ac10fd4bee",
+          "bytes": 802913
+        },
+        {
+          "path": "music/blackgate.m4a",
+          "url": "15 - The Black Gate Opens (feat. Sir James Galway)#t=2.18,71.47",
+          "sha256": "d88159be7c915b12e4a3a7a2cbcd10e6e2ae77f61acabd897e042f033c655bf5",
+          "bytes": 864599
+        },
+        {
+          "path": "music/crackofdoom.m4a",
+          "url": "02 The Crack Of Doom#t=50.94,161.94",
+          "sha256": "0cca580ea8f31efb8644fa72ed2d57b0b688199bbaf756fe6a0ca6e1a638a1ed",
+          "bytes": 1373800
+        }
+      ]
+    },
     "nightmare": {
       "id": "nightmare",
       "site": "https://drive.google.com/drive/folders/10pz9RF2e1QrJXqsmmLWPkO1Hu1auQuxB",

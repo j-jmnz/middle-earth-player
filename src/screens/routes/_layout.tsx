@@ -25,6 +25,7 @@ import { useIsTablet } from "../../ui/use-size-class";
 import { PicturesReady } from "../../ui/showcase/pictures-ready";
 import { SplashGlow } from "../kit/splash-glow";
 import { startUpdateChecks } from "../update/check";
+import { startMusic } from "../../ui/sound/music";
 import { APP_VERSION } from "../update/offer";
 import { UpdateFrame } from "../update/ribbon";
 
@@ -155,6 +156,12 @@ export default function RootLayout() {
   useEffect(() => {
     if (!databases) return;
     return startUpdateChecks(databases.user, { current: APP_VERSION, warn: (message) => console.warn(message) });
+  }, [databases]);
+
+  // The music (src/ui/sound/music.ts): the menu's loop once the stored settings are read, so a player who turned Music off hears none.
+  useEffect(() => {
+    if (!databases) return;
+    return startMusic();
   }, [databases]);
 
   useEffect(() => {

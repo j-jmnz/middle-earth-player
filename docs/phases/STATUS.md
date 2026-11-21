@@ -42,7 +42,7 @@ No phase is open.
 - The Attack on Dol Guldur, The Wizard's Quest, The Woodland Realm, The Mines of Moria and Escape from Khazad-dûm pictures come from cardgame.tools; re-run `pnpm data sync pictures` once Google Drive's quota allows. Durin's Bane (51311), Chamber of Mazarbul (51211) and Mendor (51111) keep their scans.
 
 ### Sound
-- Music, sound on the web and the desktop, and the sound slots not played yet: `docs/plans/sound-and-music.md`.
+- Sound and music on the web and the desktop, and the sound slots not played yet: `docs/plans/sound-and-music.md`.
 
 ### README
 - The README showcase (`scripts/showcase/`): a first full capture run on a Mac or the showcase workflow, its contact sheet checked and failed flows fixed; then a Screens section, each shot a `<picture>` (Rivendell capture for GitHub's light theme, Ringwraiths otherwise) with the captions and alt text of `scripts/showcase/shots.ts`.

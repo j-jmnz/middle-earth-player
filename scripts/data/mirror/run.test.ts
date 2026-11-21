@@ -23,7 +23,7 @@ const record = (id: string, files: SourceFile[]): SourceRecord => ({ id, site: "
 function dirs(): CacheDirs {
   const root = mkdtempSync(path.join(tmpdir(), "mirror-"));
   roots.push(root);
-  const made = { scans: path.join(root, "scans"), pictures: path.join(root, "pictures"), pdf: path.join(root, "pdf"), sounds: path.join(root, "sounds") };
+  const made = { scans: path.join(root, "scans"), pictures: path.join(root, "pictures"), pdf: path.join(root, "pdf"), sounds: path.join(root, "sounds"), music: path.join(root, "music") };
   for (const dir of Object.values(made)) mkdirSync(dir);
   return made;
 }

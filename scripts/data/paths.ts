@@ -13,3 +13,6 @@ export const BOOKLET_PACK_DIR = path.join(ROOT, "assets", "booklets");
 // The sound effects cut from the player's own game files (scripts/build/pack-sounds.ts), and where the bundle takes them from.
 export const SOUND_CACHE_DIR = path.join(ROOT, ".cache", "audio", "sfx");
 export const SOUND_PACK_DIR = path.join(ROOT, "assets", "sounds");
+// The music loops cut from the player's own copy of the score (scripts/build/pack-music.ts), and where the bundle takes them from.
+export const MUSIC_CACHE_DIR = path.join(ROOT, ".cache", "audio", "music");
+export const MUSIC_PACK_DIR = path.join(ROOT, "assets", "music");

@@ -3,14 +3,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { tableSettings } from "../table-settings.ts";
 
-const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[], moded: 0 }));
+const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[] }));
 vi.mock("react-native", () => ({ Platform: { OS: "ios" } }));
+vi.mock("./session.ts", () => ({ startAudioSession: () => undefined, audioFailed: () => undefined }));
+// The accessibility store is mocked whole: loaded here with the mocked react-native, it would stay in the shared module cache (vitest.config.mts, isolate).
+vi.mock("../accessibility.ts", () => ({ accessibility: () => ({ screenReader: false }) }));
 vi.mock("./bundled", () => ({ bundledSounds: { "ui.confirm": 1, "card.land": 2, "ui.back": 3 } }));
 vi.mock("expo-audio", () => ({
-  setAudioModeAsync: () => {
-    calls.moded += 1;
-    return Promise.resolve();
-  },
   createAudioPlayer: (source: number) => {
     calls.created.push(source);
     return { seekTo: () => Promise.resolve(), play: () => calls.played.push(source) };
@@ -35,13 +34,12 @@ describe("sound effects", () => {
     expect(SOUNDS_BUNDLED).toBe(true);
   });
 
-  it("plays a bundled slot, loading every sound and setting the session once", () => {
+  it("plays a bundled slot, loading every sound once", () => {
     playSound("ui.confirm");
     vi.advanceTimersByTime(100);
     playSound("card.land");
     expect(calls.played).toEqual([1, 2]);
     expect(calls.created.sort()).toEqual([1, 2, 3]);
-    expect(calls.moded).toBe(1);
   });
 
   it("plays nothing for a slot without a file", () => {

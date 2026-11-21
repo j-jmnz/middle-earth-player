@@ -25,18 +25,20 @@ const QUIET = { LOG_LEVEL: "warn" };
 const booklets: Step = { script: "build/pack-booklets.ts" };
 const scans: Step = { script: "build/pack-scans.ts" };
 const sounds: Step = { script: "build/pack-sounds.ts" };
+const music: Step = { script: "build/pack-music.ts" };
 const canvaskit: Step = { script: "build/pack-canvaskit.ts" };
 const pdfjs: Step = { script: "build/pack-pdfjs.ts" };
 
 export const GROUPS: Record<string, Record<string, Command>> = {
   assets: {
-    all: { steps: [catalog, canvaskit, pdfjs, booklets, scans, sounds], about: "catalog, canvaskit, pdfjs, booklets, scans and sounds in order (`--optional` lets a pack fail)" },
+    all: { steps: [catalog, canvaskit, pdfjs, booklets, scans, sounds, music], about: "catalog, canvaskit, pdfjs, booklets, scans, sounds and music in order (`--optional` lets a pack fail)" },
     catalog: { steps: [catalog], about: "writes assets/catalog.db and src/catalog/version.ts" },
     canvaskit: { steps: [canvaskit], about: "copies CanvasKit's wasm to public/canvaskit.wasm for the web table" },
     pdfjs: { steps: [pdfjs], about: "copies pdf.js's worker and data to public/pdfjs for the web booklet reader" },
     booklets: { steps: [booklets], about: "packs the booklet PDFs into assets/booklets" },
     scans: { steps: [scans], about: "packs every card picture into assets/scans" },
     sounds: { steps: [sounds], about: "packs the cut sound effects into assets/sounds (--from <folder> cuts them first from unpacked Darkest Dungeon II banks)" },
+    music: { steps: [music], about: "packs the music loops into assets/music (--from <folder> cuts them first from the tracks of the score)" },
     capture: { steps: [{ script: "showcase/capture.ts" }], about: "takes the README showcase's captures on the iOS simulators (--app <App.app>, macOS)" },
     showcase: { steps: [{ script: "showcase/build.ts" }], about: "turns the captures into the README's images, GIFs and contact sheet" },
     banner: { steps: [{ script: "showcase/banner.ts" }], about: "draws the README's banner in both themes into .github/readme" },
