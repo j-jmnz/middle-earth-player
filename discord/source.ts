@@ -176,12 +176,15 @@ async function threadOn(env: Env, channelId: string, messageId: string, threadNa
   }
 }
 
+// Discord's message flag that hides the preview cards of the links in a message.
+const SUPPRESS_EMBEDS = 1 << 2;
+
 /**
  * Posts where the report is: in the thread on the report message (started as `threadName` when there is none), else
- * as a reply to the message; for a thread report, in the thread. Mentions never ping.
+ * as a reply to the message; for a thread report, in the thread. Mentions never ping, and links show no preview card.
  */
 export async function postAt(env: Env, source: SourceRef, content: string, threadName: string): Promise<"thread" | "reply"> {
-  const message = { content, allowed_mentions: { parse: [] } };
+  const message = { content, flags: SUPPRESS_EMBEDS, allowed_mentions: { parse: [] } };
   if (source.kind === "thread") {
     await discord(env, "POST", `/channels/${source.threadId}/messages`, message);
     return "thread";

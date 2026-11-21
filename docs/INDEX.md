@@ -266,9 +266,9 @@ Read the sections your task touches.
   - 61–81 On a phone (~350)
   - 82–136 Commands (~2.3K) ← 4
   - 137–147 Asset mirror (~560) ← 7
-- `docs/discord-issues.md` — Discord issue bot (~3.7K tok)
+- `docs/discord-issues.md` — Discord issue bot (~3.8K tok)
   - 5–16 What it does (~290) ← 1
-  - 17–36 Issue updates (~490) ← 2
+  - 17–36 Issue updates (~520) ← 2
   - 37–46 Release announcements (~230)
   - 47–50 How it works (~190)
   - 51–169 Set it up (~1.7K)

@@ -129,6 +129,7 @@ describe("Discord issue bot", () => {
     const link = calls.find((call) => call.method === "POST" && call.url.endsWith("/channels/300/messages"))!;
     expect(link.body).toEqual({
       content: "Thanks for the report, **Frodo**! It's now tracked as **[#42](<https://github.com/owner/repo/issues/42>)** on GitHub. I'll post updates here.",
+      flags: 4,
       allowed_mentions: { parse: [] },
     });
     const told = calls.find((call) => call.method === "PATCH")!;
