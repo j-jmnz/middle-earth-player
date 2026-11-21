@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { FOLD_SLOP, OPEN_FOLD, foldOnScroll, openAt, shadeOf, type FoldScroll } from "./scroll-fold";
+import { PREVIEW_Z } from "../../play/cards/preview-size";
+import { FOLD_SLOP, FOLD_Z, OPEN_FOLD, foldOnScroll, openAt, shadeOf, type FoldScroll } from "./scroll-fold";
 
 const ROOM = 120;
 const END = 5000;
@@ -80,5 +81,12 @@ describe("the shade behind the pool's filters", () => {
       expect(stops[i]!.alpha).toBeLessThanOrEqual(stops[i - 1]!.alpha);
       expect(stops[i]!.at).toBeGreaterThanOrEqual(stops[i - 1]!.at);
     }
+  });
+});
+
+describe("the filters' place", () => {
+  // A phone flattens the views between the preview and the list, so the two zIndex values meet as siblings (issue #158).
+  it("stands under the long-press preview", () => {
+    expect(FOLD_Z).toBeLessThan(PREVIEW_Z);
   });
 });
