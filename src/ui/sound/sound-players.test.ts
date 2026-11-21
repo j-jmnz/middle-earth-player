@@ -1,6 +1,6 @@
 // The limit on loaded sound players over every slot (sound.ts, PLAYERS_MAX): each holds one of the phone's few audio decoders, and
 // the music needs some for its loops, so a new slot's player releases the one used longest ago.
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SOUND_SLOTS } from "./slots.ts";
 
@@ -46,6 +46,12 @@ beforeEach(() => {
   vi.useFakeTimers();
   clock += 100_000;
   vi.setSystemTime(clock);
+});
+
+// The workers share one module scope (vitest.config.mts, isolate: false), so fake timers left on would stall the next
+// file's setTimeout.
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 describe("sound players", () => {
