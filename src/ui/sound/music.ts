@@ -7,7 +7,7 @@
 // front. The Music setting and its volume apply at once; a screen reader halves the volume. A bundle packed without the loops plays
 // none, and so do the web and the desktop for now (bundled.ts).
 import { createAudioPlayer, type AudioPlayer } from "./audio-player";
-import { AppState, Platform } from "react-native";
+import { AppState } from "react-native";
 
 import { accessibility } from "../accessibility.ts";
 import { tableSettings } from "../table-settings.ts";
@@ -18,7 +18,7 @@ import { otherAudioPlaying } from "./other-audio";
 import { audioFailed, startAudioSession } from "./session.ts";
 
 /** Whether this bundle carries any music and can play it: the Music rows show only then. Fixed when the bundle loads. */
-export const MUSIC_BUNDLED = Platform.OS !== "web" && Object.keys(bundledMusic).length > 0;
+export const MUSIC_BUNDLED = Object.keys(bundledMusic).length > 0;
 
 // How often the fades step and the repeat is checked. A fade takes MUSIC_LEAD_SECONDS, so it moves in about 15 steps.
 export const MUSIC_TICK_MS = 100;

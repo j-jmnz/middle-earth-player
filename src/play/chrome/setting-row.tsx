@@ -107,7 +107,7 @@ export function SettingRow({ id, settings, onChange, always, testPrefix }: RowPr
     case "soundVolume":
       return <VolumeSlider label={title} detail={EFFECTS_VOLUME_LINE} value={settings.soundVolume} dim={!settings.sounds} onChange={(soundVolume) => setVolume(onChange, soundVolume)} testID={tid("sound-volume")} />;
     case "music":
-      return <SettingSwitch roomy label={title} detail={MUSIC_LINE} value={settings.music} onChange={(music) => onChange({ music })} testID={tid("music")} />;
+      return <SettingSwitch roomy label={title} detail={platformLine(MUSIC_LINE)} value={settings.music} onChange={(music) => onChange({ music })} testID={tid("music")} />;
     case "musicVolume":
       return <VolumeSlider label={title} detail={MUSIC_VOLUME_LINE} value={settings.musicVolume} dim={!settings.music} onChange={(musicVolume) => onChange({ musicVolume })} testID={tid("music-volume")} />;
     case "guide":
