@@ -8,17 +8,18 @@ Read a section, not a file: `pnpm doc section <file> "<heading>"` prints one sec
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~3.3K tok)
+- `CLAUDE.md` — Claude Code (~3.4K tok)
   - 7–26 Data (~1.4K)
   - 27–46 Commands (~1.3K)
   - 47–50 Agents (~180)
   - 51–54 Skills (~80)
   - 55–58 Cloud sessions (~60)
-- `.claude/rules/agent-standards.md` — Agent standards (~840 tok)
+- `.claude/rules/agent-standards.md` — Agent standards (~640 tok)
 - `.claude/rules/authority.md` — Authority (~790 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~1.2K tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
+- `.claude/rules/issue-standards.md` — Issue standards (~1.1K tok)
 - `.claude/rules/release-standards.md` — Release standards (~1.4K tok)
 
 ## Agents
@@ -265,8 +266,8 @@ Read the sections your task touches.
   - 82–134 Commands (~2.1K) ← 4
   - 135–145 Asset mirror (~480) ← 5
 - `docs/discord-issues.md` — Discord issue bot (~3.7K tok)
-  - 5–16 What it does (~290)
-  - 17–36 Issue updates (~490) ← 1
+  - 5–16 What it does (~290) ← 1
+  - 17–36 Issue updates (~490) ← 2
   - 37–46 Release announcements (~230)
   - 47–50 How it works (~190)
   - 51–169 Set it up (~1.7K)
@@ -389,8 +390,8 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)
 - `scripts/game`: development.md, Reading a game as text (1)
-- `scripts/git`: .claude/rules/commit-standards.md, Subject line (2); .claude/rules/commit-standards.md, Body (1); .claude/rules/commit-standards.md, Commit often (1)
-- `scripts/release`: .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); releasing.md, Installs count (2); releasing.md, Issue comments (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
+- `scripts/git`: .claude/rules/commit-standards.md, Subject line (2); .claude/rules/issue-standards.md, Finish (2); .claude/rules/commit-standards.md, Body (1); .claude/rules/commit-standards.md, Commit often (1)
+- `scripts/release`: .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); .claude/rules/issue-standards.md, Finish (2); releasing.md, Installs count (2); releasing.md, Issue comments (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
 - `scripts/showcase`: design-system.md, Color (1)
 - `scripts/tools`: .claude/rules/code-standards.md, Test cost (4); agents/agent-brief.md, Scenario procedure (4); architecture.md, Modules (1); design-system-table.md, Choice tray (1); development.md, Commands (1)
 - `src/campaign`: agents/agent-brief.md, Scenario procedure (49); brief.md, The Return of the King (6); brief.md, The Two Towers (6); brief.md, Nightmare (5); brief.md, Attack on Dol Guldur (4); brief.md, Escape from Khazad-dûm (4); brief.md, Murder at the Prancing Pony (4); brief.md, The Mines of Moria (4); brief.md, The Siege of Annúminas (4); brief.md, The Wizard's Quest (4); brief.md, The Woodland Realm (4); brief.md, The Battle of Lake-town (3); brief.md, The Hunt for the Dreadnaught (3); brief.md, The Old Forest (3); brief.md, The Ruins of Belegost (3); architecture.md, Tests (2); brief.md, Angmar Awakened (2); brief.md, Ered Mithrin (2); brief.md, Fog on the Barrow-downs (2); brief.md, The Stone of Erech (2); architecture.md, Persistence (1); brief.md, Persistence and shipping (1); design-system.md, Table opens stale (1); design-system.md, Type (1)
