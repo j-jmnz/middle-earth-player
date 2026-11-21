@@ -1,9 +1,10 @@
 // How Settings is laid out (docs/design-system.md, Settings; user decision, 2026-11-21): the settings by id, the categories that hold
 // them, the rows the table's settings panel keeps, the search over names, details and the words players use, and the quick setups
 // that change several settings at once. Pure, so a test reads it; the rows themselves are drawn by setting-row.tsx.
-import { BANNER_CLOSES_LINE, CONTRAST_LINE, CONFIRM_TIME_LINE, FOG_LINE, GUIDE_LINE, HAPTICS_LINE, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, TITLE_FACE_LINE, TITLE_FACE_WORDS, ALWAYS_EMPTY_LINE, AWAKE_LINE, DEBUG_LABEL, DEBUG_LINE } from "./settings-words.ts";
+import { BANNER_CLOSES_LINE, EFFECTS_VOLUME_LINE, MUSIC_LINE, MUSIC_VOLUME_LINE, SOUNDS_LINE, CONTRAST_LINE, CONFIRM_TIME_LINE, FOG_LINE, GUIDE_LINE, HAPTICS_LINE, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, TITLE_FACE_LINE, TITLE_FACE_WORDS, ALWAYS_EMPTY_LINE, AWAKE_LINE, DEBUG_LABEL, DEBUG_LINE } from "./settings-words.ts";
 import type { TableSettings } from "../../ui/table-settings.ts";
 import { CHECK_LABEL, CHECK_LINE } from "../../ui/update/offer.ts";
+import { volumeWords } from "../../ui/sound/volume.ts";
 
 export type SettingId =
   | "theme"
@@ -17,6 +18,10 @@ export type SettingId =
   | "bannerCloses"
   | "spotlight"
   | "haptics"
+  | "sounds"
+  | "soundVolume"
+  | "music"
+  | "musicVolume"
   | "guide"
   | "stops"
   | "tableList"
@@ -27,11 +32,11 @@ export type SettingId =
   | "checkUpdates"
   | "debugTools";
 
-export type CategoryId = "look" | "motion" | "playing" | "accessibility" | "performance" | "saves" | "about";
+export type CategoryId = "look" | "motion" | "sound" | "playing" | "accessibility" | "performance" | "saves" | "about";
 
-// What a platform draws: the phone has haptics and leaves Table as a list out of a web build that has no canvas; the web and the desktop
-// have no vibration, show Table as a list, and have Saves (settings-platform.ts and its .canvaskit variant).
-export type SettingsPlatform = { haptics: boolean; tableList: boolean; saves: boolean; computer: boolean };
+// What a platform draws: the phone has haptics and leaves Table as a list out of a web build that has no canvas; the sound effects and the
+// music show only in a bundle packed with their files (src/ui/sound/sound.ts, music.ts); Saves is the web's and the desktop's (settings-platform.ts).
+export type SettingsPlatform = { haptics: boolean; tableList: boolean; saves: boolean; computer: boolean; sounds: boolean; music: boolean };
 
 // The name of each setting and what the search reads besides its detail: the words a player may type for it.
 export const SETTING_TITLES: Readonly<Record<SettingId, string>> = {
@@ -46,6 +51,10 @@ export const SETTING_TITLES: Readonly<Record<SettingId, string>> = {
   bannerCloses: "Banner closes",
   spotlight: "Combat spotlight",
   haptics: "Haptics",
+  sounds: "Sound effects",
+  soundVolume: "Effects volume",
+  music: "Music",
+  musicVolume: "Music volume",
   guide: "First-game guide",
   stops: "Stops on",
   tableList: "Table as a list",
@@ -69,6 +78,10 @@ const SETTING_DETAILS: Readonly<Record<SettingId, string>> = {
   bannerCloses: BANNER_CLOSES_LINE,
   spotlight: SPOTLIGHT_LINE,
   haptics: HAPTICS_LINE,
+  sounds: SOUNDS_LINE,
+  soundVolume: EFFECTS_VOLUME_LINE,
+  music: MUSIC_LINE,
+  musicVolume: MUSIC_VOLUME_LINE,
   guide: GUIDE_LINE,
   stops: STOPS_LINE,
   tableList: TABLE_LIST_LINE,
@@ -92,6 +105,10 @@ export const SETTING_KEYWORDS: Readonly<Record<SettingId, string>> = {
   bannerCloses: "message popup notice time wait",
   spotlight: "combat attack damage replay animation",
   haptics: "vibrate vibration buzz rumble feedback",
+  sounds: "audio sfx click noise mute quiet",
+  soundVolume: "audio sfx loud quiet louder softer",
+  music: "audio soundtrack score song film mute quiet",
+  musicVolume: "audio soundtrack score loud quiet louder softer",
   guide: "tutorial help hint learn new beginner",
   stops: "pause stop step skip pass auto",
   tableList: "screen reader voiceover talkback blind switch keyboard text",
@@ -119,6 +136,7 @@ export const ACCESSIBILITY_LINE = "Every setting that helps with sight, touch or
 export const CATEGORIES: readonly Category[] = [
   { id: "look", title: "Look", rows: ["theme", "scale", "titleFace", "contrast"], words: "display appearance" },
   { id: "motion", title: "Motion", rows: ["speed", "reduceMotion", "spotlight", "haptics"], words: "animation feel" },
+  { id: "sound", title: "Sound", rows: ["sounds", "soundVolume", "music", "musicVolume"], words: "audio volume" },
   { id: "playing", title: "Playing", rows: ["guide", "stops", "bannerCloses", "timingTips", "confirmTime", "awake", "always"], words: "game table play" },
   { id: "accessibility", title: "Accessibility", note: ACCESSIBILITY_LINE, rows: ["tableList", "scale", "contrast", "reduceMotion", "confirmTime"], words: "a11y access" },
   { id: "performance", title: "Performance", note: PERFORMANCE_LINE, rows: ["quality", "fog"], words: "battery speed slow lag stutter hot" },
@@ -127,7 +145,7 @@ export const CATEGORIES: readonly Category[] = [
 ];
 
 // The rows the table's settings panel keeps: what a player changes during a game. The rest is one tap away in All settings.
-export const PANEL_ROWS: readonly SettingId[] = ["speed", "spotlight", "bannerCloses", "haptics", "timingTips", "always"];
+export const PANEL_ROWS: readonly SettingId[] = ["speed", "spotlight", "bannerCloses", "haptics", "sounds", "soundVolume", "music", "musicVolume", "timingTips", "always"];
 
 export function categoryOf(id: CategoryId): Category {
   const category = CATEGORIES.find((each) => each.id === id);
@@ -148,12 +166,14 @@ export function homeOf(id: SettingId): CategoryId {
 export function shown(id: SettingId, platform: SettingsPlatform): boolean {
   if (id === "haptics") return platform.haptics;
   if (id === "tableList") return platform.tableList;
+  if (id === "sounds" || id === "soundVolume") return platform.sounds;
+  if (id === "music" || id === "musicVolume") return platform.music;
   return true;
 }
 
-/** The categories the platform shows: Saves only where the app backs up its own saves. */
+/** The categories the platform shows: Saves only where the app backs up its own saves, Sound only in a bundle with sounds or music. */
 export function categoriesFor(platform: SettingsPlatform): readonly Category[] {
-  return CATEGORIES.filter((each) => each.id !== "saves" || platform.saves);
+  return CATEGORIES.filter((each) => (each.id !== "saves" || platform.saves) && (each.id !== "sound" || platform.sounds || platform.music));
 }
 
 /** The rows of a category, or of the panel, that the platform draws. */
@@ -171,6 +191,12 @@ export function categorySummary(id: CategoryId, settings: TableSettings, platfor
     case "motion": {
       const parts = [`${SPEED_WORDS[settings.animationSpeed]} speed`, `Spotlight ${onOff(settings.spotlight)}`];
       if (platform.haptics) parts.push(`Haptics ${onOff(settings.haptics)}`);
+      return parts.join(" · ");
+    }
+    case "sound": {
+      const parts: string[] = [];
+      if (platform.sounds) parts.push(settings.sounds ? `Effects ${volumeWords(settings.soundVolume)}` : "Effects off");
+      if (platform.music) parts.push(settings.music ? `Music ${volumeWords(settings.musicVolume)}` : "Music off");
       return parts.join(" · ");
     }
     case "playing":

@@ -31,6 +31,14 @@ const COPIES: readonly { phone: string; web: string; from?: string; to?: string;
         '// The web build lists the table and has no canvas to play a spotlight on.\nconst CANVAS = Platform.OS !== "web";',
         "// A canvas draws the spotlight on every platform (the web's once CanvasKit has loaded, and until then the list table ends each gate: reader-gate.ts).\nconst CANVAS = true;",
       ],
+      // The web and the desktop play no sound yet (src/ui/sound/sound.ts): the strikes' sounds stay on the phone.
+      ['import { tickImpact } from "../../ui/haptics.ts";\nimport { playStrike } from "./strike-play.ts";\nimport { strikeSounds } from "./strike-sounds.ts";\n', 'import { tickImpact } from "../../ui/haptics.ts";\n'],
+      [
+        "  // Each strike's sound at its hit stop (strike-sounds.ts), on the same clock as the impact haptic.\n  const struck = (plan?.clashes ?? []).flatMap((clash, index) => strikeSounds(clash).map((slot) => ({ at: hits[index] ?? 0, index, slot })));\n",
+        "",
+      ],
+      ["      for (const cue of struck) if (was < cue.at && now >= cue.at) scheduleOnRN(playStrike, seq, cue.index, cue.slot);\n", ""],
+      ["    [hits, total, leaveAt, leave, struck, seq],\n", "    [hits, total, leaveAt, leave],\n"],
     ],
   },
   {

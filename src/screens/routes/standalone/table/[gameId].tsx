@@ -13,6 +13,7 @@ import { useStaleChoice } from "../../../session/use-stale-choice";
 import { StaleSheet } from "../../../table/stale-sheet";
 import { TableLoading } from "../../../table/loading";
 import { TableView, type TableNav } from "../../../table/view";
+import { TableMusic } from "../../../../play/chrome/table-music";
 
 // What a choice answers when the route has no game id: nothing to continue.
 const MISSING = { ok: false, message: MISSING_GAME } as const;
@@ -67,5 +68,10 @@ export default function StandaloneTableScreen() {
     outcome: { pathname: "/standalone/outcome/[gameId]", params: { gameId } },
     booklet: bookletOf(session.stored.campaignId, session.stored.scenarioId),
   };
-  return <TableView session={session} store={table.store} clock={table.clock} nav={nav} intents={() => table.game().active?.intents ?? null} />;
+  return (
+    <>
+      <TableMusic store={table.store} />
+      <TableView session={session} store={table.store} clock={table.clock} nav={nav} intents={() => table.game().active?.intents ?? null} />
+    </>
+  );
 }

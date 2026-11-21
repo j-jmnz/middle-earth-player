@@ -5,6 +5,7 @@ import { Pressable, View } from "react-native";
 
 import { useFocusRing } from "./focus-ring.ts";
 import { GameIcon } from "./game-icon.tsx";
+import { playSound } from "./sound/sound.ts";
 import type { IconName } from "./icon-map.ts";
 import { segmentRestSurface, segmentSurface, sunkSurface } from "./surfaces.ts";
 import { touchSlop, useUiScale } from "./ui-scale.ts";
@@ -74,7 +75,10 @@ export function Segmented<T extends string>({
           compact={compact}
           thumb={thumb}
           slop={slop}
-          onPress={() => onChange(option)}
+          onPress={() => {
+            if (option !== value) playSound("ui.select");
+            onChange(option);
+          }}
         />
       ))}
     </View>

@@ -16,7 +16,9 @@ import { scheduleOnRN } from "react-native-worklets";
 
 import { finishMotions } from "../motion/card-motion.native.tsx";
 import { NO_SPREAD, pick, pushed, pushing, pushMove, SCRUB_HOLD_MS, SCRUB_SLOP, spreadLayout, startCard, startsScrub, type Push, type Spread } from "./hand-scrub.ts";
-import { tickArmed, tickRefused } from "../../ui/haptics.ts";
+import { tickArmed } from "../../ui/haptics.ts";
+import { refusedFeedback } from "../../ui/sound/feedback.ts";
+import { playSound } from "../../ui/sound/sound.ts";
 import { type CardSlot, type TableLayout } from "../layout/layout.ts";
 import { hitDrop, hitSlot, type DropRect } from "../layout/hits.ts";
 import { timing } from "../../ui/motion-run.ts";
@@ -48,6 +50,11 @@ type Args = {
   onPreview: (cardId: string) => void;
   onDrop: (cardId: string, target: string) => void;
 };
+
+// A card lifted to drag makes the pick-up sound (docs/design-system-table.md, Sound).
+function pickedFeedback(): void {
+  playSound("card.pick");
+}
 
 export function useTableGestures({ layout, canvas, draggable, targets, k, hurry, live, swallow, select, onTap, onEmptyTap, onPreview, onDrop }: Args) {
   const { progress: hurryProgress, clear: hurryClear } = hurry;
@@ -160,7 +167,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
       const target = hitDrop(drops.get(), x, y);
       lift.set(1);
       const refused = target === "" && !lifts.get()[at];
-      if (refused) scheduleOnRN(tickRefused);
+      if (refused) scheduleOnRN(refusedFeedback);
       if (refused && k !== 0) {
         const from = dx.get();
         const shake = refuseTiming.duration * 4;
@@ -228,6 +235,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         dy.set(event.translationY);
         lift.set(k === 0 ? 1.08 : withTiming(1.08, liftTiming));
         scheduleOnRN(select, slot.id);
+        scheduleOnRN(pickedFeedback);
       })
       .onUpdate((event) => {
         if (dragging.get() < 0) return;
@@ -308,6 +316,7 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
           dy.set(event.y - grabY.get());
           lift.set(k === 0 ? 1.08 : withTiming(1.08, liftTiming));
           scheduleOnRN(select, pickedUp);
+          scheduleOnRN(pickedFeedback);
           return;
         }
         // While a push is under way the lifted card stays lifted, though the finger drifts toward a neighbour.

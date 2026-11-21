@@ -32,6 +32,7 @@ import { withAlphaHex } from "../../ui/tokens";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import type { PictureSource } from "../../play/canvas/table-canvas-types";
 import { touch, useUiScale } from "../../ui/ui-scale";
+import { withSound } from "../../ui/sound/sound";
 import { useSizeClass } from "../../ui/use-size-class";
 import { Text } from "../../ui/text";
 import { announce } from "../../ui/announce";
@@ -114,7 +115,8 @@ function SphereToggles({ value, onChange }: { value: string | null; onChange: (n
             accessibilityState={{ selected: on, checked: on }}
             aria-checked={on}
             accessibilityLabel={sphereWord(sphere)}
-            onPress={() => onChange(on ? null : sphere)}
+            // Picking a sphere plays the choice's sound; tapping the picked one again clears the filter.
+            onPress={withSound(() => onChange(on ? null : sphere), on ? "ui.toggle-off" : "ui.select")}
           >
             {({ pressed }) => (
               <View

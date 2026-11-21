@@ -14,6 +14,7 @@ import type { PictureSource } from "../../play/canvas/table-canvas-types";
 import { withAlphaHex } from "../../ui/tokens";
 import { usePalette } from "../kit/palette-hook";
 import { useUiScale } from "../../ui/ui-scale";
+import { withSound } from "../../ui/sound/sound";
 import { Text } from "../../ui/text";
 
 export type HeroFace = {
@@ -269,7 +270,8 @@ function pressProps({ name, heroes, detail, status, note, onPress, onLongPress, 
     accessibilityActions: actions && actions.accessibilityActions && actions.accessibilityActions.length > 0 ? actions.accessibilityActions : undefined,
     onAccessibilityAction: actions?.onAccessibilityAction,
     disabled: disabled ?? false,
-    onPress,
+    // Opening a deck clicks; picking one in the briefing plays the choice's sound.
+    onPress: withSound(onPress, picker ? "ui.select" : "ui.confirm"),
     onLongPress,
     delayLongPress: 350,
   };

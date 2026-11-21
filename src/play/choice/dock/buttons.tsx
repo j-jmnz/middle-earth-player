@@ -14,6 +14,7 @@ import { MORE_ID } from "./extras.ts";
 import { pausedFor } from "./phase-pause.ts";
 import { RING_OFFSET, RING_WIDTH } from "../../../ui/focus-ring-style.ts";
 import { tickArmed } from "../../../ui/haptics.ts";
+import { playSound } from "../../../ui/sound/sound.ts";
 import { armBarEasing, useMotionScale } from "../../../ui/motion-run.ts";
 import { useScreenReader } from "../../../ui/screen-reader.ts";
 import { tableSettings } from "../../../ui/table-settings.ts";
@@ -102,6 +103,7 @@ export function DockButtons({
         timer.current = setTimeout(() => setArmed(null), wait);
       }
       tickArmed();
+      playSound("ui.select");
       // A screen reader hears what the second tap does, the loss a caution names included.
       announce(button.armed ?? `Tap again: ${button.label}`);
       return;

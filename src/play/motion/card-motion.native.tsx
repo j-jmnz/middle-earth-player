@@ -15,6 +15,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import type { Clash } from "../store/clash.ts";
 import { cardFrame } from "../canvas/frame.ts";
 import { tickLand } from "../../ui/haptics.ts";
+import { playSound } from "../../ui/sound/sound.ts";
 import type { CardSlot, TableLayout } from "../layout/layout.ts";
 import { easingOf, useMotionScale } from "../../ui/motion-run.ts";
 import { ghostPoseAt, landAt, motionEnd, motionSpan, poseAt } from "./pose.ts";
@@ -24,6 +25,7 @@ import { motionsBetween, slotRotation, still, type Ghost, type Motion } from "./
 import type { TableStore } from "../store/store.ts";
 import { fxPlan, fxSpan, type Fx } from "./token-fx.ts";
 import { tokenDeltas } from "./token-deltas.ts";
+import { fxCues, motionCues, type SoundCue } from "./motion-sounds.ts";
 import { useSpotlightHold } from "../spotlight/use-spotlight.ts";
 
 /** What one state's motion is: the cards' motions, the cards that left, the token changes, and which state it is (`at`). */
@@ -48,7 +50,8 @@ export function finishMotions(progress: SharedValue<number>, clear: () => void):
 }
 
 // `actingLayout`: the last layout drawn from the acting seat's side, which a peek that ends with a new state is diffed from (motion/kind.ts).
-type Track = { layout: TableLayout; actingLayout: TableLayout; seat: number; acting: number; moves: Moves; span: number; fxSpan: number };
+// `cues` and `pops`: the state's sounds on its card clock and on its token clock (motion-sounds.ts).
+type Track = { layout: TableLayout; actingLayout: TableLayout; seat: number; acting: number; moves: Moves; span: number; fxSpan: number; cues: readonly SoundCue[]; pops: readonly SoundCue[] };
 
 // The track for a new layout: how its cards move, and the token changes. `log` is read here, not in the hook, because what it holds changes
 // without a render; every call is for a layout no call has seen, so the compiler's cache never answers with a stale update.
@@ -78,7 +81,39 @@ function nextTrack(track: Track, layout: TableLayout, seat: number, acting: numb
         return slot ? (motion && !still(motion) ? motionEnd(motion) : 0) : null;
       })
     : [];
-  return { layout, actingLayout: seat === acting ? layout : track.actingLayout, seat, acting, moves: { ...between, fx, at: track.moves.at + 1 }, span: animate ? motionSpan(between) : 0, fxSpan: animate ? fxSpan(fx) : 0 };
+  // A state held for a spotlight that destroyed a target: the spotlight plays the kill and the death, so the shake makes no discard sound.
+  const killed = held && clashes.some((clash) => clash.destroyed);
+  const cues = animate ? motionCues(between.motions, between.ghosts, layout.slots, new Set(from.slots.map((slot) => slot.id)), killed) : [];
+  return { layout, actingLayout: seat === acting ? layout : track.actingLayout, seat, acting, moves: { ...between, fx, at: track.moves.at + 1 }, span: animate ? motionSpan(between) : 0, fxSpan: animate ? fxSpan(fx) : 0, cues, pops: fxCues(fx) };
+}
+
+const NO_TIMES: readonly number[] = [];
+
+function tickLandAt(): void {
+  tickLand();
+}
+
+function playCue(cues: readonly SoundCue[], index: number): void {
+  const cue = cues[index];
+  if (cue) playSound(cue.slot);
+}
+
+/**
+ * Calls `onCue(i)` on the JavaScript thread as a clock running 0 to 1 over `span` ms passes `times[i]` (ms, scaled): only for a frame that
+ * moves forward and stops short of the end, so a clock set to 0, jumped to its end by a touch or a skip, or never started plays none.
+ */
+function useClockCues(progress: SharedValue<number>, span: number, times: readonly number[], onCue: (index: number) => void): void {
+  useAnimatedReaction(
+    () => progress.get() * span,
+    (now, was) => {
+      if (span === 0 || was == null || now <= was || now >= span) return;
+      for (let i = 0; i < times.length; i += 1) {
+        const at = times[i] ?? 0;
+        if (was <= at && now > at) scheduleOnRN(onCue, i);
+      }
+    },
+    [times, span, onCue],
+  );
 }
 
 /**
@@ -91,7 +126,7 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
   // The state and the attacks a new layout is drawn from, taken from the store here so the compiler sees them as dependencies.
   const game = useStore(store, (state) => state.game);
   const clashes = useStore(store, (state) => state.spotlight.clashes);
-  const [track, setTrack] = useState<Track>(() => ({ layout, actingLayout: layout, seat, acting, moves: { ...motionsBetween(null, layout, () => null), fx: [], at: 1 }, span: 0, fxSpan: 0 }));
+  const [track, setTrack] = useState<Track>(() => ({ layout, actingLayout: layout, seat, acting, moves: { ...motionsBetween(null, layout, () => null), fx: [], at: 1 }, span: 0, fxSpan: 0, cues: [], pops: [] }));
   // What moved this layout: each update of the store is used by the first new layout after it (update-log.ts).
   const [log] = useState(() => new UpdateLog(store.getState().game));
   useEffect(() => store.subscribe((state, before) => log.note(state, before)), [store, log]);
@@ -143,17 +178,12 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
   // The tick of a played card's landing, as the clock passes it (the same moment the squash begins): `landing` ms after the state was
   // drawn at the motion scale, if the state plays and a card played from the hand lands in it. None when the state snaps (reduced motion:
   // `scaled` is 0), or waits for a spotlight (the clock stays at 0 until it ends), or the clock is set past the landing (a touch's hurry or
-  // a skipped spotlight: it jumps to the end, and a jump is not a pass); a new state replaces this reaction and its landing.
+  // a skipped spotlight: it jumps to the end, and a jump is not a pass); a new state replaces this reaction and its landing. The state's
+  // sounds (motion-sounds.ts) play by the same rule, on the card clock and on the token clock.
   const landing = landAt(moves.motions);
-  const landMs = scaled === 0 || landing == null ? null : landing * k;
-  useAnimatedReaction(
-    () => progress.get() * scaled,
-    (now, was) => {
-      if (landMs == null || was == null || now <= was || now >= scaled) return;
-      if (was < landMs && now >= landMs) scheduleOnRN(tickLand);
-    },
-    [landMs, scaled],
-  );
+  useClockCues(progress, scaled, scaled === 0 || landing == null ? NO_TIMES : [landing * k], tickLandAt);
+  useClockCues(progress, scaled, track.cues.map((cue) => cue.at * k), (index) => playCue(track.cues, index));
+  useClockCues(fxProgress, fxScaled, track.pops.map((cue) => cue.at * k), (index) => playCue(track.pops, index));
   const clock = useMemo((): Clock => ({ progress, epoch, at: moves.at, k, span: Math.max(1, scaled) }), [progress, epoch, moves.at, k, scaled]);
   const fxClock = useMemo((): Clock => ({ progress: fxProgress, epoch, at: moves.at, k, span: Math.max(1, fxScaled) }), [fxProgress, epoch, moves.at, k, fxScaled]);
   const hurry = useMemo(() => ({ progress, clear }), [progress, clear]);
