@@ -1,8 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-import { bytes, describeError, runScript, type Log } from "../../log.ts";
+import { bytes, describeError, isDirectRun, runScript, type Log } from "../../log.ts";
 import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR } from "../paths.ts";
 import { fetchBytesRetrying, RETRY_WAITS_MS, sha256, type SourceFile, type SourceRecord } from "../sources/fetch.ts";
 import { MIRROR_ENV, mirrorFromEnv, type Mirror } from "./client.ts";
@@ -164,12 +163,7 @@ async function retrying(work: () => Promise<void>, waits: readonly number[], log
   }
 }
 
-function isDirectRun(): boolean {
-  const entry = process.argv[1];
-  return entry ? path.resolve(entry) === fileURLToPath(import.meta.url) : false;
-}
-
-if (isDirectRun()) {
+if (isDirectRun(import.meta.url)) {
   void runScript("data:mirror", async (log) => {
     const [command, ...wanted] = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
     if (command !== "push" && command !== "pull") throw new Error("Usage: pnpm data mirror push [--fetch] | pull [source...]");

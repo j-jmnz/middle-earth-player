@@ -21,7 +21,7 @@ describe("motion sounds", () => {
       ["h1", moved({ arc: 18, flip: true, delay: 90 })],
       ["h2", moved({ arc: 18, flip: true, delay: 180 })],
     ]);
-    expect(motionCues(motions, [], slots)).toEqual([
+    expect(motionCues(motions, [], slots, new Set(), false)).toEqual([
       { at: 90, slot: "card.draw" },
       { at: MOTION.lift.ms + MOTION.glide.ms, slot: "card.land" },
     ]);
@@ -35,15 +35,22 @@ describe("motion sounds", () => {
       ["x", { ...AT_REST, fromRot: 0, toRot: Math.PI / 2 }],
       ["r", { ...AT_REST, fromRot: Math.PI / 2, toRot: 0, delay: 5 }],
     ]);
-    expect(motionCues(motions, [], slots).map((cue) => cue.slot)).toEqual(["card.exhaust", "card.ready", "dread.shadow", "card.flip"]);
+    expect(motionCues(motions, [], slots, new Set(["x", "r"]), false).map((cue) => cue.slot)).toEqual(["card.exhaust", "card.ready", "dread.shadow", "card.flip"]);
   });
 
   it("makes no sound for a card that only shifts, and discards when a card shakes away", () => {
     const slots = [slot("a", "play")];
     const ghost = { slot: slot("g", "play"), dx: 0, dy: 0, scale: 1, rot: 0, leave: "shake" } as Ghost;
-    expect(motionCues(new Map([["a", moved({})]]), [], slots)).toEqual([]);
-    expect(motionCues(new Map(), [ghost], slots)).toEqual([{ at: 0, slot: "card.discard" }]);
-    expect(motionCues(new Map(), [{ ...ghost, leave: "glide" }], slots)).toEqual([]);
+    expect(motionCues(new Map([["a", moved({})]]), [], slots, new Set(["a"]), false)).toEqual([]);
+    expect(motionCues(new Map(), [ghost], slots, new Set(), false)).toEqual([{ at: 0, slot: "card.discard" }]);
+    expect(motionCues(new Map(), [{ ...ghost, leave: "glide" }], slots, new Set(), false)).toEqual([]);
+  });
+
+  it("deals a shadow card only when it is new, and leaves the discard to a spotlight that killed", () => {
+    const slots = [slot("s", "engaged", {}, "shadow")];
+    const ghost = { slot: slot("g", "play"), dx: 0, dy: 0, scale: 1, rot: 0, leave: "shake" } as Ghost;
+    expect(motionCues(new Map([["s", moved({})]]), [], slots, new Set(["s"]), false)).toEqual([]);
+    expect(motionCues(new Map(), [ghost], slots, new Set(), true)).toEqual([]);
   });
 
   it("pops a resource, damage or progress placed, and the removal of any token", () => {

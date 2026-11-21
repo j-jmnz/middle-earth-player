@@ -7,7 +7,7 @@
 import { createStore } from "zustand/vanilla";
 
 import { SPEEDS, type Speed } from "./motion-tokens.ts";
-import { clampVolume } from "./volume.ts";
+import { clampVolume } from "./sound/volume.ts";
 
 /** The step action windows the table can pass for the player, in round order (rail.ts names each). */
 export const STOP_POINTS = ["resourceActions", "3.3", "3.4", "4.2", "5.2", "5.3", "6.2", "defense", "shadow", "damage", "end", "strike", "7.4"] as const;
@@ -36,7 +36,7 @@ export type TableSettings = {
   haptics: boolean;
   // Sound effects on the table's and the screens' moments (src/ui/sound/sound.ts). Off plays none; a bundle without the files plays none either.
   sounds: boolean;
-  // How loud the sound effects play, 0 to 1 in steps of 5% (src/ui/volume.ts).
+  // How loud the sound effects play, 0 to 1 in steps of 5% (src/ui/sound/volume.ts).
   soundVolume: number;
   // Reduced motion: follow the phone's setting, or always snap whatever the phone says.
   reduceMotion: ReduceMotionOption;

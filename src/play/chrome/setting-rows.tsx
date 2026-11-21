@@ -13,7 +13,7 @@ import { useReduceMotion } from "../../ui/motion-run.ts";
 import { BANNER_CLOSES_OPTIONS, CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, REDUCE_MOTION_OPTIONS, STRONG_OUTLINES_OPTIONS, TABLE_LIST_OPTIONS, THEME_OPTIONS, TITLE_FACE_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "../../ui/table-settings.ts";
 import { SectionHeading } from "../../ui/section-heading.tsx";
 import { playSound, SOUNDS_BUNDLED } from "../../ui/sound/sound.ts";
-import { VolumeSlider } from "../../ui/volume-slider.tsx";
+import { VolumeSlider } from "../../ui/sound/volume-slider.tsx";
 import { useTheme } from "../../ui/theme.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { Text } from "../../ui/text.tsx";

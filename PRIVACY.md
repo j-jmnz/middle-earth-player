@@ -23,7 +23,7 @@ The browser build of the app has no bundled pictures, so it also loads each card
 
 ## Permissions
 
-On Android the app asks for `INTERNET`, for deck import and the update check, and `VIBRATE`, for haptics. On iPhone and iPad it asks for none. The desktop app asks for none and denies every permission request its window receives, except writing text to the clipboard. It never uses the camera, microphone, location, contacts or photos, and it never reads the clipboard.
+On Android the app asks for `INTERNET`, for deck import and the update check, `VIBRATE`, for haptics, and `MODIFY_AUDIO_SETTINGS`, which the sound library (`expo-audio`) declares to play its sounds; it changes no audio setting and records nothing. On iPhone and iPad it asks for none. The desktop app asks for none and denies every permission request its window receives, except writing text to the clipboard. It never uses the camera, microphone, location, contacts or photos, and it never reads the clipboard.
 
 With Debug tools switched on in Settings (it is off by default), the table menu has Copy game state. Tapping it puts the open game on your clipboard as text. The app sends that text nowhere; it goes only where you paste it.
 

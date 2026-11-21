@@ -18,7 +18,7 @@ The sound effects are built (`docs/design-system-table.md`, Sound): the slots in
 - Source: Howard Shore's score, from the three original soundtrack albums or The Complete Recordings, not from a film's mixed audio track, which carries dialogue and effects. The user downloads the albums whole and keeps the track numbers in the file names.
 - Each scenario gets a calm loop and a combat loop, cut from the cue that scores the same place in the film; the boxes with no film scene take a mood's pair. The track titles are the original soundtrack's, written from memory: check them against the album downloaded, and use the Complete Recordings cue of the same scene where it has one.
 
-Download the three albums whole: The Fellowship of the Ring, The Two Towers and The Return of the King (the original soundtracks, or The Complete Recordings). Name each file as it comes, with its track number. The track titles below are the original soundtrack's; check them against the album downloaded, and use the Complete Recordings cue of the same scene where it has one. Each row is the calm loop, then the combat loop.
+Each row is the calm loop, then the combat loop.
 
 | Scenario | Calm | Combat |
 | --- | --- | --- |

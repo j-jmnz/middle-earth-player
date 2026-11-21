@@ -1,12 +1,11 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { BOOKLETS, type BookletId } from "../../src/screens/booklets/books.ts";
 import { BOOKLET_PACK_DIR, DATA_DIR, PDF_CACHE_DIR } from "../data/paths.ts";
 import { mirrorFromEnv, mirrorReader } from "../data/mirror/client.ts";
 import { fetchBytes, sha256, type SourceRecord } from "../data/sources/fetch.ts";
-import { bytes, describeError, runScript, type Log } from "../log.ts";
+import { bytes, isDirectRun, runPack, type Log } from "../log.ts";
 
 // The PDF each book is bundled from: a file of the `rules` source in data/sources.json, pinned by sha256 there.
 export const BOOKLET_SOURCES: Record<BookletId, string> = {
@@ -97,19 +96,5 @@ export function packBookletsHere(log: Log): Promise<PackedBooklet[]> {
   return packBooklets({ sourcesPath: path.join(DATA_DIR, "sources.json"), pdfCacheDir: PDF_CACHE_DIR, outDir: BOOKLET_PACK_DIR, mirror: mirrorReader(mirrorFromEnv(), log) }, log);
 }
 
-function isDirectRun(): boolean {
-  const entry = process.argv[1];
-  return entry ? path.resolve(entry) === fileURLToPath(import.meta.url) : false;
-}
-
 // --optional (pnpm start): a failed pack is a warning, so Metro still starts offline; the books are then not bundled.
-if (isDirectRun()) {
-  void runScript("pack-booklets", async (log) => {
-    try {
-      await packBookletsHere(log);
-    } catch (error) {
-      if (!process.argv.includes("--optional")) throw error;
-      log.warn(`booklets not packed, so this bundle carries none: ${describeError(error)}`);
-    }
-  });
-}
+if (isDirectRun(import.meta.url)) runPack("pack-booklets", "booklets not packed, so this bundle carries none", packBookletsHere);

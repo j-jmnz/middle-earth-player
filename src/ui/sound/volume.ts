@@ -1,4 +1,4 @@
-// The volume slider's numbers (src/ui/volume-slider.tsx): a volume is 0 to 1 in steps of 5%, a touch on the track picks the step under
+// The volume slider's numbers (src/ui/sound/volume-slider.tsx): a volume is 0 to 1 in steps of 5%, a touch on the track picks the step under
 // it, and a screen reader's adjust gesture moves it 10% at a time.
 
 const STEP = 0.05;

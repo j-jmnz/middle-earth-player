@@ -1,4 +1,4 @@
-// The volume row (docs/design-system.md, Components): its name and what it sets over a track with a round knob and the volume as a
+// The volume row (docs/design-system.md, Settings): its name and what it sets over a track with a round knob and the volume as a
 // figure, in the switch's Carved Stone look. A touch on the track sets the volume there; a sideways drag moves it and sets it on release,
 // so a drag writes the setting once; an upright move leaves the page to scroll. A screen reader adjusts it 10% at a time. `onChange`
 // gets the new volume once, when the finger lifts.
@@ -6,10 +6,10 @@ import { useState } from "react";
 import { View, type LayoutChangeEvent } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
-import { touch, useUiScale } from "./ui-scale.ts";
-import { useTableTokens } from "./use-table-tokens.ts";
-import { withAlphaHex } from "./tokens.ts";
-import { Text } from "./text.tsx";
+import { touch, useUiScale } from "../ui-scale.ts";
+import { useTableTokens } from "../use-table-tokens.ts";
+import { withAlphaHex } from "../tokens.ts";
+import { Text } from "../text.tsx";
 import { stepVolume, volumeAt, volumeWords } from "./volume.ts";
 
 // The 44 pt target, as the switch row's.

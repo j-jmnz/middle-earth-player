@@ -16,7 +16,8 @@ import { scheduleOnRN } from "react-native-worklets";
 
 import { finishMotions } from "../motion/card-motion.native.tsx";
 import { NO_SPREAD, pick, pushed, pushing, pushMove, SCRUB_HOLD_MS, SCRUB_SLOP, spreadLayout, startCard, startsScrub, type Push, type Spread } from "./hand-scrub.ts";
-import { tickArmed, tickRefused } from "../../ui/haptics.ts";
+import { tickArmed } from "../../ui/haptics.ts";
+import { refusedFeedback } from "../../ui/sound/feedback.ts";
 import { playSound } from "../../ui/sound/sound.ts";
 import { type CardSlot, type TableLayout } from "../layout/layout.ts";
 import { hitDrop, hitSlot, type DropRect } from "../layout/hits.ts";
@@ -50,17 +51,11 @@ type Args = {
   onDrop: (cardId: string, target: string) => void;
 };
 
-
-// A card lifted to drag makes the pick-up sound; one let go where it cannot be played gets the reject tick and the error sound
-// (docs/design-system-table.md, Sound).
+// A card lifted to drag makes the pick-up sound (docs/design-system-table.md, Sound).
 function pickedFeedback(): void {
   playSound("card.pick");
 }
 
-function refusedFeedback(): void {
-  tickRefused();
-  playSound("ui.error");
-}
 export function useTableGestures({ layout, canvas, draggable, targets, k, hurry, live, swallow, select, onTap, onEmptyTap, onPreview, onDrop }: Args) {
   const { progress: hurryProgress, clear: hurryClear } = hurry;
   const liftTiming = useMemo(() => timing(MOTION.dragLift, k), [k]);

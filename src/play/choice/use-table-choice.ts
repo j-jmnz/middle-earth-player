@@ -7,8 +7,9 @@ import { useStore } from "zustand";
 
 import { actionsSheet, commitSheet, playSheet, windowSheet } from "./bar-sheets.ts";
 import type { BeatStore } from "../store/beat-store.ts";
-import { tickRefused, tickSent } from "../../ui/haptics.ts";
-import { playSound, playUndo } from "../../ui/sound/sound.ts";
+import { tickSent } from "../../ui/haptics.ts";
+import { refusedFeedback } from "../../ui/sound/feedback.ts";
+import { playUndo } from "../../ui/sound/sound.ts";
 import { pointTitle } from "../phases/rail.ts";
 import { isFreeResponse, nextStopTitle, passableWindow } from "../phases/stops.ts";
 import { useAutoAnswer, useBanner, useGuide, useSettle } from "./table-hooks.ts";
@@ -90,18 +91,6 @@ export type TableChoice = {
   foldOutside: () => boolean;
   closeOverlay: () => void;
 };
-
-// The feedback of a sent or refused intent (docs/design-system-table.md, Haptics and Sound).
-// An accepted intent plays no sound of its own: what it changes on the table (a card, a token, the threat, a strike) has one, and a
-// click over it would cover it.
-function sentFeedback(): void {
-  tickSent();
-}
-
-function refusedFeedback(): void {
-  tickRefused();
-  playSound("ui.error");
-}
 
 export function useTableChoice({
   store,
@@ -220,7 +209,7 @@ export function useTableChoice({
     (intent: PlayerIntent) => {
       // The Sent tick plays the moment the reducer accepts the intent, before the next state is built and the save written; a refused intent
       // gets the Refused tick, never both. The moments the table answers after it are answered in the same tap (table-hooks.ts, follow).
-      if (store.getState().dispatch(intent, sentFeedback)) {
+      if (store.getState().dispatch(intent, tickSent)) {
         reset();
         // An accepted send keeps the card the reader last activated, so focus can stay on it in the next moment.
         resetReader("send");

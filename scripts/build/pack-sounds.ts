@@ -1,12 +1,11 @@
 import { spawnSync } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { isSoundSlot, SOUND_SLOTS, type SoundSlot } from "../../src/ui/sound/slots.ts";
 import { SOUND_CACHE_DIR, SOUND_PACK_DIR } from "../data/paths.ts";
 import { sha256 } from "../data/sources/fetch.ts";
-import { bytes, describeError, runScript, type Log } from "../log.ts";
+import { bytes, isDirectRun, runPack, type Log } from "../log.ts";
 import { SOUND_PICKS, type SoundPick } from "./sound-picks.ts";
 
 // The sound effects are not in git and come from no online source: they are cut from the player's own Darkest Dungeon II install
@@ -109,21 +108,11 @@ function argument(name: string): string | undefined {
   return at >= 0 ? process.argv[at + 1] : undefined;
 }
 
-function isDirectRun(): boolean {
-  const entry = process.argv[1];
-  return entry ? path.resolve(entry) === fileURLToPath(import.meta.url) : false;
-}
-
 // --optional (pnpm assets all): a failed pack is a warning, so the other packs still run.
-if (isDirectRun()) {
-  void runScript("pack-sounds", (log) => {
-    try {
-      const from = argument("--from");
-      if (from) cutSounds(path.resolve(from), SOUND_CACHE_DIR, log);
-      packSounds(SOUND_CACHE_DIR, SOUND_PACK_DIR, log);
-    } catch (error) {
-      if (!process.argv.includes("--optional")) throw error;
-      log.warn(`sounds not packed, so this bundle carries none: ${describeError(error)}`);
-    }
+if (isDirectRun(import.meta.url)) {
+  runPack("pack-sounds", "sounds not packed, so this bundle carries none", (log) => {
+    const from = argument("--from");
+    if (from) cutSounds(path.resolve(from), SOUND_CACHE_DIR, log);
+    packSounds(SOUND_CACHE_DIR, SOUND_PACK_DIR, log);
   });
 }

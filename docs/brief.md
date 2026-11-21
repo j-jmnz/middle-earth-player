@@ -104,7 +104,7 @@ Pin these. Do not swap them for a lookalike.
 | User schema | `expo-sqlite`, with committed migrations in `drizzle/` |
 | Validation at the catalog boundary | Zod |
 | Images and files | `expo-file-system`, `expo-image` |
-| Sound effects | `expo-audio`, the SDK 58 `pnpm expo install` version, with no microphone and no background playback (`app.json`). Short sounds at the haptics' moments, which add to the screen and never replace it (`docs/design-system-table.md`, Sound). |
+| Sound effects | `expo-audio`, the SDK 58 `pnpm expo install` version (user request, 2026-11-18), with no microphone and no background playback (`app.json`). Short sounds at the haptics' moments, which add to the screen and never replace it (`docs/design-system-table.md`, Sound). |
 | Haptics | `expo-haptics`, the SDK 58 `pnpm expo install` version (user request, 2026-10-25): a tick when a table button arms, sends or is refused, and on Undo. It adds to what the screen shows and never replaces it. |
 | Screen state | Zustand. The only writer of game state is the reducer in `src/rules` |
 | Tests | Vitest, in Node, on `src/rules` and `src/campaign`. The physical phone still judges fling and drag. |
@@ -114,7 +114,7 @@ Pin these. Do not swap them for a lookalike.
 | PDF reader on web and desktop | `pdfjs-dist` (exact pin), its worker and data copied by `pnpm assets pdfjs`; the phone keeps its native readers. `src/screens/booklets/web` |
 | Device builds | Releases, built by `.github/workflows/release.yml` (`docs/releasing.md`) with no store listing: a signed Android APK, an iOS IPA for SideStore and AltStore, and unsigned desktop installers for Windows, macOS and Linux (`.claude/rules/release-standards.md`, Tags and releases), all on the GitHub Releases page, and, as an optional extra, the iOS build on TestFlight (user decisions, 2026-11-06 and 2026-11-16). EAS Build profiles for development and e2e builds |
 
-Install Reanimated, `react-native-worklets`, Gesture Handler, Skia, FlashList, `expo-sqlite`, `expo-image`, `expo-file-system` and `expo-haptics` with `pnpm expo install`. Worklets is the Reanimated 4 peer. Stay on the Skia and FlashList versions that command selects. Expo Go ships those binaries.
+Install Reanimated, `react-native-worklets`, Gesture Handler, Skia, FlashList, `expo-sqlite`, `expo-image`, `expo-file-system`, `expo-haptics` and `expo-audio` with `pnpm expo install`. Worklets is the Reanimated 4 peer. Stay on the Skia and FlashList versions that command selects. Expo Go ships those binaries.
 
 Do not add TanStack Query, Redux, a Phoenix client, or a server framework.
 

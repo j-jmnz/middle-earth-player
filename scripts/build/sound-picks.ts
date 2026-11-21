@@ -41,7 +41,7 @@ export const SOUND_PICKS: Record<SoundSlot, SoundPick> = {
   "combat.block": { bank: "shared_hero", event: "sfx_hero_meleeA_guard_use", ...combat },
   "combat.miss": { bank: "shared_hero", event: "sfx_hero_meleeA_atk_miss", ...combat },
   "combat.kill": { bank: "battle", event: "sfx_battle_crit_hero", ...combat },
-  // Softer than the kill that comes just before it (user choice, 2026-11-21).
+  // Softer than the kill it plays with at the same hit stop (user choice, 2026-11-21).
   "combat.enemy-death": { bank: "battle", event: "sfx_battle_execution", ...combat, lufs: -21 },
   "dread.threat-up": { bank: "battle", event: "sfx_battle_status_stressup", ...dread },
   "dread.threat-down": { bank: "battle", event: "sfx_battle_status_stressdown", ...dread },

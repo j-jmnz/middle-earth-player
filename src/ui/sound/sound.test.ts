@@ -5,7 +5,7 @@ import { tableSettings } from "../table-settings.ts";
 
 const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[], moded: 0 }));
 vi.mock("react-native", () => ({ Platform: { OS: "ios" } }));
-vi.mock("./bundled.ts", () => ({ bundledSounds: { "ui.confirm": 1, "card.land": 2, "ui.back": 3 } }));
+vi.mock("./bundled", () => ({ bundledSounds: { "ui.confirm": 1, "card.land": 2, "ui.back": 3 } }));
 vi.mock("expo-audio", () => ({
   setAudioModeAsync: () => {
     calls.moded += 1;

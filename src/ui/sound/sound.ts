@@ -1,14 +1,15 @@
 // The table's and the screens' sound effects (docs/design-system-table.md, Sound; user request, 2026-11-18). A sound plays at the
 // moment its haptic or its motion does and adds to what the screen shows; it never replaces it. It follows the phone's silent switch
 // and mixes with the player's own music. The Sound effects setting turns them all off. A bundle without the files (every release and
-// CI build: scripts/build/pack-sounds.ts) plays none, and so does the web and the desktop for now. A failed sound is not an error
-// the player should see.
+// CI build: scripts/build/pack-sounds.ts) plays none, and so do the web and the desktop for now (bundled.ts). A failed sound is not an
+// error the player should see; a development build logs it. One player a slot is made the first time any sound plays and kept for the
+// app's life: the set is small and fixed.
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from "expo-audio";
 import { Platform } from "react-native";
 
 import { accessibility } from "../accessibility.ts";
 import { tableSettings } from "../table-settings.ts";
-import { bundledSounds } from "./bundled.ts";
+import { bundledSounds } from "./bundled";
 import type { SoundSlot } from "./slots.ts";
 
 // The same sound asked for again this soon (cards drawn in a row, tokens landing together) is not restarted: one plays for all.
@@ -34,11 +35,18 @@ function playerOf(slot: SoundSlot, source: number): AudioPlayer {
   return player;
 }
 
+function failed(error: unknown): void {
+  if (typeof __DEV__ !== "undefined" && __DEV__) console.warn("sound effect failed", error);
+}
+
 function startSession(): void {
   if (moded) return;
   moded = true;
-  // Respects the silent switch, never ducks or stops the player's music, and stops with the app.
-  setAudioModeAsync({ playsInSilentMode: false, interruptionMode: "mixWithOthers", shouldPlayInBackground: false, allowsRecording: false, shouldRouteThroughEarpiece: false }).catch(() => undefined);
+  // Respects the silent switch, never ducks or stops the player's music, and stops with the app. A failed call is asked again next time.
+  setAudioModeAsync({ playsInSilentMode: false, interruptionMode: "mixWithOthers", shouldPlayInBackground: false, allowsRecording: false, shouldRouteThroughEarpiece: false }).catch((error: unknown) => {
+    moded = false;
+    failed(error);
+  });
   // Every sound is loaded once the first one is asked for, so the next ones start on time.
   for (const [slot, source] of Object.entries(bundledSounds) as [SoundSlot, number][]) playerOf(slot, source);
 }
@@ -60,10 +68,10 @@ export function playSound(slot: SoundSlot): void {
     startSession();
     const player = playerOf(slot, source);
     player.volume = soundVolume;
-    player.seekTo(0).catch(() => undefined);
+    player.seekTo(0).catch(failed);
     player.play();
-  } catch {
-    // A platform without the module.
+  } catch (error) {
+    failed(error);
   }
 }
 
