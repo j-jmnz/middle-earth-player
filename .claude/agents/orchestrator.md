@@ -59,5 +59,5 @@ If a task cannot be done without changing a behaviour the plan keeps, stop and a
 - Phone and tablet checks are not tracked (user instruction, 2026-11-06): do not write phone-check notes in `docs/phases/STATUS.md`, a phase file, a plan, a handover or a report, and do not keep a phase open for one.
 - The plan is done: delete it, and point what cites it at the doc that owns the behaviour (`docs/brief.md`, `docs/architecture.md`, the design system). Delete any prompt or handover file the work consumed.
 - Before the last commit, check that `pnpm test`, `pnpm lint`, `pnpm typecheck` and `pnpm data check` are green on the final tree. The fix task's full run, green on that tree, counts; do not repeat it. Then commit and push.
-- After the last commit, open the pull request and update its issues, as the pull request and Issues rules of `.claude/rules/agent-standards.md` say.
+- After the last commit, open the pull request and update its issues, as `.claude/rules/agent-standards.md` and `.claude/rules/issue-standards.md` say.
 - Finish with a short report: what each task changed, the measured numbers, the review findings and what was fixed or kept, and what stays open.
