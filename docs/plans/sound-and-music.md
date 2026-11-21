@@ -112,10 +112,10 @@ Each pick is trimmed after its tail, faded out and levelled by kind (UI at -24 L
 | `combat.engage` | `ui_battle_start` | `ui.bank` |
 | `combat.roar` | `sfx_monster_ghoul_howl_use` | `shared_enemy.bank` |
 | `combat.strike` | `sfx_monster_footsoldier_cut_use` | `shared_enemy.bank` |
-| `combat.block` | `sfx_hero_maa_rampart_use` | `hero_man_at_arms.bank` |
+| `combat.block` | `sfx_hero_meleeA_guard_use` | `shared_hero.bank` |
 | `combat.miss` | `sfx_hero_meleeA_atk_miss` | `shared_hero.bank` |
 | `combat.kill` | `sfx_battle_crit_hero` | `battle.bank` |
-| `combat.enemy-death` | `fol_monster_woodsman_deathsdoor` | `shared_enemy.bank` |
+| `combat.enemy-death` | `sfx_battle_execution` | `battle.bank` |
 | `dread.threat-up` | `sfx_battle_status_stressup` | `battle.bank` |
 | `dread.threat-down` | `sfx_battle_status_stressdown` | `battle.bank` |
 | `dread.danger` | `sfx_battle_deathsdoor` | `battle.bank` |
