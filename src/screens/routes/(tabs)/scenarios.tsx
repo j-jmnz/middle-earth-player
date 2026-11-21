@@ -9,10 +9,12 @@ import { campaignListQueries } from "../../campaign/list";
 import { PillButton, PrimaryButton, TextButton } from "../../kit/chrome";
 import { deckFaces } from "../../deck/store";
 import { useDatabases } from "../../data/databases";
-import { FoldSection, useFolds } from "../../kit/fold-section";
+import { FoldHeader, useFolds } from "../../kit/fold-section";
 import { foldAllOffer } from "../../kit/fold-state";
 import { heroFace } from "../../art/hero-tile";
-import { CatalogGrid, CatalogTile, HubPage, LockedTiles, OtherRuns, PrimaryPlate, RunHero, RunRow } from "../../campaign/hub-parts";
+import { CatalogTile, LockedTiles, OtherRuns, PrimaryPlate, RunHero, RunRow } from "../../campaign/hub-parts";
+import { boxFoldId, hubItems, type HubEntry, type HubItem } from "../../campaign/hub-items";
+import { HubListPage } from "../../campaign/hub-page";
 import { comingLater, splitRuns } from "../../campaign/hub-runs";
 import { usePalette } from "../../kit/palette-hook";
 import { seatWord } from "../../data/seats";
@@ -24,7 +26,8 @@ import { useSizeClass } from "../../../ui/use-size-class";
 
 // Standalone play (mec109.campaign-mode: "players can still play the scenarios as standalone adventures"). The Scenarios hub
 // (docs/design-system.md, Scenarios): the game in progress dealt last as the hero over its scenario's scene, the
-// other games in progress as rows, one fold per box holding the scenarios it can deal, then Coming later. Finished and archived games
+// other games in progress as rows, one fold per box holding the scenarios it can deal, then Coming later; the boxes and Coming later
+// are the items of one FlashList under the head (HubListPage). Finished and archived games
 // are in History. Reads the scenario files, user.db and the campaigns and heroes the catalog names.
 export default function Scenarios() {
   const palette = usePalette();
@@ -103,55 +106,68 @@ export default function Scenarios() {
     const playable = box.scenarios.flatMap((id, index) => (isPlayable(id) ? [{ id, number: index + 1 }] : []));
     return playable.length > 0 ? [{ box, playable }] : [];
   });
-  // The scenarios list's folds, each box and Coming later: Collapse all folds every one while any is open, else Expand all opens them.
+  // Coming later: the scenarios no box can deal yet and the locked campaigns and cycles, in the campaigns table's order (no card is read for them).
   const waiting = comingLater(BOXES, campaignListQueries(catalog).campaigns.all(), isPlayable, scenarioName);
-  const listFolds = [...boxes.map(({ box }) => ({ id: `box-${box.id}`, defaultFolded: false })), ...(waiting.length > 0 ? [{ id: "scenarios-coming", defaultFolded: false }] : [])];
+  // The catalog is the list's items (hub-items.ts): a folded box mounts its header alone.
+  const items = hubItems({ boxes, waiting: waiting.length, posters, folded: (id) => folds.folded(id, false) });
+  // The scenarios list's folds, each box and Coming later: Collapse all folds every one while any is open, else Expand all opens them.
+  const listFolds = [...boxes.map(({ box }) => ({ id: boxFoldId(box.id), defaultFolded: false })), ...(waiting.length > 0 ? [{ id: "scenarios-coming", defaultFolded: false }] : [])];
   const offer = foldAllOffer(listFolds.map(({ id, defaultFolded }) => folds.folded(id, defaultFolded)));
-  const foldAll =
-    listFolds.length > 1 ? (
-      <View className="-mx-3 flex-row justify-end">
-        <TextButton
-          label={offer.label}
-          tone="accent"
-          small
-          testID="scenarios-fold-all"
-          accessibilityHint={offer.folds ? "Folds every box and Coming later" : "Opens every box and Coming later"}
-          onPress={() => folds.setAll(listFolds, offer.folds)}
-        />
-      </View>
-    ) : null;
-  const catalogBlock = (
-    <View testID="standalone-scenarios" style={{ gap: 18 * s }}>
-      {foldAll}
-      {boxes.map(({ box, playable }) => (
-        <View key={box.id} testID={`box-${box.id}`}>
-          <FoldSection id={`box-${box.id}`} title={box.name} count={playable.length} unit="scenario" {...fold(`box-${box.id}`)}>
-            <CatalogGrid posters={posters}>
-              {playable.map(({ id, number }) => {
-                const { line, tone } = standing(id);
-                return (
-                  <CatalogTile key={id} testID={`standalone-${id}`} sceneId={id} number={number} name={scenarioName(id)} line={line} tone={tone} accessibilityLabel={[`Scenario ${number}`, scenarioName(id), line].filter(Boolean).join(", ")} accessibilityHint="Opens its briefing" posters={posters} onPress={() => brief(id)} />
-                );
-              })}
-            </CatalogGrid>
-          </FoldSection>
-        </View>
-      ))}
-    </View>
-  );
 
-  // Coming later (`waiting`, above): the scenarios no box can deal yet and the locked campaigns and cycles, in the campaigns table's order
-  // (no card is read for them).
-  const coming =
-    waiting.length > 0 ? (
-      <FoldSection id="scenarios-coming" title="Coming later" count={waiting.length} {...fold("scenarios-coming")}>
-        <LockedTiles tiles={waiting} testID="locked-scenarios" />
-      </FoldSection>
-    ) : null;
+  const tile = ({ id, number }: HubEntry) => {
+    const { line, tone } = standing(id);
+    return (
+      <CatalogTile key={id} testID={`standalone-${id}`} sceneId={id} number={number} name={scenarioName(id)} line={line} tone={tone} accessibilityLabel={[`Scenario ${number}`, scenarioName(id), line].filter(Boolean).join(", ")} accessibilityHint="Opens its briefing" posters={posters} onPress={() => brief(id)} />
+    );
+  };
+  // Each item's space above it is the gap the folds had in one column: 18 between sections, 8 between a phone's rows and 12 between posters.
+  const section = (lead: boolean) => (lead ? undefined : { paddingTop: 18 * s });
+  const renderItem = (item: HubItem, lead: boolean) => {
+    switch (item.type) {
+      case "fold-all":
+        return (
+          <View className="-mx-3 flex-row justify-end" style={section(lead)}>
+            <TextButton
+              label={offer.label}
+              tone="accent"
+              small
+              testID="scenarios-fold-all"
+              accessibilityHint={offer.folds ? "Folds every box and Coming later" : "Opens every box and Coming later"}
+              onPress={() => folds.setAll(listFolds, offer.folds)}
+            />
+          </View>
+        );
+      case "box":
+        return (
+          <View testID={item.id} style={section(lead)}>
+            <FoldHeader id={item.id} title={item.name} count={item.count} unit="scenario" {...fold(item.id)} />
+          </View>
+        );
+      case "tiles": {
+        const gap = item.first ? undefined : { paddingTop: (posters ? 12 : 8) * s };
+        return posters ? (
+          <View className="flex-row" style={{ ...gap, marginHorizontal: -6 * s }}>
+            {item.entries.map(tile)}
+          </View>
+        ) : (
+          <View style={gap}>{item.entries.map(tile)}</View>
+        );
+      }
+      case "coming":
+        return (
+          <View style={section(lead)}>
+            <FoldHeader id="scenarios-coming" title="Coming later" count={item.count} {...fold("scenarios-coming")} />
+          </View>
+        );
+      case "locked":
+        return <LockedTiles tiles={waiting} testID="locked-scenarios" />;
+    }
+  };
 
   return (
-    <HubPage
+    <HubListPage
       testID="scenarios"
+      listTestID="standalone-scenarios"
       title="Scenarios"
       actions={<PillButton label="History" testID="history-open" accessibilityLabel="History: games in progress, finished and archived" onPress={() => router.push({ pathname: "/history", params: { kind: "standalone" } })} />}
       hero={heroBlock}
@@ -159,8 +175,8 @@ export default function Scenarios() {
       heroTestID="current-game"
       sceneId={hero?.scenarioId}
       others={othersBlock}
-      catalog={catalogBlock}
-      coming={coming}
+      items={items}
+      renderItem={renderItem}
     />
   );
 }
