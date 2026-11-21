@@ -78,6 +78,54 @@ The Sounds Resource has no rip of the LOTR Adventure Card Game, Gwent or Shadow 
 - The Hobbit films' score would fit Mirkwood and Ered Mithrin, outside the stated trilogy: a user decision.
 - A scenario's music map is data: `data/audio/music.json`, each scenario id to its calm and combat clip ids, so `pnpm data check` covers it.
 
+## Chosen sound effects
+
+Every sound effect comes from Darkest Dungeon II (user decision, 2026-11-21), taken from the user's own install: the banks named below, unpacked with vgmstream and sent as Opus. `combat.engage`, `combat.miss` and `combat.enemy-death` are slots that set adds. Darkest Dungeon II has no card sounds, so the card slots use its item, skill and hero handling sounds; the Bicycle card set is the fallback if they sound wrong in play.
+
+Each pick is trimmed after its tail, faded out and levelled by kind (UI at -24 LUFS, cards and tokens at -22, stings at -18, combat at -17), then encoded as mono AAC (`.m4a`, which the phone, the web and the desktop all play). The built files and `manifest.json` (each file's sha256, and its source bank, event and sha256) are in `.cache/audio/sfx/`, not committed.
+
+| Slot | Darkest Dungeon II event | Bank |
+| --- | --- | --- |
+| `ui.select` | `ui_shared_mouseover_v2` | `ui.bank` |
+| `ui.confirm` | `ui_shared_mouseclick` | `ui.bank` |
+| `ui.back` | `ui_shared_back` | `ui.bank` |
+| `ui.error` | `ui_shared_invalid` | `ui.bank` |
+| `ui.toggle-on` | `ui_shared_skill_equip_v2` | `ui.bank` |
+| `ui.toggle-off` | `ui_shared_skill_unequip_v2` | `ui.bank` |
+| `ui.tab` | `ui_shared_tab` | `ui.bank` |
+| `ui.open` | `ui_shared_menu_open` | `ui.bank` |
+| `ui.close` | `ui_shared_menu_close` | `ui.bank` |
+| `ui.notice` | `ui_shr_text_popup` | `ui.bank` |
+| `card.draw` | `ui_rewards_item_appear` | `ui.bank` |
+| `card.pick` | `ui_heroselect_pickup` | `ui.bank` |
+| `card.land` | `ui_heroselect_add` | `ui.bank` |
+| `card.shuffle` | `ui_heroselect_path_gen` | `ui.bank` |
+| `card.deal` | `ui_battle_turnorder_reveal` | `ui.bank` |
+| `card.flip` | `ui_inn_quirk_reveal_neg` | `ui.bank` |
+| `card.discard` | `ui_shared_discard` | `ui.bank` |
+| `card.exhaust` | `ui_embark_unhighlight` | `ui.bank` |
+| `card.ready` | `ui_embark_highlight` | `ui.bank` |
+| `token.resource` | `ui_rewards_take_currency_gold` | `ui.bank` |
+| `token.damage` | `sfx_battle_status_bleedDOT` | `battle.bank` |
+| `token.progress` | `ui_eor_candle_count` | `ui.bank` |
+| `token.remove` | `ui_shared_wheel_lose` | `ui.bank` |
+| `combat.engage` | `ui_battle_start` | `ui.bank` |
+| `combat.roar` | `sfx_monster_ghoul_howl_use` | `shared_enemy.bank` |
+| `combat.strike` | `sfx_monster_footsoldier_cut_use` | `shared_enemy.bank` |
+| `combat.block` | `sfx_hero_maa_rampart_use` | `hero_man_at_arms.bank` |
+| `combat.miss` | `sfx_hero_meleeA_atk_miss` | `shared_hero.bank` |
+| `combat.kill` | `sfx_battle_crit_hero` | `battle.bank` |
+| `combat.enemy-death` | `char_en_vo_brig_1_death_01` | `shared_enemy.bank` |
+| `dread.threat-up` | `sfx_battle_status_stressup` | `battle.bank` |
+| `dread.threat-down` | `sfx_battle_status_stressdown` | `battle.bank` |
+| `dread.danger` | `sfx_battle_deathsdoor` | `battle.bank` |
+| `dread.shadow` | `sfx_battle_status_horror` | `battle.bank` |
+| `dread.treachery` | `sfx_battle_status_debuff` | `battle.bank` |
+| `dread.phase` | `sfx_battle_switch` | `battle.bank` |
+| `dread.stage` | `ui_battle_dungeon_next` | `battle.bank` |
+| `dread.win` | `ui_eor_results` | `ui.bank` |
+| `dread.loss` | `ui_driving_torchlight_out` | `ui.bank` |
+
 ## Download list
 
 Save each file under one folder, in the subfolder and with the name given here (the extension is whatever the source gives: WAV or FLAC first, else the best quality offered). A row with two names wants two or three takes of the sound, saved as `-1`, `-2`, `-3`, so a repeat does not sound the same each time. Keep a `sources.txt` in each subfolder: the page URL each file came from.
