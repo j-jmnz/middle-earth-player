@@ -34,6 +34,8 @@ vi.mock("./audio-player", () => ({
   },
 }));
 
+// A fresh sound.ts with this file's mocks: sound.test.ts loads it with its own, and the module cache is shared (vitest.config.mts, isolate).
+vi.resetModules();
 const { playSound, PLAYERS_MAX } = await import("./sound.ts");
 
 const loaded = () => calls.players.filter((player) => !player.removed);
