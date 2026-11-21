@@ -93,8 +93,9 @@ export function SettingSwitch({
       accessibilityState={{ checked: value }}
       aria-checked={value}
       onPress={() => {
-        playSound(value ? "ui.toggle-off" : "ui.toggle-on");
+        // After the change, so turning Sound effects on is heard.
         onChange(!value);
+        playSound(value ? "ui.toggle-off" : "ui.toggle-on");
       }}
       style={({ pressed }) => ({
         minHeight: touch(s, ROW),

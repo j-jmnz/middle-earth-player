@@ -7,17 +7,18 @@ import type { ReactNode } from "react";
 import { TextButton } from "../../ui/buttons.tsx";
 import { Segmented } from "../../ui/segmented.tsx";
 import { SettingSwitch } from "../../ui/setting-switch.tsx";
-import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, NONE_YET, SOUNDS_LINE, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, type AlwaysRow } from "./settings-words.ts";
+import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, fogLine, GUIDE_LINE, EFFECTS_VOLUME_LINE, HAPTICS_LINE, NONE_YET, SOUNDS_LINE, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, type AlwaysRow } from "./settings-words.ts";
 import { SPEEDS } from "../../ui/motion-tokens.ts";
 import { useReduceMotion } from "../../ui/motion-run.ts";
 import { BANNER_CLOSES_OPTIONS, CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, REDUCE_MOTION_OPTIONS, STRONG_OUTLINES_OPTIONS, TABLE_LIST_OPTIONS, THEME_OPTIONS, TITLE_FACE_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "../../ui/table-settings.ts";
 import { SectionHeading } from "../../ui/section-heading.tsx";
-import { SOUNDS_BUNDLED } from "../../ui/sound/sound.ts";
+import { playSound, SOUNDS_BUNDLED } from "../../ui/sound/sound.ts";
+import { VolumeSlider } from "../../ui/volume-slider.tsx";
 import { useTheme } from "../../ui/theme.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { Text } from "../../ui/text.tsx";
 
-export type SettingGroupId = "display" | "performance" | "motion" | "table";
+export type SettingGroupId = "display" | "performance" | "motion" | "sound" | "table";
 
 /** A choice row: its name and what it does over the control, which keeps the full width so three words fit at Large. */
 export function SettingChoice({ title, detail, children, testID }: { title: string; detail?: string; children: ReactNode; testID: string }) {
@@ -61,9 +62,15 @@ export function SettingGroup({ title, note, testID, first = false, children }: {
   );
 }
 
+// A new effects volume is written, then a sound plays at it, so the player hears what they chose.
+function setVolume(onChange: (change: Partial<TableSettings>) => void, soundVolume: number): void {
+  onChange({ soundVolume });
+  playSound("ui.confirm");
+}
+
 /**
  * The groups: Display (Theme, UI scale, Strong outlines), Performance (Card pictures, Moving fog: the two switches whose only job is to ease
- * a slow phone, under a note that says so), Motion and feel (Animation speed, Reduce motion, Combat spotlight, Haptics) and At the table
+ * a slow phone, under a note that says so), Motion and feel (Animation speed, Reduce motion, Combat spotlight, Haptics), Sound (Sound effects and their volume, only in a bundle packed with the sounds) and At the table
  * (First-game guide, Stops on when `stops`, Table as a list on a phone, Confirm time, Explain timing words, Keep screen awake and the Responses used every time). Every row shows what it does. `groups` picks which to draw, so a wide Settings page can split them across two columns. Every change
  * goes through `onChange`; the stored `uiScale` and `theme` apply at once. The Stops switch is the tab's: the table's rail carries Stops.
  */
@@ -72,7 +79,7 @@ export function SettingsRows({
   onChange,
   always,
   testPrefix,
-  groups = ["display", "performance", "motion", "table"],
+  groups = ["display", "performance", "motion", "sound", "table"],
   stops = false,
   first = false,
 }: {
@@ -117,8 +124,14 @@ export function SettingsRows({
           <ChoiceRow title="Banner closes" detail={BANNER_CLOSES_LINE} id={id("banner-closes")} options={BANNER_CLOSES_OPTIONS} words={BANNER_CLOSES_WORDS} value={settings.bannerCloses} onChange={(bannerCloses) => onChange({ bannerCloses })} />
           <SettingSwitch roomy label="Combat spotlight" detail={SPOTLIGHT_LINE} value={settings.spotlight} onChange={(spotlight) => onChange({ spotlight })} testID={id("spotlight")} />
           <SettingSwitch roomy label="Haptics" detail={HAPTICS_LINE} value={settings.haptics} onChange={(haptics) => onChange({ haptics })} testID={id("haptics")} />
-          {/* Only a bundle packed with the sounds can play them (src/ui/sound/sound.ts). */}
-          {SOUNDS_BUNDLED ? <SettingSwitch roomy label="Sound effects" detail={SOUNDS_LINE} value={settings.sounds} onChange={(sounds) => onChange({ sounds })} testID={id("sounds")} /> : null}
+        </SettingGroup>
+      ) : null}
+
+      {/* Only a bundle packed with the sounds can play them (src/ui/sound/sound.ts). */}
+      {groups.includes("sound") && SOUNDS_BUNDLED ? (
+        <SettingGroup title="Sound" testID={id("sound")} first={first && top === "sound"}>
+          <SettingSwitch roomy label="Sound effects" detail={SOUNDS_LINE} value={settings.sounds} onChange={(sounds) => onChange({ sounds })} testID={id("sounds")} />
+          <VolumeSlider label="Effects volume" detail={EFFECTS_VOLUME_LINE} value={settings.soundVolume} dim={!settings.sounds} onChange={(soundVolume) => setVolume(onChange, soundVolume)} testID={id("sound-volume")} />
         </SettingGroup>
       ) : null}
 

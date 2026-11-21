@@ -65,8 +65,9 @@ export function PhaseRail({
   useEffect(() => {
     if (lastPhase.current === rail.phase) return;
     lastPhase.current = rail.phase;
-    // The phase's sound plays with its flash, and under reduced motion too (docs/design-system-table.md, Sound).
-    playSound("dread.phase");
+    // A new round's sound plays with the Resource phase's flash, and under reduced motion too; the other phases are quiet
+    // (docs/design-system-table.md, Sound).
+    if (rail.phase.toLowerCase() === ROUND_PHASES[0]?.toLowerCase()) playSound("dread.phase");
     if (scale > 0) flash.set(withSequence(withTiming(1, timing(MOTION.railFlashIn, scale)), withTiming(0, timing(MOTION.railFlashOut, scale))));
   }, [rail.phase, scale, flash]);
   const glow = useAnimatedStyle(() => ({ opacity: 0.55 + 0.45 * flash.get() }));

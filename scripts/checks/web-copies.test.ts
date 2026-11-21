@@ -55,8 +55,10 @@ const COPIES: readonly { phone: string; web: string; from?: string; to?: string;
       ["detail={AWAKE_LINE}", "detail={noBattery(AWAKE_LINE)}"],
       ['          <SettingSwitch roomy label="Haptics" detail={HAPTICS_LINE} value={settings.haptics} onChange={(haptics) => onChange({ haptics })} testID={id("haptics")} />\n', ""],
       // The web and the desktop play no sound yet (src/ui/sound/sound.ts).
+      ["Motion and feel (Animation speed, Reduce motion, Combat spotlight, Haptics), Sound (Sound effects and their volume, only in a bundle packed with the sounds) and At the table", "Motion and feel (Animation speed, Reduce motion, Combat spotlight, Haptics) and At the table"],
+      ['  groups = ["display", "performance", "motion", "sound", "table"],', '  groups = ["display", "performance", "motion", "table"],'],
       [
-        '          {/* Only a bundle packed with the sounds can play them (src/ui/sound/sound.ts). */}\n          {SOUNDS_BUNDLED ? <SettingSwitch roomy label="Sound effects" detail={SOUNDS_LINE} value={settings.sounds} onChange={(sounds) => onChange({ sounds })} testID={id("sounds")} /> : null}\n',
+        '      {/* Only a bundle packed with the sounds can play them (src/ui/sound/sound.ts). */}\n      {groups.includes("sound") && SOUNDS_BUNDLED ? (\n        <SettingGroup title="Sound" testID={id("sound")} first={first && top === "sound"}>\n          <SettingSwitch roomy label="Sound effects" detail={SOUNDS_LINE} value={settings.sounds} onChange={(sounds) => onChange({ sounds })} testID={id("sounds")} />\n          <VolumeSlider label="Effects volume" detail={EFFECTS_VOLUME_LINE} value={settings.soundVolume} dim={!settings.sounds} onChange={(soundVolume) => setVolume(onChange, soundVolume)} testID={id("sound-volume")} />\n        </SettingGroup>\n      ) : null}\n\n',
         "",
       ],
       ["      ) : null}\n    </>\n", '      ) : null}\n\n      {groups.includes("table") ? extra : null}\n    </>\n'],

@@ -66,7 +66,7 @@ Win and loss stings may be cut from The Return of the King (win) and Hope Fails 
 ## Player and settings
 
 - One `expo-audio` player per active loop, beside the sound effects' players (`src/ui/sound/sound.ts`), with the same audio session: the silent switch, mixed with the player's own music, stopped when the app leaves the foreground.
-- Settings, Motion and feel: Music (on) and a music volume, beside Sound effects; the row shows only in a bundle that carries the music.
+- Settings, the Sound group: Music (on) and a Music volume row (`VolumeSlider`), under Sound effects and Effects volume (user request, 2026-11-21); they show only in a bundle that carries the music.
 
 ## Steps
 

@@ -145,7 +145,7 @@ export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
               <SettingsRows settings={settings} onChange={change} always={always} testPrefix="app-settings" groups={["display", "performance"]} />
             </View>
             <View className="flex-1">
-              <SettingsRows settings={settings} onChange={change} always={always} testPrefix="app-settings" groups={["motion", "table"]} stops />
+              <SettingsRows settings={settings} onChange={change} always={always} testPrefix="app-settings" groups={["motion", "sound", "table"]} stops />
               {about}
             </View>
           </View>

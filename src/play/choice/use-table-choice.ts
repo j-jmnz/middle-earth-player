@@ -8,7 +8,7 @@ import { useStore } from "zustand";
 import { actionsSheet, commitSheet, playSheet, windowSheet } from "./bar-sheets.ts";
 import type { BeatStore } from "../store/beat-store.ts";
 import { tickRefused, tickSent } from "../../ui/haptics.ts";
-import { playSound } from "../../ui/sound/sound.ts";
+import { playSound, playUndo } from "../../ui/sound/sound.ts";
 import { pointTitle } from "../phases/rail.ts";
 import { isFreeResponse, nextStopTitle, passableWindow } from "../phases/stops.ts";
 import { useAutoAnswer, useBanner, useGuide, useSettle } from "./table-hooks.ts";
@@ -91,10 +91,11 @@ export type TableChoice = {
   closeOverlay: () => void;
 };
 
-// The feedback of a sent or refused intent: the haptic tick and its sound, at the same moment (docs/design-system-table.md, Sound).
+// The feedback of a sent or refused intent (docs/design-system-table.md, Haptics and Sound).
+// An accepted intent plays no sound of its own: what it changes on the table (a card, a token, the threat, a strike) has one, and a
+// click over it would cover it.
 function sentFeedback(): void {
   tickSent();
-  playSound("ui.confirm");
 }
 
 function refusedFeedback(): void {
@@ -242,7 +243,7 @@ export function useTableChoice({
     // Undo goes back exactly when there is an intent to take back, so the tick can play before it does the work.
     if (store.getState().history.length === 0) return;
     tickSent();
-    playSound("ui.back");
+    playUndo();
     store.getState().undo();
     reset();
     resetReader("undo");

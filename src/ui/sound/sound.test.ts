@@ -5,7 +5,7 @@ import { tableSettings } from "../table-settings.ts";
 
 const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[], moded: 0 }));
 vi.mock("react-native", () => ({ Platform: { OS: "ios" } }));
-vi.mock("./bundled.ts", () => ({ bundledSounds: { "ui.confirm": 1, "card.land": 2 } }));
+vi.mock("./bundled.ts", () => ({ bundledSounds: { "ui.confirm": 1, "card.land": 2, "ui.back": 3 } }));
 vi.mock("expo-audio", () => ({
   setAudioModeAsync: () => {
     calls.moded += 1;
@@ -17,7 +17,7 @@ vi.mock("expo-audio", () => ({
   },
 }));
 
-const { playSound, SOUNDS_BUNDLED } = await import("./sound.ts");
+const { playSound, playUndo, SOUNDS_BUNDLED } = await import("./sound.ts");
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -40,7 +40,7 @@ describe("sound effects", () => {
     vi.advanceTimersByTime(100);
     playSound("card.land");
     expect(calls.played).toEqual([1, 2]);
-    expect(calls.created.sort()).toEqual([1, 2]);
+    expect(calls.created.sort()).toEqual([1, 2, 3]);
     expect(calls.moded).toBe(1);
   });
 
@@ -62,6 +62,24 @@ describe("sound effects", () => {
     vi.advanceTimersByTime(1000);
     tableSettings.getState().update({ sounds: false });
     playSound("ui.confirm");
+    expect(calls.played).toEqual([]);
+  });
+
+  it("keeps the table quiet for a moment after an Undo, but not the interface", () => {
+    vi.advanceTimersByTime(1000);
+    playUndo();
+    playSound("card.land");
+    playSound("ui.confirm");
+    vi.advanceTimersByTime(900);
+    playSound("card.land");
+    expect(calls.played).toEqual([3, 1, 2]);
+  });
+
+  it("plays nothing at a volume of 0", () => {
+    vi.advanceTimersByTime(1000);
+    tableSettings.getState().update({ soundVolume: 0 });
+    playSound("ui.confirm");
+    tableSettings.getState().update({ soundVolume: 0.8 });
     expect(calls.played).toEqual([]);
   });
 });

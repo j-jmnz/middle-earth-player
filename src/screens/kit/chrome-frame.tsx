@@ -166,15 +166,7 @@ export function NavBar({
   return (
     // box-none: floating over a scrolling page, the bar takes only its buttons' touches, so the rows under its empty middle stay live.
     <View pointerEvents="box-none" className="min-h-14 flex-row items-center justify-between gap-3 py-1">
-      <IconButton
-        chevron
-        testID={backTestID}
-        label={backLabel === "Back" ? "Back" : `Back to ${backLabel}`}
-        onPress={() => {
-          playSound("ui.back");
-          onBack();
-        }}
-      />
+      <IconButton chevron testID={backTestID} label={backLabel === "Back" ? "Back" : `Back to ${backLabel}`} onPress={onBack} />
       {title ? (
         <View className="flex-1 items-center">
           <Text accessibilityRole="header" numberOfLines={wrap ? 2 : 1} className={wrap ? "text-center font-display text-title text-bone" : "font-display text-title text-bone"}>
@@ -417,9 +409,13 @@ export function OutcomeTitle({ won, scenario, testID, ended }: { won: boolean; s
   const big = size === "compact" ? 50 : 72;
   const ring = (size === "compact" ? 240 : 330) * s;
   const light = t.depth === "light";
-  // The win or loss sting plays as the title shows; an end plays none (docs/design-system-table.md, Sound).
+  // The win or loss sting plays once, as the title first shows; an end plays none, and a screen shown again by Activity does not
+  // play it again (docs/design-system-table.md, Sound).
+  const stung = useRef(false);
   useEffect(() => {
-    if (ended !== true) playSound(won ? "dread.win" : "dread.loss");
+    if (stung.current || ended === true) return;
+    stung.current = true;
+    playSound(won ? "dread.win" : "dread.loss");
   }, [won, ended]);
   // An end (The Black Gate Opens) is neither: muted, with no glow or red.
   const tone = ended === true ? palette.muted : won ? (light ? palette.accent : palette.glow) : palette.threat;

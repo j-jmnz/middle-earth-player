@@ -6,6 +6,7 @@
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from "expo-audio";
 import { Platform } from "react-native";
 
+import { accessibility } from "../accessibility.ts";
 import { tableSettings } from "../table-settings.ts";
 import { bundledSounds } from "./bundled.ts";
 import type { SoundSlot } from "./slots.ts";
@@ -13,7 +14,12 @@ import type { SoundSlot } from "./slots.ts";
 // The same sound asked for again this soon (cards drawn in a row, tokens landing together) is not restarted: one plays for all.
 const REPEAT_MS = 60;
 
+// After an Undo, the table's own sounds (the threat dial, the rail, the cards and tokens moving back) stay quiet this long: the
+// state it restores is not news, and Undo has its own sound.
+const UNDO_QUIET_MS = 800;
+
 const players = new Map<SoundSlot, AudioPlayer>();
+let quietUntil = 0;
 const lastPlayed = new Map<SoundSlot, number>();
 let moded = false;
 
@@ -39,18 +45,30 @@ function startSession(): void {
 
 /** Plays a slot's sound from its start, when the setting is on and this bundle has the file. */
 export function playSound(slot: SoundSlot): void {
-  if (!SOUNDS_BUNDLED || !tableSettings.getState().settings.sounds) return;
+  const { sounds, soundVolume } = tableSettings.getState().settings;
+  if (!SOUNDS_BUNDLED || !sounds || soundVolume <= 0) return;
   const source = bundledSounds[slot];
   if (source == null) return;
   const now = Date.now();
+  const ui = slot.startsWith("ui.");
+  // A screen reader plays its own sound for each control it activates or moves to: the interface sounds would double them.
+  if (ui && accessibility().screenReader) return;
+  if (!ui && now < quietUntil) return;
   if (now - (lastPlayed.get(slot) ?? -Infinity) < REPEAT_MS) return;
   lastPlayed.set(slot, now);
   try {
     startSession();
     const player = playerOf(slot, source);
+    player.volume = soundVolume;
     player.seekTo(0).catch(() => undefined);
     player.play();
   } catch {
     // A platform without the module.
   }
+}
+
+/** Undo's sound, and quiet for the table's sounds of the state it restores (UNDO_QUIET_MS). */
+export function playUndo(): void {
+  playSound("ui.back");
+  quietUntil = Date.now() + UNDO_QUIET_MS;
 }

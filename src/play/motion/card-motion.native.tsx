@@ -158,7 +158,9 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
   );
   // The state's sounds (motion-sounds.ts), on the same clocks and by the same rule as the landing tick: each as its clock passes it,
   // none for a state that snaps, waits or is jumped to its end.
-  const cues = motionCues(moves.motions, moves.ghosts, track.layout.slots);
+  // A card the spotlight destroyed already had its kill and its death at the hit stop: it shakes away without the discard sound.
+  const killed = clashes.some((clash) => clash.destroyed);
+  const cues = motionCues(moves.motions, moves.ghosts, track.layout.slots).filter((cue) => cue.slot !== "card.discard" || !killed);
   const cueAt = cues.map((cue) => cue.at * k);
   const cueSound = cues.map((cue) => cue.slot);
   useAnimatedReaction(
