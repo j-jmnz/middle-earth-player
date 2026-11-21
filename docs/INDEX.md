@@ -218,7 +218,7 @@ Read the sections your task touches.
 - `docs/design-system.md` — Design system — Carved Stone (~37.3K tok)
   - 7–20 Direction (~660)
   - 21–34 Standards (~750) ← 1
-  - 35–45 Performance (~720) ← 4
+  - 35–45 Performance (~740) ← 4
   - 46–84 Color (~1.5K) ← 2
   - 85–107 Surfaces (~850) ← 1
   - 108–129 Type (~1.5K) ← 13

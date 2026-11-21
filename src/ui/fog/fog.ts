@@ -60,6 +60,25 @@ export function maskStops(invert: boolean | undefined): { positions: number[]; a
   return invert ? { positions: [0.3, 1], alphas: [0, 1] } : { positions: [0.1, 0.85], alphas: [1, 0] };
 }
 
+/**
+ * The box a layer draws in, in points of a `width` × `height` box: the whole box, or for a mask that fades out, only its ellipse's bounds
+ * at the radius where it is gone (`maskStops`), since the layer draws nothing outside it. Rounded out to whole points plus one, so no
+ * edge pixel the mask would still touch is cut; the shader and the gradient keep the whole box's coordinates, so the pixels are the same.
+ */
+export function layerBox(layer: FogLayer, width: number, height: number): { x: number; y: number; width: number; height: number } {
+  const { mask } = layer;
+  if (!mask || layer.invert) return { x: 0, y: 0, width, height };
+  const gone = maskStops(false).positions[1] ?? 1;
+  // The gradient's radius is at least 1 point across (EllipseGradient, fog.native.tsx); its height is the ellipse's own.
+  const rx = Math.max(mask.rx * width, 1) * gone;
+  const ry = mask.ry * height * gone;
+  const x0 = Math.max(0, Math.floor(mask.cx * width - rx) - 1);
+  const y0 = Math.max(0, Math.floor(mask.cy * height - ry) - 1);
+  const x1 = Math.min(width, Math.ceil(mask.cx * width + rx) + 1);
+  const y1 = Math.min(height, Math.ceil(mask.cy * height + ry) + 1);
+  return { x: x0, y: y0, width: Math.max(0, x1 - x0), height: Math.max(0, y1 - y0) };
+}
+
 /** Fine grey noise laid over a whole scene. */
 export const gritTexture: FogTexture = { freq: [0.85, 0.85], octaves: 2, seed: 2, rgb: [128, 128, 128], gain: 0, bias: 1, tile: [260, 260], drift: 0 };
 
