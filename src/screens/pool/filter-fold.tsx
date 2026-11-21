@@ -9,7 +9,7 @@ import { useOpenMotion } from "../../ui/motion-run";
 import { MOTION } from "../../ui/motion-tokens";
 import { useUiScale } from "../../ui/ui-scale";
 import { usePalette } from "../kit/palette-hook";
-import { OPEN_FOLD, foldOnScroll, openAt, shadeOf } from "./scroll-fold";
+import { FOLD_Z, OPEN_FOLD, foldOnScroll, openAt, shadeOf } from "./scroll-fold";
 
 export type FilterFoldState = {
   // Whether the filters fold at all here: they then sit over the top of the list (FilterFold), and the list starts under them.
@@ -96,7 +96,7 @@ export function FilterFold({ fold, column = false, children }: { fold: FilterFol
     // inside.
     <View
       className="absolute -left-6 -right-6 top-0 overflow-hidden"
-      style={{ zIndex: 1, height }}
+      style={{ zIndex: FOLD_Z, height }}
       pointerEvents={fold.folded ? "none" : "box-none"}
       onFocus={fold.folded ? fold.reveal : undefined}
     >

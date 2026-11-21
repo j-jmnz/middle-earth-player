@@ -290,7 +290,7 @@ Two files, two handles, both reachable from screens.
 
 `useSQLiteContext` returns the nearest `SQLiteProvider`. Nesting the two providers and reading through that single hook leaves `catalog.db` unreachable, and the suspense helper keeps one module-level database and closes the previous file. Open each file with its own handle and pass both down.
 
-On the web and the desktop, Settings backs up and restores `user.db` (`src/screens/settings/web/`; the phone's `view.tsx` and `setting-rows.tsx` stay as they are, and their `.canvaskit` variants add a Saves group through the `ExtraSettingsRows` context in `src/ui/web`). The backup is `serializeAsync` of the open connection. A restore opens the file with `deserializeDatabaseAsync` as a copy in memory and checks it there (`quick_check`, the `__drizzle_migrations` rows against the journal in `drizzle/meta`, the migrations run on an older copy, `readSaveChecked` on every save); only then does one `BEGIN IMMEDIATE` transaction on the live connection replace the rows of every table but `meta`, `booklets` and `image_files`. A transaction cut short by closing the tab rolls back when the database next opens, so the old saves stay. The page reloads after it so every store reads the restored rows.
+On the web and the desktop, Settings backs up and restores `user.db` (`src/screens/settings/web/`; `view.canvaskit.tsx` hands the phone's `view.tsx` the Saves page, and `src/play/chrome/settings-platform.canvaskit.ts` says the web and the desktop show that category). The backup is `serializeAsync` of the open connection. A restore opens the file with `deserializeDatabaseAsync` as a copy in memory and checks it there (`quick_check`, the `__drizzle_migrations` rows against the journal in `drizzle/meta`, the migrations run on an older copy, `readSaveChecked` on every save); only then does one `BEGIN IMMEDIATE` transaction on the live connection replace the rows of every table but `meta`, `booklets` and `image_files`. A transaction cut short by closing the tab rolls back when the database next opens, so the old saves stay. The page reloads after it so every store reads the restored rows.
 
 `image_files` stores code, path, width, height, byte size, media type, and sha256. The bytes live under the document directory. A catalog update deletes a file only when that code's hash changed.
 
@@ -332,7 +332,7 @@ Every card's picture is bundled (brief, Card images): `scanAssets` in `src/scree
 
 ## Screens
 
-Expo Router. The app opens on the campaign list. Its dock (`(tabs)`) is Campaigns, Scenarios, Decks, Cards and Rules (user requests, 2026-10-25 and 2026-10-28); Settings is a pushed route, `routes/settings.tsx`, opened by the gear at the top right of each hub; in an expanded window (840 points and wider, by size class, not device) the dock is a rail down the left edge with the same tabs and Settings at its foot.
+Expo Router. The app opens on the campaign list. Its dock (`(tabs)`) is Campaigns, Scenarios, Decks, Cards and Rules (user requests, 2026-10-25 and 2026-10-28); Settings is a pushed route, `routes/settings/index.tsx` with a page per category, `routes/settings/[category].tsx`, opened by the gear at the top right of each hub; in an expanded window (840 points and wider, by size class, not device) the dock is a rail down the left edge with the same tabs and Settings at its foot.
 
 | Route | Reads | Writes |
 | --- | --- | --- |
