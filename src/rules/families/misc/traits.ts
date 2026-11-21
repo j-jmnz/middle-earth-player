@@ -4,7 +4,7 @@
 // lasting effect) and "Lothíriel gains the Rohan trait" (a constant), held as the flags traitRohan and traitGondor. And the
 // count of different Traits a player's characters have.
 import { characters } from "../../combat/combat.ts";
-import { grantedTraits } from "../../interpret/conditions.ts";
+import { countedTraits, grantedTraits } from "../../interpret/conditions.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -19,9 +19,26 @@ export function flaggedTrait(state: ScenarioState, id: string, trait: string): b
   return false;
 }
 
+// The Traits flaggedTrait finds on the card: those a traitGained modifier names, and Rohan, Gondor or Mount from their flags.
+export function flaggedTraits(state: ScenarioState, id: string): string[] {
+  if (state.modifiers.length === 0) return [];
+  const named = state.modifiers.flatMap((modifier) => (modifier.stat === "traitGained" && modifier.trait != null && modifier.instanceId === id && modifierActive(state, modifier) ? [modifier.trait] : []));
+  return [...new Set([...named, ...["Rohan", "Gondor", "Mount"].filter((trait) => flaggedTrait(state, id, trait))])];
+}
+
 /** A Trait the holder loses, printed or gained ("Attached character loses the Eagle trait", 900607:A:2): the flag `losesEagle`. */
 export function lostTrait(state: ScenarioState, id: string, trait: string): boolean {
   return trait === "Eagle" && flagged(state, id, "losesEagle");
+}
+
+// Every Trait the card has now: its printed ones (unless blanked or lost) and those it gains from an attachment, a modifier or a
+// "counts as" record (rr.traits). A "shares a Trait" check compares these lists, so a gained Trait counts on both sides (22027:A:2).
+export function traitsOf(state: ScenarioState, id: string, ctx: ReduceContext): string[] {
+  const instance = state.cards[id];
+  if (instance == null) return [];
+  const printed = flagged(state, id, "blanksTraits") ? [] : printedOf(ctx.cards, instance.code).traits;
+  const all = new Set([...printed, ...grantedTraits(state, id, ctx), ...flaggedTraits(state, id), ...countedTraits(state, id, ctx)]);
+  return [...all].filter((trait) => !lostTrait(state, id, trait));
 }
 
 // "When counting the number of Dwarf characters you control, Bombur counts as two": the extra cards a count of Dwarf characters
@@ -36,11 +53,7 @@ export function countsExtra(state: ScenarioState, found: readonly string[], spec
 export function distinctTraitCount(state: ScenarioState, seat: number, ctx: ReduceContext): number {
   const traits = new Set<string>();
   for (const id of characters(state, seat, ctx.cards)) {
-    const card = state.cards[id];
-    if (!card) continue;
-    for (const trait of printedOf(ctx.cards, card.code).traits) traits.add(trait);
-    for (const trait of grantedTraits(state, id, ctx)) traits.add(trait);
-    for (const trait of ["Rohan", "Gondor"]) if (flaggedTrait(state, id, trait)) traits.add(trait);
+    for (const trait of traitsOf(state, id, ctx)) traits.add(trait);
   }
   return traits.size;
 }

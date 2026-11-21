@@ -64,9 +64,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 34, scenarios: ["temple-of-the-deceived"], note: "An ally turned up from under the active location enters play, and the cards that answer an ally entering play hear it." },
   { version: 35, scenarios: "all", note: "An attachment you play or put into play on another player's character is controlled by that player, who triggers its abilities; it still goes to your discard pile." },
   { version: 35, scenarios: "all", note: "When an effect targets one of several copies of a card in play, you choose the copy: Mr. Underhill bars the Black Rider you pick, and an attachment like Pale Blade goes on the enemy you pick." },
+  { version: 36, scenarios: "all", note: "A Trait a card gains counts when a card asks whether two cards share a Trait: with Éomer in play, Lothíriel can put a Rohan ally from your hand into the quest." },
 ];
 
-export const ENGINE_VERSION = 35;
+export const ENGINE_VERSION = 36;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {
