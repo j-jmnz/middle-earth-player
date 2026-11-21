@@ -1,7 +1,7 @@
 // Rules: rr.threat-elimination-level, rr.player-elimination (data/rules/entries.json).
 import { describe, expect, it } from "vitest";
 
-import { ELIMINATION_THREAT, threatDelta, threatDeltaWords, threatLevel, threatMeter } from "./threat-level.ts";
+import { ELIMINATION_THREAT, threatDelta, threatDeltaWords, threatLevel, threatMeter, threatSound } from "./threat-level.ts";
 
 describe("threat dial", () => {
   it("fills toward the elimination level, 50", () => {
@@ -24,5 +24,16 @@ describe("threat dial", () => {
     expect(threatDelta(30, 30)).toBeNull();
     expect(threatDeltaWords("Threat", 30, 24)).toBe("Threat lowered by 6, now 24");
     expect(threatDeltaWords("Player 2 threat", 28, 30)).toBe("Player 2 threat raised by 2, now 30");
+  });
+});
+
+describe("threatSound", () => {
+  it("rises, falls, and warns when the threat crosses into critical", () => {
+    expect(threatSound(30, 32)).toBe("dread.threat-up");
+    expect(threatSound(46, 40)).toBe("dread.threat-down");
+    expect(threatSound(43, 45)).toBe("dread.danger");
+    expect(threatSound(45, 47)).toBe("dread.threat-up");
+    expect(threatSound(80, 90, 99)).toBe("dread.danger");
+    expect(threatSound(20, 20)).toBeNull();
   });
 });

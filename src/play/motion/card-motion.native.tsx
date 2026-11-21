@@ -15,6 +15,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import type { Clash } from "../store/clash.ts";
 import { cardFrame } from "../canvas/frame.ts";
 import { tickLand } from "../../ui/haptics.ts";
+import { playSound } from "../../ui/sound/sound.ts";
 import type { CardSlot, TableLayout } from "../layout/layout.ts";
 import { easingOf, useMotionScale } from "../../ui/motion-run.ts";
 import { ghostPoseAt, landAt, motionEnd, motionSpan, poseAt } from "./pose.ts";
@@ -24,6 +25,7 @@ import { motionsBetween, slotRotation, still, type Ghost, type Motion } from "./
 import type { TableStore } from "../store/store.ts";
 import { fxPlan, fxSpan, type Fx } from "./token-fx.ts";
 import { tokenDeltas } from "./token-deltas.ts";
+import { fxCues, motionCues } from "./motion-sounds.ts";
 import { useSpotlightHold } from "../spotlight/use-spotlight.ts";
 
 /** What one state's motion is: the cards' motions, the cards that left, the token changes, and which state it is (`at`). */
@@ -153,6 +155,30 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
       if (was < landMs && now >= landMs) scheduleOnRN(tickLand);
     },
     [landMs, scaled],
+  );
+  // The state's sounds (motion-sounds.ts), on the same clocks and by the same rule as the landing tick: each as its clock passes it,
+  // none for a state that snaps, waits or is jumped to its end.
+  const cues = motionCues(moves.motions, moves.ghosts, track.layout.slots);
+  const cueAt = cues.map((cue) => cue.at * k);
+  const cueSound = cues.map((cue) => cue.slot);
+  useAnimatedReaction(
+    () => progress.get() * scaled,
+    (now, was) => {
+      if (scaled === 0 || was == null || now <= was || now >= scaled) return;
+      for (let i = 0; i < cueAt.length; i += 1) if (was <= cueAt[i] && now > cueAt[i]) scheduleOnRN(playSound, cueSound[i]);
+    },
+    [cueAt, cueSound, scaled],
+  );
+  const pops = fxCues(moves.fx);
+  const popAt = pops.map((cue) => cue.at * k);
+  const popSound = pops.map((cue) => cue.slot);
+  useAnimatedReaction(
+    () => fxProgress.get() * fxScaled,
+    (now, was) => {
+      if (fxScaled === 0 || was == null || now <= was || now >= fxScaled) return;
+      for (let i = 0; i < popAt.length; i += 1) if (was <= popAt[i] && now > popAt[i]) scheduleOnRN(playSound, popSound[i]);
+    },
+    [popAt, popSound, fxScaled],
   );
   const clock = useMemo((): Clock => ({ progress, epoch, at: moves.at, k, span: Math.max(1, scaled) }), [progress, epoch, moves.at, k, scaled]);
   const fxClock = useMemo((): Clock => ({ progress: fxProgress, epoch, at: moves.at, k, span: Math.max(1, fxScaled) }), [fxProgress, epoch, moves.at, k, fxScaled]);

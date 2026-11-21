@@ -1,6 +1,6 @@
 // The chrome's frame (docs/design-system.md, Components): the page and its scrolling body, the top bar, rows, panels, stat tiles,
 // the pinned action bar, the paper sheet and the outcome word. Re-exported by chrome.tsx.
-import { useContext, useRef, type ComponentRef, type ReactNode, type RefObject } from "react";
+import { useContext, useEffect, useRef, type ComponentRef, type ReactNode, type RefObject } from "react";
 import { Pressable, ScrollView, View, type DimensionValue, type ViewProps } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { vars } from "nativewind";
@@ -16,6 +16,7 @@ import { Eyebrow } from "./chrome-text";
 import { usePalette } from "./palette-hook";
 import { themeVars } from "./palette.js";
 import { GameIcon } from "../../ui/game-icon";
+import { playSound } from "../../ui/sound/sound";
 import type { IconName } from "../../ui/icon-map";
 import { longPressA11y } from "../../ui/long-press-action";
 import { useOpenFocus } from "../../ui/use-open-focus";
@@ -165,7 +166,15 @@ export function NavBar({
   return (
     // box-none: floating over a scrolling page, the bar takes only its buttons' touches, so the rows under its empty middle stay live.
     <View pointerEvents="box-none" className="min-h-14 flex-row items-center justify-between gap-3 py-1">
-      <IconButton chevron testID={backTestID} label={backLabel === "Back" ? "Back" : `Back to ${backLabel}`} onPress={onBack} />
+      <IconButton
+        chevron
+        testID={backTestID}
+        label={backLabel === "Back" ? "Back" : `Back to ${backLabel}`}
+        onPress={() => {
+          playSound("ui.back");
+          onBack();
+        }}
+      />
       {title ? (
         <View className="flex-1 items-center">
           <Text accessibilityRole="header" numberOfLines={wrap ? 2 : 1} className={wrap ? "text-center font-display text-title text-bone" : "font-display text-title text-bone"}>
@@ -408,6 +417,10 @@ export function OutcomeTitle({ won, scenario, testID, ended }: { won: boolean; s
   const big = size === "compact" ? 50 : 72;
   const ring = (size === "compact" ? 240 : 330) * s;
   const light = t.depth === "light";
+  // The win or loss sting plays as the title shows; an end plays none (docs/design-system-table.md, Sound).
+  useEffect(() => {
+    if (ended !== true) playSound(won ? "dread.win" : "dread.loss");
+  }, [won, ended]);
   // An end (The Black Gate Opens) is neither: muted, with no glow or red.
   const tone = ended === true ? palette.muted : won ? (light ? palette.accent : palette.glow) : palette.threat;
   return (

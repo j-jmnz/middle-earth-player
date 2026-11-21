@@ -1,5 +1,5 @@
 // The app's settings (docs/design-system-table.md, Overview, docs/design-system.md, Settings): the theme and the UI scale,
-// haptics and reduced motion, the card picture quality and the moving fog, keeping the screen awake, where the table stops to ask
+// haptics, sound effects and reduced motion, the card picture quality and the moving fog, keeping the screen awake, where the table stops to ask
 // in a step's action window, the free Responses the player always uses, the readability options and the first-game guide. Kept in
 // user.db by the screens (src/screens/settings/store.ts); a vanilla Zustand store here so src/play reads them without importing screens.
 // A setting is the player's own standing answer, chosen on purpose: that is the confirmation an auto-pass or an auto-use
@@ -33,6 +33,8 @@ export type TableSettings = {
   uiScale: UiScaleOption;
   // A buzz on the table's key moments. Off plays none.
   haptics: boolean;
+  // Sound effects on the table's and the screens' moments (src/ui/sound/sound.ts). Off plays none; a bundle without the files plays none either.
+  sounds: boolean;
   // Reduced motion: follow the phone's setting, or always snap whatever the phone says.
   reduceMotion: ReduceMotionOption;
   // Keep the screen from sleeping while a table is open.
@@ -89,7 +91,7 @@ export function strongOutlines(option: StrongOutlinesOption, increaseContrast: b
 // The stops the video uses: after staging ("the golden action window") and before the shadow card turns.
 export const DEFAULT_STOPS: readonly string[] = ["3.3", "shadow"];
 
-export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: "system", guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard", bannerCloses: "timer", titleFace: "carved", timingTips: false, checkUpdates: true, debugTools: false };
+export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: "system", guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, sounds: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard", bannerCloses: "timer", titleFace: "carved", timingTips: false, checkUpdates: true, debugTools: false };
 
 /** Settings read back from storage: unknown keys dropped, missing ones defaulted, wrong types replaced. */
 export function parseSettings(raw: unknown): TableSettings {
@@ -112,6 +114,7 @@ export function parseSettings(raw: unknown): TableSettings {
     spotlight: flag(value.spotlight, true),
     uiScale: UI_SCALE_OPTIONS.find((option) => option === value.uiScale) ?? DEFAULT_SETTINGS.uiScale,
     haptics: flag(value.haptics, DEFAULT_SETTINGS.haptics),
+    sounds: flag(value.sounds, DEFAULT_SETTINGS.sounds),
     reduceMotion: REDUCE_MOTION_OPTIONS.find((option) => option === value.reduceMotion) ?? DEFAULT_SETTINGS.reduceMotion,
     keepAwake: flag(value.keepAwake, DEFAULT_SETTINGS.keepAwake),
     theme: THEME_OPTIONS.find((option) => option === value.theme) ?? DEFAULT_SETTINGS.theme,

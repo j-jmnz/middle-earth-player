@@ -11,6 +11,7 @@ import { IconButton } from "../kit/chrome-buttons";
 import { useTitleShadow } from "../kit/chrome-text";
 import { usePalette } from "../kit/palette-hook";
 import { GameIcon } from "../../ui/game-icon";
+import { playSound } from "../../ui/sound/sound";
 import { iconAspect, type IconName } from "../../ui/icon-map";
 import { raisedEdgeOf } from "../../ui/surfaces";
 import { withAlphaHex } from "../../ui/tokens";
@@ -68,7 +69,9 @@ function tabItem(props: TabBarProps, route: TabBarProps["state"]["routes"][numbe
       accessibilityLabel: options.tabBarAccessibilityLabel,
       onPress: () => {
         const event = emitter.emit({ type: "tabPress", target: route.key, canPreventDefault: true });
-        if (!focused && !event.defaultPrevented) navigateToTab(route.key);
+        if (focused || event.defaultPrevented) return;
+        playSound("ui.tab");
+        navigateToTab(route.key);
       },
     },
   };

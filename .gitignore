@@ -76,6 +76,10 @@ agent-tools/
 *.pdf
 assets/booklets/
 
+# sound effects cut from the player's own game files (pnpm assets sounds); the folder stays for require.context
+assets/sounds/*
+!assets/sounds/.gitkeep
+
 # card images; shell icons stay
 *.jpg
 # what assets scans packed each picture from

@@ -31,6 +31,14 @@ const COPIES: readonly { phone: string; web: string; from?: string; to?: string;
         '// The web build lists the table and has no canvas to play a spotlight on.\nconst CANVAS = Platform.OS !== "web";',
         "// A canvas draws the spotlight on every platform (the web's once CanvasKit has loaded, and until then the list table ends each gate: reader-gate.ts).\nconst CANVAS = true;",
       ],
+      // The web and the desktop play no sound yet (src/ui/sound/sound.ts): the strikes' sounds stay on the phone.
+      ['import { tickImpact } from "../../ui/haptics.ts";\nimport { playSound } from "../../ui/sound/sound.ts";\nimport { strikeSounds } from "./strike-sounds.ts";\n', 'import { tickImpact } from "../../ui/haptics.ts";\n'],
+      [
+        "  // Each strike's sound at its hit stop (strike-sounds.ts), on the same clock as the impact haptic.\n  const struck = (plan?.clashes ?? []).flatMap((clash, index) => strikeSounds(clash).map((slot) => ({ at: hits[index] ?? 0, slot })));\n",
+        "",
+      ],
+      ["      for (const cue of struck) if (was < cue.at && now >= cue.at) scheduleOnRN(playSound, cue.slot);\n", ""],
+      ["    [hits, total, leaveAt, leave, struck],\n", "    [hits, total, leaveAt, leave],\n"],
     ],
   },
   {
@@ -46,6 +54,11 @@ const COPIES: readonly { phone: string; web: string; from?: string; to?: string;
       ["detail={fogLine(light, reduced)}", "detail={noBattery(fogLine(light, reduced))}"],
       ["detail={AWAKE_LINE}", "detail={noBattery(AWAKE_LINE)}"],
       ['          <SettingSwitch roomy label="Haptics" detail={HAPTICS_LINE} value={settings.haptics} onChange={(haptics) => onChange({ haptics })} testID={id("haptics")} />\n', ""],
+      // The web and the desktop play no sound yet (src/ui/sound/sound.ts).
+      [
+        '          {/* Only a bundle packed with the sounds can play them (src/ui/sound/sound.ts). */}\n          {SOUNDS_BUNDLED ? <SettingSwitch roomy label="Sound effects" detail={SOUNDS_LINE} value={settings.sounds} onChange={(sounds) => onChange({ sounds })} testID={id("sounds")} /> : null}\n',
+        "",
+      ],
       ["      ) : null}\n    </>\n", '      ) : null}\n\n      {groups.includes("table") ? extra : null}\n    </>\n'],
     ],
   },

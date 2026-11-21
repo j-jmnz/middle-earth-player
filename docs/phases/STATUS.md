@@ -29,6 +29,9 @@ No phase is open.
 - Six Nightmare cards (901810, 904109, 904307, 904308, 904309, 905005) are each a one-card set in the Encounter cards view: their scenario files name a set of their own.
 - The light theme of the Cards tab views, the card-group route and the spoiler ask has not been checked.
 
+### Sound
+- Music, sound on the web and the desktop, and the sound slots not played yet: `docs/plans/sound-and-music.md`.
+
 ### README
 - The README showcase (`scripts/showcase/`): a first full capture run on a Mac or the showcase workflow, its contact sheet checked and failed flows fixed; then a Screens section, each shot a `<picture>` (Rivendell capture for GitHub's light theme, Ringwraiths otherwise) with the captions and alt text of `scripts/showcase/shots.ts`.
 

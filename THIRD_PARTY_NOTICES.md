@@ -13,6 +13,10 @@ Game content appears in these places:
 - `assets/icons/` and `src/ui/icons/` hold game icons built from `data/raw/icons/`.
 - Card images and PDFs are downloaded at build time and never committed.
 
+## Sound effects
+
+A development build can carry sound effects cut from Darkest Dungeon II (© Red Hook Studios) by `pnpm assets sounds --from`, from the player's own copy of the game. They are never committed and no release carries them.
+
 ## Data sources
 
 None of these sources publishes a license for its data, so the data is used as published.

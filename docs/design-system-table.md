@@ -371,6 +371,19 @@ Undo is the first of the dock's quiet pills. It takes back the last choice while
 
 A tick when a button arms, a confirm when an intent is sent or taken back, a reject when the reducer refuses one, a play the heroes cannot pay for is tried, or a card that cannot be played is let go out of the hand scrub, a light tick when a card played from the hand lands (`tickLand`, at most one per new state), a medium impact at a spotlight's hit stop (`tickImpact`, at most one per strike), and the scrub's selection tick (`tickArmed`; no scrub runs during a spotlight). The confirm plays the moment the reducer accepts the intent, before the table redraws and the save is written (a refused intent gets only the reject); the landing tick plays as the card's motion clock passes the landing, so a touch that snaps the motion plays none. On iOS the selection, light and medium impact and warning feedback; on Android the system's Segment tick, Confirm, Reject and Long press constants (`performAndroidHapticsAsync`), which follow the phone's touch-feedback setting, never the vibrator. They add to the screen and never replace it. The **Haptics** setting (`haptics`, on by default) turns all of them off.
 
+
+## Sound
+
+Short sound effects beside the haptics and the motion (user request, 2026-11-18), from one set of slots (`src/ui/sound/slots.ts`) played through `playSound` (`src/ui/sound/sound.ts`). Each plays at the moment its haptic or its motion does, by the same rules: the Sent sound on acceptance, a motion's sound as its clock passes it (none for a state that snaps, waits for a spotlight, or is jumped to its end by a touch or a skip), none on a peek or a handoff.
+
+- **Dock and hand:** a button arms (`ui.select`), an intent is sent (`ui.confirm`), Undo (`ui.back`), a refusal or an unplayable card let go (`ui.error`), a card picked up from the hand to drag (`card.pick`).
+- **Card motions** (`src/play/motion/motion-sounds.ts`, one of each kind a state, at its first moment): drawn (`card.draw`), played and landed (`card.land`), revealed or turned face up (`card.flip`), a shadow card dealt (`dread.shadow`), exhausted or readied (`card.exhaust`, `card.ready`), destroyed or discarded from play (`card.discard`); the token pops on their own clock: a resource, damage or progress placed (`token.resource`, `token.damage`, `token.progress`) or any token taken off (`token.remove`).
+- **Spotlight** (`src/play/spotlight/strike-sounds.ts`), at each hit stop: a block when no damage got through (`combat.block`), a strike (`combat.strike`), a kill (`combat.kill`), with the enemy's death (`combat.enemy-death`) when the players destroyed an enemy.
+- **Dials and rail:** a seat's threat dial rising or falling (`dread.threat-up`, `dread.threat-down`; `threatSound`), or crossing into critical (`dread.danger`); a phase change (`dread.phase`); the quest advance screen (`dread.stage`); the outcome title, Victory or Defeat (`dread.win`, `dread.loss`; an end plays none).
+- **Screens:** a switch turned on or off (`ui.toggle-on`, `ui.toggle-off`), a segmented choice (`ui.select`), a root tab (`ui.tab`), the nav bar's Back (`ui.back`), a sheet or a popover opening and closing (`ui.open`, `ui.close`).
+
+The same slot asked for again within 60 ms plays once. Sounds follow the phone's silent switch, mix with the player's own music and stop with the app. The **Sound effects** setting (`sounds`, on by default) turns all of them off; its row shows only in a bundle that carries the files. The files are cut from the player's own Darkest Dungeon II files (`scripts/build/sound-picks.ts`; user decision, 2026-11-21) and never committed, so every release and CI build carries none and plays none. The web and the desktop play none yet: the copies `scripts/checks/web-copies.test.ts` holds leave the sound lines out. Some slots are packed but not played yet (`docs/plans/sound-and-music.md`).
+
 ## Banner
 
 Code: `moment-banner.tsx`, `banner-span.ts`.

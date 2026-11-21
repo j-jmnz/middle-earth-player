@@ -2,7 +2,7 @@
 // when the new stage asked a question as it was revealed, until that question is answered. Read during the render the moment arrives
 // in, so the table's own answers (use-table-choice.ts, useAutoAnswer) already hold on that render. A combat spotlight plays first.
 // The table opens on it too, at the stage in play (openingLatch).
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useStore } from "zustand";
 
 import { isOver } from "../../rules/engine/undo.ts";
@@ -10,6 +10,7 @@ import { isOver } from "../../rules/engine/undo.ts";
 import { advancedTo, askingStage, callerLastStage, stagesKey, closeLatch, nextLatch, openAdvance, openingLatch, type QuestAdvance, type QuestView } from "./quest-advance.ts";
 import type { TableStore } from "../store/store.ts";
 import { useSpotlightHold } from "../spotlight/use-spotlight.ts";
+import { playSound } from "../../ui/sound/sound.ts";
 
 export type QuestAdvanceState = {
   // The advance on screen, or null; `held` is true from the moment it arrives, also while a spotlight plays before it shows.
@@ -39,5 +40,10 @@ export function useQuestAdvance(store: TableStore): QuestAdvanceState {
   if (next !== latch) setLatch(next);
   const open = openAdvance(next, view);
   const close = useCallback(() => setLatch(closeLatch), []);
+  // The advance's sound plays as its screen shows, once a spotlight before it has ended (docs/design-system-table.md, Sound).
+  const showing = open && !spotlit ? open.seq : null;
+  useEffect(() => {
+    if (showing != null) playSound("dread.stage");
+  }, [showing]);
   return { shown: open && !spotlit ? open : null, held: open != null, asks: open != null && view.asking === open.stageId, close };
 }

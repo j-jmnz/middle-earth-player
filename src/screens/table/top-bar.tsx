@@ -151,6 +151,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
                     label={hand ? hand.label : seatLabel}
                     accessibilityName={threats.length > 1 ? `Player ${threat.seat + 1} threat` : "Threat"}
                     spokenWord="Threat"
+                    voiced
                     limit={direLimit}
                     eliminates={direLimit != null}
                     limitWords={direLimit != null ? `a player is eliminated at ${direLimit}` : undefined}

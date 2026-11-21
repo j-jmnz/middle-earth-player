@@ -7,11 +7,12 @@ import type { ReactNode } from "react";
 import { TextButton } from "../../ui/buttons.tsx";
 import { Segmented } from "../../ui/segmented.tsx";
 import { SettingSwitch } from "../../ui/setting-switch.tsx";
-import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, NONE_YET, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, type AlwaysRow } from "./settings-words.ts";
+import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, NONE_YET, SOUNDS_LINE, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, type AlwaysRow } from "./settings-words.ts";
 import { SPEEDS } from "../../ui/motion-tokens.ts";
 import { useReduceMotion } from "../../ui/motion-run.ts";
 import { BANNER_CLOSES_OPTIONS, CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, REDUCE_MOTION_OPTIONS, STRONG_OUTLINES_OPTIONS, TABLE_LIST_OPTIONS, THEME_OPTIONS, TITLE_FACE_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "../../ui/table-settings.ts";
 import { SectionHeading } from "../../ui/section-heading.tsx";
+import { SOUNDS_BUNDLED } from "../../ui/sound/sound.ts";
 import { useTheme } from "../../ui/theme.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { Text } from "../../ui/text.tsx";
@@ -116,6 +117,8 @@ export function SettingsRows({
           <ChoiceRow title="Banner closes" detail={BANNER_CLOSES_LINE} id={id("banner-closes")} options={BANNER_CLOSES_OPTIONS} words={BANNER_CLOSES_WORDS} value={settings.bannerCloses} onChange={(bannerCloses) => onChange({ bannerCloses })} />
           <SettingSwitch roomy label="Combat spotlight" detail={SPOTLIGHT_LINE} value={settings.spotlight} onChange={(spotlight) => onChange({ spotlight })} testID={id("spotlight")} />
           <SettingSwitch roomy label="Haptics" detail={HAPTICS_LINE} value={settings.haptics} onChange={(haptics) => onChange({ haptics })} testID={id("haptics")} />
+          {/* Only a bundle packed with the sounds can play them (src/ui/sound/sound.ts). */}
+          {SOUNDS_BUNDLED ? <SettingSwitch roomy label="Sound effects" detail={SOUNDS_LINE} value={settings.sounds} onChange={(sounds) => onChange({ sounds })} testID={id("sounds")} /> : null}
         </SettingGroup>
       ) : null}
 

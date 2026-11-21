@@ -8,6 +8,7 @@ import { useStore } from "zustand";
 import { actionsSheet, commitSheet, playSheet, windowSheet } from "./bar-sheets.ts";
 import type { BeatStore } from "../store/beat-store.ts";
 import { tickRefused, tickSent } from "../../ui/haptics.ts";
+import { playSound } from "../../ui/sound/sound.ts";
 import { pointTitle } from "../phases/rail.ts";
 import { isFreeResponse, nextStopTitle, passableWindow } from "../phases/stops.ts";
 import { useAutoAnswer, useBanner, useGuide, useSettle } from "./table-hooks.ts";
@@ -85,6 +86,17 @@ export type TableChoice = {
   foldOutside: () => boolean;
   closeOverlay: () => void;
 };
+
+// The feedback of a sent or refused intent: the haptic tick and its sound, at the same moment (docs/design-system-table.md, Sound).
+function sentFeedback(): void {
+  tickSent();
+  playSound("ui.confirm");
+}
+
+function refusedFeedback(): void {
+  tickRefused();
+  playSound("ui.error");
+}
 
 export function useTableChoice({
   store,
@@ -200,13 +212,13 @@ export function useTableChoice({
     (intent: PlayerIntent) => {
       // The Sent tick plays the moment the reducer accepts the intent, before the next state is built and the save written; a refused intent
       // gets the Refused tick, never both. The moments the table answers after it are answered in the same tap (table-hooks.ts, follow).
-      if (store.getState().dispatch(intent, tickSent)) {
+      if (store.getState().dispatch(intent, sentFeedback)) {
         reset();
         // An accepted send keeps the card the reader last activated, so focus can stay on it in the next moment.
         resetReader("send");
         follow();
       } else {
-        tickRefused();
+        refusedFeedback();
         if (readerMode) announce(store.getState().refusal ?? "");
       }
     },
@@ -223,6 +235,7 @@ export function useTableChoice({
     // Undo goes back exactly when there is an intent to take back, so the tick can play before it does the work.
     if (store.getState().history.length === 0) return;
     tickSent();
+    playSound("ui.back");
     store.getState().undo();
     reset();
     resetReader("undo");
@@ -230,7 +243,7 @@ export function useTableChoice({
   // A payment the pools cannot make: the reject haptic, and the reason on the dock as a reducer refusal shows.
   const refuse = useCallback(
     (reason: string) => {
-      tickRefused();
+      refusedFeedback();
       store.getState().refuse(reason);
       if (readerMode) announce(reason);
     },

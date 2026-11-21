@@ -1,0 +1,56 @@
+// The table's and the screens' sound effects (docs/design-system-table.md, Sound; user request, 2026-11-18). A sound plays at the
+// moment its haptic or its motion does and adds to what the screen shows; it never replaces it. It follows the phone's silent switch
+// and mixes with the player's own music. The Sound effects setting turns them all off. A bundle without the files (every release and
+// CI build: scripts/build/pack-sounds.ts) plays none, and so does the web and the desktop for now. A failed sound is not an error
+// the player should see.
+import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from "expo-audio";
+import { Platform } from "react-native";
+
+import { tableSettings } from "../table-settings.ts";
+import { bundledSounds } from "./bundled.ts";
+import type { SoundSlot } from "./slots.ts";
+
+// The same sound asked for again this soon (cards drawn in a row, tokens landing together) is not restarted: one plays for all.
+const REPEAT_MS = 60;
+
+const players = new Map<SoundSlot, AudioPlayer>();
+const lastPlayed = new Map<SoundSlot, number>();
+let moded = false;
+
+/** Whether this bundle carries any sound and can play it: the Sound effects row shows only then. Fixed when the bundle loads. */
+export const SOUNDS_BUNDLED = Platform.OS !== "web" && Object.keys(bundledSounds).length > 0;
+
+function playerOf(slot: SoundSlot, source: number): AudioPlayer {
+  const existing = players.get(slot);
+  if (existing) return existing;
+  const player = createAudioPlayer(source);
+  players.set(slot, player);
+  return player;
+}
+
+function startSession(): void {
+  if (moded) return;
+  moded = true;
+  // Respects the silent switch, never ducks or stops the player's music, and stops with the app.
+  setAudioModeAsync({ playsInSilentMode: false, interruptionMode: "mixWithOthers", shouldPlayInBackground: false, allowsRecording: false, shouldRouteThroughEarpiece: false }).catch(() => undefined);
+  // Every sound is loaded once the first one is asked for, so the next ones start on time.
+  for (const [slot, source] of Object.entries(bundledSounds) as [SoundSlot, number][]) playerOf(slot, source);
+}
+
+/** Plays a slot's sound from its start, when the setting is on and this bundle has the file. */
+export function playSound(slot: SoundSlot): void {
+  if (!SOUNDS_BUNDLED || !tableSettings.getState().settings.sounds) return;
+  const source = bundledSounds[slot];
+  if (source == null) return;
+  const now = Date.now();
+  if (now - (lastPlayed.get(slot) ?? -Infinity) < REPEAT_MS) return;
+  lastPlayed.set(slot, now);
+  try {
+    startSession();
+    const player = playerOf(slot, source);
+    player.seekTo(0).catch(() => undefined);
+    player.play();
+  } catch {
+    // A platform without the module.
+  }
+}

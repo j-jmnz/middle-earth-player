@@ -5,6 +5,7 @@
 // badge says what the last intent did to it ("−6" when it fell, "+2" when it rose).
 import { ELIMINATION_LEVEL } from "../../rules/core/eliminate.ts";
 import { DIRE_ELIMINATION_LEVEL } from "../../rules/families/black-gate/dire.ts";
+import type { SoundSlot } from "../../ui/sound/slots.ts";
 
 export const ELIMINATION_THREAT = ELIMINATION_LEVEL;
 /** The elimination level while the main quest has Dire (mec113.dire): the dial's meter, its warming and its words read it. */
@@ -40,4 +41,11 @@ export function threatDeltaWords(name: string, before: number, after: number): s
   const change = after - before;
   if (change === 0) return null;
   return `${name} ${change < 0 ? "lowered" : "raised"} by ${Math.abs(change)}, now ${after}`;
+}
+
+/** The threat dial's sound for a change (docs/design-system-table.md, Sound): the warning when it crosses into critical, else a rise or a fall. */
+export function threatSound(before: number, after: number, limit: number = ELIMINATION_THREAT): SoundSlot | null {
+  if (after === before) return null;
+  if (threatLevel(after, limit) === "critical" && threatLevel(before, limit) !== "critical") return "dread.danger";
+  return after > before ? "dread.threat-up" : "dread.threat-down";
 }

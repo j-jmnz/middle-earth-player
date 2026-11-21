@@ -28,7 +28,7 @@ For iOS you need macOS and Xcode. For Android you need Android Studio, SDK Platf
 pnpm assets
 ```
 
-`pnpm assets` runs `assets catalog`, `assets canvaskit`, `assets pdfjs`, `assets booklets` and `assets scans`. The first time `assets scans` runs, it downloads every pinned card picture into `.cache/` (about 5 GB), checks each one's sha256, and writes 1200 px copies to `assets/scans/`. Later runs only pack the pictures that changed. `pnpm start`, `pnpm android` and `pnpm ios` run it for you first. It rewrites `src/screens/images/scan-map.ts`; don't commit that change.
+`pnpm assets` runs `assets catalog`, `assets canvaskit`, `assets pdfjs`, `assets booklets`, `assets scans` and `assets sounds`. The first time `assets scans` runs, it downloads every pinned card picture into `.cache/` (about 5 GB), checks each one's sha256, and writes 1200 px copies to `assets/scans/`. Later runs only pack the pictures that changed. `pnpm start`, `pnpm android` and `pnpm ios` run it for you first. It rewrites `src/screens/images/scan-map.ts`; don't commit that change.
 
 For a release build, which works offline with all its data bundled:
 
@@ -73,6 +73,7 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm assets canvaskit` | Copies CanvasKit's wasm to `public/canvaskit.wasm` (gitignored), which the web build loads to draw the table. `pnpm web` and `pnpm test a11y` run it with `catalog`. |
 | `pnpm assets pdfjs` | Copies pdf.js's worker and data (CMaps, standard fonts, ICC profiles, wasm decoders) to `public/pdfjs` (gitignored), which the web booklet reader loads. `pnpm web` runs it. |
 | `pnpm assets scans` / `pnpm assets booklets` | Packs the card pictures or the booklet PDFs into `assets/`. |
+| `pnpm assets sounds [--from <folder>]` | Packs the sound effects cut into `.cache/audio/sfx` into `assets/sounds`; `--from` first cuts them from a folder of unpacked Darkest Dungeon II banks (needs ffmpeg). Restart Metro with `--clear` after. |
 | `pnpm assets capture --build` | Takes the README's screenshots on the iOS simulators. It needs macOS, Xcode and Maestro. |
 | `pnpm assets showcase [--publish]` | Turns the captures into the README's images and a contact sheet. `--publish` replaces the `showcase` branch with them. |
 | `pnpm assets banner` | Draws the README's banner in both themes (`.github/readme/banner-*.webp`) from the tablet stills, the icon and the app's fonts. |
