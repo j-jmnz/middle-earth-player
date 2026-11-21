@@ -180,7 +180,7 @@ Read the sections your task touches.
   - 2771–2798 Persistence and shipping (~3.2K) ← 10
   - 2799–2841 Screens (~6.0K) ← 2
     - 2826–2841 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~71.1K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~71.2K tok)
   - 5–8 Overview (~170) ← 1
   - 9–35 Top bar (~6.7K) ← 11
   - 36–39 Table menu (~870) ← 9
@@ -211,7 +211,7 @@ Read the sections your task touches.
   - 386–391 Quest advance (~530) ← 1
   - 392–395 Undo (~150)
   - 396–399 Haptics (~340) ← 1
-  - 400–416 Sound (~2.1K) ← 29
+  - 400–416 Sound (~2.2K) ← 29
   - 417–428 Banner (~750) ← 5
   - 429–448 Screen reader (~3.0K) ← 19
   - 449–452 Android Back (~90)
