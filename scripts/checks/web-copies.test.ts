@@ -34,6 +34,22 @@ const COPIES: readonly { phone: string; web: string; from?: string; to?: string;
     ],
   },
   {
+    phone: "src/play/chrome/setting-rows.tsx",
+    web: "src/play/chrome/setting-rows.canvaskit.tsx",
+    from: "/**\n * The groups: Display",
+    edits: [
+      [
+        '          {/* The web build is already a list of names: the row would change nothing there. */}\n          {Platform.OS !== "web" ? (\n            <ChoiceRow title="Table as a list" detail={TABLE_LIST_LINE} id={id("table-list")} options={TABLE_LIST_OPTIONS} words={TABLE_LIST_WORDS} value={settings.tableAsList} onChange={(tableAsList) => onChange({ tableAsList })} />\n          ) : null}\n',
+        '          <ChoiceRow title="Table as a list" detail={TABLE_LIST_LINE} id={id("table-list")} options={TABLE_LIST_OPTIONS} words={TABLE_LIST_WORDS} value={settings.tableAsList} onChange={(tableAsList) => onChange({ tableAsList })} />\n',
+      ],
+      ["  const fogStill = reduced;\n", "  const fogStill = reduced;\n  const extra = useContext(ExtraSettingsRows);\n"],
+      ["detail={fogLine(light, reduced)}", "detail={noBattery(fogLine(light, reduced))}"],
+      ["detail={AWAKE_LINE}", "detail={noBattery(AWAKE_LINE)}"],
+      ['          <SettingSwitch roomy label="Haptics" detail={HAPTICS_LINE} value={settings.haptics} onChange={(haptics) => onChange({ haptics })} testID={id("haptics")} />\n', ""],
+      ["      ) : null}\n    </>\n", '      ) : null}\n\n      {groups.includes("table") ? extra : null}\n    </>\n'],
+    ],
+  },
+  {
     phone: "src/ui/text.tsx",
     web: "src/ui/web/text.canvaskit.tsx",
     from: "// Bold Text (the phone's",

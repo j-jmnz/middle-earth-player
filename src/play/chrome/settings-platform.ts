@@ -1,6 +1,5 @@
-// What the phone's Settings and table panel draw (settings-catalog.ts, SettingsPlatform): Haptics, Table as a list but in a web build with no
-// canvas, which is already a list, and no Saves (the phone's saves are in the system's own backup). settings-platform.canvaskit.ts is the
-// web's and the desktop's, which metro.config.js serves in its place on the web platform only.
+// What Settings and the table panel draw (settings-catalog.ts, SettingsPlatform): Haptics, Table as a list but in a web build with no canvas,
+// which is already a list, and no Saves (the phone's saves are in the system's own backup).
 import { Platform } from "react-native";
 
 import type { SettingsPlatform } from "./settings-catalog.ts";

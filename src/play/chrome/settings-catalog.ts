@@ -1,6 +1,6 @@
 // How Settings is laid out (docs/design-system.md, Settings; user decision, 2026-11-21): the settings by id, the categories that hold
 // them, the rows the table's settings panel keeps, the search over names, details and the words players use, and the quick setups
-// that change several settings at once. Pure, so a test reads it; the rows themselves are drawn by setting-rows.tsx.
+// that change several settings at once. Pure, so a test reads it; the rows themselves are drawn by setting-row.tsx.
 import { BANNER_CLOSES_LINE, CONTRAST_LINE, CONFIRM_TIME_LINE, FOG_LINE, GUIDE_LINE, HAPTICS_LINE, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, TITLE_FACE_LINE, TITLE_FACE_WORDS, ALWAYS_EMPTY_LINE, AWAKE_LINE, DEBUG_LABEL, DEBUG_LINE } from "./settings-words.ts";
 import type { TableSettings } from "../../ui/table-settings.ts";
 import { CHECK_LABEL, CHECK_LINE } from "../../ui/update/offer.ts";

@@ -1,10 +1,10 @@
 // The first page of Settings (docs/design-system.md, Settings; user decision, 2026-11-21): the categories, each with what it is set to now,
 // the quick setups, and the search's results in their place while a query is typed. The categories, the search and the setups are
-// settings-catalog.ts; the rows are setting-rows.tsx.
+// settings-catalog.ts; the rows are setting-row.tsx.
 import { View } from "react-native";
 
 import { BodyText, Label, ListRow, Section, TextButton } from "../kit/chrome";
-import { SettingRow } from "../../play/chrome/setting-rows";
+import { SettingRow } from "../../play/chrome/setting-row";
 import { categoriesFor, categoryOf, categorySummary, quickSetups, searchSettings, setupInUse, type CategoryId, type QuickSetup } from "../../play/chrome/settings-catalog";
 import { SETTINGS_PLATFORM } from "../../play/chrome/settings-platform";
 import type { AlwaysRow } from "../../play/chrome/settings-words";

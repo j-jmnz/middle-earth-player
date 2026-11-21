@@ -18,7 +18,7 @@ import { withAlphaHex } from "../../ui/tokens.ts";
 import { logLineSpeech, type LogLine } from "../store/log.ts";
 import { CloseButton, TextButton } from "../../ui/buttons.tsx";
 import { LineMark } from "./table-chrome.tsx";
-import { SettingRows } from "./setting-rows.tsx";
+import { SettingRows } from "./setting-row.tsx";
 import { PANEL_ROWS, rowsFor } from "./settings-catalog.ts";
 import { SETTINGS_PLATFORM } from "./settings-platform.ts";
 import { ELIMINATION_THREAT } from "../readouts/threat-level.ts";
@@ -313,7 +313,7 @@ export function ThreatPanel({
 
 /**
  * The table's settings, a night side panel from the menu's Table settings: the settings a player changes during a game (settings-catalog.ts,
- * PANEL_ROWS; user decision, 2026-11-21), the Settings pages' own rows (setting-rows.tsx) under a left-aligned title. At the end of the rows,
+ * PANEL_ROWS; user decision, 2026-11-21), the Settings pages' own rows (setting-row.tsx) under a left-aligned title. At the end of the rows,
  * All settings opens Settings (the game is saved); the round ✕ closes the panel. Text and switches only; nothing here sends an intent.
  */
 export function SettingsPanel({

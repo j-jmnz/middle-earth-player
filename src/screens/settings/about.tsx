@@ -8,7 +8,7 @@ import { useStore } from "zustand";
 import { BodyText, Label, TextButton } from "../kit/chrome";
 import { AskInPlace } from "../kit/ask-in-place";
 import { CATALOG_VERSION } from "../../catalog/version";
-import { SettingRow } from "../../play/chrome/setting-rows";
+import { SettingRow } from "../../play/chrome/setting-row";
 import { CREDITS } from "../../play/chrome/settings-words";
 import { restoreDefaults, tableSettings, type TableSettings } from "../../ui/table-settings";
 import { useUiScale } from "../../ui/ui-scale";

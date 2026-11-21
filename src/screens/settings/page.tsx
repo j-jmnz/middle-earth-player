@@ -4,7 +4,7 @@ import type { ComponentRef, ReactNode, RefObject } from "react";
 import { ScrollView, View } from "react-native";
 
 import { Label } from "../kit/chrome";
-import { SettingRows } from "../../play/chrome/setting-rows";
+import { SettingRows } from "../../play/chrome/setting-row";
 import { categoryOf, rowsFor, type CategoryId } from "../../play/chrome/settings-catalog";
 import { SETTINGS_PLATFORM } from "../../play/chrome/settings-platform";
 import type { AlwaysRow } from "../../play/chrome/settings-words";

@@ -1,9 +1,9 @@
-// The Saves page of Settings on the web and the desktop (docs/brief.md, Screens, Settings): Back up saves and Restore from a backup. A phone's saves are in the system's own backup,
-// so the phone's Settings has no such page. Restore asks in place before it replaces anything (ask-in-place.tsx) and refuses a file with a sentence.
+// The Saves group of Settings on the web and the desktop (docs/brief.md, Screens, Settings): Back up saves and Restore from a backup. A phone's saves are in the system's own backup,
+// so the phone's Settings has no such group. Restore asks in place before it replaces anything (ask-in-place.tsx) and refuses a file with a sentence.
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 
-import { SettingChoice } from "../../../play/chrome/setting-rows";
+import { SettingChoice, SettingGroup } from "../../../play/chrome/setting-rows";
 import { AskInPlace } from "../../kit/ask-in-place";
 import { Label, TextButton } from "../../kit/chrome";
 import { useDatabases } from "../../data/databases";
@@ -54,7 +54,7 @@ export function BackupGroup() {
   };
 
   return (
-    <View testID="app-settings-saves">
+    <SettingGroup title="Saves" testID="app-settings-saves">
       <SettingChoice title="Back up saves" detail={BACKUP_LINE} testID="app-settings-backup">
         <View className="-mx-3 items-start">
           <TextButton label="Back up" tone="accent" testID="app-settings-backup-make" accessibilityHint="Downloads a backup file" disabled={busy} onPress={onBackUp} />
@@ -79,6 +79,6 @@ export function BackupGroup() {
           {said.text}
         </Label>
       ) : null}
-    </View>
+    </SettingGroup>
   );
 }

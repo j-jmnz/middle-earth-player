@@ -19,7 +19,7 @@ export const TITLE_FACE_WORDS: Readonly<Record<TitleFaceOption, string>> = { car
 export const QUALITY_WORDS: Readonly<Record<CardQualityOption, string>> = { high: "High", low: "Low" };
 
 // Each row's detail states what the setting changes. The settings that exist to lighten the load on the device sit in the Performance
-// group (setting-rows.tsx); Reduce motion and Keep screen awake, which also affect it, say so in their detail.
+// category (settings-catalog.ts); Reduce motion and Keep screen awake, which also affect it, say so in their detail.
 export const THEME_LINE = "Ringwraith is dark, Rivendell is light. System follows the device's setting.";
 export const SCALE_LINE = "Size of text, buttons and cards, the table included.";
 // What the phone calls the setting Follow system reads: iOS Increase Contrast, Android High contrast text.
