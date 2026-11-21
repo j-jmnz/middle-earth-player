@@ -3,7 +3,7 @@ import "../../../global.css";
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Platform, StatusBar, View } from "react-native";
-import { Stack } from "expo-router";
+import { Stack, usePathname } from "expo-router";
 import Head from "expo-router/head";
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
@@ -25,6 +25,8 @@ import { useIsTablet } from "../../ui/use-size-class";
 import { PicturesReady } from "../../ui/showcase/pictures-ready";
 import { SplashGlow } from "../kit/splash-glow";
 import { startUpdateChecks } from "../update/check";
+import { setTableMusic, startMusic } from "../../ui/sound/music";
+import { keepsTableMusic } from "../nav/route-music";
 import { APP_VERSION } from "../update/offer";
 import { UpdateFrame } from "../update/ribbon";
 
@@ -156,6 +158,17 @@ export default function RootLayout() {
     if (!databases) return;
     return startUpdateChecks(databases.user, { current: APP_VERSION, warn: (message) => console.warn(message) });
   }, [databases]);
+
+  // The music (src/ui/sound/music.ts): the menu's loop once the stored settings are read, so a player who turned Music off hears none.
+  useEffect(() => {
+    if (!databases) return;
+    return startMusic();
+  }, [databases]);
+  // A screen that is neither the table nor one read from it hands the music back to the menu's loop (route-music.ts).
+  const pathname = usePathname();
+  useEffect(() => {
+    if (!keepsTableMusic(pathname)) setTableMusic(null);
+  }, [pathname]);
 
   useEffect(() => {
     if (!databases) return;

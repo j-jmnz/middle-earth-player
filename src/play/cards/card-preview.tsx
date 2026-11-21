@@ -25,7 +25,7 @@ import type { NotApplied } from "./not-applied.ts";
 import { NotAppliedView } from "./not-applied-view.tsx";
 import { springConfig, timing, useMotionScale } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
-import { previewSideSize, previewSize, previewStrip, tokenLines } from "./preview-size.ts";
+import { PREVIEW_Z, previewSideSize, previewSize, previewStrip, tokenLines } from "./preview-size.ts";
 import { clampStep, swipeStep } from "./preview-swipe.ts";
 import { listHeading, previewValue } from "./preview-words.ts";
 import { SecondaryButton } from "../../ui/buttons.tsx";
@@ -327,7 +327,7 @@ export function CardPreview({
   );
 
   return (
-    <View testID="card-preview" accessibilityViewIsModal onAccessibilityEscape={back} style={StyleSheet.absoluteFill}>
+    <View testID="card-preview" accessibilityViewIsModal onAccessibilityEscape={back} style={[StyleSheet.absoluteFill, { zIndex: PREVIEW_Z }]}>
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: t.night }, scrimStyle]} />
       {/* The scrim is a button of its own under the content, so no control sits inside another (the web nests them as buttons in a button). The wrapper over it is not a
           control (no role, no tab stop): it takes the tap that lands on no control of the preview, and the preview closes, as before (user request, 2026-10-29). */}

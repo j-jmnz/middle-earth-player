@@ -9,6 +9,7 @@ import { useTheme } from "../../ui/theme";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { useUiScale } from "../../ui/ui-scale";
 import { useSizeClass } from "../../ui/use-size-class";
+import { withSound } from "../../ui/sound/sound";
 import { HeroArt, SceneArt } from "../art/art";
 import { COVER } from "../art/crop";
 import { Chevron, Eyebrow, HubHeader, RingMark, Screen, ScreenScroll, useTitleShadow } from "../kit/chrome";
@@ -92,7 +93,7 @@ export function RunRow({ testID, title, line, heroes, accessibilityLabel, access
   const t = useTableTokens();
   const { s } = useSizeClass();
   return (
-    <Pressable testID={testID} collapsable={false} accessibilityRole="button" accessibilityLabel={accessibilityLabel} accessibilityHint={accessibilityHint} onPress={onPress}>
+    <Pressable testID={testID} collapsable={false} accessibilityRole="button" accessibilityLabel={accessibilityLabel} accessibilityHint={accessibilityHint} onPress={withSound(onPress, "ui.confirm")}>
       {({ pressed }) => (
         <View className="flex-row items-center gap-3 rounded-item px-3" style={{ minHeight: 62 * s, ...rowSurface(pressed, t) }}>
           <HeroTrio heroes={heroes} />
@@ -220,7 +221,7 @@ export function CatalogTile({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityHint={accessibilityHint}
-      onPress={onPress}
+      onPress={withSound(onPress, "ui.confirm")}
       style={posters ? { width: `${100 / posters}%`, paddingHorizontal: 6 * s } : undefined}
     >
       {({ pressed }) =>

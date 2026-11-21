@@ -66,7 +66,7 @@ For iOS you need macOS and Xcode. For Android you need Android Studio, SDK Platf
 pnpm assets
 ```
 
-`pnpm assets` runs `assets catalog`, `assets canvaskit`, `assets pdfjs`, `assets booklets` and `assets scans`. The first time `assets scans` runs, it downloads every pinned card picture into `.cache/` (about 5 GB), checks each one's sha256, and writes 1200 px copies to `assets/scans/`. Later runs only pack the pictures that changed. `pnpm start`, `pnpm android` and `pnpm ios` run it for you first. It rewrites `src/screens/images/scan-map.ts`; don't commit that change.
+`pnpm assets` runs `assets catalog`, `assets canvaskit`, `assets pdfjs`, `assets booklets`, `assets scans` and `assets sounds`. The first time `assets scans` runs, it downloads every pinned card picture into `.cache/` (about 5 GB), checks each one's sha256, and writes 1200 px copies to `assets/scans/`. Later runs only pack the pictures that changed. `pnpm start`, `pnpm android` and `pnpm ios` run it for you first. It rewrites `src/screens/images/scan-map.ts`; don't commit that change.
 
 For a release build, which works offline with all its data bundled:
 
@@ -116,6 +116,8 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm assets canvaskit` | Copies CanvasKit's wasm to `public/canvaskit.wasm` (gitignored), which the web build loads to draw the table. `pnpm web` and `pnpm test a11y` run it with `catalog`. |
 | `pnpm assets pdfjs` | Copies pdf.js's worker and data (CMaps, standard fonts, ICC profiles, wasm decoders) to `public/pdfjs` (gitignored), which the web booklet reader loads. `pnpm web` runs it. |
 | `pnpm assets scans` / `pnpm assets booklets` | Packs the card pictures or the booklet PDFs into `assets/`. |
+| `pnpm assets sounds [--from <folder> --hearthstone <folder>]` | Packs the sound effects that `data/sources.json` pins into `assets/sounds`, from `.cache/audio/sfx` or the asset mirror; `--from` first cuts them from a folder of unpacked Darkest Dungeon II banks, and `--hearthstone` the card landing from a folder of Hearthstone's sounds (needs ffmpeg) and writes their pins: commit `data/sources.json`, then `pnpm data mirror push sounds`. Restart Metro with `--clear` after. |
+| `pnpm assets music [--from <folder>]` | The same for the music loops (`assets/music`, `.cache/audio/music`): `--from` cuts each loop of `scripts/build/music-picks.ts` from a folder of the score's tracks (needs ffmpeg) and writes their pins; then `pnpm data mirror push music`. |
 | `pnpm assets capture --build` | Takes the README's screenshots on the iOS simulators. It needs macOS, Xcode and Maestro. |
 | `pnpm assets showcase [--publish]` | Turns the captures into the README's images and a contact sheet. `--publish` replaces the `showcase` branch with them. |
 | `pnpm assets banner` | Draws the README's banner in both themes (`.github/readme/banner-*.webp`) from the tablet stills, the icon and the app's fonts. |
@@ -134,7 +136,7 @@ Scripts log to stderr. Pass `--verbose` or `--quiet`, or set `LOG_LEVEL` to `deb
 
 ## Asset mirror
 
-The asset mirror is a private Cloudflare R2 bucket that holds every file `data/sources.json` pins in `.cache/` (the card scans, the pictures and the PDFs), each at `sha256/<hash>` (`scripts/data/mirror/client.ts`). It is a cache in front of the sources, not a source: the pins keep the original URLs, and `data sync` still reads the sources.
+The asset mirror is a private Cloudflare R2 bucket that holds every file `data/sources.json` pins in `.cache/` (the card scans, the pictures, the PDFs, the sound effects and the music loops), each at `sha256/<hash>` (`scripts/data/mirror/client.ts`). It is a cache in front of the sources, not a source: the pins keep the original URLs, and `data sync` still reads the sources. The sound effects and the music loops are the exception (user decision, 2026-11-21): cut from the player's own files, they have no URL, so the mirror is their only copy online, and `pnpm assets sounds` and `pnpm assets music` read them only from `.cache/audio` and the mirror.
 
 - `pnpm assets scans` and `pnpm assets booklets` read a file that `.cache/` misses from the mirror first, then from its URL. Every body is checked against its pin either way. After the first error (no network, a refused key) the run reads the sources and warns once.
 - `pnpm data mirror pull [source...]` fills `.cache/` from the mirror, so a fresh clone has the scans and PDFs without a sync. `pnpm data mirror push [source...]` uploads what the mirror lacks, with the write key. A pack reads only the files it bundles, so a scan that a picture stands in for reaches `.cache/` only through `data sync scans`; `push --fetch` downloads such files from their URLs first. A page rendered from a PDF is pushed only when a local render matches its pin.

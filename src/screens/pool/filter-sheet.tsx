@@ -21,6 +21,7 @@ import {
 } from "./filter";
 import { withAlphaHex } from "../../ui/tokens";
 import { useUiScale } from "../../ui/ui-scale";
+import { withSound } from "../../ui/sound/sound";
 import { useSizeClass } from "../../ui/use-size-class";
 import { Text } from "../../ui/text";
 
@@ -152,7 +153,7 @@ function Chip({
       accessibilityRole="radio"
       accessibilityState={{ checked: selected }}
       aria-checked={selected}
-      onPress={onPress}
+      onPress={withSound(onPress, "ui.select")}
       className="mb-2 mr-2 min-h-touch flex-row items-center gap-2 rounded-control px-4"
       style={{ backgroundColor: selected ? palette.ink : withAlphaHex(palette.ink, 0.08) }}
     >
@@ -169,7 +170,7 @@ function OptionRow({ label, detail, onPress, icon, opens = false }: { label: str
     <Pressable
       accessibilityRole="button"
       accessibilityHint={opens ? "Opens a choice" : undefined}
-      onPress={onPress}
+      onPress={withSound(onPress, "ui.confirm")}
       className="min-h-14 flex-row items-center justify-between"
     >
       <View className="flex-row items-center gap-2">

@@ -7,7 +7,9 @@ import { useStore } from "zustand";
 
 import { actionsSheet, commitSheet, playSheet, windowSheet } from "./bar-sheets.ts";
 import type { BeatStore } from "../store/beat-store.ts";
-import { tickRefused, tickSent } from "../../ui/haptics.ts";
+import { tickSent } from "../../ui/haptics.ts";
+import { refusedFeedback } from "../../ui/sound/feedback.ts";
+import { playUndo } from "../../ui/sound/sound.ts";
 import { pointTitle } from "../phases/rail.ts";
 import { isFreeResponse, nextStopTitle, passableWindow } from "../phases/stops.ts";
 import { useAutoAnswer, useBanner, useGuide, useSettle } from "./table-hooks.ts";
@@ -213,7 +215,7 @@ export function useTableChoice({
         resetReader("send");
         follow();
       } else {
-        tickRefused();
+        refusedFeedback();
         if (readerMode) announce(store.getState().refusal ?? "");
       }
     },
@@ -230,6 +232,7 @@ export function useTableChoice({
     // Undo goes back exactly when there is an intent to take back, so the tick can play before it does the work.
     if (store.getState().history.length === 0) return;
     tickSent();
+    playUndo();
     store.getState().undo();
     reset();
     resetReader("undo");
@@ -237,7 +240,7 @@ export function useTableChoice({
   // A payment the pools cannot make: the reject haptic, and the reason on the dock as a reducer refusal shows.
   const refuse = useCallback(
     (reason: string) => {
-      tickRefused();
+      refusedFeedback();
       store.getState().refuse(reason);
       if (readerMode) announce(reason);
     },

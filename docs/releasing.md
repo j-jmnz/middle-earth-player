@@ -43,7 +43,7 @@ A release whose desktop build was cancelled or failed goes out without the deskt
 
 ## Issue comments
 
-An issue stays open when its pull request merges and is closed by the release that ships it (user instruction, 2026-11-20). So a commit names the issue it finishes as `Settles #<n>`, not with a GitHub closing keyword (`Closes`, `Fixes`, `Resolves`), which would close it at the merge; `pnpm commit:check` refuses those in commit bodies and in a pull request's description (the Issues rule of `.claude/rules/agent-standards.md`).
+An issue stays open when its pull request merges and is closed by the release that ships it (user instruction, 2026-11-20). So a commit names the issue it finishes as `Settles #<n>`, not with a GitHub closing keyword (`Closes`, `Fixes`, `Resolves`), which would close it at the merge; `pnpm commit:check` refuses those in commit bodies and in a pull request's description (`.claude/rules/issue-standards.md`, Finish).
 
 After the release is out, `publish` comments on each issue that a commit since the last tag names in a `Settles` or `Refs` line (`.github/scripts/comment-issues.sh`, with the text from `pnpm release issues`, `scripts/release/issue-comments.ts`), then closes each settled issue as completed. A `Refs` issue stays open. The comment links the release and lists the lines of the notes that name the issue: "Fixed in" when a `fix` settles it, "Released in" when another type settles it, and "Work on this issue is in" for a `Refs` line. A hidden marker names the tag, so a rerun of `publish` (one that adds the desktop app included) posts only the comments that are missing and closes what is still open. A locked or deleted issue only warns. The job needs `issues: write`. The Discord bot posts nothing for a close by the release workflow, since its release post already says the fix is out (`docs/discord-issues.md`, Issue updates).
 
@@ -100,7 +100,7 @@ After the first release, set the variable `ANDROID_CERT_SHA256` to the certifica
 
 ### Asset mirror secrets
 
-Optional. With them, the `assets` job reads the card pictures and PDFs from the asset mirror before their sources and pushes what it had to fetch (`docs/development.md`, Asset mirror). Secrets: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY`, from an R2 token with Object Read & Write on the bucket only; the bucket name goes in the variable `R2_BUCKET` (a secret of that name works too). The showcase workflow's pack uses the same ones. Without them the job reads the sources, and a failed push only warns.
+Optional for the pictures and the PDFs, needed for the sound effects and the music. With them, the `assets` job reads the card pictures and PDFs from the asset mirror before their sources and pushes what it had to fetch, and packs the sound effects and the music, which only the mirror holds (`docs/development.md`, Asset mirror); without them a release's phone builds carry no sound and no music. Secrets: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY`, from an R2 token with Object Read & Write on the bucket only; the bucket name goes in the variable `R2_BUCKET` (a secret of that name works too). The showcase workflow's pack uses the same ones. Without them the job reads the sources, and a failed push only warns.
 
 ### TestFlight (optional)
 

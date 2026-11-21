@@ -2,7 +2,7 @@
 // text with testIDs, so tests can read them; card pictures stay on the canvas (docs/design-system-table.md). Phase
 // changes animate with Reanimated, never gate a rule, and snap under reduced motion. Nothing here holds a number the engine
 // did not compute.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
 
@@ -17,7 +17,8 @@ import { MOTION, SHAPE } from "../../ui/motion-tokens.ts";
 import { HEADING_HINT, headingArcs, headingDelta, headingDeltaWords, headingLook, headingWords, type HeadingStep } from "../dream-chaser/heading.ts";
 import { dialSpeech, type DialRole } from "../store/peek.ts";
 import type { SeatThreat } from "../store/selectors.ts";
-import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "../readouts/threat-level.ts";
+import { threatDelta, threatDeltaWords, threatLevel, threatMeter, threatSound, type ThreatLevel } from "../readouts/threat-level.ts";
+import { playSound } from "../../ui/sound/sound.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { badgeFoot, DIAL_SIZE, HEADING_BADGE_OVER, HEADING_LABEL_W } from "./top-bar-layout.ts";
 import { touch, useUiScale } from "../../ui/ui-scale.ts";
@@ -83,6 +84,7 @@ export function ThreatRing({
   note,
   notch,
   word,
+  voiced,
   onPress,
 }: {
   threat: SeatThreat;
@@ -127,12 +129,14 @@ export function ThreatRing({
   notch?: number;
   // The disc says this word in place of the number (the Day and Night dial: "Day"); the number only makes the dial pop when it changes, and no change badge is drawn.
   word?: string;
+  // A seat's threat dial: a change plays the threat's sound (threatSound). The other dials are silent.
+  voiced?: boolean;
   // A tap opens the threat panel (each enemy's cost against the threat), or peeks at the seat (a dial that is not shown).
   onPress?: () => void;
 }) {
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} eliminates={eliminates} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} notch={notch} word={word} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} eliminates={eliminates} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} notch={notch} word={word} voiced={voiced} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-control">
@@ -170,6 +174,7 @@ function ThreatDial({
   note,
   notch,
   word,
+  voiced,
   onPress,
 }: {
   threat: SeatThreat;
@@ -193,6 +198,8 @@ function ThreatDial({
   note?: string;
   notch?: number;
   word?: string;
+  // A seat's threat dial: a change plays the threat's sound (threatSound). The other dials are silent.
+  voiced?: boolean;
   onPress?: () => void;
 }) {
   const speed = useMotionScale();
@@ -205,11 +212,16 @@ function ThreatDial({
   const seen = useRef(threat.threat);
   const [change, setChange] = useState<{ before: number; after: number; at: number } | null>(null);
   const scale = useSharedValue(1);
+  const voice = useEffectEvent((before: number, after: number) => {
+    const sound = voiced === true ? threatSound(before, after, limit) : null;
+    if (sound) playSound(sound);
+  });
   useEffect(() => {
     const before = seen.current;
     seen.current = threat.threat;
     if (before === threat.threat) return;
     setChange({ before, after: threat.threat, at: Date.now() });
+    voice(before, threat.threat);
     if (speed > 0) scale.set(withSequence(withTiming(SHAPE.dialPop, timing(MOTION.dialPopRise, speed)), withSpring(1, springConfig(MOTION.dialPopSettle, speed))));
   }, [threat.threat, speed, scale]);
   // The seat that is asked turns active in two-handed play: its dial pulses once in an accent ring (1 to 1.12 and back).

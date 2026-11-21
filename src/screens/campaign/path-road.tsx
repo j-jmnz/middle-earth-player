@@ -10,6 +10,7 @@ import { useAheadLine } from "../kit/chrome";
 import { usePalette } from "../kit/palette-hook";
 import { withAlphaHex } from "../../ui/tokens";
 import { useUiScale } from "../../ui/ui-scale";
+import { withSound } from "../../ui/sound/sound";
 import { Text } from "../../ui/text";
 import { stopLabel, stopState } from "./road-speech";
 
@@ -109,7 +110,7 @@ export function Road({ stops, height, width, label, onStop, scores, go = null }:
               accessibilityState={stopState(press != null)}
               accessibilityHint={go?.id === node.id ? go.action : undefined}
               disabled={!press}
-              onPress={press}
+              onPress={press ? withSound(press, "ui.confirm") : undefined}
               testID={go?.id === node.id ? "begin" : `stop-${node.id}`}
             >
               <View style={{ width: size, height: size, borderRadius: size / 2, overflow: "hidden", backgroundColor: palette.raised, boxShadow: stopRing(node.status, palette.night, palette.accent, palette.accentHigh, palette.accentLine, palette.glow) }}>

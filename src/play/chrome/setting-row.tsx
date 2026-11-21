@@ -8,10 +8,12 @@ import type { ReactNode } from "react";
 import { TextButton } from "../../ui/buttons.tsx";
 import { Segmented } from "../../ui/segmented.tsx";
 import { SettingSwitch } from "../../ui/setting-switch.tsx";
-import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, DEBUG_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, NONE_YET, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, type AlwaysRow } from "./settings-words.ts";
+import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, DEBUG_LINE, EFFECTS_VOLUME_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, MUSIC_LINE, MUSIC_VOLUME_LINE, SOUNDS_LINE, NONE_YET, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, type AlwaysRow } from "./settings-words.ts";
 import { SETTING_TITLES, type SettingId } from "./settings-catalog.ts";
 import { platformLine, TABLE_LIST_DETAIL } from "./settings-platform.ts";
 import { CHECK_LINE } from "../../ui/update/offer.ts";
+import { playSound } from "../../ui/sound/sound.ts";
+import { VolumeSlider } from "../../ui/sound/volume-slider.tsx";
 import { SPEEDS } from "../../ui/motion-tokens.ts";
 import { useReduceMotion } from "../../ui/motion-run.ts";
 import { BANNER_CLOSES_OPTIONS, CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, REDUCE_MOTION_OPTIONS, STRONG_OUTLINES_OPTIONS, TABLE_LIST_OPTIONS, THEME_OPTIONS, TITLE_FACE_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "../../ui/table-settings.ts";
@@ -40,6 +42,12 @@ export function ChoiceRow<T extends string>({ title, detail, id, options, words,
       <Segmented options={options} value={value} onChange={onChange} testIDPrefix={id} accessibilityLabel={title} stretch words={words} labels={labels} />
     </SettingChoice>
   );
+}
+
+// A new effects volume is written, then a sound plays at it, so the player hears what they chose.
+function setVolume(onChange: (change: Partial<TableSettings>) => void, soundVolume: number): void {
+  onChange({ soundVolume });
+  playSound("ui.confirm");
 }
 
 type RowProps = {
@@ -94,6 +102,14 @@ export function SettingRow({ id, settings, onChange, always, testPrefix }: RowPr
       return <SettingSwitch roomy label={title} detail={SPOTLIGHT_LINE} value={settings.spotlight} onChange={(spotlight) => onChange({ spotlight })} testID={tid("spotlight")} />;
     case "haptics":
       return <SettingSwitch roomy label={title} detail={HAPTICS_LINE} value={settings.haptics} onChange={(haptics) => onChange({ haptics })} testID={tid("haptics")} />;
+    case "sounds":
+      return <SettingSwitch roomy label={title} detail={SOUNDS_LINE} value={settings.sounds} onChange={(sounds) => onChange({ sounds })} testID={tid("sounds")} />;
+    case "soundVolume":
+      return <VolumeSlider label={title} detail={EFFECTS_VOLUME_LINE} value={settings.soundVolume} dim={!settings.sounds} onChange={(soundVolume) => setVolume(onChange, soundVolume)} testID={tid("sound-volume")} />;
+    case "music":
+      return <SettingSwitch roomy label={title} detail={MUSIC_LINE} value={settings.music} onChange={(music) => onChange({ music })} testID={tid("music")} />;
+    case "musicVolume":
+      return <VolumeSlider label={title} detail={MUSIC_VOLUME_LINE} value={settings.musicVolume} dim={!settings.music} onChange={(musicVolume) => onChange({ musicVolume })} testID={tid("music-volume")} />;
     case "guide":
       return <SettingSwitch roomy label={title} detail={GUIDE_LINE} value={settings.guide} onChange={(guide) => onChange({ guide, ...(guide ? { guideSeen: {} } : {}) })} testID={tid("guide")} />;
     case "stops":

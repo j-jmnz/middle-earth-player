@@ -5,8 +5,8 @@ import { DEFAULT_SETTINGS, restoreDefaults } from "../../ui/table-settings.ts";
 // The lines that name the phone's own setting follow the platform; the tests read the iOS one.
 vi.mock("react-native", () => ({ Platform: { OS: "ios", select: (choices: { ios?: string; default?: string }) => choices.ios ?? choices.default } }));
 
-const PHONE: SettingsPlatform = { haptics: true, tableList: true, saves: false, computer: false };
-const COMPUTER: SettingsPlatform = { haptics: false, tableList: true, saves: true, computer: true };
+const PHONE: SettingsPlatform = { haptics: true, tableList: true, saves: false, computer: false, sounds: true, music: true };
+const COMPUTER: SettingsPlatform = { haptics: false, tableList: true, saves: true, computer: true, sounds: false, music: false };
 const ids = (query: string, platform = PHONE) => searchSettings(query, platform).map((hit) => `${hit.kind}:${hit.id}`);
 
 describe("the categories", () => {
@@ -34,7 +34,16 @@ describe("the categories", () => {
     expect(isCategoryId("device")).toBe(false);
   });
 
+  it("show Sound only in a bundle packed with the sounds or the music, and only the rows it has files for", () => {
+    expect(categoriesFor(COMPUTER).map((each) => each.id)).not.toContain("sound");
+    expect(categoriesFor({ ...COMPUTER, music: true }).map((each) => each.id)).toContain("sound");
+    expect(rowsFor(["sounds", "soundVolume", "music", "musicVolume"], { ...PHONE, sounds: false })).toEqual(["music", "musicVolume"]);
+    expect(ids("soundtrack", COMPUTER)).toEqual([]);
+  });
+
   it("say what each is set to now", () => {
+    expect(categorySummary("sound", DEFAULT_SETTINGS, PHONE)).toBe("Effects 80% · Music 50%");
+    expect(categorySummary("sound", { ...DEFAULT_SETTINGS, music: false }, { ...PHONE, sounds: false })).toBe("Music off");
     expect(categorySummary("look", DEFAULT_SETTINGS, PHONE)).toBe("Ringwraith · Medium · Carved titles");
     expect(categorySummary("motion", DEFAULT_SETTINGS, PHONE)).toBe("Normal speed · Spotlight on · Haptics on");
     expect(categorySummary("motion", DEFAULT_SETTINGS, COMPUTER)).toBe("Normal speed · Spotlight on");
@@ -44,7 +53,7 @@ describe("the categories", () => {
 
 describe("the table's panel", () => {
   it("keeps the settings a player changes during a game", () => {
-    expect(PANEL_ROWS).toEqual(["speed", "spotlight", "bannerCloses", "haptics", "timingTips", "always"]);
+    expect(PANEL_ROWS).toEqual(["speed", "spotlight", "bannerCloses", "haptics", "sounds", "soundVolume", "music", "musicVolume", "timingTips", "always"]);
   });
 });
 
@@ -56,6 +65,7 @@ describe("the search", () => {
   it("finds a setting by the words a player uses, once, with its home", () => {
     expect(ids("vibrate")).toEqual(["setting:haptics"]);
     expect(ids("vibrate", COMPUTER)).toEqual([]);
+    expect(ids("soundtrack")).toEqual(["setting:music", "setting:musicVolume"]);
     expect(ids("dark")).toContain("setting:theme");
     expect(searchSettings("contrast", PHONE).filter((hit) => hit.id === "contrast")).toEqual([{ kind: "setting", id: "contrast", home: "look" }]);
   });

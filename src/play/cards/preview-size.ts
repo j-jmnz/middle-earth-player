@@ -2,6 +2,11 @@
 
 import { touch } from "../../ui/ui-scale.ts";
 
+// The preview's place over the rest of its screen. A screen draws it as its last child, but a phone flattens the plain views between it
+// and the list under it, so a view the list raises by its own zIndex (the Cards tab's folding filters, FOLD_Z in
+// src/screens/pool/scroll-fold.ts) stands beside the preview and would draw over it with no zIndex here.
+export const PREVIEW_Z = 10;
+
 // Width over height of a printed card.
 const CARD_ASPECT = 0.705;
 

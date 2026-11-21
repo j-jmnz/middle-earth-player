@@ -12,8 +12,8 @@ export type CommitType = (typeof COMMIT_TYPES)[number];
 /**
  * One commit since the last release: its type (undefined for a subject from before the commit standards), its summary, its
  * `Breaking:` lines, and the issues its body names: `closes` from a `Settles` line, which the release closes (or a `Closes`,
- * `Fixes` or `Resolves` line from before that rule, which GitHub closed at the merge), `refs` from a `Refs` line (the Issues
- * rule of .claude/rules/agent-standards.md).
+ * `Fixes` or `Resolves` line from before that rule, which GitHub closed at the merge), `refs` from a `Refs` line (the .claude/rules/issue-standards.md,
+ * Finish).
  */
 export type Change = { type: CommitType | undefined; summary: string; breaking: string[]; closes: number[]; refs: number[] };
 

@@ -75,7 +75,7 @@ const SESSION_LINK = /^claude-session:|claude\.ai\/code\/session/i;
 
 // A GitHub closing keyword before an issue reference (`Closes #12`, `fixes: owner/repo#12`), anywhere in a line, as GitHub reads it
 // (https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue). The
-// release closes an issue instead (`Settles #12`; the Issues rule of .claude/rules/agent-standards.md).
+// release closes an issue instead (`Settles #12`; .claude/rules/issue-standards.md, Finish).
 const CLOSING_KEYWORD = /\b(close[sd]?|fix(?:e[sd])?|resolve[sd]?)\b:?\s*(?:[\w.-]+\/[\w.-]+)?#\d+/i;
 
 /** What is wrong with a commit message's body, or undefined when it names no Claude Code session and closes no issue at the merge. */

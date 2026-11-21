@@ -26,7 +26,7 @@ function tilt(m: Motion, away: number): number {
 }
 
 /** Whether a motion is the quarter turn of exhausting or readying alone: the card stays where it is. */
-function turnOnly(m: Motion): boolean {
+export function turnOnly(m: Motion): boolean {
   "worklet";
   return m.dx === 0 && m.dy === 0 && m.scale === 1 && m.fromRot !== m.toRot && !m.flip && m.land == null;
 }
@@ -144,12 +144,17 @@ export function motionSpan(moves: { motions: ReadonlyMap<string, Motion>; ghosts
   return span;
 }
 
+/** When a card played from the hand lands (the squash begins), ms after the state was drawn and unscaled. */
+export function landTime(m: Motion): number {
+  return m.delay + MOTION.lift.ms + MOTION.glide.ms;
+}
+
 /** When the first card played from the hand lands, ms after the state was drawn and unscaled, or null when none is: the tick waits for it. */
 export function landAt(motions: ReadonlyMap<string, Motion>): number | null {
   let first: number | null = null;
   for (const motion of motions.values()) {
     if (motion.land !== "squash") continue;
-    const at = motion.delay + MOTION.lift.ms + MOTION.glide.ms;
+    const at = landTime(motion);
     first = first == null ? at : Math.min(first, at);
   }
   return first;
