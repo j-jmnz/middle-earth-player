@@ -5,6 +5,9 @@ import { withAlphaHex } from "../../ui/tokens";
 /** The fold and the offset the next turn is measured from: the lowest offset since the last fold, or the highest while folded. */
 export type FoldScroll = { folded: boolean; anchor: number };
 
+// The folding filters' place over the list they sit on. The long-press preview stands above them (PREVIEW_Z, preview-size.ts).
+export const FOLD_Z = 1;
+
 export const OPEN_FOLD: FoldScroll = { folded: false, anchor: 0 };
 
 // How far the list must move one way, in points, before the filters follow it: a finger's wobble does not fold or show them.
