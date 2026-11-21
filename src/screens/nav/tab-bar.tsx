@@ -11,7 +11,7 @@ import { IconButton } from "../kit/chrome-buttons";
 import { useTitleShadow } from "../kit/chrome-text";
 import { usePalette } from "../kit/palette-hook";
 import { GameIcon } from "../../ui/game-icon";
-import { playSound } from "../../ui/sound/sound";
+import { playSound, withSound } from "../../ui/sound/sound";
 import { iconAspect, type IconName } from "../../ui/icon-map";
 import { raisedEdgeOf } from "../../ui/surfaces";
 import { withAlphaHex } from "../../ui/tokens";
@@ -208,7 +208,7 @@ function RailTabBar(props: TabBarProps) {
             collapsable: false,
             accessibilityRole: "button",
             accessibilityLabel: "Settings",
-            onPress: () => router.push("/settings"),
+            onPress: withSound(() => router.push("/settings"), "ui.open"),
           })}
         </View>
       </ScrollView>
@@ -221,7 +221,7 @@ export function GearButton() {
   const router = useRouter();
   const { rail } = useSizeClass();
   if (rail) return null;
-  return <IconButton label="Settings" testID="settings-open" mark={GearMark} onPress={() => router.push("/settings")} />;
+  return <IconButton label="Settings" testID="settings-open" mark={GearMark} sound="ui.open" onPress={() => router.push("/settings")} />;
 }
 
 /**
