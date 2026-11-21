@@ -9,7 +9,7 @@ vi.mock("./session.ts", () => ({ startAudioSession: () => undefined, audioFailed
 // The accessibility store is mocked whole: loaded here with the mocked react-native, it would stay in the shared module cache (vitest.config.mts, isolate).
 vi.mock("../accessibility.ts", () => ({ accessibility: () => ({ screenReader: false }) }));
 vi.mock("./bundled", () => ({ bundledSounds: { "ui.confirm": 1, "card.land": 2, "ui.back": 3 } }));
-vi.mock("expo-audio", () => ({
+vi.mock("./audio-player", () => ({
   createAudioPlayer: (source: number) => {
     calls.created.push(source);
     return { seekTo: () => Promise.resolve(), play: () => calls.played.push(source) };

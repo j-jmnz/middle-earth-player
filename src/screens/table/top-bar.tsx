@@ -25,7 +25,6 @@ import { useTableTokens } from "../../ui/use-table-tokens";
 import { withAlphaHex } from "../../ui/tokens";
 import { BAR_PAD, barZones, chipCompact, DIAL_GAP, dialScale, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, TOP_BAR } from "../../play/chrome/top-bar-layout";
 import { UiScaleContext, useUiScale } from "../../ui/ui-scale";
-import { useTableMusic } from "../../ui/sound/use-table-music";
 
 export { TOP_BAR };
 // The scroll fade: this many bands of this width (EDGE_FADE in all), rising to nearly the felt.
@@ -61,8 +60,6 @@ export type TopBarProps = {
   // A tap on a scenario dial that holds lists (`lists`): opens its panel.
   onDialReading?: ((id: string) => void) | null;
   rail: Rail;
-  // The open scenario: the music plays its calm loop, and its combat loop during the Combat phase (docs/design-system-table.md, Sound).
-  scenario: string;
   // Stops are on and one of the player's stops lies ahead in this phase: an accent S by the next phase.
   stopAhead: boolean;
   // The phase carousel is open.
@@ -92,8 +89,7 @@ export type TopBarProps = {
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, heading = null, island = null, onIsland, onNightmare = null, onDial = null, onDialPile = null, onDialReading = null, rail, scenario, stopAhead, carouselOpen, narrow, areas, ticks, direLimit, pursuit = null, defense = null, scenarioDials, hands, held, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
-  useTableMusic(scenario, rail.phase === "Combat");
+export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, heading = null, island = null, onIsland, onNightmare = null, onDial = null, onDialPile = null, onDialReading = null, rail, stopAhead, carouselOpen, narrow, areas, ticks, direLimit, pursuit = null, defense = null, scenarioDials, hands, held, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const t = useTableTokens();
   const s = useUiScale();
   const screen = useWindowDimensions();

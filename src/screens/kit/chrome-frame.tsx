@@ -17,6 +17,7 @@ import { usePalette } from "./palette-hook";
 import { themeVars } from "./palette.js";
 import { GameIcon } from "../../ui/game-icon";
 import { playSound } from "../../ui/sound/sound";
+import { quietMusic } from "../../ui/sound/music";
 import type { IconName } from "../../ui/icon-map";
 import { longPressA11y } from "../../ui/long-press-action";
 import { useOpenFocus } from "../../ui/use-open-focus";
@@ -29,6 +30,9 @@ import { touch, useUiScale } from "../../ui/ui-scale";
 import { useSizeClass } from "../../ui/use-size-class";
 import { Text } from "../../ui/text";
 import { ThemeContext, useResolvedTheme } from "../../ui/theme";
+
+// The music waits this long under the win or loss sting, then fades back in (docs/design-system-table.md, Sound).
+const STING_MS = 5000;
 
 /**
  * The page: the ground and its fog (the scene), an optional art layer, then the content, inset 24 and starting under the top inset (useTopInset: the status bar is hidden, a notch or cutout is not); in landscape (the card and booklet
@@ -415,6 +419,7 @@ export function OutcomeTitle({ won, scenario, testID, ended }: { won: boolean; s
   useEffect(() => {
     if (stung.current || ended === true) return;
     stung.current = true;
+    quietMusic(STING_MS);
     playSound(won ? "dread.win" : "dread.loss");
   }, [won, ended]);
   // An end (The Black Gate Opens) is neither: muted, with no glow or red.

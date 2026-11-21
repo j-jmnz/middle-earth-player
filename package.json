@@ -33,6 +33,7 @@
     "expo-sqlite": "~58.0.17",
     "image-backup-exclusion": "file:./modules/image-backup-exclusion",
     "nativewind": "4.2.7",
+    "other-audio": "file:./modules/other-audio",
     "pdfjs-dist": "6.4.299",
     "react": "19.3.0",
     "react-dom": "19.3.0",

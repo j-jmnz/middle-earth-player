@@ -4,7 +4,7 @@
 // mirror and no cache: scripts/build/pack-sounds.ts) plays none, and so do the web and the desktop for now (bundled.ts). A failed sound is not an
 // error the player should see; a development build logs it. One player a slot is made the first time any sound plays and kept for the
 // app's life: the set is small and fixed.
-import { createAudioPlayer, type AudioPlayer } from "expo-audio";
+import { createAudioPlayer, type AudioPlayer } from "./audio-player";
 import { Platform } from "react-native";
 
 import { accessibility } from "../accessibility.ts";

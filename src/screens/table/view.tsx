@@ -329,7 +329,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
           onNightmare={nightmareId ? () => onPreview(nightmareId) : null}
           onDial={onPreview} onDialPile={onPile} onDialReading={(id) => setReading({ kind: "dial", id })} rail={rail}
           stopAhead={stopAhead} carouselOpen={carouselOpen}
-          narrow={narrow} areas={game.separate === true} scenario={game.scenarioId}
+          narrow={narrow} areas={game.separate === true}
           ticks={ticks}
           direLimit={dialLimit(game.dire === true)}
           pursuit={pursuit}

@@ -44,13 +44,18 @@ export function isMusicLoop(name: string): name is MusicLoop {
 
 type Pair = { calm: MusicLoop; combat: MusicLoop };
 
-const FOREST: Pair = { calm: "shadow", combat: "nazgul" };
+// Mirkwood and the other dark woods fight spiders and wargs.
+const FOREST: Pair = { calm: "shadow", combat: "shelob" };
 const WILDS: Pair = { calm: "river", combat: "uruk" };
-const HILLS: Pair = { calm: "rohan", combat: "amonhen" };
+// The hills of Eriador and Angmar: Rohan's theme belongs to Rohan.
+const HILLS: Pair = { calm: "river", combat: "amonhen" };
 const FORTRESS: Pair = { calm: "morgul", combat: "isengard" };
 const UNDERGROUND: Pair = { calm: "moria", combat: "khazad" };
-const DRAGONS: Pair = { calm: "rivendell", combat: "ents" };
+const DRAGONS: Pair = { calm: "rivendell", combat: "khazad" };
 const SEA: Pair = { calm: "havens", combat: "helmsdeep" };
+// The undead (the barrow-wights, the Dead of Deadmen's Dike, the ghost of Framsburg) and the Corsairs' black ships.
+const UNDEAD = "deadpaths";
+const CORSAIRS = "pelennor";
 
 // The film's own scene where the scenario has one; a mood's pair otherwise.
 const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
@@ -77,7 +82,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "return-to-mirkwood": FOREST,
   "the-hunt-for-gollum": FOREST,
   "a-journey-to-rhosgobel": FOREST,
-  "intruders-in-chetwood": FOREST,
+  "intruders-in-chetwood": { calm: "bree", combat: "weathertop" },
   "journey-along-the-anduin": WILDS,
   "journey-up-the-anduin": WILDS,
   "roam-across-rhovanion": WILDS,
@@ -93,23 +98,23 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "the-treachery-of-rhudaur": FORTRESS,
   "the-battle-of-carn-dum": FORTRESS,
   "the-dread-realm": FORTRESS,
-  "deadmens-dike": FORTRESS,
+  "deadmens-dike": { calm: "morgul", combat: UNDEAD },
   "the-caves-of-nibin-dum": UNDERGROUND,
   "mount-gundabad": UNDERGROUND,
   "the-kings-quest": DRAGONS,
   "the-withered-heath": DRAGONS,
   "fire-in-the-night": DRAGONS,
-  "the-ghost-of-framsburg": DRAGONS,
+  "the-ghost-of-framsburg": { calm: "rivendell", combat: UNDEAD },
   "the-fate-of-wilderland": DRAGONS,
   "voyage-across-belegaer": SEA,
   "the-fate-of-numenor": SEA,
   "raid-on-the-grey-havens": SEA,
-  "flight-of-the-stormcaller": SEA,
+  "flight-of-the-stormcaller": { calm: "havens", combat: CORSAIRS },
   "the-thing-in-the-depths": SEA,
   "temple-of-the-deceived": SEA,
   "the-drowned-ruins": SEA,
   "a-storm-on-cobas-haven": SEA,
-  "the-city-of-corsairs": SEA,
+  "the-city-of-corsairs": { calm: "havens", combat: CORSAIRS },
   "into-the-pit": UNDERGROUND,
   "the-seventh-level": UNDERGROUND,
   "flight-from-moria": UNDERGROUND,
@@ -123,7 +128,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "the-battle-of-lake-town": DRAGONS,
   "the-stone-of-erech": { calm: "greycompany", combat: "deadpaths" },
   "the-old-forest": { calm: "fangorn", combat: "ents" },
-  "fog-on-the-barrow-downs": { calm: "morgul", combat: "nazgul" },
+  "fog-on-the-barrow-downs": { calm: "morgul", combat: UNDEAD },
   "the-ruins-of-belegost": DRAGONS,
   "murder-at-the-prancing-pony": { calm: "bree", combat: "weathertop" },
   "the-siege-of-annuminas": { calm: "gondor", combat: "siege" },

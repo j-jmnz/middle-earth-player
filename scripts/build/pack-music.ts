@@ -22,7 +22,7 @@ export const MUSIC_SOURCE = "music";
 const SITE = "The Lord of the Rings film trilogy's score (the player's own copy, cut by pnpm assets music --from)";
 const EXTENSIONS = [".opus", ".flac", ".mp3", ".m4a", ".ogg", ".wav"];
 // The music sits under the loudest sound effects (-17 LUFS), so a strike or a sting stays clear over it.
-const MUSIC_LUFS = -20;
+export const MUSIC_LUFS = -20;
 
 /** The pick's track in the folder: `<file>` with any audio extension. */
 export function findTrack(from: string, pick: MusicPick): string | undefined {
