@@ -24,7 +24,7 @@ Pin Expo SDK 58. The new architecture stays on. One package, no monorepo. pnpm i
 | Files and list images | `expo-file-system`, `expo-image` | bundled pictures, lists, inspect, booklets |
 | Screen state | Zustand | subscribers of reducer output |
 | Haptics | `expo-haptics` (user request, 2026-10-25) | the table's dock: arm, send, undo, refusal; a card landing; a combat spotlight's strike |
-| Sound effects and music | `expo-audio` (user request, 2026-11-18) | the table's and the screens' moments, and a looped piece of the film score for each scenario, on the phone only (`src/ui/sound/`; `docs/design-system-table.md`, Sound) |
+| Sound effects and music | `expo-audio` (user request, 2026-11-18) | the table's and the screens' moments, and a looped piece of the film score for each scenario, on the phone, the web and the desktop (the web and the desktop read the same files through `expo-audio`'s web players, in an export packed with them: `src/ui/sound/*.canvaskit.*`, `src/ui/web/web-audio.ts`; `src/ui/sound/`; `docs/design-system-table.md`, Sound) |
 | Clipboard | `expo-clipboard` | Copy game state on a phone (`src/screens/table/clipboard.native.ts`); it only writes |
 | Keep awake | `expo-keep-awake` (user request, 2026-10-28) | the table, while Keep screen awake is on (`src/play/chrome/use-keep-awake.ts`) |
 | Backup exclusion | local Expo module `modules/image-backup-exclusion` | the image directory (`src/screens/images/queue.native.ts`) |

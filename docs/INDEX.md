@@ -38,7 +38,7 @@ Each agent reads its own file.
 Read the sections your task touches.
 
 - `docs/architecture.md` — Architecture (~25.3K tok)
-  - 7–44 Stack (~1.6K)
+  - 7–44 Stack (~1.7K)
   - 45–80 Processes (~730)
   - 81–166 Modules (~2.6K) ← 4
     - 130–166 Repository map (~1.0K) ← 1
