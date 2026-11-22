@@ -256,7 +256,8 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
   const campaign = useMemo(() => campaignTokens(game, ctx.effects, nameOf, peek.shown), [game, ctx, nameOf, peek.shown]);
   const tokenName = campaign?.name ?? null;
   const tokenCount = campaign?.tokens ?? null;
-  const tokens = useMemo(() => (tokenName == null || tokenCount == null ? null : { name: tokenName, tokens: tokenCount }), [tokenName, tokenCount]);
+  const tokenCard = campaign?.cardId ?? null;
+  const tokens = useMemo(() => (tokenName == null || tokenCount == null || tokenCard == null ? null : { name: tokenName, tokens: tokenCount, cardId: tokenCard }), [tokenName, tokenCount, tokenCard]);
   const held = useMemo(() => heldDials(game, nameOf, (code) => ctx.cards.get(code)?.type === "enemy"), [game, nameOf, ctx]);
   const pursuit = usePursuitReadout(game);
   const defense = useDefenseTokens(game, nameOf);

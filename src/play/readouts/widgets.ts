@@ -129,7 +129,8 @@ export function usePursuitReadout(game: ScenarioState): PursuitReadout | null {
   return useMemo(() => (value == null || limit == null ? null : { value, limit }), [value, limit]);
 }
 
-export type TokenReadout = { name: string; tokens: number };
+// `cardId` is the card that holds the tokens: a press on the dial opens its preview.
+export type TokenReadout = { name: string; tokens: number; cardId: string };
 
 // The quest stage of the seat the table shows: the one stage before stages are separate, that seat's own after.
 function stageCard(game: ScenarioState, seat: number) {
@@ -147,7 +148,7 @@ export function campaignTokens(game: ScenarioState, effects: readonly Effect[], 
   const places = (code: string) => effects.some((effect) => effect.cardCode === code && effect.instructions.some((instruction) => instruction.verb === "PlaceToken"));
   const holders = [Object.values(game.cards).find((entry) => entry.zone === "campaign"), stageCard(game, seat)];
   const card = holders.find((entry) => entry != null && places(entry.code));
-  return card ? { name: nameOf(card.code), tokens: card.resources } : null;
+  return card ? { name: nameOf(card.code), tokens: card.resources, cardId: card.id } : null;
 }
 
 /** The Nightmare setup card's instance next to the quest deck (zone `nightmare`), or null on Easy and Normal. */

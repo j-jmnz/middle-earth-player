@@ -24,10 +24,10 @@ const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
 describe("the resource tokens on the campaign card (41050:A:3)", () => {
   it("shows the number the engine wrote, named for the card, in a Campaign Mode game of The Oath", () => {
     const made = oathTable(world, { campaign: true });
-    expect(campaignTokens(made.state, made.ctx.effects, nameOf)).toEqual({ name: "The Oath", tokens: 0 });
+    expect(campaignTokens(made.state, made.ctx.effects, nameOf)).toEqual({ name: "The Oath", tokens: 0, cardId: first(made.state, "41050") });
     const id = first(made.state, "41050");
     const more = { ...made.state, cards: { ...made.state.cards, [id]: { ...made.state.cards[id]!, resources: 4 } } };
-    expect(campaignTokens(more, made.ctx.effects, nameOf)).toEqual({ name: "The Oath", tokens: 4 });
+    expect(campaignTokens(more, made.ctx.effects, nameOf)).toEqual({ name: "The Oath", tokens: 4, cardId: id });
   });
 
   it("shows nothing in a standalone game (no campaign card), and nothing for a campaign card that places no token", () => {

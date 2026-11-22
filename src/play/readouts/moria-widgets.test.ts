@@ -21,9 +21,9 @@ const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
 describe("the resource tokens on stage 2 (142041:B:3)", () => {
   it("shows the number the engine wrote, named for the stage, while stage 2 is current", () => {
     const made = makeTable(world, { stage: "142041", tokens: 2 });
-    expect(campaignTokens(made.state, made.ctx.effects, nameOf)).toEqual({ name: "Drums in the Deep", tokens: 2 });
+    expect(campaignTokens(made.state, made.ctx.effects, nameOf)).toEqual({ name: "Drums in the Deep", tokens: 2, cardId: first(made.state, "142041") });
     const more = makeTable(world, { stage: "142041", tokens: 5 });
-    expect(campaignTokens(more.state, more.ctx.effects, nameOf)).toEqual({ name: "Drums in the Deep", tokens: 5 });
+    expect(campaignTokens(more.state, more.ctx.effects, nameOf)).toEqual({ name: "Drums in the Deep", tokens: 5, cardId: first(more.state, "142041") });
   });
 
   it("shows nothing on the stages that place none", () => {

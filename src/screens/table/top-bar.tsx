@@ -45,7 +45,7 @@ export type TopBarProps = {
   burdenDeck: number | null;
   // The resource tokens on the campaign card (The Oath, 41050:A:3) or on the current stage (Journey in the Dark, 142041:B:3) and the card's name, or null
   // when its scenario has none.
-  tokens?: { name: string; tokens: number } | null;
+  tokens?: { name: string; tokens: number; cardId: string } | null;
   // The Heading dial, after the seat dials, while the Heading card is in play (dcce.heading): the current step, and what a tap does (the Heading card's preview). Absent: no dial.
   heading?: { step: HeadingStep; onPress: () => void } | null;
   // The Island Map chip, right after the seat dials, while the game has a map (dcce.island-map): the map as the table reads it, and what a tap does (the map panel).
@@ -193,7 +193,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
             {(scenarioDials ?? NO_DIALS).map((dial) => (
               <ThreatRing key={dial.id} {...dialProps(dial)} onPress={dial.cardId && onDial ? () => onDial(dial.cardId ?? "", dial.extra) : dial.pile && onDialPile ? () => onDialPile(dial.pile ?? "") : dial.lists && onDialReading ? () => onDialReading(dial.id) : undefined} compact />
             ))}
-            {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} compact /> : null}
+            {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} onPress={onDial ? () => onDial(tokens.cardId) : undefined} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
             {onNightmare ? (
               // Laid out as Life, Tokens and Burden are (the mark, then its word), with the dials' pressed fill. The word stays at every
