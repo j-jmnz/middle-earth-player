@@ -87,8 +87,7 @@ describe("the Dol Amroth towers (12134 to 12137)", () => {
   }
 
   // rr.guarded: "If the next card also has the guarded keyword, use the next card of the encounter deck to fulfill the original keyword effect, and then resolve the guarded keyword on the second card."
-  // FAULT: the second tower is revealed with the guarded keyword, so it goes to the staging area and is guarded in its turn (rr.guarded); the engine skips it and leaves it in the encounter deck.
-  it.fails("12135:A:1 a second tower revealed as its guard goes to the staging area, the next card guards the first, and the second tower is guarded in turn", () => {
+  it("12135:A:1 a second tower revealed as its guard goes to the staging area, the next card guards the first, and the second tower is guarded in turn", () => {
     const made = table({ deck: [TOWERS.heron, "f0", "f3"] });
     const { state, id } = reveal(made, TOWERS.gull);
     const heron = idOf(state, TOWERS.heron);

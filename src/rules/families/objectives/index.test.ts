@@ -42,17 +42,30 @@ function resolveRevealed(layout: DolGuldurLayout, code: string, pick: (state: Sc
 }
 
 describe("Guarded (rr.guarded, 01108:A:1, 01123:A:1)", () => {
-  it("attaches the next non-objective card of the encounter deck to an objective when it is revealed, and keeps both in the staging area", () => {
-    const { run, state } = resolveRevealed({ staging: ["01108"], deck: ["01109", "f3", "f0"], phase: "Quest" }, "01108");
+  it("attaches the next card of the encounter deck to an objective when it is revealed, and keeps both in the staging area", () => {
+    const { run, state } = resolveRevealed({ staging: ["01108"], deck: ["f3", "f0"], phase: "Quest" }, "01108");
     const map = first(run.state, "01108");
-    // The objective on top of the deck is skipped: it stays on the deck, and the first enemy guards.
     const guard = first(run.state, "f3");
     expect(run.state.cards[guard]?.host).toBe(map);
     expect(run.state.cards[guard]?.zone).toBe("staging");
     expect(run.state.cards[map]?.attachments).toEqual([guard]);
     expect(run.state.staging).toContain(guard);
-    expect(codesOf(run.state, run.state.encounterDeck)).toEqual(["01109", "f0"]);
+    expect(codesOf(run.state, run.state.encounterDeck)).toEqual(["f0"]);
     expect(state.cards[map]?.attachments).toEqual([]);
+    expect(causeProblems(run.steps)).toEqual([]);
+  });
+
+  // rr.guarded: "If the next card also has the guarded keyword, use the next card of the encounter deck to fulfill the original keyword effect, and then resolve the guarded keyword on the second card."
+  it("uses the card after a second Guarded objective to guard the first, then reveals the second, which the next card guards (rr.guarded)", () => {
+    const { run } = resolveRevealed({ staging: ["01108"], deck: ["01109", "f3", "f0", "f0"], phase: "Quest" }, "01108");
+    const map = first(run.state, "01108");
+    const second = first(run.state, "01109");
+    expect(run.state.cards[first(run.state, "f3")]).toMatchObject({ host: map, zone: "staging", guard: true });
+    expect(run.state.cards[second]).toMatchObject({ zone: "staging" });
+    const guardOfSecond = run.state.cards[second]?.attachments ?? [];
+    expect(guardOfSecond).toHaveLength(1);
+    expect(codesOf(run.state, guardOfSecond)).toEqual(["f0"]);
+    expect(codesOf(run.state, run.state.encounterDeck)).toEqual(["f0"]);
     expect(causeProblems(run.steps)).toEqual([]);
   });
 
