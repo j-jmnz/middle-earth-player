@@ -48,7 +48,7 @@ export type SoundSlot = (typeof SOUND_SLOTS)[number];
 // from launch and again when the table closes, and the ones the table plays most, while it is open. Any other sound is loaded as its
 // moment is known to come, or the first time it plays.
 export const SCREEN_SOUNDS: readonly SoundSlot[] = ["ui.confirm", "ui.back", "ui.select", "ui.tab", "ui.open", "ui.close", "ui.toggle-on", "ui.toggle-off", "ui.error", "ui.notice"];
-export const TABLE_SOUNDS: readonly SoundSlot[] = ["ui.select", "ui.back", "ui.error", "card.pick", "card.land", "card.draw", "card.exhaust", "card.ready", "token.resource", "token.damage", "token.progress", "token.remove"];
+export const TABLE_SOUNDS: readonly SoundSlot[] = ["ui.select", "ui.confirm", "ui.toggle-off", "ui.back", "card.pick", "card.land", "card.draw", "card.exhaust", "card.ready", "token.resource", "token.damage", "token.progress"];
 
 export function isSoundSlot(name: string): name is SoundSlot {
   return (SOUND_SLOTS as readonly string[]).includes(name);

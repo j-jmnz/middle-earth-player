@@ -32,6 +32,9 @@ export const PLAYERS_MAX = 12;
 // How long after a sound's end its player is put back to its start, and the longest a player whose length never loads is left to sound
 // (the longest sound is kept to 4.5 s: scripts/build/sound-picks.ts).
 const REWIND_MS = 80;
+// A new player asked to play before its file has loaded can stay silent. It is asked again as it loads, if that is this soon after:
+// later, the sound's moment has gone.
+const LATE_MS = 700;
 const LONGEST_MS = 5000;
 
 // After an Undo, the table's own sounds (the threat dial, the rail, the cards and tokens moving back) stay quiet this long: the
@@ -126,6 +129,17 @@ function rewind(voice: Voice, token: number): void {
   }
 }
 
+// A new player that was asked to play before it had loaded is asked again once it has, when it is not sounding by then.
+function playWhenLoaded(voice: Voice, token: number): void {
+  const { player } = voice;
+  if (player.isLoaded) return;
+  const heard = player.addListener("playbackStatusUpdate", (status) => {
+    if (!status.isLoaded) return;
+    heard.remove();
+    if (voice.started === token && !status.playing && Date.now() - token < LATE_MS) player.play();
+  });
+}
+
 // Loads a player for each slot that has none, in place of the players used longest ago, and counts the slots' players as just used.
 function load(slots: readonly SoundSlot[], now: number): void {
   const keep = new Set(slots);
@@ -201,6 +215,7 @@ export function playSound(slot: SoundSlot): void {
     if (!voice) return;
     const { player } = voice;
     const { cued } = voice;
+    const first = voice.started === 0;
     voice.started = now;
     voice.used = now;
     voice.cued = false;
@@ -210,8 +225,10 @@ export function playSound(slot: SoundSlot): void {
     }
     // A player at its start plays at once. One still sounding, or not yet put back (rewind), starts again only once its seek to the
     // start is done, so it never plays on from where it stopped.
-    if (cued) player.play();
-    else {
+    if (cued) {
+      player.play();
+      if (first) playWhenLoaded(voice, now);
+    } else {
       player.pause();
       player
         .seekTo(0)
