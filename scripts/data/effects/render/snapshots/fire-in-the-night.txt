@@ -21,19 +21,19 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 12187:B:1 (back): Resolution: While repairs begin on Hrogar's Hill, Beldis attends to the wounded heroes. If the heroes choose to accept her offer to join their quest, add Beldis to the campaign pool (any player may add her to their deck). Otherwise, mark in the campaign log that "Beldis's care has bolstered the heroes' spirits" (fear will have less of a hold on them).
   12187:resolution:1: Resolution
-    - [json BoonAllyOrLogLine {"verb":"BoonAllyOrLogLine","ally":"12188","line":"beldis"}]
+    - Resolution: the players choose, the first player answering for the group, with no default: accept the aid, and the boon ally with code 12188 joins the Campaign Pool (any player may add it to their deck); or decline, and the line "beldis" is recorded in the Campaign Log
 
 12187:B:2 (back): If there is at least 5 progress on Hrogar's Hill, the players look at 3 random undiscovered treasures and choose 1 to attach to an eligible character.
   12187:resolution:2: Resolution
-    - [json ChooseRandomTreasure {"verb":"ChooseRandomTreasure","count":3,"when":{"kind":"stageProgress","min":5}}]
+    - if the current quest stage holds at least 5 progress: Resolution: 3 undiscovered treasures are drawn with the game's seed and the first player chooses one; the scenario is over, so the treasure joins the discovered ones the Resolution writes instead of being attached
 
 12187:B:3 (back): The players discover each treasure they control.
   12187:resolution:3: Resolution
-    - [json DiscoverTreasure {"verb":"DiscoverTreasure"}]
+    - Resolution: each treasure a player controls, claimed and attached to a character, is written to the log's discovered treasures (a treasure still guarded in the staging area is not controlled and is not discovered)
 
 12187:B:4 (back): Each player may remove a non-burden card from the campaign pool.
   12187:resolution:4: Resolution
-    - [json RemoveFromPool {"verb":"RemoveFromPool","choice":"eachPlayerNonBurden"}]
+    - Resolution: each player in turn may remove one card that is not a burden from the Campaign Pool, a card of the pool or an encounter card the pool tallies; a player may decline
 
 ## 12188 Beldis
 
@@ -41,7 +41,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   12188:action:1: Action (cost: pay 1 resource(s); any player may use it)
     only if [json condition {"kind":"beldisBox"}]
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MarkBeldisUse {"verb":"MarkBeldisUse"}]
+    - the acting player's box beside Beldis in the Campaign Log is marked (the log has four boxes for each player; the log keeps it when the scenario is won)
     - choose character (any player controls)
     - heal 3 damage from the picked card
 
@@ -276,7 +276,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 19080:A:3 (shadow): Shadow: Excess damage from this attack must be dealt to Hrogar's Hill.
   19080:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - [json ExcessToStage {"verb":"ExcessToStage"}]
+    - (a shadow effect) the damage the attack in progress deals beyond its defender's remaining hit points goes on the main quest card (nothing outside an attack)
 
 ## 19081 The Dragon's Fury
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -321,9 +321,9 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
     only if it is the Planning phase
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RevealSideQuest {"verb":"RevealSideQuest"}]
+    - the acting player reveals the top card of the side quest deck as an encounter card, its When Revealed effects resolve (they cannot be canceled), and it lies in the staging area (nothing with an empty deck or in a game that dealt none)
     - choose enemy (any player controls) or in the staging area, named "Dagnir"
-    - [json AttackStage {"verb":"AttackStage"}]
+    - the last picked enemy, in the staging area, attacks the main quest card: the first player is the defending player and may declare a defender (a character they control, or a Sentinel) or leave it undefended; the whole undefended damage, and the damage beyond a defender's remaining hit points, is dealt to the quest card; no shadow card is dealt, and it does not use up the enemy's attack of the combat phase
 
 19083:B:2 (back): This stage cannot be defeated while Dagnir has hit points remaining. If Dagnir has no hit points remaining, the players win the game. If this stage has damage equal to its quest points, the players lose the game.
   19083:constant:1: Constant
@@ -334,4 +334,4 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19083:constant:2: Constant
     - this card: stat loseAtDamage quest points of this card, while this card is in play
 
-(rendered pieces: 200 by template, 9 as JSON)
+(rendered pieces: 209 by template, 1 as JSON)

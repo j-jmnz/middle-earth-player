@@ -9,9 +9,9 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
   12193:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if [json condition {"kind":"treasuresLogged","min":6}]: a card with code 12194 from the box joins the encounter deck, which is shuffled
-    - [json SearchBoonAllyToHand {"verb":"SearchBoonAllyToHand"}]
+    - Campaign Setup: each player in turn, the first player first, may take a unique boon ally of their deck (a pool ally the checklist is about to shuffle into it is in the deck already) into their starting hand, or decline; the offer ends with the first who takes one (the checklist deals it, so it changes nothing here)
     - if the Campaign Log holds "melanwar": remove 2 non-unique locations from the encounter deck
-    - [json RemoveFromCavesIfLogged {"verb":"RemoveFromCavesIfLogged","line":"melanwar","count":1,"cardType":"location"}]
+    - Campaign Setup: if the Campaign Log holds "melanwar": the first player chooses up to 1 location card(s) of the Caves deck the scenario deals and they are removed from the game (the checklist deals it, so it changes nothing here)
     - if the Campaign Log holds "beldis": remove 3 treacheries from the encounter deck
 
 12193:B:1 (back): Ignore the discover keyword. Unique locations cannot be discarded from play by encounter card effects.
@@ -22,19 +22,19 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 12193:B:2 (back): Resolution: The players may, as a group, look at 3 random undiscovered treasures and choose 1 to attach to an eligible character.
   12193:resolution:1: Resolution
-    - [json ChooseRandomTreasure {"verb":"ChooseRandomTreasure","count":3}]
+    - Resolution: 3 undiscovered treasures are drawn with the game's seed and the first player chooses one; the scenario is over, so the treasure joins the discovered ones the Resolution writes instead of being attached
 
 12193:B:3 (back): The players discover each treasure they control.
   12193:resolution:2: Resolution
-    - [json DiscoverTreasure {"verb":"DiscoverTreasure"}]
+    - Resolution: each treasure a player controls, claimed and attached to a character, is written to the log's discovered treasures (a treasure still guarded in the staging area is not controlled and is not discovered)
 
 12193:B:4 (back): Remove A Growing Threat from the campaign pool.
   12193:resolution:3: Resolution
-    - [json RemoveFromPool {"verb":"RemoveFromPool","codes":["12167"]}]
+    - Resolution: every copy of the encounter cards with codes 12167 leaves the Campaign Pool (only the encounter cards the pool tallies, not the pool's own cards)
 
 12193:B:5 (back): If there are 6 or more treasures recorded in the campaign log, add Dragon-sickness to the campaign pool.
   12193:resolution:4: Resolution
-    - [json AddEncounterToPool {"verb":"AddEncounterToPool","codes":["12194"],"when":{"kind":"treasuresLogged","min":6}}]
+    - if [json condition {"kind":"treasuresLogged","min":6}]: Resolution: encounter cards join the Campaign Pool: one copy of each of the cards with codes 12194 (the log tallies the copies, never past what one collection holds)
 
 ## 19122 The First Forge
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -84,7 +84,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 19124:A:1 (front): Response: When Throat of the Mountain is explored, search the quest deck for a quest card and make it the current main quest. Then, flip it over. Shuffle the rest of the quest deck.
   19124:response:1: Response after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
-    - [json SearchQuestDeck {"verb":"SearchQuestDeck"}]
+    - the acting player chooses a stage of the quest deck; it becomes the current quest in place of the stage now current (which goes back into the quest deck with no progress, side A up, as a bypassed stage does), it is revealed and shows side B at once, and the quest deck is shuffled
 
 ## 19125 Dagnir
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -154,7 +154,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19129:A:1 (front): Deep.
   19129:constant:1: Constant
-    - [json Deep {"verb":"Deep"}]
+    - (constant, the Deep keyword) after the players travel to this location and the Responses to the travel are done, they discard it and the top card of the Caves deck replaces it as the active location (ignored with the Caves deck empty, once it is no longer the active location, or while a card in play ignores the keyword)
 
 19129:A:2 (front): Dagnir gets -10 engagement cost.
   19129:constant:2: Constant
@@ -170,7 +170,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19130:A:1 (front): Deep.
   19130:constant:1: Constant
-    - [json Deep {"verb":"Deep"}]
+    - (constant, the Deep keyword) after the players travel to this location and the Responses to the travel are done, they discard it and the top card of the Caves deck replaces it as the active location (ignored with the Caves deck empty, once it is no longer the active location, or while a card in play ignores the keyword)
 
 19130:A:2 (front): When faced with the option to travel, the players must travel to Narrow Stair.
   19130:constant:2: Constant
@@ -186,7 +186,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19131:A:1 (front): Deep.
   19131:constant:1: Constant
-    - [json Deep {"verb":"Deep"}]
+    - (constant, the Deep keyword) after the players travel to this location and the Responses to the travel are done, they discard it and the top card of the Caves deck replaces it as the active location (ignored with the Caves deck empty, once it is no longer the active location, or while a card in play ignores the keyword)
 
 19131:A:2 (front): While there are 3 or more quest cards in the victory display, Desecrated Ruins gets +2 Threat.
   19131:constant:2: Constant
@@ -254,7 +254,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - advance to the next quest stage
-    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+    - the current quest card shows side B (a stage that already shows side B changes nothing)
   19134:forced:2: Forced on the event questCardDefeated (heard about this card)
     - when this stage is defeated, whatever the heading: the first player looks at the top 2 stages of the quest deck and chooses 1 to place on the bottom of the quest deck; the others stay on top in their order and the quest advances to the top stage
 
@@ -269,11 +269,11 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19135:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
   19135:constant:1: Constant
-    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+    - (marker, does nothing when run) this stage is not flipped over until the beginning of the quest phase; the scenario definition copies it onto the stage: the quest is ordered by its quest deck, a stage arrives with side A up, the stage defeated goes to the victory display and the quest advances to the top stage of the deck
   19135:forced:1: Forced when a phase begins
     only if it is the Quest phase
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+    - the current quest card shows side B (a stage that already shows side B changes nothing)
 
 19135:B:1 (back): Forced: After characters are committed to the quest, raise each player's threat by 1.
   19135:forced:2: Forced when the staging step begins, before the first card is revealed
@@ -282,7 +282,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19135:B:2 (back): Forced: When this stage is defeated, shuffle The First Forge into the Caves deck.
   19135:forced:3: Forced on the event questCardDefeated (heard about this card)
-    - [json ShuffleSetAsideIntoPile {"verb":"ShuffleSetAsideIntoPile","pile":"caves","code":"19122","count":1}]
+    - up to 1 set-aside copies of the card with code 19122 join the Caves deck, which is shuffled with the game's seed (a game that dealt no such pile, or has no copy set aside, changes nothing)
 
 19135:B:3 (back): At the end of the combat phase, the players may bypass this stage.
   19135:forced:4: Forced at the end of the phase
@@ -290,7 +290,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 ## 19137 Exploring Gundabad
@@ -304,11 +304,11 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19137:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
   19137:constant:1: Constant
-    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+    - (marker, does nothing when run) this stage is not flipped over until the beginning of the quest phase; the scenario definition copies it onto the stage: the quest is ordered by its quest deck, a stage arrives with side A up, the stage defeated goes to the victory display and the quest advances to the top stage of the deck
   19137:forced:1: Forced when a phase begins
     only if it is the Quest phase
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+    - the current quest card shows side B (a stage that already shows side B changes nothing)
 
 19137:B:1 (back): The "when revealed" effects of the first treachery revealed each round cannot be canceled.
   19137:constant:2: Constant
@@ -317,7 +317,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 19137:B:2 (back): Forced: When this stage is defeated, search the Caves deck for a location and make it the active location. Shuffle the Caves deck.
   19137:forced:2: Forced on the event questCardDefeated (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ActivateFromCaves {"verb":"ActivateFromCaves"}]
+    - the acting player chooses a card of the Caves deck, which becomes the active location (the one active now returns to the staging area) and hears that it did (nothing with the Caves deck empty; the shuffle is the record's)
     - shuffle the caves deck
 
 19137:B:3 (back): At the end of the combat phase, the players may bypass this stage.
@@ -326,7 +326,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 ## 19138 Exploring Gundabad
@@ -340,18 +340,18 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19138:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
   19138:constant:1: Constant
-    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+    - (marker, does nothing when run) this stage is not flipped over until the beginning of the quest phase; the scenario definition copies it onto the stage: the quest is ordered by its quest deck, a stage arrives with side A up, the stage defeated goes to the victory display and the quest advances to the top stage of the deck
   19138:forced:1: Forced when a phase begins
     only if it is the Quest phase
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+    - the current quest card shows side B (a stage that already shows side B changes nothing)
 
 19138:B:1 (back): Forced: After characters are committed to the quest, discard the top 5 cards of the encounter deck. Add a random enemy discarded this way to the staging area.
   19138:forced:2: Forced when the staging step begins, before the first card is revealed
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard 5 card(s) from the top of the encounter deck
-    - [json StageRandomDiscarded {"verb":"StageRandomDiscarded","type":"enemy"}]
+    - one of the cards the last discard step discarded that is still in the encounter discard pile and is an enemy, chosen with the game's seed, enters the staging area
 
 19138:B:2 (back): Forced: When this stage is defeated, reduce each player's threat by 5.
   19138:forced:3: Forced on the event questCardDefeated (heard about this card)
@@ -363,7 +363,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 ## 19139 Exploring Gundabad
@@ -377,11 +377,11 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19139:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
   19139:constant:1: Constant
-    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+    - (marker, does nothing when run) this stage is not flipped over until the beginning of the quest phase; the scenario definition copies it onto the stage: the quest is ordered by its quest deck, a stage arrives with side A up, the stage defeated goes to the victory display and the quest advances to the top stage of the deck
   19139:forced:1: Forced when a phase begins
     only if it is the Quest phase
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+    - the current quest card shows side B (a stage that already shows side B changes nothing)
 
 19139:B:1 (back): Forced: After characters are committed to the quest, Dagnir makes an immediate attack against each player with 6 or more characters.
   19139:forced:2: Forced when the staging step begins, before the first card is revealed
@@ -403,7 +403,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 ## 19140 Exploring Gundabad
@@ -417,15 +417,15 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19140:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
   19140:constant:1: Constant
-    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+    - (marker, does nothing when run) this stage is not flipped over until the beginning of the quest phase; the scenario definition copies it onto the stage: the quest is ordered by its quest deck, a stage arrives with side A up, the stage defeated goes to the victory display and the quest advances to the top stage of the deck
   19140:forced:1: Forced when a phase begins
     only if it is the Quest phase
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+    - the current quest card shows side B (a stage that already shows side B changes nothing)
 
 19140:B:1 (back): Each player cannot play more than 1 card each phase.
   19140:constant:2: Constant
-    - [json LimitPlaysPerPhase {"verb":"LimitPlaysPerPhase","max":1}]
+    - (constant) a player who has played 1 card(s) in the phase may play no more; a card put into play is not played
 
 19140:B:2 (back): Forced: When this stage is defeated, the first player looks at the top 2 cards of the quest deck and chooses 1 to place on the bottom of the quest deck. Then, flip over the top card of the quest deck.
   19140:forced:2: Forced on the event questCardDefeated (heard about this card)
@@ -437,7 +437,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 ## 19141 Exploring Gundabad
@@ -451,11 +451,11 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19141:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
   19141:constant:1: Constant
-    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+    - (marker, does nothing when run) this stage is not flipped over until the beginning of the quest phase; the scenario definition copies it onto the stage: the quest is ordered by its quest deck, a stage arrives with side A up, the stage defeated goes to the victory display and the quest advances to the top stage of the deck
   19141:forced:1: Forced when a phase begins
     only if it is the Quest phase
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+    - the current quest card shows side B (a stage that already shows side B changes nothing)
 
 19141:B:1 (back): Forced: After characters are committed to the quest, each player must deal 2 damage to a questing character he controls.
   19141:forced:2: Forced when the staging step begins, before the first card is revealed
@@ -476,7 +476,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 ## 19142 Exploring Gundabad
@@ -490,11 +490,11 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19142:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
   19142:constant:1: Constant
-    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+    - (marker, does nothing when run) this stage is not flipped over until the beginning of the quest phase; the scenario definition copies it onto the stage: the quest is ordered by its quest deck, a stage arrives with side A up, the stage defeated goes to the victory display and the quest advances to the top stage of the deck
   19142:forced:1: Forced when a phase begins
     only if it is the Quest phase
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+    - the current quest card shows side B (a stage that already shows side B changes nothing)
 
 19142:B:1 (back): Dagnir gets -5 engagement cost for each character the first player controls.
   19142:constant:2: Constant
@@ -516,7 +516,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
   19142:forced:2: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (the number of card (any player controls) in the victory display, a quest card of any kind (a quest stage, an encounter side quest or a player side quest) is at most 4)
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json BypassStage {"verb":"BypassStage"}]
+    - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
 
 ## 19144 Wormsbane
 
@@ -532,4 +532,4 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
   19144:constant:3: Constant
     - its host: stat lossOnLeavingPlay 1, while this card is in play
 
-(rendered pieces: 320 by template, 37 as JSON)
+(rendered pieces: 356 by template, 2 as JSON)

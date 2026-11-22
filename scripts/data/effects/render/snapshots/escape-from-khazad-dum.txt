@@ -16,7 +16,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51301:B:1 (back): Forced: When Dark Pit is explored, flip it over and set Durin's Bane aside, out of play. Each player searches the top 5 cards of his deck for a card, adds it to his hand, and shuffles his deck.
   51301:forced:1: Forced on the event locationExplored (heard about location (any player controls) named "Dark Pit")
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json FlipOver {"verb":"FlipOver","into":"51311","target":"subject","setAside":true}]
+    - the card the event is about, the explored location, flips over and shows the card with code 51311, and goes to the set-aside zone, out of play, instead of the staging area (the old side is kept as the card's other side)
     - for each player, first player first:
       - choose card (you control) in the deck, among the top 5
       - move the picked card to hand
@@ -763,9 +763,9 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51351:A:1 (front): Forced: After Nameless Thing enters play, the first player attaches the top card of his deck to it faceup as a guarded attachment. Nameless Thing gets +X Threat, +X Attack, and +X Defense, where X is that card's printed cost. When Nameless Thing leaves play, discard that card.
   51351:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
-    - [json GuardWithDeckTop {"verb":"GuardWithDeckTop","discards":true}]
+    - the first player's top deck card lies faceup under this card, which guards it (nothing with an empty deck); when this card leaves play the guarded card goes to its owner's discard pile, not to the hand
   51351:forced:2: Forced after a card leaves play (heard about this card)
-    - [json DiscardGuarded {"verb":"DiscardGuarded"}]
+    - (marker, does nothing when run) when this card leaves play, the card it guards is discarded to its owner's discard pile by the settle sweep
   51351:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat threat the printed cost of the card this card guards (one under it, or the host it guards as a guard; 0 for a card with no printed cost), while this card is in play
@@ -798,4 +798,4 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 465 by template, 7 as JSON)
+(rendered pieces: 468 by template, 4 as JSON)

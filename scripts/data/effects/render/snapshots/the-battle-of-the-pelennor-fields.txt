@@ -515,7 +515,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145077:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card with code 145080 is added to the staging area (the copy a Setup search found, else one the Setup deals)
-    - [json AttachSearched {"verb":"AttachSearched","type":"treachery","trait":"Morgul","to":"The Witch-king","name":"Fell Beast"}]
+    - the first player chooses a treachery with the trait Morgul titled "Fell Beast" in the encounter deck or its discard pile (one of each title) that the enemy named "The Witch-king" does not carry yet, and it is attached to that enemy in play (the deck is shuffled by the step after)
     - shuffle the encounter deck
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card
@@ -542,7 +542,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - Campaign Setup: each enemy recorded in the Campaign Log under The Black Gate with the trait Harad is set aside, out of play, one copy for each recorded (nothing is set aside with no log)
     - Campaign Setup: the first player attaches the cards with codes 142014 and 145013, from the supply, to the hero with code 145001 and sets him aside, out of play, with an empty resource pool (he returns with an empty one)
-    - [json AddToStagingWithResources {"verb":"AddToStagingWithResources","code":"145072","amount":{"recorded":"corsairFleet"}}]
+    - the card with code 145072 enters the staging area with [json amount {"recorded":"corsairFleet"}] resource tokens on it (on the campaign card's Setup it is spawned; on the card's own Setup a copy of the pool the Setup search found is placed)
     - Campaign Setup: the pool's burdens of the burden sets "A Shadow of the Past", "Flight to the Ford", "The Ring Goes South", "The Passage of the Marshes", "Shelob's Lair" are not dealt this scenario; they stay in the pool, only left out of the decks the setup builds (the encounter deck)
 
 145078:B:1 (back): Forced: When the players advance to stage 5B, add each set aside Harad enemy to the staging area.
@@ -590,4 +590,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - this enemy, in the staging area, engages the first player
     - then, if this card is engaged with a player (that player is who "you" means in this record) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 357 by template, 6 as JSON)
+(rendered pieces: 359 by template, 5 as JSON)

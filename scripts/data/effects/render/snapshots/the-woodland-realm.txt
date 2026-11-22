@@ -15,7 +15,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51101:B:1 (back): Forced: When Spider Den is explored, flip it over and put Mendor into play under the first player's control, ready.
   51101:forced:1: Forced on the event locationExplored (heard about location (any player controls) named "Spider Den")
-    - [json FlipOver {"verb":"FlipOver","into":"51111","target":"subject","control":"firstPlayer"}]
+    - the card the event is about, the explored location, flips over and shows the card with code 51111: the back is a player-side card, so it enters the first player's play area, faceup and ready (it enters play for that player and has no owner) (the old side is kept as the card's other side)
 
 51101:B:2 (back): This stage cannot be defeated unless the first player controls Mendor.
   51101:constant:1: Constant
@@ -793,4 +793,4 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 475 by template, 3 as JSON)
+(rendered pieces: 476 by template, 2 as JSON)

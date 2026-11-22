@@ -278,7 +278,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09051:A:2 (front): Forced: When Lost in the Wilderness is defeated, return each card underneath it to its owner's hand.
   09051:forced:1: Forced on the event questDefeated
-    - [json ReturnFacedownToHands {"verb":"ReturnFacedownToHands"}]
+    - each facedown player card under the location the event is about (explored, and left play) returns to its owner's hand
 
 ## 09068 Stop the War Party
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -353,4 +353,4 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - if not (2 is less than the number of players): this card: stat loseAtDamage 10, while this card is in play
     - then, if 2 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat loseAtDamage 20, while this card is in play
 
-(rendered pieces: 211 by template, 3 as JSON)
+(rendered pieces: 212 by template, 2 as JSON)

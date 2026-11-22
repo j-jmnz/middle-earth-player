@@ -184,12 +184,12 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50609:A:1 (front): Loot. Restricted.
   50609:constant:2: Constant
-    - [json Loot {"verb":"Loot"}]
+    - (constant, the Loot keyword) this objective enters play only through the Discover keyword: one revealed from the encounter deck is discarded and another card is revealed
 
 50609:A:2 (front): If unattached, the first player claims Sword of Belegost and attaches it to a hero he controls.
   50609:constant:3: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
     - this card: stat returnsToStagingArea 1, while this card is in play
     - this card counts as an attachment while it is attached
 
@@ -207,12 +207,12 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50610:A:1 (front): Loot.
   50610:constant:1: Constant
-    - [json Loot {"verb":"Loot"}]
+    - (constant, the Loot keyword) this objective enters play only through the Discover keyword: one revealed from the encounter deck is discarded and another card is revealed
 
 50610:A:2 (front): If unattached, the first player claims Map of Ered Luin and attaches it to a hero he controls.
   50610:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
     - this card: stat returnsToStagingArea 1, while this card is in play
     - this card counts as an attachment while it is attached
 
@@ -228,12 +228,12 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50611:A:1 (front): Loot.
   50611:constant:1: Constant
-    - [json Loot {"verb":"Loot"}]
+    - (constant, the Loot keyword) this objective enters play only through the Discover keyword: one revealed from the encounter deck is discarded and another card is revealed
 
 50611:A:2 (front): If unattached, the first player claims Keys of Belegost and attaches it to a hero he controls.
   50611:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
     - this card: stat returnsToStagingArea 1, while this card is in play
     - this card counts as an attachment while it is attached
 
@@ -249,12 +249,12 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50612:A:1 (front): Loot.
   50612:constant:1: Constant
-    - [json Loot {"verb":"Loot"}]
+    - (constant, the Loot keyword) this objective enters play only through the Discover keyword: one revealed from the encounter deck is discarded and another card is revealed
 
 50612:A:2 (front): If unattached, the first player claims Book of Aulë's Children and attaches it to a hero he controls.
   50612:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
     - this card: stat returnsToStagingArea 1, while this card is in play
     - this card counts as an attachment while it is attached
 
@@ -270,12 +270,12 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50613:A:1 (front): Loot.
   50613:constant:1: Constant
-    - [json Loot {"verb":"Loot"}]
+    - (constant, the Loot keyword) this objective enters play only through the Discover keyword: one revealed from the encounter deck is discarded and another card is revealed
 
 50613:A:2 (front): If unattached, the first player claims Dwarven Torch and attaches it to a hero he controls.
   50613:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
     - this card: stat returnsToStagingArea 1, while this card is in play
     - this card counts as an attachment while it is attached
 
@@ -292,12 +292,12 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50614:A:1 (front): Loot.
   50614:constant:1: Constant
-    - [json Loot {"verb":"Loot"}]
+    - (constant, the Loot keyword) this objective enters play only through the Discover keyword: one revealed from the encounter deck is discarded and another card is revealed
 
 50614:A:2 (front): If unattached, the first player claims Blue Mountain Gem and attaches it to a hero he controls.
   50614:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+    - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
     - this card: stat returnsToStagingArea 1, while this card is in play
     - this card counts as an attachment while it is attached
 
@@ -421,7 +421,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50621:A:1 (front): Discover 5.
   50621:forced:1: Forced after this location becomes the active location (heard about this card)
-    - [json Discover {"verb":"Discover","amount":5}]
+    - the Discover 5 keyword: the first player looks at the top 5 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 50621:A:2: Immune to player card effects.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -444,7 +444,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50622:A:1 (front): Discover 2.
   50622:forced:1: Forced after this location becomes the active location (heard about this card)
-    - [json Discover {"verb":"Discover","amount":2}]
+    - the Discover 2 keyword: the first player looks at the top 2 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 50622:A:2 (front): While Abandoned Mine is in the staging area, progress cannot be placed on locations in the staging area not named Abandoned Mine.
   50622:constant:2: Constant
@@ -460,7 +460,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50623:A:1 (front): Discover 4.
   50623:forced:1: Forced after this location becomes the active location (heard about this card)
-    - [json Discover {"verb":"Discover","amount":4}]
+    - the Discover 4 keyword: the first player looks at the top 4 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 50623:A:2 (front): While Flooded Hall is in the staging area, increase the cost to play each ally by 1.
   50623:constant:2: Constant
@@ -476,7 +476,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50624:A:1 (front): Discover 2.
   50624:forced:1: Forced after this location becomes the active location (heard about this card)
-    - [json Discover {"verb":"Discover","amount":2}]
+    - the Discover 2 keyword: the first player looks at the top 2 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 50624:A:2 (front): While Darkened Tunnel is in the staging area, it gains: "Forced: After a 'when revealed' effect is canceled, discard the top card of the encounter deck. If the discarded card has the Hazard trait, resolve its staging as if it was just revealed from the encounter deck."
   50624:forced:2: Forced on the event whenRevealedCanceled
@@ -494,7 +494,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50625:A:1 (front): Discover 3.
   50625:forced:1: Forced after this location becomes the active location (heard about this card)
-    - [json Discover {"verb":"Discover","amount":3}]
+    - the Discover 3 keyword: the first player looks at the top 3 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 50625:A:2 (front): Sunken Treasury gets +1 Threat for each Loot objective attached to a hero.
   50625:constant:2: Constant
@@ -516,12 +516,12 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50626:A:1 (front): Discover 3.
   50626:forced:1: Forced after this location becomes the active location (heard about this card)
-    - [json Discover {"verb":"Discover","amount":3}]
+    - the Discover 3 keyword: the first player looks at the top 3 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 50626:A:2 (front): Response: After the players travel to Secret Chamber, if no Loot objective is attached to Secret Chamber, search the encounter discard pile for a Loot objective and attach it to Secret Chamber as a guarded objective.
   50626:response:1: Response after the players travel (heard about this card)
     only if not (the number of objective (any player controls) attached to this card [also {"lootKeyword":true}] is at least 1)
-    - [json AttachLootFromDiscard {"verb":"AttachLootFromDiscard","to":"self"}]
+    - a Loot objective of the encounter discard pile (the first player chooses among several) is added to the staging area and this location guards it (nothing when none is there)
 
 50626:A:3 (front): Travel: Raise each player's threat by 2.
   50626:travel:1: Travel
@@ -596,4 +596,4 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy to the staging area
 
-(rendered pieces: 329 by template, 33 as JSON)
+(rendered pieces: 348 by template, 14 as JSON)

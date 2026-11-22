@@ -387,7 +387,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146070:A:3 (front): Forced: After the players travel here, flip The Two Watchers to its enemy side and move it to the staging area.
   146070:forced:1: Forced after the players travel (heard about this card)
-    - [json FlipToEnemySide {"verb":"FlipToEnemySide","code":"146070","into":"146071"}]
+    - the card in play with code 146070 becomes the card with code 146071, faceup and ready in the staging area, controlled by no one, with no damage; it keeps its resource tokens and its attachments (nothing when no such card is in play)
 
 ## 146071 The Two Watchers
 
@@ -401,4 +401,4 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     who acts: the acting player is the defending player (the player the attack is against)
     - this card: stat phantom (its attacks' damage is canceled and the defending player raises his threat by as much instead) 1, until the end of the attack
 
-(rendered pieces: 271 by template, 10 as JSON)
+(rendered pieces: 272 by template, 9 as JSON)

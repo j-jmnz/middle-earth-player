@@ -15,23 +15,23 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   120165:response:1: Response on the event locationExplored (heard about non-unique location (any player controls))
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource token(s) are placed on this card
-    - [json ClaimRandomTreasure {"verb":"ClaimRandomTreasure","count":3,"when":{"kind":"all","conditions":[{"kind":"less","left":{"players":true,"plus":2},"right":{"stat":"resources","of":"self"}},{"kind":"less","left":{"stat":"resources","of":"self"},"right":{"players":true,"plus":4}}]}}]
+    - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): 3 treasures the log has not recorded and the game has not dealt are drawn with the game's seed and the first player chooses one: it is the picked card, set aside until a later pick of a card it may attach to and the attach step put it on that character; the players claim it
     - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, chosen by the first player [also {"hostForPicked":true}]
     - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before the last pick (an attachment) is attached to the last picked card
 
 120165:B:1 (back): Resolution: The heroes' selfless valor in protecting the refugees from Harad has inspired Turayn. If the heroes choose to accept his aid, add Turayn to the campaign pool (any player may add him to their deck). Otherwise, mark in the campaign log that "Turayn has taken an oath of vigilance" (he will follow the heroes' example and continue to protect the free folk of Wilderland).
   120165:resolution:1: Resolution
-    - [json BoonAllyOrLogLine {"verb":"BoonAllyOrLogLine","ally":"12166","line":"turayn"}]
+    - Resolution: the players choose, the first player answering for the group, with no default: accept the aid, and the boon ally with code 12166 joins the Campaign Pool (any player may add it to their deck); or decline, and the line "turayn" is recorded in the Campaign Log
 
 120165:B:2 (back): The players discover each treasure they control.
   120165:resolution:2: Resolution
-    - [json DiscoverTreasure {"verb":"DiscoverTreasure"}]
+    - Resolution: each treasure a player controls, claimed and attached to a character, is written to the log's discovered treasures (a treasure still guarded in the staging area is not controlled and is not discovered)
 
 120165:B:3 (back): Add A Growing Threat and each Evil Creatures enemy in play to the campaign pool.
   120165:resolution:3: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddEncounterToPool {"verb":"AddEncounterToPool","codes":["12167"]}]
-    - [json AddEncounterToPool {"verb":"AddEncounterToPool","fromDeck":"evilCreatures"}]
+    - Resolution: encounter cards join the Campaign Pool: one copy of each of the cards with codes 12167 (the log tallies the copies, never past what one collection holds)
+    - Resolution: encounter cards join the Campaign Pool: one copy of each card dealt from the evilCreatures deck that is in play (the log tallies the copies, never past what one collection holds)
 
 ## 18016 The Old Ford
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -203,9 +203,9 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18026:A:1 (front): When Revealed: The player with the most cards in his hand without a copy of Lost in the Wild adds Lost in the Wild to his hand. (While in a player's hand, Lost in the Wild gains: "Cannot be discarded by player card effects. Forced: After you play a card, discard each card in your hand.")
   18026:whenRevealed:1: When revealed
-    - [json AddSourceToHandOfMost {"verb":"AddSourceToHandOfMost"}]
+    - of the players with no card of this card's title in hand, the one with the most cards in hand takes this card into their hand (the first player chooses among players tied; nothing when every player holds a copy)
   18026:constant:1: Constant
-    - [json Undiscardable {"verb":"Undiscardable"}]
+    - (marker, in a card in a hand, does nothing when run) cannot be discarded by player card effects: a pick from a hand that a player card makes leaves the card out; an encounter card's effect still discards it
   18026:forced:1: Forced after this card is played (heard about card (you control); event happened to the controller; used from hand)
     only if this card is in its player's hand
     (steps run in order; a step depends on an earlier one only through its own condition)
@@ -327,13 +327,13 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for the acting player, the top card(s) of the evilCreatures deck go to the staging area
-    - [json FlipOver {"verb":"FlipOver","into":"18070","guardedBy":"picked"}]
+    - this card, wherever it lies, flips over and shows the card with code 18070, and enters the staging area faceup; the picked card (the enemy the last add put in) guards it (the old side is kept as the card's other side)
 
 ## 18070 Haldan
 
 18070:A:1 (front): The first player gains control of Haldan while he is free of encounters.
   18070:constant:1: Constant
-    - [json GainControlWhenFree {"verb":"GainControlWhenFree","who":"firstPlayer"}]
+    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them
 
 18070:A:2 (front): While there is an active location, Haldan does not exhaust to quest.
   18070:constant:2: Constant
@@ -344,4 +344,4 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     - the players lose the game
 
-(rendered pieces: 223 by template, 11 as JSON)
+(rendered pieces: 239 by template, 2 as JSON)

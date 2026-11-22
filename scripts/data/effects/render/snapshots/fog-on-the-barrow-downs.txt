@@ -153,9 +153,9 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
       - choose ally (you control)
       - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): place the picked card facedown under this card (out of play there; its attachments are discarded, its tokens go; a player card stays its owner's)
   148008:forced:2: Forced on the event locationExplored (heard about this card)
-    - [json ReturnFacedownToHands {"verb":"ReturnFacedownToHands"}]
+    - each facedown player card under the location the event is about (explored, and left play) returns to its owner's hand
   148008:forced:3: Forced on the event activeExplored (heard about this card)
-    - [json ReturnFacedownToHands {"verb":"ReturnFacedownToHands"}]
+    - each facedown player card under the location the event is about (explored, and left play) returns to its owner's hand
 
 ## 148009 Stone Ring
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -327,4 +327,4 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
       - discard this card [also {"counted":true}]
       - then, if not (the running effect has discarded no card (with DiscardEach)) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
 
-(rendered pieces: 223 by template, 3 as JSON)
+(rendered pieces: 225 by template, 1 as JSON)

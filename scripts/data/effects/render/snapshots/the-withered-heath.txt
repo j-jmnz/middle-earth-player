@@ -12,9 +12,9 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - a copy of the card with code 12177 is set aside, out of play
     - a copy of the card with code 12178 is set aside, out of play
     - a copy of the card with code 12179 is set aside, out of play
-    - [json SearchBoonAllyToHand {"verb":"SearchBoonAllyToHand"}]
+    - Campaign Setup: each player in turn, the first player first, may take a unique boon ally of their deck (a pool ally the checklist is about to shuffle into it is in the deck already) into their starting hand, or decline; the offer ends with the first who takes one (the checklist deals it, so it changes nothing here)
     - if the Campaign Log holds "melanwar": remove 2 non-unique locations from the encounter deck
-    - [json RemoveFromCavesIfLogged {"verb":"RemoveFromCavesIfLogged","line":"melanwar","count":1,"cardType":"location"}]
+    - Campaign Setup: if the Campaign Log holds "melanwar": the first player chooses up to 1 location card(s) of the Caves deck the scenario deals and they are removed from the game (the checklist deals it, so it changes nothing here)
     - if the Campaign Log holds "isolde": remove 3 non-unique enemies from the encounter deck
 
 12175:B:1 (back): Forced: After a main quest stage is defeated, any player who does not control an Accolade boon may attach one of the following boons to one of their heroes and memorialize their valorous deeds, based on which quest stage was defeated:
@@ -99,11 +99,11 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 12175:B:7 (back): If there are 4 Dragon Sign objectives in the victory display, the players also look at 3 random undiscovered treasures and choose 1 to attach to an eligible character.
   12175:resolution:2: Resolution
-    - [json ChooseRandomTreasure {"verb":"ChooseRandomTreasure","count":3,"when":{"kind":"less","left":3,"right":{"count":{"type":"card","control":"any","from":"victory","names":["Dragon Sign"]}}}}]
+    - if 3 is less than the number of card (any player controls) in the victory display, named "Dragon Sign": Resolution: 3 undiscovered treasures are drawn with the game's seed and the first player chooses one; the scenario is over, so the treasure joins the discovered ones the Resolution writes instead of being attached
 
 12175:B:8 (back): The players discover each treasure they control.
   12175:resolution:3: Resolution
-    - [json DiscoverTreasure {"verb":"DiscoverTreasure"}]
+    - Resolution: each treasure a player controls, claimed and attached to a character, is written to the log's discovered treasures (a treasure still guarded in the staging area is not controlled and is not discovered)
 
 ## 19011 Cold-Drake
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -139,7 +139,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19012:A:3 (front): When Dragon Sign is free of encounters, add it to the victory display.
   19012:constant:2: Constant
-    - [json VictoryWhenFree {"verb":"VictoryWhenFree"}]
+    - (marker, does nothing when run) when this objective is free of encounters, the settle sweep moves it from the staging area to the victory display
 
 ## 19013 Snow-troll
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -189,7 +189,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19016:A:1 (front): Deep.
   19016:constant:1: Constant
-    - [json Deep {"verb":"Deep"}]
+    - (constant, the Deep keyword) after the players travel to this location and the Responses to the travel are done, they discard it and the top card of the Caves deck replaces it as the active location (ignored with the Caves deck empty, once it is no longer the active location, or while a card in play ignores the keyword)
 
 19016:A:2 (front): Progress cannot be placed on Dwarven Door while it is in the staging area.
   19016:constant:2: Constant
@@ -201,7 +201,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19017:A:1 (front): Deep.
   19017:constant:1: Constant
-    - [json Deep {"verb":"Deep"}]
+    - (constant, the Deep keyword) after the players travel to this location and the Responses to the travel are done, they discard it and the top card of the Caves deck replaces it as the active location (ignored with the Caves deck empty, once it is no longer the active location, or while a card in play ignores the keyword)
 
 19017:A:2 (front): Cave Entrance gets +1 Threat for each Dragon Sign in the victory display.
   19017:constant:2: Constant
@@ -217,7 +217,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19018:A:1 (front): Response: After the players travel to Creature Den, search the Caves deck for a Dragon Sign and attach it to Creature Den as a guarded objective. Shuffle the Caves deck.
   19018:response:1: Response after the players travel (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AttachGuardedFromPile {"verb":"AttachGuardedFromPile","pile":"caves","code":"19012"}]
+    - the first card with code 19012 of the Caves deck enters the staging area and this card, in play as the active location, becomes its guard (it is free of encounters once this card leaves play; nothing with no such card in the pile; the shuffle is the record's)
     - shuffle the caves deck
 
 19018:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until an enemy is discarded. Add that enemy to the staging area.
@@ -232,7 +232,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19019:A:1 (front): Deep.
   19019:constant:1: Constant
-    - [json Deep {"verb":"Deep"}]
+    - (constant, the Deep keyword) after the players travel to this location and the Responses to the travel are done, they discard it and the top card of the Caves deck replaces it as the active location (ignored with the Caves deck empty, once it is no longer the active location, or while a card in play ignores the keyword)
 
 19019:A:2 (front): X is the number of locations in the staging area.
   19019:constant:2: Constant
@@ -268,7 +268,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19021:A:1 (front): When Revealed: For each ready character a player controls, he must choose: either exhaust that character, or deal 1 damage to it.
   19021:whenRevealed:1: When revealed
     - for each player, first player first:
-      - [json ExhaustOrDamageEachReady {"verb":"ExhaustOrDamageEachReady","amount":1}]
+      - for each player in turn, for each ready character they control (those ready when the verb starts, in the order they entered play), the player chooses: exhaust that character, or deal 1 damage to it
 
 19021:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if defending character is damaged).
   19021:shadow:1: Shadow
@@ -284,7 +284,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
   19022:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the caves deck
-    - [json ShuffleSetAsideIntoPile {"verb":"ShuffleSetAsideIntoPile","pile":"caves","code":"19012","count":2}]
+    - up to 2 set-aside copies of the card with code 19012 join the Caves deck, which is shuffled with the game's seed (a game that dealt no such pile, or has no copy set aside, changes nothing)
     - shuffle the encounter deck
     - for each player, first player first:
       - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
@@ -340,7 +340,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19024:A:1 (front): When Revealed: Shuffle 2 set-aside Dragon Sign objectives into the Caves deck. Set Cold-Drake aside, out of play. (Do not remove damage tokens from it.) Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each discarded location to the staging area.
   19024:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShuffleSetAsideIntoPile {"verb":"ShuffleSetAsideIntoPile","pile":"caves","code":"19012","count":2}]
+    - up to 2 set-aside copies of the card with code 19012 join the Caves deck, which is shuffled with the game's seed (a game that dealt no such pile, or has no copy set aside, changes nothing)
     - the card in play with code 19011 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its other tokens (the damage tokens stay on it); a later step can bring it back (nothing when no card with the code is in play)
     - shuffle the encounter discard pile into the encounter deck
     - for each player, first player first:
@@ -358,7 +358,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19024:B:2 (back): Forced: At the end of the round, remove 3 damage tokens from the set-aside Cold-Drake.
   19024:forced:2: Forced at the end of the round
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json RemoveSetAsideDamage {"verb":"RemoveSetAsideDamage","code":"19011","amount":3}]
+    - up to 3 damage tokens come off the set-aside card with code 19011
 
 19024:B:3 (back): The players cannot defeat this stage unless at least 3 Dragon Signs are in the victory display.
   19024:constant:1: Constant
@@ -398,4 +398,4 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - later, at the end of this phase:
       - the players win the game
 
-(rendered pieces: 326 by template, 13 as JSON)
+(rendered pieces: 342 by template, 0 as JSON)

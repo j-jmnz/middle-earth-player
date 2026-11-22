@@ -198,7 +198,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 ## 03071 Search for an Exit
@@ -221,7 +221,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 ## 03072 Search for an Exit
@@ -243,7 +243,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 ## 03073 Search for an Exit
@@ -274,7 +274,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 ## 03074 Search for an Exit
@@ -330,7 +330,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 03075:B:5 (back): If the players defeat this stage, they escape and win the game.
@@ -369,7 +369,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 03076:B:3 (back): Progress tokens cannot be placed on Escape from Darkness except by Abandoned Tools.
@@ -467,7 +467,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 ## 901203 Search for an Exit
@@ -501,7 +501,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 ## 901204 Search for an Exit
@@ -522,7 +522,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if the quest deck holds at least 1 stage):
-        - [json BypassStage {"verb":"BypassStage"}]
+        - the players bypass this stage: it loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving (nothing when the quest deck holds no other stage; a bypassed stage is not defeated, so the Forced effects of "when this stage is defeated" do not hear it)
       * option "stay":
 
 ## 901205 Swarming Goblins
@@ -594,4 +594,4 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the shadow card with code 901209 that the attacking enemy holds goes to the victory display
 
-(rendered pieces: 367 by template, 10 as JSON)
+(rendered pieces: 376 by template, 1 as JSON)

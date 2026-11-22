@@ -4,7 +4,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144014:A:1 (front): Play only if you control the Ring-bearer.
   144014:constant:1: Constant
-    - [json PlayOnlyIf {"verb":"PlayOnlyIf","condition":{"kind":"count","pick":{"type":"hero","control":"you","trait":"Ring-bearer"},"min":1}}]
+    - (constant on a card in hand, read when it would be played) it can only be played while the number of Ring-bearer hero (you control) is at least 1
 
 144014:A:2 (front): Planning Action: Add Brace of Coneys to the victory display to (choose 2): heal up to 2 damage from a hero, add 2 resources to a hero's pool, choose a player to draw 2 cards, or reduce a player's threat by 2.
   144014:action:1: Action
@@ -316,4 +316,4 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
   144068:forced:2: Forced on the event locationExplored (heard about location (any player controls) named "The Cross-roads")
     - the players win the game
 
-(rendered pieces: 203 by template, 1 as JSON)
+(rendered pieces: 206 by template, 0 as JSON)

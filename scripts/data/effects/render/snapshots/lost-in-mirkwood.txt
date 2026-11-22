@@ -9,19 +9,19 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
   12168:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - Campaign Setup: the objective ally with code 12169 enters play under the first player (put there, not played: nothing is revealed and no cost is paid; a pool card with this record for itself is put into play at the start of each scenario instead of being shuffled into the encounter deck)
-    - [json SearchGuardForTreasure {"verb":"SearchGuardForTreasure","code":"18033"}]
+    - Campaign Setup, once the quest card's Setup has run: the first player chooses whether to search the encounter deck and its discard pile for a copy of the card with code 18033; if they search and one is found it is added to the staging area and a random undiscovered treasure is attached to it as a guarded objective (no copy to find, or a refusal, changes nothing)
 
 12168:B:1 (back): Resolution: At the edge of the forest, Melanwar pledged his friendship to the heroes, moved by their altruism and their willingness to trust a stranger. If the heroes choose to invite him to join their quest, add Melanwar to the campaign pool (any player may add him to their deck). Otherwise, mark in the campaign log that "Melanwar has given you guidance on traversing Wilderland" (you can more safely navigate the mountains).
   12168:resolution:1: Resolution
-    - [json BoonAllyOrLogLine {"verb":"BoonAllyOrLogLine","ally":"12169","line":"melanwar"}]
+    - Resolution: the players choose, the first player answering for the group, with no default: accept the aid, and the boon ally with code 12169 joins the Campaign Pool (any player may add it to their deck); or decline, and the line "melanwar" is recorded in the Campaign Log
 
 12168:B:2 (back): The players discover each treasure they control.
   12168:resolution:2: Resolution
-    - [json DiscoverTreasure {"verb":"DiscoverTreasure"}]
+    - Resolution: each treasure a player controls, claimed and attached to a character, is written to the log's discovered treasures (a treasure still guarded in the staging area is not controlled and is not discovered)
 
 12168:B:3 (back): Discard cards from the encounter deck until X cards from either the Spiders of Mirkwood or Dol Guldur Orcs encounter set have been discarded and add those cards to the campaign pool. X is equal to the number of players in the game.
   12168:resolution:3: Resolution
-    - [json DiscardToPoolFromSets {"verb":"DiscardToPoolFromSets","sets":["Spiders of Mirkwood","Dol Guldur Orcs"],"count":{"players":true}}]
+    - Resolution: cards come off the top of the encounter deck into the encounter discard pile until the number of players of them belong to one of the encounter sets "Spiders of Mirkwood" or "Dol Guldur Orcs", or the deck is empty; each of those goes to the Campaign Pool (the log keeps no more copies than one collection holds)
 
 ## 18028 Searching for a Way Out
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -37,7 +37,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18028:A:2 (front): Forced: When progress would be placed on the main quest, if there are no objective-locations in play, discard an equal number of cards from the top of the encounter deck instead. Then, put the topmost objective-location in the encounter discard pile into play.
   18028:forced:1: Forced on the event progressReplaced
-    - [json PutObjectiveLocationAfterDiscard {"verb":"PutObjectiveLocationAfterDiscard"}]
+    - (marker, does nothing when run) after the cards that progress was turned into are discarded, the topmost Objective-Location in the encounter discard pile enters play in the staging area, its Guarded keyword resolved
 
 ## 18029 Overgrown Path
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -56,7 +56,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18029:A:3 (front): Forced: After the players travel here, advance to the next stage A, if able.
   18029:forced:1: Forced after the players travel (heard about this card)
-    - [json AdvanceToLetterStage {"verb":"AdvanceToLetterStage","letter":"A","levels":[["18071"],["18072","18073"],["18074","18075"],["18076","18077"]]}]
+    - the quest advances to the stage of the next level with the letter A (A is the first stage of a level, C the second; the levels by number are 18071, 18072 | 18073, 18074 | 18075, 18076 | 18077); the stage left is defeated and the new one is revealed; nothing happens at the last level
 
 ## 18030 Abandoned Village
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -75,7 +75,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18030:A:3 (front): Forced: After the players travel here, advance to the next stage C, if able.
   18030:forced:1: Forced after the players travel (heard about this card)
-    - [json AdvanceToLetterStage {"verb":"AdvanceToLetterStage","letter":"C","levels":[["18071"],["18072","18073"],["18074","18075"],["18076","18077"]]}]
+    - the quest advances to the stage of the next level with the letter C (A is the first stage of a level, C the second; the levels by number are 18071, 18072 | 18073, 18074 | 18075, 18076 | 18077); the stage left is defeated and the new one is revealed; nothing happens at the last level
 
 ## 18031 Bare Hilltop
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -94,7 +94,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18031:A:3 (front): Forced: After the players travel here, advance to the next stage A, if able.
   18031:forced:1: Forced after the players travel (heard about this card)
-    - [json AdvanceToLetterStage {"verb":"AdvanceToLetterStage","letter":"A","levels":[["18071"],["18072","18073"],["18074","18075"],["18076","18077"]]}]
+    - the quest advances to the stage of the next level with the letter A (A is the first stage of a level, C the second; the levels by number are 18071, 18072 | 18073, 18074 | 18075, 18076 | 18077); the stage left is defeated and the new one is revealed; nothing happens at the last level
 
 ## 18032 Forest Clearing
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -113,7 +113,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18032:A:3 (front): Forced: After the players travel here, advance to the next stage C, if able.
   18032:forced:1: Forced after the players travel (heard about this card)
-    - [json AdvanceToLetterStage {"verb":"AdvanceToLetterStage","letter":"C","levels":[["18071"],["18072","18073"],["18074","18075"],["18076","18077"]]}]
+    - the quest advances to the stage of the next level with the letter C (A is the first stage of a level, C the second; the levels by number are 18071, 18072 | 18073, 18074 | 18075, 18076 | 18077); the stage left is defeated and the new one is revealed; nothing happens at the last level
 
 ## 18033 Twilight Hall
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -330,7 +330,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
       - choose hero (you control)
       - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
       - the picked card goes to the staging area (it is not revealed)
-      - [json CarryAwayHero {"verb":"CarryAwayHero"}]
+      - the hero picked before the last pick (the enemy found is in the staging area) loses its tokens and attachments and lies facedown under the enemy (in play, controlled by no one), flagged as guarded; the enemy guards it (nothing when no enemy was found)
 
 18074:B:1 (back): Each enemy guarding a hero cannot take non-combat damage. Each guarded hero is in play but under no player's control.
   18074:constant:1: Constant
@@ -338,11 +338,11 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18074:B:2 (back): Forced: When an enemy guarding a hero is defeated, return that hero to its owner's control, exhausted.
   18074:forced:1: Forced after a card leaves play (heard about card (any player controls) or in the staging area or the active location [also {"guardsHero":true}])
-    - [json ReleaseGuardedHero {"verb":"ReleaseGuardedHero"}]
+    - the hero the event's subject (the enemy) guarded comes back among its owner's heroes, faceup and exhausted (when the enemy leaves play in any way)
 
 18074:B:3 (back): When the players advance from this stage, discard each guarded hero.
   18074:forced:2: Forced on the event questCardDefeated (heard about this card)
-    - [json DiscardGuardedHeroes {"verb":"DiscardGuardedHeroes"}]
+    - each hero an enemy guards goes to its owner's discard pile; a player left with no hero is eliminated
 
 ## 18075 Truly Lost
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -354,7 +354,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
       - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
       - the picked card goes to the staging area (it is not revealed)
     - for each player, first player first:
-      - [json PlaceHandUnderLocation {"verb":"PlaceHandUnderLocation"}]
+      - the acting player chooses a location in the staging area (an Objective-Location is one) that no player has put a hand under yet, and every card of their hand goes facedown under it, still theirs (nothing is chosen with an empty hand)
 
 18075:B:1 (back): Each location gets +1 quest point for each facedown player card under it.
   18075:constant:1: Constant
@@ -364,13 +364,13 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18075:B:2 (back): Forced: When a location with a facedown player card under it is explored, return each facedown player card under that location to its owner's hand.
   18075:forced:1: Forced on the event locationExplored (heard about card (any player controls) or in the staging area or the active location [also {"hasFacedownUnder":true}])
-    - [json ReturnFacedownToHands {"verb":"ReturnFacedownToHands"}]
+    - each facedown player card under the location the event is about (explored, and left play) returns to its owner's hand
   18075:forced:2: Forced on the event activeExplored (heard about card (any player controls) or in the staging area or the active location [also {"hasFacedownUnder":true}])
-    - [json ReturnFacedownToHands {"verb":"ReturnFacedownToHands"}]
+    - each facedown player card under the location the event is about (explored, and left play) returns to its owner's hand
 
 18075:B:3 (back): When the players advance from this stage, discard each facedown player card under each location.
   18075:forced:3: Forced on the event questCardDefeated (heard about this card)
-    - [json DiscardFacedownUnder {"verb":"DiscardFacedownUnder"}]
+    - each facedown player card under a location goes to its owner's discard pile
 
 ## 18076 The Forest of Great Fear
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -379,7 +379,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
   18076:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card in play with code 18028 is removed from the game, wherever it is (in the staging area or attached)
-    - [json SearchNemesis {"verb":"SearchNemesis"}]
+    - of the enemies of the Spiders of Mirkwood and Dol Guldur Orcs piles that are still set aside, the one with the most printed hit points (the first player chooses among a tie) enters the staging area, flagged as the nemesis until it leaves play (nothing with both piles used)
 
 18076:B:1 (back): The nemesis gets +2 Threat, +2 Attack, +2 Defense and is immune to player card effects.
   18076:constant:1: Constant
@@ -392,7 +392,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18076:B:2 (back): Forced: At the end of the round, return the nemesis to the staging area and it makes an attack against the first player.
   18076:forced:1: Forced at the end of the round
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json NemesisAttacks {"verb":"NemesisAttacks"}]
+    - an engaged nemesis goes back to the staging area; it then attacks the first player, dealt a shadow card for the attack
 
 18076:B:3 (back): This stage cannot be defeated while the nemesis is in play. The nemesis cannot take damage unless there is at least 8 progress on this stage. If the players defeat the nemesis, they win the game.
   18076:constant:2: Constant
@@ -426,4 +426,4 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 254 by template, 40 as JSON)
+(rendered pieces: 273 by template, 22 as JSON)

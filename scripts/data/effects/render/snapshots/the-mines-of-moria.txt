@@ -27,7 +27,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51201:B:2 (back): Forced: When The Watcher is defeated, flip it over and add Chamber of Mazarbul to the staging area.
   51201:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls) named "The Watcher")
-    - [json FlipOver {"verb":"FlipOver","into":"51211","target":"subject"}]
+    - the card the event is about, the explored location, flips over and shows the card with code 51211, and enters the staging area faceup (the old side is kept as the card's other side)
 
 51201:B:3 (back): This stage cannot be defeated while The Watcher is in play.
   51201:constant:2: Constant
@@ -757,4 +757,4 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     - for each enemy (any player controls) engaged with you:
       - the picked card: stat attack 1, until the end of the phase
 
-(rendered pieces: 437 by template, 4 as JSON)
+(rendered pieces: 438 by template, 3 as JSON)
