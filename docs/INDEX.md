@@ -254,8 +254,8 @@ One file per box or cycle: each scenario's mechanics, readings, decisions and ta
   - 224–255 Foundations of Stone (~4.3K) ← 3
   - 256–286 Shadow and Flame (~4.1K) ← 4
   - 287–304 Readings to confirm (~660)
-- `docs/scenarios/ered-mithrin.md` — Ered Mithrin (~17.0K tok)
-  - 32–38 Readings to confirm (~160)
+- `docs/scenarios/ered-mithrin.md` — Ered Mithrin (~16.8K tok)
+  - 32–38 Readings to confirm (~120)
 - `docs/scenarios/fellowship-of-the-ring.md` — Fellowship of the Ring (~10.7K tok)
   - 27–41 Scenario 1 resolution (~370)
   - 42–55 A Knife in the Dark (~1.6K) ← 1
