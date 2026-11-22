@@ -186,4 +186,178 @@ Scenario piles that place cards with no record (quest: 02126 Through the Forest;
     only if it is the Encounter phase
     - this enemy engages the player who controls a character (you control) named "Gollum" (the first player chooses among several; nothing when it is already engaged with that player; an enemy engaged with another player leaves that player)
 
-(rendered pieces: 106 by template, 0 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 900901 Return to Mirkwood Nightmare
+
+900901:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+900901:A:2 (front): Forced: At the beginning of the quest phase, the player who is guarding Gollum must either exhaust a hero he controls or resolve the "when revealed" effect of the topmost Tantrum card in the encounter discard pile.
+  900901:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - the player guarding Gollum chooses one of:
+      * option "exhaust" (only if there is a ready hero (you control) to choose):
+        - choose ready hero (you control)
+        - exhaust the picked card
+      * option "tantrum" (only if the encounter discard pile holds a Tantrum treachery):
+        - the topmost treachery with the trait Tantrum in the encounter discard pile (the last put there) is picked (nothing with none)
+        - the When Revealed effects of the picked card resolve as if it had just been revealed
+
+900901:A:3 (front): Forced: When Stage 4A is revealed, search the encounter deck and discard pile for 1 copy of Attercop, Attercop and add it to the staging area, if able. Shuffle the encounter deck.
+  900901:forced:2: Forced on the event stageRevealed
+    only if the card the event is about is a card (any player controls) named "Ambush"
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 02139 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+900901:B:1 (back): Begin with the standard quest deck and encounter deck for the Return to Mirkwood scenario.
+  (inert: the engine applies it by rule, no record)
+
+900901:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+900901:B:3 (back): 3x Woodman's Glade
+  (inert: the engine applies it by rule, no record)
+
+900901:B:4 (back): 3x Wood Elf Path
+  (inert: the engine applies it by rule, no record)
+
+900901:B:5 (back): 3x Mountains of Mirkwood
+  (inert: the engine applies it by rule, no record)
+
+900901:B:6 (back): 2x Goblin Sniper
+  (inert: the engine applies it by rule, no record)
+
+900901:B:7 (back): 1x Marsh Adder
+  (inert: the engine applies it by rule, no record)
+
+900901:B:8 (back): 2x Wargs
+  (inert: the engine applies it by rule, no record)
+
+900901:B:9 (back): 2x Despair
+  (inert: the engine applies it by rule, no record)
+
+900901:B:10 (back): 2x The Brown Lands
+  (inert: the engine applies it by rule, no record)
+
+900901:B:11 (back): 2x The East Bight
+  (inert: the engine applies it by rule, no record)
+
+900901:B:12 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Return to Mirkwood encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+900901:B:13 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 900902 Ambushing Orcs
+
+900902:A:1 (front): When Ambushing Orcs is dealt a shadow card that targets the player guarding Gollum, that shadow card also targets each other player.
+  900902:constant:1: Constant
+    - this card: stat shadowHitsAll 1, while this card is in play
+
+## 900903 Pursuing Warg-rider
+
+900903:A:1 (front): Cannot be optionally engaged.
+  900903:constant:1: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+900903:A:2 (front): Forced: After the player guarding Gollum changes, Pursuing Warg-rider engages the player guarding Gollum and makes an immediate attack against that player.
+  900903:forced:1: Forced on the event changedControl (heard about character (any player controls) named "Gollum")
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this enemy engages the player who controls a character (any player controls) named "Gollum" (the first player chooses among several; nothing when it is already engaged with that player; an enemy engaged with another player leaves that player)
+    - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 900904 Web-spinner
+
+900904:A:1 (front): When Revealed: The player guarding Gollum must either exhaust a hero he controls, or Web-spinner gains surge.
+  900904:whenRevealed:1: When revealed
+    - the player guarding Gollum chooses one of:
+      * option "exhaust" (only if there is a ready hero (you control) to choose):
+        - choose ready hero (you control)
+        - exhaust the picked card
+      * option "surge":
+        - this card gains surge (one more encounter card is revealed when it has been resolved)
+
+900904:A:2 (shadow): Shadow: The player guarding Gollum must exhaust a character he controls.
+  900904:shadow:1: Shadow
+    - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
+      - choose ready character (you control)
+      - exhaust the picked card
+
+## 900905 Deceptive Path
+
+900905:A:1 (front): Progress cannot be placed on Deceptive Path while it is in the staging area.
+  900905:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+900905:A:2 (front): Forced: After Deceptive Path becomes the active location, shuffle the encounter discard pile into the encounter deck and discard cards from the top of the encounter deck until a location is discarded. Reveal that location and make it the active location. Then, discard Deceptive Path.
+  900905:forced:1: Forced after this location becomes the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
+    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+    - the picked card becomes the active location
+    - then, if the picked card is a location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
+
+## 900906 Web-wall
+
+900906:A:1 (front): When Revealed: Reveal the topmost Spider enemy in the encounter discard pile and add it to the staging area.
+  900906:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the topmost enemy with the trait Spider in the encounter discard pile (the last put there) is picked (nothing with none)
+    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+
+900906:A:2 (shadow): Shadow: The player guarding Gollum must discard all resources from each of his heroes' resource pools.
+  900906:shadow:1: Shadow
+    - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
+      - for each hero (you control):
+        - all the resources come off the resource pool of the picked card (discarded, not spent)
+
+## 900907 Isolation
+
+900907:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+900907:A:2 (front): When Revealed: Attach Isolation to the current quest. (Counts as a Condition attachment with the text: "All characters lose the ranged and sentinel keywords. The player guarding Gollum cannot choose a new player to guard Gollum.")
+  900907:whenRevealed:1: When revealed
+    - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
+  900907:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - each character (any player controls): stat loseRanged 1, while this card is in play
+    - each character (any player controls): stat loseSentinel 1, while this card is in play
+    - the table: stat guardianLocked 1, while this card is in play
+
+## 900908 Befouled Equipment
+
+900908:A:1 (front): When Revealed: Discard all attachments controlled by the player guarding Gollum. Then, remove all cards in that player's discard pile from the game. If no attachments are discarded as a result of this effect, Befouled Equipment gains surge.
+  900908:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
+      - the acting player discards each attachment (you control)
+      - every card in the acting player's discard pile is removed from the game
+    - then, if the running effect has discarded no card (with DiscardEach) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+900908:A:2 (shadow): Shadow: Discard all attachments controlled by the player guarding Gollum.
+  900908:shadow:1: Shadow
+    - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
+      - the acting player discards each attachment (you control)
+
+## 900909 Wickedness and Mischief
+
+900909:A:1 (front): When Revealed: The player guarding Gollum must either reveal the topmost Tantrum card in the encounter discard pile, or reveal 2 additional encounter cards from the encounter deck.
+  900909:whenRevealed:1: When revealed
+    - the player guarding Gollum chooses one of:
+      * option "tantrum" (only if the encounter discard pile holds a Tantrum treachery):
+        - the topmost treachery with the trait Tantrum in the encounter discard pile (the last put there) is picked (nothing with none)
+        - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+      * option "reveal":
+        - the acting player reveals 2 encounter cards, one after the other, each in a staging of its own
+
+900909:A:2 (shadow): Shadow: Deal the topmost Tantrum card in the encounter discard pile as a new shadow card for this attack, if able.
+  900909:shadow:1: Shadow
+    - the topmost Tantrum card with a Shadow effect in the encounter discard pile is dealt to the attacking enemy as one more shadow card for this attack (nothing with none there)
+
+(rendered pieces: 198 by template, 0 as JSON)

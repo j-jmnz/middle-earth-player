@@ -356,4 +356,206 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
   03076:forced:3: Forced on the event questCardDefeated (heard about this card)
     - the players win the game
 
-(rendered pieces: 240 by template, 16 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 901201 Flight from Moria Nightmare
+
+901201:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+901201:A:2 (front): When a quest card is bypassed, shuffle it into the quest deck instead of placing it on the bottom.
+  901201:constant:1: Constant
+    - the table: stat bypassShuffles 1, while this card is in play
+
+901201:A:3 (front): While the Escape from Darkness quest card is in play, the Refresh Action on Abandoned Tools can only be triggered once each round.
+  901201:constant:2: Constant
+    only if the card with code 03076 is in play
+    - the table: stat refreshOnce 1, while this card is in play
+
+901201:B:1 (back): Begin with the standard quest deck and encounter deck for the Flight from Moria scenario.
+  (inert: the engine applies it by rule, no record)
+
+901201:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter and quest deck:
+  (inert: the engine applies it by rule, no record)
+
+901201:B:3 (back): 1x Blocked by Shadow
+  (inert: the engine applies it by rule, no record)
+
+901201:B:4 (back): 1x New Devilry
+  (inert: the engine applies it by rule, no record)
+
+901201:B:5 (back): 3x Stray Goblin
+  (inert: the engine applies it by rule, no record)
+
+901201:B:6 (back): 2x The Mountains' Roots
+  (inert: the engine applies it by rule, no record)
+
+901201:B:7 (back): 3x Chance Encounter
+  (inert: the engine applies it by rule, no record)
+
+901201:B:8 (back): 2x Goblin Archer
+  (inert: the engine applies it by rule, no record)
+
+901201:B:9 (back): 1x Goblin Spearman
+  (inert: the engine applies it by rule, no record)
+
+901201:B:10 (back): 2x Plundered Armoury
+  (inert: the engine applies it by rule, no record)
+
+901201:B:11 (back): 3x Cave In
+  (inert: the engine applies it by rule, no record)
+
+901201:B:12 (back): 2x Dark and Dreadful
+  (inert: the engine applies it by rule, no record)
+
+901201:B:13 (back): Shuffle the new stage 2 quest cards in this Nightmare Deck into the quest deck along with the rest of the scenario's stage 2 quest cards, leaving stage 1A on top of the quest deck. Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Flight from Moria encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+901201:B:14 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 901202 Search for an Exit
+
+901202:A:1 (front): While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step.
+  901202:forced:1: Forced when the staging step begins, before the first card is revealed
+    - the current stage is flipped to side B (at the beginning of the staging step): its side B's When Revealed effects resolve now, the first player acting; a stage already on side B changes nothing; this also makes the stage a stage of a quest deck, which arrives side A and whose side B's text works only once flipped
+
+901202:B:1 (back): Forced: At the end of the round, shuffle the discard pile into the encounter deck and discard the top 5 cards. Resolve the "when revealed" effects of each copy of A Foe Beyond discarded by this effect.
+  901202:forced:2: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard 5 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
+    - the "when revealed" effects of each copy of A Foe Beyond this effect discarded from the top of the encounter deck resolve, in the order discarded, the acting player revealing them
+
+901202:B:2 (back): No more than 1 progress can be placed on this stage each round.
+  901202:constant:1: Constant
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 1, while this card is in play
+
+901202:B:3 (back): If the players defeat this stage, they win the game.
+  901202:forced:3: Forced on the event questCardDefeated (heard about this card)
+    - the players win the game
+
+901202:B:4 (back): Players may bypass this quest card at the end of the combat phase.
+  901202:forced:4: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+## 901203 Search for an Exit
+
+901203:A:1 (front): While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step.
+  901203:forced:1: Forced when the staging step begins, before the first card is revealed
+    - the current stage is flipped to side B (at the beginning of the staging step): its side B's When Revealed effects resolve now, the first player acting; a stage already on side B changes nothing; this also makes the stage a stage of a quest deck, which arrives side A and whose side B's text works only once flipped
+
+901203:B:1 (back): The Nameless Fear attacks each player in turn order during the combat phase (deal and discard a new shadow card for each attack). Characters are eligible to attack The Nameless Fear while it is in the staging area.
+  901203:forced:2: Forced when a phase begins
+    only if it is the Combat phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "The Nameless Fear"
+    - for each player, first player first:
+      - the picked enemy attacks the acting player now, from the staging area
+  901203:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "The Nameless Fear": stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
+
+901203:B:2 (back): If The Nameless Fear has 10 or more damage on it, remove all damage from it and advance to the next stage.
+  901203:forced:3: Forced after a card takes damage (heard about enemy (any player controls) or in the staging area, named "The Nameless Fear")
+    only if 9 is less than damage of "The Nameless Fear"
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - heal all damage from the card the event is about
+    - advance to the next quest stage
+
+901203:B:3 (back): Players may bypass this quest card at the end of the combat phase.
+  901203:forced:4: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+## 901204 Search for an Exit
+
+901204:A:1 (front): While Search for an Exit is the active quest card, only flip it to side 2B at the beginning of the staging step.
+  901204:forced:1: Forced when the staging step begins, before the first card is revealed
+    - the current stage is flipped to side B (at the beginning of the staging step): its side B's When Revealed effects resolve now, the first player acting; a stage already on side B changes nothing; this also makes the stage a stage of a quest deck, which arrives side A and whose side B's text works only once flipped
+
+901204:B:1 (back): When Revealed: Deal 1 damage to each questing character.
+  901204:whenRevealed:1: When revealed
+    - for each character (any player controls) committed to the quest:
+      - deal 1 damage to the picked card
+
+901204:B:2 (back): Players may bypass this quest card at the end of the combat phase.
+  901204:forced:2: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+## 901205 Swarming Goblins
+
+901205:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+901205:A:2 (front): While you are engaged with Swarming Goblins, it gains: "Forced: When a quest card is bypassed, search the encounter discard pile for a copy of Goblin Spearman and put it into play engaged with you."
+  901205:forced:1: Forced on the event stageBypassed (event happened to the controller)
+    only if [json condition {"kind":"engagedWithActor"}]
+    - the acting player finds one card with code 03031 in the encounter discard pile (the deck is not searched) and puts it into play engaged with them (it is not revealed)
+
+## 901206 Coal-Black Orc
+
+901206:A:1 (front): X is the number of victory points in the victory display.
+  901206:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the Victory points of the cards in the victory display added up (read live), while this card is in play
+    - this card: stat attack the Victory points of the cards in the victory display added up (read live), while this card is in play
+
+901206:A:2 (shadow): Shadow: Attacking enemy gets +X Attack. X is the number of victory points in the victory display.
+  901206:shadow:1: Shadow
+    - the attacking enemy: stat attack the Victory points of the cards in the victory display added up (read live), until the end of the attack
+
+## 901207 Shadowed Corridor
+
+901207:A:1 (front): As an additional cost to bypass a quest card, each player must raise his threat by 2.
+  901207:constant:1: Constant
+    - the table: stat bypassThreat 2, while this card is in play
+
+901207:A:2 (shadow): Shadow: If the defending character is a hero, discard all resources in its resource pool. Deal attacking enemy another shadow card for each resource discarded in this way.
+  901207:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a hero (you control) defending to choose: choose hero (you control) defending
+    - then, if there is a hero (you control) defending to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the effect's X grows by resources of the picked card
+    - then, if there is a hero (you control) defending to choose (checked when this step runs, after the steps above; not tied to whether they did anything): all the resources come off the resource pool of the picked card (discarded, not spent)
+    - repeat X times:
+      - the attacking enemy is dealt a shadow card
+
+## 901208 Dismay and Fear
+
+901208:A:1 (front): When Revealed: Choose and remove characters from the quest until the total Willpower of characters removed from the quest is equal to or higher than The Nameless Fear's Threat.
+  901208:whenRevealed:1: When revealed
+    - repeat the number of character (any player controls) committed to the quest times:
+      - if all of: (X is less than threat of "The Nameless Fear") and (there is a character (any player controls) committed to the quest, chosen by the first player to choose): choose character (any player controls) committed to the quest, chosen by the first player
+      - then, if X is less than threat of "The Nameless Fear" (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked character is removed from the quest (it stays exhausted)
+      - then, if X is less than threat of "The Nameless Fear" (checked when this step runs, after the steps above; not tied to whether they did anything): the effect's X grows by willpower of the picked card
+
+901208:A:2 (shadow): Shadow: Discard each attachment you control with a cost less than The Nameless Fear's Threat.
+  901208:shadow:1: Shadow
+    - for each attachment (you control) with a printed cost of at least 0 (a card with no printed cost never matches):
+      - if cost of the picked card is less than threat of "The Nameless Fear": discard the picked card
+
+## 901209 An Evil Fortune
+
+901209:A:1: Surge. Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+901209:A:2 (front): When Revealed: Add this card to the victory display.
+  901209:whenRevealed:1: When revealed
+    - this card is added to the victory display (the players' own, the group's)
+
+901209:A:3 (shadow): Shadow: If this attack destroys a character, add this card to the victory display.
+  901209:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the shadow card with code 901209 that the attacking enemy holds goes to the victory display
+
+(rendered pieces: 354 by template, 23 as JSON)

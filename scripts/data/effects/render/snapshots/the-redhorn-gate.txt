@@ -311,4 +311,149 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
     only if the event's other card is a enemy (any player controls) that is this card itself
     - deal 1 damage to the card the event is about
 
-(rendered pieces: 194 by template, 0 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 901301 The Redhorn Gate Nightmare
+
+901301:A:1 (front): You are playing in Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+901301:A:2 (front): Setup: Remove all copies of Blinding Blizzard from the encounter deck and set them aside, out of play. During this game, player cards in the victory display do not count their victory points.
+  901301:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the copy of the card with code 901307 in the encounter deck is set aside, out of play
+    - the table: stat playerVictoryIgnored (the player cards in the victory display are worth no victory points: the amount, the stage's bar and the score) 1, until the end of the game
+
+901301:A:3 (front): Forced: When stage 2b is revealed, shuffle each set aside copy of Blinding Blizzard into the encounter deck.
+  901301:forced:1: Forced on the event stageRevealed
+    only if the card the event is about is a card (any player controls) named "Snowdrifts"
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - repeat 2 times:
+      - one set-aside copy of the card with code 901307 is shuffled into the encounter deck (nothing with none set aside)
+    - shuffle the encounter deck
+
+901301:B:1 (back): Begin with the standard quest deck and encounter deck for The Redhorn Gate scenario.
+  (inert: the engine applies it by rule, no record)
+
+901301:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+901301:B:3 (back): 1x Black Uruks
+  (inert: the engine applies it by rule, no record)
+
+901301:B:4 (back): 3x Mountain Warg
+  (inert: the engine applies it by rule, no record)
+
+901301:B:5 (back): 1x Knees of the Mountain
+  (inert: the engine applies it by rule, no record)
+
+901301:B:6 (back): 2x Turbulent Waters
+  (inert: the engine applies it by rule, no record)
+
+901301:B:7 (back): 2x Warg Lair
+  (inert: the engine applies it by rule, no record)
+
+901301:B:8 (back): 1x The Dimrill Stair
+  (inert: the engine applies it by rule, no record)
+
+901301:B:9 (back): 2x Fell Voices
+  (inert: the engine applies it by rule, no record)
+
+901301:B:10 (back): 2x Fallen Stones
+  (inert: the engine applies it by rule, no record)
+
+901301:B:11 (back): 3x Mountain Goblin
+  (inert: the engine applies it by rule, no record)
+
+901301:B:12 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Redhorn Gate encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+901301:B:13 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 901302 Wolfpelt Goblin
+
+901302:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+901302:A:2 (front): Forced: After engaging Wolfpelt Goblin, the engaged player must deal X damage to 1 character he controls, where X is the active location's remaining quest points. Then, remove 2 progress from the active location, if able.
+  901302:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control)
+    - deal the quest points the active location still needs (its quest points less its progress; 0 with no active location) damage to the picked card
+    - remove 2 progress from the active location
+
+## 901303 Silvertine Marauder
+
+901303:A:1 (front): While attacking, Silvertine Marauder gets +2 Attack if the defending character has less than 2 Willpower.
+  901303:constant:1: Constant
+    - if the card holding this stat is an enemy attacking a declared defender with a current Willpower of 1 or less (modifiers counted): this card: stat attack 2, while this card is in play
+
+901303:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack if the defending character has less than 2 Willpower.
+  901303:shadow:1: Shadow
+    - if the defender is a character (any player controls) with a current Willpower of 1 or less: the attacking enemy: stat attack 2, until the end of the attack
+
+## 901304 Snow-Giant
+
+901304:A:1 (front): While Snow-Giant is in the staging area, it attacks the first player during the combat phase, as if it were engaged.
+  901304:forced:1: Forced when a phase begins
+    only if all of: (it is the Combat phase) and (this card is in the staging area)
+    - this card attacks the first player now, from the staging area
+
+901304:A:2 (front): Forced: After Snow-Giant engages you, discard the ally you control with the highest Willpower.
+  901304:forced:2: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ally (you control) with the highest current Willpower of those (ties: the chooser decides)
+    - discard the picked card
+
+## 901305 Icy Cavern
+
+901305:A:1 (front): X is the number of Snow cards in the staging area.
+  901305:constant:1: Constant
+    - this card: stat threat the number of Snow card (any player controls) in the staging area only, while this card is in play
+
+901305:A:2 (front): Travel: Search the encounter deck and discard pile for 1 copy of Freezing Cold and reveal it to travel here. Shuffle the encounter deck.
+  901305:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player searches the encounter deck and discard pile for the card with code 04023, a a card, reveals it and adds it to the staging area (a Travel cost: payable only when a card is found)
+    - shuffle the encounter deck
+
+901305:A:3 (shadow): Shadow: Defending character gets -1 Willpower. Deal the attacking enemy 1 additional shadow card.
+  901305:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the defender: stat willpower -1, until the end of the attack
+    - the attacking enemy is dealt a shadow card
+
+## 901306 Frozen Silverlode
+
+901306:A:1 (front): While Frozen Silverlode is in the staging area, characters cannot gain Willpower from player card effects.
+  901306:constant:1: Constant
+    only if this card is in the staging area
+    - the table: stat noWillpowerGain (no character gains Willpower from a player card effect; reductions still apply) 1, while this card is in play
+
+901306:A:2 (shadow): Shadow: Defending character gets -1 Willpower. Deal the attacking enemy 1 additional shadow card.
+  901306:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the defender: stat willpower -1, until the end of the attack
+    - the attacking enemy is dealt a shadow card
+
+## 901307 Blinding Blizzard
+
+901307:A:1 (front): While Blinding Blizzard is in play, heroes do not collect resources during the resource phase.
+  901307:constant:1: Constant
+    - every hero in play: stat noCollection 1, while this card is in play
+
+901307:A:2 (front): When Revealed: Add Blinding Blizzard to the staging area. Progress that would be placed on the current quest or on Snow locations are instead placed on Blinding Blizzard. When the 5th progress is placed on Blinding Blizzard, discard it.
+  901307:whenRevealed:1: When revealed
+    - this card: stat progressRedirect (it stays in the staging area; progress that would be placed on the current quest or on a Snow location is placed on it instead, up to 5, and its 5th progress discards it) 1, while this card is in play
+
+## 901308 Caradhras the Cruel
+
+901308:A:1 (front): When Revealed: Return all Snow cards in the encounter discard pile to the top of the encounter deck, in random order. Reveal the top card of the encounter deck (reveal the top 2 cards instead if there are 3 or 4 players in the game).
+  901308:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - return every Snow card(s) of the encounter discard pile to the top of the encounter deck, in a random order, facedown (the cards ArrangeEncounter may reorder) (they are not revealed: no When Revealed, no engagement; the number returned is counted)
+    - the acting player reveals an encounter card
+    - then, if the number of player (any player controls) is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reveals an encounter card
+
+(rendered pieces: 251 by template, 0 as JSON)

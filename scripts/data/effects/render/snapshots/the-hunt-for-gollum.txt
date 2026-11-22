@@ -185,4 +185,169 @@ Scenario piles that place cards with no record (quest: 02011 The Hunt Begins; qu
       - if not (the picked card is a hero (any player controls) with resources on it): exhaust the picked card
       - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
 
-(rendered pieces: 131 by template, 0 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 900401 The Hunt for Gollum Nightmare
+
+900401:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+900401:A:2 (front): Forced: At the end of the refresh phase, choose an unclaimed Clue card not attached to a Mordor enemy and attach it to a Mordor enemy, if able. (If it was guarded, detach the encounter guarding it first. The newly attached Mordor enemy is now guarding it.)
+  900401:forced:1: Forced at the end of the phase
+    only if it is the Refresh phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Clue objective (any player controls) in the staging area only, chosen by the first player, not guarded by (attached to) a Mordor enemy
+    - choose Mordor enemy (any player controls) or in the staging area, chosen by the first player, that is not guarding an objective
+    - the picked card becomes the guard of the card picked before, attached to it in the staging area (the objective's own guards are detached first and stay in the staging area) (an engaged guard stays engaged)
+
+900401:A:3 (front): If at any point there are four or more Clue cards attached to Mordor enemies, the players lose the game.
+  900401:constant:1: Constant
+    only if the number of Clue objective (any player controls) guarded by (attached to) a Mordor enemy is at least 4
+    - the players lose the game (Four Signs of Gollum are in the hands of the Mordor hunters)
+
+900401:B:1 (back): Begin with the standard quest deck and encounter deck for The Hunt for Gollum scenario.
+  (inert: the engine applies it by rule, no record)
+
+900401:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+900401:B:3 (back): 2x River Ninglor
+  (inert: the engine applies it by rule, no record)
+
+900401:B:4 (back): 1x The Eaves of Mirkwood
+  (inert: the engine applies it by rule, no record)
+
+900401:B:5 (back): 2x False Lead
+  (inert: the engine applies it by rule, no record)
+
+900401:B:6 (back): 2x Misty Mountain Goblins
+  (inert: the engine applies it by rule, no record)
+
+900401:B:7 (back): 2x Banks of the Anduin
+  (inert: the engine applies it by rule, no record)
+
+900401:B:8 (back): 3x Gladden Fields
+  (inert: the engine applies it by rule, no record)
+
+900401:B:9 (back): 3x Eastern Crows
+  (inert: the engine applies it by rule, no record)
+
+900401:B:10 (back): 2x Treacherous Fog
+  (inert: the engine applies it by rule, no record)
+
+900401:B:11 (back): 3x Evil Storm
+  (inert: the engine applies it by rule, no record)
+
+900401:B:12 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Hunt for Gollum encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+900401:B:13 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 900402 Ravenous Hawk
+
+900402:A:1 (front): Forced: When a card effect instructs a player to "look" at cards in the encounter deck and Ravenous Hawk is among those cards, that player must put Ravenous Hawk into play engaged with him. (This does not satisfy the Forced effect of stage 1B or 2B).
+  900402:forced:1: Forced on the event lookedAt (heard about this card)
+    - this card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+
+## 900403 Hunting Warg
+
+900403:A:1 (front): Forced: At the beginning of the refresh phase, if Hunting Warg entered play this round, search the encounter deck and discard pile for 1 copy of Hunters from Mordor and add it to the staging area, if able. Shuffle the encounter deck.
+  900403:forced:2: Forced on the event encounterEnteredPlay (heard about this card)
+    - this card: stat enteredThisRound 1, until the end of the round
+  900403:forced:1: Forced when a phase begins
+    only if all of: (it is the Refresh phase) and (this card holds the flag enteredThisRound)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 02021 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 900404 Watched Path
+
+900404:A:1 (front): Each player who does not control at least 1 Clue card cannot draw cards through card effects.
+  900404:constant:1: Constant
+    - a player who does not control a Clue objective (you control) cannot draw cards through card effects (the framework's draws are not card effects)
+
+900404:A:2 (shadow): Shadow: If you do not control at least 1 Clue card, discard all cards from your hand.
+  900404:shadow:1: Shadow
+    - if not (there is a Clue objective (you control) to choose): the acting player discards all the cards in their hand
+
+## 900405 Hunter's Lookout
+
+900405:A:1 (front): Each Mordor enemy with at least 1 Clue card attached gets +2 Defense.
+  900405:constant:1: Constant
+    - each Mordor enemy (any player controls) or in the staging area, attached as the guard of a Clue objective: stat defense 2, while this card is in play
+
+900405:A:2 (shadow): Shadow: Attacking enemy gets +1 Defense for each Clue card in play until the end of the round.
+  900405:shadow:1: Shadow
+    - the attacking enemy: stat defense the number of Clue objective (any player controls), until the end of the round
+
+## 900406 Dark Pools
+
+900406:A:1 (front): Progress cannot be placed on Dark Pools while it is in the staging area.
+  900406:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+900406:A:2 (front): Forced: After Dark Pools becomes the active location, each player must discard an ally with the highest printed cost among the allies he controls.
+  900406:forced:1: Forced after this location becomes the active location (heard about this card)
+    - for each player, first player first:
+      - choose ally (you control) with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides)
+      - discard the picked card
+
+## 900407 The Enemy's Trail
+
+900407:A:1 (front): When Revealed: Search the encounter discard pile for a Clue card and attach it to a Mordor enemy in play, if able. If no card is attached by this effect, The Enemy's Trail gains surge.
+  900407:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Mordor enemy (any player controls) or in the staging area, chosen by the first player, that is not guarding an objective
+    - then, if there is a Mordor enemy (any player controls) or in the staging area, that is not guarding an objective to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one Clue objective in the encounter discard pile (the deck is not searched) and adds it to the staging area (it is not revealed); it is the picked card afterward
+    - the card picked before becomes the guard of the picked card, attached to it in the staging area (an engaged guard stays engaged)
+    - then, if not (the picked card is a objective (any player controls) that has an encounter card attached as its guard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+900407:A:2 (shadow): Shadow: Search the encounter discard pile for a Clue card and attach it to a Mordor enemy in play, if able.
+  900407:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Mordor enemy (any player controls) or in the staging area, that is not guarding an objective
+    - then, if there is a Mordor enemy (any player controls) or in the staging area, that is not guarding an objective to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one Clue objective in the encounter discard pile (the deck is not searched) and adds it to the staging area (it is not revealed); it is the picked card afterward
+    - the card picked before becomes the guard of the picked card, attached to it in the staging area (an engaged guard stays engaged)
+
+## 900408 Restless Hunters
+
+900408:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+900408:A:2 (front): When Revealed: The first player chooses a Clue card attached to a hero and attaches it to a Mordor enemy in play, if able.
+  900408:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Mordor enemy (any player controls) or in the staging area, chosen by the first player, that is not guarding an objective
+    - then, if there is a Mordor enemy (any player controls) or in the staging area, that is not guarding an objective to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose Clue objective (any player controls) chosen by the first player, that is claimed (attached to a character a player controls)
+    - then, if the picked card is a Clue objective (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+    - then, if the picked card is a Clue objective (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area (an engaged guard stays engaged)
+
+900408:A:3 (shadow): Shadow: Damage from this attack must be applied to a hero you control with a Clue card attached, if able.
+  900408:shadow:1: Shadow
+    - the damage of this attack, if undefended, must go on a hero (you control) with a Clue card attached the defending player controls, if able (the player names the hero among them; a defended attack still damages its defender)
+
+## 900409 The Trail Goes Cold
+
+900409:A:1 (front): When Revealed: Attach to the active location and remove all progress from that location. (Counts as a Condition attachment with the text: "Limit 1 per location. Attached location contributes its Threat during the quest phase as if it were in the staging area.")
+  900409:whenRevealed:1: When revealed (record also names 900409:A:2)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) that is the active location
+    - this card attaches to the picked card (nowhere if that card carries one of its title already)
+    - then, if this card is a attachment (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): remove all the progress from the picked card
+    - then, if not (this card is a attachment (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+  900409:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - its host: stat activeThreat 1, while this card is in play
+
+900409:A:2 (front): If The Trail Goes Cold does not attach to a location as a result of its effect, it gains surge.
+  900409:whenRevealed:1: When revealed (record also names 900409:A:1)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) that is the active location
+    - this card attaches to the picked card (nowhere if that card carries one of its title already)
+    - then, if this card is a attachment (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): remove all the progress from the picked card
+    - then, if not (this card is a attachment (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+(rendered pieces: 234 by template, 0 as JSON)

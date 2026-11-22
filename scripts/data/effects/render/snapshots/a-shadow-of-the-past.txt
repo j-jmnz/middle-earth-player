@@ -385,6 +385,8 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 141085:A:3 (front): If The One Ring leaves play, the players lose the game.
   (inert: the engine applies it by rule, no record)
 
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
 ## 906101 A Shadow of the Past Nightmare
 
 906101:A:1 (front): You are playing Nightmare mode.

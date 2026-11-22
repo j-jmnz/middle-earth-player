@@ -304,4 +304,176 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   141084:shadow:1: Shadow
     - the acting player discards 1 random card(s) from hand
 
-(rendered pieces: 129 by template, 25 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 906301 Flight to the Ford Nightmare
+
+906301:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+906301:A:2 (front): The players cannot win while Ford of Bruinen is in play.
+  906301:constant:1: Constant
+    only if all of: (the card with code 906303 is in play) and (the card with code 141029 is in play)
+    - the players cannot defeat this stage while this holds
+
+906301:B:1 (back): Begin with the standard quest deck and encounter deck for the Flight to the Ford scenario.
+  (inert: the engine applies it by rule, no record)
+
+906301:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+906301:B:3 (back): 4x Fell Rider
+  (inert: the engine applies it by rule, no record)
+
+906301:B:4 (back): 1x Ford of Bruinen
+  (inert: the engine applies it by rule, no record)
+
+906301:B:5 (back): 1x The Troll's Camp
+  (inert: the engine applies it by rule, no record)
+
+906301:B:6 (back): 3x Ettenmoors
+  (inert: the engine applies it by rule, no record)
+
+906301:B:7 (back): 3x Pain Assailed Him
+  (inert: the engine applies it by rule, no record)
+
+906301:B:8 (back): 3x The Old Road
+  (inert: the engine applies it by rule, no record)
+
+906301:B:9 (back): 3x Pathless Country
+  (inert: the engine applies it by rule, no record)
+
+906301:B:10 (back): 3x Stricken Dumb
+  (inert: the engine applies it by rule, no record)
+
+906301:B:11 (back): 2x Rode Like a Gale
+  (inert: the engine applies it by rule, no record)
+
+906301:B:12 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Flight to the Ford encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+906301:B:13 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 906302 Fell Rider
+
+906302:A:1 (front): Cannot have non-Morgul attachments.
+  906302:constant:1: Constant
+    only if this card is in play
+    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+
+906302:A:2 (front): Forced: After Fell Rider attacks and destroys a character, reduce the Ring-bearer's life by 1.
+  906302:forced:1: Forced when this enemy attacks, before the defender is declared
+    - when the attack in progress ends:
+      - [json ReduceLife {"verb":"ReduceLife","amount":1,"when":{"kind":"x","min":1}}]
+
+906302:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if The One Ring is exhausted).
+  906302:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the card with code 141085 in play is exhausted (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 906303 Ford of Bruinen
+
+906303:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+906303:A:2 (front): Travel: Each player searches the encounter deck and discard pile for a Nazgûl enemy and puts it into play engaged with him. Shuffle the encounter deck.
+  906303:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Nazgûl enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
+    - shuffle the encounter deck
+
+## 906304 Trollshaw Forest
+
+906304:A:1 (front): While Trollshaw Forest is in the staging area, it gains: "Forced: After a 'when revealed' effect is canceled, reduce the Ring-bearer's life by 1."
+  906304:forced:1: Forced on the event whenRevealedCanceled
+    only if this card is in the staging area
+    - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+
+906304:A:2 (front): Travel: Reduce the Ring-bearer's life by 1 to travel here.
+  906304:travel:1: Travel
+    - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+
+## 906305 Great East Road
+
+906305:A:1 (front): X is 1 plus the number of Nazgûl enemies in play.
+  906305:constant:1: Constant
+    - this card: stat threat the number of Nazgûl enemy (any player controls) + 1, while this card is in play
+
+906305:A:2 (front): While Great East Road is in the staging area, each Nazgûl enemy gets -5 engagement cost.
+  906305:constant:2: Constant
+    only if this card is in the staging area
+    - every enemy in play (Nazgûl only): stat engagementCost -5, while this card is in play
+
+906305:A:3 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an immediate attack.
+  906305:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if another player is still in the game: the attacking enemy engages the next player
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
+
+## 906306 Pathless Wilderness
+
+906306:A:1 (front): Pathless Wilderness enters play with 3 resource tokens on it.
+  906306:triggered:1: Triggered (mandatory, not printed as Forced) on the event encounterEnteredPlay (heard about this card)
+    - 3 resource token(s) are placed on this card
+
+906306:A:2 (front): Forced: At the end of the round, discard 1 resource token here. Then, if there are no resource tokens here, reduce the Ring-bearer's life by 3.
+  906306:forced:1: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - 1 resource(s) come off the resource pool of this card (discarded, not spent)
+    - [json ReduceLife {"verb":"ReduceLife","amount":3,"when":{"kind":"not","condition":{"kind":"matches","card":"self","pick":{"type":"location","control":"any","hasResources":true}}}}]
+
+## 906307 Ettendales
+
+906307:A:1 (front): Forced: When Ettendales is explored, shuffle the top card of the burden deck into the encounter deck.
+  906307:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - [json MoveBurden {"verb":"MoveBurden","to":"encounterShuffle"}]
+
+906307:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack. If this attack destroys a character, reduce the Ring-bearer's life by 1.
+  906307:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 2, until the end of the attack
+    - when the attack in progress ends:
+      - [json ReduceLife {"verb":"ReduceLife","amount":1,"when":{"kind":"x","min":1}}]
+
+## 906308 Come Back!
+
+906308:A:1: Peril. Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+906308:A:2 (front): When Revealed: Reduce the Ring-bearer's life by 1 and remove all progress from the current quest.
+  906308:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+    - all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
+
+906308:A:3 (shadow): Shadow: Either reduce the Ring-bearer's life by 1, or this attack is considered undefended.
+  906308:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "life":
+        - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+      * option "undefended":
+        - this attack is considered undefended
+
+## 906309 The Twilight World
+
+906309:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+906309:A:2 (front): When Revealed: Attach to the Ring-bearer. Limit 1 per hero. (Counts as a Condition attachment with the text: "Forced: At the beginning of the planning phase, either exhaust The One Ring, or reduce the Ring-bearer's life by 1.")
+  906309:whenRevealed:1: When revealed
+    - [json AttachSelfToRingBearer {"verb":"AttachSelfToRingBearer","when":{"kind":"count","pick":{"type":"card","control":"any","names":["The Twilight World"],"on":{"type":"hero","control":"any"}},"max":0}}]
+  906309:forced:1: Forced when a phase begins
+    only if it is the Planning phase
+    - the first player chooses one of:
+      * option "exhaust" (only if the card with code 141085 in play is ready):
+        - exhaust the card with code 141085
+      * option "life":
+        - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+  906309:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+
+(rendered pieces: 188 by template, 36 as JSON)

@@ -183,4 +183,151 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): this attack is considered undefended
 
-(rendered pieces: 128 by template, 0 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 901501 The Watcher in the Water Nightmare
+
+901501:A:1 (front): You are playing in Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+901501:A:2 (front): While Doors of Durin is in play, The Watcher cannot be engaged.
+  901501:constant:1: Constant
+    only if the card with code 04065 is in play
+    - each enemy (any player controls) or in the staging area, named "The Watcher": stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, until the end of the game
+
+901501:A:3 (front): Forced: When a Tentacle enemy is destroyed, deal 1 damage to The Watcher if it is in play.
+  901501:forced:1: Forced after an enemy is destroyed (heard about Tentacle enemy (any player controls))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a enemy (any player controls) or in the staging area, named "The Watcher" to choose: choose enemy (any player controls) or in the staging area, named "The Watcher"
+    - then, if there is a enemy (any player controls) or in the staging area, named "The Watcher" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
+
+901501:A:4 (front): The players cannot win the game unless both Doors of Durin and The Watcher are in the victory display.
+  901501:constant:2: Constant
+    only if all of: (the card with code 04064 is in play) and (the card with code 04065 is not in the victory display)
+    - the players cannot defeat this stage while this holds
+  901501:constant:3: Constant
+    only if all of: (the card with code 04064 is in play) and (the card with code 04072 is not in the victory display)
+    - the players cannot defeat this stage while this holds
+
+901501:B:1 (back): Begin with the standard quest deck and encounter deck for The Watcher in the Water scenario.
+  (inert: the engine applies it by rule, no record)
+
+901501:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+901501:B:3 (back): 1x The Watcher
+  (inert: the engine applies it by rule, no record)
+
+901501:B:4 (back): 2x Makeshift Passage
+  (inert: the engine applies it by rule, no record)
+
+901501:B:5 (back): 4x Black Uruks
+  (inert: the engine applies it by rule, no record)
+
+901501:B:6 (back): 3x Mountain Warg
+  (inert: the engine applies it by rule, no record)
+
+901501:B:7 (back): 2x Warg Lair
+  (inert: the engine applies it by rule, no record)
+
+901501:B:8 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Watcher in the Water encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+901501:B:9 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 901502 The Watcher
+
+901502:A:1 (front): While The Watcher is in the staging area, it cannot be damaged by player card effects.
+  901502:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat noPlayerEffectDamage 1, while this card is in play
+
+901502:A:2 (front): If The Watcher is in the staging area at the end of the combat phase, each player must deal 3 damage to 1 character he controls.
+  901502:forced:1: Forced at the end of the phase
+    only if all of: (it is the Combat phase) and (this card is in the staging area)
+    - each player assigns 3 damage to 1 of the character (you control), all of it
+
+## 901503 Writing Tentacle
+
+901503:A:1 (front): Forced: When Writhing Tentacle engages a player, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, Writhing Tentacle makes an immediate attack, then attaches to the defending character as a Tentacle attachment with the text: "Attached character cannot commit to the quest."
+  901503:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attachesAfterAttack 1, until the end of the phase
+    - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
+  901503:forced:2: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    only if this card holds the flag attachesAfterAttack
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this enemy attaches to the event's other card (the defending character, when there was one and it is still in play) as an attachment: it has no enemy text there and is discarded to the encounter discard pile with it when that card leaves play (it is no enemy while it lies there)
+    - this card: stat attachesAfterAttack -1, until the end of the phase
+  901503:constant:1: Constant
+    - this card counts as a Tentacle attachment while it is attached
+  901503:constant:2: Constant
+    only if all of: (this card is attached to a card) and (its host is a character (any player controls))
+    - its host: stat cannotQuest 1, while this card is in play
+
+## 901504 Choking Tentacle
+
+901504:A:1 (front): Forced: After resolving an attack made by Choking Tentacle, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, attach Choking Tentacle to a character the defending player controls as a Tentacle attachment with the text: "Forced: After attached character readies, deal it 1 damage."
+  901504:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): choose character (any player controls) chosen by the first player, controlled by the player this card is engaged with
+    - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attaches to the picked card as an attachment: it has no enemy text there and is discarded to the encounter discard pile with it when that card leaves play (it is no enemy while it lies there)
+  901504:constant:1: Constant
+    - this card counts as a Tentacle attachment while it is attached
+  901504:forced:2: Forced on the event readied (heard about the host)
+    only if all of: (this card is attached to a card) and (its host is a character (any player controls))
+    - deal 1 damage to its host
+
+## 901505 Banks of Sirannon
+
+901505:A:1 (front): While Banks of Sirannon is in the staging area, each Tentacle enemy gets +2 Defense.
+  901505:constant:1: Constant
+    only if this card is in the staging area
+    - each Tentacle enemy (any player controls) or in the staging area: stat defense 2, while this card is in play
+
+901505:A:2 (shadow): Shadow: For each point of damage dealt by this attack, the defending player must discard a random card from his hand.
+  901505:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the acting player discards the damage just dealt random card(s) from hand
+
+## 901506 Hideous Depths
+
+901506:A:1 (front): Forced: After a player looks at one or more cards in the encounter deck, shuffle the encounter deck.
+  901506:forced:1: Forced on the event lookedAtEncounterDeck
+    - shuffle the encounter deck
+
+901506:A:2 (front): Travel: Reveal the topmost Tentacle enemy in the encounter discard pile to travel here.
+  901506:travel:1: Travel
+    - the topmost Tentacle enemy of the encounter discard pile (the last put there) is revealed by the acting player in full: it enters the staging area and its When Revealed and keywords resolve (a Travel cost cannot be paid with none in the pile)
+
+## 901507 Pulled Under
+
+901507:A:1 (front): When Revealed: Deal 3 damage to each character with a Tentacle attachment. If no characters were damaged by this effect, Pulled Under gains surge.
+  901507:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - deal 3 damage to each character (any player's, hero or ally) that has a Tentacle attachment; the effect's X becomes how many were damaged (damage that was canceled or prevented leaves a character undamaged)
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+901507:A:2 (shadow): Shadow: If the defending character has a Tentacle attachment, discard that character.
+  901507:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a character (any player controls) defending, with a Tentacle card attached to choose: choose character (any player controls) defending, with a Tentacle card attached
+    - then, if there is a character (any player controls) defending, with a Tentacle card attached to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 901508 Rippling From Beneath
+
+901508:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+901508:A:2 (front): When Revealed: Shuffle X Tentacle enemies from the encounter discard pile into the encounter deck. Heal X damage from The Watcher, if it is in play. X is the number of players in the game.
+  901508:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - repeat the number of players times:
+      - one Tentacle enemy in the encounter discard pile (chosen by the first player) goes back into the encounter deck, which is shuffled (nothing with none there)
+    - then, if there is a enemy (any player controls) or in the staging area, named "The Watcher" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, named "The Watcher"
+    - then, if there is a enemy (any player controls) or in the staging area, named "The Watcher" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): heal the number of players damage from the picked card
+
+(rendered pieces: 230 by template, 0 as JSON)

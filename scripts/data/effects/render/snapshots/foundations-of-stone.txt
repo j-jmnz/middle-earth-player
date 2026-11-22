@@ -255,4 +255,154 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
     only if this card is engaged with the player
     - this card: stat attack the number of enemy (any player controls) engaged with you, other than this card, while this card is in play
 
-(rendered pieces: 179 by template, 0 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 901701 Foundations of Stone Nightmare
+
+901701:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+901701:A:2 (front): Forced: When stage 3b is revealed, discard all Mount and Artifact cards from play. Each player must also discard allies he controls until the total printed cost of allies he controls is 6 or less.
+  901701:forced:1: Forced on the event stageRevealed
+    only if the card the event is about is a card (any player controls) named "Washed Away!"
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard every card in play that matches Mount or Artifact card (any player controls) (not destroyed: no Victory, no "when destroyed"), its attachments with it; an encounter card goes to the encounter discard pile, a player's card to its owner's
+    - for each player, first player first:
+      - the acting player chooses and discards allies he controls, one at a time, until the total printed cost of the allies he controls is 6 or less
+
+901701:B:1 (back): Begin with the standard quest deck and encounter deck for the Foundations of Stone scenario.
+  (inert: the engine applies it by rule, no record)
+
+901701:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+901701:B:3 (back): 3x Goblin Scout
+  (inert: the engine applies it by rule, no record)
+
+901701:B:4 (back): 2x Goblin Swordsman
+  (inert: the engine applies it by rule, no record)
+
+901701:B:5 (back): 1x Goblin Follower
+  (inert: the engine applies it by rule, no record)
+
+901701:B:6 (back): 3x Burning Low
+  (inert: the engine applies it by rule, no record)
+
+901701:B:7 (back): 1x Branching Paths
+  (inert: the engine applies it by rule, no record)
+
+901701:B:8 (back): 1x Many Roads
+  (inert: the engine applies it by rule, no record)
+
+901701:B:9 (back): 3x Cave In
+  (inert: the engine applies it by rule, no record)
+
+901701:B:10 (back): 3x Drowned Treasury
+  (inert: the engine applies it by rule, no record)
+
+901701:B:11 (back): 1x Mitril Lode
+  (inert: the engine applies it by rule, no record)
+
+901701:B:12 (back): 4x Moria Bats
+  (inert: the engine applies it by rule, no record)
+
+901701:B:13 (back): During setup, players are instructed to set the Foundations of Stone encounter set aside, out of play. Shuffle the encounter cards in this Nightmare Deck with the Goblins of the Deep encounter set icon into the standard encounter deck. Then, shuffle the encounter cards in this Nightmare Deck with the Foundations of Stone encounter set icon into the remainder of the set aside Foundations of Stone encounter set.
+  (inert: the engine applies it by rule, no record)
+
+901701:B:14 (back): Finally, flip this card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 901702 Mithril Seeker
+
+901702:A:1 (front): Mithril Seeker gets +1 Attack for each resource on it.
+  901702:constant:1: Constant
+    - this card: stat attack resources of this card, while this card is in play
+
+901702:A:2 (front): Forced: When Mithril Seeker attacks, move 1 resource from each of the defending player's heroes to Mithril Seeker.
+  901702:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    - 1 resource moves from the pool of each hero the acting player controls that has one to this card
+
+## 901703 Giant Cave Centipede
+
+901703:A:1 (front): When Revealed: Each player at this stage shuffles the card in his hand with the highest printed cost back into his deck.
+  901703:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player shuffles the card in his hand with the highest printed cost (no printed cost counts 0; he chooses among ties) into his deck; nothing from an empty hand
+
+901703:A:2 (front): Forced: At the end of the combat phase, if Giant Cave Centipede is engaged with a player, that player chooses and adds it to a different player's staging area.
+  901703:forced:1: Forced at the end of the phase
+    only if all of: (it is the Combat phase) and (this card is engaged with the player)
+    - for the player this enemy is engaged with:
+      - if there is a player (another player controls) whose staging area is a different one from the chooser's (every other player while the areas are not separate) to choose: choose player (another player controls) whose staging area is a different one from the chooser's (every other player while the areas are not separate)
+      - this enemy, engaged with a player, moves to the staging area of the player picked, as a staging card (with no other area to pick, to the area the players share; with one player it stays engaged)
+
+## 901704 Unspeakable Thing
+
+901704:A:1 (front): Forced: When Unspeakable Thing engages a player or attacks a player, attach the top card of that player's deck to it.
+  901704:forced:1: Forced after an enemy engages a player (heard about this card)
+    - attach the top card of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to this enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
+  901704:forced:2: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    - attach the top card of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to this enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
+
+901704:A:2 (front): X is the printed cost of all attached cards on this card. If there are no cards attached, X is 5.
+  901704:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack the total printed cost of the player cards attached to this card from the top of a deck (a hero, an X cost or no printed cost counts 0), or 5 when none is attached, while this card is in play
+    - this card: stat hitPoints the total printed cost of the player cards attached to this card from the top of a deck (a hero, an X cost or no printed cost counts 0), or 5 when none is attached, while this card is in play
+
+## 901705 Primeval Thing
+
+901705:A:1 (front): Forced: When Primeval Thing enters play, attach cards from the top of the first player's deck to it until the total printed cost of all attached cards is 6 or higher.
+  901705:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
+    - attach cards one after another until the printed cost of all the cards attached to this enemy is 6 or more (or the deck is empty), starting with the top card of the first player's deck (of the staging area, once the areas are separate) to this enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
+
+901705:A:2 (front): X is the printed cost of all attached cards on this card. If there are no cards attached, X is 6.
+  901705:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack the total printed cost of the player cards attached to this card from the top of a deck (a hero, an X cost or no printed cost counts 0), or 6 when none is attached, while this card is in play
+    - this card: stat hitPoints the total printed cost of the player cards attached to this card from the top of a deck (a hero, an X cost or no printed cost counts 0), or 6 when none is attached, while this card is in play
+
+## 901706 Nest of Horrors
+
+901706:A:1 (front): While Nest of Horrors is in the staging area, it gains: "Forced: When one or more cards are attached to a Nameless enemy from the top of a player's deck, attach an additional card from the top of that player's deck."
+  901706:forced:1: Forced on the event attachedFromDeck
+    only if this card is in the staging area
+    - attach the top card of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to the enemy the event is about, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached this way are not a new event for the Forced effects that hear one
+
+901706:A:2 (front): Travel: Each player at this stage discards the top card of the encounter deck to travel here. Reveal each Nameless enemy discarded by this effect.
+  901706:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard the top card of the encounter deck for each player at this stage (fewer from a short deck); they are the cards this effect looked at
+    - the acting player reveals, in full, each Nameless enemy among the cards this effect discarded that still lies in the encounter discard pile, one after another (its When Revealed resolves and it enters the staging area)
+
+## 901707 Shivering River
+
+901707:A:1 (front): While Shivering River is in the staging area, it contributes its Threat to the total Threat in each other player's staging area.
+  901707:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat threatInOtherAreas 1, while this card is in play
+
+901707:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if there is more than one player at this staging area.)
+  901707:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of players at the acting player's staging area (every player before the areas are separate) is less than 2: the attacking enemy: stat attack 1, until the end of the attack
+    - then, if 1 is less than the number of players at the acting player's staging area (every player before the areas are separate) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 901708 Chill of the Roots
+
+901708:A:1 (front): When Revealed: Each player must either discard his hand, or raise his threat by the number of cards in his hand. If no cards were discarded by this effect, Chill of the Roots gains surge.
+  901708:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "discard":
+          - the acting player discards each card (you control) in hand
+        * option "raise":
+          - raise threat by the cards in your hand (the acting player)
+    - then, if the running effect has discarded no card (with DiscardEach) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+901708:A:2 (shadow): Shadow: If attacking enemy is Nameless, attach the top card of the defending player's deck to it.
+  901708:shadow:1: Shadow
+    - if the attacking enemy is a Nameless enemy (any player controls): attach the top card of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to the attacking enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
+
+(rendered pieces: 251 by template, 0 as JSON)

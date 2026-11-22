@@ -251,4 +251,165 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
     - each copy of code 01133 and code 01138 attached to a hero in play joins the Campaign Pool attached to that hero
     - [json NamePrisoner {"verb":"NamePrisoner"}]
 
-(rendered pieces: 135 by template, 7 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 900201 Journey Along the Anduin Nightmare
+
+900201:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+900201:A:2 (front): All Troll enemies gain the text: "Cannot have attachments."
+  900201:constant:1: Constant
+    - each Troll enemy (any player controls) or in the staging area: stat cannotHaveAttachments 1, while this card is in play
+
+900201:A:3 (front): If the encounter deck is empty (at any time), shuffle the encounter discard pile back into the encounter deck.
+  900201:constant:2: Constant
+    - the table: stat encounterRefill 1, while this card is in play
+
+900201:B:1 (back): Begin with the standard quest deck and encounter deck for the Journey Along the Anduin scenario found in the LOTR LCG core set.
+  (inert: the engine applies it by rule, no record)
+
+900201:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+900201:B:3 (back): 3x Evil Storm
+  (inert: the engine applies it by rule, no record)
+
+900201:B:4 (back): 2x Treacherous Fog
+  (inert: the engine applies it by rule, no record)
+
+900201:B:5 (back): 2x Banks of the Anduin
+  (inert: the engine applies it by rule, no record)
+
+900201:B:6 (back): 3x Dol Guldur Orcs
+  (inert: the engine applies it by rule, no record)
+
+900201:B:7 (back): 2x Enchanted Stream
+  (inert: the engine applies it by rule, no record)
+
+900201:B:8 (back): 2x Despair
+  (inert: the engine applies it by rule, no record)
+
+900201:B:9 (back): 3x Misty Mountain Goblins
+  (inert: the engine applies it by rule, no record)
+
+900201:B:10 (back): 2x Necromancer's Pass
+  (inert: the engine applies it by rule, no record)
+
+900201:B:11 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Journey Along the Anduin encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+900201:B:12 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 900202 Marshland Outlaws
+
+900202:A:1 (front): If you are engaged with this enemy, you cannot attack or deal damage (through effects) to enemies with a title other than Marshland Outlaws.
+  900202:constant:1: Constant
+    only if this card is engaged with the player
+    - engagedSeat: stat attackOnlyTitle 1, while this card is in play
+
+900202:A:2 (shadow): Shadow: Raise your threat by X. X is the amount of damage dealt by this attack.
+  900202:shadow:1: Shadow
+    - when the attack in progress ends:
+      - raise threat by the damage just dealt (the acting player)
+
+## 900203 Anduin Troll Spawn
+
+900203:A:1 (front): If there is no Hill Troll in play, Anduin Troll Spawn gains surge.
+  900203:whenRevealed:1: When revealed
+    - if the number of enemy (any player controls) or in the staging area, named "Hill Troll" is at most 0: this card gains surge (one more encounter card is revealed when it has been resolved)
+
+900203:A:2 (front): Forced: At the beginning of the combat phase, Anduin Troll Spawn engages a player engaged with a Hill Troll.
+  900203:forced:1: Forced when a phase begins
+    only if it is the Combat phase
+    - this enemy engages a player engaged with a enemy (any player controls) named "Hill Troll" (the first player chooses among several; nothing when it is already engaged with that player)
+
+## 900204 Brown Water Rats
+
+900204:A:1 (front): Brown Water Rats cannot be damaged.
+  900204:constant:1: Constant
+    - this card: stat cannotTakeDamage 1, while this card is in play
+
+900204:A:2 (front): Forced: If the players are on stage 3 and all remaining enemies have the printed Rat trait, discard Brown Water Rats from play.
+  900204:forced:1: Forced on the event stageRevealed
+    only if all of: (the players are on stage 3) and (the number of enemy (any player controls) or in the staging area, without Rat is at most 0) and (this card is in play)
+    - discard this card
+  900204:forced:2: Forced after a card leaves play (heard about enemy (any player controls) not named "Brown Water Rats")
+    only if all of: (the players are on stage 3) and (the number of enemy (any player controls) or in the staging area, without Rat is at most 0) and (this card is in play)
+    - discard this card
+  900204:forced:3: Forced on the event encounterEnteredPlay (heard about this card)
+    only if all of: (the players are on stage 3) and (the number of enemy (any player controls) or in the staging area, without Rat is at most 0) and (this card is in play)
+    - discard this card
+
+900204:A:3 (shadow): Shadow: Attacking enemy cannot be damaged this round.
+  900204:shadow:1: Shadow
+    - the attacking enemy: stat cannotTakeDamage 1, until the end of the round
+
+## 900205 A Flooded Ford
+
+900205:A:1 (front): Each card revealed by the encounter deck gains doomed X. X is the number of progress tokens on this card.
+  900205:triggered:1: Triggered (mandatory, not printed as Forced) after a card is revealed (heard about card (any player controls); only when the encounter deck revealed it)
+    only if this card is in play
+    - raise threat by progress of this card (each player)
+
+900205:A:2 (shadow): Shadow: If this attack is undefended, put A Flooded Ford into the staging area with 1 progress token on it.
+  900205:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attack has no defender: this card goes to the staging area (it is not revealed)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 progress on this card
+
+## 900206 Gladden Marshlands
+
+900206:A:1 (front): Action: Deal 1 damage to a hero you control to reduce Gladden Marshlands' Threat by 1 until the end of the phase. Any player may trigger this effect.
+  900206:action:1: Action (any player may use it)
+    only if there is a hero (you control) to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control)
+    - deal 1 damage to the picked card
+    - this card: stat threat -1, until the end of the phase
+
+900206:A:2 (shadow): Shadow: Each enemy engaged with the defending player gets +1 Attack until the end of the phase. (+2 Attack instead if this attack is undefended.)
+  900206:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): each enemy (any player controls) engaged with you: stat attack 1, until the end of the phase
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy (any player controls) engaged with you: stat attack 2, until the end of the phase
+
+## 900207 Pursuit on the Shore
+
+900207:A:1 (front): When Revealed: Search the victory display and encounter discard pile for the enemy with the most hit points. Return that enemy to the staging area. If no enemy is returned by this effect, Pursuit on the Shore gains surge. (Cannot be canceled.)
+  900207:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PickMostHitPoints {"verb":"PickMostHitPoints"}]
+    - the picked card goes to the staging area (it is not revealed)
+    - then, if not (the picked card is a [json pick undefined]) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+## 900208 Troll Attack
+
+900208:A:1 (front): When Revealed: All engaged Troll enemies attack. If no Troll enemies are engaged, Troll Attack gains surge.
+  900208:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy engaged with a player with the trait Troll makes an immediate attack, each dealt a shadow card of its own
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+900208:A:2 (shadow): Shadow: If attacking enemy is a Troll, resolve this attack against each player. (Attack is undefended against each player not engaged with this enemy.)
+  900208:shadow:1: Shadow
+    - when the attack in progress ends:
+      - [json AttackOthersUndefended {"verb":"AttackOthersUndefended","when":{"kind":"matches","card":"self","pick":{"type":"enemy","control":"any","trait":"Troll"}}}]
+
+## 900209 Smoking Blood
+
+900209:A:1 (front): When Revealed: Remove all damage from all enemies. Then, each player raises his threat by the amount of damage just removed from his engaged enemies. If no damage is removed by this effect, Smoking Blood gains surge.
+  900209:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json RemoveEnemyDamage {"verb":"RemoveEnemyDamage"}]
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+900209:A:2 (shadow): Shadow: Move all damage on this enemy to the defending character. (If undefended, move the damage to the hero damaged by this attack.)
+  900209:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): all the damage on the attacking enemy moves to the defender (placed, not dealt; it can destroy a character at its limit; nothing with the target out of play)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): when the attack in progress ends:
+      - all the damage on this card moves to the event's other card (placed, not dealt; it can destroy a character at its limit; nothing with the target out of play)
+
+(rendered pieces: 229 by template, 11 as JSON)

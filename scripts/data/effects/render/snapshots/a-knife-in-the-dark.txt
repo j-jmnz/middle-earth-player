@@ -424,6 +424,8 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141085:A:3 (front): If The One Ring leaves play, the players lose the game.
   (inert: the engine applies it by rule, no record)
 
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
 ## 906201 A Knife in the Dark Nightmare
 
 906201:A:1 (front): You are playing Nightmare mode.

@@ -210,4 +210,213 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
   02049:shadow:1: Shadow
     - if the attacking enemy is a Troll enemy (any player controls): heal 2 damage from the attacking enemy
 
-(rendered pieces: 130 by template, 0 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 900501 Conflict at the Carrock Nightmare
+
+900501:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+900501:A:2 (front): Stage 1A should read, "Remove 5 unique Troll cards" instead of 4.
+  900501:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the copy of the card with code 900503 in the encounter deck is set aside, out of play
+    - the table: stat noteQuestProgress 1, until the end of the game
+
+900501:A:3 (front): Stage 2B should read, "When Revealed: Place Louis, Morris, Rupert and Stuart into the staging area."
+  900501:forced:1: Forced on the event stageRevealed
+    only if the card the event is about is a card (any player controls) named "Against the Trolls"
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 900504 joins the staging area (it is not revealed)
+    - one set-aside card with code 900505 joins the staging area (it is not revealed)
+    - one set-aside card with code 900506 joins the staging area (it is not revealed)
+    - one set-aside card with code 900507 joins the staging area (it is not revealed)
+
+900501:A:4 (front): Forced: At the end of the quest phase, if no progress was placed on the current quest this phase, place 1 progress on the current quest (bypassing the active location).
+  900501:forced:2: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and (no progress was placed on the current quest card this quest phase (the quest card itself; progress an active location took does not count))
+    - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
+
+900501:A:5 (front): Response: After defeating a unique Troll enemy, you may choose and discard 1 "Sacked!" card from play.
+  900501:response:1: Response after an enemy is destroyed (heard about unique Troll enemy (any player controls); answered by the player the event happened to)
+    only if there is a attachment (any player controls) named "Sacked!" to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (any player controls) named "Sacked!"
+    - discard the picked card
+
+900501:B:1 (back): Begin with the standard quest deck and encounter deck for the Conflict at the Carrock scenario.
+  (inert: the engine applies it by rule, no record)
+
+900501:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+900501:B:3 (back): 1x Grimbeorn the Old
+  (inert: the engine applies it by rule, no record)
+
+900501:B:4 (back): 1x Louis
+  (inert: the engine applies it by rule, no record)
+
+900501:B:5 (back): 1x Morris
+  (inert: the engine applies it by rule, no record)
+
+900501:B:6 (back): 1x Stuart
+  (inert: the engine applies it by rule, no record)
+
+900501:B:7 (back): 1x Rupert
+  (inert: the engine applies it by rule, no record)
+
+900501:B:8 (back): 3x Bee Pastures
+  (inert: the engine applies it by rule, no record)
+
+900501:B:9 (back): 3x Oak-wood Grove
+  (inert: the engine applies it by rule, no record)
+
+900501:B:10 (back): 1x Roasted Slowly
+  (inert: the engine applies it by rule, no record)
+
+900501:B:11 (back): 3x Misty Mountain Goblins
+  (inert: the engine applies it by rule, no record)
+
+900501:B:12 (back): 2x Banks of the Anduin
+  (inert: the engine applies it by rule, no record)
+
+900501:B:13 (back): 1x Wolf Rider
+  (inert: the engine applies it by rule, no record)
+
+900501:B:14 (back): 2x Goblin Sniper
+  (inert: the engine applies it by rule, no record)
+
+900501:B:15 (back): 2x Wargs
+  (inert: the engine applies it by rule, no record)
+
+900501:B:16 (back): 2x Despair
+  (inert: the engine applies it by rule, no record)
+
+900501:B:17 (back): 2x The Brown Lands
+  (inert: the engine applies it by rule, no record)
+
+900501:B:18 (back): 2x The East Bight
+  (inert: the engine applies it by rule, no record)
+
+900501:B:19 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Conflict at the Carrock encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+900501:B:20 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 900502 Savage Hill-troll
+
+900502:A:1 (front): While Savage Hill-troll is in the victory display, each Troll enemy gets +1 hit point.
+  900502:constant:1: Constant
+    only if this card is in the victory display
+    - each Troll enemy (any player controls) or in the staging area: stat hitPoints 1, while this card is in play
+
+900502:A:2 (shadow): Shadow: If attacking enemy is a Troll, defending character does not ready during the refresh phase this round.
+  900502:shadow:1: Shadow
+    - if the attacking enemy is a Troll enemy (any player controls): the defender: stat cannotReady 1, until the end of the round
+
+## 900503 Rob and Bob
+
+900503:A:1 (front): Forced: After Rob & Bob makes its first attack each round, if there are two or more players, it engages the next player and makes an additional attack (discard and deal a new shadow card for this attack).
+  900503:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card; limit once per round)
+    only if another player is still in the game
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy engages the next player
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 900504 Louis
+
+900504:A:1 (front): Forced: After Louis attacks, the defending player must raise his threat by 3.
+  900504:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    - raise threat by 3 (the player the event is about)
+
+900504:A:2 (front): While Louis is in the victory display, each Troll enemy gains, "Forced: After this enemy attacks, the defending player must raise his threat by 1."
+  900504:forced:2: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about Troll enemy (any player controls) or in the staging area; used from the victory display)
+    only if this card is in the victory display
+    - raise threat by 1 (the player the event is about)
+
+## 900505 Morris
+
+900505:A:1 (front): Immune to player events.
+  900505:constant:1: Constant
+    - this card: stat immuneToPlayerEvents 1, while this card is in play
+
+900505:A:2 (front): While Morris is in the victory display, each Troll enemy gets +1 Attack and gains "Immune to player events".
+  900505:constant:2: Constant
+    only if this card is in the victory display
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Troll enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
+    - each Troll enemy (any player controls) or in the staging area: stat immuneToPlayerEvents 1, while this card is in play
+
+## 900506 Rupert
+
+900506:A:1 (front): Rupert's Defense cannot be reduced.
+  900506:constant:1: Constant
+    - this card: stat cannotReduceDefense 1, while this card is in play
+
+900506:A:2 (front): While Rupert is in the victory display, the Defense of each Troll enemy cannot be reduced.
+  900506:constant:2: Constant
+    only if this card is in the victory display
+    - each Troll enemy (any player controls) or in the staging area: stat cannotReduceDefense 1, while this card is in play
+
+## 900507 Stuart
+
+900507:A:1 (front): Cannot have player attachments.
+  900507:constant:1: Constant
+    - this card: stat noPlayerAttachments 1, while this card is in play
+
+900507:A:2 (front): While Stuart is in the victory display, each Troll enemy gets +1 Defense and gains "Cannot have player attachments."
+  900507:constant:2: Constant
+    only if this card is in the victory display
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Troll enemy (any player controls) or in the staging area: stat defense 1, while this card is in play
+    - each Troll enemy (any player controls) or in the staging area: stat noPlayerAttachments 1, while this card is in play
+
+## 900508 Troll Lair
+
+900508:A:1 (front): While Troll Lair is in the staging area, players cannot reduce their threat.
+  900508:constant:1: Constant
+    only if this card is in the staging area
+    - the table: stat noThreatReduction 1, while this card is in play
+
+900508:A:2 (shadow): Shadow: If attacking enemy is a Troll, remove 4 damage tokens from it.
+  900508:shadow:1: Shadow
+    - if the attacking enemy is a Troll enemy (any player controls): heal 4 damage from the attacking enemy
+
+## 900509 Hives and Hives
+
+900509:A:1 (front): Forced: After any amount of progress is placed on Hives and Hives, deal 1 damage to each character in play.
+  900509:forced:1: Forced on the event progressPlaced (heard about this card)
+    - deal 1 damage to each character (any player controls)
+
+900509:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack.
+  900509:shadow:1: Shadow
+    - the attacking enemy: stat attack 2, until the end of the attack
+
+## 900510 Time for Supper
+
+900510:A:1 (front): When Revealed: The first player chooses a hero in any player's discard pile and removes that hero from the game. Then, heal all damage from each Troll enemy in play. If no damage is removed from any Troll enemy as a result of this effect, Time for Supper gains surge.
+  900510:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (any player controls) in the discard pile, chosen by the first player
+    - then, if the picked card is a hero (any player controls) in the discard pile (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked card is removed from the game
+    - then, if not (the picked card is a hero (any player controls) in the discard pile) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if all of: (the picked card is a hero (any player controls) in the discard pile) and (the number of Troll damaged enemy (any player controls) or in the staging area is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the picked card is a hero (any player controls) in the discard pile (checked when this step runs, after the steps above; not tied to whether they did anything): for each Troll damaged enemy (any player controls) or in the staging area:
+      - heal all damage from the picked card
+
+## 900511 Grimbeorn's Folly
+
+900511:A:1 (front): When Revealed: Add Rob & Bob to the staging area. Then, each player must search the encounter deck and discard pile for a non-unique Troll enemy and add it to the staging area, if able. Shuffle the encounter deck.
+  900511:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 900503 joins the staging area (it is not revealed)
+    - for each player, first player first:
+      - the acting player finds one non-unique Troll enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+900511:B:1 (back): When Rob & Bob have been defeated, the players have rescued Grimbeorn the Old from certain death, and won the game.
+  900511:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) named "Rob and Bob")
+    - the players win the game
+
+(rendered pieces: 233 by template, 0 as JSON)

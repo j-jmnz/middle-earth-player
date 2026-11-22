@@ -333,4 +333,167 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - raise threat by 1 (each player)
     - [json SetStatUntil {"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","isHost":true}}]
 
-(rendered pieces: 184 by template, 12 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 906401 The Ring Goes South Nightmare
+
+906401:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+906401:A:2 (front): Setup: Set each copy of Pale-green Tentacle aside, out of play.
+  906401:setup:1: Setup
+    - the copy of the card with code 906402 in the encounter deck is set aside, out of play
+
+906401:A:3 (front): Forced: When the players advance to stage 4B, each player puts 1 copy of Pale-green Tentacle into play engaged with him. Shuffle any remaining copies, and the encounter discard pile, into the encounter deck.
+  906401:forced:1: Forced on the event stageRevealed
+    only if the card the event is about is a card (any player controls) named "The Gates of Moria"
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json EngageSetAside {"verb":"EngageSetAside","code":"906402"}]
+    - repeat 4 times:
+      - one set-aside copy of the card with code 906402 is shuffled into the encounter deck (nothing with none set aside)
+    - shuffle the encounter discard pile into the encounter deck
+
+906401:B:1 (back): Begin with the standard quest deck and encounter deck for the The Ring Goes South scenario.
+  (inert: the engine applies it by rule, no record)
+
+906401:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+906401:B:3 (back): 2x Crebain from Dunland
+  (inert: the engine applies it by rule, no record)
+
+906401:B:4 (back): 2x Howling Warg
+  (inert: the engine applies it by rule, no record)
+
+906401:B:5 (back): 1x Tree-crowned Hill
+  (inert: the engine applies it by rule, no record)
+
+906401:B:6 (back): 3x Hills of Hollin
+  (inert: the engine applies it by rule, no record)
+
+906401:B:7 (back): 2x Snowdrifts
+  (inert: the engine applies it by rule, no record)
+
+906401:B:8 (back): 1x Storm of Howls
+  (inert: the engine applies it by rule, no record)
+
+906401:B:9 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Ring Goes South encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+906401:B:10 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 906402 Pale-green Tentacle
+
+906402:A:1 (front): Cannot have attachments.
+  906402:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+906402:A:2 (front): Watcher in the Water cannot take damage.
+  906402:constant:2: Constant
+    - each enemy (any player controls) named "Watcher in the Water": stat cannotTakeDamage 1, while this card is in play
+
+906402:A:3 (front): Forced: After Pale-green Tentacle attacks and destroys a character, return Pale-green Tentacle to the staging area.
+  906402:forced:1: Forced when this enemy attacks, before the defender is declared
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 906403 Hunting Hawk
+
+906403:A:1 (front): Cannot have attachments or be optionally engaged.
+  906403:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+906403:A:2 (front): While Hunting Hawk is in the staging area it gains, "Forced: After a player plays an ally, he must either exhaust it, or place 1 damage on an active location."
+  906403:forced:1: Forced after this card is played (heard about ally (any player controls))
+    only if this card is in the staging area
+    - the acting player chooses one of:
+      * option "exhaust":
+        - exhaust the card the event is about
+      * option "damage" (only if there is a location (any player controls) chosen by the first player, that is the active location to choose):
+        - choose location (any player controls) chosen by the first player, that is the active location
+        - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
+
+## 906404 Misty Mountain Warg
+
+906404:A:1 (front): When Revealed: Misty Mountain Warg makes an immediate attack against you. If it destroys a character, place 2 damage on each active location.
+  906404:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AttackActor {"verb":"AttackActor"}]
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose location (any player controls) chosen by the first player, that is the active location
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): place 2 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) chosen by the first player, that is the active location, other than the cards this effect already picked
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): place 2 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
+
+906404:A:2 (shadow): Shadow: If this attack destroys a character, place 1 damage on an active location.
+  906404:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose location (any player controls) chosen by the first player, that is the active location
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
+
+## 906405 Expanse of Hollin
+
+906405:A:1 (front): X is 1 more than the number of enemies in play.
+  906405:constant:1: Constant
+    - this card: stat threat the number of enemy (any player controls) + 1, while this card is in play
+
+906405:A:2 (front): Forced: When Expanse of Hollin is explored, shuffle the encounter discard pile into the encounter deck. Then, discard the top card of the encounter deck for each damage here. Add each enemy discarded by this effect to the staging area.
+  906405:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - repeat damage of this card times:
+      - the top card of the encounter deck goes to the encounter discard pile
+      - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+## 906406 Slopes of Hithaeglir
+
+906406:A:1 (front): Forced: After a 'when revealed' effect is canceled, place 1 damage on each active location.
+  906406:forced:1: Forced on the event whenRevealedCanceled
+    - for each location (any player controls) that is the active location:
+      - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
+
+906406:A:2 (front): Forced: When Slopes of Hithaeglir is explored, each player raises his threat by 1 for each damage here.
+  906406:forced:2: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - raise threat by damage of this card (each player)
+
+## 906407 Hunted in Hollin
+
+906407:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+906407:A:2 (front): When Revealed: Either raise your threat by 6, or engage the lowest engagement cost enemy in the staging area and reveal an encounter card.
+  906407:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 6 (the acting player)
+      * option "engage" (only if there is a enemy (any player controls) in the staging area only to choose):
+        - [json PickLowestEngagement {"verb":"PickLowestEngagement"}]
+        - engage the picked card
+        - the acting player reveals an encounter card
+
+906407:A:3 (shadow): Shadow: Raise your threat by 1 for each enemy engaged with you.
+  906407:shadow:1: Shadow
+    - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
+
+## 906408 Shelterless Land
+
+906408:A:1: Surge. Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+906408:A:2 (front): When Revealed: Until the end of the phase, add 1 to the total Threat in the staging area for each damage on each active location.
+  906408:whenRevealed:1: When revealed
+    - for each location (any player controls) that is the active location:
+      - the total Threat in the staging area is damage of the picked card higher until the end of the phase
+
+906408:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack for each damage on each active location.
+  906408:shadow:1: Shadow
+    - for each location (any player controls) that is the active location:
+      - the attacking enemy: stat attack damage of the picked card, until the end of the attack
+
+(rendered pieces: 280 by template, 15 as JSON)

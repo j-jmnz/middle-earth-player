@@ -203,4 +203,168 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
   04052:forced:1: Forced after an enemy engages a player (heard about this card)
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 110 by template, 0 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 901401 Road to Rivendell Nightmare
+
+901401:A:1 (front): You are playing in Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+901401:A:2 (front): Forced: When an enemy with the ambush keyword engages a player during the quest phase, it contributes its Threat to the total Threat in the staging area until the end of the phase.
+  901401:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) with the ambush keyword, printed or gained)
+    only if it is the Quest phase
+    - the card the event is about: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, until the end of the phase
+
+901401:B:1 (back): Begin with the standard quest deck and encounter deck for the Road to Rivendell scenario.
+  (inert: the engine applies it by rule, no record)
+
+901401:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter and quest deck:
+  (inert: the engine applies it by rule, no record)
+
+901401:B:3 (back): 1x Orc Outpost (quest stage 2)
+  (inert: the engine applies it by rule, no record)
+
+901401:B:4 (back): 2x Ruined Road
+  (inert: the engine applies it by rule, no record)
+
+901401:B:5 (back): 2x Barren Hills
+  (inert: the engine applies it by rule, no record)
+
+901401:B:6 (back): 1x Goblin Taskmaster
+  (inert: the engine applies it by rule, no record)
+
+901401:B:7 (back): 4x Black Uruks
+  (inert: the engine applies it by rule, no record)
+
+901401:B:8 (back): 3x Mountain Warg
+  (inert: the engine applies it by rule, no record)
+
+901401:B:9 (back): 3x Bitter Wind
+  (inert: the engine applies it by rule, no record)
+
+901401:B:10 (back): 2x Warg Lair
+  (inert: the engine applies it by rule, no record)
+
+901401:B:11 (back): 5x Goblin Spearman
+  (inert: the engine applies it by rule, no record)
+
+901401:B:12 (back): 2x Goblin Archer
+  (inert: the engine applies it by rule, no record)
+
+901401:B:13 (back): 2x Plundered Armoury
+  (inert: the engine applies it by rule, no record)
+
+901401:B:14 (back): Add the new quest card in this Nightmare Deck to the normal quest deck, in stage order. Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Road to Rivendell encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+901401:B:15 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 901402 Ambush in the Night
+
+901402:A:1 (front): When Revealed: Search the encounter deck, discard pile and victory display for Goblin Gate and add it to the staging area, if able. Shuffle the encounter discard pile into the encounter deck. Discard cards from the top of the encounter deck until X enemies have been discarded, where X is the number of players in the game. Reveal all enemies discarded by this effect.
+  901402:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 04043 in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard from the top of the encounter deck until 1 enemy for each player is discarded; reveal those enemies in full, in the order discarded
+
+901402:B:1 (back): When Revealed: The first player loses control of Arwen Undómiel and attaches her to Goblin Gate (she is now guarded by Goblin Gate). While she is guarded, the first player cannot gain control of Arwen Undómiel.
+  901402:whenRevealed:2: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) named "Goblin Gate"
+    - then, if there is a location (any player controls) named "Goblin Gate" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the card in play with code 04041 goes back to the staging area, controlled by no one, guarded by the last picked card (which may be the active location); it stays in play with its damage, tokens and attachments and rejoins the first player's play area once nothing guards it
+
+901402:B:2 (back): Goblin Gate gets +1 quest point for each enemy engaged with a player.
+  901402:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each location (any player controls) named "Goblin Gate": stat questPoints the number of enemy (any player controls), while this card is in play
+    - each location (any player controls) named "Goblin Gate": stat exploredWhenFull 1, while this card is in play
+
+901402:B:3 (back): Progress cannot be placed on this stage unless the players control Arwen Undómiel.
+  901402:constant:2: Constant
+    - if the number of ally (any player controls) named "Arwen Undómiel", that a player controls (not one a guard holds in the staging area) is at most 0: the table: stat noQuestProgress 1, while this card is in play
+
+## 901403 Uruk Elf-stalker
+
+901403:A:1: Ambush.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+901403:A:2 (front): Forced: When Uruk Elf-stalker attacks and destroys a character, deal 1 damage to Arwen Undómiel.
+  901403:forced:1: Forced on the event characterDestroyedByAttack
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (any player controls) named "Arwen Undómiel"
+    - deal 1 damage to the picked card
+
+901403:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
+  901403:shadow:1: Shadow
+    - the attacking enemy: stat attack 2, until the end of the attack
+
+## 901404 Gobline Trapper
+
+901404:A:1: Ambush.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+901404:A:2 (front): Forced: After Goblin Trapper engages a player, that player must exhaust a character he controls.
+  901404:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+901404:A:3 (shadow): Shadow: Add Goblin Trapper to the staging area.
+  901404:shadow:1: Shadow
+    - this card goes to the staging area (it is not revealed)
+
+## 901405 Raiding Party
+
+901405:A:1: Ambush.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+901405:A:2 (front): Forced: After Raiding Party engages a player, each player discards the top card of the encounter deck, starting with the first player. Each player who discards an enemy with the ambush keyword must make an engagement check against that enemy.
+  901405:forced:1: Forced after an enemy engages a player (heard about this card)
+    - for each player, first player first:
+      - the acting player discards the top card of the encounter deck; an enemy with the ambush keyword so discarded makes one engagement check against that player alone: it engages them from the discard pile when their threat reaches its engagement cost, else it stays in the discard pile
+
+## 901406 Vicious Trackers
+
+901406:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+901406:A:2 (front): While Vicious Trackers is engaged with a player, that player is considered to have +20 threat for the purposes of engagement checks only.
+  901406:constant:1: Constant
+    only if this card is engaged with the player
+    - engagedSeat: stat engagementThreat 20, while this card is in play
+
+## 901407 Treacherous Bluffs
+
+901407:A:1 (front): Forced: When an enemy with the ambush keyword engages a player, Treacherous Bluffs gets +2 Threat until the end of the phase.
+  901407:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) with the ambush keyword, printed or gained)
+    only if any of: (this card is in the staging area) or (this card is the active location)
+    - this card: stat threat 2, until the end of the phase
+
+901407:A:2 (shadow): Shadow: Excess damage dealt by this attack must be assigned to Arwen Undómiel.
+  901407:shadow:1: Shadow
+    - the damage this attack deals beyond the remaining hit points of the character it damages is assigned to the card in play titled Arwen Undómiel, wherever it lies (an undefended attack has none)
+
+## 901408 Concealed Woods
+
+901408:A:1 (front): While Concealed Woods is the active location, the first enemy with the ambush keyword revealed from the encounter deck each round gains surge.
+  901408:constant:1: Constant
+    only if this card is the active location
+    - the first enemy with the ambush keyword revealed from the encounter deck each round gains surge (counted from the round's start, whether or not this card is in play)
+
+901408:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack if engaged with the first player.
+  901408:shadow:1: Shadow
+    - if the actor holds the first player token: the attacking enemy: stat attack 2, until the end of the attack
+
+## 901409 Tumultuous Assault
+
+901409:A:1 (front): When Revealed: Return each engaged enemy with the ambush keyword to the staging area. Each player makes engagement checks against each enemy in the staging area, as if it were the encounter phase. If there are no enemies with the ambush keyword in play, Tumultuous Assault gains surge.
+  901409:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - return every enemy with the ambush keyword engaged with a player to the staging area
+    - the players make engagement checks against each enemy in the staging area, outside the encounter phase: in player order each engages the enemy of the highest engagement cost at or below their threat, pass after pass until a pass engages none
+    - then, if the number of enemy (any player controls) or in the staging area, with the ambush keyword, printed or gained is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+(rendered pieces: 175 by template, 0 as JSON)

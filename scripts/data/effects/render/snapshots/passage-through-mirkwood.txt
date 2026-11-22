@@ -272,4 +272,156 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
     - [json Earn {"verb":"Earn","codes":["01136"],"when":{"kind":"stageReached","code":"01122","is":true}}]
     - [json Earn {"verb":"Earn","codes":["01137"],"when":{"kind":"stageReached","code":"01121","is":true}}]
 
-(rendered pieces: 150 by template, 6 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 900101 Passage Through Mirkwood Nightmare
+
+900101:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+900101:A:2 (front): Forced: During setup, each player reveals 1 card from the encounter deck and adds it to the staging area.
+  900101:forced:1: Forced on the event duringSetup
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+900101:B:1 (back): Begin with the standard quest deck and encounter deck for the Passage Through Mirkwood scenario found in the LOTR LCG core set.
+  (inert: the engine applies it by rule, no record)
+
+900101:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+900101:B:3 (back): Ungoliant's Spawn x1
+  (inert: the engine applies it by rule, no record)
+
+900101:B:4 (back): Black Forest Bats x1
+  (inert: the engine applies it by rule, no record)
+
+900101:B:5 (back): Forest Spider x3
+  (inert: the engine applies it by rule, no record)
+
+900101:B:6 (back): Dol Guldur Orcs x3
+  (inert: the engine applies it by rule, no record)
+
+900101:B:7 (back): Old Forest Road x1
+  (inert: the engine applies it by rule, no record)
+
+900101:B:8 (back): Forest Gate x2
+  (inert: the engine applies it by rule, no record)
+
+900101:B:9 (back): Mountains of Mirkwood x3
+  (inert: the engine applies it by rule, no record)
+
+900101:B:10 (back): Caught in a Web x2
+  (inert: the engine applies it by rule, no record)
+
+900101:B:11 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Passage Through Mirkwood encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+900101:B:12 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 900102 Ungoliant's Spawn
+
+900102:A:1 (front): When Revealed: Until the end of the phase, each character currently committed to the quest gets -2 Willpower and is discarded if its Willpower is 0.
+  900102:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each character (any player controls) committed to the quest: stat willpower -2, until the end of the phase
+    - for each character (any player controls) committed to the quest, with a current Willpower of 0 or less:
+      - discard the picked card
+
+900102:A:2 (shadow): Shadow: Raise defending player's threat by 5. (Raise defending player's threat by 10 instead if undefended.)
+  900102:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): raise threat by 5 (the acting player)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 10 (the acting player)
+
+## 900103 Ungoliant's Brood
+
+900103:A:1 (front): Forced: After you engage Ungoliant's Brood, your cards cannot ready for the remainder of the round.
+  900103:forced:1: Forced after an enemy engages a player (heard about this card)
+    - each card (you control): stat cannotReady 1, until the end of the round
+
+900103:A:2 (shadow): Shadow: If this attack is undefended, exhaust all characters you control.
+  900103:shadow:1: Shadow
+    - if the attack has no defender: for each ready character (you control):
+      - exhaust the picked card
+
+## 900104 Forest Flies
+
+900104:A:1 (front): Forced: After you engage Forest Flies, deal 1 damage to each exhausted character you control.
+  900104:forced:1: Forced after an enemy engages a player (heard about this card)
+    - deal 1 damage to each exhausted character (you control)
+
+900104:A:2 (shadow): Shadow: If attacking enemy is an Insect, deal it 2 additional Shadow cards.
+  900104:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attacking enemy is a Insect enemy (any player controls): the attacking enemy is dealt a shadow card
+    - then, if the attacking enemy is a Insect enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt a shadow card
+
+## 900105 Spiders of Mirkwood
+
+900105:A:1 (front): While it is engaged with you, Spiders of Mirkwood gets +1 Attack for each exhausted character you control.
+  900105:constant:1: Constant
+    only if this card is engaged with the player
+    - this card: stat attack the number of exhausted character (you control), while this card is in play
+
+900105:A:2 (shadow): Shadow: Choose and exhaust 1 character you control. If this attack was undefended, also deal that character 2 damage.
+  900105:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+
+## 900106 The Spider's Web
+
+900106:A:1 (front): When Revealed: The player with the highest threat exhausts all heroes he controls. Then, attach this card to one of that player's heroes. (Counts as a Condition attachment with the text, "Each time attached hero readies, deal it 1 damage.")
+  900106:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the player with the highest threat becomes the picked player (the first player chooses among a tie)
+    - for each ready hero (any player controls) controlled by the player picked last:
+      - exhaust the picked card
+    - attach this card to a hero
+  900106:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  900106:triggered:1: Triggered (mandatory, not printed as Forced) on the event readied (heard about the host)
+    - deal 1 damage to its host
+
+## 900107 Backtrack!
+
+900107:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+900107:A:2 (front): When Revealed: The topmost enemy or location card in the encounter discard pile is returned to the staging area.
+  900107:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the topmost enemy or location in the encounter discard pile (the last put there) is picked (nothing with none)
+    - the picked card goes to the staging area (it is not revealed)
+
+900107:A:3 (shadow): Shadow: Deal and resolve the topmost Shadow effect in the encounter discard pile for this attack.
+  900107:shadow:1: Shadow
+    - the topmost card with a Shadow effect in the encounter discard pile is dealt to the attacking enemy as one more shadow card for this attack (nothing with none there)
+
+## 900108 Abandoned Camp
+
+900108:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+900108:A:2 (front): Forced: After Abandoned Camp leaves play, each player must deal 2 damage to each exhausted character he controls.
+  900108:forced:1: Forced after a card leaves play (heard about this card)
+    - deal 2 damage to each exhausted character (any player controls)
+
+900108:A:3 (shadow): Shadow: If this attack is undefended, discard all attachment cards players control.
+  900108:shadow:1: Shadow
+    - if the attack has no defender: for each attachment (any player controls) that is a player card:
+      - discard the picked card
+
+## 900109 Glade of the Spawn
+
+900109:A:1 (front): While Glade of the Spawn is the active location, it gains: "Forced: After a Spider enemy enters play, each player must choose and exhaust 1 character he controls."
+  900109:forced:1: Forced on the event encounterEnteredPlay (heard about Spider enemy (any player controls))
+    only if this card is the active location
+    - for each player, first player first:
+      - choose ready character (you control)
+      - exhaust the picked card
+
+(rendered pieces: 224 by template, 6 as JSON)

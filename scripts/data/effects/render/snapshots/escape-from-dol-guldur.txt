@@ -227,4 +227,160 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     - [json CarryOver {"verb":"CarryOver","codes":["01135"],"when":{"kind":"inPlay","code":"01135","is":true}}]
     - [json CarryOver {"verb":"CarryOver","codes":["01132"],"eachPlayer":true,"when":{"kind":"inPlay","code":"01135","is":true}}]
 
-(rendered pieces: 127 by template, 18 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 900301 Escape from Dol Guldur Nightmare
+
+900301:A:1 (front): You are playing Nightmare Mode.
+  (inert: the engine applies it by rule, no record)
+
+900301:A:2 (front): Forced: When stage 1B is revealed, the number of random heroes captured is determined by the number of players, as follows: 1-2 players = 1 hero captured, 3 players = 2 heroes captured, 4 players = 3 heroes captured. All captured heroes are turned face down and considered "the prisoner," cannot be used, cannot be damaged, and do not collect resources until they are rescued. (A single player cannot have more than 1 hero captured by this effect.)
+  900301:forced:1: Forced on the event prisonerTaken (heard about hero (any player controls))
+    - [json TakeMorePrisoners {"verb":"TakeMorePrisoners"}]
+
+900301:B:1 (back): Begin with the standard quest deck and encounter deck for the Escape from Dol Guldur scenario found in the LOTR LCG core set.
+  (inert: the engine applies it by rule, no record)
+
+900301:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+900301:B:3 (back): 2x Dol Guldur Orcs
+  (inert: the engine applies it by rule, no record)
+
+900301:B:4 (back): 2x Enchanted Stream
+  (inert: the engine applies it by rule, no record)
+
+900301:B:5 (back): 1x Great Forest Web
+  (inert: the engine applies it by rule, no record)
+
+900301:B:6 (back): 3x Mountains of Mirkwood
+  (inert: the engine applies it by rule, no record)
+
+900301:B:7 (back): 2x Caught in a Web
+  (inert: the engine applies it by rule, no record)
+
+900301:B:8 (back): 1x The Necromancer's Reach
+  (inert: the engine applies it by rule, no record)
+
+900301:B:9 (back): 1x Necromancer's Pass
+  (inert: the engine applies it by rule, no record)
+
+900301:B:10 (back): 2x Under the Shadow
+  (inert: the engine applies it by rule, no record)
+
+900301:B:11 (back): 2x Tower Gate
+  (inert: the engine applies it by rule, no record)
+
+900301:B:12 (back): 1x Iron Shackles
+  (inert: the engine applies it by rule, no record)
+
+900301:B:13 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Escape from Dol Guldur encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+900301:B:14 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 900302 Torture Master
+
+900302:A:1 (front): When Revealed: Add 1 resource token to each Dol Guldur location in play.
+  900302:whenRevealed:1: When revealed
+    - for each Dol Guldur location (any player controls):
+      - place 1 resource tokens on the picked card
+
+900302:A:2 (shadow): Shadow: Any hero damaged (but not defeated) by this attack is turned face down, as a "prisoner." Then, if the players are on stage 3, return to stage 2B of the quest.
+  900302:shadow:1: Shadow
+    - when the attack in progress ends:
+      - [json TakeHeroPrisoner {"verb":"TakeHeroPrisoner","card":"other","dealt":true}]
+      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the players are on stage 3) (checked when this step runs, after the steps above; not tied to whether they did anything): the players return to stage 2 of the quest deck (side B: the stage comes back as if just beginning, with no progress; the progress on the active location and every other card stay; no When Revealed or Setup resolves again)
+
+## 900303 Crazed Captive
+
+900303:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+900303:A:2 (front): Forced: If Crazed Captive is defeated, raise each player's threat by 7.
+  900303:forced:1: Forced after an enemy is destroyed (heard about this card)
+    - raise threat by 7 (each player)
+
+900303:A:3 (shadow): Shadow: If attacking enemy is not defeated this phase, raise defending player's threat by 7 at the end of the phase.
+  900303:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area [also {"attackingEnemy":true}]
+    - later, at the end of this phase, acting on the card last picked:
+      - if the picked card is a [json pick undefined]: raise threat by 7 (the acting player)
+
+## 900304 Spider of Dol Guldur
+
+900304:A:1 (front): If there are any unclaimed objectives in play, Spider of Dol Guldur gains surge.
+  900304:whenRevealed:1: When revealed
+    - if the number of objective (any player controls) in the staging area only is at least 1: this card gains surge (one more encounter card is revealed when it has been resolved)
+
+900304:A:2 (shadow): Shadow: Attacking enemy gets +3 Attack for each unclaimed objective in play.
+  900304:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of objective (any player controls) in the staging area only x 3, until the end of the attack
+
+## 900305 Torture Chamber
+
+900305:A:1 (front): If Torture Chamber has 4 or more resource tokens on it, all "prisoners" were killed, and the players have lost the game.
+  900305:constant:1: Constant
+    only if this card is a location (any player controls) [also {"minResources":4}]
+    - the players lose the game
+
+900305:A:2 (front): Forced: At the end of each round, place 1 resource token on each Dol Guldur location in play.
+  900305:forced:1: Forced at the end of the round
+    - for each Dol Guldur location (any player controls):
+      - place 1 resource tokens on the picked card
+
+## 900306 Dungeon Labyrinth
+
+900306:A:1 (front): Dungeon Labyrinth gets +1 Threat and +1 quest point for each resource token on it.
+  900306:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat resources of this card, while this card is in play
+    - this card: stat questPoints resources of this card, while this card is in play
+
+900306:A:2 (front): Forced: At the end of each round, place 1 resource token on Dungeon Labyrinth for each player in the game.
+  900306:forced:1: Forced at the end of the round
+    - place the number of players resource tokens on this card
+
+## 900307 Sentinel of Shadow
+
+900307:A:1 (front): When Revealed: The staging area gets +X Threat until the end of the phase, where X is twice the number of players in the game. If the players quest unsuccessfully this phase, put the Nazgûl of Dol Guldur into play (from any out of play area), engaged with the first player. (Cannot be canceled.)
+  900307:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the total Threat in the staging area is the number of players x 2 higher until the end of the phase
+    - later, if the players quest unsuccessfully this phase (never, if they do not):
+      - [json EngageOutOfPlay {"verb":"EngageOutOfPlay","code":"01102"}]
+
+## 900308 Catacomb Inspection
+
+900308:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+900308:A:2 (front): When Revealed: Add 1 resource token to each Dol Guldur location in play.
+  900308:whenRevealed:1: When revealed
+    - for each Dol Guldur location (any player controls):
+      - place 1 resource tokens on the picked card
+
+900308:A:3 (shadow): Shadow: If there is a Dol Guldur location in the staging area, move 1 resource token from each of your heroes' resource pools to that location. (Resolve this effect for each Dol Guldur location.)
+  900308:shadow:1: Shadow
+    - for each Dol Guldur location (any player controls) in the staging area only:
+      - 1 resource moves from the pool of each hero the acting player controls that has one to the picked card
+
+## 900309 Dark Interrogation
+
+900309:A:1 (front): When Revealed: Each player must choose and discard cards from hand until he has only 2 cards in hand. (Each player with 2 or fewer cards in hand must instead reveal 1 card from the encounter deck.)
+  900309:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - if the number of card (you control) in hand is at most 2: the acting player reveals an encounter card
+      - then, if the number of card (you control) in hand is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): discard the cards in your hand - 2 cards from hand
+
+900309:A:2 (shadow): Shadow: Discard each card you control that has at least 1 copy of itself in your discard pile. (If this attack is undefended, each player must resolve this effect.)
+  900309:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): for each card (you control) with a copy of it (the same title) in its controller's discard pile:
+      - discard the picked card
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each card (any player controls) with a copy of it (the same title) in its controller's discard pile:
+      - discard the picked card
+
+(rendered pieces: 201 by template, 24 as JSON)

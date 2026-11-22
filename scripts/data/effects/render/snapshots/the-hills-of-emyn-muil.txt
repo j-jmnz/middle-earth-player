@@ -151,4 +151,155 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
   02094:constant:1: Constant
     - this card: stat attack the number of location (any player controls) in the staging area only, while this card is in play
 
-(rendered pieces: 87 by template, 0 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 900701 The Hills of Emyn Muil Nightmare
+
+900701:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+900701:A:2 (front): No more than 1 progress may be placed on each location in the staging area each round.
+  900701:constant:1: Constant
+    - each location (any player controls) in the staging area only: stat progressCap 1, while this card is in play
+
+900701:B:1 (back): Begin with the standard quest deck and encounter deck for The Hills of Emyn Muil scenario.
+  (inert: the engine applies it by rule, no record)
+
+900701:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+900701:B:3 (back): 1x The East Wall of Rohan
+  (inert: the engine applies it by rule, no record)
+
+900701:B:4 (back): 1x The North Stair
+  (inert: the engine applies it by rule, no record)
+
+900701:B:5 (back): 2x The Shores of Nen Hithoel
+  (inert: the engine applies it by rule, no record)
+
+900701:B:6 (back): 4x The Highlands
+  (inert: the engine applies it by rule, no record)
+
+900701:B:7 (back): 2x Slick Footing
+  (inert: the engine applies it by rule, no record)
+
+900701:B:8 (back): 2x Impassable Chasm
+  (inert: the engine applies it by rule, no record)
+
+900701:B:9 (back): 2x Dol Guldur Orcs
+  (inert: the engine applies it by rule, no record)
+
+900701:B:10 (back): 1x Chieftan Ufthak
+  (inert: the engine applies it by rule, no record)
+
+900701:B:11 (back): 2x Dol Guldur Beastmaster
+  (inert: the engine applies it by rule, no record)
+
+900701:B:12 (back): 2x The Necromancer's Reach
+  (inert: the engine applies it by rule, no record)
+
+900701:B:13 (back): 2x Necromancer's Pass
+  (inert: the engine applies it by rule, no record)
+
+900701:B:14 (back): 2x Enchanted Stream
+  (inert: the engine applies it by rule, no record)
+
+900701:B:15 (back): 3x Evil Storm
+  (inert: the engine applies it by rule, no record)
+
+900701:B:16 (back): 2x Pursued by Shadow
+  (inert: the engine applies it by rule, no record)
+
+900701:B:17 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Hills of Emyn Muil encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+900701:B:18 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 900702 Tunneling Nameless Thing
+
+900702:A:1 (front): Forced: After the players travel to a location, Tunneling Nameless Thing engages the first player.
+  900702:forced:1: Forced after the players travel (heard about location (any player controls))
+    - this enemy, in the staging area or engaged with another player (it moves), engages the first player
+
+900702:A:2 (front): If there is no active location, return Tunneling Nameless Thing to the staging area.
+  900702:constant:1: Constant
+    - this card: stat returnsWithoutActive 1, while this card is in play
+
+## 900703 Orc Interceptor
+
+900703:A:1 (front): Orc Interceptor gets +1 Threat and +1 Attack for each resource token on it.
+  900703:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat resources of this card, while this card is in play
+    - this card: stat attack resources of this card, while this card is in play
+
+900703:A:2 (front): Forced: After a location leaves play as an explored location, place a resource token on Orc Interceptor.
+  900703:forced:1: Forced on the event locationExplored (heard about location (any player controls))
+    - 1 resource token(s) are placed on this card
+
+## 900704 Brambles and Thorns
+
+900704:A:1 (front): Forced: After a character commits to the quest, deal 1 damage to that character if it has not been dealt damage by another copy of Brambles and Thorns this round.
+  900704:forced:1: Forced after a card is committed to the quest (heard about character (any player controls))
+    - deal 1 damage to the card the event is about unless a card with this card's title has dealt it damage this round (it is marked for the round once the damage is dealt)
+
+## 900705 Sarn Gebir Rapids
+
+900705:A:1 (front): While Sarn Gebir Rapids is the active location, the "when revealed" effects of Hazard cards cannot be canceled.
+  900705:constant:1: Constant
+    only if this card is the active location
+    - while this card is in play (under its condition), the When Revealed effects of Hazard cards cannot be canceled
+
+## 900706 A Hurrying Darkness
+
+900706:A:1 (front): When Revealed: Each player must either increase his threat by 5, or reveal an additional encounter card from the encounter deck and add it to the staging area.
+  900706:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "threat":
+          - raise threat by 5 (the acting player)
+        * option "reveal":
+          - the acting player reveals an encounter card
+
+900706:A:2 (shadow): Shadow: Attacking enemy gets +X Attack. X is the Threat of the active location.
+  900706:shadow:1: Shadow
+    - the attacking enemy: stat attack threat of the active location, until the end of the attack
+
+## 900707 Blast of Savage Wind
+
+900707:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+900707:A:2 (front): When Revealed: Remove all progress from each Emyn Muil location in play. Each Emyn Muil location gets +2 Threat until the end of the round.
+  900707:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - remove all the progress from each Emyn Muil location (any player controls)
+    - every location in play (staging area or active) with the trait, now and arriving later while the effect lasts (Emyn Muil only): stat threat 2, until the end of the round
+
+900707:A:3 (shadow): Shadow: Remove all progress from each Emyn Muil location in play.
+  900707:shadow:1: Shadow
+    - remove all the progress from each Emyn Muil location (any player controls)
+
+## 900708 Hazardous Terrain
+
+900708:A:1: Surge. Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+900708:A:2 (front): When Revealed: Shuffle all Hazard cards in the encounter discard pile back into the encounter deck.
+  900708:whenRevealed:1: When revealed
+    - shuffle the Hazard cards of the encounter discard pile into the encounter deck
+
+900708:A:3 (shadow): Shadow: Shuffle all Hazard cards in the encounter discard pile back into the encounter deck. Then, deal another shadow card for this attack.
+  900708:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the Hazard cards of the encounter discard pile into the encounter deck
+    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+
+## 900709 Retraced Steps
+
+900709:A:1 (front): When Revealed: Discard a random Emyn Muil location from the victory display.
+  900709:whenRevealed:1: When revealed
+    - discard a random Emyn Muil location from the victory display to the encounter discard pile (chosen with the game's seed)
+
+(rendered pieces: 133 by template, 0 as JSON)
