@@ -89,7 +89,7 @@ Read the sections your task touches.
   - 601–643 Screens (~6.0K) ← 3
     - 628–643 Table screen (~1.8K) ← 3
   - 644–653 Readings to confirm (~220)
-- `docs/design-system-table.md` — Design system — Table (landscape) (~71.7K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~71.8K tok)
   - 5–8 Overview (~170) ← 1
   - 9–35 Top bar (~6.7K) ← 14
   - 36–39 Table menu (~870) ← 9
@@ -120,7 +120,7 @@ Read the sections your task touches.
   - 388–393 Quest advance (~530) ← 1
   - 394–397 Undo (~150)
   - 398–401 Haptics (~340) ← 1
-  - 402–419 Sound (~2.4K) ← 31
+  - 402–419 Sound (~2.5K) ← 31
   - 420–431 Banner (~750) ← 5
   - 432–451 Screen reader (~3.0K) ← 19
   - 452–455 Android Back (~90)

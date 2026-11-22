@@ -3,10 +3,10 @@
 import { useEffect } from "react";
 import { useStore } from "zustand";
 
-import { playSound } from "../../ui/sound/sound.ts";
+import { playSound, primeSounds } from "../../ui/sound/sound.ts";
 import type { SoundSlot } from "../../ui/sound/slots.ts";
 import type { TableStore } from "../store/store.ts";
-import { skippedSounds } from "./strike-sounds.ts";
+import { gateSounds, skippedSounds } from "./strike-sounds.ts";
 
 // How many of each gate's attacks have played their sound at the hit stop, by the gate's seq. Kept for the last few gates only.
 const struck = new Map<number, number>();
@@ -28,5 +28,9 @@ export function useSkippedStrikes(store: TableStore): void {
     if (from >= gate.clashes.length) return;
     struck.set(gate.seq, gate.clashes.length);
     for (const slot of skippedSounds(gate, from)) playSound(slot);
+  }, [gate]);
+  // The sounds of a gate's attacks are loaded as it opens, ahead of their hit stops (sound.ts, primeSounds).
+  useEffect(() => {
+    if (gate.ended == null) primeSounds(gateSounds(gate, 0));
   }, [gate]);
 }

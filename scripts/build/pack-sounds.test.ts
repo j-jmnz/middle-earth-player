@@ -8,7 +8,7 @@ import { SOUND_SLOTS } from "../../src/ui/sound/slots.ts";
 import { sha256, type SourceFile } from "../data/sources/fetch.ts";
 import { createLog } from "../log.ts";
 import { writeSource } from "./pack-audio.ts";
-import { findSource, packSounds, SOUND_SOURCE, soundEnd } from "./pack-sounds.ts";
+import { cutFilter, findSource, packSounds, SOUND_SOURCE, soundEnd, soundStart } from "./pack-sounds.ts";
 import { SOUND_PICKS } from "./sound-picks.ts";
 
 const roots: string[] = [];
@@ -61,6 +61,18 @@ describe("pack sounds", () => {
     expect(soundEnd(samples, 8000)).toBeCloseTo(0.1, 5);
     samples.fill(300, 800, 4000);
     expect(soundEnd(samples, 8000)).toBeCloseTo(0.5, 5);
+  });
+
+  it("starts a sound at its first window over 1% of the peak, and cuts from there", () => {
+    const samples = new Int16Array(8000);
+    expect(soundStart(samples, 8000)).toBe(0);
+    samples.fill(100, 0, 2400);
+    samples.fill(20_000, 2400, 3200);
+    expect(soundStart(samples, 8000)).toBeCloseTo(0.3, 5);
+    samples.fill(300, 800, 2400);
+    expect(soundStart(samples, 8000)).toBeCloseTo(0.1, 5);
+    // The cut's clock starts at the sound, so the fade is timed from it.
+    expect(cutFilter(0.3, 0.9, -22)).toBe("atrim=0.300:0.900,asetpts=PTS-STARTPTS,afade=t=out:st=0.450:d=0.150,loudnorm=I=-22:TP=-1.5:LRA=11");
   });
 
   it("copies the pinned sounds from the cache, or else from the mirror, and clears the rest", async () => {

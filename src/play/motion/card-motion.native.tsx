@@ -15,7 +15,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import type { Clash } from "../store/clash.ts";
 import { cardFrame } from "../canvas/frame.ts";
 import { tickLand } from "../../ui/haptics.ts";
-import { playSound } from "../../ui/sound/sound.ts";
+import { playSound, primeSounds } from "../../ui/sound/sound.ts";
 import type { CardSlot, TableLayout } from "../layout/layout.ts";
 import { easingOf, useMotionScale } from "../../ui/motion-run.ts";
 import { ghostPoseAt, landAt, motionEnd, motionSpan, poseAt } from "./pose.ts";
@@ -181,6 +181,8 @@ export function useCardMotion(store: TableStore, layout: TableLayout, seat: numb
   // a skipped spotlight: it jumps to the end, and a jump is not a pass); a new state replaces this reaction and its landing. The state's
   // sounds (motion-sounds.ts) play by the same rule, on the card clock and on the token clock.
   const landing = landAt(moves.motions);
+  // Each sound of the state is loaded as the state is drawn, ahead of the moment its clock passes it (sound.ts, primeSounds).
+  useEffect(() => primeSounds([...track.cues, ...track.pops].map((cue) => cue.slot)), [track.cues, track.pops]);
   useClockCues(progress, scaled, scaled === 0 || landing == null ? NO_TIMES : [landing * k], tickLandAt);
   useClockCues(progress, scaled, track.cues.map((cue) => cue.at * k), (index) => playCue(track.cues, index));
   useClockCues(fxProgress, fxScaled, track.pops.map((cue) => cue.at * k), (index) => playCue(track.pops, index));

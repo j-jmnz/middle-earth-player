@@ -20,7 +20,7 @@ import { SOUND_PICKS, type SoundPick } from "./sound-picks.ts";
 
 export const SOUND_SOURCE = "sounds";
 const SITE = "Darkest Dungeon II and Hearthstone (the player's own copies, cut by pnpm assets sounds --from and --hearthstone)";
-// The tail is kept until the level stays under 1% of the peak, plus this much, then faded out.
+// The silence before the sound is cut off (soundStart). The tail is kept until the level stays under 1% of the peak, plus this much, then faded out.
 const TAIL_SECONDS = 0.12;
 
 /** Where the player's copies are: the folder of unpacked Darkest Dungeon II banks, and the folder of Hearthstone's sounds. */
@@ -39,18 +39,43 @@ export function findSource(folders: SoundFolders, pick: SoundPick): string | und
   return name ? path.join(folder, name) : undefined;
 }
 
-/** Where the sound's tail falls under 1% of its peak, in seconds, read from a 8 kHz mono decode in 10 ms windows. */
-export function soundEnd(samples: Int16Array, rate: number): number {
-  const window = Math.round(rate / 100);
+// The peak level of each 10 ms window of a mono decode.
+function windowLevels(samples: Int16Array, window: number): number[] {
   const levels: number[] = [];
   for (let start = 0; start < samples.length; start += window) {
     let level = 0;
     for (let i = start; i < Math.min(start + window, samples.length); i += 1) level = Math.max(level, Math.abs(samples[i] ?? 0));
     levels.push(level);
   }
+  return levels;
+}
+
+/** Where the sound's tail falls under 1% of its peak, in seconds, read from a 8 kHz mono decode in 10 ms windows. */
+export function soundEnd(samples: Int16Array, rate: number): number {
+  const window = Math.round(rate / 100);
+  const levels = windowLevels(samples, window);
   const peak = Math.max(1, ...levels);
   const last = levels.findLastIndex((level) => level > peak * 0.01);
   return ((last < 0 ? 0 : last) + 1) * (window / rate);
+}
+
+/**
+ * Where the sound begins, in seconds: the start of the first 10 ms window over 1% of its peak. The silence a source file holds before
+ * it is cut off, so the sound is heard at the moment it is played.
+ */
+export function soundStart(samples: Int16Array, rate: number): number {
+  const window = Math.round(rate / 100);
+  const levels = windowLevels(samples, window);
+  const peak = Math.max(1, ...levels);
+  const first = levels.findIndex((level) => level > peak * 0.01);
+  return Math.max(0, first) * (window / rate);
+}
+
+/** The filter that cuts a source to `start`..`end` (seconds), fades its tail out and levels it to `lufs`. */
+export function cutFilter(start: number, end: number, lufs: number): string {
+  const length = end - start;
+  const fade = Math.min(0.15, length / 3);
+  return `atrim=${start.toFixed(3)}:${end.toFixed(3)},asetpts=PTS-STARTPTS,afade=t=out:st=${(length - fade).toFixed(3)}:d=${fade.toFixed(3)},loudnorm=I=${lufs}:TP=-1.5:LRA=11`;
 }
 
 /** Cuts, levels and encodes each slot's pick into `cacheDir`, and returns the `sounds` source that pins every file. */
@@ -62,16 +87,16 @@ export function cutSounds(from: SoundFolders, cacheDir: string, log: Log): Sourc
     const source = findSource(from, pick);
     if (!source) throw new Error(pick.game === "hearthstone" ? `${slot}: ${pick.event}.ogg is not in ${from.hearthstone ?? "the Hearthstone folder (--hearthstone)"}` : `${slot}: ${pick.bank}/<n>-${pick.event}.ogg is not in ${from.dd2}`);
     const pcm = ffmpeg(["-i", source, "-ac", "1", "-ar", "8000", "-f", "s16le", "-"]);
-    const end = Math.min(soundEnd(new Int16Array(pcm.buffer, pcm.byteOffset, Math.floor(pcm.length / 2)), 8000) + TAIL_SECONDS, pick.maxSeconds);
-    const fade = Math.min(0.15, end / 3);
+    const samples = new Int16Array(pcm.buffer, pcm.byteOffset, Math.floor(pcm.length / 2));
+    const start = soundStart(samples, 8000);
+    const end = Math.min(soundEnd(samples, 8000) + TAIL_SECONDS, start + pick.maxSeconds);
     const target = path.join(cacheDir, `${slot}.m4a`);
-    const filter = `atrim=0:${end.toFixed(3)},afade=t=out:st=${(end - fade).toFixed(3)}:d=${fade.toFixed(3)},loudnorm=I=${pick.lufs}:TP=-1.5:LRA=11`;
-    ffmpeg(["-y", "-i", source, "-ac", "1", "-ar", "44100", "-af", filter, "-c:a", "aac", "-b:a", "96k", "-movflags", "+faststart", target]);
+    ffmpeg(["-y", "-i", source, "-ac", "1", "-ar", "44100", "-af", cutFilter(start, end, pick.lufs), "-c:a", "aac", "-b:a", "96k", "-movflags", "+faststart", target]);
     const body = readFileSync(target);
     // No URL can fetch it: the file's "url" names the bank and the event it was cut from, or the Hearthstone sound.
     const origin = pick.game === "hearthstone" ? `hearthstone#${pick.event}` : `${pick.bank}.bank#${pick.event}`;
     files.push({ path: `sounds/${slot}.m4a`, url: origin, sha256: sha256(body), bytes: body.length });
-    log.debug(`${slot}: ${pick.event}, ${end.toFixed(2)} s`);
+    log.debug(`${slot}: ${pick.event}, ${(end - start).toFixed(2)} s, ${Math.round(start * 1000)} ms of silence cut from its start`);
   }
   log.info(`cut ${files.length} sounds into ${cacheDir}`);
   return audioSource(SOUND_SOURCE, SITE, files);
