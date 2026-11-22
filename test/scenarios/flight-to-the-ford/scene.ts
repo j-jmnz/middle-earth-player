@@ -1,5 +1,5 @@
 import { EFFECTS } from "../../../src/effects/index.ts";
-import type { ScenarioDefinition } from "../../../src/catalog/boundary.ts";
+import type { Effect, ScenarioDefinition } from "../../../src/catalog/boundary.ts";
 import { scenarioCards, scenarioDefinition, type CampaignData, type ScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
 import type { ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
@@ -9,7 +9,7 @@ import { attachTo, spawn } from "../../../src/rules/core/zones.ts";
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { loadPrinted } from "../../harness/catalog.ts";
 import { FRODO, MERRY, RING, SAM } from "../../harness/scene.ts";
-import { addStandIns, enemyCard, opening, sceneEffects } from "../../harness/scene-kit.ts";
+import { addStandIns, enemyCard, opening, sceneEffects, type ScenePhase } from "../../harness/scene-kit.ts";
 
 // Shared scene for the Flight to the Ford effect tests. Test-only.
 export const ford: ScenarioData = loadScenario("flight-to-the-ford");
@@ -66,7 +66,9 @@ export type FordLayout = {
   // Cards in the first seat's hand, and extra allies in its play area.
   hand?: readonly string[];
   allies?: readonly string[];
-  phase?: "Quest" | "Encounter" | "Combat";
+  phase?: ScenePhase;
+  // The records the table runs (the scene's by default): a test removes a line's records to show they are what it reads (test/harness/card-spec.ts, withoutLine).
+  effects?: readonly Effect[];
 };
 
 export function fordTable(world: FordWorld, layout: FordLayout = {}): { state: ScenarioState; ctx: ReduceContext; frodo: string } {
@@ -111,5 +113,5 @@ export function fordTable(world: FordWorld, layout: FordLayout = {}): { state: S
   if (layout.campaign) state = spawn(state, CAMPAIGN_CARD, { zone: "campaign" }).state;
   state = { ...state, life: layout.life ?? 15 };
   state = { ...state, ...opening(layout.phase ?? "Quest") };
-  return { state, ctx: { effects: FORD_EFFECTS, cards: world.cards }, frodo: frodo.id };
+  return { state, ctx: { effects: layout.effects ?? FORD_EFFECTS, cards: world.cards }, frodo: frodo.id };
 }

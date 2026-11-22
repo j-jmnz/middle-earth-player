@@ -1,4 +1,4 @@
-// Rules: dcce.gaining-xp, dcce.scalable-upgradable, rr.ownership-and-control (data/rules/entries.json); ledger lines 11209:B:1, 11209:B:4 to 11209:B:8.
+// Rules: dcce.gaining-xp, dcce.scalable-upgradable, rr.ownership-and-control, rr.victory (data/rules/entries.json); ledger lines 11209:B:1, 11209:B:4 to 11209:B:12.
 // The Resolution of A Storm on Cobas Haven's campaign card (11209): the XP lines no golden reaches yet, each read from its record on the table of the scenario, the Círdan's Blessing the Setup let a player take, and
 // the four XP the players may spend on Gavin ("Gavin returned", which the XP model of the campaign log keeps: src/campaign/xp.ts).
 import { beforeAll, describe, expect, it } from "vitest";
@@ -8,6 +8,8 @@ import { EFFECTS } from "../../../effects/index.ts";
 import { updateCard } from "../../../rules/core/state.ts";
 import type { ScenarioState } from "../../../rules/engine/reduce.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
+import type { Effect } from "../../../catalog/boundary.ts";
+import { withoutLine } from "../../../../test/harness/card-spec.ts";
 import { openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
@@ -21,53 +23,89 @@ import { gavinReturned, markRefusal, pick, spendXp } from "../../xp.ts";
 let world: HavenWorld;
 beforeAll(async () => {
   world = await loadHavenWorld();
-  for (const [code, card] of await loadPrinted([CODES.dolAmrothWarship, "110102", CODES.dreamChaser])) world.cards.set(code, card);
+  for (const [code, card] of await loadPrinted([CODES.dolAmrothWarship, "110102", CODES.dreamChaser, OMINOUS_FATE])) world.cards.set(code, card);
 }, 120_000);
 
 const LINES = sideInstructions(EFFECTS, CODES.campaignCard, "B", "resolution");
 const SKIRMISHER_SHIP = "12125~ship";
+const OMINOUS_FATE = "11176";
 
 // The scenario won with `layout` on the table: the XP the Resolution gains, with the towers in `freed` claimed by the players as a settle sweep leaves them, and the heading `at` (Sun is on-course).
-function xp(layout: HavenLayout, options: { freed?: readonly string[]; at?: "Sun" | "Storm" } = {}): number {
+// `effects`: the records the Resolution is read from (a test removes a line's records to show they are what it reads).
+function xp(layout: HavenLayout, options: { freed?: readonly string[]; at?: "Sun" | "Storm"; effects?: readonly Effect[] } = {}): number {
   const made = havenTable(world, { stage: "12122", ...layout });
   let state: ScenarioState = made.state;
   for (const code of options.freed ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { claimed: true, controller: null });
   state = syncConstants({ ...state, sea: { heading: options.at ?? "Storm", headingCard: null, routes: state.sea?.routes ?? {} } }, made.ctx);
-  const opened = openResolution({ ...state, scenarioId: "a-storm-on-cobas-haven", window: null, stageCleared: true, resolution: LINES }, made.ctx);
+  const resolution = options.effects ? sideInstructions(options.effects, CODES.campaignCard, "B", "resolution") : LINES;
+  const opened = openResolution({ ...state, scenarioId: "a-storm-on-cobas-haven", window: null, stageCleared: true, resolution }, made.ctx);
   return resolutionResult(opened)?.xp ?? 0;
 }
 
 describe("11209:B Gain the following", () => {
-  it("B:4: 1 XP for ending on-course (Sun) and none otherwise", () => {
+  it("11209:B:4 1 XP for ending on-course (Sun) and none otherwise", () => {
     expect(xp({}, { at: "Sun" }) - xp({}, { at: "Storm" })).toBe(1);
   });
 
-  it("B:5: 1 XP when 2 Dol Amroth Warships are in play, not for 1 or for a set-aside one", () => {
+  it("11209:B:5 1 XP when 2 Dol Amroth Warships are in play, not for 1 or for a set-aside one", () => {
     const base = xp({});
     expect(xp({ play: [CODES.dolAmrothWarship, "110102"] }) - base).toBe(1);
+    expect(xp({ play: [CODES.dolAmrothWarship, "110102"] }, { effects: withoutLine(EFFECTS, "11209:B:5") }) - base).toBe(0);
     expect(xp({ play: [CODES.dolAmrothWarship] }) - base).toBe(0);
     expect(xp({ play: [CODES.dolAmrothWarship], setAside: ["110102"] }) - base).toBe(0);
   });
 
-  it("B:6: 1 XP when the players control 2 Corsair Skirmishers, and none for ones still engaged enemies", () => {
+  it("11209:B:6 1 XP when the players control 2 Corsair Skirmishers, and none for ones still engaged enemies", () => {
     const base = xp({});
     expect(xp({ play: [SKIRMISHER_SHIP, SKIRMISHER_SHIP] }) - base).toBe(1);
+    expect(xp({ play: [SKIRMISHER_SHIP, SKIRMISHER_SHIP] }, { effects: withoutLine(EFFECTS, "11209:B:6") }) - base).toBe(0);
     expect(xp({ play: [SKIRMISHER_SHIP] }) - base).toBe(0);
     expect(xp({ play: [SKIRMISHER_SHIP], engaged: [CODES.corsairSkirmisher] }) - base).toBe(0);
   });
 
-  it("B:7: 1 XP when the players control 4 Dol Amroth objectives (the towers freed of encounters), not for a tower that is still guarded", () => {
+  it("11209:B:7 1 XP when the players control 4 Dol Amroth objectives (the towers freed of encounters), not for a tower that is still guarded", () => {
     const base = xp({});
     const towers = [CODES.seaWardTower, CODES.towerOfTheGull, CODES.theBeacon, CODES.towerOfTheHeron];
     expect(xp({ staging: towers }, { freed: towers }) - base).toBe(1);
+    expect(xp({ staging: towers }, { freed: towers, effects: withoutLine(EFFECTS, "11209:B:7") }) - base).toBe(0);
     expect(xp({ staging: towers }, { freed: towers.slice(0, 3) }) - base).toBe(0);
     expect(xp({ staging: towers }) - base).toBe(0);
   });
 
-  it("B:8: 1 XP for each Corsair Warship in the victory display", () => {
+  it("11209:B:8 1 XP for each Corsair Warship in the victory display", () => {
     const base = xp({});
     expect(xp({ victory: [CODES.corsairWarship] }) - base).toBe(1);
     expect(xp({ victory: [CODES.corsairWarship, CODES.corsairWarship, CODES.corsairWarship] }) - base).toBe(3);
+  });
+
+  // Each line reads the victory display only: the same card elsewhere (engaged, in the encounter discard pile) gains nothing.
+  it("11209:B:9 1 XP if Crowley is in the victory display, and none for Crowley in the discard pile", () => {
+    const base = xp({});
+    expect(xp({ victory: [CODES.crowley] }) - base).toBe(1);
+    expect(xp({ discard: [CODES.crowley] }) - base).toBe(0);
+    expect(xp({ victory: [CODES.crowley] }, { effects: withoutLine(EFFECTS, "11209:B:9") }) - base).toBe(0);
+  });
+
+  it("11209:B:10 2 XP if Raider Flagship is in the victory display, and none while it is engaged", () => {
+    const base = xp({});
+    expect(xp({ victory: [CODES.raiderFlagship] }) - base).toBe(2);
+    expect(xp({ engaged: [CODES.raiderFlagship] }) - base).toBe(0);
+    expect(xp({ victory: [CODES.raiderFlagship] }, { effects: withoutLine(EFFECTS, "11209:B:10") }) - base).toBe(0);
+  });
+
+  it("11209:B:11 2 XP if Thunderstruck is in the victory display, and none for Thunderstruck in the discard pile", () => {
+    const base = xp({});
+    expect(xp({ victory: [CODES.thunderstruck] }) - base).toBe(2);
+    expect(xp({ discard: [CODES.thunderstruck] }) - base).toBe(0);
+    expect(xp({ victory: [CODES.thunderstruck] }, { effects: withoutLine(EFFECTS, "11209:B:11") }) - base).toBe(0);
+  });
+
+  // Ominous Fate (11176) is a burden of the campaign. The XP is read on Sun, so the 1 XP for the heading leaves room for the -1.
+  it("11209:B:12 -1 XP if Ominous Fate is in the victory display, and none for Ominous Fate in the discard pile", () => {
+    const base = xp({}, { at: "Sun" });
+    expect(xp({ victory: [OMINOUS_FATE] }, { at: "Sun" }) - base).toBe(-1);
+    expect(xp({ discard: [OMINOUS_FATE] }, { at: "Sun" }) - base).toBe(0);
+    expect(xp({ victory: [OMINOUS_FATE] }, { at: "Sun", effects: withoutLine(EFFECTS, "11209:B:12") }) - base).toBe(0);
   });
 });
 
