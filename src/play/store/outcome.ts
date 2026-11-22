@@ -11,7 +11,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 
 import type { LogMark } from "./log.ts";
 import { plural } from "../words/list.ts";
-import { deckWord } from "./pile-ids.ts";
+import { reshuffleWords } from "./pile-ids.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { boardingWords } from "../words/scenarios/sea.ts";
 import type { FateNames } from "../words/scenarios/fate-beats.ts";
@@ -298,7 +298,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         line("The encounter discard pile is shuffled into the encounter deck");
         return;
       case "reshuffleDeck":
-        line(`The ${deckWord(step.deck)}'s discard pile is shuffled back into it`);
+        line(reshuffleWords(step.deck));
         return;
       default:
         return;
