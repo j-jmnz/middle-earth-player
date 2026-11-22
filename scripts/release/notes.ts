@@ -2,7 +2,7 @@ import { BUNDLE_ID, sourceUrl } from "./sideload-source.ts";
 import { joinNames } from "./reach.ts";
 import type { Change, CommitType } from "./version.ts";
 
-// The release notes, written from the commits since the last release (.claude/rules/release-standards.md, Release notes).
+// The release notes, written from the commits since the last release (docs/agents/release-standards.md, Release notes).
 // Pure: plan.ts gathers the commits, the versions and the APK's checksums.
 
 export type NotesInput = {

@@ -1,6 +1,6 @@
 import type { EngineChange } from "../../src/rules/engine/version.ts";
 
-// Which scenarios' open games a release can reach (.claude/rules/release-standards.md, Release notes). Pure: plan.ts reads git.
+// Which scenarios' open games a release can reach (docs/agents/release-standards.md, Release notes). Pure: plan.ts reads git.
 // A game is reached when a golden of its scenario now has other checks (src/campaign/digest.ts: the digest of the table after each
 // move, pinned in golden.json) than at the previous release, or when ENGINE_CHANGES names it after the previous release's engine version.
 

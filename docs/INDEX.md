@@ -8,7 +8,7 @@ Read a section, not a file: `pnpm doc section <file> "<heading>"` prints one sec
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~3.4K tok)
+- `CLAUDE.md` — Claude Code (~3.5K tok)
   - 7–26 Data (~1.4K)
   - 27–46 Commands (~1.3K)
   - 47–50 Agents (~200)
@@ -19,8 +19,6 @@ Read whole.
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~1.3K tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.2K tok)
-- `.claude/rules/issue-standards.md` — Issue standards (~1.1K tok)
-- `.claude/rules/release-standards.md` — Release standards (~1.4K tok)
 
 ## Agents
 
@@ -39,23 +37,6 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` (~8.0K tok)
-  - 58–95 Features (~550)
-    - 81–95 Themes (~190)
-  - 96–114 What you can play (~270)
-  - 115–122 Private by design (~170)
-  - 123–128 Accessibility (~120)
-  - 129–226 Install (~1.7K)
-  - 227–452 FAQ (~2.2K)
-    - 231–317 At the table (~960)
-    - 318–368 Settings worth knowing (~460)
-    - 369–401 Decks and cards (~240)
-    - 402–452 Campaigns, saves and updates (~530)
-  - 453–485 Roadmap (~1.1K)
-  - 486–496 Get involved (~210)
-  - 497–500 Support (~90)
-  - 501–516 Attribution (~410)
-  - 517–520 License (~50)
 - `docs/architecture.md` — Architecture (~25.3K tok)
   - 7–44 Stack (~1.6K)
   - 45–80 Processes (~730)
@@ -352,6 +333,8 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
   - 274–291 Readings the review catches (~770) ← 3
   - 292–311 Not expressible yet: leave open, report (~410)
+- `docs/agents/issue-standards.md` — Issue standards (~1.1K tok)
+- `docs/agents/release-standards.md` — Release standards (~1.4K tok)
 
 ## Phases
 
@@ -370,6 +353,28 @@ Read when a task names the plan.
 Open work; read when a task names it.
 
 
+## For players
+
+Written for players, not agents: read it only when the task changes it.
+
+- `README.md` (~8.0K tok)
+  - 58–95 Features (~550)
+    - 81–95 Themes (~190)
+  - 96–114 What you can play (~270)
+  - 115–122 Private by design (~170)
+  - 123–128 Accessibility (~120)
+  - 129–226 Install (~1.7K)
+  - 227–452 FAQ (~2.2K)
+    - 231–317 At the table (~960)
+    - 318–368 Settings worth knowing (~460)
+    - 369–401 Decks and cards (~240)
+    - 402–452 Campaigns, saves and updates (~530)
+  - 453–485 Roadmap (~1.1K)
+  - 486–496 Get involved (~210)
+  - 497–500 Support (~90)
+  - 501–516 Attribution (~410)
+  - 517–520 License (~50)
+
 ## Code to docs
 
 The sections each area's comments cite, most cited first. Read these before changing code there.
@@ -377,14 +382,14 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts`: development.md, Commands (1)
 - `scripts/build`: design-system-table.md, Sound (4); brief.md, Card images (2); development.md, Asset mirror (1)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
-- `scripts/checks`: architecture.md, Screens (4); design-system.md, Screen reader (2); scenarios/nightmare.md, Nightmare (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); agents/effect-authoring.md, Templates and copied lines (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); releasing.md, Add the desktop app to a release (1); releasing.md, Caches (1); releasing.md, Jobs (1); scenarios/standalone-scenarios.md, Attack on Dol Guldur (1); scenarios/standalone-scenarios.md, Fog on the Barrow-downs (1); scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught (1); scenarios/standalone-scenarios.md, The Old Forest (1); scenarios/standalone-scenarios.md, The Siege of Annúminas (1)
+- `scripts/checks`: architecture.md, Screens (4); design-system.md, Screen reader (2); scenarios/nightmare.md, Nightmare (2); .claude/rules/code-standards.md, Test cost (1); agents/effect-authoring.md, Templates and copied lines (1); agents/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); releasing.md, Add the desktop app to a release (1); releasing.md, Caches (1); releasing.md, Jobs (1); scenarios/standalone-scenarios.md, Attack on Dol Guldur (1); scenarios/standalone-scenarios.md, Fog on the Barrow-downs (1); scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught (1); scenarios/standalone-scenarios.md, The Old Forest (1); scenarios/standalone-scenarios.md, The Siege of Annúminas (1)
 - `scripts/data`: scenarios/nightmare.md, Nightmare (6); brief.md, Data sources (3); design-system.md, Icons (3); scenarios/dream-chaser.md, Dream-chaser (3); scenarios/ered-mithrin.md, Ered Mithrin (3); development.md, Asset mirror (2); scenarios/mirkwood-paths.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); scenarios/dwarrowdelf.md, Dwarrowdelf (1); scenarios/dwarrowdelf.md, Foundations of Stone (1); scenarios/standalone-scenarios.md, Escape from Khazad-dûm (1); scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught (1); scenarios/the-two-towers.md, The Two Towers (1)
 - `scripts/desktop`: releasing.md, Jobs (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)
 - `scripts/game`: development.md, Reading a game as text (1)
-- `scripts/git`: .claude/rules/commit-standards.md, Subject line (2); .claude/rules/issue-standards.md, Finish (2); .claude/rules/commit-standards.md, Body (1); .claude/rules/commit-standards.md, Commit often (1)
-- `scripts/release`: .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); .claude/rules/issue-standards.md, Finish (2); releasing.md, Installs count (2); releasing.md, Issue comments (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
+- `scripts/git`: .claude/rules/commit-standards.md, Subject line (2); agents/issue-standards.md, Finish (2); .claude/rules/commit-standards.md, Body (1); .claude/rules/commit-standards.md, Commit often (1)
+- `scripts/release`: agents/release-standards.md, Release notes (3); agents/release-standards.md, Versioning (3); agents/issue-standards.md, Finish (2); releasing.md, Installs count (2); releasing.md, Issue comments (2); releasing.md, Jobs (2); agents/release-standards.md, Branches (1)
 - `scripts/showcase`: design-system.md, Color (1)
 - `scripts/tools`: .claude/rules/code-standards.md, Test cost (4); agents/agent-brief.md, Scenario procedure (4); architecture.md, Modules (1); design-system-table.md, Choice tray (1); development.md, Commands (1)
 - `src/campaign`: agents/agent-brief.md, Scenario procedure (49); scenarios/the-return-of-the-king.md, The Return of the King (6); scenarios/the-two-towers.md, The Two Towers (6); scenarios/nightmare.md, Nightmare (5); scenarios/standalone-scenarios.md, Attack on Dol Guldur (4); scenarios/standalone-scenarios.md, Escape from Khazad-dûm (4); scenarios/standalone-scenarios.md, Murder at the Prancing Pony (4); scenarios/standalone-scenarios.md, The Mines of Moria (4); scenarios/standalone-scenarios.md, The Siege of Annúminas (4); scenarios/standalone-scenarios.md, The Wizard's Quest (4); scenarios/standalone-scenarios.md, The Woodland Realm (4); scenarios/standalone-scenarios.md, The Battle of Lake-town (3); scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught (3); scenarios/standalone-scenarios.md, The Old Forest (3); scenarios/standalone-scenarios.md, The Ruins of Belegost (3); architecture.md, Tests (2); scenarios/angmar-awakened.md, Angmar Awakened (2); scenarios/ered-mithrin.md, Ered Mithrin (2); scenarios/standalone-scenarios.md, Fog on the Barrow-downs (2); scenarios/standalone-scenarios.md, The Stone of Erech (2); architecture.md, Persistence (1); brief.md, Persistence and shipping (1); design-system.md, Table opens stale (1); design-system.md, Type (1)

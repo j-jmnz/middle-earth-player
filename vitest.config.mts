@@ -52,6 +52,8 @@ export default defineConfig({
     isolate: false,
     // The main process only collects results, so every core runs a worker (the card smoke sweep is split for them).
     maxWorkers: "100%",
+    // node:sqlite prints an ExperimentalWarning in each worker; it is noise in every agent's test output.
+    execArgv: ["--disable-warning=ExperimentalWarning"],
     sequence: { sequencer: heavyFirst(slowFiles) },
   },
 });

@@ -57,5 +57,5 @@ If a task cannot be done without changing a behaviour the plan keeps, stop and a
 - The plan is done: delete it, and point what cites it at the doc that owns the behaviour (`docs/brief.md`, `docs/architecture.md`, the design system). Delete any prompt or handover file the work consumed.
 - A scenario phase's last commit carries the measures of `docs/agents/agent-brief.md` (Measure), taken from each task's report: ask every task to report its full test runs, its wait minutes and its writing minutes.
 - Before the last commit, check that `pnpm test`, `pnpm lint`, `pnpm typecheck` and `pnpm data check` are green on the final tree. The fix task's full run, green on that tree, counts; do not repeat it. Then commit and push.
-- After the last commit, open the pull request and update its issues, as `.claude/rules/agent-standards.md` and `.claude/rules/issue-standards.md` say.
+- After the last commit, open the pull request and update its issues, as `.claude/rules/agent-standards.md` and `docs/agents/issue-standards.md` say.
 - Finish with a short report: what each task changed, the measured numbers, the review findings and what was fixed or kept, and what stays open.

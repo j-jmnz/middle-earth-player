@@ -1,5 +1,5 @@
 // The app config is app.json; a release build stamps its version from APP_VERSION, which the release workflow sets from
-// the tag (.claude/rules/release-standards.md, Versioning), and the iOS signing team from APPLE_TEAM_ID (docs/releasing.md,
+// the tag (docs/agents/release-standards.md, Versioning), and the iOS signing team from APPLE_TEAM_ID (docs/releasing.md,
 // Signing). Without them the build keeps app.json's 0.0.0 and Xcode's own team, a development build.
 // Android's versionCode must grow with every release that installs over the last: major, minor and patch each get three
 // digits, so 1.2.3 is 1002003 and the largest major that fits Android's limit (2100000000) is 2100. iOS takes the same

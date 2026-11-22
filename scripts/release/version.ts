@@ -1,6 +1,6 @@
 import { COMMIT_TYPES } from "../git/commit-message.ts";
 
-// The release version from the commits since the last release (.claude/rules/release-standards.md, Versioning). Pure: the
+// The release version from the commits since the last release (docs/agents/release-standards.md, Versioning). Pure: the
 // git reads are in plan.ts. The version lives only in the tag `v<major>.<minor>.<patch>`; app.config.js stamps it into the
 // build from APP_VERSION.
 
@@ -12,7 +12,7 @@ export type CommitType = (typeof COMMIT_TYPES)[number];
 /**
  * One commit since the last release: its type (undefined for a subject from before the commit standards), its summary, its
  * `Breaking:` lines, and the issues its body names: `closes` from a `Settles` line, which the release closes (or a `Closes`,
- * `Fixes` or `Resolves` line from before that rule, which GitHub closed at the merge), `refs` from a `Refs` line (the .claude/rules/issue-standards.md,
+ * `Fixes` or `Resolves` line from before that rule, which GitHub closed at the merge), `refs` from a `Refs` line (the docs/agents/issue-standards.md,
  * Finish).
  */
 export type Change = { type: CommitType | undefined; summary: string; breaking: string[]; closes: number[]; refs: number[] };

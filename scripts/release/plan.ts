@@ -12,7 +12,7 @@ import { fileSha256 } from "./sha256.ts";
 import { reachedScenarios, type GoldenChecks } from "./reach.ts";
 import { BUMP_REQUESTS, branchProblem, nextVersion, parseCommit, parseTag, tagOf, type BumpRequest, type Change } from "./version.ts";
 
-// Plans a release from git: the next tag and its notes (.claude/rules/release-standards.md; docs/releasing.md says how the
+// Plans a release from git: the next tag and its notes (docs/agents/release-standards.md; docs/releasing.md says how the
 // release workflow calls it). Offline; reads only this checkout, so `git fetch --tags` first.
 // Usage: pnpm release plan [--bump auto|patch|minor|major] prints the next tag and its notes. In CI:
 //   --branch <name>        the branch being released (default: GITHUB_REF_NAME, else the checked-out branch)

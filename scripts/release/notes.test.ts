@@ -21,7 +21,7 @@ const base: NotesInput = {
   reach: undefined,
 };
 
-describe("release notes (.claude/rules/release-standards.md, Release notes)", () => {
+describe("release notes (docs/agents/release-standards.md, Release notes)", () => {
   it("lists every commit by section, repo commits under Project, and links the comparison", () => {
     const notes = renderNotes(base);
     expect(notes).toContain("## Before you update\n\n- Saves made in 0.3 lose their open scenario\n");
@@ -35,7 +35,7 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
     expect(notes.indexOf("Before you update")).toBeLessThan(notes.indexOf("## New"));
   });
 
-  it("adds the issues each change closes and refers to (.claude/rules/release-standards.md, Release notes)", () => {
+  it("adds the issues each change closes and refers to (docs/agents/release-standards.md, Release notes)", () => {
     const notes = renderNotes({ ...base, changes: [parseCommit("fix: Make Hasty Stroke cancel the shadow effect (#105)", "Settles #99\nRefs #94")] });
     expect(notes).toContain("## Fixes\n\n- Make Hasty Stroke cancel the shadow effect (#105) · closes #99 · see #94\n");
   });

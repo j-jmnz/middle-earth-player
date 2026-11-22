@@ -3,7 +3,7 @@ name: release
 # Cuts a release: the next version from the commits since the last tag, the same checks as test.yml, a signed Android APK,
 # an iOS IPA that players sign with SideStore or AltStore and the desktop installers for Windows, macOS and Linux, then the tag
 # and a GitHub release with generated notes and the SideStore/AltStore source; and, when the Apple signing is set up, the iOS build on TestFlight as an optional extra.
-# .claude/rules/release-standards.md sets the rules; docs/releasing.md says how to start it and what each job does. Start it
+# docs/agents/release-standards.md sets the rules; docs/releasing.md says how to start it and what each job does. Start it
 # from the Actions tab, with `gh workflow run release.yml --ref main -f bump=auto -f dry_run=false`, or with the GitHub
 # API's workflow dispatch.
 

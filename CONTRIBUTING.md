@@ -26,7 +26,7 @@ pnpm desktop dev # opens the app in the Electron desktop shell
 
 ## Making a change
 
-1. Fork the repository and branch from `main`. Name the branch `<type>/<short-slug>`, for example `fix/staging-attacks`. The Branches section of [.claude/rules/release-standards.md](./.claude/rules/release-standards.md) has the details.
+1. Fork the repository and branch from `main`. Name the branch `<type>/<short-slug>`, for example `fix/staging-attacks`. The Branches section of [docs/agents/release-standards.md](./docs/agents/release-standards.md) has the details.
 2. Add tests with the change: a new feature, card effect or rule gets tests in the automated suite (`pnpm test`), and a bug fix gets a test that fails without it.
 3. Before you push, run `pnpm data check`, `pnpm lint`, `pnpm typecheck` and `pnpm test`. CI (`.github/workflows/test.yml`) runs the same checks. While you work, `pnpm test changed` or `pnpm test scenario <id>` give faster feedback; [docs/development.md](docs/development.md) lists every command.
 4. Write commit subjects as `<type>: <summary>`, where the type is `fix`, `feat`, `refactor`, `style` or `repo` and the summary is an action that starts with an imperative verb (`fix: Scroll the table menu when it is taller than the screen`) ([.claude/rules/commit-standards.md](./.claude/rules/commit-standards.md)). The `commit-msg` hook that `pnpm install` sets up (`.githooks/`) enforces this, and `pnpm commit:check "<subject>"` lets you check a subject by hand.
@@ -34,7 +34,7 @@ pnpm desktop dev # opens the app in the Electron desktop shell
 
 ## Releases
 
-Releases are only ever cut by the release workflow ([docs/releasing.md](docs/releasing.md), with the rules in [.claude/rules/release-standards.md](./.claude/rules/release-standards.md)). Don't bump a version or push a tag in a pull request.
+Releases are only ever cut by the release workflow ([docs/releasing.md](docs/releasing.md), with the rules in [docs/agents/release-standards.md](./docs/agents/release-standards.md)). Don't bump a version or push a tag in a pull request.
 
 ## Conventions
 

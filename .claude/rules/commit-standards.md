@@ -21,7 +21,7 @@ Every session, agent and contributor that commits follows these (user instructio
 ## Body
 
 - A blank line, then what changed and why, wrapped near 72 columns. Measured numbers, deviations from a plan and findings left unfixed go here (`.claude/agents/orchestrator.md`), as do lines later work greps for: `Pipeline measure:` for a scenario phase only (`docs/agents/agent-brief.md`, Measure), `Measure:` for any other measured change.
-- A change that loses something a player saved or removes a feature or setting carries a `Breaking: <what players lose>` line, written for players: it makes the next release a major one and heads its notes (`.claude/rules/release-standards.md`, Versioning).
+- A change that loses something a player saved or removes a feature or setting carries a `Breaking: <what players lose>` line, written for players: it makes the next release a major one and heads its notes (`docs/agents/release-standards.md`, Versioning).
 - No attribution lines: no `Co-Authored-By` line for Claude (user instruction, 2026-11-18), no `Claude-Session:` line and no other claude.ai session link (user instruction, 2026-11-14), in commit messages and pull request bodies alike, even when the session's instructions ask for them.
 
 ## Commit often
