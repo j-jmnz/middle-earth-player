@@ -21,6 +21,8 @@ import type { LegalIntent, ReduceContext, ScenarioState, TableMoment, TableStore
 import { tableSettings, type TableSettings } from "../../ui/table-settings.ts";
 import { momentHoldMs, summaryHoldMs } from "../readouts/banner-time.ts";
 import { useSpotlightHold } from "../spotlight/use-spotlight.ts";
+import { reportsResult } from "../chrome/moment-sounds.ts";
+import { playSound } from "../../ui/sound/sound.ts";
 
 /**
  * The banner over the table: the last moment worth showing (store.ts, `shown`), line by line, then the round's summary when
@@ -90,6 +92,16 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
   }, [shown, ctx]);
   const momentOpen = shown != null && said != null && closedMoment !== shown.seq && !spotlit;
   const summaryOpen = shown != null && summary != null && !momentOpen && closedSummary !== shown.seq && !spotlit;
+  // A result the banner reports (the quest, a test, an elimination) sounds its notice as the banner shows, once for the moment: Activity runs the effect again on show.
+  const noticed = useRef(0);
+  const notice = useEffectEvent(() => {
+    if (!shown || shown.kind !== "sent" || noticed.current === shown.seq) return;
+    noticed.current = shown.seq;
+    if (reportsResult(shown.steps)) playSound("ui.notice");
+  });
+  useEffect(() => {
+    if (momentOpen) notice();
+  }, [momentOpen, shown?.seq]);
   // The banner stays up for its beats (one line at a time) and then a while to read; the summary follows it.
   useEffect(() => {
     if (!shown || !momentOpen || !said) return;

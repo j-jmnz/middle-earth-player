@@ -70,7 +70,7 @@ export default function TableScreen() {
   };
   return (
     <>
-      <TableMusic store={table.store} ctx={session.ctx} />
+      <TableMusic store={table.store} />
       <TableView session={session} store={table.store} clock={table.clock} nav={nav} intents={() => table.save().active?.intents ?? null} />
     </>
   );

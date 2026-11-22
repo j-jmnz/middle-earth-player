@@ -9,29 +9,28 @@ import { tableMusic } from "../../ui/sound/music-map.ts";
 import { setTableMusic } from "../../ui/sound/music.ts";
 import { useSpotlightHold } from "../spotlight/use-spotlight.ts";
 import type { TableStore } from "../store/store.ts";
-import type { ReduceContext } from "../../rules/interpret/interpret.ts";
 import { combatMusic, newlyEngaged } from "./combat-music.ts";
 import { momentSounds } from "./moment-sounds.ts";
 import { playSound } from "../../ui/sound/sound.ts";
 import { useSkippedStrikes } from "../spotlight/strike-play.ts";
 
 /** The table's music, mounted beside the table view by its routes (src/screens/routes/table, standalone/table); it draws nothing. */
-export function TableMusic({ store, ctx }: { store: TableStore; ctx: ReduceContext }): null {
+export function TableMusic({ store }: { store: TableStore }): null {
   useTableMusic(store);
   // The sounds of the attacks a skipped spotlight did not play (strike-play.ts).
   useSkippedStrikes(store);
   useEngageSound(store);
-  useMomentSounds(store, ctx);
+  useMomentSounds(store);
   return null;
 }
 
-// What an accepted intent revealed, shuffled, dealt or reported (moment-sounds.ts) sounds as the state is accepted, as the engagement does: under reduced motion too, and an Undo's restored state is quiet.
-function useMomentSounds(store: TableStore, ctx: ReduceContext): void {
+// A deck shuffled in by an accepted intent (moment-sounds.ts) sounds as the state is accepted, as the engagement does: under reduced motion too, and an Undo's restored state is quiet.
+function useMomentSounds(store: TableStore): void {
   useEffect(() => store.subscribe((state, before) => {
     const moment = state.moment;
     if (moment === before.moment || moment?.kind !== "sent") return;
-    for (const slot of momentSounds(moment.before, moment.steps, moment.after, ctx.cards)) playSound(slot);
-  }), [store, ctx]);
+    for (const slot of momentSounds(moment.steps)) playSound(slot);
+  }), [store]);
 }
 
 // An enemy engaging a seat sounds as the state that engages it is accepted, under reduced motion too; an Undo's restored state is quiet (sound.ts).
