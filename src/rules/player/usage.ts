@@ -20,7 +20,7 @@ import { moveCard } from "../core/zones.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { exhaustAnnounced } from "../windows/exhaust.ts";
 import { announceTopDiscard } from "../families/deck/pressure.ts";
-import { currentCause, effectCause, UNATTRIBUTED } from "../core/cause.ts";
+import { currentCause, effectCause } from "../core/cause.ts";
 import { campaignUsed, noteCampaignUse } from "../families/campaign/used.ts";
 
 // Costs and limits on an Action or a Response. A cost is paid when the effect is triggered, before
@@ -230,7 +230,7 @@ export function payUsage(
         next = destroyCard(next, sourceId, ctx.cards, steps);
         break;
       case "damageSelf":
-        next = placeDamage(next, sourceId, cost.amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED));
+        next = placeDamage(next, sourceId, cost.amount, ctx.cards, steps, "player", currentCause(steps, effectCause(effect)));
         break;
       case "returnSelfToHand": {
         const card = next.cards[sourceId];

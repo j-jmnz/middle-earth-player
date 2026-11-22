@@ -130,10 +130,9 @@ describe("Hauberk of Mail (18007)", () => {
     expect(stat(tab.state, tab, idsOf(tab, SPEARMAN), "hitPoints")).toBe(printed(tab, SPEARMAN, "health") + 1);
   });
 
-  // FAULT: the card prints +1 hit point for a host with the sentinel keyword, and the Redwater Sentry gains Sentinel from its Armor
-  // (18003:A:2), but the state the PlayCard intent returns holds the Sentry at its printed 3 hit points; it reads 4 only after the next
-  // intent (the constants that hang on another constant's keyword are not settled within the intent).
-  it.fails("18007:A:2 Hauberk of Mail: +1 hit point on a Redwater Sentry, which gains Sentinel from it, as soon as it is played", () => {
+  // The Redwater Sentry gains Sentinel from its Armor (18003:A:2), and the +1 hit point that hangs on that keyword is in the state
+  // the PlayCard intent returns.
+  it("18007:A:2 Hauberk of Mail: +1 hit point on a Redwater Sentry, which gains Sentinel from it, as soon as it is played", () => {
     const tab = table(EFFECTS, { heroes: [{ code: BARD, seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: SENTRY, seat: 0 }], hand: [{ code: HAUBERK, seat: 0 }] });
     const sentry = idsOf(tab, SENTRY);
     // Free on the Sentry (18003:A:1).
@@ -180,9 +179,8 @@ describe("King of Dale (18008:A:2)", () => {
     expect(played.state.cards[warrior]?.zone).toBe("play");
   });
 
-  // FAULT: the card counts each different player attachment on the hero, but the engine also counts Caught in a Web, an encounter card
-  // attached to Bard: with King of Dale and Hauberk of Mail the Warrior of Dale should cost 3 - 2 = 1, and the engine makes it 0.
-  it.fails("18008:A:2 King of Dale: an encounter attachment on the hero is not counted", () => {
+  // Caught in a Web, an encounter card attached to Bard, is not counted: with King of Dale and Hauberk of Mail the Warrior of Dale costs 3 - 2 = 1.
+  it("18008:A:2 King of Dale: an encounter attachment on the hero is not counted", () => {
     const { tab, run, warrior, printedCost } = kingTable(EFFECTS, true);
     expect(playCost(run.state, warrior, 0, tab.ctx)).toBe(printedCost - 2);
   });

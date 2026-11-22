@@ -155,12 +155,20 @@ function sameModifiers(left: readonly Modifier[], right: readonly Modifier[]): b
   });
 }
 
+// A constant can depend on what another constant gives (a +1 hit point for a host with Sentinel that Armor grants), and `wanted` reads
+// the modifiers already in the state. So the records are rebuilt until a pass changes nothing, at most MAX_PASSES times.
+const MAX_PASSES = 8;
+
 export function syncConstants(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  const current = state.modifiers.filter((modifier) => modifier.origin != null);
-  if (current.length === 0 && !ctx.effects.some((effect) => effect.timing === "constant")) return state;
-  const desired = wanted(state, ctx);
-  if (sameModifiers(current, desired)) return state;
-  return { ...state, modifiers: [...state.modifiers.filter((modifier) => modifier.origin == null), ...desired] };
+  let next = state;
+  for (let pass = 0; pass < MAX_PASSES; pass += 1) {
+    const current = next.modifiers.filter((modifier) => modifier.origin != null);
+    if (current.length === 0 && !ctx.effects.some((effect) => effect.timing === "constant")) return next;
+    const desired = wanted(next, ctx);
+    if (sameModifiers(current, desired)) return next;
+    next = { ...next, modifiers: [...next.modifiers.filter((modifier) => modifier.origin == null), ...desired] };
+  }
+  return next;
 }
 
 // A constant victory condition ("If there are no Nazgûl enemies in play, the players win the game", 141027:B:1) ends the

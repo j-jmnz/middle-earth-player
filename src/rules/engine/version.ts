@@ -88,6 +88,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 37, scenarios: ["the-wizards-quest"], note: "Power Sevenfold chooses only a non-unique enemy or location; a unique card of lower Threat is no longer discarded." },
   { version: 38, scenarios: "all", note: "A player whose last hero is discarded by a card effect, not destroyed, is eliminated at once, for example by Sleeping Sentry's shadow effect." },
   { version: 38, scenarios: "all", note: "A character that left play while committed to the quest and is put into play again in the same quest phase is no longer committed." },
+  { version: 38, scenarios: "all", note: "Spare Hood and Cloak can only ready another character that is exhausted, and is not offered when there is none." },
+  { version: 38, scenarios: "all", note: "King of Dale counts only player attachments on the hero, not an encounter card such as Caught in a Web." },
+  { version: 38, scenarios: "all", note: "Bartering can return only a ready player attachment on a character you control, not one on an enemy or a location." },
+  { version: 38, scenarios: "all", note: "A card that gets a bonus from a keyword another card gives it, like Hauberk of Mail on a Redwater Sentry, has the bonus as soon as the keyword arrives." },
 ];
 
 export const ENGINE_VERSION = 38;

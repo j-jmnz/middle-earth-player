@@ -9,6 +9,8 @@ const doomed = (amount: number) => ({ verb: "RaiseThreat", amount, who: "eachSea
 // Linhir Sea-captain: exactly one hero's pool paid for it.
 const SINGLE_PAYER = { kind: "count", pick: { type: "hero", control: "any", paidFor: "subject" }, min: 1, max: 1 } as const;
 const icon = (stat: "leadershipIcon" | "loreIcon" | "tacticsIcon" | "spiritIcon") => ({ verb: "ModifyStat", stat, amount: 1, until: "endOfPhase", target: "host" }) as const;
+// Bartering: a ready player attachment on a character you control.
+const ON_CHARACTER = { type: "attachment", control: "you", state: "ready", playerCard: true, on: { type: "character", control: "you" } } as const;
 const LOWER_THREAT_HEROES = { type: "hero", control: "any", lowerThreatCost: true } as const;
 
 const OWN: readonly Effect[] = [
@@ -212,7 +214,7 @@ const OWN: readonly Effect[] = [
       {
         verb: "ReduceNextCost",
         pick: { type: "card", control: "you", cardType: "ally", trait: "Dale" },
-        amount: { count: { type: "attachment", control: "any", attachedTo: "host" }, distinct: true },
+        amount: { count: { type: "attachment", control: "any", attachedTo: "host", playerCard: true }, distinct: true },
         until: "endOfPhase",
         noMatch: true,
       },
@@ -223,9 +225,9 @@ const OWN: readonly Effect[] = [
     cardCode: "18015",
     lines: ["18015:A:1"],
     timing: "action",
-    condition: { kind: "all", conditions: [{ kind: "phase", is: "Planning" }, { kind: "canPick", pick: { type: "attachment", control: "you", state: "ready" } }] },
+    condition: { kind: "all", conditions: [{ kind: "phase", is: "Planning" }, { kind: "canPick", pick: ON_CHARACTER }] },
     instructions: [
-      { verb: "Pick", pick: { type: "attachment", control: "you", state: "ready" } },
+      { verb: "Pick", pick: ON_CHARACTER },
       { verb: "ReturnToHand", target: "picked" },
       { verb: "ReduceNextCost", pick: { type: "card", control: "you", cardType: "attachment" }, amount: { stat: "cost", of: "picked", printed: true }, until: "endOfPhase", who: "any" },
     ],

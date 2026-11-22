@@ -226,10 +226,8 @@ describe("Bartering (18015:A:1)", () => {
     expect(playCost(run.state, steward, 0, tab.ctx, aragorn)).toBe(tab.ctx.cards.get(STEWARD)?.cost ?? 0);
   });
 
-  // FAULT: the card picks a ready player attachment on a character you control, but the engine offers any ready attachment the player
-  // controls: with a ready Forest Snare on an engaged enemy and a ready Power in the Earth on a location, Bartering is playable and
-  // offers both (beside a ready Steward of Gondor on Aragorn), so a Snare or a Power can be returned to the hand.
-  it.fails("18015:A:1 Bartering: an attachment on an enemy or a location is not on a character you control", () => {
+  // With a ready Forest Snare on an engaged enemy and a ready Power in the Earth on a location, Bartering offers only the Steward of Gondor on Aragorn.
+  it("18015:A:1 Bartering: an attachment on an enemy or a location is not on a character you control", () => {
     const build = (steward: boolean): Table => {
       const scene = table(EFFECTS, {
         heroes: [{ code: DENETHOR, seat: 0 }, { code: ARAGORN, seat: 0 }],
@@ -243,7 +241,11 @@ describe("Bartering (18015:A:1)", () => {
     };
     const tab = build(true);
     const run = step(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, BARTERING), payments: [] }, tab.ctx);
-    expect(choices(run.state, tab)).toEqual([idsOf(tab, STEWARD)]);
+    // One candidate: it is picked without a question, and the Snare and the Power stay attached.
+    expect(run.state.window?.kind).not.toBe("choose");
+    expect(run.state.cards[idsOf(tab, STEWARD)]?.zone).toBe("hand");
+    expect(run.state.cards[idsOf(tab, SNARE)]?.host).toBe(idsOf(tab, ORC));
+    expect(run.state.cards[idsOf(tab, POWER)]?.host).toBe(idsOf(tab, GREEN_HILL));
     const bare = build(false);
     expect(playable(bare.state, bare)).not.toContain(idsOf(bare, BARTERING));
   });

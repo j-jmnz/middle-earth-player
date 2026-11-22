@@ -220,7 +220,6 @@ describe("Quickbeam (143006:A:1, A:2)", () => {
   });
 
   // "Response: After Quickbeam enters play, deal 1 damage to him to ready him."
-  // The cost's damage step carries no cause (the fault below), so this reads the state through reduce without the harness's cause check.
   lineSpec("143006:A:2", "after he enters play, 1 damage to him readies him", (effects) => {
     const tab = table(effects, { heroes: [{ code: TREEBEARD, seat: 0 }], hand: [{ code: QUICKBEAM, seat: 0 }] });
     const quickbeam = idsOf(tab, QUICKBEAM);
@@ -230,8 +229,8 @@ describe("Quickbeam (143006:A:1, A:2)", () => {
     expect(state.cards[quickbeam]?.exhausted).toBe(false);
   });
 
-  // FAULT: the card prints the 1 damage as the cost of Quickbeam's Response; the engine's damage step names the unattributed cause instead of 143006:A:2.
-  it.fails("143006:A:2 names the line as the cause of the 1 damage it deals", () => {
+  // The 1 damage is the cost of Quickbeam's Response: its step names the line as the cause (`send` checks it).
+  it("143006:A:2 names the line as the cause of the 1 damage it deals", () => {
     const tab = table(EFFECTS, { heroes: [{ code: TREEBEARD, seat: 0 }], hand: [{ code: QUICKBEAM, seat: 0 }] });
     const run = play(tab, QUICKBEAM);
     send(run, { type: "Trigger", cardId: idsOf(tab, QUICKBEAM), effectId: "143006:response:1" }, tab.ctx);

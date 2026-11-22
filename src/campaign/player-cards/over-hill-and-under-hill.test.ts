@@ -281,8 +281,7 @@ describe("Spare Hood and Cloak (131012:A:2)", () => {
   // "Action: Exhaust Spare Hood and Cloak and exhaust attached character to ready another character. Then, attach Spare Hood and Cloak to that character."
   // rr.then: the text after "Then" resolves only if the text before it resolved in full. Readying a character that is already ready does not resolve,
   // so the Cloak must stay where it is (or the ready character must not be a legal choice).
-  // FAULT: with the only other character already ready, the engine picks it without asking, "readies" it and moves the Cloak to it anyway.
-  it.fails("131012:A:2 does not move the Cloak to a character that was already ready", () => {
+  it("131012:A:2 does not move the Cloak to a character that was already ready", () => {
     const tab = table(EFFECTS, { heroes: [{ code: NORI, seat: 0 }], attached: [{ code: HOOD, host: NORI }], allies: [{ code: FILI, seat: 0 }] });
     const [nori, hood, fili] = [idsOf(tab, NORI), idsOf(tab, HOOD), idsOf(tab, FILI)];
     expect(tab.state.cards[fili]?.exhausted).toBe(false);
