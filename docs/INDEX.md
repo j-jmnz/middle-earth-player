@@ -60,7 +60,7 @@ Read the sections your task touches.
   - 411–416 Catalog build (~410)
   - 417–433 Tests (~2.2K) ← 18
   - 434–449 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~35.8K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~35.9K tok)
   - 17–35 Sections (~420)
   - 36–47 Product (~740) ← 2
   - 48–61 Non-goals (~610)
@@ -78,17 +78,17 @@ Read the sections your task touches.
     - 329–366 Core round (~2.3K) ← 5
     - 367–404 Keywords implemented once (~2.1K)
   - 405–447 Deckbuilding (~2.6K) ← 1
-  - 448–530 Effects (~4.2K)
-    - 451–511 Three layers (~2.5K) ← 10
-    - 512–522 Player side quests, contracts and saga cards (~1.4K) ← 1
-    - 523–526 Window stack (~100)
-    - 527–530 Coverage test (~270)
-  - 531–554 Data sources (~820) ← 4
-  - 555–573 Card images (~1.4K) ← 9
-  - 574–601 Persistence and shipping (~3.2K) ← 9
-  - 602–644 Screens (~6.0K) ← 3
-    - 629–644 Table screen (~1.8K) ← 3
-  - 645–654 Readings to confirm (~220)
+  - 448–532 Effects (~4.3K)
+    - 451–513 Three layers (~2.6K) ← 10
+    - 514–524 Player side quests, contracts and saga cards (~1.4K) ← 1
+    - 525–528 Window stack (~100)
+    - 529–532 Coverage test (~270)
+  - 533–556 Data sources (~820) ← 4
+  - 557–575 Card images (~1.4K) ← 9
+  - 576–603 Persistence and shipping (~3.2K) ← 9
+  - 604–646 Screens (~6.0K) ← 3
+    - 631–646 Table screen (~1.8K) ← 3
+  - 647–656 Readings to confirm (~220)
 - `docs/design-system-table.md` — Design system — Table (landscape) (~71.7K tok)
   - 5–8 Overview (~170) ← 1
   - 9–35 Top bar (~6.7K) ← 14

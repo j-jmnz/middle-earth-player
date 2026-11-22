@@ -507,6 +507,8 @@ The four core-set Learn to Play decks are in scope the same way (user request, 2
 
 A cost of X that the player chooses may be 0 (`rr.the-letter-x`): X is offered from 0, and the rest of the effect still resolves. We Are Not Idle (04129) is played with no ready Dwarf hero and draws 1 card; its X resources go to any hero, as printed ("a hero's resource pool"). Status: researched (`rr.the-letter-x`; https://ringsdb.com/card/04129 agrees).
 
+A hero that gains a resource icon belongs to that sphere as well, for paying and for every card that reads a hero's sphere (`rr.spheres-of-influence`: a card with a sphere's icon belongs to that sphere). Aragorn with Celebrían's Stone (01027:A:3) is a Spirit hero while it is attached. Status: researched (the designer's answer in the semi-official FAQ, https://alongextendedparty.com/semi-official-errata-faq-1-10/).
+
 Campaign-dealt cards cannot be inactive. That includes encounter cards, quest cards, boons, burdens, and The One Ring. A missing effect id there fails the coverage test, and the scenario stays unplayable.
 
 ### Player side quests, contracts and saga cards
