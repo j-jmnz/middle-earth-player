@@ -30,7 +30,7 @@ export function IslandPanel({ readout, fit, onRead, onClose }: { readout: Island
   }, []);
   return (
     <View testID="island-map" collapsable={false} style={{ flexShrink: 1 }}>
-      <View ref={focus} accessible accessibilityRole="header" accessibilityLabel={`Island Map, ${readout.explored} of ${readout.cells.length} locations explored`} className="flex-row flex-wrap items-baseline justify-center" style={{ paddingHorizontal: CLOSE_CLEAR * s, columnGap: 8 * s }}>
+      <View ref={focus} accessible accessibilityRole="header" accessibilityLabel={`Island Map, ${readout.explored} of ${readout.cells.length} locations explored`} className="flex-row flex-wrap items-end justify-center" style={{ paddingHorizontal: CLOSE_CLEAR * s, columnGap: 8 * s }}>
         <Text className="font-display text-title text-ink">Island Map</Text>
         <Text className="font-display text-eyebrow uppercase text-inkLabel">{`${readout.explored} of ${readout.cells.length} explored`}</Text>
       </View>

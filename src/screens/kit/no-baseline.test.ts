@@ -13,9 +13,8 @@ function sources(dir: string): string[] {
 }
 
 describe("row alignment", () => {
-  it("never uses items-baseline in a screen", () => {
-    const root = join(__dirname, "..");
-    const found = sources(root).filter((file) => readFileSync(file, "utf8").includes("items-baseline"));
+  it("never uses items-baseline in a screen or on the table", () => {
+    const found = [join(__dirname, ".."), join(__dirname, "../../play")].flatMap(sources).filter((file) => readFileSync(file, "utf8").includes("items-baseline"));
     expect(found).toEqual([]);
   });
 });
