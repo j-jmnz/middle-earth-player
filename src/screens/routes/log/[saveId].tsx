@@ -204,7 +204,7 @@ export default function Log() {
               const extras = extrasWords(log.xpGained[id], log.modes[id]);
               return (
                 <View key={id} testID={`log-scenario-${id}`} className="mt-1">
-                  <View className="flex-row items-baseline gap-1.5">
+                  <View className="flex-row items-end gap-1.5">
                     <Text className={score ? "shrink text-body text-ink" : "shrink text-body text-inkMuted"}>{names[id] ?? id}</Text>
                     {/* Dotted leaders to the score, as a printed log ruled by hand. */}
                     <View className="min-w-3 flex-1" style={{ borderBottomWidth: 1.5, borderStyle: "dotted", borderColor: withAlphaHex(palette.inkLine, 0.4), marginBottom: 4 * s }} />
@@ -218,7 +218,7 @@ export default function Log() {
           {marshes.length > 0 ? <Row label="The Passage of the Marshes" lines={marshes} onCard={card} testID="log-marshes" /> : null}
           {/* A continued save's total carries on from the finished campaign's: its score is a line of its own so the total adds up. */}
           {log.scoreBase > 0 ? (
-            <View testID="log-score-base" className="flex-row items-baseline gap-1.5 py-2">
+            <View testID="log-score-base" className="flex-row items-end gap-1.5 py-2">
               <Text className="shrink text-body text-ink">{scoreBaseName(log, save.campaignId, (id) => campaignOf(id)?.name ?? null)}</Text>
               <View className="min-w-3 flex-1" style={{ borderBottomWidth: 1.5, borderStyle: "dotted", borderColor: withAlphaHex(palette.inkLine, 0.4), marginBottom: 4 * s }} />
               <Text className="font-display text-label text-ink">{log.scoreBase}</Text>

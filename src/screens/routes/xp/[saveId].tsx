@@ -80,7 +80,7 @@ function CardRow({
   const reason = enabled ? row.reason : OPEN_REASON;
   const face = (pressed: boolean) => (
     <View className="min-h-14 justify-center overflow-hidden rounded-item px-3.5 py-2" style={{ ...rowSurface(pressed && live, t), opacity: dimmed ? DIMMED : 1 }}>
-      <View className="flex-row items-baseline justify-between gap-2">
+      <View className="flex-row items-center justify-between gap-2">
         <Text className="shrink font-display text-heading text-bone">{row.name}</Text>
         <Text testID={`xp-words-${row.code}`} className="text-label text-muted">
           {row.note ?? row.words}
