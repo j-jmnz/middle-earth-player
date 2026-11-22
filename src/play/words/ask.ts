@@ -30,10 +30,14 @@ export function askWords(a: {
   // The record the instruction is from: the frame's effect id, and the cause of the queued instruction when the frame runs several records (asks.ts).
   effectId?: string;
   cause?: Cause;
+  // The DiscardFromHand a Pick was expanded from, and the picks of it still to come after this one: the record's entry is keyed on the DiscardFromHand, and the sheet counts what is left (effect-frames.ts expandDiscards).
+  origin?: Instruction;
+  picksLeft?: number;
 }): AskedWords {
   const { game, ctx, names, instruction, queue, options, source, picked, amountNow, effectId, cause } = a;
-  const written = asksPick({ game, ctx, names, instruction, source, amountNow, options, ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });
-  if (written) return written;
+  const asked = a.origin?.verb === "DiscardFromHand" ? a.origin : instruction;
+  const written = asksPick({ game, ctx, names, instruction: asked, source, amountNow, options, ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });
+  if (written) return a.picksLeft ? { ...written, prompt: `${written.prompt} ${a.picksLeft} more after this one.` } : written;
   const traded = instruction.verb === "TradeDamageForThreat" && instruction.character ? game.cards[instruction.character] : undefined;
   if (instruction.verb === "TradeDamageForThreat" && traded) {
     const loses = effectsOf(ctx, traded.code).some((item) => item.trigger === "leftPlay" && item.instructions.some((step) => step.verb === "LoseGame"));
@@ -41,10 +45,11 @@ export function askWords(a: {
   }
   // The Burglar's Turn's Setup with more candidates than the loot deck takes (22024:A:2).
   if (instruction.verb === "BuildLootDeck") return lootLeaveOutWords(options.length, instruction.size);
-  return (
+  const words = (
     grappleAsk(instruction, source, names, grappleFactsOf(game, ctx, instruction, picked)) ??
     wilderlandAsk(instruction, source, names, queue[0], picked, { game, ctx, options }) ??
     seaAsk(instruction, queue[0], options, game, ctx, names, source, queue.slice(1)) ??
     pickWords(instruction, queue[0], names, source, source ? restrictedLimit(game, source) : 2, game, amountNow, queue.slice(1))
   );
+  return a.picksLeft && a.origin?.verb === "DiscardFromHand" ? { ...words, prompt: `${words.prompt} ${a.picksLeft} more after this one.` } : words;
 }

@@ -60,8 +60,8 @@ export type FortitudeResult = { success: boolean; willpower: number; eyes: numbe
 export type EscapeResult = { success: boolean; committed: number; escape: number };
 
 // One instruction still to run, with the seat it runs for. `chosen` is the card a player picked for it.
-// `offset` is where ArrangeTop has got to in the deck.
-export type QueueItem = { instruction: Instruction; seat: number; chosen: string | null; cause?: Cause; offset?: number };
+// `offset` is where ArrangeTop has got to in the deck. `origin` is the record's instruction an item was expanded from (one pick of a DiscardFromHand), so the words find the record's entry and count the picks left.
+export type QueueItem = { instruction: Instruction; seat: number; chosen: string | null; cause?: Cause; offset?: number; origin?: Instruction };
 
 export type EffectWait =
   | { kind: "branch"; item: QueueItem }

@@ -333,7 +333,7 @@ function expandDiscards(state: ScenarioState, item: QueueItem, frame: Frame, ctx
   const cause = item.cause ? { cause: item.cause } : {};
   const pick = { verb: "Pick" as const, pick: { type: "card" as const, control: "you" as const, from: "hand" as const } };
   const expanded = Array.from({ length: count }, (): QueueItem[] => [
-    { instruction: pick, seat: item.seat, chosen: null, ...cause },
+    { instruction: pick, seat: item.seat, chosen: null, origin: instruction, ...cause },
     { instruction: { verb: "DiscardPicked" as const }, seat: item.seat, chosen: null, ...cause },
   ]).flat();
   return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });

@@ -59,6 +59,16 @@ describe("The Long Dark's choice words", () => {
     expect(sheet.note).toContain("Discard 1 card from your hand");
   });
 
+  it("04097:A:1 Cave Spider's discard of 4 reads its entry and counts the picks left on each of the expanded picks", () => {
+    const made = table({ staging: ["04097"], hand: ["filler", "event", "filler", "event", "filler"], deckOf: ["filler"], deck: ["f0"] });
+    const sheet = opened(made, "04097", "whenRevealed");
+    expect(sheet.note).toContain("choose 4 cards from your hand to discard, one at a time.");
+    expect(sheet.note).toContain("3 more after this one.");
+    const option = sheet.state.window?.kind === "choose" ? (sheet.state.window.options[0] ?? "") : "";
+    const next = pickSheet(made, send({ state: sheet.state, steps: [] }, { type: "Choose", optionId: option }, made.ctx).state);
+    expect(next.note).toContain("2 more after this one.");
+  });
+
   it("04099:A:2 the Lost effects of several cards are ordered by the first player, each card listed", () => {
     const made = table({ seats: 2, staging: ["04090", "04091", "04099"], hand: [{ code: "filler", seat: 0 }], deck: ["f0"] });
     const sheet = opened(made, "04099", "shadow");
