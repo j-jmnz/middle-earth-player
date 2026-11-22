@@ -7,9 +7,10 @@ import { describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
-import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
-import { attachTo } from "../../../rules/core/zones.ts";
+import { attachTo, spawn } from "../../../rules/core/zones.ts";
+import { whenRevealedUncancelable } from "../../../rules/families/wilderland/heath.ts";
 import { play } from "../../../../test/harness/card-spec-play.ts";
 import { attack, defend, endPhase, endRound, quest, reveal, travel, withoutLine, type Act, type Row } from "../../../../test/harness/card-spec.ts";
 import { finish, idOf, legalIntents, legalTargets, revealFromTop, send, start, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
@@ -132,8 +133,38 @@ describe("18037 Vastness of Mirkwood", () => {
 });
 
 describe("18038 Accursed Forest", () => {
-  it("18038:A:1 as the active location it lets a when revealed effect be canceled", () => {
-    expect(flagged(played({ active: "18038" }, []), "table", "encounterUncancelable")).toBe(false);
+  // A Test of Will (01050, Spirit, cost 1): "Response: Cancel the 'when revealed' effects of a card just revealed from the encounter deck." Unseen Danger (18036) is revealed on top of the deck; the first hero is made a Spirit hero with 3 resources.
+  const testOfWillOffered = (staging: readonly (string | { code: string })[], active?: string): boolean => {
+    const made = tableFromLayout(SCENARIO, { staging, ...(active ? { active } : {}), hand: ["01050"], heroResources: 3, deck: ["f0", "f0"] }, { extra: ["01050"] });
+    const hero = made.cards.get("dh1");
+    if (hero) made.cards.set("dh1", { ...hero, sphere: "spirit" });
+    const revealed = revealFromTop(made.state, made.ctx, "18036", []);
+    return legalIntents(revealed.state, made.ctx).some((intent) => intent.type === "Trigger" && intent.effectId === "01050:response:1");
+  };
+
+  it("18038:A:1 a when revealed effect can be canceled while no Accursed Forest is in the staging area (the control)", () => {
+    expect(testOfWillOffered([])).toBe(true);
+  });
+
+  it("18038:A:1 while it is in the staging area no cancel is offered against a when revealed effect", () => {
+    expect(testOfWillOffered(["18038"])).toBe(false);
+    expect(testOfWillOffered(["18038", "place"])).toBe(false);
+  });
+
+  it("18038:A:1 as the active location it is not in the staging area, so a when revealed effect can be canceled", () => {
+    expect(testOfWillOffered([], "18038")).toBe(true);
+  });
+
+  // The cancel of a card "just revealed" (The Master Ring, Frodo Baggins) answers the reveal itself, not the When Revealed window.
+  it("18038:A:1 a cancel that answers the reveal itself is barred in the staging area too", () => {
+    const cancels: Effect = { id: "x:response:1", cardCode: "x", lines: ["x:A:1"], timing: "response", trigger: "encounterRevealed", instructions: [{ verb: "CancelEffect" }] };
+    const barred = (staging: readonly string[]): boolean => {
+      const made = tableFromLayout(SCENARIO, { staging, deck: ["f0", "f0"] }, { effects: [...EFFECTS, cancels] });
+      const revealed = spawn(made.state, "18036", { zone: "staging" });
+      return whenRevealedUncancelable(revealed.state, { trigger: "encounterRevealed", seat: 0, subject: revealed.id }, cancels, made.ctx);
+    };
+    expect(barred(["18038"])).toBe(true);
+    expect(barred([])).toBe(false);
   });
 
   // Hasty Stroke (01048, Spirit, cost 1): "Response: Cancel a shadow effect just triggered during combat." The first hero is made a Spirit hero with 3 resources to pay for it.

@@ -206,8 +206,6 @@ const FLAGS = [
   // Held by the table while the source is the active location: "encounter card effects cannot be canceled" (41010:A:1). No Response cancels a
   // When Revealed or Shadow effect, and no paid cancel is offered against one (src/rules/families/encounter/cancel.ts).
   "encounterUncancelable",
-  // Held by the table while its source is in the staging area: "'when revealed' effects cannot be canceled" (18038:A:1, 50822:A:1). Only a When Revealed effect is barred; a Shadow effect can still be canceled.
-  "whenRevealedUncancelable",
   // On a card in the staging area: nothing moves it out of the staging area ("Uglúk cannot leave the staging area", 143069:B:2): moveCard refuses a move to another zone, as cannotEnterStaging refuses one into it.
   "cannotLeaveStaging",
   // On a card in play until the end of the round: it entered play this round ("if Hunting Warg entered play this round", 900403:A:1), set by a Forced effect that hears `encounterEnteredPlay` and read by the condition `flag` with holder `self`.

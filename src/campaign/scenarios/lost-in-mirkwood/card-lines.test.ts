@@ -4,7 +4,7 @@
 // Card specs for the Lost in Mirkwood encounter cards and quest stages, read from their printed lines. `cardSpecs` runs each row again with the records of its line removed, where it must fail.
 // The stand-in heroes dh1 and dh2 have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; f0 and f3 are enemies of Threat 0 and 3 with 1 Attack; "place" is a location of Threat 2 with no trait; every seat starts at threat 28.
 // A travel to an Objective-Location is made at stage 18077, the last level, so its "advance to the next stage, if able" changes nothing there.
-import { answer, attack, cardSpecs, endPhase, committed, count, damageOn, deckCount, defend, endRound, exhausted, flag, quest, resolve, resourcesOn, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { answer, attack, cardSpecs, endPhase, committed, count, damageOn, deckCount, defend, endRound, exhausted, quest, resolve, resourcesOn, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 const ROWS: readonly Row[] = [
   // 18029 to 18032 "Guarded (location)" / "Guarded (enemy)": discard from the encounter deck until a card of that type is discarded, add it to the staging area and attach the objective to it (emce.guarded-x).
@@ -54,7 +54,7 @@ const ROWS: readonly Row[] = [
   { line: "18037:A:1", name: "1 location for 2 players: it gains surge", layout: { seats: 2, staging: ["place"], deck: ["f3", "f0"] }, act: reveal("18037"), expect: [stat("place", "threat", 3), zone("f3", "staging"), deckCount(1)] },
 
   // 18038 Accursed Forest: "While Accursed Forest is in the staging area, 'when revealed' effects cannot be canceled."
-  { line: "18038:A:1", name: "in the staging area no when revealed effect can be canceled", layout: { staging: ["18038"] }, act: [], expect: flag("table", "whenRevealedUncancelable") },
+  // The cancel of a When Revealed effect is played against it in card-lines-scenes.test.ts (18038 Accursed Forest).
   // "Travel: Reveal the top card of the encounter deck."
   { line: "18038:A:2", name: "traveling here reveals the top card of the encounter deck", layout: { phase: "Travel", staging: ["18038"], deck: ["f3", "f0"] }, act: travel("18038"), expect: [zone("f3", "staging"), deckCount(1)] },
 

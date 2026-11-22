@@ -203,7 +203,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18038:A:1 (front): While Accursed Forest is in the staging area, 'when revealed' effects cannot be canceled.
   18038:constant:1: Constant
     only if this card is in the staging area
-    - the table: stat whenRevealedUncancelable 1, while this card is in play
+    - while this card is in play (under its condition), the When Revealed effects of cards cannot be canceled
 
 18038:A:2 (front): Travel: Reveal the top card of the encounter deck.
   18038:travel:1: Travel

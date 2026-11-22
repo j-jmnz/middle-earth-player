@@ -140,7 +140,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
 
   // 18038 Accursed Forest: while in the staging area 'when revealed' effects cannot be canceled; Travel: reveal the top card of the encounter deck.
-  { id: "18038:constant:1", cardCode: "18038", lines: ["18038:A:1"], timing: "constant", condition: { kind: "sourceIn", zone: "staging" }, instructions: [{ verb: "ModifyStat", stat: "whenRevealedUncancelable", amount: 1, until: "whileSourceInPlay", target: "table" }] },
+  { id: "18038:constant:1", cardCode: "18038", lines: ["18038:A:1"], timing: "constant", condition: { kind: "sourceIn", zone: "staging" }, instructions: [{ verb: "UncancelableWhenRevealed" }] },
   { id: "18038:travel:1", cardCode: "18038", lines: ["18038:A:2"], timing: "travel", instructions: [{ verb: "RevealEncounter" }] },
 
   // 18039 Dark Black Woods: while in the staging area no more than 1 progress goes on each Forest location there each round; Travel: each player discards the top card and each enemy so discarded is added to the staging area.
