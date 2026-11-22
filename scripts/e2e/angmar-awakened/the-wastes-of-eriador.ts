@@ -1,5 +1,4 @@
-// The fixtures of The Wastes of Eriador (angmar-awakened part 4), written into src/campaign/fixtures/the-wastes-of-eriador.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
-// Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `eriador-won` is the first seed that wins, parked on the win (the Resolution waits); `eriador-lost` the first
+// The fixtures of The Wastes of Eriador (angmar-awakened part 4), written into src/campaign/fixtures/the-wastes-of-eriador.json by scripts/e2e/fixtures.ts: real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `eriador-won` is the first seed that wins, parked on the win (the Resolution waits); `eriador-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks nothing (Determination is added to each hand and the pool, Fend Off Despair shuffled into the encounter deck, Arnor Ravaged staged with the damage the log noted, Mysterious Omens shuffled in from the pool); the Resolution asks nothing

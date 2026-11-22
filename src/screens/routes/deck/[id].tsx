@@ -8,7 +8,7 @@ import { ActionBar, Chip, FloatingBarShade, NavBar, PaperSheet, PrimaryButton, S
 import { CardPoolBody, type PoolTypeRequest } from "../../pool/card-pool";
 import { BANNER_HEIGHT, DeckGlance } from "../../deck/glance";
 import { DeckCardCell, DeckSectionHeader, gridRows, JumpChips, refusedCodes, refusedKey, sideRows, TYPE_NOUN, type EditorCard, type EditorRow, type Jump } from "../../deck/grid";
-import { announceDraftChange, discardDraftChanges, draftIsDirty, editSavedDeck, getDeckDraft, markDraftSaved, NEW_DECK_ID, removeDraftHero, setDeckName, setDraftTarget, startNewDeck, useDeckDraft, type DraftCard, type DraftPile, type TitleLookup } from "../../deck/draft";
+import { announceDraftChange, discardDraftChanges, draftHeroLimit, draftIsDirty, editSavedDeck, getDeckDraft, markDraftSaved, NEW_DECK_ID, removeDraftHero, setDeckName, setDraftTarget, startNewDeck, useDeckDraft, type DraftCard, type DraftPile, type TitleLookup } from "../../deck/draft";
 import { deckContentsPhrase, deckCountLine, deckLootRule, deckReadiness, deckSections, notAppliedLine, savedDeckName, sideDeckNote, startingThreat, type DeckFace } from "../../deck/status";
 import { deckFaces, isStarterDeck, listDecks, notAppliedIn, readDeck, writeDeck } from "../../deck/store";
 import { notAppliedWords } from "../../../play/cards/not-applied";
@@ -125,6 +125,8 @@ export default function DeckEditor() {
   );
   // The loot deck the deck's contract takes from the side deck (The Burglar's Turn), read once per change of the cards.
   const loot = useMemo(() => deckLootRule(draft.cards), [draft.cards]);
+  // Three, or the contract's limit: the heroes heading counts against it, and the empty hero slots fill up to it.
+  const heroLimit = draftHeroLimit(draft.cards);
   // A phone holds three cards a row (each wide enough for its stepper), a tablet in portrait six, the deck's pane in landscape five.
   const cols = size === "compact" ? 3 : size === "medium" ? 6 : 5;
   const rows: EditorRow[] = [
@@ -139,7 +141,7 @@ export default function DeckEditor() {
   const notApplied = notAppliedLine(draft, inactive);
   const threat = startingThreat(draft.heroes, faces);
   const heroes: HeroFace[] = draft.heroes.map((code) => heroFace(faces, code));
-  const emptySlots = Math.max(0, 3 - heroes.length);
+  const emptySlots = Math.max(0, heroLimit - heroes.length);
 
   // The pool, adding to this deck, on one type: an empty hero slot opens it on heroes, a subsection's Add on its type. The side deck's
   // Add opens it on every type, adding to the side deck. Expanded, the pool is already on screen beside the deck, so the request
@@ -251,7 +253,7 @@ export default function DeckEditor() {
 
   function renderRow({ item }: { item: EditorRow }) {
     if (item.kind === "heroes") return heroStrip;
-    if (item.kind === "type") return <DeckSectionHeader type={item.type} title={item.title} count={item.count} onAdd={addOfType} />;
+    if (item.kind === "type") return <DeckSectionHeader type={item.type} title={item.title} count={item.count} heroLimit={heroLimit} onAdd={addOfType} />;
     if (item.kind === "note") {
       return (
         <Text testID={`deck-${item.key}`} className="pb-3 text-label text-muted">

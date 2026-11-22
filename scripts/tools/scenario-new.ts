@@ -209,11 +209,12 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
   };
 
   edit(FIXTURE_REGISTRY, (text) => {
-    if (text.includes(`scenarioId: "${id}"`) || text.includes(`"${short}-won"`)) {
-      problems.push(`${FIXTURE_REGISTRY} already names ${id} or ${short}-won: pass --short with another name`);
+    if (text.includes(`scenarioId: "${id}"`) || text.includes(`"${short}-lost"`)) {
+      problems.push(`${FIXTURE_REGISTRY} already names ${id} or ${short}-lost: pass --short with another name`);
       return text;
     }
-    const line = facts.cycle ? `  { scenarioId: "${id}", kind: "standalone", names: ["${short}-won", "${short}-lost"] },` : `  { scenarioId: "${id}", names: ["${short}-won", "${short}-lost"] },`;
+    // The loss alone: a scenario gets no won fixture (docs/architecture.md, Tests).
+    const line = facts.cycle ? `  { scenarioId: "${id}", kind: "standalone", names: ["${short}-lost"] },` : `  { scenarioId: "${id}", names: ["${short}-lost"] },`;
     const after = new RegExp(`scenarioId: "${previous}"`);
     return previous && blockHas(text, FIXTURE_ARRAY, after) ? insert(text, FIXTURE_REGISTRY, { block: FIXTURE_ARRAY, anchor: after }, line, "after", problems) : insert(text, FIXTURE_REGISTRY, { block: FIXTURE_ARRAY }, line, "before", problems);
   });

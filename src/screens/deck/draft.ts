@@ -1,6 +1,8 @@
 import { useSyncExternalStore } from "react";
 
+import { heroLimitOfCodes } from "../../catalog/deck-rules";
 import { copyCapRule, formatDeckRefusal } from "../../catalog/deck-save";
+import { EFFECTS } from "../../effects";
 import { showToast } from "../kit/toast";
 
 export type DraftCard = {
@@ -199,13 +201,23 @@ function sideRefusal(typeCode: string): string | null {
   return null;
 }
 
+/** How many heroes the deck may hold: three, or what its contract says (Bond of Friendship: four; rr.deckbuilding, src/catalog/deck-rules.ts). */
+export function draftHeroLimit(cards: readonly DraftCard[]): number {
+  return heroLimitOfCodes(EFFECTS, cards.map((card) => card.code));
+}
+
+// "At most three heroes.", in the words the deck's readiness check uses (src/catalog/deck-save.ts).
+function heroLimitRule(limit: number): string {
+  return `At most ${limit === 3 ? "three heroes" : limit === 1 ? "one hero" : `${limit} heroes`}.`;
+}
+
 /**
  * Whether + on this card would be refused: its title is at its copy limit, or a hero is taken or the slots are full. On the side
  * deck (`target`), the copies are the side deck's and a hero or a contract is refused.
  */
 export function draftAddRefused(current: Pick<DraftPicks, "heroes" | "cards">, card: DraftAdd, lookup?: TitleLookup, target: DraftPile = "deck"): boolean {
   if (target === "side" && sideRefusal(card.typeCode)) return true;
-  if (card.typeCode === "hero") return heroWithTitle(current, card, lookup) !== null || current.heroes.length >= 3;
+  if (card.typeCode === "hero") return heroWithTitle(current, card, lookup) !== null || current.heroes.length >= draftHeroLimit(current.cards);
   const title = titleCopies(current, card, lookup);
   return copyCapRule(title.count + 1, title.deckLimit) !== null;
 }
@@ -253,7 +265,7 @@ export function changeDraftCount(code: string, name: string, deckLimit: number |
 }
 
 /**
- * A hero joins the hero slots (one to three, one of each title, rr.deckbuilding); any other card is one more copy. While the pool adds
+ * A hero joins the hero slots (one to three, or to the contract's limit, one of each title, rr.deckbuilding); any other card is one more copy. While the pool adds
  * to the side deck (`target`), the card is a copy there, and a hero or a contract is refused.
  */
 export function addDraftCard(card: DraftAdd, lookup?: TitleLookup): DraftChange {
@@ -263,10 +275,11 @@ export function addDraftCard(card: DraftAdd, lookup?: TitleLookup): DraftChange 
   }
   if (card.typeCode === "hero") {
     if (heroWithTitle(draft, card, lookup)) return refused(card.name, "A hero appears once.");
-    if (draft.heroes.length >= 3) return refused(card.name, "At most three heroes.");
+    const limit = draftHeroLimit(draft.cards);
+    if (draft.heroes.length >= limit) return refused(card.name, heroLimitRule(limit));
     const before = picks(draft);
     update({ ...draft, heroes: [...draft.heroes, card.code] });
-    return { ok: true, text: `Added ${card.name} · hero ${draft.heroes.length} of 3`, before };
+    return { ok: true, text: `Added ${card.name} · hero ${draft.heroes.length} of ${limit}`, before };
   }
   return changeDraftCount(card.code, card.name, card.deckLimit, 1, lookup);
 }

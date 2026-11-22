@@ -10,7 +10,7 @@ import { reduce, startScenario, type ReduceContext, type ScenarioState } from ".
 import { marshesStart, marshesWorld } from "../../../../test/scenarios/the-passage-of-the-marshes/game.ts";
 import { loadCampaign, loadScenario } from "../../../../scripts/data/load-scenarios.ts";
 import { isengardWonLog } from "../../../../scripts/e2e/the-passage-of-the-marshes.ts";
-import { prebuiltDeck } from "../../../../scripts/e2e/seed-kit.ts";
+import { prebuiltDeck, SOLO_FIXTURE_DECK } from "../../../../scripts/e2e/seed-kit.ts";
 import { temporaryCatalog } from "../../../../test/harness/temp-catalog.ts";
 
 import { briefing, startFor } from "../../briefing.ts";
@@ -79,7 +79,7 @@ describe("The Passage of the Marshes in the the-two-towers campaign", () => {
   });
 
   it("144067:A:2 deals no Searching Eye from a standalone deal of the same seat, and one from a campaign deal", () => {
-    const seat = { deckId: "the-one-deck", ...prebuiltDeck("the-one-deck") };
+    const seat = { deckId: SOLO_FIXTURE_DECK, ...prebuiltDeck(SOLO_FIXTURE_DECK) };
     const world = loadWorld(drizzle(new Database(temporaryCatalog(), { readonly: true })), campaign, marshes, EFFECTS, [FRODO, ...seat.heroes, ...seat.deck]);
     const standalone = standaloneStart(world, 1, { scenarioId: marshes.id, difficulty: "Normal", seats: [seat], ringBearer: FRODO }, 1);
     const campaignStart = startFor({ world, log: emptyLog(1), seatCount: 1, seats: [seat], ringBearer: FRODO, difficulty: "Normal" }, 1);
@@ -103,7 +103,7 @@ describe("The Passage of the Marshes in the the-two-towers campaign", () => {
   });
 
   it("144063:A:1 refuses a first seat with no Ring-bearer, and takes one with the saga Frodo", () => {
-    const seat = { deckId: "the-one-deck", ...prebuiltDeck("the-one-deck") };
+    const seat = { deckId: SOLO_FIXTURE_DECK, ...prebuiltDeck(SOLO_FIXTURE_DECK) };
     const world = loadWorld(drizzle(new Database(temporaryCatalog(), { readonly: true })), campaign, marshes, EFFECTS, [FRODO, ...seat.heroes, ...seat.deck]);
     const input = { world, log: emptyLog(1), seatCount: 1 as const, seats: [seat], difficulty: "Normal" as const };
     expect(briefing({ ...input, ringBearer: null }).problems.map((problem) => problem.message).join(" ")).toMatch(/Ring-bearer/);

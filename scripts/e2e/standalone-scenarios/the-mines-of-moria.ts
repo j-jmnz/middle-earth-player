@@ -1,5 +1,4 @@
-// The save fixtures of The Mines of Moria (standalone-scenarios cycle part 12), written into src/campaign/fixtures/the-mines-of-moria.json by scripts/e2e/fixtures.ts: real standalone games of saved decklists (the One Deck and
-// Defenders of Gondor lists of data/decks), two-handed, Easy, so each is one open game. `mines-won` is the first seed that wins, parked on the win (the outcome screen is one tap away); `mines-lost` the first that loses,
+// The save fixtures of The Mines of Moria (standalone-scenarios cycle part 12), written into src/campaign/fixtures/the-mines-of-moria.json by scripts/e2e/fixtures.ts: real standalone games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is one open game. `mines-won` is the first seed that wins, parked on the win (the outcome screen is one tap away); `mines-lost` the first that loses,
 // parked on the loss. A cycle has no log and no earlier part. A game not found in the seeds is left out.
 import { nextIntent } from "../../../test/harness/auto-player.ts";
 import { createLog } from "../../log.ts";

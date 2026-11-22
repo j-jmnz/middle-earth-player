@@ -20,6 +20,7 @@ import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import { loadAnyScenario, loadCampaign, loadScenario } from "../data/load-scenarios.ts";
 import type { Log } from "../log.ts";
 import { NO_COPY_LIMITS } from "../../src/campaign/wilderland.ts";
+import { FIXTURE_REGISTRY } from "../../src/campaign/fixtures/registry.ts";
 import { searchWin, type DealtGame } from "./search/find.ts";
 import { searchFlags } from "./search/options.ts";
 import type { ScoreHook } from "./search/score.ts";
@@ -29,7 +30,7 @@ import type { ScoreHook } from "./search/score.ts";
 // answers, every intent one the reducer accepts, the first seed that gives the game a fixture wants, and the log an earlier part's
 // won golden writes. A seed finder keeps what is its own: its answers, its fixture names and what it keeps.
 
-/** A decklist of data/decks/prebuilt.json or data/decks/test-decks.json (The One Deck): its heroes, and its cards one entry a copy. */
+/** A decklist of data/decks/test-decks.json (the fixture decks) or data/decks/prebuilt.json: its heroes, and its cards one entry a copy. */
 export function prebuiltDeck(id: string): { heroes: string[]; deck: string[] } {
   const found = prebuilt.find((entry) => entry.id === id) ?? testDecks.find((entry) => entry.id === id);
   if (!found) throw new Error(`No prebuilt deck ${id}`);
@@ -85,10 +86,16 @@ function playOut(
 }
 
 /**
- * The saved decklists every fixture plays: the first seat's, then the second's. The first is The One Deck (RingsDB decklist 8682,
- * data/decks/test-decks.json). The second shares no hero title with it, since a hero title may be in only one seat.
+ * The saved decklists every fixture plays (data/decks/test-decks.json; user instruction, 2026-11-22), and no other. A two-handed game plays
+ * the pair of RingsDB decklists 53651 and 53652, the first seat's, then the second's: they share no hero title, since a hero title may be
+ * in only one seat. A true solo game plays RingsDB decklist 41298. Each is four heroes under the Bond of Friendship contract.
  */
-export const FIXTURE_DECKS = ["the-one-deck", "defenders-of-gondor"] as const;
+export const FIXTURE_DECKS = ["100-fellowship-detours-and-defense", "100-fellowship-out-of-thin-air"] as const;
+export const SOLO_FIXTURE_DECK = "a-modern-one-deck-or-how-friendship-conquers-all";
+/** The fixture decklists of a game of `seatCount` seats. */
+export function fixtureDecks(seatCount: 1 | 2): readonly string[] {
+  return seatCount === 1 ? [SOLO_FIXTURE_DECK] : FIXTURE_DECKS;
+}
 export const DREAM_CHASER = "dream-chaser";
 
 export type SeedSpec<S extends 1 | 2> = {
@@ -110,7 +117,7 @@ export type SeedSpec<S extends 1 | 2> = {
   /** The scenario's answer, and the point (checked before each intent) a game is parked at. */
   answer: (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => PlayerIntent;
   stop?: (state: ScenarioState, played: number) => boolean;
-  /** A term the scenario adds to the fixture search's generic score (scripts/e2e/search/score.ts), when the search is run (`--search`). */
+  /** A term the scenario adds to the fixture search's generic score (scripts/e2e/search/score.ts), when the user asks for the search (`--search`). */
   score?: ScoreHook;
 };
 export type SeedGame = { loadout: StoredLoadout; intents: PlayerIntent[]; state: ScenarioState };
@@ -121,7 +128,7 @@ export function dealSeed<S extends 1 | 2>(spec: SeedSpec<S>, seed: number): Deal
   const campaign = loadCampaign(spec.campaignId);
   const scenario = loadScenario(spec.scenarioId);
   const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
-  const seats = (spec.decks ?? FIXTURE_DECKS).slice(0, spec.seatCount).map((id) => ({ deckId: id, ...prebuiltDeck(id) }));
+  const seats = (spec.decks ?? fixtureDecks(spec.seatCount)).map((id) => ({ deckId: id, ...prebuiltDeck(id) }));
   const save = newSave("fixture", campaign.id, spec.seatCount);
   const log = spec.log ?? save.log;
   const dealt = spec.loadout?.seats ?? seats;
@@ -162,7 +169,7 @@ export function dealStandaloneSeed<S extends 1 | 2>(spec: StandaloneSeedSpec<S>,
   const campaign = loadCampaign(spec.campaignId);
   const scenario = loadAnyScenario(spec.scenarioId);
   const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
-  const seats = (spec.decks ?? FIXTURE_DECKS).slice(0, spec.seatCount).map((id) => ({ deckId: id, ...prebuiltDeck(id) }));
+  const seats = (spec.decks ?? fixtureDecks(spec.seatCount)).map((id) => ({ deckId: id, ...prebuiltDeck(id) }));
   const loadout: StandaloneLoadout = { scenarioId: scenario.id, difficulty: spec.difficulty ?? "Easy", seats, ringBearer: null };
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...(spec.codes ?? [])]);
   const dealt = dealStandalone("fixture", world, spec.seatCount, loadout, seed);
@@ -178,7 +185,7 @@ export function playStandaloneSeed<S extends 1 | 2>(spec: StandaloneSeedSpec<S>,
   return { loadout: dealt.loadout, ...playOut(dealt.state, dealt.ctx, spec.limit ?? 8000, spec.answer, spec.stop) };
 }
 
-/** The fixtures of a cycle scenario: the first seed whose two-handed standalone game wins (`<prefix>-won`) and the first whose game loses (`<prefix>-lost`), each parked on its end; one not found is left out. */
+/** The fixtures of a cycle scenario: the first seed whose two-handed standalone game loses (`<prefix>-lost`) and, when the registry names it (`wonIsWanted`), the first whose game wins (`<prefix>-won`), each parked on its end; one not found is left out. */
 export function standaloneWonLost<P extends string>(say: Log, prefix: P, spec: StandaloneSeedSpec<2>, seedsVar: string): Partial<Record<`${P}-won` | `${P}-lost`, StandaloneSeedFixture<2>>> {
   const won = firstStandaloneSeed(say, spec, seedsVar, (state) => state.stageCleared && !state.lost, `${prefix}-won`);
   const lost = firstStandaloneSeed(say, spec, seedsVar, (state) => state.lost, `${prefix}-lost`);
@@ -197,10 +204,25 @@ export function committedSeed(scenarioId: string, label: string): number {
 /** What `firstSeed` and `firstStandaloneSeed` search over: a game played from a seed, with the loadout that dealt it. */
 type SeedSearch = { campaignId: string; scenarioId: string; seatCount: 1 | 2; seeds?: number; score?: ScoreHook };
 
+/**
+ * A won fixture is played for only when the fixture registry names it (docs/architecture.md, Tests): a `-won` label the registry
+ * does not name is a game no seed finder looks for, so a new scenario's finder plays its loss alone. `FIXTURE_TRY_WON=1` plays the
+ * plain seeds for every finder's won game once, for the user who changes the fixture decks; a game it finds joins the registry.
+ */
+export function wonIsWanted(label: string, env: Record<string, string | undefined> = process.env): boolean {
+  return !label.endsWith("-won") || env.FIXTURE_TRY_WON === "1" || FIXTURE_REGISTRY.some((entry) => (entry.names as readonly string[]).includes(label));
+}
+
 function searchSeeds<L>(say: Log, spec: SeedSearch, play: (seed: number) => { loadout: L; intents: PlayerIntent[]; state: ScenarioState }, deal: (seed: number) => DealtGame<L>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string) {
+  if (!wonIsWanted(label)) {
+    say.debug(`${label} is not in the fixture registry: not played for`);
+    return null;
+  }
   const flags = searchFlags();
   // `--plain=<n>` replaces the count, the committed fixture's seed included: a search that asks for no plain scan is a search.
-  const limit = flags?.plain != null ? flags.plain : Math.max(Number(process.env[seedsVar] ?? spec.seeds ?? 100), committedSeed(spec.scenarioId, label));
+  // `FIXTURE_SEEDS=<n>` replaces the count for every finder, as `--plain` does: a run over all scenarios is held to it.
+  const all = process.env.FIXTURE_SEEDS;
+  const limit = flags?.plain != null ? flags.plain : all != null ? Number(all) : Math.max(Number(process.env[seedsVar] ?? spec.seeds ?? 100), committedSeed(spec.scenarioId, label));
   for (let seed = 1; seed <= limit; seed += 1) {
     const game = play(seed);
     const outcome = game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "parked";
@@ -209,8 +231,9 @@ function searchSeeds<L>(say: Log, spec: SeedSearch, play: (seed: number) => { lo
     say.info(`${label}: seed ${seed}, ${game.intents.length} intents, round ${game.state.round}, ${outcome}`);
     return { campaignId: spec.campaignId, seatCount: spec.seatCount, loadout: game.loadout, seed, intents: game.intents };
   }
-  say.warn(`no ${label} game found in ${limit} seeds`);
-  // `pnpm scenario fixtures <id> --search`: a won game the fixed policy cannot reach is searched for (scripts/e2e/search/).
+  // A won fixture the seeds no longer find is dropped, not searched for (docs/architecture.md, Tests).
+  say.warn(label.endsWith("-won") && !flags ? `no ${label} game found in ${limit} seeds: take the name out of src/campaign/fixtures/registry.ts, do not search for it` : `no ${label} game found in ${limit} seeds`);
+  // `pnpm scenario fixtures <id> --search`, when the user asks for it: a won game the fixed policy cannot reach is searched for (scripts/e2e/search/).
   if (flags && label.endsWith("-won")) {
     const found = searchWin(say, label, deal, wanted, flags, spec.score);
     if (found) return { campaignId: spec.campaignId, seatCount: spec.seatCount, loadout: found.loadout, seed: found.seed, intents: found.intents };
@@ -220,9 +243,9 @@ function searchSeeds<L>(say: Log, spec: SeedSearch, play: (seed: number) => { lo
 
 /**
  * The first seed, from 1 to the count in the environment variable `seedsVar` (the spec's `seeds`, else 100, by default), whose game
- * `wanted` accepts. Null, with a warning, when none is. The search always reaches the seed of the fixture already committed under
+ * `wanted` accepts. Null, with a warning, when none is, and null at once for a `-won` label the registry does not name (`wonIsWanted`). The search always reaches the seed of the fixture already committed under
  * `label`, so a bare rerun writes the same fixture: the games are deterministic, and a committed fixture found with a raised seed count
- * (`oath-won` at seed 909) is not lost to the default, nor is a fixture that chains from it.
+ * is not lost to the default, nor is a fixture that chains from it.
  */
 export function firstSeed<S extends 1 | 2>(say: Log, spec: SeedSpec<S>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string): SeedFixture<S> | null {
   const found = searchSeeds(say, spec, (seed) => playSeed(spec, seed), (seed) => dealSeed(spec, seed), seedsVar, wanted, label);

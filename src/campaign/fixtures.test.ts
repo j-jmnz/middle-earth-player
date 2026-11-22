@@ -8,6 +8,7 @@ import { catalog, worldFor, worldForStandalone } from "../../test/harness/fixtur
 import { skippedSetupAnswersOf } from "../../test/harness/setup-answers.ts";
 
 import { cards as cardRows } from "../catalog/schema.ts";
+import { deckRulesOf } from "../catalog/deck-rules.ts";
 import { deckSaveRefusal, type DeckSaveCard } from "../catalog/deck-save.ts";
 
 import { briefing } from "./briefing.ts";
@@ -23,27 +24,29 @@ import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
 
 // The fixtures (src/campaign/fixtures/*.json) are real games of saved deck cards: a briefing would deal each
 // loadout, the reducer replays each to its moment, and the A Knife in the Dark one starts from the log scenario 1's won
-// game writes. When this fails, run scripts/e2e/fixtures.ts again. `won` and `knife-lost` are open (GitHub issue #188):
+// game writes. When this fails, run scripts/e2e/fixtures.ts again. `won` and `knife-lost` are the two names not committed (`OPEN`):
 // no legal win of the two starter decks has been found, so the tests that need them are skipped until they are committed.
 // A scenario of a cycle has no campaign save: its fixtures are one open standalone game each (the describe at the foot).
 const COMMITTED = FIXTURE_NAMES.filter((name) => hasFixture(name) && fixtureKindOf(name) === "campaign");
 const STANDALONE_ENTRIES = FIXTURE_REGISTRY.filter((entry) => entry.names.some((name) => fixtureKindOf(name) === "standalone"));
 const WON = hasFixture("won");
 const KNIFE = hasFixture("knife-lost");
+// The only names the registry may hold with no committed game (docs/architecture.md, Tests).
+const OPEN: readonly FixtureName[] = ["won", "knife-lost"];
 
 const campaign = loadCampaign();
 
 // Dream-chaser parts 2 on: the fixtures of each scenario in the registry (fixtures/registry.ts) are games of two decklists from the log the earlier parts' golden wins write
-// (the Voyage's `voyage-won` and the like, wins of real decklists, are open), so every earlier part in the campaign's order is completed, the playthrough's open scenario is this one and the path
-// resumes it. A name whose game the seeds did not find is not committed and has nothing to check. The Campaign Setup's offers are answered "skip" in the loadout, as many as the Setup asks (`skippedSetupAnswersOf`, test/harness/setup-answers.ts: Raid's Galdor's Counsel, the Drowned Ruins' Command and Círdan's Blessing, Haven's and The City of Corsairs' Círdan's Blessing).
+// (no won game of real decklists is searched for), so every earlier part in the campaign's order is completed, the playthrough's open scenario is this one and the path
+// resumes it. A part has a `-lost` fixture and, where one is committed, a `-won` one. The Campaign Setup's offers are answered "skip" in the loadout, as many as the Setup asks (`skippedSetupAnswersOf`, test/harness/setup-answers.ts: Raid's Galdor's Counsel, the Drowned Ruins' Command and Círdan's Blessing, Haven's and The City of Corsairs' Círdan's Blessing).
 const DREAM_CHASER = loadCampaign("dream-chaser");
 const LATER_PARTS = FIXTURE_REGISTRY.flatMap((entry) => {
   const at = DREAM_CHASER.scenarios.indexOf(entry.scenarioId);
   if (at < 1) return [];
   const won = entry.names.find((name) => name.endsWith("-won"));
   const lost = entry.names.find((name) => name.endsWith("-lost"));
-  if (!won || !lost) throw new Error(`${entry.scenarioId} needs a -won and a -lost name in the fixture registry`);
-  return [{ scenarioId: entry.scenarioId, part: at + 1, previous: DREAM_CHASER.scenarios.slice(0, at), won, lost, names: [won, lost].filter((name) => hasFixture(name)) }];
+  if (!lost) throw new Error(`${entry.scenarioId} needs a -lost name in the fixture registry`);
+  return [{ scenarioId: entry.scenarioId, part: at + 1, previous: DREAM_CHASER.scenarios.slice(0, at), lost, names: [...(won ? [won] : []), lost].filter((name) => hasFixture(name)) }];
 });
 
 // The scenarios of the fixture's campaign before the one the fixture plays: the one owner of what a fixture's log holds as completed.
@@ -54,6 +57,12 @@ function earlierParts(name: FixtureName): readonly string[] {
 }
 
 describe("Save fixtures", () => {
+  // A won fixture is never searched for: a name whose game is not committed (a `-won` the seeds no longer find) leaves the registry.
+  it("are all committed, but scenario 1's won game and the loss dealt from its log", () => {
+    const missing = FIXTURE_NAMES.filter((name) => !hasFixture(name));
+    expect(missing.filter((name) => !OPEN.includes(name)), "take these names out of src/campaign/fixtures/registry.ts; do not search for a won game (docs/architecture.md, Tests)").toEqual([]);
+  });
+
   it("are loadouts a briefing deals, from the fixture's log", () => {
     for (const name of COMMITTED) {
       const { loadout, seatCount, log } = fixture(name);
@@ -75,7 +84,8 @@ describe("Save fixtures", () => {
             .map((row) => [row.code, { name: row.name, typeCode: row.typeCode, sphereCode: row.sphereCode, deckLimit: row.deckLimit, deckLegal: row.deckLegal, traits: row.traits }]),
         );
         const counts = [...new Set(seat.deck)].map((code) => ({ code, count: seat.deck.filter((item) => item === code).length }));
-        expect(deckSaveRefusal(seat.heroes, counts, facts), `${name} ${seat.deckId}`).toBeNull();
+        // The deck's own rules apply, as the deck screen applies them: a contract's hero limit (Bond of Friendship's four).
+        expect(deckSaveRefusal(seat.heroes, counts, facts, [], deckRulesOf(worldFor(name).effects, codes)), `${name} ${seat.deckId}`).toBeNull();
       }
     }
   });
@@ -168,7 +178,7 @@ describe("duo (the peek's two-handed fixture, phase 26)", () => {
   it("is a two-handed game of scenario 1 with one deck per seat, from an empty log", () => {
     const found = fixture("duo");
     expect(found.seatCount).toBe(2);
-    expect(found.loadout.seats.map((seat) => seat.deckId)).toEqual(["the-one-deck", "stealth-and-steadfastness"]);
+    expect(found.loadout.seats.map((seat) => seat.deckId)).toEqual(["100-fellowship-detours-and-defense", "100-fellowship-out-of-thin-air"]);
     expect(found.loadout.scenarioId).toBe("a-shadow-of-the-past");
     expect(found.past).toBeNull();
     expect(found.log.completed).toEqual([]);
@@ -241,7 +251,7 @@ describe("Voyage Across Belegaer (Dream-chaser part 1, phase 40)", () => {
   });
 });
 
-describe.each(LATER_PARTS)("$scenarioId (Dream-chaser part $part)", ({ scenarioId, previous, won, lost, names }) => {
+describe.each(LATER_PARTS)("$scenarioId (Dream-chaser part $part)", ({ scenarioId, previous, lost, names }) => {
   it("are games of two decklists dealt on the scenario, the Campaign Setup's offers answered in the loadout", () => {
     for (const name of names) {
       const found = fixture(name);
@@ -266,7 +276,7 @@ describe.each(LATER_PARTS)("$scenarioId (Dream-chaser part $part)", ({ scenarioI
     }
   });
 
-  it(`${won} replays to a win, and ${lost} to a loss that writes nothing`, () => {
+  it(`${lost} replays to a loss that writes nothing, and a won fixture to a win`, () => {
     for (const name of names) {
       const world = worldFor(name);
       const save = fixtureSave(name, "s", CATALOG_VERSION);

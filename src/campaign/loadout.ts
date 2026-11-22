@@ -10,7 +10,8 @@ import { sameTitle, type TitleBan } from "./saga.ts";
 // scenarios in the saga expansions").
 
 // `loot`: the loot deck the seat's contract takes from its side deck (The Burglar's Turn, src/catalog/loot.ts). Absent for none.
-export type LoadoutSeat = { heroes: readonly string[]; deck: readonly string[]; loot?: readonly string[] };
+// `heroLimit`: the most starting heroes the deck's rules allow (src/catalog/deck-rules.ts, `heroLimit`: four under Bond of Friendship). Absent for three.
+export type LoadoutSeat = { heroes: readonly string[]; deck: readonly string[]; loot?: readonly string[]; heroLimit?: number };
 
 // A hero a campaign refuses in a scenario, with the rule that says so. Campaign Mode only: a standalone game is not bound by it.
 export type HeroBan = { code: string; name: string; rule: string };
@@ -60,6 +61,11 @@ export type LoadoutError = { rule: LoadoutRule; code: string; card: string; mess
 
 const MOST_HEROES = 3;
 
+// "a fourth hero" for the usual three, "a fifth hero" when the deck's contract allows four.
+function nextHero(limit: number): string {
+  return `a ${["first", "second", "third", "fourth", "fifth"][limit] ?? `number ${limit + 1}`} hero`;
+}
+
 function isFellowship(card: PrintedCard): boolean {
   return card.type === "hero" && card.sphere === "fellowship";
 }
@@ -73,7 +79,7 @@ function isRingBearer(card: PrintedCard): boolean {
 // the hero limit (mec112.aragorn); heroes are unique (rr.unique-cards).
 type Cards = readonly (readonly (PrintedCard | null)[])[];
 
-function grantedHeroErrors(heroCards: Cards, deckCards: Cards, cards: ReadonlyMap<string, PrintedCard>, hero: string): LoadoutError[] {
+function grantedHeroErrors(heroCards: Cards, deckCards: Cards, cards: ReadonlyMap<string, PrintedCard>, hero: string, limits: readonly number[]): LoadoutError[] {
   const errors: LoadoutError[] = [];
   const fail = (rule: LoadoutRule, card: PrintedCard, why: string) => errors.push({ rule, code: card.code, card: card.name, message: `${card.name} (${card.code}): ${why}` });
   const granted = cards.get(hero);
@@ -87,9 +93,10 @@ function grantedHeroErrors(heroCards: Cards, deckCards: Cards, cards: ReadonlyMa
     if (granted && card.name === granted.name) fail("secondVersion", card, `another ${granted.name} cannot be a starting hero or in the deck while the ☺ ${granted.name} is in the game`);
     if (card.leavesPlayLoses) fail("ringInDeck", card, "this card is granted by setup and cannot be in a deck");
   }
-  for (const seat of heroCards) {
-    for (const card of seat.filter((item): item is PrintedCard => item != null && item.code !== hero).slice(MOST_HEROES)) fail("tooManyHeroes", card, "a fourth hero is legal only when the extra hero is ☺ Aragorn");
-  }
+  heroCards.forEach((seat, index) => {
+    const limit = limits[index] ?? MOST_HEROES;
+    for (const card of seat.filter((item): item is PrintedCard => item != null && item.code !== hero).slice(limit)) fail("tooManyHeroes", card, `${nextHero(limit)} is legal only when the extra hero is ☺ Aragorn`);
+  });
   const names = new Set<string>();
   for (const card of heroes) {
     if (card == null || card.type !== "hero") continue;
@@ -123,6 +130,7 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
     }
   };
 
+  const limits = seats.map((seat) => seat.heroLimit ?? MOST_HEROES);
   const heroCards = seats.map((seat) => seat.heroes.map(known));
   const deckCards = seats.map((seat) => seat.deck.map(known));
   if (errors.length > 0) return errors;
@@ -170,7 +178,7 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
   if (rules.hero != null) {
     // A Fellowship hero whose title the box already bans (Frodo Baggins in 7 to 9) is refused once, for the ban.
     const banned = new Set(errors.filter((error) => error.rule === "bannedTitle").map((error) => error.code));
-    return [...errors, ...grantedHeroErrors(heroCards, deckCards, cards, rules.hero).filter((error) => !(error.rule === "twoFellowshipHeroes" && banned.has(error.code)))];
+    return [...errors, ...grantedHeroErrors(heroCards, deckCards, cards, rules.hero, limits).filter((error) => !(error.rule === "twoFellowshipHeroes" && banned.has(error.code)))];
   }
 
   // The first seat needs a Ring-bearer of its own.
@@ -210,11 +218,12 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
     if (card?.leavesPlayLoses) fail("ringInDeck", card, "this card is granted by setup and cannot be in a deck");
   }
 
-  // Three heroes besides the Ring-bearer. A fourth hero is legal only when the extra one is the Ring-bearer.
-  heroCards.forEach((heroes) => {
+  // Three heroes besides the Ring-bearer, or as many as the deck's rules allow (`heroLimit`). One more is legal only when the extra one is the Ring-bearer.
+  heroCards.forEach((heroes, index) => {
+    const limit = limits[index] ?? MOST_HEROES;
     const bearer = heroes.find((card) => card != null && isRingBearer(card));
     const others = heroes.filter((card): card is PrintedCard => card != null && card !== bearer);
-    for (const card of others.slice(MOST_HEROES)) fail("tooManyHeroes", card, "a fourth hero is legal only when the extra hero is the Ring-bearer");
+    for (const card of others.slice(limit)) fail("tooManyHeroes", card, `${nextHero(limit)} is legal only when the extra hero is the Ring-bearer`);
   });
   return errors;
 }
