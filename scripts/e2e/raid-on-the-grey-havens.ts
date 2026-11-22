@@ -58,7 +58,7 @@ export async function raidFixtures(): Promise<Partial<Record<RaidFixtureName, Ra
   const log = await fateWonLog();
   const find = (wanted: (state: ScenarioState) => boolean, label: string): RaidFixture | null => {
     // Neither player takes a Galdor's Counsel at the Campaign Setup.
-    const found = firstSeed(say, { campaignId: DREAM_CHASER, scenarioId: "raid-on-the-grey-havens", seatCount: 2, log, choices: ["skip", "skip"], answer: intentFor }, "RAID_SEEDS", wanted, label);
+    const found = firstSeed(say, { campaignId: DREAM_CHASER, scenarioId: "raid-on-the-grey-havens", seatCount: 2, log, answer: intentFor }, "RAID_SEEDS", wanted, label);
     return found && { ...found, log };
   };
   const won = find((state) => state.stageCleared && !state.lost, "raid-won");

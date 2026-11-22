@@ -68,6 +68,7 @@ ${dataConsts(facts, c)}
 
 // Test helper. A whole game of ${facts.name} in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// The Campaign Setup's offers are declined, as many times as it asks (test/harness/setup-answers.ts): no count is typed here; a golden that answers them passes \`choices\`.
 export const ${U}_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type ${P}Decks = "strong" | "weak" | "brittle";
@@ -241,7 +242,7 @@ export async function ${logName}(): Promise<CampaignLog> {
   return `// The save fixtures of ${facts.name} (${facts.campaignId} part ${facts.part}), written into src/campaign/fixtures/${facts.id}.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
 // Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. \`${facts.short}-won\` is the first seed that wins, parked on the win (the Resolution waits); \`${facts.short}-lost\` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.${withLog ? "\n// The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it." : ""}
-// TODO: say what the Campaign Setup and the Resolution ask, and which answers the saved decklists' policy gives them.
+// The Campaign Setup's offers are declined, as many times as it asks (\`firstSeed\`, scripts/e2e/seed-kit.ts: no count is typed here). TODO: say what the Resolution asks, and which answers the saved decklists' policy gives it.
 import type { CampaignLog } from "${root}src/campaign/log.ts";
 import type { StoredLoadout } from "${root}src/campaign/save.ts";
 import type { PlayerIntent, ScenarioState } from "${root}src/rules/engine/reduce.ts";

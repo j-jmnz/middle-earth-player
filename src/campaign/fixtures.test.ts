@@ -5,6 +5,7 @@ import { CATALOG_VERSION } from "../catalog/version.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
 import { loadCampaign } from "../../scripts/data/load-scenarios.ts";
 import { catalog, worldFor, worldForStandalone } from "../../test/harness/fixture-world.ts";
+import { skippedSetupAnswersOf } from "../../test/harness/setup-answers.ts";
 
 import { cards as cardRows } from "../catalog/schema.ts";
 import { deckSaveRefusal, type DeckSaveCard } from "../catalog/deck-save.ts";
@@ -34,9 +35,8 @@ const campaign = loadCampaign();
 
 // Dream-chaser parts 2 on: the fixtures of each scenario in the registry (fixtures/registry.ts) are games of two decklists from the log the earlier parts' golden wins write
 // (the Voyage's `voyage-won` and the like, wins of real decklists, are open), so every earlier part in the campaign's order is completed, the playthrough's open scenario is this one and the path
-// resumes it. A name whose game the seeds did not find is not committed and has nothing to check. The Campaign Setup's offers are answered in the loadout (Raid's Galdor's Counsel, the Drowned Ruins' Command and Círdan's Blessing, Haven's and The City of Corsairs' Círdan's Blessing).
+// resumes it. A name whose game the seeds did not find is not committed and has nothing to check. The Campaign Setup's offers are answered "skip" in the loadout, as many as the Setup asks (`skippedSetupAnswersOf`, test/harness/setup-answers.ts: Raid's Galdor's Counsel, the Drowned Ruins' Command and Círdan's Blessing, Haven's and The City of Corsairs' Círdan's Blessing).
 const DREAM_CHASER = loadCampaign("dream-chaser");
-const SETUP_CHOICES: Readonly<Record<string, readonly string[]>> = { "raid-on-the-grey-havens": ["skip", "skip"], "the-drowned-ruins": ["skip", "skip", "skip", "skip"], "a-storm-on-cobas-haven": ["skip", "skip"], "the-city-of-corsairs": ["skip", "skip"] };
 const LATER_PARTS = FIXTURE_REGISTRY.flatMap((entry) => {
   const at = DREAM_CHASER.scenarios.indexOf(entry.scenarioId);
   if (at < 1) return [];
@@ -247,7 +247,7 @@ describe.each(LATER_PARTS)("$scenarioId (Dream-chaser part $part)", ({ scenarioI
       const found = fixture(name);
       expect(found.campaignId, name).toBe("dream-chaser");
       expect(found.loadout.scenarioId, name).toBe(scenarioId);
-      expect(found.loadout.choices, name).toEqual(SETUP_CHOICES[scenarioId] ?? []);
+      expect(found.loadout.choices, name).toEqual(skippedSetupAnswersOf(worldFor(name), found.loadout.seats, found.log));
       expect(found.seatCount, name).toBe(2);
       expect(found.past, name).toBeNull();
       expect(found.loadout.ringBearer, name).toBeNull();

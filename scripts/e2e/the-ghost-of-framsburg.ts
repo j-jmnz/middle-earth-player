@@ -29,7 +29,7 @@ export async function framsburgFixtures(): Promise<Partial<Record<FramsburgFixtu
   const log = await nightWonLog();
   const find = (wanted: (state: ScenarioState) => boolean, label: string): FramsburgFixture | null => {
     const answer = (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => framsburgIntent(state, ctx, memory, { ...DEFAULT_POLICY, quest: "all", engage: true, use: true, reshuffle: true }, { ...FRAMSBURG_POLICY, play: true, act: true });
-    const found = firstSeed(say, { campaignId: "ered-mithrin", scenarioId: "the-ghost-of-framsburg", seatCount: 2, log, choices: ["skip"], answer }, "FRAMSBURG_SEEDS", wanted, label);
+    const found = firstSeed(say, { campaignId: "ered-mithrin", scenarioId: "the-ghost-of-framsburg", seatCount: 2, log, answer }, "FRAMSBURG_SEEDS", wanted, label);
     return found && { ...found, log };
   };
   const won = find((state) => state.stageCleared && !state.lost, "framsburg-won");

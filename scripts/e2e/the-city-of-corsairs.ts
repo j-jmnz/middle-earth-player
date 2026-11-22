@@ -27,7 +27,7 @@ export async function corsairsFixtures(): Promise<Partial<Record<CorsairsFixture
   const log = await havenWonLog();
   const find = (wanted: (state: ScenarioState) => boolean, label: string): CorsairsFixture | null => {
     // Neither player takes a Círdan's Blessing at the Campaign Setup.
-    const found = firstSeed(say, { campaignId: DREAM_CHASER, scenarioId: "the-city-of-corsairs", seatCount: 2, log, choices: ["skip", "skip"], answer: intentFor }, "CORSAIRS_SEEDS", wanted, label);
+    const found = firstSeed(say, { campaignId: DREAM_CHASER, scenarioId: "the-city-of-corsairs", seatCount: 2, log, answer: intentFor }, "CORSAIRS_SEEDS", wanted, label);
     return found && { ...found, log };
   };
   const won = find((state) => state.stageCleared && !state.lost, "corsairs-won");

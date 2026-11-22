@@ -29,7 +29,7 @@ export async function wilderlandFixtures(): Promise<Partial<Record<WilderlandFix
   const log = await gundabadWonLog();
   const find = (wanted: (state: ScenarioState) => boolean, label: string): WilderlandFixture | null => {
     const answer = (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => wilderlandIntent(state, ctx, memory, { ...DEFAULT_POLICY, quest: "pair", defend: "all", most: 1, choose: "spare", use: true }, { ...WILDERLAND_POLICY, play: true, act: true });
-    const found = firstSeed(say, { campaignId: "ered-mithrin", scenarioId: "the-fate-of-wilderland", seatCount: 2, log, choices: ["skip"], answer }, "WILDERLAND_SEEDS", wanted, label);
+    const found = firstSeed(say, { campaignId: "ered-mithrin", scenarioId: "the-fate-of-wilderland", seatCount: 2, log, answer }, "WILDERLAND_SEEDS", wanted, label);
     return found && { ...found, log };
   };
   const won = find((state) => state.stageCleared && !state.lost, "wilderland-won");

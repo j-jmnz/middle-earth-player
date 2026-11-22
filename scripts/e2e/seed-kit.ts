@@ -10,6 +10,7 @@ import { dealStandalone, resumeStandalone, type StandaloneLoadout } from "../../
 import { loadWorld, logCodes, type World } from "../../src/campaign/world.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { goldenState } from "../../test/harness/golden-state.ts";
+import { skippedSetupAnswersOf } from "../../test/harness/setup-answers.ts";
 import type { PrintedCard } from "../../src/rules/core/printed.ts";
 import { reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
@@ -110,9 +111,12 @@ export function playSeed<S extends 1 | 2>(spec: SeedSpec<S>, seed: number): Seed
   const scenario = loadScenario(spec.scenarioId);
   const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
   const seats = (spec.decks ?? FIXTURE_DECKS).slice(0, spec.seatCount).map((id) => ({ deckId: id, ...prebuiltDeck(id) }));
-  const loadout: StoredLoadout = spec.loadout ?? { scenarioId: scenario.id, difficulty: "Easy", seats, ringBearer: null, choices: [...(spec.choices ?? [])], acceptPenalty: false };
-  const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...(spec.log ? logCodes(spec.log) : []), ...(spec.codes ?? [])]);
   const save = newSave("fixture", campaign.id, spec.seatCount);
+  const log = spec.log ?? save.log;
+  const dealt = spec.loadout?.seats ?? seats;
+  const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...dealt.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log), ...(spec.codes ?? [])]);
+  // The Campaign Setup's offers are declined as many times as it asks (test/harness/setup-answers.ts), unless the spec gives its own answers or a loadout.
+  const loadout: StoredLoadout = spec.loadout ?? { scenarioId: scenario.id, difficulty: "Easy", seats, ringBearer: null, choices: [...(spec.choices ?? skippedSetupAnswersOf(world, seats, log))], acceptPenalty: false };
   return { loadout, ...playDealt(world, spec.log ? { ...save, log: spec.log } : save, loadout, seed, spec.limit ?? 8000, spec.answer, spec.stop) };
 }
 
