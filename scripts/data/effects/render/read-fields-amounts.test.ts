@@ -38,6 +38,13 @@ describe("effects render read fields, amounts", () => {
     { attackDamage: true },
     { resourcesOn: PICK, max: true },
     { damageOn: PICK },
+    { facedown: true, times: 2 },
+    { firstPlayerTens: true },
+    { mostPerPlayer: PICK },
+    { guardedCost: true },
+    { discoverValue: true, plus: 1 },
+    { totalOf: PICK, stat: "threat" },
+    { totalOf: PICK, stat: "cost" },
   ];
   const render: Render = (value, ctx) => renderAmount(value, ctx, renderPick);
 

@@ -522,7 +522,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
   51135:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each enemy engaged with a player makes an immediate attack, each dealt a shadow card of its own
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 51135:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Deal it an additional shadow card. That card's shadow effects cannot be canceled.
   51135:shadow:1: Shadow

@@ -506,7 +506,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145076:forced:1: Forced at the end of the phase
     only if it is the Quest phase
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"145077"}]
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 145077 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 ## 145077 Fighting in the Fields
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -590,4 +590,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - this enemy, in the staging area, engages the first player
     - then, if this card is engaged with a player (that player is who "you" means in this record) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 324 by template, 30 as JSON)
+(rendered pieces: 325 by template, 29 as JSON)

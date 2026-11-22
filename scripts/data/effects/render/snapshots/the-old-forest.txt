@@ -38,7 +38,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
   147002:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
-    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"147006","when":{"kind":"not","condition":{"kind":"less","left":{"victoryDisplay":true},"right":{"players":true,"times":5}}}}]
+    - then, if not (the Victory points in the victory display is less than the number of players x 5) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 147006 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 ## 147003 The Living Forest
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -59,7 +59,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
   147003:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
-    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"147006","when":{"kind":"not","condition":{"kind":"less","left":{"victoryDisplay":true},"right":{"players":true,"times":5}}}}]
+    - then, if not (the Victory points in the victory display is less than the number of players x 5) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 147006 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 ## 147004 The Living Forest
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -79,7 +79,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
   147004:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
-    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"147006","when":{"kind":"not","condition":{"kind":"less","left":{"victoryDisplay":true},"right":{"players":true,"times":5}}}}]
+    - then, if not (the Victory points in the victory display is less than the number of players x 5) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 147006 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 ## 147005 The Living Forest
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -100,7 +100,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
   147005:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
-    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"147006","when":{"kind":"not","condition":{"kind":"less","left":{"victoryDisplay":true},"right":{"players":true,"times":5}}}}]
+    - then, if not (the Victory points in the victory display is less than the number of players x 5) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 147006 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 ## 147006 The Wicked Willow
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -349,4 +349,4 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
       - discard this card [also {"counted":true}]
       - then, if not (the running effect has discarded no card (with DiscardEach)) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
 
-(rendered pieces: 214 by template, 6 as JSON)
+(rendered pieces: 234 by template, 2 as JSON)

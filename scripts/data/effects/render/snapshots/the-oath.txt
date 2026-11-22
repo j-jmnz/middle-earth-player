@@ -166,7 +166,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - return one enemy engaged with the acting player (that player picks which) to the staging area
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
     - [json Doomed {"verb":"Doomed","amount":1,"when":{"kind":"noneReturned"}}]
 
 41017:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Return attacking enemy to the staging area after this attack.

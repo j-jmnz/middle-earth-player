@@ -88,7 +88,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose player (any player controls)
     - the effect goes on with the picked player as the acting player
-    - the acting player looks at the top [json amount {"discoverValue":true}] card(s) of their own deck (a card with a Forced effect for being looked at acts at once and is not one of them)
+    - the acting player looks at the top the Discover value of the active location (its Discover X, with the adjustment a Response made; 0 when it has none) card(s) of their own deck (a card with a Forced effect for being looked at acts at once and is not one of them)
     - choose card (you control) in the deck, among the cards this effect looked at or discarded
     - move the picked card to hand
     - for each card (you control) in the deck, among the cards this effect looked at or discarded:
@@ -159,9 +159,9 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 19099:A:1 (front): X is the tens digit of the first player's threat.
   19099:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat threat [json amount {"firstPlayerTens":true}], while this card is in play
-    - this card: stat attack [json amount {"firstPlayerTens":true}], while this card is in play
-    - this card: stat defense [json amount {"firstPlayerTens":true}], while this card is in play
+    - this card: stat threat the tens digit of the first player's threat, whoever the actor is, while this card is in play
+    - this card: stat attack the tens digit of the first player's threat, whoever the actor is, while this card is in play
+    - this card: stat defense the tens digit of the first player's threat, whoever the actor is, while this card is in play
 
 19099:A:2 (front): Forced: When Crypt Stalker attacks, raise the defending player's threat by 1.
   19099:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
@@ -226,11 +226,11 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19103:A:2 (front): X is the tens digit of the first player's threat.
   19103:constant:1: Constant
-    - this card: stat threat [json amount {"firstPlayerTens":true}], while this card is in play
+    - this card: stat threat the tens digit of the first player's threat, whoever the actor is, while this card is in play
 
 19103:A:3 (front): Forced: After resolving the Discover keyword on Hidden Staircase, reduce each player's threat by X if no Hazard cards were revealed by it.
   19103:forced:2: Forced on the event discovered (heard about this card)
-    - if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)): lower threat by [json amount {"firstPlayerTens":true}] (each player)
+    - if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)): lower threat by the tens digit of the first player's threat, whoever the actor is (each player)
 
 ## 19104 Moonlit Passage
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -383,4 +383,4 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     only if the card with code 19098 is not in the victory display
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 198 by template, 37 as JSON)
+(rendered pieces: 204 by template, 31 as JSON)

@@ -31,7 +31,7 @@ export const ESCAPE_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Mad
 export const ESCAPE_CONDITIONS: Readonly<Record<string, (c: Obj, ctx: Ctx) => Made>> = {
   lastEscapeFailed: () => ({ text: "the last escape test the running effect made was failed (false before it has made one)", read: [] }),
   lastEscapePassed: () => ({ text: "the last escape test the running effect made was passed (false before it has made one)", read: [] }),
-  noneReturned: () => ({ text: "the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard)", read: [] }),
+  noneReturned: () => ({ text: "the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card)", read: [] }),
   returnedBelow: (c) => ({ text: `the running effect returned fewer than ${str(c.than)} cards (ReturnFromDiscard counts the cards it moved, only the treachery cards with \`treacheries\`; ShuffleEncounterDiscard \`alsoVictory\` the cards that went back into the deck)`, read: ["than"] }),
 };
 

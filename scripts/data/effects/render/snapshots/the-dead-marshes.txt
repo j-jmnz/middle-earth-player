@@ -346,7 +346,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
   900810:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - return the topmost the number of players Undead enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed; one with the ambush keyword makes its engagement checks on entering the staging area; the number returned is counted)
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 900810:A:2 (front): Escape: 10
   900810:constant:1: Constant

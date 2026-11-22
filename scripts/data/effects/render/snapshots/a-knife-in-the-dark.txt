@@ -94,7 +94,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     - the first player chooses one of:
       * option "progress" (only if [json condition {"kind":"questProgress"}]):
         - [json RemoveQuestProgress {"verb":"RemoveQuestProgress","perPlayer":1}]
-      * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
+      * option "ringwraith" (only if a copy of the card with code 141069 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)):
         - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
 
 141026:B:3 (back): The players cannot advance while Midgewater is in play.
@@ -227,7 +227,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   141051:forced:1: Forced when the staging step begins, before the first card is revealed
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
-      * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
+      * option "ringwraith" (only if a copy of the card with code 141069 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)):
         - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
       * option "threat" (only if there is a hero (any player controls) committed to the quest, that is not a fellowship card to choose):
         - raise threat by 1 (each player) for each non-fellowship hero committed to the quest
@@ -253,7 +253,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141053:A:1 (front): When Revealed: You must either shuffle an out of play Ringwraith into the encounter deck or reveal an additional encounter card.
   141053:whenRevealed:1: When revealed
     - the acting player chooses one of:
-      * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
+      * option "ringwraith" (only if a copy of the card with code 141069 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)):
         - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
       * option "reveal":
         - this card gains surge (one more encounter card is revealed when it has been resolved)
@@ -272,7 +272,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
         - the last picked character is removed from the quest (it stays exhausted)
         - choose hero (you control) committed to the quest
         - the last picked character is removed from the quest (it stays exhausted)
-      * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
+      * option "ringwraith" (only if a copy of the card with code 141069 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)):
         - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
 
 141054:A:3 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
@@ -491,7 +491,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 906203:A:1 (front): When Revealed: Either shuffle an out of play Ringwraith into the encounter deck, or Southern Spy makes an immediate attack against you.
   906203:whenRevealed:1: When revealed
     - the acting player chooses one of:
-      * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
+      * option "ringwraith" (only if a copy of the card with code 141069 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)):
         - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
       * option "attack":
         - [json AttackActor {"verb":"AttackActor"}]
@@ -592,4 +592,4 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906209:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 248 by template, 28 as JSON)
+(rendered pieces: 253 by template, 23 as JSON)

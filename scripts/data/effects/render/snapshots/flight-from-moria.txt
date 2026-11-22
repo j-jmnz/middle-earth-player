@@ -197,7 +197,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     only if it is the Combat phase
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
-      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+      * option "bypass" (only if the quest deck holds at least 1 stage):
         - [json BypassStage {"verb":"BypassStage"}]
       * option "stay":
 
@@ -220,7 +220,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     only if it is the Combat phase
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
-      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+      * option "bypass" (only if the quest deck holds at least 1 stage):
         - [json BypassStage {"verb":"BypassStage"}]
       * option "stay":
 
@@ -242,7 +242,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     only if it is the Combat phase
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
-      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+      * option "bypass" (only if the quest deck holds at least 1 stage):
         - [json BypassStage {"verb":"BypassStage"}]
       * option "stay":
 
@@ -273,7 +273,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     only if it is the Combat phase
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
-      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+      * option "bypass" (only if the quest deck holds at least 1 stage):
         - [json BypassStage {"verb":"BypassStage"}]
       * option "stay":
 
@@ -305,7 +305,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     - the first player chooses one of:
       * option "discard":
         - each living player in turn order discards the top card of the encounter deck (not revealed; a deck that ran out is reset); a treachery eliminates the player who discarded it from the game before the next player discards
-      * option "next" (only if [json condition {"kind":"questDeck"}]):
+      * option "next" (only if the quest deck holds at least 1 stage):
         - the current stage goes to the bottom of the quest deck with no progress, side A up, and the next stage is revealed side A (not flipped, not a bypass, not defeated); nothing with no other stage in the deck
 
 03075:B:2 (back): • Each player discards 1 card from the top of the encounter deck. If the card is a treachery card, the discarding player is eliminated from the game.
@@ -313,7 +313,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     - the first player chooses one of:
       * option "discard":
         - each living player in turn order discards the top card of the encounter deck (not revealed; a deck that ran out is reset); a treachery eliminates the player who discarded it from the game before the next player discards
-      * option "next" (only if [json condition {"kind":"questDeck"}]):
+      * option "next" (only if the quest deck holds at least 1 stage):
         - the current stage goes to the bottom of the quest deck with no progress, side A up, and the next stage is revealed side A (not flipped, not a bypass, not defeated); nothing with no other stage in the deck
 
 03075:B:3 (back): • Reveals the next quest card, putting Blocked by Shadow on the bottom of the quest deck.
@@ -321,7 +321,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     - the first player chooses one of:
       * option "discard":
         - each living player in turn order discards the top card of the encounter deck (not revealed; a deck that ran out is reset); a treachery eliminates the player who discarded it from the game before the next player discards
-      * option "next" (only if [json condition {"kind":"questDeck"}]):
+      * option "next" (only if the quest deck holds at least 1 stage):
         - the current stage goes to the bottom of the quest deck with no progress, side A up, and the next stage is revealed side A (not flipped, not a bypass, not defeated); nothing with no other stage in the deck
 
 03075:B:4 (back): Players may bypass this quest card at the end of the combat phase.
@@ -329,7 +329,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     only if it is the Combat phase
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
-      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+      * option "bypass" (only if the quest deck holds at least 1 stage):
         - [json BypassStage {"verb":"BypassStage"}]
       * option "stay":
 
@@ -368,7 +368,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     only if it is the Combat phase
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
-      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+      * option "bypass" (only if the quest deck holds at least 1 stage):
         - [json BypassStage {"verb":"BypassStage"}]
       * option "stay":
 
@@ -466,7 +466,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     only if it is the Combat phase
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
-      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+      * option "bypass" (only if the quest deck holds at least 1 stage):
         - [json BypassStage {"verb":"BypassStage"}]
       * option "stay":
 
@@ -500,7 +500,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     only if it is the Combat phase
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
-      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+      * option "bypass" (only if the quest deck holds at least 1 stage):
         - [json BypassStage {"verb":"BypassStage"}]
       * option "stay":
 
@@ -521,7 +521,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     only if it is the Combat phase
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
-      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+      * option "bypass" (only if the quest deck holds at least 1 stage):
         - [json BypassStage {"verb":"BypassStage"}]
       * option "stay":
 
@@ -594,4 +594,4 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the shadow card with code 901209 that the attacking enemy holds goes to the victory display
 
-(rendered pieces: 354 by template, 23 as JSON)
+(rendered pieces: 366 by template, 11 as JSON)

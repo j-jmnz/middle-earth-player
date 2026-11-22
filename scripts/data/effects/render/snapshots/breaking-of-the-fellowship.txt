@@ -64,7 +64,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142063:B:2 (back): Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.
   142063:forced:2: Forced after a card is revealed (heard about objective (any player controls) named "Frodo's Choice"; event happened to the controller)
-    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"142067"}]
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 142067 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 142063:B:3 (back): Response: After you quest successfully, discard a non-unique location in any staging area.
   142063:response:1: Response after the players quest successfully (event happened to the controller)
@@ -88,7 +88,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142064:B:2 (back): Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.
   142064:forced:2: Forced after a card is revealed (heard about objective (any player controls) named "Frodo's Choice"; event happened to the controller)
-    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"142067"}]
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 142067 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 142064:B:3 (back): Response: After you quest successfully, choose a player. Ready each of that player's heroes.
   142064:response:1: Response after the players quest successfully (event happened to the controller)
@@ -112,7 +112,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142065:B:2 (back): Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.
   142065:forced:2: Forced after a card is revealed (heard about objective (any player controls) named "Frodo's Choice"; event happened to the controller)
-    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"142067"}]
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 142067 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 142065:B:3 (back): Response: After you quest successfully, choose a player. That player draws 2 cards and lowers his threat by 2.
   142065:response:1: Response after the players quest successfully (event happened to the controller)
@@ -136,7 +136,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142066:B:2 (back): Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.
   142066:forced:2: Forced after a card is revealed (heard about objective (any player controls) named "Frodo's Choice"; event happened to the controller)
-    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"142067"}]
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 142067 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 142066:B:3 (back): Response: After you quest successfully, discard an enemy engaged with a player.
   142066:response:1: Response after the players quest successfully (event happened to the controller)
@@ -441,4 +441,4 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 209 by template, 37 as JSON)
+(rendered pieces: 213 by template, 33 as JSON)

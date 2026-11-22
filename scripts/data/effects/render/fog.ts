@@ -12,6 +12,10 @@ export const FOG_TEMPLATES: Readonly<Record<string, (i: Obj) => Made>> = {
     text: `the acting player's own stage goes back to the quest deck with no progress and he is at the stage with code ${str(i.code)} again: the enemies, locations and active location of his area join its staging area (engaged enemies stay engaged), and he joins the players there or takes the stage when none is; once every player shares one area the areas are the shared one again (nothing when he is not at another stage)`,
     read: ["code"],
   }),
+  AdvanceToStage: (i) => ({
+    text: `the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code ${str(i.code)} becomes the stage, side B up with no progress, its When Revealed effects resolving${i.again === true ? "; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it" : ""} (nothing when no such card is there)`,
+    read: ["code", "again"],
+  }),
   CancelRevealed: () => ({ text: "the effects of the location the event is about, just revealed, are canceled and it goes to the encounter discard pile instead of staying in the staging area; the reveal is over (no other card is revealed in its place)", read: [] }),
 };
 
@@ -30,6 +34,7 @@ export const FOG_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   SplitToOwnStage: [{ verb: "SplitToOwnStage", code: "148004" }],
   ReturnToSharedStage: [{ verb: "ReturnToSharedStage", code: "148003" }],
   CancelRevealed: [{ verb: "CancelRevealed" }],
+  AdvanceToStage: [{ verb: "AdvanceToStage", code: "142067" }, { verb: "AdvanceToStage", code: "50903", again: true }],
 };
 
 export const FOG_CONDITION_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {

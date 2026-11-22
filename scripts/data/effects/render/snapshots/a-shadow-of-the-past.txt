@@ -319,7 +319,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   141075:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - return every enemy with the trait Nazgûl engaged with a player to the staging area
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 141075:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   141075:shadow:1: Shadow

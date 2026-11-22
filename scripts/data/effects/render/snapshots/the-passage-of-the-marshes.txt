@@ -256,7 +256,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
         - flip Sméagol to Gollum: discard his damage; he enters play ready, engaged with the first player (nothing if Sméagol is not in play)
       * option "attack" (only if the card with code 144075 is in play):
         - Gollum, if he is in play, makes an immediate attack against the player he is engaged with
-      * option "cancel" (only if all of: (the number of card (any player controls) or in the staging area or the active location, named "Gollum" or "Sméagol", (enemies engaged with a player included) is at least 1) and ([json condition {"kind":"resources","min":1,"sphere":"fellowship"}]) and (the card with code 144063 in play is ready)):
+      * option "cancel" (only if all of: (the number of card (any player controls) or in the staging area or the active location, named "Gollum" or "Sméagol", (enemies engaged with a player included) is at least 1) and (the actor's heroes that can pay for a fellowship card (with that icon or one they were given) hold at least 1 resource(s) in all) and (the card with code 144063 in play is ready)):
         - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship"}]
         - exhaust the card with code 144063
         - the effect being resolved is canceled: nothing after this resolves
@@ -373,4 +373,4 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144076:triggered:1: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
     - the players lose the game (Sméagol was destroyed)
 
-(rendered pieces: 238 by template, 4 as JSON)
+(rendered pieces: 239 by template, 3 as JSON)

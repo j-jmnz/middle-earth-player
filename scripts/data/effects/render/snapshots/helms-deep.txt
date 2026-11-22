@@ -24,7 +24,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource token(s) are placed on this card
     - then, if the card with code 143033 in play holds at least 8 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is added to the victory display (the players' own, the group's)
-    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143076","when":{"kind":"inVictory","code":"143033","is":true}}]
+    - then, if the card with code 143033 is in the victory display (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 143076 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 143033:A:3 (front): If there are 8 resource tokens here, add The Defense of Helm's Deep to the victory display and advance to stage 5A.
   143033:forced:1: Forced at the end of the phase (record also names 143033:A:2)
@@ -33,7 +33,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource token(s) are placed on this card
     - then, if the card with code 143033 in play holds at least 8 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is added to the victory display (the players' own, the group's)
-    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143076","when":{"kind":"inVictory","code":"143033","is":true}}]
+    - then, if the card with code 143033 is in the victory display (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 143076 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 ## 143034 Wild Hillman
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -238,7 +238,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
       * option "counsels":
         - [json ShuffleCopyIntoEachDeck {"verb":"ShuffleCopyIntoEachDeck","code":"143021"}]
       * option "bypass":
-        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143073"}]
+        - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 143073 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 143072:B:1 (back): When Revealed: Each player chooses 1 ally in his hand that matches the sphere of a hero he controls and puts it into play under his control.
   143072:whenRevealed:1: When revealed
@@ -254,7 +254,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143072:B:3 (back): Forced: At the end of the round, advance to stage 2A.
   143072:forced:1: Forced at the end of the round
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143073"}]
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 143073 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 ## 143073 Assault on Helm's Deep
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -345,4 +345,4 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if there is no enemy in play (in the staging area or engaged)
     - the players win the game
 
-(rendered pieces: 183 by template, 11 as JSON)
+(rendered pieces: 189 by template, 7 as JSON)

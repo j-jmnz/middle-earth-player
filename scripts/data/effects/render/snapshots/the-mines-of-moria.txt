@@ -255,7 +255,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51217:A:1 (front): When Revealed: Until the end of the phase, add X Threat to the staging area, where X is the number of characters controlled by the player with the most characters.
   51217:whenRevealed:1: When revealed
-    - the total Threat in the staging area is [json amount {"mostPerPlayer":{"type":"character","control":"you"}}] higher until the end of the phase
+    - the total Threat in the staging area is the most character (you control) any one player controls, each player counted from their own side higher until the end of the phase
 
 51217:A:2 (shadow): Shadow: Assign X damage among characters you control, where X is the number of enemies engaged with you.
   51217:shadow:1: Shadow
@@ -383,7 +383,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     - choose location (any player controls) that is the active location
     - return the active location to the staging area
     - each player assigns threat of the picked card damage among the character (you control), one at a time
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 51226:A:2 (shadow): Shadow: If this attack destroys a character, return the active location to the staging area.
   51226:shadow:1: Shadow
@@ -749,7 +749,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
   51253:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each enemy engaged with a player makes an immediate attack, each dealt a shadow card of its own
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 51253:A:2 (shadow): Shadow: Each enemy engaged with you gets +1 Attack.
   51253:shadow:1: Shadow
@@ -757,4 +757,4 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     - for each enemy (any player controls) engaged with you:
       - the picked card: stat attack 1, until the end of the phase
 
-(rendered pieces: 434 by template, 6 as JSON)
+(rendered pieces: 436 by template, 5 as JSON)

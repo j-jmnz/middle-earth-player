@@ -20,7 +20,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 146043:A:1 (front): Immune to player card effects. X is the tens digit of the first player's threat dial.
   (the keyword part is owned by the card's keywords; the records cover: X is the tens digit of the first player's threat dial.)
   146043:constant:1: Constant
-    - this card: stat threat [json amount {"firstPlayerTens":true}], while this card is in play
+    - this card: stat threat the tens digit of the first player's threat, whoever the actor is, while this card is in play
 
 146043:A:2 (front): The players cannot travel here unless there is at least 20 progress on stage 3B.
   146043:constant:2: Constant
@@ -57,7 +57,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 
 146045:A:1 (front): Mordor Road gets +1 Threat for each ally controlled by the player who controls the most allies.
   146045:constant:1: Constant
-    - this card: stat threat [json amount {"mostPerPlayer":{"type":"ally","control":"you"}}], while this card is in play
+    - this card: stat threat the most ally (you control) any one player controls, each player counted from their own side, while this card is in play
 
 146045:A:2 (front): Forced: After Mordor Road becomes the active location, each player discards the top card of the encounter deck. Add each enemy discarded this way to the staging area.
   146045:forced:1: Forced after this location becomes the active location (heard about this card)
@@ -365,4 +365,4 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Ring-bearer claimed The One Ring)
     - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
 
-(rendered pieces: 237 by template, 5 as JSON)
+(rendered pieces: 240 by template, 3 as JSON)

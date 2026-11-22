@@ -8,6 +8,7 @@ import { ERECH_CONDITIONS } from "./erech.ts";
 import { FOG_CONDITIONS } from "./fog.ts";
 import { INVESTIGATION_CONDITIONS } from "./investigation.ts";
 import { LONG_DARK_CONDITIONS } from "./long-dark.ts";
+import { SHARED_CONDITIONS } from "./shared-conditions.ts";
 
 export { ESCAPE_CONDITION_SAMPLES } from "./escape.ts";
 export { GUARDIAN_CONDITION_SAMPLES } from "./guardian.ts";
@@ -15,6 +16,7 @@ export { ERECH_CONDITION_SAMPLES } from "./erech.ts";
 export { FOG_CONDITION_SAMPLES } from "./fog.ts";
 export { INVESTIGATION_CONDITION_SAMPLES } from "./investigation.ts";
 export { LONG_DARK_CONDITION_SAMPLES } from "./long-dark.ts";
+export { SHARED_CONDITION_SAMPLES } from "./shared-conditions.ts";
 
 const ZONE: Readonly<Record<string, string>> = {
   activeLocation: "is the active location",
@@ -44,6 +46,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   ...FOG_CONDITIONS,
   ...INVESTIGATION_CONDITIONS,
   ...LONG_DARK_CONDITIONS,
+  ...SHARED_CONDITIONS,
   sourceIn: (c) => ({ text: `this card ${ZONE[str(c.zone)] ?? `is in ${str(c.zone)}`}`, read: ["zone"] }),
   less: (c, ctx) => ({ text: `${renderAmount(c.left, ctx, renderPick)} is less than ${renderAmount(c.right, ctx, renderPick)}`, read: ["left", "right"] }),
   subjectExplored: () => ({ text: "the card the event is about had enough progress to be explored", read: [] }),

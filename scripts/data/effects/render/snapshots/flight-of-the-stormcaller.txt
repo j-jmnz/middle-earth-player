@@ -108,7 +108,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12012:B:2 (back): Forced: At the end of the quest phase, if you are off-course (Cloud, Rain, or Storm), move 2 progress from Swift Departure to the Stormcaller's quest stage.
   12012:forced:1: Forced at the end of the phase
-    only if all of: (it is the Quest phase) and ([json condition {"kind":"heading","is":"offCourse"}])
+    only if all of: (it is the Quest phase) and (the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card))
     who acts: the acting player is the first player (a phase has no player of its own)
     - [json MoveProgressToStormcaller {"verb":"MoveProgressToStormcaller","amount":2}]
 
@@ -126,9 +126,9 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12013:B:2 (back): No more than 8 progress can be placed here each round. If you are off-course (Cloud, Rain, or Storm), no more than 4 progress can be placed here each round instead.
   12013:constant:1: Constant
-    - if not ([json condition {"kind":"heading","is":"offCourse"}]): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 8, while this card is in play
+    - if not (the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card)): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 8, while this card is in play
   12013:constant:2: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 4, while this card is in play
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 4, while this card is in play
 
 12013:B:3 (back): When you defeat this stage, if the Stormcaller is at stage 2, you have caught up to the Stormcaller and win the game. Otherwise, advance to the next stage.
   12013:constant:3: Constant
@@ -142,7 +142,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12014:B:2 (back): Forced: At the end of the staging step, if you are off-course (Cloud, Rain, or Storm), reveal an additional encounter card from the top of the encounter deck.
   12014:forced:1: Forced on the event stagingStepEnds
-    only if [json condition {"kind":"heading","is":"offCourse"}]
+    only if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card)
     - the acting player reveals an encounter card
 
 12014:B:3 (back): When you defeat this stage, if the Stormcaller is at stage 3, you have caught up to the Stormcaller and win the game. Otherwise, advance to the next stage.
@@ -176,7 +176,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12016:B:1 (back): If the players are off-course (Cloud, Rain, or Storm), the Stormcaller gets +2 Threat.
   12016:constant:1: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: stormcaller: stat threat 2, while this card is in play
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): stormcaller: stat threat 2, while this card is in play
 
 12016:B:2 (back): No more than 4 damage may be placed on the Stormcaller each round.
   12016:constant:2: Constant
@@ -198,7 +198,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12017:B:1 (back): If the players are off-course (Cloud, Rain, or Storm), the Stormcaller gets +2 Threat.
   12017:constant:1: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: stormcaller: stat threat 2, while this card is in play
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): stormcaller: stat threat 2, while this card is in play
 
 12017:B:2 (back): No more than 8 damage may be placed on the Stormcaller each round.
   12017:constant:2: Constant
@@ -330,8 +330,8 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
     only if it is the Travel phase
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"heading","is":"onCourse"}]: place 2 progress on this card
-    - then, if [json condition {"kind":"heading","is":"offCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to each Ship character (any player controls)
+    - if the Heading card shows Sun (on-course) (false while the game has no Heading card): place 2 progress on this card
+    - then, if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to each Ship character (any player controls)
 
 ## 12026 Hidden Cove
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -361,7 +361,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 12028:A:1 (front): When Revealed: Each player contributing at least 8 Willpower to the quest must discard a questing character. If your heading is at the worst setting (Storm), this effect cannot be canceled.
-  12028:whenRevealed:1: When revealed (cannot be canceled while [json condition {"kind":"heading","is":"worst"}])
+  12028:whenRevealed:1: When revealed (cannot be canceled while the Heading card shows Storm (the worst setting) (false while the game has no Heading card))
     - for each player, first player first:
       - if [json condition {"kind":"committedWillpower","min":8}]: choose character (you control) committed to the quest
       - then, if [json condition {"kind":"committedWillpower","min":8}] (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -383,7 +383,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
   12029:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   12029:forced:1: Forced after a card is committed to the quest (heard about ally (any player controls))
-    only if [json condition {"kind":"heading","is":"offCourse"}]
+    only if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card)
     - deal 1 damage to the card the event is about
 
-(rendered pieces: 150 by template, 47 as JSON)
+(rendered pieces: 160 by template, 37 as JSON)

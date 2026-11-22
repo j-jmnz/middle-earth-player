@@ -8,9 +8,9 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 110102:A:2 (front): If you are on-course (Sun), Dol Amroth Warship gets +2 Willpower, +2 Attack, and +2 Defense.
   110102:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"heading","is":"onCourse"}]: this card: stat willpower 2, while this card is in play
-    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, while this card is in play
-    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat defense 2, while this card is in play
+    - if the Heading card shows Sun (on-course) (false while the game has no Heading card): this card: stat willpower 2, while this card is in play
+    - then, if the Heading card shows Sun (on-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, while this card is in play
+    - then, if the Heading card shows Sun (on-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat defense 2, while this card is in play
 
 110102:A:3 (front): Forced: When Dol Amroth Warship is destroyed, set it aside, out of play.
   110102:forced:1: Forced on the event characterDestroyed (heard about this card)
@@ -28,9 +28,9 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 110102:B:4 (back): If you are on-course (Sun), Dol Amroth Warship gets +2 Willpower, +2 Attack, and +2 Defense.
   110102:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"heading","is":"onCourse"}]: this card: stat willpower 2, while this card is in play
-    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, while this card is in play
-    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat defense 2, while this card is in play
+    - if the Heading card shows Sun (on-course) (false while the game has no Heading card): this card: stat willpower 2, while this card is in play
+    - then, if the Heading card shows Sun (on-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, while this card is in play
+    - then, if the Heading card shows Sun (on-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat defense 2, while this card is in play
 
 110102:B:5 (back): Forced: When Dol Amroth Warship is destroyed, set it aside, out of play.
   110102:forced:2: Forced on the event characterDestroyed (heard about this card)
@@ -152,13 +152,13 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
   12120:forced:1: Forced after an enemy engages a player (heard about Ship enemy (any player controls) or in the staging area)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"heading","is":"offCourse"}]: choose Ship character (you control)
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): choose Ship character (you control)
     - [json DamageShip {"verb":"DamageShip","amount":2,"when":{"kind":"heading","is":"offCourse"}}]
-    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the card the event is about
+    - then, if the Heading card shows Sun (on-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the card the event is about
 
 12120:B:3 (back): If your current heading is at the worst setting (Storm), Raider Flagship gets -50 engagement cost.
   12120:constant:1: Constant
-    only if [json condition {"kind":"heading","is":"worst"}]
+    only if the Heading card shows Storm (the worst setting) (false while the game has no Heading card)
     - each enemy (any player controls) or in the staging area, named "Raider Flagship": stat engagementCost -50, while this card is in play
 
 ## 12121 Battle in the Bay
@@ -179,7 +179,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12121:B:2 (back): If your current heading is at the worst setting (Storm), Raider Flagship gets -50 engagement cost.
   12121:constant:1: Constant
-    only if [json condition {"kind":"heading","is":"worst"}]
+    only if the Heading card shows Storm (the worst setting) (false while the game has no Heading card)
     - each enemy (any player controls) or in the staging area, named "Raider Flagship": stat engagementCost -50, while this card is in play
 
 12121:B:3 (back): You cannot advance while at least 1 objective is guarded by an encounter.
@@ -219,9 +219,9 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12123:A:2 (front): If you are on-course (Sun), Dol Amroth Warship gets +2 Willpower, +2 Attack, and +2 Defense.
   12123:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"heading","is":"onCourse"}]: this card: stat willpower 2, while this card is in play
-    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, while this card is in play
-    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat defense 2, while this card is in play
+    - if the Heading card shows Sun (on-course) (false while the game has no Heading card): this card: stat willpower 2, while this card is in play
+    - then, if the Heading card shows Sun (on-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, while this card is in play
+    - then, if the Heading card shows Sun (on-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat defense 2, while this card is in play
 
 12123:A:3 (front): Forced: When Dol Amroth Warship is destroyed, set it aside, out of play.
   12123:forced:1: Forced on the event characterDestroyed (heard about this card)
@@ -303,7 +303,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12128:A:1 (front): If you are off-course (Cloud, Rain, or Storm), Coast of Anfalas gets +2 Threat.
   12128:constant:1: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: this card: stat threat 2, while this card is in play
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): this card: stat threat 2, while this card is in play
 
 12128:A:2 (front): Travel: Exhaust a Ship objective to travel here.
   12128:travel:1: Travel
@@ -314,14 +314,14 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12128:A:3 (shadow): Shadow: If you are off-course (Cloud, Rain, or Storm), attacking enemy gets +2 Attack.
   12128:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - if [json condition {"kind":"heading","is":"offCourse"}]: the attacking enemy: stat attack 2, until the end of the attack
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 12129 Belfalas Islet
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 12129:A:1 (front): You cannot travel to Belfalas Islet if you are off-course (Cloud, Rain, or Storm).
   12129:constant:1: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: the players cannot travel to this location while this holds
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): the players cannot travel to this location while this holds
 
 12129:A:2 (front): Response: After you travel to Belfalas Islet, choose a Ship enemy that is not guarding an objective. While Belfalas Islet is the active location, the chosen enemy is considered to be out of play.
   12129:response:1: Response after the players travel (heard about this card)
@@ -344,7 +344,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12131:A:1 (front): When Revealed: If you are off-course (Cloud, Rain, or Storm), the engaged Ship enemy with the highest Attack makes an immediate attack. Until the end of the phase, add 1 to the total Threat in the staging area for each damage dealt by this attack. If no attack is made as a result of this effect, Ramming Speed! gains doomed 2.
   12131:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"heading","is":"offCourse"}]: choose Ship enemy (any player controls) engaged with you, with the highest Attack of those, as the table shows it (ties: the chooser decides)
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): choose Ship enemy (any player controls) engaged with you, with the highest Attack of those, as the table shows it (ties: the chooser decides)
     - [json AttackWithPicked {"verb":"AttackWithPicked","raiseStagingThreat":"endOfPhase","when":{"kind":"heading","is":"offCourse"}}]
     - [json Doomed {"verb":"Doomed","amount":2,"when":{"kind":"noneReturned"}}]
 
@@ -381,7 +381,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - then, if there is a objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
     - choose objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters)
     - the card picked before becomes the guard of the picked card, attached to it in the staging area
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 12134 Sea-ward Tower
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -451,4 +451,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     only if [json condition {"kind":"controlledByPlayers"}]
     - this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) -4, while this card is in play
 
-(rendered pieces: 206 by template, 60 as JSON)
+(rendered pieces: 223 by template, 43 as JSON)

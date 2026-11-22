@@ -294,7 +294,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40010:A:3 (front): Action: Spend 2 resources to ready a character. (Limit once per round.)
   40010:action:1: Action (limit once per round)
-    only if all of: ([json condition {"kind":"resources","min":2}]) and (there is a exhausted character (any player controls) to choose)
+    only if all of: (the actor's heroes that can pay for a card of any sphere hold at least 2 resource(s) in all) and (there is a exhausted character (any player controls) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json SpendResources {"verb":"SpendResources","amount":2}]
     - choose exhausted character (any player controls)
@@ -313,7 +313,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40010:B:3 (back): Action: Spend 1 resource to ready a card. (Limit once per round.)
   40010:action:2: Action (limit once per round)
-    only if all of: ([json condition {"kind":"resources","min":1}]) and (there is a exhausted card (any player controls) or in the staging area or the active location to choose)
+    only if all of: (the actor's heroes that can pay for a card of any sphere hold at least 1 resource(s) in all) and (there is a exhausted card (any player controls) or in the staging area or the active location to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json SpendResources {"verb":"SpendResources","amount":1}]
     - choose exhausted card (any player controls) or in the staging area or the active location
@@ -728,7 +728,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40034:A:1 (front): Response: After Belfalas Shipyard is explored as the active location, the players as a group spend 5 resources to heal 5 damage from a Ship objective in any group. Ready that Ship and flip it to its Upgraded side.
   40034:response:1: Response on the event activeExplored (heard about this card)
-    only if all of: ([json condition {"kind":"resources","min":5,"group":true}]) and (there is a Ship character (any player controls) to choose)
+    only if all of: (the living players' heroes that can pay for a card of any sphere hold at least 5 resource(s) in all) and (there is a Ship character (any player controls) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json SpendResources {"verb":"SpendResources","amount":5,"group":true}]
     - choose Ship character (any player controls) chosen by the first player
@@ -876,7 +876,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     - choose enemy (any player controls) or in the staging area, in the staging area only, with the highest current engagement cost of those (ties: the chooser decides), chosen by the first player
     - this enemy, in the staging area, engages the first player [also {"target":"picked"}]
     - [json AttackWithPicked {"verb":"AttackWithPicked","who":"firstPlayer","counted":true}]
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 40043:A:2 (shadow): Shadow: Either raise your threat by 4 or attacking enemy makes an additional attack.
   40043:shadow:1: Shadow
@@ -942,4 +942,4 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
-(rendered pieces: 519 by template, 43 as JSON)
+(rendered pieces: 522 by template, 40 as JSON)

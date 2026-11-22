@@ -19,7 +19,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AssignFaceup {"verb":"AssignFaceup","cards":4,"outcomes":["play","hand","discard","shuffle"]}]
     - the first player chooses one of:
-      * option "lust" (only if [json condition {"kind":"outOfPlay","code":"142084"}]):
+      * option "lust" (only if a copy of the card with code 142084 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)):
         - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"142084"}]
       * option "threat":
         - raise threat by 5 (each player)
@@ -512,4 +512,4 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - for each location (any player controls) that is the active location:
       - the attacking enemy: stat attack damage of the picked card, until the end of the attack
 
-(rendered pieces: 280 by template, 15 as JSON)
+(rendered pieces: 281 by template, 14 as JSON)

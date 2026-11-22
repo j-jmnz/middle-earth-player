@@ -54,13 +54,13 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     - shuffle the encounter deck
     - the first player chooses one of:
       * option "50903":
-        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50903","again":true}]
+        - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 50903 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there)
       * option "50904":
-        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50904","again":true}]
+        - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 50904 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there)
       * option "50905":
-        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50905","again":true}]
+        - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 50905 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there)
       * option "50906":
-        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50906","again":true}]
+        - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 50906 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there)
 
 ## 50903 The Siege of Dol Guldur
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -452,7 +452,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50922:A:1 (front): The Shadow Road gets +2 Threat for each facedown card attached to it.
   50922:constant:2: Constant
-    - this card: stat threat [json amount {"facedown":true,"times":2}], while this card is in play
+    - this card: stat threat the number of cards attached facedown to this card x 2, while this card is in play
 
 50922:A:2 (front): While The Shadow Road is in the staging area, it gains: 'The players cannot travel or place progress here unless they are at stage 3F. Forced: After an event is played during the quest phase, attach it facedown to The Shadow Road.'
   50922:constant:1: Constant
@@ -482,7 +482,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50924:A:1 (front): Forest Battleground gets +1 Threat for each ally controlled by the player with the most allies.
   50924:constant:1: Constant
-    - this card: stat threat [json amount {"mostPerPlayer":{"type":"ally","control":"you"}}], while this card is in play
+    - this card: stat threat the most ally (you control) any one player controls, each player counted from their own side, while this card is in play
 
 50924:A:2 (front): Forced: When Forest Battleground is explored, each player searches the encounter deck and discard pile for an Orc enemy and adds it to the staging area. Shuffle the encounter deck.
   50924:forced:1: Forced on the event locationExplored (heard about this card)
@@ -625,17 +625,17 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     - all progress on this stage (the main quest card) is discarded
     - the first player chooses one of:
       * option "50903" (only if the card with code 50903 is not in play):
-        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50903","again":true}]
+        - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 50903 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there)
       * option "50904" (only if the card with code 50904 is not in play):
-        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50904","again":true}]
+        - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 50904 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there)
       * option "50905" (only if the card with code 50905 is not in play):
-        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50905","again":true}]
+        - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 50905 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there)
       * option "50906" (only if the card with code 50906 is not in play):
-        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50906","again":true}]
+        - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 50906 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there)
 
 50931:B:3 (back): At the end of the round, if Dol Guldur's city strength is 0 and there are no Lieutenant enemies in play, Dol Guldur is captured and the players win the game.
   50931:forced:1: Forced at the end of the round
     who acts: the acting player is the first player (a phase has no player of its own)
     - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 1) and (the number of Lieutenant enemy (any player controls) or in the staging area is at most 0): the players win the game
 
-(rendered pieces: 490 by template, 31 as JSON)
+(rendered pieces: 501 by template, 21 as JSON)

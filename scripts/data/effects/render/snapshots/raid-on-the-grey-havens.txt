@@ -306,7 +306,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - for each Raider enemy (any player controls) or in the staging area:
       - place 1 resource tokens on the picked card
     - each enemy engaged with a player without the trait Ship makes an immediate attack, each dealt a shadow card of its own
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 11067:A:2 (shadow): Shadow: If the attacking enemy is a Raider, place 2 resources on it.
   11067:shadow:1: Shadow

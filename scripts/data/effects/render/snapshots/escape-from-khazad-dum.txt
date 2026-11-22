@@ -24,7 +24,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51301:B:2 (back): This stage cannot be defeated while Dark Pit is in play.
   51301:constant:1: Constant
-    only if any of: (the card with code 51310 is in play) or ([json condition {"kind":"exploredPending","code":"51310","effect":"51301:forced:1"}])
+    only if any of: (the card with code 51310 is in play) or (a copy of the card with code 51310 was explored and the Forced effect that hears it has not finished (its explored event waits in the queue, or the record 51301:forced:1 is running))
     - the players cannot defeat this stage while this holds
 
 ## 51303 Search for an Exit
@@ -768,9 +768,9 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - [json DiscardGuarded {"verb":"DiscardGuarded"}]
   51351:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat threat [json amount {"guardedCost":true}], while this card is in play
-    - this card: stat attack [json amount {"guardedCost":true}], while this card is in play
-    - this card: stat defense [json amount {"guardedCost":true}], while this card is in play
+    - this card: stat threat the printed cost of the card this card guards (one under it, or the host it guards as a guard; 0 for a card with no printed cost), while this card is in play
+    - this card: stat attack the printed cost of the card this card guards (one under it, or the host it guards as a guard; 0 for a card with no printed cost), while this card is in play
+    - this card: stat defense the printed cost of the card this card guards (one under it, or the host it guards as a guard; 0 for a card with no printed cost), while this card is in play
 
 ## 51352 Mithril Lode
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -798,4 +798,4 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 459 by template, 13 as JSON)
+(rendered pieces: 463 by template, 9 as JSON)

@@ -47,7 +47,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
         - the acting player names one hideout (a Suspect or a Hideout), by title, of the cards with codes 50704, 50705, 50706, 50707 and 50708 (a card in play too)
         - the facedown out-of-play Suspect and Hideout (the set-aside cards among 50709, 50710, 50711, 50712 and 50713 and 50704, 50705, 50706, 50707 and 50708) are turned faceup and added to the staging area; for each name that is not one of them, the Investigation deck is searched for that card and it is added to the staging area unless it is in play; X is 1 if either name was wrong, else 0
         - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 3 (each player)
-        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"50703"}]
+        - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 50703 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 ## 50703 Apprehending the Killer
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -370,8 +370,8 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (the acting player)
-    - then, if [json condition {"kind":"resources","min":1}] (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player looks at the bottom card of the Investigation deck (nothing is shuffled or moved); a card looked at that hears the look (Taken by Surprise) resolves once this effect is done
-    - then, if [json condition {"kind":"resources","min":1}] (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
+    - then, if the actor's heroes that can pay for a card of any sphere hold at least 1 resource(s) in all (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player looks at the bottom card of the Investigation deck (nothing is shuffled or moved); a card looked at that hears the look (Taken by Surprise) resolves once this effect is done
+    - then, if the actor's heroes that can pay for a card of any sphere hold at least 1 resource(s) in all (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
     - [json SpendResources {"verb":"SpendResources","amount":1}]
 
 ## 50723 Lawless Ruffian
@@ -493,4 +493,4 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
     who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the Investigate value of the active location (its printed Investigate X; 0 with no active location or none printed), until the end of the attack
 
-(rendered pieces: 257 by template, 9 as JSON)
+(rendered pieces: 260 by template, 6 as JSON)

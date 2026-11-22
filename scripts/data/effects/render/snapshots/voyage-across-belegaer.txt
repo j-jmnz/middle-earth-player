@@ -258,7 +258,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11016:B:2 (back): While you are on-course (Sun), each Ship objective gets +2 Willpower.
   11016:constant:1: Constant
-    - if [json condition {"kind":"heading","is":"onCourse"}]: each Ship character (any player controls): stat willpower 2, while this card is in play
+    - if the Heading card shows Sun (on-course) (false while the game has no Heading card): each Ship character (any player controls): stat willpower 2, while this card is in play
 
 11016:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
   11016:constant:2: Constant
@@ -278,7 +278,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11017:B:2 (back): Forced: At the end of the quest phase, if you are off-course (Cloud, Rain, or Storm), each player must distribute 5 damage among characters he controls.
   11017:forced:1: Forced at the end of the phase
-    only if all of: (it is the Quest phase) and ([json condition {"kind":"heading","is":"offCourse"}])
+    only if all of: (it is the Quest phase) and (the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card))
     who acts: the acting player is the first player (a phase has no player of its own)
     - each player assigns 5 damage among the character (you control), one at a time
 
@@ -300,7 +300,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11018:B:2 (back): While you are off-course (Cloud, Rain, or Storm), each non-Ship ally gets -2 Willpower.
   11018:constant:1: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: each ally (any player controls) without Ship: stat willpower -2, while this card is in play
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): each ally (any player controls) without Ship: stat willpower -2, while this card is in play
 
 11018:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
   11018:constant:2: Constant
@@ -320,7 +320,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11019:B:2 (back): While you are off-course (Cloud, Rain, or Storm), each Ship enemy gains Boarding 1.
   11019:constant:1: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: each Ship enemy (any player controls) or in the staging area: stat boarding 1, while this card is in play
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): each Ship enemy (any player controls) or in the staging area: stat boarding 1, while this card is in play
 
 11019:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
   11019:constant:2: Constant
@@ -340,7 +340,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11020:B:2 (back): While you are off-course (Cloud, Rain, or Storm), each Ocean location gets +1 Threat.
   11020:constant:1: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: each Ocean location (any player controls) or in the staging area: stat threat 1, while this card is in play
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): each Ocean location (any player controls) or in the staging area: stat threat 1, while this card is in play
 
 11020:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
   11020:constant:2: Constant
@@ -361,7 +361,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11021:B:2 (back): You cannot place progress on Corsair Pursuit unless you are on-course (Sun).
   11021:constant:1: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
 
 11021:B:3 (back): If there are no Ship enemies in play, you have defeated your pursuers, and win the game.
   11021:constant:2: Constant
@@ -385,21 +385,21 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11022:A:3 (front): Scouting Ship gets -15 engagement cost while you are off-course (Cloud, Rain, or Storm).
   11022:constant:2: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: this card: stat engagementCost -15, while this card is in play
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): this card: stat engagementCost -15, while this card is in play
 
 ## 11023 Starlit Sea
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 11023:A:1 (front): While you are off-course (Cloud, Rain, or Storm), Starlit Sea gains: "Travel: Raise each player's threat by 3."
   11023:travel:1: Travel
-    - if [json condition {"kind":"heading","is":"offCourse"}]: raise threat by 3 (each player)
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): raise threat by 3 (each player)
 
 11023:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you are off-course).
   11023:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not ([json condition {"kind":"heading","is":"offCourse"}]): the attacking enemy: stat attack 1, until the end of the attack
-    - then, if [json condition {"kind":"heading","is":"offCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - if not (the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 11024 Fog Bank
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -415,7 +415,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11024:A:2 (shadow): Shadow: If your heading is at the worst setting (Storm), attacking enemy makes an additional attack after this one.
   11024:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - if [json condition {"kind":"heading","is":"worst"}]: when the attack in progress ends:
+    - if the Heading card shows Storm (the worst setting) (false while the game has no Heading card): when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 11050 Calm Waters
@@ -475,14 +475,14 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11053:A:2 (shadow): Shadow: If you are off-course (Cloud, Rain, or Storm), attacking enemy gets +2 Attack.
   11053:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - if [json condition {"kind":"heading","is":"offCourse"}]: the attacking enemy: stat attack 2, until the end of the attack
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 11054 Waterspout
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 11054:A:1 (front): While your heading is at the worst setting (Storm), when faced with the option to travel, the players must travel to Waterspout, if able.
   11054:constant:1: Constant
-    - if [json condition {"kind":"heading","is":"worst"}]: while no location is the active location and the players can travel to this location, they must travel to it: the travel step offers no way to decline it or to go elsewhere
+    - if the Heading card shows Storm (the worst setting) (false while the game has no Heading card): while no location is the active location and the players can travel to this location, they must travel to it: the travel step offers no way to decline it or to go elsewhere
 
 11054:A:2 (front): Forced: After traveling to Waterspout, deal 4 damage to each Ship objective.
   11054:forced:1: Forced after the players travel (heard about this card)
@@ -512,8 +512,8 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 11056:A:1 (front): When Revealed: If you are off-course, deal 1 damage to each character in play. If your heading is at the worst setting (Storm), this effect cannot be canceled.
-  11056:whenRevealed:1: When revealed (cannot be canceled while [json condition {"kind":"heading","is":"worst"}])
-    - if [json condition {"kind":"heading","is":"offCourse"}]: deal 1 damage to each character (any player controls)
+  11056:whenRevealed:1: When revealed (cannot be canceled while the Heading card shows Storm (the worst setting) (false while the game has no Heading card))
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): deal 1 damage to each character (any player controls)
 
 11056:A:2 (shadow): Shadow: Either shift your heading off-course or treat this attack as undefended.
   11056:shadow:1: Shadow
@@ -754,4 +754,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   11171:resolution:9: Resolution
     - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
 
-(rendered pieces: 264 by template, 69 as JSON)
+(rendered pieces: 279 by template, 54 as JSON)

@@ -17,7 +17,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (the acting player)
     - the acting player chooses one of:
-      * option "detach" (only if [json condition {"kind":"resources","min":1,"sphere":"fellowship"}]):
+      * option "detach" (only if the actor's heroes that can pay for a fellowship card (with that icon or one they were given) hold at least 1 resource(s) in all):
         - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship"}]
         - this card is detached from the acting player's threat dial and set aside, out of play
       * option "keep":
@@ -348,4 +348,4 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
         - choose ally (you control)
         - discard the picked card
 
-(rendered pieces: 195 by template, 3 as JSON)
+(rendered pieces: 196 by template, 2 as JSON)
