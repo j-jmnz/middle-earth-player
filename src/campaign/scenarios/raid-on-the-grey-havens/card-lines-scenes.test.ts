@@ -21,8 +21,7 @@ const tokens = (state: ScenarioState, code: string) => state.cards[idOf(state, c
 const resources = (state: ScenarioState, code: string) => tokens(state, code)?.resources ?? 0;
 
 describe("11064 Umbar Raider", () => {
-  // FAULT: the card moves 1 resource from one of your heroes' pools; with no resource in any of them the engine still places 1 resource on Umbar Raider.
-  it.fails("11064:A:2 gets no resource after it attacks when none of your heroes has a resource to move", () => {
+  it("11064:A:2 gets no resource after it attacks when none of your heroes has a resource to move", () => {
     expect(resources(played({}, attack("11064")), "11064")).toBe(0);
   });
 });

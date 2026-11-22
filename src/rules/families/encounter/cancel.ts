@@ -29,5 +29,7 @@ export function cancelBarred(state: ScenarioState, event: GameEvent, effect: Eff
   if (event.trigger === "shadowPending" && cancels && flagged(state, "table", "allShadowsUncancelable")) return true;
   // The card SearchTopReveal revealed (51003:A:1): its When Revealed effects cannot be canceled.
   if (event.trigger === "whenRevealedPending" && cancels && flagged(state, event.subject ?? event.cardId ?? "", "revealUncancelable")) return true;
+  // While Accursed Forest or Hills of Evendim is in the staging area only the When Revealed effects cannot be canceled (18038:A:1, 50822:A:1).
+  if (event.trigger === "whenRevealedPending" && cancels && flagged(state, "table", "whenRevealedUncancelable")) return true;
   return (event.trigger === "whenRevealedPending" || event.trigger === "shadowPending") && encounterUncancelable(state) && cancels;
 }

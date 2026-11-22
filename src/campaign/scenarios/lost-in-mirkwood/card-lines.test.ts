@@ -54,7 +54,7 @@ const ROWS: readonly Row[] = [
   { line: "18037:A:1", name: "1 location for 2 players: it gains surge", layout: { seats: 2, staging: ["place"], deck: ["f3", "f0"] }, act: reveal("18037"), expect: [stat("place", "threat", 3), zone("f3", "staging"), deckCount(1)] },
 
   // 18038 Accursed Forest: "While Accursed Forest is in the staging area, 'when revealed' effects cannot be canceled."
-  { line: "18038:A:1", name: "in the staging area no when revealed effect can be canceled", layout: { staging: ["18038"] }, act: [], expect: flag("table", "encounterUncancelable") },
+  { line: "18038:A:1", name: "in the staging area no when revealed effect can be canceled", layout: { staging: ["18038"] }, act: [], expect: flag("table", "whenRevealedUncancelable") },
   // "Travel: Reveal the top card of the encounter deck."
   { line: "18038:A:2", name: "traveling here reveals the top card of the encounter deck", layout: { phase: "Travel", staging: ["18038"], deck: ["f3", "f0"] }, act: travel("18038"), expect: [zone("f3", "staging"), deckCount(1)] },
 

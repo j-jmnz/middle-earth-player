@@ -111,9 +111,7 @@ function runToCombat(state: ScenarioState, made: LayoutTable): ScenarioState {
 }
 
 describe("18036 Unseen Danger", () => {
-  // FAULT: the card prints "If the discarded card's printed Threat is greater than the removed character's Willpower, discard that character"; the engine discards the encounter card it just discarded (the
-  // discard step makes it the picked card) and the removed hero stays in play.
-  it.fails("18036:A:1 a discarded Threat 3 is greater than the removed hero's Willpower 2: the hero is discarded", () => {
+  it("18036:A:1 a discarded Threat 3 is greater than the removed hero's Willpower 2: the hero is discarded", () => {
     const state = played({ committed: ["dh1"], deck: ["f3", "f0"] }, reveal("18036"));
     expect(card(state, "f3")?.zone).toBe("encounterDiscard");
     expect(card(state, "dh1")?.zone).toBe("discard");
@@ -157,8 +155,7 @@ describe("18038 Accursed Forest", () => {
     expect(strokeOffered([])).toBe(true);
   });
 
-  // FAULT: the card prints "'when revealed' effects cannot be canceled"; the record sets the table's encounterUncancelable, which also bars the cancel of a Shadow effect, so Hasty Stroke is not offered.
-  it.fails("18038:A:1 while it is in the staging area a shadow effect can still be canceled", () => {
+  it("18038:A:1 while it is in the staging area a shadow effect can still be canceled", () => {
     expect(strokeOffered(["18038"])).toBe(true);
   });
 });

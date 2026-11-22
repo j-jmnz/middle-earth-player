@@ -65,7 +65,7 @@ describe("the Responses at the end of the round", () => {
 
 describe("table-wide effects and keywords in a line with X", () => {
   it("50822:A:1 bars the cancel of 'when revealed' effects only while Hills of Evendim is in the staging area", () => {
-    const barred = (layout: Layout) => table(layout).state.modifiers.some((modifier) => modifier.stat === "encounterUncancelable");
+    const barred = (layout: Layout) => table(layout).state.modifiers.some((modifier) => modifier.stat === "whenRevealedUncancelable");
     expect(barred({ stage: "50805", staging: ["50822"] })).toBe(true);
     expect(barred({ stage: "50805", engaged: ["50822"] })).toBe(false);
     expect(barred({ stage: "50805" })).toBe(false);

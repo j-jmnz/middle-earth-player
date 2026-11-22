@@ -298,7 +298,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 11064 Umbar Raider. +1 Attack for each resource on it. Forced: after it attacks you, a resource from one of your heroes' pools moves to it.
   { id: "11064:constant:1", cardCode: "11064", lines: ["11064:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "attack", amount: { stat: "resources", of: "self" }, until: "whileSourceInPlay", target: "self" }] },
-  { id: "11064:forced:1", cardCode: "11064", lines: ["11064:A:2"], timing: "forced", trigger: "attackResolved", subject: "self", eventSeat: "you", instructions: takesAHeroResource },
+  { id: "11064:forced:1", cardCode: "11064", lines: ["11064:A:2"], timing: "forced", trigger: "attackResolved", subject: "self", eventSeat: "you", condition: { kind: "canPick", pick: A_HERO_WITH_RESOURCES }, instructions: takesAHeroResource },
 
   // 11065 Corsair Infiltrator. Forced: when it attacks, it is dealt 1 additional shadow card for each resource on it. Forced: after the engaged player collects resources, a resource from one of their heroes' pools moves to it.
   {

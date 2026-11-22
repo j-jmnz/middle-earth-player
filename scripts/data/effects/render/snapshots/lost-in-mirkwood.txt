@@ -178,7 +178,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
       - choose character (you control) committed to the quest
       - the last picked character is removed from the quest (it stays exhausted)
       - the top card of the encounter deck goes to the encounter discard pile
-      - then, if willpower of the picked card is less than printed threat of the top card of the encounter discard pile (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+      - then, if willpower of the card picked before is less than printed threat of the top card of the encounter discard pile (checked when this step runs, after the steps above; not tied to whether they did anything): discard the card picked before
 
 18036:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack and +2 Defense until the end of the phase if it is guarding a card.
   18036:shadow:1: Shadow
@@ -203,7 +203,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18038:A:1 (front): While Accursed Forest is in the staging area, 'when revealed' effects cannot be canceled.
   18038:constant:1: Constant
     only if this card is in the staging area
-    - the table: stat encounterUncancelable (no Response cancels an encounter card's When Revealed or Shadow effect, and no paid cancel is offered against one) 1, while this card is in play
+    - the table: stat whenRevealedUncancelable 1, while this card is in play
 
 18038:A:2 (front): Travel: Reveal the top card of the encounter deck.
   18038:travel:1: Travel

@@ -121,6 +121,9 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: "all", note: "Dúnedain Warning moves only to another hero, never back to the hero it is on, and is not offered when there is none. Dwalin's Response is not offered after he destroys an enemy that is not an Orc, and Master Ironsmith's when two heroes paid for it." },
   { version: 38, scenarios: ["the-ring-goes-south", "flight-to-the-ford", "a-knife-in-the-dark"], note: "In the Nightmare decks, an enemy in the staging area is in play: Pale-green Tentacle protects the Watcher in the Water there, Weathertop protects the Witch-king there, and Expanse of Hollin and Great East Road count it." },
   { version: 38, scenarios: ["flight-to-the-ford", "a-knife-in-the-dark"], note: "In the Nightmare decks, The Old Road and Pathless Wilderness do nothing after \"Then\" when they have no resource token left to discard." },
+  { version: 38, scenarios: ["raid-on-the-grey-havens"], note: "Umbar Raider takes a resource only when one of your heroes has one to move." },
+  { version: 38, scenarios: ["lost-in-mirkwood"], note: "Unseen Danger discards the character it removed from the quest when the discarded card's printed Threat is greater than that character's Willpower, not the encounter card." },
+  { version: 38, scenarios: ["lost-in-mirkwood", "the-siege-of-annuminas"], note: "While Accursed Forest or Hills of Evendim is in the staging area, only 'when revealed' effects cannot be canceled: a Shadow effect can still be canceled." },
 ];
 
 export const ENGINE_VERSION = 38;

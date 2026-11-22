@@ -287,7 +287,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 50822:A:1 (front): While Hills of Evendim is in the staging area, 'when revealed' effects cannot be canceled.
   50822:constant:1: Constant
     only if this card is in the staging area
-    - the table: stat encounterUncancelable (no Response cancels an encounter card's When Revealed or Shadow effect, and no paid cancel is offered against one) 1, while this card is in play
+    - the table: stat whenRevealedUncancelable 1, while this card is in play
 
 50822:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until an enemy is discarded. Add the discarded enemy to the staging area to travel here.
   50822:travel:1: Travel
