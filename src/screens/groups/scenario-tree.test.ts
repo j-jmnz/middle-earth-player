@@ -70,3 +70,32 @@ describe("scenarioTree", () => {
     expect(rows.filter(isScenarioRow).map((one) => one.code)).not.toContain("52");
   });
 });
+
+// Hall of Beorn puts a few Nightmare cards in an encounter set of their own (Crumbling Stairs of Shadow and Flame, the Stormcaller's cards of The Thing in the Depths): each lies in its deck's row, by its code.
+describe("scenarioTree, the Nightmare decks", () => {
+  const nightmare = (code: string, name: string, typeCode: string, encounterSet: string | null) => row({ code, name, typeCode, packCode: "Nightmare", packCodes: [], encounterSet });
+  const rows = [
+    nightmare("901801", "Shadow and Flame Nightmare", "nightmare", null),
+    nightmare("901809", "Fiery Depths", "location", "Shadow and Flame Nightmare"),
+    nightmare("901810", "Crumbling Stairs", "location", "Shadow and Flame"),
+    nightmare("905001", "The Thing in the Depths Nightmare", "nightmare", null),
+    nightmare("905002", "Captain's Quarters", "location", "The Stormcaller Nightmare"),
+    nightmare("905005", "Corsair Duelist", "enemy", "Corsair Raiders Nightmare"),
+    nightmare("905006", "Slithering Arm", "enemy", "The Thing in the Depths Nightmare"),
+  ];
+  const tree = scenarioTree(rows, [], [{ code: "Nightmare", name: "Nightmare" }]);
+  const decks = tree.products[0]?.packs[0]?.sets ?? [];
+
+  it("makes one row of each deck, named for its setup card", () => {
+    expect(decks.map((deck) => deck.name)).toEqual(["Shadow and Flame Nightmare", "The Thing in the Depths Nightmare"]);
+    expect(decks.map((deck) => deck.key)).toEqual(["Nightmare~Shadow and Flame Nightmare", "Nightmare~The Thing in the Depths Nightmare"]);
+  });
+
+  it("keeps a card of another encounter set in its deck's row", () => {
+    const cards = (name: string) => tree.byKey.get(`Nightmare~${name}`)?.set.groups.flatMap((group) => group.cards.map((card) => card.code));
+    expect(cards("Shadow and Flame Nightmare")).toContain("901810");
+    expect(cards("The Thing in the Depths Nightmare")).toEqual(expect.arrayContaining(["905002", "905005", "905006"]));
+    expect(tree.byKey.has("Nightmare~Shadow and Flame")).toBe(false);
+    expect(tree.byKey.has("Nightmare~Corsair Raiders Nightmare")).toBe(false);
+  });
+});
