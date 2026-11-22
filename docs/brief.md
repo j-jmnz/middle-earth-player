@@ -645,6 +645,7 @@ The table is landscape only (user request, 2026-10-25).
 
 Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.
 
+- Bond of Friendship (22147) in a saga campaign: the deck starts with its four heroes and the saga hero, five in all. The contract allows four starting heroes, and the Ring-bearer with The One Ring (`mec109.the-one-ring`) and the Fellowship Aragorn (`mec112.aragorn`) do not count against the hero limit; the rulebooks' "up to 4 heroes" follows from a limit of three. The saga hero's Fellowship sphere is a fifth, different sphere. No ruling was found (`recommended`; read: https://ringsdb.com/card/22147, https://hallofbeorn.com/LotR/Details/Bond-of-Friendship-TFoN, https://images-cdn.fantasyflightgames.com/filer_public/7c/1e/7c1efcc9-103c-4c98-ab1e-f3b28776d4b7/mec109_rulebook-compressed.pdf; neither the FAQ nor a discussion found covers the pair).
 - Beechbone 10118:A:2 reads X as 0 when its own cost destroys him (`recommended`, docs/brief.md, Core round).
 - A card played from the hand or the deck "at no cost" (Host of Galadhrim, Send for Help, Scavenge for Supplies) needs no resource match (community-sourced, docs/brief.md, Core round).
 - A resource moved to a hero's pool (Errand-rider) is gained, not added: Heir of Mardil answers it, Harbor Master does not (community-sourced, docs/brief.md, Core round).

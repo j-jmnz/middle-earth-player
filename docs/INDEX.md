@@ -60,7 +60,7 @@ Read the sections your task touches.
   - 411–416 Catalog build (~410)
   - 417–433 Tests (~2.1K) ← 18
   - 434–449 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~35.6K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~35.8K tok)
   - 17–35 Sections (~420)
   - 36–47 Product (~740) ← 2
   - 48–61 Non-goals (~610)
@@ -88,7 +88,7 @@ Read the sections your task touches.
   - 573–600 Persistence and shipping (~3.2K) ← 9
   - 601–643 Screens (~6.0K) ← 3
     - 628–643 Table screen (~1.8K) ← 3
-  - 644–653 Readings to confirm (~220)
+  - 644–654 Readings to confirm (~410)
 - `docs/design-system-table.md` — Design system — Table (landscape) (~71.7K tok)
   - 5–8 Overview (~170) ← 1
   - 9–35 Top bar (~6.7K) ← 14
