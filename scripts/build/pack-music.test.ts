@@ -34,6 +34,9 @@ describe("pack music", () => {
     writeFileSync(path.join(from, "05 - The Black Rider.opus"), "");
     expect(findTrack(from, { file: "05 - The Black Rider", start: 2, end: 70 })).toBe(path.join(from, "05 - The Black Rider.opus"));
     expect(findTrack(from, { file: "05 - The Black", start: 2, end: 70 })).toBeUndefined();
+    // An album a folder: the track is found under it.
+    writeFileSync(path.join(from, "other", "02 The Shire.mp3"), "");
+    expect(findTrack(from, { file: "02 The Shire", start: 2, end: 70 })).toBe(path.join(from, "other", "02 The Shire.mp3"));
   });
 
   it("gives every playable scenario its own calm and combat loops", () => {
