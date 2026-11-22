@@ -69,6 +69,8 @@ export function defenseOptions(state: ScenarioState, ctx: ReduceContext, legal: 
   if (enemyId == null) return [];
   const defenders = legal.some((intent) => intent.type === "DeclareDefender") ? legalTargets(state, { type: "DeclareDefender" }, ctx) : [];
   const heroes = legal.some((intent) => intent.type === "Undefended") ? legalTargets(state, { type: "Undefended" }, ctx) : [];
+  // No hero to name: the engine picks the one the attack lands on.
+  if (heroes.length === 0 && defenders.length === 0) return legal.some((intent) => intent.type === "Undefended") ? [{ type: "Undefended" }] : [];
   const options = [
     ...defenders.map((id) => ({ intent: { type: "DeclareDefender", defenderId: id } satisfies PlayerIntent, loss: lossOf(state, ctx, enemyId, id, true) })),
     ...heroes.map((id) => ({ intent: { type: "Undefended", heroId: id } satisfies PlayerIntent, loss: lossOf(state, ctx, enemyId, id, false) })),

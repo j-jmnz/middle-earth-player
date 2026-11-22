@@ -49,9 +49,9 @@ function payments(state: ScenarioState, ctx: ReduceContext, cardId: string, cost
 }
 
 /** The PlayCard intents the seat can pay for: allies, then attachments, then events, the dearest first; an attachment once for each of its two best hosts, a card once for each way to pay it. */
-export function playOptions(state: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[]): PlayerIntent[] {
+export function playOptions(state: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], memory: ReadonlySet<string>): PlayerIntent[] {
   const seat = state.activeSeat;
-  const cards = legal.flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
+  const cards = legal.flatMap((intent) => (intent.type === "PlayCard" && !memory.has(passedKey(state, intent.cardId)) ? [intent.cardId] : []));
   const ranked = cards
     .map((cardId) => ({ cardId, printed: printedOf(ctx.cards, state.cards[cardId]?.code ?? "") }))
     .sort((left, right) => (TYPE_RANK[left.printed.type] ?? 3) - (TYPE_RANK[right.printed.type] ?? 3) || (right.printed.cost ?? 0) - (left.printed.cost ?? 0));
@@ -73,6 +73,11 @@ export function playOptions(state: ScenarioState, ctx: ReduceContext, legal: rea
     for (const paid of payments(state, ctx, cardId, cost)) out.push({ type: "PlayCard", cardId, payments: paid });
   }
   return out.slice(0, MOST_CARDS);
+}
+
+/** The key a card the search chose not to play is remembered by, so it is not offered again this round. */
+export function passedKey(state: ScenarioState, cardId: string): string {
+  return `${state.round}:pass:${cardId}`;
 }
 
 /** The key a used Action or Response is remembered by, so a policy uses it once a round. */

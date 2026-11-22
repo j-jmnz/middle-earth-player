@@ -194,7 +194,8 @@ type SeedSearch = { campaignId: string; scenarioId: string; seatCount: 1 | 2; se
 
 function searchSeeds<L>(say: Log, spec: SeedSearch, play: (seed: number) => { loadout: L; intents: PlayerIntent[]; state: ScenarioState }, deal: (seed: number) => DealtGame<L>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string) {
   const flags = searchFlags();
-  const limit = Math.max(flags?.plain ?? Number(process.env[seedsVar] ?? spec.seeds ?? 100), committedSeed(spec.scenarioId, label));
+  // `--plain=<n>` replaces the count, the committed fixture's seed included: a search that asks for no plain scan is a search.
+  const limit = flags?.plain != null ? flags.plain : Math.max(Number(process.env[seedsVar] ?? spec.seeds ?? 100), committedSeed(spec.scenarioId, label));
   for (let seed = 1; seed <= limit; seed += 1) {
     const game = play(seed);
     const outcome = game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "parked";

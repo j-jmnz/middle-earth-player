@@ -3,7 +3,7 @@ import { ELIMINATION_LEVEL } from "../../../src/rules/core/eliminate.ts";
 import { printedOf } from "../../../src/rules/core/printed.ts";
 import { victoryPointsOf } from "../../../src/rules/core/printed-stat.ts";
 import { flagged, type CardInstance, type ScenarioState } from "../../../src/rules/core/state.ts";
-import { questPointsOf, questStatOf, stagingThreat } from "../../../src/rules/quest/quest.ts";
+import { engagementCostOf, questPointsOf, questStatOf, stagingThreat } from "../../../src/rules/quest/quest.ts";
 import type { ReduceContext } from "../../../src/rules/engine/reduce.ts";
 
 // The score the fixture search ranks a table by, read from the state alone (no scenario code in the default path): how far the quest is, what
@@ -89,10 +89,20 @@ export function scorePartsOf(state: ScenarioState, ctx: ReduceContext): ScorePar
     return sum + seat.threat * 1.5 + near * near * 6;
   }, 0);
   const engaged = living.flatMap((seat) => seat.engaged);
-  const enemies = -engaged.reduce((sum, id) => {
+  // The enemies engaged now count in full, the ones the next engagement check will take (cost no higher than a seat's threat) by two thirds.
+  const reach = Math.max(0, ...living.filter((seat) => !seat.eliminated).map((seat) => seat.threat));
+  const weigh = (id: string) => {
     const card = state.cards[id];
-    return sum + (card ? 10 + Math.max(0, modifiedStat(state, card, "attack", ctx.cards)) * 5 : 0);
-  }, 0);
+    if (!card) return 0;
+    // An enemy already hurt weighs less: a card that wounds it is worth something even when it does not kill.
+    const share = Math.min(1, Math.max(0, card.damage / Math.max(1, modifiedStat(state, card, "hitPoints", ctx.cards))));
+    return (10 + Math.max(0, modifiedStat(state, card, "attack", ctx.cards)) * 5) * (1 - 0.5 * share);
+  };
+  const coming = state.staging.filter((id) => {
+    const card = state.cards[id];
+    return card != null && printedOf(ctx.cards, card.code).type === "enemy" && (engagementCostOf(state, card, ctx.cards) ?? 99) <= reach;
+  });
+  const enemies = -engaged.reduce((sum, id) => sum + weigh(id), 0) - (coming.reduce((sum, id) => sum + weigh(id), 0) * 2) / 3;
   // The questing the table can field against the threat waiting in the staging area.
   const staging = 15 * Math.max(-12, Math.min(12, questing - stagingPressure));
   const life = state.life == null ? 0 : state.life * 15;

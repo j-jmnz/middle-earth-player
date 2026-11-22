@@ -4,13 +4,13 @@
 //   --search          after the plain seed scan finds no won game, search for one (scripts/e2e/search/)
 //   --seeds=1-6       the seeds the search deals, first-last (a single number is one seed); default 1-4
 //   --budget=600      seconds the search of one won game may take in all, shared by its seeds; default 600
-//   --width=6         lines the beam keeps after each round; default 6
-//   --branches=6      ways each line plays a round; default 6
+//   --width=6         lines the beam keeps after each round; default: three passes over the seeds, widening (3, 6 and 10 lines)
+//   --branches=6      ways each line plays a round; default 4, 6 and 8 in those passes
 //   --rounds=40       rounds a game is played at most; default 40
 //   --plain=100       seeds the plain scan tries first (0 skips it); default is the finder's own count
 //   --out=<folder>    the folder the fixture file is written to, instead of src/campaign/fixtures
 
-export type SearchFlags = { seedFrom: number; seedTo: number; budgetSeconds: number; width: number; branches: number; rounds: number; plain: number | null; out: string | null };
+export type SearchFlags = { seedFrom: number; seedTo: number; budgetSeconds: number; width: number | null; branches: number | null; rounds: number; plain: number | null; out: string | null };
 
 function value(args: readonly string[], name: string): string | null {
   const found = args.find((arg) => arg === `--${name}` || arg.startsWith(`--${name}=`));
@@ -36,8 +36,8 @@ export function searchFlags(args: readonly string[] = process.argv.slice(2)): Se
     seedFrom,
     seedTo: Math.max(seedFrom, seedTo),
     budgetSeconds: whole(value(args, "budget"), 600, "budget"),
-    width: Math.max(1, whole(value(args, "width"), 6, "width")),
-    branches: Math.max(1, whole(value(args, "branches"), 6, "branches")),
+    width: value(args, "width") === null ? null : Math.max(1, whole(value(args, "width"), 6, "width")),
+    branches: value(args, "branches") === null ? null : Math.max(1, whole(value(args, "branches"), 6, "branches")),
     rounds: Math.max(1, whole(value(args, "rounds"), 40, "rounds")),
     plain: plain === null ? null : whole(plain, 0, "plain"),
     out: value(args, "out") || null,

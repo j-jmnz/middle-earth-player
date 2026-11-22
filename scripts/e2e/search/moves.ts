@@ -1,4 +1,6 @@
-import { questPointsOf, questStatOf } from "../../../src/rules/quest/quest.ts";
+import { engagementCostOf, questPointsOf, questStatOf } from "../../../src/rules/quest/quest.ts";
+import { printedOf } from "../../../src/rules/core/printed.ts";
+import type { CardInstance } from "../../../src/rules/core/state.ts";
 import { modifiedStat } from "../../../src/rules/core/keywords.ts";
 import type { LegalIntent, PlayerIntent } from "../../../src/rules/core/intents.ts";
 import { hideCommitLimit } from "../../../src/rules/families/nightmare/guards.ts";
@@ -14,21 +16,21 @@ import { mustSurvive } from "./score.ts";
 // one the style prefers) built from `legalIntents` and `legalTargets`, never a number the engine computes. The same state, memory and style
 // always give the same list. A branch of the search picks among the options with its own seeded noise (beam.ts).
 
-export type QuestStyle = "all" | "keepDefender" | "keepTwo" | "heroes" | "half";
+export type QuestStyle = "all" | "keepFoes" | "keepDefender" | "keepTwo" | "heroes" | "half";
 
 /** One way to play a round: the kind of option each window puts first. */
 export type Style = { quest: QuestStyle; engage: EngageStyle; attack: AttackStyle; travel: "easiest" | "stay" };
 
 /** The styles the branches of a line take in turn: a spread from careful to bold. */
 export const STYLES: readonly Style[] = [
+  { quest: "keepFoes", engage: "none", attack: "always", travel: "easiest" },
+  { quest: "keepFoes", engage: "weak", attack: "always", travel: "easiest" },
   { quest: "keepDefender", engage: "none", attack: "always", travel: "easiest" },
   { quest: "all", engage: "weak", attack: "always", travel: "easiest" },
   { quest: "keepTwo", engage: "weak", attack: "always", travel: "easiest" },
   { quest: "all", engage: "all", attack: "always", travel: "easiest" },
-  { quest: "heroes", engage: "none", attack: "never", travel: "stay" },
   { quest: "half", engage: "weak", attack: "always", travel: "stay" },
-  { quest: "keepDefender", engage: "all", attack: "always", travel: "easiest" },
-  { quest: "all", engage: "none", attack: "never", travel: "easiest" },
+  { quest: "heroes", engage: "none", attack: "never", travel: "stay" },
 ];
 
 /** The most options a decision lists. */
@@ -43,7 +45,20 @@ function guard(state: ScenarioState, ctx: ReduceContext, id: string): number {
   return modifiedStat(state, card, "defense", ctx.cards) * 10 + modifiedStat(state, card, "hitPoints", ctx.cards) - card.damage;
 }
 
-/** The sets of characters that may commit to the quest, the style's first: all of them, all but the best defender (or two), heroes only, the strongest half. */
+/** The enemies the next combat phase is likely to bring: those engaged now, and those in the staging area the engagement check will take (cost no higher than a seat's threat). */
+export function foesToCome(state: ScenarioState, ctx: ReduceContext): number {
+  const seats = state.seats.slice(0, state.seatCount).filter((seat) => !seat.eliminated);
+  const threat = Math.max(0, ...seats.map((seat) => seat.threat));
+  const engaged = seats.reduce((sum, seat) => sum + seat.engaged.length, 0);
+  const coming = state.staging.filter((id) => {
+    const card = state.cards[id];
+    const printed = card ? printedOf(ctx.cards, card.code) : null;
+    return printed?.type === "enemy" && (engagementCostOf(state, card as CardInstance, ctx.cards) ?? 99) <= threat;
+  });
+  return engaged + coming.length;
+}
+
+/** The sets of characters that may commit to the quest, the style's first: all of them, all but as many defenders as enemies will attack, all but the best defender (or two), heroes only, the strongest half. */
 function commitSets(state: ScenarioState, ctx: ReduceContext, style: QuestStyle): string[][] {
   const ids = legalTargets(state, { type: "Commit" }, ctx);
   const byGuard = [...ids].sort((left, right) => guard(state, ctx, right) - guard(state, ctx, left));
@@ -54,12 +69,13 @@ function commitSets(state: ScenarioState, ctx: ReduceContext, style: QuestStyle)
   const byPower = [...ids].sort((left, right) => power(right) - power(left));
   const sets: Record<QuestStyle, readonly string[]> = {
     all: ids,
+    keepFoes: byGuard.slice(Math.max(1, Math.min(foesToCome(state, ctx), Math.max(1, ids.length - 1)))),
     keepDefender: byGuard.slice(1),
     keepTwo: byGuard.slice(2),
     heroes: ids.filter((id) => state.cards[id]?.zone === "heroes"),
     half: byPower.slice(0, Math.max(1, Math.ceil(ids.length / 2))),
   };
-  const order: QuestStyle[] = [style, "all", "keepDefender", "keepTwo", "heroes", "half"];
+  const order: QuestStyle[] = [style, "all", "keepFoes", "keepDefender", "keepTwo", "heroes", "half"];
   const seen = new Set<string>();
   const out: string[][] = [];
   for (const name of order) {
@@ -115,7 +131,7 @@ function passOptions(state: ScenarioState, ctx: ReduceContext, legal: readonly L
   const pass: PlayerIntent[] = has.has("Pass") ? [{ type: "Pass" }] : [];
   const triggers = triggerOptions(state, ctx, legal, memory);
   if (state.mode === "resourceActions") return [...pass, ...triggers].slice(0, MOST);
-  const plays = state.mode === "planning" ? playOptions(state, ctx, legal) : [];
+  const plays = state.mode === "planning" ? playOptions(state, ctx, legal, memory) : [];
   return [...plays, ...triggers, ...pass].slice(0, MOST);
 }
 
@@ -165,4 +181,4 @@ export function movesOf(state: ScenarioState, ctx: ReduceContext, memory: Readon
 }
 
 // The key a sent Action or Response is remembered by (`memory` of `movesOf`).
-export { usedKey } from "./moves-play.ts";
+export { passedKey, usedKey } from "./moves-play.ts";

@@ -1,7 +1,8 @@
 import type { PlayerIntent } from "../../../src/rules/core/intents.ts";
 import { reduce, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
-import { movesOf, STYLES, usedKey, type Style } from "./moves.ts";
+import { movesOf, passedKey, STYLES, usedKey, type Style } from "./moves.ts";
+import { bestFirst, hurts } from "./probe.ts";
 import { safetyOf, scoreOf, type ScoreHook } from "./score.ts";
 
 // A beam search over end-of-round states for one dealt game. Each line is played one round at a time in several ways (a style for each
@@ -59,7 +60,7 @@ function generator(seed: number): () => number {
 type Played = { state: ScenarioState; chunk: PlayerIntent[]; end: "round" | "won" | "lost" | "stuck"; reason: string };
 
 /** Plays one round from `from` with the style, taking the style's first option except with probability `noise`, when it takes another. */
-function playRound(from: ScenarioState, ctx: ReduceContext, style: Style, noise: number, random: () => number): Played {
+function playRound(from: ScenarioState, ctx: ReduceContext, style: Style, noise: number, random: () => number, hook?: ScoreHook): Played {
   let state = from;
   const chunk: PlayerIntent[] = [];
   const memory = new Set<string>();
@@ -70,17 +71,28 @@ function playRound(from: ScenarioState, ctx: ReduceContext, style: Style, noise:
     const options = movesOf(state, ctx, memory, style);
     if (options.length === 0) return { state, chunk, end: "stuck", reason: `no move in ${state.window?.kind ?? "no window"} (${state.mode})` };
     const first = options.length > 1 && random() < noise ? 1 + Math.floor(random() * (options.length - 1)) : 0;
-    const order = [options[first], ...options.filter((_, index) => index !== first)];
+    // A choice (a target, an option) the line makes without noise is the one that leaves the table with the best score.
+    const ranked = first === 0 && options.length > 1 && state.window?.kind === "choose" ? bestFirst(state, options, ctx, style, hook) : options;
+    const order = [ranked[first], ...ranked.filter((_, index) => index !== first)];
+    // A card or an Action that costs the table more than it gives is passed over, unless nothing else can be sent.
     let sent = false;
-    for (const intent of order) {
-      if (!intent) continue;
-      const result = reduce(state, intent, ctx);
-      if (!result.ok) continue;
-      if (intent.type === "Trigger") memory.add(usedKey(state, intent.cardId, intent.effectId));
-      state = result.state;
-      chunk.push(intent);
-      sent = true;
-      break;
+    for (const filtered of [true, false]) {
+      for (const intent of order) {
+        if (!intent) continue;
+        if (filtered && (intent.type === "Trigger" || intent.type === "PlayCard") && hurts(state, intent, ctx, style, hook)) {
+          // It is not offered again this round.
+          memory.add(intent.type === "Trigger" ? usedKey(state, intent.cardId, intent.effectId) : passedKey(state, intent.cardId));
+          continue;
+        }
+        const result = reduce(state, intent, ctx);
+        if (!result.ok) continue;
+        if (intent.type === "Trigger") memory.add(usedKey(state, intent.cardId, intent.effectId));
+        state = result.state;
+        chunk.push(intent);
+        sent = true;
+        break;
+      }
+      if (sent) break;
     }
     if (!sent) return { state, chunk, end: "stuck", reason: `every option refused in ${state.window?.kind ?? "no window"}` };
   }
@@ -142,7 +154,7 @@ export function searchGame(start: ScenarioState, ctx: ReduceContext, seed: numbe
         if (!style) continue;
         const noise = branch === 0 && attempt === 0 ? 0 : 0.08 + 0.12 * attempt + (branch >= STYLES.length ? 0.15 : 0);
         const random = generator(seed * 1_000_003 + depth * 10_007 + index * 101 + branch * 7 + attempt * 13);
-        const played = playRound(line.state, ctx, style, noise, random);
+        const played = playRound(line.state, ctx, style, noise, random, options.hook);
         sent += played.chunk.length;
         if (played.end === "won") return { ...outcome("won", flatten(line.trail, played.chunk)), round: played.state.round, sent };
         if (played.end !== "round") {

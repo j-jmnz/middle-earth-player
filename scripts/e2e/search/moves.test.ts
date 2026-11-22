@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { legalIntents, reduce, type PlayerIntent } from "../../../src/rules/engine/reduce.ts";
 import { send, start, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
 
-import { movesOf, STYLES, type Style } from "./moves.ts";
+import { foesToCome, movesOf, STYLES, type Style } from "./moves.ts";
 
 const ID = "the-uruk-hai";
 const built = (layout: Layout) => tableFromLayout(ID, layout);
@@ -25,6 +25,13 @@ describe("the search's move generator", () => {
     expect(distinct(all)).toBe(true);
     expect(accepted(table, all).every(Boolean)).toBe(true);
     expect(all.length).toBeGreaterThan(2);
+  });
+
+  it("keeps back as many defenders as enemies will attack", () => {
+    const table = built({ phase: "Quest", engaged: [{ code: "f0", seat: 0 }, { code: "f3", seat: 0 }], play: [{ code: "ally", seat: 0 }, { code: "ally", seat: 0 }] });
+    expect(foesToCome(table.state, table.ctx)).toBe(2);
+    const first = movesOf(table.state, table.ctx, new Set(), STYLES[0] as Style)[0];
+    expect(first?.type === "Commit" ? first.cardIds.length : -1).toBe(2);
   });
 
   it("offers engaging the enemies first to a bold style and declining first to a careful one", () => {
@@ -62,7 +69,7 @@ describe("the search's move generator", () => {
     expect(options.every((intent) => reduce(table.state, intent, table.ctx).ok)).toBe(true);
   });
 
-  it("plays a card in the planning window, then passes, and leaves the Actions it used out", () => {
+  it("plays a card in the planning window, then passes", () => {
     const table = built({ phase: "Planning", hand: ["ally"], heroResources: 3 });
     const options = movesOf(table.state, table.ctx, new Set(), careful);
     expect(options[0]?.type).toBe("PlayCard");

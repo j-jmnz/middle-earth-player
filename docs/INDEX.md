@@ -167,13 +167,13 @@ Read the sections your task touches.
     - 501–508 Booklet (~540) ← 2
     - 509–512 Database (~110)
   - 513–532 States (~620)
-- `docs/development.md` — Development (~5.2K tok)
+- `docs/development.md` — Development (~5.4K tok)
   - 5–14 In a browser (~170)
   - 15–32 Checking a screen in a browser (~700) ← 4
   - 33–52 Reading a game as text (~760) ← 4
   - 53–60 On a desktop (~210) ← 1
   - 61–81 On a phone (~350)
-  - 82–136 Commands (~2.3K) ← 4
+  - 82–136 Commands (~2.5K) ← 4
   - 137–147 Asset mirror (~560) ← 6
 - `docs/discord-issues.md` — Discord issue bot (~3.8K tok)
   - 5–16 What it does (~290) ← 1
