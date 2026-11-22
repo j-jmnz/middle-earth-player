@@ -1,5 +1,5 @@
 // Rules: emce.discover, emce.loot, emce.immune, rr.forced, rr.surge, rr.travel, rr.guarded, rr.quest-advancement, rr.restricted, rr.victory, rr.cannot, rr.engaged, rr.shadow-effects, faq.additional-attacks, faq.next-player (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Ruins of Belegost).
-import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, endPhase, exhausted, flag, handCount, quest, resolve, resourcesOn, reveal, stat, stagingThreat, respond, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, drew, endPhase, exhausted, flag, handCount, quest, resolve, resourcesOn, reveal, stat, stagingThreat, respond, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Ruins of Belegost (standalone-scenarios part 6): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The lines a row cannot express (the table-wide must-travel
@@ -135,6 +135,11 @@ const ROWS: readonly Row[] = [
   // 50630 Covered Pit.
   { line: "50630:A:1", name: "When Revealed: each player discards an ally they control", layout: { play: ["ally"], deck: F0 }, act: reveal("50630"), expect: [zone("ally", "discard")] },
   { line: "50630:A:2", name: "Shadow: with a non-unique attacker a Loot objective you control is attached to it as a guarded objective", layout: { engaged: ["f3"], attached: [ON_HERO(KEYS)] }, act: attack("f3", { shadow: "50630", undefended: true }), expect: [zone(KEYS, "staging")] },
+  // "When Revealed: Add Lurker of the Depths to the staging area."
+  { line: "50602:A:1", name: "When Revealed: the set-aside Lurker of the Depths is added to the staging area", layout: { stage: "50602", side: "A", setAside: ["50616"] }, act: resolve("50602", "whenRevealed"), expect: [zone("50616", "staging")] },
+  // "Action: Exhaust Book of Aulë's Children to choose a player. That player draws 1 card."
+  { line: "50612:A:3", name: "Action: the Book is exhausted and the player chosen draws 1 card", layout: { attached: [ON_HERO(BOOK)], deckOf: ["filler", "filler"] }, act: respond(BOOK), expect: [exhausted(BOOK), drew(1)] },
+  { line: "50612:A:3", name: "with two players the second player may be the one chosen, and draws while the first does not", layout: { seats: 2, attached: [ON_HERO(BOOK)], deckOf: ["filler", "filler"] }, act: [respond(BOOK), answer("seat:1")], expect: [drew(1, 1), drew(0, 0)] },
 ];
 
 cardSpecs("the-ruins-of-belegost", ROWS);

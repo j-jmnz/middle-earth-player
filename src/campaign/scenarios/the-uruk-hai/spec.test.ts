@@ -30,6 +30,8 @@ const ROWS: readonly Row[] = [
   { line: "143027:A:1", name: "its Response, as the active location, adds 1 resource to each hero", layout: { active: "143027" }, act: resolve("143027", "response"), expect: [resourcesOn("dh1", 1), resourcesOn("dh2", 1)] },
   { line: "143018:A:3", name: "its Response adds 1 resource to the attached hero", layout: { attached: [{ code: "143018", to: "dh1" }] }, act: resolve("143018", "response"), expect: resourcesOn("dh1", 1) },
   { line: "143019:A:3", name: "the hero gets +1 Willpower", layout: { attached: [{ code: "143019", to: "dh1" }] }, act: [], expect: stat("dh1", "willpower", 3) },
+  // "Setup: Attach to a hero."
+  { line: "143019:A:2", name: "its Setup attaches Beyond All Hope to a hero, who then gets its +1 Willpower", act: resolve("143019", "setup"), expect: [zone("143019", "attached"), stat("dh1", "willpower", 3)] },
   { line: "143065:A:2", name: "the Uruk-hai enemy searched for is engaged with the player", layout: { deck: ["143064"], staging: ["143022"] }, act: reveal("143065"), expect: zone("143064", "engaged") },
   { line: "143070:A:1", name: "the Uruk-hai enemy searched for is added to the staging area", layout: { deck: ["143064"], stage: "143070" }, act: resolve("143070", "whenRevealed"), expect: zone("143064", "staging") },
   { line: "143018:A:3", name: "used after the quest succeeds, its Response adds 1 resource to the attached hero", layout: { attached: [{ code: "143018", to: "dh1" }], pursuit: 10 }, act: [quest("success"), respond("143018")], expect: resourcesOn("dh1", 1) },

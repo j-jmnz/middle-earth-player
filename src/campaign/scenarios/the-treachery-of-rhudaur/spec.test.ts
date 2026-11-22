@@ -1,12 +1,13 @@
 // Rules: mec108.side-quests, mec108.side-quests-in-play, mec108.time-x, mec108.the-investigation, mec108.objective-allies, rr.forced, rr.response, rr.reveal, rr.shadow-effects, rr.travel, rr.first-player, rr.running-out-of-cards, faq.additional-attacks, faq.enemy-attacks-outside-combat (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { attack, attackersOf, cardSpecs, damageOn, endPhase, notWon, progressOn, quest, resolve, reveal, stat, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { attack, attackersOf, cardSpecs, damageOn, defend, endPhase, lost, notWon, progressOn, quest, resolve, reveal, stat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Treachery of Rhudaur (angmar-awakened part 7): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot express (a card in a discard pile, a count over several steps, a cost, a pool entry, a tie) is a test
 // titled with its line id in lines.test.ts, stages.test.ts, clues.test.ts and campaign.test.ts. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; every seat starts at threat 28; a layout's current stage is on its B side.
 const STAGE2 = "10095";
+const AMARTHIUL = "10096";
 const THAURDIR = "10098";
 const WIGHT = "10100";
 const EERIE_HALLS = "10102";
@@ -31,6 +32,11 @@ const ROWS: readonly Row[] = [
   { line: "10105:A:3", name: "Shadow: the attack is undefended unless the defending player controls a Clue", layout: {}, act: attack("f3", { shadow: CENTURIES }), expect: damageOn("dh1", 1) },
 
   { line: "10106:A:2", name: "Shadow: +1 Attack, +3 instead when the defending player controls no Clue", layout: {}, act: attack("f3", { shadow: CURSE, undefended: true }), expect: damageOn("dh1", 4) },
+
+  // "If Amarthiúl leaves play, the players lose the game." He defends Traitorous Wight (4 Attack against his 3 Defense) with 2 damage on his 3 hit points, and the attack destroys him.
+  { line: "10096:A:2", name: "the attack that destroys Amarthiúl loses the game", layout: { play: [{ code: AMARTHIUL, damage: 2 }] }, act: [attack(WIGHT), defend(AMARTHIUL)], expect: [zone(AMARTHIUL, "encounterDiscard"), lost] },
+  // "Attached hero gets +1 Willpower."
+  { line: "10186:A:2", name: "the hero Heirloom of Iârchon is attached to gets +1 Willpower, the other hero does not", layout: { attached: [{ code: "10186", to: "dh1" }] }, act: [], expect: [stat("dh1", "willpower", 3), stat("dh2", "willpower", 2)] },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-treachery-of-rhudaur", ROWS);
