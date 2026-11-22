@@ -104,6 +104,8 @@ export type FateLayout = {
   mode?: "A" | "B";
   // Damage on the first card of each code: [code, damage].
   damage?: readonly (readonly [string, number])[];
+  // The records that name these ledger lines are left out of the table's effects (a test run again without the records of its line).
+  without?: readonly string[];
 };
 
 export type FateTable = { state: ScenarioState; ctx: ReduceContext; hero: string; hero2: string; seat1Hero: string | null; calphon: string | null };
@@ -111,7 +113,8 @@ export type FateTable = { state: ScenarioState; ctx: ReduceContext; hero: string
 export function fateTable(world: FateWorld, layout: FateLayout = {}): FateTable {
   const seats = layout.seats ?? 1;
   const stage = layout.stage ?? "11025";
-  const ctx: ReduceContext = { effects: SCENE_EFFECTS, cards: world.cards };
+  const without = layout.without ?? [];
+  const ctx: ReduceContext = { effects: without.length === 0 ? SCENE_EFFECTS : SCENE_EFFECTS.filter((effect) => !effect.lines.some((line) => without.includes(line))), cards: world.cards };
   let state = blankScenario({ seatCount: seats, seed: layout.seed ?? 3, definition: world.definition });
   const at = STAGES.indexOf(stage);
   for (const code of STAGES) {

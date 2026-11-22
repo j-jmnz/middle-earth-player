@@ -114,6 +114,8 @@ export type VoyageLayout = {
   damage?: readonly (readonly [string, number])[];
   exhaustedShips?: boolean;
   attachments?: readonly string[];
+  // The records that name these ledger lines are left out of the table's effects (a test run again without the records of its line).
+  without?: readonly string[];
 };
 
 export type VoyageTable = { state: ScenarioState; ctx: ReduceContext; hero: string; hero2: string; seat1Hero: string | null; ships: string[]; heading: string | null };
@@ -189,7 +191,8 @@ export function voyageTable(world: VoyageWorld, layout: VoyageLayout = {}): Voya
   if (layout.campaign) state = spawn(state, CAMPAIGN_CARD, { zone: "campaign" }).state;
   if (layout.mode) state = spawn(state, HARD_MODE, { zone: "modeCard" }, layout.mode).state;
   state = { ...state, ...opening(layout.phase ?? "Quest") };
-  const ctx = { effects: SCENE_EFFECTS, cards: world.cards };
+  const without = layout.without ?? [];
+  const ctx = { effects: without.length === 0 ? SCENE_EFFECTS : SCENE_EFFECTS.filter((effect) => !effect.lines.some((line) => without.includes(line))), cards: world.cards };
   return { state: syncConstants(state, ctx), ctx, hero: first.id, hero2: secondHero.id, seat1Hero, ships, heading: headingCard };
 }
 
