@@ -33,6 +33,12 @@ describe("rule columns", () => {
   it("records the column boxes per document, and the markdown was extracted with them", () => {
     for (const [name, doc] of docs) {
       expect(columns[name], `${name} has column boxes`).toBeDefined();
+      // A rulesheet with no text layer is read by eye: its markdown names who read it and has no boxes to be extracted with.
+      if (columns[name]?.handRead !== undefined) {
+        expect(readFileSync(path.join(rulesDir, `${name}.md`), "utf8"), `${name} names who read it`).toMatch(/^readBy: .+$/m);
+        expect(doc.sha256, `${name} names the PDF it was read from`).toMatch(/^[0-9a-f]{64}$/);
+        continue;
+      }
       expect(doc.columnsSha256, `${name} was extracted with the recorded boxes`).toBe(hashColumns(columns[name] as never));
       for (const page of doc.pages) expect(page.columns.length, `${name} p${page.number}`).toBe((columns[name]?.pages?.[String(page.number)] ?? columns[name]?.default ?? []).length);
     }

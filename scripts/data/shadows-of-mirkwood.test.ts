@@ -104,13 +104,15 @@ describe("The Shadows of Mirkwood cycle", () => {
     expect(byCode.get("02084")?.name).toBe("Amon Lhaw");
   });
 
-  it("reads the encounter sets of four packs from their rulesheets (The Hunt for Gollum's and Conflict at the Carrock's have no text layer)", () => {
-    for (const id of ["a-journey-to-rhosgobel", "the-hills-of-emyn-muil", "the-dead-marshes", "return-to-mirkwood"]) {
+  it("reads the encounter sets of every pack from its rulesheet (The Hunt for Gollum's and Conflict at the Carrock's are read by eye: no text layer)", () => {
+    for (const id of ["the-hunt-for-gollum", "conflict-at-the-carrock", "a-journey-to-rhosgobel", "the-hills-of-emyn-muil", "the-dead-marshes", "return-to-mirkwood"]) {
       const text = rules.get(`sotm.setup-${id}`) ?? "";
       expect(text, id).toContain("is played with an encounter deck built with all the cards from the following encounter sets");
-      for (const set of DECK[id as keyof typeof DECK].sets) expect(text.replaceAll("’", "'"), `${id} ${set}`).toContain(set);
+      // The rulesheets of the 2011 packs call the Core Set's second scenario "Journey Down the Anduin" (the alias in data/overrides.json).
+      for (const set of DECK[id as keyof typeof DECK].sets) expect(text.replaceAll("’", "'").replace("Journey Down the Anduin", "Journey Along the Anduin"), `${id} ${set}`).toContain(set);
     }
-    for (const id of ["the-hunt-for-gollum", "conflict-at-the-carrock"]) expect(rules.has(`sotm.setup-${id}`), id).toBe(false);
+    expect(rules.get("sotm.signs-of-gollum")).toContain("There are four copies of this card in the encounter deck");
+    expect(rules.get("sotm.ally-objective-grimbeorn")).toContain("If Grimbeorn the Old leaves play for any reason, the card is placed in the encounter discard pile");
     expect(rules.get("sotm.ally-objective-wilyador")).toContain("If Wilyador leaves play for any reason, the players have lost the game");
     expect(rules.get("sotm.escape-test")).toContain("the escape test is failed");
     expect(rules.get("sotm.guarding-gollum")).toContain("If Gollum is destroyed, or leaves play for any reason, the players have lost the game");

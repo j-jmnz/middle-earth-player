@@ -30130,9 +30130,9 @@
       "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
       "pin": {
         "kind": "sha256",
-        "value": "5c535203baa7b6af96cecca46e385c5cf28a3a84aa773b544fafc816b9d3fed7"
+        "value": "f3fa000e5d2e11dfb17cdc13f21124f977eef230f1f704c45ff1fca0c3e51a81"
       },
-      "fetchedAt": "2026-11-17T13:50:12.692Z",
+      "fetchedAt": "2026-11-22T10:05:05.895Z",
       "files": [
         {
           "path": "pdf/mec109_rulebook-compressed.pdf",
@@ -30361,6 +30361,18 @@
           "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec_communitydecklists_theswordsofthenoldor-compressed.pdf",
           "sha256": "f8ba37508167224152585f5f74a6051c787cbedfe2648230a03589dac08a15c6",
           "bytes": 9131141
+        },
+        {
+          "path": "pdf/mec02_the_hunt_for_gollum_rulesheet.pdf",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC02.pdf",
+          "sha256": "cdc2c41387d14f7af75f7f5d2a656884fe52f14b71c9a14cf86a9dc2889ae29f",
+          "bytes": 437456
+        },
+        {
+          "path": "pdf/mec03_conflict_at_the_carrock_rulesheet.pdf",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC03.pdf",
+          "sha256": "f8522e5a9f1b69691e69e7e61844148b7d7dd6f831bcb55c0c05d9c750144929",
+          "bytes": 489519
         },
         {
           "path": "pdf/mec08_khazad-dum_rules_insert.pdf",

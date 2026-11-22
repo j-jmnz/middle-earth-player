@@ -3,7 +3,7 @@
 import type { CampaignDef, ScenarioDef } from "./campaign-defs.ts";
 
 // A scenario of a cycle: its product (an Adventure Pack or a deluxe box), and the DragnCards decks `Q<cycle>.<n>` / `E<cycle>.<n>` that load it (`n` counts from 1 within DragnCards' cycle: Shadows
-// of Mirkwood's start at 4, after the three 2011 core decks Q01.1 to Q01.3). An Adventure Pack's rulesheet (`<insert>.setup-<id>`) prints its encounter sets where it has a text layer, and a scenario
+// of Mirkwood's start at 4, after the three 2011 core decks Q01.1 to Q01.3). An Adventure Pack's rulesheet (`<insert>.setup-<id>`) prints its encounter sets (read from its text layer, or by eye where the text is outlines: `handRead` in data/rules/columns.json), and a scenario
 // with no such span has no `setupSpan`: its piles are checked against the quest card's printed Setup and Hall of Beorn's set list.
 function cycleScenario(cycle: string, n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef {
   return { id, product, deck: { normal: `Q${cycle}.${n}`, easy: `E${cycle}.${n}` }, ...extra };
@@ -19,8 +19,8 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
     released: "2011-07-22",
     products: ["The Hunt for Gollum", "Conflict at the Carrock", "A Journey to Rhosgobel", "The Hills of Emyn Muil", "The Dead Marshes", "Return to Mirkwood"],
     scenarios: [
-      shadowsOfMirkwood(1, "the-hunt-for-gollum", "The Hunt for Gollum"),
-      shadowsOfMirkwood(2, "conflict-at-the-carrock", "Conflict at the Carrock"),
+      shadowsOfMirkwood(1, "the-hunt-for-gollum", "The Hunt for Gollum", { setupSpan: "sotm.setup-the-hunt-for-gollum" }),
+      shadowsOfMirkwood(2, "conflict-at-the-carrock", "Conflict at the Carrock", { setupSpan: "sotm.setup-conflict-at-the-carrock" }),
       // DragnCards loads Wilyador in player 1's play area; the printed Setup adds him to the staging area (the first player then gains control of him, his own text).
       shadowsOfMirkwood(3, "a-journey-to-rhosgobel", "A Journey to Rhosgobel", { setupSpan: "sotm.setup-a-journey-to-rhosgobel", groups: { player1Play1: "staging" } }),
       shadowsOfMirkwood(4, "the-hills-of-emyn-muil", "The Hills of Emyn Muil", { setupSpan: "sotm.setup-the-hills-of-emyn-muil" }),

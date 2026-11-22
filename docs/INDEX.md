@@ -60,7 +60,7 @@ Read the sections your task touches.
   - 411–416 Catalog build (~410)
   - 417–433 Tests (~1.9K) ← 5
   - 434–449 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~35.5K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~35.6K tok)
   - 17–35 Sections (~420)
   - 36–47 Product (~740) ← 2
   - 48–61 Non-goals (~610)
@@ -83,7 +83,7 @@ Read the sections your task touches.
     - 511–521 Player side quests, contracts and saga cards (~1.4K) ← 1
     - 522–525 Window stack (~100)
     - 526–529 Coverage test (~270)
-  - 530–553 Data sources (~750) ← 3
+  - 530–553 Data sources (~820) ← 4
   - 554–572 Card images (~1.4K) ← 9
   - 573–600 Persistence and shipping (~3.2K) ← 9
   - 601–643 Screens (~6.0K) ← 3
@@ -272,9 +272,9 @@ One file per box or cycle: each scenario's mechanics, readings, decisions and ta
   - 70–84 The Oath (~2.4K)
   - 85–102 The Caves of Nibin-Dûm (~2.5K)
 - `docs/scenarios/nightmare.md` — Nightmare (~460 tok)
-- `docs/scenarios/shadows-of-mirkwood.md` — Shadows of Mirkwood (~14.6K tok)
-  - 11–32 The Hunt for Gollum (~2.1K) ← 1
-  - 33–52 Conflict at the Carrock (~2.4K) ← 2
+- `docs/scenarios/shadows-of-mirkwood.md` — Shadows of Mirkwood (~14.7K tok)
+  - 11–32 The Hunt for Gollum (~2.2K) ← 1
+  - 33–52 Conflict at the Carrock (~2.5K) ← 2
   - 53–79 A Journey to Rhosgobel (~3.2K) ← 2
   - 80–97 The Hills of Emyn Muil (~1.5K) ← 1
   - 98–118 The Dead Marshes (~2.1K) ← 2
