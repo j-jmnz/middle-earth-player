@@ -60,7 +60,7 @@ export type PickContext = {
   discards?: boolean;
 };
 
-function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[] {
+export function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[] {
   if (spec.control === "you") return [asking];
   // "At this stage": the chooser's own once stages are separate (mec109.multiple-staging-areas).
   if (spec.atStage && state.separate) return sharing(state, asking);

@@ -81,10 +81,7 @@ describe("Raise the Shire (146013:A:1)", () => {
     const { tab, run: played } = raised(effects, CHEAP);
     const hobbit = idsOf(tab, HOBBIT);
     let run = played;
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([hobbit]);
-      run = sendUnledgered(run, { type: "Choose", optionId: hobbit }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[hobbit]).toMatchObject({ zone: "play", controller: 0 });
     expect(run.state.cards[idsOf(tab, ROSIE)]?.zone).toBe("deck");
     expect(run.state.seats[0]?.deck).toHaveLength(5);

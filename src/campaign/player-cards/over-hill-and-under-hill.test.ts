@@ -160,7 +160,7 @@ describe("Fili and Kili (131006:A:1, 131007:A:1)", () => {
       const cursor = tab.state.seedCursor;
       let run = playCode(tab, code);
       run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, code), effectId: effect }, tab.ctx);
-      if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: brother }, tab.ctx);
+      expect(run.state.window?.kind).not.toBe("choose");
       expect(run.state.cards[brother]).toMatchObject({ zone: "play", controller: 0 });
       expect(run.state.seats[0]?.deck).toHaveLength(5);
       // "Then, shuffle your deck": the shuffle draws on the seed.
@@ -175,14 +175,10 @@ describe("Bofur (131008:A:1)", () => {
     // Top 5: a card, Steward of Gondor (not a Weapon), a card, Dwarven Axe, a card; a second Axe lies sixth.
     const deck = [{ code: "card", seat: 0 }, { code: STEWARD, seat: 0 }, { code: "card", seat: 0 }, { code: AXE, seat: 0 }, { code: "card", seat: 0 }, { code: AXE, seat: 0 }];
     const tab = table(effects, { heroes: [{ code: THORIN, seat: 0 }], allies: [{ code: BOFUR, seat: 0 }], playerDeck: deck });
-    const [axe, deeper] = tab.ids[AXE] ?? [];
+    const [axe] = tab.ids[AXE] ?? [];
     let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, BOFUR), effectId: "131008:action:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, BOFUR)]?.exhausted).toBe(true);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).not.toContain(idsOf(tab, STEWARD));
-      expect(choices(run.state, tab)).not.toContain(deeper);
-      run = sendUnledgered(run, { type: "Choose", optionId: axe ?? "" }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.seats[0]?.hand).toEqual([axe]);
     expect(run.state.seats[0]?.deck).toHaveLength(5);
   });
@@ -251,7 +247,7 @@ describe("Spare Hood and Cloak (131012:A:2)", () => {
     const tab = { ...scene, state: updateCard(scene.state, fili, { exhausted: true }) };
     expect(triggers(tab.state, tab)).toContain("131012:action:1");
     let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: hood, effectId: "131012:action:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: fili }, tab.ctx);
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[fili]?.exhausted).toBe(false);
     expect(run.state.cards[nori]?.exhausted).toBe(true);
     expect(run.state.cards[hood]?.exhausted).toBe(true);

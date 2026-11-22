@@ -106,10 +106,7 @@ describe("The Great Hunt (19149)", () => {
     expect(playable(tab.state, tab)).not.toContain(idsOf(tab, HUNT));
     const payments = [DENETHOR, GLORFINDEL, BERAVOR].map((code) => ({ heroId: idsOf(tab, code), amount: 1 }));
     let run = sendUnledgered(combat(tab.state, tab), { type: "PlayCard", cardId: idsOf(tab, HUNT), payments }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([idsOf(tab, BRUTE)]);
-      run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, BRUTE) }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[idsOf(tab, BRUTE)]?.zone).toBe("encounterDiscard");
     expect(run.state.cards[idsOf(tab, CHIEF)]?.zone).toBe("staging");
     expect(run.state.cards[idsOf(tab, CHEAP)]?.zone).toBe("engaged");
@@ -162,7 +159,8 @@ describe("Reforged (19153:A:1)", () => {
     let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, REFORGED), payments: [{ heroId: eowyn, amount: 1 }] }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([horn, blade].sort());
     run = sendUnledgered(run, { type: "Choose", optionId: blade ?? "" }, tab.ctx);
-    if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
+    expect(run.state.window?.kind).toBe("choose");
+    run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
     expect(run.state.cards[blade ?? ""]).toMatchObject({ zone: "play", host: eowyn });
     expect(run.state.cards[eowyn]?.resources).toBe(0);
   });

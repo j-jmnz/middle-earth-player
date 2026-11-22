@@ -77,7 +77,8 @@ describe("Galadriel (08112:A:1)", () => {
     const tab = table(effects, { heroes: [{ code: GALADRIEL, seat: 0 }, { code: EOWYN, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: HANDMAIDEN, seat: 0 }] });
     const [handmaiden, ally] = [idsOf(tab, HANDMAIDEN), idsOf(tab, ALLY)];
     let run = play(begin(tab.state), tab, handmaiden);
-    if (run.state.window?.kind === "response") run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    expect(run.state.window?.kind).toBe("response");
+    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
     run = sendUnledgered(begin(questing(run.state)), { type: "Commit", cardIds: [handmaiden, ally] }, tab.ctx);
     expect(run.state.cards[handmaiden]).toMatchObject({ committed: true, exhausted: false });
     expect(run.state.cards[ally]).toMatchObject({ committed: true, exhausted: true });
@@ -126,10 +127,7 @@ describe("Orophin (08114:A:2)", () => {
     let run = play(begin(tab.state), tab, orophin);
     expect(triggers(run.state, tab)).toContain("08114:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: orophin, effectId: "08114:response:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([mine]);
-      run = sendUnledgered(run, { type: "Choose", optionId: mine ?? "" }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.seats[0]?.hand).toEqual([mine]);
     expect(run.state.cards[scout ?? ""]?.zone).toBe("discard");
     expect(run.state.cards[song ?? ""]?.zone).toBe("discard");

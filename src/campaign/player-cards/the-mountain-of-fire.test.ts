@@ -119,10 +119,7 @@ describe("Éomer (146003:A:1)", () => {
     run = sendUnledgered(run, { type: "Commit", cardIds: [eomer] }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("146003:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: eomer, effectId: "146003:response:1", payments: [{ heroId: eomer, amount: 1 }] }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).not.toContain(dear);
-      run = sendUnledgered(run, { type: "Choose", optionId: soft }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[eomer]?.resources).toBe(0);
     expect(run.state.cards[soft]?.damage).toBe(printed(tab, EOMER, "attack"));
     expect(run.state.cards[dear]?.damage).toBe(0);
@@ -138,7 +135,7 @@ describe("Éomer (146003:A:1)", () => {
     expect(run.state.cards[eomer]).toMatchObject({ exhausted: true, committed: true });
     expect(triggers(run.state, tab)).toContain("146003:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: eomer, effectId: "146003:response:1", payments: [{ heroId: eomer, amount: 1 }] }, tab.ctx);
-    if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: tough }, tab.ctx);
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[eomer]).toMatchObject({ resources: 0, exhausted: true, committed: true });
     expect(run.state.cards[tough]?.damage).toBe(Math.max(0, printed(tab, EOMER, "attack") - printed(tab, TOUGH, "defense")));
     expect(run.state.cards[tough]?.damage).toBeGreaterThan(0);

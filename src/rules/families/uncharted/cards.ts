@@ -24,6 +24,7 @@ import { askTradeOrKeep } from "../encounter/trade.ts";
 import type { Focus } from "../index.ts";
 import { queueFront } from "../play/refs.ts";
 import { lowerThreatByEffect } from "../quest/threat.ts";
+import { forgetCommitted } from "../costs/pay.ts";
 import { queueHeard } from "../quest/events.ts";
 import { lastPlayer } from "../sea/players.ts";
 import { stage } from "./deck.ts";
@@ -180,7 +181,7 @@ export function removeWillpowerFromQuest(state: ScenarioState, instruction: Verb
   if (!chosen) return effectData(state) ? askTarget(state, { instruction: { ...instruction, left }, seat: state.firstPlayer, chosen: null, cause }, options) : state;
   const card = state.cards[chosen];
   if (!card) return state;
-  const removed = queueHeard(updateCard(state, chosen, { committed: false }), ctx, { trigger: "removedFromQuest", seat: card.controller, subject: chosen });
+  const removed = queueHeard(forgetCommitted(updateCard(state, chosen, { committed: false }), chosen), ctx, { trigger: "removedFromQuest", seat: card.controller, subject: chosen });
   const rest = left - modifiedStat(state, card, "willpower", ctx.cards);
   return rest > 0 ? queueFront(removed, [{ instruction: { ...instruction, left: rest }, seat: focus.seat, chosen: null, cause }]) : removed;
 }

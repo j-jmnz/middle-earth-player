@@ -115,11 +115,7 @@ describe("Horn's Cry (10088:A:1, A:2)", () => {
   lineSpec("10088:A:1", "gives every enemy -1 Attack until the end of the phase", (effects) => {
     const { tab, mine, theirs, staged } = horn(effects, 8);
     let run = playCode(tab, HORN);
-    if (run.state.window?.kind === "choose") {
-      // Below 40 threat the Valour Action is no choice.
-      expect(choices(run.state, tab)).toEqual(["all"]);
-      run = sendUnledgered(run, { type: "Choose", optionId: "all" }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     for (const id of [mine, theirs, staged]) expect(stat(run.state, tab, id, "attack")).toBe(2);
     const later = enter(run.state, tab, "questCommit");
     for (const id of [mine, theirs, staged]) expect(stat(later.state, tab, id, "attack")).toBe(3);

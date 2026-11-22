@@ -55,7 +55,7 @@ describe("Denethor (12001:A:2)", () => {
     const [denethor, eleanor] = [idsOf(scene, DENETHOR), idsOf(scene, ELEANOR)];
     const tab = { ...scene, state: updateCard(scene.state, denethor, { resources: 2 }) };
     let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: denethor, effectId: "12001:action:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") expect(choices(run.state, tab)).not.toContain(idsOf(tab, GLOIN));
+    expect(run.state.window?.kind).not.toBe("choose");
     run = chooseIfAsked(run, tab, eleanor);
     expect(run.state.cards[denethor]?.resources).toBe(1);
     expect(run.state.cards[eleanor]?.resources).toBe(1);
@@ -89,7 +89,7 @@ describe("Azain Silverbeard (12004:A:1)", () => {
     expect(destroyed.state.cards[idsOf(tab, FRAIL_ORC)]?.zone).toBe("encounterDiscard");
     expect(triggers(destroyed.state, tab)).toContain("12004:response:1");
     let run = sendUnledgered(destroyed, { type: "Trigger", cardId: idsOf(tab, AZAIN), effectId: "12004:response:1", payments: [{ heroId: legolas, amount: 1 }] }, tab.ctx);
-    if (run.state.window?.kind === "choose") expect(choices(run.state, tab)).not.toContain(troll);
+    expect(run.state.window?.kind).not.toBe("choose");
     run = chooseIfAsked(run, tab, orc);
     expect(run.state.cards[orc]?.damage).toBe(2);
     expect(run.state.cards[troll]?.damage).toBe(0);

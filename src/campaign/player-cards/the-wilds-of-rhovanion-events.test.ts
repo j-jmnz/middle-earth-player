@@ -99,10 +99,7 @@ describe("To Arms! (18013:A:1)", () => {
     for (const id of [warrior, ally, aragorn]) state = updateCard(state, id, { exhausted: true });
     const tab = { ...attached, state };
     let run = play(begin(tab.state), tab, idsOf(tab, TO_ARMS));
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([warrior]);
-      run = sendUnledgered(run, { type: "Choose", optionId: warrior }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[warrior]?.exhausted).toBe(false);
     expect(run.state.cards[ally]?.exhausted).toBe(true);
     expect(run.state.cards[aragorn]?.exhausted).toBe(true);
@@ -171,10 +168,7 @@ describe("Bartering (18015:A:1)", () => {
     const [steward, courage, stone, aragorn] = [idsOf(scene, STEWARD), idsOf(scene, COURAGE), idsOf(scene, STONE), idsOf(scene, ARAGORN)];
     const tab = { ...scene, state: updateCard(scene.state, courage, { exhausted: true }) };
     let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, BARTERING), payments: [] }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([steward]);
-      run = sendUnledgered(run, { type: "Choose", optionId: steward }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[steward]?.zone).toBe("hand");
     expect(run.state.cards[aragorn]?.attachments).toEqual([]);
     expect(playCost(run.state, stone, 0, tab.ctx, aragorn)).toBe(0);

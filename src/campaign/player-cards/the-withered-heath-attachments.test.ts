@@ -98,7 +98,7 @@ describe("Woodmen's Clearing (19006)", () => {
     }
     expect(run.state.cards[location]?.zone).not.toBe("activeLocation");
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, CLEARING), effectId: "19006:response:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: choices(run.state, tab)[0] ?? "" }, tab.ctx);
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.seats[1]?.threat).toBe((threats[1] ?? 0) - 3);
     expect(run.state.seats[0]?.threat).toBe(threats[0]);
   });
@@ -129,10 +129,7 @@ describe("Grey Cloak (19009)", () => {
     const { tab, run: open } = scene(effects);
     const [cheap, chief, dunhere, cloak] = [idsOf(tab, CHEAP), idsOf(tab, CHIEF), idsOf(tab, DUNHERE), idsOf(tab, CLOAK)];
     let run = sendUnledgered(open, { type: "Trigger", cardId: cloak, effectId: "19009:action:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([cheap]);
-      run = sendUnledgered(run, { type: "Choose", optionId: cheap }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[dunhere]?.exhausted).toBe(true);
     expect(run.state.cards[cloak]?.zone).toBe("discard");
     run = passAll(run, tab.ctx, { responses: true, engage: true });
@@ -215,7 +212,7 @@ describe("The Arkenstone (19010:A:3, A:4)", () => {
     const [mine, theirs] = tab.ids[CHAMPION] ?? [];
     const threats = tab.state.seats.map((seat) => seat.threat);
     let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: stone, effectId: "19010:action:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, SAGE) }, tab.ctx);
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.seats[0]?.threat).toBe((threats[0] ?? 0) - 2);
     expect(run.state.seats[1]?.threat).toBe((threats[1] ?? 0) + 2);
     expect(run.state.cards[stone]).toMatchObject({ host: idsOf(tab, SAGE), controller: 1 });

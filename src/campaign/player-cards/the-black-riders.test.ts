@@ -77,7 +77,8 @@ describe("Fatty Bolger (141005:A:1)", () => {
     const before = stagingThreat(tab.state, tab.ctx.cards);
     let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: fatty, effectId: "141005:action:1" }, tab.ctx);
     // The engaged enemy is not in the staging area: it is no choice.
-    if (run.state.window?.kind === "choose") expect(choices(run.state, tab)).not.toContain(idsOf(tab, WEAK));
+    expect(run.state.window?.kind).toBe("choose");
+    expect(choices(run.state, tab)).not.toContain(idsOf(tab, WEAK));
     run = chooseIfAsked(run, tab, enemy);
     expect(run.state.cards[fatty]?.exhausted).toBe(true);
     expect(run.state.seats[0]?.threat).toBe(8 + 3);
@@ -114,7 +115,7 @@ describe("Farmer Maggot (141008:A:1)", () => {
       expect(triggers(run.state, tab)).toContain("141008:response:1");
       run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, MAGGOT), effectId: "141008:response:1" }, tab.ctx);
       // The enemy engaged with the other player is no choice.
-      if (run.state.window?.kind === "choose") expect(choices(run.state, tab)).not.toContain(idsOf(tab, WEAK));
+      expect(run.state.window?.kind).not.toBe("choose");
       run = chooseIfAsked(run, tab, idsOf(tab, enemy));
       expect(run.state.cards[idsOf(tab, enemy)]?.damage).toBe(damage);
       expect(run.state.cards[idsOf(tab, WEAK)]?.damage).toBe(0);

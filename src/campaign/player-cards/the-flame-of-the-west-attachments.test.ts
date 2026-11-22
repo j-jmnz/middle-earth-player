@@ -78,13 +78,14 @@ describe("Golden Shield (145010:A:1, A:2)", () => {
     const [eowyn, shield, first] = [idsOf(tab, EOWYN), idsOf(tab, SHIELD), idsOf(tab, WEAK)];
     let run = passAll(combat(tab.state, tab), tab.ctx);
     // The player picks which engaged enemy attacks first.
-    if (run.state.window?.kind === "chooseEnemy") run = passAll(sendUnledgered(run, { type: "ChooseEnemy", enemyId: first }, tab.ctx), tab.ctx);
+    expect(run.state.window?.kind).toBe("chooseEnemy");
+    run = passAll(sendUnledgered(run, { type: "ChooseEnemy", enemyId: first }, tab.ctx), tab.ctx);
     expect(run.state.window?.kind).toBe("defense");
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: eowyn }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("145010:response:1");
     const before = run.steps.length;
     run = passAll(sendUnledgered(run, { type: "Trigger", cardId: shield, effectId: "145010:response:1" }, tab.ctx), tab.ctx);
-    if (run.state.window?.kind === "chooseEnemy") run = passAll(sendUnledgered(run, { type: "ChooseEnemy", enemyId: tab.ids[WEAK]?.[1] ?? "" }, tab.ctx), tab.ctx);
+    expect(run.state.window?.kind).not.toBe("chooseEnemy");
     const strikes = run.steps.slice(before).filter((step) => step.kind === "strike" && step.side === "enemy");
     expect(strikes.map((step) => (step.kind === "strike" ? [step.targetId, step.defense] : []))).toEqual([[eowyn, 1 + 4]]);
     expect(run.state.window?.kind).toBe("defense");

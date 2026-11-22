@@ -177,6 +177,13 @@ export function noteEvent(state: ScenarioState, event: GameEvent, ctx: ReduceCon
   return now.succeeded.includes(event.seat) ? state : { ...state, quested: { ...now, succeeded: [...now.succeeded, event.seat] } };
 }
 
+// A character removed from the quest no longer quests: "quests successfully" is read from who is committed when the quest resolves (rr.step-3-4). The event
+// removedFromQuest is queued only while a card hears it, so the removal itself takes the character out of the round's record.
+export function forgetCommitted(state: ScenarioState, cardId: string): ScenarioState {
+  const now = state.quested;
+  return now?.round === state.round && now.committed.includes(cardId) ? { ...state, quested: { ...now, committed: now.committed.filter((id) => id !== cardId) } } : state;
+}
+
 // The `questSucceeded` condition: the seat's quest succeeded this round; with `committed`, the card was committed to it.
 export function questSucceeded(state: ScenarioState, seat: number, cardId: string | null, committed: boolean): boolean {
   const now = state.quested;

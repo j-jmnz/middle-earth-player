@@ -64,10 +64,7 @@ describe("The Elvenking (19057)", () => {
     const [lord, king, guide] = [idsOf(scene, SILVAN), idsOf(scene, ELVENKING), idsOf(scene, GUIDE)];
     const tab = { ...scene, state: updateCard(scene.state, lord, { exhausted: true }) };
     let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: king, effectId: "19057:action:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([guide]);
-      run = sendUnledgered(run, { type: "Choose", optionId: guide }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[guide]?.zone).toBe("hand");
     expect(run.state.cards[idsOf(tab, ALLY)]?.zone).toBe("play");
     expect(run.state.cards[king]?.exhausted).toBe(true);

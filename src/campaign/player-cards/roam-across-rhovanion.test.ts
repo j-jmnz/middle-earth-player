@@ -95,10 +95,9 @@ describe("Wiglaf (19027:A:2)", () => {
     const { tab, first, second } = wiglafTable(effects);
     const wiglaf = idsOf(tab, WIGLAF);
     let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: wiglaf, effectId: "19027:action:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab).sort()).toEqual([first, second].sort());
-      run = sendUnledgered(run, { type: "Choose", optionId: first }, tab.ctx);
-    }
+    expect(run.state.window?.kind).toBe("choose");
+    expect(choices(run.state, tab).sort()).toEqual([first, second].sort());
+    run = sendUnledgered(run, { type: "Choose", optionId: first }, tab.ctx);
     expect(run.state.cards[wiglaf]?.exhausted).toBe(false);
     expect([run.state.cards[first]?.exhausted, run.state.cards[second]?.exhausted]).toEqual([true, false]);
     const again = updateCard(run.state, wiglaf, { exhausted: true });
@@ -148,7 +147,7 @@ describe("Meneldor (19031:A:1, A:2)", () => {
     expect(run.state.cards[meneldor]?.zone).toBe("discard");
     expect(triggers(run.state, tab)).toContain("19031:response:2");
     run = sendUnledgered(run, { type: "Trigger", cardId: meneldor, effectId: "19031:response:2" }, tab.ctx);
-    if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, GLADE) }, tab.ctx);
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[idsOf(tab, GLADE)]?.progress).toBe(2);
   });
 
@@ -194,10 +193,7 @@ describe("South Away! (19034:A:1)", () => {
     const declined = sendUnledgered(begin(tab.state), { type: "DeclineTravel" }, tab.ctx);
     expect(declined.state.phase).toBe("Travel");
     let run = play(declined, tab, idsOf(tab, SOUTH));
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([chosen]);
-      run = sendUnledgered(run, { type: "Choose", optionId: chosen }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[chosen]?.zone).toBe("activeLocation");
     expect(run.state.cards[active]?.zone).toBe("staging");
     expect(run.state.seats.map((seat) => seat.threat)).toEqual([8 - 2, 6 - 2]);

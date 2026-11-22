@@ -156,7 +156,7 @@ describe("Quicker Than Sight (19064:A:1)", () => {
     const event = idsOf(tab, QUICKER);
     expect(triggers(pending.state, tab)).toContain("19064:response:1");
     let run = sendUnledgered(pending, { type: "Trigger", cardId: event, effectId: "19064:response:1", payments: payFor(pending.state, tab.ctx, event) }, tab.ctx);
-    if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, GUIDE) }, tab.ctx);
+    expect(run.state.window?.kind).not.toBe("choose");
     for (let guard = 0; guard < 10 && (run.state.window?.kind === "frameAction" || run.state.window?.kind === "response"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, GUIDE)]?.zone).toBe("hand");
     expect(run.state.cards[idsOf(tab, ALLY)]?.zone).toBe("play");

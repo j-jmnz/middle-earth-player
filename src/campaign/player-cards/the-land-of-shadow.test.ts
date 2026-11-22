@@ -74,10 +74,9 @@ describe("Faramir (144002:A:2)", () => {
     let run = sendUnledgered(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, WEAK) }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("144002:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, FARAMIR), effectId: "144002:response:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab).sort()).toEqual([mine, spare].sort());
-      run = sendUnledgered(run, { type: "Choose", optionId: mine }, tab.ctx);
-    }
+    expect(run.state.window?.kind).toBe("choose");
+    expect(choices(run.state, tab).sort()).toEqual([mine, spare].sort());
+    run = sendUnledgered(run, { type: "Choose", optionId: mine }, tab.ctx);
     expect(run.state.cards[mine]?.exhausted).toBe(false);
     expect(run.state.cards[theirs]?.exhausted).toBe(true);
     expect(run.state.cards[idsOf(tab, FARAMIR)]?.exhausted).toBe(true);
@@ -89,7 +88,8 @@ describe("Faramir (144002:A:2)", () => {
     const { tab, mine } = faramirTable(effects, [WEAK, NEAR]);
     let run = sendUnledgered(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, WEAK) }, tab.ctx);
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, FARAMIR), effectId: "144002:response:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: mine }, tab.ctx);
+    expect(run.state.window?.kind).toBe("choose");
+    run = sendUnledgered(run, { type: "Choose", optionId: mine }, tab.ctx);
     expect(run.state.cards[mine]?.exhausted).toBe(false);
     for (let guard = 0; guard < 10 && run.state.cards[idsOf(tab, NEAR)]?.zone !== "engaged"; guard += 1) {
       const intent = run.state.window?.kind === "optionalEngage" ? ({ type: "DeclineEngage" } as const) : ({ type: "Pass" } as const);

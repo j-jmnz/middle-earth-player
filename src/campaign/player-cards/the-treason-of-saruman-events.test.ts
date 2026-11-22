@@ -111,8 +111,9 @@ describe("Helm! Helm! (143012:A:1, A:2)", () => {
     const tab = table(effects, { heroes: [{ code: THEODEN, seat: 0 }], allies: [{ code: HAMA, seat: 0 }], hand: [{ code: HELM, seat: 0 }], engaged: [{ code: TOUGH, seat: 0 }, { code: WEAK, seat: 0 }, { code: BOSS, seat: 0 }] });
     const [hama, weak, boss] = [idsOf(tab, HAMA), idsOf(tab, WEAK), idsOf(tab, BOSS)];
     let run = playIn(afterEnemyAttacks(tab).state, tab, HELM);
-    if (run.state.window?.kind === "choose" && choices(run.state, tab).includes(hama)) run = send(run, { type: "Choose", optionId: hama }, tab.ctx);
-    // The unique enemy is not offered.
+    // The only Rohan ally is discarded as the cost, so the one choice is the enemy; the unique enemy is not offered.
+    expect(run.state.window?.kind).toBe("choose");
+    expect(choices(run.state, tab)).not.toContain(hama);
     expect(choices(run.state, tab)).toContain(weak);
     expect(choices(run.state, tab)).not.toContain(boss);
     run = send(run, { type: "Choose", optionId: weak }, tab.ctx);
@@ -155,7 +156,11 @@ describe("The Three Hunters (143013:A:1, A:2)", () => {
     const before = ids.map((id) => [stat(committed.state, tab, id, "willpower"), stat(committed.state, tab, id, "attack"), stat(committed.state, tab, id, "defense")]);
     let run = playIn(committed.state, tab, HUNTERS);
     // Aragorn, Théoden and Treebeard are chosen; Éowyn stays exhausted.
-    for (const id of ids.slice(0, 3)) if (run.state.window?.kind === "choose") run = send(run, { type: "Choose", optionId: id }, tab.ctx);
+    for (const id of ids.slice(0, 3)) {
+      expect(run.state.window?.kind).toBe("choose");
+      expect(choices(run.state, tab)).toContain(id);
+      run = send(run, { type: "Choose", optionId: id }, tab.ctx);
+    }
     ids.forEach((id, index) => {
       const bonus = index < 3 ? 1 : 0;
       expect(run.state.cards[id]?.exhausted).toBe(index >= 3);

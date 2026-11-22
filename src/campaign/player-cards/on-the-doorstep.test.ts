@@ -168,7 +168,7 @@ describe("Glóin and Bifur (132006:A:1, 132007:A:1)", () => {
       const scene = table(EFFECTS, { heroes: [{ code: DWARF_HERO, seat: 0 }, { code: PAL, seat: 0 }, { code: SAGE, seat: 0 }], allies: dwarves(3), hand: [{ code: KINSFOLK, seat: 0 }] });
       const { tab, ids: [id = ""] } = discarded(scene, [[code, 0]]);
       let run = play(begin(tab.state), tab, idsOf(tab, KINSFOLK));
-      if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: id }, tab.ctx);
+      expect(run.state.window?.kind).not.toBe("choose");
       expect(run.state.cards[id]?.zone).toBe("play");
       expect(triggers(run.state, tab)).not.toContain(effect);
     }

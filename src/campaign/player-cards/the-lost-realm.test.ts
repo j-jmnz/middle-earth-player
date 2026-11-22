@@ -145,15 +145,12 @@ describe("Weather Hills Watchman (09003:A:1)", () => {
   lineSpec("09003:A:1", "after it enters play, takes a Signal card from the top 5 cards into the hand and shuffles", (effects) => {
     const deck = [CARD, CARD, SUMMONS, CARD, CARD, SUMMONS].map((code) => ({ code, seat: 0 }));
     const tab = table(effects, { heroes: [{ code: CORE_ARAGORN, seat: 0 }], hand: [{ code: WATCHMAN, seat: 0 }], playerDeck: deck });
-    const [near, deep] = tab.ids[SUMMONS] ?? [];
+    const [near] = tab.ids[SUMMONS] ?? [];
     const cursor = tab.state.seedCursor;
     let run = playCode(tab, WATCHMAN);
     expect(triggers(run.state, tab)).toContain("09003:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, WATCHMAN), effectId: "09003:response:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).not.toContain(deep);
-      expect(choices(run.state, tab).filter((id) => tab.ids[CARD]?.includes(id))).toEqual([]);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     run = chooseIfAsked(run, tab, near ?? "");
     expect(run.state.seats[0]?.hand).toEqual([near]);
     expect(run.state.seats[0]?.deck).toHaveLength(5);
@@ -254,7 +251,7 @@ describe("Expert Trackers (09009:A:1)", () => {
     expect(triggers(run.state, tab)).toContain("09009:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: trackers, effectId: "09009:response:1", payments: payFor(run.state, tab.ctx, trackers) }, tab.ctx);
     // Glóin is neither a Scout nor a Ranger.
-    if (run.state.window?.kind === "choose") expect(choices(run.state, tab)).not.toContain(idsOf(tab, GLOIN));
+    expect(run.state.window?.kind).not.toBe("choose");
     run = chooseIfAsked(run, tab, beravor);
     run = chooseIfAsked(run, tab, location);
     expect(run.state.cards[beravor]?.exhausted).toBe(true);

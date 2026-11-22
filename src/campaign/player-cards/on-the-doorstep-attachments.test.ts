@@ -16,7 +16,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, combat, hosts, passAll, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { attach, attacking, choices, combat, hosts, passAll, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const BARD = "132003";
 const YEW = "132014";
@@ -98,10 +98,14 @@ describe("Great Yew Bow (132014:A:2)", () => {
     let run = combat(tab.state, tab);
     expect(triggers(run.state, tab)).toContain("132014:action:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: yew, effectId: "132014:action:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([staged]);
-      run = sendUnledgered(run, { type: "Choose", optionId: staged ?? "" }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
+    // No other attacker can join: the window offers no declaration, and one sent for the ready Archer is refused.
+    const archer = idsOf(tab, ARCHER);
+    expect(legalIntents(run.state, tab.ctx).map((intent) => intent.type)).not.toContain("DeclareAttackers");
+    expect(() => sendUnledgered(run, { type: "DeclareAttackers", enemyId: staged ?? "", attackerIds: [archer] }, tab.ctx)).toThrow();
+    expect(() => sendUnledgered(run, { type: "DeclareAttackers", enemyId: staged ?? "", attackerIds: [legolas, archer] }, tab.ctx)).toThrow();
+    // A plain attack does offer the declaration (the control).
+    expect(legalIntents(attacking(tab.state), tab.ctx).map((intent) => intent.type)).toContain("DeclareAttackers");
     expect(run.state.cards[yew]?.exhausted).toBe(true);
     expect(run.state.cards[legolas]?.exhausted).toBe(true);
     run = passAll(run, tab.ctx, { responses: true });
@@ -118,7 +122,7 @@ describe("Great Yew Bow (132014:A:2)", () => {
     const tab = table(EFFECTS, { heroes: [{ code: BARD, seat: 0 }, { code: PAL, seat: 0 }], attached: [{ code: YEW, host: BARD }], staging: [SOFT] });
     const soft = idsOf(tab, SOFT);
     let run = sendUnledgered(combat(tab.state, tab), { type: "Trigger", cardId: idsOf(tab, YEW), effectId: "132014:action:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: soft }, tab.ctx);
+    expect(run.state.window?.kind).not.toBe("choose");
     run = passAll(run, tab.ctx, { responses: true });
     expect(run.state.cards[soft]?.damage).toBe(tab.ctx.cards.get(BARD)?.attack ?? 0);
   });
@@ -168,7 +172,8 @@ describe("Expert Treasure-hunter (132017:A:1, A:2)", () => {
       expect(triggers(quest.state, tab)).toContain("132017:response:1");
       let run = sendUnledgered(quest, { type: "Trigger", cardId: idsOf(tab, HUNTER), effectId: "132017:response:1" }, tab.ctx);
       run = sendUnledgered(run, { type: "Choose", optionId: named }, tab.ctx);
-      if (run.state.window?.kind === "choose" && choices(run.state, tab).includes(top)) run = sendUnledgered(run, { type: "Choose", optionId: top }, tab.ctx);
+      // The named type is the only thing to decide: the discarded top card is not a choice.
+      expect(run.state.window?.kind).not.toBe("choose");
       expect(run.state.cards[top]?.zone).toBe(zone);
       expect(run.state.seats[0]?.deck).toHaveLength(1);
     }
@@ -202,7 +207,7 @@ describe("King Under the Mountain (132018:A:1, A:2)", () => {
     let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: king, effectId: "132018:action:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([first, second].sort());
     run = sendUnledgered(run, { type: "Choose", optionId: second }, tab.ctx);
-    if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: first }, tab.ctx);
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[second]?.zone).toBe("hand");
     expect(run.state.cards[first]?.zone).toBe("discard");
     expect(run.state.seats[0]?.deck).toEqual([third]);

@@ -33,6 +33,7 @@ import { flagged, inPlay, livingSeats, updateCard, type ScenarioState } from "..
 import { attachTo, cardsUnder, discardFromHand, moveCard, turnedUp } from "../core/zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../core/cause.ts";
 import { takeProgressOff } from "../core/progress.ts";
+import { forgetCommitted } from "../families/costs/pay.ts";
 import { noteEncounterThreat } from "../families/encounter/reveal.ts";
 import { moveEncounter } from "../families/encounter/moves.ts";
 import { isGollum } from "../families/gollum/index.ts";
@@ -176,7 +177,7 @@ export function runExtraVerb(
       const id = lastPicked(state);
       const card = state.cards[id];
       // "After attached character is removed from the quest" (12116:A:3).
-      return card?.committed ? queueHeard(updateCard(state, id, { committed: false }), ctx, { trigger: "removedFromQuest", seat: card.controller, subject: id }) : state;
+      return card?.committed ? queueHeard(forgetCommitted(updateCard(state, id, { committed: false }), id), ctx, { trigger: "removedFromQuest", seat: card.controller, subject: id }) : state;
     }
     case "EngageAll": {
       const seat = seatFor(state, instruction.who, focus.seat);

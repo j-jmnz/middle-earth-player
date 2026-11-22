@@ -68,7 +68,8 @@ describe("Aragorn (143001:A:2)", () => {
     // The 2 come from Aragorn's pool, not another hero's.
     expect(refusal(state, { type: "Trigger", cardId: aragorn, effectId: "143001:action:1", payments: [{ heroId: gimli, amount: 2 }] }, tab.ctx)).toBe("Only that card's resources can pay");
     let run = send(begin(state), { type: "Trigger", cardId: aragorn, effectId: "143001:action:1", payments: [{ heroId: aragorn, amount: 2 }] }, tab.ctx);
-    if (run.state.window?.kind === "choose") run = send(run, { type: "Choose", optionId: gimli }, tab.ctx);
+    expect(run.state.window?.kind).toBe("choose");
+    run = send(run, { type: "Choose", optionId: gimli }, tab.ctx);
     expect(run.state.cards[gimli]?.exhausted).toBe(false);
     expect(run.state.cards[aragorn]?.resources).toBe(1);
     expect(run.state.cards[gimli]?.resources).toBe(5);

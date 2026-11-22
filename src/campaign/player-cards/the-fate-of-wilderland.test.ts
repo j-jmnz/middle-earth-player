@@ -204,10 +204,9 @@ describe("Mithril Shirt (19152)", () => {
     const [shirt, location, eowyn] = [idsOf(tab, SHIRT), idsOf(tab, GREEN_HILL), idsOf(tab, EOWYN)];
     // The location is explored (it leaves play), and the next intent lets the game resolve what that set off.
     let run = sendUnledgered(begin(destroyCard(played.state, location, tab.ctx.cards, [], true)), { type: "Pass" }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, GIMLI), eowyn].sort());
-      run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
-    }
+    expect(run.state.window?.kind).toBe("choose");
+    expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, GIMLI), eowyn].sort());
+    run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
     expect(run.state.cards[shirt]).toMatchObject({ host: eowyn, zone: "play" });
   });
 
@@ -272,10 +271,7 @@ describe("Radagast's Staff (19154)", () => {
     let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, STAFF), effectId: "19154:action:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual(["ready", "reduce"]);
     run = sendUnledgered(run, { type: "Choose", optionId: "ready" }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([raven]);
-      run = sendUnledgered(run, { type: "Choose", optionId: raven }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[raven]?.exhausted).toBe(false);
     expect(run.state.cards[ally]?.exhausted).toBe(true);
   });
@@ -285,10 +281,7 @@ describe("Radagast's Staff (19154)", () => {
     const { tab, run: used } = staff(effects, { engaged: [{ code: WARG, seat: 0 }, { code: BEAST, seat: 0 }] });
     expect(choices(used.state, tab).sort()).toEqual(["reduce", "return"]);
     let run = sendUnledgered(used, { type: "Choose", optionId: "return" }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([idsOf(tab, WARG)]);
-      run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, WARG) }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[idsOf(tab, WARG)]?.zone).toBe("staging");
     expect(run.state.cards[idsOf(tab, BEAST)]?.zone).toBe("engaged");
   });

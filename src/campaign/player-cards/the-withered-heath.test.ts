@@ -12,7 +12,7 @@ import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-pas
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, discarded, passAll, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, combat, discarded, passAll, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const SKIN_CHANGER = "19004";
 const RAGE = "19005";
@@ -65,10 +65,7 @@ describe("Beorning Skin-changer (19004:A:1)", () => {
     let run = combat(tab.state, tab);
     expect(triggers(run.state, tab)).toContain("19004:action:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: skin, effectId: "19004:action:1" }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([bear]);
-      run = sendUnledgered(run, { type: "Choose", optionId: bear }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[skin]?.zone).toBe("discard");
     expect(run.state.cards[bear]).toMatchObject({ zone: "play", controller: 0 });
   });
@@ -80,10 +77,7 @@ describe("Beorning Skin-changer (19004:A:1)", () => {
     let run = combat(tab.state, tab);
     expect(triggers(run.state, tab)).toContain("19004:action:2");
     run = sendUnledgered(run, { type: "Trigger", cardId: skin, effectId: "19004:action:2" }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([guardian]);
-      run = sendUnledgered(run, { type: "Choose", optionId: guardian }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[skin]?.zone).toBe("discard");
     expect(run.state.cards[guardian]).toMatchObject({ zone: "play", controller: 0 });
     expect(run.state.cards[brute]?.zone).toBe("discard");
@@ -163,10 +157,7 @@ describe("Long Lake Fisherman (19008:A:1)", () => {
     run = sendUnledgered(run, { type: "Trigger", cardId: fisherman, effectId: "19008:response:1" }, tab.ctx);
     // The number is named among 0 to 6 (the options x0 to x6).
     run = sendUnledgered(run, { type: "Choose", optionId: "x2" }, tab.ctx);
-    if (run.state.window?.kind === "choose") {
-      expect(choices(run.state, tab)).toEqual([two]);
-      run = sendUnledgered(run, { type: "Choose", optionId: two ?? "" }, tab.ctx);
-    }
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[two ?? ""]?.zone).toBe("hand");
     expect(run.state.cards[sixth ?? ""]?.zone).toBe("deck");
     expect(run.state.seats[0]?.deck).toHaveLength(5);
