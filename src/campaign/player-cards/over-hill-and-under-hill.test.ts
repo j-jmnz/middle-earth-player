@@ -9,15 +9,13 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { settle } from "../../rules/engine/machine.ts";
-import { legalIntents, reduce, type PlayerIntent, type ReduceContext } from "../../rules/engine/reduce.ts";
-import { expectOk } from "../../rules/core/test-fixture.ts";
-import { withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { syncConstants } from "../../rules/interpret/constants.ts";
-import { fund, payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import type { ReduceContext } from "../../rules/engine/reduce.ts";
+import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
+import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { causeProblems } from "../../../test/harness/cause-check.ts";
-import { begin, buildTable, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { choices, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const BILBO = "131001";
 const THORIN = "131002";
@@ -39,6 +37,8 @@ const WEAK = "weak";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
+const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+
 beforeAll(async () => {
   const starter = await starterBase();
   const cards = new Map([...starter.cards, ...(await loadPrinted([BILBO, THORIN, NORI, ORI, BEORN, FILI, KILI, BOFUR, GANDALF, CRAM, HOOD, MAP, STEWARD, AXE]))]);
@@ -46,41 +46,16 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-// The harness's send (test/harness/scene.ts), save one cause problem it tolerates: data/printed has no ledger for this box yet, so a step these
-// cards' records cause names a line "which is not in the ledger". Every other cause problem still fails the intent.
-function send(run: Run, intent: PlayerIntent, ctx: ReduceContext): Run {
-  const result = expectOk(reduce(run.state, intent, ctx));
-  const problems = causeProblems(result.steps).filter((problem) => !/names line 131\d{3}:A:\d+, which is not in the ledger/.test(problem));
-  if (problems.length > 0) throw new Error(`Steps without a verified cause after ${intent.type}: ${problems.join("; ")}`);
-  return { state: result.state, steps: [...run.steps, ...result.steps] };
-}
-
 // The harness's passWindows on this file's send: the framework action windows are passed until the game asks for something else.
 function passWindows(run: Run, ctx: ReduceContext): Run {
   let next = run;
-  for (let guard = 0; guard < 20 && next.state.window?.kind === "frameAction"; guard += 1) next = send(next, { type: "Pass" }, ctx);
+  for (let guard = 0; guard < 20 && next.state.window?.kind === "frameAction"; guard += 1) next = sendUnledgered(next, { type: "Pass" }, ctx);
   return next;
-}
-
-// A table on these records, every hero of every seat holding `resources`, the constants brought up to date.
-function table(effects: readonly Effect[], scene: Scene = {}, resources = 6): Table {
-  const tab = buildTable(base, { ring: "none", start: "planning", ...scene, effects });
-  let state = tab.state;
-  for (let seat = 0; seat < (scene.seats ?? 1); seat += 1) state = fund(state, seat, resources);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
-
-function triggers(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Trigger" ? [intent.effectId] : []));
-}
-
-function choices(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Choose" ? [intent.optionId] : []));
 }
 
 function play(tab: Table, code: string, run: Run = begin(tab.state)): Run {
   const card = tab.ids[code]?.find((id) => run.state.cards[id]?.zone === "hand") ?? idsOf(tab, code);
-  return send(run, { type: "PlayCard", cardId: card, payments: payFor(run.state, tab.ctx, card) }, tab.ctx);
+  return sendUnledgered(run, { type: "PlayCard", cardId: card, payments: payFor(run.state, tab.ctx, card) }, tab.ctx);
 }
 
 // The reason the attachment cannot be played on the host, or null when it can.
@@ -102,17 +77,17 @@ describe("Bilbo Baggins (131001:A:1, A:2)", () => {
   lineSpec("131001:A:1", "the first player takes control of him, and he follows the first player token", (effects) => {
     const tab = table(effects, { seats: 2, heroes: [{ code: THORIN, seat: 0 }, { code: BILBO, seat: 1 }, { code: NORI, seat: 1 }] });
     const bilbo = idsOf(tab, BILBO);
-    let run = send(begin(tab.state), { type: "Pass" }, tab.ctx);
+    let run = sendUnledgered(begin(tab.state), { type: "Pass" }, tab.ctx);
     expect(run.state.cards[bilbo]?.controller).toBe(0);
     expect(run.state.seats[0]?.heroes).toContain(bilbo);
-    run = send(begin({ ...run.state, firstPlayer: 1 }), { type: "Pass" }, tab.ctx);
+    run = sendUnledgered(begin({ ...run.state, firstPlayer: 1 }), { type: "Pass" }, tab.ctx);
     expect(run.state.cards[bilbo]?.controller).toBe(1);
   });
 
   // "Bilbo Baggins cannot gain resources from player card effects."
   lineSpec("131001:A:2", "gains no resource from a player card effect", (effects) => {
     const tab = table(effects, { heroes: [{ code: BILBO, seat: 0 }, { code: THORIN, seat: 0 }], attached: [{ code: STEWARD, host: BILBO }] }, 0);
-    const run = send(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, STEWARD), effectId: "01026:action:1" }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, STEWARD), effectId: "01026:action:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, STEWARD)]?.exhausted).toBe(true);
     expect(run.state.cards[idsOf(tab, BILBO)]?.resources).toBe(0);
   });
@@ -156,7 +131,7 @@ describe("Nori (131003:A:1)", () => {
     const tab = table(effects, { heroes: [{ code: NORI, seat: 0 }, { code: ORI, seat: 0 }], hand: [{ code: KILI, seat: 0 }] });
     const threat = tab.state.seats[0]?.threat ?? 0;
     let run = play(tab, KILI);
-    run = send(run, { type: "Trigger", cardId: idsOf(tab, NORI), effectId: "131003:response:1" }, tab.ctx);
+    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, NORI), effectId: "131003:response:1" }, tab.ctx);
     expect(run.state.seats[0]?.threat).toBe(threat - 1);
   });
 
@@ -168,8 +143,8 @@ describe("Nori (131003:A:1)", () => {
     const threat = plain.state.seats[0]?.threat ?? 0;
     let run = play(tab, FILI, plain);
     expect(triggers(run.state, tab).sort()).toEqual(["131003:response:1", "131006:response:1"]);
-    run = send(run, { type: "Trigger", cardId: idsOf(tab, NORI), effectId: "131003:response:1" }, tab.ctx);
-    run = send(run, { type: "Trigger", cardId: idsOf(tab, FILI), effectId: "131006:response:1" }, tab.ctx);
+    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, NORI), effectId: "131003:response:1" }, tab.ctx);
+    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, FILI), effectId: "131006:response:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, KILI)]?.zone).toBe("play");
     expect(triggers(run.state, tab)).not.toContain("131003:response:1");
     expect(run.state.seats[0]?.threat).toBe(threat - 1);
@@ -191,7 +166,7 @@ describe("Beorn (131005:A:1, A:3)", () => {
     const beorn = idsOf(tab, BEORN);
     let run = passWindows(enter(tab.state, tab, "combatStart"), tab.ctx);
     expect(run.state.window?.kind).toBe("defense");
-    run = send(run, { type: "DeclareDefender", defenderId: beorn }, tab.ctx);
+    run = sendUnledgered(run, { type: "DeclareDefender", defenderId: beorn }, tab.ctx);
     expect(run.state.cards[beorn]?.exhausted).toBe(false);
   });
 });
@@ -206,8 +181,8 @@ describe("Fili and Kili (131006:A:1, 131007:A:1)", () => {
       const brother = idsOf(tab, other);
       const cursor = tab.state.seedCursor;
       let run = play(tab, code);
-      run = send(run, { type: "Trigger", cardId: idsOf(tab, code), effectId: effect }, tab.ctx);
-      if (run.state.window?.kind === "choose") run = send(run, { type: "Choose", optionId: brother }, tab.ctx);
+      run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, code), effectId: effect }, tab.ctx);
+      if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: brother }, tab.ctx);
       expect(run.state.cards[brother]).toMatchObject({ zone: "play", controller: 0 });
       expect(run.state.seats[0]?.deck).toHaveLength(5);
       // "Then, shuffle your deck": the shuffle draws on the seed.
@@ -223,12 +198,12 @@ describe("Bofur (131008:A:1)", () => {
     const deck = [{ code: "card", seat: 0 }, { code: STEWARD, seat: 0 }, { code: "card", seat: 0 }, { code: AXE, seat: 0 }, { code: "card", seat: 0 }, { code: AXE, seat: 0 }];
     const tab = table(effects, { heroes: [{ code: THORIN, seat: 0 }], allies: [{ code: BOFUR, seat: 0 }], playerDeck: deck });
     const [axe, deeper] = tab.ids[AXE] ?? [];
-    let run = send(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, BOFUR), effectId: "131008:action:1" }, tab.ctx);
+    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, BOFUR), effectId: "131008:action:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, BOFUR)]?.exhausted).toBe(true);
     if (run.state.window?.kind === "choose") {
       expect(choices(run.state, tab)).not.toContain(idsOf(tab, STEWARD));
       expect(choices(run.state, tab)).not.toContain(deeper);
-      run = send(run, { type: "Choose", optionId: axe ?? "" }, tab.ctx);
+      run = sendUnledgered(run, { type: "Choose", optionId: axe ?? "" }, tab.ctx);
     }
     expect(run.state.seats[0]?.hand).toEqual([axe]);
     expect(run.state.seats[0]?.deck).toHaveLength(5);
@@ -240,7 +215,7 @@ describe("Gandalf (131010:A:1, A:2)", () => {
   lineSpec("131010:A:1", "is committed to the quest and stays ready", (effects) => {
     const tab = table(effects, { start: "quest", heroes: [{ code: THORIN, seat: 0 }], allies: [{ code: GANDALF, seat: 0 }], deck: ["f0", "f0"] });
     const gandalf = idsOf(tab, GANDALF);
-    const run = send(begin(tab.state), { type: "Commit", cardIds: [gandalf, idsOf(tab, THORIN)] }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [gandalf, idsOf(tab, THORIN)] }, tab.ctx);
     expect(run.state.cards[gandalf]).toMatchObject({ committed: true, exhausted: false });
     expect(run.state.cards[idsOf(tab, THORIN)]?.exhausted).toBe(true);
   });
@@ -254,7 +229,7 @@ describe("Gandalf (131010:A:1, A:2)", () => {
   lineSpec("131010:A:2", "is discarded at the end of the refresh phase", (effects) => {
     const { tab, run: ended } = refreshEnds(effects);
     let run = ended;
-    if (choices(run.state, tab).includes("discard")) run = send(run, { type: "Choose", optionId: "discard" }, tab.ctx);
+    if (choices(run.state, tab).includes("discard")) run = sendUnledgered(run, { type: "Choose", optionId: "discard" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, GANDALF)]?.zone).toBe("discard");
     // The refresh phase raised the threat by its own 1 only.
     expect(run.state.seats[0]?.threat).toBe(9);
@@ -263,7 +238,7 @@ describe("Gandalf (131010:A:1, A:2)", () => {
   lineSpec("131010:A:2", "stays in play when the player raises their threat by 2", (effects) => {
     const { tab, run: ended } = refreshEnds(effects);
     expect(choices(ended.state, tab).sort()).toEqual(["cancel", "discard"]);
-    const run = send(ended, { type: "Choose", optionId: "cancel" }, tab.ctx);
+    const run = sendUnledgered(ended, { type: "Choose", optionId: "cancel" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, GANDALF)]?.zone).toBe("play");
     // 8, +1 for the refresh phase, +2 to keep him.
     expect(run.state.seats[0]?.threat).toBe(11);
@@ -280,18 +255,30 @@ describe("Gandalf (131010:A:1, A:2)", () => {
 describe("Spare Hood and Cloak (131012:A:2)", () => {
   // "Action: Exhaust Spare Hood and Cloak and exhaust attached character to ready another character. Then, attach Spare Hood and Cloak to that character."
   // rr.then: the text after "Then" resolves only if the text before it resolved in full. Readying a character that is already ready does not resolve,
-  // so the Cloak must stay where it is (or the ready character must not be a legal choice).
-  it("131012:A:2 does not move the Cloak to a character that was already ready", () => {
+  // so a ready character is no choice: with no exhausted other character the Action is not offered at all, and nothing is exhausted for it.
+  it("131012:A:2 is not offered while every other character is ready, and nothing is exhausted", () => {
     const tab = table(EFFECTS, { heroes: [{ code: NORI, seat: 0 }], attached: [{ code: HOOD, host: NORI }], allies: [{ code: FILI, seat: 0 }] });
     const [nori, hood, fili] = [idsOf(tab, NORI), idsOf(tab, HOOD), idsOf(tab, FILI)];
     expect(tab.state.cards[fili]?.exhausted).toBe(false);
-    const result = reduce(tab.state, { type: "Trigger", cardId: hood, effectId: "131012:action:1" }, tab.ctx);
-    // The Action is refused: nothing is changed, which the card allows.
-    if (!result.ok) return;
-    let run: Run = { state: result.state, steps: [...result.steps] };
-    if (choices(run.state, tab).includes(fili)) run = send(run, { type: "Choose", optionId: fili }, tab.ctx);
-    expect(run.state.cards[hood]?.host).toBe(nori);
-    expect(run.state.cards[fili]?.attachments).not.toContain(hood);
+    expect(triggers(tab.state, tab)).not.toContain("131012:action:1");
+    expect(refusal(tab.state, { type: "Trigger", cardId: hood, effectId: "131012:action:1" }, tab.ctx)).toBe("That effect cannot be triggered");
+    expect(tab.state.cards[hood]?.exhausted).toBe(false);
+    expect(tab.state.cards[nori]?.exhausted).toBe(false);
+  });
+
+  // "Action: Exhaust Spare Hood and Cloak and exhaust attached character to ready another character. Then, attach Spare Hood and Cloak to that character."
+  lineSpec("131012:A:2", "readies an exhausted character and moves the Cloak to it", (effects) => {
+    const scene = table(effects, { heroes: [{ code: NORI, seat: 0 }], attached: [{ code: HOOD, host: NORI }], allies: [{ code: FILI, seat: 0 }] });
+    const [nori, hood, fili] = [idsOf(scene, NORI), idsOf(scene, HOOD), idsOf(scene, FILI)];
+    const tab = { ...scene, state: updateCard(scene.state, fili, { exhausted: true }) };
+    expect(triggers(tab.state, tab)).toContain("131012:action:1");
+    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: hood, effectId: "131012:action:1" }, tab.ctx);
+    if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: fili }, tab.ctx);
+    expect(run.state.cards[fili]?.exhausted).toBe(false);
+    expect(run.state.cards[nori]?.exhausted).toBe(true);
+    expect(run.state.cards[hood]?.exhausted).toBe(true);
+    expect(run.state.cards[hood]?.host).toBe(fili);
+    expect(run.state.cards[nori]?.attachments).not.toContain(hood);
   });
 });
 

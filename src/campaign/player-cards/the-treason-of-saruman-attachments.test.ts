@@ -9,13 +9,13 @@ import { EFFECTS } from "../../effects/index.ts";
 import { hasKeyword, modifiedStat } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
-import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { syncConstants } from "../../rules/interpret/constants.ts";
+import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
 import { playCost } from "../../rules/player/attach.ts";
-import { fund, payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, buildTable, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { begin, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { attacking, choices, playerTable, triggers } from "../../../test/harness/player-table.ts";
 
 const THEODEN = "143002";
 const TREEBEARD = "143003";
@@ -40,6 +40,8 @@ const LOCATION = "141034";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
+const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+
 beforeAll(async () => {
   const starter = await starterBase();
   const cards = new Map([...starter.cards, ...(await loadPrinted([THEODEN, TREEBEARD, LEGOLAS, QUICKBEAM, HAMA, AROD, ENT_DRAUGHT, HERUGRIM, SHADOWFAX, GIMLI, EOWYN, GANDALF, ORI]))]);
@@ -47,20 +49,6 @@ beforeAll(async () => {
   cards.set(WEAK, definePrinted({ code: WEAK, name: "Weak", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 0, health: 1 }));
   base = { ...starter, cards };
 });
-
-// A table on these records, every hero holding `resources`, the constants brought up to date.
-function table(effects: readonly Effect[], scene: Scene = {}, resources = 6): Table {
-  const tab = buildTable(base, { ring: "none", start: "planning", ...scene, effects });
-  return { ...tab, state: syncConstants(fund(tab.state, 0, resources), tab.ctx) };
-}
-
-function triggers(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Trigger" ? [intent.effectId] : []));
-}
-
-function choices(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Choose" ? [intent.optionId] : []));
-}
 
 // The reason the card cannot be played on the host, or null when it can (paid in full from the heroes that can pay).
 function onto(tab: Table, cardId: string, hostId: string, state: ScenarioState = tab.state): string | null {
@@ -73,8 +61,6 @@ function passAll(run: Run, tab: Table): Run {
   for (let guard = 0; guard < 10 && next.state.pendingStrike && legalIntents(next.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) next = send(next, { type: "Pass" }, tab.ctx);
   return next;
 }
-
-const attacking = (state: ScenarioState): ScenarioState => ({ ...withMode(state, "playerAttacks"), window: { kind: "playerAttack" }, activeSeat: 0 });
 
 describe("Arod (143008:A:1, A:2)", () => {
   // "Attach to a hero or Legolas."

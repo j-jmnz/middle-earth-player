@@ -5,17 +5,16 @@
 import { beforeAll, describe, expect } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
-import { modifiedStat } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { attackBarred, syncConstants } from "../../rules/interpret/constants.ts";
-import { settle } from "../../rules/engine/machine.ts";
+import { withMode } from "../../rules/core/state.ts";
+import { attackBarred } from "../../rules/interpret/constants.ts";
 import { legalIntents, legalTargets } from "../../rules/engine/reduce.ts";
 import { stagingThreat } from "../../rules/quest/quest.ts";
-import { fund, payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, buildTable, idsOf, passWindows, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { begin, idsOf, passWindows, send, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { combat, playerTable, stat } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const THEODRED = "01002";
@@ -48,6 +47,8 @@ const ALLY = "ally";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
+const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+
 beforeAll(async () => {
   const starter = await starterBase();
   const codes = [ARAGORN, THEODRED, GIMLI, LEGOLAS, THALIN, EOWYN, DENETHOR, TOOK, STEWARD, STONE, THICKET, GONDOLIN, PLATE, AXE, HORN, FAVOR, POWER, COURAGE, SNARE, PROTECTOR, DARK, PRESERVATION, BAMFURLONG, GREEN_HILL];
@@ -56,23 +57,9 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-// The table on the records under test, each hero funded, the constants brought up to date as the reducer does after an intent.
-function table(effects: readonly Effect[], scene: Scene, resources = 6): Table {
-  const tab = buildTable(base, { ring: "none", start: "planning", ...scene, effects });
-  let state = tab.state;
-  for (let seat = 0; seat < (scene.seats ?? 1); seat += 1) state = fund(state, seat, resources);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
-
 // The cards the engine offers as the host of the attachment in hand.
 function hosts(tab: Table, code: string): string[] {
   return [...legalTargets(tab.state, { type: "PlayCard", cardId: idsOf(tab, code) }, tab.ctx)].sort();
-}
-
-function stat(state: ScenarioState, tab: Table, id: string, which: "attack" | "defense" | "hitPoints" | "willpower" | "threat"): number {
-  const card = state.cards[id];
-  if (!card) throw new Error(`no card ${id}`);
-  return modifiedStat(state, card, which, tab.ctx.cards);
 }
 
 function printed(tab: Table, code: string, which: "attack" | "defense" | "health" | "willpower"): number {
@@ -187,10 +174,6 @@ describe("Power in the Earth (01056)", () => {
     expect(stagingThreat(run.state, tab.ctx.cards)).toBe(before - 1);
   });
 });
-
-function combat(state: ScenarioState, tab: Table): Run {
-  return begin(settle({ ...withMode(state, "combatStart"), window: null }, tab.ctx, []));
-}
 
 describe("Forest Snare (01069)", () => {
   // "Attach to an enemy engaged with a player.": an enemy engaged with either player is offered; one in the staging area is not.

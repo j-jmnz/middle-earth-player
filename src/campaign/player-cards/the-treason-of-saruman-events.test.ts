@@ -4,16 +4,15 @@
 import { beforeAll, describe, expect } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
-import { modifiedStat } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { settle } from "../../rules/engine/machine.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import { withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { syncConstants } from "../../rules/interpret/constants.ts";
-import { fund, payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, buildTable, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { begin, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { attacking, choices, combat, playerTable, stat } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "143001";
 const THEODEN = "143002";
@@ -37,6 +36,8 @@ const FELLOW = "fellow";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
+const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+
 beforeAll(async () => {
   const starter = await starterBase();
   const cards = new Map([...starter.cards, ...(await loadPrinted([ARAGORN, THEODEN, TREEBEARD, QUICKBEAM, HAMA, ENT_DRAUGHT, ENTMOOT, HELM, HUNTERS, CORE_ARAGORN, EOWYN, GIMLI, ORI]))]);
@@ -47,20 +48,6 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-// A table on these records, every hero holding `resources`, the constants brought up to date.
-function table(effects: readonly Effect[], scene: Scene = {}, resources = 6): Table {
-  const tab = buildTable(base, { ring: "none", start: "planning", ...scene, effects });
-  return { ...tab, state: syncConstants(fund(tab.state, 0, resources), tab.ctx) };
-}
-
-function choices(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Choose" ? [intent.optionId] : []));
-}
-
-function stat(state: ScenarioState, tab: Table, id: string, which: "attack" | "defense" | "willpower"): number {
-  return modifiedStat(state, state.cards[id]!, which, tab.ctx.cards);
-}
-
 function playIn(state: ScenarioState, tab: Table, code: string): Run {
   const card = idsOf(tab, code);
   return send(begin(state), { type: "PlayCard", cardId: card, payments: payFor(state, tab.ctx, card) }, tab.ctx);
@@ -70,12 +57,6 @@ function playable(state: ScenarioState, tab: Table, code: string): string | null
   const card = idsOf(tab, code);
   return refusal(state, { type: "PlayCard", cardId: card, payments: payFor(state, tab.ctx, card) }, tab.ctx);
 }
-
-function combat(state: ScenarioState, tab: Table): Run {
-  return begin(settle({ ...withMode(state, "combatStart"), window: null }, tab.ctx, []));
-}
-
-const attacking = (state: ScenarioState): ScenarioState => ({ ...withMode(state, "playerAttacks"), window: { kind: "playerAttack" }, activeSeat: 0 });
 
 describe("Entmoot (143011:A:1, A:2)", () => {
   // "Play only if you control at least 1 Ent character."

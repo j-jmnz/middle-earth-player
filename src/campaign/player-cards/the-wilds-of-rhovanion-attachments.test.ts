@@ -8,19 +8,19 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { ruleCause } from "../../rules/core/cause.ts";
-import { modifiedStat, placeDamage } from "../../rules/core/keywords.ts";
+import { placeDamage } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
 import { attachTo, spawn } from "../../rules/core/zones.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { playCost } from "../../rules/player/attach.ts";
 import { settle } from "../../rules/engine/machine.ts";
-import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext } from "../../rules/engine/reduce.ts";
-import { expectOk } from "../../rules/core/test-fixture.ts";
-import { fund, payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { legalTargets } from "../../rules/engine/reduce.ts";
+import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, buildTable, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { choices, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const THEODRED = "01002";
@@ -49,6 +49,8 @@ const PAL = "pal";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
+const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+
 beforeAll(async () => {
   const starter = await starterBase();
   const codes = [ARAGORN, THEODRED, GIMLI, DENETHOR, SNOWBOURN, SPEARMAN, BOWMAN, BARD, SENTRY, LOOKOUT, WARRIOR, HAUBERK, KING, BOW, MAP, NECKLACE, CRAWLING, GREEN_HILL, WEB];
@@ -57,13 +59,6 @@ beforeAll(async () => {
   cards.set(WALL, definePrinted({ code: WALL, name: "Wall", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 9, health: 9 }));
   base = { ...starter, cards };
 });
-
-function table(effects: readonly Effect[], scene: Scene, resources = 6): Table {
-  const tab = buildTable(base, { ring: "none", start: "planning", ...scene, effects });
-  let state = tab.state;
-  for (let seat = 0; seat < (scene.seats ?? 1); seat += 1) state = fund(state, seat, resources);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
 
 // Attaches cards the scene put in play to the hosts named (the scene attaches only to heroes), then brings the constants up to date.
 function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
@@ -76,29 +71,8 @@ function hosts(tab: Table, cardId: string): string[] {
   return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
 }
 
-function stat(state: ScenarioState, tab: Table, id: string, which: "attack" | "defense" | "hitPoints" | "willpower"): number {
-  const card = state.cards[id];
-  if (!card) throw new Error(`no card ${id}`);
-  return modifiedStat(state, card, which, tab.ctx.cards);
-}
-
 function printed(tab: Table, code: string, which: "attack" | "defense" | "health" | "willpower"): number {
   return tab.ctx.cards.get(code)?.[which] ?? 0;
-}
-
-// The Wilds of Rhovanion cards have no scan-read ledger yet (data/printed), so the harness's cause check (scene.ts send) refuses
-// their steps: these tests send through the reducer directly, as the Beechbone tests do (src/campaign/starter/tactics.test.ts).
-function step(run: Run, intent: PlayerIntent, ctx: ReduceContext): Run {
-  const result = expectOk(reduce(run.state, intent, ctx));
-  return { state: result.state, steps: [...run.steps, ...result.steps] };
-}
-
-function triggers(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Trigger" ? [intent.effectId] : []));
-}
-
-function choices(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Choose" ? [intent.optionId] : []));
 }
 
 describe("Hauberk of Mail (18007)", () => {
@@ -114,7 +88,7 @@ describe("Hauberk of Mail (18007)", () => {
     const [worn, held] = scene.ids[HAUBERK] ?? [];
     const tab = attach(scene, [[worn ?? "", idsOf(scene, SENTRY)]]);
     expect(hosts(tab, held ?? "")).toEqual([idsOf(tab, BARD), ...(tab.ids[SPEARMAN] ?? [])].sort());
-    const run = step(begin(tab.state), { type: "PlayCard", cardId: held ?? "", hostId: idsOf(tab, BARD), payments: payFor(tab.state, tab.ctx, held ?? "") }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: held ?? "", hostId: idsOf(tab, BARD), payments: payFor(tab.state, tab.ctx, held ?? "") }, tab.ctx);
     expect(run.state.cards[held ?? ""]?.host).toBe(idsOf(tab, BARD));
   });
 
@@ -136,7 +110,7 @@ describe("Hauberk of Mail (18007)", () => {
     const tab = table(EFFECTS, { heroes: [{ code: BARD, seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: SENTRY, seat: 0 }], hand: [{ code: HAUBERK, seat: 0 }] });
     const sentry = idsOf(tab, SENTRY);
     // Free on the Sentry (18003:A:1).
-    const played = step(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, HAUBERK), hostId: sentry, payments: [] }, tab.ctx);
+    const played = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, HAUBERK), hostId: sentry, payments: [] }, tab.ctx);
     expect(stat(played.state, tab, sentry, "hitPoints")).toBe(printed(tab, SENTRY, "health") + 1);
   });
 });
@@ -148,7 +122,7 @@ describe("King of Dale (18008:A:1)", () => {
     const tab = table(effects, { heroes: [{ code: BARD, seat: 0 }, { code: BOWMAN, seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: WARRIOR, seat: 0 }], hand: [{ code: KING, seat: 0 }] });
     const king = idsOf(tab, KING);
     expect(hosts(tab, king)).toEqual([idsOf(tab, BARD), idsOf(tab, BOWMAN)].sort());
-    const run = step(begin(tab.state), { type: "PlayCard", cardId: king, hostId: idsOf(tab, BOWMAN), payments: payFor(tab.state, tab.ctx, king) }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: king, hostId: idsOf(tab, BOWMAN), payments: payFor(tab.state, tab.ctx, king) }, tab.ctx);
     expect(run.state.cards[king]?.host).toBe(idsOf(tab, BOWMAN));
   });
 });
@@ -163,7 +137,7 @@ describe("King of Dale (18008:A:2)", () => {
     const state = web ? attachTo(updateCard(made.state, made.id, { face: "up", controller: null }), made.id, bard) : scene.state;
     const tab = { ...scene, state: syncConstants(state, scene.ctx) };
     expect(tab.state.cards[bard]?.attachments).toHaveLength(web ? 3 : 2);
-    const run = step(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, KING), effectId: "18008:action:1" }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, KING), effectId: "18008:action:1" }, tab.ctx);
     return { tab, run, warrior: idsOf(tab, WARRIOR), printedCost: tab.ctx.cards.get(WARRIOR)?.cost ?? 0 };
   }
 
@@ -175,7 +149,7 @@ describe("King of Dale (18008:A:2)", () => {
     expect(playCost(tab.state, warrior, 0, tab.ctx)).toBe(printedCost);
     expect(run.state.cards[idsOf(tab, KING)]?.exhausted).toBe(true);
     expect(playCost(run.state, warrior, 0, tab.ctx)).toBe(printedCost - 2);
-    const played = step(run, { type: "PlayCard", cardId: warrior, payments: [{ heroId: idsOf(tab, BARD), amount: printedCost - 2 }] }, tab.ctx);
+    const played = sendUnledgered(run, { type: "PlayCard", cardId: warrior, payments: [{ heroId: idsOf(tab, BARD), amount: printedCost - 2 }] }, tab.ctx);
     expect(played.state.cards[warrior]?.zone).toBe("play");
   });
 
@@ -197,7 +171,7 @@ describe("Bow of Yew (18009)", () => {
     });
     const bow = idsOf(tab, BOW);
     expect(hosts(tab, bow)).toEqual([GIMLI, BARD, THEODRED, WARRIOR, SPEARMAN].map((code) => idsOf(tab, code)).sort());
-    const run = step(begin(tab.state), { type: "PlayCard", cardId: bow, hostId: idsOf(tab, WARRIOR), payments: payFor(tab.state, tab.ctx, bow) }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: bow, hostId: idsOf(tab, WARRIOR), payments: payFor(tab.state, tab.ctx, bow) }, tab.ctx);
     expect(run.state.cards[bow]?.host).toBe(idsOf(tab, WARRIOR));
   });
 
@@ -210,13 +184,13 @@ describe("Bow of Yew (18009)", () => {
     const bow = idsOf(scene, BOW);
     const wall = idsOf(scene, WALL);
     const tab = attach(scene, [[bow, idsOf(scene, WARRIOR)]]);
-    let run = step(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: wall, attackerIds: [idsOf(tab, WARRIOR)] }, tab.ctx);
+    let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: wall, attackerIds: [idsOf(tab, WARRIOR)] }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("18009:response:1");
-    run = step(run, { type: "Trigger", cardId: bow, effectId: "18009:response:1" }, tab.ctx);
+    run = sendUnledgered(run, { type: "Trigger", cardId: bow, effectId: "18009:response:1" }, tab.ctx);
     expect(run.state.cards[wall]?.damage).toBe(1);
     expect(run.state.cards[bow]?.exhausted).toBe(true);
     // Gimli, who holds no Bow, declares no Response.
-    const other = step(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: wall, attackerIds: [idsOf(tab, GIMLI)] }, tab.ctx);
+    const other = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: wall, attackerIds: [idsOf(tab, GIMLI)] }, tab.ctx);
     expect(triggers(other.state, tab)).not.toContain("18009:response:1");
   });
 });
@@ -240,16 +214,16 @@ describe("Map of Rhovanion (18010)", () => {
     const tab = table(effects, { start: "quest", heroes: [{ code: BARD, seat: 0 }, { code: DENETHOR, seat: 0 }], attached: [{ code: MAP, host: BARD }], active: GREEN_HILL });
     const map = idsOf(tab, MAP);
     const active = idsOf(tab, GREEN_HILL);
-    let run = step(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, BARD)] }, tab.ctx);
+    let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, BARD)] }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("18010:response:1");
-    run = step(run, { type: "Trigger", cardId: map, effectId: "18010:response:1" }, tab.ctx);
+    run = sendUnledgered(run, { type: "Trigger", cardId: map, effectId: "18010:response:1" }, tab.ctx);
     expect(run.state.cards[active]?.progress).toBe(1);
     // Denethor, who holds no Map, commits alone: no Response.
-    const other = step(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, DENETHOR)] }, tab.ctx);
+    const other = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, DENETHOR)] }, tab.ctx);
     expect(triggers(other.state, tab)).not.toContain("18010:response:1");
     // With no active location there is nowhere to place the progress: no Response.
     const empty = table(effects, { start: "quest", heroes: [{ code: BARD, seat: 0 }, { code: DENETHOR, seat: 0 }], attached: [{ code: MAP, host: BARD }] });
-    expect(triggers(step(begin(empty.state), { type: "Commit", cardIds: [idsOf(empty, BARD)] }, empty.ctx).state, empty)).not.toContain("18010:response:1");
+    expect(triggers(sendUnledgered(begin(empty.state), { type: "Commit", cardIds: [idsOf(empty, BARD)] }, empty.ctx).state, empty)).not.toContain("18010:response:1");
   });
 });
 
@@ -260,7 +234,7 @@ describe("Necklace of Girion (18011)", () => {
     const tab = table(effects, { heroes: [{ code: ARAGORN, seat: 0 }, { code: DENETHOR, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: NECKLACE, seat: 0 }], deck: [CRAWLING, guard] });
     const necklace = idsOf(tab, NECKLACE);
     const [hostId] = hosts(tab, necklace);
-    const run = step(begin(tab.state), { type: "PlayCard", cardId: necklace, hostId, payments: payFor(tab.state, tab.ctx, necklace) }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: necklace, hostId, payments: payFor(tab.state, tab.ctx, necklace) }, tab.ctx);
     return { tab, run };
   }
 
@@ -284,9 +258,9 @@ describe("Necklace of Girion (18011)", () => {
     const necklace = idsOf(tab, NECKLACE);
     const enemy = idsOf(tab, "f3");
     expect(played.state.cards[necklace]?.host).toBe(enemy);
-    let run = step(begin(placeDamage(played.state, enemy, 9, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
+    let run = sendUnledgered(begin(placeDamage(played.state, enemy, 9, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, ARAGORN), idsOf(tab, DENETHOR)].sort());
-    run = step(run, { type: "Choose", optionId: idsOf(tab, DENETHOR) }, tab.ctx);
+    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, DENETHOR) }, tab.ctx);
     expect(run.state.cards[necklace]?.host).toBe(idsOf(tab, DENETHOR));
     expect(run.state.cards[necklace]?.zone).toBe("play");
   });

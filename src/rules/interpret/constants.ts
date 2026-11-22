@@ -156,8 +156,10 @@ function sameModifiers(left: readonly Modifier[], right: readonly Modifier[]): b
 }
 
 // A constant can depend on what another constant gives (a +1 hit point for a host with Sentinel that Armor grants), and `wanted` reads
-// the modifiers already in the state. So the records are rebuilt until a pass changes nothing, at most MAX_PASSES times.
+// the modifiers already in the state. So the records are rebuilt until a pass changes nothing, at most MAX_PASSES times. Constants that
+// keep switching each other never settle: that is a state the engine cannot continue from, so `failure` is set and reduce refuses the intent.
 const MAX_PASSES = 8;
+export const UNSETTLED_CONSTANTS = `Constant effects did not settle after ${MAX_PASSES} passes`;
 
 export function syncConstants(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   let next = state;
@@ -168,7 +170,7 @@ export function syncConstants(state: ScenarioState, ctx: ReduceContext): Scenari
     if (sameModifiers(current, desired)) return next;
     next = { ...next, modifiers: [...next.modifiers.filter((modifier) => modifier.origin == null), ...desired] };
   }
-  return next;
+  return { ...next, failure: UNSETTLED_CONSTANTS };
 }
 
 // A constant victory condition ("If there are no Nazgûl enemies in play, the players win the game", 141027:B:1) ends the

@@ -7,17 +7,16 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { expectOk } from "../../rules/core/test-fixture.ts";
 import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { attachTo } from "../../rules/core/zones.ts";
+import { attachTo, spawn } from "../../rules/core/zones.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
-import { settle } from "../../rules/engine/machine.ts";
 import { playCost } from "../../rules/player/attach.ts";
-import { legalIntents, reduce, type PlayerIntent, type ReduceContext } from "../../rules/engine/reduce.ts";
-import { fund, payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { legalIntents, type ReduceContext } from "../../rules/engine/reduce.ts";
+import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, buildTable, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { choices, combat, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const GIMLI = "01004";
@@ -38,6 +37,8 @@ const VALOUR = "18014";
 const BARTERING = "18015";
 const SNARE = "01069";
 const POWER = "01056";
+// Caught in a Web: an encounter treachery that attaches itself to a hero.
+const WEB = "01080";
 const GREEN_HILL = "141036";
 const ORC = "orc";
 const ALLY = "ally";
@@ -47,20 +48,15 @@ const PLAIN = "plain";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
+const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+
 beforeAll(async () => {
   const starter = await starterBase();
-  const codes = [ARAGORN, GIMLI, EOWYN, DENETHOR, STEWARD, STONE, PLATE, COURAGE, BRAND, BARD, WARRIOR, HAUBERK, BOW, TRAFFIC, TO_ARMS, VALOUR, BARTERING, SNARE, POWER, GREEN_HILL];
+  const codes = [ARAGORN, GIMLI, EOWYN, DENETHOR, STEWARD, STONE, PLATE, COURAGE, BRAND, BARD, WARRIOR, HAUBERK, BOW, TRAFFIC, TO_ARMS, VALOUR, BARTERING, SNARE, POWER, GREEN_HILL, WEB];
   const cards = new Map([...starter.cards, ...(await loadPrinted(codes))]);
   cards.set(ORC, definePrinted({ code: ORC, name: "Orc", type: "enemy", traits: ["Orc"], threat: 1, engagementCost: 40, attack: 3, defense: 1, health: 9 }));
   base = { ...starter, cards };
 });
-
-function table(effects: readonly Effect[], scene: Scene, resources = 6): Table {
-  const tab = buildTable(base, { ring: "none", start: "planning", ...scene, effects });
-  let state = tab.state;
-  for (let seat = 0; seat < (scene.seats ?? 1); seat += 1) state = fund(state, seat, resources);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
 
 // Attaches cards the scene put in play to the hosts named (the scene attaches only to heroes), then brings the constants up to date.
 function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
@@ -69,39 +65,20 @@ function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Tabl
   return { ...tab, state: syncConstants(state, tab.ctx) };
 }
 
-// The Wilds of Rhovanion cards have no scan-read ledger yet (data/printed), so the harness's cause check (scene.ts send) refuses
-// their steps: these tests send through the reducer directly, as the Beechbone tests do (src/campaign/starter/tactics.test.ts).
-function step(run: Run, intent: PlayerIntent, ctx: ReduceContext): Run {
-  const result = expectOk(reduce(run.state, intent, ctx));
-  return { state: result.state, steps: [...run.steps, ...result.steps] };
-}
-
 // Passes the open action and response windows until the game asks for something else.
 function passAll(run: Run, ctx: ReduceContext): Run {
   let next = run;
   const open = (state: ScenarioState) => (state.window?.kind === "frameAction" || state.window?.kind === "response") && legalIntents(state, ctx).some((intent) => intent.type === "Pass");
-  for (let guard = 0; guard < 20 && open(next.state); guard += 1) next = step(next, { type: "Pass" }, ctx);
+  for (let guard = 0; guard < 20 && open(next.state); guard += 1) next = sendUnledgered(next, { type: "Pass" }, ctx);
   return next;
-}
-
-function choices(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Choose" ? [intent.optionId] : []));
 }
 
 function playable(state: ScenarioState, tab: Table): string[] {
   return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
 }
 
-function triggers(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Trigger" ? [intent.effectId] : []));
-}
-
 function play(run: Run, tab: Table, cardId: string): Run {
-  return step(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId) }, tab.ctx);
-}
-
-function combat(state: ScenarioState, tab: Table): Run {
-  return begin(settle({ ...withMode(state, "combatStart"), window: null }, tab.ctx, []));
+  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId) }, tab.ctx);
 }
 
 describe("Traffic from Dale (18012:A:1)", () => {
@@ -123,9 +100,9 @@ describe("Traffic from Dale (18012:A:1)", () => {
     const [first, second] = tab.ids[TRAFFIC] ?? [];
     const bard = idsOf(tab, BARD);
     expect(playable(combat(tab.state, tab).state, tab)).not.toContain(first);
-    let run = step(begin(tab.state), { type: "PlayCard", cardId: first ?? "", payments: [{ heroId: idsOf(tab, BRAND), amount: 1 }] }, tab.ctx);
+    let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: first ?? "", payments: [{ heroId: idsOf(tab, BRAND), amount: 1 }] }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, BRAND), bard].sort());
-    run = step(run, { type: "Choose", optionId: bard }, tab.ctx);
+    run = sendUnledgered(run, { type: "Choose", optionId: bard }, tab.ctx);
     expect(run.state.cards[bard]?.resources).toBe(1 + 3);
     expect(playable(run.state, tab)).not.toContain(second);
   });
@@ -144,7 +121,7 @@ describe("To Arms! (18013:A:1)", () => {
     let run = play(begin(tab.state), tab, idsOf(tab, TO_ARMS));
     if (run.state.window?.kind === "choose") {
       expect(choices(run.state, tab)).toEqual([warrior]);
-      run = step(run, { type: "Choose", optionId: warrior }, tab.ctx);
+      run = sendUnledgered(run, { type: "Choose", optionId: warrior }, tab.ctx);
     }
     expect(run.state.cards[warrior]?.exhausted).toBe(false);
     expect(run.state.cards[ally]?.exhausted).toBe(true);
@@ -167,9 +144,9 @@ describe("Valour of the North (18014:A:1)", () => {
     const tab = scene(effects);
     const warrior = idsOf(tab, WARRIOR);
     const valour = idsOf(tab, VALOUR);
-    let run = step(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, ORC), attackerIds: [warrior] }, tab.ctx);
+    let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, ORC), attackerIds: [warrior] }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("18014:response:1");
-    run = step(run, { type: "Trigger", cardId: valour, effectId: "18014:response:1", payments: payFor(run.state, tab.ctx, valour) }, tab.ctx);
+    run = sendUnledgered(run, { type: "Trigger", cardId: valour, effectId: "18014:response:1", payments: payFor(run.state, tab.ctx, valour) }, tab.ctx);
     run = passAll(run, tab.ctx);
     expect(strikes(run, "player").map((strike) => strike.attack)).toEqual([(tab.ctx.cards.get(WARRIOR)?.attack ?? 0) + 3]);
     // The bonus ends with the attack.
@@ -185,9 +162,9 @@ describe("Valour of the North (18014:A:1)", () => {
     const valour = idsOf(tab, VALOUR);
     let run = passAll(combat(tab.state, tab), tab.ctx);
     expect(run.state.window?.kind).toBe("defense");
-    run = step(run, { type: "DeclareDefender", defenderId: gimli }, tab.ctx);
+    run = sendUnledgered(run, { type: "DeclareDefender", defenderId: gimli }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("18014:response:2");
-    run = step(run, { type: "Trigger", cardId: valour, effectId: "18014:response:2", payments: payFor(run.state, tab.ctx, valour) }, tab.ctx);
+    run = sendUnledgered(run, { type: "Trigger", cardId: valour, effectId: "18014:response:2", payments: payFor(run.state, tab.ctx, valour) }, tab.ctx);
     run = passAll(run, tab.ctx);
     expect(strikes(run, "enemy").map((strike) => strike.defense)).toEqual([(tab.ctx.cards.get(GIMLI)?.defense ?? 0) + 3]);
     expect(run.state.cards[gimli]?.damage).toBe(0);
@@ -197,9 +174,9 @@ describe("Valour of the North (18014:A:1)", () => {
   lineSpec("18014:A:1", "Valour of the North: not offered against an enemy without an attachment", (effects) => {
     const tab = table(effects, { heroes: [{ code: GIMLI, seat: 0 }], allies: [{ code: WARRIOR, seat: 0 }], engaged: [{ code: ORC, seat: 0 }], hand: [{ code: VALOUR, seat: 0 }] });
     const marked = scene(effects);
-    const bare = step(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, ORC), attackerIds: [idsOf(tab, WARRIOR)] }, tab.ctx);
+    const bare = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, ORC), attackerIds: [idsOf(tab, WARRIOR)] }, tab.ctx);
     expect(triggers(bare.state, tab)).not.toContain("18014:response:1");
-    const run = step(begin(attacking(marked.state)), { type: "DeclareAttackers", enemyId: idsOf(marked, ORC), attackerIds: [idsOf(marked, WARRIOR)] }, marked.ctx);
+    const run = sendUnledgered(begin(attacking(marked.state)), { type: "DeclareAttackers", enemyId: idsOf(marked, ORC), attackerIds: [idsOf(marked, WARRIOR)] }, marked.ctx);
     expect(triggers(run.state, marked)).toContain("18014:response:1");
   });
 });
@@ -213,21 +190,22 @@ describe("Bartering (18015:A:1)", () => {
     const scene = table(effects, { heroes: [{ code: DENETHOR, seat: 0 }, { code: ARAGORN, seat: 0 }], attached: [{ code: STEWARD, host: ARAGORN }, { code: COURAGE, host: DENETHOR }], hand: [{ code: BARTERING, seat: 0 }, { code: STONE, seat: 0 }] }, 0);
     const [steward, courage, stone, aragorn] = [idsOf(scene, STEWARD), idsOf(scene, COURAGE), idsOf(scene, STONE), idsOf(scene, ARAGORN)];
     const tab = { ...scene, state: updateCard(scene.state, courage, { exhausted: true }) };
-    let run = step(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, BARTERING), payments: [] }, tab.ctx);
+    let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, BARTERING), payments: [] }, tab.ctx);
     if (run.state.window?.kind === "choose") {
       expect(choices(run.state, tab)).toEqual([steward]);
-      run = step(run, { type: "Choose", optionId: steward }, tab.ctx);
+      run = sendUnledgered(run, { type: "Choose", optionId: steward }, tab.ctx);
     }
     expect(run.state.cards[steward]?.zone).toBe("hand");
     expect(run.state.cards[aragorn]?.attachments).toEqual([]);
     expect(playCost(run.state, stone, 0, tab.ctx, aragorn)).toBe(0);
-    run = step(run, { type: "PlayCard", cardId: stone, hostId: aragorn, payments: [] }, tab.ctx);
+    run = sendUnledgered(run, { type: "PlayCard", cardId: stone, hostId: aragorn, payments: [] }, tab.ctx);
     expect(run.state.cards[stone]?.host).toBe(aragorn);
     expect(playCost(run.state, steward, 0, tab.ctx, aragorn)).toBe(tab.ctx.cards.get(STEWARD)?.cost ?? 0);
   });
 
-  // With a ready Forest Snare on an engaged enemy and a ready Power in the Earth on a location, Bartering offers only the Steward of Gondor on Aragorn.
-  it("18015:A:1 Bartering: an attachment on an enemy or a location is not on a character you control", () => {
+  // With a ready Forest Snare on an engaged enemy, a ready Power in the Earth on a location and Caught in a Web (an encounter card, not a player attachment) on Aragorn,
+  // Bartering offers only the Steward of Gondor on Aragorn.
+  it("18015:A:1 Bartering: an attachment on an enemy or a location, or an encounter card, is not a player attachment on a character you control", () => {
     const build = (steward: boolean): Table => {
       const scene = table(EFFECTS, {
         heroes: [{ code: DENETHOR, seat: 0 }, { code: ARAGORN, seat: 0 }],
@@ -237,15 +215,19 @@ describe("Bartering (18015:A:1)", () => {
         staging: [GREEN_HILL],
         hand: [{ code: BARTERING, seat: 0 }],
       }, 0);
-      return attach(scene, [[idsOf(scene, SNARE), idsOf(scene, ORC)], [idsOf(scene, POWER), idsOf(scene, GREEN_HILL)]]);
+      const web = spawn(scene.state, WEB, { zone: "attached" });
+      const webbed = { ...scene, state: attachTo(updateCard(web.state, web.id, { face: "up", controller: null }), web.id, idsOf(scene, ARAGORN)) };
+      return attach(webbed, [[idsOf(scene, SNARE), idsOf(scene, ORC)], [idsOf(scene, POWER), idsOf(scene, GREEN_HILL)]]);
     };
     const tab = build(true);
-    const run = step(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, BARTERING), payments: [] }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, BARTERING), payments: [] }, tab.ctx);
     // One candidate: it is picked without a question, and the Snare and the Power stay attached.
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[idsOf(tab, STEWARD)]?.zone).toBe("hand");
     expect(run.state.cards[idsOf(tab, SNARE)]?.host).toBe(idsOf(tab, ORC));
     expect(run.state.cards[idsOf(tab, POWER)]?.host).toBe(idsOf(tab, GREEN_HILL));
+    const web = Object.values(tab.state.cards).find((card) => card.code === WEB);
+    expect(run.state.cards[web?.id ?? ""]?.host).toBe(idsOf(tab, ARAGORN));
     const bare = build(false);
     expect(playable(bare.state, bare)).not.toContain(idsOf(bare, BARTERING));
   });

@@ -6,17 +6,16 @@
 import { beforeAll, describe, expect } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
-import { hasKeyword, modifiedStat } from "../../rules/core/keywords.ts";
-import { expectOk } from "../../rules/core/test-fixture.ts";
-import type { ScenarioState } from "../../rules/core/state.ts";
+import { hasKeyword } from "../../rules/core/keywords.ts";
 import { attachTo } from "../../rules/core/zones.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { playCost } from "../../rules/player/attach.ts";
-import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext } from "../../rules/engine/reduce.ts";
-import { fund, payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { legalTargets, type PlayerIntent } from "../../rules/engine/reduce.ts";
+import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, buildTable, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { choices, playerTable, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const GIMLI = "01004";
@@ -42,18 +41,13 @@ const PAL = "pal";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
+const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+
 beforeAll(async () => {
   const starter = await starterBase();
   const codes = [ARAGORN, GIMLI, DENETHOR, SPEARMAN, STEWARD, PLATE, BRAND, BARD, SENTRY, LOOKOUT, WARRIOR, TRADER, HAUBERK, BOW, MAP, SWORD, NECKLACE, GREEN_HILL];
   base = { ...starter, cards: new Map([...starter.cards, ...(await loadPrinted(codes))]) };
 });
-
-function table(effects: readonly Effect[], scene: Scene, resources = 6): Table {
-  const tab = buildTable(base, { ring: "none", start: "planning", ...scene, effects });
-  let state = tab.state;
-  for (let seat = 0; seat < (scene.seats ?? 1); seat += 1) state = fund(state, seat, resources);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
 
 // Attaches cards the scene put in play to the hosts named (the scene attaches only to heroes), then brings the constants up to date.
 function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
@@ -62,25 +56,8 @@ function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Tabl
   return { ...tab, state: syncConstants(state, tab.ctx) };
 }
 
-// The Wilds of Rhovanion cards have no scan-read ledger yet (data/printed), so the harness's cause check (scene.ts send) refuses
-// their steps: these tests send through the reducer directly, as the Beechbone tests do (src/campaign/starter/tactics.test.ts).
-function step(run: Run, intent: PlayerIntent, ctx: ReduceContext): Run {
-  const result = expectOk(reduce(run.state, intent, ctx));
-  return { state: result.state, steps: [...run.steps, ...result.steps] };
-}
-
-function stat(state: ScenarioState, tab: Table, id: string, which: "attack" | "defense" | "hitPoints" | "willpower"): number {
-  const card = state.cards[id];
-  if (!card) throw new Error(`no card ${id}`);
-  return modifiedStat(state, card, which, tab.ctx.cards);
-}
-
 function printed(tab: Table, code: string, which: "attack" | "defense" | "health" | "willpower"): number {
   return tab.ctx.cards.get(code)?.[which] ?? 0;
-}
-
-function choices(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Choose" ? [intent.optionId] : []));
 }
 
 describe("Brand son of Bain (18001:A:1)", () => {
@@ -117,7 +94,7 @@ describe("Bard son of Brand (18002:A:1)", () => {
     const play = (code: string, amount: number, hostId?: string): PlayerIntent => ({ type: "PlayCard", cardId: idsOf(tab, code), ...(hostId ? { hostId } : {}), payments: [{ heroId: bard, amount }] });
     for (const code of [HAUBERK, MAP]) expect(refusal(tab.state, play(code, 1, bard), tab.ctx)).toBeNull();
     expect(refusal(tab.state, play(SWORD, 1, idsOf(tab, SPEARMAN)), tab.ctx)).toBeNull();
-    const run = step(begin(tab.state), play(HAUBERK, 1, bard), tab.ctx);
+    const run = sendUnledgered(begin(tab.state), play(HAUBERK, 1, bard), tab.ctx);
     expect(run.state.cards[idsOf(tab, HAUBERK)]?.host).toBe(bard);
     expect(refusal(tab.state, play(STEWARD, 2, bard), tab.ctx)).toBe("No hero matches that card's sphere");
     expect(refusal(tab.state, play(ALLY, 1), tab.ctx)).toBe("No hero matches that card's sphere");
@@ -133,7 +110,7 @@ describe("Redwater Sentry (18003)", () => {
     expect(playCost(tab.state, hauberk, 0, tab.ctx, sentry)).toBe(0);
     expect(playCost(tab.state, hauberk, 0, tab.ctx, brand)).toBe(1);
     expect(playCost(tab.state, map, 0, tab.ctx, sentry)).toBe(1);
-    const run = step(begin(tab.state), { type: "PlayCard", cardId: hauberk, hostId: sentry, payments: [] }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: hauberk, hostId: sentry, payments: [] }, tab.ctx);
     expect(run.state.cards[hauberk]?.host).toBe(sentry);
     expect(run.state.cards[brand]?.resources).toBe(1);
   });
@@ -160,7 +137,7 @@ describe("North Realm Lookout (18004:A:1)", () => {
     const tab = attach(scene, [[idsOf(scene, MAP), held ?? ""]]);
     expect(stat(tab.state, tab, held ?? "", "willpower")).toBe(printed(tab, LOOKOUT, "willpower") + 1);
     expect(stat(tab.state, tab, bare ?? "", "willpower")).toBe(printed(tab, LOOKOUT, "willpower"));
-    const run = step(begin(tab.state), { type: "Commit", cardIds: [held ?? "", bare ?? ""] }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [held ?? "", bare ?? ""] }, tab.ctx);
     expect(run.state.cards[held ?? ""]).toMatchObject({ committed: true, exhausted: false });
     expect(run.state.cards[bare ?? ""]).toMatchObject({ committed: true, exhausted: true });
   });
@@ -175,7 +152,7 @@ describe("Warrior of Dale (18005)", () => {
     expect(playCost(tab.state, sword, 0, tab.ctx, warrior)).toBe(0);
     expect(playCost(tab.state, sword, 0, tab.ctx, gimli)).toBe(1);
     expect(playCost(tab.state, hauberk, 0, tab.ctx, warrior)).toBe(1);
-    const run = step(begin(tab.state), { type: "PlayCard", cardId: sword, hostId: warrior, payments: [] }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: sword, hostId: warrior, payments: [] }, tab.ctx);
     expect(run.state.cards[sword]?.host).toBe(warrior);
     expect(run.state.cards[gimli]?.resources).toBe(1);
   });
@@ -207,12 +184,12 @@ describe("Long Lake Trader (18006:A:1)", () => {
     const [onBard, onBrand] = tab.ids[MAP] ?? [];
     const trader = idsOf(tab, TRADER);
     const lookout = idsOf(tab, LOOKOUT);
-    let run = step(begin(tab.state), { type: "Trigger", cardId: trader, effectId: "18006:action:1" }, tab.ctx);
+    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: trader, effectId: "18006:action:1" }, tab.ctx);
     expect(run.state.cards[trader]?.exhausted).toBe(true);
     expect(choices(run.state, tab).sort()).toEqual([onBard ?? "", onBrand ?? ""].sort());
-    run = step(run, { type: "Choose", optionId: onBard ?? "" }, tab.ctx);
+    run = sendUnledgered(run, { type: "Choose", optionId: onBard ?? "" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([trader, lookout].sort());
-    run = step(run, { type: "Choose", optionId: lookout }, tab.ctx);
+    run = sendUnledgered(run, { type: "Choose", optionId: lookout }, tab.ctx);
     expect(run.state.cards[onBard ?? ""]?.host).toBe(lookout);
     expect(run.state.cards[lookout]?.attachments).toEqual([onBard]);
     expect(run.state.cards[idsOf(tab, BARD)]?.attachments).toEqual([]);
@@ -225,7 +202,7 @@ describe("Long Lake Trader (18006:A:1)", () => {
     const map = idsOf(tab, MAP);
     const trader = idsOf(tab, TRADER);
     // One Item and one eligible character: the engine makes both picks itself, so the move it made is what shows the reading.
-    const run = step(begin(tab.state), { type: "Trigger", cardId: trader, effectId: "18006:action:1" }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: trader, effectId: "18006:action:1" }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[map]?.host).toBe(trader);
     expect(run.state.cards[idsOf(tab, BARD)]?.attachments).toEqual([]);
@@ -238,13 +215,13 @@ describe("Long Lake Trader (18006:A:1)", () => {
     const tab = table(effects, { heroes: [{ code: BARD, seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: TRADER, seat: 0 }, { code: LOOKOUT, seat: 0 }, { code: MAP, seat: 0 }], hand: [{ code: NECKLACE, seat: 0 }], deck: [GREEN_HILL] });
     const necklace = idsOf(tab, NECKLACE);
     const [hostId] = legalTargets(tab.state, { type: "PlayCard", cardId: necklace }, tab.ctx);
-    const guarded = step(begin(tab.state), { type: "PlayCard", cardId: necklace, hostId, payments: payFor(tab.state, tab.ctx, necklace) }, tab.ctx);
+    const guarded = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: necklace, hostId, payments: payFor(tab.state, tab.ctx, necklace) }, tab.ctx);
     expect(guarded.state.cards[necklace]).toMatchObject({ zone: "setAside", host: idsOf(tab, GREEN_HILL), controller: 0 });
     expect(refusal(guarded.state, { type: "Trigger", cardId: idsOf(tab, TRADER), effectId: "18006:action:1" }, tab.ctx)).toBe("That effect cannot be triggered");
     // With a Map on the Lookout the Action is offered: the Map is the one Item it takes (the engine picks it itself) and the
     // Necklace stays on its guard.
     const withMap = attach({ ...tab, state: guarded.state }, [[idsOf(tab, MAP), idsOf(tab, LOOKOUT)]]);
-    const run = step(begin(withMap.state), { type: "Trigger", cardId: idsOf(tab, TRADER), effectId: "18006:action:1" }, tab.ctx);
+    const run = sendUnledgered(begin(withMap.state), { type: "Trigger", cardId: idsOf(tab, TRADER), effectId: "18006:action:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, BARD), idsOf(tab, TRADER)].sort());
     expect(run.state.cards[necklace]).toMatchObject({ zone: "setAside", host: idsOf(tab, GREEN_HILL) });
   });

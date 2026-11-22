@@ -6,16 +6,14 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { settle } from "../../rules/engine/machine.ts";
-import { legalIntents, reduce, type PlayerIntent, type ReduceContext } from "../../rules/engine/reduce.ts";
-import { expectOk } from "../../rules/core/test-fixture.ts";
-import { withMode, type ScenarioState } from "../../rules/core/state.ts";
+import { legalIntents } from "../../rules/engine/reduce.ts";
+import { type ScenarioState } from "../../rules/core/state.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { fund, payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
-import { causeProblems } from "../../../test/harness/cause-check.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, buildTable, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { attacking, choices, combat, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const THORIN = "131002";
 const ORI = "131004";
@@ -38,6 +36,8 @@ const ORC = "orc";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
+const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+
 beforeAll(async () => {
   const starter = await starterBase();
   const cards = new Map([...starter.cards, ...(await loadPrinted([THORIN, ORI, FILI, KILI, BOFUR, GANDALF, TALE, FOE_HAMMER, CLEAVER, MISCHIEF, GIMLI, AXE, LEGOLAS]))]);
@@ -47,45 +47,15 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-// The harness's send (test/harness/scene.ts), save one cause problem it tolerates: data/printed has no ledger for this box yet, so a step these
-// cards' records cause names a line "which is not in the ledger". Every other cause problem still fails the intent.
-function send(run: Run, intent: PlayerIntent, ctx: ReduceContext): Run {
-  const result = expectOk(reduce(run.state, intent, ctx));
-  const problems = causeProblems(result.steps).filter((problem) => !/names line 131\d{3}:A:\d+, which is not in the ledger/.test(problem));
-  if (problems.length > 0) throw new Error(`Steps without a verified cause after ${intent.type}: ${problems.join("; ")}`);
-  return { state: result.state, steps: [...run.steps, ...result.steps] };
-}
-
-// A table on these records, every hero holding `resources`, the constants brought up to date.
-function table(effects: readonly Effect[], scene: Scene = {}, resources = 6): Table {
-  const tab = buildTable(base, { ring: "none", start: "planning", ...scene, effects });
-  return { ...tab, state: syncConstants(fund(tab.state, 0, resources), tab.ctx) };
-}
-
-function triggers(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Trigger" ? [intent.effectId] : []));
-}
-
-function choices(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Choose" ? [intent.optionId] : []));
-}
-
 function playIn(state: ScenarioState, tab: Table, code: string): Run {
   const card = idsOf(tab, code);
-  return send(begin(state), { type: "PlayCard", cardId: card, payments: payFor(state, tab.ctx, card) }, tab.ctx);
+  return sendUnledgered(begin(state), { type: "PlayCard", cardId: card, payments: payFor(state, tab.ctx, card) }, tab.ctx);
 }
 
 function playable(state: ScenarioState, tab: Table, code: string): string | null {
   const card = idsOf(tab, code);
   return refusal(state, { type: "PlayCard", cardId: card, payments: payFor(state, tab.ctx, card) }, tab.ctx);
 }
-
-// The combat phase begins with the enemies engaged: its action window (6.2) is open.
-function combat(state: ScenarioState, tab: Table): Run {
-  return begin(settle({ ...withMode(state, "combatStart"), window: null }, tab.ctx, []));
-}
-
-const attacking = (state: ScenarioState): ScenarioState => ({ ...withMode(state, "playerAttacks"), window: { kind: "playerAttack" }, activeSeat: 0 });
 
 describe("A Very Good Tale (131014:A:1)", () => {
   // "Action: Exhaust 2 allies you control to shuffle your deck and discard the top 5 cards. Put up to 2 allies discarded by this effect into play under your control.
@@ -96,7 +66,7 @@ describe("A Very Good Tale (131014:A:1)", () => {
     const deck = [GANDALF, BOFUR, "ally", "card", "card"].map((code) => ({ code, seat: 0 }));
     const tab = table(effects, { heroes: [{ code: THORIN, seat: 0 }], allies: [{ code: FILI, seat: 0 }, { code: KILI, seat: 0 }], hand: [{ code: TALE, seat: 0 }], playerDeck: deck });
     let run = playIn(tab.state, tab, TALE);
-    for (const code of [FILI, KILI]) if (choices(run.state, tab).includes(idsOf(tab, code))) run = send(run, { type: "Choose", optionId: idsOf(tab, code) }, tab.ctx);
+    for (const code of [FILI, KILI]) if (choices(run.state, tab).includes(idsOf(tab, code))) run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, code) }, tab.ctx);
     return { tab, run };
   }
 
@@ -106,10 +76,10 @@ describe("A Very Good Tale (131014:A:1)", () => {
     expect(discarded.state.seats[0]?.deck).toHaveLength(0);
     // Gandalf (5) and Bofur (3) together cost 8, more than 6: once Gandalf is picked, Bofur is not offered.
     expect(choices(discarded.state, tab)).toEqual(expect.arrayContaining([idsOf(tab, GANDALF), idsOf(tab, BOFUR), idsOf(tab, "ally")]));
-    let run = send(discarded, { type: "Choose", optionId: idsOf(tab, GANDALF) }, tab.ctx);
+    let run = sendUnledgered(discarded, { type: "Choose", optionId: idsOf(tab, GANDALF) }, tab.ctx);
     expect(choices(run.state, tab)).not.toContain(idsOf(tab, BOFUR));
     expect(choices(run.state, tab)).toContain(idsOf(tab, "ally"));
-    run = send(run, { type: "Choose", optionId: idsOf(tab, "ally") }, tab.ctx);
+    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, "ally") }, tab.ctx);
     expect(run.state.cards[idsOf(tab, GANDALF)]).toMatchObject({ zone: "play", controller: 0 });
     expect(run.state.cards[idsOf(tab, "ally")]).toMatchObject({ zone: "play", controller: 0 });
     expect(run.state.cards[idsOf(tab, BOFUR)]?.zone).toBe("discard");
@@ -126,9 +96,9 @@ describe("Foe-hammer (131015:A:1)", () => {
   lineSpec("131015:A:1", "exhausts the attacking hero's Weapon to draw 3 cards after he destroys an enemy", (effects) => {
     const tab = table(effects, { heroes: [{ code: GIMLI, seat: 0 }], attached: [{ code: AXE, host: GIMLI }], hand: [{ code: FOE_HAMMER, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }], playerDeck: Array.from({ length: 5 }, () => ({ code: "card", seat: 0 })) });
     const hammer = idsOf(tab, FOE_HAMMER);
-    let run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WEAK), attackerIds: [idsOf(tab, GIMLI)] }, tab.ctx);
+    let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WEAK), attackerIds: [idsOf(tab, GIMLI)] }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("131015:response:1");
-    run = send(run, { type: "Trigger", cardId: hammer, effectId: "131015:response:1", payments: payFor(run.state, tab.ctx, hammer) }, tab.ctx);
+    run = sendUnledgered(run, { type: "Trigger", cardId: hammer, effectId: "131015:response:1", payments: payFor(run.state, tab.ctx, hammer) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, AXE)]?.exhausted).toBe(true);
     // The hand held Foe-hammer only; it is played and 3 cards are drawn.
     expect(run.state.seats[0]?.hand).toHaveLength(3);
@@ -138,10 +108,10 @@ describe("Foe-hammer (131015:A:1)", () => {
   it("131015:A:1 is not offered without a ready Weapon on the hero, or when an ally destroyed the enemy", () => {
     const deck = Array.from({ length: 5 }, () => ({ code: "card", seat: 0 }));
     const bare = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: FOE_HAMMER, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }], playerDeck: deck });
-    const unarmed = send(begin(attacking(bare.state)), { type: "DeclareAttackers", enemyId: idsOf(bare, WEAK), attackerIds: [idsOf(bare, GIMLI)] }, bare.ctx);
+    const unarmed = sendUnledgered(begin(attacking(bare.state)), { type: "DeclareAttackers", enemyId: idsOf(bare, WEAK), attackerIds: [idsOf(bare, GIMLI)] }, bare.ctx);
     expect(triggers(unarmed.state, bare)).not.toContain("131015:response:1");
     const ally = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], attached: [{ code: AXE, host: GIMLI }], allies: [{ code: BOFUR, seat: 0 }], hand: [{ code: FOE_HAMMER, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }], playerDeck: deck });
-    const byAlly = send(begin(attacking(ally.state)), { type: "DeclareAttackers", enemyId: idsOf(ally, WEAK), attackerIds: [idsOf(ally, BOFUR)] }, ally.ctx);
+    const byAlly = sendUnledgered(begin(attacking(ally.state)), { type: "DeclareAttackers", enemyId: idsOf(ally, WEAK), attackerIds: [idsOf(ally, BOFUR)] }, ally.ctx);
     expect(triggers(byAlly.state, ally)).not.toContain("131015:response:1");
   });
 });
@@ -153,9 +123,9 @@ describe("Goblin-cleaver (131016:A:1)", () => {
     const opened = combat(tab.state, tab);
     expect(opened.state.window?.kind).toBe("frameAction");
     let run = playIn(opened.state, tab, CLEAVER);
-    if (choices(run.state, tab).includes(idsOf(tab, AXE))) run = send(run, { type: "Choose", optionId: idsOf(tab, AXE) }, tab.ctx);
+    if (choices(run.state, tab).includes(idsOf(tab, AXE))) run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, AXE) }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, TOUGH), idsOf(tab, ORC)].sort());
-    run = send(run, { type: "Choose", optionId: idsOf(tab, target) }, tab.ctx);
+    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, target) }, tab.ctx);
     return { tab, run };
   }
 
@@ -177,8 +147,13 @@ describe("Goblin-cleaver (131016:A:1)", () => {
     const opened = combat(tab.state, tab);
     expect(playable(opened.state, tab, CLEAVER)).toBeNull();
     const unarmed = table(effects, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: CLEAVER, seat: 0 }], engaged: [{ code: TOUGH, seat: 0 }] });
-    const window = combat(unarmed.state, unarmed);
-    if (window.state.window?.kind === "frameAction") expect(playable(window.state, unarmed, CLEAVER)).not.toBeNull();
+    // With no ready Weapon on a hero nothing can be played in the combat action window, so the engine does not open it: the first enemy attacks (a defense window).
+    expect(opened.state.window?.kind).toBe("frameAction");
+    expect(combat(unarmed.state, unarmed).state.window?.kind).toBe("defense");
+    // The same window opened by hand, the card is refused for the missing Weapon and not for the window.
+    const window = { ...opened.state, cards: unarmed.state.cards, seats: unarmed.state.seats };
+    expect(window.window?.kind).toBe("frameAction");
+    expect(playable(window, unarmed, CLEAVER)).toBe("That card cannot be played now");
   });
 });
 
@@ -191,14 +166,14 @@ describe("Goblin-cleaver with another player's Weapon (131016:A:1)", () => {
     const [axe, gimli, tough, cleaver] = [idsOf(tab, AXE), idsOf(tab, GIMLI), idsOf(tab, TOUGH), idsOf(tab, CLEAVER)];
     // Seat 1's planning turn: it pays for the Axe and attaches it to Gimli.
     const turn = { ...tab.state, activeSeat: 1, planningSeat: 1 };
-    const planned = send(begin(turn), { type: "PlayCard", cardId: axe, hostId: gimli, payments: payFor(turn, tab.ctx, axe, 1) }, tab.ctx);
+    const planned = sendUnledgered(begin(turn), { type: "PlayCard", cardId: axe, hostId: gimli, payments: payFor(turn, tab.ctx, axe, 1) }, tab.ctx);
     expect(planned.state.cards[axe]).toMatchObject({ host: gimli, controller: 0, owner: 1 });
     // The combat phase's action window: seat 0 plays Goblin-cleaver.
     const opened = combat(planned.state, tab);
     expect(opened.state.activeSeat).toBe(0);
     let run = playIn(opened.state, tab, CLEAVER);
-    if (choices(run.state, tab).includes(axe)) run = send(run, { type: "Choose", optionId: axe }, tab.ctx);
-    if (choices(run.state, tab).includes(tough)) run = send(run, { type: "Choose", optionId: tough }, tab.ctx);
+    if (choices(run.state, tab).includes(axe)) run = sendUnledgered(run, { type: "Choose", optionId: axe }, tab.ctx);
+    if (choices(run.state, tab).includes(tough)) run = sendUnledgered(run, { type: "Choose", optionId: tough }, tab.ctx);
     expect(run.state.cards[axe]?.exhausted).toBe(true);
     expect(run.state.cards[tough]?.damage).toBe(2);
     expect(run.state.cards[cleaver]?.zone).toBe("discard");
@@ -214,8 +189,8 @@ describe("Expecting Mischief (131018:A:1)", () => {
     const planning = table(effects, { heroes: [{ code: ORI, seat: 0 }, { code: THORIN, seat: 0 }], hand: [{ code: MISCHIEF, seat: 0 }] });
     expect(playable(planning.state, planning, MISCHIEF)).not.toBeNull();
     // The heroes commit and the staging step reveals: the window after staging (3.3) is too late.
-    let run = send(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, THORIN)] }, tab.ctx);
-    for (let guard = 0; guard < 5 && run.state.window?.kind !== "frameAction" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) run = send(run, { type: "Pass" }, tab.ctx);
+    let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, THORIN)] }, tab.ctx);
+    for (let guard = 0; guard < 5 && run.state.window?.kind !== "frameAction" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
     expect(run.state.mode).not.toBe("questCommit");
     expect(playable(run.state, tab, MISCHIEF)).not.toBeNull();
   });

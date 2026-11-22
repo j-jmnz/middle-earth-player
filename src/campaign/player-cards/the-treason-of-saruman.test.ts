@@ -5,18 +5,15 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
-import { modifiedStat } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { settle } from "../../rules/engine/machine.ts";
-import { legalIntents, reduce } from "../../rules/engine/reduce.ts";
-import { expectOk } from "../../rules/core/test-fixture.ts";
-import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { syncConstants } from "../../rules/interpret/constants.ts";
+import { updateCard, withMode } from "../../rules/core/state.ts";
 import { playCost } from "../../rules/player/attach.ts";
-import { fund, payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, buildTable, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { begin, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { attacking, combat, playerTable, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "143001";
 const THEODEN = "143002";
@@ -41,6 +38,8 @@ const FREE_ROHAN = "free-rohan";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
+const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+
 beforeAll(async () => {
   const starter = await starterBase();
   const cards = new Map([...starter.cards, ...(await loadPrinted([ARAGORN, THEODEN, TREEBEARD, LEGOLAS, QUICKBEAM, HAMA, ENT_DRAUGHT, TACTICS, GIMLI, TOOK, SHIELD, PLATE]))]);
@@ -50,31 +49,9 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-// A table on these records, every hero holding `resources`, the constants brought up to date.
-function table(effects: readonly Effect[], scene: Scene = {}, resources = 6): Table {
-  const tab = buildTable(base, { ring: "none", start: "planning", ...scene, effects });
-  return { ...tab, state: syncConstants(fund(tab.state, 0, resources), tab.ctx) };
-}
-
-function stat(state: ScenarioState, tab: Table, id: string, which: "attack" | "defense" | "willpower" | "hitPoints"): number {
-  return modifiedStat(state, state.cards[id]!, which, tab.ctx.cards);
-}
-
-function triggers(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Trigger" ? [intent.effectId] : []));
-}
-
 function play(tab: Table, code: string, run: Run = begin(tab.state), hostId?: string): Run {
   const card = tab.ids[code]?.find((id) => run.state.cards[id]?.zone === "hand") ?? idsOf(tab, code);
   return send(run, { type: "PlayCard", cardId: card, payments: payFor(run.state, tab.ctx, card), ...(hostId ? { hostId } : {}) }, tab.ctx);
-}
-
-// The combat phase with no enemy attacking: the player attack window, the first seat to declare.
-const attacking = (state: ScenarioState): ScenarioState => ({ ...withMode(state, "playerAttacks"), window: { kind: "playerAttack" }, activeSeat: 0 });
-
-// The combat phase begins with the enemies engaged: its action window (6.2) is open.
-function combat(state: ScenarioState, tab: Table): Run {
-  return begin(settle({ ...withMode(state, "combatStart"), window: null }, tab.ctx, []));
 }
 
 // The phase in progress ends and the next begins (withMode announces it); the engine then runs to its next window.
@@ -89,7 +66,7 @@ describe("Aragorn (143001:A:2)", () => {
     const [aragorn, gimli] = [idsOf(tab, ARAGORN), idsOf(tab, GIMLI)];
     const state = updateCard(updateCard(tab.state, aragorn, { resources: 3 }), gimli, { exhausted: true, resources: 5 });
     // The 2 come from Aragorn's pool, not another hero's.
-    expect(refusal(state, { type: "Trigger", cardId: aragorn, effectId: "143001:action:1", payments: [{ heroId: gimli, amount: 2 }] }, tab.ctx)).not.toBeNull();
+    expect(refusal(state, { type: "Trigger", cardId: aragorn, effectId: "143001:action:1", payments: [{ heroId: gimli, amount: 2 }] }, tab.ctx)).toBe("Only that card's resources can pay");
     let run = send(begin(state), { type: "Trigger", cardId: aragorn, effectId: "143001:action:1", payments: [{ heroId: aragorn, amount: 2 }] }, tab.ctx);
     if (run.state.window?.kind === "choose") run = send(run, { type: "Choose", optionId: gimli }, tab.ctx);
     expect(run.state.cards[gimli]?.exhausted).toBe(false);
@@ -224,7 +201,7 @@ describe("Quickbeam (143006:A:1, A:2)", () => {
     const tab = table(effects, { heroes: [{ code: TREEBEARD, seat: 0 }], hand: [{ code: QUICKBEAM, seat: 0 }] });
     const quickbeam = idsOf(tab, QUICKBEAM);
     const run = play(tab, QUICKBEAM);
-    const state = expectOk(reduce(run.state, { type: "Trigger", cardId: quickbeam, effectId: "143006:response:1" }, tab.ctx)).state;
+    const { state } = send(run, { type: "Trigger", cardId: quickbeam, effectId: "143006:response:1" }, tab.ctx);
     expect(state.cards[quickbeam]?.damage).toBe(1);
     expect(state.cards[quickbeam]?.exhausted).toBe(false);
   });
