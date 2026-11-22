@@ -20,7 +20,6 @@ import { heldDials } from "../readouts/widgets.ts";
 import { zoneSelector } from "../store/selectors.ts";
 import { pictureCode } from "../canvas/picture-key.ts";
 import { NO_HIGHLIGHT } from "../store/peek.ts";
-import { marksText } from "../canvas/table-canvas-views.ts";
 import { cardSpeech, type CardSpeechDeps } from "../words/card-speech.ts";
 
 const ID = "intruders-in-chetwood";
@@ -182,12 +181,11 @@ describe("a side quest of Fire in the Night wears the same pieces (the side ques
     expect(numbers.questPoints).not.toBeNull();
     expect(numbers.side).toMatchObject({ current: true });
     expect(slotNumbers(night.state, night.ctx, id).side).toBeNull();
-    expect(marksText(numbers)).toContain("the current quest");
   });
 
-  it("10158:A:3 the web list says Protect the Innocent's damage against the number that loses", () => {
+  it("10158:A:3 the slot says Protect the Innocent's damage against the number that loses", () => {
     const made = built({ staging: [{ code: PROTECT, damage: 9 }] });
-    expect(marksText(slotNumbers(made.state, made.ctx, idOf(made.state, PROTECT)))).toContain("9 of 10 damage, the players lose at 10, one more damage loses the game");
+    expect(slotNumbers(made.state, made.ctx, idOf(made.state, PROTECT)).side?.loses).toMatchObject({ danger: true, speech: expect.stringContaining("9 of 10 damage, the players lose at 10") });
   });
 });
 

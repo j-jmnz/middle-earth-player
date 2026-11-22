@@ -15,7 +15,6 @@ import { gramWorld } from "../../../test/scenarios/escape-from-mount-gram/game.t
 
 import { angmarDetail } from "../cards/angmar-preview.ts";
 import { slotNumbers } from "../cards/card-effects.ts";
-import { marksText } from "../canvas/table-canvas-views.ts";
 import { sheetFor } from "../choice/sheets.ts";
 import { tiedLabel } from "../choice/sheet-parts.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
@@ -103,8 +102,6 @@ describe("the cards captured under a host", () => {
     expect(stacksUnder({ game: state })).toBe(true);
     expect(detail(state, cell)).toBe("3 cards captured underneath, out of play and facedown (3 of Player 2's). They are rescued to their owners when this leaves play.");
     expect(slotNumbers(state, ctx, cell, 1).under).toMatchObject({ text: "3 captured", loses: false, speech: "3 cards captured underneath: 3 of Player 2's" });
-    // The web list says what the native reader says (the pill is only drawn on the canvas).
-    expect(marksText(slotNumbers(state, ctx, cell, 1) as never)).toContain(" · 3 cards captured underneath: 3 of Player 2's");
   });
 
   it("10038:B:1 draws the 7 cards of stage 2A's Capture under each seat's own stage, and names the owners of a host that holds two players' cards", () => {

@@ -24,7 +24,6 @@ import { scenarioDials, seatMarks } from "../readouts/scenario-dials.ts";
 import { hidesFace, isDead, zoneSelector } from "../store/selectors.ts";
 import { pictureCode } from "../canvas/picture-key.ts";
 import { NO_HIGHLIGHT } from "../store/peek.ts";
-import { marksText } from "../canvas/table-canvas-views.ts";
 import { cardSpeech, type CardSpeechDeps } from "../words/card-speech.ts";
 import { islandOptionLabel, islandPickWords } from "../words/scenarios/island.ts";
 import { deadSeatWords, escapeNear } from "../words/scenarios/angmar/dread-realm-table.ts";
@@ -103,14 +102,13 @@ describe("a Reanimated Dead on the table", () => {
     expect(previewOf(made, settledState, staged)?.text).toBe("A facedown card acting as an Undead enemy: engagement cost 0, Threat 2, Attack 3, Defense 3, 2 hit points. In the staging area, adding its Threat there. It is your card, and goes to your discard pile when it leaves play.");
   });
 
-  it("mec108.reanimated-dead is spoken as what it is and whose card it is by the reader and the web list, never as the card behind it", () => {
+  it("mec108.reanimated-dead is spoken as what it is and whose card it is by the reader and the slot, never as the card behind it", () => {
     const made = solo();
     const state = reanimated(made);
     const [id] = deadOf(state, 0);
     const said = "a facedown Undead enemy engaged with you: engagement cost 0, Threat 2, Attack 2, Defense 2, 2 hit points. Your card, it goes to your discard pile when it leaves play";
     expect(slotNumbers(state, made.ctx, id!, 0).dead).toBe(said);
     expect(cardSpeech(state, 0, id!, speechDeps(made)).label).toBe(`Reanimated Dead, ${said}`);
-    expect(marksText(slotNumbers(state, made.ctx, id!, 0))).toContain(said);
     expect(cardSpeech(state, 0, id!, speechDeps(made)).hint).toBe("Double tap to show the card");
     expect(cardSpeech(state, 0, id!, speechDeps(made)).label).not.toContain("Laermuin");
   });

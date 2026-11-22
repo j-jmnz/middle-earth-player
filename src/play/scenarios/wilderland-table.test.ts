@@ -20,7 +20,6 @@ import { isDiscardPile, opensList, PILE_WORDS, pileIds, pileSelector, secondPile
 import { wilderlandFixture, wilderlandViews } from "../store/wilderland-fixture.ts";
 import { seaFixture } from "../dream-chaser/sea-fixture.ts";
 import { discoverLines, discoverLogLine, discoverTitle, lookBeat, lookIdsOf, lookStripWords } from "../words/scenarios/wilderland.ts";
-import { pileCountWords, secondSlotLine } from "../words/scenarios/sea.ts";
 
 describe("the Wilderland piles in selectors", () => {
   it("has the Evil Creatures pair once the game has dealt that deck, and the Caves deck alone once it has dealt that", () => {
@@ -72,14 +71,6 @@ describe("what a reader hears of the Wilderland piles", () => {
     expect(pileSpeech({ zone: "evilCreaturesDeck", count: 5 })).toEqual({ label: "Evil Creatures deck, 5 cards", hint: null });
     expect(pileSpeech({ zone: "evilCreaturesDiscard", count: 1 })).toEqual({ label: "Evil Creatures discard pile, 1 card", hint: "Opens the list of cards" });
     expect(pileSpeech({ zone: "cavesDeck", count: 6 })).toEqual({ label: "Caves deck, 6 cards", hint: null });
-  });
-
-  it("names the whole slot in the web list on one line", () => {
-    const fixture = wilderlandFixture({ evilDeck: 5, evilDiscard: 2 });
-    const pair = secondPilesOf(fixture.state).map((pile) => ({ name: PILE_WORDS[pile], count: pileIds(fixture.state, pile, 0).length }));
-    expect(secondSlotLine(pair)).toContain("Evil Creatures deck");
-    expect(secondSlotLine(pair)).toContain("Evil Creatures discard pile");
-    expect(pileCountWords(PILE_WORDS.cavesDeck, 6)).toBe("Caves deck, 6 cards");
   });
 });
 
