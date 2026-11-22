@@ -28,11 +28,13 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 145041:A:1 (each player in turn, the first player first) and A:2 (the defending player).
   "145041:whenRevealed:1 @0.0 Choose": { owned: true, note: "Raiding the Coasts: add 3 to the staging area's Threat this phase, or discard your highest cost attachment." },
   "145041:whenRevealed:1 @0.0 threat": { label: "Add 3 to the staging area's Threat until the end of the phase" },
-  // The label cannot name the attachment (an asks template names only the record's own card and numbers), so it says whether the highest cost is one attachment or a tie the follow-up pick settles.
+  // The label names the highest cost attachment and its cost (`named`, `{attachmentCost}`); with a tie it says the cost and that the follow-up pick settles which.
   "145041:whenRevealed:1 @0.0 discard": {
+    named: { attachment: { pick: { type: "attachment", control: "you", highestCost: true }, otherwise: "your highest cost attachment" } },
     label: [
-      { when: { kind: "count", pick: { type: "attachment", control: "you", highestCost: true }, min: 2 }, text: "Discard your highest cost attachment: you choose among those tied for the highest cost" },
-      { text: "Discard your highest cost attachment: it is the only one at the highest cost" },
+      { when: { kind: "count", pick: { type: "attachment", control: "you", highestCost: true }, min: 2 }, text: "Discard one of your attachments tied at cost {attachmentCost}: you choose which" },
+      { when: { kind: "count", pick: { type: "attachment", control: "you", highestCost: true }, min: 1 }, text: "Discard {attachment}, your highest cost attachment (cost {attachmentCost})" },
+      { text: "Discard your highest cost attachment: you control none" },
     ],
   },
   "145041:whenRevealed:1 @0.0.discard.0 Pick": { owned: true, note: "Raiding the Coasts: choose, among your attachments tied for the highest cost, the one to discard.", verb: "Discard" },

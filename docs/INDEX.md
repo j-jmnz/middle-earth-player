@@ -89,7 +89,7 @@ Read the sections your task touches.
   - 601–643 Screens (~6.0K) ← 3
     - 628–643 Table screen (~1.8K) ← 3
   - 644–653 Readings to confirm (~220)
-- `docs/design-system-table.md` — Design system — Table (landscape) (~71.4K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~71.5K tok)
   - 5–8 Overview (~170) ← 1
   - 9–35 Top bar (~6.8K) ← 14
   - 36–39 Table menu (~870) ← 9
