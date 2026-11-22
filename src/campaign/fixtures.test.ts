@@ -322,8 +322,8 @@ describe("standalone fixtures (a cycle's scenarios)", () => {
       expect(ended.result?.outcome, name).toBe(name.endsWith("-lost") ? "lost" : "won");
       expect(ended.active, name).toBeNull();
     }
-    // Every cycle fixture replays in turn: about 2.5 s alone, past the default 5 s on a busy run of the whole suite.
-  }, 30_000);
+    // Every cycle fixture replays in turn: about 11 s alone, and several times that on a busy run of the whole suite.
+  }, 120_000);
 });
 
 // The cycle a standalone entry belongs to: its fixture's campaign once the file holds one, else the first cycle that lists the scenario.
