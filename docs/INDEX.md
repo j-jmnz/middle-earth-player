@@ -37,7 +37,7 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `docs/architecture.md` — Architecture (~25.5K tok)
+- `docs/architecture.md` — Architecture (~25.6K tok)
   - 7–44 Stack (~1.7K)
   - 45–80 Processes (~730)
   - 81–166 Modules (~2.6K) ← 4
@@ -58,9 +58,9 @@ Read the sections your task touches.
   - 389–400 Desktop (~1.4K) ← 4
   - 401–410 Update check (~680) ← 7
   - 411–416 Catalog build (~410)
-  - 417–433 Tests (~2.1K) ← 18
+  - 417–433 Tests (~2.2K) ← 18
   - 434–449 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~35.7K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~35.8K tok)
   - 17–35 Sections (~420)
   - 36–47 Product (~740) ← 2
   - 48–61 Non-goals (~610)
@@ -68,27 +68,27 @@ Read the sections your task touches.
   - 84–117 Stack (~1.3K)
   - 118–135 Performance and feel (~750)
   - 136–154 Repository layout (~490)
-  - 155–403 Domain (~11.5K)
+  - 155–404 Domain (~11.5K)
     - 157–245 Campaign (~2.2K) ← 1
     - 246–260 Mirkwood campaign cards and carry-over (~890)
     - 261–273 Standalone play (~990) ← 1
     - 274–285 Scenario state (~540)
     - 286–320 The engine plays the game (~2.3K) ← 5
     - 321–328 Engine steps (~180)
-    - 329–365 Core round (~2.3K) ← 5
-    - 366–403 Keywords implemented once (~2.1K)
-  - 404–446 Deckbuilding (~2.6K) ← 1
-  - 447–529 Effects (~4.2K)
-    - 450–510 Three layers (~2.5K) ← 10
-    - 511–521 Player side quests, contracts and saga cards (~1.4K) ← 1
-    - 522–525 Window stack (~100)
-    - 526–529 Coverage test (~270)
-  - 530–553 Data sources (~820) ← 4
-  - 554–572 Card images (~1.4K) ← 9
-  - 573–600 Persistence and shipping (~3.2K) ← 9
-  - 601–643 Screens (~6.0K) ← 3
-    - 628–643 Table screen (~1.8K) ← 3
-  - 644–653 Readings to confirm (~220)
+    - 329–366 Core round (~2.3K) ← 5
+    - 367–404 Keywords implemented once (~2.1K)
+  - 405–447 Deckbuilding (~2.6K) ← 1
+  - 448–530 Effects (~4.2K)
+    - 451–511 Three layers (~2.5K) ← 10
+    - 512–522 Player side quests, contracts and saga cards (~1.4K) ← 1
+    - 523–526 Window stack (~100)
+    - 527–530 Coverage test (~270)
+  - 531–554 Data sources (~820) ← 4
+  - 555–573 Card images (~1.4K) ← 9
+  - 574–601 Persistence and shipping (~3.2K) ← 9
+  - 602–644 Screens (~6.0K) ← 3
+    - 629–644 Table screen (~1.8K) ← 3
+  - 645–654 Readings to confirm (~220)
 - `docs/design-system-table.md` — Design system — Table (landscape) (~71.7K tok)
   - 5–8 Overview (~170) ← 1
   - 9–35 Top bar (~6.7K) ← 14
@@ -173,7 +173,7 @@ Read the sections your task touches.
   - 33–52 Reading a game as text (~760) ← 4
   - 53–60 On a desktop (~210) ← 1
   - 61–81 On a phone (~350)
-  - 82–136 Commands (~2.6K) ← 4
+  - 82–136 Commands (~2.7K) ← 4
   - 137–147 Asset mirror (~560) ← 6
 - `docs/discord-issues.md` — Discord issue bot (~3.8K tok)
   - 5–16 What it does (~290) ← 1
