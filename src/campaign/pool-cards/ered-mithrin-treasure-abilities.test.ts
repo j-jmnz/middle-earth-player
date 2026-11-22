@@ -86,10 +86,7 @@ describe("Anvil of Gundabad (12196:A:3)", () => {
     expect(run.state.cards[idsOf(tab, GIMLI)]?.exhausted).toBe(true);
   });
 
-  // FAULT: with no Item attachment in the hand (only the Title) the effect "play an Item attachment from your hand" can change nothing, so the
-  // Action is not offered (rr.triggered-ability: "A triggered ability on a player card can only be initiated if its effect has the potential
-  // to change the game state on its own"). The engine offers it, and its cost would exhaust the Anvil and Gimli for nothing.
-  it.fails("12196:A:3 Anvil of Gundabad: not offered with no Item attachment in the hand", () => {
+  it("12196:A:3 Anvil of Gundabad: not offered with no Item attachment in the hand", () => {
     const tab = anvil(EFFECTS, [STEWARD]);
     expect(triggers(tab.state, tab)).not.toContain("12196:action:1");
   });
@@ -170,10 +167,7 @@ describe("Gondolin Shield (12201:A:3)", () => {
     expect(triggers(run.state, tab)).not.toContain("12201:response:1");
   });
 
-  // FAULT: the Shield is "Attach to a character" and its cost is "spend 1 resource", which names no pool (rr.resources: a player spends
-  // resources from a hero's resource pool; the Shield is neutral, so no sphere is needed). On the Veteran Axehand, defending, the Response is
-  // offered and paid from Gimli's pool. The record takes the resource from the host's pool only, and an ally has none.
-  it.fails("12201:A:3 Gondolin Shield: on an ally that defends, the resource is spent from a hero's pool", () => {
+  it("12201:A:3 Gondolin Shield: on an ally that defends, the resource is spent from a hero's pool", () => {
     const { tab, run: pending } = defended(EFFECTS, AXEHAND, AXEHAND);
     expect(triggers(pending.state, tab)).toContain("12201:response:1");
     const paid = send(pending, { type: "Trigger", cardId: idsOf(tab, SHIELD), effectId: "12201:response:1", payments: [{ heroId: idsOf(tab, GIMLI), amount: 1 }] }, tab.ctx);

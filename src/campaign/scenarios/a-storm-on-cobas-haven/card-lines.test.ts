@@ -188,7 +188,7 @@ describe("the locations of the heading (12128, 12129)", () => {
 
 describe("Gavin (11210)", () => {
   // "When Revealed: Put Gavin into play under any player's control committed to the quest. Add 1 resource to Lanwyn's resource pool, if able." The first player names the player
-  // (docs/scenarios/dream-chaser.md, Gavin). Gavin has Surge, so the deck holds a card for it.
+  // (docs/scenarios/dream-chaser.md). Gavin has Surge, so the deck holds a card for it.
   const LANWYN = "12030";
   // Lanwyn is a hero of the second player.
   const withLanwyn = (made: LayoutTable): LayoutTable => ({ ...made, state: syncConstants(spawn(made.state, LANWYN, { zone: "heroes", seat: 1 }).state, made.ctx) });

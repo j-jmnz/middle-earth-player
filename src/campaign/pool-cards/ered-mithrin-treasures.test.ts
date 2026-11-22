@@ -2,8 +2,8 @@
 // The Ered Mithrin treasures' Attach to lines and constants, each tested from the line read from its scan (data/printed/ered-mithrin.json;
 // lineSpec, test/harness/line-spec.ts): 12196:A:1, 12197:A:1, 12197:A:2, 12198:A:1, 12198:A:2, 12199:A:1, 12200:A:1, 12200:A:2, 12201:A:1,
 // 12201:A:2, 12202:A:1, 12202:A:2, 12203:A:1, 12203:A:2, 12204:A:1, 12204:A:2. A treasure reaches a character in two ways: the players claim
-// it once it is free of encounters (emce.treasure: "the players claim it"; the first player picks the character, docs/scenarios/ered-mithrin.md,
-// Rulings), or a player who has it in their deck plays it from the hand ("add a treasure card to their player deck"). The claim is the
+// it once it is free of encounters (emce.treasure: "the players claim it"; the first player picks the character, docs/scenarios/ered-mithrin.md),
+// or a player who has it in their deck plays it from the hand ("add a treasure card to their player deck"). The claim is the
 // table's way in here (`claimed`); the play from the hand is the fault at the end of the file.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -114,9 +114,7 @@ describe("Restricted (12197:A:1, 12200:A:1, 12201:A:1, 12202:A:1, 12204:A:1)", (
   ] as const;
   for (const [line, worn, code] of rows) it(`${line} a third restricted attachment, beside Citadel Plate and ${worn}, sends one to the discard pile`, () => thirdRestricted(worn, code));
 
-  // FAULT: Masterwork Bow prints "Attach to a character. Restricted." (12204:A:1, read from its scan), but its card row has no restricted
-  // keyword (data/cards/EMCE.json keywords {}), so the engine lets it be a third restricted attachment and asks for no discard.
-  it.fails("12204:A:1 a third restricted attachment, beside Citadel Plate and Helm of Heroes, sends one to the discard pile", () => thirdRestricted(HELM, BOW));
+  it("12204:A:1 a third restricted attachment, beside Citadel Plate and Helm of Heroes, sends one to the discard pile", () => thirdRestricted(HELM, BOW));
 
   // Anvil of Gundabad and Jewels of Wilderland print no Restricted: beside two restricted attachments they ask nothing.
   for (const code of [ANVIL, JEWELS]) {
