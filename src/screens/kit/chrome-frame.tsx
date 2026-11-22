@@ -12,6 +12,7 @@ import { useOverrun } from "../nav/use-overrun";
 import type { SceneName } from "../art/backdrop-scenes";
 import { IconButton } from "./chrome-buttons";
 import { Chevron } from "./chrome-marks";
+import { SplitListRow } from "./list-row-split";
 import { Eyebrow } from "./chrome-text";
 import { usePalette } from "./palette-hook";
 import { themeVars } from "./palette.js";
@@ -225,6 +226,8 @@ export function ListRow({
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
+  // A trailing control of its own (a stepper) is a sibling of the row's press, never inside it.
+  if (trailing != null) return <SplitListRow label={label} detail={detail} onPress={onPress} onLongPress={onLongPress} longPressLabel={longPressLabel} testID={testID} leading={leading} trailing={trailing} detailIcons={detailIcons} selected={selected} />;
   return (
     <Pressable
       testID={testID}
@@ -251,11 +254,9 @@ export function ListRow({
               </View>
             ) : null}
           </View>
-          {trailing ?? (
-            <View className="w-6 items-center">
-              <Chevron direction="right" color={palette.faint} size={8} />
-            </View>
-          )}
+          <View className="w-6 items-center">
+            <Chevron direction="right" color={palette.faint} size={8} />
+          </View>
         </View>
       )}
     </Pressable>
