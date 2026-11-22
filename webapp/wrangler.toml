@@ -1,0 +1,16 @@
+# The web app's Worker and its static assets (docs/plans/pwa-iphone-ipad.md). Build first (pnpm webapp build), then deploy from this folder: npx wrangler deploy.
+name = "middle-earth-player"
+main = "worker.ts"
+compatibility_date = "2025-09-01"
+workers_dev = true
+# No preview URLs: each one is another origin with its own saves.
+preview_urls = false
+
+[assets]
+directory = "./build/web"
+binding = "ASSETS"
+html_handling = "auto-trailing-slash"
+not_found_handling = "none"
+
+[observability]
+enabled = true

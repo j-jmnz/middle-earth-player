@@ -57,9 +57,10 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
 };
 
 // The Electron shell (desktop/) is not part of the app's bundle, and its build folders hold a web export of about a gigabyte that Metro must not watch.
-const desktopFolder = path.join(__dirname, "desktop").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const desktopFiles = new RegExp(`^${desktopFolder}[/\\\\].*`);
-config.resolver.blockList = [...[config.resolver.blockList ?? []].flat(), desktopFiles];
+// The web app's Worker (webapp/) is outside the bundle too, and its build folder holds the same export.
+const outsideFolders = ["desktop", "webapp"].map((folder) => path.join(__dirname, folder).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+const outsideFiles = outsideFolders.map((folder) => new RegExp(`^${folder}[/\\\\].*`));
+config.resolver.blockList = [...[config.resolver.blockList ?? []].flat(), ...outsideFiles];
 
 const enhanceMiddleware = config.server.enhanceMiddleware;
 config.server.enhanceMiddleware = (middleware, metroServer) => {

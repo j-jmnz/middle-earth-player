@@ -121,6 +121,7 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm assets capture --build` | Takes the README's screenshots on the iOS simulators. It needs macOS, Xcode and Maestro. |
 | `pnpm assets showcase [--publish]` | Turns the captures into the README's images and a contact sheet. `--publish` replaces the `showcase` branch with them. |
 | `pnpm assets banner` | Draws the README's banner in both themes (`.github/readme/banner-*.webp`) from the tablet stills, the icon and the app's fonts. |
+| `pnpm webapp build` | Writes the web export with Cloudflare's headers, page list and ignore file to `webapp/build/web` (The web app on Cloudflare). `--skip-assets`, `--optional`, `--skip-export`. |
 | `pnpm desktop dev` | Opens the Electron shell on the Metro web server (`localhost:8081`, allowed in this mode only). |
 | `pnpm desktop build` | Writes the web export (`EXPO_PUBLIC_DESKTOP=1`) and the shell's bundle to `desktop/build`, after `pnpm assets`. `--skip-assets` leaves the packs, `--optional` lets one fail. |
 | `pnpm desktop pack` | Runs electron-builder for this OS into `desktop/out`; `APP_VERSION` sets the version, `--skip-build` packs the last build and `--dir` makes the unpacked app only. |
@@ -133,6 +134,21 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm move <old> <new>` | Moves files and rewrites every reference to them. Try `--dry-run` first. |
 
 Scripts log to stderr. Pass `--verbose` or `--quiet`, or set `LOG_LEVEL` to `debug`, `info`, `warn`, `error` or `silent`.
+
+## The web app on Cloudflare
+
+Not released: this is the test site of `docs/plans/pwa-iphone-ipad.md` (Phase 0: device spike).
+
+```bash
+pnpm webapp build
+cd webapp && npx wrangler deploy
+```
+
+`pnpm webapp build` packs the assets and writes the desktop's web export to `webapp/build/web`, then adds what Cloudflare needs (`scripts/webapp/site.ts`): the `_headers` file (COOP `same-origin`, COEP `require-corp`, the desktop's CSP), the list of pages with a parameter that the Worker reads, the Home Screen tags and icon in each page, and an `.assetsignore` of the files over Cloudflare's 25 MiB for a static asset, which it warns about. `--skip-assets` leaves the packs, `--optional` lets one fail and `--skip-export` stages the export that is there. Its summary line counts the files and their size.
+
+`webapp/wrangler.toml` deploys the export as the Worker's static assets. Cloudflare answers a file's path itself; `webapp/worker.ts` runs only for the rest and answers a route with a parameter (`/table/<id>`) with its page, and any other path with the not-found page and a 404. `npx wrangler dev` in `webapp/` serves the same site on localhost.
+
+The first deploy is public until Cloudflare Access is on. Deploy once with no pictures (`pnpm webapp build --skip-assets` on a clone with no `assets/scans`), turn on Access for the Worker's `workers.dev` name in the dashboard (the Worker's Settings, Domains & Routes), then build with the pictures and deploy again.
 
 ## Asset mirror
 

@@ -87,6 +87,7 @@
     "game": "node scripts/cli.ts game",
     "browser": "node scripts/cli.ts browser",
     "desktop": "node scripts/cli.ts desktop",
+    "webapp": "node scripts/cli.ts webapp",
     "release": "node scripts/cli.ts release",
     "move": "node scripts/tools/move.ts",
     "commit:check": "node scripts/git/commit-message.ts",

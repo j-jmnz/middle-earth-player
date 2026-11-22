@@ -1,6 +1,6 @@
 # Plan: a web app for iPhone and iPad on Cloudflare
 
-A player opens one URL in Safari, adds the app to the Home Screen and plays offline, with no SideStore, AltStore or TestFlight. Nothing here is built. Phase 0 decides whether the rest goes ahead.
+A player opens one URL in Safari, adds the app to the Home Screen and plays offline, with no SideStore, AltStore or TestFlight. Only the test site of Phase 0 is built (`docs/development.md`, The web app on Cloudflare). Phase 0 decides whether the rest goes ahead.
 
 ## Assessment
 
@@ -57,13 +57,13 @@ If Phase 0 shows that a deploy of the whole export is too slow or too large, the
 
 ## Phase 0: device spike
 
-No product code. A throwaway deploy behind Cloudflare Access answers the open risks.
+No product code. A test site behind Cloudflare Access answers the open risks. The site is the desktop's export with `require-corp`; in Chromium it is isolated, opens `user.db` and shows no error.
 
-1. Export the web build with COEP `require-corp` and the pictures of one campaign bundled, and deploy it with `wrangler` to a `workers.dev` name behind Access.
+1. Build and deploy the test site to a `workers.dev` name behind Access (`docs/development.md`, The web app on Cloudflare).
 2. On an iPhone and an iPad (the oldest the user has, on iOS 17 or later), in Safari and from the Home Screen: `crossOriginIsolated` is true, `user.db` opens, a save survives a relaunch and a week, and Back up saves and Restore work.
 3. Play a full scenario from a save fixture. Record the time of one accepted intent, any page reload, and the table's frame rate with pictures on High and Low.
 4. Open a booklet, start the music, import a RingsDB deck.
-5. Count the export's files and its largest files against the limits in Cloudflare fit.
+5. Read the build's summary line and warnings: the export's files and the files over the asset limit.
 
 Exit: a short report with each answer. The user decides to go on, to change the storage design (for example an asynchronous database path), or to stop.
 
@@ -92,7 +92,7 @@ Exit: a short report with each answer. The user decides to go on, to change the 
 
 ## Phase 4: Cloudflare and release
 
-- `webapp/wrangler.toml`: the Worker with the static assets binding, the R2 bucket for files over the asset limit, and the RingsDB route if it is needed. The Worker is outside the app's bundle, like `desktop/` and `discord/` (`.oxlintrc.json`).
+- `webapp/wrangler.toml` and `webapp/worker.ts` gain the R2 bucket for files over the asset limit, and the RingsDB route if it is needed.
 - `release.yml` gains a `webapp` job beside `web`: it builds the web app export, uploads the oversize files to R2 by sha256, runs `wrangler deploy`, and loads the deployed site once in Chromium (isolation, the drawn table, a save across a reload). Like the desktop leg, its failure does not hold back the APK and the IPA. Secrets: a Cloudflare API token scoped to this Worker and bucket, and the account id (`docs/releasing.md`).
 - A dry run deploys to a preview version, never to the public origin.
 - A WebKit run of the smoke in CI (Playwright's WebKit build) catches a header or API regression that Chromium accepts. It is not iOS, so the device checks of Phase 0 are repeated by the user before the first public release.

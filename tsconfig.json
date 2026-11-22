@@ -25,6 +25,8 @@
     "node_modules",
     ".claude",
     "desktop/build",
-    "desktop/out"
+    "desktop/out",
+    "webapp/build",
+    "webapp/.wrangler"
   ]
 }
