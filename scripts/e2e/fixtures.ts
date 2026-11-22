@@ -346,7 +346,9 @@ function position(order: readonly string[], id: string): number {
 void runScript("e2e-fixtures", async () => {
   const searching = process.argv.includes("--won");
   const only = scenarioArgument();
+  if (only === null && searchFlags() !== null) throw new Error("--search takes one scenario id: a search of every scenario would run for hours");
   const dir = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "..", "src", "campaign", "fixtures");
+  if (only !== null && !isChained(only) && searchFlags() !== null) throw new Error(`${only} has its own search for its won game: pass --won`);
   if (only === null || !isChained(only)) writeScenarioOne(dir, searching);
   if (only === null || isChained(only)) await writeChained(dir, only, searchFlags()?.out ?? null);
 });

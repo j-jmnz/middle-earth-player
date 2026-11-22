@@ -125,11 +125,16 @@ function trackersOf(state: ScenarioState): number {
   return sum;
 }
 
-/** Damage on an objective in play (a card the scenario can end the game over, "Protect the Innocent holds 10 damage"): each token costs the table, whatever the scenario's card says. */
+/** The card types that are neither characters, enemies nor locations: damage on one is a counter the scenario's text can end the game over. */
+const COUNTER_TYPES = new Set(["objective", "encounter-side-quest", "player-side-quest"]);
+
+const COUNTER_ZONES = new Set<CardInstance["zone"]>(["play", "staging", "attached", "questStage", "activeLocation"]);
+
+/** Damage on an objective or a side quest in play ("Protect the Innocent holds 10 damage"): each token costs the table, whatever the scenario's card says. */
 function objectivesOf(state: ScenarioState, ctx: ReduceContext): number {
   let damage = 0;
   for (const card of Object.values(state.cards)) {
-    if (card.damage > 0 && (card.zone === "play" || card.zone === "staging" || card.zone === "attached") && printedOf(ctx.cards, card.code).type === "objective") damage += card.damage;
+    if (card.damage > 0 && COUNTER_ZONES.has(card.zone) && COUNTER_TYPES.has(printedOf(ctx.cards, card.code).type)) damage += card.damage;
   }
   return -25 * damage;
 }
