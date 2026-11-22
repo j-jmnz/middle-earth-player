@@ -16,6 +16,32 @@ export function deckRulesOf(effects: readonly Effect[], codes: Iterable<string>)
   return rules;
 }
 
+// The hero limit each contract sets, by card code, built once for an effect list (the list is never changed after it is built).
+const HERO_LIMITS = new WeakMap<readonly Effect[], ReadonlyMap<string, number>>();
+
+function heroLimitsOf(effects: readonly Effect[]): ReadonlyMap<string, number> {
+  const known = HERO_LIMITS.get(effects);
+  if (known) return known;
+  const limits = new Map<string, number>();
+  for (const effect of effects) {
+    if (effect.timing !== "constant") continue;
+    for (const instruction of effect.instructions) if (instruction.verb === "DeckRule" && instruction.rule.kind === "heroes" && !limits.has(effect.cardCode)) limits.set(effect.cardCode, instruction.rule.max);
+  }
+  HERO_LIMITS.set(effects, limits);
+  return limits;
+}
+
+/** How many starting heroes a deck holding these cards may have: `heroLimit` of its contract's rules, read from an index so a list screen can ask for every card. */
+export function heroLimitOfCodes(effects: readonly Effect[], codes: Iterable<string>): number {
+  const limits = heroLimitsOf(effects);
+  if (limits.size === 0) return 3;
+  for (const code of codes) {
+    const limit = limits.get(code);
+    if (limit != null) return limit;
+  }
+  return 3;
+}
+
 // How many starting heroes the rules allow: three, unless the contract says otherwise ("You cannot choose more than 1 starting
 // hero", "you may choose 4 heroes instead of 3").
 export function heroLimit(rules: readonly DeckRule[]): number {

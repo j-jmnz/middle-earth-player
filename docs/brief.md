@@ -413,7 +413,7 @@ A deck saves at any stage, so a deck can be built over several sittings (user de
 
 Universal rules, which decide whether a deck is ready to play, are the Rules Reference's (`rr.deckbuilding`; user decision 2026-10-25):
 
-- One to three heroes, no two with the same title.
+- One to three heroes, no two with the same title. A contract in the deck sets another limit (Bond of Friendship: four; `heroLimit`, `src/catalog/deck-rules.ts`): the editor's empty hero slots, its Heroes count and the pool's + follow it.
 - At least 50 other cards.
 - At most three copies of a title, across its printings, and never more than the card's `deck_limit`. `is_unique` does not lower that cap. A second copy of a unique title cannot enter play; that is not a save check. A contract in the deck is no deck card and does not count toward the minimum; at most one. The deckbuilding rules printed on its side A are `DeckRule` instructions on its records (no allies, copies by title, one starting hero or four, different spheres, an exact or larger size, cards per sphere) and change these checks (`src/catalog/deck-rules.ts`, `deck-save.ts`).
 - A card's sphere does not have to match a hero to be saved. It needs a hero of that sphere to be played (`rr.resource-match`), which the table checks. Saga rules still run on the briefing loadout, not on this save.
@@ -422,7 +422,7 @@ Universal rules, which decide whether a deck is ready to play, are the Rules Ref
 Fellowship rules (Fellowship of the Ring, above) run on the briefing loadout, not on the saved deck. MEC109 says Frodo is the only Ring-bearer in this box.
 
 - The hero count runs on the saved deck. The saga rules run on the loadout.
-- The Ring-bearer slot is required when the saved deck has no Ring-bearer, and unused when it already has one. A fourth hero is legal only when the extra hero is that Ring-bearer; a deck whose contract allows four heroes (Bond of Friendship) starts with its four and the Ring-bearer.
+- The Ring-bearer slot is required when the saved deck has no Ring-bearer, and unused when it already has one. A fourth hero is legal only when the extra hero is that Ring-bearer; a deck whose contract allows four heroes (Bond of Friendship) starts with its four and the Ring-bearer or the ☺ Aragorn, five in all (user decision, 2026-11-22).
 - Two-handed play requires a single Ring-bearer across the table. It does not reject two decks that share some other unique card.
 
 A saved deck does not have to be legal for any particular campaign. The briefing picks one saved deck per seat, offers only a deck that is ready to play, and refuses to deal when the loadout fails. The error names the card and the rule.
@@ -645,7 +645,6 @@ The table is landscape only (user request, 2026-10-25).
 
 Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.
 
-- Bond of Friendship (22147) in a saga campaign: the deck starts with its four heroes and the saga hero, five in all. The contract allows four starting heroes, and the Ring-bearer with The One Ring (`mec109.the-one-ring`) and the Fellowship Aragorn (`mec112.aragorn`) do not count against the hero limit; the rulebooks' "up to 4 heroes" follows from a limit of three. The saga hero's Fellowship sphere is a fifth, different sphere. No ruling was found (`recommended`; read: https://ringsdb.com/card/22147, https://hallofbeorn.com/LotR/Details/Bond-of-Friendship-TFoN, https://images-cdn.fantasyflightgames.com/filer_public/7c/1e/7c1efcc9-103c-4c98-ab1e-f3b28776d4b7/mec109_rulebook-compressed.pdf; neither the FAQ nor a discussion found covers the pair).
 - Beechbone 10118:A:2 reads X as 0 when its own cost destroys him (`recommended`, docs/brief.md, Core round).
 - A card played from the hand or the deck "at no cost" (Host of Galadhrim, Send for Help, Scavenge for Supplies) needs no resource match (community-sourced, docs/brief.md, Core round).
 - A resource moved to a hero's pool (Errand-rider) is gained, not added: Heir of Mardil answers it, Harbor Master does not (community-sourced, docs/brief.md, Core round).
