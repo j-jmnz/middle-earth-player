@@ -59,7 +59,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19094:A:3 (front): Response: When the players travel to a Discover location, exhaust Crypt Key to either increase or decrease its Discover value by 1 before resolving it.
   19094:response:1: Response after the players travel (heard about location (any player controls); cost: exhaust this card)
-    only if not ([json condition {"kind":"discoverUnavailable"}])
+    only if not (the active location has no Discover keyword to resolve (none printed, or the keyword is ignored))
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) that is the active location
     - the acting player chooses one of:
@@ -83,7 +83,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19095:A:3 (front): Action: Exhaust Old Lantern to choose a player to look at the top X cards of his deck, where X is the Discover value of the active location. He adds one of those cards to his hand and places the rest on the bottom of his deck.
   19095:action:1: Action (cost: exhaust this card)
-    only if not ([json condition {"kind":"discoverUnavailable"}])
+    only if not (the active location has no Discover keyword to resolve (none printed, or the keyword is ignored))
     who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose player (any player controls)
@@ -276,8 +276,8 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player, for the player in the keyword's first player, resolves the Discover keyword of the active location (its Discover value, with any adjustment): looks at the top cards, chooses a Loot objective to guard the location, reveals a random Hazard and discards the rest (nothing when the active location has no Discover keyword or it is ignored)
-    - then, if [json condition {"kind":"discoverUnavailable"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
-    - then, if [json condition {"kind":"discoverUnavailable"}] (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 2 from the doomed keyword this card gains (doomedRaised is announced for each)
+    - then, if the active location has no Discover keyword to resolve (none printed, or the keyword is ignored) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the active location has no Discover keyword to resolve (none printed, or the keyword is ignored) (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 2 from the doomed keyword this card gains (doomedRaised is announced for each)
 
 19106:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   19106:shadow:1: Shadow
@@ -383,4 +383,4 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     only if the card with code 19098 is not in the victory display
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 226 by template, 12 as JSON)
+(rendered pieces: 230 by template, 8 as JSON)

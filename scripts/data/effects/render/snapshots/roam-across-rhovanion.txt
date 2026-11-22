@@ -251,8 +251,8 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 19041 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - one set-aside card with code 19054 joins the staging area (it is not revealed)
-    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Grey Moorland" (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Tiny"
-    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Tiny" (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Grey Moorland" that is in play now (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Tiny"
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Tiny" that is in play now (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
     - shuffle the encounter deck
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card
@@ -284,8 +284,8 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 19038 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - one set-aside card with code 19037 joins the staging area (it is not revealed)
-    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Grey Mountain Giant" (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Urdug's Horn"
-    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Urdug's Horn" (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Grey Mountain Giant" that is in play now (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Urdug's Horn"
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Urdug's Horn" that is in play now (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
     - shuffle the encounter deck
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card
@@ -316,8 +316,8 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 19042 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - one set-aside card with code 19036 joins the staging area (it is not revealed)
-    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Deep Ravine" (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Durin's Key"
-    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Durin's Key" (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Deep Ravine" that is in play now (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Durin's Key"
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Durin's Key" that is in play now (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
     - shuffle the encounter deck
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card

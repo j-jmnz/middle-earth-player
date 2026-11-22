@@ -312,9 +312,9 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
     - repeat 4 times:
       - the next pair, in the order they were paired, becomes the pair the running effect is on: its player card and its encounter card are picked (nothing is picked once the pairs are done)
       - the first player chooses one of:
-        * option "discard" (only if [json condition {"kind":"embassy","is":"pair"}]):
+        * option "discard" (only if the running effect is on an Embassy pair (its player card still lies faceup)):
           - the player card of the current pair goes to its owner's discard pile and its encounter card to the encounter discard pile
-        * option "play" (only if [json condition {"kind":"embassy","is":"playable"}]):
+        * option "play" (only if the player card of the Embassy pair the running effect is on can be played at no cost by its owner now):
           - the first player reveals the current pair's encounter card as a card revealed in the staging step (Peril, Surge and Doomed apply; "you" is the first player); the player card is played after it
           - the player card of the Embassy's current pair, lying faceup in front of its owner, is played for no cost by its owner; when it cannot be played it goes to its owner's discard pile
     - the Embassy is over: an encounter card of the row that was never paired goes back on top of the encounter deck in the order it was placed (a game with too few player cards), and the Embassy is forgotten
@@ -345,4 +345,4 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:constant:2: Constant
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 232 by template, 5 as JSON)
+(rendered pieces: 234 by template, 3 as JSON)

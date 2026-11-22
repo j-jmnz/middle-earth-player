@@ -10,7 +10,7 @@ import { newCtx, type Obj } from "./kit.ts";
 import { BARS } from "./bars.ts";
 import { FAMILY_FLAGS } from "../../../../src/catalog/families/index.ts";
 import { renderPick } from "./picks.ts";
-import { renderRecord } from "./record.ts";
+import { renderCost, renderRecord } from "./record.ts";
 import { renderInstruction } from "./verbs.ts";
 
 // The reading aid (scripts/data/effects/render.ts): a template per piece, JSON for a piece with none, and no field hidden.
@@ -32,6 +32,14 @@ describe("effects render templates", () => {
     expect(renderCondition({ kind: "not", condition: { kind: "namedFlag", name: "The Heroes' Defense", stat: "noResourcesPlaced" } }, ctx)).toBe(
       "not (the card in play titled \"The Heroes' Defense\" holds the flag noResourcesPlaced)",
     );
+  });
+
+  it("renders each cost a record can name", () => {
+    const ctx = newCtx();
+    expect(renderCost({ kind: "addSelfToVictory" }, ctx)).toContain("victory display");
+    expect(renderCost({ kind: "exhaustCode", code: "12345" }, ctx)).toContain("12345");
+    expect(renderCost({ kind: "discardDeckTop", amount: 2 }, ctx)).toContain("top 2");
+    expect(ctx.tally.json).toBe(0);
   });
 
   it("renders a Choose with its options indented", () => {

@@ -61,7 +61,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 
 11200:B:9 (back): • 1 XP if each surviving player's threat is 40 or less.
   11200:resolution:8: Resolution
-    - if [json condition {"kind":"survivorsThreat","max":40}]: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - if each surviving player's threat is 40 or less (read at a campaign card's Resolution; true with no surviving player): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11200:B:10 (back): • -1 XP if Ominous Fate is in the victory display.
   11200:resolution:9: Resolution
@@ -373,4 +373,4 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
-(rendered pieces: 256 by template, 12 as JSON)
+(rendered pieces: 257 by template, 11 as JSON)

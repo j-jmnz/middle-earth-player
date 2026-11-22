@@ -41,7 +41,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11037:B:2 (back): Each Raider enemy revealed by the encounter deck enters play with 1 resource on it.
   11037:forced:1: Forced after a card is revealed (heard about Raider enemy (any player controls) or in the staging area; only when the encounter deck revealed it)
-    only if not ([json condition {"kind":"revealing"}])
+    only if not (the When Revealed effects of this card are resolving now (a quest stage's side B holds from the moment it is revealed, but its text is not in force while side A's When Revealed is))
     - place 1 resource tokens on the card the event is about
 
 11037:B:3 (back): If Captain Sahír is in the victory display and each location in play has no damage, the players win the game.
@@ -58,7 +58,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11038:A:2 (front): If there are X or more cards underneath The Havens Burn, the Corsairs have destroyed the Elven fleet and the players lose the game. X is 3 more than the number of players in the game.
   11038:triggered:1: Triggered (mandatory, not printed as Forced) on the event placedUnder (heard about location (any player controls))
-    only if [json condition {"kind":"underBurn","min":3,"players":true}]
+    only if the cards facedown underneath The Havens Burn number at least 3, both bounds counted on top of the number of players in the game
     - the players lose the game (The Corsairs have destroyed the Elven fleet)
 
 ## 11039 Dream-chaser
@@ -456,8 +456,8 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11182:B:5 (back): • 1 XP if 2 or fewer cards are underneath The Havens Burn (2 XP instead if no cards are underneath it).
   11182:resolution:4: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"underBurn","max":2}]: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
-    - then, if [json condition {"kind":"underBurn","max":0}] (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - if the cards facedown underneath The Havens Burn number at most 2: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - then, if the cards facedown underneath The Havens Burn number at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11182:B:6 (back): • 1 XP for each Elven Wave-runner in the victory display.
   11182:resolution:5: Resolution
@@ -473,7 +473,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11182:B:9 (back): • 1 XP if each surviving player's threat is 40 or less.
   11182:resolution:8: Resolution
-    - if [json condition {"kind":"survivorsThreat","max":40}]: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - if each surviving player's threat is 40 or less (read at a campaign card's Resolution; true with no surviving player): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11182:B:10 (back): • -1 XP if Ominous Fate is in the victory display.
   11182:resolution:9: Resolution
@@ -499,4 +499,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with a player (that player is who "you" means in this record)) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 323 by template, 21 as JSON)
+(rendered pieces: 328 by template, 16 as JSON)

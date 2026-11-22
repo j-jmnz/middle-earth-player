@@ -532,7 +532,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 
 901205:A:2 (front): While you are engaged with Swarming Goblins, it gains: "Forced: When a quest card is bypassed, search the encounter discard pile for a copy of Goblin Spearman and put it into play engaged with you."
   901205:forced:1: Forced on the event stageBypassed (event happened to the controller)
-    only if [json condition {"kind":"engagedWithActor"}]
+    only if this card is an enemy engaged with the acting player
     - the acting player finds one card with code 03031 in the encounter discard pile (the deck is not searched) and puts it into play engaged with them (it is not revealed)
 
 ## 901206 Coal-Black Orc
@@ -594,4 +594,4 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the shadow card with code 901209 that the attacking enemy holds goes to the victory display
 
-(rendered pieces: 376 by template, 1 as JSON)
+(rendered pieces: 377 by template, 0 as JSON)

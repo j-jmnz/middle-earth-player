@@ -92,7 +92,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   141026:forced:1: Forced at the end of the round
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
-      * option "progress" (only if [json condition {"kind":"questProgress"}]):
+      * option "progress" (only if the current quest card has progress on it):
         - remove 1 progress from the current quest card for each player in the game (it stops at 0)
       * option "ringwraith" (only if a copy of the card with code 141069 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)):
         - one out-of-play copy of the card with code 141069 (set aside, in the encounter discard pile, in the victory display or under a card) joins the encounter deck, which is shuffled (when copies are out of play in more than one zone the first player chooses which; nothing with no copy left)
@@ -592,4 +592,4 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906209:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 277 by template, 2 as JSON)
+(rendered pieces: 278 by template, 1 as JSON)

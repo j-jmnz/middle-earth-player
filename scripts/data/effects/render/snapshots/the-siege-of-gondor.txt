@@ -59,7 +59,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
   145033:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if [json condition {"kind":"dealt"}]: the event's other card: stat cannotReady 1, until the end of the round
+      - if the attack that left this effect for its end, or the damage the answered event placed, dealt at least 1 damage: the event's other card: stat cannotReady 1, until the end of the round
 
 ## 145034 Pelargir Quays
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -265,4 +265,4 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
         * option "damage" (only if there is a character (you control) to choose):
           - the acting player assigns the resource tokens on objective (any player controls) named "The Corsair Fleet" damage among the character (you control), one at a time
 
-(rendered pieces: 185 by template, 1 as JSON)
+(rendered pieces: 186 by template, 0 as JSON)

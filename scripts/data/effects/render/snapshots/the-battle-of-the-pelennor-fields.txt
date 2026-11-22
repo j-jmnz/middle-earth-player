@@ -104,7 +104,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145046:A:2 (front): Forced: When City Wall has damage equal to its quest points, discard it. Then, each player raises his threat by 3.
   145046:forced:1: Forced after a card takes damage (heard about this card)
-    only if [json condition {"kind":"damageReached","nth":4}]
+    only if the damaged event the card answers placed this card's 4th damage token: it holds at least that many now and held fewer before
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard this card
     - raise threat by 3 (each player)
@@ -306,7 +306,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145058:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if [json condition {"kind":"dealt"}]: when the attack ends: the attacking enemy's shadow card with code 145058 attaches faceup to the hero the attack damaged (its defender, or the hero an undefended attack landed on), unless that hero carries one already (Limit 1 per hero); a damaged ally or no damage attaches nothing
+      - if the attack that left this effect for its end, or the damage the answered event placed, dealt at least 1 damage: when the attack ends: the attacking enemy's shadow card with code 145058 attaches faceup to the hero the attack damaged (its defender, or the hero an undefended attack landed on), unless that hero carries one already (Limit 1 per hero); a damaged ally or no damage attaches nothing
 
 ## 145059 Spells of Ruin
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -440,7 +440,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145074:B:1 (back): X is the total cost of all allies in the staging area.
   145074:constant:1: Constant
-    - this card: stat questPoints [json amount {"stagedAlliesCost":true}], while this card is in play
+    - this card: stat questPoints the total printed cost of the allies in the staging area (a card with no printed cost counts 0), while this card is in play
 
 145074:B:2 (back): Allies in the staging area are treated as if their text box is blank, are immune to player card effects, and are under no player's control.
   145074:constant:2: Constant
@@ -542,7 +542,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - Campaign Setup: each enemy recorded in the Campaign Log under The Black Gate with the trait Harad is set aside, out of play, one copy for each recorded (nothing is set aside with no log)
     - Campaign Setup: the first player attaches the cards with codes 142014 and 145013, from the supply, to the hero with code 145001 and sets him aside, out of play, with an empty resource pool (he returns with an empty one)
-    - the card with code 145072 enters the staging area with [json amount {"recorded":"corsairFleet"}] resource tokens on it (on the campaign card's Setup it is spawned; on the card's own Setup a copy of the pool the Setup search found is placed)
+    - the card with code 145072 enters the staging area with the count the earlier Resolution recorded in the Campaign Log's notes as "corsairFleet" (0 when none is recorded or the game has no log) resource tokens on it (on the campaign card's Setup it is spawned; on the card's own Setup a copy of the pool the Setup search found is placed)
     - Campaign Setup: the pool's burdens of the burden sets "A Shadow of the Past", "Flight to the Ford", "The Ring Goes South", "The Passage of the Marshes", "Shelob's Lair" are not dealt this scenario; they stay in the pool, only left out of the decks the setup builds (the encounter deck)
 
 145078:B:1 (back): Forced: When the players advance to stage 5B, add each set aside Harad enemy to the staging area.
@@ -590,4 +590,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - this enemy, in the staging area, engages the first player
     - then, if this card is engaged with a player (that player is who "you" means in this record) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 359 by template, 5 as JSON)
+(rendered pieces: 363 by template, 1 as JSON)

@@ -244,7 +244,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the bottom card of the acting player's deck goes to its owner's discard pile, announced as discarded from the deck; the effect remembers it, so a later check can read its printed cost
-    - then, if [json condition {"kind":"discardedCost","max":2}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - then, if the card the effect just discarded from the bottom of a deck has a printed cost of 2 or less (a card with no printed cost does not, and nothing discarded does not) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 11033 Mysterious Fog
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -262,8 +262,8 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the bottom card of the acting player's deck goes to its owner's discard pile, announced as discarded from the deck; the effect remembers it, so a later check can read its printed cost
-    - then, if [json condition {"kind":"discardedCost","max":2}] (checked when this step runs, after the steps above; not tied to whether they did anything): choose ready character (you control)
-    - then, if [json condition {"kind":"discardedCost","max":2}] (checked when this step runs, after the steps above; not tied to whether they did anything): exhaust the picked card
+    - then, if the card the effect just discarded from the bottom of a deck has a printed cost of 2 or less (a card with no printed cost does not, and nothing discarded does not) (checked when this step runs, after the steps above; not tied to whether they did anything): choose ready character (you control)
+    - then, if the card the effect just discarded from the bottom of a deck has a printed cost of 2 or less (a card with no printed cost does not, and nothing discarded does not) (checked when this step runs, after the steps above; not tied to whether they did anything): exhaust the picked card
 
 ## 11034 Lingering Malevolence
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -279,7 +279,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the bottom card of the acting player's deck goes to its owner's discard pile, announced as discarded from the deck; the effect remembers it, so a later check can read its printed cost
-    - then, if [json condition {"kind":"discardedCost","max":2}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - then, if the card the effect just discarded from the bottom of a deck has a printed cost of 2 or less (a card with no printed cost does not, and nothing discarded does not) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 11035 Ruins of Ages Past
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -332,7 +332,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
   11070:forced:1: Forced after an enemy is destroyed (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the bottom card of the acting player's deck goes to its owner's discard pile, announced as discarded from the deck; the effect remembers it, so a later check can read its printed cost
-    - then, if [json condition {"kind":"discardedCost","max":2}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card goes on top of the encounter deck
+    - then, if the card the effect just discarded from the bottom of a deck has a printed cost of 2 or less (a card with no printed cost does not, and nothing discarded does not) (checked when this step runs, after the steps above; not tied to whether they did anything): this card goes on top of the encounter deck
 
 ## 11071 Curse of the Downfallen
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -348,7 +348,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the bottom card of the acting player's deck goes to its owner's discard pile, announced as discarded from the deck; the effect remembers it, so a later check can read its printed cost
-    - then, if [json condition {"kind":"discardedCost","max":2}] (checked when this step runs, after the steps above; not tied to whether they did anything): when the attack in progress ends:
+    - then, if the card the effect just discarded from the bottom of a deck has a printed cost of 2 or less (a card with no printed cost does not, and nothing discarded does not) (checked when this step runs, after the steps above; not tied to whether they did anything): when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 11072 Flooded Ruins
@@ -474,10 +474,10 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11179:B:5 (back): • 1 XP if each surviving player's threat is 40 or less.
   11179:resolution:4: Resolution
-    - if [json condition {"kind":"survivorsThreat","max":40}]: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - if each surviving player's threat is 40 or less (read at a campaign card's Resolution; true with no surviving player): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11179:B:6 (back): • -1 XP if Ominous Fate is in the victory display.
   11179:resolution:5: Resolution
     - if the number of card (any player controls) in the victory display, named "Ominous Fate" is at least 1: Resolution: lose 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
-(rendered pieces: 263 by template, 26 as JSON)
+(rendered pieces: 270 by template, 19 as JSON)

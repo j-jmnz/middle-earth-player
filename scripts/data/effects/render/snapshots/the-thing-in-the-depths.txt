@@ -92,8 +92,8 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 11194:B:8 (back): • 1 XP if each surviving player's threat is 40 or less (2 XP instead if their threat is 30 or less).
   11194:resolution:7: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"survivorsThreat","max":40}]: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
-    - then, if [json condition {"kind":"survivorsThreat","max":30}] (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - if each surviving player's threat is 40 or less (read at a campaign card's Resolution; true with no surviving player): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - then, if each surviving player's threat is 30 or less (read at a campaign card's Resolution; true with no surviving player) (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11194:B:9 (back): • -1 XP if Ominous Fate is in the victory display.
   11194:resolution:8: Resolution
@@ -148,7 +148,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12041:B:2 (back): At the end of the round, if the total Threat of any one Ship location is 9 or higher, the Stormcaller is destroyed, and the players lose the game.
   12041:forced:1: Forced at the end of the round
-    only if [json condition {"kind":"locationThreat","trait":"Ship","min":9}]
+    only if a location in play with the trait Ship has a total Threat of at least 9, its grappled enemies' Threat included
     who acts: the acting player is the first player (a phase has no player of its own)
     - the players lose the game (The Stormcaller was destroyed: a Ship location's Threat reached 9)
 
@@ -308,8 +308,8 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
     only if all of: (it is the Combat phase) and (this card is engaged with a player (that player is who "you" means in this record))
     who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
-      - if [json condition {"kind":"engagedWithActor"}]: choose character (you control)
-      - then, if [json condition {"kind":"engagedWithActor"}] (checked when this step runs, after the steps above; not tied to whether they did anything): deal 3 damage to the picked card
+      - if this card is an enemy engaged with the acting player: choose character (you control)
+      - then, if this card is an enemy engaged with the acting player (checked when this step runs, after the steps above; not tied to whether they did anything): deal 3 damage to the picked card
 
 ## 12052 Crushing Arm
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
@@ -367,7 +367,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 12055:A:2 (shadow): Shadow: Assign damage among characters you control equal to the number of enemies grappled with locations in the staging area.
   12055:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - the acting player assigns [json amount {"grappled":true}] damage among the character (you control), one at a time
+    - the acting player assigns the number of enemies grappled with locations in the staging area damage among the character (you control), one at a time
 
 ## 12056 Lashing Tentacles
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
@@ -385,4 +385,4 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
       - the picked enemy attacks the acting player now, from the staging area
 
-(rendered pieces: 205 by template, 12 as JSON)
+(rendered pieces: 211 by template, 6 as JSON)

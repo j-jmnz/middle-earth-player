@@ -25,7 +25,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 110042:B:3 (back): If you are at the Stormcaller's stage, no more than 9 progress can be placed on your quest each round.
   110042:constant:2: Constant
-    - if [json condition {"kind":"stormcaller","is":"sameStage"}]: the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 9, while this card is in play
+    - if the players are at the same quest stage as the Stormcaller: their main quest stage's number matches its current stage (false in a game with no Stormcaller's area): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 9, while this card is in play
 
 110042:B:4 (back): When the Stormcaller advances to the next quest stage, return it to the Stormcaller's area.
   110042:triggered:4: Triggered (mandatory, not printed as Forced) on the event stormcallerAdvanced (event happened to the controller)
@@ -284,12 +284,12 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12022:A:3 (front): Forced: When Corsair Skiff engages you from the staging area, either raise your threat by 3 or it gains Boarding 1.
   12022:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
-    only if [json condition {"kind":"fromStaging"}]
+    only if the engagement the Forced effect answers was from the staging area (known only in a game with ships)
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "threat":
         - raise threat by 3 (the acting player)
-      * option "boarding" (only if [json condition {"kind":"corsairHas"}]):
+      * option "boarding" (only if the Corsair deck or its discard pile holds a card):
         - this card: stat boarding 1, while this card is in play
 
 ## 12023 Corsair Seafarer
@@ -355,7 +355,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12027:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack if you are at the same stage as the Stormcaller.
   12027:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - if [json condition {"kind":"stormcaller","is":"sameStage"}]: the attacking enemy: stat attack 2, until the end of the attack
+    - if the players are at the same quest stage as the Stormcaller: their main quest stage's number matches its current stage (false in a game with no Stormcaller's area): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 12028 Man Overboard!
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -363,13 +363,13 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12028:A:1 (front): When Revealed: Each player contributing at least 8 Willpower to the quest must discard a questing character. If your heading is at the worst setting (Storm), this effect cannot be canceled.
   12028:whenRevealed:1: When revealed (cannot be canceled while the Heading card shows Storm (the worst setting) (false while the game has no Heading card))
     - for each player, first player first:
-      - if [json condition {"kind":"committedWillpower","min":8}]: choose character (you control) committed to the quest
-      - then, if [json condition {"kind":"committedWillpower","min":8}] (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+      - if the acting player's characters committed to the quest add up to at least 8 Willpower, as the quest reads it: choose character (you control) committed to the quest
+      - then, if the acting player's characters committed to the quest add up to at least 8 Willpower, as the quest reads it (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
 12028:A:2 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the Stormcaller's current quest stage.
   12028:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - the attacking enemy: stat attack [json amount {"stormcallerStage":true}], until the end of the attack
+    - the attacking enemy: stat attack the stage number of the Stormcaller's current quest stage (0 with no Stormcaller's area), until the end of the attack
 
 ## 12029 Raging Squall
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -386,4 +386,4 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
     only if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card)
     - deal 1 damage to the card the event is about
 
-(rendered pieces: 197 by template, 7 as JSON)
+(rendered pieces: 204 by template, 0 as JSON)

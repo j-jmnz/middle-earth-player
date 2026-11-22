@@ -129,7 +129,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
             - move the picked card to hand
             - shuffle the acting player's deck
           * option "decline":
-      * option "penalty" (only if [json condition {"kind":"anyHand","min":2}]):
+      * option "penalty" (only if some living player's hand holds at least 2 cards):
     - for each player, first player first:
       - if the running effect took the option "penalty" (a choice made earlier in it, or the stage picked at random): the actor must choose 1 of the card (you control) in hand to keep (all stay with no more than that many; nothing is asked then); for each of the others:
         - discard the picked card
@@ -225,7 +225,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 (the scenario deals it into the staging pile; the piles place it, no record does)
 
 50908:A:1 (front): While you control Power of Lórien, it gains: 'Response: Add Power of Lórien to the victory display to cancel and discard an encounter card just revealed from the encounter deck.'
-  50908:response:1: Response on the event encounterRevealed (cost: [json cost {"kind":"addSelfToVictory"}])
+  50908:response:1: Response on the event encounterRevealed (cost: add this card to the victory display (payable too from its owner's discard pile, when its host just left play))
     only if not (this card is in the staging area)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the effect being resolved is canceled: nothing after this resolves
@@ -327,7 +327,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 50915:A:1 (front): Forced: After Mirkwood Olog-hai attacks and destroys a character, remove 1 progress from the main quest for each excess point of damage.
   50915:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
-    - remove [json amount {"excessOf":"subject"}] progress from the current quest card (all of it when it holds less)
+    - remove the damage on the card the event is about beyond its printed hit points progress from the current quest card (all of it when it holds less)
 
 50915:A:2 (shadow): Shadow: Either remove 2 progress from the main quest, or return attacking enemy to the staging area.
   50915:shadow:1: Shadow
@@ -638,4 +638,4 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     who acts: the acting player is the first player (a phase has no player of its own)
     - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 1) and (the number of Lieutenant enemy (any player controls) or in the staging area is at most 0): the players win the game
 
-(rendered pieces: 516 by template, 6 as JSON)
+(rendered pieces: 519 by template, 3 as JSON)

@@ -113,7 +113,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142024:A:3 (front): Forced: After placing the 6th damage here, the first player takes control of the Ring-bearer, exhausted with 1 damage on it.
   142024:forced:1: Forced after a card takes damage (heard about this card)
-    only if [json condition {"kind":"damageReached","nth":6}]
+    only if the damaged event the card answers placed this card's 6th damage token: it holds at least that many now and held fewer before
     - the first player takes control of the Ring-bearer facedown under this card and of the cards attached to it: it returns to play faceup in their play area exhausted with 1 damage on it
 
 ## 142025 Great Warg Chief
@@ -512,4 +512,4 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - for each location (any player controls) that is the active location:
       - the attacking enemy: stat attack damage of the picked card, until the end of the attack
 
-(rendered pieces: 293 by template, 3 as JSON)
+(rendered pieces: 294 by template, 2 as JSON)

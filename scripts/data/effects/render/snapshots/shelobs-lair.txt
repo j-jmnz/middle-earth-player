@@ -51,7 +51,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144042:A:2 (front): When Revealed: Either discard 1 random card from each player's hand, or Orc of Cirith Ungol makes an immediate attack against you.
   144042:whenRevealed:1: When revealed
     - the acting player chooses one of:
-      * option "discard" (only if [json condition {"kind":"anyHand","min":1}]):
+      * option "discard" (only if some living player's hand holds at least 1 cards):
         - each player discards 1 random card(s) from hand
       * option "attack":
         - this card attacks the acting player now, from the staging area
@@ -71,7 +71,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     - the first player chooses one of:
       * option "exhaust" (only if the card with code 144063 in play is ready):
         - exhaust the card with code 144063
-      * option "discard" (only if [json condition {"kind":"anyHand","min":1}]):
+      * option "discard" (only if some living player's hand holds at least 1 cards):
         - each player discards 1 random card(s) from hand
 
 ## 144044 Sméagol's Secret Way
@@ -85,7 +85,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     - the first player chooses one of:
       * option "exhaust" (only if the card with code 144076 in play is ready):
         - exhaust the card with code 144076
-      * option "discard" (only if [json condition {"kind":"anyHand","min":1,"every":true}]):
+      * option "discard" (only if every living player's hand holds at least 1 cards):
         - each player discards 1 random card(s) from hand
 
 144044:A:3 (front): Forced: After Sméagol's Secret Way is explored, each player either exhausts a character he controls, or discards 1 random card from his hand.
@@ -320,7 +320,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144070:B:2 (back): Response: After Sméagol's Secret Way is explored, discard 3 random cards from each player's hand to discard each Nazgûl enemy in the staging area.
   144070:response:1: Response on the event locationExplored (heard about location (any player controls) named "Sméagol's Secret Way"; any player may use it)
-    only if all of: (there is a Nazgûl enemy (any player controls) in the staging area only to choose) and ([json condition {"kind":"anyHand","min":3,"every":true}])
+    only if all of: (there is a Nazgûl enemy (any player controls) in the staging area only to choose) and (every living player's hand holds at least 3 cards)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each player discards 3 random card(s) from hand
     - for each Nazgûl enemy (any player controls) in the staging area only:
@@ -382,4 +382,4 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     only if any of: (the card with code 144040 is not in the victory display) or (the card with code 144075 is not in the victory display)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 250 by template, 4 as JSON)
+(rendered pieces: 254 by template, 0 as JSON)

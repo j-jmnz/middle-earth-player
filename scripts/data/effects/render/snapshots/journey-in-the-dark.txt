@@ -70,7 +70,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - up to 1 damage token(s) come off the card in play with printed code 142043; it stops at 0
-    - then, if [json condition {"kind":"damageHere","max":0}] (checked when this step runs, after the steps above; not tied to whether they did anything): one set-aside card with code 142044 joins the staging area (it is not revealed)
+    - then, if this card holds at most 0 damage tokens (checked when this step runs, after the steps above; not tied to whether they did anything): one set-aside card with code 142044 joins the staging area (it is not revealed)
 
 142043:A:2 (front): Forced: At the end of the quest phase, The Balrog makes an attack if it is in play.
   142043:forced:2: Forced at the end of the phase
@@ -379,4 +379,4 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     only if not (this card is in the staging area)
     - deal 1 damage to its host
 
-(rendered pieces: 207 by template, 1 as JSON)
+(rendered pieces: 208 by template, 0 as JSON)

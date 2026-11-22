@@ -1,5 +1,6 @@
 // Amounts: a printed number, or a number the engine reads ("the number of enemies in play", "the stage number"). `src/catalog/effect-schema-amount.ts` owns the keys.
 import { done, isObj, jsonOf, str, type Ctx, type Obj } from "./kit.ts";
+import { familyAmount } from "./family-amounts.ts";
 import type { PickRenderer } from "./picks.ts";
 
 const CARD_REF: Readonly<Record<string, string>> = {
@@ -75,7 +76,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.dealt === true) return { text: "the damage just dealt", read: ["dealt"] };
   if (isObj(expr.resourcesOn)) return { text: `the resource tokens on ${pick(expr.resourcesOn, ctx)}${expr.max === true ? " (the most on any one)" : ""}`, read: ["resourcesOn", "max"] };
   if (isObj(expr.damageOn)) return { text: `the damage tokens on ${pick(expr.damageOn, ctx)}`, read: ["damageOn"] };
-  return null;
+  return familyAmount(expr);
 }
 
 export function renderAmount(amount: unknown, ctx: Ctx, pick: PickRenderer): string {

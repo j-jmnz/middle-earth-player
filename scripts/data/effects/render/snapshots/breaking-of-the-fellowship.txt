@@ -54,7 +54,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142063:A:1 (front): Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card.
   142063:forced:1: Forced on the event stageDiscarded
-    only if [json condition {"kind":"stagingThreat","max":3}]
+    only if the total Threat of the encounter cards in the acting player's staging area is 3 or less (once the stages are separate, their own area)
     - the acting player reveals an encounter card
 
 142063:B:1 (back): If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.
@@ -78,7 +78,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142064:A:1 (front): Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card.
   142064:forced:1: Forced on the event stageDiscarded
-    only if [json condition {"kind":"stagingThreat","max":3}]
+    only if the total Threat of the encounter cards in the acting player's staging area is 3 or less (once the stages are separate, their own area)
     - the acting player reveals an encounter card
 
 142064:B:1 (back): If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.
@@ -102,7 +102,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142065:A:1 (front): Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card.
   142065:forced:1: Forced on the event stageDiscarded
-    only if [json condition {"kind":"stagingThreat","max":3}]
+    only if the total Threat of the encounter cards in the acting player's staging area is 3 or less (once the stages are separate, their own area)
     - the acting player reveals an encounter card
 
 142065:B:1 (back): If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.
@@ -126,7 +126,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142066:A:1 (front): Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card.
   142066:forced:1: Forced on the event stageDiscarded
-    only if [json condition {"kind":"stagingThreat","max":3}]
+    only if the total Threat of the encounter cards in the acting player's staging area is 3 or less (once the stages are separate, their own area)
     - the acting player reveals an encounter card
 
 142066:B:1 (back): If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.
@@ -441,4 +441,4 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 235 by template, 11 as JSON)
+(rendered pieces: 239 by template, 7 as JSON)

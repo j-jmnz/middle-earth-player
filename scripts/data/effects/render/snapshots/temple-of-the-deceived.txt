@@ -118,8 +118,8 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     - if the number of ally (any player controls) named "Starla" is at least 1: Resolution: the cards with codes 11198 are earned, with no choice
   11197:resolution:2: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"island","revealed":{"code":"11199","min":1}}]: the first player takes "11199" for a player (shuffled into their deck)
-    - then, if [json condition {"kind":"island","revealed":{"code":"11199","min":2}}] (checked when this step runs, after the steps above; not tied to whether they did anything): the first player takes "11199" for a player (shuffled into their deck)
+    - if at least 1 copies of the card with code 11199 are in the game and not secrets under a Temple location: the first player takes "11199" for a player (shuffled into their deck)
+    - then, if at least 2 copies of the card with code 11199 are in the game and not secrets under a Temple location (checked when this step runs, after the steps above; not tied to whether they did anything): the first player takes "11199" for a player (shuffled into their deck)
 
 11197:B:2 (back): Gain the following:
   11197:resolution:3: Resolution (record also names 11197:B:3)
@@ -139,7 +139,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 
 11197:B:6 (back): • 1 XP if 4 or fewer Uncharted locations are faceup.
   11197:resolution:6: Resolution
-    - if [json condition {"kind":"island","flippedAtMost":4}]: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - if at most 4 of the Island Map's double-sided (Uncharted) locations are flipped over to the location side: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11197:B:7 (back): • 1 XP if Temple Guardian is in the victory display.
   11197:resolution:7: Resolution
@@ -147,7 +147,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 
 11197:B:8 (back): • 1 XP if each surviving player's threat is 40 or less.
   11197:resolution:8: Resolution
-    - if [json condition {"kind":"survivorsThreat","max":40}]: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - if each surviving player's threat is 40 or less (read at a campaign card's Resolution; true with no surviving player): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11197:B:9 (back): • -1 XP if Ominous Fate is in the victory display.
   11197:resolution:9: Resolution
@@ -414,9 +414,9 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12077:A:1 (front): Forced: When you travel to the right, Profane Dead makes an immediate attack against the engaged player.
   12077:forced:1: Forced after the players travel (heard about location (any player controls))
-    only if all of: ([json condition {"kind":"island","movedRight":true}]) and (this card is engaged with a player (that player is who "you" means in this record))
+    only if all of: (the last travel went to the right) and (this card is engaged with a player (that player is who "you" means in this record))
     - for each player, first player first:
-      - if [json condition {"kind":"engagedWithActor"}]: this enemy attacks now, dealt a new shadow card after its old ones are discarded
+      - if this card is an enemy engaged with the acting player: this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 12077:A:2 (shadow): Shadow: Attacking enemy gets +3 Attack if the players control the Gate Key.
   12077:shadow:1: Shadow
@@ -429,8 +429,8 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12078:A:1 (front): When Revealed: Until the end of the phase, add X Threat to the total Threat in the staging area. X is the total Threat of all locations to the left of the active location (in its row). If X is 0, Deeper into the Ruins gains Doomed 1.
   12078:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if 0 is less than [json amount {"islandLeft":true}]: the total Threat in the staging area is [json amount {"islandLeft":true}] higher until the end of the phase
-    - then, if [json amount {"islandLeft":true}] is less than 1 (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 1 from the doomed keyword this card gains (doomedRaised is announced for each)
+    - if 0 is less than the total Threat of the locations to the left of the active location, in its row on the Island Map: the total Threat in the staging area is the total Threat of the locations to the left of the active location, in its row on the Island Map higher until the end of the phase
+    - then, if the total Threat of the locations to the left of the active location, in its row on the Island Map is less than 1 (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 1 from the doomed keyword this card gains (doomedRaised is announced for each)
 
 ## 12079 Furious Rainstorm
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -480,4 +480,4 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each hero (any player controls) with resources on it:
       - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
 
-(rendered pieces: 304 by template, 26 as JSON)
+(rendered pieces: 313 by template, 17 as JSON)

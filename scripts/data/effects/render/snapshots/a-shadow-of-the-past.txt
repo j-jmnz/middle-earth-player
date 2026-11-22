@@ -10,7 +10,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - Setup: the card with code 141017 is attached to the Ring-bearer, the hero with that trait (the first player's hero is searched first, then the other seats in order); with no Ring-bearer the setup fails
 
 141017:A:3 (front): Action: Add Mr. Underhill to the victory display to choose an enemy engaged with you. Until the end of the round, that enemy cannot attack you.
-  141017:action:1: Action (cost: [json cost {"kind":"addSelfToVictory"}])
+  141017:action:1: Action (cost: add this card to the victory display (payable too from its owner's discard pile, when its host just left play))
     only if the actor has an enemy engaged
     - the acting player picks an enemy engaged with them; it cannot attack them until the end of the round
 
@@ -135,7 +135,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141035:A:2 (front): While there is at least 1 other location in play, the players cannot travel here.
   141035:constant:1: Constant
-    only if [json condition {"kind":"otherLocationInPlay"}]
+    only if some location other than this card is in the staging area or is the active location
     - the players cannot travel to this location while this holds
 
 141035:A:3 (front): Travel: The first player must make a Hide 3 test to travel here.
@@ -159,7 +159,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
-    - then, if [json condition {"kind":"hideFailed","scope":"round"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the acting player failed a Hide test in the current round (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
 ## 141037 Stock Road
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -185,7 +185,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
-    - then, if [json condition {"kind":"hideFailed","scope":"round"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the acting player failed a Hide test in the current round (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
 ## 141039 Black Rider
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -198,7 +198,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141039:A:2 (front): Forced: After engaged player fails a Hide test, Black Rider makes an immediate attack.
   141039:forced:1: Forced on the event hideFailed
-    only if [json condition {"kind":"engagedWithActor"}]
+    only if this card is an enemy engaged with the acting player
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 ## 141040 Evil Crow
@@ -212,7 +212,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 141040:A:2 (shadow): Shadow: If you have failed a Hide test this round, this attack is considered undefended.
   141040:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - if [json condition {"kind":"hideFailed","scope":"round"}]: this attack is considered undefended
+    - if the acting player failed a Hide test in the current round: this attack is considered undefended
 
 ## 141041 Crawling Towards Him
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -222,7 +222,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141041:A:2 (front): When Revealed: If you have failed a Hide test this phase, remove each character you control from the quest.
   141041:whenRevealed:1: When revealed
-    - if [json condition {"kind":"hideFailed","scope":"phase"}]: every character the acting player controls is no longer committed to the quest (they stay exhausted)
+    - if the acting player failed a Hide test in the current phase: every character the acting player controls is no longer committed to the quest (they stay exhausted)
 
 141041:A:3 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   141041:shadow:1: Shadow
@@ -459,8 +459,8 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     only if all of: (it is the Refresh phase) and (this card is engaged with a player (that player is who "you" means in this record))
     who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
-      - if [json condition {"kind":"engagedWithActor"}]: the revealing player makes a Hide test with Hide 2: they may exhaust any number of ready characters they control to commit them, then discard the top 2 card(s) of the encounter deck (a treachery adds 0 Threat); the test passes when the committed characters' total Willpower is at least the total Threat of the discarded cards; a failure is recorded and the Forced effects that hear it resolve
-      - then, if all of: ([json condition {"kind":"engagedWithActor"}]) and ([json condition {"kind":"lastHideFailed"}]) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
+      - if this card is an enemy engaged with the acting player: the revealing player makes a Hide test with Hide 2: they may exhaust any number of ready characters they control to commit them, then discard the top 2 card(s) of the encounter deck (a treachery adds 0 Threat); the test passes when the committed characters' total Willpower is at least the total Threat of the discarded cards; a failure is recorded and the Forced effects that hear it resolve
+      - then, if all of: (this card is an enemy engaged with the acting player) and (the last Hide test the running effect made was failed (false before it has made one)) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 ## 906103 Dark Horseman
 
@@ -520,7 +520,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 2, until the end of the attack
-    - then, if [json condition {"kind":"hideFailed","scope":"round"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the acting player failed a Hide test in the current round (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
 ## 906107 In the Name of Mordor!
 
@@ -541,12 +541,12 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   906108:whenRevealed:1: When revealed
     - for each player, first player first:
       - the revealing player makes a Hide test with Hide 2: they may exhaust any number of ready characters they control to commit them, then discard the top 2 card(s) of the encounter deck (a treachery adds 0 Threat); the test passes when the committed characters' total Willpower is at least the total Threat of the discarded cards; a failure is recorded and the Forced effects that hear it resolve
-      - then, if [json condition {"kind":"lastHideFailed"}] (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 5 (the acting player)
+      - then, if the last Hide test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 5 (the acting player)
 
 906108:A:2 (shadow): Shadow: If the defending player has failed a Hide test this round, this attack is considered undefended.
   906108:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - if [json condition {"kind":"hideFailed","scope":"round"}]: this attack is considered undefended
+    - if the acting player failed a Hide test in the current round: this attack is considered undefended
 
 ## 906109 Sniffing and Hissing
 
@@ -570,4 +570,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 247 by template, 13 as JSON)
+(rendered pieces: 260 by template, 0 as JSON)

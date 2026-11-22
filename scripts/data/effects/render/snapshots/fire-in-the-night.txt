@@ -39,7 +39,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 12188:A:1 (front): Action: Spend 1 resource and mark a use in the campaign log to heal 3 damage from a character. Any player may trigger this ability. (Each player has 4 uses for the campaign.)
   12188:action:1: Action (cost: pay 1 resource(s); any player may use it)
-    only if [json condition {"kind":"beldisBox"}]
+    only if the acting player has a box left beside Beldis on the Campaign Log (four for each player; a game without the log's facts has none marked)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player's box beside Beldis in the Campaign Log is marked (the log has four boxes for each player; the log keeps it when the scenario is won)
     - choose character (any player controls)
@@ -334,4 +334,4 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19083:constant:2: Constant
     - this card: stat loseAtDamage quest points of this card, while this card is in play
 
-(rendered pieces: 209 by template, 1 as JSON)
+(rendered pieces: 210 by template, 0 as JSON)

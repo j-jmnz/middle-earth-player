@@ -54,7 +54,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141056:A:2 (front): Response: After an enemy is declared as an attacker, shuffle the top card of the burden deck into the encounter deck to cancel that attack. (Any player may trigger this ability.)
   141056:response:1: Response on the event enemyAttacks (heard about enemy (any player controls); any player may use it)
-    only if [json condition {"kind":"burdenDeck"}]
+    only if the burden deck holds at least 1 card(s)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the burden deck is shuffled into the encounter deck (nothing when the burden deck is empty)
     - the attack in progress is canceled: no shadow effect or damage resolves after this, and the enemy's attack is used up
@@ -136,7 +136,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141062:A:1 (front): Action: Place the top card of the burden deck on top of the encounter deck to place 4 progress on The Old Road. (Use this action only if you are playing campaign mode.)
   141062:action:1: Action
-    only if all of: ([json condition {"kind":"campaign"}]) and ([json condition {"kind":"burdenDeck"}])
+    only if all of: (the scenario is played in Campaign Mode, which is when its campaign card is in the game) and (the burden deck holds at least 1 card(s))
     who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the burden deck is placed on top of the encounter deck (nothing when the burden deck is empty)
@@ -169,7 +169,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141064:A:2 (front): When Revealed: You must either shuffle the top card of the burden deck into the encounter deck and reveal an additional encounter card, or raise each player's threat by 3 and immediately end the quest phase (do not resolve the quest).
   141064:whenRevealed:1: When revealed
     - the acting player chooses one of:
-      * option "burden" (only if [json condition {"kind":"burdenDeck"}]):
+      * option "burden" (only if the burden deck holds at least 1 card(s)):
         - the top card of the burden deck is shuffled into the encounter deck (nothing when the burden deck is empty)
         - this card gains surge (one more encounter card is revealed when it has been resolved)
       * option "threat":
@@ -495,4 +495,4 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   906309:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 231 by template, 4 as JSON)
+(rendered pieces: 235 by template, 0 as JSON)

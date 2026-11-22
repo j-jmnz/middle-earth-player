@@ -143,7 +143,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143041:A:1 (front): While Helm's Gate is the active location, if any player is not engaged with an enemy, the first player reveals an encounter card at the end of each staging step.
   143041:forced:1: Forced on the event stagingStepEnds
-    only if all of: (this card is the active location) and ([json condition {"kind":"playerUnengaged"}])
+    only if all of: (this card is the active location) and (some living player has no enemy engaged with them)
     - the acting player reveals an encounter card
 
 143041:A:2 (front): Forced: When Helm's Gate is explored, each enemy gets -20 engagement cost and +2 Attack until the end of the round.
@@ -301,7 +301,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143074:B:2 (back): Forced: After resolving the quest, if the encounter deck did not place at least 1 progress on this stage as the result of questing, the first player reveals 1 encounter card.
   143074:forced:1: Forced on the event defenseQuestResolved (heard about this card)
-    only if not ([json condition {"kind":"encounterPlacedOnStage"}])
+    only if not (the encounter deck placed at least 1 progress on the current quest stage itself as the result of questing in the quest resolution just made (progress the active location took does not count; false while no quest has resolved under Defense))
     - the acting player reveals an encounter card
 
 ## 143075 The Wall is Breached!
@@ -345,4 +345,4 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if there is no enemy in play (in the staging area or engaged)
     - the players win the game
 
-(rendered pieces: 195 by template, 3 as JSON)
+(rendered pieces: 197 by template, 1 as JSON)

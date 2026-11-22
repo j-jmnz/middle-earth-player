@@ -280,8 +280,8 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
   01129:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
     - Resolution: the cards with codes 01132 are earned, with no choice (one copy for each living player)
-    - then, if [json condition {"kind":"stageReached","code":"01122","is":true}] (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: the cards with codes 01136 are earned, with no choice
-    - then, if [json condition {"kind":"stageReached","code":"01121","is":true}] (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: the cards with codes 01137 are earned, with no choice
+    - then, if the quest advanced to the stage with code 01122 (kept only by a quest that branches) (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: the cards with codes 01136 are earned, with no choice
+    - then, if the quest advanced to the stage with code 01121 (kept only by a quest that branches) (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: the cards with codes 01137 are earned, with no choice
 
 === Nightmare deck (the cards the scenario's Nightmare deck adds) ===
 
@@ -443,4 +443,4 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
       - choose ready character (you control)
       - exhaust the picked card
 
-(rendered pieces: 230 by template, 2 as JSON)
+(rendered pieces: 232 by template, 0 as JSON)

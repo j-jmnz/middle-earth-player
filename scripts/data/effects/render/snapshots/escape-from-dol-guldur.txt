@@ -179,7 +179,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01124:B:1 (back): Response: After placing any number of progress tokens on this card, flip the "prisoner" hero card face-up, and place 1 damage token on it. This hero has been "rescued," and may now be used by its controller.
   01124:response:1: Response on the event progressPlaced (heard about this card)
-    only if [json condition {"kind":"prisoner","is":true}]
+    only if a hero is the "prisoner" now, facedown, until it is rescued
     - the prisoner hero is flipped faceup with 1 damage placed on it; its controller controls it again, with the cards attached to it faceup; it has been rescued (prisonerRescued is announced) and no hero is the prisoner any more
 
 01124:B:2 (back): The players, as a group, cannot play more than 1 ally card each round.
@@ -188,7 +188,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01124:B:3 (back): Players cannot advance to the next stage of this quest unless they have rescued the prisoner and have all 3 "Escape from Dol Guldur" objective cards.
   01124:constant:2: Constant
-    only if any of: ([json condition {"kind":"prisoner","is":true}]) or (the number of objective (any player controls) that is attached to another card is at most 2)
+    only if any of: (a hero is the "prisoner" now, facedown, until it is rescued) or (the number of objective (any player controls) that is attached to another card is at most 2)
     - the players cannot defeat this stage while this holds
 
 ## 01125 Out of the Dungeons
@@ -318,7 +318,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area [also {"attackingEnemy":true}]
     - later, at the end of this phase, acting on the card last picked:
-      - if the picked card is a [json pick undefined]: raise threat by 7 (the acting player)
+      - if the picked card is in play now: raise threat by 7 (the acting player)
 
 ## 900304 Spider of Dol Guldur
 
@@ -399,4 +399,4 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each card (any player controls) or in the staging area or the active location, with a copy of it (the same title) in its controller's discard pile:
       - discard the picked card
 
-(rendered pieces: 222 by template, 5 as JSON)
+(rendered pieces: 224 by template, 2 as JSON)

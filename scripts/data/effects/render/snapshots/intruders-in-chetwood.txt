@@ -332,9 +332,9 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - its host: stat willpower 1, while this card is in play
 
 10157:A:2 (front): Response: Add Iârion's Pendant to the victory display to cancel the 'when revealed' effects of a card that was just revealed from the encounter deck, or to cancel a shadow effect just triggered.
-  10157:response:1: Response on the event whenRevealedPending (heard about card (any player controls) or in the staging area or the active location; cost: [json cost {"kind":"addSelfToVictory"}])
+  10157:response:1: Response on the event whenRevealedPending (heard about card (any player controls) or in the staging area or the active location; cost: add this card to the victory display (payable too from its owner's discard pile, when its host just left play))
     - the effect being resolved is canceled: nothing after this resolves
-  10157:response:2: Response on the event shadowPending (cost: [json cost {"kind":"addSelfToVictory"}])
+  10157:response:2: Response on the event shadowPending (cost: add this card to the victory display (payable too from its owner's discard pile, when its host just left play))
     - the effect being resolved is canceled: nothing after this resolves
 
 ## 10158 Protect the Innocent
@@ -353,4 +353,4 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - if not (2 is less than the number of players): this card: stat loseAtDamage 10, while this card is in play
     - then, if 2 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat loseAtDamage 20, while this card is in play
 
-(rendered pieces: 212 by template, 2 as JSON)
+(rendered pieces: 214 by template, 0 as JSON)

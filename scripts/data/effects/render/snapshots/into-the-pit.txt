@@ -207,7 +207,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
       - exhaust the picked card
       - the effect's X is set to 0
       - the acting player discards the top card of their deck; its printed cost (0 with none or an X cost) is added to the effect's X
-      - then, if [json condition {"kind":"xReachesRemaining"}] (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+      - then, if the running effect's X is at least the remaining hit points of the picked card (its hit points less its damage; false with no picked card) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
 ## 03050 Dark and Dreadful
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -540,4 +540,4 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
     who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat defense 3, until the end of the phase
 
-(rendered pieces: 304 by template, 1 as JSON)
+(rendered pieces: 305 by template, 0 as JSON)

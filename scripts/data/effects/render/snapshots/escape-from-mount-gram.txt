@@ -126,7 +126,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10045:A:2 (front): X is the number of cards in play with 1 or more captured cards underneath them.
   10045:constant:2: Constant
-    - this card: stat attack [json amount {"captured":"cardsWith"}], while this card is in play
+    - this card: stat attack the number of cards in play with 1 or more captured cards underneath them, while this card is in play
 
 10045:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has no captured cards underneath it).
   10045:shadow:1: Shadow
@@ -177,7 +177,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10048:A:2 (front): X is the number of captured cards underneath Tunnels of Mount Gram.
   10048:constant:2: Constant
-    - this card: stat threat [json amount {"captured":"under"}], while this card is in play
+    - this card: stat threat the number of captured cards underneath this card, while this card is in play
 
 10048:A:3 (shadow): Shadow: Capture each attachment attached to the defending character underneath the attacking enemy.
   10048:shadow:1: Shadow
@@ -280,7 +280,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10174:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
     who acts: the acting player is the first player (a phase has no player of its own)
-    - raise threat by [json amount {"captured":"questsAndSides"}] (each player)
+    - raise threat by the number of quest cards the players have completed plus the number of side quests in the victory display (each player)
 
 10174:B:2 (back): Forced: After a hero enters play, attach to that hero each set-aside permanent boon attachment assigned to that character in the Campaign Log.
   10174:forced:2: Forced on the event heroEnteredPlay (heard about hero (any player controls))
@@ -298,7 +298,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10175:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker) this card is considered to be in each player's staging area: while the stages are separate it is in every seat's area, one card with one set of tokens and one pile of captured cards
-    - this card: stat questPoints [json amount {"captured":"players","times":4}], while this card is in play
+    - this card: stat questPoints the number of players in the game, for each player at every staging area x 4, while this card is in play
 
 10175:A:2 (front): Forced: When Loot the Dungeons is defeated, each player (at every staging area) may choose one of the following boons and add it to their hand: Berelind, Chieftain's Brooch, Coruhaer, Laermuin, Mail of Eärnur, or Silverthorn. Add the chosen cards to the Campaign Pool.
   10175:forced:1: Forced on the event questDefeated (heard about this card)
@@ -361,11 +361,11 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10181:A:2 (front): While attacking or defending against an enemy, attached hero gets +1 Attack and +1 Defense if that enemy shares a Trait with an enemy in the victory display.
   10181:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"versusVictoryTrait"}]: its host: stat attack 1, while this card is in play
-    - then, if [json condition {"kind":"versusVictoryTrait"}] (checked when this step runs, after the steps above; not tied to whether they did anything): its host: stat defense 1, while this card is in play
+    - if the holder attacks, or defends against, an enemy that shares a Trait with an enemy in the victory display: its host: stat attack 1, while this card is in play
+    - then, if the holder attacks, or defends against, an enemy that shares a Trait with an enemy in the victory display (checked when this step runs, after the steps above; not tied to whether they did anything): its host: stat defense 1, while this card is in play
 
 10181:A:3 (front): Response: After attached hero attacks and destroys an enemy, add that enemy to the victory display. (Limit once per game.)
   10181:response:1: Response after a player's attack destroys an enemy (heard about the host; limit once per game)
     - the event's other card is added to the victory display
 
-(rendered pieces: 191 by template, 13 as JSON)
+(rendered pieces: 197 by template, 7 as JSON)

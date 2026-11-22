@@ -337,7 +337,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51321:A:2 (front): Forced: After Old Stone-troll attacks and destroys a character you control, raise your threat by 1 for each excess point of damage dealt.
   51321:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
-    - raise threat by [json amount {"excessOf":"subject"}] (the player the event is about)
+    - raise threat by the damage on the card the event is about beyond its printed hit points (the player the event is about)
 
 ## 51322 Frightful Den
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -798,4 +798,4 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 468 by template, 4 as JSON)
+(rendered pieces: 469 by template, 3 as JSON)

@@ -108,7 +108,13 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   questLeads: () => ({ text: "the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area", read: [] }),
   soleAttacker: () => ({ text: "exactly one character was declared as an attacker in this attack", read: [] }),
   captives: (c) => ({ text: `the number of Captives in play${c.of === "actor" ? " that belong to the acting seat" : ""} is ${range(c.min, c.max)}`, read: ["min", "max", "of"] }),
-  matches: (c, ctx) => ({ text: `${typeof c.card === "string" ? cardRefWords(c.card) : "the card"} is a ${renderPick(c.pick, ctx)}${c.inPlay === false ? " that is out of play now" : ""}${c.inStaging === true ? " that is in the staging area" : ""}`, read: ["card", "pick", "inPlay", "inStaging"] }),
+  matches: (c, ctx) => {
+    const subject = typeof c.card === "string" ? cardRefWords(c.card) : "the card";
+    const where = [c.inPlay === false ? "out of play now" : c.inPlay === true ? "in play now" : "", c.inStaging === true ? "in the staging area" : c.inStaging === false ? "not in the staging area" : ""].filter((part) => part !== "").join(" and ");
+    const kind = c.pick === undefined ? "" : `a ${renderPick(c.pick, ctx)}`;
+    const text = kind === "" ? `${subject} is ${where === "" ? "any card" : where}` : `${subject} is ${kind}${where === "" ? "" : ` that is ${where}`}`;
+    return { text, read: ["card", "pick", "inPlay", "inStaging"] };
+  },
   tokens: (c) => ({ text: `the card with code ${str(c.code)} in play holds at least ${str(c.min)} resource token(s)${c.perPlayer === true ? " for each player" : ""}`, read: ["code", "min", "perPlayer"] }),
   controls: (c) => ({ text: `${c.who === "anyPlayer" ? "a player" : "the actor"} controls the card with code ${str(c.code)}`, read: ["code", "who"] }),
 };

@@ -48,7 +48,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     - Campaign Setup: the set-aside copy of the card with code 11192 is attached to the card in play named "Stormcaller" (a card dealt on its Upgraded side stays so)
     - Campaign Setup, after the quest card's Setup has prepared the fleet: each player in player order takes one of the set-aside cards with codes 11172, 11173, 11174 and 11175 for each ship-objective they control, in the order the ships were taken, and attaches it to that ship (a card dealt on its Upgraded side if the log says it is upgraded)
     - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
-    - then, if [json condition {"kind":"upgraded","code":"11210"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the set-aside card titled "Gavin" is put into play under a player the first player chooses
+    - then, if the Campaign Log marks the card with code 11210 upgraded (every box beside it is marked; false in a game with no campaign facts) (checked when this step runs, after the steps above; not tied to whether they did anything): the set-aside card titled "Gavin" is put into play under a player the first player chooses
     - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
 
 11215:A:3 (front): Put Calaerion into play under the control of the player with the Dream-chaser. One player may choose a copy of Círdan's Blessing not in the Campaign Pool and add it to their hand. If "Gavin returned," put him into play under any player's control. Flip this card over.
@@ -71,7 +71,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     - Campaign Setup: the set-aside copy of the card with code 11192 is attached to the card in play named "Stormcaller" (a card dealt on its Upgraded side stays so)
     - Campaign Setup, after the quest card's Setup has prepared the fleet: each player in player order takes one of the set-aside cards with codes 11172, 11173, 11174 and 11175 for each ship-objective they control, in the order the ships were taken, and attaches it to that ship (a card dealt on its Upgraded side if the log says it is upgraded)
     - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
-    - then, if [json condition {"kind":"upgraded","code":"11210"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the set-aside card titled "Gavin" is put into play under a player the first player chooses
+    - then, if the Campaign Log marks the card with code 11210 upgraded (every box beside it is marked; false in a game with no campaign facts) (checked when this step runs, after the steps above; not tied to whether they did anything): the set-aside card titled "Gavin" is put into play under a player the first player chooses
     - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
 
 11215:B:1 (back): Forced: When stage 2B is revealed, search the encounter deck and discard pile for each boon and non-Ship burden and shuffle them into the second encounter deck.
@@ -241,7 +241,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
   12152:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if all of: ([json condition {"kind":"dealt"}]) and (the event's other card is a Ship character (any player controls)): the acting player assigns the damage just dealt damage among the character (you control) without Ship, one at a time
+      - if all of: (the attack that left this effect for its end, or the damage the answered event placed, dealt at least 1 damage) and (the event's other card is a Ship character (any player controls)): the acting player assigns the damage just dealt damage among the character (you control) without Ship, one at a time
 
 ## 12153 Umbar Slaver
 (the scenario deals it into the corsairDeck pile; the piles place it, no record does)
@@ -423,4 +423,4 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
       - the acting player assigns the resource tokens on Raider enemy (any player controls) engaged with you damage among the character (you control), one at a time
     - then, if the number of Raider enemy (any player controls) is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
-(rendered pieces: 307 by template, 6 as JSON)
+(rendered pieces: 310 by template, 3 as JSON)

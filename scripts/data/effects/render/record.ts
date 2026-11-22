@@ -79,13 +79,16 @@ const COSTS: Readonly<Record<string, (c: Obj) => string | null>> = {
   returnSelfToHand: () => "return this card to hand",
   resources: (c) => `pay ${str(c.amount)} ${typeof c.sphere === "string" ? `${c.sphere} ` : ""}resource(s)${c.from === "self" ? " from this card's pool" : c.from === "host" ? " from the host's pool" : ""}`,
   playEvent: () => "pay the event's printed cost",
+  addSelfToVictory: () => "add this card to the victory display (payable too from its owner's discard pile, when its host just left play)",
+  exhaustCode: (c) => `exhaust the card in play with code ${str(c.code)} that the acting player controls`,
+  discardDeckTop: (c) => `discard the top ${str(c.amount)} card(s) of your deck`,
 };
 
-function renderCost(value: unknown, ctx: Ctx): string {
+export function renderCost(value: unknown, ctx: Ctx): string {
   if (Array.isArray(value)) return value.map((one) => renderCost(one, ctx)).join(" and ");
   if (!isObj(value) || typeof value.kind !== "string") return jsonOf(ctx, "cost", value);
   const said = COSTS[value.kind]?.(value);
-  return said ? done(ctx, said, value, ["kind", "amount", "sphere", "from"]) : jsonOf(ctx, "cost", value);
+  return said ? done(ctx, said, value, ["kind", "amount", "sphere", "from", "code"]) : jsonOf(ctx, "cost", value);
 }
 
 function renderSubject(value: unknown, ctx: Ctx): string {

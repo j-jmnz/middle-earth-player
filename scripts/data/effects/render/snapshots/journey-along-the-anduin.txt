@@ -400,7 +400,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the enemy with the most printed hit points in the victory display and the encounter discard pile becomes the picked card (the first player chooses among a tie; nothing is picked with no enemy there)
     - the picked card goes to the staging area (it is not revealed)
-    - then, if not (the picked card is a [json pick undefined]) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if not (the picked card is in play now) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 900208 Troll Attack
 
@@ -432,4 +432,4 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): when the attack in progress ends:
       - all the damage on this card moves to the event's other card (placed, not dealt; it can destroy a character at its limit; nothing with the target out of play)
 
-(rendered pieces: 243 by template, 1 as JSON)
+(rendered pieces: 243 by template, 0 as JSON)

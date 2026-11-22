@@ -266,7 +266,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
       - exhaust the picked card
       - the effect's X is set to 0
       - the acting player discards the top card of their deck; its printed cost (0 with none or an X cost) is added to the effect's X
-      - then, if [json condition {"kind":"xReachesRemaining"}] (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+      - then, if the running effect's X is at least the remaining hit points of the picked card (its hit points less its damage; false with no picked card) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
 ## 41039 Lost in the Dark
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -314,7 +314,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41051:B:1 (back): Resolution: Check the final threat of the player with the highest threat: If it is under 40, you have rescued a retired Ranger who shares his wisdom with you. Each player may add 1 copy of Ranger Sense to their deck and to the Campaign Pool. At the start of your next campaign, each player may also shuffle 1 copy of Ranger Sense into their deck and add it to the Campaign Pool.
   41051:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"highestThreat","max":39}]: Resolution: the cards with codes 41049 are earned, with no choice (one copy for each living player)
-    - then, if [json condition {"kind":"highestThreat","max":39}] (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: the cards with codes 41049 go to the NEXT campaign, not this one (one copy for each player); a new save takes them in from a finished one
+    - if the highest threat among the players is 39 or less (an eliminated player counts as 50): Resolution: the cards with codes 41049 are earned, with no choice (one copy for each living player)
+    - then, if the highest threat among the players is 39 or less (an eliminated player counts as 50) (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: the cards with codes 41049 go to the NEXT campaign, not this one (one copy for each player); a new save takes them in from a finished one
 
-(rendered pieces: 190 by template, 3 as JSON)
+(rendered pieces: 193 by template, 0 as JSON)

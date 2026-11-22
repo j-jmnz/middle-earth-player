@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { renderAmount } from "./amounts.ts";
+import { FAMILY_AMOUNT_SAMPLES } from "./family-amounts.ts";
 import type { Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 import { checkPiece, type Render } from "./read-fields-piece.ts";
@@ -45,6 +46,7 @@ describe("effects render read fields, amounts", () => {
     { discoverValue: true, plus: 1 },
     { totalOf: PICK, stat: "threat" },
     { totalOf: PICK, stat: "cost" },
+    ...FAMILY_AMOUNT_SAMPLES,
   ];
   const render: Render = (value, ctx) => renderAmount(value, ctx, renderPick);
 

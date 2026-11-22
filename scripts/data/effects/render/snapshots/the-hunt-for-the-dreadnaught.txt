@@ -625,12 +625,12 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40027:A:2 (front): Forced: When Corsair Skiff engages you from the staging area, either raise your threat by 3 or it gains Boarding 1.
   40027:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
-    only if [json condition {"kind":"fromStaging"}]
+    only if the engagement the Forced effect answers was from the staging area (known only in a game with ships)
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "threat":
         - raise threat by 3 (the acting player)
-      * option "boarding" (only if [json condition {"kind":"corsairHas"}]):
+      * option "boarding" (only if the Corsair deck or its discard pile holds a card):
         - this card: stat boarding 1, while this card is in play
 
 ## 40028 Corsair Skirmisher
@@ -641,7 +641,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40028:A:2 (front): Response: After Corsair Skirmisher is destroyed as an enemy, the engaged player may discard allies they control with a total of at least 3 Willpower to take control of Corsair Skirmisher as a ship-objective with Willpower equal to its Threat. (It loses the ship-enemy card type and gains the ship-objective card type).
   40028:response:1: Response after an enemy is destroyed (heard about this card; answered by the player the event happened to)
-    only if [json condition {"kind":"alliesWillpower","min":3}]
+    only if the allies the acting player controls have a total Willpower of at least 3
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player chooses allies they control one at a time and each is discarded as it is chosen, until the Willpower of the allies discarded adds up to at least 3
     - this Ship enemy, from the discard pile it was destroyed to, goes into play under the acting player as a Ship-objective with Willpower equal to its Threat: it loses the Ship-enemy card type and gains the Ship-objective type, keeps its Attack, Defense and hit points and has no damage
@@ -690,7 +690,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40031:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if all of: ([json condition {"kind":"dealt"}]) and (the event's other card is a Ship character (any player controls)): the acting player assigns the damage just dealt damage among the character (you control) without Ship, one at a time
+      - if all of: (the attack that left this effect for its end, or the damage the answered event placed, dealt at least 1 damage) and (the event's other card is a Ship character (any player controls)): the acting player assigns the damage just dealt damage among the character (you control) without Ship, one at a time
 
 ## 40032 War Galley
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -702,12 +702,12 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40032:A:2 (front): Forced: When War Galley engages you from the staging area, either raise your threat by 4 or it gains Boarding 1.
   40032:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
-    only if [json condition {"kind":"fromStaging"}]
+    only if the engagement the Forced effect answers was from the staging area (known only in a game with ships)
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "threat":
         - raise threat by 4 (the acting player)
-      * option "boarding" (only if [json condition {"kind":"corsairHas"}]):
+      * option "boarding" (only if the Corsair deck or its discard pile holds a card):
         - this card: stat boarding 1, while this card is in play
 
 ## 40033 Sea Monster
@@ -787,7 +787,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40038:A:1 (front): While Tolfalas Landing is in the staging area, it gains: "Forced: After a player draws any number of cards from a player card effect, that player raises their threat by that number."
   40038:forced:1: Forced on the event cardsDrawn
-    only if all of: (this card is in the staging area) and ([json condition {"kind":"byPlayerCard"}])
+    only if all of: (this card is in the staging area) and (the heal or ready the effect answers was made by a player card's effect, not by a rule, the refresh phase or an encounter card)
     - raise threat by X (the acting player)
 
 40038:A:2 (shadow): Shadow: Raise your threat by 1 (3 instead if you have 5 or more cards in hand).
@@ -942,4 +942,4 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
-(rendered pieces: 556 by template, 8 as JSON)
+(rendered pieces: 563 by template, 1 as JSON)

@@ -444,7 +444,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   11051:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if all of: ([json condition {"kind":"dealt"}]) and (the event's other card is a Ship character (any player controls)): the Heading card shifts one step toward Storm (off-course), never past either end (nothing in a game with no Heading card)
+      - if all of: (the attack that left this effect for its end, or the damage the answered event placed, dealt at least 1 damage) and (the event's other card is a Ship character (any player controls)): the Heading card shifts one step toward Storm (off-course), never past either end (nothing in a game with no Heading card)
 
 ## 11052 Thrown Off Course
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -505,8 +505,8 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat excessToShip (the damage its attack deals beyond the hit points the character had left is kept for the effect that deals it to a Ship objective) 1, until the end of the attack
     - when the attack in progress ends:
-      - if [json condition {"kind":"excess","min":1}]: choose Ship character (you control)
-      - then, if [json condition {"kind":"excess","min":1}] (checked when this step runs, after the steps above; not tied to whether they did anything): deal [json amount {"excess":true}] damage to the last picked card, a Ship objective, as the encounter or campaign card whose effect it is (a ship is immune to player card effects, not to this)
+      - if the attack that left this effect for its end sent at least 1 damage on past its defender: choose Ship character (you control)
+      - then, if the attack that left this effect for its end sent at least 1 damage on past its defender (checked when this step runs, after the steps above; not tied to whether they did anything): deal the damage the attack in progress sent on past its defender damage to the last picked card, a Ship objective, as the encounter or campaign card whose effect it is (a ship is immune to player card effects, not to this)
 
 ## 11056 Winds of Wrath
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -754,4 +754,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   11171:resolution:9: Resolution
     - if the number of card (any player controls) in the victory display, named "Ominous Fate" is at least 1: Resolution: lose 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
-(rendered pieces: 348 by template, 6 as JSON)
+(rendered pieces: 352 by template, 2 as JSON)

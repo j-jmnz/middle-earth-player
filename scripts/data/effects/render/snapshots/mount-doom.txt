@@ -124,7 +124,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
   146049:forced:3: Forced on the event discardedInFortitude (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - if all of: (this card is a [json pick undefined] that is out of play now) and (the actor holds the first player token): this card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+      - if all of: (this card is out of play now) and (the actor holds the first player token): this card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
     - then, if there is a card (any player controls) or in the staging area or the active location, discarded for the Fortitude test in progress and still in the encounter discard pile, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, discarded for the Fortitude test in progress and still in the encounter discard pile, chosen by the first player
     - then, if there is a card (any player controls) or in the staging area or the active location, discarded for the Fortitude test in progress and still in the encounter discard pile, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the card just chosen (discarded for the Fortitude test in progress) adds no Sauron's Eye icons to that test
 
@@ -365,4 +365,4 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Ring-bearer claimed The One Ring)
     - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
 
-(rendered pieces: 242 by template, 1 as JSON)
+(rendered pieces: 242 by template, 0 as JSON)

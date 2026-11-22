@@ -245,7 +245,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     only if all of: (it is the Encounter phase) and (this card is engaged with a player (that player is who "you" means in this record))
     who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
-      - if [json condition {"kind":"engagedWithActor"}]: the acting player reveals the top card of the Corsair deck and puts it into play engaged with them (the deck refills from its discard pile when it runs out)
+      - if this card is an enemy engaged with the acting player: the acting player reveals the top card of the Corsair deck and puts it into play engaged with them (the deck refills from its discard pile when it runs out)
 
 ## 12125 Corsair Skirmisher
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -258,7 +258,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12125:A:3 (front): Response: After Corsair Skirmisher is destroyed as an enemy, the engaged player may discard allies he controls with a total of at least 3 Willpower to take control of Corsair Skirmisher as a Ship-Objective with Willpower equal to its Threat. (It loses the Ship-Enemy card type and gains the Ship-Objective card type).
   12125:response:1: Response after an enemy is destroyed (heard about this card; answered by the player the event happened to)
-    only if [json condition {"kind":"alliesWillpower","min":3}]
+    only if the allies the acting player controls have a total Willpower of at least 3
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player chooses allies they control one at a time and each is discarded as it is chosen, until the Willpower of the allies discarded adds up to at least 3
     - this Ship enemy, from the discard pile it was destroyed to, goes into play under the acting player as a Ship-objective with Willpower equal to its Threat: it loses the Ship-enemy card type and gains the Ship-objective type, keeps its Attack, Defense and hit points and has no damage
@@ -396,7 +396,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12134:A:3 (front): While the players control Sea-ward Tower, look at 2 additional cards from the top of the encounter deck during each Sailing test.
   12134:constant:2: Constant
-    only if [json condition {"kind":"controlledByPlayers"}]
+    only if the players control this objective: a freed objective in the staging area, or one a player claimed and attached to a hero
     - the table: stat sailingLook 2, while this card is in play
 
 ## 12135 Tower of the Gull
@@ -412,7 +412,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12135:A:3 (front): Combat Action: If the players control Tower of the Gull, exhaust it to deal 2 damage to a non-unique Ship enemy. Any player may trigger this action.
   12135:action:1: Action (cost: exhaust this card)
-    only if all of: (it is the Combat phase) and ([json condition {"kind":"controlledByPlayers"}]) and (there is a non-unique Ship enemy (any player controls) or in the staging area to choose)
+    only if all of: (it is the Combat phase) and (the players control this objective: a freed objective in the staging area, or one a player claimed and attached to a hero) and (there is a non-unique Ship enemy (any player controls) or in the staging area to choose)
     who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose non-unique Ship enemy (any player controls) or in the staging area
@@ -431,7 +431,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12136:A:3 (front): Planning Action: If the players control The Beacon, exhaust it and spend 5 resources to take control of 1 set aside copy of Dol Amroth Warship. Any player may trigger this action.
   12136:action:1: Action (cost: exhaust this card and pay 5 resource(s))
-    only if all of: (it is the Planning phase) and ([json condition {"kind":"controlledByPlayers"}])
+    only if all of: (it is the Planning phase) and (the players control this objective: a freed objective in the staging area, or one a player claimed and attached to a hero)
     who acts: any player may trigger it; the acting player is the one who does
     - the set-aside card titled "Dol Amroth Warship" is put into play under the acting player
 
@@ -448,7 +448,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12137:A:3 (front): While Tower of the Heron is controlled by the players, reduce the archery total by 4.
   12137:constant:2: Constant
-    only if [json condition {"kind":"controlledByPlayers"}]
+    only if the players control this objective: a freed objective in the staging area, or one a player claimed and attached to a hero
     - this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) -4, while this card is in play
 
-(rendered pieces: 276 by template, 8 as JSON)
+(rendered pieces: 282 by template, 2 as JSON)

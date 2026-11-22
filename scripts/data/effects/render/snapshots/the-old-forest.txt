@@ -269,7 +269,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) in the victory display
     - the picked card goes to the staging area (it is not revealed)
-    - then, if not (the picked card is a location (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if not (the picked card is a location (any player controls) that is in play now) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 147018 Falling Branches
 (the scenario deals it into the encounter pile; the piles place it, no record does)
