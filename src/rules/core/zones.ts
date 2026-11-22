@@ -317,7 +317,8 @@ function guardLeaves(current: CardInstance, dest: Destination): boolean {
 }
 
 // Stamps the order in which a card entered play, so Forced effects can resolve oldest first. A card enters play ready
-// (rr.ready) and carries no tokens from an earlier time in play: an ally destroyed with 3 damage comes back with none.
+// (rr.ready), not committed to the quest, and carries no tokens from an earlier time in play: an ally destroyed with 3 damage comes back with none,
+// and one destroyed while it was committed and put into play again in the same quest phase (Stand and Fight, 01051) adds no Willpower.
 function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioState {
   const now = state.cards[id];
   if (!now || inPlay(from) || !inPlay(now.zone)) return state;
@@ -325,7 +326,7 @@ function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioS
   // Tokens placed on a card while it was set aside stay on it as it enters play ("add 1 resource to each of them", 12039:B:2).
   // The damage a card was set aside with stays too when the card says so (keepsDamage, 19024:A:1).
   const keeps = from === "setAside" && now.keepsDamage === true;
-  return updateCard({ ...state, clock }, id, { enteredPlay: clock, damage: keeps ? now.damage : 0, progress: 0, resources: from === "setAside" ? now.resources : 0, exhausted: false, ...(keeps ? { keepsDamage: undefined } : {}) });
+  return updateCard({ ...state, clock }, id, { enteredPlay: clock, damage: keeps ? now.damage : 0, progress: 0, resources: from === "setAside" ? now.resources : 0, exhausted: false, committed: false, ...(keeps ? { keepsDamage: undefined } : {}) });
 }
 
 export type MoveOptions = { readonly released?: readonly string[]; readonly defeated?: boolean; readonly supersedes?: boolean };
