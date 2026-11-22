@@ -135,6 +135,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: ["the-thing-in-the-depths"], note: "The Thing in the Depths attacks a player once for each Eye of the Beast engaged with that player, each attack dealt its own shadow card." },
   { version: 38, scenarios: ["the-ring-goes-south"], note: "In the Nightmare deck, Expanse of Hollin is not shuffled into the encounter deck by its own explored effect: it goes to the encounter discard pile." },
   { version: 38, scenarios: ["passage-through-mirkwood"], note: "In the Nightmare deck, the Shadow effect of Spiders of Mirkwood can choose a character that is already exhausted, which then takes the 2 damage of an undefended attack." },
+  { version: 38, scenarios: ["the-city-of-corsairs"], note: "Serpent's Tail deals a shadow card to each Ship enemy in the staging area as well as to each engaged one." },
   { version: 38, scenarios: ["across-the-ettenmoors", "escape-from-khazad-dum", "fog-on-the-barrow-downs", "into-the-pit", "mount-gundabad", "murder-at-the-prancing-pony", "the-battle-of-the-pelennor-fields", "the-black-gate-opens", "the-dread-realm", "the-ghost-of-framsburg", "the-hunt-for-gollum", "the-kings-quest", "the-long-dark", "the-mines-of-moria", "the-old-forest", "the-road-to-isengard", "the-wastes-of-eriador", "the-woodland-realm"], note: "A card that attaches itself to a card, like Hired Muscle, never attaches to a card that cannot have attachments: Hired Muscle never goes on a Suspect, but on another Brigand enemy." },
 ];
 
