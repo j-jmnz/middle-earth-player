@@ -6,7 +6,10 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { applyResolution, openResolution, resolutionIntents, resolutionResult } from "../../../rules/setup/resolution.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
-import { CODES, idOf, templeTable, loadTempleWorld, type TempleLayout, type TempleWorld } from "../../../../test/scenarios/temple-of-the-deceived/scene.ts";
+import { scenarioDefinition } from "../../../catalog/scenario-data.ts";
+import { EFFECTS } from "../../../effects/index.ts";
+import { withoutLine } from "../../../../test/harness/card-spec.ts";
+import { CODES, campaign, dealt, idOf, templeTable, loadTempleWorld, type TempleLayout, type TempleWorld } from "../../../../test/scenarios/temple-of-the-deceived/scene.ts";
 
 let world: TempleWorld;
 
@@ -21,7 +24,9 @@ const BASE: TempleLayout = { map: COVERED, at: 0, threat: [45, 26], campaign: tr
 // The log the Resolution writes for the table `layout` describes, won; every choice is answered by `choice` (the first option by default).
 function resolved(layout: TempleLayout = {}, tweak: (state: ScenarioState) => ScenarioState = (state) => state, choice?: (state: ScenarioState) => string) {
   const made = templeTable(world, { ...BASE, ...layout });
-  const won: ScenarioState = tweak({ ...made.state, window: null, stageCleared: true, resolution: world.definition.resolution });
+  // With `without`, the Resolution is the campaign card's records less the ones that name those lines.
+  const definition = layout.without ? scenarioDefinition(dealt, campaign, layout.without.reduce(withoutLine, EFFECTS)) : world.definition;
+  const won: ScenarioState = tweak({ ...made.state, window: null, stageCleared: true, resolution: definition.resolution });
   let state = openResolution(won, made.ctx);
   for (let guard = 0; guard < 8 && state.window?.kind === "resolution"; guard += 1) {
     const options = resolutionIntents(state, made.ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
@@ -126,5 +131,42 @@ describe("the cards the Resolution earns (11197:B:1)", () => {
     const options = resolutionIntents(asked, made.ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
     expect(options).toEqual([`${CODES.nightmare}>${made.hero}`, `${CODES.nightmare}>${made.seat1Hero}`]);
     expect(idOf(made.state, CODES.nightmare)).toBeTruthy();
+  });
+});
+
+// Each XP line on the table that makes it true, and again with its record left out: the XP must fall.
+describe("the campaign card's XP lines, with and without their records (11197:B:4 to 11197:B:8)", () => {
+  const both = (line: string, layout: TempleLayout, tweak?: (state: ScenarioState) => ScenarioState) => [xpOf(layout, tweak), xpOf({ ...layout, without: [line] }, tweak)];
+
+  it("11197:B:4 gains 1 XP for each resource on this card, at most 3", () => {
+    expect(both("11197:B:4", {}, resourcesOn(CODES.campaignCard, 2))).toEqual([1 + 2, 1]);
+    expect(both("11197:B:4", {}, resourcesOn(CODES.campaignCard, 5))).toEqual([1 + 3, 1]);
+  });
+
+  it("11197:B:5 gains 1 XP for each faceup Temple Halls", () => {
+    const made = templeTable(world, { ...BASE });
+    expect(both("11197:B:5", {}, flipped(9, 14)(made))).toEqual([1 + 2, 1]);
+  });
+
+  it("11197:B:6 gains 1 XP if 4 or fewer Uncharted locations are faceup", () => {
+    // Index 1 back to its Lost Island side leaves 4 flipped.
+    const made = templeTable(world, { ...BASE });
+    const four = (state: ScenarioState): ScenarioState => ({ ...state, cards: { ...state.cards, [made.cells[1]!]: { ...state.cards[made.cells[1]!]!, face: "B" } } });
+    expect(both("11197:B:6", {}, four)).toEqual([1 + 1, 1]);
+    expect(both("11197:B:6", {})).toEqual([1, 1]);
+  });
+
+  it("11197:B:7 gains 1 XP if Temple Guardian is in the victory display", () => {
+    expect(both("11197:B:7", { victory: [CODES.guardian] })).toEqual([1 + 1, 1]);
+    expect(both("11197:B:7", { victory: [CODES.guardianOriginal] })).toEqual([1 + 1, 1]);
+    // In play, it earns nothing.
+    expect(xpOf({ staging: [CODES.guardian] })).toBe(1);
+  });
+
+  it("11197:B:8 gains 1 XP if each surviving player's threat is 40 or less", () => {
+    expect(both("11197:B:8", { threat: [40, 26] })).toEqual([1 + 1, 1]);
+    expect(both("11197:B:8", { seats: 2, threat: [30, 40] })).toEqual([2 + 1, 2]);
+    // One surviving player at 41: none.
+    expect(xpOf({ seats: 2, threat: [30, 41] })).toBe(2);
   });
 });
