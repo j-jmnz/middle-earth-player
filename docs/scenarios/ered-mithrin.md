@@ -32,7 +32,7 @@ The Ered Mithrin campaign is nine scenarios played in order: The Wilds of Rhovan
 ## Encounter card readings
 
 - **Lost in Mirkwood encounter cards.** Unseen Danger (18036:A:1) discards the character it removed from the quest when the printed Threat of the card it discarded is greater than that character's Willpower, not the discarded encounter card. While Accursed Forest (18038:A:1) is in the staging area only 'when revealed' effects cannot be canceled (`rr.cancel`): a Shadow effect can still be canceled.
-- **Wormsbane** (19143:A:1). The Setup's attach follows `rr.restricted` like any attach: a hero that already holds 2 Restricted attachments discards one of the three at once.
+- **Wormsbane** (19143:A:1). The Setup's attach follows `rr.restricted` like any attach: a hero that already holds 2 Restricted attachments discards one of the three at once, the choice of the hero's controller (`docs/brief.md`, Keywords implemented once).
 
 ## Readings to confirm
 
