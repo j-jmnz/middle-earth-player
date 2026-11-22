@@ -30,23 +30,30 @@ The app already runs in a browser: the desktop app is the web export in Electron
 
 | Need | Cloudflare product | Note |
 | --- | --- | --- |
-| The export (HTML, JavaScript, WebAssembly, `catalog.db`, fonts, sounds, pictures) | Workers static assets | 25 MiB a file; 20,000 files on the free plan, 100,000 on the paid one. Requests for static assets are free. A `_headers` file sets COOP, COEP and the CSP. |
+| The export (HTML, JavaScript, WebAssembly, `catalog.db`, fonts, sounds, pictures) | Workers static assets | 25 MiB a file and 100,000 files on the paid plan, which the account has. Requests for static assets are free and run no Worker code. A `_headers` file sets COOP, COEP and the CSP. |
 | A file over 25 MiB (the Dream-chaser booklet) | R2, read by the Worker on the same origin | The Worker answers `Range`, which pdf.js and Safari's media need. |
 | The RingsDB import, if RingsDB sends no CORS headers | A Worker route | A new request path: `PRIVACY.md` names it. |
 | The domain | Cloudflare Registrar and DNS | See Decisions for the user. |
 | A closed test | Cloudflare Access | Free for a small group, signs in by email code. |
 | Deploy | `wrangler deploy` from `.github/workflows/release.yml` | Only the release workflow deploys the public site (`docs/agents/release-standards.md`, Tags and releases). |
 
-The asset mirror bucket (`docs/development.md`, Asset mirror) stays private and stays a build cache. The site gets its own bucket.
+The asset mirror bucket (`docs/development.md`, Asset mirror) stays private and stays a build cache: it holds the pinned source files (full-size pictures, scans, PDFs), not what the app shows. The site gets its own bucket.
+
+### How a picture reaches the player
+
+1. The release job packs the pictures from the mirror, as it does for the phone and desktop builds (`.github/actions/pack-assets`): 1200 px copies in `assets/scans`.
+2. The web app export carries them as hashed files under `/assets/`, and `wrangler deploy` uploads them as static assets. Wrangler sends only the files whose content changed, so a release that changes no picture uploads none.
+3. The browser reads each picture from the app's own origin, which `require-corp` and the CSP's `img-src 'self'` allow, and the service worker keeps it (Phase 2).
+
+If Phase 0 shows that a deploy of the whole export is too slow or too large, the packed pictures move to the site's R2 bucket by sha256 and the Worker serves them on the same origin. The browser's side does not change.
 
 ## Decisions for the user
 
 1. **Public pictures and music.** The site would serve every card picture and the music loops, cut from the film score, at a public URL. A release file needs a download and an install; a URL does not, so the copyright exposure is higher, and a complaint to Cloudflare can take the site down. Options: a public site without the music, a public site with all of it, or a site behind Cloudflare Access for invited players. Recommendation: start behind Access, and decide on the music before it opens.
 2. **The domain.** The origin holds the saves, so it never changes after the first release, like the desktop's names (`desktop/identity.ts`). A `workers.dev` name is free but ties the saves to the account's subdomain. Recommendation: a domain bought at Cloudflare Registrar before Phase 2.
 3. **What "offline" means on the web.** The phone and desktop builds carry every picture. A gigabyte before the first game is too much in a browser. Recommendation: the app shell is cached at install (it plays offline with cards drawn as text), each picture is cached when first shown, and Settings has Download pictures for each campaign and for all, with the size and progress.
-4. **The plan's price.** The free plan fits if the export has under 20,000 files; the paid Workers plan is 5 USD a month. Phase 0 counts the files.
-5. **Save sync between devices.** Possible later with a Worker and R2 or D1, but it sends saves off the device, which the app never does today. Recommendation: not in this plan; Back up saves and Restore cover a move between devices.
-6. **Keeping the SideStore IPA and TestFlight.** The web app does not replace them until it has proved stable. Recommendation: keep both.
+4. **Save sync between devices.** Possible later with a Worker and R2 or D1, but it sends saves off the device, which the app never does today. Recommendation: not in this plan; Back up saves and Restore cover a move between devices.
+5. **Keeping the SideStore IPA and TestFlight.** The web app does not replace them until it has proved stable. Recommendation: keep both.
 
 ## Phase 0: device spike
 
