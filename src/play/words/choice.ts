@@ -30,6 +30,7 @@ import { smaugBranchWords } from "./scenarios/standalone-scenarios/smaug.ts";
 import { stormcallerBranchWords } from "./scenarios/stormcaller.ts";
 import { commandBranchWords } from "./command.ts";
 import { wilderlandBranchWords } from "./scenarios/wilderland.ts";
+import { claimedEffectWords } from "./objective.ts";
 import { objectiveTokensWords } from "./scenarios/assault.ts";
 
 export type ChoiceNames = {
@@ -39,6 +40,12 @@ export type ChoiceNames = {
   code: (code: string) => string;
   // A card code's Traits, for the words that name the side a card flips to (Grotto, Underwater).
   traits?: (code: string) => readonly string[];
+};
+
+// The claimed card's lasting effect, said after the prompt (" Forced: ..."), or nothing.
+const claimedEffect = (code: string | null): string => {
+  const words = code ? claimedEffectWords(code) : "";
+  return words ? ` ${words}` : "";
 };
 
 type ChooseInstruction = Extract<Instruction, { verb: "Choose" }>;
@@ -173,7 +180,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
     case "MoveEncounterCard":
       return next.to === "shuffle" ? { verb: "Shuffle in", prompt: `Choose ${pick.pick.type === "objective" ? "an unclaimed objective" : one} to shuffle into the encounter deck.` } : { verb: "Choose", prompt: `Choose ${one}.` };
     case "ClaimObjective":
-      return { verb: "Claim", prompt: `Choose ${one} to carry ${sourceId ? names.card(sourceId) : "the objective"}.` };
+      return { verb: "Claim", prompt: `Choose ${one} to carry ${sourceId ? names.card(sourceId) : "the objective"}.${claimedEffect(sourceId ? (game?.cards[sourceId]?.code ?? sourceId) : null)}` };
     case "Discard":
       return { verb: "Discard", prompt: `Choose ${one} to discard.` };
     // The Glórinaith's target (110139:A:4, 110139:B:5), Armor Plating's enemy (11172:B:3).

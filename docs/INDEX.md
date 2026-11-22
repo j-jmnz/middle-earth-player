@@ -114,16 +114,16 @@ Read the sections your task touches.
   - 332–335 One answer, one tap (~240)
   - 336–339 Stops and Always use (~250)
   - 340–343 Guide (~120)
-  - 344–360 Choice tray (~5.7K) ← 80
-  - 361–375 Reading panels (~1.7K) ← 5
-  - 376–385 Phase carousel (~680)
-  - 386–391 Quest advance (~530) ← 1
-  - 392–395 Undo (~150)
-  - 396–399 Haptics (~340) ← 1
-  - 400–416 Sound (~2.2K) ← 29
-  - 417–428 Banner (~750) ← 5
-  - 429–448 Screen reader (~3.0K) ← 19
-  - 449–452 Android Back (~90)
+  - 344–361 Choice tray (~5.7K) ← 80
+  - 362–376 Reading panels (~1.7K) ← 5
+  - 377–386 Phase carousel (~680)
+  - 387–392 Quest advance (~530) ← 1
+  - 393–396 Undo (~150)
+  - 397–400 Haptics (~340) ← 1
+  - 401–417 Sound (~2.2K) ← 29
+  - 418–429 Banner (~750) ← 5
+  - 430–449 Screen reader (~3.0K) ← 19
+  - 450–453 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~37.4K tok)
   - 7–20 Direction (~660)
   - 21–34 Standards (~750) ← 1
