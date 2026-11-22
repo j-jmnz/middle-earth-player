@@ -68,7 +68,6 @@ ${dataConsts(facts, c)}
 
 // Test helper. A whole game of ${facts.name} in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. TODO: say how the players travel, engage and answer the choices this scenario asks.
-// The Campaign Setup's offers are declined, as many times as it asks (test/harness/setup-answers.ts): no count is typed here; a golden that answers them passes \`choices\`.
 export const ${U}_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type ${P}Decks = "strong" | "weak" | "brittle";
@@ -106,6 +105,8 @@ const game = campaignGame<${P}Decks, ${P}Policy>({
   campaign,
   scenario: ${c},
   stats: HERO_STATS,
+  // The Campaign Setup's offers are declined as many times as it asks, with no count typed (test/harness/setup-answers.ts); a golden that answers them passes \`choices\`.
+  declineSetup: true,
   // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
   codes: [...${c}.cards.map((card) => card.code)],
   intent: ${c}Intent,

@@ -160,6 +160,8 @@ export type CampaignGoldenBase = { seatCount: 1 | 2; seed: number; difficulty: D
 export type EarlierParts = { xp: readonly number[]; pool: readonly { code: string; seat?: number }[]; marks: Readonly<Record<string, number>> };
 
 export type CampaignGameSpec<D extends string, P extends object> = {
+  /** The Campaign Setup's offers are declined, as many as it asks (test/harness/setup-answers.ts), when a start is given no answers; absent, a Setup that asks refuses it. */
+  declineSetup?: boolean;
   campaign: CampaignData;
   scenario: ScenarioData;
   /** The numbers of the stand-in heroes q1 to q6, by deck. */
@@ -227,8 +229,9 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
 
   function plan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[], difficulty?: Difficulty, loadout: LoadoutSeat[] = spec.loadout?.(seatCount) ?? fillerLoadout(seatCount)) {
     const input = { log, scenario: campaignScenario(spec.scenario), seats: loadout, effects: EFFECTS, cards: cardsOrThrow(), ...(difficulty ? { difficulty } : {}) };
-    // No answers given: the Setup's offers are declined, as many as it asks (test/harness/setup-answers.ts), so a skeleton needs no count typed.
-    const checked = checklist({ ...input, choices: choices ?? skippedSetupAnswers(input) });
+    // With `declineSetup` in the spec and no answers given: the Setup's offers are declined, as many as it asks (test/harness/setup-answers.ts), so a skeleton needs no count typed.
+    const answers = choices ?? (spec.declineSetup ? skippedSetupAnswers(input) : undefined);
+    const checked = checklist({ ...input, ...(answers ? { choices: answers } : {}) });
     if (!checked.ok) throw new Error(checked.errors.join("; ") || "The campaign card asks for a choice");
     return checked;
   }
