@@ -15,6 +15,6 @@
 - [ ] `pnpm typecheck`
 - [ ] `pnpm test`
 - [ ] `pnpm data check` (when the engine or `data/` could move)
-- [ ] `pnpm effects open` and `pnpm doc index` run if records, doc headings or doc citations changed
+- [ ] `pnpm effects open` run if records changed
 - [ ] No version bump or tag (the release workflow makes them)
 - [ ] No card scans, card pictures, PDFs, `assets/catalog.db` or filled `scan-map.ts` committed
