@@ -34,6 +34,7 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   phantom: " (its attacks' damage is canceled and the defending player raises his threat by as much instead)",
   resourceCancel: " (damage it would be dealt, all of one instance, is canceled and 1 resource is discarded from it instead while it has one)",
   checkCostPerDamaged: " (while a player makes an engagement check against it, its engagement cost changes by this amount for each damaged character that player controls, not below 0; an optional engagement does not read it)",
+  noEncounterEngagementChecks: " (held by the table, no engagement check is made during the encounter phase; an Ambush check in the quest phase still is)",
   noEngagementChecks: " (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing)",
   optionalEngageThreat: " (a player whose threat is at least this much cannot optionally engage it; an engagement check still engages him)",
   engagedWithThreatening: " (in the staging area it is considered engaged with each player whose threat is 1 or higher, read live: it attacks each of them once in the combat phase and only they declare attackers against it)",

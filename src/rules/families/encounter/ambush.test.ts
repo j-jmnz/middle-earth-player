@@ -77,9 +77,15 @@ describe("Ambush (04049:A:1, dwd.ambush)", () => {
     expect(where(run({ instructions: REVEAL, deck: ["ambusher"], threats: [30], flags: [{ instanceId: "table", stat: "ignoreAmbush", amount: 1 }] }).state, "ambusher")).toBe("staging");
   });
 
-  it("01127:B:1 no engagement checks \"during the encounter phase\": the table flag stops an ambush check in that phase only, not the quest phase's", () => {
-    const flags = [{ instanceId: "table", stat: "noEngagementChecks", amount: 1 }];
+  it("01127:B:1 no engagement checks \"during the encounter phase\": the table's noEncounterEngagementChecks stops an ambush check in that phase only, not the quest phase's", () => {
+    const flags = [{ instanceId: "table", stat: "noEncounterEngagementChecks", amount: 1 }];
     expect(where(run({ instructions: REVEAL, deck: ["ambusher"], threats: [30], flags }).state, "ambusher")).toBe("engaged:0");
+    expect(where(run({ instructions: REVEAL, deck: ["ambusher"], threats: [30], flags, phase: "Encounter" }).state, "ambusher")).toBe("staging");
+  });
+
+  it("10011:A:1 a table that holds noEngagementChecks (Daybreak) stops an ambush check in the quest phase too", () => {
+    const flags = [{ instanceId: "table", stat: "noEngagementChecks", amount: 1 }];
+    expect(where(run({ instructions: REVEAL, deck: ["ambusher"], threats: [30], flags, phase: "Quest" }).state, "ambusher")).toBe("staging");
     expect(where(run({ instructions: REVEAL, deck: ["ambusher"], threats: [30], flags, phase: "Encounter" }).state, "ambusher")).toBe("staging");
   });
 

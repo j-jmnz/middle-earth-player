@@ -209,7 +209,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
   01127:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the table: stat revealMore (the staging step reveals this many more cards, after the one each player makes; they go to the players in turn, the first player first, and while the stages are separate to the player whose stage holds the effect) 1, while this card is in play
-    - the table: stat noEngagementChecks (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing) 1, while this card is in play
+    - the table: stat noEncounterEngagementChecks (held by the table, no engagement check is made during the encounter phase; an Ambush check in the quest phase still is) 1, while this card is in play
 
 ## 01128 Ambush on the Shore
 (the scenario deals it into the quest pile; the piles place it, no record does)
