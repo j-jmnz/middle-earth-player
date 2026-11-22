@@ -12,6 +12,9 @@ import { verbFlags } from "../verb-flags.ts";
 const guardType = z.enum(["enemy", "location"]);
 
 const VERBS = [
+  // Constant on an encounter card attached by its own text: it counts as an attachment with this trait while attached
+  // ("Counts as a Condition attachment", 141043:A:2, 141055:A:2), so "a Condition attachment" finds it (01061:A:1); with no trait it counts as an attachment only ("Counts as an attachment", 50208:A:2).
+  z.strictObject({ verb: z.literal("CountsAs"), cardType: z.literal("attachment"), trait: z.string().min(1).optional(), ...when }),
   // Constant on an attachment: it is played (or put into play) unattached into the staging area ("Play Ranger Spikes into
   // the staging area unattached") or into its player's own play area ("Play into your play area unattached"), or onto a
   // player's threat dial ("Attach to a player's threat dial"): into that player's play area, under their control. The table

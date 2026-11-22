@@ -109,6 +109,13 @@ export function heroPaysFor(state: ScenarioState, heroId: string, cardId: string
 }
 
 // Why these payments break the card's own payment rule ("from 3 different heroes' pools"), or null.
+/** The refusal for a card that must be paid from at least `need` different heroes' pools, and the number it names (null for any other refusal): one definition, so the player's words read the number back without matching the wording elsewhere. */
+export const fewestHeroesReason = (need: number): string => `Pay from at least ${need} different heroes`;
+export function fewestHeroesIn(reason: string): number | null {
+  const found = /^Pay from at least (\d+) different heroes$/.exec(reason);
+  return found ? Number(found[1]) : null;
+}
+
 export function distinctHeroesReason(state: ScenarioState, cardId: string, payments: readonly { heroId: string; amount: number }[], ctx: ReduceContext): string | null {
   const code = state.cards[cardId]?.code ?? "";
   const heroes = new Set(payments.filter((payment) => payment.amount > 0).map((payment) => payment.heroId)).size;
@@ -117,7 +124,7 @@ export function distinctHeroesReason(state: ScenarioState, cardId: string, payme
     if (effect.timing !== "constant") continue;
     for (const instruction of effect.instructions) {
       if (instruction.verb !== "PayDistinctHeroes" || (instruction.when && !holds(state, instruction.when, scope, ctx))) continue;
-      if (instruction.min != null && heroes < instruction.min) return `Pay from at least ${instruction.min} different heroes`;
+      if (instruction.min != null && heroes < instruction.min) return fewestHeroesReason(instruction.min);
       if (instruction.max != null && heroes > instruction.max) return instruction.max === 1 ? "Pay from a single hero" : `Pay from at most ${instruction.max} heroes`;
     }
   }
