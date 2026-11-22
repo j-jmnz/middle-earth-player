@@ -129,6 +129,8 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: ["journey-up-the-anduin", "lost-in-mirkwood", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"], note: "Masterwork Bow counts as a Restricted attachment: a third one on a character sends one of them to the discard pile." },
   { version: 38, scenarios: ["journey-up-the-anduin", "lost-in-mirkwood", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"], note: "The Action of Anvil of Gundabad is not offered when no Item attachment in your hand can be played." },
   { version: 38, scenarios: ["journey-up-the-anduin", "lost-in-mirkwood", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"], note: "Gondolin Shield's resource can come from any hero's pool, so an ally it is attached to can use it." },
+  { version: 38, scenarios: ["flight-to-the-ford"], note: "In the Nightmare deck, a second The Twilight World does not attach to the Ring-bearer while one is already on him: Limit 1 per hero." },
+  { version: 38, scenarios: ["murder-at-the-prancing-pony"], note: "Hired Muscle never attaches to a Suspect, which cannot have attachments: it goes on another Brigand enemy." },
 ];
 
 export const ENGINE_VERSION = 38;

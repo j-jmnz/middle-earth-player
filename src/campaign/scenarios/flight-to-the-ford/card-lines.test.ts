@@ -214,9 +214,7 @@ describe("The Twilight World (906309)", () => {
     expect(plain.state.cards[plain.id]?.zone).not.toBe("attached");
   });
 
-  // FAULT: the card prints "Limit 1 per hero", and the record means a copy on the Ring-bearer to keep another off; the engine attaches a second copy to him, as the copy already attached has no
-  // controller and the record's count reads only cards a player controls.
-  it.fails("906309:A:2 a second copy does not attach while one is on the Ring-bearer (Limit 1 per hero)", () => {
+  it("906309:A:2 a second copy does not attach while one is on the Ring-bearer (Limit 1 per hero)", () => {
     const made = make({ deck: ["f0", "f0"] });
     const once = reveal(made.state, made.ctx, "906309");
     const twice = reveal(once.state, made.ctx, "906309");

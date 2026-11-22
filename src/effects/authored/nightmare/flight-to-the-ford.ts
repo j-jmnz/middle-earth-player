@@ -8,7 +8,7 @@ const RING = "141085";
 const LAST_STAGE = "141029";
 const FORD = "906303";
 const NAZGUL: PickSpec = { type: "enemy", control: "any", staging: true, trait: "Nazgûl" };
-const TWILIGHT_ON_A_HERO: PickSpec = { type: "card", control: "any", names: ["The Twilight World"], on: { type: "hero", control: "any" } };
+const TWILIGHT_ON_A_HERO: PickSpec = { type: "attachment", control: "any", names: ["The Twilight World"], on: { type: "hero", control: "any" } };
 const NEXT_PLAYER_ATTACKS = [{"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}},{"verb":"ImmediateAttack","when":{"kind":"otherPlayer"}}] as const;
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [

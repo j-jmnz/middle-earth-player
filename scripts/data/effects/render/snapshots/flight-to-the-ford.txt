@@ -488,7 +488,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 906309:A:2 (front): When Revealed: Attach to the Ring-bearer. Limit 1 per hero. (Counts as a Condition attachment with the text: "Forced: At the beginning of the planning phase, either exhaust The One Ring, or reduce the Ring-bearer's life by 1.")
   906309:whenRevealed:1: When revealed
-    - if the number of card (any player controls) or in the staging area or the active location, named "The Twilight World", attached to a hero (any player controls) is at most 0: this treachery is attached to the Ring-bearer, the hero with the Ring-bearer trait (it stays in the encounter discard pile when there is no Ring-bearer in play)
+    - if the number of attachment (any player controls) named "The Twilight World", attached to a hero (any player controls) is at most 0: this treachery is attached to the Ring-bearer, the hero with the Ring-bearer trait (it stays in the encounter discard pile when there is no Ring-bearer in play)
   906309:forced:1: Forced when a phase begins
     only if it is the Planning phase
     who acts: the acting player is the first player (a phase has no player of its own)

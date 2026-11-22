@@ -27,16 +27,14 @@ describe("Cannot have attachments (50709:A:1 to 50713:A:1)", () => {
     });
   }
 
-  // FAULT: each Suspect prints "Cannot have attachments.", but Hired Muscle's When Revealed attaches to the Suspect and returns it to the staging area (AttachSelfToPicked does not read attachBlocked).
   for (const code of SUSPECTS) {
     const row: Row = { line: `${code}:A:1`, layout: { engaged: [code], deck: F0 }, act: reveal(HIRED_MUSCLE), expect: [count(HIRED_MUSCLE, "attached", 0), zone(code, "engaged")] };
-    it.fails(`${code}:A:1 Hired Muscle cannot attach to the Suspect, which stays engaged`, () => {
+    it(`${code}:A:1 Hired Muscle cannot attach to the Suspect, which stays engaged`, () => {
       expect(rowProblems(SCENARIO, row, EFFECTS)).toEqual([]);
     });
   }
 
-  // FAULT: the same with another Brigand engaged: Hired Muscle must go on Lawless Ruffian, but Todd the Troll is offered as its host too and takes it.
-  it.fails("50709:A:1 with another Brigand engaged Hired Muscle attaches to it and returns it, not Todd the Troll", () => {
+  it("50709:A:1 with another Brigand engaged Hired Muscle attaches to it and returns it, not Todd the Troll", () => {
     const row: Row = { line: "50709:A:1", layout: { engaged: ["50709", LAWLESS_RUFFIAN], deck: F0 }, act: reveal(HIRED_MUSCLE), expect: [count(HIRED_MUSCLE, "attached", 1), zone(LAWLESS_RUFFIAN, "staging"), zone("50709", "engaged")] };
     expect(rowProblems(SCENARIO, row, EFFECTS)).toEqual([]);
   });

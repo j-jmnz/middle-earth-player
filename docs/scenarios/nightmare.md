@@ -10,3 +10,4 @@ User request, 2026-10-30: Nightmare mode for the scenarios the app has, every Ni
 - The Nightmare cards' lines are effect records like any card's, read from the ledger (`data/printed/nightmare.json`, from the Drive pictures). A scenario offers Nightmare once its deck's lines are all owned (`NIGHTMARE_PLAYABLE`).
 - A Nightmare card that names the enemies "in play" counts or protects an enemy in the staging area as well as an engaged one (rr.in-play-and-out-of-play): Pale-green Tentacle, Weathertop, Expanse of Hollin and Great East Road.
 - The part of a Nightmare card after "Then" is not attempted when the part before it could not resolve (rr.then): The Old Road and Pathless Wilderness with no resource token left to discard.
+- The Twilight World (906309:A:2): "Limit 1 per hero" counts the copy already attached to the Ring-bearer, which an encounter card makes an attachment no player controls.

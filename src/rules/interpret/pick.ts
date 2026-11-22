@@ -238,7 +238,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.isHost && (at.sourceId == null || hostOf(state, at.sourceId) !== id)) return false;
   if (spec.active && !activeFor(state, asking, spec.stagingArea === "any").includes(id)) return false;
   // The attachments family's filters: attached or not, Guarded, progress tokens (families/attachments/pick.ts).
-  if (!attachmentsPickMatches(state, id, spec, ctx)) return false;
+  if (!attachmentsPickMatches(state, id, spec, ctx, at.sourceId)) return false;
   // The uncharted family's filters: a Lost Island, progress enough (families/uncharted/pick.ts).
   if (!unchartedPickMatches(state, id, spec, ctx) || !aflamePickMatches(state, id, spec, ctx) || !sidePickMatches(state, id, spec)) return false;
   if (spec.attachable != null && !attachmentHostIds(state, asking, spec.attachable, ctx).includes(id)) return false;
