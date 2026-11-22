@@ -332,8 +332,8 @@ function expandDiscards(state: ScenarioState, item: QueueItem, frame: Frame, ctx
   const count = Math.min(resolveAmount(state, instruction.amount, frameScope(state, item.seat, frame.cardId), ctx), discardable);
   const cause = item.cause ? { cause: item.cause } : {};
   const pick = { verb: "Pick" as const, pick: { type: "card" as const, control: "you" as const, from: "hand" as const } };
-  const expanded = Array.from({ length: count }, (): QueueItem[] => [
-    { instruction: pick, seat: item.seat, chosen: null, origin: instruction, ...cause },
+  const expanded = Array.from({ length: count }, (_, index): QueueItem[] => [
+    { instruction: pick, seat: item.seat, chosen: null, origin: instruction, nth: index + 1, of: count, ...cause },
     { instruction: { verb: "DiscardPicked" as const }, seat: item.seat, chosen: null, ...cause },
   ]).flat();
   return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });
