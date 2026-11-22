@@ -167,7 +167,7 @@ Read the sections your task touches.
     - 501–508 Booklet (~540) ← 2
     - 509–512 Database (~110)
   - 513–532 States (~620)
-- `docs/development.md` — Development (~5.4K tok)
+- `docs/development.md` — Development (~5.5K tok)
   - 5–14 In a browser (~170)
   - 15–32 Checking a screen in a browser (~700) ← 4
   - 33–52 Reading a game as text (~760) ← 4

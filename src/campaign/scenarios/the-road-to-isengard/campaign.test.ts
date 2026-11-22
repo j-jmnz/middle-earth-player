@@ -13,7 +13,7 @@ import { DEEP_GOLDENS, deepWorld, playGolden as playDeep } from "../../../../tes
 import { ISENGARD_GOLDENS, isengardStart, isengardWorld, playGolden } from "../../../../test/scenarios/the-road-to-isengard/game.ts";
 import { HAI_GOLDENS, haiWorld, playGolden as playHai } from "../../../../test/scenarios/the-uruk-hai/game.ts";
 import { loadCampaign, loadScenario } from "../../../../scripts/data/load-scenarios.ts";
-import { prebuiltDeck } from "../../../../scripts/e2e/seed-kit.ts";
+import { prebuiltDeck, SOLO_FIXTURE_DECK } from "../../../../scripts/e2e/seed-kit.ts";
 import { temporaryCatalog } from "../../../../test/harness/temp-catalog.ts";
 
 import { startFor } from "../../briefing.ts";
@@ -100,7 +100,7 @@ describe("The Road to Isengard in the the-two-towers campaign", () => {
   });
 
   it("143081:A:2 is what puts Saruman's Voice in the encounter deck: a standalone deal of the same seat holds none, a campaign deal one", () => {
-    const seat = { deckId: "the-one-deck", ...prebuiltDeck("the-one-deck") };
+    const seat = { deckId: SOLO_FIXTURE_DECK, ...prebuiltDeck(SOLO_FIXTURE_DECK) };
     const world = loadWorld(drizzle(new Database(temporaryCatalog(), { readonly: true })), campaign, isengard, EFFECTS, [...seat.heroes, ...seat.deck]);
     const standalone = standaloneStart(world, 1, { scenarioId: isengard.id, difficulty: "Normal", seats: [seat], ringBearer: null }, 1);
     const campaignStart = startFor({ world, log: emptyLog(1), seatCount: 1, seats: [seat], ringBearer: null, difficulty: "Normal" }, 1);

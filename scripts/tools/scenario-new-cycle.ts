@@ -124,8 +124,7 @@ export function cycleSeedFinderFile(facts: Facts): string {
   const e2e = depth === 0 ? "./" : "../".repeat(depth);
   const scripts = "../".repeat(depth + 1);
   const root = `${scripts}../`;
-  return `// The save fixtures of ${facts.name} (${facts.campaignId} cycle part ${facts.part}), written into src/campaign/fixtures/${facts.id}.json by scripts/e2e/fixtures.ts: real standalone games of saved decklists (the One Deck and
-// Defenders of Gondor lists of data/decks), two-handed, Easy, so each is one open game. \`${facts.short}-lost\` is the first seed that loses,
+  return `// The save fixtures of ${facts.name} (${facts.campaignId} cycle part ${facts.part}), written into src/campaign/fixtures/${facts.id}.json by scripts/e2e/fixtures.ts: real standalone games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is one open game. \`${facts.short}-lost\` is the first seed that loses,
 // parked on the loss. A cycle has no log and no earlier part. There is no won fixture: the registry names none, so \`standaloneWonLost\` plays for none (docs/architecture.md, Tests).
 // TODO: say which answers the saved decklists' policy gives the scenario's questions.
 import { nextIntent } from "${root}test/harness/auto-player.ts";

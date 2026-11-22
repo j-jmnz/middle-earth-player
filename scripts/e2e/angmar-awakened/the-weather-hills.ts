@@ -1,5 +1,4 @@
-// The fixtures of The Weather Hills (angmar-awakened part 2), written into src/campaign/fixtures/the-weather-hills.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
-// Gondor and Swords of the Noldor lists of data/prebuilt-decks.json), two-handed, Easy, so each is a real save. `hills-won` is the first seed that wins, parked on the win (the Resolution waits); `hills-lost` the first
+// The fixtures of The Weather Hills (angmar-awakened part 2), written into src/campaign/fixtures/the-weather-hills.json by scripts/e2e/fixtures.ts: real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `hills-won` is the first seed that wins, parked on the win (the Resolution waits); `hills-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won (Intruders in Chetwood's two-handed win, with Protect the Innocent in its pool), so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks nothing (Protect the Innocent and Mysterious Omens are dealt from the pool); the Resolution asks nothing (the damage is noted, a boon is earned only when Mysterious Omens was defeated and a player chose one). The decklists are played with

@@ -1,5 +1,4 @@
-// The fixtures of Journey to the Cross-roads (the-two-towers part 5), written into src/campaign/fixtures/journey-to-the-cross-roads.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck in the first
-// seat, Defenders of Gondor in the second: FIXTURE_DECKS in scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `roads-won` is the first seed that wins, parked on the win (the Resolution waits); `roads-lost` the first
+// The fixtures of Journey to the Cross-roads (the-two-towers part 5), written into src/campaign/fixtures/journey-to-the-cross-roads.json by scripts/e2e/fixtures.ts: real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `roads-won` is the first seed that wins, parked on the win (the Resolution waits); `roads-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup (144069) asks each player for a copy of Brace of Coneys or 1 resource on each hero: both seats take the resources (the loadout's choices). The Resolution asks nothing (it earns a Brace of Coneys for each
@@ -16,7 +15,7 @@ import { createLog } from "../log.ts";
 import { firstSeed, FIXTURE_DECKS, prebuiltDeck, wonLog } from "./seed-kit.ts";
 
 const say = createLog("e2e-roads");
-// The saga Frodo (141001, Fellowship sphere, Ring-bearer) is the first seat's Ring-bearer with The One Ring (mec112.setting-up-the-game, scenarios 10 to 12), beside The One Deck's heroes.
+// The saga Frodo (141001, Fellowship sphere, Ring-bearer) is the first seat's Ring-bearer with The One Ring (mec112.setting-up-the-game, scenarios 10 to 12), beside the first deck's heroes.
 const FRODO = "141001";
 const loadout: StoredLoadout = { scenarioId: "journey-to-the-cross-roads", difficulty: "Easy", seats: FIXTURE_DECKS.map((id) => ({ deckId: id, ...prebuiltDeck(id) })), ringBearer: FRODO, choices: [...ROADS_CHOICES], acceptPenalty: false };
 

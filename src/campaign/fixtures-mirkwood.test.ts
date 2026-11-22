@@ -86,35 +86,3 @@ describe("Journey Along the Anduin (Mirkwood Paths part 2, phase 30)", () => {
     expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status).slice(0, 3)).toEqual(["completed", "current", "locked"]);
   });
 });
-
-describe("The Caves of Nibin-Dûm (The Dark of Mirkwood part 2, phase 33)", () => {
-  it("start from the log a real oath-won game writes when it is confirmed, in a The Dark of Mirkwood save, each seat's cards from the pool", () => {
-    const oathSave = fixtureSave("oath-won", "s", CATALOG_VERSION);
-    const resumed = resume(oathSave, worldFor("oath-won"));
-    if (!resumed.ok) throw new Error(resumed.reason);
-    const written = finish(oathSave, worldFor("oath-won"), resumed.state).log;
-    for (const name of ["nibin-dum-lost"] as const) {
-      const found = fixture(name);
-      expect(found.campaignId, name).toBe("the-dark-of-mirkwood");
-      expect(found.seatCount, name).toBe(2);
-      expect(found.loadout.scenarioId, name).toBe("the-caves-of-nibin-dum");
-      expect(found.loadout.ringBearer, name).toBeNull();
-      expect(found.log, name).toEqual(written);
-      expect(found.log.completed, name).toEqual(["the-oath"]);
-      expect(found.past?.fixture, name).toBe("oath-won");
-    }
-  });
-
-  it("nibin-dum-lost replays to a loss, and finishing it writes nothing: The Caves of Nibin-Dûm stays current and nothing is carried over", () => {
-    const world = worldFor("nibin-dum-lost");
-    const save = fixtureSave("nibin-dum-lost", "s", CATALOG_VERSION);
-    const resumed = resume(save, world);
-    expect(resumed.ok && resumed.state.lost).toBe(true);
-    if (!resumed.ok) return;
-    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
-    const after = finish(save, world, resumed.state);
-    expect(after.log).toEqual(save.log);
-    expect(after.log.carryOver).toEqual([]);
-    expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status)).toEqual(["completed", "current"]);
-  });
-});

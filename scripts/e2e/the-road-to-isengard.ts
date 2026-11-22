@@ -1,5 +1,4 @@
-// The fixtures of The Road to Isengard (the-two-towers part 3), written into src/campaign/fixtures/the-road-to-isengard.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
-// Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `isengard-won` is the first seed that wins, parked on the win (the Resolution waits); `isengard-lost` the first
+// The fixtures of The Road to Isengard (the-two-towers part 3), written into src/campaign/fixtures/the-road-to-isengard.json by scripts/e2e/fixtures.ts: real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `isengard-won` is the first seed that wins, parked on the win (the Resolution waits); `isengard-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks nothing (Helm's Deep's boons are in the log, the checklist places them: an earned Poisoned Counsels is shuffled into its owner's deck after the starting hand); the quest card's Setup shuffles the encounter deck and

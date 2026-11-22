@@ -1,5 +1,4 @@
-// The fixtures of Escape from Mount Gram (angmar-awakened part 5), written into src/campaign/fixtures/escape-from-mount-gram.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
-// Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `gram-won` is the first seed that wins, parked on the win (the Resolution waits); `gram-lost` the first
+// The fixtures of Escape from Mount Gram (angmar-awakened part 5), written into src/campaign/fixtures/escape-from-mount-gram.json by scripts/e2e/fixtures.ts: real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `gram-won` is the first seed that wins, parked on the win (the Resolution waits); `gram-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks nothing (Loot the Dungeons joins the staging area holding the bottom 5 cards of each captured deck; each player is asked for their starting hero, answered with the first); the Resolution asks nothing of its own (the unique cards still in
