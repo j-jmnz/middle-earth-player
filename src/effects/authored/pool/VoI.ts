@@ -10,9 +10,9 @@ export const RECORDS: readonly Effect[] = [
   // 07001 Éomer
   {"id":"07001:response:1","cardCode":"07001","lines":["07001:A:1"],"timing":"response","trigger":"leftPlay","subject":{"type":"character","control":"any"},"limit":"oncePerRound","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfRound"}]},
   // 07004 Orthanc Guard
-  {"id":"07004:response:1","cardCode":"07004","lines":["07004:A:1"],"timing":"response","trigger":"played","subject":{"type":"card","control":"any","keyword":"doomed"},"instructions":[{"verb":"Ready"}]},
+  {"id":"07004:response:1","cardCode":"07004","lines":["07004:A:1"],"timing":"response","trigger":"doomedRaised","eventSeat":"you","instructions":[{"verb":"Ready"}]},
   // 07005 Isengard Messenger
-  {"id":"07005:response:1","cardCode":"07005","lines":["07005:A:1"],"timing":"response","trigger":"played","subject":{"type":"card","control":"any","keyword":"doomed"},"limit":"twicePerRound","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"endOfRound"}]},
+  {"id":"07005:response:1","cardCode":"07005","lines":["07005:A:1"],"timing":"response","trigger":"doomedRaised","eventSeat":"you","limit":"twicePerRound","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"endOfRound"}]},
   // 07006 Westfold Outrider. An enemy not engaged with you is in the staging area or engaged with another player.
   {"id":"07006:action:1","cardCode":"07006","lines":["07006:A:1"],"timing":"action","cost":{"kind":"discardSelf"},"condition":{"kind":"any","conditions":[{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true}},{"kind":"canPick","pick":{"type":"enemy","control":"any","engaged":"other"}}]},"instructions":[
     {"verb":"Choose","who":"actor","options":[
@@ -24,7 +24,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"07008:constant:1","cardCode":"07008","lines":["07008:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","spheres":["tactics"]},{"type":"hero","control":"any","trait":"Rohan"}]}]},
   {"id":"07008:response:1","cardCode":"07008","lines":["07008:A:2"],"timing":"response","trigger":"attackDestroyed","subject":"host","cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"Ready","target":"host"}]},
   // 07010 Keys of Orthanc (line 1 is the generated 07010:constant:1)
-  {"id":"07010:response:1","cardCode":"07010","lines":["07010:A:2"],"timing":"response","trigger":"played","subject":{"type":"card","control":"any","keyword":"doomed"},"cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"AddResources","amount":1,"to":"host"}]},
+  {"id":"07010:response:1","cardCode":"07010","lines":["07010:A:2"],"timing":"response","trigger":"doomedRaised","eventSeat":"you","cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"AddResources","amount":1,"to":"host"}]},
   // 07011 Legacy of Númenor (line 1 is Doomed)
   {"id":"07011:action:1","cardCode":"07011","lines":["07011:A:2"],"timing":"action","instructions":[{"verb":"Each","pick":{"type":"hero","control":"any"},"instructions":[{"verb":"AddResources","amount":1,"to":"picked"}]}]},
   // 07012 Deep Knowledge (line 1 is Doomed)

@@ -35,6 +35,8 @@ function table({ real = false, deck = ["s1", "s0", "s2", "s0"], discard = [], sa
     encounter: deck,
   });
   let state = spawn(built.state, "qsail", { zone: "questStage" }, "B").state;
+  // The card in hand draws a card: the deck holds one, since a draw from an empty deck changes nothing and the card is not played (rr.running-out-of-cards).
+  if (hand) state = spawn(state, "gift", { zone: "deck", seat: 0 }).state;
   for (const code of discard) state = spawn(state, code, { zone: "encounterDiscard" }).state;
   state = { ...state, sea: { heading, headingCard: null, routes: state.sea?.routes ?? {} }, phase: "Planning", mode: "planning", boundaryPhase: "Planning", window: { kind: "pass" }, planningSeat: 0, passed: [], round: 1 };
   return { ...built, ids: { ...built.ids, dc: built.ids[dc]! }, state };

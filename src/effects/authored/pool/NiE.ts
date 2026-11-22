@@ -13,7 +13,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"08090:action:1","cardCode":"08090","lines":["08090:A:1"],"timing":"action","condition":{"kind":"canPick","pick":{"type":"ally","control":"you","trait":"Silvan"}},"instructions":[{"verb":"Pick","pick":{"type":"ally","control":"you","trait":"Silvan"}},{"verb":"ReturnToHand"},{"verb":"LowerThreat","amount":{"stat":"cost","of":"picked"},"who":"actor"}]},
   // 08093 Defender of the West. An objective
   // ally is not of the ally card type.
-  {"id":"08093:constant:1","cardCode":"08093","lines":["08093:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"ally","control":"any","unique":true}]}]},
+  {"id":"08093:constant:1","cardCode":"08093","lines":["08093:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"ally","control":"any","unique":true,"nonObjective":true}]}]},
 ];
 
 export const REPLACES: readonly string[] = [];

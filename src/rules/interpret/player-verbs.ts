@@ -10,7 +10,7 @@ import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 import { characters } from "../combat/combat.ts";
 import { declareAttack } from "../families/attack/index.ts";
 import { enforceRestricted, hostTakesControl } from "../player/attach.ts";
-import { placeProgress, progressPlacer } from "./effect-verbs.ts";
+import { placeProgress, progressPlacer, readsThen } from "./effect-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { announceAllyLeft } from "../core/ally-left.ts";
 import { announceTopDiscard } from "../families/deck/pressure.ts";
@@ -213,7 +213,11 @@ export function runPlayerVerb(
     case "DiscardTopOfDeck": {
       const top = state.seats[focus.seat]?.deck[0];
       const card = top ? state.cards[top] : undefined;
-      if (!top || !card) return state;
+      if (!top || !card) {
+        // A discard of the top card of an empty deck is not resolved in full (the `thenResolves` condition).
+        const data = topFrame(state)?.data;
+        return data?.kind === "effect" && readsThen(ctx) ? patchTop(state, { data: { ...data, short: true } }) : state;
+      }
       const discarded = announceTopDiscard(queueEvent(moveCard(state, top, { zone: "discard", seat: focus.seat }), { trigger: "discardedFromDeck", seat: focus.seat, cardId: top }), focus.seat, 1, ctx);
       const data = topFrame(discarded)?.data;
       // The discarded card's printed cost is the effect's X.

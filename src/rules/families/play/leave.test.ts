@@ -50,7 +50,8 @@ describe("a card that leaves play takes its attachments with it", () => {
     const drop: Effect = { id: "blade:action:1", cardCode: "blade", lines: ["blade:A:1"], timing: "action", instructions: [{ verb: "Discard", target: { kind: "self" } }] };
     const context = playCtx([...RECORDS, listen, drop]);
     const table = seat(1, ["gondor", "rohan"]);
-    const blade = put(table.state, "blade", "hand");
+    // The Response draws a card, so the deck holds one (a draw from an empty deck changes nothing, rr.running-out-of-cards).
+    const blade = put(put(table.state, "filler", "deck").state, "blade", "hand");
     const hero = table.heroes[0] ?? "";
     const played = play(blade.state, blade.id, context, [], hero);
     expect(triggers(played, context, "gondor:response:1")).toEqual([{ type: "Trigger", cardId: hero, effectId: "gondor:response:1" }]);

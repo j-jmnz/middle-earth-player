@@ -3,9 +3,8 @@ import type { Effect } from "../../../catalog/boundary.ts";
 // Records for the KD player cards whose lines no template reads (data/cards/KD.json). An id here that a template also
 // produces replaces the generated record; list it in REPLACES.
 export const RECORDS: readonly Effect[] = [
-  // 03001 Dwalin: a Response's condition cannot read the destroyed enemy (the event's other card), so the Orc test is on
-  // the instruction.
-  {"id":"03001:response:1","cardCode":"03001","lines":["03001:A:1"],"timing":"response","trigger":"attackDestroyed","subject":"self","instructions":[{"verb":"LowerThreat","amount":2,"who":"actor","when":{"kind":"matches","card":"other","pick":{"type":"enemy","control":"any","trait":"Orc"}}}]},
+  // 03001 Dwalin: the Orc test is on the Response's `condition`, which reads the destroyed enemy (the event's other card).
+  {"id":"03001:response:1","cardCode":"03001","lines":["03001:A:1"],"timing":"response","trigger":"attackDestroyed","subject":"self","condition":{"kind":"matches","card":"other","pick":{"type":"enemy","control":"any","trait":"Orc"}},"instructions":[{"verb":"LowerThreat","amount":2,"who":"actor"}]},
   // 03002 Bifur: any hero's resource pays.
   {"id":"03002:action:1","cardCode":"03002","lines":["03002:A:1"],"timing":"action","anyPlayer":true,"limit":"oncePerRound","cost":{"kind":"resources","amount":1,"sphere":"neutral"},"instructions":[{"verb":"AddResources","amount":1,"to":"self"}]},
   // 03004 Durin's Song

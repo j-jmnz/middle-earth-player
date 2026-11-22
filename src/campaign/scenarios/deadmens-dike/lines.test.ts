@@ -127,10 +127,12 @@ describe("09040:A:1 hears the Actions and Responses a player triggers", () => {
 
   it("09040:A:1 discards the top card of the deck of the player who triggers an Action, once", () => {
     const t = gate({ attached: [{ code: "10167", to: HERO }] });
-    const intent = trigger(t.state, t, "10167");
+    // The Action readies its hero, so it is offered only while the hero is exhausted (rr.triggered-ability).
+    const tired = updateCard(t.state, idOf(t.state, HERO), { exhausted: true });
+    const intent = trigger(tired, t, "10167");
     expect(intent).toBeTruthy();
-    const run = finish(send({ state: t.state, steps: [] }, intent as PlayerIntent, t.ctx), t.ctx);
-    expect(deck(run.state)).toBe(deck(t.state) - 1);
+    const run = finish(send({ state: tired, steps: [] }, intent as PlayerIntent, t.ctx), t.ctx);
+    expect(deck(run.state)).toBe(deck(tired) - 1);
   });
 
   it("09040:A:1 discards a card for an event played for its Action, and none for a Forced effect", () => {
@@ -157,9 +159,11 @@ describe("09040:A:1 hears the Actions and Responses a player triggers", () => {
 
   it("09040:A:1 is not in force while Deadmen's Gate is in the staging area, not active", () => {
     const t = at({ phase: "Planning", staging: ["09040"], heroResources: 3, deckOf: ["filler", "filler"], attached: [{ code: "10167", to: HERO }] });
-    const intent = trigger(t.state, t, "10167");
-    const run = finish(send({ state: t.state, steps: [] }, intent as PlayerIntent, t.ctx), t.ctx);
-    expect(deck(run.state)).toBe(deck(t.state));
+    const tired = updateCard(t.state, idOf(t.state, HERO), { exhausted: true });
+    const intent = trigger(tired, t, "10167");
+    expect(intent).toBeTruthy();
+    const run = finish(send({ state: tired, steps: [] }, intent as PlayerIntent, t.ctx), t.ctx);
+    expect(deck(run.state)).toBe(deck(tired));
   });
 });
 

@@ -105,7 +105,7 @@ function barred(state: ScenarioState, offer: ResponseOffer, ctx: ReduceContext):
 function liveOffers(state: ScenarioState, offers: readonly ResponseOffer[], ctx: ReduceContext): ResponseOffer[] {
   return offers.filter((offer) => {
     const effect = effectById(ctx, offer.effectId);
-    return effect != null && usable(state, effect, offer.cardId, offer.seat, ctx);
+    return effect != null && usable(state, effect, offer.cardId, offer.seat, ctx, offer.event);
   });
 }
 
@@ -139,7 +139,7 @@ export function responseReason(state: ScenarioState, intent: TriggerIntent, ctx:
   const offer = offersOf(state).find((entry) => entry.cardId === intent.cardId && entry.effectId === intent.effectId && entry.seat === seat);
   const effect = offer ? effectById(ctx, offer.effectId) : undefined;
   if (!offer || !effect) return "That effect cannot be triggered";
-  return usageReason(state, effect, offer.cardId, seat, intent.payments ?? [], ctx);
+  return usageReason(state, effect, offer.cardId, seat, intent.payments ?? [], ctx, offer.event);
 }
 
 // The cost is paid, the offer is spent, and the effect resolves in a frame above the response frame.

@@ -66,6 +66,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("playerWithoutReady") }),
   // A Draw the running effect ran drew at least 1 card ("draws 1 card. Then, ... discard 4 cards", 04097:A:1: what follows "then" resolves only when the draw did, rr.then).
   z.strictObject({ kind: z.literal("drew") }),
+  // Every Draw and every DiscardTopOfDeck the running effect ran before it resolved in full (a deck of fewer cards than the effect names stops it short): what follows "then" is attempted only when it did (rr.then; "Draw 2 cards. Then, discard 1 card", 04108:A:1).
+  z.strictObject({ kind: z.literal("thenResolves") }),
   // The source is an enemy engaged with the last player, the first player in a one-player game (dwd.last-player): "it engages the last player and attacks him" only when the engagement was made (901603:A:2).
   z.strictObject({ kind: z.literal("engagedWithLastPlayer") }),
   z.strictObject({ kind: z.literal("fortitudeFailed"), scope: z.literal("round"), who: z.enum(["actor", "any"]) }),

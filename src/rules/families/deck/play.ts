@@ -6,7 +6,7 @@
 // Actions on different lines, of which its player uses one (Hope Rekindled's Action and Valour Action); an event that may be
 // played once a phase; a Response that lowers a card's cost as it is played (Erebor Guard); and a Response offered in the
 // mulligan window in place of the mulligan (Galdor of the Havens).
-import type { Effect, Instruction, PickSpec, SimpleInstruction } from "../../../catalog/boundary.ts";
+import type { Effect, Instruction, SimpleInstruction } from "../../../catalog/boundary.ts";
 
 import { attachmentHostIds, playCost } from "../../player/attach.ts";
 import { effectCause } from "../../core/cause.ts";
@@ -19,6 +19,7 @@ import { uniqueBlocked } from "../../core/keywords.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { heroPays } from "../../player/payments.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
+import { eventActionReason } from "../../player/potential.ts";
 import { playCard } from "../../player/planning.ts";
 import { printedOf } from "../../core/printed.ts";
 import { finishMulliganChoice } from "../../setup/setup.ts";
@@ -35,13 +36,6 @@ type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 type PlayIntent = Extract<PlayerIntent, { type: "PlayCard" }>;
 type PlayFrom = Extract<Instruction, { verb: "PlayFrom" }>;
 
-/** A Pick that does not keep an event from being played when it finds nothing: one that depends on an earlier pick, a search
- * of a deck or of the cards the effect looked at (rr.search: a search is not a target, and finding nothing still resolves),
- * or one made only if a condition holds when the effect resolves. */
-export function searchOrLaterPick(pick: PickSpec, when: unknown): boolean {
-  return pick.different === true || pick.attackableByPicked === true || pick.from === "deck" || pick.looked === true || when != null;
-}
-
 // The Action records of an event its player could resolve now: the condition holds, the limit is unspent, and each target it
 // chooses exists.
 function eventActionsNow(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext): Effect[] {
@@ -49,7 +43,7 @@ function eventActionsNow(state: ScenarioState, cardId: string, seat: number, ctx
   const scope = { actor: seat, sourceId: cardId, returned: 0 };
   return effectsOf(ctx, code).filter((effect) => {
     if (effect.timing !== "action" || (effect.condition && !holds(state, effect.condition, scope, ctx)) || limitSpent(state, effect, cardId, seat)) return false;
-    return effect.instructions.every((instruction) => instruction.verb !== "Pick" || searchOrLaterPick(instruction.pick, instruction.when) || pickCandidates(state, instruction.pick, seat, [], cardId, ctx).length > 0);
+    return eventActionReason(state, effect.instructions, cardId, seat, ctx) == null;
   });
 }
 
@@ -62,7 +56,7 @@ function payable(state: ScenarioState, seat: number, cardId: string, ctx: Reduce
 }
 
 // Whether the seat could play the card now under PlayFrom's terms.
-function playableFrom(state: ScenarioState, id: string, instruction: PlayFrom, seat: number, ctx: ReduceContext): boolean {
+export function playableFrom(state: ScenarioState, id: string, instruction: PlayFrom, seat: number, ctx: ReduceContext): boolean {
   const card = state.cards[id];
   if (!card) return false;
   const printed = printedOf(ctx.cards, card.code);

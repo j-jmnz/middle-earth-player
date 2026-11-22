@@ -4,11 +4,14 @@ import { PLAYS } from "./costs-plays.ts";
 // Authored records for costs: discounts, resource matches, who pays for what, icons, optional doomed (docs/agents/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
 const DISTINCT_THREE = { verb: "PayDistinctHeroes", min: 3 } as const;
 // "You may give ~ doomed N when you play it from your hand. If you do, it gains: Response: After you play ~, ...": the Response
-// is the choice; taking it gives the card its Doomed (each player raises their threat, rr.doomed-x).
-const doomed = (amount: number) => ({ verb: "RaiseThreat", amount, who: "eachSeat" }) as const;
+// is the choice; taking it gives the card its Doomed: the Doomed verb raises each player's threat with the cause rr.doomed-x, so a card that answers a threat raise
+// from the Doomed keyword (Orthanc Guard, Isengard Messenger, Keys of Orthanc) answers it.
+const doomed = (amount: number) => ({ verb: "Doomed", amount }) as const;
 // Linhir Sea-captain: exactly one hero's pool paid for it.
 const SINGLE_PAYER = { kind: "count", pick: { type: "hero", control: "any", paidFor: "subject" }, min: 1, max: 1 } as const;
 const icon = (stat: "leadershipIcon" | "loreIcon" | "tacticsIcon" | "spiritIcon") => ({ verb: "ModifyStat", stat, amount: 1, until: "endOfPhase", target: "host" }) as const;
+// Bartering: a ready player attachment on a character you control.
+const ON_CHARACTER = { type: "attachment", control: "you", state: "ready", playerCard: true, on: { type: "character", control: "you" } } as const;
 const LOWER_THREAT_HEROES = { type: "hero", control: "any", lowerThreatCost: true } as const;
 
 const OWN: readonly Effect[] = [
@@ -212,7 +215,7 @@ const OWN: readonly Effect[] = [
       {
         verb: "ReduceNextCost",
         pick: { type: "card", control: "you", cardType: "ally", trait: "Dale" },
-        amount: { count: { type: "attachment", control: "any", attachedTo: "host" }, distinct: true },
+        amount: { count: { type: "attachment", control: "any", attachedTo: "host", playerCard: true }, distinct: true },
         until: "endOfPhase",
         noMatch: true,
       },
@@ -223,9 +226,9 @@ const OWN: readonly Effect[] = [
     cardCode: "18015",
     lines: ["18015:A:1"],
     timing: "action",
-    condition: { kind: "all", conditions: [{ kind: "phase", is: "Planning" }, { kind: "canPick", pick: { type: "attachment", control: "you", state: "ready" } }] },
+    condition: { kind: "all", conditions: [{ kind: "phase", is: "Planning" }, { kind: "canPick", pick: ON_CHARACTER }] },
     instructions: [
-      { verb: "Pick", pick: { type: "attachment", control: "you", state: "ready" } },
+      { verb: "Pick", pick: ON_CHARACTER },
       { verb: "ReturnToHand", target: "picked" },
       { verb: "ReduceNextCost", pick: { type: "card", control: "you", cardType: "attachment" }, amount: { stat: "cost", of: "picked", printed: true }, until: "endOfPhase", who: "any" },
     ],

@@ -13,7 +13,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"04107:constant:1","cardCode":"04107","lines":["04107:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","traits":["Noldor","Silvan"]}]}]},
   {"id":"04107:constant:2","cardCode":"04107","lines":["04107:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"noExhaustQuest","amount":1,"until":"whileSourceInPlay","target":"host"}]},
   // 04108 Daeron's Runes
-  {"id":"04108:action:1","cardCode":"04108","lines":["04108:A:1"],"timing":"action","instructions":[{"verb":"Draw","amount":2},{"verb":"DiscardFromHand","amount":1}]},
+  {"id":"04108:action:1","cardCode":"04108","lines":["04108:A:1"],"timing":"action","instructions":[{"verb":"Draw","amount":2},{"verb":"DiscardFromHand","amount":1,"when":{"kind":"thenResolves"}}]},
   // 04109 Healing Herbs (line 1 is the generated 04109:constant:1). The host exhausts before the card leaves it.
   {"id":"04109:action:1","cardCode":"04109","lines":["04109:A:2"],"timing":"action","cost":[{"kind":"exhaustHost"},{"kind":"discardSelf"}],"condition":{"kind":"canPick","pick":{"type":"character","control":"any","damaged":true}},"instructions":[{"verb":"Pick","pick":{"type":"character","control":"any","damaged":true}},{"verb":"Heal","all":true,"target":"picked"}]},
   // 04110 Asfaloth

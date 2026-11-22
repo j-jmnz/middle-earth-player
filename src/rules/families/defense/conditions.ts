@@ -10,7 +10,7 @@ import type { ScenarioState } from "../../core/state.ts";
 type CombatStep = Extract<Condition, { kind: "combatStep" }>["is"];
 
 // `beforeEnemyAttacks`: the combat phase has not reached the resolving enemy attacks step. `beforeAttacksResolve`: the shadow
-// cards are dealt (rr.step-6-2) and no attack has resolved yet. `afterEnemyAttacks`: the enemy attacks step is complete and
+// cards are dealt (rr.step-6-2) and no attack has resolved yet (one whose damage is placed has resolved, though it is not over). `afterEnemyAttacks`: the enemy attacks step is complete and
 // the players attack (rr.step-6-5).
 export function combatStepIs(state: ScenarioState, step: CombatStep): boolean {
   if (state.phase !== "Combat") return false;
@@ -18,7 +18,7 @@ export function combatStepIs(state: ScenarioState, step: CombatStep): boolean {
     case "beforeEnemyAttacks":
       return state.mode === "combatStart" || state.mode === "combatShadows" || state.mode === "combatActions";
     case "beforeAttacksResolve":
-      return (state.mode === "combatActions" || state.mode === "enemyAttacks") && state.resolvedAttacks.length === 0 && state.declaredAttacks.length === 0;
+      return (state.mode === "combatActions" || state.mode === "enemyAttacks") && state.resolvedAttacks.length === 0 && state.declaredAttacks.length === 0 && state.pendingAttack?.damaged !== true && state.pendingAttack?.awaiting !== "end";
     case "afterEnemyAttacks":
       return state.mode === "playerAttacks";
   }

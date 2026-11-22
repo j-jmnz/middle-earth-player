@@ -14,6 +14,8 @@ const TYPES = ["ally", "attachment", "event"] as const;
 const SINGLE_PAYER = { kind: "count", pick: { type: "hero", control: "you", paidFor: "subject" }, min: 1, max: 1 } as const;
 
 const committedSelf: Condition = { kind: "matches", card: "self", pick: { type: "character", control: "any", committed: true } };
+// "After X quests successfully": the quest has resolved and cleared the live committed mark, so the round's record of who quested answers (state.quested).
+const questedSelf: Condition = { kind: "matches", card: "self", pick: { type: "character", control: "any", questedThisRound: true } };
 
 // "Discard ~ to play any Tactics event card in your discard pile as if it were in your hand. Then, place that event on the
 // bottom of your deck."
@@ -97,12 +99,12 @@ export const RECORDS: readonly Effect[] = [
   // 11006 Warden of the Havens, 11012 Sailor of Lune: the top card of the discard pile is the last one put there.
   {"id":"11006:constant:1","cardCode":"11006","lines":["11006:A:1"],"timing":"constant","condition":{"kind":"count","pick":{"type":"card","control":"you","from":"discard","top":1,"cardType":"attachment"},"min":1},"instructions":[{"verb":"ModifyStat","stat":"defense","amount":2,"until":"whileSourceInPlay"},{"verb":"ModifyStat","stat":"sentinel","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"11012:constant:1","cardCode":"11012","lines":["11012:A:1"],"timing":"constant","condition":{"kind":"count","pick":{"type":"card","control":"you","from":"discard","top":1,"cardType":"event"},"min":1},"instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"whileSourceInPlay"},{"verb":"ModifyStat","stat":"cannotTakeDamage","amount":1,"until":"whileSourceInPlay","when":committedSelf}]},
-  // 12009 Heed the Dream: the chosen player searches; the group may pay for a second search of the whole deck.
+  // 12009 Heed the Dream: the chosen player searches; the group may pay for a second search of the whole deck only when the first search found a card (rr.then).
   {"id":"12009:action:1","cardCode":"12009","lines":["12009:A:1"],"timing":"action","instructions":[{"verb":"Pick","pick":{"type":"player","control":"any"}},{"verb":"ActAs","who":"pickedPlayer"},...search({ top: 5 }),{"verb":"ActAs","who":"actor"},{"verb":"Choose","who":"actor","options":[
-    {"id":"spend","requires":{"kind":"resources","min":3,"sphere":"leadership","group":true},"instructions":[{"verb":"SpendResources","amount":3,"sphere":"leadership","group":true},{"verb":"ActAs","who":"pickedPlayer"},...(search({}) as SimpleInstruction[])]},
+    {"id":"spend","requires":{"kind":"all","conditions":[{"kind":"matches","card":"picked","pick":{"type":"card","control":"any"}},{"kind":"resources","min":3,"sphere":"leadership","group":true}]},"instructions":[{"verb":"SpendResources","amount":3,"sphere":"leadership","group":true},{"verb":"ActAs","who":"pickedPlayer"},...(search({}) as SimpleInstruction[])]},
     {"id":"decline","instructions":[]}]}]},
   // 12033 Master Ironsmith: from the hand or the discard pile, onto the hero that paid for it.
-  {"id":"12033:response:1","cardCode":"12033","lines":["12033:A:1"],"timing":"response","trigger":"played","subject":"self","eventSeat":"you","instructions":[{"verb":"Choose","who":"actor","options":(["hand","discard"] as const).map((from) => ({"id":from,"requires":{"kind":"all","conditions":[SINGLE_PAYER,{"kind":"canPick","pick":{"type":"card","control":"you","from":from,"cardType":"attachment","traits":["Weapon","Armor"]}}]},"instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":from,"cardType":"attachment","traits":["Weapon","Armor"]}},{"verb":"PutIntoPlay","card":"picked","host":{"type":"hero","control":"you","paidFor":"subject"}}]}) satisfies Extract<Instruction, { verb: "Choose" }>["options"][number])}]},
+  {"id":"12033:response:1","cardCode":"12033","lines":["12033:A:1"],"timing":"response","trigger":"played","subject":"self","eventSeat":"you","condition":SINGLE_PAYER,"instructions":[{"verb":"Choose","who":"actor","options":(["hand","discard"] as const).map((from) => ({"id":from,"requires":{"kind":"canPick","pick":{"type":"card","control":"you","from":from,"cardType":"attachment","traits":["Weapon","Armor"]}},"instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":from,"cardType":"attachment","traits":["Weapon","Armor"]}},{"verb":"PutIntoPlay","card":"picked","host":{"type":"hero","control":"you","paidFor":"subject"}}]}) satisfies Extract<Instruction, { verb: "Choose" }>["options"][number])}]},
   // 12066 Ered Luin Miner: heard from the discard pile it went to.
   {"id":"12066:response:1","cardCode":"12066","lines":["12066:A:1"],"timing":"response","trigger":"discardedFromDeck","subject":"self","instructions":[{"verb":"PutIntoPlay","card":"self"}]},
   // 12118 The Houses of Healing (line 1, its cost, is another record's).
@@ -116,7 +118,7 @@ export const RECORDS: readonly Effect[] = [
     {"verb":"DiscardFromDeck","amount":5,"shuffle":true},
     {"verb":"Each","pick":{"type":"card","control":"you","from":"discard","looked":true,"cardType":"ally","intoPlay":true},"upTo":2,"totalCost":{"x":true},"instructions":[{"verb":"PutIntoPlay","card":"picked"}]}]},
   // 132017 Expert Treasure-hunter: the discarded card is taken only if it is of the named type.
-  {"id":"132017:response:1","cardCode":"132017","lines":["132017:A:2"],"timing":"response","trigger":"questSucceeded","eventSeat":"you","condition":{"kind":"matches","card":"host","pick":{"type":"hero","control":"any","committed":true}},"instructions":[named((type) => [{"verb":"DiscardFromDeck","amount":1},{"verb":"Pick","pick":{"type":"card","control":"you","from":"discard","looked":true,"cardType":type}},{"verb":"MovePicked","to":"hand"}])]},
+  {"id":"132017:response:1","cardCode":"132017","lines":["132017:A:2"],"timing":"response","trigger":"questSucceeded","eventSeat":"you","condition":{"kind":"matches","card":"host","pick":{"type":"hero","control":"any","questedThisRound":true}},"instructions":[named((type) => [{"verb":"DiscardFromDeck","amount":1},{"verb":"Pick","pick":{"type":"card","control":"you","from":"discard","looked":true,"cardType":type}},{"verb":"MovePicked","to":"hand"}])]},
   // 16004 Erebor Guard: read when it is played (deck-play.ts): paying 2 less discards the top 2 cards of the deck.
   {"id":"16004:response:1","cardCode":"16004","lines":["16004:A:2"],"timing":"response","trigger":"paying","subject":"self","cost":{"kind":"discardDeckTop","amount":2},"instructions":[{"verb":"ReducePlayCost","amount":2}]},
   // 19008 Long Lake Fisherman
@@ -139,7 +141,7 @@ export const RECORDS: readonly Effect[] = [
     {"id":"doomed","instructions":[{"verb":"ReduceNextDoomed","amount":2,"until":"endOfPhase"}]},
     {"id":"search","instructions":search({ top: 5, cardType: "event", keyword: "doomed" }) as SimpleInstruction[]}]}]},
   // 22140 Haleth
-  {"id":"22140:response:1","cardCode":"22140","lines":["22140:A:1"],"timing":"response","trigger":"questSucceeded","eventSeat":"you","condition":committedSelf,"instructions":search({ top: 5, cardType: "attachment" })},
+  {"id":"22140:response:1","cardCode":"22140","lines":["22140:A:1"],"timing":"response","trigger":"questSucceeded","eventSeat":"you","condition":questedSelf,"instructions":search({ top: 5, cardType: "attachment" })},
 ];
 
 // Generated record ids an authored record here replaces.

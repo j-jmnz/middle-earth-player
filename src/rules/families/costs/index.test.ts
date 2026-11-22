@@ -86,7 +86,8 @@ describe("Response events (rr.response, rr.resource-match)", () => {
       [["lore"], [answerRecord(), blocked], false],
     ] as const) {
       const { state, ctx } = table([...effects], [...CARDS, card("pal", "ally", "neutral", 0)], [heroes]);
-      const event = put(state, "answer", "hand");
+      // The Response draws a card, so the deck holds one (a draw from an empty deck changes nothing, rr.running-out-of-cards).
+      const event = put(put(state, "pal", "deck").state, "answer", "hand");
       const ally = put(event.state, "pal", "hand");
       const paid = expectOk(reduce(ally.state, { type: "PlayCard", cardId: ally.id, payments: [] }, ctx));
       expect(legalIntents(paid.state, ctx).some((intent) => intent.type === "Trigger" && intent.cardId === event.id), `${heroes[0]} ${effects.length}`).toBe(offered);
@@ -106,7 +107,9 @@ describe("Response events (rr.response, rr.resource-match)", () => {
     };
     const { state, ids, ctx } = table([sentry], CARDS, [["lore"], ["lore"]]);
     const watcher = put(state, "mule", "play", 1);
-    const ally = put(watcher.state, "eagle", "hand", 0);
+    // The answering seat has a card to draw: a draw from an empty deck changes nothing (rr.running-out-of-cards).
+    const stocked = put(watcher.state, "eagle", "deck", 1);
+    const ally = put(stocked.state, "eagle", "hand", 0);
     const start = withThreat(withThreat(ally.state, 0, 20), 1, 30);
     const played = expectOk(reduce(start, { type: "PlayCard", cardId: ally.id, payments: [{ heroId: ids[0]?.[0] ?? "", amount: 2 }] }, ctx)).state;
     expect(played.window).toEqual({ kind: "response", seat: 1 });

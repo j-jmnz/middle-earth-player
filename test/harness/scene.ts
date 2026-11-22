@@ -1,6 +1,5 @@
 import type { ScenarioDefinition } from "../../src/catalog/boundary.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
-import { expectOk } from "../../src/rules/core/test-fixture.ts";
 import type { EngineStep } from "../../src/rules/core/intents.ts";
 import { definePrinted, type PrintedCard } from "../../src/rules/core/printed.ts";
 import { reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
@@ -127,8 +126,25 @@ export function begin(state: ScenarioState): Run {
   return { state, steps: [] };
 }
 
+// The reducer refused an intent a check sent. lineSpec accepts it (an intent nobody offers any more) and nothing else but a failed expectation.
+export class IntentRefused extends Error {
+  readonly intent: PlayerIntent;
+  constructor(intent: PlayerIntent, reason: string) {
+    super(`${intent.type} refused: ${reason}`);
+    this.name = "IntentRefused";
+    this.intent = intent;
+  }
+}
+
+// The reducer's accepted result for `intent`, or an IntentRefused.
+export function accepted(state: ScenarioState, intent: PlayerIntent, ctx: ReduceContext): Extract<ReturnType<typeof reduce>, { ok: true }> {
+  const result = reduce(state, intent, ctx);
+  if (!result.ok) throw new IntentRefused(intent, result.reason);
+  return result;
+}
+
 export function send(run: Run, intent: PlayerIntent, ctx: ReduceContext): Run {
-  const result = expectOk(reduce(run.state, intent, ctx));
+  const result = accepted(run.state, intent, ctx);
   // Every card-effect test goes through here, so an effect that moves a number without naming its cause fails it.
   const problems = causeProblems(result.steps);
   if (problems.length > 0) throw new Error(`Steps without a verified cause after ${intent.type}: ${problems.join("; ")}`);

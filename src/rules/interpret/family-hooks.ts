@@ -6,7 +6,7 @@ import type { PrintedCard } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
 import type { AmountScope } from "./amounts.ts";
 import type { Scope } from "./conditions.ts";
-import type { PlayHow, QuestTotals, RulesFamily, SettleHook, SettleHooks, TravelCharge } from "./family-manifest.ts";
+import type { IdleFrame, IdleMark, PlayHow, QuestTotals, RulesFamily, SettleHook, SettleHooks, TravelCharge } from "./family-manifest.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { PickContext } from "./pick.ts";
 
@@ -62,6 +62,8 @@ type Hooked = {
   readonly combat: readonly RulesFamily[];
   readonly optionalEngage: readonly RulesFamily[];
   readonly questResult: readonly RulesFamily[];
+  readonly idle: readonly RulesFamily[];
+  readonly idleCards: readonly RulesFamily[];
 };
 const hookedBy = new WeakMap<readonly RulesFamily[], Hooked>();
 
@@ -86,6 +88,8 @@ function hooked(families: readonly RulesFamily[]): Hooked {
       combat: families.filter((family) => family.combat != null),
       optionalEngage: families.filter((family) => family.optionalEngage != null),
       questResult: families.filter((family) => family.questResult != null),
+      idle: families.filter((family) => family.idle != null),
+      idleCards: families.filter((family) => family.idleCards != null),
     };
     hookedBy.set(families, found);
   }
@@ -273,6 +277,24 @@ export function familyQuestResult(state: ScenarioState, totals: QuestTotals, car
   for (const family of hooked(families).questResult) {
     const next = family.questResult?.(state, totals, cards, steps, canAdvance);
     if (next) return next;
+  }
+  return null;
+}
+
+/** Whether the family that owns the instruction's verb says it would change nothing (see IdleHook); null when no family owns the verb. */
+export function familyIdle(state: ScenarioState, instruction: Instruction, sourceId: string, frame: IdleFrame, ctx: ReduceContext, mark: IdleMark, families: readonly RulesFamily[] = active()): boolean | null {
+  for (const family of hooked(families).idle) {
+    const answer = family.idle?.(state, instruction, sourceId, frame, ctx, mark);
+    if (answer != null) return answer;
+  }
+  return null;
+}
+
+/** The cards the family that owns the instruction's verb says it makes for the steps after it (see IdleCardsHook), or null when no family owns the verb. */
+export function familyIdleCards(state: ScenarioState, instruction: Instruction, sourceId: string, frame: IdleFrame, ctx: ReduceContext, families: readonly RulesFamily[] = active()): readonly string[] | null {
+  for (const family of hooked(families).idleCards) {
+    const cards = family.idleCards?.(state, instruction, sourceId, frame, ctx);
+    if (cards != null) return cards;
   }
   return null;
 }

@@ -30,7 +30,7 @@ export const RECORDS: readonly Effect[] = [
   // 03005 Ever Onward: the failed quest's threat waits for this Response (families/quest/threat.ts).
   {"id":"03005:response:1","cardCode":"03005","lines":["03005:A:1"],"timing":"response","trigger":"questFailed","eventSeat":"you","cost":{"kind":"playEvent"},"instructions":[{"verb":"Pick","pick":{"type":"player","control":"any"}},{"verb":"WaiveQuestThreat","who":"picked","until":"endOfPhase"}]},
   // 04007 Renewed Friendship: "that player" is the player who played the attachment.
-  {"id":"04007:response:1","cardCode":"04007","lines":["04007:A:1"],"timing":"response","trigger":"played","eventSeat":"other","subject":{"type":"attachment","control":"other","on":{"type":"hero","control":"you"}},"cost":{"kind":"playEvent"},"instructions":[{"verb":"Choose","who":"actor","options":[
+  {"id":"04007:response:1","cardCode":"04007","lines":["04007:A:1"],"timing":"response","trigger":"played","eventSeat":"other","subject":{"type":"attachment","control":"any","on":{"type":"hero","control":"you"}},"cost":{"kind":"playEvent"},"instructions":[{"verb":"Choose","who":"actor","options":[
     {"id":"ready","requires":{"kind":"canPick","pick":{"type":"hero","control":"other","state":"exhausted"}},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"other","state":"exhausted"}},{"verb":"Ready","target":"picked"}]},
     {"id":"draw","instructions":[{"verb":"Draw","who":"eventSeat"}]},
     {"id":"threat","instructions":[{"verb":"LowerThreat","amount":2,"who":"eventSeat"}]}]}]},

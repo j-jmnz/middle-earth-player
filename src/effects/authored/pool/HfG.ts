@@ -12,7 +12,7 @@ export const RECORDS: readonly Effect[] = [
   // 02004 Winged Guardian
   {"id":"02004:constant:1","cardCode":"02004","lines":["02004:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveRestricted","amount":1,"until":"whileSourceInPlay"}]},
   // 02005 The Eagles Are Coming!: every Eagle card among the top 5 goes to the hand.
-  {"id":"02005:action:1","cardCode":"02005","lines":["02005:A:1"],"timing":"action","instructions":[{"verb":"Each","pick":{"type":"card","control":"you","from":"deck","top":5,"trait":"Eagle"},"instructions":[{"verb":"MovePicked","to":"hand"}]},{"verb":"ShuffleDeck"}]},
+  {"id":"02005:action:1","cardCode":"02005","lines":["02005:A:1"],"timing":"action","instructions":[{"verb":"Each","pick":{"type":"card","control":"you","from":"deck","top":5,"trait":"Eagle"},"upTo":"any","instructions":[{"verb":"MovePicked","to":"hand"}]},{"verb":"ShuffleDeck"}]},
   // 02006 Westfold Horse-breaker
   {"id":"02006:action:1","cardCode":"02006","lines":["02006:A:1"],"timing":"action","cost":{"kind":"discardSelf"},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"any"}},{"verb":"Ready","target":"picked"}]},
   // 02007 Mustering the Rohirrim

@@ -6,6 +6,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { payToPlay, playFromHand } from "./play.ts";
 import { chooseX, discardResources, heroesGain, reattach, reduceNextCost, setX, spendResources } from "./verbs.ts";
 import type { Focus } from "../index.ts";
+import { costsIdle } from "./idle.ts";
 
 // The verbs src/catalog/families/costs.ts adds, for costs: discounts, resource matches, who pays for what, icons, optional doomed. Null when the verb is not one of them.
 // ReduceNextCost (effect-schema-verbs.ts) resolves here too. The constants (PaysAsIcons, PaidByIcons, CannotPayFor, ThreatCost,
@@ -43,4 +44,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "costs", verbs: ["ReduceNextCost", "ChooseX", "SetX", "DiscardResources", "SpendResources", "HeroesGainResources", "Reattach", "PlayFromHand", "PayToPlay", "PaysAsIcons", "PaidByIcons", "CannotPayFor", "ThreatCost", "IncreaseCost", "PlayCost", "ExhaustToReduce"], run };
+export const manifest: RulesFamily = { name: "costs", verbs: ["ReduceNextCost", "ChooseX", "SetX", "DiscardResources", "SpendResources", "HeroesGainResources", "Reattach", "PlayFromHand", "PayToPlay", "PaysAsIcons", "PaidByIcons", "CannotPayFor", "ThreatCost", "IncreaseCost", "PlayCost", "ExhaustToReduce"], run, idle: costsIdle };

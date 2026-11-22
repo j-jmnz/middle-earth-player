@@ -108,8 +108,8 @@ describe("planning costs", () => {
     const spiritHero = hero("eowyn", "spirit");
     const spiritCards = cardMap([spiritHero, spirit]);
     let spiritState = event.state;
-    spiritState = updateCard(spiritState, event.heroId, { code: "eowyn" });
-    // The event's Action has a record, so it can be played (rr.triggered-ability): it lowers the player's threat.
+    spiritState = withThreat(updateCard(spiritState, event.heroId, { code: "eowyn" }), 0, 5);
+    // The event's Action has a record, so it can be played (rr.triggered-ability): it lowers the player's threat, which is above 0.
     const lower: Effect = { id: "spirit:action:1", cardCode: "spirit", lines: ["spirit:A:1"], timing: "action", instructions: [{ verb: "LowerThreat", amount: 1, who: "actor" }] };
     const paid = expectOk(
       reduce(spiritState, { type: "PlayCard", cardId: event.cardId, payments: [{ heroId: event.heroId, amount: 2 }] }, {

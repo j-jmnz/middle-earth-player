@@ -55,19 +55,23 @@ export function drawVerb(
   const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, seat, topFrame(state)?.cardId ?? null), ctx);
   const count = (trait == null ? 1 : (state.seats[target]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length) * amount;
   const drawn = drawMany(state, target, count, steps, UNATTRIBUTED, ctx, instruction.from === "bottom", playerSource(state, topFrame(state)?.cardId ?? null, ctx));
-  // The effect notes that a card was drawn, for "Then" text that follows it (the `drew` condition, rr.then), in a game whose records read it.
-  const grew = (drawn.seats[target]?.hand.length ?? 0) > (state.seats[target]?.hand.length ?? 0);
-  return grew && data?.kind === "effect" && readsDrew(ctx) ? patchTop(drawn, { data: { ...data, drew: true } }) : drawn;
+  // The effect notes that a card was drawn, for "Then" text that follows it (the `drew` condition, rr.then), in a game whose records read it. A card is drawn when it leaves the deck,
+  // so a drawn card that goes straight into play (a hero shuffled into the deck, families/deck/hero.ts) counts, though the hand does not grow.
+  const gained = (state.seats[target]?.deck.length ?? 0) - (drawn.seats[target]?.deck.length ?? 0);
+  if (data?.kind !== "effect" || !readsThen(ctx)) return drawn;
+  // A draw that found fewer cards than it named is not resolved in full, so what follows "then" is not attempted (the `thenResolves` condition).
+  return gained > 0 || count > gained ? patchTop(drawn, { data: { ...data, ...(gained > 0 ? { drew: true } : {}), ...(count > gained ? { short: true } : {}) } }) : drawn;
 }
 
-const READS_DREW = new WeakMap<readonly Effect[], boolean>();
+const READS_THEN = new WeakMap<readonly Effect[], boolean>();
 
-// Whether any record of the list holds the `drew` condition (04097:A:1 does, The Long Dark's); the list is never changed, so it is read once.
-function readsDrew(ctx: ReduceContext): boolean {
-  let reads = READS_DREW.get(ctx.effects);
+// Whether any record of the list holds the `drew` condition (04097:A:1 does, The Long Dark's) or the `thenResolves` one (04108:A:1, 06141:A:1); the list is never changed, so it is read once.
+export function readsThen(ctx: ReduceContext): boolean {
+  let reads = READS_THEN.get(ctx.effects);
   if (reads === undefined) {
-    reads = JSON.stringify(ctx.effects).includes('"kind":"drew"');
-    READS_DREW.set(ctx.effects, reads);
+    const text = JSON.stringify(ctx.effects);
+    reads = text.includes('"kind":"drew"') || text.includes('"kind":"thenResolves"');
+    READS_THEN.set(ctx.effects, reads);
   }
   return reads;
 }

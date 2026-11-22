@@ -66,7 +66,8 @@ describe(`encounter smoke: ${SCENARIO}`, () => {
     expect(first.ended).not.toBe("problem");
     expect(first.steps).toBeGreaterThan(5);
     expect(playGame(world, 0)).toEqual(first);
-  });
+    // Two whole games: well over the default 5 s when other work shares the cores.
+  }, 30_000);
 
   it("reports a game a broken record stops, with its seed, step and intent", () => {
     // Every game reveals encounter cards: break all of the scenario's When Revealed records.

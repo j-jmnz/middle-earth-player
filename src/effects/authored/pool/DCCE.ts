@@ -234,7 +234,7 @@ export const RECORDS: readonly Effect[] = [
     timing: "response",
     trigger: "questSucceeded",
     eventSeat: "you",
-    condition: { kind: "matches", card: "host", pick: { type: "character", control: "any", committed: true } },
+    condition: { kind: "matches", card: "host", pick: { type: "character", control: "any", questedThisRound: true } },
     instructions: [{ verb: "AddResources", amount: 1, to: "host" }],
   },
   { id: "11183:action:1", cardCode: "11183", lines: ["11183:B:4"], timing: "action", cost: [{ kind: "exhaustSelf" }, { kind: "resources", amount: 3, from: "host" }], instructions: [{ verb: "Ready", target: "host" }] },

@@ -138,8 +138,8 @@ describe("damage moved to another character", () => {
     const { ids, ctx } = built;
     // The combat action window after the shadow cards are dealt (6.2) offers the Song's Action.
     const window = until(send(built.state, { type: "DeclineEngage" }, ctx), ctx, (state, legal) => state.phase === "Combat" && offered(legal, "02099:action:1"));
-    const asked = send(window, { type: "Trigger", cardId: ids["02099"]!, effectId: "02099:action:1" }, ctx);
-    const sung = send(asked, { type: "Choose", optionId: ids.chosen! }, ctx);
+    // "Choose another hero": the host is not one, so the other hero is chosen without a question.
+    const sung = send(window, { type: "Trigger", cardId: ids["02099"]!, effectId: "02099:action:1" }, ctx);
     const attacked = until(sung, ctx, (state) => state.window?.kind === "defense");
     const hit = send(attacked, { type: "Undefended", heroId: ids.chosen! }, ctx);
     expect(hit.cards[ids.chosen!]?.damage).toBe(0);
