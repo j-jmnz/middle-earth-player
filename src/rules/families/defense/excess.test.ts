@@ -36,8 +36,8 @@ describe("excess combat damage", () => {
     const flagged = send(send(at, { type: "PlayCard", cardId: ids["01038"]!, payments: [] }, ctx), { type: "Choose", optionId: "seat:0" }, ctx);
     const defense = until(flagged, ctx, defenseWindow);
     const more = send(defense, { type: "DeclareDefender", defenderId: ids.a! }, ctx);
-    const pickB = send(send(more, { type: "Choose", optionId: "another" }, ctx), { type: "Choose", optionId: ids.b! }, ctx);
-    const pickC = send(pickB, { type: "Choose", optionId: "another" }, ctx);
+    const pickB = send(more, { type: "Choose", optionId: ids.b! }, ctx);
+    const pickC = send(pickB, { type: "Choose", optionId: ids.c! }, ctx);
     const threat = pickC.seats[0].threat;
     // 9 Attack against 1 + 1 + 0 Defense: 7 damage on a hero with 5 hit points, so 2 points of excess.
     const hit = send(pickC, { type: "Choose", optionId: ids.b! }, ctx);

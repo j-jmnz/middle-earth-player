@@ -318,13 +318,16 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const asked: AskedWords = wait?.kind === "target" ? askWords({ game, ctx, names: words, instruction: wait.item.instruction, queue, options: window.options, source, picked: data?.kind === "effect" ? (data.picked?.at(-1) ?? null) : null, amountNow, ...(data?.effectId ? { effectId: data.effectId } : {}), ...(wait.item.cause ? { cause: wait.item.cause } : {}) }) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       const collection = wait?.kind === "target" && asksCollection(wait.item.instruction);
+      // The further defenders of Stand Together stop on the sheet's pass, not on a row (families/defense/defenders.ts).
+      const stopsDefenders = defending && wait?.kind === "target";
       return {
         ...base,
+        ...(stopsDefenders ? { alternative: { label: "No more defenders", intent: { type: "Choose" as const, optionId: DONE } } } : {}),
         note: [`${asked.prompt}${asked.owned ? "" : who}`, committedNote(game, ctx, effect, window.seat), line].filter((part) => part != null).join(" "),
         verb: asked.verb,
         // Which Ringwraith copy goes in: the primary says the action alone, so the pill does not wrap on a long zone name.
         ...(outOfPlay ? { confirm: asked.verb } : {}),
-        options: (collection ? collectionOrder(game, ctx, window.options) : window.options).map((id): PickOption => {
+        options: (collection ? collectionOrder(game, ctx, window.options) : window.options).filter((id) => !(stopsDefenders && id === DONE)).map((id): PickOption => {
           const card = option(game, names, id);
           // The Willpower each character the players may remove from the quest adds up (11075:A:1), as the commit sheet shows it.
           const willpower = wait?.kind === "target" && wait.item.instruction.verb === "RemoveWillpowerFromQuest" ? statOf(game, ctx, id, "willpower") : [];
