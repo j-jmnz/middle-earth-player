@@ -643,7 +643,7 @@ The table is landscape only (user request, 2026-10-25).
 
 ## Readings to confirm
 
-Readings no official source settles: each was taken as the agent's recommendation or from community discussion alone (`.claude/rules/authority.md`, Open points), and stands until the user confirms or changes it. The reading itself is written in its scenario's section above. When the user confirms one, delete its line here.
+Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.
 
 - Beechbone 10118:A:2 reads X as 0 when its own cost destroys him (`recommended`, docs/brief.md, Core round).
 - A card played from the hand or the deck "at no cost" (Host of Galadhrim, Send for Help, Scavenge for Supplies) needs no resource match (community-sourced, docs/brief.md, Core round).

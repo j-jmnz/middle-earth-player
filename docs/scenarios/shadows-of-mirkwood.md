@@ -142,6 +142,6 @@ Shadows of Mirkwood part 6 (pack `RtM`), standalone only, no campaign card. Ever
 
 ## Readings to confirm
 
-Readings no official source settles: each was taken as the agent's recommendation or from community discussion alone (`.claude/rules/authority.md`, Open points), and stands until the user confirms or changes it. The reading itself is written in its scenario's section above. When the user confirms one, delete its line here.
+Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.
 
 - Readings settled only by community discussion are marked so under each scenario in `docs/scenarios/shadows-of-mirkwood.md` (Shadows of Mirkwood). Not user-confirmed.

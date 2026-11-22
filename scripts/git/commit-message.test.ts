@@ -47,10 +47,22 @@ describe("commit subjects (.claude/rules/commit-standards.md, Subject line)", ()
   it("refuses a body that links a Claude Code session, outside comment lines", () => {
     // Built from parts so this file holds no link (scripts/checks/private-data.test.ts).
     const link = ["https://claude.ai", "code", "session_01abc"].join("/");
-    expect(bodyProblem("repo: Add the hook\n\nBody\n\nCo-Authored-By: Claude <noreply@anthropic.com>\n")).toBeUndefined();
     expect(bodyProblem(`repo: Add the hook\n\nClaude-Session: ${link}\n`)).toContain("names a Claude Code session");
     expect(bodyProblem(`repo: Add the hook\n\nSee ${link}\n`)).toContain("names a Claude Code session");
     expect(bodyProblem(`repo: Add the hook\n# Claude-Session: ${link}\n`)).toBeUndefined();
+  });
+
+  it("refuses a Claude co-author line and keeps a person's (the No Claude co-author line of .claude/rules/agent-standards.md)", () => {
+    expect(bodyProblem("repo: Add the hook\n\nBody\n\nCo-Authored-By: Claude <noreply@anthropic.com>\n")).toContain("co-author");
+    expect(bodyProblem("repo: Add the hook\n\nco-authored-by: Someone <x@anthropic.com>\n")).toContain("co-author");
+    expect(bodyProblem("repo: Add the hook\n\nCo-Authored-By: Ana Pérez <ana@example.com>\n")).toBeUndefined();
+  });
+
+  it("refuses a Pipeline measure without the task times and the review findings (docs/agents/agent-brief.md, Measure)", () => {
+    expect(bodyProblem("feat: Add a scenario\n\nPipeline measure: 40 open lines\n")).toContain("Pipeline measure");
+    const full = "feat: Add a scenario\n\nPipeline measure: 40 open lines; review findings: 3 words; Read wait minutes 4, writing minutes 20\n";
+    expect(bodyProblem(full)).toBeUndefined();
+    expect(bodyProblem("refactor: Draw the fog faster\n\nMeasure: 643 -> 312 ms\n")).toBeUndefined();
   });
 
   it("refuses a GitHub closing keyword before an issue, which would close it at the merge (docs/agents/issue-standards.md, Finish)", () => {

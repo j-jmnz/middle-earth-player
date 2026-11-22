@@ -479,7 +479,7 @@ The 2020 print-on-demand scenario (pack `THftD`, RingsDB's code for it; Hall of 
 
 ## Readings to confirm
 
-Readings no official source settles: each was taken as the agent's recommendation or from community discussion alone (`.claude/rules/authority.md`, Open points), and stands until the user confirms or changes it. The reading itself is written in its scenario's section above. When the user confirms one, delete its line here.
+Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.
 
 - The Massing at Osgiliath has no rulesheet and no official ruling; its readings are in `docs/scenarios/standalone-scenarios.md` (The Massing at Osgiliath). Agent recommendations, not user-confirmed: Snaga Scouts engages every copy (00002:A:1), Wainriders' threat per damage placed (00004:A:1), Wolves from Mordor (00003:A:1), Wainrider Captain's "top Scout" (00005:A:1), Morgulduin (00009:A:1), Pelennor Fields charged once and satisfied by the raise (00010:A:1), Cut Off's discard offered only when payable (00012:A:3), Ranger of Ithilien's shadow (00015:A:2), Through the Ruins' count (00017:B:2), Anduin Crossing's once a round and its quest-phase timing (00018:B:3).
 - The Massing at Osgiliath, community only, not user-confirmed: Easy deals the Normal deck; Ranger of Ithilien enters committed in the quest phase (00015:A:1); Anduin Crossing's discard-or-commit-nothing (00018:B:3).

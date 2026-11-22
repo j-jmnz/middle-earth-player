@@ -1,13 +1,12 @@
 # Docs standards
 
-Agents read `CLAUDE.md`, the rules, their agent file, `docs/phases/STATUS.md`, the active phase file and the sections of `docs/brief.md`, `docs/scenarios/`, `docs/architecture.md`, `docs/design-system.md` and `docs/design-system-table.md` their task touches before they work. They find those sections with `pnpm doc find "<words>"` or through `docs/INDEX.md` and read one with `pnpm doc section <file> "<heading>"`. Every line there costs context on every run. These docs say what is true now. History is in git: a commit message says what changed and why, and `git log -- <file>` finds it. A reviewer reports a breach as a finding.
+Agents read the sections of the docs their task touches (`CLAUDE.md` says how to find them), so every line costs context on every run. The docs say what is true now. History is in git: a commit message says what changed and why, and `git log -- <file>` finds it. A reviewer reports a breach as a finding.
 
 ## Current state, not history
 
 - When a change supersedes a rule, a design or a plan step, rewrite the passage so it states the new rule. Do not append "was / now", "replaces phase N", "previously", or a dated note under the old text.
 - No dated "built" tags on headings ("— built (2026-10-27)"). A thing that is not built says "Not built." in one line.
 - Keep an authority stamp on a rule the user set, short: "(user instruction, 2026-10-27)". It cites who decided, not how it was reached.
-- Say each rule once, in the doc that owns it (`.claude/rules/authority.md` gives the owners), and point to it from elsewhere. Do not copy a rule into an agent file, a phase file or a plan.
 
 ## Facts the code owns
 
@@ -20,9 +19,20 @@ Agents read `CLAUDE.md`, the rules, their agent file, `docs/phases/STATUS.md`, t
 - A new doc agents should read goes in a folder the index lists (`scripts/docs/index.ts`, `groups`). A long doc keeps `##`/`###` headings for each topic, so the index can point into it: a bold run-in label is not a heading.
 - When one section grows past a few thousand tokens and only some tasks need it, split it into its own file (as `docs/design-system-table.md` was) and leave a one-line pointer where it was.
 
+## Agent context
+
+What agents read is held small, single and current (user instruction, 2026-11-22). `scripts/checks/agent-docs.test.ts` and `scripts/docs/index.test.ts` check each point; run them after any doc or agent-file change. Never raise a limit or add an exception to pass: split, cut or move the text, unless the user agrees.
+
+- Every session loads `CLAUDE.md` and `.claude/rules/` (budgets in `scripts/checks/agent-docs.ts`). A rule few tasks need lives in `docs/agents/`, and `CLAUDE.md` says when to read it. To add a rule past the budget, cut or move another.
+- An agent file holds only that agent's inputs, steps, hand-back and report. It cites a rule by file and section, never restates it, and never tells the agent to read `CLAUDE.md` or `.claude/rules/` again. A read instruction names sections, not whole files.
+- Say each rule once, in the doc that owns it (`.claude/rules/authority.md` gives the owners). Before writing an instruction, search for the rule (`pnpm doc find`, grep): if another file says it, point there; if two files disagree, fix the owner and delete the copy.
+- Each heading's text is unique in its doc. A doc merge conflict becomes one section, never both sides.
+- A scenario's rulings go in its box's file in `docs/scenarios/`, never in `docs/brief.md`.
+- Move or delete a doc with `pnpm move`, so no path names a missing doc.
+
 ## `docs/phases/STATUS.md`
 
-- The rules header, then one row per phase not yet completed: a completed phase's row is deleted with its file. A note is at most about 200 characters: the date, and only what is still open (`engine done`, a review not run, deferred work). Phone and tablet checks are not tracked and get no note anywhere (user instruction, 2026-11-06).
+- The rules header, then one row per phase not yet completed: a completed phase's row is deleted with its file. A note is at most about 200 characters: the date, and only what is still open (`engine done`, a review not run, deferred work).
 - **Open items**: a pointer to the GitHub issue of each area. A thing still to do is one checklist line in its area's issue (or a new issue with an existing label); tick it when the work merges, and never copy the list back into a doc.
 - **Standing decisions**: one line per user decision that still constrains later work, with its date. Delete it when the work it constrained is finished and nothing later depends on it.
 - No dated sections, no "Built / Decided / Checked" blocks, no fixed review findings, test counts, timings or commit hashes. Those go in the commit message and the final report to the user.
@@ -30,7 +40,7 @@ Agents read `CLAUDE.md`, the rules, their agent file, `docs/phases/STATUS.md`, t
 ## Plans, phases and handovers
 
 - A plan under `docs/plans/` is live while its work is open. When the work is done, delete it; git keeps it. A citation of it in code or a live doc points to the doc that owns the behaviour instead.
-- A phase file is its spec and exit. When the phase is completed, delete the file; git keeps it. Its open items go to their area's issue (`docs/phases/STATUS.md`, Open items), and a citation of it in code or a live doc points to the doc that owns the behaviour (`docs/brief.md`, `docs/architecture.md`, the design system) instead.
-- A handover in `docs/handover/` exists while work is in flight or open. The final commit of that work deletes it, or cuts it to the points still open. A handover with only phone or tablet checks left is deleted.
+- A phase file is its spec and exit. When the phase is completed, delete the file; git keeps it. Its open items go to their area's issue (`docs/phases/STATUS.md`, Open items), and a citation of it points to the doc that owns the behaviour instead.
+- A handover in `docs/handover/` exists while work is in flight or open. The final commit of that work deletes it, or cuts it to the points still open.
 - `docs/agents/` holds the standing procedures agents follow on every run of a kind of task (the scenario procedure, the effect-authoring cookbook). They are not plans or handovers: they stay, and say what is true now.
 - A paste-once prompt for a new session is not committed. Give it to the user in the report, or put it in the scratchpad.

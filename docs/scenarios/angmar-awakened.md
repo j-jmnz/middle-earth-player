@@ -354,7 +354,7 @@ Part 9 and the last (`10193`; `mec108.reanimated-dead`, `mec108.indestructible`,
 
 ## Readings to confirm
 
-Readings no official source settles: each was taken as the agent's recommendation or from community discussion alone (`.claude/rules/authority.md`, Open points), and stands until the user confirms or changes it. The reading itself is written in its scenario's section above. When the user confirms one, delete its line here.
+Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.
 
 - A played player side quest goes to the staging area: The Lost Realm text read from a transcription; no official PDF is pinned in data/sources.json (docs/brief.md).
 - Objective allies (Wilyador, Iârion, Amarthiúl, Captain Sahír, Na'asiyah): a player card that returns one to "its owner's hand" puts it in the encounter discard pile, and the players lose when it leaves play (agent recommendation; no ruling found, `docs/scenarios/shadows-of-mirkwood.md`, A Journey to Rhosgobel). Not user-confirmed.

@@ -31,6 +31,6 @@ The Ered Mithrin campaign is nine scenarios played in order: The Wilds of Rhovan
 
 ## Readings to confirm
 
-Readings no official source settles: each was taken as the agent's recommendation or from community discussion alone (`.claude/rules/authority.md`, Open points), and stands until the user confirms or changes it. The reading itself is written in its scenario's section above. When the user confirms one, delete its line here.
+Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.
 
 - A claimed treasure is not an attachment for card effects (`recommended`, docs/scenarios/ered-mithrin.md, Ered Mithrin).
