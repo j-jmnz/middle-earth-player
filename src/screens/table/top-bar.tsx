@@ -23,7 +23,7 @@ import { dialProps, type TableDial } from "../../play/readouts/dials";
 import { defenseLimitWords } from "../../play/words/scenarios/fortress";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { withAlphaHex } from "../../ui/tokens";
-import { BAR_PAD, barZones, chipCompact, DIAL_GAP, dialScale, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, TOP_BAR } from "../../play/chrome/top-bar-layout";
+import { BAR_PAD, chipCompact, dialZones, DIAL_GAP, dialScale, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, TOP_BAR } from "../../play/chrome/top-bar-layout";
 import { UiScaleContext, useUiScale } from "../../ui/ui-scale";
 
 export { TOP_BAR };
@@ -104,7 +104,6 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   const onChip = (event: LayoutChangeEvent) => setChipW(Math.round(event.nativeEvent.layout.width));
   const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
   const onBar = (event: LayoutChangeEvent) => setBar({ width: Math.round(event.nativeEvent.layout.width), x: Math.round(event.nativeEvent.layout.x) });
-  const onDials = (event: LayoutChangeEvent) => setDials(Math.round(event.nativeEvent.layout.width));
   // The zones need the bar and the dials measured. Until both are, the rail is held invisible rather than drawn at a guess, so it
   // never jumps when the table opens.
   // If the dials never report a width, the rail still shows after a moment, on a dial width of 0.
@@ -115,7 +114,20 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   }, []);
   // The zones are worked out inside the bar's side padding (px-2, 8 pt at every scale), so the screen's middle is counted from there.
   const center = screen.width / 2 - bar.x - BAR_PAD;
-  const zones = bar.width > 0 && (dials > 0 || waited) ? barZones(bar.width - 2 * BAR_PAD, dials, s, center) : null;
+  // The scenario dials drop their words while the row with them would scroll (dialZones). The row's width with the words is measured while they show and kept until the row's makeup changes.
+  const scenario = scenarioDials ?? NO_DIALS;
+  const rowKey = [s, threats.length, life, burdenDeck, tokens?.name, pursuit != null, defense != null, island != null, heading != null, onNightmare != null, held?.length, hands?.map((mark) => mark.label).join(","), scenario.map((dial) => dial.id).join(",")].join("|");
+  const [labelled, setLabelled] = useState({ key: "", width: 0 });
+  const withWords = scenario.length > 0 && labelled.key === rowKey ? labelled.width : 0;
+  const placed = bar.width > 0 && (dials > 0 || waited) ? dialZones(bar.width - 2 * BAR_PAD, dials, withWords, s, center) : null;
+  const wordless = placed?.wordless === true;
+  const zones = placed;
+  // The row's width with the words is kept from the layout event, while the words show.
+  const onDials = (event: LayoutChangeEvent) => {
+    const width = Math.round(event.nativeEvent.layout.width);
+    setDials(width);
+    if (!wordless && width > 0 && scenario.length > 0) setLabelled((was) => (was.key === rowKey && was.width === width ? was : { key: rowKey, width }));
+  };
   // The Heading dial drops its word and lays its badge under the disc when the dial at its full width would make the dials scroll; that is told from the other dials' width, not the dial's own.
   const others = heading ? dials - headingBox.w - DIAL_GAP * s : dials;
   const compact = heading != null && bar.width > 0 && dials > 0 && headingCompact(bar.width - 2 * BAR_PAD, others, s, center, narrow);
@@ -190,8 +202,8 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
             {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
             {pursuit != null ? <ThreatRing threat={{ seat: 0, threat: pursuit.value, eliminated: false }} label="Pursuit" accessibilityName="Pursuit value" testID="pursuit" icon={null} limit={pursuit.limit} compact /> : null}
             {defense != null ? <ThreatRing threat={{ seat: 0, threat: defense.value, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${defense.name}`} testID="defense-tokens" icon={null} limit={defense.limit} limitWords={defenseLimitWords(defense.value, defense.limit, defense.stage)} goal compact /> : null}
-            {(scenarioDials ?? NO_DIALS).map((dial) => (
-              <ThreatRing key={dial.id} {...dialProps(dial)} onPress={dial.cardId && onDial ? () => onDial(dial.cardId ?? "", dial.extra) : dial.pile && onDialPile ? () => onDialPile(dial.pile ?? "") : dial.lists && onDialReading ? () => onDialReading(dial.id) : undefined} compact />
+            {scenario.map((dial) => (
+              <ThreatRing key={dial.id} {...dialProps(dial)} wordless={wordless} onPress={dial.cardId && onDial ? () => onDial(dial.cardId ?? "", dial.extra) : dial.pile && onDialPile ? () => onDialPile(dial.pile ?? "") : dial.lists && onDialReading ? () => onDialReading(dial.id) : undefined} compact />
             ))}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} onPress={onDial ? () => onDial(tokens.cardId) : undefined} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}

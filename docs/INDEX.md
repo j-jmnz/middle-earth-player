@@ -91,7 +91,7 @@ Read the sections your task touches.
   - 644–653 Readings to confirm (~220)
 - `docs/design-system-table.md` — Design system — Table (landscape) (~71.5K tok)
   - 5–8 Overview (~170) ← 1
-  - 9–35 Top bar (~6.8K) ← 14
+  - 9–35 Top bar (~6.7K) ← 14
   - 36–39 Table menu (~870) ← 9
   - 40–47 Quest scale (~830) ← 2
   - 48–51 Canvas (~560)

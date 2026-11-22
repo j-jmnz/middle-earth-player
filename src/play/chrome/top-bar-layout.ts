@@ -110,6 +110,17 @@ export function barZones(bar: number, dials: number, scale = 1, center = bar / 2
   return { left: left * scale, rail: Math.max(0, room - left - right) * scale, right: right * scale, scroll: Math.ceil(natural) > left };
 }
 
+/**
+ * The zones when the scenario dials may drop their words (Top bar, The threat dial). `labelled` is the dials row's width measured with the words (0 when there is none to drop), `dials` its width now, in screen points.
+ * The dials go wordless when the row with its words would scroll the left zone. The zones are then those of the row with its words, so the rail never changes size, and the row scrolls only if it is still too wide without
+ * them. The answer reads `labelled`, never the current width, so it cannot flip back and forth.
+ */
+export function dialZones(bar: number, dials: number, labelled: number, scale = 1, center = bar / 2): BarZones & { wordless: boolean } {
+  const held = barZones(bar, labelled, scale, center);
+  if (labelled <= 0 || !held.scroll) return { ...barZones(bar, dials, scale, center), wordless: false };
+  return { ...held, scroll: Math.ceil(dials / scale) + GAP > held.left / scale, wordless: true };
+}
+
 // ---- The dials row: the Heading dial (phase 39b, docs/design-system-table.md, Top bar). All sizes are logical points at Medium, as the zones above. ----
 
 /** A dial's disc, the padding either side of a dial, the gap between a disc and its label, and the gap between two dials (table-chrome.tsx, table/top-bar.tsx). */
