@@ -216,12 +216,14 @@ describe("Expanse of Hollin (906405)", () => {
 
   // "Forced: When Expanse of Hollin is explored, shuffle the encounter discard pile into the encounter deck. Then, discard the top card of the encounter deck for each damage here. Add each enemy discarded by this effect to the staging area."
   // The quest card places the progress, so no staging step reveals a card first.
-  it("906405:A:2 shuffles the discard pile into the deck, discards 2 cards for its 2 damage and adds the enemies among them to the staging area", () => {
+  // Reading (agent recommendation, docs/scenarios/nightmare.md): "When ... is explored" interrupts the move to the discard pile, so the Forced effect resolves while Expanse of Hollin is still in play: it is not shuffled into the deck, and goes to the encounter discard pile after the effect.
+  it("906405:A:2 shuffles the discard pile into the deck without the explored Expanse, discards 2 cards for its 2 damage and adds the enemies among them to the staging area", () => {
     const made = tableFromLayout(SCENARIO, { active: { code: "906405", damage: 2, progress: 5 }, deck: ["f0", "treachery"], discard: ["f3"] });
     const state = settle(syncConstants(runInstruction({ ...made.state, window: null }, { verb: "ProgressQuest", amount: 1 }, { seat: 0, sourceId: made.state.questStage }, made.ctx, []), made.ctx), made.ctx, []);
-    // The explored Expanse is in the discard pile as the Forced resolves (rr.explored), so it is shuffled in too: 4 cards, 2 of them discarded.
-    expect(state.encounterDeck).toHaveLength(2);
-    const gone = ["f0", "f3", "treachery", "906405"].flatMap((code) => idsOf(state, code)).filter((id) => state.cards[id]?.zone !== "encounterDeck");
+    // 3 cards are shuffled in, not 4: the explored Expanse stays out, in the encounter discard pile; 2 of the 3 are discarded.
+    expect(state.encounterDeck).toHaveLength(1);
+    expect(state.cards[idOf(state, "906405")]?.zone).toBe("encounterDiscard");
+    const gone = ["f0", "f3", "treachery"].flatMap((code) => idsOf(state, code)).filter((id) => state.cards[id]?.zone !== "encounterDeck");
     expect(gone).toHaveLength(2);
     const enemy = (id: string) => made.cards.get(state.cards[id]?.code ?? "")?.type === "enemy";
     expect(gone.filter(enemy).map((id) => state.cards[id]?.zone)).toEqual(gone.filter(enemy).map(() => "staging"));

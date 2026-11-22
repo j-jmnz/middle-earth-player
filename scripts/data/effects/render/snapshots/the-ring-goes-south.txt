@@ -472,7 +472,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     only if the card the event is about had enough progress to be explored
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - shuffle the encounter discard pile into the encounter deck
+    - shuffle the encounter discard pile into the encounter deck [also {"exceptSource":true}]
     - repeat damage of this card times:
       - the top card of the encounter deck goes to the encounter discard pile
       - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
@@ -527,4 +527,4 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - for each location (any player controls) that is the active location:
       - the attacking enemy: stat attack damage of the picked card, until the end of the attack
 
-(rendered pieces: 296 by template, 0 as JSON)
+(rendered pieces: 295 by template, 1 as JSON)

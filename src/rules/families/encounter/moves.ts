@@ -158,10 +158,11 @@ export function travelThere(state: ScenarioState, id: string, ctx: ReduceContext
 
 // The encounter discard pile goes back into the encounter deck, which is shuffled; with a `name`, only the copies of that title ("all copies of Balin's Doom", 901101:A:3); with a `trait`, only the cards with that trait do ("Shuffle all Hazard cards in the encounter discard pile back into the encounter deck", 900708:A:2); with a `type`, only the cards of that printed type ("Shuffle all locations ...", 03039:A:2).
 export function shuffleDiscardIn(state: ScenarioState): ScenarioState;
-export function shuffleDiscardIn(state: ScenarioState, ctx: ReduceContext, trait?: string, type?: CardType, name?: string): ScenarioState;
-export function shuffleDiscardIn(state: ScenarioState, ctx?: ReduceContext, trait?: string, type?: CardType, name?: string): ScenarioState {
+export function shuffleDiscardIn(state: ScenarioState, ctx: ReduceContext, trait?: string, type?: CardType, name?: string, except?: string | null): ScenarioState;
+export function shuffleDiscardIn(state: ScenarioState, ctx?: ReduceContext, trait?: string, type?: CardType, name?: string, except?: string | null): ScenarioState {
   let next = state;
-  for (const id of [...state.encounterDiscard]) if ((trait == null || (ctx != null && hasTrait(state, id, trait, ctx))) && (type == null || (ctx != null && typeOf(state, id, ctx) === type)) && (name == null || (ctx != null && printedOf(ctx.cards, state.cards[id]?.code ?? "").name === name))) next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
+  // `except`: the card whose effect shuffles stays in the discard pile (an explored location whose "When ~ is explored" effect resolves while it is still in play).
+  for (const id of [...state.encounterDiscard]) if (id !== except && ((trait == null || (ctx != null && hasTrait(state, id, trait, ctx))) && (type == null || (ctx != null && typeOf(state, id, ctx) === type)) && (name == null || (ctx != null && printedOf(ctx.cards, state.cards[id]?.code ?? "").name === name)))) next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
   return shuffleEncounterDeck(next);
 }
 
