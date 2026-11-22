@@ -61,7 +61,7 @@ function charactersOf(state: ScenarioState, ctx: ReduceContext): { hero: boolean
 }
 
 /** What `scoreOf` read, term by term, for a report and for the tests. */
-export type ScoreParts = { stage: number; progress: number; victory: number; heroes: number; damage: number; allies: number; threat: number; enemies: number; staging: number; life: number };
+export type ScoreParts = { stage: number; progress: number; victory: number; heroes: number; damage: number; allies: number; threat: number; enemies: number; staging: number; life: number; trackers: number; objectives: number };
 
 export function scorePartsOf(state: ScenarioState, ctx: ReduceContext): ScoreParts {
   const living = state.seats.slice(0, state.seatCount);
@@ -106,7 +106,32 @@ export function scorePartsOf(state: ScenarioState, ctx: ReduceContext): ScorePar
   // The questing the table can field against the threat waiting in the staging area.
   const staging = 15 * Math.max(-12, Math.min(12, questing - stagingPressure));
   const life = state.life == null ? 0 : state.life * 15;
-  return { stage, progress, victory, heroes, damage, allies, threat, enemies, staging, life };
+  return { stage, progress, victory, heroes, damage, allies, threat, enemies, staging, life, trackers: trackersOf(state), objectives: objectivesOf(state, ctx) };
+}
+
+/**
+ * The trackers the scenario's data declares (`state.widgets`): a tracker that ends the game when it reaches its limit (the pursuit value) costs more as it
+ * nears it, and one that advances the quest when it does (the tokens on The Defense of Helm's Deep) pays more as it nears it.
+ */
+function trackersOf(state: ScenarioState): number {
+  let sum = 0;
+  const lose = state.widgets.pursuitTracker;
+  if (lose != null && state.pursuit != null) sum -= 800 * Math.min(1, state.pursuit / lose) ** 2;
+  const win = state.widgets.defenseTracker;
+  if (win) {
+    const tokens = Object.values(state.cards).filter((card) => card.code === win.code && card.zone !== "discard").reduce((total, card) => total + card.resources, 0);
+    sum += 150 * Math.min(1, tokens / win.limit);
+  }
+  return sum;
+}
+
+/** Damage on an objective in play (a card the scenario can end the game over, "Protect the Innocent holds 10 damage"): each token costs the table, whatever the scenario's card says. */
+function objectivesOf(state: ScenarioState, ctx: ReduceContext): number {
+  let damage = 0;
+  for (const card of Object.values(state.cards)) {
+    if (card.damage > 0 && (card.zone === "play" || card.zone === "staging" || card.zone === "attached") && printedOf(ctx.cards, card.code).type === "objective") damage += card.damage;
+  }
+  return -25 * damage;
 }
 
 /** The score of a table (higher is better): the sum of the terms above, plus the scenario's hook. */

@@ -47,6 +47,14 @@ describe("the search's score", () => {
     expect(safetyOf(near.state, near.ctx)).toBeLessThan(safetyOf(safe.state, safe.ctx));
   });
 
+  it("reads the pursuit tracker the scenario's data declares: the nearer its limit, the lower", () => {
+    const far = built({ pursuit: 5 });
+    const near = built({ pursuit: 26 });
+    expect(far.state.widgets.pursuitTracker).toBe(30);
+    expect(scorePartsOf(near.state, near.ctx).trackers).toBeLessThan(scorePartsOf(far.state, far.ctx).trackers);
+    expect(scoreOf(near.state, near.ctx)).toBeLessThan(scoreOf(far.state, far.ctx));
+  });
+
   it("knows no card the game is lost with on a plain table", () => {
     const table = built();
     expect(mustSurvive(table.state, table.ctx, table.hero)).toBe(false);

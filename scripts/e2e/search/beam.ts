@@ -40,7 +40,11 @@ export type BeamOutcome = {
 };
 
 type Trail = { prev: Trail | null; chunk: readonly PlayerIntent[] };
-type Line = { state: ScenarioState; trail: Trail | null; score: number };
+// `value` is what the beam ranks by: the score, mixed with the score of the table one round on (`foresee`).
+type Line = { state: ScenarioState; trail: Trail | null; score: number; value: number };
+
+/** The style the look ahead plays a round with: the careful one. */
+const FIRST: Style = STYLES[0] ?? { quest: "all", engage: "none", attack: "always", travel: "easiest" };
 
 /** The most intents one round of one branch sends before it is called stuck. */
 const MOST_PER_ROUND = 700;
@@ -112,19 +116,28 @@ function flatten(trail: Trail | null, last: readonly PlayerIntent[]): PlayerInte
   return chunks.reverse().flat();
 }
 
-/** The lines the next round starts from: the best-scoring ones, then the safest of the rest. */
-function select(children: readonly Line[], ctx: ReduceContext, width: number): Line[] {
+/** The lines that differ as tables, the best score of each. */
+function distinct(children: readonly Line[]): Line[] {
   const unique = new Map<string, Line>();
   for (const child of children) {
     const key = signature(child.state);
     const same = unique.get(key);
     if (!same || child.score > same.score) unique.set(key, child);
   }
-  const all = [...unique.values()];
-  const ahead = [...all].sort((left, right) => right.score - left.score).slice(0, Math.ceil(width * 0.65));
-  const safe = all.filter((line) => !ahead.includes(line)).sort((left, right) => safetyOf(right.state, ctx) - safetyOf(left.state, ctx)).slice(0, width - ahead.length);
+  return [...unique.values()];
+}
+
+/** The lines the next round starts from: the best by value, then the safest of the rest. */
+function select(all: readonly Line[], ctx: ReduceContext, width: number): Line[] {
+  const ahead = [...all].sort((left, right) => right.value - left.value).slice(0, Math.ceil(width * 0.65));
+  // A line the look ahead lost is kept only when no other is.
+  const alive = all.filter((line) => !ahead.includes(line) && line.value > LOST_AHEAD);
+  const safe = alive.sort((left, right) => safetyOf(right.state, ctx) - safetyOf(left.state, ctx)).slice(0, width - ahead.length);
   return [...ahead, ...safe];
 }
+
+/** A line whose next round, played with the first style, loses the game has a value below this. */
+const LOST_AHEAD = -100_000;
 
 function describe(state: ScenarioState): string {
   const card = state.cards[state.questStage ?? ""];
@@ -135,11 +148,11 @@ function describe(state: ScenarioState): string {
 export function searchGame(start: ScenarioState, ctx: ReduceContext, seed: number, options: BeamOptions): BeamOutcome {
   const endings: Record<string, number> = {};
   let sent = 0;
-  let best: Line = { state: start, trail: null, score: scoreOf(start, ctx, options.hook) };
+  let best: Line = { state: start, trail: null, score: scoreOf(start, ctx, options.hook), value: 0 };
   let deepest = 0;
   const outcome = (stopped: BeamOutcome["stopped"], won: PlayerIntent[] | null): BeamOutcome => ({ won, round: best.state.round, best: Math.round(best.score), stage: describe(best.state), endings, stopped, sent });
   // The beams of each round so far: a round whose lines all end is played again with other noise, and after three tries the round before is.
-  const stack: Line[][] = [[{ state: start, trail: null, score: best.score }]];
+  const stack: Line[][] = [[{ state: start, trail: null, score: best.score, value: best.score }]];
   const attempts: number[] = [0];
   while (stack.length > 0) {
     const depth = stack.length - 1;
@@ -161,7 +174,7 @@ export function searchGame(start: ScenarioState, ctx: ReduceContext, seed: numbe
           endings[played.reason] = (endings[played.reason] ?? 0) + 1;
           continue;
         }
-        children.push({ state: played.state, trail: { prev: line.trail, chunk: played.chunk }, score: scoreOf(played.state, ctx, options.hook) });
+        children.push({ state: played.state, trail: { prev: line.trail, chunk: played.chunk }, score: scoreOf(played.state, ctx, options.hook), value: 0 });
       }
     }
     if (children.length === 0) {
@@ -174,7 +187,17 @@ export function searchGame(start: ScenarioState, ctx: ReduceContext, seed: numbe
       }
       continue;
     }
-    const next = select(children, ctx, options.width);
+    // The look ahead: each of the best lines plays one more round with the first style. A line that wins is the answer, and one that loses ranks last.
+    const pool = distinct(children).sort((left, right) => right.score - left.score).slice(0, options.width * 2);
+    for (const [index, line] of pool.entries()) {
+      if (Date.now() > options.deadline) return outcome("deadline", null);
+      const probe = playRound(line.state, ctx, FIRST, 0, generator(seed * 31 + depth * 17 + index), options.hook);
+      sent += probe.chunk.length;
+      if (probe.end === "won") return { ...outcome("won", flatten(line.trail, probe.chunk)), round: probe.state.round, sent };
+      const later = probe.end === "round" ? scoreOf(probe.state, ctx, options.hook) : probe.end === "lost" ? -1_000_000 : line.score - 300;
+      line.value = (line.score + later) / 2;
+    }
+    const next = select(pool, ctx, options.width);
     const top = next.reduce((one, other) => (other.score > one.score ? other : one));
     // The best line is the best of the deepest round reached.
     if (stack.length > deepest || (stack.length === deepest && top.score > best.score)) {

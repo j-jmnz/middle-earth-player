@@ -22,6 +22,7 @@ import type { Log } from "../log.ts";
 import { NO_COPY_LIMITS } from "../../src/campaign/wilderland.ts";
 import { searchWin, type DealtGame } from "./search/find.ts";
 import { searchFlags } from "./search/options.ts";
+import type { ScoreHook } from "./search/score.ts";
 
 // The parts every scenario's seed finder (scripts/e2e/<scenario-id>.ts) shares: a printed decklist as a seat's heroes and
 // deck, and a game dealt from a save the way the app deals it (deal, then resume) and played to its end by the scenario's
@@ -109,6 +110,8 @@ export type SeedSpec<S extends 1 | 2> = {
   /** The scenario's answer, and the point (checked before each intent) a game is parked at. */
   answer: (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => PlayerIntent;
   stop?: (state: ScenarioState, played: number) => boolean;
+  /** A term the scenario adds to the fixture search's generic score (scripts/e2e/search/score.ts), when the search is run (`--search`). */
+  score?: ScoreHook;
 };
 export type SeedGame = { loadout: StoredLoadout; intents: PlayerIntent[]; state: ScenarioState };
 export type SeedFixture<S extends 1 | 2> = { campaignId: string; seatCount: S; loadout: StoredLoadout; seed: number; intents: PlayerIntent[] };
@@ -149,6 +152,8 @@ export type StandaloneSeedSpec<S extends 1 | 2> = {
   /** The scenario's answer, and the point (checked before each intent) a game is parked at. */
   answer: (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => PlayerIntent;
   stop?: (state: ScenarioState, played: number) => boolean;
+  /** A term the scenario adds to the fixture search's generic score, when the search is run (`--search`). */
+  score?: ScoreHook;
 };
 export type StandaloneSeedFixture<S extends 1 | 2> = { campaignId: string; seatCount: S; loadout: StandaloneLoadout; seed: number; intents: PlayerIntent[] };
 
@@ -190,7 +195,7 @@ export function committedSeed(scenarioId: string, label: string): number {
 }
 
 /** What `firstSeed` and `firstStandaloneSeed` search over: a game played from a seed, with the loadout that dealt it. */
-type SeedSearch = { campaignId: string; scenarioId: string; seatCount: 1 | 2; seeds?: number };
+type SeedSearch = { campaignId: string; scenarioId: string; seatCount: 1 | 2; seeds?: number; score?: ScoreHook };
 
 function searchSeeds<L>(say: Log, spec: SeedSearch, play: (seed: number) => { loadout: L; intents: PlayerIntent[]; state: ScenarioState }, deal: (seed: number) => DealtGame<L>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string) {
   const flags = searchFlags();
@@ -207,7 +212,7 @@ function searchSeeds<L>(say: Log, spec: SeedSearch, play: (seed: number) => { lo
   say.warn(`no ${label} game found in ${limit} seeds`);
   // `pnpm scenario fixtures <id> --search`: a won game the fixed policy cannot reach is searched for (scripts/e2e/search/).
   if (flags && label.endsWith("-won")) {
-    const found = searchWin(say, label, deal, wanted, flags);
+    const found = searchWin(say, label, deal, wanted, flags, spec.score);
     if (found) return { campaignId: spec.campaignId, seatCount: spec.seatCount, loadout: found.loadout, seed: found.seed, intents: found.intents };
   }
   return null;
