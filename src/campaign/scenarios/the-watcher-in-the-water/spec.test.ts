@@ -1,7 +1,7 @@
 // Rules: rr.reveal, rr.staging, rr.travel, rr.shadow-effects, rr.first-player, dwd.setup-the-watcher-in-the-water, dwd.setup-the-watcher-in-the-water-set-aside, rr.running-out-of-cards, rr.attachment-cards (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { attack, cardSpecs, deckCount, progressOn, resolve, reveal, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { attack, cardSpecs, damageOn, deckCount, defend, handCount, progressOn, resolve, reveal, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Watcher in the Water (dwarrowdelf part 6): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The rows here are the lines whose records need only a table; the lines with a flow
@@ -21,6 +21,11 @@ const ROWS: readonly Row[] = [
   // 04066 Stair Falls and 04067 Perilous Swamp, Shadow: 1 progress token is removed from the main quest stage.
   { line: "04066:A:2", name: "its Shadow removes 1 progress from the main quest", layout: { stage: "04064", progress: 3 }, act: attack("f0", { shadow: "04066" }), expect: progressOn("04064", 2) },
   { line: "04067:A:2", name: "its Shadow removes 1 progress from the main quest", layout: { stage: "04064", progress: 3 }, act: attack("f0", { shadow: "04067" }), expect: progressOn("04064", 2) },
+
+  // 901505:A:2 "Shadow: For each point of damage dealt by this attack, the defending player must discard a random card from his hand." f0 (1 Attack) undefended deals 1: one of three cards is discarded.
+  { line: "901505:A:2", name: "Shadow: a card at random from the hand for each point of damage the attack deals", layout: { hand: ["filler", "filler", "filler"] }, act: attack("f0", { shadow: "901505", undefended: true }), expect: handCount(2) },
+  // Mountain Warg (4 Attack) defended by dh1 (2 Defense) deals 2: two of three cards are discarded.
+  { line: "901505:A:2", name: "Shadow: 2 damage dealt, 2 cards discarded at random", layout: { hand: ["filler", "filler", "filler"] }, act: [attack("03055", { shadow: "901505" }), defend("dh1")], expect: [damageOn("dh1", 2), handCount(1)] },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-watcher-in-the-water", ROWS);

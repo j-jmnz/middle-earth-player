@@ -52,6 +52,8 @@ const ROWS: readonly Row[] = [
 
   { line: "09022:A:1", name: "When Revealed: each player returns an enemy engaged with them to the staging area", layout: { engaged: [{ code: "f3", seat: 0 }], deck: ["f0"] }, act: reveal(SPEED), expect: [zone("f3", "staging"), threat(28)] },
   { line: "09022:A:1", name: "and with none returned it gains surge and doomed 1", layout: { deck: ["f0"] }, act: reveal(SPEED), expect: [zone("f0", "staging"), threat(29)] },
+  // 09022:A:2 "Shadow: Attacking enemy gets +1 Attack. Return attacking enemy to the staging area after this attack." The undefended attack of f0 (1 Attack) deals 2, and f0 is back in the staging area after it.
+  { line: "09022:A:2", name: "Shadow: the attacking enemy gets +1 Attack and returns to the staging area after the attack", layout: {}, act: attack("f0", { shadow: SPEED, undefended: true }), expect: [damageOn("dh1", 2), zone("f0", "staging")] },
 
   { line: "09023:A:1", name: "in the staging area no more than 3 progress can be placed on the current quest each round", layout: { stage: STAGE, staging: [REARGUARD] }, act: quest("success"), expect: progressOn(STAGE, 3) },
   { line: "09023:A:2", name: "while it is the current quest, the Forced effect at the end of the staging step reveals a card", layout: { staging: [REARGUARD, PRESSING], deck: ["f0"] }, act: [resolve(PRESSING, "whenRevealed"), announce("stagingStepEnds")], expect: zone("f0", "staging") },

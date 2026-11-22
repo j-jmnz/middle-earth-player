@@ -39,6 +39,9 @@ const ROWS: readonly Row[] = [
   { line: "900607:A:2", name: "When Revealed: it attaches to an Eagle character, who loses the Eagle trait", layout: { play: ["02064"], deck: ["f0", "f0", "f0"] }, act: reveal("900607"), expect: [zone("900607", "attached"), flag("02064", "losesEagle")] },
   { line: "900607:A:3", name: "Shadow: the When Revealed effect attaches it to an Eagle character", layout: { play: ["02064"] }, act: attack("f3", { shadow: "900607", undefended: true }), expect: [zone("900607", "attached")] },
   { line: "900608:A:2", name: "When Revealed: it attaches to Wilyador, whose heals it reduces", layout: { play: ["02064"], deck: ["f0", "f0", "f0"] }, act: reveal("900608"), expect: [zone("900608", "attached"), flag("02064", "healReducedToOne")] },
+
+  // 900605:A:1 "While Labyrinthine Woods is in the staging area, Creature enemies get +1 Threat and +1 Attack." Black Forest Bats (a Creature, 1 Attack) attacks undefended for 2 (the false cases are in card-lines.test.ts).
+  { line: "900605:A:1", name: "an engaged Creature enemy attacks with +1 Attack while it is in the staging area", layout: { staging: ["900605"] }, act: attack("02071", { undefended: true }), expect: damageOn("dh1", 2) },
 ];
 
 if (ROWS.length > 0) cardSpecs("a-journey-to-rhosgobel", ROWS);

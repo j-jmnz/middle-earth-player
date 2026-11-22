@@ -1,7 +1,7 @@
 // Rules: mec112.defense, rr.active-location, rr.lasting-effects, rr.forced, rr.reveal, rr.shadow-effects, rr.explored, rr.first-player, faq.additional-attacks (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, attackersOf, cardSpecs, defend, damageOn, endPhase, exhausted, handCount, lost, progressOn, quest, resolve, resourcesOn, reveal, revealedBy, stagingThreat, stat, threat, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, attackersOf, cardSpecs, damageOn, defend, endPhase, exhausted, handCount, lost, progressOn, quest, resolve, resourcesOn, reveal, revealedBy, stagingThreat, stat, threat, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Helm's Deep (the-two-towers part 2): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure). A row cannot ask who revealed a card
@@ -80,6 +80,9 @@ export const ROWS: readonly Row[] = [
   { line: "143075:B:3", name: "the stage defeated loses the game", layout: { stage: "143075", progress: 7, play: ["ally"] }, act: [attack("143034"), defend("ally")], expect: lost },
   { line: "143076:A:1", name: "When Revealed: enemies are discarded from the shuffled deck, one for each player, and join the staging area", layout: { stage: "143076", deck: ["place", "f3"] }, act: resolve("143076", "whenRevealed"), expect: zone("f3", "staging") },
   { line: "143076:B:2", name: "the players win once no enemy is in play", layout: { stage: "143076" }, act: END_OF_ROUND, expect: won },
+
+  // 143045:A:3 "Shadow: Return attacking enemy to the staging area after this attack." On stage 2 with a location active, as the other attack rows: the undefended attack of f0 is made (1 damage), then f0 is back in the staging area.
+  { line: "143045:A:3", name: "Shadow: the attacking enemy returns to the staging area after the attack", layout: { ...STAGE_2, active: "143038" }, act: attack("f0", { shadow: "143045", undefended: true }), expect: [damageOn("dh1", 1), zone("f0", "staging")] },
 ];
 
 if (ROWS.length > 0) cardSpecs("helms-deep", ROWS);
