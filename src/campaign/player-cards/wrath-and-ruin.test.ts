@@ -129,9 +129,7 @@ describe("Pillars of the Kings (22003:A:1, A:2)", () => {
   });
 
   // At threat 40 the effect can change nothing (the threat is already 40 and nothing is drawn), so it is not offered (rr.triggered-ability).
-  // FAULT: at threat 40 the card's Action can change nothing (rr.triggered-ability), but the engine offers to play it, and the player pays
-  // its 4 resources for nothing.
-  it.fails("22003:A:2 Pillars of the Kings: not offered at threat 40", () => {
+  it("22003:A:2 Pillars of the Kings: not offered at threat 40", () => {
     const tab = pillars(EFFECTS, 40);
     expect(playable(tab.state, tab, idsOf(tab, PILLARS))).toBe(false);
   });

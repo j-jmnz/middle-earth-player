@@ -77,12 +77,12 @@ describe("The Hammer-stroke (06111:A:1)", () => {
   });
 
   // Every enemy in play is already engaged with you: engaging them changes nothing, so the card is not played (rr.triggered-ability).
-  // FAULT: every enemy in play is engaged with you already, so engaging them changes nothing; the engine still offers the card.
-  it.fails("06111:A:1 The Hammer-stroke: not played when every enemy is engaged with you", () => {
+  it("06111:A:1 The Hammer-stroke: not played when every enemy is engaged with you", () => {
     const tab = table(EFFECTS, { seats: 2, start: "encounter", heroes: [{ code: GIMLI, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: HAMMER, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] });
     let run = sendUnledgered(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
     run = sendUnledgered(run, { type: "DeclineEngage" }, tab.ctx);
-    expect(run.state.phase).toBe("Encounter");
+    // No window opens for a card that can change nothing: the phase moves past the engagement checks and the Encounter action window.
+    expect(run.state.phase).toBe("Combat");
     expect(playable(tab, run.state, idsOf(tab, HAMMER))).toBe(false);
   });
 });
@@ -172,8 +172,7 @@ describe("Well-Equipped (06116:A:1)", () => {
   });
 
   // An empty deck: nothing is discarded and nothing can be attached, so the card can change nothing and is not played.
-  // FAULT: with an empty deck nothing is discarded or attached; the engine still offers the card.
-  it.fails("06116:A:1 Well-Equipped: not played with an empty deck", () => {
+  it("06116:A:1 Well-Equipped: not played with an empty deck", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: WELL, seat: 0 }] });
     expect(playable(tab, tab.state, idsOf(tab, WELL))).toBe(false);
   });

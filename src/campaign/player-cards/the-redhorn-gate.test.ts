@@ -244,10 +244,8 @@ describe("Renewed Friendship (04007:A:1)", () => {
 
   // "Response: After another player plays an attachment on a hero you control, you may (choose 1): ready 1 of that player's heroes, have
   // that player draw 1 card, or lower that player's threat by 2.": each option acts on the other player.
-  // FAULT: the card answers another player playing an attachment on your hero, but the engine reads who controls the attachment once it is
-  // attached (the hero's controller, rr.attachment-cards), so the Response is never offered.
-  it.fails("04007:A:1 Renewed Friendship: after another player plays an attachment on your hero, ready, draw or lower threat for that player", () => {
-    const first = friendship(EFFECTS, HOBBIT);
+  lineSpec("04007:A:1", "Renewed Friendship: after another player plays an attachment on your hero, ready, draw or lower threat for that player", (effects) => {
+    const first = friendship(effects, HOBBIT);
     expect(first.run.state.cards[idsOf(first.tab, MEAL)]?.host).toBe(idsOf(first.tab, HOBBIT));
     expect(triggers(first.run.state, first.tab)).toContain("04007:response:1");
     const threat = answer(first.tab, first.run, "threat");

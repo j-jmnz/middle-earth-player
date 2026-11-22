@@ -92,8 +92,7 @@ describe("Boromir (02095:A:1, A:2)", () => {
   });
 
   // With no enemy engaged with any player the damage has no target: not offered, and Boromir is not discarded for nothing.
-  // FAULT: the card deals damage only to enemies engaged with a player, so with none engaged it cannot change the game state (rr.triggered-ability), yet the engine offers the Action and Boromir is discarded for nothing.
-  it.fails("02095:A:2 is not offered when no enemy is engaged", () => {
+  it("02095:A:2 is not offered when no enemy is engaged", () => {
     const tab = table(EFFECTS, { heroes: [{ code: BOROMIR, seat: 0 }], staging: [BRUTE] });
     expect(triggers(tab.state, tab)).not.toContain("02095:action:2");
   });

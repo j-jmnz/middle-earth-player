@@ -1,4 +1,5 @@
 // Rules: rr.quest-cards-quest-deck, rr.quest-advancement (data/rules/entries.json).
+import { questDamageCause } from "../families/defense/damage.ts";
 import { pushCardEffects } from "../interpret/effect-frames.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { runQuestResolution } from "./explore.ts";
@@ -38,7 +39,7 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
   const outcome = questOutcome(state, ctx);
   const canAdvance = (current: ScenarioState) => !restricted(current, ctx, "advance").length;
   // Once stages are separate each seat resolves the quest of its own stage in player order, against its own staging area (mec109.multiple-staging-areas).
-  const quested = state.separate ? resolveSeparate(state, ctx, steps, canAdvance) : resolveQuest(state, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), undefined, failureAmountRead(state, ctx));
+  const quested = state.separate ? resolveSeparate(state, ctx, steps, canAdvance) : resolveQuest(state, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), undefined, failureAmountRead(state, ctx), questDamageCause(state, ctx));
   const resolved = keepCommitted(quested, state);
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
@@ -72,7 +73,7 @@ function resolveSeparate(state: ScenarioState, ctx: ReduceContext, steps: Engine
   for (const seat of areaSeats(state)) {
     // A seat whose own quest phase ended resolves nothing (EndQuestPhase `own`, 148004:A:1).
     if ((state.questEnded ?? []).includes(seat)) continue;
-    next = resolveQuest(next, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), seat, failureAmountRead(state, ctx));
+    next = resolveQuest(next, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), seat, failureAmountRead(state, ctx), questDamageCause(state, ctx));
     if (next.stageCleared || next.lost) break;
   }
   const { questEnded: _ended, ...rest } = next;

@@ -136,10 +136,8 @@ describe("Kahliel's Headdress (17010:A:1, A:2, A:3)", () => {
     expect([[topmost, ...deck], [...deck, topmost]]).not.toContainEqual(after);
   });
 
-  // FAULT: the card shuffles "the topmost Harad ally" in the discard pile, but the engine takes the topmost ally and drops it when it is
-  // not Harad, so a plain ally on top of a Harad ally leaves the Action with no card and it is not offered.
-  it.fails("17010:A:3 Kahliel's Headdress: the topmost Harad ally under a plain ally is shuffled in", () => {
-    const { tab, ids: [lower = "", topmost = ""] } = refreshed(EFFECTS, [HARAD, SCOUT, ALLY]);
+  lineSpec("17010:A:3", "Kahliel's Headdress: the topmost Harad ally under a plain ally is shuffled in", (effects) => {
+    const { tab, ids: [lower = "", topmost = ""] } = refreshed(effects, [HARAD, SCOUT, ALLY]);
     let run = enter(tab.state, tab, "refresh");
     expect(triggers(run.state, tab)).toContain("17010:action:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, HEADDRESS), effectId: "17010:action:1" }, tab.ctx);

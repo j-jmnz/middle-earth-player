@@ -14,7 +14,7 @@ import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-pa
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, hosts, passAll, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { combat, hosts, passAll, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const WARNING = "02026";
 const ALOFT = "02029";
@@ -69,20 +69,16 @@ describe("Dúnedain Warning (02026:A:1, A:2, A:3)", () => {
     const tab = table(effects, { heroes: [{ code: ARAGORN, seat: 0 }, { code: THEODRED, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], attached: [{ code: WARNING, host: ARAGORN }] });
     const [aragorn, theodred, warning] = [idsOf(tab, ARAGORN), idsOf(tab, THEODRED), idsOf(tab, WARNING)];
     expect(triggers(tab.state, tab)).toContain("02026:action:1");
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: warning, effectId: "02026:action:1", payments: [{ heroId: aragorn, amount: 1 }] }, tab.ctx);
-    expect(run.state.window?.kind).toBe("choose");
-    expect(choices(run.state, tab)).toContain(theodred);
-    expect(choices(run.state, tab)).not.toContain(idsOf(tab, ALLY));
-    run = sendUnledgered(run, { type: "Choose", optionId: theodred }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: warning, effectId: "02026:action:1", payments: [{ heroId: aragorn, amount: 1 }] }, tab.ctx);
+    // Théodred is the only other hero (the ally is not one, and the hero it is on is not another): no question is asked.
+    expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[warning]?.host).toBe(theodred);
     expect(run.state.cards[aragorn]?.resources).toBe(6 - 1);
     expect(stat(run.state, tab, theodred, "defense")).toBe(printed(tab, THEODRED, "defense") + 1);
     expect(stat(run.state, tab, aragorn, "defense")).toBe(printed(tab, ARAGORN, "defense"));
   });
 
-  // FAULT: the card prints "attach Dúnedain Warning to another hero", and the engine offers the hero it is already on (Aragorn) as the hero
-  // to attach it to.
-  it.fails("02026:A:3 Dúnedain Warning: the hero it is attached to is not another hero", () => {
+  it("02026:A:3 Dúnedain Warning: the hero it is attached to is not another hero", () => {
     const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }, { code: THEODRED, seat: 0 }], attached: [{ code: WARNING, host: ARAGORN }] });
     const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, WARNING), effectId: "02026:action:1", payments: [{ heroId: idsOf(tab, ARAGORN), amount: 1 }] }, tab.ctx);
     // Théodred is the only other hero, so no question is asked.
@@ -90,9 +86,7 @@ describe("Dúnedain Warning (02026:A:1, A:2, A:3)", () => {
     expect(run.state.cards[idsOf(tab, WARNING)]?.host).toBe(idsOf(tab, THEODRED));
   });
 
-  // FAULT: alone on the table, Aragorn has no other hero to send the Warning to, so the Action can change nothing but its cost
-  // (rr.triggered-ability), and the engine offers it.
-  it.fails("02026:A:3 Dúnedain Warning: not offered with no other hero", () => {
+  it("02026:A:3 Dúnedain Warning: not offered with no other hero", () => {
     const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], attached: [{ code: WARNING, host: ARAGORN }] });
     expect(triggers(tab.state, tab)).not.toContain("02026:action:1");
   });
@@ -108,9 +102,7 @@ describe("Dúnedain Warning (02026:A:1, A:2, A:3)", () => {
   it("02026:A:3 Dúnedain Warning: attaches to another player's hero", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: ARAGORN, seat: 0 }, { code: PAL, seat: 1 }], attached: [{ code: WARNING, host: ARAGORN }] });
     const [warning, pal] = [idsOf(tab, WARNING), idsOf(tab, PAL)];
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: warning, effectId: "02026:action:1", payments: [{ heroId: idsOf(tab, ARAGORN), amount: 1 }] }, tab.ctx);
-    expect(choices(run.state, tab)).toContain(pal);
-    run = sendUnledgered(run, { type: "Choose", optionId: pal }, tab.ctx);
+    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: warning, effectId: "02026:action:1", payments: [{ heroId: idsOf(tab, ARAGORN), amount: 1 }] }, tab.ctx);
     expect(run.state.cards[warning]?.host).toBe(pal);
   });
 });

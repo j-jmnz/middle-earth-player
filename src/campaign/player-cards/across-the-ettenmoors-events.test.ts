@@ -157,9 +157,9 @@ describe("None Return (10062:A:1, A:2)", () => {
 });
 
 describe("Hope Rekindled (10063:A:1, A:2)", () => {
-  // Legolas (Tactics) pays; the hand holds Hope Rekindled, two Horn's Cry and Feint.
+  // Legolas (Tactics) pays; the hand holds Hope Rekindled, two Horn's Cry and Feint; an enemy in the staging area gives Horn's Cry something to change.
   const hope = (effects: readonly Effect[], threat: number, deck: Scene["playerDeck"] = []): Table => {
-    const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }], hand: [{ code: HOPE, seat: 0 }, { code: HORN, seat: 0 }, { code: HORN, seat: 0 }, { code: FEINT, seat: 0 }], playerDeck: deck });
+    const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }], hand: [{ code: HOPE, seat: 0 }, { code: HORN, seat: 0 }, { code: HORN, seat: 0 }, { code: FEINT, seat: 0 }], playerDeck: deck, staging: [FRAIL] });
     return { ...tab, state: withThreat(tab.state, 0, threat) };
   };
 

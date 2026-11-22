@@ -86,8 +86,7 @@ describe("Strength of Arms (06034:A:1, A:2)", () => {
   });
 
   // With every ally ready the Action can ready nothing, so it is not played (rr.triggered-ability).
-  // FAULT: the card prints "Ready each ally in play.", and the engine lets it be played (and paid for) when no ally is exhausted.
-  it.fails("06034:A:2 Strength of Arms: not played with no exhausted ally", () => {
+  it("06034:A:2 Strength of Arms: not played with no exhausted ally", () => {
     const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }, { code: THEODRED, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: STRENGTH, seat: 0 }] });
     expect(playable(tab.state, tab, idsOf(tab, STRENGTH))).toBe(false);
   });

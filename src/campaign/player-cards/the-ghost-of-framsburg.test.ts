@@ -236,9 +236,7 @@ describe("Familiar Lands (19088:A:1)", () => {
   });
 
   // No location has an attachment: its effect can change nothing, so it is not played (rr.triggered-ability).
-  // FAULT: with no location holding an attachment, "Each location with an attachment gets -2 Threat" can change nothing, yet the engine
-  // offers the event.
-  it.fails("19088:A:1 Familiar Lands: not played when no location has an attachment", () => {
+  it("19088:A:1 Familiar Lands: not played when no location has an attachment", () => {
     const { tab } = lands(EFFECTS, false);
     expect(playable(tab)).not.toContain(idsOf(tab, LANDS));
   });

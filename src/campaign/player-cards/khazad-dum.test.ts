@@ -80,8 +80,7 @@ describe("Dwalin (03001:A:1)", () => {
     expect(run.state.seats[0]?.threat).toBe(8 - 2);
   });
 
-  // FAULT: the card triggers only after Dwalin destroys an Orc enemy; the engine offers the Response after he destroys an enemy with no Orc Trait, and triggering it lowers nothing.
-  it.fails("03001:A:1 Dwalin: not offered after he destroys an enemy that is not an Orc", () => {
+  it("03001:A:1 Dwalin: not offered after he destroys an enemy that is not an Orc", () => {
     const tab = table(EFFECTS, { heroes: [{ code: DWALIN, seat: 0 }], engaged: [{ code: GOBLIN, seat: 0 }] });
     const run = attack(tab, tab.state, idsOf(tab, GOBLIN), [idsOf(tab, DWALIN)]);
     expect(run.state.cards[idsOf(tab, GOBLIN)]?.zone).not.toBe("engaged");
@@ -175,8 +174,7 @@ describe("Dwarrowdelf Axe (03007:A:2, A:3, A:4)", () => {
     expect(triggers(run.state, tab)).not.toContain("03007:response:1");
   });
 
-  // FAULT: the card deals 1 damage to the defending enemy, and none is left when the attack destroyed it, so the Response can change nothing (rr.triggered-ability); the engine still offers it.
-  it.fails("03007:A:4 Dwarrowdelf Axe: not offered when the attack destroyed the defending enemy", () => {
+  it("03007:A:4 Dwarrowdelf Axe: not offered when the attack destroyed the defending enemy", () => {
     const tab = armed(EFFECTS, ORC);
     const run = attack(tab, tab.state, idsOf(tab, ORC), [idsOf(tab, AXEMAN)]);
     expect(run.state.cards[idsOf(tab, ORC)]?.zone).not.toBe("engaged");
@@ -230,8 +228,7 @@ describe("Untroubled by Darkness (03010:A:1)", () => {
   });
 
   // No Dwarf character is in play: the event can change nothing, so it is not offered (rr.triggered-ability).
-  // FAULT: the card gives Willpower to each Dwarf character and none is in play, so it can change nothing; the engine still offers it to be played.
-  it.fails("03010:A:1 Untroubled by Darkness: not offered with no Dwarf character in play", () => {
+  it("03010:A:1 Untroubled by Darkness: not offered with no Dwarf character in play", () => {
     const tab = table(EFFECTS, { heroes: [{ code: SPIRIT, seat: 0 }, { code: PAL, seat: 0 }], hand: [{ code: UNTROUBLED, seat: 0 }] });
     expect(legalIntents(tab.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === idsOf(tab, UNTROUBLED))).toBe(false);
   });

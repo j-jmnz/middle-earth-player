@@ -195,8 +195,7 @@ describe("Smoke and Think (22116:A:1)", () => {
   });
 
   // With no Pipe the reduction is 0 and the event changes nothing: it is not offered.
-  // FAULT: with no Pipe the card reduces the next cost by 0, which cannot change the game state (rr.triggered-ability), yet the engine lets the event be played.
-  it.fails("22116:A:1 is not offered when you control no Pipe", () => {
+  it("22116:A:1 is not offered when you control no Pipe", () => {
     const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], hand: [{ code: SMOKE, seat: 0 }, { code: COSTLY, seat: 0 }] });
     expect(legalIntents(tab.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === idsOf(tab, SMOKE))).toBe(false);
   });

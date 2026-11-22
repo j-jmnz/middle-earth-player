@@ -97,8 +97,7 @@ describe("Caldara (06107:A:1)", () => {
 
   // No other hero with a printed Spirit icon: the Action would put nothing into play, so it is not offered and Caldara stays
   // (rr.triggered-ability, rr.cost).
-  // FAULT: with no other Spirit hero the effect puts no ally into play; the engine still offers the Action, whose cost discards Caldara.
-  it.fails("06107:A:1 Caldara: not offered with no other Spirit hero", () => {
+  it("06107:A:1 Caldara: not offered with no other Spirit hero", () => {
     const { tab } = scene(EFFECTS, [{ code: DENETHOR, seat: 0 }]);
     expect(triggers(tab.state, tab)).not.toContain("06107:action:1");
   });

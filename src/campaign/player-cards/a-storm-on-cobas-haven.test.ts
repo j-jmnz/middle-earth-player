@@ -226,8 +226,7 @@ describe("Ioreth (12117:A:1, A:2)", () => {
   });
 
   // No character has damage: the heal can change nothing, so the Action is not offered and nothing is spent (rr.triggered-ability).
-  // FAULT: the card heals damage and no character has any, so the Action can change nothing; the engine still offers it.
-  it.fails("12117:A:2 Ioreth: not offered when no character has damage", () => {
+  it("12117:A:2 Ioreth: not offered when no character has damage", () => {
     const tab = scene(EFFECTS, 0);
     expect(triggers(tab.state, tab)).not.toContain("12117:action:1");
   });

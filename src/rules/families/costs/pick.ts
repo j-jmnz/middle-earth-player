@@ -45,7 +45,7 @@ export function highestCost(state: ScenarioState, found: readonly string[], ctx:
   }, "highest");
 }
 
-export function costsPickMatches(state: ScenarioState, id: string, spec: PickSpec, picked: readonly string[] | undefined, ctx: ReduceContext): boolean {
+export function costsPickMatches(state: ScenarioState, id: string, spec: PickSpec, picked: readonly string[] | undefined, ctx: ReduceContext, answered?: string | null): boolean {
   const instance = state.cards[id];
   if (!instance) return false;
   if (spec.minResources != null && instance.resources < spec.minResources) return false;
@@ -58,7 +58,8 @@ export function costsPickMatches(state: ScenarioState, id: string, spec: PickSpe
     if (!first || !state.cards[first] || threatCostOf(state, id, ctx) >= threatCostOf(state, first, ctx)) return false;
   }
   if (spec.paidFor === "subject") {
-    const subject = frame?.subject;
+    // The card the running effect is about, or the card the answered event is about when a Response is read before its effect runs.
+    const subject = frame?.subject ?? answered;
     const entry = (state.played ?? []).find((play) => play.id === subject && play.round === state.round);
     if (!entry?.paid?.some((payment) => payment.heroId === id && payment.amount > 0)) return false;
   }

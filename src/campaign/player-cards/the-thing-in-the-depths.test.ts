@@ -192,8 +192,7 @@ describe("Master Ironsmith (12033:A:1)", () => {
 
   // Paid 2 by Gimli and 1 by Thalin: not all of it from a single hero, so the Response can change nothing and is not offered
   // (rr.triggered-ability).
-  // FAULT: the card's condition fails when two heroes paid; the engine still offers the Response, which then does nothing.
-  it.fails("12033:A:1 Master Ironsmith: no Response when two heroes paid", () => {
+  it("12033:A:1 Master Ironsmith: no Response when two heroes paid", () => {
     const { tab } = scene(EFFECTS, [BLADE]);
     const intent = { type: "PlayCard" as const, cardId: idsOf(tab, IRONSMITH), payments: [{ heroId: idsOf(tab, GIMLI), amount: 2 }, { heroId: idsOf(tab, THALIN), amount: 1 }] };
     const run = sendUnledgered(begin(tab.state), intent, tab.ctx);

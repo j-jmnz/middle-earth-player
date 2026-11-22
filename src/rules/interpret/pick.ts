@@ -122,7 +122,10 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
         // The last card put on a discard pile is its top.
         const top = [...pile].reverse().find((id) => {
           const instance = state.cards[id];
-          return instance != null && (!spec.cardType || printedOf(ctx.cards, instance.code).type === spec.cardType);
+          // The topmost card of those that match: "the topmost Harad ally" is the Harad ally nearest the top, with plain allies above it (Kahliel's Headdress, 17010:A:3).
+          if (instance == null) return false;
+          const printed = printedOf(ctx.cards, instance.code);
+          return (!spec.cardType || printed.type === spec.cardType) && (!spec.trait || printed.traits.includes(spec.trait)) && (!spec.traits || spec.traits.some((trait) => printed.traits.includes(trait)));
         });
         if (top) raw.push(top);
       }
@@ -228,7 +231,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.damaged != null && instance.damage > 0 !== spec.damaged) return false;
   if (spec.hasResources && instance.resources <= 0) return false;
   // The costs family's filters: a pool's size, a Valour ability, a lower threat cost, a pool that paid (families/costs/pick.ts).
-  if (!costsPickMatches(state, id, spec, at.picked, ctx)) return false;
+  if (!costsPickMatches(state, id, spec, at.picked, ctx, at.subject)) return false;
   if (spec.on && !onHost(state, instance.host, spec.on, asking, ctx)) return false;
   if (spec.notHost && at.sourceId != null && hostOf(state, at.sourceId) === id) return false;
   if (spec.engagedThisRound && heldAmount(state, id, "engagedThisRound") <= 0) return false;
@@ -366,8 +369,9 @@ function candidatesOf(
   const asking = spec.who === "firstPlayer" ? state.firstPlayer : seat;
   if (spec.type === "player") return seatsOf(state, spec, asking).filter((index) => !state.seats[index]?.eliminated && seatPickMatches(state, index, spec, ctx)).map((index) => `seat:${index}`);
   if (spec.hostForPicked) {
-    const code = state.cards[picked.at(-1) ?? ""]?.code;
-    return code ? attachmentHostIds(state, asking, code, ctx) : [];
+    const card = state.cards[picked.at(-1) ?? ""];
+    // An attachment already on a card moves to another one ("attach Dúnedain Warning to another hero", 02026:A:3).
+    return card ? attachmentHostIds(state, asking, card.code, ctx).filter((id) => id !== card.host) : [];
   }
   // Immunity is to player card effects: an encounter card's Pick may choose an immune card (mec109.immune-to-player-card-effects).
   // An ally with an encounter back is an encounter card and has encounter card effects (dcce.encounter-cards: the ship-objectives, the Modification attachments, Calaerion, Gavin, Send for Help). The Stormcaller Elite's objective allies have no encounter back (dcce.stormcaller-elite) and stay objectives.
@@ -428,8 +432,8 @@ export function feedsDiscard(instructions: readonly Instruction[]): boolean {
 }
 
 // How many cards match a filter from a seat's side: the count an amount or a condition reads.
-export function countMatching(state: ScenarioState, spec: PickSpec, seat: number, sourceId: string | null, ctx: ReduceContext, participants?: readonly string[], picked: readonly string[] = []): number {
-  const found = pickCandidates(state, spec, seat, picked, sourceId, ctx, undefined, participants, true);
+export function countMatching(state: ScenarioState, spec: PickSpec, seat: number, sourceId: string | null, ctx: ReduceContext, participants?: readonly string[], picked: readonly string[] = [], event?: { subject?: string | null }): number {
+  const found = pickCandidates(state, spec, seat, picked, sourceId, ctx, undefined, participants, true, event);
   // "When counting the number of Dwarf characters you control, Bombur counts as two" (families/misc/traits.ts).
   return found.length + countsExtra(state, found, spec);
 }

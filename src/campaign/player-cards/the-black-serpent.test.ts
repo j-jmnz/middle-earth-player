@@ -119,8 +119,7 @@ describe("Burst into Song (17083:A:1)", () => {
   });
 
   // rr.triggered-ability: with every hero that holds a Song ready, the event could change nothing.
-  // FAULT: the card readies only heroes with a Song attachment; with that hero ready, the engine still offers the event (only another hero is exhausted).
-  it.fails("17083:A:1 Burst into Song: not played when no hero with a Song attachment is exhausted", () => {
+  it("17083:A:1 Burst into Song: not played when no hero with a Song attachment is exhausted", () => {
     const tab = table(EFFECTS, { heroes: [{ code: LEAD, seat: 0 }, { code: TAC, seat: 0 }], attached: [{ code: SONG_OF_KINGS, host: LEAD }], hand: [{ code: BURST, seat: 0 }] });
     const state = updateCard(tab.state, idsOf(tab, TAC), { exhausted: true });
     expect(legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === idsOf(tab, BURST))).toBe(false);

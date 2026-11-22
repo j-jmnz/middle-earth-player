@@ -142,11 +142,11 @@ describe("Tighten Our Belts (08086:A:1)", () => {
 
   // Every hero of every player spent resources this round: no hero can gain a resource, so the event can change nothing and is not offered
   // (rr.triggered-ability).
-  // FAULT: with the only hero having spent resources this round, the card can change nothing, but the engine offers to play it.
-  it.fails("08086:A:1 Tighten Our Belts: not offered when every hero spent resources this round", () => {
+  it("08086:A:1 Tighten Our Belts: not offered when every hero spent resources this round", () => {
     const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: GUARD, seat: 0 }, { code: BELTS, seat: 0 }] });
     const run = enter(playCode(tab, GUARD).state, tab, "refresh");
-    expect([run.state.window?.kind, run.state.activeSeat]).toEqual(["frameAction", 0]);
+    // The only card that could be played there can change nothing, so the refresh action window does not open as one for it.
+    expect([run.state.window?.kind, run.state.activeSeat]).toEqual(["pass", 0]);
     expect(playable(run.state, tab, idsOf(tab, BELTS))).toBe(false);
   });
 
@@ -304,10 +304,9 @@ describe("Defender of the West (08093:A:1, A:3)", () => {
     expect(play(begin(tab.state), tab, defender, idsOf(tab, BEECHBONE)).state.cards[defender]?.host).toBe(idsOf(tab, BEECHBONE));
   });
 
-  // FAULT: the card prints "Attach to a non-objective unique ally", but the engine offers Mendor, a unique objective ally the player
-  // controls (an ally for picks, src/rules/interpret/pick.ts), as a host.
-  it.fails("08093:A:1 Defender of the West: a unique objective ally is not offered", () => {
-    const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: BEECHBONE, seat: 0 }, { code: MENDOR, seat: 0 }], hand: [{ code: DEFENDER, seat: 0 }] });
+  // "Attach to a non-objective unique ally": Mendor, a unique objective ally the player controls (an ally for picks, src/rules/interpret/pick.ts), is not offered.
+  lineSpec("08093:A:1", "Defender of the West: a unique objective ally is not offered", (effects) => {
+    const tab = table(effects, { heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: BEECHBONE, seat: 0 }, { code: MENDOR, seat: 0 }], hand: [{ code: DEFENDER, seat: 0 }] });
     expect(tab.state.cards[idsOf(tab, MENDOR)]?.zone).toBe("play");
     expect(hosts(tab, idsOf(tab, DEFENDER))).toEqual([idsOf(tab, BEECHBONE)]);
   });

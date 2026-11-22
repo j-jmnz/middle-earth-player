@@ -135,9 +135,8 @@ describe("Song of Mocking (02099:A:1, A:2)", () => {
     expect(run.state.cards[aragorn]?.damage).toBe(4 - 1);
   });
 
-  // FAULT: the card says "choose another hero", so the attached hero cannot be chosen, yet the engine offers Aragorn himself among the choices.
-  it.fails("02099:A:2 the attached hero is not a choice (another hero)", () => {
-    const { tab, run } = mocking(EFFECTS);
+  lineSpec("02099:A:2", "the attached hero is not a choice (another hero)", (effects) => {
+    const { tab, run } = mocking(effects);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, THEODRED), idsOf(tab, GIMLI)].sort());
   });
 });

@@ -144,10 +144,8 @@ describe("Dawn Take You All (02118:A:1, A:2)", () => {
 
   // "Play after shadow cards have been dealt, before any attacks have resolved.": it can be played once the shadow cards are dealt; once
   // the first player's enemy has attacked (Aragorn defends, the damage is dealt), it cannot be played in the next action window.
-  // FAULT: the card cannot be played once an attack has resolved; the engine still offers it in the action window after the first attack
-  // dealt its damage, before the second enemy attacks.
-  it.fails("02118:A:1 Dawn Take You All: played after the shadow cards are dealt, and not once an attack has resolved", () => {
-    const tab = dawn(EFFECTS);
+  lineSpec("02118:A:1", "Dawn Take You All: played after the shadow cards are dealt, and not once an attack has resolved", (effects) => {
+    const tab = dawn(effects);
     const dealt = combat(tab.state, tab);
     expect((tab.ids[WEAK] ?? []).every((id) => dealt.state.cards[id]?.shadowId != null)).toBe(true);
     expect(playable(dealt, tab)).toBe(true);
@@ -155,11 +153,9 @@ describe("Dawn Take You All (02118:A:1, A:2)", () => {
     expect(run.state.window).toMatchObject({ kind: "defense", seat: 0 });
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, ARAGORN) }, tab.ctx);
     const struck = (next: Run): boolean => next.steps.some((step) => step.kind === "strike" && step.side === "enemy");
-    for (let guard = 0; guard < 8 && !(struck(run) && run.state.window?.kind === "frameAction"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
-    // The first attack has struck; the action window before the second player's enemy attacks is open to the first player.
+    for (let guard = 0; guard < 8 && !struck(run) && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    // The first attack has struck: Dawn is not offered in any window that follows (none opens for it any more).
     expect(struck(run)).toBe(true);
-    expect(run.state.window?.kind).toBe("frameAction");
-    expect(run.state.activeSeat).toBe(0);
     expect(playable(run, tab)).toBe(false);
   });
 
@@ -284,9 +280,7 @@ describe("Astonishing Speed (02122:A:1)", () => {
 
   // No Rohan character in play (Eleanor, Spirit, pays): the lasting effect reaches only the cards in play now (rr.lasting-effects), so the
   // Action can change nothing and the event is not offered (rr.triggered-ability).
-  // FAULT: the card gives +2 Willpower to the Rohan characters in play; with none in play it changes nothing, but the engine offers it
-  // (and takes its 3 resources).
-  it.fails("02122:A:1 Astonishing Speed: not offered with no Rohan character in play", () => {
+  it("02122:A:1 Astonishing Speed: not offered with no Rohan character in play", () => {
     const tab = table(EFFECTS, { heroes: [{ code: ELEANOR, seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: SPEED, seat: 0 }] });
     expect(legalIntents(tab.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === idsOf(tab, SPEED))).toBe(false);
   });

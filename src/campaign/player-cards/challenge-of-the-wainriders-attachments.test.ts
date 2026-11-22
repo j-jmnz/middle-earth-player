@@ -56,9 +56,8 @@ describe("Power of Command (22055:A:1, A:2)", () => {
 
   // "Attach to the hero with The One Ring": Beravor holds Strength and Courage, a Master attachment, and not The One Ring. (Only a built
   // table reaches this: every Master attachment prints the same host rule.)
-  // FAULT: the record reads "a hero with a Master card attached", so Beravor is offered as a host though he does not hold The One Ring.
-  it.fails("22055:A:1 Power of Command: a hero with another Master attachment and no One Ring is not a host", () => {
-    const tab = table(EFFECTS, { heroes: [{ code: PAL, seat: 0 }, { code: BERAVOR, seat: 0 }], attached: [{ code: ONE_RING, host: PAL }, { code: COURAGE, host: BERAVOR }], hand: [{ code: COMMAND, seat: 0 }] });
+  lineSpec("22055:A:1", "Power of Command: a hero with another Master attachment and no One Ring is not a host", (effects) => {
+    const tab = table(effects, { heroes: [{ code: PAL, seat: 0 }, { code: BERAVOR, seat: 0 }], attached: [{ code: ONE_RING, host: PAL }, { code: COURAGE, host: BERAVOR }], hand: [{ code: COMMAND, seat: 0 }] });
     expect(hosts(tab, idsOf(tab, COMMAND))).toEqual([idsOf(tab, PAL)]);
   });
 

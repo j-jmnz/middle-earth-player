@@ -139,9 +139,10 @@ describe("Rear Guard (02074:A:1)", () => {
     run = sendUnledgered(passAll(run, tab.ctx, { responses: true }), { type: "Pass" }, tab.ctx);
     expect(run.state.activeSeat).toBe(1);
     if (commit) run = sendUnledgered(run, { type: "Commit", cardIds: [idsOf(tab, PAL)] }, tab.ctx);
-    // The second player is done committing: the staging step reveals the f0 and the quest phase's action window opens.
+    // The second player is done committing: the staging step reveals the f0 and the quest phase's action window opens. With no hero committed, Rear
+    // Guard is the only card that could be played there and it can change nothing, so no window opens and the phase moves on.
     run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
-    expect(run.state.phase).toBe("Quest");
+    expect(run.state.phase).toBe(commit ? "Quest" : "Travel");
     return { tab, run };
   }
 
@@ -171,8 +172,7 @@ describe("Rear Guard (02074:A:1)", () => {
   });
 
   // No hero is committed: the bonus would go to nobody, so the card is not played and no ally is discarded for nothing (rr.cost).
-  // FAULT: the ally's discard is the cost and the bonus has no hero to go to, but the engine lets Rear Guard be played in the quest phase.
-  it.fails("02074:A:1 Rear Guard: not played when no hero is committed", () => {
+  it("02074:A:1 Rear Guard: not played when no hero is committed", () => {
     const { tab, run } = committed(EFFECTS, false);
     expect(playable({ ...run.state, activeSeat: 0 }, tab, idsOf(tab, REAR))).toBe(false);
   });

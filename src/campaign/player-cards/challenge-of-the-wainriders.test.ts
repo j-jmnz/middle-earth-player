@@ -65,10 +65,13 @@ describe("Saruman (22054:A:2, A:3)", () => {
   // "While playing an event with the printed doomed keyword, Saruman gains the printed Leadership, Spirit, and Tactics icons.": Saruman (Lore)
   // pays alone for Defiant Challenge (Spirit, Doomed 2); he cannot pay for Quick Strike (Tactics, not doomed).
   lineSpec("22054:A:2", "Saruman: pays for an event with the printed doomed keyword of any sphere", (effects) => {
-    const tab = table(effects, { heroes: [{ code: SARUMAN, seat: 0 }], hand: [{ code: DEFIANT, seat: 0 }, { code: STRIKE, seat: 0 }], engaged: [{ code: WALL, seat: 0 }] });
+    const tab = table(effects, { heroes: [{ code: SARUMAN, seat: 0 }], allies: [{ code: RIDER, seat: 0 }], hand: [{ code: DEFIANT, seat: 0 }, { code: STRIKE, seat: 0 }], engaged: [{ code: WALL, seat: 0 }] });
     const saruman = idsOf(tab, SARUMAN);
     expect(refusal(tab.state, { type: "PlayCard", cardId: idsOf(tab, STRIKE), payments: [{ heroId: saruman, amount: 1 }] }, tab.ctx)).not.toBeNull();
-    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, DEFIANT), payments: [{ heroId: saruman, amount: 0 }] }, tab.ctx);
+    // Defiant Challenge readies an exhausted character: the Rider is exhausted, so the event can change the game.
+    let run = sendUnledgered(begin(updateCard(tab.state, idsOf(tab, RIDER), { exhausted: true })), { type: "PlayCard", cardId: idsOf(tab, DEFIANT), payments: [{ heroId: saruman, amount: 0 }] }, tab.ctx);
+    // The first player chooses whether to ready the Rider; the event resolves once he declines.
+    run = sendUnledgered(run, { type: "Choose", optionId: "skip" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, DEFIANT)]?.zone).not.toBe("hand");
   });
 

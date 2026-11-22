@@ -83,8 +83,7 @@ describe("Folco Boffin (17109:A:1, A:2)", () => {
   });
 
   // At threat 0 the threat cannot be reduced: the Action can change nothing but its cost, so it is not offered (rr.triggered-ability).
-  // FAULT: the card reduces the threat by 7; at threat 0 that changes nothing, but the engine offers the Action (and discards Folco for it).
-  it.fails("17109:A:2 Folco Boffin: not offered at threat 0", () => {
+  it("17109:A:2 Folco Boffin: not offered at threat 0", () => {
     const tab = threatened(table(EFFECTS, { heroes: [{ code: FOLCO, seat: 0 }, { code: ARAGORN, seat: 0 }] }), 0);
     expect(triggers(tab.state, tab)).not.toContain("17109:action:1");
   });

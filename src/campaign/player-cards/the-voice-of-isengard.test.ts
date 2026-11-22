@@ -118,9 +118,8 @@ describe("Orthanc Guard (07004:A:1)", () => {
   });
 
   // An encounter card with Doomed revealed in the staging step also raises your threat from the Doomed keyword (rr.doomed-x).
-  // FAULT: the card answers any threat raised by Doomed; the record hears only a doomed card being played, so a revealed doomed encounter card does not offer it.
-  it.fails("07004:A:1 Orthanc Guard: also after a doomed encounter card is revealed", () => {
-    const tab = table(EFFECTS, { start: "quest", heroes: [{ code: DENETHOR, seat: 0 }], allies: [{ code: GUARD, seat: 0 }], deck: [DOOM, GLADE] });
+  lineSpec("07004:A:1", "Orthanc Guard: also after a doomed encounter card is revealed", (effects) => {
+    const tab = table(effects, { start: "quest", heroes: [{ code: DENETHOR, seat: 0 }], allies: [{ code: GUARD, seat: 0 }], deck: [DOOM, GLADE] });
     const guard = idsOf(tab, GUARD);
     let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [guard] }, tab.ctx);
     run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
@@ -148,6 +147,20 @@ describe("Isengard Messenger (07005:A:1)", () => {
     expect(run.state.seats[0]?.threat).toBe(8 + 6);
     expect(triggers(run.state, tab)).not.toContain("07005:response:1");
     expect(stat(endRound(run.state, tab).state, tab, messenger, "willpower")).toBe(printed(tab, MESSENGER, "willpower"));
+  });
+});
+
+describe("Isengard Messenger, a revealed Doomed card (07005:A:1)", () => {
+  // An encounter card with Doomed revealed in the staging step raises the threat from the Doomed keyword (rr.doomed-x): the Messenger answers it.
+  lineSpec("07005:A:1", "Isengard Messenger: +1 Willpower after a doomed encounter card is revealed", (effects) => {
+    const tab = table(effects, { start: "quest", heroes: [{ code: DENETHOR, seat: 0 }], allies: [{ code: MESSENGER, seat: 0 }], deck: [DOOM, GLADE] });
+    const messenger = idsOf(tab, MESSENGER);
+    let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [messenger] }, tab.ctx);
+    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    expect(run.state.seats[0]?.threat).toBe(8 + 1);
+    expect(triggers(run.state, tab)).toContain("07005:response:1");
+    run = sendUnledgered(run, { type: "Trigger", cardId: messenger, effectId: "07005:response:1" }, tab.ctx);
+    expect(stat(run.state, tab, messenger, "willpower")).toBe(printed(tab, MESSENGER, "willpower") + 1);
   });
 });
 

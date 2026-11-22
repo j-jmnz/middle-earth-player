@@ -169,9 +169,8 @@ describe("The Eagles Are Coming! (02005:A:1)", () => {
   });
 
   // "any number": the player picks which Eagles to take; with two found the game asks.
-  // FAULT: the card lets the player take any number of the Eagles found; the engine adds every Eagle of the top 5 to the hand and asks nothing.
-  it.fails("02005:A:1 The Eagles Are Coming!: the player chooses how many of the Eagles to take", () => {
-    const { tab } = eagles(EFFECTS);
+  lineSpec("02005:A:1", "The Eagles Are Coming!: the player chooses how many of the Eagles to take", (effects) => {
+    const { tab } = eagles(effects);
     const run = play(begin(tab.state), tab, idsOf(tab, EAGLES));
     expect(run.state.window?.kind).toBe("choose");
   });
@@ -195,8 +194,7 @@ describe("Westfold Horse-breaker (02006:A:1)", () => {
   });
 
   // rr.triggered-ability: with every hero ready, nothing can be readied, and the Horse-breaker is not discarded for nothing.
-  // FAULT: the card readies a hero; with every hero ready the engine still offers the Action, so its cost (discard the ally) is paid for nothing.
-  it.fails("02006:A:1 Westfold Horse-breaker: not offered when every hero is ready", () => {
+  it("02006:A:1 Westfold Horse-breaker: not offered when every hero is ready", () => {
     const tab = table(EFFECTS, { heroes: [{ code: SPI, seat: 0 }], allies: [{ code: HORSE_BREAKER, seat: 0 }] });
     expect(triggers(tab.state, tab)).not.toContain("02006:action:1");
   });

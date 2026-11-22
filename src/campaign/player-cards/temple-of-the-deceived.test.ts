@@ -355,8 +355,7 @@ describe("Arrows from the Trees (12065:A:1, A:2)", () => {
   });
 
   // No enemy is in the staging area: neither part can deal damage, so the event is not offered (rr.triggered-ability).
-  // FAULT: the card deals damage only to enemies in the staging area and there is none, so it can change nothing; the engine still offers it to be played.
-  it.fails("12065:A:2 Arrows from the Trees: not offered with no enemy in the staging area", () => {
+  it("12065:A:2 Arrows from the Trees: not offered with no enemy in the staging area", () => {
     const tab = scene(EFFECTS, []);
     expect(playable(checked(tab).state, tab, idsOf(tab, ARROWS))).toBe(false);
   });

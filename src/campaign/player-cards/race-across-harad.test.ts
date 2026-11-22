@@ -324,8 +324,7 @@ describe("Steward of Orthanc (17037:A:1)", () => {
   });
 
   // With the deck empty nothing can be drawn: the Response is not offered, and the event is not made Doomed for nothing (rr.triggered-ability).
-  // FAULT: Doomed 1 is the cost ("to draw a card") and an empty deck leaves the draw nothing to change, but the engine offers the Response.
-  it.fails("17037:A:1 Steward of Orthanc: not offered with an empty deck", () => {
+  it("17037:A:1 Steward of Orthanc: not offered with an empty deck", () => {
     const tab = steward(EFFECTS, 1, 0);
     const run = play(begin(tab.state), tab, tab.ids[VIGILANT]?.[0] ?? "");
     expect(triggers(run.state, tab)).not.toContain("17037:response:1");

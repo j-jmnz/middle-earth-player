@@ -179,10 +179,9 @@ describe("Inner Strength (22009:A:1, A:2)", () => {
     expect(stat(run.state, tab, idsOf(tab, BEARER), "defense")).toBe(printed(tab, BEARER, "defense") + 1);
   });
 
-  // FAULT: the card prints "Attach to the hero with The One Ring", but the engine offers any hero with a Ring attachment: Éowyn with the
-  // Ring of Barahir (an Artifact Ring that is not The One Ring) is offered as a host.
-  it.fails("22009:A:1 Inner Strength: a hero with another Ring attachment is not offered", () => {
-    const tab = ringed(EFFECTS, [{ code: BARAHIR, host: EOWYN }]);
+  // "Attach to the hero with The One Ring": Éowyn holds the Ring of Barahir (an Artifact Ring that is not The One Ring) and is not a host.
+  lineSpec("22009:A:1", "Inner Strength: a hero with another Ring attachment is not offered", (effects) => {
+    const tab = ringed(effects, [{ code: BARAHIR, host: EOWYN }]);
     expect(tab.state.cards[idsOf(tab, BARAHIR)]?.host).toBe(idsOf(tab, EOWYN));
     expect(hosts(tab, tab.ids[INNER]?.[0] ?? "")).toEqual([idsOf(tab, BEARER)]);
   });

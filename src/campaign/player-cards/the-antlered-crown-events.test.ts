@@ -14,7 +14,7 @@ import { legalIntents } from "../../rules/engine/reduce.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { accepted, begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
 import { choices, play, playCode, playerTable, printed, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const RIDE = "08142";
@@ -84,11 +84,11 @@ describe("Ride Them Down (08142:A:1)", () => {
   // "Quest Action: Choose a non-unique enemy in the staging area. Until the end of the phase, progress that would be placed on the quest from
   // questing successfully is instead assigned as damage to the chosen enemy. (Progress must still be placed on any active location first.)":
   // the Rams are offered and the Chief is not; Éowyn's 4 progress puts 2 on the active location (explored) and the other 2 as damage on the
-  // chosen Ram, none on the quest. The last Pass is read through `accepted`, which skips the cause check (the fault below).
+  // chosen Ram, none on the quest.
   lineSpec("08142:A:1", "Ride Them Down: questing progress past the active location is damage on the chosen non-unique enemy", (effects) => {
     const { tab, run, ram, other } = ridden(effects);
     const stage = tab.state.questStage ?? "";
-    const done = accepted(run.state, { type: "Pass" }, tab.ctx);
+    const done = sendUnledgered(run, { type: "Pass" }, tab.ctx);
     expect(done.state.mode).toBe("travel");
     expect(done.state.cards[idsOf(tab, LOC)]?.zone).toBe("encounterDiscard");
     expect(done.state.cards[ram]?.damage).toBe(2);
@@ -96,10 +96,8 @@ describe("Ride Them Down (08142:A:1)", () => {
     expect(done.state.cards[stage]?.progress).toBe(0);
   });
 
-  // FAULT: the 2 damage the card assigns to the chosen enemy is a step with the unattributed cause (rr.effects), not the cause of the record
-  // 08142:action:1, so the harness's send refuses the quest resolution.
-  it.fails("08142:A:1 Ride Them Down: the damage on the chosen enemy names its cause", () => {
-    const { tab, run, ram } = ridden(EFFECTS);
+  lineSpec("08142:A:1", "Ride Them Down: the damage on the chosen enemy names its cause", (effects) => {
+    const { tab, run, ram } = ridden(effects);
     const done = sendUnledgered(run, { type: "Pass" }, tab.ctx);
     expect(done.state.cards[ram]?.damage).toBe(2);
   });
@@ -209,9 +207,7 @@ describe("Waters of Nimrodel (08145:A:2)", () => {
   });
 
   // No character is damaged: its effect can change nothing, so it is not played (rr.triggered-ability).
-  // FAULT: with no damaged character in play, "Action: Heal all damage on each character in play." can change nothing, yet the engine
-  // offers the event (and its Doomed 3 would raise each threat for nothing).
-  it.fails("08145:A:2 Waters of Nimrodel: not played when no character is damaged", () => {
+  it("08145:A:2 Waters of Nimrodel: not played when no character is damaged", () => {
     const tab = table(EFFECTS, { heroes: [{ code: BERAVOR, seat: 0 }], hand: [{ code: WATERS, seat: 0 }] });
     expect(playable(tab)).not.toContain(idsOf(tab, WATERS));
   });

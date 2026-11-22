@@ -19,7 +19,7 @@ import { checkEngages } from "./check.ts";
 import { askSplit } from "../families/smaug/split.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { moveCard } from "../core/zones.ts";
-import { placeQuestingProgress } from "../families/defense/damage.ts";
+import { placeQuestingProgress, type QuestDamageCause } from "../families/defense/damage.ts";
 import { travelsOverActive } from "../families/grapple/travel.ts";
 import { freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
 import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
@@ -145,6 +145,8 @@ export function resolveQuest(
   only?: number,
   // The game has a card whose record answers a failed quest with an X amount (gameReadsOnTrigger): the event carries the shortfall for it.
   stampAmount = false,
+  // The record of the card whose lasting effect assigns the progress as damage (Ride Them Down), as the cause of that damage.
+  damageCause?: QuestDamageCause,
 ): ScenarioState {
   const started = steps.length;
   const willpower = committedWillpower(state, cards, only);
@@ -161,7 +163,7 @@ export function resolveQuest(
     next = failQuest(next, threat - willpower, steps, hearing, raise);
   } else if (willpower > threat) {
     // Progress may be assigned as damage to an enemy instead (08142).
-    next = withView(next, only, (view) => placeQuestingProgress(view, willpower - threat, cards, steps, canAdvance));
+    next = withView(next, only, (view) => placeQuestingProgress(view, willpower - threat, cards, steps, canAdvance, damageCause));
   }
   // Each seat hears how its quest went ("After you quest successfully"; questing exactly equal is neither, rr.step-3-4).
   if (willpower !== threat) {

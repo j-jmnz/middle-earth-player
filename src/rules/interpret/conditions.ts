@@ -278,7 +278,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return found === condition.is;
     }
     case "count": {
-      const found = countMatching(state, condition.pick, scope.actor, scope.sourceId, ctx, undefined, condition.pick.sameTitleAs === "picked" ? scope.picked : undefined);
+      const found = countMatching(state, condition.pick, scope.actor, scope.sourceId, ctx, undefined, condition.pick.sameTitleAs === "picked" ? scope.picked : undefined, scope.subject != null ? { subject: scope.subject } : undefined);
       return (condition.min == null || found >= condition.min) && (condition.max == null || found <= condition.max);
     }
     case "allMatch": {

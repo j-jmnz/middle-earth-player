@@ -170,8 +170,7 @@ describe("Song of Healing (22112:A:1, A:2)", () => {
     expect(triggers(tab.state, tab)).not.toContain("22112:action:1");
   });
 
-  // FAULT: the card heals 1 damage from the attached hero, so with no damage on it the effect cannot change the game state (rr.triggered-ability), yet the engine offers the Action and takes the discarded card for nothing.
-  it.fails("22112:A:2 is not offered when the attached hero has no damage", () => {
+  it("22112:A:2 is not offered when the attached hero has no damage", () => {
     const tab = song(EFFECTS, 0, [[EV1]]);
     expect(triggers(tab.state, tab)).not.toContain("22112:action:1");
   });

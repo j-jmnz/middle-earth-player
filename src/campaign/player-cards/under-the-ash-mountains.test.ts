@@ -86,9 +86,7 @@ describe("Gildor Inglorion (22081:A:1)", () => {
   });
 
   // With both decks empty no player can draw, so the Action is not offered (rr.triggered-ability).
-  // FAULT: the card prints "choose a player to draw 1 card", and the engine offers the Action (and takes its resource) when every deck is
-  // empty.
-  it.fails("22081:A:1 Gildor Inglorion: not offered when no player has a card to draw", () => {
+  it("22081:A:1 Gildor Inglorion: not offered when no player has a card to draw", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: GILDOR, seat: 0 }, { code: PAL, seat: 1 }] });
     expect(triggers(tab.state, tab)).not.toContain("22081:action:1");
   });
@@ -214,9 +212,7 @@ describe("Defiant Challenge (22089:A:2)", () => {
   });
 
   // With no exhausted character in play no player can ready one, so it is not played (rr.triggered-ability).
-  // FAULT: the card prints "Each player may ready a character he controls.", and the engine lets it be played (and its Doomed 2 raise each
-  // threat) when no character is exhausted.
-  it.fails("22089:A:2 Defiant Challenge: not played with no exhausted character", () => {
+  it("22089:A:2 Defiant Challenge: not played with no exhausted character", () => {
     const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: DEFIANT, seat: 0 }] });
     expect(playable(tab.state, tab, idsOf(tab, DEFIANT))).toBe(false);
   });

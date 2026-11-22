@@ -138,8 +138,7 @@ describe("Knowledge of the Enemy (22139:A:1)", () => {
   });
 
   // rr.triggered-ability: with no enemy engaged with you it adds 0 resources and changes nothing.
-  // FAULT: the card adds 1 resource for each enemy engaged with you; with none engaged the engine still offers it (it adds 0).
-  it.fails("22139:A:1 Knowledge of the Enemy: not played when no enemy is engaged with you", () => {
+  it("22139:A:1 Knowledge of the Enemy: not played when no enemy is engaged with you", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: LEAD, seat: 0 }, { code: SPI, seat: 1 }], engaged: [{ code: BOSS, seat: 1 }], hand: [{ code: KNOWLEDGE, seat: 0 }] });
     expect(playable(tab, tab.state, idsOf(tab, KNOWLEDGE))).toBe(false);
   });

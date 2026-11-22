@@ -122,8 +122,7 @@ describe("Well Warned (16008:A:1, A:2)", () => {
   });
 
   // An enemy of printed threat 0 is engaged: X is 0, so the Response can change nothing and is not offered (rr.triggered-ability).
-  // FAULT: the card reduces the threat by the enemy's printed Threat; with Threat 0 it changes nothing, but the engine offers the Response.
-  it.fails("16008:A:2 Well Warned: not offered after an enemy of printed threat 0 is engaged", () => {
+  it("16008:A:2 Well Warned: not offered after an enemy of printed threat 0 is engaged", () => {
     const { tab, run } = engaged(EFFECTS, EOWYN, "f0");
     expect(triggers(run.state, tab)).not.toContain("16008:response:1");
   });

@@ -124,8 +124,7 @@ describe("Lure of Moria (04030:A:1)", () => {
   });
 
   // Every Dwarf character is ready: the event can change nothing, so it is not offered (rr.triggered-ability).
-  // FAULT: the card readies Dwarf characters and every one is ready, so it can change nothing; the engine still offers it to be played.
-  it.fails("04030:A:1 Lure of Moria: not offered when every Dwarf character is ready", () => {
+  it("04030:A:1 Lure of Moria: not offered when every Dwarf character is ready", () => {
     const tab = table(EFFECTS, { heroes: [{ code: PAL, seat: 0 }, { code: DWARF_HERO, seat: 0 }], allies: [{ code: DWARF, seat: 0 }], hand: [{ code: LURE, seat: 0 }] });
     expect(legalIntents(tab.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === idsOf(tab, LURE))).toBe(false);
   });

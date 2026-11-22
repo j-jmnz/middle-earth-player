@@ -35,6 +35,7 @@ const ARCHER = "01030";
 const FRAIL = "frail";
 const WALL = "wall";
 const GLADE = "glade";
+const DOOM = "doom";
 const PAL = "pal";
 const PLAIN = "plain";
 
@@ -48,6 +49,7 @@ beforeAll(async () => {
   const cards = new Map([...starter.cards, ...(await loadPrinted(codes))]);
   cards.set(FRAIL, definePrinted({ code: FRAIL, name: "Frail", type: "enemy", threat: 1, engagementCost: 50, attack: 1, defense: 0, health: 1 }));
   cards.set(WALL, definePrinted({ code: WALL, name: "Wall", type: "enemy", threat: 1, engagementCost: 50, attack: 1, defense: 9, health: 9 }));
+  cards.set(DOOM, definePrinted({ code: DOOM, name: "Doom", type: "treachery", keywords: { doomed: 1 } }));
   cards.set(GLADE, definePrinted({ code: GLADE, name: "Glade", type: "location", threat: 1, questPoints: 5 }));
   base = { ...starter, cards };
 });
@@ -167,6 +169,18 @@ describe("Keys of Orthanc (07010:A:1, A:2)", () => {
     expect(triggers(run.state, tab)).toContain("07010:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: keys, effectId: "07010:response:1" }, tab.ctx);
     expect(run.state.cards[keys]?.exhausted).toBe(true);
+    expect(run.state.cards[gimli]?.resources).toBe(6 + 1);
+  });
+
+  // An encounter card with Doomed revealed in the staging step raises the threat from the Doomed keyword (rr.doomed-x): the Keys answer it.
+  lineSpec("07010:A:2", "Keys of Orthanc: after a doomed encounter card is revealed, 1 resource to the attached hero", (effects) => {
+    const tab = table(effects, { start: "quest", heroes: [{ code: DENETHOR, seat: 0 }, { code: GIMLI, seat: 0 }], allies: [{ code: SNOWBOURN, seat: 0 }], attached: [{ code: KEYS, host: GIMLI }], deck: [DOOM, GLADE] });
+    const [gimli, keys] = [idsOf(tab, GIMLI), idsOf(tab, KEYS)];
+    let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, SNOWBOURN)] }, tab.ctx);
+    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    expect(run.state.seats[0]?.threat).toBe(8 + 1);
+    expect(triggers(run.state, tab)).toContain("07010:response:1");
+    run = sendUnledgered(run, { type: "Trigger", cardId: keys, effectId: "07010:response:1" }, tab.ctx);
     expect(run.state.cards[gimli]?.resources).toBe(6 + 1);
   });
 

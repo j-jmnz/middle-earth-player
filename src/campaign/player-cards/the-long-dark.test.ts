@@ -137,8 +137,7 @@ describe("Erestor (04077:A:1)", () => {
   });
 
   // With the deck empty nothing can be drawn: the Action is not offered, and no card is discarded for nothing (rr.cost).
-  // FAULT: the card's discard is the cost ("to draw 1 card") and an empty deck leaves the draw nothing to change, but the engine offers the Action.
-  it.fails("04077:A:1 Erestor: not offered with an empty deck", () => {
+  it("04077:A:1 Erestor: not offered with an empty deck", () => {
     const tab = erestor(EFFECTS, 0);
     expect(triggers(tab.state, tab)).not.toContain("04077:action:1");
   });
@@ -273,8 +272,7 @@ describe("Word of Command (04084:A:1)", () => {
   });
 
   // With the deck empty nothing can be searched for: it is not played, and Gandalf is not exhausted for nothing.
-  // FAULT: the exhaust is the cost and a search and shuffle of an empty deck change nothing, but the engine lets the event be played.
-  it.fails("04084:A:1 Word of Command: not played with an empty deck", () => {
+  it("04084:A:1 Word of Command: not played with an empty deck", () => {
     const tab = word(EFFECTS, { allies: [{ code: GANDALF, seat: 0 }] });
     expect(playable(tab.state, tab, idsOf(tab, WORD))).toBe(false);
   });

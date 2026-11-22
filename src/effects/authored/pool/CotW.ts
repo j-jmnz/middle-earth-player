@@ -9,7 +9,7 @@ export const RECORDS: readonly Effect[] = [
   // hero with The One Ring" is the hero with a Master attachment (The One Ring is a Master card itself). The Response's cost
   // can be paid only by the player who controls The One Ring, so attached hero is a unique character that player controls:
   // the -1 on it cancels the +1 every unique character of theirs gets, which leaves each other one +1.
-  {"id":"22055:constant:1","cardCode":"22055","lines":["22055:A:1","22055:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","hasAttachment":{"trait":"Master"}}],"limitPerHost":true}]},
+  {"id":"22055:constant:1","cardCode":"22055","lines":["22055:A:1","22055:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","hasAttachment":{"names":["The One Ring"]}}],"limitPerHost":true}]},
   {"id":"22055:constant:2","cardCode":"22055","lines":["22055:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"whileSourceInPlay","target":"host"}]},
   {"id":"22055:response:1","cardCode":"22055","lines":["22055:A:3"],"timing":"response","trigger":"committed","subject":"host","cost":[{"kind":"exhaustNamed","name":"The One Ring"},{"kind":"raiseThreat","amount":1}],"instructions":[
     {"verb":"ModifyStat","stat":"willpower","amount":1,"until":"endOfPhase","holders":{"type":"character","control":"you","unique":true}},

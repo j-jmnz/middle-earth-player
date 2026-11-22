@@ -183,8 +183,7 @@ describe("Greenwood Archer (16003:A:2)", () => {
   });
 
   // Every hero ready: the Response can ready nothing, so it is not offered (rr.triggered-ability).
-  // FAULT: the card readies a hero; with every hero ready it can change nothing, but the engine offers the Response.
-  it.fails("16003:A:2 Greenwood Archer: not offered while every hero is ready", () => {
+  it("16003:A:2 Greenwood Archer: not offered while every hero is ready", () => {
     const tab = archer(EFFECTS, false);
     expect(triggers(playCode(tab, ARCHER).state, tab)).not.toContain("16003:response:1");
   });

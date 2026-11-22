@@ -70,9 +70,7 @@ describe("Second Breakfast (02027:A:1)", () => {
   });
 
   // With no attachment in any discard pile the Action can return nothing, so it is not played (rr.triggered-ability).
-  // FAULT: the card prints "returns the topmost attachment card from his discard pile to his hand", and the engine lets it be played (and
-  // paid for) when no discard pile holds an attachment.
-  it.fails("02027:A:1 Second Breakfast: not played with no attachment in a discard pile", () => {
+  it("02027:A:1 Second Breakfast: not played with no attachment in a discard pile", () => {
     const scene = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: BREAKFAST, seat: 0 }] });
     const { tab } = discarded(scene, [[CARD, 0]]);
     expect(legalIntents(tab.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === idsOf(tab, BREAKFAST))).toBe(false);
@@ -130,9 +128,7 @@ describe("Éomund and Nor am I a Stranger (02030:A:1, 02031:A:1, A:2)", () => {
   });
 
   // With no exhausted Rohan character in play the Response can ready nothing, so it is not offered (rr.triggered-ability).
-  // FAULT: the card prints "ready all Rohan characters in play", and the engine offers the Response when every Rohan character (Théodred)
-  // is ready already.
-  it.fails("02030:A:1 Éomund: not offered with no exhausted Rohan character", () => {
+  it("02030:A:1 Éomund: not offered with no exhausted Rohan character", () => {
     const tab = table(EFFECTS, { heroes: [{ code: THEODRED, seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: EOMUND, seat: 0 }], engaged: [{ code: RIDER, seat: 0 }] });
     let run = passAll(combat(tab.state, tab), tab.ctx);
     run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, EOMUND) }, tab.ctx), tab.ctx);

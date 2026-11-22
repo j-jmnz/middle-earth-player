@@ -56,7 +56,7 @@ function payable(state: ScenarioState, seat: number, cardId: string, ctx: Reduce
 }
 
 // Whether the seat could play the card now under PlayFrom's terms.
-function playableFrom(state: ScenarioState, id: string, instruction: PlayFrom, seat: number, ctx: ReduceContext): boolean {
+export function playableFrom(state: ScenarioState, id: string, instruction: PlayFrom, seat: number, ctx: ReduceContext): boolean {
   const card = state.cards[id];
   if (!card) return false;
   const printed = printedOf(ctx.cards, card.code);

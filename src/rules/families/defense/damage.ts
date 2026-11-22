@@ -5,7 +5,8 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
 import { characters } from "../../combat/combat.ts";
-import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { currentCause, effectCause, UNATTRIBUTED, type Cause } from "../../core/cause.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, placeDamage } from "../../core/keywords.ts";
@@ -98,7 +99,7 @@ export function defenseFromWillpower(state: ScenarioState, instance: CardInstanc
 
 // Progress from questing successfully (rr.step-3-4): the active location takes what it needs first, and while an enemy holds
 // takesQuestProgress the rest is assigned to it as damage instead of being placed on the quest (Ride Them Down, 08142).
-export function placeQuestingProgress(state: ScenarioState, amount: number, cards: Cards, steps: EngineStep[], canAdvance: (state: ScenarioState) => boolean): ScenarioState {
+export function placeQuestingProgress(state: ScenarioState, amount: number, cards: Cards, steps: EngineStep[], canAdvance: (state: ScenarioState) => boolean, causeOf?: QuestDamageCause): ScenarioState {
   const enemy = Object.values(state.cards).find((card) => inPlay(card.zone) && printedOf(cards, card.code).type === "enemy" && flagged(state, card.id, "takesQuestProgress"));
   if (!enemy) return placeQuestProgress(state, amount, cards, steps, canAdvance, true);
   const location = state.activeLocation ? state.cards[state.activeLocation] : undefined;
@@ -106,7 +107,20 @@ export function placeQuestingProgress(state: ScenarioState, amount: number, card
   const toLocation = location && points != null ? Math.min(amount, Math.max(0, points - location.progress)) : 0;
   const placed = toLocation > 0 ? placeQuestProgress(state, toLocation, cards, steps, canAdvance, true) : state;
   const rest = amount - toLocation;
-  return rest > 0 && placed.cards[enemy.id] ? placeDamage(placed, enemy.id, rest, cards, steps, "player", currentCause(steps, UNATTRIBUTED)) : placed;
+  // The damage is the effect of the card that set the flag: its record is the cause.
+  const holder = state.modifiers.find((modifier) => modifier.stat === "takesQuestProgress" && modifier.instanceId === enemy.id && modifierActive(state, modifier));
+  const cause = (holder ? causeOf?.(holder.sourceId) : undefined) ?? currentCause(steps, UNATTRIBUTED);
+  return rest > 0 && placed.cards[enemy.id] ? placeDamage(placed, enemy.id, rest, cards, steps, "player", cause) : placed;
+}
+
+/** The record of the card with this id that holds the flag `takesQuestProgress`, as the cause of the damage it assigns. */
+export type QuestDamageCause = (sourceId: string) => Cause | undefined;
+
+export function questDamageCause(state: ScenarioState, ctx: ReduceContext): QuestDamageCause {
+  return (sourceId) => {
+    const effect = effectsOf(ctx, state.cards[sourceId]?.code ?? "").find((record) => record.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "takesQuestProgress"));
+    return effect ? effectCause(effect) : undefined;
+  };
 }
 
 // Each character that took damage from the enemy attack in progress and is still in play hears it ("After attached hero takes

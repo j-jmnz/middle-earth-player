@@ -93,8 +93,7 @@ describe("Tome of Atanatar (06109:A:1, A:2, A:3)", () => {
 
   // The heroes hold no resources: For Gondor! (cost 2) cannot be played, so the Action can change nothing and is not offered
   // (rr.triggered-ability), and the Tome is not discarded for nothing.
-  // FAULT: no resources to pay for the only Leadership event; the engine still offers the Action, discards the Tome and leaves For Gondor! in the discard pile.
-  it.fails("06109:A:3 Tome of Atanatar: not offered when the Leadership event cannot be paid for", () => {
+  it("06109:A:3 Tome of Atanatar: not offered when the Leadership event cannot be paid for", () => {
     const start = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }, { code: GIMLI, seat: 0 }], attached: [{ code: TOME, host: ARAGORN }], playerDeck: fillers(PLAIN, 2) }, 0);
     const { tab } = discarded(start, [[FOR_GONDOR, 0]]);
     expect(triggers(tab.state, tab)).not.toContain("06109:action:1");

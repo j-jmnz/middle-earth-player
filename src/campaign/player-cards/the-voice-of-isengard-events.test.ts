@@ -69,8 +69,7 @@ describe("Deep Knowledge (07012:A:2)", () => {
   });
 
   // Both decks empty: no player can draw, so the Action can change nothing and the card is not played (rr.triggered-ability).
-  // FAULT: with every deck empty no player can draw; the engine still offers the card.
-  it.fails("07012:A:2 Deep Knowledge: not played when every deck is empty", () => {
+  it("07012:A:2 Deep Knowledge: not played when every deck is empty", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: DENETHOR, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: DEEP, seat: 0 }] });
     expect(playable(tab, idsOf(tab, DEEP))).toBe(false);
   });
@@ -91,8 +90,7 @@ describe("The Wizards's Voice (07013:A:2)", () => {
   });
 
   // No enemy engaged with any player: nothing to choose, so the card is not played.
-  // FAULT: with no enemy engaged no player can choose one; the engine still offers the card.
-  it.fails("07013:A:2 The Wizards's Voice: not played with no enemy engaged", () => {
+  it("07013:A:2 The Wizards's Voice: not played with no enemy engaged", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: VOICE, seat: 0 }], staging: [BRUTE] });
     expect(playable(tab, idsOf(tab, VOICE))).toBe(false);
   });
@@ -131,8 +129,7 @@ describe("Power of Orthanc (07014:A:2)", () => {
   });
 
   // No Condition attachment in play: each player can only skip, so the card can change nothing and is not played.
-  // FAULT: with no Condition attachment in play there is nothing to discard; the engine still offers the card.
-  it.fails("07014:A:2 Power of Orthanc: not played with no Condition attachment in play", () => {
+  it("07014:A:2 Power of Orthanc: not played with no Condition attachment in play", () => {
     const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], attached: [{ code: STONE_ITEM, host: EOWYN }], hand: [{ code: POWER, seat: 0 }] });
     expect(playable(tab, idsOf(tab, POWER))).toBe(false);
   });

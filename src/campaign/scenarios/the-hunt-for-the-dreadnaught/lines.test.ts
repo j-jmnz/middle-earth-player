@@ -200,8 +200,8 @@ describe("Silent Mist, Swan Ship of Dol Amroth and Twilight's Call", () => {
     expect(run.state.cards[made.hero]?.exhausted).toBe(false);
   });
 
-  // A lore event costs 3 and the stand-in heroes are tactics: it is paid only where a ship waives the match.
-  const lore = (play: Layout["play"], hand: string[]) => tableFromLayout("the-hunt-for-the-dreadnaught", { stages: STAGES, play, hand, heroResources: 3 }, { extra: ["01064"] });
+  // A lore event costs 3 and the stand-in heroes are tactics: it is paid only where a ship waives the match. The deck holds cards to draw (an event that draws from an empty deck is not played).
+  const lore = (play: Layout["play"], hand: string[]) => tableFromLayout("the-hunt-for-the-dreadnaught", { stages: STAGES, play, hand, deckOf: ["ally", "ally", "ally", "ally", "ally", "ally"], heroResources: 3 }, { extra: ["01064"] });
   const playable = (made: ReturnType<typeof lore>, id: string) => legalIntents(made.state, made.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
   it("40011:A:2 the first card you play each round does not require a resource match", () => {
     const made = lore(["40011"], ["01064"]);
