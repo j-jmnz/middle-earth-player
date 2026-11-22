@@ -45,6 +45,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18016:A:3 (front): Forced: After The Old Ford becomes the active location, each enemy in the staging area makes an immediate attack against the first player.
   18016:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each enemy (any player controls) in the staging area only:
       - the picked enemy attacks the first player now, from the staging area
 
@@ -53,6 +54,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18017:A:1 (front): Forced: When Wooded Riverbank is explored, put the top card of the Evil Creatures deck into play engaged with the first player.
   18017:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for the first player, the top card(s) of the evilCreatures deck go to the engaged area
 
 18017:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
@@ -176,6 +178,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18024:A:2 (front): While Lonely Lands is in the staging area, it gains: "Forced: After an event is played during the quest phase, place it facedown under Lonely Lands."
   18024:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if all of: (it is the Quest phase) and (this card is in the staging area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about, now in a discard pile, is attached facedown to this card: out of play under it, with no text, and discarded to its owner's discard pile when this card leaves play
 
 ## 18025 Ruined Supplies
@@ -208,6 +211,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     - (marker, in a card in a hand, does nothing when run) cannot be discarded by player card effects: a pick from a hand that a player card makes leaves the card out; an encounter card's effect still discards it
   18026:forced:1: Forced after this card is played (heard about card (you control); event happened to the controller; used from hand)
     only if this card is in its player's hand
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player discards each card (you control) in hand
     - discard this card
@@ -223,6 +227,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18027:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   18027:forced:1: Forced on the event readied (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player chooses one of:
       * option "other" (only if there is a card (any player controls) or in the staging area or the active location, that is not an objective, attached to this card's host, other than this card to choose):
         - choose card (any player controls) or in the staging area or the active location, attached to this card's host, other than this card
@@ -250,6 +255,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18066:B:1 (back): Forced: After placing progress here from questing successfully, place 1 resource here.
   18066:forced:1: Forced on the event progressPlaced (heard about this card)
     only if all of: (it is the Quest phase) and (the quest succeeded)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - 1 resource token(s) are placed on this card
 
 18066:B:2 (back): Forced: At the beginning of the encounter phase, remove 1 resource from this stage. Then, add the top card of the Evil Creatures deck to the staging area.
@@ -281,6 +287,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18067:B:2 (back): Forced: After the players travel to a location, add the top card of the Evil Creatures deck to the staging area.
   18067:forced:1: Forced after the players travel (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for the acting player, the top card(s) of the evilCreatures deck go to the staging area
 
 18067:B:3 (back): The players cannot defeat this stage unless the first player controls Haldan.
@@ -314,6 +321,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     only if the card with code 18016 is in play
     - the players cannot defeat this stage while this holds
   18068:forced:2: Forced on the event locationExplored (heard about location (any player controls) named "The Old Ford")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 18069 Woodmen Village
@@ -325,6 +333,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18069:A:2 (front): Forced: When Woodmen Village is explored, add the top card of the Evil Creatures deck to the staging area. Then, flip over Woodmen Village and attach Haldan to the just-added enemy as a guarded objective.
   18069:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for the acting player, the top card(s) of the evilCreatures deck go to the staging area
     - this card, wherever it lies, flips over and shows the card with code 18070, and enters the staging area faceup; the picked card (the enemy the last add put in) guards it (the old side is kept as the card's other side)
@@ -342,6 +351,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18070:A:3 (front): If Haldan leaves play, the players lose the game.
   18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 (rendered pieces: 241 by template, 0 as JSON)

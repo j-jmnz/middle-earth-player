@@ -16,6 +16,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110136:A:4 (front): If the Dream-chaser is destroyed, the players lose the game.
   110136:triggered:2: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 110136:B:1 (back): Campaign Mode only.
@@ -35,6 +36,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110136:B:5 (back): If the Dream-chaser is destroyed, the players lose the game.
   110136:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 110137 Dawn Star
@@ -55,6 +57,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110137:A:5 (front): If the Dawn Star is destroyed, its controller is eliminated from the game.
   110137:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player is eliminated from the game by a card effect
 
 110137:B:1 (back): Campaign Mode only.
@@ -72,6 +75,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110137:B:5 (back): If the Dawn Star is destroyed, its controller is eliminated from the game.
   110137:triggered:4: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player is eliminated from the game by a card effect
 
 ## 110138 Duskbringer
@@ -91,6 +95,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110138:A:4 (front): If the Duskbringer is destroyed, its controller is eliminated from the game.
   110138:triggered:2: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player is eliminated from the game by a card effect
 
 110138:B:1 (back): Campaign Mode only.
@@ -110,6 +115,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110138:B:5 (back): If the Duskbringer is destroyed, its controller is eliminated from the game.
   110138:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player is eliminated from the game by a card effect
 
 ## 110139 Glórinaith
@@ -134,6 +140,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110139:A:5 (front): If the Glórinaith is destroyed, its controller is eliminated from the game.
   110139:triggered:2: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player is eliminated from the game by a card effect
 
 110139:B:1 (back): Campaign Mode only.
@@ -160,6 +167,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110139:B:6 (back): If the Glórinaith is destroyed, its controller is eliminated from the game.
   110139:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player is eliminated from the game by a card effect
 
 ## 110140 Nárelenya
@@ -176,6 +184,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110140:A:4 (front): If the Nárelenya is destroyed, its controller is eliminated from the game.
   110140:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player is eliminated from the game by a card effect
 
 110140:B:1 (back): Campaign Mode only.
@@ -193,6 +202,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110140:B:5 (back): If the Nárelenya is destroyed, its controller is eliminated from the game.
   110140:triggered:4: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player is eliminated from the game by a card effect
 
 ## 110141 Silver Wing
@@ -216,6 +226,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110141:A:6 (front): If the Silver Wing is destroyed, its controller is eliminated from the game.
   110141:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player is eliminated from the game by a card effect
 
 110141:B:1 (back): Campaign Mode only.
@@ -240,6 +251,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110141:B:7 (back): If the Silver Wing is destroyed, its controller is eliminated from the game.
   110141:triggered:4: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player is eliminated from the game by a card effect
 
 ## 11016 Departure from the Havens
@@ -486,6 +498,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11054:A:2 (front): Forced: After traveling to Waterspout, deal 4 damage to each Ship objective.
   11054:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 4 damage to each Ship character (any player controls)
 
 ## 11055 Sudden Storms
@@ -632,6 +645,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11080:A:4 (front): If the Dream-chaser is destroyed, the players lose the game.
   11080:triggered:2: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 11081 Dawn Star
@@ -653,6 +667,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11081:A:5 (front): If the Dawn Star is destroyed, its controller is eliminated from the game.
   11081:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player is eliminated from the game by a card effect
 
 ## 11082 Nárelenya
@@ -670,6 +685,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11082:A:4 (front): If the Nárelenya is destroyed, its controller is eliminated from the game.
   11082:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player is eliminated from the game by a card effect
 
 ## 11083 Silver Wing
@@ -694,6 +710,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11083:A:6 (front): If the Silver Wing is destroyed, its controller is eliminated from the game.
   11083:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player is eliminated from the game by a card effect
 
 ## 11171 Voyage Across Belegaer

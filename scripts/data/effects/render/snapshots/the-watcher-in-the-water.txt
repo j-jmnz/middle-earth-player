@@ -105,6 +105,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 04068:A:1 (front): Forced: After you travel to Makeshift Passage, place 2 progress tokens on the current quest card, bypassing any active location.
   04068:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - 2 progress is placed on the main quest stage (a quest effect: a full stage advances)
 
 ## 04069 Stagnant Creek
@@ -157,6 +158,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 04073:A:1 (front): Forced: When Grasping Tentacle is attacked, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, attach this card to an attacking character as a Tentacle attachment with the text: "Attached character's Attack and Defense are reduced to 0."
   04073:forced:1: Forced on the event enemyAttacked (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): choose character (any player controls) chosen by the first player, that took part in the attack this effect answers
@@ -175,6 +177,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 04074:A:1 (front): Forced: When Thrashing Tentacle is attacked, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, deal the damage from the attack to 1 character an attacking player controls (ignoring defense).
   04074:forced:1: Forced on the event enemyAttacked (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): choose character (any player controls) chosen by the first player, controlled by a player whose character took part in the attack this effect answers
@@ -205,6 +208,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 901501:A:3 (front): Forced: When a Tentacle enemy is destroyed, deal 1 damage to The Watcher if it is in play.
   901501:forced:1: Forced after an enemy is destroyed (heard about Tentacle enemy (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a enemy (any player controls) or in the staging area, named "The Watcher" to choose: choose enemy (any player controls) or in the staging area, named "The Watcher"
     - then, if there is a enemy (any player controls) or in the staging area, named "The Watcher" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
@@ -291,6 +295,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
     - this card counts as a Tentacle attachment while it is attached
   901504:forced:2: Forced on the event readied (heard about the host)
     only if all of: (this card is attached to a card) and (its host is a character (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to its host
 
 ## 901505 Banks of Sirannon
@@ -310,6 +315,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 901506:A:1 (front): Forced: After a player looks at one or more cards in the encounter deck, shuffle the encounter deck.
   901506:forced:1: Forced on the event lookedAtEncounterDeck
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - shuffle the encounter deck
 
 901506:A:2 (front): Travel: Reveal the topmost Tentacle enemy in the encounter discard pile to travel here.

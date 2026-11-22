@@ -65,6 +65,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144043:A:2 (front): Forced: After Morgul Vale is explored, search the encounter deck and discard pile for a Morgul Wraith and add it to the staging area. Shuffle the encounter deck. Then, the first player must either exhaust The One Ring, or discard 1 random card from each player's hand.
   144043:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 144053 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
@@ -92,6 +93,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144044:A:3 (front): Forced: After Sméagol's Secret Way is explored, each player either exhausts a character he controls, or discards 1 random card from his hand.
   144044:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "exhaust" (only if there is a ready character (you control) to choose):
@@ -127,10 +129,12 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144046:A:1 (front): Forced: When The Spider's Lair is explored, remove 1 resource from Shelob.
   144046:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - up to 1 resource token(s) come off the card with code 144040 in play
 
 144046:A:2 (front): Forced: After The Spider's Lair becomes the active location, Shelob makes an immediate attack against the first player.
   144046:forced:2: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Shelob"
     - then, if there is a enemy (any player controls) or in the staging area, named "Shelob" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area (or engaged)
@@ -173,6 +177,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144049:A:1 (front): While Den of Night is in the staging area, it gains: "Forced: After a 'When Revealed' effect is canceled, place 1 resource on Shelob."
   144049:forced:1: Forced on the event whenRevealedCanceled
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Shelob"
     - place 1 resource tokens on the picked card
@@ -375,6 +380,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144072:B:1 (back): If Gollum is defeated, add him to the victory display. (Do not flip him over.)
   144072:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls) named "Gollum")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about is added to the victory display
 
 144072:B:2 (back): While Shelob has at least 1 resource on her, she gains: "Forced: When Shelob is dealt any amount of damage, cancel that damage and discard 1 resource from Shelob instead."

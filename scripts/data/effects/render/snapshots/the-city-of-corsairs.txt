@@ -77,10 +77,12 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 11215:B:1 (back): Forced: When stage 2B is revealed, search the encounter deck and discard pile for each boon and non-Ship burden and shuffle them into the second encounter deck.
   11215:forced:1: Forced on the event stageRevealed
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Fate of the Dream-chaser"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - every boon, and every burden without the trait Ship, in the encounter deck or its discard pile is marked as carried across to the second encounter deck (a discard-pile card moves to the deck, and the stage's set-aside step keeps the marked cards in it)
 
 11215:B:2 (back): Forced: When Captain Sahír enters play, attach Black Key (burden) and The Black Sword to him.
   11215:forced:2: Forced on the event encounterEnteredPlay (heard about enemy (any player controls) or in the staging area, named "Captain Sahír")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - Campaign Setup: the set-aside copy of the card with code 11192 is attached to the card in play named "Captain Sahír" (a card dealt on its Upgraded side stays so)
     - Campaign Setup: the set-aside copy of the card with code 11216 is attached to the card in play named "Captain Sahír" (a card dealt on its Upgraded side stays so)
@@ -138,6 +140,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12147:B:3 (back): If the Stormcaller is destroyed (or if this stage has 15 or more progress on it), advance to stage 2.
   12147:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Stormcaller")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - advance to the next quest stage
 
 ## 12148 Fate of the Dream-chaser
@@ -197,14 +200,17 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12150:B:2 (back): Forced: When a hero or enemy is destroyed, add its resources to Captain Sahír.
   12150:forced:1: Forced on the event characterDestroyed (heard about hero (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each enemy (any player controls) or in the staging area, named "Captain Sahír":
       - place resources of the card the event is about resource tokens on the picked card
   12150:forced:2: Forced after an enemy is destroyed (heard about enemy (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each enemy (any player controls) or in the staging area, named "Captain Sahír":
       - place resources of the card the event is about resource tokens on the picked card
 
 12150:B:3 (back): If Captain Sahír is destroyed, the players have finally put an end to the Corsairs' treacherous plot and win the game.
   12150:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Captain Sahír")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 12151 Stormcaller
@@ -255,6 +261,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12153:A:2 (front): Forced: After the engaged player spends any number of resources, place 1 of those resources on Umbar Slaver.
   12153:forced:1: Forced on the event resourcesSpent (event happened to the controller)
     only if this card is engaged with a player (that player is who "you" means in this record)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on this card
 
 ## 12154 Southern Belfalas
@@ -295,6 +302,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12156:A:1 (front): While Watch Tower is in the staging area, it gains: "Forced: When a Raider enemy enters play, add 1 resource to it."
   12156:forced:1: Forced on the event encounterEnteredPlay (heard about Raider enemy (any player controls) or in the staging area)
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on the card the event is about
 
 12156:A:2 (shadow): Shadow: If this attack destroys an ally, add resources to a Raider enemy in play equal to that character's printed resource cost.
@@ -320,6 +328,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12158:A:1 (front): Captain Sahír engages the first player.
   12158:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this enemy, in the staging area, engages the first player
 
 12158:A:2 (front): For each point of damage Captain Sahír would take, discard 1 resource from him and cancel that damage.

@@ -20,6 +20,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 110013:A:3 (front): If Calphon leaves play, the players lose the game.
   110013:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 110013:B:1 (back): Campaign Mode only.
@@ -43,6 +44,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 110013:B:4 (back): If Calphon leaves play, the players lose the game.
   110013:triggered:2: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 11025 Explore the Island
@@ -64,10 +66,12 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 11025:B:2 (back): Forced: After a location is explored, add progress to Explore the Island equal to that location's printed quest points.
   11025:forced:1: Forced after a card leaves play (heard about location (any player controls))
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - progress equal to printed quest points of the card the event is about is placed on the main quest stage (a quest effect: a full stage advances)
 
 11025:B:3 (back): Forced: When an Uncharted location becomes the active location, add 1 copy of Lost Island from the top of the Uncharted deck to the staging area.
   11025:forced:2: Forced after this location becomes the active location (heard about location (any player controls) that is a double-sided location lying on its Lost Island side (Uncharted))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the top 1 cards of the Uncharted deck join the staging area without being revealed, Lost Island side up (the deck is not shuffled)
 
 ## 11026 A Fateful Discovery
@@ -83,6 +87,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 11026:B:1 (back): Forced: After a location is explored, if it would be shuffled into the Uncharted deck, add it to the victory display, instead.
   11026:forced:1: Forced after a card leaves play (heard about location (any player controls))
     only if all of: (the card the event is about had enough progress to be explored) and (the card the event is about is a location (any player controls) that is a double-sided location lying on its Lost Island side (Uncharted))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about is added to the victory display
 
 11026:B:2 (back): The players cannot defeat this stage unless Shrine to Morgoth is in the victory display. When Shrine to Morgoth is added to the victory display, the players win the game.
@@ -103,6 +108,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 11027:A:2 (front): Forced: After Shrine to Morgoth is flipped over while active, exhaust each ally in play with printed cost 2 or less. Then, each player must search the encounter deck and discard pile for an Undead enemy and put it into play engaged with him. Shuffle the encounter deck.
   11027:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust each ally (any player controls) of card type ally, with a printed cost of 2 or less
     - for each player, first player first:
@@ -118,6 +124,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11027:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   11027:forced:2: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 11027:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
@@ -147,6 +154,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11028:A:3 (front): If Calphon leaves play, the players lose.
   11028:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 11029 Servant of the Deceiver
@@ -173,6 +181,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 11030:A:2 (front): Forced: After Lush Jungle is flipped over while active, return it to the staging area unless each player exhausts each ready hero he controls.
   11030:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player chooses one of:
       * option "exhaust":
         - exhaust each ready hero (any player controls)
@@ -188,6 +197,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11030:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   11030:forced:2: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 11030:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
@@ -202,6 +212,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 11031:A:1 (front): Forced: After Forbidden Coast is flipped over while active, each player may draw a card. Then, each player chooses a card from his hand and places it on the bottom of his deck.
   11031:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player chooses one of:
@@ -221,6 +232,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11031:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   11031:forced:2: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 11031:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
@@ -330,6 +342,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11070:A:2 (front): Forced: When Throngs of Unfaithful is destroyed, discard the bottom card of the engaged player's deck. If that card's printed cost is 2 or less, return Throngs of Unfaithful to the top of the encounter deck.
   11070:forced:1: Forced after an enemy is destroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the bottom card of the acting player's deck goes to its owner's discard pile, announced as discarded from the deck; the effect remembers it, so a later check can read its printed cost
     - then, if the card the effect just discarded from the bottom of a deck has a printed cost of 2 or less (a card with no printed cost does not, and nothing discarded does not) (checked when this step runs, after the steps above; not tied to whether they did anything): this card goes on top of the encounter deck
@@ -368,6 +381,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11072:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   11072:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 11072:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
@@ -382,6 +396,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 11073:A:1 (front): Forced: After Drowned Graves is flipped over while active, discard the top X cards of the encounter deck. Each player adds an Undead enemy discarded by this effect to the staging area. X is 2 more than the number of players in the game.
   11073:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard the number of players + 2 card(s) from the top of the encounter deck
     - each player in turn adds one Undead enemy among the cards this effect discarded (still in the encounter discard pile) to the staging area, choosing among them; not revealed
@@ -395,6 +410,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11073:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   11073:forced:2: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 11073:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
@@ -420,6 +436,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11074:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   11074:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 11074:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.

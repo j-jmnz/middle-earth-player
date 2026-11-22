@@ -44,6 +44,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19122:A:2 (front): Forced: After The First Forge becomes the active location, exhaust the hero with Wormsbane attached. That hero cannot ready while The First Forge is the active location.
   19122:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (any player controls) with an attachment named "Wormsbane"
     - exhaust the picked card
@@ -61,6 +62,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19123:A:1 (front): Forced: When Dagnir's Hoard is explored, Dagnir returns to the staging area and makes an immediate attack against each player in turn order.
   19123:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Dagnir"
     - return the picked card to the staging area
@@ -147,6 +149,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19128:A:2 (front): Forced: After Deep-dweller takes any amount of damage (and survives), return it to the staging area.
   19128:forced:2: Forced after a card takes damage (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return this card to the staging area
 
 ## 19129 Mines of Gundabad
@@ -256,6 +259,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     - advance to the next quest stage
     - the current quest card shows side B (a stage that already shows side B changes nothing)
   19134:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - when this stage is defeated, whatever the heading: the first player looks at the top 2 stages of the quest deck and chooses 1 to place on the bottom of the quest deck; the others stay on top in their order and the quest advances to the top stage
 
 ## 19135 Exploring Gundabad
@@ -282,6 +286,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19135:B:2 (back): Forced: When this stage is defeated, shuffle The First Forge into the Caves deck.
   19135:forced:3: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - up to 1 set-aside copies of the card with code 19122 join the Caves deck, which is shuffled with the game's seed (a game that dealt no such pile, or has no copy set aside, changes nothing)
 
 19135:B:3 (back): At the end of the combat phase, the players may bypass this stage.
@@ -316,6 +321,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19137:B:2 (back): Forced: When this stage is defeated, search the Caves deck for a location and make it the active location. Shuffle the Caves deck.
   19137:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player chooses a card of the Caves deck, which becomes the active location (the one active now returns to the staging area) and hears that it did (nothing with the Caves deck empty; the shuffle is the record's)
     - shuffle the caves deck
@@ -355,6 +361,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19138:B:2 (back): Forced: When this stage is defeated, reduce each player's threat by 5.
   19138:forced:3: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - lower threat by 5 (each player)
 
 19138:B:3 (back): At the end of the combat phase, the players may bypass this stage.
@@ -393,6 +400,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19139:B:2 (back): Forced: When this stage is defeated, deal 5 damage to Dagnir. This damage is not limited by Dagnir's text, and does not count toward her X value.
   19139:forced:3: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Dagnir"
     - deal 5 damage to the picked card
@@ -429,6 +437,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19140:B:2 (back): Forced: When this stage is defeated, the first player looks at the top 2 cards of the quest deck and chooses 1 to place on the bottom of the quest deck. Then, flip over the top card of the quest deck.
   19140:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - when this stage is defeated, whatever the heading: the first player looks at the top 2 stages of the quest deck and chooses 1 to place on the bottom of the quest deck; the others stay on top in their order and the quest advances to the top stage
 
 19140:B:3 (back): At the end of the combat phase, the players may bypass this stage.
@@ -466,6 +475,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19141:B:2 (back): Forced: When this stage is defeated, discard a non-unique enemy from play.
   19141:forced:3: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a non-unique enemy (any player controls) or in the staging area to choose: choose non-unique enemy (any player controls) or in the staging area, chosen by the first player
     - then, if there is a non-unique enemy (any player controls) or in the staging area to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card

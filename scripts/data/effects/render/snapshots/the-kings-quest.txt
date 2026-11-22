@@ -45,6 +45,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18042:A:3 (front): Forced: After the active location is explored, Fire-drake returns to the staging area and makes an immediate attack against each player in turn order.
   18042:forced:1: Forced on the event activeExplored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - return this card to the staging area
     - for each player, first player first:
@@ -94,6 +95,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18045:A:2 (front): Forced: After the players travel to Contested Depths, either raise each player's threat by 1 for each location in the victory display, or discard Contested Depths and replace it with the top card of the Caves deck.
   18045:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player chooses one of:
       * option "threat":
         - raise threat by the number of location (any player controls) in the victory display (each player)
@@ -154,6 +156,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18049:A:2 (front): Forced: After Stone-troll attacks and destroys a character you control, discard 1 card from your hand for each excess point of damage dealt.
   18049:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls); event happened to the controller)
     only if the event's other card is a enemy (any player controls) named "Stone-troll"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard the damage on the card the event is about beyond its printed hit points cards from hand
 
 18049:A:3 (shadow): Shadow: Discard an attachment you control.
@@ -175,8 +178,10 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18050:A:2 (front): Forced: After Hobgoblin enters play, the first player attaches the top card of his deck to Hobgoblin faceup as a guarded attachment. When Hobgoblin leaves play, return the card it was guarding to its owner's hand.
   18050:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player's top deck card lies faceup under this card, which guards it (nothing with an empty deck)
   18050:forced:2: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - (marker, does nothing when run) when this enemy leaves play, the card it was guarding returns to its owner's hand (the settle sweep returns a card held under an enemy that is out of play)
 
 ## 18051 Werewolf
@@ -205,6 +210,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18052:A:1 (front): Forced: After Giant Spider attacks and damages a character, that character cannot ready until the end of the round.
   18052:forced:1: Forced on the event damagedByAttack (heard about character (any player controls))
     only if the attacking enemy is a enemy (any player controls) named "Giant Spider"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about: stat cannotReady 1, until the end of the round
 
 18052:A:2 (shadow): Shadow: The defender cannot ready until the end of the round.
@@ -306,6 +312,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18058:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   18058:forced:1: Forced on the event enemyAttacks (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each character (you control):
       - deal 1 damage to the picked card
@@ -359,6 +366,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18062:A:1 (front): Forced: After Frightful Den becomes the active location, shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded, where X is the number of players. Add each enemy discarded this way to the staging area.
   18062:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - discard from the top of the encounter deck until 1 enemy for each player is discarded; add those enemies to the staging area
@@ -378,6 +386,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18064:A:1 (front): Forced: After Crumbling Cavern becomes the active location, each player assigns X damage among characters he controls, where X is the number of characters he controls.
   18064:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player assigns the number of character (you control) damage among the character (you control), one at a time
 
@@ -392,6 +401,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18065:A:2 (front): Forced: After an ally enters play, exhaust it.
   18065:forced:1: Forced after a card enters play (heard about ally (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - exhaust the card the event is about
 
 ## 18078 The Iron Hills
@@ -449,6 +459,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18079:B:3 (back): After Dragon Hoard becomes the active location, advance to stage 3A.
   18079:triggered:1: Triggered (mandatory, not printed as Forced) after this location becomes the active location (heard about location (any player controls) named "Dragon Hoard")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - advance to the next quest stage
 
 ## 18080 The Fire Worm
@@ -466,6 +477,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18080:B:2 (back): Forced: After a player declares X attackers against Fire-drake, he must remove X progress tokens from the main quest or cancel the attack.
   18080:forced:1: Forced on the event enemyAttacked (heard about enemy (any player controls) named "Fire-drake")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player chooses one of:
       * option "remove" (only if not (progress of this card is less than the number of character (any player controls) that took part in the attack this effect answers)):
         - remove the number of character (any player controls) that took part in the attack this effect answers progress from the current quest card (all of it when it holds less)
@@ -477,6 +489,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     only if there is a enemy (any player controls) or in the staging area, named "Fire-drake" to choose
     - the players cannot defeat this stage while this holds
   18080:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Fire-drake")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 (rendered pieces: 320 by template, 0 as JSON)

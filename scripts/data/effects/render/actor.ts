@@ -19,6 +19,7 @@ export function actorNote(effect: Obj, ctx: Ctx): string {
     if (ATTACK_EVENTS.has(trigger)) return "the acting player is the defending player (the player the attack is against)";
     if (trigger === "engaged") return "the acting player is the player the enemy engaged";
     if (PHASE_EVENTS.has(trigger)) return "the acting player is the first player (a phase has no player of its own)";
+    if (trigger !== "") return "the acting player is the player the event happened to (the first player when the event names no player)";
   }
   if (timing === "action" && ctx.cardType !== undefined && SHARED_TYPES.has(ctx.cardType)) return "any player may trigger it; the acting player is the one who does";
   return "";

@@ -69,6 +69,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50303:B:3 (back): If the players defeat this stage, they have escaped the Blackroot Vale with Derufin and won the game.
   50303:triggered:1: Triggered (mandatory, not printed as Forced) after a side quest is defeated (its progress reached its quest points) (heard about this card only: with no subject, an event about one card is heard by that card alone)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 50304 Derufin
@@ -76,6 +77,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50304:A:1 (front): Forced: After the players travel to The Stone of Erech, the first player gains control of Derufin.
   50304:forced:1: Forced after the players travel (heard about location (any player controls) named "The Stone of Erech")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card, an objective ally attached to another card, leaves it and joins the first player's play area, ready, controlled by him
 
 50304:A:2 (front): Dusk. Derufin gets -1 Willpower
@@ -90,6 +92,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50304:A:4 (front): If Derufin leaves play, the players lose the game.
   50304:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 50305 The Lord of the Dead
@@ -183,6 +186,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
     - this card counts as a Artifact attachment while it is attached
   50311:forced:1: Forced after a character is declared as an attacker (heard about the host)
     only if all of: (its host is a hero (any player controls)) and (the event's other card is a Oathbreaker enemy (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the event's other card: stat losesSpectral 1, until the end of the phase
 
 ## 50312 Shadow-man
@@ -301,6 +305,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50319:A:1 (front): Forced: When Blackroot Graves is explored, return the topmost Undead enemy in the encounter discard pile to play, engaged with the first player.
   50319:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return the topmost 1 Undead enemies of the encounter discard pile into play engaged with the first player (they are not revealed: no When Revealed, no engagement; the number returned is counted)
 
 50319:A:2 (shadow): Shadow: If defending character has 0 Willpower, deal 2 damage to that character.

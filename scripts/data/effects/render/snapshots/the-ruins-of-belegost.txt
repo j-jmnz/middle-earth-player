@@ -24,6 +24,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50601:B:3 (back): Forced: When this stage is defeated, if Keys of Belegost is attached to a hero, advance to stage 2C. Otherwise, advance to stage 2A.
   50601:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - when this stage is defeated, the quest advances to the quest card with code 50603 if the card with code 50611 is attached to a hero, otherwise to the quest card with code 50602 (a stage played before comes back from the set-aside pile with no progress; this stage has no next stage in order)
 
 ## 50602 Ancient Evils Disturbed
@@ -40,6 +41,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50602:B:2 (back): Forced: When this stage is defeated, if Book of Aulë's Children is attached to a hero, advance to stage 3C. Otherwise, advance to stage 3A.
   50602:forced:1: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - when this stage is defeated, the quest advances to the quest card with code 50605 if the card with code 50612 is attached to a hero, otherwise to the quest card with code 50604 (a stage played before comes back from the set-aside pile with no progress; this stage has no next stage in order)
 
 ## 50603 Deeper into the Past
@@ -60,10 +62,12 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50603:B:2 (back): Forced: After the active location is explored, place 1 resource here.
   50603:forced:1: Forced on the event activeExplored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on this card
 
 50603:B:3 (back): Forced: When this stage is defeated, if Book of Aulë's Children is attached to a hero, advance to stage 3E. Otherwise, advance to stage 3C.
   50603:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - when this stage is defeated, the quest advances to the quest card with code 50606 if the card with code 50612 is attached to a hero, otherwise to the quest card with code 50605 (a stage played before comes back from the set-aside pile with no progress; this stage has no next stage in order)
 
 ## 50604 The Servants of Morgoth
@@ -86,6 +90,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50604:B:3 (back): Forced: When this stage is defeated, if Dwarven Torch is attached to a hero, advance to stage 4A. Otherwise, advance to stage 3C.
   50604:forced:1: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - when this stage is defeated, the quest advances to the quest card with code 50607 if the card with code 50613 is attached to a hero, otherwise to the quest card with code 50605 (a stage played before comes back from the set-aside pile with no progress; this stage has no next stage in order)
 
 ## 50605 The Roots of Ered Luin
@@ -108,6 +113,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50605:B:3 (back): Forced: When this stage is defeated, if Map of Ered Luin is attached to a hero advance to stage 4A. Otherwise, advance to stage 3E.
   50605:forced:1: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - when this stage is defeated, the quest advances to the quest card with code 50607 if the card with code 50610 is attached to a hero, otherwise to the quest card with code 50606 (a stage played before comes back from the set-aside pile with no progress; this stage has no next stage in order)
 
 ## 50606 The Mines of Belegost
@@ -126,10 +132,12 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50606:B:2 (back): Forced: After resolving the Discover keyword, if no Hazard card was revealed by that effect, reveal the top card of the encounter deck.
   50606:forced:1: Forced on the event discovered (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)): the first player reveals an encounter card
 
 50606:B:3 (back): Forced: When this stage is defeated, if Blue Mountain Gem is attached to a hero advance to stage 4A. Otherwise, advance to stage 3A.
   50606:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - when this stage is defeated, the quest advances to the quest card with code 50607 if the card with code 50614 is attached to a hero, otherwise to the quest card with code 50604 (a stage played before comes back from the set-aside pile with no progress; this stage has no next stage in order)
 
 ## 50607 The Beast of Belegost
@@ -158,6 +166,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50607:B:3 (back): When Naurlhûg is defeated, the players win the game.
   50607:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) named "Naurlhûg")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 50608 Stalking the Ruins
@@ -175,6 +184,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50608:A:2 (front): Forced: When the players advance to a new quest stage, discard all tokens from Stalking the Ruins. Then, set Naurlhûg aside, out of play.
   50608:forced:2: Forced on the event stageRevealed
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - up to resources of this card resource token(s) come off the card with code 50608 in play
     - the card in play with code 50615 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
@@ -421,6 +431,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 
 50621:A:1 (front): Discover 5.
   50621:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Discover 5 keyword: the first player looks at the top 5 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 50621:A:2: Immune to player card effects.
@@ -429,6 +440,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 50621:A:3 (front): Forced: When Naurlhûg's Lair is explored, add the Loot objective from underneath Stalking the Ruins to the staging area faceup.
   50621:forced:2: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each card under the card in play with code 50608 returns to the staging area faceup
 
 50621:A:4 (front): Travel: Place X resources on Stalking the Ruins, where X is the number of players.
@@ -444,6 +456,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50622:A:1 (front): Discover 2.
   50622:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Discover 2 keyword: the first player looks at the top 2 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 50622:A:2 (front): While Abandoned Mine is in the staging area, progress cannot be placed on locations in the staging area not named Abandoned Mine.
@@ -453,6 +466,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50622:A:3 (front): Forced: When resolving the Discover keyword on Abandoned Mine, look at X additional cards where X is the number of players in the game.
   50622:forced:2: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card: stat discoverLooked (the Discover keyword of this location looks at this many cards more than its value, while it resolves) the number of players, until the end of the phase
 
 ## 50623 Flooded Hall
@@ -460,6 +474,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50623:A:1 (front): Discover 4.
   50623:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Discover 4 keyword: the first player looks at the top 4 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 50623:A:2 (front): While Flooded Hall is in the staging area, increase the cost to play each ally by 1.
@@ -469,6 +484,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50623:A:3 (front): Forced: When resolving the Discover keyword on Flooded Hall, the first player reveals an additional looked at Hazard card for each other player in the game.
   50623:forced:2: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card: stat discoverHazards (the Discover keyword of this location reveals this many more of the looked-at Hazard cards, one at a time, at random) the number of players - 1, until the end of the phase
 
 ## 50624 Darkened Tunnel
@@ -476,11 +492,13 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50624:A:1 (front): Discover 2.
   50624:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Discover 2 keyword: the first player looks at the top 2 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 50624:A:2 (front): While Darkened Tunnel is in the staging area, it gains: "Forced: After a 'when revealed' effect is canceled, discard the top card of the encounter deck. If the discarded card has the Hazard trait, resolve its staging as if it was just revealed from the encounter deck."
   50624:forced:2: Forced on the event whenRevealedCanceled
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard 1 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
     - the acting player reveals, in full, each Hazard card (of any type) among the cards this effect discarded that still lies in the encounter discard pile, one after another (its When Revealed resolves and it enters the staging area)
@@ -494,6 +512,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50625:A:1 (front): Discover 3.
   50625:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Discover 3 keyword: the first player looks at the top 3 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 50625:A:2 (front): Sunken Treasury gets +1 Threat for each Loot objective attached to a hero.
@@ -516,6 +535,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50626:A:1 (front): Discover 3.
   50626:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Discover 3 keyword: the first player looks at the top 3 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 50626:A:2 (front): Response: After the players travel to Secret Chamber, if no Loot objective is attached to Secret Chamber, search the encounter discard pile for a Loot objective and attach it to Secret Chamber as a guarded objective.

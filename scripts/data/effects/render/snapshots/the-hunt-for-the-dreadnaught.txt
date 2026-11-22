@@ -157,6 +157,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40005:B:4 (back): When the Dreadnaught is destroyed, the players win the game.
   40005:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) named "Dreadnaught")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 40006 Eithiliant
@@ -236,6 +237,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40008:A:3 (front): Forced: When you draw your starting hand, draw 5 additional cards, then shuffle 5 cards from your hand into your deck. You cannot take a mulligan.
   40008:forced:1: Forced on the event setupHandDrawn
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player's hand (but this card) is shuffled into their deck; the effect's X becomes how many cards that was
     - the acting player draws 6 card(s)
@@ -371,6 +373,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40012:A:3 (front): Forced: When Gondorian Warship is destroyed, set it aside, out of play.
   40012:forced:1: Forced on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card, wherever it is, goes to the set-aside zone with no damage and no controller, so a set-aside copy can be taken again
 
 40012:A:4 (shadow): Shadow: Deal 5 damage to attacking enemy.
@@ -418,6 +421,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40013:B:3 (back): Forced: After the Dreadnaught flips, each player puts 1 set-aside unique Corsair enemy into play at random engaged with them.
   40013:forced:2: Forced after a card is flipped over (the FlipCard verb) (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - put 1 set-aside unique Corsair enemy chosen at random into play engaged with the acting player, not revealed and dealt no shadow card
 
@@ -501,6 +505,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     - this card: stat singleAttacker (a player attack against it is declared with one attacker; each ranged character of another player may attack in turn) 1, while this card is in play
   40018:triggered:1: Triggered (mandatory, not printed as Forced) after a character is declared as an attacker (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the event's other card: stat cannotBeAttacked 1, until the end of the round
 
 40018:A:2 (front): Engaged player cannot attack the Dreadnaught.
@@ -511,6 +516,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40018:A:3 (front): Forced: When a character defends against Ophidian, deal 2 damage to that character.
   40018:forced:1: Forced after a character is declared as a defender (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 2 damage to the card the event is about
 
 ## 40019 Varjax
@@ -534,6 +540,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40020:A:1 (front): Forced: When engaged player exhausts a Ship objective, Brash Corsair attacks that player.
   40020:forced:1: Forced on the event shipExhausted (heard about Ship character (you control))
     only if this card is engaged with a player (that player is who "you" means in this record)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card (an enemy engaged with the actor) makes an immediate attack against the actor, dealt a shadow card of its own
 
 ## 40021 Corsair Plunderer
@@ -546,6 +553,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40021:A:2 (front): Forced: After an event card is discarded from your deck by Corsair Plunderer's Pillage keyword, discard an attachment you control.
   40021:forced:1: Forced on the event pillaged (heard about this card)
     only if the event's other card is a card (any player controls) in the discard pile, of card type event
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -560,6 +568,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40022:A:2 (front): Forced: After an event card is discarded from your deck by Daring Buccaneer's Pillage keyword, deal 1 damage to a character you control.
   40022:forced:1: Forced on the event pillaged (heard about this card)
     only if the event's other card is a card (any player controls) in the discard pile, of card type event
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control)
     - deal 1 damage to the picked card
@@ -574,6 +583,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40023:A:2 (front): Forced: After an event card is discarded from your deck by Fierce Marauder's Pillage keyword, discard 1 resource from the resource pool of a hero you control.
   40023:forced:1: Forced on the event pillaged (heard about this card)
     only if the event's other card is a card (any player controls) in the discard pile, of card type event
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control) with resources on it
     - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
@@ -756,10 +766,12 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40036:A:1 (front): Isle of Fortune enters play with 1 PerPlayer resource(s) on it.
   40036:triggered:1: Triggered (mandatory, not printed as Forced) after a card enters play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place the number of players resource tokens on this card
 
 40036:A:2 (front): Forced: After a Ship enemy enters play, discard 1 resource from Isle of Fortune.
   40036:forced:1: Forced after a card enters play (heard about Ship enemy (any player controls) or in the staging area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - up to 1 resource token(s) come off this card
 
 40036:A:3 (front): Response: When Isle of Fortune is explored as the active location, move each resource on it to a hero's resource pool.
@@ -775,6 +787,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40037:A:1 (front): While Mouths of Anduin is in the staging area, it gains: "Forced: After a 'when revealed' effect is canceled, reveal the top card of the encounter deck."
   40037:forced:1: Forced on the event whenRevealedCanceled
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 40037:A:2 (shadow): Shadow: If this attack is undefended, reveal the top card of the encounter deck.
@@ -788,6 +801,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40038:A:1 (front): While Tolfalas Landing is in the staging area, it gains: "Forced: After a player draws any number of cards from a player card effect, that player raises their threat by that number."
   40038:forced:1: Forced on the event cardsDrawn
     only if all of: (this card is in the staging area) and (the heal or ready the effect answers was made by a player card's effect, not by a rule, the refresh phase or an encounter card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by X (the acting player)
 
 40038:A:2 (shadow): Shadow: Raise your threat by 1 (3 instead if you have 5 or more cards in hand).
@@ -913,6 +927,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40045:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   40045:forced:1: Forced on the event shipExhausted (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 2 damage to its host
   40045:action:1: Action
     only if the number of ready character (you control) is at least 3

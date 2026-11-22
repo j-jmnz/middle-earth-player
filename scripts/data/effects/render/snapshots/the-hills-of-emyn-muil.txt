@@ -10,6 +10,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 02082:B:1 (back): Forced: If there are no location cards in the staging area, the first treachery card revealed during the quest phase gains surge.
   02082:forced:1: Forced after a card is revealed (heard about treachery (any player controls); only when the encounter deck revealed it)
     only if all of: (it is the Quest phase) and (the card the event is about is the first treachery the encounter deck revealed this quest phase) and (the number of location (any player controls) in the staging area only is at most 0)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card just revealed gains surge
 
 02082:B:2 (back): Players cannot defeat this stage until there are no Emyn Muil locations in play, and they have collected at least 20 victory points.
@@ -59,6 +60,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 
 02086:A:1 (front): Forced: After traveling to The North Stair, move the top card of the encounter discard pile to the staging area. Resolve any "when revealed" effects on that card.
   02086:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter discard pile goes to the staging area (it is not revealed)
     - the When Revealed effects of the picked card resolve as if it had just been revealed
@@ -225,6 +227,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 
 900702:A:1 (front): Forced: After the players travel to a location, Tunneling Nameless Thing engages the first player.
   900702:forced:1: Forced after the players travel (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this enemy, in the staging area or engaged with another player (it moves), engages the first player
 
 900702:A:2 (front): If there is no active location, return Tunneling Nameless Thing to the staging area.
@@ -241,12 +244,14 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 
 900703:A:2 (front): Forced: After a location leaves play as an explored location, place a resource token on Orc Interceptor.
   900703:forced:1: Forced on the event locationExplored (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - 1 resource token(s) are placed on this card
 
 ## 900704 Brambles and Thorns
 
 900704:A:1 (front): Forced: After a character commits to the quest, deal 1 damage to that character if it has not been dealt damage by another copy of Brambles and Thorns this round.
   900704:forced:1: Forced after a card is committed to the quest (heard about character (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to the card the event is about unless a card with this card's title has dealt it damage this round (it is marked for the round once the damage is dealt)
 
 ## 900705 Sarn Gebir Rapids

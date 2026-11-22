@@ -36,6 +36,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147002:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
   147002:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
     - then, if not (the Victory points in the victory display is less than the number of players x 5) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 147006 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
@@ -57,6 +58,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147003:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
   147003:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
     - then, if not (the Victory points in the victory display is less than the number of players x 5) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 147006 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
@@ -77,6 +79,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147004:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
   147004:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
     - then, if not (the Victory points in the victory display is less than the number of players x 5) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 147006 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
@@ -98,6 +101,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147005:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
   147005:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the Victory points in the victory display is less than the number of players x 5: advance to a random stage out of 147002, 147003, 147004, 147005, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)
     - then, if not (the Victory points in the victory display is less than the number of players x 5) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 147006 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
@@ -145,6 +149,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 147008:A:1 (front): While Long Trailer is in the staging area it gains: 'Forced: After the active location leaves play as an explored location, Long Trailer makes an immediate attack against the first player.'
   147008:forced:1: Forced on the event activeExplored
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card attacks the first player now, from the staging area
 
 ## 147009 Grasping Root
@@ -212,6 +217,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 147013:A:1 (front): While Deep Gulley is in the staging area, it gains: 'Forced: After a player optionally engages an enemy, that player raises his threat by X, where X is the engaged enemy's Attack.'
   147013:forced:1: Forced on the event optionallyEngaged
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by attack of the card the event is about (the player the event is about)
 
 ## 147014 Strange Woods

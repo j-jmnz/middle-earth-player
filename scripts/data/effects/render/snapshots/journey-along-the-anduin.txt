@@ -75,6 +75,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01087:A:1 (front): Forced: After the players travel to The Brown Lands, place 1 progress token on it.
   01087:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 progress on this card
 
 ## 01088 The East Bight
@@ -118,6 +119,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01113:A:1 (front): Forced: If Banks of the Anduin leaves play, return it to the top of the encounter deck instead of placing it in the discard pile.
   01113:forced:1: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes on top of the encounter deck
 
 ## 01114 Gladden Fields
@@ -137,6 +139,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01115:A:2 (front): Forced: After Eastern Crows is defeated, shuffle it back into the encounter deck.
   01115:forced:1: Forced after an enemy is destroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card is shuffled into the encounter deck
 
 01115:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if defending player's threat is 35 or higher.)
@@ -249,12 +252,14 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01130:A:4 (front): Forced: After a character is destroyed by a Hill Troll, each player attaches 1 set-aside copy of Scarred to a hero they control. (Limit once per game.)
   01130:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls); limit once per game)
     only if the event's other card is a enemy (any player controls) named "Hill Troll"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - choose hero (you control) that the card with code 01138 can be attached to
       - the set-aside copy of the card with code 01138 is attached to the last picked hero
 
 01130:A:5 (front): If Mendor leaves play, the players lose the game.
   01130:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about card (any player controls) or in the staging area or the active location, named "Mendor")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 01130:B:1 (back): Resolution: Add each copy of Valor and Scarred in play to the Campaign Pool. Record the names of heroes with Valor and/or Scarred attached in the notes section of the Campaign Log and attach them to those heroes when setting up each subsequent scenario in this campaign. The hero with the most damage will be taken prisoner at the beginning of Escape from Dol Guldur (in case of a tie, randomly select among the heroes with the most damage). Record the name of the "prisoner" in the notes section of the Campaign Log.
@@ -348,12 +353,15 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 900204:A:2 (front): Forced: If the players are on stage 3 and all remaining enemies have the printed Rat trait, discard Brown Water Rats from play.
   900204:forced:1: Forced on the event stageRevealed
     only if all of: (the players are on stage 3) and (the number of enemy (any player controls) or in the staging area, without Rat is at most 0) and (this card is in play)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard this card
   900204:forced:2: Forced after a card leaves play (heard about enemy (any player controls) not named "Brown Water Rats")
     only if all of: (the players are on stage 3) and (the number of enemy (any player controls) or in the staging area, without Rat is at most 0) and (this card is in play)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard this card
   900204:forced:3: Forced on the event encounterEnteredPlay (heard about this card)
     only if all of: (the players are on stage 3) and (the number of enemy (any player controls) or in the staging area, without Rat is at most 0) and (this card is in play)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard this card
 
 900204:A:3 (shadow): Shadow: Attacking enemy cannot be damaged this round.
@@ -366,6 +374,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 900205:A:1 (front): Each card revealed by the encounter deck gains doomed X. X is the number of progress tokens on this card.
   900205:triggered:1: Triggered (mandatory, not printed as Forced) after a card is revealed (heard about card (any player controls) or in the staging area or the active location; only when the encounter deck revealed it)
     only if this card is in play
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by progress of this card (each player)
 
 900205:A:2 (shadow): Shadow: If this attack is undefended, put A Flooded Ford into the staging area with 1 progress token on it.

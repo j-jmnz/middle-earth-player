@@ -8,6 +8,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143021:A:2 (front): Forced: After you draw this card, discard all other cards in your hand.
   143021:forced:1: Forced on the event enteredHand (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player discards each card (you control) in hand
 
 ## 143033 The Defense of Helm's Deep
@@ -64,6 +65,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143035:A:3 (front): Forced: After Warrior of Dunland attacks and destroys a character, place 3 progress on the active location.
   143035:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 3 progress on the active location
 
 ## 143036 Soldier of Isengard
@@ -75,6 +77,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143036:A:2 (front): Forced: After Soldier of Isengard attacks and destroys a character, place 1 progress on the current quest.
   143036:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 progress on the current quest; the active location takes it first
 
 143036:A:3 (shadow): Shadow: Exhaust a character you control.
@@ -95,6 +98,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143037:A:2 (front): Forced: When The Hornburg is explored, assign X damage among characters in play. X is the number of enemies in play.
   143037:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player assigns the number of enemy (any player controls) or in the staging area damage among the character (any player controls), one at a time
 
 ## 143038 Deeping Wall
@@ -108,6 +112,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143038:A:2 (front): Forced: When Deeping Wall is explored, raise each player's threat by 4.
   143038:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 4 (each player)
 
 ## 143039 Deeping Culvert
@@ -120,6 +125,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143039:A:2 (front): Forced: When Deeping Culvert is explored, each player searches the encounter deck and discard pile for an enemy, reveals it, and adds it to the staging area. Shuffle the encounter deck.
   143039:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player searches the encounter deck and discard pile for a enemy, reveals it and adds it to the staging area
@@ -136,6 +142,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143040:A:2 (front): Forced: When Postern Door is explored, until the end of the round, players cannot declare attacks.
   143040:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the table: stat cannotDeclareAttacks 1, until the end of the round
 
 ## 143041 Helm's Gate
@@ -144,11 +151,13 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143041:A:1 (front): While Helm's Gate is the active location, if any player is not engaged with an enemy, the first player reveals an encounter card at the end of each staging step.
   143041:forced:1: Forced on the event stagingStepEnds
     only if all of: (this card is the active location) and (some living player has no enemy engaged with them)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 143041:A:2 (front): Forced: When Helm's Gate is explored, each enemy gets -20 engagement cost and +2 Attack until the end of the round.
   143041:forced:2: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - every enemy in play: stat engagementCost -20, until the end of the round
     - every enemy in play: stat attack 2, until the end of the round
@@ -302,6 +311,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143074:B:2 (back): Forced: After resolving the quest, if the encounter deck did not place at least 1 progress on this stage as the result of questing, the first player reveals 1 encounter card.
   143074:forced:1: Forced on the event defenseQuestResolved (heard about this card)
     only if not (the encounter deck placed at least 1 progress on the current quest stage itself as the result of questing in the quest resolution just made (progress the active location took does not count; false while no quest has resolved under Defense))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 ## 143075 The Wall is Breached!
@@ -319,10 +329,12 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143075:B:2 (back): Forced: After a character is destroyed, place 1 progress on this stage (bypassing any active location).
   143075:forced:1: Forced on the event characterDestroyed
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
 
 143075:B:3 (back): If this stage is defeated, the players lose the game.
   143075:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game (The Wall is Breached!: Saruman's army captured Helm's Deep)
 
 ## 143076 The King Rides Out

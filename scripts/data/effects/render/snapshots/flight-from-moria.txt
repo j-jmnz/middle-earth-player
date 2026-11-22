@@ -264,6 +264,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 
 03073:B:2 (back): Forced: After placing the 1st progress token on Narrow Paths, search the encounter deck and discard pile for Abandoned Tools and add it to the staging area, if able.
   03073:forced:2: Forced on the event progressPlaced (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (X is less than progress of this card): the acting player finds one card with code 03029 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - then, if not (X is less than progress of this card) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter deck
@@ -335,6 +336,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 
 03075:B:5 (back): If the players defeat this stage, they escape and win the game.
   03075:forced:3: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 03076 Search for an Exit
@@ -378,6 +380,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 
 03076:B:4 (back): If the players defeat this stage, they escape and win the game.
   03076:forced:3: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 === Nightmare deck (the cards the scenario's Nightmare deck adds) ===
@@ -459,6 +462,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 
 901202:B:3 (back): If the players defeat this stage, they win the game.
   901202:forced:3: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 901202:B:4 (back): Players may bypass this quest card at the end of the combat phase.
@@ -491,6 +495,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 901203:B:2 (back): If The Nameless Fear has 10 or more damage on it, remove all damage from it and advance to the next stage.
   901203:forced:3: Forced after a card takes damage (heard about enemy (any player controls) or in the staging area, named "The Nameless Fear")
     only if 9 is less than damage of "The Nameless Fear"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - heal all damage from the card the event is about
     - advance to the next quest stage
@@ -533,6 +538,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 901205:A:2 (front): While you are engaged with Swarming Goblins, it gains: "Forced: When a quest card is bypassed, search the encounter discard pile for a copy of Goblin Spearman and put it into play engaged with you."
   901205:forced:1: Forced on the event stageBypassed (event happened to the controller)
     only if this card is an enemy engaged with the acting player
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player finds one card with code 03031 in the encounter discard pile (the deck is not searched) and puts it into play engaged with them (it is not revealed)
 
 ## 901206 Coal-Black Orc

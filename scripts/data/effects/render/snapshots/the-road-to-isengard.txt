@@ -44,6 +44,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 
 143047:A:2 (front): Forced: When Saruman is dealt a shadow card with a Wizardry effect, the defending player resolves that Wizardry effect as if he is the only player in the game.
   143047:forced:1: Forced on the event shadowWizardry (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - triggers the Wizardry effect on the shadow card the answered event names; the acting player resolves it as if they are the only player in the game, so each "each player" reads them alone and the number of players is 1 (nothing for a card with no Wizardry line)
 
 ## 143048 Saruman's Staff
@@ -51,6 +52,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 
 143048:A:1 (front): Forced: After a player draws any number of cards, Saruman attacks that player. Deal and resolve 2 shadow cards for this attack. Then, remove 1 damage from Saruman.
   143048:forced:1: Forced on the event cardsDrawn
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - its host attacks the acting player now, from the staging area, dealt 2 shadow cards
     - heal 1 damage from its host
@@ -84,6 +86,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143050:A:1 (front): Forced: After Lieutenant of Orthanc attacks and destroys a character, that character's controller discards 1 random card from his hand.
   143050:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player discards 1 random card(s) from hand
 
 ## 143051 Isengard Orc
@@ -110,6 +113,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 
 143052:A:1 (front): Forced: When Wolf of Isengard is dealt a shadow card with a Wizardry effect, either discard 1 card from your hand, or Wolf of Isengard makes an additional attack against you after this one.
   143052:forced:1: Forced on the event shadowWizardry (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player chooses one of:
       * option "discard" (only if the actor has a card in hand):
         - discard 1 cards from hand
@@ -130,6 +134,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143053:A:2 (front): While Orthanc is in the staging area, it gains: "Forced: After the players quest successfully, the first player looks at the top 3 cards of the encounter deck, reveals 1, and discards the others."
   143053:forced:1: Forced after the players quest successfully
     only if all of: (this card is in the staging area) and (the actor holds the first player token)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player looks at the top 3 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
     - choose an encounter card among the cards the effect looked at (none when no card matches)
@@ -146,6 +151,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143054:A:2 (front): Forced: When Gates of Isengard is explored, each player searches the encounter deck and discard pile for an enemy and puts it into play engaged with him. Shuffle the encounter deck.
   143054:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player finds one enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
@@ -157,11 +163,13 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143055:A:1 (front): While Ring-wall of Isengard is in the staging area, it gains: "Forced: After any amount of damage is healed from a character, its owner discards 1 card from his hand."
   143055:forced:1: Forced on the event healed (heard about character (any player controls))
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard 1 cards from hand
 
 143055:A:2 (front): Wizardry: Each player discards 1 random card from his hand.
   143055:forced:2: Forced on the event wizardry (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player discards 1 random card(s) from hand
 
@@ -177,6 +185,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143056:A:2 (front): Wizardry: Each player exhausts a character he controls.
   143056:forced:2: Forced on the event wizardry (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - choose ready character (you control)
       - exhaust the picked card
@@ -187,6 +196,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143057:A:1 (front): While Steaming Vent is in the staging area, it gains: "Forced: After a player commits characters to the quest, he deals 1 damage to a questing character he controls."
   143057:forced:1: Forced on the event commitmentMade
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a character (you control) committed to the quest to choose: choose character (you control) committed to the quest
     - then, if there is a character (you control) committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
@@ -194,6 +204,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143057:A:2 (front): Wizardry: Assign X damage among characters in play. X is 1 more than the number of players in the game.
   143057:forced:2: Forced on the event wizardry (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player assigns the number of players + 1 damage among the character (any player controls), one at a time
 
 ## 143058 Plain of Isengard
@@ -211,6 +222,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143058:A:3 (front): Wizardry: Each player discards 1 ally he controls.
   143058:forced:1: Forced on the event wizardry (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - choose ally (you control)
       - discard the picked card
@@ -221,11 +233,13 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143059:A:1 (front): While Open Pit is in the staging area, it gains: "Forced: After a player draws any number of cards from a player card effect, he raises his threat by 2."
   143059:forced:1: Forced on the event cardsDrawn
     only if all of: (this card is in the staging area) and (the heal or ready the effect answers was made by a player card's effect, not by a rule, the refresh phase or an encounter card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 2 (the player the event is about)
 
 143059:A:2 (front): Wizardry: Each player raises his threat by 2.
   143059:forced:2: Forced on the event wizardry (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 2 (each player)
 
 ## 143060 Blast of Sorcery
@@ -292,12 +306,16 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
   143068:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   143068:forced:1: Forced after a card is committed to the quest (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard 1 cards from hand
   143068:forced:2: Forced after a character is declared as an attacker (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard 1 cards from hand
   143068:forced:3: Forced after a character is declared as a defender (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard 1 cards from hand
   143068:forced:4: Forced on the event abilityTriggered (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard 1 cards from hand
 
 ## 143078 Rouse the Ents
@@ -345,6 +363,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 
 143079:B:2 (back): Forced: After a non-unique location is explored, place 1 damage here. Then, if there are 5 damage tokens here, advance to stage 3A.
   143079:forced:1: Forced on the event locationExplored (heard about non-unique location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 damage token(s) on this card (placed, not dealt: nothing cancels or reduces them)
     - then, if 4 is less than damage of this card (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 143080 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
@@ -379,6 +398,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143080:B:2 (back): Forced: When Orthanc is explored, cancel any progress placed on the quest this phase and return Orthanc to the staging area.
   143080:forced:1: Forced after a card leaves play (heard about location (any player controls) named "Orthanc")
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the progress placed on the current quest card since the phase began, the overflow of an explored active location included, is taken off it and forgotten
     - the card the event is about goes to the staging area (it is not revealed)

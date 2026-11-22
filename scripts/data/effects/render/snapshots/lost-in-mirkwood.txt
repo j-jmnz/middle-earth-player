@@ -37,6 +37,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18028:A:2 (front): Forced: When progress would be placed on the main quest, if there are no objective-locations in play, discard an equal number of cards from the top of the encounter deck instead. Then, put the topmost objective-location in the encounter discard pile into play.
   18028:forced:1: Forced on the event progressReplaced
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - (marker, does nothing when run) after the cards that progress was turned into are discarded, the topmost Objective-Location in the encounter discard pile enters play in the staging area, its Guarded keyword resolved
 
 ## 18029 Overgrown Path
@@ -56,6 +57,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18029:A:3 (front): Forced: After the players travel here, advance to the next stage A, if able.
   18029:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the quest advances to the stage of the next level with the letter A (A is the first stage of a level, C the second; the levels by number are 18071, 18072 | 18073, 18074 | 18075, 18076 | 18077); the stage left is defeated and the new one is revealed; nothing happens at the last level
 
 ## 18030 Abandoned Village
@@ -75,6 +77,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18030:A:3 (front): Forced: After the players travel here, advance to the next stage C, if able.
   18030:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the quest advances to the stage of the next level with the letter C (A is the first stage of a level, C the second; the levels by number are 18071, 18072 | 18073, 18074 | 18075, 18076 | 18077); the stage left is defeated and the new one is revealed; nothing happens at the last level
 
 ## 18031 Bare Hilltop
@@ -94,6 +97,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18031:A:3 (front): Forced: After the players travel here, advance to the next stage A, if able.
   18031:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the quest advances to the stage of the next level with the letter A (A is the first stage of a level, C the second; the levels by number are 18071, 18072 | 18073, 18074 | 18075, 18076 | 18077); the stage left is defeated and the new one is revealed; nothing happens at the last level
 
 ## 18032 Forest Clearing
@@ -113,6 +117,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18032:A:3 (front): Forced: After the players travel here, advance to the next stage C, if able.
   18032:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the quest advances to the stage of the next level with the letter C (A is the first stage of a level, C the second; the levels by number are 18071, 18072 | 18073, 18074 | 18075, 18076 | 18077); the stage left is defeated and the new one is revealed; nothing happens at the last level
 
 ## 18033 Twilight Hall
@@ -127,6 +132,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18033:A:2 (front): Forced: After a Forest location is explored, place 1 resource here.
   18033:forced:1: Forced on the event locationExplored (heard about Forest location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - 1 resource token(s) are placed on this card
 
 18033:A:3 (front): Travel: Raise each player's threat by 1 for each resource here. If there are no resources on Twilight Hall, the players cannot travel here.
@@ -294,11 +300,13 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18072:B:1 (back): The first Spider enemy revealed each quest phase gains surge.
   18072:forced:1: Forced after a card is revealed (heard about Spider enemy (any player controls); limit once per phase; only when the encounter deck revealed it)
     only if it is the Quest phase
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card just revealed gains surge
 
 18072:B:2 (back): Forced: When a Spider enemy attacks and damages a character, that character cannot ready until the end of the round.
   18072:forced:2: Forced on the event damagedByAttack (heard about character (any player controls))
     only if the attacking enemy is a Spider enemy (any player controls)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about: stat cannotReady 1, until the end of the round
 
 ## 18073 Dol Guldur Orcs
@@ -314,11 +322,13 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18073:B:1 (back): The first Orc enemy revealed each quest phase gains surge.
   18073:forced:1: Forced after a card is revealed (heard about Orc enemy (any player controls); limit once per phase; only when the encounter deck revealed it)
     only if it is the Quest phase
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card just revealed gains surge
 
 18073:B:2 (back): Forced: When an Orc enemy attacks and damages a character, that character's controller chooses and discards 1 card from his hand.
   18073:forced:2: Forced on the event damagedByAttack (heard about character (any player controls); event happened to the controller)
     only if the attacking enemy is a Orc enemy (any player controls)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard 1 cards from hand
 
 ## 18074 Carried Away
@@ -338,10 +348,12 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18074:B:2 (back): Forced: When an enemy guarding a hero is defeated, return that hero to its owner's control, exhausted.
   18074:forced:1: Forced after a card leaves play (heard about card (any player controls) or in the staging area or the active location, that guards a hero, in play or not)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the hero the event's subject (the enemy) guarded comes back among its owner's heroes, faceup and exhausted (when the enemy leaves play in any way)
 
 18074:B:3 (back): When the players advance from this stage, discard each guarded hero.
   18074:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each hero an enemy guards goes to its owner's discard pile; a player left with no hero is eliminated
 
 ## 18075 Truly Lost
@@ -364,12 +376,15 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18075:B:2 (back): Forced: When a location with a facedown player card under it is explored, return each facedown player card under that location to its owner's hand.
   18075:forced:1: Forced on the event locationExplored (heard about card (any player controls) or in the staging area or the active location, with a facedown player card under it, wherever the card is now)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each facedown player card under the location the event is about (explored, and left play) returns to its owner's hand
   18075:forced:2: Forced on the event activeExplored (heard about card (any player controls) or in the staging area or the active location, with a facedown player card under it, wherever the card is now)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each facedown player card under the location the event is about (explored, and left play) returns to its owner's hand
 
 18075:B:3 (back): When the players advance from this stage, discard each facedown player card under each location.
   18075:forced:3: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each facedown player card under a location goes to its owner's discard pile
 
 ## 18076 The Forest of Great Fear
@@ -402,6 +417,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     only if progress of this card is less than 8
     - each enemy (any player controls) or in the staging area, that is the nemesis (the enemy the stage named, until it leaves play): stat cannotTakeDamage 1, while this card is in play
   18076:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, that is the nemesis (the enemy the stage named, until it leaves play))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 18077 Escape from Taur-nu-fuin

@@ -278,6 +278,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 901701:A:2 (front): Forced: When stage 3b is revealed, discard all Mount and Artifact cards from play. Each player must also discard allies he controls until the total printed cost of allies he controls is 6 or less.
   901701:forced:1: Forced on the event stageRevealed
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Washed Away!"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard every card in play that matches Mount or Artifact card (any player controls) or in the staging area or the active location (not destroyed: no Victory, no "when destroyed"), its attachments with it; an encounter card goes to the encounter discard pile, a player's card to its owner's
     - for each player, first player first:
@@ -371,6 +372,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 
 901705:A:1 (front): Forced: When Primeval Thing enters play, attach cards from the top of the first player's deck to it until the total printed cost of all attached cards is 6 or higher.
   901705:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - attach cards one after another until the printed cost of all the cards attached to this enemy is 6 or more (or the deck is empty), starting with the top card of the first player's deck (of the staging area, once the areas are separate) to this enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
 
 901705:A:2 (front): X is the printed cost of all attached cards on this card. If there are no cards attached, X is 6.
@@ -384,6 +386,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 901706:A:1 (front): While Nest of Horrors is in the staging area, it gains: "Forced: When one or more cards are attached to a Nameless enemy from the top of a player's deck, attach an additional card from the top of that player's deck."
   901706:forced:1: Forced on the event attachedFromDeck
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - attach the top card of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to the enemy the event is about, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached this way are not a new event for the Forced effects that hear one
 
 901706:A:2 (front): Travel: Each player at this stage discards the top card of the encounter deck to travel here. Reveal each Nameless enemy discarded by this effect.

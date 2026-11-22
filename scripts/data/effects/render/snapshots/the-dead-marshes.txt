@@ -16,6 +16,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 02106:B:1 (back): Forced: After this stage is defeated, the first player chooses a player. That player must pass an Escape test, dealing 1 card from the encounter deck for each resource token on Gollum, to capture him. If Gollum is not captured at this time, reset the quest deck to stage 1B.
   02106:forced:1: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a objective (any player controls) named "Gollum" to choose: choose player (any player controls) chosen by the first player
     - then, if there is a objective (any player controls) named "Gollum" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then a number of cards equal to resources of "Gollum" are dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
@@ -26,6 +27,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
   02106:constant:1: Constant
     - this card: stat holdsWin (defeating this final stage does not win the game: it stays the current quest card, defeated, and its own Forced effects win the game or reset the quest) 1, while this card is in play
   02106:forced:2: Forced after an escape test that this card's own effect made is passed (no other card hears it; the event happened to the player who made the test)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 02107 Gollum
@@ -145,6 +147,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 02115:A:1 (front): Forced: After the players travel to this location, place 1 resource token on Gollum.
   02115:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
 
 02115:A:2 (front): Escape: 2
@@ -171,6 +174,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 900801:A:4 (front): Forced: After Gollum is placed in the discard pile, shuffle him into the encounter deck.
   900801:forced:1: Forced on the event encounterDiscarded (heard about objective (any player controls) named "Gollum")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about is shuffled into the encounter deck
 
 900801:B:1 (back): Begin with the standard quest deck and encounter deck for The Dead Marshes scenario.
@@ -241,6 +245,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 900802:A:3 (front): Forced: After Gollum enters play, place 2 resource tokens on Gollum, then move all resource tokens from The Mere of Dead Faces to Gollum.
   900802:forced:1: Forced on the event encounterEnteredPlay (heard about objective (any player controls) named "Gollum")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 2 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
     - choose location (any player controls) that is this card itself
@@ -269,6 +274,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 900804:A:1 (front): Forced: After a character commits to an escape test, deal 1 damage to that character.
   900804:forced:1: Forced on the event committedToEscape (heard about character (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to the card the event is about
 
 900804:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if attacking enemy is Undead.)
@@ -292,6 +298,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 900806:A:1 (front): Forced: After Lost Soul of Lórien is destroyed, attach it to a hero with 1 or more Willpower, if able. (Counts as a Condition attachment with the text: "Limit 1 per hero. Attached hero's Willpower is reduced to 0.")
   900806:forced:1: Forced after an enemy is destroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - attach this card to a hero with 1 or more Willpower of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
   900806:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)

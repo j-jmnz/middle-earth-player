@@ -241,6 +241,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01120:B:1 (back): Forced: When you defeat this stage, proceed to one of the 2 "A Chosen Path" stages, at random.
   01120:forced:1: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - (the stage's definition carries it; nothing runs when it is resolved) defeating this stage proceeds to one of the stages with codes 01121 and 01122, chosen with the scenario's seed, and the others are removed from the game; the stage reached is the last one: defeating it wins the game
 
 ## 01121 A Chosen Path
@@ -255,6 +256,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
   01121:constant:1: Constant
     - the players cannot defeat this stage while this holds
   01121:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) named "Ungoliant's Spawn")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 01122 A Chosen Path
@@ -276,6 +278,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01129:A:3 (front): If Mendor leaves play, the players lose the game.
   01129:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about card (any player controls) or in the staging area or the active location, named "Mendor")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 01129:B:1 (back): Resolution: Each player earns 1 copy of the Mendor's Support boon card. Add the earned cards to the Campaign Pool. If stage 3B was Beorn's Path, add the Ungoliant's Swarm burden card to the Campaign Pool. If stage 3B was Don't Leave the Path, add the Lingering Venom burden card to the Campaign Pool.
@@ -294,6 +297,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 900101:A:2 (front): Forced: During setup, each player reveals 1 card from the encounter deck and adds it to the staging area.
   900101:forced:1: Forced on the event duringSetup
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player reveals an encounter card
 
@@ -403,6 +407,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
   900106:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   900106:triggered:1: Triggered (mandatory, not printed as Forced) on the event readied (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to its host
 
 ## 900107 Backtrack!
@@ -428,6 +433,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 900108:A:2 (front): Forced: After Abandoned Camp leaves play, each player must deal 2 damage to each exhausted character he controls.
   900108:forced:1: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 2 damage to each exhausted character (any player controls)
 
 900108:A:3 (shadow): Shadow: If this attack is undefended, discard all attachment cards players control.
@@ -441,6 +447,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 900109:A:1 (front): While Glade of the Spawn is the active location, it gains: "Forced: After a Spider enemy enters play, each player must choose and exhaust 1 character he controls."
   900109:forced:1: Forced on the event encounterEnteredPlay (heard about Spider enemy (any player controls))
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - choose ready character (you control)
       - exhaust the picked card

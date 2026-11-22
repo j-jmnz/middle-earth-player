@@ -20,6 +20,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 12175:B:1 (back): Forced: After a main quest stage is defeated, any player who does not control an Accolade boon may attach one of the following boons to one of their heroes and memorialize their valorous deeds, based on which quest stage was defeated:
   12175:forced:1: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location) (record also names 12175:B:2)
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Searching for Dragon Sign" that is out of play now
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and (a copy of the card with code 12176 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)) and (there is a hero (you control) that the card with code 12176 can be attached to to choose)):
@@ -28,6 +29,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
         * option "decline":
   12175:forced:2: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location) (record also names 12175:B:3)
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "The Cold-Drake Attacks!" that is out of play now
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and (a copy of the card with code 12177 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)) and (there is a hero (you control) that the card with code 12177 can be attached to to choose)):
@@ -36,6 +38,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
         * option "decline":
   12175:forced:3: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location) (record also names 12175:B:4)
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Hunting the Beast" that is out of play now
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and (a copy of the card with code 12178 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)) and (there is a hero (you control) that the card with code 12178 can be attached to to choose)):
@@ -44,6 +47,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
         * option "decline":
   12175:forced:4: Forced after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Cold-Drake") (record also names 12175:B:5)
     only if the players are on stage 4
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and (a copy of the card with code 12179 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)) and (there is a hero (you control) that the card with code 12179 can be attached to to choose)):
@@ -54,6 +58,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 12175:B:2 (back): Stage 1: Attach Master of the Hunt to a hero.
   12175:forced:1: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location) (record also names 12175:B:1)
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Searching for Dragon Sign" that is out of play now
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and (a copy of the card with code 12176 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)) and (there is a hero (you control) that the card with code 12176 can be attached to to choose)):
@@ -64,6 +69,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 12175:B:3 (back): Stage 2: Attach Unbroken to a hero.
   12175:forced:2: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location) (record also names 12175:B:1)
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "The Cold-Drake Attacks!" that is out of play now
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and (a copy of the card with code 12177 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)) and (there is a hero (you control) that the card with code 12177 can be attached to to choose)):
@@ -74,6 +80,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 12175:B:4 (back): Stage 3: Attach The Steadfast to a hero.
   12175:forced:3: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location) (record also names 12175:B:1)
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Hunting the Beast" that is out of play now
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and (a copy of the card with code 12178 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)) and (there is a hero (you control) that the card with code 12178 can be attached to to choose)):
@@ -84,6 +91,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 12175:B:5 (back): Stage 4: Attach Dragon-slayer to a hero.
   12175:forced:4: Forced after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Cold-Drake") (record also names 12175:B:1)
     only if the players are on stage 4
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and (a copy of the card with code 12179 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)) and (there is a hero (you control) that the card with code 12179 can be attached to to choose)):
@@ -292,6 +300,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19022:B:1 (back): Forced: After the active location is explored, look at the top 3 cards of the encounter deck. Reveal 1 of those cards and discard the rest.
   19022:forced:1: Forced on the event activeExplored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player looks at the top 3 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
     - choose an encounter card among the cards the effect looked at (none when no card matches)
@@ -349,6 +358,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19024:B:1 (back): Forced: After the active location is explored, look at the top 3 cards of the encounter deck. Reveal 1 of those cards and discard the rest.
   19024:forced:1: Forced on the event activeExplored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player looks at the top 3 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
     - choose an encounter card among the cards the effect looked at (none when no card matches)
@@ -395,6 +405,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     only if the card with code 19011 is not in the victory display
     - the players cannot defeat this stage while this holds
   19025:forced:2: Forced after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Cold-Drake")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - later, at the end of this phase:
       - the players win the game
 

@@ -25,6 +25,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 02061:B:2 (back): Forced: After a card effect heals Wilyador, remove that card from the game.
   02061:forced:1: Forced on the event healed (heard about character (any player controls) named "Wilyador")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the event's other card is removed from the game
 
 ## 02062 Return to Rhosgobel
@@ -191,6 +192,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 900601:A:3 (front): Forced: The first Creature enemy revealed during each quest phase gains surge.
   900601:forced:1: Forced after a card is revealed (heard about Creature enemy (any player controls); limit once per phase; only when the encounter deck revealed it)
     only if it is the Quest phase
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card just revealed gains surge
 
 900601:A:4 (front): Response: After an Athelas card is placed in the discard pile, you may shuffle it into the encounter deck.
@@ -330,6 +332,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
     - this card counts as a Condition attachment while it is attached
     - its host: stat losesEagle 1, while this card is in play
   900607:triggered:1: Triggered (mandatory, not printed as Forced) on the event readied (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to its host
 
 900607:A:3 (shadow): Shadow: Resolve the "when revealed" effect of Shot from the Sky.

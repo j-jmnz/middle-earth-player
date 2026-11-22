@@ -24,9 +24,11 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 09026:A:2 (front): While Amon Forn is the active location, it gains: "Forced: After an Orc enemy is added to the staging area, it makes an immediate attack against the first player."
   09026:forced:1: Forced after an encounter card is added to the staging area (heard about Orc enemy (any player controls))
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about attacks the first player now, from the staging area
   09026:forced:2: Forced on the event returnedToStaging (heard about Orc enemy (any player controls))
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about attacks the first player now, from the staging area
 
 09026:A:3 (front): The players cannot win while Amon Forn is in play.
@@ -42,6 +44,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09027:A:2 (front): Forced: After a Weather treachery is revealed from the encounter deck, place 1 resource token here.
   09027:forced:1: Forced after a card is revealed (heard about Weather treachery (any player controls); not for a card found in the encounter discard pile)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on this card
 
 ## 09028 Exposed Ridge
@@ -115,6 +118,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09032:A:2 (front): Forced: After the last time counter is removed from this quest card, each player deals 4 damage to a hero he controls. Then, place 4 time counters on this quest card.
   09032:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - choose hero (you control)
@@ -188,6 +192,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 09056:A:1 (front): Forced: After the "when revealed" effect of a treachery card is canceled, raise each player's threat by 2.
   09056:forced:1: Forced on the event whenRevealedCanceled (heard about treachery (any player controls))
     only if any of: (this card is in the staging area) or (this card is the active location)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 2 (each player)
 
 09056:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, the defending player raises his threat by 2.
@@ -203,6 +208,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09057:A:1 (front): Forced: When Ancient Causeway is explored, raise each player's threat by 2.
   09057:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 2 (each player)
 
 ## 09058 Tragic Discovery
@@ -252,6 +258,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09069:B:2 (back): Forced: After the active location is explored, reveal the top card of the Orc deck and resolve its staging as if it was just revealed from the encounter deck (reveal the top 2 cards instead if there are 3 or more players in the game).
   09069:forced:1: Forced on the event activeExplored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player reveals the top card of the angmarOrcs deck and resolves its staging, into the staging area, as if it was just revealed from the encounter deck (nothing with the deck empty)
     - then, if 2 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the first player reveals the top card of the angmarOrcs deck and resolves its staging, into the staging area, as if it was just revealed from the encounter deck (nothing with the deck empty)
@@ -291,6 +298,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09071:A:1 (front): Forced: After an enemy is defeated, place 1 resource token here. Then, if there are at least X resource tokens here, flip Hunting the Orcs and place each resource token that was on it on Savage Counter-attack. X is 3 more than the number of players in the game.
   09071:forced:1: Forced after an enemy is destroyed
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 resource tokens on this card
     - then, if not (resources of this card is less than the number of players + 3) (checked when this step runs, after the steps above; not tied to whether they did anything): the card with code 09071 in play is flipped to the card with code 09072, where it lies, with its tokens and attachments; the new side enters play
@@ -299,10 +307,12 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09072:A:1 (front): Forced: After Savage Counter-attack enters play, advance to stage 2A.
   09072:forced:1: Forced after a card enters play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - advance to the next quest stage
 
 09072:A:2 (front): Forced: After an enemy attacks and destroys a character, discard 1 resource token from Savage Counter-attack.
   09072:forced:2: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - up to 1 resource token(s) come off the card with code 09072 in play
 
 09072:A:3 (front): If there are no resource tokens here, the players lose the game.
@@ -336,11 +346,13 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 10160:A:2 (front): Forced: After Mysterious Omens becomes the current quest, each player discards 1 random card from their hand.
   10160:forced:1: Forced on the event becameCurrentQuest (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player discards 1 random card(s) from hand
 
 10160:A:3 (front): Forced: When Mysterious Omens is defeated, remove it from the Campaign Pool. Then, each player may choose 1 of the following boons and attach it to a hero they control: Cunning, Hardy, Resolute, Ruthless, or Stalwart.
   10160:forced:2: Forced after a side quest is defeated (its progress reached its quest points) (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card is removed from the Campaign Pool
     - starting with the first player, each player may choose 1 of the boons still set aside (code 10161, code 10162, code 10163, code 10164 and code 10165) and attach it to a hero they control; a boon taken is not offered again

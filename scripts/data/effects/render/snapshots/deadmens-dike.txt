@@ -12,6 +12,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09033:A:3 (front): Forced: After a treachery card with the Sorcery trait is revealed from the encounter deck, Thaurdir heals 3 damage and makes an immediate attack against the first player.
   09033:forced:1: Forced after a card is revealed (heard about Sorcery treachery (any player controls); not for a card found in the encounter discard pile)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - heal 3 damage from this card
     - this card attacks the first player now, from the staging area (or engaged)
@@ -52,6 +53,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09036:A:2 (front): Forced: After the last time counter is removed from Broken Battlements, each player discards the top 5 cards of his deck and places 1 time counter here.
   09036:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the top 5 card(s) of the acting player's deck go to their discard pile
       - place 1 resource tokens on this card
@@ -66,7 +68,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09037:A:1 (front): While Norbury Tombs is the active location, it gains: "Response: When Norbury Tombs is explored, each player shuffles the top 5 cards of his discard pile back into his deck."
   09037:response:1: Response on the event activeExplored (heard about this card)
-    - for each card (any player controls) in the discard pile, among the top 5:
+    - for each card (any player controls) in the discard pile, among the top 5 cards of each player's own discard pile:
       - the picked card goes into its owner's deck, which is shuffled
 
 09037:A:2 (front): Travel: Return the topmost enemy in the encounter discard pile to the staging area.
@@ -86,6 +88,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 09038:A:2 (front): Forced: After the first player discards any number of cards from the top of his deck, place 1 resource token here.
   09038:forced:1: Forced on the event deckTopDiscarded
     only if the actor holds the first player token
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on this card
 
 ## 09039 Haunted Keep
@@ -109,6 +112,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 09040:A:1 (front): While Deadmen's Gate is the active location, it gains: "Forced: After a player triggers an 'Action' or 'Response' effect, he must discard the top card of his deck."
   09040:forced:1: Forced on the event playerAbilityTriggered (heard about card (any player controls) or in the staging area or the active location)
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the top 1 card(s) of the acting player's deck go to their discard pile
 
 09040:A:2 (shadow): Shadow: Discard an attachment you control.
@@ -275,7 +279,8 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09067:A:3 (front): Forced: After this stage is defeated, each player shuffles the top 5 cards of his discard pile back into his deck.
   09067:forced:1: Forced after a side quest is defeated (its progress reached its quest points) (heard about this card)
-    - for each card (any player controls) in the discard pile, among the top 5:
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each card (any player controls) in the discard pile, among the top 5 cards of each player's own discard pile:
       - the picked card goes into its owner's deck, which is shuffled
 
 ## 09073 The Shades of Angmar
@@ -320,6 +325,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 09074:B:1 (back): Forced: After Thaurdir attacks and destroys a character, that character's controller must either discard the top 3 cards of his deck, or return Thaurdir to the staging area.
   09074:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) named "Thaurdir"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player chooses one of:
       * option "discard" (only if there is a card (you control) in the deck to choose):
         - the top 3 card(s) of the acting player's deck go to their discard pile
@@ -345,6 +351,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 100158:A:2 (front): Forced: After an attack damages a character but does not destroy it, move 1 damage from Arnor Ravaged to that character.
   100158:forced:1: Forced on the event attackDamagedCharacter (heard about enemy (any player controls) or in the staging area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - up to 1 damage on this card moves to the event's other card (placed, not dealt; it can destroy a character at its limit; nothing with the target out of play)
 
 ## 10166 Deadmen's Dike
@@ -361,6 +368,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 10166:A:3 (front): Forced: After Thaurdir enters play, randomly select one of the following burdens and attach it to Thaurdir: Thaurdir's Legacy, Thaurdir's Majesty, or Thaurdir's Spite. Add that card to the Campaign Pool.
   10166:forced:1: Forced after an encounter card is added to the staging area (heard about enemy (any player controls) named "Thaurdir")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - one of the burdens code 10168, code 10169 and code 10170 not yet in the game is picked at random (the game's seed) and attached to the card the event is about, though it cannot have attachments (nothing when none is loaded)
 
 10166:B:1 (back): Resolution: Note the amount of damage on Protect the Innocent in the Campaign Log (replacing the previous number) and remove Protect the Innocent from the Campaign Pool. Add Arnor Ravaged to the Campaign Pool in its place (found on the opposite side of Protect the Innocent). The players as a group must select either Iârion's Pendant or Amarthiúl's Courage to add to the Campaign Pool. Any player may add Iârion's Pendant to their deck if it is chosen.
@@ -397,6 +405,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 10168:A:2 (front): Forced: After a Sorcery treachery is revealed, move Thaurdir's Legacy to the hero with the most resources. (Counts as a Sorcery attachment with the text: "Attached hero gets -2 Willpower and is treated as if its printed text box were blank.")
   10168:forced:1: Forced after a card is revealed (heard about Sorcery treachery (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this burden moves to the hero (any player's) that holds the most resource tokens; the hero it is on counts, and the first player chooses among heroes that tie
   10168:constant:1: Constant
     - this card counts as a Sorcery attachment while it is attached
@@ -415,6 +424,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 10169:A:2 (front): Forced: After a Sorcery treachery is revealed, move Thaurdir's Majesty to the hero with the most non-objective attachments. (Counts as a Sorcery attachment with the text: "Attached hero gets -2 Attack and cannot commit to the quest.")
   10169:forced:1: Forced after a card is revealed (heard about Sorcery treachery (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this burden moves to the hero (any player's) that holds the most attachments that are not objectives; the hero it is on counts, and the first player chooses among heroes that tie
   10169:constant:1: Constant
     - this card counts as a Sorcery attachment while it is attached
@@ -432,6 +442,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 10170:A:2 (front): Forced: After a Sorcery treachery is revealed, move Thaurdir's Spite to the hero with the most damage. (Counts as a Sorcery attachment with the text: "Attached hero gets -2 Defense and cannot be healed.")
   10170:forced:1: Forced after a card is revealed (heard about Sorcery treachery (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this burden moves to the hero (any player's) that holds the most damage; the hero it is on counts, and the first player chooses among heroes that tie
   10170:constant:1: Constant
     - this card counts as a Sorcery attachment while it is attached

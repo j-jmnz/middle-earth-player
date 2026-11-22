@@ -8,6 +8,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144015:A:2 (front): Forced: After you draw this card, either exhaust each hero you control, or reveal the top card of the encounter deck.
   144015:forced:1: Forced on the event enteredHand (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player chooses one of:
       * option "exhaust" (only if there is a ready hero (you control) to choose):
         - exhaust each hero (you control)
@@ -25,6 +26,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144016:A:2 (front): Forced: After Groping Dead destroys a character, place 1 mire token on the active location.
   144016:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 mire token(s) (resources) on the active location; a location whose mire tokens then reach its Mire X is discarded by the Mire keyword
 
 144016:A:3 (shadow): Shadow: If this attack destroys a character, place 1 mire token on the active location.
@@ -44,6 +46,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144017:A:2 (front): Forced: After Dead Things destroys a character, the defending player must raise his threat by 3.
   144017:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 3 (the defending player (the player this enemy is engaged with))
 
 144017:A:3 (shadow): Shadow: Raise your threat by 1 for each Undead enemy engaged with you.
@@ -62,6 +65,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144018:A:2 (front): Forced: After Candle-bearer destroys a character, it cannot take damage until the end of the round.
   144018:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card: stat cannotTakeDamage 1, until the end of the round
 
 144018:A:3 (shadow): Shadow: Until the end of the round, attacking enemy cannot take damage.
@@ -76,6 +80,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144019:constant:1: Constant
     - this card: stat mire 3, while this card is in play
   144019:forced:1: Forced on the event discardedByMire (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to each character (any player controls)
 
 144019:A:2 (front): Travel: Each player must raise his threat by 1 to travel here.
@@ -97,6 +102,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144020:constant:1: Constant
     - this card: stat mire 1, while this card is in play
   144020:forced:1: Forced on the event discardedByMire (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player chooses one of:
       * option "return" (only if the number of location (any player controls) in the victory display is at least 1):
         - return a random location from the victory display to the staging area (chosen with the game's seed)
@@ -115,6 +121,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144021:constant:1: Constant
     - this card: stat mire 2, while this card is in play
   144021:forced:1: Forced on the event discardedByMire (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one Undead enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
@@ -131,6 +138,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144022:constant:1: Constant
     - this card: stat mire 5, while this card is in play
   144022:forced:1: Forced on the event discardedByMire (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 5 (each player)
 
 144022:A:2 (front): Stagnant Pools gets +1 Threat for each mire token on it.
@@ -149,6 +157,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144023:constant:1: Constant
     - this card: stat mire 1, while this card is in play
   144023:forced:1: Forced on the event discardedByMire (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player reveals an encounter card
 
 144023:A:2 (front): Travel: Each player must raise his threat by 1 to travel here.
@@ -289,6 +298,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144064:B:2 (back): Forced: After a player declares any number of attackers against Gollum, discard the top card of the encounter deck. Gollum gets +X Defense for this attack, where X is the discarded card's Threat.
   144064:forced:1: Forced on the event enemyAttacked (heard about enemy (any player controls) named "Gollum")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - the card the event is about: stat defense threat of the picked card, until the end of the attack
@@ -317,6 +327,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144065:B:3 (back): Forced: At the end of the staging step, if the number of locations in the staging area is less than the number of players in the game, reveal the top card of the encounter deck.
   144065:forced:1: Forced on the event stagingStepEnds
     only if the number of location (any player controls) in the staging area only is less than the number of players
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player reveals an encounter card
 
 ## 144066 Don't Look at the Lights!
@@ -346,6 +357,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144075:constant:1: Constant
     - this card: stat immuneToNonFellowship 1, while this card is in play
   144075:triggered:1: Triggered (mandatory, not printed as Forced) on the event firstPlayerTokenPassed
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this enemy moves to the first player's play area and engages them (nothing if it is not engaged, or already engaged with them)
 
 144075:A:2 (front): Forced: After Gollum engages the first player during the refresh phase, he makes an immediate attack.
@@ -357,6 +369,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144075:A:3 (front): Forced: When Gollum is defeated, flip him to Sméagol and exhaust Sméagol.
   144075:forced:2: Forced after an enemy is destroyed (heard about this card)
     only if the card with code 144072 is not in play
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - flip Gollum to Sméagol: discard his damage; he enters play exhausted, controlled by the first player (not the discard pile or the victory display)
 
 ## 144076 Sméagol
@@ -370,10 +383,12 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144076:A:2 (front): Forced: After the players quest unsuccessfully, flip Sméagol to Gollum.
   144076:forced:1: Forced after the players quest unsuccessfully
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - flip Sméagol to Gollum: discard his damage; he enters play ready, engaged with the first player (nothing if Sméagol is not in play)
 
 144076:A:3 (front): If Sméagol is destroyed, the players lose the game.
   144076:triggered:1: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game (Sméagol was destroyed)
 
 (rendered pieces: 242 by template, 0 as JSON)

@@ -229,6 +229,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 
 145068:A:3 (front): If Army of the Dead leaves play, remove it from the game.
   145068:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card is removed from the game
 
 ## 145069 Attack on Pelargir

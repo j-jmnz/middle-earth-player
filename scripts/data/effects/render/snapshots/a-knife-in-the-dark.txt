@@ -138,6 +138,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141045:A:2 (front): Forced: After The Prancing Pony leaves play, discard cards from the top of the encounter deck until X enemies have been discarded. X is the number of players in the game. Put each enemy discarded by this effect into play engaged with the first player.
   141045:forced:1: Forced after a card leaves play
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard from the top of the encounter deck until 1 enemy for each player is discarded
 
 ## 141046 Weathertop
@@ -184,6 +185,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141048:A:2 (front): Forced: After Midgewater becomes the active location, return each engaged enemy in play to the staging area.
   141048:forced:1: Forced after this location becomes the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return every enemy engaged with a player to the staging area
 
 ## 141049 Weather Hills
@@ -197,6 +199,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141049:A:2 (front): Forced: After this location leaves play, return each enemy under it to the staging area face-up.
   141049:forced:1: Forced after a card leaves play
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each card under this location returns to the staging area faceup
 
 ## 141050 Rider of Mordor
@@ -431,6 +434,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     only if this card is in play
     - the hero this card is, or is attached to, does not count against the hero limit
   141085:forced:1: Forced on the event firstPlayerTokenPassed
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the host of this card, its resource pool, and every card attached to it pass to the first player
 
 141085:A:3 (front): If The One Ring leaves play, the players lose the game.
@@ -483,6 +487,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 906202:A:2 (front): Forced: After The One Ring is exhausted, Menacing Wraith engages the first player and makes an immediate attack.
   906202:forced:1: Forced on the event exhausted (heard about card (any player controls) or in the staging area or the active location, named "The One Ring")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - if the actor holds the first player token: engage this card
       - then, if the actor holds the first player token (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
@@ -515,6 +520,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 906204:A:3 (front): Forced: After Weathertop becomes the active location, exhaust The One Ring. The One Ring cannot ready while Weathertop is the active location.
   906204:forced:1: Forced after this location becomes the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust the card with code 141085
     - choose card (any player controls) or in the staging area or the active location, named "The One Ring"
@@ -541,6 +547,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 906206:A:1 (front): The Old Road enters play with 3 resource tokens on it.
   906206:triggered:1: Triggered (mandatory, not printed as Forced) on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - 3 resource token(s) are placed on this card
 
 906206:A:2 (front): Forced: At the end of the round, discard 1 resource token here. Then, if there are no resource tokens here, shuffle 1 out of play Ringwraith into the encounter deck.

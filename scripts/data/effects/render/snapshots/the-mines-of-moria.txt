@@ -27,6 +27,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51201:B:2 (back): Forced: When The Watcher is defeated, flip it over and add Chamber of Mazarbul to the staging area.
   51201:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls) named "The Watcher")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about, the explored location, flips over and shows the card with code 51211, and enters the staging area faceup (the old side is kept as the card's other side)
 
 51201:B:3 (back): This stage cannot be defeated while The Watcher is in play.
@@ -136,6 +137,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51209:B:2 (back): Forced: When the active location is explored, reveal the top card of the encounter deck.
   51209:forced:1: Forced on the event activeExplored (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 51209:B:3 (back): This stage cannot be defeated while Chamber of Mazarbul is in play. When this stage is defeated, the players win the game.
@@ -243,6 +245,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51216:A:1 (front): While Darkened Stairway is in the staging area, it gains: 'Forced: After a 'when revealed' effect is canceled, reveal the top card of the encounter deck.'
   51216:forced:1: Forced on the event whenRevealedCanceled
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 51216:A:2 (front): Travel: Discard the top card of the encounter deck. If that card is a treachery, resolve its 'when revealed' effect.
@@ -289,6 +292,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51219:A:2 (front): Forced: When Spider Burrow is explored, the opposing team searches the encounter deck and discard pile for a Spider enemy with cost 1 or less and adds it to the staging area. Shuffle the encounter deck.
   51219:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one Spider enemy with a printed cost of 1 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
@@ -329,6 +333,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51222:A:2 (front): Forced: After an event is played, place 1 resource here.
   51222:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on this card
 
 51222:A:3 (front): Travel: Assign X damage among characters in play, where X is Ancient Guardroom's Threat.
@@ -399,6 +404,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51227:A:1 (front): Forced: After Hive Guardian attacks and destroys an ally, return Hive Guardian to the staging area.
   51227:forced:1: Forced on the event characterDestroyedByAttack (heard about ally (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return this card to the staging area
 
 51227:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
@@ -594,6 +600,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51240:A:2 (front): Forced: When Stairs of Náin is explored, raise each player's threat by 4.
   51240:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 4 (each player)
 
 ## 51241 Hidden Threat
@@ -615,6 +622,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51242:A:2 (front): Forced: After Goblin Warlord enters play, the opposing team searches the encounter deck and discard pile for a 0-cost Goblin enemy and adds it to the staging area. Shuffle the encounter deck.
   51242:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one Goblin enemy with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
@@ -742,6 +750,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51252:A:2 (front): Forced: When Goblin Tunnels is explored, the opposing team searches the encounter deck and discard pile for a Goblin enemy with cost 1 or less and adds it to the staging area. Shuffle the encounter deck.
   51252:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one Goblin enemy with a printed cost of 1 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck

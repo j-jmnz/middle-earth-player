@@ -61,6 +61,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142022:B:2 (back): Forced: After a location enters play, place 1 damage on it.
   142022:forced:1: Forced on the event encounterEnteredPlay (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 damage token(s) on the card the event is about (placed, not dealt: nothing cancels or reduces them)
 
 142022:B:3 (back): Forced: After an enemy engages a player, place 1 damage on the active location, if able.
@@ -95,6 +96,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142023:B:3 (back): If Doors of Durin is explored, the players win the game.
   142023:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about location (any player controls) named "Doors of Durin")
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 142024 Watcher in the Water
@@ -114,6 +116,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142024:A:3 (front): Forced: After placing the 6th damage here, the first player takes control of the Ring-bearer, exhausted with 1 damage on it.
   142024:forced:1: Forced after a card takes damage (heard about this card)
     only if the damaged event the card answers placed this card's 6th damage token: it holds at least that many now and held fewer before
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player takes control of the Ring-bearer facedown under this card and of the cards attached to it: it returns to play faceup in their play area exhausted with 1 damage on it
 
 ## 142025 Great Warg Chief
@@ -195,6 +198,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142029:A:2 (front): Forced: When Redhorn Pass is explored, each player assigns X damage among characters he controls. X is the number of damage here.
   142029:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each player assigns damage of this card damage among the character (you control), one at a time
 
 ## 142030 Doors of Durin
@@ -224,6 +228,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142031:A:2 (front): Forced: When Tree-crowned Hill is explored, the players, as a group, exhaust X characters in play. X is the number of damage here.
   142031:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - repeat damage of this card times:
       - choose ready character (any player controls) chosen by the first player
       - exhaust the picked card
@@ -239,6 +244,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142032:A:2 (front): Forced: When Hills of Hollin is explored, each player raises his threat by 1 for each damage here.
   142032:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by damage of this card (each player)
 
 ## 142033 Redhorn Foothills
@@ -247,11 +253,13 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142033:A:1 (front): While Redhorn Foothills is the active location, it gains: "Forced: After an enemy is added to the staging area, it gets -5 engagement cost until the end of the round."
   142033:forced:1: Forced after an encounter card is added to the staging area (heard about enemy (any player controls))
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about: stat engagementCost -5, until the end of the round
 
 142033:A:2 (front): Forced: When Redhorn Foothills is explored, each player must discard X cards from his hand at random. X is the number of damage here.
   142033:forced:2: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player discards damage of this card random card(s) from hand
 
@@ -261,6 +269,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142034:A:1 (front): Forced: When Eregion is explored, the players, as a group, must discard X allies from play. X is the number of damage here.
   142034:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - repeat damage of this card times:
       - choose ally (any player controls) chosen by the first player
       - discard the picked card
@@ -341,6 +350,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
   142084:whenRevealed:1: When revealed
     - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
   142084:forced:1: Forced on the event exhausted (heard about card (any player controls) or in the staging area or the active location, named "The One Ring")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (each player)
     - each hero (any player controls) that this card is attached to now: willpower is set to 0 until the end of the round, whatever else modifies it (the most recent set wins)
@@ -359,6 +369,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 906401:A:3 (front): Forced: When the players advance to stage 4B, each player puts 1 copy of Pale-green Tentacle into play engaged with him. Shuffle any remaining copies, and the encounter discard pile, into the encounter deck.
   906401:forced:1: Forced on the event stageRevealed
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "The Gates of Moria"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - one set-aside copy of the card with code 906402 is put into play engaged with the acting player (nothing with no copy set aside)
@@ -423,6 +434,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 906403:A:2 (front): While Hunting Hawk is in the staging area it gains, "Forced: After a player plays an ally, he must either exhaust it, or place 1 damage on an active location."
   906403:forced:1: Forced after this card is played (heard about ally (any player controls))
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player chooses one of:
       * option "exhaust":
         - exhaust the card the event is about
@@ -458,6 +470,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 906405:A:2 (front): Forced: When Expanse of Hollin is explored, shuffle the encounter discard pile into the encounter deck. Then, discard the top card of the encounter deck for each damage here. Add each enemy discarded by this effect to the staging area.
   906405:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - repeat damage of this card times:
@@ -468,12 +481,14 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 906406:A:1 (front): Forced: After a 'when revealed' effect is canceled, place 1 damage on each active location.
   906406:forced:1: Forced on the event whenRevealedCanceled
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each location (any player controls) that is the active location:
       - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
 
 906406:A:2 (front): Forced: When Slopes of Hithaeglir is explored, each player raises his threat by 1 for each damage here.
   906406:forced:2: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by damage of this card (each player)
 
 ## 906407 Hunted in Hollin

@@ -113,6 +113,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144031:A:2 (front): Forced: After Henneth Annûn becomes the active location, return each engaged enemy to the staging area.
   144031:forced:1: Forced after this location becomes the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return every enemy engaged with a player to the staging area
 
 ## 144032 Southward Road
@@ -316,6 +317,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
     only if the card with code 144030 is in play
     - the players cannot defeat this stage while this holds
   144068:forced:2: Forced on the event locationExplored (heard about location (any player controls) named "The Cross-roads")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 (rendered pieces: 206 by template, 0 as JSON)

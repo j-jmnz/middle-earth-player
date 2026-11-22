@@ -31,6 +31,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
   50202:constant:2: Constant
     - this card: stat progressHealsLakeTown (progress that questing would place on this stage is not placed; the stage's record hears it and may discard it to remove damage from Lake-town) 1, while this card is in play
   50202:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player chooses how many of the replaced progress tokens (the event's X) to discard, at most the damage on Lake-town: that much damage comes off Lake-town and the rest of the progress is placed on the quest card
 
 ## 50203 The Dragon's Wrath
@@ -50,6 +51,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 
 50203:B:3 (back): The players must defeat Smaug to defeat this stage. When Smaug is defeated, compare the number of damage tokens on Lake-town with the number of victory points in the victory display. If the players have more victory points, they have won the game. Otherwise, Lake-town has burned and the players have lost.
   50203:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about Dragon enemy (any player controls) or in the staging area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the damage on Lake-town is less than the Victory points in the victory display: the players win the game
     - then, if not (the damage on Lake-town is less than the Victory points in the victory display) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (Smaug was defeated, but the victory display holds no more Victory points than the damage on Lake-town)

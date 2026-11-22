@@ -107,6 +107,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04012:B:2 (back): Forced: After placing the 11th progress token on Snowdrifts, discard any active location. Caradhras becomes the active location.
   04012:forced:1: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the active location is a location (any player controls) named "Caradhras"): discard the active location
     - then, if the encounter deck or its discard pile holds a card with code 04015 (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter deck
@@ -149,6 +150,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04014:A:3 (front): If Arwen Undómiel leaves play, the players are defeated.
   04014:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 04015 Caradhras
@@ -172,6 +174,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
     - each hero (any player controls): stat willpowerCostsResource (its Willpower counts toward the quest only once it holds countsWillpower, which paying 1 resource from its pool gives until the end of the phase) 1, while this card is in play
   04016:forced:1: Forced on the event questTotalCounted
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - for each hero (you control) committed to the quest, with resources on it:
         - the acting player chooses one of:
@@ -271,6 +274,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
     - its host: stat cannotQuest 1, while this card is in play
   04023:triggered:1: Triggered (mandatory, not printed as Forced) on the event attached (heard about this card)
     only if the number of attachment (any player controls) named "Freezing Cold", attached to this card's host is at least 2
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard its host
 
 ## 04024 Avalanche!
@@ -320,6 +324,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 04027:A:2 (front): Forced: After a character is declared as a defender against Snow Warg, deal 1 damage to the defending character, if able.
   04027:forced:1: Forced after a character is declared as a defender (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to the card the event is about
 
 === Nightmare deck (the cards the scenario's Nightmare deck adds) ===
@@ -338,6 +343,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 901301:A:3 (front): Forced: When stage 2b is revealed, shuffle each set aside copy of Blinding Blizzard into the encounter deck.
   901301:forced:1: Forced on the event stageRevealed
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Snowdrifts"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - repeat 2 times:
       - one set-aside copy of the card with code 901307 is shuffled into the encounter deck (nothing with none set aside)

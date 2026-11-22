@@ -40,7 +40,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
     if (text) after.push(text);
   };
   note(["from"], typeof pick.from === "string" ? (FROM[pick.from] ?? pick.from) : null);
-  note(["top"], typeof pick.top === "number" ? `among the top ${pick.top}` : null);
+  note(["top"], typeof pick.top === "number" ? (pick.from === "discard" ? `among the top ${pick.top} cards of each player's own discard pile` : `among the top ${pick.top}`) : null);
   note(["bottom"], typeof pick.bottom === "number" ? `among the bottom ${pick.bottom}` : null);
   note(["staging"], pick.staging === true ? "or in the staging area" : null);
   note(["stagingArea"], pick.stagingArea === "shared" ? "in the shared staging area (the one stage 2B deals out)" : pick.stagingArea === "any" ? "in any player's staging area" : pick.stagingArea === "own" ? "in the chooser's own staging area (the only one while the stages are not separate)" : null);

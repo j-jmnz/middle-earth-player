@@ -21,6 +21,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09016:A:4 (front): If Iârion leaves play, the players lose the game.
   09016:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 09017 Orc War Party
@@ -134,6 +135,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 09023:A:2 (front): While Orc Rearguard is the current quest it gains: "Forced: At the end of the staging step, reveal 1 card from the encounter deck."
   09023:forced:1: Forced on the event stagingStepEnds
     only if this card is the current quest
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 ## 09024 Rescue Iârion
@@ -149,6 +151,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09024:A:3 (front): Forced: After the last time counter is removed from this stage, discard Iârion.
   09024:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card only: with no subject, an event about one card is heard by that card alone)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card held under this card is discarded from where it lies, and leaves play
 
 ## 09043 Angmar Orc
@@ -279,6 +282,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09051:A:2 (front): Forced: When Lost in the Wilderness is defeated, return each card underneath it to its owner's hand.
   09051:forced:1: Forced after a side quest is defeated (its progress reached its quest points) (heard about this card only: with no subject, an event about one card is heard by that card alone)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each facedown player card under the location the event is about (explored, and left play) returns to its owner's hand
 
 ## 09068 Stop the War Party
@@ -342,6 +346,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 10158:A:1 (front): Forced: After an attack damages a character, place 1 damage on Protect the Innocent.
   10158:forced:1: Forced on the event attackDamagedCharacter (heard about enemy (any player controls) or in the staging area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 damage token(s) on the card in play with code 10158 (placed, not dealt: nothing cancels or reduces them)
 
 10158:A:2 (front): When progress would be placed on Protect the Innocent, remove that much damage from it instead.

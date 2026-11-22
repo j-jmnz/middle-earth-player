@@ -19,6 +19,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
   04086:constant:1: Constant
     - each location (any player controls): stat threat 1, while this card is in play
   04086:forced:1: Forced after the players quest unsuccessfully
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - trigger every "Lost:" effect of the faceup cards in play (a shadow card is not in play); the set is fixed now, the first player picks the effect that resolves next, one at a time, and each resolves in full before the next (no choice for one effect or for copies of one card: the oldest first); nothing happens when none is in play
 
 ## 04087 Continuing Eastward
@@ -34,6 +35,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 04087:B:2 (back): If the players quest unsuccessfully, trigger all "Lost:" effects in play.
   04087:forced:1: Forced after the players quest unsuccessfully
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - trigger every "Lost:" effect of the faceup cards in play (a shadow card is not in play); the set is fixed now, the first player picks the effect that resolves next, one at a time, and each resolves in full before the next (no choice for one effect or for copies of one card: the oldest first); nothing happens when none is in play
 
 04087:B:3 (back): If the players defeat this stage, they have won the game.
@@ -56,6 +58,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 04089:A:1 (front): Lost: Return the top 2 Goblin enemies in the encounter discard pile to the staging area, if able.
   04089:forced:1: Forced when the "Lost:" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return the topmost 2 Goblin enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed; one with the ambush keyword makes its engagement checks on entering the staging area; the number returned is counted)
 
 04089:A:2: PASS.
@@ -66,6 +69,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 04090:A:1 (front): Lost: Each player must choose and discard 1 card from his hand.
   04090:forced:1: Forced when the "Lost:" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - discard 1 cards from hand
 
@@ -77,6 +81,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 04091:A:1 (front): Lost: Exhaust all characters.
   04091:forced:1: Forced when the "Lost:" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - exhaust each character (any player controls)
 
 04091:A:2: PASS.
@@ -87,6 +92,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 04092:A:1 (front): Forced: Before placing progress tokens on Twisting Passage, the first player must make a locate test. If this test is failed, do not place any progress tokens on Twisting Passage and trigger all "Lost:" effects in play.
   04092:forced:1: Forced before progress is placed on this location (the whole placement, the effect's X, waits for this effect)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player makes a locate test: they may discard 1 card from their hand to discard the top card of the encounter deck, again and again; an encounter card that prints PASS passes the test (no ill effects follow), any other lets them try again; the test is failed when they stop or have no card to discard (an empty encounter deck is refilled from the discard pile in the quest phase, and otherwise the test is failed at once)
     - then, if the last locate test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the progress the event held back (the whole placement, the effect's X) is now placed on this location without another test; what does not fit goes on the current quest as an explored active location's overflow does
@@ -189,6 +195,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 04099:A:1 (front): Lost: Each player must choose and discard 1 ally he controls from play, if able.
   04099:forced:1: Forced when the "Lost:" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - choose ally (you control)
       - discard the picked card
@@ -206,6 +213,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
     only if this card does not hold the flag dealtDamageThisRound
     - this card: stat cannotBeAttacked 1, while this card is in play
   04100:forced:1: Forced on the event attackDamagedCharacter (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card: stat dealtDamageThisRound 1, until the end of the round
 
 04100:A:2 (shadow): Shadow: If this attack is undefended, the defending player must discard 1 character he controls from play.
@@ -224,10 +232,12 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 901601:A:2 (front): Durin's Greaves gains surge.
   901601:forced:1: Forced after a card is revealed (heard about objective (any player controls) named "Durin's Greaves")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card just revealed gains surge
 
 901601:A:3 (front): Lost: The first player must choose and discard an ally in play.
   901601:forced:2: Forced when the "Lost:" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ally (any player controls) chosen by the first player
     - discard the picked card
@@ -284,6 +294,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 901602:A:2 (front): Forced: When Goblin Stalker is dealt a shadow card with "PASS" printed in its text box, it gets +2 Attack until the end of the phase.
   901602:forced:2: Forced on the event shadowDealtTo (heard about this card)
     only if the other card of the event (the shadow card just dealt) prints PASS in its text box
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card: stat attack 2, until the end of the phase
 
 901602:A:3: PASS.
@@ -293,10 +304,12 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 901603:A:1 (front): Forced: If Trapdoor Spider damages a character, discard that character from play.
   901603:forced:1: Forced on the event attackDamagedCharacter (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard the event's other card
 
 901603:A:2 (front): Lost: Trapdoor Spider engages the last player and makes an immediate attack.
   901603:forced:2: Forced when the "Lost:" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the source enemy engages the last player
     - then, if this enemy is engaged with the last player (the first player in a one-player game) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
@@ -334,6 +347,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 901606:A:1 (front): For each point of progress that is placed on Bottomless Chasm, the players must choose and discard 1 card from a player's hand, if able.
   901606:forced:1: Forced after progress is placed on this card, the placement that explores it included (X is the amount placed; the card may have left play)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - repeat X times:
       - choose card (any player controls) in hand, chosen by the first player
       - discard the picked card
@@ -371,6 +385,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
     - this card counts as a Condition attachment while it is attached
   901608:triggered:1: Triggered (mandatory, not printed as Forced) when the "Lost:" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)
     only if this card is attached to a card
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard its host
 
 901608:A:3 (shadow): Shadow: If you have no cards in your hand, discard defending character from play.

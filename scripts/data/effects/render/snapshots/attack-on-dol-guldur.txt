@@ -213,8 +213,10 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50907:A:1 (front): While the players are at stage 3, Dol Guldur gains: 'Forced: At the end of the round, after resolving the Forced effect on each stage 3 in play, reduce Dol Guldur's city strength by X, where X is the total siege value of each location explored and each enemy destroyed at each stage this round.'
   50907:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls) or in the staging area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - add the Siege value printed on the card the event is about (a destroyed enemy, an explored location; 0 when it prints none) to this round's Siege tally
   50907:forced:2: Forced on the event locationExplored (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - add the Siege value printed on the card the event is about (a destroyed enemy, an explored location; 0 when it prints none) to this round's Siege tally
   50907:forced:3: Forced at the end of the round
     only if 2 is less than the stage number of the quest
@@ -246,6 +248,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50909:A:4 (front): If Host of Lórien leaves play, remove it from the game.
   50909:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card is removed from the game
 
 ## 50910 Bane of Amon Lanc
@@ -327,6 +330,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 50915:A:1 (front): Forced: After Mirkwood Olog-hai attacks and destroys a character, remove 1 progress from the main quest for each excess point of damage.
   50915:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - remove the damage on the card the event is about beyond its printed hit points progress from the current quest card (all of it when it holds less)
 
 50915:A:2 (shadow): Shadow: Either remove 2 progress from the main quest, or return attacking enemy to the staging area.
@@ -445,6 +449,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     - this card: stat noProgressPlaced 1, while this card is in play
   50921:forced:1: Forced on the event whenRevealedCanceled
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 ## 50922 The Shadow Road
@@ -462,6 +467,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     - this card: stat noProgressPlaced 1, while this card is in play
   50922:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if all of: (it is the Quest phase) and (this card is in the staging area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about, now in a discard pile, is attached facedown to this card: out of play under it, with no text, and discarded to its owner's discard pile when this card leaves play
 
 ## 50923 Dungeon Door
@@ -486,6 +492,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50924:A:2 (front): Forced: When Forest Battleground is explored, each player searches the encounter deck and discard pile for an Orc enemy and adds it to the staging area. Shuffle the encounter deck.
   50924:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player finds one Orc enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
@@ -496,6 +503,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50925:A:1 (front): Forced: When Blackened Woods is explored, discard the top card of the encounter deck and raise each player's threat by X, where X is that card's printed Threat.
   50925:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard 1 card(s) from the top of the encounter deck
     - raise threat by the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0) (each player)

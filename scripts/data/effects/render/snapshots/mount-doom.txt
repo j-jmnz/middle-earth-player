@@ -46,6 +46,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 
 146044:A:2 (front): Forced: After Orc-hold becomes the active location, shuffle the encounter discard pile into the encounter deck. Discard cards from the top until an Orc enemy is discarded. Put that enemy into play engaged with the first player.
   146044:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - cards are discarded from the top of the encounter deck until an enemy with the trait Orc is discarded, or the deck is empty; that card becomes the picked card
@@ -61,6 +62,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 
 146045:A:2 (front): Forced: After Mordor Road becomes the active location, each player discards the top card of the encounter deck. Add each enemy discarded this way to the staging area.
   146045:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the top card of the encounter deck goes to the encounter discard pile
       - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
@@ -89,6 +91,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 
 146047:A:2 (front): Forced: After Brake of Thorns becomes the active location, each player assigns X damage among characters he controls, where X is the tens digit of his threat dial.
   146047:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each player assigns the tens digit of your threat damage among the character (you control), one at a time
 
 ## 146048 Old Water-course
@@ -115,14 +118,18 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 
 146049:A:2 (front): Gollum engages the first player.
   146049:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this enemy, in the staging area, engages the first player
   146049:triggered:1: Triggered (mandatory, not printed as Forced) on the event firstPlayerTokenPassed
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this enemy moves to the first player's play area and engages them (nothing if it is not engaged, or already engaged with them)
   146049:forced:2: Forced on the event returnedToStaging (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this enemy, in the staging area, engages the first player
 
 146049:A:3 (front): *Forced: After Gollum is discarded during a Fortitude test, put him into play engaged with the first player. Then, choose an encounter card discarded for this test and ignore its Sauron's Eye icons.
   146049:forced:3: Forced on the event discardedInFortitude (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - if all of: (this card is out of play now) and (the actor holds the first player token): this card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
@@ -140,6 +147,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 146050:A:2 (front): While Ringwraith of Sauron is in the staging area, it gains: "Forced: After a player fails a Fortitude test, Ringwraith of Sauron engages that player and makes an immediate attack."
   146050:forced:1: Forced on the event fortitudeFailed
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - engage this card
     - then, if this card is engaged with a player (that player is who "you" means in this record) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
@@ -264,6 +272,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - its host: stat noFortitudeCommit 1, while this card is in play
   146057:forced:1: Forced on the event fortitudeFailed
     only if the card this one is attached to is controlled by the acting player
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust its host
     - the acting player discards each card (any player controls) or in the staging area or the active location, that is not an objective, attached to this card's host
@@ -302,6 +311,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
   (the keyword part is owned by the card's keywords; the records cover: Forced: After placing progress here from questing successfully, each player makes a Fortitude test. If a player passes this test, he places a resource here. If a player fails this test, he discards cards from the top of the encounter deck until an enemy is discarded and puts that enemy into play engaged with him.)
   146076:forced:1: Forced on the event progressPlaced (heard about this card)
     only if all of: (it is the Quest phase) and (the quest succeeded)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat), counts the Sauron's Eye icons on them, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)
       - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on this card
@@ -361,6 +371,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 
 146078:B:2 (back): Forced: When Mount Doom is explored, the first player makes a Fortitude test. Discard 1 extra encounter card for each player. If the first player fails this test, the Ring-bearer claims The One Ring and the players lose the game. If the test is successful, the Ring-bearer completes the quest and the players win the game.
   146078:forced:1: Forced on the event locationExplored (heard about location (any player controls) named "Mount Doom")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat, plus the number of players more cards), counts the Sauron's Eye icons on them, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)
     - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Ring-bearer claimed The One Ring)

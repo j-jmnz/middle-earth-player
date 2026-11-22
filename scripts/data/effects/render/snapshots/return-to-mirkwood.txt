@@ -21,6 +21,7 @@ Scenario piles that place cards with no record (quest: 02126 Through the Forest;
 
 02127:B:2 (back): If the players quest unsuccessfully, Gollum escapes and the players have lost the game.
   02127:triggered:1: Triggered (mandatory, not printed as Forced) after the players quest unsuccessfully
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game (Gollum escaped)
 
 ## 02128 To the Elvin King's Halls
@@ -217,6 +218,7 @@ Scenario piles that place cards with no record (quest: 02126 Through the Forest;
 900901:A:3 (front): Forced: When Stage 4A is revealed, search the encounter deck and discard pile for 1 copy of Attercop, Attercop and add it to the staging area, if able. Shuffle the encounter deck.
   900901:forced:2: Forced on the event stageRevealed
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Ambush"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 02139 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
@@ -274,6 +276,7 @@ Scenario piles that place cards with no record (quest: 02126 Through the Forest;
 
 900903:A:2 (front): Forced: After the player guarding Gollum changes, Pursuing Warg-rider engages the player guarding Gollum and makes an immediate attack against that player.
   900903:forced:1: Forced on the event changedControl (heard about character (any player controls) named "Gollum")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this enemy engages the player who controls a character (any player controls) named "Gollum" (the first player chooses among several; nothing when it is already engaged with that player; an enemy engaged with another player leaves that player)
     - then, if this card is engaged with a player (that player is who "you" means in this record) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
@@ -305,6 +308,7 @@ Scenario piles that place cards with no record (quest: 02126 Through the Forest;
 
 900905:A:2 (front): Forced: After Deceptive Path becomes the active location, shuffle the encounter discard pile into the encounter deck and discard cards from the top of the encounter deck until a location is discarded. Reveal that location and make it the active location. Then, discard Deceptive Path.
   900905:forced:1: Forced after this location becomes the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card

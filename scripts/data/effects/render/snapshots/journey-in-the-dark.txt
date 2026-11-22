@@ -13,6 +13,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142040:B:1 (back): Forced: After a player optionally engages an enemy, remove 1 damage token from Doom, Doom, Doom.
   142040:forced:1: Forced on the event optionallyEngaged
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - up to 1 damage token(s) come off the card in play with printed code 142043; it stops at 0
 
 ## 142041 Drums in the Deep
@@ -35,6 +36,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142041:B:3 (back): Forced: After an enemy is defeated, place 1 resource token on this stage.
   142041:forced:2: Forced after an enemy is destroyed
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - 1 resource token(s) are placed on this card
 
 ## 142042 The Bridge of Khazad-dûm
@@ -238,6 +240,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142054:A:1 (front): Forced: After Darkened Stairway is explored, discard the top card of the encounter deck. If the discarded card is a location, add it to the staging area.
   142054:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the picked card is a location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
@@ -354,11 +357,13 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142087:A:2 (front): Forced: After a character is destroyed, if Overcome by Grief is unattached, attach to a hero. (Counts as a Condition attachment with the text: "Forced: After a character you control is destroyed, exhaust attached hero. Until the end of the round, attached hero cannot ready.")
   142087:forced:1: Forced on the event characterDestroyed
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
   142087:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   142087:forced:2: Forced on the event characterDestroyed (heard about character (any player controls) controlled by the player who controls this card's host)
     only if not (this card is in the staging area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust its host
     - its host: stat cannotReady 1, until the end of the round
@@ -372,11 +377,13 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142088:A:2 (front): Forced: After a hero takes damage, if Grievous Wound is unattached, attach to that hero. (Counts as a Condition attachment with the text: "Forced: After attached hero exhausts, deal 1 damage to it.")
   142088:forced:1: Forced after a card takes damage (heard about hero (any player controls))
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this objective, in the staging area, attaches to the hero the answered event was about (a card that is attached already stays where it is)
   142088:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   142088:forced:2: Forced on the event exhausted (heard about the host)
     only if not (this card is in the staging area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to its host
 
 (rendered pieces: 208 by template, 0 as JSON)

@@ -14,6 +14,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 110102:A:3 (front): Forced: When Dol Amroth Warship is destroyed, set it aside, out of play.
   110102:forced:1: Forced on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card, wherever it is, goes to the set-aside zone with no damage and no controller, so a set-aside copy can be taken again
 
 110102:B:1 (back): Campaign Mode only.
@@ -34,6 +35,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 110102:B:5 (back): Forced: When Dol Amroth Warship is destroyed, set it aside, out of play.
   110102:forced:2: Forced on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card, wherever it is, goes to the set-aside zone with no damage and no controller, so a set-aside copy can be taken again
 
 ## 11209 A Storm on Cobas Haven
@@ -225,6 +227,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12123:A:3 (front): Forced: When Dol Amroth Warship is destroyed, set it aside, out of play.
   12123:forced:1: Forced on the event characterDestroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card, wherever it is, goes to the set-aside zone with no damage and no controller, so a set-aside copy can be taken again
 
 ## 12124 Raider Flagship
@@ -358,6 +361,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
   12132:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   12132:forced:1: Forced on the event shipExhausted (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 2 damage to its host
   12132:action:1: Action
     only if the number of ready character (you control) is at least 3

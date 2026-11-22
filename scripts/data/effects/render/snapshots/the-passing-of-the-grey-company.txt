@@ -30,6 +30,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145017:A:2 (front): Forced: After The Stone of Erech becomes the active location, each player searches the encounter deck and discard pile for an Oathbreaker enemy and adds it to the staging area. Shuffle the encounter deck.
   145017:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player finds one Oathbreaker enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
@@ -72,6 +73,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 145020:A:1 (front): While Deadly Road is in the staging area, it gains: "Forced: After a 'when revealed' effect is canceled, raise each player's threat by 1."
   145020:forced:1: Forced on the event whenRevealedCanceled
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 1 (each player)
 
 145020:A:2 (front): Travel: Spend 1 Fellowship resource to travel here.
@@ -328,6 +330,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
   145065:constant:2: Constant
     - the players cannot defeat this stage while this holds
   145065:forced:1: Forced on the event locationExplored (heard about location (any player controls) named "The Stone of Erech")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 145067 Army of the Dead

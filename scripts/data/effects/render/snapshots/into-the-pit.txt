@@ -5,6 +5,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03014:A:1 (front): Forced: Before Patrol Leader is dealt damage, discard the top card of the encounter deck. If the discarded card is an enemy, cancel that damage.
   03014:forced:1: Forced on the event damageDealt (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): cancel all of the damage just dealt
@@ -41,6 +42,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 03016:A:3 (front): Forced: After East-gate leaves play as an explored location, add First Hall to the staging area.
   03016:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - one set-aside card with code 03017 joins the staging area (it is not revealed)
 
 ## 03017 First Hall
@@ -53,6 +55,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 03017:A:2 (front): Forced: After First Hall leaves play as an explored location, add Bridge of Khazad-dûm to the staging area.
   03017:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - one set-aside card with code 03018 joins the staging area (it is not revealed)
 
 ## 03018 Bridge of Khazad-dûm
@@ -105,6 +108,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 03036:A:2 (front): Forced: After Branching Paths leaves play as an explored location, look at the top 3 cards of the encounter deck. Players must choose 1 of those to reveal and add to the staging area, moving the other 2 to the bottom of the deck.
   03036:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player looks at the top 3 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
     - choose an encounter card among the cards the effect looked at (none when no card matches)
@@ -185,6 +189,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03041:A:3 (front): Forced: After Cave Torch exhausts, discard the top card of the encounter deck. If that card is an enemy, add it to the staging area.
   03041:forced:1: Forced on the event exhausted (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
@@ -310,6 +315,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 03063:A:1 (front): While Goblin Tunnels is in the staging area, it gains: "Forced: After a Goblin is revealed from the encounter deck, remove a progress token from the current quest card."
   03063:forced:1: Forced after a card is revealed (heard about Goblin enemy (any player controls); only when the encounter deck revealed it)
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - remove 1 progress from the current quest card (all of it when it holds less)
 
 03063:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if attacking enemy is a Goblin.)
@@ -353,6 +359,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03065:B:2 (back): Forced: After an enemy is revealed from the encounter deck, discard it instead of adding it to the staging area.
   03065:forced:1: Forced after a card is revealed (heard about enemy (any player controls); only when the encounter deck revealed it)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - if the card the event is about is a enemy (any player controls) that is in the staging area: the card the event is about goes to the encounter discard pile
 
 03065:B:3 (back): If there are no enemies in play, immediately advance to the next stage of the scenario. (Players can also advance by placing 11 progress tokens on Goblin Patrol.)
@@ -380,6 +387,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 901001:A:2 (front): Forced: After Cave Torch exhausts, place 1 damage token on this card. Then, if there are 5 or more damage tokens on this card, remove Cave Torch from the game.
   901001:forced:1: Forced on the event exhausted (heard about card (any player controls) or in the staging area or the active location, named "Cave Torch")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 damage token(s) on this card (placed, not dealt: nothing cancels or reduces them)
     - then, if 4 is less than damage of this card (checked when this step runs, after the steps above; not tied to whether they did anything): the card the event is about is removed from the game
@@ -437,6 +445,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 901002:B:2 (back): Forced: After an enemy is defeated, place 1 progress on this stage.
   901002:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
 
 901002:B:3 (back): Progress cannot be placed on Goblin Ambush except by the above effect.
@@ -448,6 +457,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 901003:A:1 (front): Forced: After Cave Torch exhausts, Patrol Sentry makes an immediate attack against the engaged player, if able.
   901003:forced:1: Forced on the event exhausted (heard about card (any player controls) or in the staging area or the active location, named "Cave Torch")
     only if this card is engaged with a player (that player is who "you" means in this record)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 901003:A:2 (shadow): Shadow: Add Patrol Sentry to the staging area.

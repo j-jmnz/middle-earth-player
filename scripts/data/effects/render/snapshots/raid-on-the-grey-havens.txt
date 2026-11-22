@@ -37,11 +37,13 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
   11037:constant:1: Constant
     - this card: stat progressHeals 1, while this card is in play
   11037:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players remove X damage from the locations in play, one damage at a time from the location the first player chooses (the amount is the progress a stage replaced with healing)
 
 11037:B:2 (back): Each Raider enemy revealed by the encounter deck enters play with 1 resource on it.
   11037:forced:1: Forced after a card is revealed (heard about Raider enemy (any player controls) or in the staging area; only when the encounter deck revealed it)
     only if not (the When Revealed effects of this card are resolving now (a quest stage's side B holds from the moment it is revealed, but its text is not in force while side A's When Revealed is))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on the card the event is about
 
 11037:B:3 (back): If Captain Sahír is in the victory display and each location in play has no damage, the players win the game.
@@ -54,11 +56,13 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11038:A:1 (front): Forced: When a card is placed underneath The Havens Burn, reveal the top card of the encounter deck.
   11038:forced:1: Forced on the event placedUnder (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 11038:A:2 (front): If there are X or more cards underneath The Havens Burn, the Corsairs have destroyed the Elven fleet and the players lose the game. X is 3 more than the number of players in the game.
   11038:triggered:1: Triggered (mandatory, not printed as Forced) on the event placedUnder (heard about location (any player controls))
     only if the cards facedown underneath The Havens Burn number at least 3, both bounds counted on top of the number of players in the game
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game (The Corsairs have destroyed the Elven fleet)
 
 ## 11039 Dream-chaser
@@ -76,6 +80,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11039:A:4 (front): When the Dream-chaser is placed underneath The Havens Burn, the players lose the game.
   11039:triggered:1: Triggered (mandatory, not printed as Forced) on the event placedUnder (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game (The Dream-chaser was placed underneath The Havens Burn)
 
 ## 11040 Corsair Arsonist
@@ -129,6 +134,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11043:A:3 (front): Forced: When Burning Piers is placed underneath The Havens Burn, deal 3 damage to The Dream-chaser.
   11043:forced:1: Forced on the event placedUnder (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) named "Dream-chaser"
     - deal 3 damage to the picked card
@@ -175,6 +181,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11045:A:3 (front): Forced: When White Ship is placed underneath The Havens Burn, place 1 resource on each Raider enemy in play.
   11045:forced:1: Forced on the event placedUnder (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each Raider enemy (any player controls) or in the staging area:
       - place 1 resource tokens on the picked card
 
@@ -210,6 +217,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11047:A:3 (front): Forced: When Elven Caravel is placed underneath The Havens Burn, deal 1 damage to each character in play.
   11047:forced:1: Forced on the event placedUnder (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to each character (any player controls)
 
 ## 11048 Put to the Torch
@@ -280,6 +288,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11065:A:2 (front): Forced: After the engaged player collects resources at the beginning of the resource phase, that player moves 1 resource from one of his heroes' pools to Corsair Infiltrator.
   11065:forced:2: Forced on the event resourcesCollected (event happened to the controller)
     only if all of: (this card is engaged with a player (that player is who "you" means in this record)) and (there is a hero (you control) with resources on it to choose)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control) with resources on it
     - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
@@ -320,6 +329,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11076:A:1 (front): Captain Sahír engages the first player.
   11076:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this enemy, in the staging area, engages the first player
 
 11076:A:2 (front): For each point of damage Captain Sahír would take, discard 1 resource from him and cancel that damage.
@@ -356,6 +366,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11077:A:4 (front): If Captain Sahír leaves play, the players lose.
   11077:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 11078 Na'asiyah
@@ -363,6 +374,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11078:A:1 (front): Na'asiyah engages the last player.
   11078:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the source enemy engages the last player
 
 11078:A:2 (front): Forced: When Na'asiyah engages you, discard each event in your hand. Add 1 resource to Na'asiyah for each event discarded in this way.
@@ -374,6 +386,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11078:A:3 (front): Forced: When Na'asiyah attacks or defends, she gets +1 Attack and +1 Defense for this attack for each resource on her. After this attack, discard 1 resource from her.
   11078:forced:4: Forced on the event enemyAttacked (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat attack resources of this card, until the end of the attack
     - this card: stat defense resources of this card, until the end of the attack
@@ -414,6 +427,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11079:A:4 (front): If Na'asiyah leaves play, the players lose.
   11079:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 11182 Raid on the Grey Havens
@@ -435,6 +449,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11182:A:3 (front): Forced: After stage 2B is revealed, remove Calphon and each attachment on him from the game, ignoring his "leaves play" ability.
   11182:forced:1: Forced on the event afterStageRevealed
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Sahír's Advance"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card in play titled "Calphon" and the cards attached to it leave the game, and none is announced as leaving play, so no "if it leaves play" ability triggers (the campaign pool is left alone)
 
 11182:B:1 (back): Resolution: If Graxar is in the victory display, choose either Parrying Cutlass or Throwing Axe, add it to the Campaign Pool, and record which hero you attach it to.
@@ -497,6 +512,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11188:A:4 (front): Forced: When Graxar is dealt a shadow card, place 1 resource on him.
   11188:forced:1: Forced on the event shadowsDealt (event happened to the controller)
     only if all of: (this card is engaged with a player (that player is who "you" means in this record)) and (this card is a enemy (any player controls) with a shadow card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place shadowCards of this card resource tokens on this card
 
 (rendered pieces: 344 by template, 0 as JSON)

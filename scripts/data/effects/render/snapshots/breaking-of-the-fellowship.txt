@@ -55,6 +55,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142063:A:1 (front): Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card.
   142063:forced:1: Forced on the event stageDiscarded
     only if the total Threat of the encounter cards in the acting player's staging area is 3 or less (once the stages are separate, their own area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 142063:B:1 (back): If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.
@@ -64,6 +65,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142063:B:2 (back): Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.
   142063:forced:2: Forced after a card is revealed (heard about objective (any player controls) named "Frodo's Choice"; event happened to the controller)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 142067 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 142063:B:3 (back): Response: After you quest successfully, discard a non-unique location in any staging area.
@@ -79,6 +81,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142064:A:1 (front): Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card.
   142064:forced:1: Forced on the event stageDiscarded
     only if the total Threat of the encounter cards in the acting player's staging area is 3 or less (once the stages are separate, their own area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 142064:B:1 (back): If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.
@@ -88,6 +91,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142064:B:2 (back): Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.
   142064:forced:2: Forced after a card is revealed (heard about objective (any player controls) named "Frodo's Choice"; event happened to the controller)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 142067 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 142064:B:3 (back): Response: After you quest successfully, choose a player. Ready each of that player's heroes.
@@ -103,6 +107,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142065:A:1 (front): Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card.
   142065:forced:1: Forced on the event stageDiscarded
     only if the total Threat of the encounter cards in the acting player's staging area is 3 or less (once the stages are separate, their own area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 142065:B:1 (back): If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.
@@ -112,6 +117,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142065:B:2 (back): Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.
   142065:forced:2: Forced after a card is revealed (heard about objective (any player controls) named "Frodo's Choice"; event happened to the controller)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 142067 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 142065:B:3 (back): Response: After you quest successfully, choose a player. That player draws 2 cards and lowers his threat by 2.
@@ -127,6 +133,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142066:A:1 (front): Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card.
   142066:forced:1: Forced on the event stageDiscarded
     only if the total Threat of the encounter cards in the acting player's staging area is 3 or less (once the stages are separate, their own area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 142066:B:1 (back): If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.
@@ -136,6 +143,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142066:B:2 (back): Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.
   142066:forced:2: Forced after a card is revealed (heard about objective (any player controls) named "Frodo's Choice"; event happened to the controller)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 142067 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
 
 142066:B:3 (back): Response: After you quest successfully, discard an enemy engaged with a player.
@@ -308,6 +316,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142076:A:2 (front): Forced: When Sarn Gebir is explored, deal 1 damage to each exhausted character.
   142076:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to each exhausted character (any player controls)
 
 ## 142077 River Anduin
@@ -415,6 +424,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
   142083:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   142083:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each fallen hero in play goes back among its owner's heroes with its own code; one defeated while it was an enemy goes to its owner's discard pile
 
 ## 142089 Followed by Night
@@ -440,6 +450,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     - this card counts as a Condition attachment while it is attached
   142090:forced:1: Forced on the event characterDestroyed (heard about character (any player controls) controlled by the player who controls this card's host)
     only if not (this card is in the staging area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 2 (hostController)
 
 (rendered pieces: 246 by template, 0 as JSON)

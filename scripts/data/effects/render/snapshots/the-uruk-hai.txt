@@ -111,10 +111,12 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 
 143024:A:1 (front): Forced: After Grishnákh enters play, the first player attaches 1 of the Captives to him. If Grishnákh is defeated, place the attached Captive faceup underneath To Isengard!
   143024:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (in play, controlled by no player) that is a Captive that no enemy holds, chosen by the first player
     - the picked Captive is attached to this card
   143024:forced:2: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Captive this card holds lies faceup under the card with code 143022 again
 
 143024:A:2 (front): Forced: At the end of the quest phase, deal 1 damage to the attached Captive.
@@ -181,6 +183,7 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 
 143029:A:1 (front): Forced: After any amount of progress is placed on Banks of Entwash, increase the pursuit value by 1.
   143029:forced:1: Forced on the event progressPlaced (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - increase the pursuit value by 1
 
 143029:A:2 (shadow): Shadow: Either increase the pursuit value by 1, or this attack is considered undefended.

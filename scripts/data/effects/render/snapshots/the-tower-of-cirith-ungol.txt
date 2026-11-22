@@ -56,9 +56,11 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146017:A:1 (front): While Bloodied Courtyard is the active location, it gains: "Forced: After an enemy enters the staging area, deal 1 damage to it."
   146017:forced:1: Forced after an encounter card is added to the staging area (heard about enemy (any player controls))
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to the card the event is about
   146017:forced:2: Forced on the event returnedToStaging (heard about enemy (any player controls))
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to the card the event is about
 
 146017:A:2 (front): Travel: Raise each player's threat by 1 to travel here.
@@ -85,6 +87,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146019:A:1 (front): Forced: After the players travel to Torch-lit Hall, discard cards from the top of the encounter deck until an enemy is discarded. If there is a copy of that enemy in the staging area, discard that copy as well. If there is not, add the just discarded enemy to the staging area.
   146019:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
     - then, if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the number of enemy (any player controls) in the staging area only, with the same title as the last card picked, never that card itself is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
@@ -108,6 +111,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146020:A:3 (front): Forced: After progress is placed on the quest, Shagrat gets -X engagement cost until the end of the round. X is the amount of progress just placed.
   146020:forced:1: Forced on the event progressPlaced (heard about card (any player controls) or in the staging area or the active location, named "Pass the Two Watchers" or "Fighting in the Tower" or "Escape from Cirith Ungol")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card: stat engagementCost minus X, until the end of the round
 
 ## 146021 Gorbag
@@ -132,6 +136,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146022:A:1 (front): Wounded Uruk enters play with 2 damage on it.
   146022:triggered:1: Triggered (mandatory, not printed as Forced) on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 2 damage token(s) on this card (placed, not dealt: nothing cancels or reduces them)
 
 146022:A:2 (front): Forced: After Wounded Uruk engages you, it gets +2 Attack until the end of the round.
@@ -388,6 +393,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146070:A:3 (front): Forced: After the players travel here, flip The Two Watchers to its enemy side and move it to the staging area.
   146070:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card in play with code 146070 becomes the card with code 146071, faceup and ready in the staging area, controlled by no one, with no damage; it keeps its resource tokens and its attachments (nothing when no such card is in play)
 
 ## 146071 The Two Watchers

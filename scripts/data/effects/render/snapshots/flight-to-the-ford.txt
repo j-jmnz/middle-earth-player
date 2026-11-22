@@ -130,6 +130,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141061:A:2 (front): Forced: After any amount of progress is placed on Ettenmoors, reduce the Ring-bearer's life by 1.
   141061:forced:1: Forced on the event progressPlaced
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
 
 ## 141062 The Old Road
@@ -405,6 +406,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 906304:A:1 (front): While Trollshaw Forest is in the staging area, it gains: "Forced: After a 'when revealed' effect is canceled, reduce the Ring-bearer's life by 1."
   906304:forced:1: Forced on the event whenRevealedCanceled
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
 
 906304:A:2 (front): Travel: Reduce the Ring-bearer's life by 1 to travel here.
@@ -433,6 +435,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 906306:A:1 (front): Pathless Wilderness enters play with 3 resource tokens on it.
   906306:triggered:1: Triggered (mandatory, not printed as Forced) on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - 3 resource token(s) are placed on this card
 
 906306:A:2 (front): Forced: At the end of the round, discard 1 resource token here. Then, if there are no resource tokens here, reduce the Ring-bearer's life by 3.
@@ -447,6 +450,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 906307:A:1 (front): Forced: When Ettendales is explored, shuffle the top card of the burden deck into the encounter deck.
   906307:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the top card of the burden deck is shuffled into the encounter deck (nothing when the burden deck is empty)
 
 906307:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack. If this attack destroys a character, reduce the Ring-bearer's life by 1.

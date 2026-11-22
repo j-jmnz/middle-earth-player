@@ -89,6 +89,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 03032:A:3 (front): Forced: After an enemy is revealed from the encounter deck, the first player must deal 1 damage to 1 character he controls.
   03032:forced:1: Forced after a card is revealed (heard about enemy (any player controls) or in the staging area; only when the encounter deck revealed it)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control) chosen by the first player
     - deal 1 damage to the picked card
@@ -152,6 +153,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 03068:B:2 (back): Forced: At the end of the staging step, reveal the top X cards of the encounter deck, adding all enemies to the staging area. Discard the other revealed cards without resolving them. X is the number of players.
   03068:forced:1: Forced on the event stagingStepEnds
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - reveal the top the number of players cards of the encounter deck one at a time: each enemy is revealed in full (its When Revealed, Surge, Doomed and the Forced effects of a reveal) and added to the staging area, every other card is discarded unresolved (the discard pile is shuffled back when the deck runs out)
 
 03068:B:3 (back): If the players defeat this stage, they win the game.
@@ -174,6 +176,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 901101:A:3 (front): Forced: When stage 2B is revealed, make Chamber of Records the active location (returning any currently active location to the staging area) and add Overseer Maurûl to the staging area. Then, shuffle all copies of Balin's Doom in the encounter discard pile back into the encounter deck.
   901101:forced:1: Forced on the event stageRevealed
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "The Fate of Balin"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the set-aside card with code 901103 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
     - one set-aside card with code 901102 joins the staging area (it is not revealed)
@@ -252,6 +255,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 901104:A:2 (front): Forced: When a Goblin enemy with at least 1 resource on it is dealt any amount of damage, remove 1 resource from that enemy and cancel all damage just dealt to it.
   901104:forced:1: Forced on the event damageDealt (heard about Goblin enemy (any player controls) or in the staging area, with resources on it)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - up to 1 resource token(s) come off the card the event is about
     - cancel all of the damage just dealt
@@ -283,6 +287,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 901107:A:1 (front): Forced: When a Goblin enemy enters play, add 1 resource to that enemy if Deep-Mines is in the staging area.
   901107:forced:1: Forced on the event encounterEnteredPlay (heard about Goblin enemy (any player controls) or in the staging area)
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on the card the event is about
 
 901107:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Then, if attacking enemy is a Goblin, deal it another shadow card.

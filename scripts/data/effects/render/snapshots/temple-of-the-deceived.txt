@@ -176,6 +176,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
   12067:constant:2: Constant
     - this card: stat progressToStaging 1, while this card is in play
   12067:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player chooses a location in the staging area that can take progress and it takes all it can of the progress left, again and again, until none is left or no location can take any more, or they keep the rest on the stage
 
 ## 12068 The Grotto's Entrance
@@ -184,11 +185,13 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 12068:A:1 (front): Forced: When The Grotto's Entrance is flipped over while active, put Temple Guardian into play from the victory display, engaged with the player with the highest threat.
   12068:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card titled "Temple Guardian" leaves the victory display for the engagement area of the player with the highest threat (the first player chooses among those tied; nothing when it is in play or not in the victory display)
 
 12068:A:2 (front): When the 8th progress is placed on The Grotto's Entrance, the players have found the sunken ruins and win the game.
   12068:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressPlaced (heard about this card)
     only if this card is a location (any player controls) with at least 8 progress on it
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 12068:B:1: Uncharted.
@@ -204,6 +207,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 
 12068:B:4 (back): Forced: After Temple of the Deceived becomes the active location, flip it over.
   12068:forced:2: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 RECORD NAMING NO LINE OF THIS CARD (12068:B:2)
@@ -223,6 +227,7 @@ RECORD NAMING NO LINE OF THIS CARD (12068:B:2)
 12069:A:2 (front): Forced: When Temple Halls is flipped over while active, put Temple Guardian into play from the victory display, engaged with the player with the highest threat.
   12069:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card titled "Temple Guardian" leaves the victory display for the engagement area of the player with the highest threat (the first player chooses among those tied; nothing when it is in play or not in the victory display)
 
 12069:B:1: Uncharted.
@@ -238,6 +243,7 @@ RECORD NAMING NO LINE OF THIS CARD (12068:B:2)
 
 12069:B:4 (back): Forced: After Temple of the Deceived becomes the active location, flip it over.
   12069:forced:2: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
@@ -296,6 +302,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12072:A:2 (front): Forced: When Jagged Cliffs is flipped over while active, look at the facedown side of each adjacent copy of Lost Island.
   12072:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each location (any player controls) that is a copy of Lost Island (not Temple of the Deceived) next to the active location:
       - the acting player looks at the facedown side of the picked card in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
@@ -308,6 +315,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12072:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   12072:forced:2: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 12072:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
@@ -338,6 +346,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12073:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   12073:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 12073:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
@@ -357,6 +366,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12074:A:2 (front): Forced: When Jungle Path is flipped over while active, each player must exhaust a character with at least 2 Attack.
   12074:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - choose ready character (you control) with a current Attack of at least 2
       - exhaust the picked card
@@ -370,6 +380,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12074:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   12074:forced:2: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 12074:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
@@ -417,6 +428,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12077:A:1 (front): Forced: When you travel to the right, Profane Dead makes an immediate attack against the engaged player.
   12077:forced:1: Forced after the players travel (heard about location (any player controls))
     only if all of: (the last travel went to the right) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - if this card is an enemy engaged with the acting player: this enemy attacks now, dealt a new shadow card after its old ones are discarded
 

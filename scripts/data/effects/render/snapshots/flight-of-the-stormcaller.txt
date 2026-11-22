@@ -11,10 +11,12 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 110042:A:3 (front): When the Stormcaller advances to the next quest stage, return it to the Stormcaller's area.
   110042:triggered:2: Triggered (mandatory, not printed as Forced) on the event stormcallerAdvanced (event happened to the controller)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes into the Stormcaller's area, instead of the players' staging area
 
 110042:A:4 (front): If the Stormcaller leaves play, the players win the game.
   110042:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 110042:B:1 (back): Campaign Mode only.
@@ -29,10 +31,12 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 110042:B:4 (back): When the Stormcaller advances to the next quest stage, return it to the Stormcaller's area.
   110042:triggered:4: Triggered (mandatory, not printed as Forced) on the event stormcallerAdvanced (event happened to the controller)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes into the Stormcaller's area, instead of the players' staging area
 
 110042:B:5 (back): If the Stormcaller leaves play, the players win the game.
   110042:triggered:3: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 11191 Flight of the Stormcaller
@@ -143,6 +147,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12014:B:2 (back): Forced: At the end of the staging step, if you are off-course (Cloud, Rain, or Storm), reveal an additional encounter card from the top of the encounter deck.
   12014:forced:1: Forced on the event stagingStepEnds
     only if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 12014:B:3 (back): When you defeat this stage, if the Stormcaller is at stage 3, you have caught up to the Stormcaller and win the game. Otherwise, advance to the next stage.
@@ -163,6 +168,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12015:B:2 (back): Forced: After a Weather treachery is revealed, deal 1 damage to each Ship objective and Ship enemy at this stage.
   12015:forced:1: Forced after a card is revealed (heard about Weather treachery (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - deal 1 damage to each Ship character (any player controls)
     - deal 1 damage to each Ship enemy (any player controls) or in the staging area
@@ -219,6 +225,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12018:B:2 (back): If the Stormcaller defeats this stage, Captain Sahír has gotten away with the key, and the players lose the game.
   12018:triggered:1: Triggered (mandatory, not printed as Forced) on the event stormcallerStageDefeated
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game (The Stormcaller has defeated stage 4: Captain Sahír has gotten away with the key)
 
 ## 12019 Stormcaller
@@ -233,10 +240,12 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12019:A:3 (front): When the Stormcaller advances to the next quest stage, return it to the Stormcaller's area.
   12019:triggered:2: Triggered (mandatory, not printed as Forced) on the event stormcallerAdvanced (event happened to the controller)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes into the Stormcaller's area, instead of the players' staging area
 
 12019:A:4 (front): If the Stormcaller leaves play, the players win the game.
   12019:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 12020 Sahír's Escort
@@ -270,6 +279,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12021:A:3 (front): While Swift Raider is in the staging area, it gains: "Forced: After a player commits 4 or more characters to a Sailing test or to the quest, Swift Raider engages that player."
   12021:forced:1: Forced on the event commitmentMade
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - if X is at least 4 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): engage this card
 
 ## 12022 Corsair Skiff
@@ -302,11 +312,13 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12023:A:2 (front): Forced: After the engaged player commits a hero to a Sailing test or to a quest, move 1 resource from that hero's resource pool to Corsair Seafarer.
   12023:forced:1: Forced after a card is committed to the quest (heard about hero (you control); event happened to the controller)
     only if this card is engaged with a player (that player is who "you" means in this record)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the card the event is about is a hero (any player controls) with resources on it: place 1 resource tokens on this card
     - then, if the card the event is about is a hero (any player controls) with resources on it (checked when this step runs, after the steps above; not tied to whether they did anything): 1 resource(s) come off the resource pool of the card the event is about (discarded, not spent)
   12023:forced:2: Forced on the event committedToSailing (heard about hero (you control); event happened to the controller)
     only if this card is engaged with a player (that player is who "you" means in this record)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the card the event is about is a hero (any player controls) with resources on it: place 1 resource tokens on this card
     - then, if the card the event is about is a hero (any player controls) with resources on it (checked when this step runs, after the steps above; not tied to whether they did anything): 1 resource(s) come off the resource pool of the card the event is about (discarded, not spent)
@@ -317,6 +329,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12024:A:1 (front): Forced: When the Stormcaller advances to the next quest stage, Serpent's Blade makes an immediate attack against the engaged player.
   12024:forced:1: Forced on the event stormcallerAdvanced (event happened to the controller)
     only if this card is engaged with a player (that player is who "you" means in this record)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this enemy attacks the acting player now, as an attack outside the combat phase: from the staging area though it is not engaged, or while it is engaged with them; it is dealt a shadow card of its own (nothing when it is engaged with another player or out of play)
 
 ## 12025 Jagged Reef
@@ -385,6 +398,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
     - this card counts as a Condition attachment while it is attached
   12029:forced:1: Forced after a card is committed to the quest (heard about ally (any player controls))
     only if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to the card the event is about
 
 (rendered pieces: 204 by template, 0 as JSON)

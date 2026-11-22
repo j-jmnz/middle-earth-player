@@ -70,6 +70,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10041:A:1 (front): Forced: After 1 or more captured cards are rescued, Jailor Gornákh engages the player with the highest threat and makes an immediate attack.
   10041:forced:1: Forced on the event capturedRescued (heard about card (any player controls) or in the staging area or the active location)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose player (any player controls) with the highest threat among the players still in the game (ties: the chooser decides), chosen by the first player
     - this enemy engages the player the last pick chose, leaving any other engagement, and keeps it with no engagement check
@@ -89,6 +90,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10042:A:3 (front): Forced: When Southern Gate becomes the active location, each player with less than 35 threat must raise his threat to 35.
   10042:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player's threat becomes 35 if it is lower
 
@@ -101,6 +103,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10043:A:2 (front): Forced: When Cruel Torturer would damage an ally by an attack, capture that ally underneath Cruel Torturer instead.
   10043:forced:1: Forced on the event wouldDamageAlly (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - an ally the attack would damage is captured underneath the attacking enemy instead, with no damage dealt (on the enemy this is a marker the damage step reads; as a Shadow effect it makes the attack in progress do it)
 
 ## 10044 Dungeon Guard
@@ -260,6 +263,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10053:A:3 (front): Forced: When the last time counter is removed from this quest, discard its captured cards and remove this quest from the game. Then, raise each player's threat by 3 for each of his characters that was discarded by this effect.
   10053:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card discards each card captured underneath it, each to its owner's discard pile (a hero there is dead), and each player raises their threat by 3 for each of their own characters (heroes and allies) so discarded
     - this card is removed from the game
@@ -284,6 +288,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10174:B:2 (back): Forced: After a hero enters play, attach to that hero each set-aside permanent boon attachment assigned to that character in the Campaign Log.
   10174:forced:2: Forced on the event heroEnteredPlay (heard about hero (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - campaign mode: each permanent boon set aside for the hero that just entered play is attached to it, in the order they were set aside
 
 10174:B:3 (back): Resolution: Each player must make note of which unique cards are still in their captured deck and not in play at the end of the game. Those cards cannot be included in that player's deck for the rest of the campaign.
@@ -302,6 +307,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10175:A:2 (front): Forced: When Loot the Dungeons is defeated, each player (at every staging area) may choose one of the following boons and add it to their hand: Berelind, Chieftain's Brooch, Coruhaer, Laermuin, Mail of Eärnur, or Silverthorn. Add the chosen cards to the Campaign Pool.
   10175:forced:1: Forced after a side quest is defeated (its progress reached its quest points) (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - in order from the first player, each player may choose one of the boons with codes 10176, 10177, 10178, 10179, 10180, 10181 that are still set aside and add it to their hand, and it joins the Campaign Pool (a boon taken is not offered again)
 
 ## 10176 Berelind

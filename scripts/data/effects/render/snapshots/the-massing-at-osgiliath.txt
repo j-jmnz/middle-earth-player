@@ -36,6 +36,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 00003:A:1 (front): Forced: After Wolves from Mordor attack and destroy a character, shuffle Wolves from Mordor into the encounter deck.
   00003:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card is shuffled into the encounter deck
 
 00003:A:2 (shadow): Shadow: Deal 2 damage to the defending character.
@@ -105,6 +106,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 00009:A:1 (front): While Morgulduin is the active Location, it gains: 'Forced: When a character commits to a Quest, deal 1 damage to that character.'
   00009:forced:1: Forced after a card is committed to the quest (heard about character (any player controls))
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to the card the event is about
 
 00009:A:2 (shadow): Shadow: If the players have not yet crossed the Anduin, return any current active location to the staging area. Morgulduin becomes the active location.

@@ -45,6 +45,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146026:A:2 (front): Forced: After Beleaguered Hills becomes the active location, each player engages a non-unique enemy in the staging area.
   146026:forced:1: Forced after this location becomes the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - if there is a non-unique enemy (any player controls) in the staging area only, that the chooser may engage (not one that cannot be engaged, nor one barred to this seat) to choose: choose non-unique enemy (any player controls) in the staging area only, that the chooser may engage (not one that cannot be engaged, nor one barred to this seat)
       - then, if there is a non-unique enemy (any player controls) in the staging area only, that the chooser may engage (not one that cannot be engaged, nor one barred to this seat) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): engage the picked card
@@ -62,6 +63,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146028:A:1 (front): Forced: When Slopes of Cirith Gorgor leaves play, the first player shuffles the encounter discard pile into the encounter deck and discards cards from the top until an enemy is discarded. Then, he puts that enemy into play engaged with him.
   146028:forced:1: Forced after a card leaves play
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
@@ -73,12 +75,14 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146029:A:1 (front): Forced: After Reeking Moat becomes the active location, choose a non-unique, non-Nazgûl enemy in the staging area and place it facedown under Reeking Moat.
   146029:forced:1: Forced after this location becomes the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a non-unique enemy (any player controls) in the staging area only, without Nazgûl, chosen by the first player to choose: choose non-unique enemy (any player controls) in the staging area only, without Nazgûl, chosen by the first player
     - then, if there is a non-unique enemy (any player controls) in the staging area only, without Nazgûl, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked card is placed facedown under this location; while it is there it is out of play
 
 146029:A:2 (front): Forced: When Reeking Moat leaves play, put each enemy under it into play engaged with the first player.
   146029:forced:2: Forced after a card leaves play
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each card under this location is put into play engaged with the first player instead of the staging area, and counts as engaging them
 
 ## 146030 Wall of Morannon
@@ -93,6 +97,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146030:A:2 (front): Forced: After Wall of Morannon becomes the active location, return each engaged enemy to the staging area.
   146030:forced:1: Forced after this location becomes the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return every enemy engaged with a player to the staging area
 
 ## 146031 The Mouth of Sauron
@@ -106,6 +111,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 146031:A:2 (front): Forced: After a player cancels a 'when revealed' effect, The Mouth of Sauron makes an immediate attack against that player.
   146031:forced:1: Forced on the event whenRevealedCanceled
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card attacks the player the event is about now, from the staging area
 
 ## 146032 Nazgûl of Mordor
@@ -135,6 +141,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 146033:A:2 (front): Forced: After Gorgoroth Hill-troll attacks and destroys a character, the defending player discards a random card from his hand and raises his threat by that card's printed cost.
   146033:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
     - raise threat by printed cost of the picked card (the acting player)
@@ -339,6 +346,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146073:B:2 (back): Forced: After the players quest unsuccessfully, discard the active location.
   146073:forced:1: Forced after the players quest unsuccessfully
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard the active location
 
 146073:B:3 (back): This stage cannot be defeated. Each round the players survive gives the Ring-bearer more time to fulfill the quest to Mount Doom.

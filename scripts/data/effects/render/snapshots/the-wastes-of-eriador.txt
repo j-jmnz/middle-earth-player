@@ -9,6 +9,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10011:A:2 (front): Forced: When it becomes Day, return each enemy in play to the staging area.
   10011:forced:1: Forced on the event becameDay
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return every enemy engaged with a player to the staging area
 
 10011:A:3 (front): Forced: At the end of the round, flip this objective.
@@ -26,6 +27,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10012:A:2 (front): Forced: When it becomes Night, reveal an encounter card.
   10012:forced:1: Forced on the event becameNight
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player reveals an encounter card
 
 10012:A:3 (front): Forced: At the end of the round, flip this objective.
@@ -51,6 +53,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10013:B:2 (back): Forced: When it becomes Night, raise each player's threat by 1.
   10013:forced:1: Forced on the event becameNight
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 1 (each player)
 
 ## 10014 Howling at Night
@@ -64,11 +67,13 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10014:B:1 (back): Forced: When it becomes Day, each player draws 1 card.
   10014:forced:1: Forced on the event becameDay
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player draws 1 card(s)
 
 10014:B:2 (back): Forced: When it becomes Night, discard 1 non-objective ally from play (discard 2 non-objective allies instead if there are 3 or more players in the game).
   10014:forced:2: Forced on the event becameNight
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a ally (any player controls) that is not an objective, chosen by the first player to choose: choose ally (any player controls) that is not an objective, chosen by the first player
     - then, if there is a ally (any player controls) that is not an objective, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -93,6 +98,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10015:B:2 (back): Forced: When it becomes Day, discard all progress from this stage.
   10015:forced:1: Forced on the event becameDay
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - all progress on this stage (the main quest card) is discarded
 
 10015:B:3 (back): The players cannot defeat this stage while Pack Leader is in play. If Pack Leader is destroyed, the players win the game.
@@ -100,6 +106,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
     only if the card with code 10017 is in play
     - the players cannot defeat this stage while this holds
   10015:forced:2: Forced after an enemy is destroyed (heard about enemy (any player controls) named "Pack Leader")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 10016 Amarthiúl
@@ -111,6 +118,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10016:A:2 (front): If Amarthiúl leaves play, the players lose the game.
   10016:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 10017 Pack Leader
@@ -151,6 +159,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 10019:A:1 (front): While Blood-thirsty Warg is in the staging area, it gains: "Forced: When it becomes Night, Blood-thirsty Warg engages the first player and makes an immediate attack."
   10019:forced:1: Forced on the event becameNight
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - engage this card
     - then, if this card is engaged with a player (that player is who "you" means in this record) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
@@ -304,6 +313,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10173:A:2 (front): Forced: When Fend Off Despair is defeated, mark in the Campaign Log that each player's starting threat is reduced by 2. (This reduction is cumulative.)
   10173:forced:1: Forced after a side quest is defeated (its progress reached its quest points) (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - mark in the Campaign Log that each player's starting threat is reduced by 2 (cumulative; written when the scenario is won)
 
 (rendered pieces: 183 by template, 0 as JSON)

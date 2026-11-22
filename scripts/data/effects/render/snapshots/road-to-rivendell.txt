@@ -52,6 +52,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 04041:A:3 (front): If Arwen Undómiel leaves play, the players are defeated.
   04041:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 04042 Ruined Road
@@ -89,6 +90,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 04044:A:1 (front): Forced: After at least 1 progress token is placed on Pathless Country, remove 1 progress token from it.
   04044:forced:1: Forced on the event progressPlaced (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - remove 1 progress from this card
 
 04044:A:2 (shadow): Shadow: Deal 1 damage to each ally in play.
@@ -304,6 +306,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 901403:A:2 (front): Forced: When Uruk Elf-stalker attacks and destroys a character, deal 1 damage to Arwen Undómiel.
   901403:forced:1: Forced on the event characterDestroyedByAttack
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose card (any player controls) or in the staging area or the active location, named "Arwen Undómiel"
     - deal 1 damage to the picked card

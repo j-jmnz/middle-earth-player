@@ -88,6 +88,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 
 12092:B:2 (back): Forced: After a double-sided location is explored, add the top location from the Grotto deck to the staging area, Grotto side faceup.
   12092:forced:2: Forced on the event locationExplored (heard about location (any player controls) that is a double-sided location, whichever side it shows)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the top 1 cards of the Grotto deck join the staging area without being revealed, Grotto side faceup
 
 12092:B:3 (back): You cannot advance unless there are at least 3 Underwater locations in the victory display.
@@ -293,6 +294,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     only if this card is the active location
     - each Undead enemy (any player controls) or in the staging area: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
   12104:triggered:1: Triggered (mandatory, not printed as Forced) after this location becomes the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return every enemy with the trait Undead engaged with a player to the staging area
 
 12104:A:2 (front): Forced: If Drowned Cave is the active location at the end of the quest phase, each player must discard the top 10 cards of his deck. Then, you may return Drowned Cave to the staging area.

@@ -127,6 +127,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19097:A:3 (front): Forced: After the players travel to The Cursed Tomb, search the encounter deck and discard pile for Fram's Shade and add it to the staging area. Shuffle the encounter deck. Fram's Shade makes an immediate attack against each player in turn order.
   19097:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - search the encounter deck, discard pile and victory display for the card with code 19098 and add it to the staging area (not revealed; nothing when none is found)
     - shuffle the encounter deck
@@ -183,6 +184,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 19100:A:1 (front): Forced: When Evil Spectre is destroyed, shuffle it back into the encounter deck if the active location has the Dark trait.
   19100:forced:1: Forced after an enemy is destroyed (heard about this card)
     only if the active location is a Dark location (any player controls)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
 
 19100:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location has the Dark trait.)
@@ -200,6 +202,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19101:A:2 (front): Forced: After Forgotten Crypt becomes the active location, discard cards from the top of the encounter deck until an Undead enemy is discarded and add it to the staging area. Then, attach a Loot objective in the encounter discard pile to that enemy as a guarded objective.
   19101:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until an enemy with the trait Undead is discarded, or the deck is empty; that card becomes the picked card
     - the picked card goes to the staging area (it is not revealed)
@@ -210,11 +213,13 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19102:A:1 (front): Discover 4.
   19102:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Discover 4 keyword: the first player looks at the top 4 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 19102:A:2 (front): While Haunted Hall is in the staging area, it gains, "Forced: After a player places any amount of progress on a Dark location in the staging area, he raises his threat by 1."
   19102:forced:2: Forced on the event progressPlaced (heard about Dark location (any player controls) in the staging area only)
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 1 (the player the event is about)
 
 ## 19103 Hidden Staircase
@@ -222,6 +227,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19103:A:1 (front): Discover X.
   19103:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Discover the tens digit of the first player's threat, whoever the actor is keyword: the first player looks at the top the tens digit of the first player's threat, whoever the actor is cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 19103:A:2 (front): X is the tens digit of the first player's threat.
@@ -230,6 +236,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19103:A:3 (front): Forced: After resolving the Discover keyword on Hidden Staircase, reduce each player's threat by X if no Hazard cards were revealed by it.
   19103:forced:2: Forced on the event discovered (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)): lower threat by the tens digit of the first player's threat, whoever the actor is (each player)
 
 ## 19104 Moonlit Passage
@@ -237,6 +244,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19104:A:1 (front): Discover 2.
   19104:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Discover 2 keyword: the first player looks at the top 2 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 19104:A:2 (front): While Moonlit Passage is in the staging area, each player's threat cannot be reduced by more than 1 via player card effects each round.
@@ -254,11 +262,13 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19105:A:1 (front): Discover 3.
   19105:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Discover 3 keyword: the first player looks at the top 3 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 19105:A:2 (front): While Cursed Tower is in the staging area, it gains: "Forced: After a player plays an event, raise his threat by 1."
   19105:forced:2: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 1 (the player the event is about)
 
 19105:A:3 (shadow): Shadow: Discard a non-objective attachment you control.

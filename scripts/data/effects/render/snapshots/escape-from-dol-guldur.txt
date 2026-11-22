@@ -6,6 +6,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01101:A:1 (front): Forced: If Dungeon Jailor is in the staging area after the players have just quested unsuccessfully, shuffle 1 unclaimed objective card from the staging area back into the encounter deck.
   01101:forced:1: Forced after the players quest unsuccessfully (limit once per round)
     only if all of: (this card is in the staging area) and (there is a objective (any player controls) in the staging area only, chosen by the first player to choose)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose objective (any player controls) in the staging area only, chosen by the first player
     - the picked card is shuffled into the encounter deck
@@ -19,10 +20,12 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01102:A:2 (front): Forced: When the prisoner is "rescued," move Nazgûl of Dol Guldur into the staging area.
   01102:forced:1: Forced on the event prisonerRescued (heard about hero (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes to the staging area (it is not revealed)
 
 01102:A:3 (front): Forced: After a shadow effect dealt to Nazgûl of Dol Guldur resolves, the engaged player must choose and discard 1 character he controls.
   01102:forced:2: Forced on the event shadowEffectResolved (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control)
     - discard the picked card
@@ -73,6 +76,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01107:A:1 (front): Forced: After travelling to Tower Gate, each player places the top card of his deck, face down in front of him, as if it just engaged him from the staging area. These cards are called "Orc Guard," and act as enemies with: 1 hit point, 1 Attack, and 1 Defense.
   01107:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player places the top card of their deck facedown in front of them as if it just engaged them: it is an "Orc Guard", an enemy with 1 hit point, 1 Attack and 1 Defense engaged with them, held under an enemy the engine makes as a stand-in (when it leaves play the card goes to its owner's discard pile; nothing with an empty deck)
 
@@ -220,6 +224,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01131:A:3 (front): Forced: When a hero would be randomly selected to be a "prisoner," the "prisoner" from the Campaign Log is selected instead. Each card attached to that hero is turned facedown until that hero is "rescued." Mendor is captured as well. Place Mendor facedown next to the prisoner (this does not cause him to leave play). Flip this card over.
   01131:forced:1: Forced on the event prisonerTaken (heard about hero (any player controls))
     only if this card shows side A
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the prisoner named in the Campaign Log is selected instead: when the log names a hero the players control, that hero is the prisoner and the one selected at random is back among its player's heroes as it was (nothing with no such hero, so the random one stays)
     - the card in play with code 01135 is captured as well: placed facedown next to the prisoner, in play but controlled by nobody, and it does not leave play (nothing with no prisoner or no such card)
@@ -245,6 +250,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 900301:A:2 (front): Forced: When stage 1B is revealed, the number of random heroes captured is determined by the number of players, as follows: 1-2 players = 1 hero captured, 3 players = 2 heroes captured, 4 players = 3 heroes captured. All captured heroes are turned face down and considered "the prisoner," cannot be used, cannot be damaged, and do not collect resources until they are rescued. (A single player cannot have more than 1 hero captured by this effect.)
   900301:forced:1: Forced on the event prisonerTaken (heard about hero (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - heard when a hero was taken prisoner at stage 1B: more heroes are captured at random with the game's seed, from players who have none captured, until the number captured is 1 with 1 or 2 players, 2 with 3 and 3 with 4; each is facedown, "the prisoner", as the first (nothing is announced for them)
 
 900301:B:1 (back): Begin with the standard quest deck and encounter deck for the Escape from Dol Guldur scenario found in the LOTR LCG core set.
@@ -310,6 +316,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 900303:A:2 (front): Forced: If Crazed Captive is defeated, raise each player's threat by 7.
   900303:forced:1: Forced after an enemy is destroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 7 (each player)
 
 900303:A:3 (shadow): Shadow: If attacking enemy is not defeated this phase, raise defending player's threat by 7 at the end of the phase.
