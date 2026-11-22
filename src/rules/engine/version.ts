@@ -124,6 +124,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: ["raid-on-the-grey-havens"], note: "Umbar Raider takes a resource only when one of your heroes has one to move." },
   { version: 38, scenarios: ["lost-in-mirkwood"], note: "Unseen Danger discards the character it removed from the quest when the discarded card's printed Threat is greater than that character's Willpower, not the encounter card." },
   { version: 38, scenarios: ["lost-in-mirkwood", "the-siege-of-annuminas"], note: "While Accursed Forest or Hills of Evendim is in the staging area, only 'when revealed' effects cannot be canceled: a Shadow effect can still be canceled." },
+  { version: 38, scenarios: ["into-the-pit", "the-caves-of-nibin-dum", "mount-gundabad", "foundations-of-stone", "the-long-dark"], note: "A Restricted attachment a Setup attaches, like Cave Torch or Wormsbane, counts toward the limit of 2 Restricted attachments on a hero: a third one makes one of them go to the discard pile." },
 ];
 
 export const ENGINE_VERSION = 38;

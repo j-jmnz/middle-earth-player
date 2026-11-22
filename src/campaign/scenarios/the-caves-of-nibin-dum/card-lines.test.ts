@@ -28,9 +28,7 @@ describe("Cave Torch (41029:A:1)", () => {
     expect(tableFromLayout(SCENARIO).ctx.cards.get(TORCH)?.keywords.restricted).toBe(true);
   });
 
-  // FAULT: rr.restricted says a third Restricted attachment on a character sends one of them to the discard pile at once, but the Setup's AttachSetAside leaves Cave Torch, Blade of Gondolin and
-  // Horn of Gondor all three on the hero.
-  it.fails("41029:A:1 attached by the Setup to a hero that holds 2 Restricted attachments, one of the three is discarded", () => {
+  it("41029:A:1 attached by the Setup to a hero that holds 2 Restricted attachments, one of the three is discarded", () => {
     const made = tableFromLayout(SCENARIO, { stage: STAGE_1, side: "A", setAside: [TORCH], attached: [{ code: BLADE, to: "dh1" }, { code: HORN, to: "dh1" }], deck: ["f0", "f0"] }, { extra: [BLADE, HORN] });
     const run = resolveRecords(made.state, made.ctx, STAGE_1, "setup", made.state.questStage ?? undefined, (state) => (state.window?.kind === "choose" ? (state.window.options.find((option) => option === made.hero) ?? state.window.options[0] ?? "") : ""));
     expect(run.state.cards[idOf(run.state, TORCH)]?.host).toBe(made.hero);

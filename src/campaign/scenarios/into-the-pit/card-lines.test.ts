@@ -82,8 +82,7 @@ describe("03041 Cave Torch", () => {
 
   // Restricted: "Each character cannot have more than 2 attachments with the restricted keyword. If a third restricted attachment is ever attached to a character, one of the restricted attachments must immediately
   // be moved to its owner's discard pile" (rr.restricted). Entering the Mines' Setup (03064:A:1) attaches the Torch to the hero the first player picks: dh1 already carries Celebrían's Stone and Citadel Plate.
-  // FAULT: the Torch is Restricted, so dh1 may hold only 2 restricted attachments once it arrives; the Setup's AttachSetAside attaches it with no restricted check, and dh1 keeps all 3.
-  it.fails("03041:A:1 the Torch the Setup attaches is a third restricted attachment, and one of the three leaves the hero", () => {
+  it("03041:A:1 the Torch the Setup attaches is a third restricted attachment, and one of the three leaves the hero", () => {
     const made = tableFromLayout(ID, { deck: ["f0"], attached: [{ code: "01027", to: "dh1" }, { code: "01040", to: "dh1" }] }, { extra: ["01027", "01040"] });
     const dh1 = idOf(made.state, "dh1");
     const run = resolveRecords(made.state, made.ctx, "03064", "setup", undefined, (state) => (state.window?.kind === "choose" ? (state.window.options.includes(dh1) ? dh1 : (state.window.options[0] ?? "")) : ""));

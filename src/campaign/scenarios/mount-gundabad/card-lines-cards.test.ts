@@ -141,8 +141,7 @@ describe("Wormsbane: Attach to a hero. Restricted.", () => {
     expect(one(run.state, CODES.wormsbane)?.host).toBe(t.hero2);
   });
 
-  // FAULT: Wormsbane prints Restricted and rr.restricted discards one of three Restricted attachments a character ever has; the Setup's AttachSetAside attaches it beside two others and enforces nothing, so the hero keeps three.
-  it.fails("19143:A:1 Restricted: attached at Setup to a hero who carries two Restricted attachments, one of the three is discarded", () => {
+  it("19143:A:1 Restricted: attached at Setup to a hero who carries two Restricted attachments, one of the three is discarded", () => {
     const t = table({ phase: "Planning", attached: [{ code: "12197" }, { code: "12200" }] });
     expect(restricted(t.state, t, t.hero)).toBe(2);
     const { run } = setup(t, t.hero);
