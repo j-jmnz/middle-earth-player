@@ -26,21 +26,14 @@ export function installsOf(releases: readonly (ReleaseAssets | readonly ReleaseA
     .reduce((sum, asset) => sum + asset.download_count, 0);
 }
 
-/** A count as a badge shows it: 999, 1.2k, 12k, 1.5M. */
-export function shortCount(count: number): string {
-  const unit = (size: number, suffix: string): string => {
-    const value = count / size;
-    const text = value < 10 ? (Math.floor(value * 10) / 10).toFixed(1).replace(/\.0$/, "") : String(Math.floor(value));
-    return `${text}${suffix}`;
-  };
-  if (count >= 1_000_000) return unit(1_000_000, "M");
-  if (count >= 1_000) return unit(1_000, "k");
-  return String(count);
+/** A count as the badge shows it: every digit, grouped by thousands (999, 1,043, 12,345, 1,500,000). */
+export function fullCount(count: number): string {
+  return String(count).replace(/\B(?=(\d{3})+$)/g, ",");
 }
 
 /** The shields.io endpoint file (https://shields.io/badges/endpoint-badge). */
 export function badgeOf(count: number): Record<string, unknown> {
-  return { schemaVersion: 1, label: "installs", message: shortCount(count), color: "3E5A48" };
+  return { schemaVersion: 1, label: "installs", message: fullCount(count), color: "3E5A48" };
 }
 
 function main(log: Log): void {
