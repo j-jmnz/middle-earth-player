@@ -126,7 +126,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19040:whenRevealed:1: When revealed
     - the first player chooses one of:
       * option "attack":
-        - this card attacks the first player now, from the staging area
+        - this card attacks the first player now, from the staging area, dealt a shadow card
       * option "discard":
         - each player discards 1 random card(s) from hand
 

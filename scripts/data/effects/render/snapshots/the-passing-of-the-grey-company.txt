@@ -155,7 +155,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
       * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
         - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
       * option "attack":
-        - this card attacks the acting player now, from the staging area
+        - this card attacks the acting player now, from the staging area, dealt a shadow card
 
 ## 145025 Shadow Host
 (the scenario deals it into the encounter pile; the piles place it, no record does)

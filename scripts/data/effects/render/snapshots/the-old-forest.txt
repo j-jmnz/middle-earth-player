@@ -150,7 +150,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
   147008:forced:1: Forced on the event activeExplored
     only if this card is in the staging area
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - this card attacks the first player now, from the staging area
+    - this card attacks the first player now, from the staging area, dealt a shadow card
 
 ## 147009 Grasping Root
 (the scenario deals it into the encounter pile; the piles place it, no record does)

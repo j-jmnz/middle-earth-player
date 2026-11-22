@@ -77,7 +77,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145044:travel:1: Travel
     - for each player, first player first:
       - choose enemy (any player controls) or in the staging area, named "The Witch-king"
-      - then, if there is a enemy (any player controls) or in the staging area, named "The Witch-king" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area (or engaged)
+      - then, if there is a enemy (any player controls) or in the staging area, named "The Witch-king" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area, dealt a shadow card (or engaged)
 
 ## 145045 Gate of Gondor
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -161,7 +161,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145050:A:2 (front): When Revealed: The Black Serpent makes an immediate attack against the first player.
   145050:whenRevealed:1: When revealed
-    - this card attacks the first player now, from the staging area
+    - this card attacks the first player now, from the staging area, dealt a shadow card
 
 ## 145051 War Mûmak
 (the scenario deals it into the encounter pile; the piles place it, no record does)

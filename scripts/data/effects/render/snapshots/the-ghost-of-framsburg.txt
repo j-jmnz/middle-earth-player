@@ -133,7 +133,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     - shuffle the encounter deck
     - for each player, first player first:
       - choose enemy (any player controls) or in the staging area, named "Fram's Shade"
-      - the picked enemy attacks the acting player now, from the staging area (or engaged)
+      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card (or engaged)
 
 ## 19098 Fram's Shade
 (the scenario deals it into the encounter pile; the piles place it, no record does)

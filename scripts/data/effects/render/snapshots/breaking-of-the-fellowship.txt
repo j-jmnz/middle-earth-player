@@ -259,7 +259,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
         - the effect goes on with the picked player as the acting player
         - the acting player reveals an encounter card
       * option "attack":
-        - this card attacks the acting player now, from the staging area
+        - this card attacks the acting player now, from the staging area, dealt a shadow card
 
 ## 142073 Parth Galen
 (the scenario deals it into the setAside pile; the piles place it, no record does)

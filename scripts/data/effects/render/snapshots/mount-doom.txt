@@ -214,7 +214,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
   146054:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a enemy (any player controls) named "Gollum" to choose: choose enemy (any player controls) named "Gollum"
-    - then, if there is a enemy (any player controls) named "Gollum" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area (or engaged)
+    - then, if there is a enemy (any player controls) named "Gollum" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card (or engaged)
     - then, if not (there is a enemy (any player controls) named "Gollum" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one card with code 146049 in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
 
 146054:A:2 (shadow): Shadow: If attacking enemy is Gollum, he makes an additional attack after this one.

@@ -80,7 +80,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, named "The Balrog"
-    - the picked enemy attacks the first player now, from the staging area
+    - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
 
 ## 142044 The Balrog
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -133,7 +133,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142047:A:1 (front): When Revealed: Uruk from Mordor makes an attack against the first player.
   142047:whenRevealed:1: When revealed
-    - this card attacks the first player now, from the staging area
+    - this card attacks the first player now, from the staging area, dealt a shadow card
 
 142047:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, attacking enemy makes an additional attack.
   142047:shadow:1: Shadow
@@ -311,7 +311,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
         - up to 1 damage token(s) come off the card in play with printed code 142043; it stops at 0
       * option "balrog" (only if the card with code 142044 is in play):
         - choose enemy (any player controls) in the staging area only, named "The Balrog"
-        - the picked enemy attacks the first player now, from the staging area
+        - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
 
 142059:A:3 (shadow): Shadow: If this attack destroys a character, reveal 1 card from the encounter deck.
   142059:shadow:1: Shadow

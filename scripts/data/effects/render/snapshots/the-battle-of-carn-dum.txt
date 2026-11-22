@@ -102,12 +102,12 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - heal 3 damage from this card
-    - this card attacks the first player now, from the staging area (or engaged)
+    - this card attacks the first player now, from the staging area, dealt a shadow card (or engaged)
   10128:forced:2: Forced after a card is revealed (heard about Sorcery treachery (any player controls); not for a card found in the encounter discard pile)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - heal 3 damage from this card
-    - this card attacks the first player now, from the staging area (or engaged)
+    - this card attacks the first player now, from the staging area, dealt a shadow card (or engaged)
 
 ## 10129 Carn Dûm Garrison
 (the scenario deals it into the staging pile; the piles place it, no record does)

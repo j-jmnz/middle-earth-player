@@ -384,7 +384,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - one set-aside card with code 19011 joins the staging area (it is not revealed)
     - choose enemy (any player controls) or in the staging area, named "Cold-Drake"
     - for each player, first player first:
-      - the picked enemy attacks the acting player now, from the staging area
+      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
 
 19025:B:1 (back): Cold-Drake cannot take more than X damage each round, where X is the number of Dragon Signs in the victory display.
   19025:constant:1: Constant
@@ -398,7 +398,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - choose enemy (any player controls) or in the staging area, named "Cold-Drake"
     - return the picked card to the staging area
     - for each player, first player first:
-      - the picked enemy attacks the acting player now, from the staging area
+      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
 
 19025:B:3 (back): This stage cannot be defeated while Cold-Drake is in play. When Cold-Drake is defeated, the players win the game.
   19025:constant:2: Constant

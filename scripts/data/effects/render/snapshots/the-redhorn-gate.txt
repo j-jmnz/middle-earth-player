@@ -418,7 +418,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
   901304:forced:1: Forced when a phase begins
     only if all of: (it is the Combat phase) and (this card is in the staging area)
     who acts: the acting player is the first player (a phase has no player of its own)
-    - this card attacks the first player now, from the staging area
+    - this card attacks the first player now, from the staging area, dealt a shadow card
 
 901304:A:2 (front): Forced: After Snow-Giant engages you, discard the ally you control with the highest Willpower.
   901304:forced:2: Forced after an enemy engages a player (heard about this card)

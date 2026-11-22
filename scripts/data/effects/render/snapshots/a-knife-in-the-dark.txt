@@ -137,7 +137,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     - move the picked card into play under the first player's control
 
 141045:A:2 (front): Forced: After The Prancing Pony leaves play, discard cards from the top of the encounter deck until X enemies have been discarded. X is the number of players in the game. Put each enemy discarded by this effect into play engaged with the first player.
-  141045:forced:1: Forced after a card leaves play
+  141045:forced:1: Forced after a card leaves play (heard about this card only: with no subject, an event about one card is heard by that card alone)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard from the top of the encounter deck until 1 enemy for each player is discarded
 
@@ -198,7 +198,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     - the last picked card is placed facedown under this location; while it is there it is out of play
 
 141049:A:2 (front): Forced: After this location leaves play, return each enemy under it to the staging area face-up.
-  141049:forced:1: Forced after a card leaves play
+  141049:forced:1: Forced after a card leaves play (heard about this card only: with no subject, an event about one card is heard by that card alone)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each card under this location returns to the staging area faceup
 

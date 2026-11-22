@@ -225,7 +225,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
         - the acting player reveals an encounter card
       * option "attack" (only if there is a enemy (any player controls) in the staging area only to choose):
         - for each enemy (any player controls) in the staging area only:
-          - the picked enemy attacks the acting player now, from the staging area
+          - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
 
 ## 144039 Arrows Thick in the Air
 (the scenario deals it into the encounter pile; the piles place it, no record does)

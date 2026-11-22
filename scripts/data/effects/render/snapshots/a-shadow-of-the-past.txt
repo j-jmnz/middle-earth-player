@@ -98,7 +98,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 (the scenario deals it into the activeLocation pile; the piles place it, no record does)
 
 141031:A:1 (front): Response: After Bag End leaves play, each player draws 1 card for each Hobbit hero he controls.
-  141031:response:1: Response after a card leaves play
+  141031:response:1: Response after a card leaves play (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - for each player, first player first:
       - the acting player draws 1 card(s) for each Hobbit hero
 

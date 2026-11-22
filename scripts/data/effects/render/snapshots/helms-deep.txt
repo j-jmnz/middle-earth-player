@@ -60,7 +60,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143035:A:2 (front): When Revealed: Warrior of Dunland makes an immediate attack against you.
   143035:whenRevealed:1: When revealed
-    - this card attacks the acting player now, from the staging area
+    - this card attacks the acting player now, from the staging area, dealt a shadow card
 
 143035:A:3 (front): Forced: After Warrior of Dunland attacks and destroys a character, place 3 progress on the active location.
   143035:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
@@ -208,7 +208,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
   143044:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides)
-    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area
+    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
     - then, if not (there is a enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 143044:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.

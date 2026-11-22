@@ -764,7 +764,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
   51151:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, that is this card itself
-    - the picked enemy attacks the first player now, from the staging area
+    - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
 
 51151:A:2 (shadow): Shadow: Engage the lowest engagement cost enemy in the staging area and deal it a shadow card.
   51151:shadow:1: Shadow

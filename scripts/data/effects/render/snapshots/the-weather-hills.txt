@@ -25,11 +25,11 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
   09026:forced:1: Forced after an encounter card is added to the staging area (heard about Orc enemy (any player controls))
     only if this card is the active location
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the card the event is about attacks the first player now, from the staging area
+    - the card the event is about attacks the first player now, from the staging area, dealt a shadow card
   09026:forced:2: Forced on the event returnedToStaging (heard about Orc enemy (any player controls))
     only if this card is the active location
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the card the event is about attacks the first player now, from the staging area
+    - the card the event is about attacks the first player now, from the staging area, dealt a shadow card
 
 09026:A:3 (front): The players cannot win while Amon Forn is in play.
   09026:constant:2: Constant

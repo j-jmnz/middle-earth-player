@@ -409,7 +409,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
       * option "threat":
         - raise threat by 2 (each player)
       * option "attack":
-        - this card attacks the first player now, from the staging area
+        - this card attacks the first player now, from the staging area, dealt a shadow card
 
 50724:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if your threat is 35 or higher).
   50724:shadow:1: Shadow

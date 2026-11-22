@@ -35,7 +35,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
   04140:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
-    - the picked enemy attacks the first player now, from the staging area
+    - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
     - one set-aside card with code 04141 joins the staging area (it is not revealed)
 
 04140:B:2 (back): Players cannot win the game while Durin's Bane is in play. If Durin's Bane leaves play by the effect on Dark Pit, the players have won the game.
@@ -165,7 +165,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
   04149:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
-    - the picked enemy attacks the first player now, from the staging area
+    - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
 
 04149:A:2 (shadow): Shadow: If attacking enemy is Durin's Bane, it gets +3 Attack.
   04149:shadow:1: Shadow
@@ -319,7 +319,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose enemy (any player controls) or in the staging area, named "Durin's Bane"
-      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
 
 ## 901806 Flame of Udûn
 

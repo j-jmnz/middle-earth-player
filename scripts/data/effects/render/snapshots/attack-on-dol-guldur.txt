@@ -74,7 +74,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     - one set-aside card with code 50910 joins the staging area (it is not revealed)
     - then, if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Bane of Amon Lanc" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, named "Bane of Amon Lanc"
     - for each player, first player first:
-      - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Bane of Amon Lanc" to choose): the picked enemy attacks the acting player now, from the staging area
+      - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Bane of Amon Lanc" to choose): the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
 
 50903:B:1 (back): Bane of Amon Lanc gets -1 engagement cost for each progress token on this stage.
   50903:constant:1: Constant
@@ -107,7 +107,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     - one set-aside card with code 50911 joins the staging area (it is not revealed)
     - then, if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Sorcerer of Dol Guldur" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, named "Sorcerer of Dol Guldur"
     - for each player, first player first:
-      - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Sorcerer of Dol Guldur" to choose): the picked enemy attacks the acting player now, from the staging area
+      - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Sorcerer of Dol Guldur" to choose): the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
 
 50904:B:1 (back): Sorcerer of Dol Guldur gets -1 engagement cost for each progress token on this stage.
   50904:constant:1: Constant
@@ -146,7 +146,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     - one set-aside card with code 50912 joins the staging area (it is not revealed)
     - then, if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Chieftain Morlug" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, named "Chieftain Morlug"
     - for each player, first player first:
-      - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Chieftain Morlug" to choose): the picked enemy attacks the acting player now, from the staging area
+      - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Chieftain Morlug" to choose): the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
 
 50905:B:1 (back): Chieftain Morlug gets -1 engagement cost for each progress token on this stage.
   50905:constant:1: Constant
@@ -182,7 +182,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     - one set-aside card with code 50913 joins the staging area (it is not revealed)
     - then, if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Dungeon Dweller" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, named "Dungeon Dweller"
     - for each player, first player first:
-      - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Dungeon Dweller" to choose): the picked enemy attacks the acting player now, from the staging area
+      - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Dungeon Dweller" to choose): the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
 
 50906:B:1 (back): Dungeon Dweller gets -1 engagement cost for each progress token on this stage.
   50906:constant:1: Constant
@@ -526,7 +526,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
   50926:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, with the highest current engagement cost of those (ties: the chooser decides), chosen by the first player
-    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area
+    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card
 
 50926:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   50926:shadow:1: Shadow

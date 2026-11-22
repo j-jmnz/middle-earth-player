@@ -49,7 +49,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     (steps run in order; a step depends on an earlier one only through its own condition)
     - return this card to the staging area
     - for each player, first player first:
-      - this card attacks the acting player now, from the staging area
+      - this card attacks the acting player now, from the staging area, dealt a shadow card
 
 ## 18043 Dragon Hoard
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -120,7 +120,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18047:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
-    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area
+    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card
     - then, if not (there is a enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 18047:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.

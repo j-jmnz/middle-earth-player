@@ -332,7 +332,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 12052:A:3 (front): Forced: After Crushing Arm is detached from a location, it makes an immediate attack against the first player.
   12052:forced:1: Forced on the event grappleDetached (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - this card attacks the first player now, from the staging area
+    - this card attacks the first player now, from the staging area, dealt a shadow card
 
 ## 12053 Grasping Arm
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
@@ -386,13 +386,13 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
   12056:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
-      - the picked enemy attacks the acting player now, from the staging area
+      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
 
 12056:A:2 (shadow): Shadow: After this attack, The Thing in the Depths makes an attack against the defending player (deal a shadow card for this attack).
   12056:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
-      - the picked enemy attacks the acting player now, from the staging area
+      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
 
 (rendered pieces: 217 by template, 0 as JSON)

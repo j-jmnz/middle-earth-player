@@ -86,7 +86,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - the set-aside card with code 51311 is added to the staging area and enters play: the cards that hear it enter play or be added to the staging area hear it
     - choose enemy (any player controls) in the staging area only, named "Durin's Bane"
     - the picked card: stat cannotTakeDamage 1, until the end of the round
-    - then, if 1 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area (or engaged)
+    - then, if 1 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card (or engaged)
 
 51307:B:1 (back): No more than 5 progress can be placed here each round.
   51307:constant:1: Constant
@@ -98,7 +98,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
-    - the picked enemy attacks the first player now, from the staging area (or engaged), undefended damage going to the stage, the damage beyond the defender's remaining hit points going on the main quest card too
+    - the picked enemy attacks the first player now, from the staging area, dealt a shadow card (or engaged), undefended damage going to the stage, the damage beyond the defender's remaining hit points going on the main quest card too
 
 51307:B:3 (back): If this stage has damage on it equal to or greater than its quest points, the players lose the game. If this stage is defeated, the players win the game.
   51307:constant:2: Constant
@@ -115,7 +115,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - the set-aside card with code 51311 is added to the staging area and enters play: the cards that hear it enter play or be added to the staging area hear it
     - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
     - the picked card: stat cannotTakeDamage 1, until the end of the round
-    - then, if 1 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area (or engaged)
+    - then, if 1 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card (or engaged)
 
 51308:B:1 (back): Durin's Bane engages the first player.
   51308:forced:1: Forced after an encounter card is added to the staging area (heard about enemy (any player controls) or in the staging area, named "Durin's Bane")
@@ -148,7 +148,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - the set-aside card with code 51311 is added to the staging area and enters play: the cards that hear it enter play or be added to the staging area hear it
     - choose enemy (any player controls) in the staging area only, named "Durin's Bane"
     - the picked card: stat cannotTakeDamage 1, until the end of the round
-    - then, if 1 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area (or engaged)
+    - then, if 1 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card (or engaged)
 
 51309:B:1 (back): Each player's threat cannot be reduced by player card effect.
   51309:constant:1: Constant
@@ -560,7 +560,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
   51336:forced:1: Forced when the staging step begins, before the first card is revealed
     only if this card is in the staging area
     who acts: the acting player is the first player (a phase has no player of its own)
-    - this card attacks the first player now, from the staging area
+    - this card attacks the first player now, from the staging area, dealt a shadow card
 
 ## 51337 Silent Caverns
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -758,7 +758,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
   51350:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
-    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area
+    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card
     - then, if not (there is a enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 51350:A:2 (shadow): Shadow: If attacking enemy is unique, it makes an additional attack against you after this one.

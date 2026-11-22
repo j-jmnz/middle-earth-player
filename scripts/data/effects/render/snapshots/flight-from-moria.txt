@@ -488,7 +488,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "The Nameless Fear"
     - for each player, first player first:
-      - the picked enemy attacks the acting player now, from the staging area
+      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
   901203:constant:1: Constant
     - each enemy (any player controls) or in the staging area, named "The Nameless Fear": stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
 

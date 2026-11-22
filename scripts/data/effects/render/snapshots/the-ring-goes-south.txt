@@ -335,7 +335,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - the acting player chooses one of:
       * option "attack" (only if there is a Warg enemy (any player controls) in the staging area only to choose):
         - choose, among the enemies in the staging area with the trait Warg, the one with the highest engagement cost (ties: the first player chooses), or pick nothing when there is none
-        - the picked enemy attacks the acting player now, from the staging area
+        - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
       * option "engagement":
         - each Warg enemy (any player controls) in the staging area only: stat engagementCost -20, until the end of the round
     - then, if not (the number of Warg enemy (any player controls) in the staging area only is at least 1) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)

@@ -220,7 +220,7 @@ Scenario piles that place cards with no record (quest: 19168 Urdug's Assault; qu
   19166:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Urdug"
-    - the picked enemy attacks the first player now, from the staging area
+    - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose objective (any player controls) or in the staging area, named "The Goblins' Assault"
       - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 progress on the picked card

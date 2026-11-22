@@ -62,7 +62,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 146028:A:1 (front): Forced: When Slopes of Cirith Gorgor leaves play, the first player shuffles the encounter discard pile into the encounter deck and discards cards from the top until an enemy is discarded. Then, he puts that enemy into play engaged with him.
-  146028:forced:1: Forced after a card leaves play
+  146028:forced:1: Forced after a card leaves play (heard about this card only: with no subject, an event about one card is heard by that card alone)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
@@ -81,7 +81,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
     - then, if there is a non-unique enemy (any player controls) in the staging area only, without Nazgûl, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked card is placed facedown under this location; while it is there it is out of play
 
 146029:A:2 (front): Forced: When Reeking Moat leaves play, put each enemy under it into play engaged with the first player.
-  146029:forced:2: Forced after a card leaves play
+  146029:forced:2: Forced after a card leaves play (heard about this card only: with no subject, an event about one card is heard by that card alone)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each card under this location is put into play engaged with the first player instead of the staging area, and counts as engaging them
 
@@ -112,7 +112,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146031:forced:1: Forced on the event whenRevealedCanceled
     only if this card is in the staging area
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - this card attacks the player the event is about now, from the staging area
+    - this card attacks the player the event is about now, from the staging area, dealt a shadow card
 
 ## 146032 Nazgûl of Mordor
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -249,7 +249,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146039:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a enemy (any player controls) in the staging area only, named "The Mouth of Sauron" to choose: choose enemy (any player controls) in the staging area only, named "The Mouth of Sauron"
-    - then, if there is a enemy (any player controls) in the staging area only, named "The Mouth of Sauron" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area; once the attack ends the player attacked raises their threat by 4 if it destroyed a character
+    - then, if there is a enemy (any player controls) in the staging area only, named "The Mouth of Sauron" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area, dealt a shadow card; once the attack ends the player attacked raises their threat by 4 if it destroyed a character
 
 146039:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if it is The Mouth of Sauron).
   146039:shadow:1: Shadow

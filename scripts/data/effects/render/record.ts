@@ -27,7 +27,7 @@ const TIMING: Readonly<Record<string, string>> = {
 };
 
 // Events that name one card: a record with no subject hears them only when they are about its own card (src/rules/windows/listen.ts, hears).
-const ABOUT_ONE_CARD: ReadonlySet<string> = new Set(["questDefeated", "lastTimeCounterRemoved", "flipped"]);
+const ABOUT_ONE_CARD: ReadonlySet<string> = new Set(["questDefeated", "lastTimeCounterRemoved", "flipped", "leftPlay"]);
 
 // Each trigger as the moment it fires, with its lead word (src/catalog/effect-schema.ts, triggerSchema, says when the engine announces it).
 const TRIGGER: Readonly<Record<string, string>> = {
