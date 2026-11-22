@@ -1,5 +1,5 @@
 // The fixtures of The Caves of Nibin-Dûm (The Dark of Mirkwood part 2, the last part of the campaign), written into src/campaign/fixtures/the-caves-of-nibin-dum.json by
-// scripts/e2e/fixtures.ts: two real games of saved decklists (The One Deck and the Defenders of Gondor lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed, Easy, from the
+// scripts/e2e/fixtures.ts: two real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, from the
 // log the `oath-won` game writes when it is confirmed (scripts/e2e/the-oath.ts: the Adaptations, Stalking Goblin and Guilty Conscience in the pool, the once-per-campaign uses),
 // so each is a real save and nothing here builds a log by hand. Played by the auto-player, every intent one the reducer listed.
 // `nibin-dum-won`: the first seed that wins, parked on the win (41051's Resolution asks nothing: with the highest final threat under 40 each player earns a Ranger Sense
@@ -80,10 +80,10 @@ export function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<
 }
 
 // A fixture whose game is not found is left out (a name whose fixture is absent is not offered, `hasFixture`). With no `oath-won` fixture there is no honest log for this
-// scenario to start from (GitHub issue #188: a fixture is a real save), so none is written.
+// scenario to start from (a fixture is a real save), so none is written.
 export function nibinDumFixtures(oath: OathFixture | undefined): Partial<Record<"nibin-dum-won" | "nibin-dum-lost", NibinDumFixture>> {
   if (!oath) {
-    say.warn("no oath-won fixture: The Caves of Nibin-Dûm's fixtures are open until The Oath has a won game");
+    say.debug("no won fixture of The Oath: The Caves of Nibin-Dûm writes no fixture");
     return {};
   }
   const log = oathWonLog(oath);

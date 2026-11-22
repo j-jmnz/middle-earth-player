@@ -1,10 +1,11 @@
 // Rules: rr.player-elimination, mec108.side-quests-in-play, rr.step-6-4-3 (data/rules/entries.json); ledger line 02042:A:1 (Conflict at the Carrock).
 import { describe, expect, it } from "vitest";
 
-import { clearEliminated, eliminateEmpties } from "./eliminate.ts";
+import { clearEliminated, eliminateEmpties, eliminateHeroless } from "./eliminate.ts";
 import { hero, table } from "../families/defense/table.ts";
 import { definePrinted } from "./printed.ts";
 import { updateCard, withSeat } from "./state.ts";
+import { moveCard } from "./zones.ts";
 
 // A seat eliminated while an attack on it is begun: the window an event frame holds aside for it is not given back (a Forced effect that discards the last hero runs after a Wolf Rider's shadow attack has begun).
 describe("a seat eliminated in the middle of an attack on it", () => {
@@ -39,5 +40,22 @@ describe("an eliminated seat's side quest in the staging area", () => {
     expect(out.seats[1]?.discard).toContain(questId);
     expect(out.staging).not.toContain(questId);
     expect(out.cards[base.ids.grunt ?? ""]?.zone).toBe("staging");
+  });
+});
+
+// A hero that an effect discards is not destroyed, so nothing asked whether its seat still has a hero ("Defending player must discard all exhausted characters he controls", Sleeping Sentry 04046:A:2).
+describe("a seat whose last hero is discarded", () => {
+  it("04046:A:2 is eliminated by the sweep, and a seat that never had a hero is not", () => {
+    const base = table({ seatCount: 2, cards: [hero("a"), hero("b")], effects: [], heroes: [{ code: "a", seat: 0 }, { code: "b", seat: 1 }] });
+    const heroId = base.state.seats[1]?.heroes[0] ?? "";
+    expect(eliminateHeroless(base.state, base.ctx.cards, [])).toBe(base.state);
+    const discarded = moveCard(base.state, heroId, { zone: "discard", seat: 1 });
+    expect(discarded.seats[1]?.heroes).toEqual([]);
+    const out = eliminateHeroless(discarded, base.ctx.cards, []);
+    expect(out.seats[1]?.eliminated).toBe(true);
+    expect(out.seats[0]?.eliminated).toBe(false);
+    // A test table whose seat was dealt no hero is left as it is.
+    const bare = table({ seatCount: 2, cards: [hero("a")], effects: [], heroes: [{ code: "a", seat: 0 }] });
+    expect(eliminateHeroless(bare.state, bare.ctx.cards, [])).toBe(bare.state);
   });
 });

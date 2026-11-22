@@ -91,7 +91,7 @@
     "move": "node scripts/tools/move.ts",
     "commit:check": "node scripts/git/commit-message.ts",
     "eas-build-post-install": "pnpm assets",
-    "prepare": "node scripts/git/commit-message.ts --install --quiet"
+    "prepare": "node scripts/git/commit-message.ts --install --quiet && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/docs/index.ts --refresh --quiet"
   },
   "private": true,
   "packageManager": "pnpm@10.34.1",

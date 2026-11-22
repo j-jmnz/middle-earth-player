@@ -29531,9 +29531,9 @@
       "site": "https://ringsdb.com",
       "pin": {
         "kind": "sha256",
-        "value": "443c1a9476c29b296ab15d6e5a1c5673696e8319c5a53741b488e0138daf4f9c"
+        "value": "eaa62e9f90c92b568289e94462827c53e0bd8bb25754cc3d00d79deaa833df89"
       },
-      "fetchedAt": "2026-11-10T19:57:20.489Z",
+      "fetchedAt": "2026-11-22T14:58:17.458Z",
       "files": [
         {
           "path": "raw/ringsdb/packs.json",
@@ -30118,10 +30118,22 @@
           "bytes": 27267
         },
         {
-          "path": "raw/ringsdb/decklists/8682.json",
-          "url": "https://ringsdb.com/api/public/decklist/8682",
-          "sha256": "db856dfcede1f323413bd15aaa11ad4a29bd51f96ee870b7914290e7abb5b586",
-          "bytes": 34565
+          "path": "raw/ringsdb/decklists/41298.json",
+          "url": "https://ringsdb.com/api/public/decklist/41298",
+          "sha256": "9e1830b216c5388089d77d67b34618a07f0c7e544129edde0cbc60c14c79b0b5",
+          "bytes": 15935
+        },
+        {
+          "path": "raw/ringsdb/decklists/53651.json",
+          "url": "https://ringsdb.com/api/public/decklist/53651",
+          "sha256": "8f409398b232fb51e4426f737c29dfbbb0947508b3987b568dff598966d02804",
+          "bytes": 15677
+        },
+        {
+          "path": "raw/ringsdb/decklists/53652.json",
+          "url": "https://ringsdb.com/api/public/decklist/53652",
+          "sha256": "a8df926c573bbfd24972b8746d9852a6d45007ec16f44870859ec11ed9acd422",
+          "bytes": 16669
         }
       ]
     },

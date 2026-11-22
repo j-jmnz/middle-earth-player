@@ -1,5 +1,4 @@
-// The fixtures of The Treachery of Rhudaur (angmar-awakened part 7), written into src/campaign/fixtures/the-treachery-of-rhudaur.json by scripts/e2e/fixtures.ts: real games of saved decklists (the One Deck and
-// Defenders of Gondor lists, `FIXTURE_DECKS` of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `rhudaur-won` is the first seed that wins, parked on the win (the Resolution waits); `rhudaur-lost` the first
+// The fixtures of The Treachery of Rhudaur (angmar-awakened part 7), written into src/campaign/fixtures/the-treachery-of-rhudaur.json by scripts/e2e/fixtures.ts: real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `rhudaur-won` is the first seed that wins, parked on the win (the Resolution waits); `rhudaur-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks nothing (Arnor Ravaged is staged, Mysterious Omens, Fend Off Despair and the Losing Time copies are shuffled in, a Determination goes to each player); the first player's question at the beginning of each quest phase (a side quest, or no current quest: Secrets of Rhudaur cannot be

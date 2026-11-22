@@ -6,6 +6,7 @@ import {
   changeDraftCount,
   discardDraftChanges,
   draftAddRefused,
+  draftHeroLimit,
   draftCopyCount,
   draftIsDirty,
   editSavedDeck,
@@ -40,6 +41,19 @@ describe("deck draft", () => {
     for (const code of ["h1", "h2", "h3"]) addDraftCard({ code, name: code, typeCode: "hero", deckLimit: 1 });
     expect(addDraftCard({ code: "h4", name: "Aragorn", typeCode: "hero", deckLimit: 1 })).toEqual({ ok: false, text: "Aragorn: At most three heroes." });
     expect(getDeckDraft().heroes).toEqual(["h1", "h2", "h3"]);
+  });
+
+  it("takes a fourth hero once the deck holds Bond of Friendship, and refuses a fifth", () => {
+    const bond = { code: "22147", name: "Bond of Friendship", typeCode: "contract", deckLimit: 1 };
+    const hero = (code: string) => ({ code, name: code, typeCode: "hero", deckLimit: 1 });
+    for (const code of ["h1", "h2", "h3"]) addDraftCard(hero(code));
+    expect(draftAddRefused(getDeckDraft(), hero("h4"))).toBe(true);
+    addDraftCard(bond);
+    expect(draftHeroLimit(getDeckDraft().cards)).toBe(4);
+    expect(draftAddRefused(getDeckDraft(), hero("h4"))).toBe(false);
+    expect(addDraftCard(hero("h4"))).toMatchObject({ ok: true, text: "Added h4 · hero 4 of 4" });
+    expect(addDraftCard(hero("h5"))).toEqual({ ok: false, text: "h5: At most 4 heroes." });
+    expect(getDeckDraft().heroes).toEqual(["h1", "h2", "h3", "h4"]);
   });
 
   it("counts copies and says how many of the limit the deck holds", () => {

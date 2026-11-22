@@ -193,7 +193,8 @@ export function canDefend(state: ScenarioState, attackedSeat: number, defenderId
   // A ship-enemy's attack is defended only by a ship-objective, and a ship-objective defends only against one (dcce.ship-enemies).
   if (familyDefenseReason(state, printed, cards, defenderId)) return false;
   if (instance.controller === attackedSeat) return true;
-  return printed.keywords.sentinel || flagged(state, defenderId, "sentinel");
+  // The keyword as the table reads it now: a blank text box (Devilry of Saruman, 143043) or a lost Sentinel takes it away, as the declaration's check reads it (engine/legal.ts defenderReason).
+  return hasKeyword(state, defenderId, "sentinel", cards);
 }
 
 export function applyDefense(

@@ -75,20 +75,22 @@ import { minesFixtures } from "./standalone-scenarios/the-mines-of-moria.ts";
 import { khazadFixtures } from "./standalone-scenarios/escape-from-khazad-dum.ts";
 import { dreadnaughtFixtures } from "./standalone-scenarios/the-hunt-for-the-dreadnaught.ts";
 
-// The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
+// The scenarios scenario 1's block writes by hand (`won` is the one fixture not committed that the registry names, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
 export type Chained = Exclude<FixtureScenarioId, (typeof SCENARIO_ONE)[number]>;
 export const isChained = (id: FixtureScenarioId): id is Chained => !(SCENARIO_ONE as readonly string[]).includes(id);
 
-// One writer per registry scenario. A part after the first is dealt from the log an earlier part's won game writes, so it takes
-// that game from `written`; a game the seeds did not find is absent and the writer leaves its own out.
+// One writer per registry scenario. A part after the first is dealt from the log an earlier part's won game writes: its golden's
+// (`wonLog` in seed-kit.ts), or the earlier part's won fixture in `written` where one is committed.
 export type Written = Partial<Record<FixtureName, unknown>>;
 export const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> = {
   "passage-through-mirkwood": () => mirkwoodFixtures(),
   "journey-along-the-anduin": (written) => anduinFixtures(written["mirkwood-won"] as Parameters<typeof anduinFixtures>[0]),
-  "escape-from-dol-guldur": (written) => dolGuldurFixtures(written["anduin-won"] as Parameters<typeof dolGuldurFixtures>[0]),
+  // Its games start from the log a won fixture of Journey Along the Anduin writes, and no won fixture is searched for (docs/architecture.md, Tests): it writes none.
+  "escape-from-dol-guldur": () => dolGuldurFixtures(undefined),
   "the-oath": () => oathFixtures(),
-  "the-caves-of-nibin-dum": (written) => nibinDumFixtures(written["oath-won"] as Parameters<typeof nibinDumFixtures>[0]),
+  // Its games start from the log a won fixture of The Oath writes, and none is committed: it writes none.
+  "the-caves-of-nibin-dum": () => nibinDumFixtures(undefined),
   "voyage-across-belegaer": () => voyageFixtures(),
   "the-fate-of-numenor": () => fateFixtures(),
   "raid-on-the-grey-havens": () => raidFixtures(),

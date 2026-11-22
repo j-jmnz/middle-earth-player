@@ -1,9 +1,9 @@
-// The fixtures of Flight of the Stormcaller (Dream-chaser part 4), written into src/campaign/fixtures/flight-of-the-stormcaller.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck and the Defenders of Gondor lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `stormcaller-won` is the first seed that wins, parked on the win (the Resolution
+// The fixtures of Flight of the Stormcaller (Dream-chaser part 4), written into src/campaign/fixtures/flight-of-the-stormcaller.json by scripts/e2e/fixtures.ts: real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `stormcaller-won` is the first seed that wins, parked on the win (the Resolution
 // waits); `stormcaller-lost` the first that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the Grey Havens box (parts 1 to 3) recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it (a blank log keeps this part locked and the path opens Voyage Across
 // Belegaer): it is the log of `scripts/e2e/raid-on-the-grey-havens.ts` (the Voyage and Fate goldens' wins), and on top of it the one of Raid on the Grey Havens' golden (src/campaign/scenarios/raid-on-the-grey-havens/golden.test.ts, "two-handed, won"), each run
 // through the same `applyResolution` that writes it in the app, with the goldens' plain-number heroes taken out (the fixture's seats play real decklists). `voyage-won`, `fate-won` and `raid-won`, real-decklist
-// wins, are open (GitHub issue #188). The Campaign Setup asks no choice.
+// wins, are not committed. The Campaign Setup asks no choice.
 import type { CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";
 import { type PlayerIntent, type ScenarioState } from "../../src/rules/engine/reduce.ts";

@@ -3,20 +3,21 @@
 // src/campaign/fixtures.test.ts reports that a fixture no longer reaches its moment:
 //
 //   pnpm scenario fixtures                 # `lost` and `duo`, then every other scenario's file
-//   pnpm scenario fixtures --won           # also search for `won`, then write `knife-lost`
+//   pnpm scenario fixtures --won           # also search for `won`, then write `knife-lost` (only when the user asks)
 //   pnpm scenario fixtures <scenario-id>   # only that scenario's file (scenario 1's block for its two ids)
 //   pnpm scenario fixtures <scenario-id> --search [--seeds=1-6] [--budget=600] [--plain=0] [--out=<folder>]
-//                                          # a won game the fixed policy never reaches is searched for (scripts/e2e/search/options.ts lists the flags)
+//                                          # a won game the fixed policy never reaches is searched for (scripts/e2e/search/options.ts lists the flags; only when the user asks)
 //
 // With a scenario id, a part after the first takes the earlier parts' won games from their committed files, so the other files are not rewritten.
 //
-// `won` and `knife-lost` are open (GitHub issue #188): with the rules as the sources state them, the search has found no
-// legal win of the two decks the search played, so they are not committed, and the tests that replay them are skipped until they are.
+// No agent searches for a won game: a scenario's goldens prove its win, and a seed finder plays for a `-won` name only while the
+// registry holds it (docs/architecture.md, Tests). `won` and `knife-lost` are the two names not committed: with the rules as the sources
+// state them, the search has found no legal win of the two decks it played, and the tests that replay them are skipped until they are.
 //
-// `won`: The One Deck (with the saga Frodo) and Stealth and Steadfastness, two-handed, Easy, parked on the first Resolution choice. The naive auto-player loses every
+// `won`: the two-handed fixture decks (scripts/e2e/seed-kit.ts, `FIXTURE_DECKS`; the first seat takes the saga Frodo), Easy, parked on the first Resolution choice. The naive auto-player loses every
 // game with those decks, so a seeded beam search plays varied (still legal) answers a round at a time and keeps the
 // games that got furthest until one is won; every intent is one the reducer listed or accepted, and the search is
-// deterministic. `lost`: The One Deck with the saga
+// deterministic. `lost`: the solo fixture deck (`SOLO_FIXTURE_DECK`) with the saga
 // Frodo, true solo, Normal, every intent up to the loss.
 //
 // `duo`: the same two decks, two-handed, Easy, parked on the first player's planning window of round 1 (the opening hands kept, the
@@ -25,13 +26,13 @@
 //
 // Every other scenario's fixtures (the names are in src/campaign/fixtures/registry.ts) are written by the scenario's own seed finder
 // in this folder, to src/campaign/fixtures/<scenario-id>.json, in campaign order (data/campaigns): a part after the first is dealt from
-// the log the earlier part's won game writes, so it takes that game from the ones written before it. A game the seeds did not find
-// is left out of its file. A scenario of a cycle (a registry entry of kind "standalone", Shadows of Mirkwood) has no log and no earlier part: its finder writes
+// the log the earlier part's won game writes (its golden's, or its won fixture where one is committed). A game the seeds did not find
+// is left out of its file, and its name leaves the registry. A scenario of a cycle (a registry entry of kind "standalone", Shadows of Mirkwood) has no log and no earlier part: its finder writes
 // one open standalone game for each name (a loadout of saved decks, a seed and the intents), and the e2e route opens it on its table.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
 // (141078) and Gildor Inglorion (141077), as the scenario-1 tests answer it. Each seat plays its list with
-// a core set hero of the same sphere in place of each hero that fell in that game (REPLACEMENT), and the briefing's threat
+// a hero of the same sphere in place of each hero that fell in that game (REPLACEMENT), and the briefing's threat
 // penalty when one did. Two-handed, Easy, the auto-player's answers, every intent up to the loss.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -51,7 +52,7 @@ import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceConte
 
 import { nextIntent } from "../../test/harness/auto-player.ts";
 import { loadAnyScenario, loadCampaign, loadCampaignsInOrder, loadScenario, scenarioOrder } from "../data/load-scenarios.ts";
-import { prebuiltDeck } from "./seed-kit.ts";
+import { FIXTURE_DECKS, SOLO_FIXTURE_DECK, prebuiltDeck } from "./seed-kit.ts";
 import { searchFlags } from "./search/options.ts";
 import { WRITERS, isChained, type Chained, type Written } from "./writers.ts";
 import { pastShowcase } from "./showcase-past.ts";
@@ -65,19 +66,9 @@ const campaign = loadCampaign();
 const scenario = loadScenario("a-shadow-of-the-past");
 const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
 
-function starter(id: string): { heroes: string[]; deck: string[] } {
-  const found = campaign.starterDecks.find((entry) => entry.id === id);
-  if (!found) throw new Error(`No starter deck ${id}`);
-  return {
-    heroes: found.rows.filter((row) => row.type === "hero").map((row) => row.code),
-    deck: found.rows.filter((row) => row.type !== "hero").flatMap((row) => Array.from({ length: row.count }, () => row.code)),
-  };
-}
-
-// The first seat plays The One Deck (data/decks/test-decks.json) and takes the saga Frodo as its Ring-bearer. The second
-// seat plays Stealth and Steadfastness: Wisdom and Wizardry has Éowyn (01007), the title of The One Deck's 145002.
-const oneDeck = prebuiltDeck("the-one-deck");
-const stealth = starter("stealth-and-steadfastness");
+// The fixture decks (scripts/e2e/seed-kit.ts): a two-handed game plays the pair, the first seat taking the saga Frodo as its Ring-bearer; a true solo game plays the solo deck.
+const solo = { deckId: SOLO_FIXTURE_DECK, ...prebuiltDeck(SOLO_FIXTURE_DECK) };
+const pair = FIXTURE_DECKS.map((id) => ({ deckId: id, ...prebuiltDeck(id) }));
 
 function opened(seatCount: 1 | 2, loadout: StoredLoadout, seed: number): { state: ScenarioState; ctx: ReduceContext } {
   const codes = [FRODO, ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck])];
@@ -147,10 +138,7 @@ function searchWin(): { seed: number; loadout: StoredLoadout; intents: PlayerInt
   const loadout: StoredLoadout = {
     scenarioId: scenario.id,
     difficulty: "Easy",
-    seats: [
-      { deckId: "the-one-deck", heroes: oneDeck.heroes, deck: oneDeck.deck },
-      { deckId: "stealth-and-steadfastness", heroes: stealth.heroes, deck: stealth.deck },
-    ],
+    seats: pair,
     ringBearer: FRODO,
     choices: [],
     acceptPenalty: false,
@@ -213,7 +201,7 @@ function playLoss(): { seed: number; loadout: StoredLoadout; intents: PlayerInte
   const loadout: StoredLoadout = {
     scenarioId: scenario.id,
     difficulty: "Normal",
-    seats: [{ deckId: "the-one-deck", heroes: oneDeck.heroes, deck: oneDeck.deck }],
+    seats: [solo],
     ringBearer: FRODO,
     choices: [],
     acceptPenalty: false,
@@ -223,7 +211,7 @@ function playLoss(): { seed: number; loadout: StoredLoadout; intents: PlayerInte
   let state = start;
   const intents: PlayerIntent[] = [];
   for (let turn = 0; turn < 3000 && !state.lost; turn += 1) {
-    const intent = nextIntent(state, ctx, { scout: oneDeck.heroes[2] ?? "", prefer: "141035", protect: FRODO });
+    const intent = nextIntent(state, ctx, { scout: solo.heroes[2] ?? "", prefer: "141035", protect: FRODO });
     const result = reduce(state, intent, ctx);
     if (!result.ok) throw new Error(`The policy sent a refused intent: ${result.reason}`);
     state = result.state;
@@ -238,10 +226,7 @@ function playDuo(): { seed: number; loadout: StoredLoadout; intents: PlayerInten
   const loadout: StoredLoadout = {
     scenarioId: scenario.id,
     difficulty: "Easy",
-    seats: [
-      { deckId: "the-one-deck", heroes: oneDeck.heroes, deck: oneDeck.deck },
-      { deckId: "stealth-and-steadfastness", heroes: stealth.heroes, deck: stealth.deck },
-    ],
+    seats: pair,
     ringBearer: FRODO,
     choices: [],
     acceptPenalty: false,
@@ -284,14 +269,17 @@ function logOfPastResolution(won: { seed: number; loadout: StoredLoadout; intent
   return { log: finish(save, world, state).log, choices };
 }
 
-// A core set hero of the same sphere for each hero that can fall, whose title is in neither seat (never Aragorn: the Fellowship's rule).
+// A hero of the same sphere for each hero of the two-handed fixture decks, whose title is in neither seat (never Aragorn: the Fellowship's rule):
+// a core set hero, and Bifur for the second Lore hero, since the core set's other Lore heroes are Denethor and Glorfindel.
 const REPLACEMENT: Readonly<Record<string, string>> = {
   "10140": "01008",
+  "12001": "01002",
+  "17028": "01012",
+  "05001": "01005",
+  "22081": "01003",
   "145002": "01004",
-  "04128": "01011",
-  "141002": "01003",
-  "141003": "01005",
-  "141004": "01010",
+  "04101": "01009",
+  "04128": "03002",
 };
 
 function playKnifeLoss(log: CampaignLog): { seed: number; loadout: StoredLoadout; intents: PlayerIntent[] } {
@@ -299,14 +287,11 @@ function playKnifeLoss(log: CampaignLog): { seed: number; loadout: StoredLoadout
   // Each seat replaces the heroes that fell in the won game (checklist step 2), and takes the threat penalty for it.
   const replaced = (heroes: readonly string[], seat: number) =>
     heroes.map((code) => ((log.fallenHeroesBySeat[seat] ?? []).includes(code) ? (REPLACEMENT[code] ?? code) : code));
-  const seats = [replaced(oneDeck.heroes, 0), replaced(stealth.heroes, 1)];
+  const seats = pair.map((seat, index) => replaced(seat.heroes, index));
   const loadout: StoredLoadout = {
     scenarioId: knife.id,
     difficulty: "Easy",
-    seats: [
-      { deckId: "the-one-deck", heroes: seats[0] ?? [], deck: oneDeck.deck },
-      { deckId: "stealth-and-steadfastness", heroes: seats[1] ?? [], deck: stealth.deck },
-    ],
+    seats: pair.map((seat, index) => ({ ...seat, heroes: seats[index] ?? [] })),
     ringBearer: FRODO,
     choices: [],
     acceptPenalty: log.fallenHeroesBySeat.some((fallen) => fallen.length > 0),
@@ -341,8 +326,8 @@ function position(order: readonly string[], id: string): number {
   return at;
 }
 
-// The won game is open: no legal win of the two starter decks has been found on this engine (GitHub issue #188), so
-// the search runs only when asked, and `won` and `knife-lost` are written only when it finds one.
+// No legal win of the two starter decks has been found on this engine, so the search runs only when the user asks for it,
+// and `won` and `knife-lost` are written only when it finds one.
 void runScript("e2e-fixtures", async () => {
   const searching = process.argv.includes("--won");
   const only = scenarioArgument();
@@ -365,7 +350,7 @@ function scenarioArgument(): FixtureScenarioId | null {
 }
 
 function writeScenarioOne(dir: string, searching: boolean): void {
-  if (!searching) say.info("the won game is open: pass --won to search for it (about two hours with no result so far)");
+  if (!searching) say.info("scenario 1's won game is not committed; --won searches for it, only when the user asks (about two hours with no result so far)");
   const lost = say.step("play scenario 1's loss", () => playLoss());
   const won = searching ? say.step("search scenario 1's won game", () => searchWin()) : null;
   const duo = say.step("play scenario 1 to a two-handed planning window", () => playDuo());

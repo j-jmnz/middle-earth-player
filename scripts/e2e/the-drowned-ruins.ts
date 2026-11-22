@@ -1,8 +1,8 @@
-// The fixtures of The Drowned Ruins (dream-chaser part 7), written into src/campaign/fixtures/the-drowned-ruins.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck and the Defenders of Gondor lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `ruins-won` is the first seed that wins, parked on the win (the Resolution waits); `ruins-lost` the first
+// The fixtures of The Drowned Ruins (dream-chaser part 7), written into src/campaign/fixtures/the-drowned-ruins.json by scripts/e2e/fixtures.ts: real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `ruins-won` is the first seed that wins, parked on the win (the Resolution waits); `ruins-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks which Command copy each player takes and which player takes the Círdan's Blessing (each seat is asked in turn until one does; neither player takes one here: "skip"), and the game asks the damage-for-threat question, which the policy answers
-// with its first option; the Resolution asks nothing (the copies chosen join the pool). `ruins-won` and `ruins-lost`, real-decklist games, are open when the seeds hold none (GitHub issue #188).
+// with its first option; the Resolution asks nothing (the copies chosen join the pool). `ruins-won` and `ruins-lost`, real-decklist games, are not committed when the seeds hold none.
 import type { CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";

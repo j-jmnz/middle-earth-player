@@ -87,7 +87,9 @@ export function loadoutOf(input: LoadoutInput): LoadoutSeat[] {
     const slot = role.kind === "ringBearer" && index === 0 && input.ringBearer && !deckHasRingBearer(input.world, seat) ? [input.ringBearer] : role.kind === "hero" && index === 0 && !seat.heroes.includes(role.hero) ? [role.hero] : [];
     const rule = lootRuleOf(input.world.effects, seat.deck);
     const loot = rule && input.world.deckFacts ? lootCodes(rule, deckCounts(seat.side ?? []), input.world.deckFacts) : [];
-    return { heroes: [...slot, ...seat.heroes], deck: seat.deck, ...(loot.length > 0 ? { loot } : {}) };
+    // The deck's own hero limit (a contract's): the saga rules count the heroes besides the saga hero against it.
+    const limit = heroLimit(deckRulesOf(input.world.effects, seat.deck));
+    return { heroes: [...slot, ...seat.heroes], deck: seat.deck, ...(loot.length > 0 ? { loot } : {}), ...(limit !== 3 ? { heroLimit: limit } : {}) };
   });
 }
 

@@ -6,6 +6,8 @@ import { runScript, type Log } from "../log.ts";
 
 // The docs index (docs/INDEX.md): every file an agent reads, its size, the heading tree of the long ones with line ranges,
 // and which code cites each section, so an agent reads one section instead of a whole file (rules/docs-standards.md).
+// The index is not committed (.gitignore): pnpm install and the post-checkout and post-merge hooks (.githooks) write it
+// with --refresh, which writes the file and reports no fault, so a doc fault never stops an install or a checkout.
 // Usage: pnpm doc index rewrites docs/INDEX.md; pnpm doc section <file> "<heading>" prints one section; pnpm doc find "<words>"
 // lists the headings that hold the words, so an agent need not read the index first.
 
@@ -246,6 +248,15 @@ export function sectionText(fileArg: string, headingArg: string): string {
   return `${file}:${heading.start}-${heading.end}\n${text.split("\n").slice(heading.start - 1, heading.end).join("\n")}\n`;
 }
 
+// Writes the index for an install or a git hook: a checkout with no docs (a packed build) or a doc fault leaves the file as it is.
+function refresh(log: Log): void {
+  try {
+    writeFileSync(path.join(ROOT, INDEX_PATH), renderIndex(buildGraph()));
+  } catch (error) {
+    log.debug(`index not written: ${String(error)}`);
+  }
+}
+
 function main(log: Log): void {
   const [command, fileArg, ...rest] = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
   if (command === "section") {
@@ -260,6 +271,7 @@ function main(log: Log): void {
     process.stdout.write(found.length > 0 ? `${found.join("\n")}\n` : `no heading holds "${words}"; see ${INDEX_PATH}\n`);
     return;
   }
+  if (process.argv.includes("--refresh")) return refresh(log);
   const graph = buildGraph();
   writeFileSync(path.join(ROOT, INDEX_PATH), renderIndex(graph));
   log.info(`${graph.indexed.length} files, ${graph.citations.length} citations, ${graph.unresolved.length} unresolved`);

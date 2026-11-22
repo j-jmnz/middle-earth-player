@@ -1,5 +1,5 @@
 import { beginActive, recordIntent, replay } from "../../src/campaign/replay.ts";
-import { characters, legalAttackEnemies } from "../../src/rules/combat/combat.ts";
+import { characters, declarableEnemies } from "../../src/rules/combat/combat.ts";
 import { legalIntents, legalTargets, reduce, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 import type { StartScenario } from "../../src/rules/setup/setup.ts";
 
@@ -7,6 +7,7 @@ import { nextIntent } from "../../test/harness/auto-player.ts";
 import { dice, playIntent, seedOf, triggerIntent, type Dice } from "./policy.ts";
 import { encounterStart, kept, type EncounterWorld, type Profile } from "./encounter-world.ts";
 import { POLICY } from "./world.ts";
+import { tableFaults } from "./invariants.ts";
 import { flagged } from "../../src/rules/core/state.ts";
 import { escapeCommitLimit } from "../../src/rules/families/escape/commit.ts";
 import { describeError } from "../log.ts";
@@ -16,7 +17,8 @@ import { describeError } from "../log.ts";
 // players' characters); the auto-player's answer is taken instead on a fixed share of the steps, so a game moves through the
 // rounds and the stages instead of passing forever. A game must end (lost, or its last stage cleared and every Resolution
 // choice answered) inside the step cap without a throw, a refusal or `state.failure`, and its intents must replay from the
-// start to the same final state (src/campaign/replay.ts, the save's replay).
+// start to the same final state (src/campaign/replay.ts, the save's replay). Every table it reaches must be sound (scripts/card-smoke/invariants.ts),
+// and on every PROBE-th table each intent the engine offers must be one it accepts, not only the one the game takes.
 
 // Games a scenario plays: the profile, the seat count and the seed of each follow from its number.
 export const GAMES = 24;
@@ -28,6 +30,8 @@ export const ROUND_CAP = 60;
 // on 40% of its steps (MIXED) whatever its heroes, so unusual intents and their order are covered, and each profile plays both kinds across the games of a scenario.
 const GUIDED: Readonly<Record<Profile, number>> = { strong: 0.97, weak: 0.6, brittle: 0.6, tense: 0.6, steady: 0.85 };
 export const MIXED = 0.6;
+// The tables on which every offered intent is tried: one in this many.
+export const PROBE = 12;
 // A fixed data hash for the replay: the save only compares it with itself.
 const HASH = 1;
 // The profiles the games rotate through (test/harness/game-kit.ts, HERO_STATS): strong heroes that win when the dice allow, weak ones that lose on threat, brittle ones that die.
@@ -105,9 +109,9 @@ function complete(state: ScenarioState, ctx: ReduceContext, offer: LegalIntent, 
     case "DeclareAttackers": {
       const seat = state.activeSeat;
       const ready = characters(state, seat, ctx.cards).filter((id) => legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx).length > 0);
-      const enemyId = pickOne(roll, [...new Set(ready.flatMap((id) => legalAttackEnemies(state, seat, id, ctx.cards)))]);
+      const enemyId = pickOne(roll, [...new Set(ready.flatMap((id) => declarableEnemies(state, seat, id, ctx.cards)))]);
       if (!enemyId) return null;
-      const attackers = ready.filter((id) => legalAttackEnemies(state, seat, id, ctx.cards).includes(enemyId));
+      const attackers = ready.filter((id) => declarableEnemies(state, seat, id, ctx.cards).includes(enemyId));
       // An enemy that cannot be attacked by more than 1 character at a time (The Great Bridge's lasting flag, 145050:A:1) gets one attacker.
       const chosen = subset(roll, attackers);
       return { type: "DeclareAttackers", enemyId, attackerIds: flagged(state, enemyId, "singleAttacker") ? chosen.slice(0, 1) : chosen };
@@ -117,6 +121,18 @@ function complete(state: ScenarioState, ctx: ReduceContext, offer: LegalIntent, 
       return cardId ? { type: "Distribute", assignments: [{ cardId, amount: (offer as Offered<"Distribute">).total }] } : null;
     }
   }
+}
+
+// The first offered intent the reducer refuses, throws on or fails with, as a sentence; null when it accepts them all. The table is left as it was: each offer is tried on its own.
+function refusedOffer(state: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], roll: Dice): string | null {
+  for (const offer of legal) {
+    const intent = complete(state, ctx, offer, roll);
+    if (!intent) continue;
+    const result = reduce(state, intent, ctx);
+    if (!result.ok) return `The reducer refused an offered ${offer.type} that the game did not take (${JSON.stringify(intent)}): ${result.reason}`;
+    if (result.state.failure) return `An offered ${offer.type} that the game did not take (${JSON.stringify(intent)}) gives state.failure: ${result.state.failure}`;
+  }
+  return null;
 }
 
 /** The next intent: the auto-player's answer on a share of the steps, else a random offered intent completed, else the auto-player's. */
@@ -168,6 +184,8 @@ function runGame(world: EncounterWorld, number: number, record: GameRecord): Gam
   const { profile, seats, seed } = gameOf(number);
   const { ctx, summary, intents } = record;
   const roll = dice(seedOf(world.scenario.id, seed * 7919 + number));
+  // The probe's own dice, so the game is the same game with or without it.
+  const probe = dice(seedOf(world.scenario.id, seed * 104729 + number));
   const memory = new Set<string>();
   let start: StartScenario | null = null;
   let state: ScenarioState | null = null;
@@ -187,12 +205,16 @@ function runGame(world: EncounterWorld, number: number, record: GameRecord): Gam
       if (state.round > ROUND_CAP) return problem(`The game has not ended after ${ROUND_CAP} rounds`);
       const legal = legalIntents(state, ctx);
       if (legal.length === 0) return problem(`The engine offers no intent (window ${state.window?.kind ?? "none"}) and the game is not over`);
+      const refused = step % PROBE === 0 ? refusedOffer(state, ctx, legal, probe) : null;
+      if (refused) return problem(refused);
       intent = randomIntent(state, ctx, legal, roll, memory, number % 2 === 0 ? GUIDED[profile] : MIXED);
       const result = reduce(state, intent, ctx);
       if (!result.ok) return problem(`The reducer refused an offered intent: ${result.reason}`);
       if (result.state.failure) return problem(`state.failure: ${result.state.failure}`);
       state = result.state;
       intents.push(intent);
+      const fault = tableFaults(state, ctx)[0];
+      if (fault) return problem(`The table is not sound after the intent: ${fault}`);
       intent = null;
     }
     summary.steps = intents.length;

@@ -86,9 +86,11 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 37, scenarios: ["journey-along-the-anduin"], note: "Under stage 2B, an enemy with Ambush revealed in the quest phase still makes its engagement checks; the stage only stops engagement checks during the encounter phase." },
   { version: 37, scenarios: ["the-massing-at-osgiliath"], note: "Captured Watchtower's Shadow removes the defending characters from combat: none of them counts as a defender of that attack, so cards that answer a defender or a defended attack no longer hear it." },
   { version: 37, scenarios: ["the-wizards-quest"], note: "Power Sevenfold chooses only a non-unique enemy or location; a unique card of lower Threat is no longer discarded." },
+  { version: 38, scenarios: "all", note: "A player whose last hero is discarded by a card effect, not destroyed, is eliminated at once, for example by Sleeping Sentry's shadow effect." },
+  { version: 38, scenarios: "all", note: "A character that left play while committed to the quest and is put into play again in the same quest phase is no longer committed." },
 ];
 
-export const ENGINE_VERSION = 37;
+export const ENGINE_VERSION = 38;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

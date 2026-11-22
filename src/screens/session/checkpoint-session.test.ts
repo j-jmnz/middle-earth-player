@@ -35,7 +35,7 @@ function openUser() {
 }
 
 const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
-// The scenario 1 game that is lost: 39 intents, the phase boundaries after the 1st, 2nd, 3rd, 24th, 26th and 28th.
+// The scenario 1 game that is lost (the `lost` save fixture).
 const NAME = "lost";
 
 // The game written to a row, current, with its checks, and the state after each intent.
@@ -114,7 +114,7 @@ describe("Continue after the rules changed", () => {
     writeCheckpoint(user, "s1", cp);
     moved(game, 27);
     const sheet = openTable(catalog, user, "s1");
-    expect(sheet).toMatchObject({ ok: false, reason: "stale", write: null, takenBack: 39 - 27, fromCheckpoint: true });
+    expect(sheet).toMatchObject({ ok: false, reason: "stale", write: null, takenBack: active.intents.length - 27, fromCheckpoint: true });
     expect(continueTable(catalog, user, "s1")).toEqual({ ok: true });
     const row = readSave(user, "s1")!.active!;
     expect(row.from).toEqual({ stateVersion: STATE_VERSION, state: cp.state });
@@ -154,7 +154,7 @@ describe("Continue after the rules changed", () => {
     for (const cp of [checkpointOf(broken, { intents: active.intents.slice(0, 25), seed: active.seed }), checkpointOf(states[24]!, { intents: active.intents.slice(0, 25), seed: active.seed + 1 })]) {
       writeCheckpoint(user, "s1", cp);
       moved(game, 27);
-      expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", takenBack: 39 - 27, fromCheckpoint: false });
+      expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", takenBack: active.intents.length - 27, fromCheckpoint: false });
       expect(continueTable(catalog, user, "s1")).toEqual({ ok: true });
       const row = readSave(user, "s1")!.active!;
       expect(row.from).toBeUndefined();

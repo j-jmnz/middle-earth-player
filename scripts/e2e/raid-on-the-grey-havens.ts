@@ -1,9 +1,9 @@
-// The fixtures of Raid on the Grey Havens (Dream-chaser part 3), written into src/campaign/fixtures/raid-on-the-grey-havens.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck and the Defenders of Gondor lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `raid-won` is the first seed that wins, parked on the win (the Resolution
+// The fixtures of Raid on the Grey Havens (Dream-chaser part 3), written into src/campaign/fixtures/raid-on-the-grey-havens.json by scripts/e2e/fixtures.ts: real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `raid-won` is the first seed that wins, parked on the win (the Resolution
 // waits); `raid-lost` the first that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has parts 1 and 2 recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it (a blank log keeps Raid locked and the path opens Voyage Across Belegaer): it is the log
 // the won game of Voyage Across Belegaer's golden writes (src/campaign/scenarios/voyage-across-belegaer/golden.test.ts, "two-handed, won"), and on top of it the one of The Fate of Númenor's golden (src/campaign/scenarios/the-fate-of-numenor/golden.test.ts,
 // "two-handed, won"), each run through the same `applyResolution` that writes it in the app, with the goldens' plain-number heroes taken out (the fixture's seats play real decklists). `voyage-won` and
-// `fate-won`, real-decklist wins, are open (GitHub issue #188). The Campaign Setup's offer of a Galdor's Counsel is answered in the loadout: neither player takes one.
+// `fate-won`, real-decklist wins, are not committed. The Campaign Setup's offer of a Galdor's Counsel is answered in the loadout: neither player takes one.
 import type { CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";
 import { characters, legalAttackEnemies } from "../../src/rules/combat/combat.ts";

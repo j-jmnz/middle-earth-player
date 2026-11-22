@@ -1,5 +1,5 @@
 // The fixtures of Passage Through Mirkwood (Mirkwood Paths part 1), written into src/campaign/fixtures/passage-through-mirkwood.json
-// by scripts/e2e/fixtures.ts: two real games of saved decklists (The One Deck and the Elves of Lórien lists of data/decks/test-decks.json and data/decks/prebuilt.json),
+// by scripts/e2e/fixtures.ts: two real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts),
 // two-handed, Easy, from an empty Mirkwood Paths log, played by the auto-player, every intent one the reducer listed.
 // `mirkwood-won`: the first seed that wins, parked on the win (the Resolution asks nothing, so the table shows Victory and the
 // Resolution screen offers Confirm). `mirkwood-lost`: the first seed that loses when Mendor leaves play (01129:A:3), parked on the loss.
@@ -19,7 +19,6 @@ function find(wanted: (state: ScenarioState) => boolean, label: string): Mirkwoo
     campaignId: "mirkwood-paths",
     scenarioId: "passage-through-mirkwood",
     seatCount: 2,
-    decks: ["the-one-deck", "elves-of-lorien"],
     limit: 6000,
     seeds: 60,
     answer: (state: ScenarioState, ctx: Parameters<typeof nextIntent>[1], memory: Set<string>) => nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory),

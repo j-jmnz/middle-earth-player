@@ -9,7 +9,7 @@ import { reduce, startScenario, type ReduceContext, type ScenarioState } from ".
 import { ROADS_GOLDENS, roadsStart, roadsWorld } from "../../../../test/scenarios/journey-to-the-cross-roads/game.ts";
 import { loadCampaign, loadScenario } from "../../../../scripts/data/load-scenarios.ts";
 import { marshesWonLog } from "../../../../scripts/e2e/journey-to-the-cross-roads.ts";
-import { prebuiltDeck } from "../../../../scripts/e2e/seed-kit.ts";
+import { prebuiltDeck, SOLO_FIXTURE_DECK } from "../../../../scripts/e2e/seed-kit.ts";
 import { goldenState } from "../../../../test/harness/golden-state.ts";
 import { temporaryCatalog } from "../../../../test/harness/temp-catalog.ts";
 
@@ -104,7 +104,7 @@ describe("Journey to the Cross-roads in the the-two-towers campaign", () => {
   });
 
   it("144069:A:2 deals no Brace of Coneys from a standalone deal of the same seat, and one from a campaign deal that chose it", () => {
-    const seat = { deckId: "the-one-deck", ...prebuiltDeck("the-one-deck") };
+    const seat = { deckId: SOLO_FIXTURE_DECK, ...prebuiltDeck(SOLO_FIXTURE_DECK) };
     const world = loadWorld(drizzle(new Database(temporaryCatalog(), { readonly: true })), campaign, roads, EFFECTS, [FRODO, BRACE, ...seat.heroes, ...seat.deck]);
     const standalone = standaloneStart(world, 1, { scenarioId: roads.id, difficulty: "Normal", seats: [seat], ringBearer: FRODO }, 1);
     const campaignStart = startFor({ world, log: emptyLog(1), seatCount: 1, seats: [seat], ringBearer: FRODO, difficulty: "Normal", choices: [BRACE] }, 1);

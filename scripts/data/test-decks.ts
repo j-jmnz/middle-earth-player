@@ -15,7 +15,8 @@ export const testDeckSchema = z.strictObject({
   name: z.string().min(1),
   // The decklist's page on RingsDB.
   source: z.string().min(1),
-  heroes: z.array(z.string().min(1)).length(3),
+  // One to four: a list with the Bond of Friendship contract has four (src/catalog/deck-rules.ts).
+  heroes: z.array(z.string().min(1)).min(1).max(4),
   cards: z.array(z.strictObject({ code: z.string().min(1), count: z.number().int().positive() })).min(1),
 });
 export type TestDeck = z.infer<typeof testDeckSchema>;

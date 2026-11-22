@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { cardMap, expectOk, fixtureDefinition, hero } from "./test-fixture.ts";
 import { definePrinted } from "./printed.ts";
 import { reduce } from "../engine/reduce.ts";
-import { blankScenario, withThreat } from "./state.ts";
+import { blankScenario, updateCard, withThreat } from "./state.ts";
 import { moveCard, spawn } from "./zones.ts";
 
 describe("zone identity", () => {
@@ -67,5 +67,16 @@ describe("a shadow card leaving its enemy", () => {
     expect(gone.cards[enemy]?.shadowId).toBeNull();
     expect(gone.cards[enemy]?.extraShadowIds).toBeUndefined();
     expect([gone.cards[first]?.host, gone.cards[second]?.host]).toEqual([null, null]);
+  });
+});
+
+// A card enters play ready and not committed (rr.ready): what it was when it left play does not come back with it.
+describe("a card that enters play again", () => {
+  it("is not committed to the quest, though it left play committed", () => {
+    const start = blankScenario({ seatCount: 1, seed: 1, definition: fixtureDefinition(["stage"]) });
+    const spawned = spawn(start, "ally", { zone: "play", seat: 0 });
+    const committed = updateCard(spawned.state, spawned.id, { committed: true, exhausted: true });
+    const back = moveCard(moveCard(committed, spawned.id, { zone: "discard", seat: 0 }), spawned.id, { zone: "play", seat: 0 });
+    expect(back.cards[spawned.id]).toMatchObject({ zone: "play", committed: false, exhausted: false });
   });
 });

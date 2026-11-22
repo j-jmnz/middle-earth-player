@@ -361,6 +361,7 @@ Decisions this file owns, because the sources are silent or the user chose:
 - Every heal, ready, discard from the hand or the deck, raise of a threat and exit from play is heard by the cards that answer it, whatever effect made it (`rr.triggering-condition`). Elrond's own heal is heard by other cards (Ring-wall of Isengard), but it is not "another card effect" to him. An encounter location that leaves play without being explored (discarded by Distant Stars) is heard too (Weather Hills returns its enemies).
 - Moving a resource to a hero's pool (Errand-rider) is a gain, not an add: Heir of Mardil ("gains any number of resources") answers it, Harbor Master ("adds any number of resources") does not. Settled by community discussion only: a designer's email posted at https://ffg-forum-archive.entropicdreams.com/topic/191248-it-never-occured-to-me-before ("'Moving' and 'adding' resources both fall under the umbrella of 'gaining' resources"; "In order to add a resource, there must be a +1 total count in resources"); https://ffg-forum-archive.entropicdreams.com/topic/298688-heir-of-mardil has no ruling (`researched`).
 - An encounter card in the staging area is the scenario's (`rr.ownership-and-control`): its Responses are the first player's (`rr.first-player`), not the player's who revealed it (Signs of Gollum, 02014:A:1).
+- A seat is eliminated as soon as its last hero leaves play, however the hero left: destroyed, or discarded by a card effect (Sleeping Sentry's shadow, 04046:A:2). A hero held as a prisoner, a captive or in a captured deck, or waiting in its owner's deck, keeps its seat in the game (`rr.player-elimination`).
 - An eliminated seat's hand, deck and cards it controls go to their owners' discard piles, its engaged enemies return to staging with their damage, an attack on it ends with the action window between its steps, a Peril lock it held is released, and the first player token passes on at once if it held it (`rr.player-elimination`, `faq.first-player-elimination`, `mec109.peril`).
 
 ### Keywords implemented once
@@ -413,7 +414,7 @@ A deck saves at any stage, so a deck can be built over several sittings (user de
 
 Universal rules, which decide whether a deck is ready to play, are the Rules Reference's (`rr.deckbuilding`; user decision 2026-10-25):
 
-- One to three heroes, no two with the same title.
+- One to three heroes, no two with the same title. A contract in the deck sets another limit (Bond of Friendship: four; `heroLimit`, `src/catalog/deck-rules.ts`): the editor's empty hero slots, its Heroes count and the pool's + follow it.
 - At least 50 other cards.
 - At most three copies of a title, across its printings, and never more than the card's `deck_limit`. `is_unique` does not lower that cap. A second copy of a unique title cannot enter play; that is not a save check. A contract in the deck is no deck card and does not count toward the minimum; at most one. The deckbuilding rules printed on its side A are `DeckRule` instructions on its records (no allies, copies by title, one starting hero or four, different spheres, an exact or larger size, cards per sphere) and change these checks (`src/catalog/deck-rules.ts`, `deck-save.ts`).
 - A card's sphere does not have to match a hero to be saved. It needs a hero of that sphere to be played (`rr.resource-match`), which the table checks. Saga rules still run on the briefing loadout, not on this save.
@@ -422,7 +423,7 @@ Universal rules, which decide whether a deck is ready to play, are the Rules Ref
 Fellowship rules (Fellowship of the Ring, above) run on the briefing loadout, not on the saved deck. MEC109 says Frodo is the only Ring-bearer in this box.
 
 - The hero count runs on the saved deck. The saga rules run on the loadout.
-- The Ring-bearer slot is required when the saved deck has no Ring-bearer, and unused when it already has one. A fourth hero is legal only when the extra hero is that Ring-bearer.
+- The Ring-bearer slot is required when the saved deck has no Ring-bearer, and unused when it already has one. A fourth hero is legal only when the extra hero is that Ring-bearer; a deck whose contract allows four heroes (Bond of Friendship) starts with its four and the Ring-bearer or the ☺ Aragorn, five in all (user decision, 2026-11-22).
 - Two-handed play requires a single Ring-bearer across the table. It does not reject two decks that share some other unique card.
 
 A saved deck does not have to be legal for any particular campaign. The briefing picks one saved deck per seat, offers only a deck that is ready to play, and refuses to deal when the loadout fails. The error names the card and the rule.
