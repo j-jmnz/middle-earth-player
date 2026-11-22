@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { badgeOf, installsOf, shortCount } from "./installs.ts";
+import { badgeOf, installsOf, fullCount } from "./installs.ts";
 
 describe("the README's installs badge (docs/releasing.md, Installs count)", () => {
   const asset = (name: string, download_count: number) => ({ name, download_count });
@@ -17,8 +17,8 @@ describe("the README's installs badge (docs/releasing.md, Installs count)", () =
     expect(installsOf(pages[0] ?? [])).toBe(18);
   });
 
-  it("shortens the count as a badge shows it", () => {
-    expect([0, 999, 1000, 1049, 1250, 12_999, 999_999, 1_500_000].map(shortCount)).toEqual(["0", "999", "1k", "1k", "1.2k", "12k", "999k", "1.5M"]);
-    expect(badgeOf(1250)).toEqual({ schemaVersion: 1, label: "installs", message: "1.2k", color: "3E5A48" });
+  it("shows every digit of the count, grouped by thousands", () => {
+    expect([0, 999, 1000, 1049, 1250, 12_999, 999_999, 1_500_000].map(fullCount)).toEqual(["0", "999", "1,000", "1,049", "1,250", "12,999", "999,999", "1,500,000"]);
+    expect(badgeOf(1250)).toEqual({ schemaVersion: 1, label: "installs", message: "1,250", color: "3E5A48" });
   });
 });
