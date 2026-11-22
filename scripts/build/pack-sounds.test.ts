@@ -8,7 +8,7 @@ import { SOUND_SLOTS } from "../../src/ui/sound/slots.ts";
 import { sha256, type SourceFile } from "../data/sources/fetch.ts";
 import { createLog } from "../log.ts";
 import { writeSource } from "./pack-audio.ts";
-import { findSource, packSounds, SOUND_SOURCE, soundEnd } from "./pack-sounds.ts";
+import { cutFilter, findSource, packSounds, SILENCE_MAX_SECONDS, SOUND_SOURCE, soundEnd, soundOnset, soundStart } from "./pack-sounds.ts";
 import { SOUND_PICKS } from "./sound-picks.ts";
 
 const roots: string[] = [];
@@ -61,6 +61,33 @@ describe("pack sounds", () => {
     expect(soundEnd(samples, 8000)).toBeCloseTo(0.1, 5);
     samples.fill(300, 800, 4000);
     expect(soundEnd(samples, 8000)).toBeCloseTo(0.5, 5);
+  });
+
+  it("starts a sound at its first window over 1% of the peak, and cuts from there", () => {
+    const samples = new Int16Array(8000);
+    expect(soundStart(samples, 8000)).toBe(0);
+    samples.fill(100, 0, 2400);
+    samples.fill(20_000, 2400, 3200);
+    expect(soundStart(samples, 8000)).toBeCloseTo(0.3, 5);
+    samples.fill(300, 800, 2400);
+    expect(soundStart(samples, 8000)).toBeCloseTo(0.1, 5);
+    // A pick's own onset starts the cut inside the sound, past a quiet lead-in, with a short fade in.
+    expect(soundStart(samples, 8000, 0.3)).toBeCloseTo(0.3, 5);
+    expect(cutFilter(0.3, 0.9, -22, true)).toContain("asetpts=PTS-STARTPTS,afade=t=in:st=0:d=0.008,afade=t=out");
+    // The cut's clock starts at the sound, so the fade is timed from it.
+    expect(cutFilter(0.3, 0.9, -22)).toBe("atrim=0.300:0.900,asetpts=PTS-STARTPTS,afade=t=out:st=0.450:d=0.150,loudnorm=I=-22:TP=-1.5:LRA=11");
+  });
+
+  it("says when a sound is heard: its silence, and when it reaches half its peak", () => {
+    const samples = new Int16Array(8000);
+    // 300 ms of silence, 100 ms that rise, then the peak.
+    samples.fill(2000, 2400, 3200);
+    samples.fill(20_000, 3200, 4000);
+    const onset = soundOnset(samples, 8000);
+    expect(onset.silence).toBeCloseTo(0.3, 5);
+    expect(onset.attack).toBeCloseTo(0.4, 5);
+    expect(onset.silence).toBeGreaterThan(SILENCE_MAX_SECONDS);
+    expect(soundOnset(samples.subarray(2400), 8000).silence).toBe(0);
   });
 
   it("copies the pinned sounds from the cache, or else from the mirror, and clears the rest", async () => {

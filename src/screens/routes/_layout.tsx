@@ -26,6 +26,8 @@ import { PicturesReady } from "../../ui/showcase/pictures-ready";
 import { SplashGlow } from "../kit/splash-glow";
 import { startUpdateChecks } from "../update/check";
 import { setTableMusic, startMusic } from "../../ui/sound/music";
+import { SCREEN_SOUNDS } from "../../ui/sound/slots";
+import { primeSounds } from "../../ui/sound/sound";
 import { keepsTableMusic } from "../nav/route-music";
 import { APP_VERSION } from "../update/offer";
 import { UpdateFrame } from "../update/ribbon";
@@ -163,6 +165,10 @@ export default function RootLayout() {
   useEffect(() => {
     if (!databases) return;
     return startMusic();
+  }, [databases]);
+  // The screens' sounds are loaded once the stored settings are read, so the first tap's sound starts on time (src/ui/sound/sound.ts).
+  useEffect(() => {
+    if (databases) primeSounds(SCREEN_SOUNDS);
   }, [databases]);
   // A screen that is neither the table nor one read from it hands the music back to the menu's loop (route-music.ts).
   const pathname = usePathname();
