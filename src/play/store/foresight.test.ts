@@ -150,6 +150,13 @@ describe("the commit and travel", () => {
     expect(readoutFor(safe, table.ctx, null, null, (id) => id)?.result).toBe("Threat +4 if nothing changes");
   });
 
+  it("says the level of the seat that goes out: a seat holding The One Ring is out at 45 while the first living seat's level is 50 (21001:A:2)", () => {
+    const table = buildTable(base, { seats: 2, staging: ["f3"], start: "quest", ring: "none" });
+    const ring = { instanceId: "seat:1", sourceId: "ring", stat: "eliminationReduction" as const, amount: 5, until: "endOfGame" as const };
+    const staged: ScenarioState = { ...withThreat(withThreat(table.state, 0, 30), 1, 43), modifiers: [ring], mode: "staging" };
+    expect(readoutFor(staged, table.ctx, null, null, (id) => id)?.result).toBe("Threat +3 if nothing changes; threat reaches 45: Player 2 is eliminated");
+  });
+
   it("while a location is active, says what exploring it still takes", () => {
     const table = buildTable(base, { start: "travel", active: "141036", staging: ["141037"] });
     const sheet = sheetFor(table.state, table.ctx, legalIntents(table.state, table.ctx), names);

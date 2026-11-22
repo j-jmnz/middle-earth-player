@@ -230,9 +230,10 @@ function commitWords(game: ScenarioState, ctx: ReduceContext, picked: readonly s
 // eliminated (rr.threat-elimination-level), and with no seat left the game is lost.
 function eliminationWords(game: ScenarioState, ctx: ReduceContext, shortfall: number, only?: number): string {
   if (shortfall <= 0) return "";
-  // The elimination level: 99 while the main quest is Dire (mec113.dire), five less for a seat holding The One Ring; when seats differ the first to go says it.
-  const level = seatLevel(game, only ?? livingSeats(game)[0] ?? 0);
   const after = failQuest(game, shortfall, [], only == null ? undefined : [only]);
+  // The elimination level: 99 while the main quest is Dire (mec113.dire), five less for a seat holding The One Ring; it is the level of the seat that goes out, the first of them when several do.
+  const out = livingSeats(game).filter((seat) => !livingSeats(after).includes(seat));
+  const level = seatLevel(game, out[0] ?? only ?? livingSeats(game)[0] ?? 0);
   // Fog on the Barrow-downs' stage 3B hears an elimination: the players at it raise their threat by 10, which can end the game (148003:B:2).
   const raise = downsRaise(game, ctx, after, level);
   const raised = raise ? `; ${raise.text}${raise.ends ? `: ${lossWords("No seats remain")}` : ""}` : "";
@@ -243,7 +244,6 @@ function eliminationWords(game: ScenarioState, ctx: ReduceContext, shortfall: nu
     return `; threat reaches ${level}: Player ${only + 1} is eliminated${raised}`;
   }
   if (after.lost && !game.lost) return `; threat reaches ${level}: ${lossWords(after.lossReason ?? "No seats remain")}`;
-  const out = livingSeats(game).filter((seat) => !livingSeats(after).includes(seat));
   if (out.length === 0) return "";
   return `; threat reaches ${level}: ${out.map((seat) => `Player ${seat + 1}`).join(" and ")} is eliminated${raised}`;
 }
