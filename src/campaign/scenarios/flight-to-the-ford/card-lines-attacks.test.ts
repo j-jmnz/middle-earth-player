@@ -85,6 +85,17 @@ describe("Great East Road (906305)", () => {
   });
 });
 
+describe("Great East Road (906305), one player", () => {
+  // Researched (faq.next-player, docs/scenarios/nightmare.md): with one player there is no next player, so the enemy engages no one and makes no immediate attack; the attack resolves as normal.
+  it("906305:A:3 with one player the enemy stays engaged with him and makes no immediate attack", () => {
+    const done = fight("906305", "grunt");
+    expect(done.run.state.seats[0].engaged.map((id) => done.run.state.cards[id]?.code)).toEqual(["grunt"]);
+    expect(done.run.state.cards[done.made.hero]?.damage ?? 0).toBe(0);
+    expect(done.run.state.pendingAttack ?? null).toBeNull();
+    expect(done.run.state.cards[first(done.run.state, MERRY)]?.damage ?? 0).toBe(0);
+  });
+});
+
 describe("Ettendales (906307)", () => {
   // "Shadow: Attacking enemy gets +2 Attack. If this attack destroys a character, reduce the Ring-bearer's life by 1."
   it("906307:A:2 the attacking enemy gets +2 Attack, and the life is not reduced when no character is destroyed", () => {

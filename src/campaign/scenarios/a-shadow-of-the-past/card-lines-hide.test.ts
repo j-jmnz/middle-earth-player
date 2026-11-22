@@ -9,7 +9,7 @@ import { settle } from "../../../rules/engine/machine.ts";
 import { startReveal } from "../../../rules/windows/frames.ts";
 import { topFrame } from "../../../rules/windows/windows.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
-import { finish, idOf, resolveRecords, revealFromTop, send, start, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
+import { finish, idOf, idsOf, resolveRecords, revealFromTop, send, start, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "a-shadow-of-the-past";
 const RING = "141085";
@@ -73,14 +73,21 @@ describe("Travel: a Hide test", () => {
   });
 
   // 906105 Green-Hill Country and 906106 Stock Woods: "Travel: The first player makes a Hide 1 test."
-  it("906105:A:2 the first player makes a Hide test to travel there", () => {
-    const made = table({ seats: 2, firstPlayer: 1, phase: "Travel", staging: ["906105"], deck: ["f3", "f3", "f0"] });
+  // Reading (researched, docs/scenarios/nightmare.md): the Travel cost is paid while the location is still in the staging area (Caleb Grace, ALeP 3.243 and 3.123), so its own A:1 adds 1: Hide 2, and 1 more for each other copy in the staging area.
+  it("906105:A:2 the first player makes a Hide 2 test to travel there: its own +1 applies while it is in the staging area", () => {
+    const made = table({ seats: 2, firstPlayer: 1, phase: "Travel", staging: ["906105"], deck: ["f3", "f3", "f3", "f3", "f0"] });
     let run = send(start(made.state), { type: "Travel", locationId: idOf(made.state, "906105") }, made.ctx);
     expect(run.state.window).toEqual({ kind: "hideCommit", seat: 1 });
     run = hide(run, made);
-    // The test is made while Green-Hill Country is still in the staging area, where its own A:1 adds 1 to each Hide X value: the words allow Hide 1 or Hide 2, so the count is not asserted.
-    expect(hideSteps(run)).toHaveLength(1);
+    expect(hideSteps(run).map((step) => step.discardedIds.length)).toEqual([2]);
     expect(zoneOf(run.state, "906105")).toBe("activeLocation");
+  });
+
+  it("906105:A:2 each other Green-Hill Country in the staging area adds 1 more: Hide 3 with one other copy", () => {
+    const made = table({ phase: "Travel", staging: ["906105", "906105"], deck: ["f3", "f3", "f3", "f3", "f0"] });
+    let run = send(start(made.state), { type: "Travel", locationId: idsOf(made.state, "906105")[0] ?? "" }, made.ctx);
+    run = hide(run, made);
+    expect(hideSteps(run).map((step) => step.discardedIds.length)).toEqual([3]);
   });
 
   it("906106:A:2 the first player makes a Hide 1 test to travel there", () => {

@@ -84,11 +84,14 @@ const ROWS: readonly Row[] = [
   // 18072 Spiders of Mirkwood: "When Revealed: Shuffle the Spiders of Mirkwood encounter set into the encounter deck. Then, reveal 1 encounter card per player."
   { line: "18072:A:1", name: "two players: the set joins the deck and 2 cards are revealed", layout: { stage: "18072", side: "A", seats: 2, piles: { spidersDeck: ["f0", "f3"] } }, act: resolve("18072", "whenRevealed", undefined), expect: [zone("f0", "staging"), zone("f3", "staging"), deckCount(0), count("f0", "spidersDeck", 0)] },
   { line: "18072:A:1", name: "one player: 1 card is revealed and the rest of the set stays in the deck", layout: { stage: "18072", side: "A", deck: ["f0", "f0"], piles: { spidersDeck: ["f0", "f0"] } }, act: resolve("18072", "whenRevealed", undefined), expect: [count("f0", "staging", 1), deckCount(3)] },
+  // Reading (agent recommendation, docs/scenarios/shadows-of-mirkwood.md style: a shuffle that moves nothing counts as resolved): with no card of the set left to add, the encounter deck is still shuffled, and the reveal after "Then" follows.
+  { line: "18072:A:1", name: "no card of the set left to shuffle in: the deck is still shuffled and 1 card per player is revealed", layout: { stage: "18072", side: "A", deck: ["f0", "f0"], piles: { spidersDeck: [] } }, act: resolve("18072", "whenRevealed", undefined), expect: [count("f0", "staging", 1), deckCount(1)] },
   // "Forced: When a Spider enemy attacks and damages a character, that character cannot ready until the end of the round." King Spider (Spider, 3 Attack) against a 2 Defense hero.
   { line: "18072:B:2", name: "the damaged defender does not ready in the refresh phase", layout: { stage: "18072" }, act: [attack("01074", { shadow: "f0" }), defend("dh1"), endRound], expect: [damageOn("dh1", 1), exhausted("dh1", true)] },
 
   // 18073 Dol Guldur Orcs: "When Revealed: Shuffle the Dol Guldur Orcs encounter set into the encounter deck. Then, reveal 1 encounter card per player."
   { line: "18073:A:1", name: "two players: the set joins the deck and 2 cards are revealed", layout: { stage: "18073", side: "A", seats: 2, piles: { orcsDeck: ["f0", "f3"] } }, act: resolve("18073", "whenRevealed", undefined), expect: [zone("f0", "staging"), zone("f3", "staging"), deckCount(0), count("f0", "orcsDeck", 0)] },
+  { line: "18073:A:1", name: "no card of the set left to shuffle in: the deck is still shuffled and 1 card per player is revealed", layout: { stage: "18073", side: "A", deck: ["f0", "f0"], piles: { orcsDeck: [] } }, act: resolve("18073", "whenRevealed", undefined), expect: [count("f0", "staging", 1), deckCount(1)] },
 ];
 
 cardSpecs("lost-in-mirkwood", ROWS);

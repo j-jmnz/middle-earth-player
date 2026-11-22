@@ -175,6 +175,48 @@ describe("Gondolin Shield (12201:A:3)", () => {
   });
 });
 
+// Readings (researched, docs/scenarios/ered-mithrin.md, Encounter card readings): the shadow card the Shield deals is flipped and resolved in the same attack, the Shield's resource comes from any pool its controller controls, and Helm of Heroes counts only damage the enemy's attack strength deals.
+describe("Gondolin Shield (12201:A:3), the readings", () => {
+  const eaten = (effects: readonly Effect[], resources: (hero: string) => number) => {
+    const made = table(effects, { heroes: [{ code: GIMLI, seat: 0 }, { code: LEGOLAS, seat: 0 }], allies: [{ code: SHIELD, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }], deck: [LURE, EATEN] });
+    const poor = [GIMLI, LEGOLAS].reduce((state, code) => updateCard(state, idsOf(made, code), { resources: resources(code) }), made.state);
+    const tab = attach({ ...made, state: poor }, [[idsOf(made, SHIELD), idsOf(made, GIMLI)]]);
+    let run = passAll(combat(tab.state, tab), tab.ctx);
+    run = passAll(send(run, { type: "DeclareDefender", defenderId: idsOf(tab, GIMLI) }, tab.ctx), tab.ctx);
+    return { tab, run };
+  };
+
+  it("12201:A:3 the shadow card the Shield deals is flipped and resolves in the same attack, and the exhausted Shield cannot cancel it", () => {
+    const { tab, run: pending } = eaten(EFFECTS, () => 6);
+    const paid = send(pending, { type: "Trigger", cardId: idsOf(tab, SHIELD), effectId: "12201:response:1", payments: [{ heroId: idsOf(tab, GIMLI), amount: 1 }] }, tab.ctx);
+    // Lure of the Ring was canceled; Eaten Alive! is dealt next and resolves: 1 damage to the defending Gimli.
+    expect(triggers(paid.state, tab)).not.toContain("12201:response:1");
+    const run = passAll(paid, tab.ctx, { responses: true });
+    expect(shadowCards(run.state.cards[idsOf(tab, WEAK)])).toEqual([idsOf(tab, LURE), idsOf(tab, EATEN)]);
+    expect(run.state.cards[idsOf(tab, EATEN)]?.face).toBe("up");
+    expect(run.state.cards[idsOf(tab, GIMLI)]?.damage).toBe(1);
+  });
+
+  it("12201:A:3 the resource is spent from any hero's pool of the Shield's controller, whatever its sphere: only Legolas has one", () => {
+    const { tab, run: pending } = eaten(EFFECTS, (code) => (code === LEGOLAS ? 3 : 0));
+    expect(triggers(pending.state, tab)).toContain("12201:response:1");
+    const paid = send(pending, { type: "Trigger", cardId: idsOf(tab, SHIELD), effectId: "12201:response:1", payments: [{ heroId: idsOf(tab, LEGOLAS), amount: 1 }] }, tab.ctx);
+    expect(resourcesOf(passAll(paid, tab.ctx, { responses: true }), tab, [GIMLI, LEGOLAS])).toEqual([0, 2]);
+  });
+});
+
+describe("Helm of Heroes (12202:A:3), damage from a shadow effect", () => {
+  // The Weak (Attack 1) deals Gimli (Defense 4 with the Helm) no damage by its attack strength; Eaten Alive! deals him 1 damage as a shadow effect, which does not count.
+  it("12202:A:3 is not offered for the damage of a shadow effect, only for damage the enemy's attack strength deals", () => {
+    const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }, { code: LEGOLAS, seat: 0 }], attached: [{ code: HELM, host: GIMLI }], engaged: [{ code: WEAK, seat: 0 }], deck: [EATEN, LURE] });
+    let run = passAll(combat(tab.state, tab), tab.ctx);
+    run = passAll(send(run, { type: "DeclareDefender", defenderId: idsOf(tab, GIMLI) }, tab.ctx), tab.ctx);
+    run = passAll(run, tab.ctx, { responses: false });
+    expect(run.state.cards[idsOf(tab, GIMLI)]?.damage).toBe(1);
+    expect(triggers(run.state, tab)).not.toContain("12202:response:1");
+  });
+});
+
 describe("Helm of Heroes (12202:A:3)", () => {
   // Gimli holds the Helm (Defense 2 + 2) and defends `enemy`; two players, the other with the Pal.
   function defended(effects: readonly Effect[], enemy: string): { tab: Table; run: Run } {

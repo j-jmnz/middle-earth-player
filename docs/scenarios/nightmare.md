@@ -11,3 +11,14 @@ User request, 2026-10-30: Nightmare mode for the scenarios the app has, every Ni
 - A Nightmare card that names the enemies "in play" counts or protects an enemy in the staging area as well as an engaged one (rr.in-play-and-out-of-play): Pale-green Tentacle, Weathertop, Expanse of Hollin and Great East Road.
 - The part of a Nightmare card after "Then" is not attempted when the part before it could not resolve (rr.then): The Old Road and Pathless Wilderness with no resource token left to discard.
 - The Twilight World (906309:A:2): "Limit 1 per hero" counts the copy already attached to the Ring-bearer, which an encounter card makes an attachment no player controls.
+- Expanse of Hollin (906405:A:2): "When ... is explored" interrupts the move to the discard pile, so the Forced effect resolves while the explored location is still in play: the encounter discard pile is shuffled into the deck without it (`exceptSource`), the cards are discarded for the damage on it, and only then is it in the encounter discard pile (`rr.when`, `faq.triggering-forced-effects`; `recommended`, agent recommendation: no official ruling or community thread names the card; Hall of Beorn, https://hallofbeorn.com/LotR/Details/Expanse-of-Hollin-TRGSN, has the text only).
+- Green-Hill Country (906105:A:2): the Travel cost is paid while the location is still in the staging area, so its own +1 applies and the first player makes a Hide 2 test, 1 more for each other copy in the staging area (Caleb Grace, ALeP 3.243 and 3.123, https://alongextendedparty.com/semi-official-errata-faq-1-10/; `researched`).
+- Great East Road and Green-Hill Country (906305:A:3, 906105:A:3): in a one-player game the shadow effect does nothing, because there is no next player to engage, so the enemy makes no immediate attack (`faq.next-player`, FAQ 1.46, https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/lotr_faq_19.pdf; `researched`).
+- Spiders of Mirkwood (900105:A:2): with every character exhausted the defending player still chooses one of them; it is not exhausted again, and it takes 2 damage if the attack was undefended (`rr.effects`, `rr.exhausted`; `recommended`, agent recommendation after Caleb Grace's targeting ruling, ALeP 3.252, https://alongextendedparty.com/semi-official-errata-faq-1-10/; no source names the card, Vision of the Palantir, https://visionofthepalantir.com/2018/08/18/nightmare-passage-through-mirkwood/, has no ruling).
+
+## Readings to confirm
+
+Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.
+
+- Expanse of Hollin's Forced effect resolves while the location is still in play (`recommended`, `docs/scenarios/nightmare.md`, Nightmare).
+- Spiders of Mirkwood's Shadow can choose an exhausted character, which then takes the 2 damage (`recommended`, `docs/scenarios/nightmare.md`, Nightmare).
