@@ -93,6 +93,17 @@ describe("12050 Eye of the Beast", () => {
   });
 });
 
+describe("12050 Eye of the Beast, two copies engaged with one player", () => {
+  // Each Eye is a separate instance of the constant ability (rr.constant-ability): The Thing attacks that player once for each, dealt a new shadow card each time (faq.additional-attacks). Researched; docs/scenarios/dream-chaser.md, Eye of the Beast and Serpent's Tail readings.
+  it("12050:A:3 makes The Thing attack the player twice when two Eyes are engaged with them, a new shadow card for each attack", () => {
+    const made = make({ phase: "Encounter", deck: Array.from({ length: 8 }, () => CODES.crewQuarters), threat: [20, 20], staging: [CODES.thingOriginal], engaged: [CODES.eye, CODES.eye] });
+    const { defenses, run } = depthsDrive(start(made.state), made.ctx, (state) => state.round > made.state.round);
+    expect(defenses).toEqual([{ enemy: CODES.thingOriginal, seat: 0 }, { enemy: CODES.thingOriginal, seat: 0 }]);
+    // Crew Quarters' Shadow gives the attack +2 Attack: two attacks of 5 + 2, each with its own shadow card.
+    expect(damageOf(run.state, [made.hero, made.hero2])).toBe((5 + 2) * 2);
+  });
+});
+
 describe("12053 Grasping Arm", () => {
   it("12053:A:2 makes the second player, whom it is engaged with, exhaust his character before he declares a defender, and not the first player", () => {
     const made = make({ seats: 2, phase: "Encounter", engaged: [{ code: CODES.grasping, seat: 1 }], deck: Array.from({ length: 4 }, () => "f0"), threat: [20, 20] });
