@@ -1,10 +1,7 @@
-// The fixtures of Escape from Dol Guldur (Mirkwood Paths part 3), written into src/campaign/fixtures/escape-from-dol-guldur.json by
-// scripts/e2e/fixtures.ts: two real games of saved decklists (The One Deck and the Elves of Lórien lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed,
-// Easy, from the log the `anduin-won` game writes when it is confirmed (scripts/e2e/journey-along-the-anduin.ts): its prisoner, its pool. That win is open (no fixture,
-// GitHub issue #188), and nothing here builds a log by hand, so no fixture of this scenario is written until `anduin-won` exists. Played by the auto-player,
+// The fixtures of Escape from Dol Guldur (Mirkwood Paths part 3): two real games of saved decklists (The One Deck and the Elves of Lórien lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed,
+// Easy, from the log a won fixture of Journey Along the Anduin writes when it is confirmed (scripts/e2e/journey-along-the-anduin.ts): its prisoner, its pool. No such fixture is
+// committed and none is searched for (docs/architecture.md, Tests), and nothing here builds a log by hand, so the registry names no fixture of this scenario and none is written. Played by the auto-player,
 // every intent one the reducer listed.
-// `dol-guldur-won`: the first seed that wins, parked on the win (01131's Resolution asks nothing: Mendor, if he is still in play, and each
-// player's Mendor's Support are kept for the next campaign). `dol-guldur-lost`: the first seed that loses, parked on the loss.
 import { type CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
@@ -63,11 +60,10 @@ function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>
   return nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory, intents);
 }
 
-// A fixture whose game is not found is left out (a name whose fixture is absent is not offered, `hasFixture`). With no `anduin-won` fixture there is no
-// honest log for this scenario to start from (GitHub issue #188: a fixture is a real save), so none is written.
+// With no won fixture of Journey Along the Anduin there is no honest log for this scenario to start from (a fixture is a real save), so none is written.
 export function dolGuldurFixtures(anduin: AnduinFixture | undefined): Partial<Record<"dol-guldur-won" | "dol-guldur-lost", DolGuldurFixture>> {
   if (!anduin) {
-    say.warn("no anduin-won fixture: Escape from Dol Guldur's fixtures are open until Journey Along the Anduin has a won game");
+    say.debug("no won fixture of Journey Along the Anduin: Escape from Dol Guldur writes no fixture");
     return {};
   }
   const { log, loadout } = anduinLog(anduin);

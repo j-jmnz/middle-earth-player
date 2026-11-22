@@ -3,7 +3,7 @@
 // The log has parts 1 and 2 recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it (a blank log keeps Raid locked and the path opens Voyage Across Belegaer): it is the log
 // the won game of Voyage Across Belegaer's golden writes (src/campaign/scenarios/voyage-across-belegaer/golden.test.ts, "two-handed, won"), and on top of it the one of The Fate of Númenor's golden (src/campaign/scenarios/the-fate-of-numenor/golden.test.ts,
 // "two-handed, won"), each run through the same `applyResolution` that writes it in the app, with the goldens' plain-number heroes taken out (the fixture's seats play real decklists). `voyage-won` and
-// `fate-won`, real-decklist wins, are open (GitHub issue #188). The Campaign Setup's offer of a Galdor's Counsel is answered in the loadout: neither player takes one.
+// `fate-won`, real-decklist wins, are not committed. The Campaign Setup's offer of a Galdor's Counsel is answered in the loadout: neither player takes one.
 import type { CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";
 import { characters, legalAttackEnemies } from "../../src/rules/combat/combat.ts";

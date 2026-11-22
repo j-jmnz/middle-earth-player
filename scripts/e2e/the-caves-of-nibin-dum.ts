@@ -80,10 +80,10 @@ export function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<
 }
 
 // A fixture whose game is not found is left out (a name whose fixture is absent is not offered, `hasFixture`). With no `oath-won` fixture there is no honest log for this
-// scenario to start from (GitHub issue #188: a fixture is a real save), so none is written.
+// scenario to start from (a fixture is a real save), so none is written.
 export function nibinDumFixtures(oath: OathFixture | undefined): Partial<Record<"nibin-dum-won" | "nibin-dum-lost", NibinDumFixture>> {
   if (!oath) {
-    say.warn("no oath-won fixture: The Caves of Nibin-Dûm's fixtures are open until The Oath has a won game");
+    say.warn("no oath-won fixture: The Caves of Nibin-Dûm's fixtures need a won fixture of The Oath");
     return {};
   }
   const log = oathWonLog(oath);

@@ -2,7 +2,7 @@
 // Resolution waits); `fate-lost` the first that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has part 1 recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it (a blank log keeps the Fate locked and the path opens Voyage Across
 // Belegaer): it is the log the won game of Voyage Across Belegaer's golden writes (src/campaign/scenarios/voyage-across-belegaer/golden.test.ts, "two-handed, won"), run through the same `applyResolution` that
-// writes it in the app, with the golden's plain-number heroes taken out (the fixture's seats play real decklists). `voyage-won`, a real-decklist win, is open (GitHub issue #188).
+// writes it in the app, with the golden's plain-number heroes taken out (the fixture's seats play real decklists). `voyage-won`, a real-decklist win, is not committed.
 // The Campaign Setup (damage traded for threat) is answered in the game by the auto-player: no damage is traded.
 import type { CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";

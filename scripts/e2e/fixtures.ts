@@ -3,15 +3,16 @@
 // src/campaign/fixtures.test.ts reports that a fixture no longer reaches its moment:
 //
 //   pnpm scenario fixtures                 # `lost` and `duo`, then every other scenario's file
-//   pnpm scenario fixtures --won           # also search for `won`, then write `knife-lost`
+//   pnpm scenario fixtures --won           # also search for `won`, then write `knife-lost` (only when the user asks)
 //   pnpm scenario fixtures <scenario-id>   # only that scenario's file (scenario 1's block for its two ids)
 //   pnpm scenario fixtures <scenario-id> --search [--seeds=1-6] [--budget=600] [--plain=0] [--out=<folder>]
-//                                          # a won game the fixed policy never reaches is searched for (scripts/e2e/search/options.ts lists the flags)
+//                                          # a won game the fixed policy never reaches is searched for (scripts/e2e/search/options.ts lists the flags; only when the user asks)
 //
 // With a scenario id, a part after the first takes the earlier parts' won games from their committed files, so the other files are not rewritten.
 //
-// `won` and `knife-lost` are open (GitHub issue #188): with the rules as the sources state them, the search has found no
-// legal win of the two decks the search played, so they are not committed, and the tests that replay them are skipped until they are.
+// No agent searches for a won game: a scenario's goldens prove its win, and a seed finder plays for a `-won` name only while the
+// registry holds it (docs/architecture.md, Tests). `won` and `knife-lost` are the two names not committed: with the rules as the sources
+// state them, the search has found no legal win of the two decks it played, and the tests that replay them are skipped until they are.
 //
 // `won`: The One Deck (with the saga Frodo) and Stealth and Steadfastness, two-handed, Easy, parked on the first Resolution choice. The naive auto-player loses every
 // game with those decks, so a seeded beam search plays varied (still legal) answers a round at a time and keeps the
@@ -25,8 +26,8 @@
 //
 // Every other scenario's fixtures (the names are in src/campaign/fixtures/registry.ts) are written by the scenario's own seed finder
 // in this folder, to src/campaign/fixtures/<scenario-id>.json, in campaign order (data/campaigns): a part after the first is dealt from
-// the log the earlier part's won game writes, so it takes that game from the ones written before it. A game the seeds did not find
-// is left out of its file. A scenario of a cycle (a registry entry of kind "standalone", Shadows of Mirkwood) has no log and no earlier part: its finder writes
+// the log the earlier part's won game writes (its golden's, or its won fixture where one is committed). A game the seeds did not find
+// is left out of its file, and its name leaves the registry. A scenario of a cycle (a registry entry of kind "standalone", Shadows of Mirkwood) has no log and no earlier part: its finder writes
 // one open standalone game for each name (a loadout of saved decks, a seed and the intents), and the e2e route opens it on its table.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
@@ -341,8 +342,8 @@ function position(order: readonly string[], id: string): number {
   return at;
 }
 
-// The won game is open: no legal win of the two starter decks has been found on this engine (GitHub issue #188), so
-// the search runs only when asked, and `won` and `knife-lost` are written only when it finds one.
+// No legal win of the two starter decks has been found on this engine, so the search runs only when the user asks for it,
+// and `won` and `knife-lost` are written only when it finds one.
 void runScript("e2e-fixtures", async () => {
   const searching = process.argv.includes("--won");
   const only = scenarioArgument();
@@ -365,7 +366,7 @@ function scenarioArgument(): FixtureScenarioId | null {
 }
 
 function writeScenarioOne(dir: string, searching: boolean): void {
-  if (!searching) say.info("the won game is open: pass --won to search for it (about two hours with no result so far)");
+  if (!searching) say.info("scenario 1's won game is not committed; --won searches for it, only when the user asks (about two hours with no result so far)");
   const lost = say.step("play scenario 1's loss", () => playLoss());
   const won = searching ? say.step("search scenario 1's won game", () => searchWin()) : null;
   const duo = say.step("play scenario 1 to a two-handed planning window", () => playDuo());

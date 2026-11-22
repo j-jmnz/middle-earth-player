@@ -3,10 +3,10 @@
 // a seed and the intents that reach the moment; nothing in it is a number the engine computes. The names are in
 // `fixtures/registry.ts`, one line per scenario; the e2e fixtures script (`e2e/fixtures.ts` in the scripts folder) writes the JSON beside it and `fixtures.test.ts`
 // replays each through the reducer, so a change to the engine or the cards that moves a game fails there and the script is
-// run again. A name whose fixture is absent is open (GitHub issue #188) and is not offered (`hasFixture`): `won` and
+// run again. The registry names only committed fixtures, but two that are not offered (`hasFixture`): `won` and
 // `knife-lost` (no legal win of scenario 1's two starter decks has been found; `knife-lost` starts from the log `won` writes
 // when its Resolution is answered with `past.choices`, as the Campaign Setup Checklist carries scenario 1's earned cards to
-// scenario 2), and any `-won` the seeds did not find. A part after the first starts from the log the earlier parts' wins write.
+// scenario 2). No won fixture is searched for (docs/architecture.md, Tests). A part after the first starts from the log the earlier parts' wins write.
 import knifeFixtures from "./fixtures/a-knife-in-the-dark.json";
 import dolGuldurFixtures from "./fixtures/escape-from-dol-guldur.json";
 import anduinFixtures from "./fixtures/journey-along-the-anduin.json";
