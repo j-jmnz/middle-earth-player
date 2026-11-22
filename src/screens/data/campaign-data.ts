@@ -115,11 +115,11 @@ export type Box = { id: string; name: string; campaignId: string; scenarios: rea
 
 export const BOXES: readonly Box[] = [
   // In the campaigns table's order (`position`): by release, the Lord of the Rings saga boxes together at the Fellowship's.
-  // Shadows of Mirkwood is a cycle, not a campaign: its six Adventure Packs have no Campaign Mode and are played standalone only (docs/brief.md, Shadows of Mirkwood).
+  // Shadows of Mirkwood is a cycle, not a campaign: its six Adventure Packs have no Campaign Mode and are played standalone only (docs/scenarios/shadows-of-mirkwood.md, Shadows of Mirkwood).
   { id: "shadows-of-mirkwood", name: "Shadows of Mirkwood", campaignId: "shadows-of-mirkwood", scenarios: ["the-hunt-for-gollum", "conflict-at-the-carrock", "a-journey-to-rhosgobel", "the-hills-of-emyn-muil", "the-dead-marshes", "return-to-mirkwood"] },
-  // The Standalone scenarios cycle likewise, one box in release order; its scenarios not built yet wait under Coming later (docs/brief.md, Standalone scenarios).
+  // The Standalone scenarios cycle likewise, one box in release order; its scenarios not built yet wait under Coming later (docs/scenarios/standalone-scenarios.md, Standalone scenarios).
   { id: "standalone-scenarios", name: "Standalone scenarios", campaignId: "standalone-scenarios", scenarios: ["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs", "the-ruins-of-belegost", "murder-at-the-prancing-pony", "the-siege-of-annuminas", "attack-on-dol-guldur", "the-wizards-quest", "the-woodland-realm", "the-mines-of-moria", "escape-from-khazad-dum", "the-hunt-for-the-dreadnaught"] },
-  // Dwarrowdelf is the second cycle (docs/brief.md, Dwarrowdelf): the Khazad-dûm expansion and six Adventure Packs, standalone only.
+  // Dwarrowdelf is the second cycle (docs/scenarios/dwarrowdelf.md, Dwarrowdelf): the Khazad-dûm expansion and six Adventure Packs, standalone only.
   { id: "dwarrowdelf", name: "Dwarrowdelf", campaignId: "dwarrowdelf", scenarios: ["into-the-pit", "the-seventh-level", "flight-from-moria", "the-redhorn-gate", "road-to-rivendell", "the-watcher-in-the-water", "the-long-dark", "foundations-of-stone", "shadow-and-flame"] },
   { id: "revised-core", name: "Revised Core Set", campaignId: "mirkwood-paths", scenarios: ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"] },
   { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood", campaignId: "the-dark-of-mirkwood", scenarios: ["the-oath", "the-caves-of-nibin-dum"] },
@@ -185,7 +185,7 @@ export function bookletParams(campaignId: string, scenarioId?: string | null): {
 
 /**
  * The same as `bookletParams`, or null when there is none to open: a cycle (Shadows of Mirkwood) prints no booklet, only a
- * rules insert per Adventure Pack, which the reader does not open (docs/brief.md, Shadows of Mirkwood).
+ * rules insert per Adventure Pack, which the reader does not open (docs/scenarios/shadows-of-mirkwood.md, Shadows of Mirkwood).
  */
 export function bookletOf(campaignId: string, scenarioId?: string | null): { id: string; page?: string } | null {
   if (campaignOf(campaignId)?.kind === "cycle") return null;

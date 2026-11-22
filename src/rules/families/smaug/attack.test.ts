@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Battle of Lake-town), rr.attacks-outside-the-combat-phase, rr.defending-player, rr.damage, faq.enemy-attacks-outside-combat; ledger lines 50211:A:1, 50206:A:2, 50214:A:1.
+// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town), rr.attacks-outside-the-combat-phase, rr.defending-player, rr.damage, faq.enemy-attacks-outside-combat; ledger lines 50211:A:1, 50206:A:2, 50214:A:1.
 // Smaug's attack against Lake-town: the last player may declare a defender; undefended, all the damage goes on Lake-town; defended, the damage beyond the defender's hit points does. Smaug the Magnificent's excess goes on Lake-town in any attack. Allies cannot defend against a Smaug that bars them.
 import { describe, expect, it } from "vitest";
 

@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Battle of Lake-town), rr.victory, ltp.scoring (data/rules/entries.json); ledger lines 50222:A:2, 50203:B:3.
+// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town), rr.victory, ltp.scoring (data/rules/entries.json); ledger lines 50222:A:2, 50203:B:3.
 // The amounts of the family: the damage on Lake-town and the Victory points in the victory display, each read when the effect resolves.
 import type { Amount } from "../../../catalog/boundary.ts";
 import type { ScenarioState } from "../../core/state.ts";

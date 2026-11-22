@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.victory (data/rules/entries.json); ledger lines 50907:A:1, 50931:A:1, 50931:B:1, 50931:B:3 (docs/brief.md, Attack on Dol Guldur, The table).
+// Rules: rr.forced, rr.victory (data/rules/entries.json); ledger lines 50907:A:1, 50931:A:1, 50931:B:1, 50931:B:3 (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, The table).
 //
 // The piece Attack on Dol Guldur's cards hold on the table, as a top-bar dial: the city strength of Dol Guldur, the resource tokens on it (the Setup places 5 for each player and 5 more, the Siege values of what is destroyed or explored take them off at the end of a
 // stage 3 round, and 0 ends the Lieutenants' Indestructible). The disc says the strength, with no ring: it counts down to the win, so only its warnings colour it. The note names this round's tally. It warns near at 5 or less and with a

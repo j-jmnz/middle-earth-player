@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { buildGraph, citationsIn, headingsOf, INDEX_PATH, renderIndex, resolveSection, ROOT, sectionText } from "./index.ts";
+import { buildGraph, citationsIn, findHeadings, headingsOf, INDEX_PATH, renderIndex, repeatedHeadings, resolveSection, ROOT, sectionText } from "./index.ts";
 
 describe("docs index", () => {
   const graph = buildGraph();
@@ -15,6 +15,15 @@ describe("docs index", () => {
   it("resolves every doc section a code comment or a live doc cites", () => {
     expect(graph.unresolved.map((citation) => `${citation.from}: ${citation.doc}, "${citation.section}"`)).toEqual([]);
     expect(graph.citations.length).toBeGreaterThan(100);
+  });
+
+  it("gives no doc two headings with the same text (a citation and doc section find a heading by its text)", () => {
+    expect(repeatedHeadings(graph)).toEqual([]);
+  });
+
+  it("finds the headings that hold every word asked for", () => {
+    expect(findHeadings("spotlight", graph).some((line) => line.startsWith("docs/design-system-table.md:") && line.includes("## Spotlight"))).toBe(true);
+    expect(findHeadings("no such heading words", graph)).toEqual([]);
   });
 
   it("reads a citation's doc and first section name", () => {

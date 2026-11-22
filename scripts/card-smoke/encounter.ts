@@ -22,7 +22,7 @@ import { encounterStart, encounterWorld, kept, type EncounterWorld } from "./enc
 // --all smokes every playable scenario (src/campaign/playable.ts).
 
 /**
- * Failures the engine has and this smoke reports without failing the run, each open in docs/phases/STATUS.md (Open items). A game is named by its scenario, number and seed, and the entry matches only the
+ * Failures the engine has and this smoke reports without failing the run, each open in GitHub issue #189. A game is named by its scenario, number and seed, and the entry matches only the
  * message that contains `error` on an intent that contains `intent`: any other problem of that game, and any other game, still fails. Delete an entry when its engine fix lands.
  */
 export type KnownFailure = { scenario: string; game: number; seed: number; intent: string; error: string; note: string };
@@ -33,7 +33,7 @@ export const KNOWN: readonly KnownFailure[] = [
     seed: 6,
     intent: "141024:response:1",
     error: "Travel was refused",
-    note: "Escape to Buckland (141024:response:1, hideSucceeded) is offered as a Trigger and then refused with \"Travel was refused\"; open in docs/phases/STATUS.md",
+    note: "Escape to Buckland (141024:response:1, hideSucceeded) is offered as a Trigger and then refused with \"Travel was refused\"; open in GitHub issue #189",
   },
 ];
 

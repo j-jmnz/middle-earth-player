@@ -1,4 +1,4 @@
-// Rules: rr.explored, rr.forced, rr.travel, rr.damage, rr.engaged, rr.guarded, rr.lasting-effects, rr.blank, rr.defending-player, rr.reveal, docs/brief.md (Escape from Khazad-dûm) (data/rules/entries.json).
+// Rules: rr.explored, rr.forced, rr.travel, rr.damage, rr.engaged, rr.guarded, rr.lasting-effects, rr.blank, rr.defending-player, rr.reveal, docs/scenarios/standalone-scenarios.md (Escape from Khazad-dûm) (data/rules/entries.json).
 // The lines a card-spec row cannot express (spec.test.ts holds the rest): a bar that must not hold for good, a modifier a seat or the table holds, an attack whose damage lands on the stage, a card that leaves play, a choice no row can refuse.
 import { describe, expect, it } from "vitest";
 

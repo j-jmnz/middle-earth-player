@@ -1,5 +1,5 @@
 // Rules: rr.in-play-and-out-of-play, rr.forced, rr.search (data/rules/entries.json); ledger lines 50701:A:1, 50702:B:1, 50702:B:2, 50714:A:1, 50715:A:1, 50716:A:1 to 50720:A:1, 50719:A:2, 50720:A:2, 50722:A:1, 50726:A:2, 50728:A:1, 50703:B:1, 50721:A:2, 50727:A:1.
-// The verbs the investigation family adds, on fixture cards (docs/brief.md, Murder at the Prancing Pony, Readings): the Investigation deck built by the Setup, Investigate X and the other looks, the removal and the shuffle, the accusation, the condition and amount, and what a game with the deck never shows.
+// The verbs the investigation family adds, on fixture cards (docs/scenarios/standalone-scenarios.md, Murder at the Prancing Pony, Readings): the Investigation deck built by the Setup, Investigate X and the other looks, the removal and the shuffle, the accusation, the condition and amount, and what a game with the deck never shows.
 import { describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";

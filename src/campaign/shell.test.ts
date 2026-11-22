@@ -258,7 +258,7 @@ describe("a save across a relaunch", () => {
   });
 });
 
-// The won fixture is open (docs/phases/STATUS.md): its tests are skipped until it is committed.
+// The won fixture is open (GitHub issue #188): its tests are skipped until it is committed.
 const WON = hasFixture("won");
 
 describe("a win and a loss", () => {

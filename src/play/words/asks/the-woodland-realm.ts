@@ -2,7 +2,7 @@ import type { Ask } from "../asks.ts";
 
 // The choice words of The Woodland Realm (standalone-scenarios part 11), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-woodland-realm --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-woodland-realm` prints each sentence.
-// The opposing team's choices (docs/brief.md, The Woodland Realm, reading 3) are the engine's, so a sheet opens only for a tie its first player settles. The entries below word those sheets and the choices a player makes.
+// The opposing team's choices (docs/scenarios/standalone-scenarios.md, The Woodland Realm, reading 3) are the engine's, so a sheet opens only for a tie its first player settles. The entries below word those sheets and the choices a player makes.
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 51107:B:1 (The Forest of Great Fear): the resource goes on an enemy of cost 2 or more.
   "51107:whenRevealed:2 @2 Pick": { note: "The Forest of Great Fear: choose the enemy of cost 2 or more that gets the resource. While this stage is in play it gets +2 Attack and +2 Defense and is immune to player card effects.", verb: "Choose" },

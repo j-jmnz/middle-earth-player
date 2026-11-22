@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Battle of Lake-town), rr.forced, rr.shadow-effects, rr.travel, rr.keywords, rr.cancel, faq.enemy-attacks-outside-combat, faq.additional-attacks (data/rules/entries.json).
+// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town), rr.forced, rr.shadow-effects, rr.travel, rr.keywords, rr.cancel, faq.enemy-attacks-outside-combat, faq.additional-attacks (data/rules/entries.json).
 import { describe, it } from "vitest";
 
 import { announce, answer, attack, cardSpecs, damageOn, defend, flag, exhausted, lost, progressOn, quest, resolve, reveal, stat, won, zone, type Row } from "../../../../test/harness/card-spec.ts";

@@ -1,4 +1,4 @@
-// Rules: rr.guarded, rr.in-play-and-out-of-play, rr.attachment-cards, rr.cannot (data/rules/entries.json); ledger lines 51004:B:1, 51004:B:2, 51013:A:1 (docs/brief.md, The Wizard's Quest, readings 3 and 9).
+// Rules: rr.guarded, rr.in-play-and-out-of-play, rr.attachment-cards, rr.cannot (data/rules/entries.json); ledger lines 51004:B:1, 51004:B:2, 51013:A:1 (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, readings 3 and 9).
 // A player card an encounter card holds faceup under it as a guarded objective: an ally under the stage Carried Away, a card of the first player's hand under Necromancer's Pass. It stays its owner's, out of play, and no copy of its title can be played while it lies there (an effect may still put one into play).
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";

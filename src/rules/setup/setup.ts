@@ -44,7 +44,7 @@ export type StartSeat = {
   // (`host` is the hero's code), and cards a campaign card adds to the seat's hand before the opening hand is drawn.
   attachments?: readonly { host: string; code: string }[];
   hand?: readonly string[];
-  // The permanent starting threat penalty this seat takes of its own, on top of the table's `threatModifier` (The Passage of the Marshes, docs/brief.md, The Two Towers).
+  // The permanent starting threat penalty this seat takes of its own, on top of the table's `threatModifier` (The Passage of the Marshes, docs/scenarios/the-two-towers.md, The Two Towers).
   threatPenalty?: number;
   // A raise of this seat's threat that step 7 of Setup makes after the initial threat level is set (the first player's search for Andúril, 145066:A:1: "raise each player's threat"), so it is not part of the starting threat level (rr.setup, rr.initial-threat-level).
   threatRaise?: number;
@@ -133,7 +133,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     for (const code of codes) state = spawn(state, code, { zone }).state;
     // The Evil Creatures deck has a discard pile of its own, which exists from the start (emce.evil-creatures-deck).
     if (zone === "evilCreaturesDeck") state = { ...state, piles: { ...state.piles, evilCreaturesDiscard: state.piles?.evilCreaturesDiscard ?? [] } };
-    // So does the Smaug deck (docs/brief.md, The Battle of Lake-town).
+    // So does the Smaug deck (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town).
     if (zone === "smaugDeck") state = { ...state, piles: { ...state.piles, smaugDiscard: state.piles?.smaugDiscard ?? [] } };
   }
   if (input.unchartedDeck && input.unchartedDeck.length > 0) state = dealUnchartedDeck(state, input.unchartedDeck, ctx);
@@ -146,7 +146,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   state = markCapture(state, ctx);
   state = markEnemyDamage(state, ctx);
   state = markSeatedRows(state, ctx);
-  // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/brief.md, Nightmare).
+  // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/scenarios/nightmare.md, Nightmare).
   if (input.definition.nightmareCard) state = spawn(state, input.definition.nightmareCard, { zone: "nightmare" }, "A").state;
   const chosen = input.seats.slice(0, input.seatCount).flatMap((seat, at) => (seat.chosen ?? []).map((code) => ({ code, seat: at })));
   if (chosen.length > 0) state = { ...state, chosenAtSetup: chosen };

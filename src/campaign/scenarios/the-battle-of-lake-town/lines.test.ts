@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Battle of Lake-town), rr.attachment-cards, rr.objective-cards, rr.travel, rr.action, rr.winning-the-game, rr.cancel, faq.enemy-attacks-outside-combat (data/rules/entries.json).
+// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town), rr.attachment-cards, rr.objective-cards, rr.travel, rr.action, rr.winning-the-game, rr.cancel, faq.enemy-attacks-outside-combat (data/rules/entries.json).
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";

@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.quest-advancement (data/rules/entries.json); ledger lines 50603:B:1, 50603:B:2, 50608:A:1, 50615:A:2 (docs/brief.md, The Ruins of Belegost, The table).
+// Rules: rr.forced, rr.quest-advancement (data/rules/entries.json); ledger lines 50603:B:1, 50603:B:2, 50608:A:1, 50615:A:2 (docs/scenarios/standalone-scenarios.md, The Ruins of Belegost, The table).
 //
 // The pieces The Ruins of Belegost's cards hold on the table, as top-bar dials: the resources on Stalking the Ruins against the 3 that bring Naurlhûg (the number is read from the card's own record; it warms when the next quest phase brings him, and once he is in play the
 // dial says his X) and the resources on stage 2D against the 3 it asks for (a goal dial: more is the way on). The Loot objective that lies facedown under Stalking the Ruins is drawn as the peek under any staging card. The engine decided every number (the tokens, the

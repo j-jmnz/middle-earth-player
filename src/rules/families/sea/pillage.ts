@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Hunt for the Dreadnaught, reading 21); ledger lines 40014:A:1, 40021:A:1 to 40023:A:1, 40034:A:2. Pillage X: after the enemy's attack on a player has resolved, defended or not, that player discards the top X cards
+// Rules: docs/scenarios/standalone-scenarios.md (The Hunt for the Dreadnaught, reading 21); ledger lines 40014:A:1, 40021:A:1 to 40023:A:1, 40034:A:2. Pillage X: after the enemy's attack on a player has resolved, defended or not, that player discards the top X cards
 // of their deck, one at a time (all of them when fewer remain). An attack that was canceled makes none. The attack's end adds the instruction (combat/shadow.ts finishAttack); each event card discarded this way is announced as `pillaged`, which the
 // Forced lines of Corsair Plunderer, Daring Buccaneer and Fierce Marauder hear, once for each card.
 import type { Instruction } from "../../../catalog/boundary.ts";

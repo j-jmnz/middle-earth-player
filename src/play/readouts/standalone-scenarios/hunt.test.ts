@@ -1,4 +1,4 @@
-// Rules: rr.damage, rr.quest-advancement, rr.action (data/rules/entries.json); docs/brief.md (The Hunt for the Dreadnaught, The table); ledger lines 40013:A:1, 40013:A:2, 40013:A:3, 40004:B:2, 40005:B:1, 40001:B:2, 40002:B:1.
+// Rules: rr.damage, rr.quest-advancement, rr.action (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Hunt for the Dreadnaught, The table); ledger lines 40013:A:1, 40013:A:2, 40013:A:3, 40004:B:2, 40005:B:1, 40001:B:2, 40002:B:1.
 // The top-bar dials of The Hunt for the Dreadnaught: the Dreadnaught's hit points left (a goal dial that warns when the next end of the round flips it), the damage it took this round against its cap, the progress placed on the stage this round
 // against its cap, and the mode card's Quest Action (Ready, then Used).
 import { describe, expect, it } from "vitest";

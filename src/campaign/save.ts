@@ -57,17 +57,17 @@ export const campaignLogSchema = z.strictObject({
   allyLines: z.array(z.enum(ALLY_LINES)).default([]),
   beldisUses: z.array(z.number().int().min(0).max(BELDIS_BOXES)).default([]),
   encounterPool: z.record(z.string(), z.number().int().positive()).default({}),
-  // The Two Towers Campaign Log (docs/brief.md, The Two Towers). A log saved before it reads with these defaults.
+  // The Two Towers Campaign Log (docs/scenarios/the-two-towers.md, The Two Towers). A log saved before it reads with these defaults.
   threatPenaltyBySeat: z.array(z.number().int().min(0)).default([]),
   marshesChoice: z.array(z.enum(MARSHES_CHOICES).nullable()).default([]),
   blackGate: z.record(z.string(), z.number().int().positive()).default({}),
   scoreBase: z.number().int().default(0),
   scoreBaseCampaigns: z.array(z.string()).default([]),
-  // The Return of the King's notes (docs/brief.md, The Return of the King). A log saved before them reads with these defaults.
+  // The Return of the King's notes (docs/scenarios/the-return-of-the-king.md, The Return of the King). A log saved before them reads with these defaults.
   corsairFleet: z.number().int().min(0).nullable().default(null),
   blackGateTokens: z.number().int().min(0).nullable().default(null),
   campaignEnd: z.enum(CAMPAIGN_ENDS).nullable().default(null),
-  // Angmar Awakened's Damage Tracking (docs/brief.md, Angmar Awakened). A log saved before it reads with these defaults.
+  // Angmar Awakened's Damage Tracking (docs/scenarios/angmar-awakened.md, Angmar Awakened). A log saved before it reads with these defaults.
   protectDamage: z.number().int().min(0).nullable().default(null),
   heroDamage: z.record(z.string(), z.number().int().positive()).default({}),
   determined: z.array(z.string()).default([]),

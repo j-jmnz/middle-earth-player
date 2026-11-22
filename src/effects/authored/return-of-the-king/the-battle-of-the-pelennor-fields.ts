@@ -6,7 +6,7 @@ import { STAGE_RECORDS } from "./pelennor/stages.ts";
 // Records for The Battle of the Pelennor Fields (the-return-of-the-king part 3, campaign card 145078, whose Resolution record is in the-return-of-the-king.ts): the Esquires, Minas Tirith and the siege locations, the Harad and Mordor enemies, the
 // treacheries and the Corsair Fleet; the quest stages, the campaign card and the Witch-king's two sides are in return-of-the-king/pelennor/stages.ts. The cards the quest card's piles set aside (Minas Tirith, Grond, the Wraiths on Wings, the Witch-king, the Esquires) are
 // dealt by the data; no record places them. Every line is read from the scan ledger (data/printed/the-return-of-the-king.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here.
-// See docs/brief.md, The Return of the King, for each reading.
+// See docs/scenarios/the-return-of-the-king.md, The Return of the King, for each reading.
 // Rules: mec113.minas-tirith, mec113.assault, mec113.setting-up-the-game, mec113.aragorn, mec113.multiplayer-aragorn, mec113.saga-staging-rules, mec113.immune-to-player-card-effects, mec113.peril, mec113.archery, rr.effects, rr.search,
 // rr.active-location, rr.explored, rr.staging, rr.quest-advancement, rr.first-player, rr.cancel, rr.then, rr.lasting-effects, rr.in-play-and-out-of-play, rr.destroy, rr.engaged, rr.damage, faq.progress-without-advancing, faq.peril-attacks,
 // faq.additional-attacks, faq.enemy-attacks-outside-combat, faq.lasting-effects, faq.triggering-forced-effects, faq.next-player (data/rules/entries.json).

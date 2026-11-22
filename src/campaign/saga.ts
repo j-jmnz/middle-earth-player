@@ -34,7 +34,7 @@ export type TitleBan = { title: string; types: readonly string[] | null; rule: s
 const TWO_TOWERS_BANS: readonly TitleBan[] = ["Saruman", "Gríma", "Sméagol"].map((title) => ({ title, types: ["ally", "hero"], rule: "mec112.saruman-grima-smeagol" }));
 
 // The Treason of Saruman scenarios (7 to 9) grant ☺ Aragorn, and "players cannot use any card titled Frodo Baggins" in them: the
-// Ring-bearer stays on the log and returns for 10 to 12 (docs/brief.md, The Two Towers; user decision, 2026-11-07).
+// Ring-bearer stays on the log and returns for 10 to 12 (docs/scenarios/the-two-towers.md, The Two Towers; user decision, 2026-11-07).
 const NO_FRODO: TitleBan = { title: "Frodo Baggins", types: null, rule: "mec112.fellowship-sphere-heroes" };
 
 /** The campaign whose log keeps the Two Towers columns and whose box bans the titles above (data/campaigns/the-two-towers.json). */
@@ -44,7 +44,7 @@ export const TWO_TOWERS_CAMPAIGN = "the-two-towers";
 export const RETURN_OF_THE_KING_CAMPAIGN = "the-return-of-the-king";
 
 // "When playing the scenarios that feature Aragorn as a Fellowship hero in campaign mode, players cannot use any card that shares a title with the Ring-bearer of the campaign" (mec113.campaign-mode-ring-bearer). The Ring-bearer is
-// Frodo Baggins, the one Fellowship hero with the trait, so the ban is the Two Towers' (docs/brief.md, The Return of the King). The box bans no other title.
+// Frodo Baggins, the one Fellowship hero with the trait, so the ban is the Two Towers' (docs/scenarios/the-return-of-the-king.md, The Return of the King). The box bans no other title.
 const NO_RING_BEARER: TitleBan = { title: "Frodo Baggins", types: null, rule: "mec113.campaign-mode-ring-bearer" };
 
 /** The titles the players cannot use in this scenario of this campaign. */

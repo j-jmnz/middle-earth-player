@@ -135,7 +135,7 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
       const traveled = travelNow(state, locationId, ctx, steps);
       // A player the cost of the travel eliminated (a threat raise to 50 earlier in the effect) travels nowhere: this instruction changes nothing, later instructions of the effect still run and the game goes on (rr.player-elimination).
       if (traveled) return traveled;
-      // The Travel effect itself made another location the active location (Dark-wood Grove reveals Giant Web, 51146:A:2, 51131:A:1), or took the location out of the staging area: the travel does not take place and the opportunity is over (docs/brief.md, The Woodland Realm, reading 20).
+      // The Travel effect itself made another location the active location (Dark-wood Grove reveals Giant Web, 51146:A:2, 51131:A:1), or took the location out of the staging area: the travel does not take place and the opportunity is over (docs/scenarios/standalone-scenarios.md, The Woodland Realm, reading 20).
       if (instruction.to === "self" && (effectMadeActive(state) || state.cards[locationId]?.zone !== "staging")) return state.mode === "travel" ? travelTaken(state) : state;
       return state.seats[focus.seat]?.eliminated ? state : { ...state, failure: "Travel was refused" };
     }

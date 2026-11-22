@@ -54,7 +54,7 @@ export function removeTimeCounters(state: ScenarioState, ctx: ReduceContext): Sc
 
 /**
  * The refresh phase ends (windows/triggers.ts crossBoundary): when a card in play holds a time counter, a frame of its own removes one from each. It goes down before the Forced effects of the end of the refresh phase, so they resolve first and the counters come off after them
- * (docs/brief.md, Angmar Awakened).
+ * (docs/scenarios/angmar-awakened.md, Angmar Awakened).
  */
 export function timeAtRefreshEnd(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const first = timeCards(state, ctx)[0];

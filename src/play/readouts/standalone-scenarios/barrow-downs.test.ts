@@ -1,4 +1,4 @@
-// Rules: mec108.create-staging-area, mec109.multiple-staging-areas, rr.quest-advancement, rr.victory (data/rules/entries.json); docs/brief.md (Fog on the Barrow-downs, The table); ledger lines 148003:B:1, 148003:B:3, 148004:B:2, 148007:A:2.
+// Rules: mec108.create-staging-area, mec109.multiple-staging-areas, rr.quest-advancement, rr.victory (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (Fog on the Barrow-downs, The table); ledger lines 148003:B:1, 148003:B:3, 148004:B:2, 148007:A:2.
 // What the table says of Fog on the Barrow-downs: the parked stage 3B as a dial, the player apart, the quest readout that promises neither the progress nor the win stage 3B withholds, and the cards drawn in each row.
 import { describe, expect, it } from "vitest";
 

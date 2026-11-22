@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (Attack on Dol Guldur, The table), rr.forced, rr.victory (data/rules/entries.json); ledger lines 50907:A:1, 50931:A:1, 50931:B:1, 50931:B:3. The words of the city strength dial (guldur.ts beside it). Pure.
+// Rules: docs/scenarios/standalone-scenarios.md (Attack on Dol Guldur, The table), rr.forced, rr.victory (data/rules/entries.json); ledger lines 50907:A:1, 50931:A:1, 50931:B:1, 50931:B:3. The words of the city strength dial (guldur.ts beside it). Pure.
 
 /** What the end of a stage 3 round takes off the city strength: the Siege value of the enemies destroyed and the locations explored this round. */
 export const tallyWords = (tally: number, atStage3: boolean): string =>

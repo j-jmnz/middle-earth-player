@@ -1,7 +1,7 @@
 import { namedBy, setsOf, stepWith } from "./setup-names.ts";
 import type { NameIndex, SetupClause } from "./setup-text.ts";
 
-// The Two Towers' Setup sentences (docs/brief.md, The Two Towers): the six stage 1A cards' and the six campaign cards'. Every pattern is quoted from a
+// The Two Towers' Setup sentences (docs/scenarios/the-two-towers.md, The Two Towers): the six stage 1A cards' and the six campaign cards'. Every pattern is quoted from a
 // ledger line (data/printed/the-two-towers.json), names the cards (and, for the burden removal, the burden sets) it moves, and returns null for a sentence it
 // does not read, so the other patterns try it. A step that names cards returns null when a name finds no card: the sentence ends up unread and the
 // scenario is not built, a name is never dropped silently.

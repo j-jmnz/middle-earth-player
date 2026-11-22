@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.reveal, rr.shadow-effects, rr.travel, rr.active-location, rr.engaged, rr.victory, rr.quest-advancement, mec113.saga-staging-rules (data/rules/entries.json); docs/brief.md (The Old Forest).
+// Rules: rr.forced, rr.reveal, rr.shadow-effects, rr.travel, rr.active-location, rr.engaged, rr.victory, rr.quest-advancement, mec113.saga-staging-rules (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Old Forest).
 import { describe, it } from "vitest";
 
 import { announce, attack, cardSpecs, damageOn, deckCount, endPhase, endRound, flag, handCount, progressOn, quest, resolve, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";

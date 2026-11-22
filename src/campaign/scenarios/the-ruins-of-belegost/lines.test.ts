@@ -1,4 +1,4 @@
-// Rules: rr.travel, rr.shadow-effects, rr.cancel, rr.attachment-cards, emce.loot (data/rules/entries.json); docs/brief.md (The Ruins of Belegost).
+// Rules: rr.travel, rr.shadow-effects, rr.cancel, rr.attachment-cards, emce.loot (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Ruins of Belegost).
 // The lines a card-spec row cannot express (spec.test.ts holds the rest): the table-wide must-travel stat, a Response in the Shadow window, the printed cost of a card in a zone, a record that must not fire.
 import { describe, expect, it } from "vitest";
 

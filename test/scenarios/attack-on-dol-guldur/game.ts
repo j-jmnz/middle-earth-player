@@ -32,7 +32,7 @@ export type GuldurPolicy = {
 };
 export const DEFAULT_POLICY: GuldurPolicy = { choose: "first", questers: 1, engage: 2 };
 
-// The Siege value of an enemy the players attack first (the printed value of the card, docs/brief.md, Attack on Dol Guldur): the Host of Dol Guldur 4, the Mirkwood Olog-hai 3, the Beast 2, the others 1, the Lieutenants (Indestructible) last.
+// The Siege value of an enemy the players attack first (the printed value of the card, docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur): the Host of Dol Guldur 4, the Mirkwood Olog-hai 3, the Beast 2, the others 1, the Lieutenants (Indestructible) last.
 const SIEGE: Readonly<Record<string, number>> = { "50914": 4, "50915": 3, "50916": 2 };
 const rankOf = (state: ScenarioState, enemyId: string): number => {
   const code = state.cards[enemyId]?.code ?? "";

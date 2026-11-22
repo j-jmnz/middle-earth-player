@@ -1,4 +1,4 @@
-// Rules: mec109.setting-up-the-game, rr.setup (data/rules/entries.json); ledger line 50801:A:1 (docs/brief.md, The Siege of Annúminas, reading 3).
+// Rules: mec109.setting-up-the-game, rr.setup (data/rules/entries.json); ledger line 50801:A:1 (docs/scenarios/standalone-scenarios.md, The Siege of Annúminas, reading 3).
 //
 // The scenario's mode card (`ScenarioDefinition.modeCard`) with a Setup of its own: The Siege of Annúminas' Standard Game Mode is laid down on its Setup side before the quest card's Setup and
 // resolves it ("set its city strength to 20"), then is flipped and kept beside the quest deck (setup.ts finishSetup). A mode card with no Setup record (the Dream-chaser Hard/Expert Mode card)
@@ -19,7 +19,7 @@ export function modeCardSetup(state: ScenarioState, ctx: ReduceContext, steps: E
   const own = ctx.effects.filter((effect) => effect.cardCode === mode.code && effect.timing === "setup");
   if (own.length === 0) return state;
   const spawned = spawn(state, mode.code, { zone: "modeCard" }, "A");
-  // A Setup that asks a player (The Hunt for the Dreadnaught's "Players prepare their fleet": each player chooses a ship) is one effect frame, resolved after Setup's own steps (docs/brief.md, The Hunt for the Dreadnaught, reading 3).
+  // A Setup that asks a player (The Hunt for the Dreadnaught's "Players prepare their fleet": each player chooses a ship) is one effect frame, resolved after Setup's own steps (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, reading 3).
   if (own.some((effect) => effect.instructions.some((instruction) => instruction.verb === "PrepareFleet"))) return pushCardEffects(spawned.state, "setup", spawned.id, state.firstPlayer, false, own, ctx, steps);
   let next = spawned.state;
   for (const effect of own) {
@@ -43,7 +43,7 @@ function gainsResources(steps: readonly Instruction[]): boolean {
 }
 
 // Easy's one resource for each hero is the mode card's own Setup line where the card prints it (The Hunt for the Dreadnaught's Easy Mode, "Add 1 resource to each hero's resource pool"): the generic step 2 of Setup then adds none
-// (docs/brief.md, The Hunt for the Dreadnaught, reading 2).
+// (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, reading 2).
 export function modeAddsEasyResource(definition: Pick<ScenarioDefinition, "modeCard">, ctx: ReduceContext): boolean {
   const mode = definition.modeCard;
   if (!mode) return false;

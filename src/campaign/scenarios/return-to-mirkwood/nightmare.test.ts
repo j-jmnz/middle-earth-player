@@ -1,6 +1,6 @@
 // Rules: sotm.guarding-gollum, rr.forced, rr.then, rr.cannot, rr.destroy, rr.shadow-effects, rr.active-location, rr.staging, rr.first-player, sotm.removed-from-game (data/rules/entries.json); ledger lines 900901:A:2, 900901:A:3, 900902:A:1, 900903:A:1, 900903:A:2, 900904:A:1, 900904:A:2, 900905:A:1, 900905:A:2, 900906:A:1, 900906:A:2,
 // 900907:A:2, 900908:A:1, 900908:A:2, 900909:A:1, 900909:A:2.
-// The Nightmare deck of Return to Mirkwood (the setup card 900901 and the eight cards the recipe adds, docs/brief.md, Nightmare). Each test starts its title with the line id it covers.
+// The Nightmare deck of Return to Mirkwood (the setup card 900901 and the eight cards the recipe adds, docs/scenarios/nightmare.md, Nightmare). Each test starts its title with the line id it covers.
 import { describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../../rules/core/intents.ts";

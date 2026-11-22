@@ -7,7 +7,7 @@ import { copyLine, withCopies } from "./reprint.ts";
 
 // Records for Journey to the Cross-roads (the-two-towers part 5, campaign card 144069, whose records are in the-two-towers.ts): the Harad deck lying under The Cross-roads (the wilderland pile `harad`), the enemies facedown
 // under The Black Gate (the harad family), the locations' lines and the Men of Harad. Every line is read from the scan ledger (data/printed/the-two-towers.json); a line a template already writes (pnpm data:build) or another card
-// prints word for word needs no record here. See docs/brief.md, The Two Towers, for each reading.
+// prints word for word needs no record here. See docs/scenarios/the-two-towers.md, The Two Towers, for each reading.
 // Rules: mec112.setup-journey-to-the-cross-roads, mec112.multiplayer-the-one-ring, mec109.archery, rr.forced, rr.travel, rr.cannot, rr.first-player, rr.effects, rr.engaged, rr.reveal, rr.search, rr.lasting-effects, rr.step-6-4-2, rr.victory (data/rules/entries.json).
 const BLACK_GATE = "144027";
 const CROSS_ROADS = "144030";

@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.player-elimination, rr.response, rr.cancel, rr.forced, rr.action, rr.cost, rr.engaged, rr.damage, rr.deckbuilding, rr.mulligan, dcce.ship-objectives, dcce.ship-enemies, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json); docs/brief.md (The Hunt for the Dreadnaught).
+// Rules: rr.setup, rr.player-elimination, rr.response, rr.cancel, rr.forced, rr.action, rr.cost, rr.engaged, rr.damage, rr.deckbuilding, rr.mulligan, dcce.ship-objectives, dcce.ship-enemies, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Hunt for the Dreadnaught).
 // The lines a card-spec row cannot express (spec.test.ts holds the rest): a Setup played from the first intent, a choice among the ships, a Response in the middle of an attack, an effect that waits on the elimination sweep, a card
 // of the players' decks in the hand, and a limit once each round. Each test starts its title with the line id.
 import { beforeAll, describe, expect, it } from "vitest";

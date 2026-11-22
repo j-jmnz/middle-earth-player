@@ -3,7 +3,7 @@ import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 // The Dead Marshes Nightmare (deck 9008, data/printed/nightmare.json). The setup card bars every threat reduction, adds The Mere of Dead Faces to the staging area (it holds the tokens meant for Gollum while he is out of play and hands them over when he enters) and shuffles Gollum
 // back into the encounter deck whenever he is placed in the discard pile. The deck prints no quest card. Its encounter cards make the escape tests cost more (Stagnant Quagmire adds to every test, Things in the Pools hurts each character that commits, Ill-fated Guard allows one committed
 // character, Marsh-wight, Candles of Corpses and Swarming Mosquitos are tests of their own) and bring the Undead back (Devilry of the Dark Land, Lost Soul of Lórien).
-// Rules: sotm.escape-test, rr.forced, rr.then, rr.destroy, rr.shadow-effects, rr.first-player, rr.setup (data/rules/entries.json); the readings are in docs/brief.md (The Dead Marshes).
+// Rules: sotm.escape-test, rr.forced, rr.then, rr.destroy, rr.shadow-effects, rr.first-player, rr.setup (data/rules/entries.json); the readings are in docs/scenarios/shadows-of-mirkwood.md (The Dead Marshes).
 const GOLLUM_CODE = "02107";
 const GOLLUM: PickSpec = { type: "objective", control: "any", names: ["Gollum"] };
 const FAILED: Condition = { kind: "lastEscapeFailed" };

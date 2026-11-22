@@ -1,6 +1,6 @@
 // The fixtures of The Battle of the Pelennor Fields (the-return-of-the-king part 3), written into src/campaign/fixtures/the-battle-of-the-pelennor-fields.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck and the
 // Defenders of Gondor list, `FIXTURE_DECKS`), two-handed, so each is a real save. `fields-won` is the first seed that wins, parked on the win (the Resolution waits); `fields-lost` the first
-// that loses, parked on the loss. A game not found in the seeds is left out (`fields-won` is not found in 100 seeds, docs/phases/STATUS.md).
+// that loses, parked on the loss. A game not found in the seeds is left out (`fields-won` is not found in 100 seeds, GitHub issue #188).
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks the first player the two Esquire questions (attach Esquire of Rohan, then Esquire of Gondor, each to a hero of any seat): the policy takes the first option, so both are attached. The Resolution asks nothing (each player earns a Wraith on Wings,
 // and an Esquire still on a hero is earned for its controller). The decklists are played with the scenario's golden policy (test/scenarios/the-battle-of-the-pelennor-fields/game.ts: one character quests, the others attack, the players engage and defend Mordor Orc's

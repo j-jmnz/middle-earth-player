@@ -1,4 +1,4 @@
-// Rules: rr.guarded, rr.reveal (data/rules/entries.json); ledger lines 51205:B:1, 51241:A:1 (docs/brief.md, The Mines of Moria, The table and readings 10 and 11; docs/design-system-table.md, Top bar).
+// Rules: rr.guarded, rr.reveal (data/rules/entries.json); ledger lines 51205:B:1, 51241:A:1 (docs/scenarios/standalone-scenarios.md, The Mines of Moria, The table and readings 10 and 11; docs/design-system-table.md, Top bar).
 // What the table shows of The Mines of Moria's two holding cards: the facedown cards Hidden Threat lays under the main quest ("1 hidden") and the attachments Narrow Paths holds under its stage ("2 held", with their owners).
 import { describe, expect, it } from "vitest";
 

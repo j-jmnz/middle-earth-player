@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, ltp.scoring, docs/brief.md (Murder at the Prancing Pony) (data/rules/entries.json).
+// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, ltp.scoring, docs/scenarios/standalone-scenarios.md (Murder at the Prancing Pony) (data/rules/entries.json).
 import { describe, expect } from "vitest";
 
 import { pileOf } from "../../../rules/core/piles.ts";

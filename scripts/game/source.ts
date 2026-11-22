@@ -31,7 +31,7 @@ export type GameSource = {
 type Pinned = { name: string; intents: PlayerIntent[]; state: ScenarioState };
 
 function fixtureSource(name: FixtureName): GameSource {
-  if (!hasFixture(name)) throw new Error(`fixture ${name} is not committed (open in docs/phases/STATUS.md)`);
+  if (!hasFixture(name)) throw new Error(`fixture ${name} is not committed (open in GitHub issue #188)`);
   if (fixtureKindOf(name) === "standalone") {
     const game = fixtureStandalone(name, `standalone-${name}`, CATALOG_VERSION);
     const world = worldForStandalone(name);

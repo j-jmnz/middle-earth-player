@@ -5,7 +5,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for The Old Forest (standalone-scenarios cycle part 4, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) needs no record here.
 // Setup: the data's piles set Old Man Willow and Withywindle aside (147001:A:1's first sentence); the four stage 2s lie in the quest deck, a stage 2B returns to it when the quest goes on to a different one (AdvanceToRandomStage `different`).
-// Rules: rr.forced, rr.surge, mec109.peril, mec109.indestructible, rr.immune, rr.doomed-x, rr.engaged, rr.victory, rr.in-play-and-out-of-play, rr.play-and-put-into-play, rr.quest-advancement, mec113.saga-staging-rules (data/rules/entries.json); the readings are in docs/brief.md (The Old Forest, Line readings).
+// Rules: rr.forced, rr.surge, mec109.peril, mec109.indestructible, rr.immune, rr.doomed-x, rr.engaged, rr.victory, rr.in-play-and-out-of-play, rr.play-and-put-into-play, rr.quest-advancement, mec113.saga-staging-rules (data/rules/entries.json); the readings are in docs/scenarios/standalone-scenarios.md (The Old Forest, Line readings).
 const STAGE_2: readonly string[] = ["147002", "147003", "147004", "147005"];
 const STAGE_3 = "147006";
 const OLD_MAN_WILLOW = "147007";

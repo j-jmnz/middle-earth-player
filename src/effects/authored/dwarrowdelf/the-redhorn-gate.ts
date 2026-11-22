@@ -3,7 +3,7 @@ import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for The Redhorn Gate (Dwarrowdelf part 4, no campaign card). Every line is read from the scan ledger (data/printed/dwarrowdelf.json). The quest's 1B says Entering the Mines' When Revealed (03064:B:1) in other words, Rocky Crags and Fallen Stones print the
-// same Shadow (04019:A:2 and 04021:A:2), Mountain Goblin and Mountain Troll the same +1 Attack (04025:A:1 and 04026:A:1). Mountain Goblin's and Mountain Troll's Shadow (04025:A:2, 04026:A:2) is a template; the Nightmare deck's records are in ../nightmare/the-redhorn-gate.ts. The readings are in docs/brief.md (The Redhorn Gate).
+// same Shadow (04019:A:2 and 04021:A:2), Mountain Goblin and Mountain Troll the same +1 Attack (04025:A:1 and 04026:A:1). Mountain Goblin's and Mountain Troll's Shadow (04025:A:2, 04026:A:2) is a template; the Nightmare deck's records are in ../nightmare/the-redhorn-gate.ts. The readings are in docs/scenarios/dwarrowdelf.md (The Redhorn Gate).
 // Rules: dwd.setup-the-redhorn-gate, dwd.setup-the-redhorn-gate-set-aside, dwd.ally-objective-arwen, dwd.caradhras, rr.reveal, rr.staging, rr.travel, rr.victory, rr.first-player, rr.defending-player, rr.attachment-cards, rr.lasting-effects, faq.lasting-effects,
 // faq.progress-without-advancing, faq.first-player-elimination, faq.simultaneous-effects (data/rules/entries.json).
 const ARWEN = "04014";
@@ -105,7 +105,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "04011:whenRevealed:1", cardCode: "04011", lines: ["04011:B:1"], timing: "whenRevealed", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "RevealEncounter" }] }] },
 
     // 04012 Snowdrifts (stage 2). B:1: 1 more Snowstorm than there are players is shuffled into the encounter deck from the set-aside copies. B:2: after the 11th progress token, the active location is discarded (with its progress) and Caradhras becomes the active location without a Travel
-    // (dwd.caradhras): from the staging area, or searched out of the victory display, the encounter deck or its discard pile into the staging area first (the deck is shuffled); a Caradhras already active stays (agent recommendation, docs/brief.md, The Redhorn Gate).
+    // (dwd.caradhras): from the staging area, or searched out of the victory display, the encounter deck or its discard pile into the staging area first (the deck is shuffled); a Caradhras already active stays (agent recommendation, docs/scenarios/dwarrowdelf.md, The Redhorn Gate).
     {
       id: "04012:whenRevealed:1",
       cardCode: "04012",
@@ -115,7 +115,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "ShuffleSetAsideIntoEncounterDeck", code: SNOWSTORM }] },
         { verb: "ShuffleSetAsideIntoEncounterDeck", code: SNOWSTORM },
         { verb: "ShuffleEncounterDeck" },
-        // While Snowdrifts is the stage the characters stay committed through its defeat (B:2, docs/brief.md, The Redhorn Gate): the table's flag, read by the quest resolution (rules/quest/stage-reveal.ts).
+        // While Snowdrifts is the stage the characters stay committed through its defeat (B:2, docs/scenarios/dwarrowdelf.md, The Redhorn Gate): the table's flag, read by the quest resolution (rules/quest/stage-reveal.ts).
         { verb: "ModifyStat", stat: "heldCommitted", amount: 1, until: "whileSourceInPlay", target: "table" },
       ],
     },
@@ -176,7 +176,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "04015:constant:2", cardCode: CARADHRAS, lines: ["04015:A:2"], timing: "constant", instructions: [{ verb: "Restrict", what: "travel", location: CARADHRAS }] },
 
     // 04016 Fanuidhol. While it is the active location every hero's Willpower counts only if its controller spends 1 resource from that hero's pool: a hero with no resource counts 0, and a player may keep a resource back. The question is asked when the quest total is counted
-    // (after the staging step and the action window that follows it), in player order, for each committed hero with a resource (docs/brief.md, The Redhorn Gate).
+    // (after the staging step and the action window that follows it), in player order, for each committed hero with a resource (docs/scenarios/dwarrowdelf.md, The Redhorn Gate).
     { id: "04016:constant:1", cardCode: "04016", lines: ["04016:A:1"], timing: "constant", condition: IN_ACTIVE, instructions: [{ verb: "ModifyStat", stat: "willpowerCostsResource", amount: 1, until: "whileSourceInPlay", holders: { type: "hero", control: "any" } }] },
     {
       id: "04016:forced:1",

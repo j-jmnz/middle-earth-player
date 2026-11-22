@@ -4,7 +4,7 @@ import { withThreat } from "../../core/state.ts";
 import { optionalEnemies } from "../../quest/quest.ts";
 import { enemy, hero, table } from "../defense/table.ts";
 
-// Rules: rr.optional-engagement, rr.engagement-check (data/rules/entries.json); ledger line 03060:A:1 (docs/brief.md, Into the Pit). The flag `optionalEngageThreat` on an enemy: a player whose threat is at least its amount cannot optionally engage it.
+// Rules: rr.optional-engagement, rr.engagement-check (data/rules/entries.json); ledger line 03060:A:1 (docs/scenarios/dwarrowdelf.md, Into the Pit). The flag `optionalEngageThreat` on an enemy: a player whose threat is at least its amount cannot optionally engage it.
 
 function scene(threat: number, flagged = true) {
   const built = table({ cards: [hero("a"), enemy("scout"), enemy("other")], effects: [], heroes: [{ code: "a" }], staging: [{ code: "scout" }, { code: "other" }] });

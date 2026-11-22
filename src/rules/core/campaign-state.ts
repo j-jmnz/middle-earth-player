@@ -43,7 +43,7 @@ export type ResolutionLog = {
   poolRemoved?: readonly { code: string; seat: number | null }[];
   // What each seat answered to the choice of a card to remove from the pool, in the order they answered: the option taken, or the decline (the screen reads it back for the seats that have answered).
   poolAnswers?: readonly { seat: number; option: string }[];
-  // The Two Towers (docs/brief.md, The Two Towers), each left out while it holds nothing: what each seat answered to a ChooseOption (`name` is the instruction's, `option` the one taken); the
+  // The Two Towers (docs/scenarios/the-two-towers.md, The Two Towers), each left out while it holds nothing: what each seat answered to a ChooseOption (`name` is the instruction's, `option` the one taken); the
   // permanent starting threat penalty a seat took (ThreatPenaltyForPick); the heroes taken off the list of fallen heroes (ReviveFallenHero) and the ones removed from the Campaign Log
   // (TrimHeroes), by the seat whose heroes they are; the enemies underneath The Black Gate by card code and quantity (RecordUnderneath).
   picks?: readonly { name: string; seat: number; option: string }[];
@@ -51,14 +51,14 @@ export type ResolutionLog = {
   revived?: readonly { seat: number; hero: string }[];
   removedHeroes?: readonly { seat: number; hero: string }[];
   underneath?: Readonly<Record<string, number>>;
-  // The Return of the King (docs/brief.md, The Return of the King), each left out while it holds nothing: the number of tokens a Resolution counted on a card for the log's notes (RecordTokens), the cards it
+  // The Return of the King (docs/scenarios/the-return-of-the-king.md, The Return of the King), each left out while it holds nothing: the number of tokens a Resolution counted on a card for the log's notes (RecordTokens), the cards it
   // took out of the Campaign Pool by code (`poolRemoved` above holds them), whether a hero in a discard pile stays off the list of fallen heroes (IgnoreDiscardedHeroes), and how the saga ends (EndCampaign).
   recorded?: Readonly<Partial<Record<RecordedCount, number>>>;
   discardedNotFallen?: true;
   campaignEnd?: CampaignEnd;
-  // Angmar Awakened (docs/brief.md, Angmar Awakened), left out while a Resolution notes none: the damage on Protect the Innocent / Arnor Ravaged (RecordDamageOn) and on each hero in play by code (RecordHeroDamage).
+  // Angmar Awakened (docs/scenarios/angmar-awakened.md, Angmar Awakened), left out while a Resolution notes none: the damage on Protect the Innocent / Arnor Ravaged (RecordDamageOn) and on each hero in play by code (RecordHeroDamage).
   damageNotes?: { protect?: number; heroes?: Readonly<Record<string, number>> };
-  // Angmar Awakened, The Wastes of Eriador (docs/brief.md, Angmar Awakened), each left out while a game notes none: the change to every player's starting threat the game marked (RecordStartingThreat, a delta: -2 for a defeated Fend Off Despair; campaign/log.ts adds it to the
+  // Angmar Awakened, The Wastes of Eriador (docs/scenarios/angmar-awakened.md, Angmar Awakened), each left out while a game notes none: the change to every player's starting threat the game marked (RecordStartingThreat, a delta: -2 for a defeated Fend Off Despair; campaign/log.ts adds it to the
   // log's `threatPenalty`), and the codes of the characters the Resolution marked "determined" (RecordDetermined; campaign/log.ts adds them to the log's `determined`).
   startingThreat?: number;
   determined?: readonly string[];

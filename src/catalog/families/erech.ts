@@ -1,4 +1,4 @@
-// The erech family (The Stone of Erech, docs/brief.md, The Stone of Erech): the Night objectives (Eventide, Dusk, Midnight: one lies in play beside the quest, takes progress and gives way to the next), Derufin who is attached to the Stone and
+// The erech family (The Stone of Erech, docs/scenarios/standalone-scenarios.md, The Stone of Erech): the Night objectives (Eventide, Dusk, Midnight: one lies in play beside the quest, takes progress and gives way to the next), Derufin who is attached to the Stone and
 // joins the first player, the hand passed to the left, and the table flags the quest and the encounter cards set (no planning phase, no resource collection, no events). src/rules/families/erech/ runs and reads them.
 import { z } from "zod";
 

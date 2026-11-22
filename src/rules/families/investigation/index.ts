@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (Murder at the Prancing Pony), rr.in-play-and-out-of-play, rr.forced (data/rules/entries.json); ledger lines 50701:A:1, 50715:A:1 to 50720:A:2, 50702:B:1, 50702:B:2, 50714:A:1, 50728:A:1.
+// Rules: docs/scenarios/standalone-scenarios.md (Murder at the Prancing Pony), rr.in-play-and-out-of-play, rr.forced (data/rules/entries.json); ledger lines 50701:A:1, 50715:A:1 to 50720:A:2, 50702:B:1, 50702:B:2, 50714:A:1, 50728:A:1.
 // The verbs and hooks src/catalog/families/investigation.ts adds: the Investigation deck built by the Setup (deck.ts), the looks at it (look.ts: Investigate X and the other looks) and the accusation (accuse.ts). Hidden information: nothing here pushes a step that names a card of the deck or the pair set aside facedown.
 import type { Amount, Condition, Instruction } from "../../../catalog/boundary.ts";
 

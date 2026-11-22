@@ -7,7 +7,7 @@ import { copyLine, withCopies } from "./reprint.ts";
 // Records for Helm's Deep (the-two-towers part 2, campaign card 143077, whose records are in the-two-towers.ts): the Defense keyword (mec112.defense: the fortress family), The Defense of Helm's Deep, the
 // Poisoned Counsels burden (a card that functions like a player card: the burden family) and the encounter cards no template reads. Every line is read from the scan ledger (data/printed/the-two-towers.json); a
 // line a template already writes (pnpm data build) or another card prints word for word needs no record here. The piles place The Defense of Helm's Deep, Deeping Wall and the Soldiers of Isengard aside (the
-// first two sentences of 143072:A:1); its record makes the choice that follows. See docs/brief.md, The Two Towers, for each reading.
+// first two sentences of 143072:A:1); its record makes the choice that follows. See docs/scenarios/the-two-towers.md, The Two Towers, for each reading.
 // Rules: mec112.defense, mec112.poisoned-counsels-searching-eye, rr.active-location, rr.lasting-effects, rr.neutral-cards, rr.unique-cards, rr.forced, rr.explored, rr.victory, faq.additional-attacks (data/rules/entries.json).
 const DEFENSE = "143033";
 const SOLDIER = "143036";

@@ -6,7 +6,7 @@ import { flipAtStagingStep } from "../dwarrowdelf/flight-from-moria.ts";
 
 // Flight from Moria Nightmare (deck 9012, data/printed/nightmare.json). The setup card shuffles a bypassed stage into the quest deck and limits the Refresh Action of Abandoned Tools; side B is the recipe the build applies (its lines are inert). The three new stage 2s are Flight from Moria's shape
 // (../dwarrowdelf/flight-from-moria.ts: flipped at the staging step, bypassed at the end of the combat phase) and the five new encounter cards read The Nameless Fear's stats and the victory display.
-// Rules: dwd.the-nameless-fear, dwd.bypassing-a-quest-card, dwd.creating-the-quest-deck, rr.forced, rr.first-player, rr.search, rr.victory, faq.additional-attacks (data/rules/entries.json); the readings are in docs/brief.md (Flight from Moria).
+// Rules: dwd.the-nameless-fear, dwd.bypassing-a-quest-card, dwd.creating-the-quest-deck, rr.forced, rr.first-player, rr.search, rr.victory, faq.additional-attacks (data/rules/entries.json); the readings are in docs/scenarios/dwarrowdelf.md (Flight from Moria).
 const NAMELESS = "The Nameless Fear";
 const NAMELESS_FEAR: PickSpec = { type: "enemy", control: "any", staging: true, names: [NAMELESS] };
 const FEAR_THREAT = { stat: "threat", ofNamed: NAMELESS } as const;

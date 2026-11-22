@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.search, rr.explored, rr.engaged, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, rr.damage, ltp.scoring, docs/brief.md (Escape from Khazad-dûm) (data/rules/entries.json).
+// Rules: rr.setup, rr.search, rr.explored, rr.engaged, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, rr.damage, ltp.scoring, docs/scenarios/standalone-scenarios.md (Escape from Khazad-dûm) (data/rules/entries.json).
 import { describe, expect } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";

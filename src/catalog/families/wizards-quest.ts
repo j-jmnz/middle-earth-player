@@ -1,4 +1,4 @@
-// The Wizard's Quest family (docs/brief.md, The Wizard's Quest): the scenario kit's Quick-build (7 of the 14 encounter sets, one stage 2 and one stage 3 chosen) and the searches of the quest stages' "opposing team" lines.
+// The Wizard's Quest family (docs/scenarios/standalone-scenarios.md, The Wizard's Quest): the scenario kit's Quick-build (7 of the 14 encounter sets, one stage 2 and one stage 3 chosen) and the searches of the quest stages' "opposing team" lines.
 // The opposing team's choices are made by the engine in the manner that gives the players the greatest challenge (reading 3): the search fields `byChallenge`, `maxCost`, `maxCostMulti`, `types` and `top` of the search verbs (src/catalog/effect-schema-verbs.ts)
 // and the pick field `challenge` (src/catalog/effect-schema-pick.ts) are its policy. src/rules/families/wizards-quest/ runs the verbs.
 import { z } from "zod";
@@ -10,7 +10,7 @@ import { verbFlags } from "../verb-flags.ts";
 const code = z.string().min(1);
 
 const VERBS = [
-  // Setup, the Quick-build rule of the kit (docs/brief.md, The Wizard's Quest, reading 2): of the encounter sets named by `sets` that the encounter deck holds, the game's seed picks `keep`; the cards of the others leave the encounter deck and lie set aside, out of play, for the whole game.
+  // Setup, the Quick-build rule of the kit (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 2): of the encounter sets named by `sets` that the encounter deck holds, the game's seed picks `keep`; the cards of the others leave the encounter deck and lie set aside, out of play, for the whole game.
   verbFlags(z.strictObject({ verb: z.literal("BuildQuickDeck"), sets: z.array(z.string().min(1)).min(2), keep: z.number().int().positive(), ...when }), { setupRuns: "top" }),
   // Setup, the Quick-build rule (reading 2): the first player chooses one of the quest cards in the quest deck with these `codes` (a stage 2 or a stage 3); the others lie set aside, out of play, and leave the quest's order. Nothing is asked when one is left.
   verbFlags(z.strictObject({ verb: z.literal("ChooseQuestStage"), codes: z.array(code).min(2), ...when }), { setupRuns: "top" }),
@@ -22,12 +22,12 @@ const VERBS = [
     (verb) => (verb.maxCostStage === true ? verb.maxCost == null && verb.maxCostMulti == null : verb.maxCost != null && verb.maxCostMulti != null),
     "SearchTopReveal takes maxCost with maxCostMulti, or maxCostStage alone",
   ),
-  // "places them faceup under this stage as guarded objectives" (51004:B:1) and "place faceup under Necromancer's Pass as a guarded objective" (51013:A:1): the last picked card, an ally in play or a card of a hand, lies faceup under the source card, still its owner's, out of play (docs/brief.md, The Wizard's Quest, readings 9 and 3).
+  // "places them faceup under this stage as guarded objectives" (51004:B:1) and "place faceup under Necromancer's Pass as a guarded objective" (51013:A:1): the last picked card, an ally in play or a card of a hand, lies faceup under the source card, still its owner's, out of play (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, readings 9 and 3).
   // An ally in play loses its tokens and its attachments are discarded as it leaves play. The source gives them back (ReturnFacedownToHands) and, while they lie there, no copy of their title can be played (src/rules/families/wizards-quest/held.ts).
-  // With `returnsExhausted` (Goblin Dungeon: "When Goblin Dungeon is explored, return that ally to its owner's control exhausted", 51340:A:1; docs/brief.md, Escape from Khazad-dûm, reading 28): once the source has left play the card enters play exhausted under its owner, not into his hand.
+  // With `returnsExhausted` (Goblin Dungeon: "When Goblin Dungeon is explored, return that ally to its owner's control exhausted", 51340:A:1; docs/scenarios/standalone-scenarios.md, Escape from Khazad-dûm, reading 28): once the source has left play the card enters play exhausted under its owner, not into his hand.
   // With `barsPutting` (Narrow Paths: "Players cannot play or put into play any attachment that shares a title with an attachment guarded by this stage", 51205:B:1): the title cannot be put into play by an effect either, and the held card is an attachment taken out of play from its host.
   z.strictObject({ verb: z.literal("HoldPickedUnder"), barsPutting: z.literal(true).optional(), returnsExhausted: z.literal(true).optional(), ...when }),
-  // "The opposing team searches the top 5 cards of the encounter deck for a card with cost X or less, where X is the stage number of the main quest, and places that card facedown under the main quest. After the next time the players quest successfully, reveal that card." (51241:A:1; docs/brief.md, The Mines of Moria, reading 11):
+  // "The opposing team searches the top 5 cards of the encounter deck for a card with cost X or less, where X is the stage number of the main quest, and places that card facedown under the main quest. After the next time the players quest successfully, reveal that card." (51241:A:1; docs/scenarios/standalone-scenarios.md, The Mines of Moria, reading 11):
   // the card nearest the top that qualifies lies facedown under the main quest, the encounter deck is shuffled (reading 14), and the card is revealed in full after the next successful quest, each hidden card in the order placed (src/rules/families/wizards-quest/hidden.ts). With none, only the shuffle.
   z.strictObject({ verb: z.literal("HideUnderQuest"), top: z.number().int().positive(), maxCostStage: z.literal(true), ...when }),
   // "The opposing team looks at the top 2 cards of the encounter deck, puts 1 on the bottom, and puts the other back on top." (51203:B:1; reading 9): the weaker of the top two cards goes to the bottom and the stronger stays on top, no one is asked.
@@ -36,7 +36,7 @@ const VERBS = [
   // A constant marker of the card that holds player cards under it (51004:B:2, 51013:A:1): "copies of that card cannot be played" while it lies there. The bar is the engine's (a card held by HoldPickedUnder bars its title, families/wizards-quest/held.ts), so run alone it does nothing.
   z.strictObject({ verb: z.literal("BarHeldTitles") }),
   // Shadow effect, "Remove the defending character from the attack. A different defending character may be declared." (51335:A:2): the defender leaves the attack (it stays exhausted) and the defending player names another defender or none (an undefended attack), when no shadow effect already made it undefended.
-  // The removed character cannot be declared as the defender of this attack again (docs/brief.md, Escape from Khazad-dûm, reading 21). Nothing happens when the attack has no defender.
+  // The removed character cannot be declared as the defender of this attack again (docs/scenarios/standalone-scenarios.md, Escape from Khazad-dûm, reading 21). Nothing happens when the attack has no defender.
   z.strictObject({ verb: z.literal("RemoveDefender"), ...when }),
   // Shadow effect, "The opposing team searches the top 5 cards of the encounter deck for a card and deals it to attacking enemy as a shadow card" (51342:A:2): the card among the top `top` that the opposing team picks (an enemy of the highest Attack, else the card nearest the top, reading 27) is dealt to the attacking enemy as a shadow card (not revealed);
   // it resolves after the shadow card being resolved, as an additional one. The encounter deck is not shuffled. With no card in the deck nothing happens.

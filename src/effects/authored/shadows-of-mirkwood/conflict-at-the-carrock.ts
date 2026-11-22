@@ -5,7 +5,7 @@ import { ALWAYS } from "../conditions.ts";
 // Records for Conflict at the Carrock (Shadows of Mirkwood part 2, standalone, no campaign card). Every line is read from the scan ledger (data/printed/shadows-of-mirkwood.json). The scenario is a fight with the four unique Trolls
 // that Setup sets aside and stage 2B puts into the staging area: Grimbeorn's Quest makes The Carrock the active location at its 7th progress, Against the Trolls cannot be defeated while a Troll is in play (and its defeat wins
 // the game on Normal and Easy). Grimbeorn the Old is an objective ally the players feed Leadership resources; "Sacked!" is a Condition attachment that takes a hero out of the game until a Troll is defeated.
-// Rules: rr.active-location, rr.attachment-cards, rr.first-player, rr.forced, rr.response, rr.objective-cards, rr.search (data/rules/entries.json); the MEC03 rulesheet for Grimbeorn and The Carrock (docs/brief.md, Conflict at the Carrock).
+// Rules: rr.active-location, rr.attachment-cards, rr.first-player, rr.forced, rr.response, rr.objective-cards, rr.search (data/rules/entries.json); the MEC03 rulesheet for Grimbeorn and The Carrock (docs/scenarios/shadows-of-mirkwood.md, Conflict at the Carrock).
 const TROLL: PickSpec = { type: "enemy", control: "any", trait: "Troll", staging: true };
 const SACKED: PickSpec = { type: "attachment", control: "any", names: ["Sacked!"] };
 const HERO_WITH_SACKED: PickSpec = { type: "hero", control: "any", hasAttachment: { names: ["Sacked!"] } };

@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, ltp.scoring, docs/brief.md (The Old Forest) (data/rules/entries.json).
+// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, ltp.scoring, docs/scenarios/standalone-scenarios.md (The Old Forest) (data/rules/entries.json).
 import { describe, expect } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";

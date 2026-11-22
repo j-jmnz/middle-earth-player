@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { ROOT } from "./tracked.ts";
 
-// A release is only ever started by hand (.claude/rules/release-standards.md, Who releases): release.yml runs on
+// A release is only ever started by hand (docs/agents/release-standards.md, Who releases): release.yml runs on
 // workflow_dispatch alone, and no other workflow makes a tag or a GitHub release.
 const GITHUB = path.join(ROOT, ".github", "workflows");
 

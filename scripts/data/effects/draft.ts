@@ -112,7 +112,7 @@ async function main(log: Log): Promise<void> {
     // The Hard/Expert Mode card is dealt by every scenario of a campaign with XP: its records sit with the Campaign Expansion's own cards.
     if (card.code === MODE_CARD_CODE) return "src/effects/authored/pool/DCCE.ts";
     if ((isPoolCard(card) && !starters.has(card.code)) || (card.campaignKind != null && (pack != null && HOB_ONLY_PACKS.has(pack)))) return `src/effects/authored/pool/${pack}.ts`;
-    // A Nightmare deck's cards go in the Nightmare file of its scenario (docs/brief.md, Nightmare).
+    // A Nightmare deck's cards go in the Nightmare file of its scenario (docs/scenarios/nightmare.md, Nightmare).
     const nightmareOf = scenarios.find((entry) => nightmareCodes([entry]).has(card.code));
     if (nightmareOf) return `src/effects/authored/nightmare/${nightmareOf.id}.ts`;
     const dealer = scenarios.find((entry) => dealtCodes([], [entry]).has(card.code) || gameCodes(campaigns, entry).includes(card.code));

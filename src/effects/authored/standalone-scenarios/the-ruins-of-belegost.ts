@@ -5,7 +5,7 @@ import { withCopies } from "../reprint.ts";
 import { EACH_PLAYER, FEWER_LOOT_THAN, LOOT, X_AT_LEAST_1, discoverKeyword, lootRecords } from "../the-ghost-of-framsburg.ts";
 
 // Records for The Ruins of Belegost (standalone-scenarios cycle part 6, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints word for word needs no record here.
-// The scenario shares Discover X and Loot with The Ghost of Framsburg: its Loot records, Discover keyword, Loot pick and Restrict conditions are that file's (the readings are in docs/brief.md, The Ruins of Belegost, Readings). A Loot objective attached to a hero counts as an attachment (the reading of 50629:A:2).
+// The scenario shares Discover X and Loot with The Ghost of Framsburg: its Loot records, Discover keyword, Loot pick and Restrict conditions are that file's (the readings are in docs/scenarios/standalone-scenarios.md, The Ruins of Belegost, Readings). A Loot objective attached to a hero counts as an attachment (the reading of 50629:A:2).
 // The quest stages branch on the Loot objective attached to a hero (AdvanceIfAttached, read by the stage's `attachedNext`); Stalking the Ruins holds the resources Naurlhûg's X reads.
 // Rules: emce.discover, emce.loot, emce.immune, rr.forced, rr.surge, rr.travel, rr.guarded, rr.quest-advancement, rr.in-play-and-out-of-play, rr.restricted, rr.victory, rr.cannot, rr.engaged, faq.additional-attacks, faq.next-player (data/rules/entries.json).
 const STALKING = "50608";

@@ -1,4 +1,4 @@
-// Rules: mec113.campaign-mode, rr.campaign-log (data/rules/entries.json). The Return of the King's columns of the Campaign Log (docs/brief.md, The Return of the King): what the box's later campaign cards' Setup reads from the notes
+// Rules: mec113.campaign-mode, rr.campaign-log (data/rules/entries.json). The Return of the King's columns of the Campaign Log (docs/scenarios/the-return-of-the-king.md, The Return of the King): what the box's later campaign cards' Setup reads from the notes
 // section ("each Harad enemy recorded in the campaign log", "the number recorded in the campaign log", "the number of resource tokens on The Black Gate, as recorded in the campaign log"), handed to the game as facts. Pure.
 import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 

@@ -93,6 +93,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
   doc: {
     index: { steps: [{ script: "docs/index.ts" }], about: "regenerates docs/INDEX.md" },
     section: { steps: [{ script: "docs/index.ts", args: ["section"] }], about: 'prints one doc section: <file> "<heading>"' },
+    find: { steps: [{ script: "docs/index.ts", args: ["find"] }], about: 'lists the doc headings that hold the words: "<words>"' },
   },
   release: {
     plan: { steps: [{ script: "release/plan.ts" }], about: "prints the next tag and its notes (--dry-run)" },

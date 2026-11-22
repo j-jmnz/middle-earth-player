@@ -57,7 +57,7 @@ const FLAGS = [
   "attacksStaging",
   "attacksStagingAlone",
   // On an enemy in the staging area: characters with the ranged keyword, of any player, may be declared as attackers against it during the player attacks of the combat phase, together with
-  // each other, one attack per seat (Goblin Archer, 03032:A:2; rr.ranged, agent recommendation in docs/brief.md, The Seventh Level). Characters without ranged cannot (rules/combat/combat.ts canAttack).
+  // each other, one attack per seat (Goblin Archer, 03032:A:2; rr.ranged, agent recommendation in docs/scenarios/dwarrowdelf.md, The Seventh Level). Characters without ranged cannot (rules/combat/combat.ts canAttack).
   "attackableByRanged",
   // On an attacking character: the enemy it attacks does not count its Defense against this attack ("While ~ is attacking alone,
   // the defending enemy does not count its Defense").
@@ -75,7 +75,7 @@ const FLAGS = [
   "cannotBeAttackedByRanged",
   // On an enemy: only characters with the Ranged keyword, printed or gained, can attack or defend against it ("Only characters with ranged can attack or defend against Moria Bats", 04127:A:1); with none able its attack is undefended.
   "onlyRangedCombat",
-  // On an enemy, until the modifier ends: it loses the Spectral keyword ("that enemy loses the Spectral keyword until the end of the phase", 50311:A:1; docs/brief.md, The Stone of Erech): characters attacking it use their Attack again.
+  // On an enemy, until the modifier ends: it loses the Spectral keyword ("that enemy loses the Spectral keyword until the end of the phase", 50311:A:1; docs/scenarios/standalone-scenarios.md, The Stone of Erech): characters attacking it use their Attack again.
   "losesSpectral",
 ] as const;
 

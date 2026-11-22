@@ -125,7 +125,7 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm desktop build` | Writes the web export (`EXPO_PUBLIC_DESKTOP=1`) and the shell's bundle to `desktop/build`, after `pnpm assets`. `--skip-assets` leaves the packs, `--optional` lets one fail. |
 | `pnpm desktop pack` | Runs electron-builder for this OS into `desktop/out`; `APP_VERSION` sets the version, `--skip-build` packs the last build and `--dir` makes the unpacked app only. |
 | `pnpm desktop smoke` | Exports with the e2e seed, launches the app through Playwright and checks isolation, the table, a booklet and a picture when packed, that nothing left `app://` and that a relaunch finds the save. `--skip-build` reuses the export, `--app <path>` launches a packed app. |
-| `pnpm doc index` / `pnpm doc section <file> "<heading>"` | Regenerates `docs/INDEX.md`, or prints one section of a doc. |
+| `pnpm doc index` / `pnpm doc section <file> "<heading>"` / `pnpm doc find "<words>"` | Regenerates `docs/INDEX.md` (it fails when one doc has two headings with the same text), prints one section of a doc, or lists the headings that hold the words. |
 | `pnpm release plan --dry-run` | Prints the next tag and its release notes without changing anything. Run `git fetch --tags` first. |
 | `pnpm release source --tag <tag> --ipa <file> --notes <file> --out <file>` | Writes a release's SideStore and AltStore source. The release workflow runs it. |
 | `pnpm release installs --releases <file> --out <file>` | Writes the README's installs badge from a `gh api --paginate --slurp` dump of the releases. The release workflow runs it. |

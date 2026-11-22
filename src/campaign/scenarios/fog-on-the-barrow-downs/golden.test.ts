@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, mec108.create-staging-area, mec109.multiple-staging-areas, ltp.scoring, docs/brief.md (Fog on the Barrow-downs) (data/rules/entries.json).
+// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, mec108.create-staging-area, mec109.multiple-staging-areas, ltp.scoring, docs/scenarios/standalone-scenarios.md (Fog on the Barrow-downs) (data/rules/entries.json).
 import { describe, expect } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";

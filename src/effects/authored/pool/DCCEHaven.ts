@@ -6,7 +6,7 @@ import { FIRST_PLAYER_CHOOSES } from "./DCCE.ts";
 // Records for the cards A Storm on Cobas Haven's campaign card (11209) sets aside or puts into play: Gavin (11210) and the four Send for Help events (11211 to 11214), read from the scan ledger
 // (data/printed/dream-chaser.json). Rules: dcce.encounter-cards, dcce.campaign-setup-a-storm-on-cobas-haven, rr.search, rr.play-and-put-into-play (data/rules/entries.json). Gavin's When Revealed is in DCCE.ts.
 //
-// The Upgraded sides of the Send for Help events are in none of the sources (docs/phases/STATUS.md; the ledger has side A only, NO_UPGRADED_SIDE in rules/families/dreamchaser/facts.ts), so no XP row buys them and
+// The Upgraded sides of the Send for Help events are in none of the sources (GitHub issue #189; the ledger has side A only, NO_UPGRADED_SIDE in rules/families/dreamchaser/facts.ts), so no XP row buys them and
 // the clause "If Send for Help (...) is upgraded, ..." never applies: the records write the base effect and no clause for it.
 
 // The top 10 cards of the searching player's own deck (ActAs: the picked player's deck).

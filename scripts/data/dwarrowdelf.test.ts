@@ -87,7 +87,7 @@ describe("The Dwarrowdelf cycle", () => {
       const text = (rules.get(`dwd.setup-${id}`) ?? "").replaceAll("’", "'");
       expect(text, id).toContain("is played with an encounter deck");
       // The Long Dark's rulesheet lists Hazards of the Pit and Foundations of Stone's Deeps of Moria; the load lists, Hall of Beorn's lists and the printed Nightmare removals say the other way
-      // (Stray Goblin and Abandoned Mine are Deeps of Moria's, Cave In is Hazards of the Pit's; docs/brief.md, Dwarrowdelf).
+      // (Stray Goblin and Abandoned Mine are Deeps of Moria's, Cave In is Hazards of the Pit's; docs/scenarios/dwarrowdelf.md, Dwarrowdelf).
       const unlisted = id === "the-long-dark" ? "Deeps of Moria" : id === "foundations-of-stone" ? "Hazards of the Pit" : "";
       for (const set of DECK[id as keyof typeof DECK].sets.filter((name) => name !== unlisted)) expect(text, `${id} ${set}`).toContain(set);
     }
@@ -98,7 +98,7 @@ describe("The Dwarrowdelf cycle", () => {
   });
 });
 
-// Each scenario's Nightmare deck (docs/brief.md, Nightmare): the setup card, the copies its side B removes and the copies of the deck shuffled in.
+// Each scenario's Nightmare deck (docs/scenarios/nightmare.md, Nightmare): the setup card, the copies its side B removes and the copies of the deck shuffled in.
 const NIGHTMARE = {
   "into-the-pit": { prefix: "9010", setup: "901001", removed: 19, added: 18, quest: ["03065"], questCards: ["901002"] },
   "the-seventh-level": { prefix: "9011", setup: "901101", removed: 12, added: 19, quest: [], questCards: undefined },

@@ -4,7 +4,7 @@ import type { Effect } from "../../../../catalog/boundary.ts";
 import { EACH_PLAYER, PICKED_ENEMY_OUT_OF_PLAY } from "../black-gate/shared.ts";
 import { A_PLAYER_FAILED_THIS_ROUND, EACH_PLAYER_TESTS, IN_STAGING, LAST_FORTITUDE_FAILED } from "./shared.ts";
 
-// Records for the locations of Mount Doom (146042 to 146048; Mount Doom itself, its Immune an override of the data). Every line is read from the scan ledger (data/printed/the-return-of-the-king.json). See docs/brief.md, The Return of the King, for each reading.
+// Records for the locations of Mount Doom (146042 to 146048; Mount Doom itself, its Immune an override of the data). Every line is read from the scan ledger (data/printed/the-return-of-the-king.json). See docs/scenarios/the-return-of-the-king.md, The Return of the King, for each reading.
 // Rules: mec113.fortitude-tests, mec113.player-actions-during-fortitude-tests, mec113.dire, rr.step-7-3, rr.active-location, rr.travel, rr.first-player, rr.in-player-order (data/rules/entries.json).
 export const LOCATION_RECORDS: readonly (Effect | Copy)[] = [
   // 146042 The Tower of Barad-dûr (an objective). While it is in the staging area no player raises his threat in the refresh phase (step 7.3). Forced: at the end of the round each player raises his threat by 1 for each non-Fellowship character he controls (heroes and allies; the Ring-bearer is a Fellowship hero).

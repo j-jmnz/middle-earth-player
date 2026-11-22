@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (Murder at the Prancing Pony, readings 9 and 11), rr.in-play-and-out-of-play, rr.search; ledger lines 50702:B:2 and 50720:A:2, and the insert's Making the Accusation. The first player names 1 Suspect and 1 Hideout, the facedown out-of-play pair is turned up into the staging area,
+// Rules: docs/scenarios/standalone-scenarios.md (Murder at the Prancing Pony, readings 9 and 11), rr.in-play-and-out-of-play, rr.search; ledger lines 50702:B:2 and 50720:A:2, and the insert's Making the Accusation. The first player names 1 Suspect and 1 Hideout, the facedown out-of-play pair is turned up into the staging area,
 // and for each name that is not the pair's the Investigation deck is searched for that card. The names are asked and kept on the effect; the pair is read from the set-aside cards, so the hidden cards are named by no step until they enter play.
 import type { Instruction } from "../../../catalog/boundary.ts";
 

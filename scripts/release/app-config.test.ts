@@ -2,7 +2,7 @@ import { createRequire } from "node:module";
 
 import { describe, expect, it } from "vitest";
 
-// app.config.js stamps the release version into the build (.claude/rules/release-standards.md, Versioning).
+// app.config.js stamps the release version into the build (docs/agents/release-standards.md, Versioning).
 const require = createRequire(import.meta.url);
 const appConfig = require("../../app.config.js") as {
   stamp: (config: Record<string, unknown>, version: string | undefined, appleTeamId?: string) => Record<string, unknown>;

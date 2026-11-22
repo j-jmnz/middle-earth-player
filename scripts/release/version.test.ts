@@ -4,7 +4,7 @@ import { branchProblem, bumpOf, nextVersion, parseCommit, parseTag, tagOf, type 
 
 const change = (subject: string, body = ""): Change => parseCommit(subject, body);
 
-describe("release versions (.claude/rules/release-standards.md, Versioning)", () => {
+describe("release versions (docs/agents/release-standards.md, Versioning)", () => {
   it("reads and writes release tags only in v<major>.<minor>.<patch>", () => {
     expect(parseTag("v1.20.3")).toEqual({ major: 1, minor: 20, patch: 3 });
     for (const tag of ["1.2.3", "v1.2", "v01.2.3", "v1.2.3-rc.1"]) expect(parseTag(tag)).toBeUndefined();
@@ -22,7 +22,7 @@ describe("release versions (.claude/rules/release-standards.md, Versioning)", ()
     expect(change("README: add an Accessibility section").type).toBeUndefined();
   });
 
-  it("reads the issues a body closes and the ones it refers to (.claude/rules/issue-standards.md, Finish)", () => {
+  it("reads the issues a body closes and the ones it refers to (docs/agents/issue-standards.md, Finish)", () => {
     const body = "Summary.\n\nSettles #11\nCloses #12\nfixes: #13, #14\nResolved #15 and #16\nRefs #17 #12\nThis line names #18 in passing.\n";
     expect(change("fix: A (#41)", body)).toMatchObject({ closes: [11, 12, 13, 14, 15, 16], refs: [17] });
     expect(change("fix: A", "Prefixes #3\nCloses issue 4")).toMatchObject({ closes: [], refs: [] });

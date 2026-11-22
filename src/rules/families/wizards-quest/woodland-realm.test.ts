@@ -1,4 +1,4 @@
-// Rules: rr.search, rr.reveal, rr.cancel, rr.first-player, rr.ownership-and-control, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 51101:B:1, 51138:A:1, 51108:B:3 (docs/brief.md, The Woodland Realm, readings 5, 7, 8 and 14).
+// Rules: rr.search, rr.reveal, rr.cancel, rr.first-player, rr.ownership-and-control, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 51101:B:1, 51138:A:1, 51108:B:3 (docs/scenarios/standalone-scenarios.md, The Woodland Realm, readings 5, 7, 8 and 14).
 // The pieces The Woodland Realm adds, on fixture cards: SearchTopReveal `maxCostStage` and `cancelable`, FlipOver `control: "firstPlayer"` and the condition questProgressNoted `min`.
 import { describe, expect, it } from "vitest";
 

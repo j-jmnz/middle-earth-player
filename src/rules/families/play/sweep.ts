@@ -134,7 +134,7 @@ export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: Engin
         next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up" });
         next = { ...next, modifiers: next.modifiers.filter((modifier) => !(modifier.instanceId === id && modifier.stat === "guardedAlly")) };
       // An objective ally in the staging area joins the first player's play area, faceup and ready, and stays with that player when the first player token moves on: "joins the first player" is one change of
-      // control, not a rule that follows the token (Grimbeorn the Old, 02037:A:2; docs/brief.md, Conflict at the Carrock).
+      // control, not a rule that follows the token (Grimbeorn the Old, 02037:A:2; docs/scenarios/shadows-of-mirkwood.md, Conflict at the Carrock).
       } else if (id && held?.zone === "staging" && instruction.intoPlay === true) next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up", exhausted: false });
       else if (id && (instruction.intoPlay !== true || instruction.follows === true) && held?.controller !== holder) next = giveControl(next, id, holder, ctx.cards);
     } else if (instruction.verb === "DiscardWhen" && modifiedStat(next, source, instruction.stat, ctx.cards) <= instruction.max) {

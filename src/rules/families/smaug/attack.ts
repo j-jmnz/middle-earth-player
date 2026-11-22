@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Battle of Lake-town), rr.attacks-outside-the-combat-phase, rr.defending-player, rr.damage, faq.enemy-attacks-outside-combat (data/rules/entries.json); ledger lines 50211:A:1, 50206:A:2, 50214:A:1.
+// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town), rr.attacks-outside-the-combat-phase, rr.defending-player, rr.damage, faq.enemy-attacks-outside-combat (data/rules/entries.json); ledger lines 50211:A:1, 50206:A:2, 50214:A:1.
 // Smaug's attack against Lake-town (Town-Baiting): Smaug, in the staging area or engaged, attacks the last player outside the combat phase and is dealt a shadow card; the last player may declare a defender, and with none the attack is undefended and all its damage goes
 // on Lake-town. A defender takes damage up to its hit points and the excess goes on Lake-town. The excess of Smaug the Magnificent's attacks goes on Lake-town too (the flag `excessToLakeTown`, read in families/defense/excess.ts). A Smaug that
 // is Reckless in His Rage cannot be defended against by allies (the flag `alliesCannotDefend`).

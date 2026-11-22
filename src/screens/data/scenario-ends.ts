@@ -1,4 +1,4 @@
-// Whether a scenario ends when its last player falls: its campaign card holds the constant `endsInDefeat` (146074:constant:1, The Black Gate Opens; docs/brief.md, The Black Gate Opens). A fixed fact of the records, read for the path's stops. Pure.
+// Whether a scenario ends when its last player falls: its campaign card holds the constant `endsInDefeat` (146074:constant:1, The Black Gate Opens; docs/scenarios/the-return-of-the-king.md, The Black Gate Opens). A fixed fact of the records, read for the path's stops. Pure.
 import type { Effect } from "../../catalog/boundary.ts";
 
 import { EFFECTS } from "../../effects";

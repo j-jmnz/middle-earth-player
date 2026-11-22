@@ -2,7 +2,7 @@
 // loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the first four parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it (a blank log keeps this part locked and the path opens Voyage Across Belegaer): it is the log
 // of `scripts/e2e/flight-of-the-stormcaller.ts` (the Voyage, Fate and Raid goldens' wins), and on top of it the one of Flight of the Stormcaller's golden ("two-handed, won"), each run through the same `applyResolution` that writes it in
-// the app, with the goldens' plain-number heroes taken out (the fixture's seats play real decklists). `voyage-won`, `fate-won`, `raid-won` and `stormcaller-won`, real-decklist wins, are open (docs/phases/STATUS.md).
+// the app, with the goldens' plain-number heroes taken out (the fixture's seats play real decklists). `voyage-won`, `fate-won`, `raid-won` and `stormcaller-won`, real-decklist wins, are open (GitHub issue #188).
 // The Campaign Setup asks no choice; the Resolution asks whether Come Together joins the pool.
 import type { CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";

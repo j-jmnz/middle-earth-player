@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.search, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, rr.ownership-and-control, ltp.scoring, docs/brief.md (The Woodland Realm) (data/rules/entries.json).
+// Rules: rr.setup, rr.search, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, rr.ownership-and-control, ltp.scoring, docs/scenarios/standalone-scenarios.md (The Woodland Realm) (data/rules/entries.json).
 import { describe, expect } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";

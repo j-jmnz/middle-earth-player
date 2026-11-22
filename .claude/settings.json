@@ -22,7 +22,19 @@
             "Bash(pnpm assets catalog)",
             "Bash(pnpm browser shot *)",
             "Bash(pnpm browser run *)",
-            "Bash(pnpm game *)"
+            "Bash(pnpm game *)",
+            "Bash(pnpm data query *)",
+            "Bash(pnpm data build)",
+            "Bash(pnpm data build *)",
+            "Bash(pnpm data check)",
+            "Bash(pnpm effects *)",
+            "Bash(pnpm doc *)",
+            "Bash(pnpm scenario *)",
+            "Bash(git status)",
+            "Bash(git status *)",
+            "Bash(git diff)",
+            "Bash(git diff *)",
+            "Bash(git log *)"
         ]
     },
     "hooks": {

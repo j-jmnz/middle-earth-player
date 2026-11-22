@@ -1,7 +1,7 @@
 // Rules: sotm.guarding-gollum, ltp.undefended-attack (data/rules/entries.json); ledger line 02130:A:1.
 //
 // "Damage from undefended attacks against you must be dealt to Gollum": the characters an undefended attack's damage goes to are only the card that holds `undefendedToHolder` and its attacked player controls. The damage a shadow effect or a treachery deals itself (Gollum's Bite,
-// Hummerhorns) is not the attack's damage and is not sent there (agent recommendation, docs/brief.md, Return to Mirkwood).
+// Hummerhorns) is not the attack's damage and is not sent there (agent recommendation, docs/scenarios/shadows-of-mirkwood.md, Return to Mirkwood).
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
 

@@ -1,5 +1,5 @@
 // Rules: emce.dragon-signs, emce.caves-deck, emce.deep, emce.guarded-x, emce.boon-allies, rr.guarded, rr.travel, rr.search, rr.winning-the-game (data/rules/entries.json); ledger lines 12175:A:2, 12175:B:5, 19018:A:1, 19019:A:3, 19020:A:2, 19022:B:1, 19024:B:1, 19025:B:3.
-// The user's rulings of 2026-11-05 for The Withered Heath (docs/brief.md, Ered Mithrin), one test each. The ruling of the Caves removal (12175:A:2) is pinned in campaign.test.ts and golden.test.ts, which chain the earlier parts' Resolutions.
+// The user's rulings of 2026-11-05 for The Withered Heath (docs/scenarios/ered-mithrin.md, Ered Mithrin), one test each. The ruling of the Caves removal (12175:A:2) is pinned in campaign.test.ts and golden.test.ts, which chain the earlier parts' Resolutions.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { settle } from "../../../rules/engine/machine.ts";

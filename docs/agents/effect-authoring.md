@@ -291,8 +291,8 @@ Read each new record against these before the review. Each one is a card bug a r
 
 ## Not expressible yet: leave open, report
 
-`pnpm effects open` lists the open lines in `src/effects/open-lines.ts`. Every player-card line is closed except
-the two below.
+`src/effects/open-lines.ts` (`pnpm effects open`) is the one list of open lines; read it, not a count here. These are the
+gaps known to the schema or the engine, with what each needs. When one closes, delete its entry.
 
 - **21072:B:1 and 21072:B:2, not expressible (Sméagol's Gollum side).** "Immune to non-Gollum card effects. Gollum engages the
   first player" and "Forced: When Gollum is defeated, flip him to Sméagol and return him to his owner's control, exhausted."

@@ -1,4 +1,4 @@
-// The investigation family (Murder at the Prancing Pony, docs/brief.md, Murder at the Prancing Pony): the Investigation deck, a pile of facedown Suspects, Hideouts and Taken by Surprise that the players look at but never draw, the Investigate X keyword, and the accusation that ends stage 2.
+// The investigation family (Murder at the Prancing Pony, docs/scenarios/standalone-scenarios.md, Murder at the Prancing Pony): the Investigation deck, a pile of facedown Suspects, Hideouts and Taken by Surprise that the players look at but never draw, the Investigate X keyword, and the accusation that ends stage 2.
 // The deck is the named pile `investigation` (src/rules/core/piles.ts). A card in it is never shown but by a look window: no step, log line or readout names a card of the pile or the hidden Suspect and Hideout set aside facedown. src/rules/families/investigation/ runs the verbs.
 import { z } from "zod";
 

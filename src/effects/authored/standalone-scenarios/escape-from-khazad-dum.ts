@@ -2,7 +2,7 @@ import type { Amount, Condition, Effect, Instruction, PickSpec } from "../../../
 import { consideredEngaged } from "../considered-engaged.ts";
 
 // Records for Escape from Khazad-dûm (standalone-scenarios cycle part 13, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) needs no record here.
-// The scenario is a kit like The Mines of Moria (src/effects/authored/standalone-scenarios/the-mines-of-moria.ts): the 1A Setup builds the Quick-build (7 of the 14 sets, the first player's stage 2 and stage 3: docs/brief.md, Escape from Khazad-dûm, reading 2) and finds the 0 cost cards,
+// The scenario is a kit like The Mines of Moria (src/effects/authored/standalone-scenarios/the-mines-of-moria.ts): the 1A Setup builds the Quick-build (7 of the 14 sets, the first player's stage 2 and stage 3: docs/scenarios/standalone-scenarios.md, Escape from Khazad-dûm, reading 2) and finds the 0 cost cards,
 // and Dark Pit lies in the staging area from the deal. "The opposing team" chooses and searches in the manner that gives the players the greatest challenge: the engine's fixed policy, never a prompt (readings 1 and 3).
 // Rules: rr.search, rr.reveal, rr.cancel, rr.explored, rr.forced, rr.travel, rr.engaged, rr.staging, rr.first-player, rr.guarded, rr.victory, rr.quest-advancement, rr.attachment-cards, rr.blank, rr.surge, rr.damage, faq.additional-attacks (data/rules/entries.json).
 const STAGE_1 = "51301";

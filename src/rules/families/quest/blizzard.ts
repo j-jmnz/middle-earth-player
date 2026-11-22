@@ -2,7 +2,7 @@
 //
 // "Progress that would be placed on the current quest or on Snow locations are instead placed on Blinding Blizzard. When the 5th progress is placed on Blinding Blizzard, discard it": a card in the staging area holding
 // progressRedirect (its constant) takes the progress that would go on the current quest stage or on a location with the Snow trait, in play or in the staging area, from questing and from a card effect alike. A Blizzard
-// takes at most what brings it to 5, is discarded as the 5th is placed, and the progress it cannot take goes on as it would have without it (the card ends the replacement itself when it leaves play; agent recommendation, docs/brief.md, The Redhorn Gate).
+// takes at most what brings it to 5, is discarded as the 5th is placed, and the progress it cannot take goes on as it would have without it (the card ends the replacement itself when it leaves play; agent recommendation, docs/scenarios/dwarrowdelf.md, The Redhorn Gate).
 // With two in the staging area the one that came first takes the progress first and the other what is left (the engine asks no player in the middle of a placement).
 import { absorbProgress } from "../angmar/sponge.ts";
 import { ruleCause } from "../../core/cause.ts";

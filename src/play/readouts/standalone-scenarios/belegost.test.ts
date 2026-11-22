@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.quest-advancement (data/rules/entries.json); docs/brief.md (The Ruins of Belegost, The table); ledger lines 50603:B:1, 50603:B:2, 50608:A:1, 50615:A:2.
+// Rules: rr.forced, rr.quest-advancement (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Ruins of Belegost, The table); ledger lines 50603:B:1, 50603:B:2, 50608:A:1, 50615:A:2.
 // The top-bar dials of The Ruins of Belegost: the resources on Stalking the Ruins against the 3 that bring Naurlhûg (it warms when the next quest phase brings him, and then says his X) and the resources on stage 2D against the 3 it asks for.
 import { describe, expect, it } from "vitest";
 

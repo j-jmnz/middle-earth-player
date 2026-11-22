@@ -1,4 +1,4 @@
-// Rules: mec108.create-staging-area, mec109.multiple-staging-areas, rr.quest-advancement, rr.victory (data/rules/entries.json); ledger lines 148003:B:1, 148003:B:3, 148004:B:2, 148007:A:2 (docs/brief.md, Fog on the Barrow-downs, The table).
+// Rules: mec108.create-staging-area, mec109.multiple-staging-areas, rr.quest-advancement, rr.victory (data/rules/entries.json); ledger lines 148003:B:1, 148003:B:3, 148004:B:2, 148007:A:2 (docs/scenarios/standalone-scenarios.md, Fog on the Barrow-downs, The table).
 //
 // The pieces Fog on the Barrow-downs' separate staging areas hold on the table. Stage 3B stays in play while no player is at it (every player trapped at a stage 4A of his own, or the one at it eliminated): it is in no seat's row, so it is a top-bar dial that names the stage and the
 // cards of its staging area, and a tap shows the stage large with its staging cards listed after it (the dial's `extra`; barrowDetail says the same in words). A player trapped at his own stage 4A wears a mark on his threat dial ("P2 · Trapped"). The quest readout does not promise what stage 3B withholds: no progress on it while a Great Barrow is in play,

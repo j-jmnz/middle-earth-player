@@ -68,7 +68,7 @@ export type Keywords = {
   uncharted: boolean;
   // Aflame X (dcce.aflame): the damage on a location that destroys it, null when the card prints none.
   aflame: number | null;
-  // The Siege value the card prints (docs/brief.md, Attack on Dol Guldur, reading 2), null when it prints none.
+  // The Siege value the card prints (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2), null when it prints none.
   siegeValue: number | null;
   pillage: number | null;
   // Burn X (The Battle of Lake-town): the burn damage a location adds to the pool "resolve all burn damage" deals, null when the card prints none.
@@ -77,7 +77,7 @@ export type Keywords = {
   grapple: "highestThreat" | "lowestThreat" | "highestQuestPoints" | "lowestQuestPoints" | null;
   // Phantom (mec113.phantom): the damage the enemy's attack would deal becomes a threat raise for the defending player (families/grey-company/).
   phantom: boolean;
-  // Spectral (docs/brief.md, The Stone of Erech): characters attacking the enemy use their Willpower instead of their Attack (families/attack/spectral.ts).
+  // Spectral (docs/scenarios/standalone-scenarios.md, The Stone of Erech): characters attacking the enemy use their Willpower instead of their Attack (families/attack/spectral.ts).
   spectral: boolean;
   // Dire (mec113.dire): read from the current quest card by families/black-gate/dire.ts.
   dire: boolean;

@@ -11,7 +11,7 @@ const code = z.string().min(1);
 
 const VERBS = [
   // Setup in Campaign Mode: each seat the Campaign Log names a captive for (`campaignFacts.heroLog.captives`) has that hero, if the seat controls it, lie faceup under the card in play with this code.
-  // A seat the log names none for is left to ask (143069:A:1, docs/brief.md, The Two Towers).
+  // A seat the log names none for is left to ask (143069:A:1, docs/scenarios/the-two-towers.md, The Two Towers).
   verbFlags(z.strictObject({ verb: z.literal("TakeLoggedCaptives"), under: code, ...when }), { setupRuns: "top" }),
   // The last picked hero becomes a Captive: it lies faceup under the card in play with this code, in play and controlled by nobody, keeping its tokens and attachments; its owner stays in the game.
   z.strictObject({ verb: z.literal("MakeCaptive"), under: code, ...when }),

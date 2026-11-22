@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Battle of Lake-town: the Smaug deck and Burn X, from the Quest Companion), rr.first-player, rr.damage (data/rules/entries.json); ledger lines 50201:A:1, 50202:B:2, 50205:A:2, 50209:A:2, 50210:A:1, 50210:A:2, 50221:A:2, 50223:A:2, 50214:A:2.
+// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town: the Smaug deck and Burn X, from the Quest Companion), rr.first-player, rr.damage (data/rules/entries.json); ledger lines 50201:A:1, 50202:B:2, 50205:A:2, 50209:A:2, 50210:A:1, 50210:A:2, 50221:A:2, 50223:A:2, 50214:A:2.
 // The choices the Lake-town engine asks that no record holds (src/rules/families/smaug/): where the first player reveals the next Smaug, each player's turn to take Burn damage on a character (exhaust one, how much of the pool it takes, or done), how many progress tokens stage 2B
 // discards to heal Lake-town, and how Fisherman's Dock's two active locations divide the progress. The keep row of the Shadow cancel offers (50209, 50210) is worded here too, since it says whether another player is asked next. Each sentence says the number, the side of the table and the
 // player; the Burn rows name the player (two-handed), and a row that loses the game, or destroys the character, is armed. Pure.
@@ -37,7 +37,7 @@ function kindOf(choose: Choose): Kind | null {
   return steps.some((step) => step.verb === "ResolveBurn" && step.assign != null) ? "share" : "burn";
 }
 
-/** The damage Lake-town holds and the limit it loses at (docs/brief.md, The Battle of Lake-town). */
+/** The damage Lake-town holds and the limit it loses at (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town). */
 const lakeNow = (game: ScenarioState): { damage: number; limit: number } => ({ damage: lakeTownDamage(game), limit: lakeTownLimit(game) });
 
 // The first of `seats` the engine asks next: the one with a ready character that can still take damage (families/smaug/burn.ts skips the others), or null.

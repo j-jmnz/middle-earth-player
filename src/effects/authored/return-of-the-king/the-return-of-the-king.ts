@@ -79,7 +79,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     {"verb":"RemoveFromPoolByCode","codes":[WRAITH_ON_WINGS],"perCopyInVictory":true},
     {"verb":"Earn","codes":[GWAIHIR],"when":{"kind":"controls","code":GWAIHIR}},
     {"verb":"IgnoreDiscardedHeroes"}]},
-  // The Black Gate Opens has no win (146073:B:3): it ends when the last player is eliminated, and that end runs this Resolution as a win does (user decision, 2026-11-12; docs/brief.md, The Return of the King). The campaign card is in the game for it, in the campaign zone.
+  // The Black Gate Opens has no win (146073:B:3): it ends when the last player is eliminated, and that end runs this Resolution as a win does (user decision, 2026-11-12; docs/scenarios/the-return-of-the-king.md, The Return of the King). The campaign card is in the game for it, in the campaign zone.
   {"id":"146074:constant:1","cardCode":"146074","lines":["146074:B:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"endsInDefeat","amount":1,"until":"whileSourceInPlay","target":"table"}]},
 
   // 146079 Mount Doom. Setup: no +1 for changing heroes; X resource tokens are placed on the card (the campaign card is kept in the game: it has a Forced), X the tokens recorded for The Black Gate in the campaign log (0 with no record); the burdens of Helm's Deep, The Road to Isengard and The Passing of the Grey Company

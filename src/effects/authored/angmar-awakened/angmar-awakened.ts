@@ -24,7 +24,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // 10159 The Weather Hills. Resolution: the damage on Protect the Innocent replaces the number in the log, and each of Mysterious Omens' boons attached to a hero is recorded with it.
   { id: "10159:resolution:1", cardCode: "10159", lines: ["10159:B:1"], timing: "resolution", instructions: [{ verb: "RecordDamageOn", codes: [PROTECT_THE_INNOCENT] }, { verb: "EarnAttached", codes: MYSTERIOUS_OMENS_BOONS }] },
 
-  // 10166 Deadmen's Dike. Resolution: the damage on Protect the Innocent is noted, Protect the Innocent leaves the pool and Arnor Ravaged takes its place, the first player chooses Iârion's Pendant or Amarthiúl's Courage for the group and which player takes it, the Omens boons attached to heroes are recorded with them, and the burden Thaurdir carried (or a hero holds now) joins the pool (to "player": fixed to that seat, as 11197:B:1 does; docs/brief.md, Angmar Awakened).
+  // 10166 Deadmen's Dike. Resolution: the damage on Protect the Innocent is noted, Protect the Innocent leaves the pool and Arnor Ravaged takes its place, the first player chooses Iârion's Pendant or Amarthiúl's Courage for the group and which player takes it, the Omens boons attached to heroes are recorded with them, and the burden Thaurdir carried (or a hero holds now) joins the pool (to "player": fixed to that seat, as 11197:B:1 does; docs/scenarios/angmar-awakened.md, Angmar Awakened).
   { id: "10166:resolution:1", cardCode: "10166", lines: ["10166:B:1"], timing: "resolution", instructions: [
     { verb: "RecordDamageOn", codes: [PROTECT_THE_INNOCENT] },
     { verb: "RemoveFromPoolByCode", codes: [PROTECT_THE_INNOCENT] },

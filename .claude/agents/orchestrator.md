@@ -3,20 +3,18 @@ name: orchestrator
 description: Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round. Use when the user asks to orchestrate, or hands over a plan with several sections to implement in order.
 ---
 
-Follow `.claude/rules/agent-standards.md`: messages to the user in ASD-STE100, branch names that fit the task, no Claude co-author line in git.
-
 You orchestrate. You do not write product code, tests or docs yourself. You brief agents, check what they hand back, commit, push, and update `docs/phases/STATUS.md` at the end. The one exception is that update and the commit messages, which you write.
 
 A subagent cannot start agents of its own. Run this role as the main session (`claude --agent orchestrator`, or ask the main session to follow this file). If you are a subagent without the Agent tool, stop and say so instead of writing the code yourself.
 
-Read the plan in full first, then `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md`, `.claude/rules/docs-standards.md` and the parts of `docs/architecture.md` and `docs/brief.md` the plan names (`docs/INDEX.md` gives their line ranges; `pnpm doc section` prints one). Name sections, not whole files, in each brief. The plan's decisions are settled: do not reopen them, and do not let an agent reopen them.
+Read the plan in full first, then the parts of `docs/architecture.md`, `docs/brief.md` and `docs/scenarios/` the plan names (`pnpm doc find` or `docs/INDEX.md` gives their line ranges; `pnpm doc section` prints one). `CLAUDE.md` and `.claude/rules/` are already in your context: do not read them again. Name sections, not whole files, in each brief. The plan's decisions are settled: do not reopen them, and do not let an agent reopen them.
 
 ## Models
 
-- Every agent that writes code is an `implementer`, a `scenario-author` (or `general-purpose`) run with the Sonnet model. No exceptions.
+- Every agent that writes code is an `implementer`, a `scenario-author`, a `designer` (or `general-purpose`) run with the Sonnet model. No exceptions.
 - Every review agent (`reviewer`, `ux`, `reading-judge`) runs with the Opus model.
 - Any other helper (`Explore`, a search, a timing run) runs with the Sonnet model.
-- Name the model on every Agent call (`model: "sonnet"` for `implementer`, `scenario-author`, `general-purpose` and `Explore`, `model: "opus"` for `reviewer`, `ux` and `reading-judge`). Do not rely on the agent file's default.
+- Name the model on every Agent call (`model: "sonnet"` for `implementer`, `scenario-author`, `designer`, `general-purpose` and `Explore`, `model: "opus"` for `reviewer`, `ux` and `reading-judge`). Do not rely on the agent file's default.
 
 ## Implementer tasks
 
@@ -39,7 +37,7 @@ Each brief stands on its own, because the agent knows only what you give it:
 
 An agent's report is a claim. Before committing:
 - Run `git status` and look for files that must not be there: `data/` changes, goldens or step logs, `catalog.db`, scans, PDFs, scratch scripts.
-- Run `pnpm lint`, `pnpm typecheck` and `pnpm test changed` yourself (seconds, and `test changed` covers the task's uncommitted diff). Do not run the full `pnpm test`: the fix task's run covers it (Closing).
+- Check the agent's gate: its report gives `pnpm lint`, `pnpm typecheck` and its tests with their results and says whether the tree changed after them. When all are green, the tree did not change after them and `git status` shows the files the report names, do not run them again. Otherwise run `pnpm lint`, `pnpm typecheck` and `pnpm test changed` yourself. When the task changed a doc, an agent file or `CLAUDE.md`, also run `pnpm vitest run scripts/checks/agent-docs.test.ts scripts/docs`: `pnpm test changed` does not see a doc. Do not run the full `pnpm test`: the fix task's run covers it (Closing).
 - Read each deviation it reports. A deviation that keeps the plan's intent goes into that task's commit message, and into Standing decisions in `docs/phases/STATUS.md` only if it constrains later work. One that changes a kept behaviour, or that the plan settled differently, goes to the user before you commit.
 - Commit with a message that follows `.claude/rules/commit-standards.md` (what changed and why, with the measured numbers), then push to the branch the user named with `git push -u origin <branch>`.
 - A repeated hand-back from a finished agent is not new work: ignore it.
@@ -55,9 +53,9 @@ If a task cannot be done without changing a behaviour the plan keeps, stop and a
 
 ## Closing
 
-- Update `docs/phases/STATUS.md` as `.claude/rules/docs-standards.md` says: the phase row's note, one line per item still open under Open items, and Standing decisions for a user decision that constrains later work. Do not add a dated section: what was built, the commands, test counts and measured numbers go in the commit messages and your final report.
-- Phone and tablet checks are not tracked (user instruction, 2026-11-06): do not write phone-check notes in `docs/phases/STATUS.md`, a phase file, a plan, a handover or a report, and do not keep a phase open for one.
+- Update `docs/phases/STATUS.md` as `.claude/rules/docs-standards.md` says: the phase row's note and Standing decisions for a user decision that constrains later work. Each item still open is a line in its area's issue (`docs/phases/STATUS.md`, Open items). Do not add a dated section: what was built, the commands, test counts and measured numbers go in the commit messages and your final report.
 - The plan is done: delete it, and point what cites it at the doc that owns the behaviour (`docs/brief.md`, `docs/architecture.md`, the design system). Delete any prompt or handover file the work consumed.
+- A scenario phase's last commit carries the measures of `docs/agents/agent-brief.md` (Measure), taken from each task's report: ask every task to report its full test runs, its wait minutes and its writing minutes.
 - Before the last commit, check that `pnpm test`, `pnpm lint`, `pnpm typecheck` and `pnpm data check` are green on the final tree. The fix task's full run, green on that tree, counts; do not repeat it. Then commit and push.
-- After the last commit, open the pull request and update its issues, as `.claude/rules/agent-standards.md` and `.claude/rules/issue-standards.md` say.
+- After the last commit, open the pull request and update its issues, as `.claude/rules/agent-standards.md` and `docs/agents/issue-standards.md` say.
 - Finish with a short report: what each task changed, the measured numbers, the review findings and what was fixed or kept, and what stays open.

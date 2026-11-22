@@ -3,7 +3,7 @@ import type { Effect, Instruction } from "../../../../catalog/boundary.ts";
 import { BLACK_GATE_TOKENS, EACH_PLAYER, GWAIHIR, STAGE_1, STAGE_2 } from "./shared.ts";
 
 // Records for the quest stages of The Black Gate Opens (146072, 146073). The cards the quest card's piles place (The Black Gate and The Mouth of Sauron in the staging area, Gwaihir set aside) are dealt by the data; no record places them.
-// Dire is a keyword the data reads from each stage. Every line is read from the scan ledger (data/printed/the-return-of-the-king.json). See docs/brief.md, The Return of the King, for each reading.
+// Dire is a keyword the data reads from each stage. Every line is read from the scan ledger (data/printed/the-return-of-the-king.json). See docs/scenarios/the-return-of-the-king.md, The Return of the King, for each reading.
 // Rules: mec113.dire, mec113.saga-staging-rules, rr.in-player-order, rr.first-player, rr.cancel, rr.search, rr.quest-advancement, faq.progress-without-advancing (data/rules/entries.json).
 
 // 146072:B:1, the Embassy from the Dark Tower. The players place faceup cards (four in all, round robin); four encounter cards lie faceup; each player card, from the highest cost down, is paired with the highest Threat encounter card left (the first player decides a tie: each Pick is his);

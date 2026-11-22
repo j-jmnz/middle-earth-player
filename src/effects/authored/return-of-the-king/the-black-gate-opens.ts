@@ -8,7 +8,7 @@ import { STAGE_RECORDS } from "./black-gate/stages.ts";
 
 // Records for The Black Gate Opens (the-return-of-the-king part 5, campaign card 146074, whose Setup and Resolution records are in the-return-of-the-king.ts): the locations, The Mouth of Sauron, the enemies and treacheries, and Gwaihir; the quest stages are in
 // return-of-the-king/black-gate/stages.ts. The cards the quest card's piles place or set aside are dealt by the data; no record places them. Every line is read from the scan ledger (data/printed/the-return-of-the-king.json); a line a template already writes (pnpm data build) or another
-// card prints word for word needs no record here. See docs/brief.md, The Return of the King, for each reading.
+// card prints word for word needs no record here. See docs/scenarios/the-return-of-the-king.md, The Return of the King, for each reading.
 // Rules: mec113.dire, mec113.saga-staging-rules, mec113.immune-to-player-card-effects, mec113.peril, rr.cannot, rr.active-location, rr.travel, rr.first-player, rr.defending-player, rr.engaged, rr.staging, rr.reveal, rr.cancel, rr.damage, rr.effects, rr.lasting-effects, rr.immune,
 // rr.printed, rr.attachment-cards, faq.lasting-effects, faq.enemy-attacks-outside-combat, faq.peril-attacks, faq.additional-attacks, faq.next-player, rr.search (data/rules/entries.json).
 const NAZGUL_NOT_MOUNTED: PickSpec = { type: "enemy", control: "any", staging: true, trait: "Nazgûl", hasAttachment: { names: ["Hell-hawk", "Fell Beast"], none: true } };

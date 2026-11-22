@@ -1,4 +1,4 @@
-// Rules: rr.destroy, rr.explored, rr.the-word-choose, rr.forced, mec109.indestructible (data/rules/entries.json); ledger lines 50907:A:1, 50931:B:1, 50931:B:2, 50930:A:2, 50903:B:2 (docs/brief.md, Attack on Dol Guldur, readings 4, 5, 6, 8 and 18).
+// Rules: rr.destroy, rr.explored, rr.the-word-choose, rr.forced, mec109.indestructible (data/rules/entries.json); ledger lines 50907:A:1, 50931:B:1, 50931:B:2, 50930:A:2, 50903:B:2 (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, readings 4, 5, 6, 8 and 18).
 // The pieces Attack on Dol Guldur adds, on fixture cards: TallySiege and the amount siegeTally, SelectRandomStage with the condition optionTaken, the flag losesIndestructible, an `early` Forced effect and AdvanceToStage `again`.
 import { describe, expect, it } from "vitest";
 

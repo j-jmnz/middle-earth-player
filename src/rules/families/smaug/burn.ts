@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Battle of Lake-town: Burn X, from the Quest Companion), rr.damage, rr.exhausted (data/rules/entries.json); ledger lines 50205:A:2, 50210:A:1, 50221:A:2, 50215:A:1, 50214:A:2.
+// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town: Burn X, from the Quest Companion), rr.damage, rr.exhausted (data/rules/entries.json); ledger lines 50205:A:2, 50210:A:1, 50221:A:2, 50215:A:1, 50214:A:2.
 // "Resolve all burn damage from all locations in play": the Burn X of every location in the staging area or an active slot, added up when it resolves, plus the 1 each location gains from West Pier (`locationsGainBurn`, itself included). Each player in turn,
 // from the first player, may exhaust any number of ready characters he controls and assign any amount of the pool to each, up to its remaining hit points; what is left goes on Lake-town. The damage on a character is an encounter card effect's.
 // The question is a Choose (windows/choices.ts) whose options run this verb again with the pool, the seats still to answer and the character just exhausted, so a saved game replays it.

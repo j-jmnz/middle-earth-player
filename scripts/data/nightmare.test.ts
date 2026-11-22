@@ -12,7 +12,7 @@ import { RAW_DIR } from "./paths.ts";
 import { namesMatch, type DriveFile } from "./sources/jvzijp.ts";
 import { cardListPath, deckFiles, nightmareFiles, parseCardList, parseNightmareFile } from "./sources/nightmare.ts";
 
-// The Nightmare decks (docs/brief.md, Nightmare): every card of the 72 decks is built, each deck's card list on Drive agrees
+// The Nightmare decks (docs/scenarios/nightmare.md, Nightmare): every card of the 72 decks is built, each deck's card list on Drive agrees
 // with Hall of Beorn's copies, every side but one has its picture, and the nine built scenarios that have a deck carry it.
 const cards = loadCards();
 const nightmare = cards.filter(isNightmareCard);

@@ -30,7 +30,7 @@ export default function CampaignSetup() {
   const [taking, setTaking] = useState<string | null>(null);
   // The Hard/Expert Mode card each briefing offers first, in a campaign with XP (dcce.hard-expert).
   const [mode, setMode] = useState<ModeCard | null>(null);
-  // The finished save of the box before this one that this save continues, or null (docs/brief.md, The Two Towers).
+  // The finished save of the box before this one that this save continues, or null (docs/scenarios/the-two-towers.md, The Two Towers).
   const [continuing, setContinuing] = useState<string | null>(null);
   const { carry, continues } = useCarryChoices(catalog, user, campaignId);
   // Set by the first press, so a second tap before the screen is replaced cannot make another save.

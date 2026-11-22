@@ -1,7 +1,7 @@
 import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
 // Records for Return to Mirkwood (shadows-of-mirkwood cycle part 6, no campaign card). The player guarding Gollum is the controller of the Gollum objective ally (02130); the records name him with `who: "guardian"` and a ForEachPlayer with `seats: "guardian"` (src/rules/families/guardian/).
-// Rules: sotm.guarding-gollum, sotm.setup-return-to-mirkwood, rr.first-player, rr.forced, rr.then, rr.cannot, rr.destroy, rr.active-location, rr.staging, rr.in-play-and-out-of-play (data/rules/entries.json); the readings are in docs/brief.md (Return to Mirkwood).
+// Rules: sotm.guarding-gollum, sotm.setup-return-to-mirkwood, rr.first-player, rr.forced, rr.then, rr.cannot, rr.destroy, rr.active-location, rr.staging, rr.in-play-and-out-of-play (data/rules/entries.json); the readings are in docs/scenarios/shadows-of-mirkwood.md (Return to Mirkwood).
 const GOLLUM = "02130";
 const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
 const OTHER_PLAYER: PickSpec = { type: "player", control: "other" };
@@ -10,7 +10,7 @@ const OTHER_PLAYER: PickSpec = { type: "player", control: "other" };
 type Choice = Extract<Instruction, { verb: "Choose" }>;
 const CHANGE: Choice["options"][number]["instructions"] = [{ verb: "Pick", pick: OTHER_PLAYER }, { verb: "ChangeGuardian" }];
 const CAN_CHANGE: Condition = { kind: "guardianCanChange" };
-// "That player must choose a new player to guard Gollum, if able" (the Tantrum cards, 02135:A:1, 02136:A:1, 02137:A:1): only the player who guarded him before the effect chooses, after the sentence before it, whether or not that did anything (docs/brief.md, Return to Mirkwood).
+// "That player must choose a new player to guard Gollum, if able" (the Tantrum cards, 02135:A:1, 02136:A:1, 02137:A:1): only the player who guarded him before the effect chooses, after the sentence before it, whether or not that did anything (docs/scenarios/shadows-of-mirkwood.md, Return to Mirkwood).
 const MUST_CHANGE: Instruction = { verb: "Choose", who: "guardian", options: [{ id: "change", requires: CAN_CHANGE, instructions: CHANGE }] };
 const GUARDIAN = (...instructions: Instruction[]): Instruction => ({ verb: "ForEachPlayer", order: "firstFirst", seats: "guardian", instructions } as Instruction);
 

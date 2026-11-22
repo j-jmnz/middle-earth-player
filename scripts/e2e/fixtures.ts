@@ -8,7 +8,7 @@
 //
 // With a scenario id, a part after the first takes the earlier parts' won games from their committed files, so the other files are not rewritten.
 //
-// `won` and `knife-lost` are open (docs/phases/STATUS.md): with the rules as the sources state them, the search has found no
+// `won` and `knife-lost` are open (GitHub issue #188): with the rules as the sources state them, the search has found no
 // legal win of the two decks the search played, so they are not committed, and the tests that replay them are skipped until they are.
 //
 // `won`: The One Deck (with the saga Frodo) and Stealth and Steadfastness, two-handed, Easy, parked on the first Resolution choice. The naive auto-player loses every
@@ -338,7 +338,7 @@ function position(order: readonly string[], id: string): number {
   return at;
 }
 
-// The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so
+// The won game is open: no legal win of the two starter decks has been found on this engine (GitHub issue #188), so
 // the search runs only when asked, and `won` and `knife-lost` are written only when it finds one.
 void runScript("e2e-fixtures", async () => {
   const searching = process.argv.includes("--won");

@@ -52,7 +52,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("PlaceToken"), amount: z.number().int().positive().optional(), ...when }),
   // Campaign Setup: "Place X resource tokens on this card, where X is the number of resource tokens on The Black Gate, as recorded in the campaign log" (146079:A:1). The campaign card, which the game keeps because it has a Forced effect, takes `amount` resource tokens (an amount: `recorded`, 0 with no record). The engine deals it in Setup.
   verbFlags(z.strictObject({ verb: z.literal("PlaceTokensOnCampaignCard"), amount: positiveAmountSchema, ...when }), { setupRole: "dealt" }),
-  // The Two Towers' campaign cards (docs/brief.md, The Two Towers; src/campaign/checklist-two-towers.ts deals the Setup ones, src/rules/families/campaign/resolution.ts runs the Resolution ones).
+  // The Two Towers' campaign cards (docs/scenarios/the-two-towers.md, The Two Towers; src/campaign/checklist-two-towers.ts deals the Setup ones, src/rules/families/campaign/resolution.ts runs the Resolution ones).
   // Campaign Setup: these cards leave the Campaign Pool ("Remove Gildor Inglorion and Mr. Underhill from the Campaign Pool", 143071:A:2). The log loses them; a card on a hero goes with it.
   z.strictObject({ verb: z.literal("RemovePoolCards"), codes: z.array(code).min(1) }),
   // Campaign Setup: the pool's burdens of these burden sets are not dealt this scenario ("Remove each burden with the following burden set icons from the encounter deck", 143071:A:2, 143077:A:2, 143081:A:2;
@@ -92,7 +92,7 @@ const VERBS = [
   // Resolution: the enemies facedown underneath the card with this code are recorded in the Campaign Log by card code and quantity ("Record the name and quantity of each enemy underneath The Black Gate in the notes
   // section of the campaign log", 144069:B:1).
   z.strictObject({ verb: z.literal("RecordUnderneath"), code, ...when }),
-  // The Return of the King's campaign cards (docs/brief.md, The Return of the King; src/campaign/checklist.ts deals the Setup one, src/rules/families/campaign/saga-end.ts runs the Resolution ones).
+  // The Return of the King's campaign cards (docs/scenarios/the-return-of-the-king.md, The Return of the King; src/campaign/checklist.ts deals the Setup one, src/rules/families/campaign/saga-end.ts runs the Resolution ones).
   // Campaign Setup: the first player may raise each player's threat by `raiseThreat` for this game to search his deck for the card and add it to his hand ("The first player may raise each player's threat by 1 to search his deck
   // for Andúril and add it to his hand", 145066:A:1). The card is taken from the deck, or from the pool where step 7 would shuffle it in, and joins the hand after the mulligan; with no copy to find nothing is asked.
   z.strictObject({ verb: z.literal("SearchDeckForCard"), code, raiseThreat: z.number().int().positive() }),
@@ -105,7 +105,7 @@ const VERBS = [
   // Campaign Setup: each player in turn may search their deck for a boon card and add it to their opening hand, after the mulligan ("Each player may search their deck for a boon and add it to their hand", 10193:A:2). A boon the pool holds is in the deck by then.
   // The checklist deals it (src/campaign/checklist.ts), so it changes nothing in the game.
   z.strictObject({ verb: z.literal("SearchBoonToHand") }),
-  // Angmar Awakened's Campaign Log (docs/brief.md, Angmar Awakened; src/campaign/log-angmar-awakened.ts). Resolution: the damage on the cards in play with these codes is added up and noted in the log's "Damage on: Protect the Innocent / Arnor Ravaged"
+  // Angmar Awakened's Campaign Log (docs/scenarios/angmar-awakened.md, Angmar Awakened; src/campaign/log-angmar-awakened.ts). Resolution: the damage on the cards in play with these codes is added up and noted in the log's "Damage on: Protect the Innocent / Arnor Ravaged"
   // row, replacing the previous number ("Note the amount of damage on Protect the Innocent in the Campaign Log", 10156:B:1). A card of two sides is two codes; with none in play the note is 0.
   z.strictObject({ verb: z.literal("RecordDamageOn"), codes: z.array(code).min(1), ...when }),
   // Resolution: the damage on each hero in play is noted in the log's "Damage on Heroes" row by hero code, replacing the previous notes ("Note the amount of damage on each hero at the end of the game", 10188:B:1). A hero out of play has none to note.
@@ -125,14 +125,14 @@ const VERBS = [
   z.strictObject({ verb: z.literal("IgnoreDiscardedHeroes"), ...when }),
   // Resolution: the saga ends, the players winning or losing the campaign ("Keep The One Ring ... the players lose the campaign", "Destroy The One Ring ... the players win the campaign", 146079:B:2, 146079:B:3). The Campaign Log records it.
   z.strictObject({ verb: z.literal("EndCampaign"), result: z.enum(CAMPAIGN_ENDS), ...when }),
-  // The Battle of the Pelennor Fields' campaign card (docs/brief.md, The Return of the King). Campaign Setup: the first player attaches these cards to the hero with this code and sets him aside, out of play ("The first player attaches Andúril and Banner of Elendil
-  // to Aragorn and sets him aside, out of play", 145078:A:1). The attachments come from the supply; the hero and they leave no `leftPlay` behind (nothing in play left it) and the hero is set aside with an empty resource pool (Setup runs before the first round) and returns with an empty one (docs/brief.md, The Return of the King, 145072:A:1).
+  // The Battle of the Pelennor Fields' campaign card (docs/scenarios/the-return-of-the-king.md, The Return of the King). Campaign Setup: the first player attaches these cards to the hero with this code and sets him aside, out of play ("The first player attaches Andúril and Banner of Elendil
+  // to Aragorn and sets him aside, out of play", 145078:A:1). The attachments come from the supply; the hero and they leave no `leftPlay` behind (nothing in play left it) and the hero is set aside with an empty resource pool (Setup runs before the first round) and returns with an empty one (docs/scenarios/the-return-of-the-king.md, The Return of the King, 145072:A:1).
   verbFlags(z.strictObject({ verb: z.literal("SetAsideHeroWithAttachments"), hero: code, attach: z.array(code).min(1) }), { setupRole: "dealt" }),
   // The first player takes control of the set aside hero with the code, with the cards attached to him ("the first player takes control of Aragorn", 145072:A:1). He enters play ready under the first player; with no such hero set aside nothing happens.
   z.strictObject({ verb: z.literal("ReturnSetAsideHero"), code, ...when }),
   // Campaign Setup: each enemy recorded in the Campaign Log under The Black Gate with this trait is set aside, out of play, one copy for each recorded ("Set each Harad enemy recorded in the campaign log aside, out of play", 145078:A:1). With no log, nothing is set aside.
   verbFlags(z.strictObject({ verb: z.literal("SetAsideLogged"), trait: z.string().min(1) }), { setupRole: "dealt" }),
-  // The Tower of Cirith Ungol's campaign card (docs/brief.md, The Return of the King). Campaign Setup: A Heavy Burden-like card from the supply is attached to the hero that has the card `with` attached ("Attach A Heavy Burden to the hero with Last of the Company attached", 146069:A:1). It resolves after the quest card's Setup,
+  // The Tower of Cirith Ungol's campaign card (docs/scenarios/the-return-of-the-king.md, The Return of the King). Campaign Setup: A Heavy Burden-like card from the supply is attached to the hero that has the card `with` attached ("Attach A Heavy Burden to the hero with Last of the Company attached", 146069:A:1). It resolves after the quest card's Setup,
   // which attaches `with`; with no such hero nothing happens.
   verbFlags(z.strictObject({ verb: z.literal("AttachToHeroWith"), code, with: code }), { setupRole: "afterSetup" }),
   // Campaign Setup: each player in turn chooses a boon of the campaign pool with this trait, other than `except`, from the pool cards dealt to them, and sets it aside, out of play: it is left out of their deck this game ("Each player chooses an Item boon (excluding Andúril) from the campaign pool and sets it aside, out of play", 146069:A:1).
@@ -147,7 +147,7 @@ const VERBS = [
 
 const TRIGGERS = [] as const;
 const FLAGS = [
-  // On "table" (target `table`), from the campaign card, for the whole scenario: the scenario has no win, and it ends when the last player is eliminated, which runs the Resolution as a win does (The Black Gate Opens, 146073:B:3 and 146074:B:1; docs/brief.md,
+  // On "table" (target `table`), from the campaign card, for the whole scenario: the scenario has no win, and it ends when the last player is eliminated, which runs the Resolution as a win does (The Black Gate Opens, 146073:B:3 and 146074:B:1; docs/scenarios/the-return-of-the-king.md,
   // The Return of the King). The last seat is not marked eliminated, so the Resolution reads the state as it stood when it fell. Held by no other scenario: every other scenario's loss writes nothing.
   "endsInDefeat",
 ] as const;

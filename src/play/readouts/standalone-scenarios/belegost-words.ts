@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Ruins of Belegost, The table), rr.forced (data/rules/entries.json); ledger lines 50603:B:1, 50603:B:2, 50608:A:1, 50615:A:2. The words of the pieces The Ruins of Belegost's cards hold on the table (belegost.ts beside it): the
+// Rules: docs/scenarios/standalone-scenarios.md (The Ruins of Belegost, The table), rr.forced (data/rules/entries.json); ledger lines 50603:B:1, 50603:B:2, 50608:A:1, 50615:A:2. The words of the pieces The Ruins of Belegost's cards hold on the table (belegost.ts beside it): the
 // resources on Stalking the Ruins against the number that brings Naurlhûg, and the resources on stage 2D against the number its stage asks for. Pure.
 
 /** The resources on Stalking the Ruins, the way the dial's note says it: Naurlhûg is set aside, in the staging area or engaged. `x` is Naurlhûg's X. */

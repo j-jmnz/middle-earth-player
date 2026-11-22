@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.player-elimination (data/rules/entries.json); docs/brief.md (The Siege of Annúminas, The table); ledger lines 50801:B:2, 50812:A:1, 50812:A:2, 50814:A:2, 50820:A:2.
+// Rules: rr.forced, rr.player-elimination (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Siege of Annúminas, The table); ledger lines 50801:B:2, 50812:A:1, 50812:A:2, 50814:A:2, 50820:A:2.
 // The top-bar dial of The Siege of Annúminas: the city strength, with the damage the end of the round brings.
 import { describe, expect, it } from "vitest";
 

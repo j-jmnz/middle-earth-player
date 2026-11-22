@@ -117,7 +117,7 @@ describe("The Shadows of Mirkwood cycle", () => {
   });
 });
 
-// Each scenario's Nightmare deck (docs/brief.md, Nightmare): the setup card, the copies its side B removes (the totals are the printed lists') and the copies of the deck shuffled in.
+// Each scenario's Nightmare deck (docs/scenarios/nightmare.md, Nightmare): the setup card, the copies its side B removes (the totals are the printed lists') and the copies of the deck shuffled in.
 const NIGHTMARE = {
   "the-hunt-for-gollum": { prefix: "9004", setup: "900401", removed: 20, added: 19, setAside: [] },
   "conflict-at-the-carrock": { prefix: "9005", setup: "900501", removed: 28, added: 18, setAside: ["02038", "02039", "02040", "02041"] },
