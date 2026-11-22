@@ -422,7 +422,7 @@ Universal rules, which decide whether a deck is ready to play, are the Rules Ref
 Fellowship rules (Fellowship of the Ring, above) run on the briefing loadout, not on the saved deck. MEC109 says Frodo is the only Ring-bearer in this box.
 
 - The hero count runs on the saved deck. The saga rules run on the loadout.
-- The Ring-bearer slot is required when the saved deck has no Ring-bearer, and unused when it already has one. A fourth hero is legal only when the extra hero is that Ring-bearer.
+- The Ring-bearer slot is required when the saved deck has no Ring-bearer, and unused when it already has one. A fourth hero is legal only when the extra hero is that Ring-bearer; a deck whose contract allows four heroes (Bond of Friendship) starts with its four and the Ring-bearer.
 - Two-handed play requires a single Ring-bearer across the table. It does not reject two decks that share some other unique card.
 
 A saved deck does not have to be legal for any particular campaign. The briefing picks one saved deck per seat, offers only a deck that is ready to play, and refuses to deal when the loadout fails. The error names the card and the rule.
