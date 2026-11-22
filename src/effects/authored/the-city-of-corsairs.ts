@@ -248,7 +248,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     lines: ["12157:A:1"],
     timing: "whenRevealed",
     instructions: [
-      { verb: "Each", pick: SHIP_ENEMIES, instructions: [{ verb: "DealShadowTo", target: "picked", inPlay: true }] },
+      { verb: "Each", pick: SHIP_ENEMIES, instructions: [{ verb: "DealShadowTo", target: "picked" }] },
       { verb: "Each", pick: SHIP_ENEMIES, instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: -10, until: "endOfRound", target: "picked" }], when: OFF_COURSE },
     ],
   },
