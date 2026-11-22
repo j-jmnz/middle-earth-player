@@ -12,7 +12,7 @@ import { fireForced } from "../../../rules/windows/triggers.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 import { play } from "../../../../test/harness/card-spec-play.ts";
 import { answer, attack, cardSpecs, damageOn, deckCount, exhausted, quest, rowProblems, threat, withoutLine, zone, type Row } from "../../../../test/harness/card-spec.ts";
-import { finish, idOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
+import { fightEnemy, finish, idOf, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "passage-through-mirkwood";
 const SPAWN = "900102";
@@ -53,6 +53,29 @@ describe("the false case of each condition", () => {
   });
   it("900108:A:3 a defended attack discards no attachment", () => {
     holds({ layout: { attached: [{ code: "attachment", to: "dh2" }] }, act: attack("f3", { shadow: CAMP }), expect: zone("attachment", "play") }, "900108:A:3");
+  });
+});
+
+// "Shadow: Choose and exhaust 1 character you control. If this attack was undefended, also deal that character 2 damage." Reading (agent recommendation, docs/scenarios/nightmare.md): with every character already exhausted the player still
+// chooses one; it is not exhausted again, and the undefended attack deals it the 2 damage (rr.effects, rr.exhausted).
+describe("Spiders of Mirkwood's Shadow with every character exhausted", () => {
+  const fought = (effects: readonly Effect[]) => {
+    const build = (made: Layout) => {
+      const t = tableFromLayout(ID, made, { effects });
+      let state = t.state;
+      for (const id of [t.hero, t.hero2]) state = updateCard(state, id, { exhausted: true });
+      return { ...t, state };
+    };
+    return fightEnemy(build, SPIDERS, "f3", {}, { undefended: true });
+  };
+  // Read while the attack is still in progress (`during`): the refresh phase after it readies everything.
+  const damageOf = (done: ReturnType<typeof fought>) => [done.made.hero, done.made.hero2].reduce((sum, id) => sum + (done.during.cards[id]?.damage ?? 0), 0);
+
+  it("900105:A:2 an exhausted character is a legal choice: it stays exhausted and takes 2 damage on top of the attack's 1", () => {
+    const done = fought(EFFECTS);
+    expect([done.made.hero, done.made.hero2].map((id) => done.during.cards[id]?.exhausted)).toEqual([true, true]);
+    expect(damageOf(done)).toBe(1 + 2);
+    expect(damageOf(fought(withoutLine(EFFECTS, "900105:A:2")))).toBe(1);
   });
 });
 
