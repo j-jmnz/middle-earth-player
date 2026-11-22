@@ -50,6 +50,8 @@ export type EngineStep =
   | { kind: "removeSet"; set: string; count: number }
   | { kind: "shuffleSet"; set: string; count: number }
   | { kind: "resetEncounterDeck"; count: number; cause: Cause }
+  // A named deck with a discard pile of its own ran out and the discard pile was shuffled back into it (the Corsair, Evil Creatures, Balrog and Smaug decks): `deck` is the deck's zone, `count` the cards that went back.
+  | { kind: "reshuffleDeck"; deck: string; count: number; cause: Cause }
   // Discover X resolved for the active location: the cards looked at (top of the encounter deck first), the Loot objective attached to it as a guarded objective and the Hazard card revealed, if any (emce.discover). The rest went to the encounter discard pile.
   | { kind: "discover"; locationId: string; looked: readonly string[]; loot?: string; hazard?: string; cause: Cause }
   // A card from the encounter discard pile was set aside for the Resolution to add a copy of to the campaign pool (A Growing Threat, 12167:A:2; emce.campaign-pool-encounter): the card that did it and the card set aside.

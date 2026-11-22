@@ -30,6 +30,7 @@ export function momentSounds(before: ScenarioState, steps: readonly EngineStep[]
         break;
       case "shuffleSet":
       case "resetEncounterDeck":
+      case "reshuffleDeck":
         hear("card.shuffle");
         break;
       // The hand a mulligan deals, and any card the Setup effects draw: before the first round.

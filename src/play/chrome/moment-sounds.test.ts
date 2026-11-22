@@ -37,6 +37,7 @@ describe("moment sounds", () => {
     const game = state("Encounter");
     expect(momentSounds(game, [{ kind: "shuffleSet", set: "Orcs", count: 2 }], game, cards)).toEqual(["card.shuffle"]);
     expect(momentSounds(game, [{ kind: "resetEncounterDeck", count: 9, cause }], game, cards)).toEqual(["card.shuffle"]);
+    expect(momentSounds(game, [{ kind: "reshuffleDeck", deck: "corsairDeck", count: 4, cause }], game, cards)).toEqual(["card.shuffle"]);
   });
 
   it("deals before the first round only: the same draw in a round is the motion's", () => {

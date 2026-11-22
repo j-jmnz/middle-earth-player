@@ -45,6 +45,13 @@ export const PILE_WORDS: Readonly<Record<PileId, string>> = {
   victory: "Victory display",
 };
 
+const WORDS_BY_ZONE: Readonly<Record<string, string>> = PILE_WORDS;
+
+/** The words for a deck's zone as an engine step names it ("Corsair deck"). */
+export function deckWord(zone: string): string {
+  return WORDS_BY_ZONE[zone] ?? "deck";
+}
+
 /** The second slot's piles this game has, one family of them: the Corsair pair once the Corsair deck is prepared, until it ends (families/sea/corsair.ts); the Evil Creatures pair once the scenario has dealt that deck; the Balrog pair once Shadow and Flame Nightmare's setup card has formed it; else the Grotto deck while the scenario deals one (dcce.grotto-deck), else the Uncharted deck while it deals that, else the Harad deck once dealt (Journey to the Cross-roads), else the Caves deck once dealt. */
 export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck" | "uncharted" | "piles">): readonly SecondPileId[] {
   if (game.corsairDeck !== undefined) return SECOND_PILES;

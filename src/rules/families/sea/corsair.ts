@@ -47,8 +47,8 @@ export function prepareCorsairDeck(state: ScenarioState, ctx: ReduceContext, tra
 }
 
 /** The Corsair deck ran out: its discard pile is shuffled back into it (dcce.corsair-deck). Settle keeps every game's deck refilled. */
-export function refillCorsairDeck(state: ScenarioState): ScenarioState {
-  return refillDeck(state, DECKS.corsair);
+export function refillCorsairDeck(state: ScenarioState, steps: EngineStep[]): ScenarioState {
+  return refillDeck(state, DECKS.corsair, steps);
 }
 
 /** Reveals the top card of the Corsair deck and puts it into play engaged with the seat (dcce.boarding): an enemy entering play, so the engine
