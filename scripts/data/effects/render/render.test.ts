@@ -98,7 +98,7 @@ describe("effects render templates", () => {
     expect(renderRecord({ id: "1:forced:1", cardCode: "1", lines: ["1:A:1"], timing: "forced", trigger: "attacks", subject: "self", instructions: [{ verb: "AttackFromStaging", who: "firstPlayer" }] }, ctx)[0]).toBe(
       "1:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)",
     );
-    expect(renderInstruction({ verb: "AttackFromStaging", who: "firstPlayer" }, ctx)).toEqual(["- the picked enemy attacks the first player now, from the staging area"]);
+    expect(renderInstruction({ verb: "AttackFromStaging", who: "firstPlayer" }, ctx)).toEqual(["- the picked enemy attacks the first player now, from the staging area, dealt a shadow card"]);
   });
 
   it("reads a later step's condition as checked when that step runs", () => {
