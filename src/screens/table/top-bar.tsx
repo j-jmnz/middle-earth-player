@@ -119,9 +119,8 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   const rowKey = [s, threats.length, life, burdenDeck, tokens?.name, pursuit != null, defense != null, island != null, heading != null, onNightmare != null, held?.length, hands?.map((mark) => mark.label).join(","), scenario.map((dial) => dial.id).join(",")].join("|");
   const [labelled, setLabelled] = useState({ key: "", width: 0 });
   const withWords = scenario.length > 0 && labelled.key === rowKey ? labelled.width : 0;
-  const placed = bar.width > 0 && (dials > 0 || waited) ? dialZones(bar.width - 2 * BAR_PAD, dials, withWords, s, center) : null;
-  const wordless = placed?.wordless === true;
-  const zones = placed;
+  const zones = bar.width > 0 && (dials > 0 || waited) ? dialZones(bar.width - 2 * BAR_PAD, dials, withWords, s, center) : null;
+  const wordless = zones?.wordless === true;
   // The row's width with the words is kept from the layout event, while the words show.
   const onDials = (event: LayoutChangeEvent) => {
     const width = Math.round(event.nativeEvent.layout.width);
@@ -202,9 +201,11 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
             {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
             {pursuit != null ? <ThreatRing threat={{ seat: 0, threat: pursuit.value, eliminated: false }} label="Pursuit" accessibilityName="Pursuit value" testID="pursuit" icon={null} limit={pursuit.limit} compact /> : null}
             {defense != null ? <ThreatRing threat={{ seat: 0, threat: defense.value, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${defense.name}`} testID="defense-tokens" icon={null} limit={defense.limit} limitWords={defenseLimitWords(defense.value, defense.limit, defense.stage)} goal compact /> : null}
-            {scenario.map((dial) => (
-              <ThreatRing key={dial.id} {...dialProps(dial)} wordless={wordless} onPress={dial.cardId && onDial ? () => onDial(dial.cardId ?? "", dial.extra) : dial.pile && onDialPile ? () => onDialPile(dial.pile ?? "") : dial.lists && onDialReading ? () => onDialReading(dial.id) : undefined} compact />
-            ))}
+            {scenario.map((dial) => {
+              const press = dial.cardId && onDial ? () => onDial(dial.cardId ?? "", dial.extra) : dial.pile && onDialPile ? () => onDialPile(dial.pile ?? "") : dial.lists && onDialReading ? () => onDialReading(dial.id) : undefined;
+              // Only a dial that opens a reading drops its word: a bare number with no press has nothing else to name it.
+              return <ThreatRing key={dial.id} {...dialProps(dial)} wordless={wordless && press != null} onPress={press} compact />;
+            })}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} onPress={onDial ? () => onDial(tokens.cardId) : undefined} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
             {onNightmare ? (
