@@ -172,7 +172,7 @@ describe("901209:A:3 An Evil Fortune's Shadow", () => {
   });
 });
 
-describe("03025 The Nameless Fear's immunity (FAQ 1.47)", () => {
+describe("03025 The Nameless Fear's immunity (`faq.immune-expanded`)", () => {
   it("03025:A:2 player card effects cannot choose it, quest and encounter card effects can", () => {
     const made = tableFromLayout("flight-from-moria", { stage: "901203", staging: ["03025"], play: ["ally"] });
     const spec: PickSpec = { type: "enemy", control: "any", staging: true, names: ["The Nameless Fear"] };

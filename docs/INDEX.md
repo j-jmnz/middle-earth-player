@@ -243,7 +243,7 @@ One file per box or cycle: each scenario's mechanics, readings, decisions and ta
   - 324–354 The Dread Realm (~4.2K)
   - 355–468 Readings to confirm (~4.5K)
 - `docs/scenarios/dream-chaser.md` — Dream-chaser (~16.2K tok)
-- `docs/scenarios/dwarrowdelf.md` — Dwarrowdelf (~40.4K tok)
+- `docs/scenarios/dwarrowdelf.md` — Dwarrowdelf (~40.5K tok)
   - 14–36 Into the Pit (~2.8K) ← 9
   - 37–57 The Seventh Level (~3.0K) ← 5
   - 58–91 Flight from Moria (~5.5K) ← 4
