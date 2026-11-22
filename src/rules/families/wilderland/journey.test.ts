@@ -1,5 +1,6 @@
 // Rules: emce.treasure, emce.campaign-pool-encounter, emce.evil-creatures-deck, rr.cancel, rr.damage, rr.guarded (data/rules/entries.json); ledger lines 120165:A:3, 12166:A:2, 12167:A:2, 18018:A:1, 18023:A:1, 18026:A:1, 18066:B:3, 18069:A:2.
 // The verbs, flags, amount and pick filters Journey Up the Anduin adds to the wilderland family, on fixture cards.
+import { EFFECTS } from "../../../effects/index.ts";
 import { describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
@@ -161,6 +162,21 @@ describe("the pick filters fromDeck and Undiscardable (18066:B:3, 18026:A:1)", (
     const dropped = frame(withBlessing, hero, [{ verb: "Each", pick: pick.pick, upTo: 1, instructions: [{ verb: "DiscardPicked" }] }], ctx.effects);
     const kept = dropped.state.window?.kind === "choose" ? dropped.state.window.options.flatMap((id) => dropped.state.cards[id]?.code ?? []) : [];
     expect(kept).toEqual(["blessing"]);
+  });
+
+  it("every availability check on a hand card the record then discards says so (`discarded`), so a card that cannot be discarded does not make the effect look usable", () => {
+    const hands = (node: unknown, found: Record<string, unknown>[] = []): Record<string, unknown>[] => {
+      if (Array.isArray(node)) node.forEach((one) => hands(one, found));
+      else if (node && typeof node === "object") {
+        const record = node as Record<string, unknown>;
+        if (record.kind === "canPick" && (record.pick as { from?: string } | undefined)?.from === "hand") found.push(record.pick as Record<string, unknown>);
+        Object.values(record).forEach((one) => hands(one, found));
+      }
+      return found;
+    };
+    const unflagged = EFFECTS.filter((effect) => /"verb":"Discard(Picked|FromHand)"/.test(JSON.stringify(effect.instructions)) && hands(effect.condition).some((pick) => pick.discarded !== true)).map((effect) => effect.id);
+    // Fouled Well and the like are encounter cards: their discard is no player card effect (03053:whenRevealed:1 uses a random discard).
+    expect(unflagged).toEqual([]);
   });
 
   it("a treasure is a player card: its pick leaves out a card immune to player card effects and a card that cannot be discarded by them", () => {

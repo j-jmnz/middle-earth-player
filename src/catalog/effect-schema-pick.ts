@@ -101,6 +101,8 @@ export const pickSchema = z.strictObject({
   captive: z.enum(["only", "free", "include"]).optional(),
   // A character committed to the quest (`false`: one that is not).
   committed: z.boolean().optional(),
+  // A character no effect bars from questing (`cannotQuest`, held by the card or by a class it belongs to): "commit that character to the quest" does nothing for one that is.
+  canQuest: z.boolean().optional(),
   // A character that took part in the attack the Response answers (not the card itself).
   participating: z.boolean().optional(),
   // A card that belongs to a sphere of influence: "any sphere" does not include a neutral card (faq.stand-and-fight).

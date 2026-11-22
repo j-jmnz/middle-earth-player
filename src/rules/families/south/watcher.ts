@@ -126,9 +126,7 @@ export function attackNowFromStaging(state: ScenarioState, id: string, seat: num
   const data = effectData(state);
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
   // "Deal and resolve 2 shadow cards for this attack" (143048:A:1): the first as any attack from the staging area, the others additional ones.
-  // Thaurdir on stage 2B is considered engaged with each player: beginEnemyAttack deals the one card that attack is dealt, so it is not dealt here too.
-  const dealtBelow = flagged(state, id, "resolvesHeldShadows") && engagedWithAll(state, id);
-  let dealt = shadow && !dealtBelow ? dealForAttack(counted, id, steps, ctx) : counted;
+  let dealt = shadow ? dealForAttack(counted, id, steps, ctx) : counted;
   for (let more = 1; shadow && more < (shadows ?? 1); more += 1) dealt = dealAdditionalShadow(dealt, id, steps, ctx);
   const begun = beginEnemyAttack(dealt, seat, id, ctx, steps, { fromStaging: enemy?.zone === "staging", shadow });
   // `raiseIfDestroys`: the effect the attack leaves for its end, with X the characters it destroyed (146039:A:2).

@@ -127,7 +127,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18047:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 18048 Afraid of the Dark
 (the scenario deals it into the encounter pile; the piles place it, no record does)

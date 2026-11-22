@@ -51,6 +51,7 @@ describe("effects render templates", () => {
     const ctx = newCtx();
     expect(renderCost({ kind: "addSelfToVictory" }, ctx)).toContain("victory display");
     expect(renderCost({ kind: "exhaustCode", code: "12345" }, ctx)).toContain("12345");
+    expect(renderCost({ kind: "exhaustNamed", name: "The One Ring" }, ctx)).toContain("The One Ring");
     expect(renderCost({ kind: "discardDeckTop", amount: 2 }, ctx)).toContain("top 2");
     expect(ctx.tally.json).toBe(0);
   });

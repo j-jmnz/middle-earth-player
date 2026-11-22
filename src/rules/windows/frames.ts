@@ -173,7 +173,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // The Doomed a card in play gives it (Troll-fells gives each Weather card Doomed 1, 10077:A:1) comes on top of the printed number.
       // The Doomed the card gives itself (`gainsDoomed`, Wight of Rhudaur, 10099:A:2) comes on top as well, and the Doomed a reveal marker or a lasting effect grants it as it is revealed (families/angmar/weather.ts).
       const printedDoomed = printed.keywords.doomed ?? 0;
-      const gainedFromPlay = gameReads(next, ctx, '"GainsDoomed"') ? gainedDoomed(next, id, seat, ctx) : 0;
+      const gainedFromPlay = gameReads(next, ctx, '"GainsDoomed"') ? gainedDoomed(next, id, seat, ctx, frame.data.kind === "reveal" && frame.data.fromDeck === true) : 0;
       const heldDoomed = next.modifiers.length > 0 ? heldAmount(next, id, "gainsDoomed") : 0;
       const revealDoomed = frame.data.kind === "reveal" ? (frame.data.extraDoomed ?? 0) : 0;
       const doomed = printedDoomed + gainedFromPlay + heldDoomed + revealDoomed;

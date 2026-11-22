@@ -9,7 +9,7 @@ const STAGING_LOCATION = { type: "location", control: "any", stagingOnly: true }
 const QUESTING_HOBBIT = { type: "character", control: "you", trait: "Hobbit", committed: true } as const;
 const EXHAUSTED_DUNEDAIN = { type: "character", control: "you", trait: "Dúnedain", state: "exhausted" } as const;
 const READY_CHARACTER = { type: "character", control: "you", state: "ready" } as const;
-const SPARE_CHARACTER = { type: "character", control: "you", state: "ready", committed: false } as const;
+const SPARE_CHARACTER = { type: "character", control: "you", state: "ready", committed: false, canQuest: true } as const;
 const HERO_WEAPON = { type: "attachment", control: "you", trait: "Weapon", state: "ready", on: { type: "hero", control: "you" } } as const;
 const ORC = { type: "enemy", control: "any", trait: "Orc" } as const;
 // "Guarding a card": a player card is attached to the enemy (the engine has no Guarded keyword; 19112:A:1).
@@ -60,7 +60,7 @@ export const RECORDS: readonly Effect[] = [
   // 10006 Curious Brandybuck.
   {"id":"10006:forced:1","cardCode":"10006","lines":["10006:A:1"],"timing":"forced","trigger":"activeExplored","instructions":[{"verb":"PutOnDeck","position":"bottom","target":"self"}]},
   // 10007 Hobbit Pony: while the quest is still to be resolved.
-  {"id":"10007:action:1","cardCode":"10007","lines":["10007:A:2"],"timing":"action","cost":[{"kind":"exhaustSelf"},{"kind":"exhaustHost"}],"condition":{"kind":"all","conditions":[{"kind":"step","is":"beforeResolution"},{"kind":"matches","card":"host","pick":{"type":"hero","control":"any","committed":false}}]},"instructions":[{"verb":"CommitToQuest","target":"host"}]},
+  {"id":"10007:action:1","cardCode":"10007","lines":["10007:A:2"],"timing":"action","cost":[{"kind":"exhaustSelf"},{"kind":"exhaustHost"}],"condition":{"kind":"all","conditions":[{"kind":"step","is":"beforeResolution"},{"kind":"matches","card":"host","pick":{"type":"hero","control":"any","committed":false,"canQuest":true}}]},"instructions":[{"verb":"CommitToQuest","target":"host"}]},
   // 10030 Descendants of Kings: the event prints no timing label, so its text resolves when it is played (in any action window).
   {"id":"10030:triggered:1","cardCode":"10030","lines":["10030:A:1"],"timing":"triggered","trigger":"played","subject":"self","instructions":[
     {"verb":"ChooseX","max":[{"count":{"type":"enemy","control":"any","engaged":"you"}},{"count":EXHAUSTED_DUNEDAIN}]},
@@ -72,7 +72,7 @@ export const RECORDS: readonly Effect[] = [
   // 10124 Favor of the Valar: settle keeps its seat from elimination until this resolves (families/quest/threat.ts).
   {"id":"10124:forced:1","cardCode":"10124","lines":["10124:A:2"],"timing":"forced","trigger":"wouldBeEliminated","eventSeat":"you","instructions":[{"verb":"SetThreat","value":45},{"verb":"Discard","target":{"kind":"self"}}]},
   // 11005 Grappling Hook: the hook is discarded once its character is committed.
-  {"id":"11005:action:1","cardCode":"11005","lines":["11005:A:2"],"timing":"action","cost":{"kind":"exhaustHost"},"condition":{"kind":"all","conditions":[{"kind":"step","is":"beforeResolution"},{"kind":"matches","card":"host","pick":{"type":"character","control":"any","committed":false}}]},"instructions":[{"verb":"CommitToQuest","target":"host","stat":"attack"},{"verb":"Discard","target":{"kind":"self"}}]},
+  {"id":"11005:action:1","cardCode":"11005","lines":["11005:A:2"],"timing":"action","cost":{"kind":"exhaustHost"},"condition":{"kind":"all","conditions":[{"kind":"step","is":"beforeResolution"},{"kind":"matches","card":"host","pick":{"type":"character","control":"any","committed":false,"canQuest":true}}]},"instructions":[{"verb":"CommitToQuest","target":"host","stat":"attack"},{"verb":"Discard","target":{"kind":"self"}}]},
   // 11009 Lindon Navigator.
   {"id":"11009:constant:1","cardCode":"11009","lines":["11009:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"noExhaustQuest","amount":1,"until":"whileSourceInPlay"},{"verb":"ModifyStat","stat":"commitsExhausted","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"11009:forced:1","cardCode":"11009","lines":["11009:A:2"],"timing":"forced","trigger":"committedQuestResolved","subject":"self","instructions":[{"verb":"Choose","who":"actor","options":[
@@ -100,7 +100,7 @@ export const RECORDS: readonly Effect[] = [
   // 12086 Battle-fury (line 2 is the attack family's).
   {"id":"12086:constant:1","cardCode":"12086","lines":["12086:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"step","is":"beforeStaging"}}]},
   // 12116 Windfola (lines 1 and 2 are 12116:constant:1 and 2).
-  {"id":"12116:response:1","cardCode":"12116","lines":["12116:A:3"],"timing":"response","trigger":"removedFromQuest","subject":"host","cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"CommitToQuest","target":"host"}]},
+  {"id":"12116:response:1","cardCode":"12116","lines":["12116:A:3"],"timing":"response","trigger":"removedFromQuest","subject":"host","cost":{"kind":"exhaustSelf"},"condition":{"kind":"matches","card":"host","pick":{"type":"character","control":"any","canQuest":true}},"instructions":[{"verb":"CommitToQuest","target":"host"}]},
   // 131013 Thrór's Map.
   {"id":"131013:action:1","cardCode":"131013","lines":["131013:A:2"],"timing":"action","cost":{"kind":"discardSelf"},"condition":{"kind":"all","conditions":[{"kind":"phase","is":"Travel"},{"kind":"canPick","pick":STAGING_LOCATION}]},"instructions":[{"verb":"Pick","pick":STAGING_LOCATION},{"verb":"MakeActive"}]},
   // 131016 Goblin-cleaver.

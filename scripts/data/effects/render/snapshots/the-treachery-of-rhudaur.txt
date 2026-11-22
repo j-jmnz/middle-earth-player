@@ -33,7 +33,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 10095:A:1 (front): When Revealed: Add Thaurdir to the staging area. Each player searches the encounter deck and discard pile for an Undead enemy and adds it to the staging area. Shuffle the encounter deck.
   10095:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the set-aside card with code 10098 is added to the staging area and enters play: the cards that hear it enter play or be added to the staging area hear it
+    - one set-aside card with code 10098 joins the staging area (it is not revealed)
     - for each player, first player first:
       - the acting player finds one Undead enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck

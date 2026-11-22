@@ -91,7 +91,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 00007:A:2 (shadow): Shadow: Remove all defending characters from combat. This attack is considered undefended.
   00007:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - this attack is considered undefended
+    - remove all defending characters from combat; this attack is considered undefended
 
 ## 00008 Emyn Arnen Overlook
 (the scenario deals it into the encounter pile; the piles place it, no record does)

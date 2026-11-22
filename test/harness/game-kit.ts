@@ -3,8 +3,7 @@ import { tableDigest } from "../../src/campaign/digest.ts";
 import type { LoadoutSeat } from "../../src/campaign/loadout.ts";
 import { emptyLog, poolCard, type CampaignLog } from "../../src/campaign/log.ts";
 import { buildStart } from "../../src/campaign/start.ts";
-import { angmarAwakenedFacts } from "../../src/campaign/log-angmar-awakened.ts";
-import { wilderlandFacts } from "../../src/campaign/wilderland.ts";
+import { logFacts } from "../../src/campaign/log-facts.ts";
 import { namesTreasures } from "../../src/campaign/world.ts";
 import { campaignScenario, type AnyScenarioData, type CampaignData, type Difficulty, type ScenarioData } from "../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
@@ -239,9 +238,9 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
   function start(seatCount: 1 | 2, seed: number, difficulty: Difficulty, options: StartOptions = {}): StartScenario {
     const { facts, modeCard, choices, loadout, standalone } = options;
     const checked = plan(seatCount, options.log ?? emptyLog(seatCount), choices, difficulty, loadout);
-    // The campaign's own columns of the log reach the game as they do in startFor (src/campaign/briefing.ts); another campaign's are none.
-    const logged = { ...wilderlandFacts(checked.log, spec.campaign.id), ...angmarAwakenedFacts(checked.log, spec.campaign.id) };
-    const dealtFacts = Object.keys(logged).length > 0 ? { prisoner: null, usedOnce: [], counters: {}, ...facts, ...logged } : facts;
+    // The log's facts reach the game as they do in startFor (src/campaign/briefing.ts, `logFacts`): the Dream-chaser marks and the columns of the Wilderland, Two Towers, Return of the King and Angmar Awakened logs; another campaign's are none.
+    const logged = logFacts(options.log ?? emptyLog(seatCount), checked.log, spec.campaign.id, cardsOrThrow());
+    const dealtFacts = Object.keys(logged).length > 0 ? { prisoner: null, usedOnce: [], counters: {}, ...logged, ...facts } : facts;
     return buildStart({
       campaign: spec.campaign,
       scenario: spec.scenario,

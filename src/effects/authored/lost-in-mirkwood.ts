@@ -91,9 +91,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
   { id: "18034:shadow:1", cardCode: "18034", lines: ["18034:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "doesNotReady", amount: 1, until: "endOfRound", target: "defender" }] },
 
-  // 18035 Ravenous Spider: after it engages you it makes an immediate attack; the Shadow gives the attacker an additional attack against you after this one.
+  // 18035 Ravenous Spider: after it engages you it makes an immediate attack; the Shadow gives the attacker an additional attack against you after this one, dealt a new shadow card (faq.additional-attacks).
   { id: "18035:forced:1", cardCode: "18035", lines: ["18035:A:1"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "ImmediateAttack" }] },
-  { id: "18035:shadow:1", cardCode: "18035", lines: ["18035:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack", shadow: false }] }] },
+  { id: "18035:shadow:1", cardCode: "18035", lines: ["18035:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack" }] }] },
 
   // 18036 Unseen Danger: each player removes a character they control from the quest and discards the top card of the encounter deck; the character is discarded when that card's printed Threat is above its Willpower. The Shadow gives an attacker guarding a card +2 Attack and +2 Defense for the phase.
   {

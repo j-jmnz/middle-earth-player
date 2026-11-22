@@ -4,7 +4,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 // produces replaces the generated record; list it in REPLACES.
 export const RECORDS: readonly Effect[] = [
   // 17001 Kahliel. Readying a character that is not exhausted would change nothing (rr.cost).
-  {"id":"17001:action:1","cardCode":"17001","lines":["17001:A:2"],"timing":"action","limit":"oncePerPhase","condition":{"kind":"all","conditions":[{"kind":"canPick","pick":{"type":"card","control":"you","from":"hand","cardType":"ally","trait":"Harad"}},{"kind":"canPick","pick":{"type":"character","control":"any","trait":"Harad","state":"exhausted"}}]},"instructions":[
+  {"id":"17001:action:1","cardCode":"17001","lines":["17001:A:2"],"timing":"action","limit":"oncePerPhase","condition":{"kind":"all","conditions":[{"kind":"canPick","pick":{"type":"card","control":"you","from":"hand","cardType":"ally","trait":"Harad","discarded":true}},{"kind":"canPick","pick":{"type":"character","control":"any","trait":"Harad","state":"exhausted"}}]},"instructions":[
     {"verb":"Pick","pick":{"type":"card","control":"you","from":"hand","cardType":"ally","trait":"Harad"}},{"verb":"DiscardPicked"},
     {"verb":"Pick","pick":{"type":"character","control":"any","trait":"Harad","state":"exhausted"}},{"verb":"Ready","target":"picked"}]},
   // 17004 Yazan (line 1 is Ranged)

@@ -372,10 +372,9 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 ## 900205 A Flooded Ford
 
 900205:A:1 (front): Each card revealed by the encounter deck gains doomed X. X is the number of progress tokens on this card.
-  900205:triggered:1: Triggered (mandatory, not printed as Forced) after a card is revealed (heard about card (any player controls) or in the staging area or the active location; only when the encounter deck revealed it)
+  900205:constant:1: Constant
     only if this card is in play
-    who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - raise threat by progress of this card (each player)
+    - each card (any player controls) or in the staging area or the active location the encounter deck reveals gains doomed progress of this card (each player raises their threat by that much more when one is revealed)
 
 900205:A:2 (shadow): Shadow: If this attack is undefended, put A Flooded Ford into the staging area with 1 progress token on it.
   900205:shadow:1: Shadow

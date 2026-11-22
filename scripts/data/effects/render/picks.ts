@@ -63,6 +63,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["cardType"], typeof pick.cardType === "string" ? `of card type ${pick.cardType}` : null);
   note(["sideQuest"], pick.sideQuest === true ? "a side quest of either kind (player or encounter)" : null);
   note(["committed"], pick.committed === true ? "committed to the quest" : pick.committed === false ? "not committed to the quest" : null);
+  note(["canQuest"], pick.canQuest === true ? "that no effect bars from questing" : pick.canQuest === false ? "barred from questing by an effect" : null);
   note(["attacking"], pick.attacking === true ? "attacking" : null);
   note(["defending"], pick.defending === true ? "defending" : null);
   note(["canExhaust"], pick.canExhaust === true ? "that can exhaust (not held by a rule that stops it exhausting)" : null);

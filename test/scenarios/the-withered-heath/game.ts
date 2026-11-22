@@ -239,7 +239,7 @@ export const HEATH_GOLDENS: readonly HeathGolden[] = [
   { name: "true solo, won from a blank log, The Steadfast, Rhyme of the Slayer, 4 Dragon Signs, the last treasure chosen", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", policy: { accolades: [3], song: "last", treasure: "last" } },
   { name: "true solo, won from a blank log, Master of the Hunt, 3 Dragon Signs, no treasure", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", policy: { accolades: [1] } },
   { name: "true solo, won, after the earlier parts, Dragon-slayer, 4 Dragon Signs, a treasure chosen", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { accolades: [4] } },
-  { name: "true solo, won, after the earlier parts, no boon ally searched, Unbroken, no Song, 4 Dragon Signs", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won", after: true, ally: "skip", policy: { accolades: [2], song: "skip" } },
+  { name: "true solo, won, after the earlier parts, no boon ally searched, Unbroken, no Song, 4 Dragon Signs", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", after: true, ally: "skip", policy: { accolades: [2], song: "skip" } },
   { name: "true solo, Easy, won, the oath and guidance lines, Unbroken, Rhyme of the Slayer, 4 Dragon Signs", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oath", policy: { accolades: [2], song: "last", treasure: "last" } },
   { name: "true solo, Easy, won, Melanwar's and Isolde's lines, The Steadfast, no Song, 4 Dragon Signs", seatCount: 1, seed: 5, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oathline", policy: { accolades: [3], song: "skip" } },
   { name: "two-handed, won, after the earlier parts, an Accolade boon for each player, 4 Dragon Signs", seatCount: 2, seed: 112, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
@@ -251,8 +251,8 @@ export const HEATH_GOLDENS: readonly HeathGolden[] = [
   { name: "two-handed, weak, lost on threat", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, brittle, lost with every hero dead", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed, brittle, lost with every hero dead", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
-  { name: "true solo, lost at the last stage, after the earlier parts, Cold-Drake alive with 4 Dragon Signs", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, policy: { accolades: [4] }, lossReason: "No seats remain" },
-  { name: "two-handed, lost at the last stage, after the earlier parts", seatCount: 2, seed: 6, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, policy: { accolades: [2, 4], song: "last", treasure: "last" }, lossReason: "No seats remain" },
+  { name: "true solo, lost at the last stage, after the earlier parts, Cold-Drake alive with 4 Dragon Signs", seatCount: 1, seed: 17, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, policy: { accolades: [4] }, lossReason: "No seats remain" },
+  { name: "two-handed, lost at the last stage, after the earlier parts", seatCount: 2, seed: 11, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, policy: { accolades: [2, 4], song: "last", treasure: "last" }, lossReason: "No seats remain" },
 ];
 
 /** The log a golden's Resolution is written onto: the earlier parts' real Resolutions, or a blank log. */

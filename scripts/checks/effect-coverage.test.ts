@@ -119,6 +119,10 @@ describe("effect coverage", () => {
     }
   });
 
+  // A printed "Forced:" line that is a replacement effect ("When 3 or more damage would be placed on Revenant, place 2 damage instead") holds for as long as its card is in play, however
+  // the card came into play, so a constant record owns it: a Forced trigger on one way in (added to the staging area, engaged) would miss the others. Named one by one, with the reason.
+  const REPLACEMENT_RECORDS: ReadonlySet<string> = new Set(["11181:constant:2"]);
+
   const lineOf = (id: string): string => {
     const [code, side, n] = id.split(":");
     return lines.byKey.get(keyOf(code ?? "", side ?? ""))?.lines[Number(n) - 1] ?? "";
@@ -137,7 +141,7 @@ describe("effect coverage", () => {
         // unlabeled line it carries out with its labeled one (Close Call's "Doomed X." raised by its Response, 08005).
         const timings = lineTimings(line ?? "");
         const alongside = timings.has("constant") && effect.lines.some((other) => other !== id && lineTimings(lineOf(other)).has(effect.timing));
-        if (!alongside && !isCampaignMarker(effect, line ?? "")) expect(timings, `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
+        if (!alongside && !REPLACEMENT_RECORDS.has(effect.id) && !isCampaignMarker(effect, line ?? "")) expect(timings, `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
       }
     }
   });

@@ -60,7 +60,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 00007 Captured Watchtower. +3 Threat once crossed. Shadow: the defending characters are removed from combat and the attack is undefended.
   { id: "00007:constant:1", cardCode: "00007", lines: ["00007:A:1"], timing: "constant", condition: CROSSED, instructions: [SELF_STAT("threat", 3)] },
-  { id: "00007:shadow:1", cardCode: "00007", lines: ["00007:A:2"], timing: "shadow", instructions: [{ verb: "ConsiderUndefended" }] },
+  { id: "00007:shadow:1", cardCode: "00007", lines: ["00007:A:2"], timing: "shadow", instructions: [{ verb: "ConsiderUndefended", removeDefenders: true }] },
 
   // 00008 Emyn Arnen Overlook. While in play, the first Scout enemy revealed each round gains surge and doomed 2 (the marker FirstTraitSurge with `doomed`, rules/families/angmar/weather.ts).
   { id: "00008:constant:1", cardCode: "00008", lines: ["00008:A:1"], timing: "constant", instructions: [{ verb: "FirstTraitSurge", trait: "Scout", type: "enemy", doomed: 2 }] },

@@ -318,7 +318,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 09074:A:1 (front): When Revealed: Add Thaurdir to the staging area. Then, reveal 1 encounter card per player.
   09074:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the set-aside card with code 09033 is added to the staging area and enters play: the cards that hear it enter play or be added to the staging area hear it
+    - one set-aside card with code 09033 joins the staging area (it is not revealed)
     - repeat the number of players times:
       - if there is a enemy (any player controls) in the staging area only, named "Thaurdir" to choose: the acting player reveals an encounter card
 

@@ -30,7 +30,7 @@ export function shipMayDefend(state: ScenarioState, defender: PrintedCard, cards
 /** Why the character may not defend the attack in progress for a ship's sake, or null (the "why not" of the legal-intent check). */
 export function shipDefenseReason(state: ScenarioState, defender: PrintedCard, cards: Cards): string | null {
   if (shipMayDefend(state, defender, cards)) return null;
-  return defender.ship === "objective" ? "A ship-objective cannot defend against an attack that is not a ship-enemy's" : "Only a ship-objective can defend against a ship-enemy's attack";
+  return defender.ship === "objective" ? "A Ship objective cannot defend against an attack that is not a Ship enemy's" : "Only a Ship objective can defend against a Ship enemy's attack";
 }
 
 /** Whether the character may attack the enemy: a ship-objective only a ship-enemy; anything else may attack a ship-enemy as it may any enemy. */
@@ -40,7 +40,7 @@ export function shipMayAttack(attacker: PrintedCard, target: PrintedCard): boole
 
 /** Why the attack is barred for a ship's sake, or null. */
 export function shipAttackReason(attacker: PrintedCard, target: PrintedCard): string | null {
-  return shipMayAttack(attacker, target) ? null : "A ship-objective can only attack a ship-enemy";
+  return shipMayAttack(attacker, target) ? null : "A Ship objective can only attack a Ship enemy";
 }
 
 /** The attack in progress is a ship-enemy's: its undefended damage goes to a ship-objective, not a hero (dcce.ship-enemies). */

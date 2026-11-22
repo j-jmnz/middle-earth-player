@@ -324,7 +324,7 @@ describe("the sea family's moments on the table", () => {
     expect([...glow].sort()).toEqual([ids.dc, ids.ds].sort());
     const keys = highlightKeys({ game: state, seat: 0, sheet: sheet as Sheet, choice: { key: (sheet as Sheet).key, ids: [], shares: [] }, panel: false });
     expect(keys.dim).toBe(true);
-    expect(whyNotChosen(state, seaCtx, ids.aragorn!, sheet)).toBe("Only a ship-objective can defend against a ship-enemy's attack.");
+    expect(whyNotChosen(state, seaCtx, ids.aragorn!, sheet)).toBe("Only a Ship objective can defend against a Ship enemy's attack.");
     // A ship that can be chosen carries no refusal.
     expect(whyNotChosen(state, seaCtx, ids.dc!, sheet)).toBeNull();
   });
@@ -355,7 +355,7 @@ describe("the sea family's moments on the table", () => {
     const built = sea({ cards: [seaHero("aragorn"), seaShip("dc", "Dream-chaser"), seaEnemy("raider")], effects: [], heroes: [{ code: "aragorn" }], allies: [{ code: "dc" }], enemies: [{ code: "raider" }] });
     const state = { ...built.state, phase: "Combat" as const, mode: "playerAttacks" as const, window: { kind: "playerAttack" as const }, boundaryPhase: "Combat" as const };
     const picking: Sheet = { kind: "multi", key: "attack", step: "Combat", title: "Attack", note: null, verb: "Attack", options: [{ id: built.ids.aragorn!, label: "aragorn", code: "aragorn" }], build: { kind: "attack", enemyId: built.ids.raider! }, allowEmpty: false, preselected: [], alternative: null };
-    expect(whyNotChosen(state, built.ctx, built.ids.dc!, picking)).toBe("A ship-objective can only attack a ship-enemy.");
+    expect(whyNotChosen(state, built.ctx, built.ids.dc!, picking)).toBe("A Ship objective can only attack a Ship enemy.");
     expect(whyNotChosen(state, built.ctx, built.ids.aragorn!, picking)).toBeNull();
   });
 

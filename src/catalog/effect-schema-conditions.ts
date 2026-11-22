@@ -34,6 +34,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("hasEngaged"), trait: z.string().min(1).optional() }),
   // A card with this code is in play and its exhausted state is `is`.
   z.strictObject({ kind: z.literal("exhausted"), code: z.string().min(1), is: z.boolean() }),
+  // The card in play with this title that a player controls is exhausted (`is`) or ready, whichever printing the game deals (The One Ring).
+  z.strictObject({ kind: z.literal("exhaustedNamed"), name: z.string().min(1), is: z.boolean() }),
   // The source is an enemy engaged with the actor.
   z.strictObject({ kind: z.literal("engagedWithActor") }),
   // The running effect has returned no enemy to staging (or, for ImmediateAttackEach, made no attack).

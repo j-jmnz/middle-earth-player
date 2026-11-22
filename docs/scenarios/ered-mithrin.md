@@ -34,3 +34,4 @@ The Ered Mithrin campaign is nine scenarios played in order: The Wilds of Rhovan
 Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.
 
 - A claimed treasure is not an attachment for card effects (`recommended`, docs/scenarios/ered-mithrin.md, Ered Mithrin).
+- The Lower Depths' Response (18079:B:2) is the first player's alone, as every Response of an encounter or quest card in play is (`recommended`: the Rules Reference and the FAQ name no other player, and a forum search found no ruling; `docs/brief.md`, Core round).

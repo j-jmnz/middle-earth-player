@@ -69,6 +69,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   phaseEnded: (c) => ({ text: `the ${str(c.is)} phase has just ended`, read: ["is"] }),
   phase: (c) => ({ text: `it is the ${str(c.is)} phase`, read: ["is"] }),
   hasEngaged: (c) => ({ text: `the actor has ${typeof c.trait === "string" ? `a ${c.trait} ` : "an "}enemy engaged`, read: ["trait"] }),
+  exhaustedNamed: (c) => ({ text: `the card titled ${str(c.name)} in play is ${c.is === true ? "exhausted" : "ready"}`, read: ["name", "is"] }),
   exhausted: (c) => ({ text: `the card with code ${str(c.code)} in play is ${c.is === true ? "exhausted" : "ready"}`, read: ["code", "is"] }),
   count: (c, ctx) => ({ text: `the number of ${renderPick(c.pick, ctx)} is ${range(c.min, c.max)}`, read: ["pick", "min", "max"] }),
   threat: (c) => ({ text: `the actor's threat is ${range(c.min, c.max)}`, read: ["min", "max"] }),

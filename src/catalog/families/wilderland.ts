@@ -78,7 +78,7 @@ const VERBS = [
   // AddFromPile added) guards it (rr.guarded). The old side is kept as the card's other side.
   // `target: "subject"` (51001:B:1, "When Rhosgobel is explored, flip it over and add Rider of Mirkwood to the staging area"): the card the event is about, the explored location, is the one that flips, not the source.
   // `control: "firstPlayer"` (51101:B:1, "flip it over and put Mendor into play under the first player's control, ready"): the back is a player-side card, so it enters the first player's play area, faceup and ready, not the staging area; it enters play for that player (the trigger enteredPlay) and has no owner.
-  // `setAside` (51301:B:1, "When Dark Pit is explored, flip it over and set Durin's Bane aside, out of play"): the card, flipped to `into`, goes to the set-aside zone instead of the staging area, where a later AddSetAsideToStaging or EnterSetAsideStaging finds it.
+  // `setAside` (51301:B:1, "When Dark Pit is explored, flip it over and set Durin's Bane aside, out of play"): the card, flipped to `into`, goes to the set-aside zone instead of the staging area, where a later AddSetAsideToStaging finds it.
   z.strictObject({ verb: z.literal("FlipOver"), into: code, guardedBy: z.literal("picked").optional(), target: z.literal("subject").optional(), control: z.literal("firstPlayer").optional(), setAside: z.literal(true).optional(), ...when }),
   // "The player with the most cards in his hand without a copy of Lost in the Wild adds Lost in the Wild to his hand" (18026:A:1): of the players with no card of the source's title in hand, the one with the most cards in hand takes the source into
   // their hand (the first player chooses among players tied). Nothing happens when every player holds a copy.

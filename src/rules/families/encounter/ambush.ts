@@ -39,10 +39,10 @@ export function pushAmbush(state: ScenarioState, event: GameEvent, ctx: ReduceCo
   return pushEffectFrame(state, { frame: "forced", sourceId: enemy.id, actor: event.seat ?? state.firstPlayer, peril: false, effectId: `${enemy.code}:ambush`, instructions: [{ verb: "AmbushChecks" }], cancel: null, blockCancel: null, cause: ruleCause("dwd.ambush") }, steps);
 }
 
-/** AmbushChecks: the source enemy, in the staging area, is checked against each player in turn from the first; the first whose Threat reaches its engagement cost engages it. */
+/** AmbushChecks (no check while the table holds `noEngagementChecks` in the encounter phase, "Do not make engagement checks during the encounter phase", 01127:B:1; the quest phase's reveals still check): the source enemy, in the staging area, is checked against each player in turn from the first; the first whose Threat reaches its engagement cost engages it. */
 export function ambushChecks(state: ScenarioState, enemyId: string | null, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const enemy = enemyId ? state.cards[enemyId] : undefined;
-  if (!enemyId || !enemy || enemy.zone !== "staging" || ambushIgnored(state) || flagged(state, "table", "noEngagementChecks")) return state;
+  if (!enemyId || !enemy || enemy.zone !== "staging" || ambushIgnored(state) || (state.phase === "Encounter" && flagged(state, "table", "noEngagementChecks"))) return state;
   for (const seat of livingSeats(state)) {
     if (!stagingEnemies(state, ctx.cards, seat).includes(enemyId) || !checkEngages(state, enemyId, seat, ctx.cards)) continue;
     return engageEnemy(state, seat, enemyId, steps);

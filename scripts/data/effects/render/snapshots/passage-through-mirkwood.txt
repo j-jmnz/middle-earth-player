@@ -343,8 +343,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
   900102:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each character (any player controls) committed to the quest (only the cards that match now: one that arrives later does not get it): stat willpower -2, until the end of the phase
-    - for each character (any player controls) committed to the quest, with a current Willpower of 0 or less:
-      - discard the picked card
+    - each character (any player controls) committed to the quest (only the cards that match now: one that arrives later does not get it): stat discardAtZeroWillpower (it is discarded from play as soon as its current Willpower is 0) 1, until the end of the phase
 
 900102:A:2 (shadow): Shadow: Raise defending player's threat by 5. (Raise defending player's threat by 10 instead if undefended.)
   900102:shadow:1: Shadow
@@ -452,4 +451,4 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
       - choose ready character (you control)
       - exhaust the picked card
 
-(rendered pieces: 232 by template, 0 as JSON)
+(rendered pieces: 231 by template, 0 as JSON)

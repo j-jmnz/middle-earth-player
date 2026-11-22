@@ -70,7 +70,7 @@ export const ENEMY_RECORDS: readonly (Effect | Copy)[] = [
   copyLine("145042:A:3", "146053:A:3"),
 
   // 146054 'Wicked Master!'. When Revealed: Gollum makes an immediate attack against the first player; then, if Gollum is not in play, the encounter deck and discard pile are searched for him and he comes into play engaged with the first player (a Gollum fetched this way does not attack:
-  // the lines' order). Shadow: if the attacking enemy is Gollum he makes an additional attack after this one (no shadow card is dealt, faq.additional-attacks).
+  // the lines' order). Shadow: if the attacking enemy is Gollum he makes an additional attack after this one (dealt a new shadow card, its old ones discarded first, faq.additional-attacks).
   {
     id: "146054:whenRevealed:1",
     cardCode: "146054",
@@ -87,7 +87,7 @@ export const ENEMY_RECORDS: readonly (Effect | Copy)[] = [
     cardCode: "146054",
     lines: ["146054:A:2"],
     timing: "shadow",
-    instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack", shadow: false }], when: { kind: "matches", card: "attacker", pick: GOLLUM_IN_PLAY } }],
+    instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack" }], when: { kind: "matches", card: "attacker", pick: GOLLUM_IN_PLAY } }],
   },
 
   // 146055 The Lidless Eye (Peril is a keyword). When Revealed: you make a Fortitude test with two more Sauron's Eye icons while The One Ring is exhausted (checked as the test is made); if you fail it you raise your threat by 10. Shadow: +1 Attack, or +2 Attack instead if you failed a Fortitude test this round.

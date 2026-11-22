@@ -275,7 +275,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "51033",
     lines: ["51033:A:1"],
     timing: "whenRevealed",
-    instructions: [{ verb: "Each", pick: { type: "card", control: "any", engagedEnemies: true, unique: false, enemyOrLocation: true, lowestThreat: true, challenge: true }, instructions: [{ verb: "Discard", target: { kind: "picked" } }, { verb: "RevealEncounter" }] }],
+    instructions: [{ verb: "Each", pick: { type: "card", control: "any", engagedEnemies: true, nonUnique: true, enemyOrLocation: true, lowestThreat: true, challenge: true }, instructions: [{ verb: "Discard", target: { kind: "picked" } }, { verb: "RevealEncounter" }] }],
   },
   { id: "51033:shadow:1", cardCode: "51033", lines: ["51033:A:2"], timing: "shadow", instructions: [{ verb: "Choose", who: "actor", options: [{ id: "reveal", instructions: [{ verb: "RevealEncounter" }] }, { id: "undefended", instructions: [{ verb: "ConsiderUndefended" }] }] }] },
 

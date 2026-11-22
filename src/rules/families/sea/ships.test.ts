@@ -29,7 +29,7 @@ describe("a ship-enemy's attack (dcce.ship-enemies)", () => {
     expect(legalTargets(state, { type: "DeclareDefender" }, ctx)).toEqual([ids.dc]);
     const refused = reduce(state, { type: "DeclareDefender", defenderId: ids.aragorn! }, ctx);
     expect(refused.ok).toBe(false);
-    expect(!refused.ok && refused.reason).toBe("Only a ship-objective can defend against a ship-enemy's attack");
+    expect(!refused.ok && refused.reason).toBe("Only a Ship objective can defend against a Ship enemy's attack");
     const defended = send(state, { type: "DeclareDefender", defenderId: ids.dc! }, ctx);
     // 3 Attack against the ship's 3 Defense: no damage.
     expect(defended.cards[ids.dc!]?.exhausted).toBe(true);
@@ -61,7 +61,7 @@ describe("a ship-objective's defense (dcce.ship-objectives)", () => {
     const { state, ids, ctx } = underAttack("raider");
     expect(legalTargets(state, { type: "DeclareDefender" }, ctx)).toEqual([ids.aragorn]);
     const refused = reduce(state, { type: "DeclareDefender", defenderId: ids.dc! }, ctx);
-    expect(!refused.ok && refused.reason).toBe("A ship-objective cannot defend against an attack that is not a ship-enemy's");
+    expect(!refused.ok && refused.reason).toBe("A Ship objective cannot defend against an attack that is not a Ship enemy's");
     // An undefended attack from a non-ship enemy lands on a hero as always.
     expect(legalTargets(state, { type: "Undefended" }, ctx)).toEqual([ids.aragorn]);
   });
@@ -83,7 +83,7 @@ describe("attacks on enemies", () => {
     const { state, ids, ctx } = attackWindow();
     expect(legalTargets(state, { type: "DeclareAttackers", cardId: ids.dc! }, ctx)).toEqual([ids.corsair]);
     const refused = reduce(state, { type: "DeclareAttackers", enemyId: ids.raider!, attackerIds: [ids.dc!] }, ctx);
-    expect(!refused.ok && refused.reason).toBe("A ship-objective can only attack a ship-enemy");
+    expect(!refused.ok && refused.reason).toBe("A Ship objective can only attack a Ship enemy");
     const struck = send(state, { type: "DeclareAttackers", enemyId: ids.corsair!, attackerIds: [ids.dc!] }, ctx);
     // 3 Attack against 1 Defense.
     expect(struck.cards[ids.corsair!]?.damage).toBe(2);

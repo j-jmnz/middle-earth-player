@@ -120,6 +120,7 @@ const ROWS: readonly Row[] = [
   { line: "51032:A:2", name: "explored as the active location it reveals one treachery", layout: { active: "51032", deck: ["treachery", "treachery", "f0"] }, act: announce("activeExplored", "51032"), expect: [deckCount(2)] },
   // 51033 Power Sevenfold.
   { line: "51033:A:1", name: "When Revealed: the non-unique enemy or location of lowest Threat is discarded and 1 card is revealed", layout: { staging: ["51024", "51015"], deck: F0 }, act: reveal("51033"), expect: [zone("51024", "encounterDiscard"), count("f0", "staging", 1)] },
+  { line: "51033:A:1", name: "When Revealed: a unique card of lower Threat is not chosen, only a non-unique one", layout: { staging: ["51024", "51010"], deck: F0 }, act: reveal("51033"), expect: [zone("51024", "encounterDiscard"), zone("51010", "staging")] },
   { line: "51033:A:2", name: "Shadow: the defending player reveals an encounter card", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51033" }), answer("reveal")], expect: [count("f0", "staging", 1)] },
   { line: "51033:A:2", name: "or the attack is treated as undefended", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51033" }), answer("undefended")], expect: [damageOn("dh1", 1)] },
   // 51035 Troll Cave.

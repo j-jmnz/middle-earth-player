@@ -43,16 +43,20 @@ export function isClassHolder(id: string): id is ClassHolder {
   return id === ALLIES_CLASS || id === CHARACTERS_CLASS || id === STAGING_CLASS || id === ENEMIES_CLASS || id === DAMAGED_CHARACTERS_CLASS || id === QUESTING_CHARACTERS_CLASS || isTraitedEnemies(id) || isTraitedStaging(id) || isTraitedLocations(id) || id.startsWith(OWN_CHARACTERS);
 }
 
-// Whether a modifier is held by this card: by its id, or by a class it belongs to.
-export function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard): boolean {
+/** Whether the card has a Trait now, the ones it gained included (hasTrait, interpret/conditions.ts): the caller that has the printed cards builds it. Without one a class named by a Trait reads the printed Traits. */
+export type TraitCheck = (trait: string) => boolean;
+
+// Whether a modifier is held by this card: by its id, or by a class it belongs to. `has`: the Traits the card has now, for a class named by a Trait.
+export function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard, has?: TraitCheck): boolean {
   if (modifier.instanceId === instance.id) return true;
   if (!inPlay(instance.zone)) return false;
+  const traited = (trait: string): boolean => (has ?? ((name: string) => printed.traits.includes(name)))(trait);
   if (modifier.instanceId === ALLIES_CLASS) return cardTypeOf(instance, printed) === "ally";
   if (modifier.instanceId === STAGING_CLASS) return instance.zone === "staging" && (cardTypeOf(instance, printed) === "enemy" || cardTypeOf(instance, printed) === "location");
-  if (isTraitedStaging(modifier.instanceId)) return instance.zone === "staging" && (cardTypeOf(instance, printed) === "enemy" || cardTypeOf(instance, printed) === "location") && printed.traits.includes(modifier.instanceId.slice(TRAITED_STAGING.length));
-  if (isTraitedLocations(modifier.instanceId)) return (instance.zone === "staging" || instance.zone === "activeLocation") && cardTypeOf(instance, printed) === "location" && printed.traits.includes(modifier.instanceId.slice(TRAITED_LOCATIONS.length));
+  if (isTraitedStaging(modifier.instanceId)) return instance.zone === "staging" && (cardTypeOf(instance, printed) === "enemy" || cardTypeOf(instance, printed) === "location") && traited(modifier.instanceId.slice(TRAITED_STAGING.length));
+  if (isTraitedLocations(modifier.instanceId)) return (instance.zone === "staging" || instance.zone === "activeLocation") && cardTypeOf(instance, printed) === "location" && traited(modifier.instanceId.slice(TRAITED_LOCATIONS.length));
   if (modifier.instanceId === ENEMIES_CLASS) return cardTypeOf(instance, printed) === "enemy";
-  if (isTraitedEnemies(modifier.instanceId)) return cardTypeOf(instance, printed) === "enemy" && printed.traits.includes(modifier.instanceId.slice(TRAITED_ENEMIES.length));
+  if (isTraitedEnemies(modifier.instanceId)) return cardTypeOf(instance, printed) === "enemy" && traited(modifier.instanceId.slice(TRAITED_ENEMIES.length));
   if (modifier.instanceId.startsWith(OWN_CHARACTERS)) return instance.controller === Number(modifier.instanceId.slice(OWN_CHARACTERS.length)) && (instance.zone === "heroes" || isCharacterType(printed));
   if (modifier.instanceId === QUESTING_CHARACTERS_CLASS) return instance.committed && (instance.zone === "heroes" || isCharacterType(printed));
   if (modifier.instanceId === DAMAGED_CHARACTERS_CLASS) return instance.damage > 0 && (instance.zone === "heroes" || isCharacterType(printed));
@@ -60,9 +64,9 @@ export function heldBy(modifier: { instanceId: string }, instance: CardInstance,
 }
 
 // The sum of a number modifier the card holds, by its id or by a class it belongs to ("Each Harad enemy gains Archery 2 until the end of the round", 144039:A:1: read by archeryTotal for an enemy that arrives later too).
-export function heldAmountByClass(state: ScenarioState, instance: CardInstance, printed: PrintedCard, stat: ModifierStat): number {
+export function heldAmountByClass(state: ScenarioState, instance: CardInstance, printed: PrintedCard, stat: ModifierStat, has?: TraitCheck): number {
   let total = 0;
-  for (const modifier of state.modifiers) if (modifier.stat === stat && modifierActive(state, modifier) && heldBy(modifier, instance, printed)) total += modifier.amount;
+  for (const modifier of state.modifiers) if (modifier.stat === stat && modifierActive(state, modifier) && heldBy(modifier, instance, printed, has)) total += modifier.amount;
   return total;
 }
 
@@ -97,15 +101,15 @@ export function readyPatch(state: ScenarioState, id: string): { exhausted: false
 // "characters cannot ready from card effects", 12102:A:1; the refresh phase readies it), or not by player card effects
 // (cannotReadyByPlayerCard, on the card or on the class of characters, 19020:A:2). `byPlayer` is the printed cards of the game when
 // the effect comes from a player card; without it the player-card bar does not apply.
-export function readyBarred(state: ScenarioState, id: string, byPlayer?: ReadonlyMap<string, PrintedCard>): boolean {
+export function readyBarred(state: ScenarioState, id: string, byPlayer?: ReadonlyMap<string, PrintedCard>, has?: TraitCheck): boolean {
   if (flagged(state, id, "cannotReady") || flagged(state, id, "cannotReadyByEffect") || readiedThisPhase(state, id)) return true;
   const card = state.cards[id];
   if (byPlayer == null || card == null) return false;
   const printed = printedOf(byPlayer, card.code);
-  return flaggedByClass(state, card, printed, "cannotReadyByPlayerCard");
+  return flaggedByClass(state, card, printed, "cannotReadyByPlayerCard", has);
 }
 
 /** A flag modifier the card holds by its id or by a class it belongs to (`cannotQuest` on every character one seat controls, 00018:B:3). */
-export function flaggedByClass(state: ScenarioState, instance: CardInstance, printed: PrintedCard, stat: ModifierStat): boolean {
-  return state.modifiers.some((modifier) => modifier.stat === stat && modifier.amount > 0 && modifierActive(state, modifier) && heldBy(modifier, instance, printed));
+export function flaggedByClass(state: ScenarioState, instance: CardInstance, printed: PrintedCard, stat: ModifierStat, has?: TraitCheck): boolean {
+  return state.modifiers.some((modifier) => modifier.stat === stat && modifier.amount > 0 && modifierActive(state, modifier) && heldBy(modifier, instance, printed, has));
 }

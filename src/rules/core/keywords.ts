@@ -27,7 +27,8 @@ import { perShadow } from "../families/wizards-quest/khazad.ts";
 import { questProgressBonus } from "../families/wilderland/dolguldur.ts";
 import { printedStat, victoryOf } from "./printed-stat.ts";
 import { wallRoom } from "../families/pelennor/wall.ts";
-import { heldBy } from "./holder-classes.ts";
+import { heldBy, type TraitCheck } from "./holder-classes.ts";
+import { hasTrait } from "../interpret/conditions.ts";
 import { inAreaOf } from "../families/breaking/areas.ts";
 import { versusVictoryTrait } from "../families/captured/values.ts";
 import { eliminateEmpties, markLoss } from "./eliminate.ts";
@@ -69,8 +70,9 @@ export function modifiedStat(
   let gainBarred: boolean | undefined;
   // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2), or its Defense (900506:A:1).
   let floor = total;
+  const has: TraitCheck = (trait) => hasTrait(state, instance.id, trait, { effects: [], cards }); // A class named by a Trait reads the Traits the card has now.
   for (const modifier of state.modifiers) {
-    if (modifier.stat !== stat || !heldBy(modifier, instance, printed)) continue;
+    if (modifier.stat !== stat || !heldBy(modifier, instance, printed, has)) continue;
     if (!modifierActive(state, modifier)) continue;
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
     if (modifier.when?.kind === "versusDefender" && !versusDefender(state, instance, modifier.when, cards)) continue;

@@ -29,7 +29,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 141075 Rode Like a Gale
   {"id":"141075:whenRevealed:1","cardCode":"141075","lines":["141075:A:1"],"timing":"whenRevealed","instructions":[{"verb":"ReturnToStaging","target":{"kind":"engagedEnemies","trait":"Nazgûl","who":"each","pick":"all"}},{"verb":"GainSurge","when":{"kind":"noneReturned"}}]},
   // 141001 Frodo Baggins: the cost is 1 Fellowship resource and exhausting The One Ring, so the Ring must be ready.
-  {"id":"141001:response:1","cardCode":"141001","lines":["141001:A:1"],"timing":"response","trigger":"encounterRevealed","cost":{"kind":"resources","amount":1,"sphere":"fellowship"},"condition":{"kind":"exhausted","code":"141085","is":false},"instructions":[{"verb":"Exhaust","target":{"kind":"byCode","code":"141085"}},{"verb":"CancelEffect"}]},
+  {"id":"141001:response:1","cardCode":"141001","lines":["141001:A:1"],"timing":"response","trigger":"encounterRevealed","cost":{"kind":"resources","amount":1,"sphere":"fellowship"},"condition":{"kind":"exhaustedNamed","name":"The One Ring","is":false},"instructions":[{"verb":"Exhaust","target":{"kind":"byName","name":"The One Ring"}},{"verb":"CancelEffect"}]},
   // 141017 Mr. Underhill
   {"id":"141017:action:1","cardCode":"141017","lines":["141017:A:3"],"timing":"action","cost":{"kind":"addSelfToVictory"},"condition":{"kind":"hasEngaged"},"instructions":[{"verb":"BarAttack"}]},
   // 141077 Gildor Inglorion

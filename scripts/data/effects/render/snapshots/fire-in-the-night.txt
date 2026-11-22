@@ -295,7 +295,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19081:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 19082 Bright Flames
 (the scenario deals it into the encounter pile; the piles place it, no record does)

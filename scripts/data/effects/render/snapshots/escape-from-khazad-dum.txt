@@ -83,7 +83,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51307:A:1 (front): When Revealed: Add the set-aside Durin's Bane to the staging area. It cannot take damage this round. If there is more than 1 player, it makes an immediate attack against the first player.
   51307:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the set-aside card with code 51311 is added to the staging area and enters play: the cards that hear it enter play or be added to the staging area hear it
+    - one set-aside card with code 51311 joins the staging area (it is not revealed)
     - choose enemy (any player controls) in the staging area only, named "Durin's Bane"
     - the picked card: stat cannotTakeDamage 1, until the end of the round
     - then, if 1 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card (or engaged)
@@ -112,7 +112,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51308:A:1 (front): When Revealed: Add the set-aside Durin's Bane to the staging area. It cannot take damage this round. If there is more than 1 player, it makes an immediate attack against the first player.
   51308:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the set-aside card with code 51311 is added to the staging area and enters play: the cards that hear it enter play or be added to the staging area hear it
+    - one set-aside card with code 51311 joins the staging area (it is not revealed)
     - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
     - the picked card: stat cannotTakeDamage 1, until the end of the round
     - then, if 1 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card (or engaged)
@@ -145,7 +145,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51309:A:1 (front): When Revealed: Add the set-aside Durin's Bane to the staging area. It cannot take damage this round. If there is more than 1 player, it makes an immediate attack against the first player.
   51309:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the set-aside card with code 51311 is added to the staging area and enters play: the cards that hear it enter play or be added to the staging area hear it
+    - one set-aside card with code 51311 joins the staging area (it is not revealed)
     - choose enemy (any player controls) in the staging area only, named "Durin's Bane"
     - the picked card: stat cannotTakeDamage 1, until the end of the round
     - then, if 1 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card (or engaged)

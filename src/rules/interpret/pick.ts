@@ -22,6 +22,7 @@ import { sidequestsPickMatches } from "../families/sidequests/pick.ts";
 import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
+import { flaggedByClass } from "../core/holder-classes.ts";
 import { cardTypeOf, isAllyLike, isQuestCardType, isSideQuestType, isPlayerType, printedOf } from "../core/printed.ts";
 import { activeFor, headOf, sharedStaging, sharing } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
@@ -216,6 +217,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.sideQuest && !isSideQuestType(printed.type)) return false;
   if (spec.notCardType && printed.type === spec.notCardType) return false;
   if (spec.committed != null && instance.committed !== spec.committed) return false;
+  if (spec.canQuest != null && flaggedByClass(state, instance, printed, "cannotQuest", (trait) => hasTrait(state, id, trait, ctx)) === spec.canQuest) return false;
   if (spec.participating && !(at.participants ?? []).includes(id)) return false;
   // No card is at another stage in a game with one stage (50805:B:2).
   if (spec.atOtherStage) return false;

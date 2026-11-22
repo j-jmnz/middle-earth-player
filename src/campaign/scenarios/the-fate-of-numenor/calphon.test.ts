@@ -167,6 +167,14 @@ describe("Revenant (11181:A:1 to A:4)", () => {
     expect(revealed.modifiers.filter((modifier) => modifier.stat === "damageLimit")).toHaveLength(1);
   });
 
+  it("holds the limit while it is in play however it came in: put into the staging area or engaged without a reveal (A:3)", () => {
+    for (const layout of [{ staging: [CODES.revenant] }, { engaged: [{ code: CODES.revenant, seat: 0 }] }]) {
+      const made = make({ phase: "Combat", ...layout });
+      const id = idOf(made.state, CODES.revenant);
+      expect(placeDamage(made.state, id, 5, made.ctx.cards, [], "framework", { rule: "rr.damage" }).cards[id]?.damage).toBe(2);
+    }
+  });
+
   it("is shuffled into the encounter deck once destroyed, and the campaign card gains a resource (A:4)", () => {
     const made = make({ phase: "Combat", engaged: [{ code: CODES.revenant, seat: 0 }], deck: ["f0", "f3"], campaign: true, campaignResources: 1 });
     const hit = runInstruction({ ...made.state, window: null }, { verb: "DamageEach", amount: 2, pick: { type: "enemy", control: "any", engaged: "you" } }, { seat: 0, sourceId: made.state.questStage }, made.ctx, []);

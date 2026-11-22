@@ -64,6 +64,8 @@ const VERBS = [
   // each other player, undefended ("resolve this attack against each player. (Attack is undefended against each player not engaged with this
   // enemy.)", 900208:A:2; ltp.undefended-attack): each of them chooses a hero they control, which takes the enemy's Attack as damage.
   z.strictObject({ verb: z.literal("AttackOthersUndefended"), ...when }),
+  // Engine use, queued by AttackOthersUndefended: the picked hero takes `amount` as the combat damage of the attacking enemy, an undefended attack's (rr.step-6-4-3).
+  z.strictObject({ verb: z.literal("StrikeUndefended"), amount: z.number().int().positive() }),
   // All damage is removed from every enemy in play; each player raises his threat by the damage removed from the enemies engaged with him.
   // The effect's X becomes the damage removed ("Remove all damage from all enemies. Then, each player raises his threat by the amount of damage
   // just removed from his engaged enemies. If no damage is removed by this effect", 900209:A:1).

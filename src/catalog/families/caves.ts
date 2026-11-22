@@ -39,6 +39,9 @@ const FLAGS = [
   // progress (families/caves/progress.ts).
   "questProgressCap",
   "questProgressPlaced",
+  // On "table" (engine use): the game has a record that reads the cap, so every placement on the quest is noted from the start of the round, also before a card holds the cap
+  // (rules/interpret/constants.ts, rules/families/caves/progress.ts).
+  "trackQuestPlaced",
   "noQuestProgress",
   // On an enemy, until the end of the attack: the combat damage dealt to it is canceled ("Cancel all combat damage dealt to attacking enemy",
   // 41033:A:2; rules/core/keywords.ts placeDamage).

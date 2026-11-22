@@ -139,9 +139,9 @@ describe("a Lost Island and Revenant", () => {
   it("says Revenant takes at most 2 damage at a time", async () => {
     const world = await loadFateWorld();
     const made = fateTable(world, { staging: [CODES.revenant] });
-    // Its Forced effect sets the limit as it joins the staging area (11181:A:3).
+    // Its constant record holds the limit while it is in play (11181:A:3).
     const id = idOf(made.state, CODES.revenant);
-    const state = addModifier(syncConstants(made.state, made.ctx), id, id, "damageLimit", 2, "whileSourceInPlay");
+    const state = syncConstants(made.state, made.ctx);
     expect(cardEffects(state, made.ctx, id).flags.map((flag) => flag.word)).toEqual(["Takes at most 2 damage at a time"]);
     expect(effectLines(state, made.ctx, id, () => "Revenant")).toEqual(["Takes at most 2 damage at a time: its own text, while it is in play"]);
   });

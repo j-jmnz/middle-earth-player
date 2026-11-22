@@ -48,3 +48,24 @@ describe("entry order", () => {
     expect(state.cards[other.id]?.enteredPlay).toBe(3);
   });
 });
+
+describe("a shadow card leaving its enemy", () => {
+  function dealt() {
+    const state = blankScenario({ seatCount: 1, seed: 1, definition: fixtureDefinition(["stage"]) });
+    const enemy = spawn(state, "orc", { zone: "engaged", seat: 0 });
+    const first = spawn(enemy.state, "shadow-a", { zone: "encounterDeck" });
+    const second = spawn(first.state, "shadow-b", { zone: "encounterDeck" });
+    let next = moveCard(second.state, first.id, { zone: "shadow", enemyId: enemy.id });
+    next = moveCard(next, second.id, { zone: "shadow", enemyId: enemy.id });
+    return { state: next, enemy: enemy.id, first: first.id, second: second.id };
+  }
+
+  it("is no longer attached to the enemy it was dealt to, whichever shadow card it was (rr.shadow-effects)", () => {
+    const { state, enemy, first, second } = dealt();
+    expect([state.cards[first]?.host, state.cards[second]?.host]).toEqual([enemy, enemy]);
+    const gone = moveCard(moveCard(state, first, { zone: "encounterDiscard" }), second, { zone: "encounterDiscard" });
+    expect(gone.cards[enemy]?.shadowId).toBeNull();
+    expect(gone.cards[enemy]?.extraShadowIds).toBeUndefined();
+    expect([gone.cards[first]?.host, gone.cards[second]?.host]).toEqual([null, null]);
+  });
+});

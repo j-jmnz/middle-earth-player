@@ -38,6 +38,7 @@ describe("effects render read fields, picks", () => {
     objective: true,
     cardType: "hero",
     committed: true,
+    canQuest: true,
     attacking: true,
     defending: true,
     hasResources: true,

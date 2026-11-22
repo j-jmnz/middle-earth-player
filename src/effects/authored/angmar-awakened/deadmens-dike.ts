@@ -269,7 +269,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["09074:A:1"],
       timing: "whenRevealed",
       instructions: [
-        { verb: "EnterSetAsideStaging", code: THAURDIR },
+        { verb: "AddSetAsideToStaging", code: THAURDIR },
         // "Then": the reveals resolve only when Thaurdir was added to the staging area (rr.then). Repeat takes no `when`, so the check is on each reveal; the difference is only a reveal that moves Thaurdir out of the staging area mid-way, which nothing in these encounter sets does.
         { verb: "Repeat", times: { players: true }, instructions: [{ verb: "RevealEncounter", when: { kind: "canPick", pick: { ...THAURDIR_PICK, stagingOnly: true } } }] },
       ],

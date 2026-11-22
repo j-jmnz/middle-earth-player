@@ -2,7 +2,7 @@
 // (data/rules/entries.json); ledger lines 906102:A:3, 906107:A:2, 906203:A:1, 906208:A:1, 906304:A:1, 900107:A:3, 900207:A:1, 900208:A:2,
 // 900209:A:1, 900209:A:2.
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
-import type { CardRef, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
+import type { CardRef, Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import { askTarget } from "../../windows/choices.ts";
@@ -28,6 +28,7 @@ import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { engageOutOfPlay, moveResourceFromHeroes, placeResourceTokens, returnToStage, takeHeroPrisoner, takeMorePrisoners } from "./dungeon.ts";
 import { discardAlliesToCost } from "./allies.ts";
+import { attackOthersUndefended, strikeUndefended } from "./undefended-others.ts";
 import { damageOncePerRound } from "./damage-once.ts";
 import { listenerInPlay } from "./guards.ts";
 import { seatThreat } from "../play/hooks.ts";
@@ -83,6 +84,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "AttackOthersUndefended":
       return attackOthersUndefended(state, focus, ctx);
+    case "StrikeUndefended":
+      return strikeUndefended(state, instruction.amount, focus, ctx, steps);
     case "RemoveEnemyDamage":
       return removeEnemyDamage(state, ctx, steps);
     case "MoveDamageTo":
@@ -259,24 +262,6 @@ function engageSeatWith(state: ScenarioState, instruction: Extract<Instruction, 
   return engageEnemy(state, seat, id, steps);
 }
 
-// AttackOthersUndefended (in the effect an attack leaves for its end, the source the attacking enemy): each player other than the one it is
-// engaged with chooses a hero he controls, which takes the enemy's Attack as damage, as an undefended attack's damage (900208:A:2).
-function attackOthersUndefended(state: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
-  const enemy = focus.sourceId ? state.cards[focus.sourceId] : undefined;
-  const data = effectData(state);
-  if (!enemy || enemy.zone !== "engaged" || !data) return state;
-  const amount = modifiedStat(state, enemy, "attack", ctx.cards);
-  if (amount <= 0) return state;
-  const hero: PickSpec = { type: "hero", control: "you" };
-  const items = livingSeats(state)
-    .filter((seat) => seat !== enemy.controller)
-    .flatMap((seat) => [
-      { instruction: { verb: "Pick", pick: hero } as const, seat, chosen: null },
-      { instruction: { verb: "DamageCard", amount, target: "picked" } as const, seat, chosen: null },
-    ]);
-  return patchTop(state, { data: { ...data, queue: [...items, ...data.queue] } });
-}
-
 // RemoveEnemyDamage: every enemy in play loses its damage; each player raises his threat by what came off the enemies engaged with him. The
 // effect's X is the damage removed in all (900209:A:1).
 function removeEnemyDamage(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -323,4 +308,4 @@ function pickMost(
   return markPicked(state, chosen ?? "");
 }
 
-export const manifest: RulesFamily = { name: "nightmare", verbs: ["DiscardAlliesToCost", "AttachToQuest", "SearchToStaging", "AttackActor", "AttachToDamagedDefender", "NotCanceledBy", "SetAsideFromDeck", "EngageSetAside", "PickLowestEngagement", "PickHighestThreat", "PickDiscardTop", "DealShadowFromDiscard", "EngageSeatWith", "PickMostHitPoints", "AttackOthersUndefended", "RemoveEnemyDamage", "MoveDamageTo", "TakeMorePrisoners", "TakeHeroPrisoner", "ReturnToStage", "EngageOutOfPlay", "MoveResourceFromHeroes", "PlaceResourceTokens", "DamageOncePerRound"], run };
+export const manifest: RulesFamily = { name: "nightmare", verbs: ["StrikeUndefended", "DiscardAlliesToCost", "AttachToQuest", "SearchToStaging", "AttackActor", "AttachToDamagedDefender", "NotCanceledBy", "SetAsideFromDeck", "EngageSetAside", "PickLowestEngagement", "PickHighestThreat", "PickDiscardTop", "DealShadowFromDiscard", "EngageSeatWith", "PickMostHitPoints", "AttackOthersUndefended", "RemoveEnemyDamage", "MoveDamageTo", "TakeMorePrisoners", "TakeHeroPrisoner", "ReturnToStage", "EngageOutOfPlay", "MoveResourceFromHeroes", "PlaceResourceTokens", "DamageOncePerRound"], run };

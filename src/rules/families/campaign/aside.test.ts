@@ -76,6 +76,15 @@ describe("SetAsideLogged and AddSetAsideToStaging by trait (145078:A:1, 145078:B
     expect(staged.staging.map((id) => staged.cards[id]?.code).sort()).toEqual(["h1", "h1", "h2"]);
     expect(staged.setAside).toEqual([]);
   });
+
+  it("announces each card it adds as added to the staging area, as an encounter card effect does (rr.in-play-and-out-of-play)", () => {
+    const { state, ctx } = built({ blackGate: { h1: 2, h2: 1, orc: 1 }, corsairFleet: null, blackGateTokens: null });
+    const away = runInstruction(state, { verb: "SetAsideLogged", trait: "Harad" }, focus, ctx, []);
+    const staged = runInstruction(away, { verb: "AddSetAsideToStaging", trait: "Harad", all: true }, focus, ctx, []);
+    const announced = (staged.pendingEvents ?? []).filter((event) => event.trigger === "addedToStaging").map((event) => event.cardId).sort();
+    expect(announced).toEqual([...staged.staging].sort());
+    expect(announced).toHaveLength(3);
+  });
 });
 
 describe("the recorded count (145078:A:1)", () => {

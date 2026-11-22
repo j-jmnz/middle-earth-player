@@ -75,7 +75,7 @@ Read the sections your task touches.
     - 274–285 Scenario state (~540)
     - 286–320 The engine plays the game (~2.3K) ← 5
     - 321–328 Engine steps (~180)
-    - 329–365 Core round (~2.3K) ← 5
+    - 329–365 Core round (~2.3K) ← 6
     - 366–403 Keywords implemented once (~2.1K)
   - 404–446 Deckbuilding (~2.5K) ← 1
   - 447–529 Effects (~4.2K)
@@ -255,7 +255,7 @@ One file per box or cycle: each scenario's mechanics, readings, decisions and ta
   - 256–286 Shadow and Flame (~4.1K) ← 4
   - 287–304 Readings to confirm (~660)
 - `docs/scenarios/ered-mithrin.md` — Ered Mithrin (~16.8K tok)
-  - 32–37 Readings to confirm (~70)
+  - 32–38 Readings to confirm (~130)
 - `docs/scenarios/fellowship-of-the-ring.md` — Fellowship of the Ring (~10.7K tok)
   - 27–41 Scenario 1 resolution (~370)
   - 42–55 A Knife in the Dark (~1.6K) ← 1
@@ -265,12 +265,13 @@ One file per box or cycle: each scenario's mechanics, readings, decisions and ta
   - 99–114 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
   - 115–138 Breaking of the Fellowship, stage 2B (~2.4K) ← 1
   - 139–160 Seeded decks (~660)
-- `docs/scenarios/mirkwood-paths.md` — Mirkwood Paths and The Dark of Mirkwood (~12.4K tok)
-  - 21–34 Passage Through Mirkwood (~1.6K)
-  - 35–48 Journey Along the Anduin (~2.1K)
-  - 49–69 Escape from Dol Guldur (~2.9K)
-  - 70–84 The Oath (~2.4K)
-  - 85–102 The Caves of Nibin-Dûm (~2.5K)
+- `docs/scenarios/mirkwood-paths.md` — Mirkwood Paths and The Dark of Mirkwood (~13.0K tok)
+  - 21–35 Passage Through Mirkwood (~1.8K) ← 1
+  - 36–50 Journey Along the Anduin (~2.3K) ← 1
+  - 51–71 Escape from Dol Guldur (~2.9K)
+  - 72–86 The Oath (~2.4K)
+  - 87–104 The Caves of Nibin-Dûm (~2.4K)
+  - 105–112 Readings to confirm (~190)
 - `docs/scenarios/nightmare.md` — Nightmare (~460 tok)
 - `docs/scenarios/shadows-of-mirkwood.md` — Shadows of Mirkwood (~14.7K tok)
   - 11–32 The Hunt for Gollum (~2.2K) ← 1

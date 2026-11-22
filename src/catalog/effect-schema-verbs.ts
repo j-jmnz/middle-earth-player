@@ -160,10 +160,8 @@ export const simpleVerbs = [
   verbFlags(codeVerb("SetAside"), { setupRole: "dealt" }),
   verbFlags(codeVerb("AttachToRingBearer"), { setupRole: "dealt" }),
   // Moves a card that was set aside, out of play, into the staging area. It is not a reveal. `all`: every set aside copy of the code joins it ("each set aside Soldier of Isengard", 143073:A:1), not one.
-  // Exactly one of `code` and `trait` (the effect schema refuses neither and both). `trait` instead of `code`: the set aside cards with that trait ("add each set aside Harad enemy to the staging area", 145078:B:1; with `all`). `announce`: the card entering play is announced as added to the staging area (`addedToStaging`), for the cards that hear it ("Forced: After Thaurdir enters play", 10166:A:3); without it nothing is announced.
+  // Exactly one of `code` and `trait` (the effect schema refuses neither and both). `trait` instead of `code`: the set aside cards with that trait ("add each set aside Harad enemy to the staging area", 145078:B:1; with `all`). The card is put into the staging area from out of play, so it is added to the staging area and enters play, and the cards that hear it are told (Thaurdir, 10166:A:3, 09074:A:1; Anborn, 144004:A:1).
   z.strictObject({ verb: z.literal("AddSetAsideToStaging"), code: z.string().min(1).optional(), trait: z.string().min(1).optional(), all: z.literal(true).optional(), ...when }),
-  // A set-aside card with this code is added to the staging area and enters play, as an encounter card effect puts a card there (the cards that hear it enter play or be added to the staging area hear it: Thaurdir, 10166:A:3, 09074:A:1). AddSetAsideToStaging does not announce.
-  z.strictObject({ verb: z.literal("EnterSetAsideStaging"), code: z.string().min(1), ...when }),
   // During play: one out-of-play copy of the card (the `outOfPlay` condition's zones) joins the encounter deck, which is
   // shuffled ("shuffle 1 out of play Ringwraith into the encounter deck", 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2).
   // When copies are out of play in more than one zone, the first player chooses which (rr.first-player). Nothing happens
@@ -271,8 +269,9 @@ export const simpleVerbs = [
   // `afterThis`: while the source enemy's attack is in progress the new attack is made once this one has ended ("makes an additional attack against you after this one", 143052:A:1); with no attack under way nothing happens. `blankBonus`: when the shadow card dealt for this attack has no shadow effect the attacking enemy gets this much Attack for the attack ("If Hunting Warg is dealt a shadow card with no shadow effect for this attack, it gets +2 Attack", 51037:A:1).
   // `target: subject`: the enemy the answered event is about, engaged with a player, attacks that player, not the source (a Forced effect of the quest stage, "it makes an immediate attack. Do not deal it a shadow card", 50607:B:2).
   verbFlags(z.strictObject({ verb: z.literal("ImmediateAttack"), shadow: z.literal(false).optional(), keepShadows: z.literal(true).optional(), afterThis: z.literal(true).optional(), target: z.literal("subject").optional(), blankBonus: z.number().int().positive().optional(), ...when }), { runsInFrame: true }),
-  // The attack in progress counts as undefended, even if a defender was declared.
-  verb("ConsiderUndefended"),
+  // The attack in progress counts as undefended, even if a defender was declared. `removeDefenders`: the defending characters are removed from combat first ("Remove all defending
+  // characters from combat. This attack is considered undefended.", 00007:A:2): none of them defends, is announced as a defender or can be declared again.
+  z.strictObject({ verb: z.literal("ConsiderUndefended"), removeDefenders: z.literal(true).optional(), ...when }),
   // The actor readies one hero they control.
   verb("ReadyHero"),
   // Places progress on a non-unique location in play: `perPlayer` for each player in the game.

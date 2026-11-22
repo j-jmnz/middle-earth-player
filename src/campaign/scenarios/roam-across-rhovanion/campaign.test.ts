@@ -101,9 +101,9 @@ describe("Roam Across Rhovanion in the ered-mithrin campaign", { timeout: 60_000
 
   it("asks the first player for the boon ally search (12184:A:2): the pool's allies are offered, the one taken goes to the hand after the mulligan, and a skip takes none", () => {
     const given = afterHeath(2);
-    // Without an answer the checklist stops at the first seat's offer: Turayn, Melanwar and Isolde, or skip.
-    expect(() => rhovanionPlan(2, given)).toThrow();
+    // Given no answer the checklist stops at the first seat's offer (the kit's plan declines it): Turayn, Melanwar and Isolde, or skip.
     const asks = checklist({ log: given, scenario: campaignScenario(rhovanion), seats: rhovanionLoadout(2), effects: EFFECTS, cards });
+    expect(asks.ok).toBe(false);
     expect(!asks.ok && asks.needs).toMatchObject({ seat: 0, options: expect.arrayContaining([CODES.turayn, CODES.melanwar, CODES.isolde, "skip"]) });
     expect(!asks.ok && asks.needs?.note).toBe("Search your deck for a unique boon ally to add to your hand, or skip. It joins your hand after the mulligan, and if you take one no other player does.");
     const state = opened(rhovanionStart(2, 3, "Normal", undefined, given, undefined, [CODES.melanwar]));

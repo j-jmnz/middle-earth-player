@@ -497,7 +497,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51033:A:1 (front): When Revealed: The opposing team chooses any number of non-unique encounter cards in play. Discard the chosen cards and reveal an equal number of cards from the top of the encounter deck.
   51033:whenRevealed:1: When revealed
-    - for each card (any player controls) or in the staging area or the active location, that is an enemy or a location, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the lowest Threat of those (ties: the chooser decides), (enemies engaged with a player included), (unique: false filters nothing: the engine reads only unique: true):
+    - for each non-unique card (any player controls) or in the staging area or the active location, that is an enemy or a location, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the lowest Threat of those (ties: the chooser decides), (enemies engaged with a player included):
       - discard the picked card
       - the acting player reveals an encounter card
 

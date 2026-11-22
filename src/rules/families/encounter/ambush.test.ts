@@ -17,7 +17,7 @@ const SOURCE = treachery("source");
 const AMBUSHER = enemy("ambusher", { keywords: { ambush: true }, engagementCost: 25 });
 const PLAIN = enemy("plain", { engagementCost: 25 });
 
-type Build = { instructions: Instruction[]; deck?: readonly string[]; discard?: readonly string[]; threats?: readonly number[]; seatCount?: 1 | 2; flags?: readonly { instanceId: string; stat: string; amount: number }[]; extra?: readonly Effect[]; firstPlayer?: number };
+type Build = { instructions: Instruction[]; deck?: readonly string[]; discard?: readonly string[]; threats?: readonly number[]; seatCount?: 1 | 2; flags?: readonly { instanceId: string; stat: string; amount: number }[]; extra?: readonly Effect[]; firstPlayer?: number; phase?: "Quest" | "Encounter" };
 
 function run(spec: Build) {
   const record: Effect = { id: "source:whenRevealed:1", cardCode: "source", lines: ["source:A:1"], timing: "whenRevealed", instructions: spec.instructions };
@@ -30,7 +30,7 @@ function run(spec: Build) {
   for (const flag of spec.flags ?? []) state = { ...state, modifiers: [...state.modifiers, { instanceId: flag.instanceId, sourceId: "table", stat: flag.stat as never, amount: flag.amount, until: "endOfGame" }] };
   const source = Object.values(state.cards).find((card) => card.code === "source")!;
   const steps: EngineStep[] = [];
-  const pushed = pushCardEffects({ ...state, firstPlayer: spec.firstPlayer ?? 0, phase: "Quest", window: null }, "whenRevealed", source.id, 0, false, [record], built.ctx, steps);
+  const pushed = pushCardEffects({ ...state, firstPlayer: spec.firstPlayer ?? 0, phase: spec.phase ?? "Quest", window: null }, "whenRevealed", source.id, 0, false, [record], built.ctx, steps);
   const done = settle(pushed, built.ctx, steps);
   return { state: done, steps };
 }
@@ -75,6 +75,12 @@ describe("Ambush (04049:A:1, dwd.ambush)", () => {
 
   it("04045:A:1 ignore ambush: no check is made while the table holds ignoreAmbush", () => {
     expect(where(run({ instructions: REVEAL, deck: ["ambusher"], threats: [30], flags: [{ instanceId: "table", stat: "ignoreAmbush", amount: 1 }] }).state, "ambusher")).toBe("staging");
+  });
+
+  it("01127:B:1 no engagement checks \"during the encounter phase\": the table flag stops an ambush check in that phase only, not the quest phase's", () => {
+    const flags = [{ instanceId: "table", stat: "noEngagementChecks", amount: 1 }];
+    expect(where(run({ instructions: REVEAL, deck: ["ambusher"], threats: [30], flags }).state, "ambusher")).toBe("engaged:0");
+    expect(where(run({ instructions: REVEAL, deck: ["ambusher"], threats: [30], flags, phase: "Encounter" }).state, "ambusher")).toBe("staging");
   });
 
   it("901406:A:2 a seat holding engagementThreat counts it in the ambush check", () => {

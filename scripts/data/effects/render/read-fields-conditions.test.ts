@@ -21,6 +21,7 @@ describe("effects render read fields, conditions", () => {
     phaseEnded: [{ kind: "phaseEnded", is: "Quest" }],
     hasEngaged: [{ kind: "hasEngaged", trait: "Orc" }],
     exhausted: [{ kind: "exhausted", code: "12345", is: true }],
+    exhaustedNamed: [{ kind: "exhaustedNamed", name: "The One Ring", is: true }],
     count: [{ kind: "count", pick: { type: "hero", control: "you" }, min: 1, max: 3 }],
     threat: [{ kind: "threat", min: 20, max: 30 }],
     inPlay: [{ kind: "inPlay", code: "12345", is: true }],

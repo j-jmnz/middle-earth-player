@@ -122,9 +122,9 @@ describe("CommitToQuest and cannotQuest (04023:A:1, 04024:A:1)", () => {
     expect(next.cards[built.ids.b!]?.committed).toBe(true);
   });
 
-  it("an earlier game (no Freezing Cold dealt) commits the character as before", () => {
+  it("refuses a character that cannot quest in every game, with no Freezing Cold dealt too", () => {
     const { built, frozen } = frozenHero([]);
     const next = runInstruction(frozen, { verb: "CommitToQuest", target: "self" }, { seat: 0, sourceId: built.ids.a! }, built.ctx, []);
-    expect(next.cards[built.ids.a!]?.committed).toBe(true);
+    expect(next.cards[built.ids.a!]?.committed).toBe(false);
   });
 });

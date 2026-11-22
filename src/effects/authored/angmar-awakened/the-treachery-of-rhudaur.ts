@@ -92,7 +92,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "10095",
       lines: ["10095:A:1"],
       timing: "whenRevealed",
-      instructions: [{ verb: "EnterSetAsideStaging", code: THAURDIR }, EACH_PLAYER([{ verb: "SearchMove", type: "enemy", trait: "Undead", to: "staging" }]), { verb: "ShuffleEncounterDeck" }],
+      instructions: [{ verb: "AddSetAsideToStaging", code: THAURDIR }, EACH_PLAYER([{ verb: "SearchMove", type: "enemy", trait: "Undead", to: "staging" }]), { verb: "ShuffleEncounterDeck" }],
     },
     { id: "10095:constant:1", cardCode: "10095", lines: ["10095:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: { count: ANY_CLUE, times: 5, negative: true }, until: "whileSourceInPlay", target: "self" }] },
     { id: "10095:constant:2", cardCode: "10095", lines: ["10095:B:2"], timing: "constant", condition: { kind: "hitPointsLeft", code: THAURDIR }, instructions: [{ verb: "Restrict", what: "advance" }] },

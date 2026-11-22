@@ -11,6 +11,7 @@ import { runInstruction } from "../../interpret/interpret.ts";
 import { placeDamage } from "../../core/keywords.ts";
 import { legalIntents, legalTargets } from "../../engine/legal.ts";
 import { settle } from "../../engine/machine.ts";
+import { attackNowFromStaging } from "./watcher.ts";
 import { reduce } from "../../engine/reduce.ts";
 import { flagged, type ScenarioState } from "../../core/state.ts";
 import { DOORS, loadSouthWorld, REDHORN_PASS, southTable, WATCHER, type SouthLayout, type SouthWorld } from "../../../../test/scenarios/the-ring-goes-south/scene.ts";
@@ -204,5 +205,17 @@ describe("an enemy engaged with each player while it stays in the staging area (
     expect(nextEnemyGroup({ ...state, resolvedAttacks: [`${watcher}@0`] })).toEqual({ seat: 1, enemies: [watcher] });
     expect(nextEnemyGroup({ ...state, resolvedAttacks: [`${watcher}@0`, `${watcher}@1`] })).toBeNull();
     void ctx;
+  });
+});
+
+describe("an attack from the staging area deals one shadow card (rr.attacks-outside-the-combat-phase, faq.additional-attacks)", () => {
+  it("deals the Watcher in the Water, considered engaged with each player, a single shadow card for an attack an effect gives it", () => {
+    const { state, ctx } = make({ stage: "142023", staging: [WATCHER], active: DOORS, deck: ["place", "place2", "place"] });
+    const watcher = first(state, WATCHER);
+    const begun = attackNowFromStaging(state, watcher, 0, ctx, [], { shadow: true });
+    expect(begun.pendingAttack?.enemyId).toBe(watcher);
+    expect(begun.cards[watcher]?.shadowId).toBeDefined();
+    expect(begun.encounterDeck).toHaveLength(2);
+    expect(begun.encounterDiscard).toEqual([]);
   });
 });

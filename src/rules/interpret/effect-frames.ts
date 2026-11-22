@@ -61,6 +61,8 @@ export type EffectSpec = {
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip).
   excess?: number;
+  // The Attack the attack struck with (AttackOthersUndefended).
+  struck?: number;
   // The ally that attack destroyed, for the copies search of 10137:A:2.
   destroyedAlly?: string;
   destroyedCharacter?: string;
@@ -99,6 +101,7 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.activeAtStart ? { activeAtStart: spec.activeAtStart } : {}),
     ...(spec.dealt != null ? { dealt: spec.dealt } : {}),
     ...(spec.excess != null ? { excess: spec.excess } : {}),
+    ...(spec.struck != null ? { struck: spec.struck } : {}),
     ...(spec.destroyedAlly ? { destroyedAlly: spec.destroyedAlly } : {}),
     ...(spec.destroyedCharacter ? { destroyedCharacter: spec.destroyedCharacter } : {}),
     ...(spec.hold ? { hold: spec.hold } : {}),

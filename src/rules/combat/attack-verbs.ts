@@ -16,6 +16,7 @@ import type { ScenarioState } from "../core/state.ts";
 import { livingSeats } from "../core/state.ts";
 import type { VerbFocus } from "../interpret/verbs.ts";
 import { moveCard } from "../core/zones.ts";
+import { declaredDefenders } from "../families/defense/defenders.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 
@@ -23,8 +24,15 @@ import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 export function runAttackVerb(state: ScenarioState, instruction: Instruction, focus: VerbFocus, steps: EngineStep[]): ScenarioState {
   const attack = state.pendingAttack;
   switch (instruction.verb) {
-    case "ConsiderUndefended":
-      return attack ? { ...state, pendingAttack: { ...attack, undefended: true } } : state;
+    case "ConsiderUndefended": {
+      if (!attack) return state;
+      if (instruction.removeDefenders !== true) return { ...state, pendingAttack: { ...attack, undefended: true } };
+      // "Remove all defending characters from combat" (00007:A:2): the declared defenders leave the attack and cannot be declared again; nobody defends it.
+      const { defenderId: _first, ...rest } = attack;
+      const { extra: _extra, ...defense } = attack.defense ?? {};
+      const removed = declaredDefenders(attack);
+      return { ...state, pendingAttack: { ...rest, undefended: true, removedDefenders: [...(attack.removedDefenders ?? []), ...removed], ...(attack.defense ? { defense } : {}) } };
+    }
     case "AfterAttack":
       return attack ? { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), ...instruction.instructions], afterCause: currentCause(steps, UNATTRIBUTED) } } : state;
     case "EngageNextPlayer": {

@@ -2,6 +2,7 @@
 import { isStatCondition, type Instruction, type ModifierStat, type PickSpec } from "../../catalog/boundary.ts";
 
 import { resolveAmount } from "./amounts.ts";
+import { gameReads } from "../core/game-reads.ts";
 
 import { characters } from "../combat/combat.ts";
 import { hasTrait } from "./conditions.ts";
@@ -127,6 +128,8 @@ function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
       });
     }
   }
+  // A game with a record that reads a per-round cap on the quest notes every placement, so progress placed before the card that holds the cap arrives counts against it.
+  if (gameReads(state, ctx, '"stat":"questProgressCap"')) found.push({ instanceId: "table", sourceId: "table", stat: "trackQuestPlaced", amount: 1, until: "endOfGame", origin: "questProgressCap" });
   return found;
 }
 

@@ -71,7 +71,7 @@ export type BelegostGolden = { name: string; seatCount: 1 | 2; seed: number; dif
 // The games to pin (about 2300 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal (a hero quests, one defends and one attacks, so Lurker of the Depths is destroyed for stage 2A and
 // Naurlhûg at stage 4A), and the two ways to lose: every player's threat at 50 (heroes too small to quest) and every hero destroyed (brittle heroes). No card of the scenario ends the game itself and it has no Nightmare deck.
 export const BELEGOST_GOLDENS: readonly BelegostGolden[] = [
-  { name: "solo win", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "solo win", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "solo loss: threat 50", seatCount: 1, seed: 3, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed loss: every hero destroyed", seatCount: 2, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },

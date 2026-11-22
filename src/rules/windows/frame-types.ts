@@ -122,6 +122,8 @@ export type EffectData = {
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip): the X of "excess damage" an effect left for the attack's end reads.
   excess?: number;
+  // The Attack the enemy struck with, for an effect the attack leaves for its end that resolves the same attack against another player (900208:A:2).
+  struck?: number;
   // The ally the attack the effect was left by destroyed (DiscardCopiesFromDeck of "other", 10137:A:2).
   destroyedAlly?: string;
   // The first character the attack the effect was left by destroyed, a hero or an ally ("reanimate that character", 101161:A:2).
@@ -265,6 +267,8 @@ export type PendingAttack = {
   heroId?: string;
   // A shadow effect made the attack count as undefended.
   undefended?: boolean;
+  // The Attack the enemy dealt with, noted at the damage step only in a game with a card that resolves the attack against each player (AttackOthersUndefended).
+  struck?: number;
   // Characters a shadow effect removed from this attack as its defender (RemoveDefender, 51335:A:2): none of them can be declared as a defender again for it.
   removedDefenders?: readonly string[];
   // A shadow effect made the attack capture an ally it would damage instead (CaptureInsteadOfDamage, families/captured/).

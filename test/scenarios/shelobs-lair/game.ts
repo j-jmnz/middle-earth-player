@@ -110,10 +110,10 @@ export type LairGolden = { name: string; seatCount: 1 | 2; seed: number; difficu
 // Shelob), take the first of SAFE_CHOICES when a card asks (cards from the hand and an attack by Shelob rather than resources on her, which would keep the quest from the stage 3 threat) and attack Gollum, then Shelob, with one
 // character at a time until Cleft's Attack and engagement have made her a target and her resources are spent.
 export const LAIR_GOLDENS: readonly LairGolden[] = [
-  { name: "true solo, won, Normal", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
-  { name: "true solo, won, Easy", seatCount: 1, seed: 23, difficulty: "Easy", decks: "strong", outcome: "won", after: true },
-  { name: "two-handed, won, Normal", seatCount: 2, seed: 9, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
-  { name: "two-handed, won, Easy", seatCount: 2, seed: 13, difficulty: "Easy", decks: "strong", outcome: "won", after: true },
+  { name: "true solo, won, Normal", seatCount: 1, seed: 15, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
+  { name: "true solo, won, Easy", seatCount: 1, seed: 49, difficulty: "Easy", decks: "strong", outcome: "won", after: true },
+  { name: "two-handed, won, Normal", seatCount: 2, seed: 21, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
+  { name: "two-handed, won, Easy", seatCount: 2, seed: 99, difficulty: "Easy", decks: "strong", outcome: "won", after: true },
   { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
   { name: "two-handed, lost, threat reaches 50", seatCount: 2, seed: 3, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
   { name: "true solo, lost, every hero is destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "No seats remain" },

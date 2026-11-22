@@ -72,7 +72,14 @@ describe("The Dark of Nibin-Dûm, stage 1 (41004:A:1, 41004:B:1)", () => {
     const lone = answered(settle(questStageStart({ ...twins.state, window: null }, twins.ctx, []), twins.ctx, []), twins.ctx);
     expect(codesIn(lone, "staging")).toEqual(["41033"]);
   });
+  it("searches the encounter deck alone: a location in the discard pile is not found (41004:B:1)", () => {
+    const made = make({ seats: 2, deck: ["f0", "41033"], discard: ["41034", "41032"], staging: [] });
+    const current = answered(settle(questStageStart({ ...made.state, window: null }, made.ctx, []), made.ctx, []), made.ctx);
+    expect(codesIn(current, "staging")).toEqual(["41033"]);
+    expect(codesIn(current, "encounterDiscard").sort()).toEqual(["41032", "41034"]);
+  });
 });
+
 
 describe("Surprise Attack, stage 2 (41005:A:1, 41005:B:1, 41005:B:2)", () => {
   it("adds the set-aside Goblin Chieftain and has each player search the deck and discard pile for an enemy", () => {

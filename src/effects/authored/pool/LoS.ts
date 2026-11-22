@@ -3,8 +3,8 @@ import type { Effect } from "../../../catalog/boundary.ts";
 // Records for the LoS player cards whose lines no template reads (data/cards/LoS.json). An id here that a template also
 // produces replaces the generated record; list it in REPLACES.
 export const RECORDS: readonly Effect[] = [
-  // 144001 Frodo Baggins. The One Ring in play is the Fellowship box's (141085), the only saga Ring a playable scenario deals.
-  {"id":"144001:action:1","cardCode":"144001","lines":["144001:A:1"],"timing":"action","cost":[{"kind":"resources","amount":1,"sphere":"fellowship"},{"kind":"exhaustCode","code":"141085"}],"instructions":[{"verb":"ModifyStat","stat":"willpower","amount":2,"until":"endOfRound"},{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfRound"}]},
+  // 144001 Frodo Baggins. The One Ring is the copy the player controls, whichever box printed it.
+  {"id":"144001:action:1","cardCode":"144001","lines":["144001:A:1"],"timing":"action","cost":[{"kind":"resources","amount":1,"sphere":"fellowship"},{"kind":"exhaustNamed","name":"The One Ring"}],"instructions":[{"verb":"ModifyStat","stat":"willpower","amount":2,"until":"endOfRound"},{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfRound"}]},
   // 144002 Faramir: readying a ready ally would not change the game state (rr.triggered-ability).
   {"id":"144002:response:1","cardCode":"144002","lines":["144002:A:2"],"timing":"response","trigger":"engaged","eventSeat":"you","limit":"oncePerPhase","condition":{"kind":"canPick","pick":{"type":"ally","control":"you","state":"exhausted"}},"instructions":[{"verb":"Pick","pick":{"type":"ally","control":"you","state":"exhausted"}},{"verb":"Ready","target":"picked"}]},
   // 144004 Anborn

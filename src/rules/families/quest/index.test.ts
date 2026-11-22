@@ -5,7 +5,7 @@
 // keeps its player in the game, skipping the quest phase, committing by effect, choosing X and spending resources.
 import { describe, expect, it } from "vitest";
 
-import type { Effect, Instruction } from "../../../catalog/boundary.ts";
+import type { Condition, Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { cardMap, expectOk, hero, idleScenario } from "../../core/test-fixture.ts";
@@ -16,7 +16,10 @@ import { settle } from "../../engine/machine.ts";
 import { definePrinted } from "../../core/printed.ts";
 import { updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
+import { holds } from "../../interpret/conditions.ts";
 import { recordStartingThreat } from "./threat.ts";
+import { RECORDS as QUEST_RECORDS } from "../../../effects/authored/families/quest.ts";
+import { ownCharacters } from "../../core/holder-classes.ts";
 
 const stage = definePrinted({ code: "stage", name: "Stage", type: "quest", questPoints: 20 });
 const goblin = definePrinted({ code: "goblin", name: "Goblin", type: "enemy", traits: ["Orc"], engagementCost: 30, threat: 3, attack: 2, defense: 1, health: 3 });
@@ -166,6 +169,46 @@ describe("committing by an effect (rr.step-3-2)", () => {
     expect(picked.cards[ally.id]?.committed).toBe(true);
     expect(picked.cards[ally.id]?.exhausted).toBe(false);
     expect(committedWillpower(picked, cards)).toBe(2);
+  });
+
+  // A bar on questing held by the card or by every character one seat controls (00018:B:3), in a game that deals no Freezing Cold.
+  const barred = (state: ScenarioState, by: "card" | "class", id: string): ScenarioState => ({ ...state, modifiers: [...state.modifiers, { instanceId: by === "card" ? id : ownCharacters(0), sourceId: "bar", stat: "cannotQuest", amount: 1, until: "endOfRound" }] });
+
+  it.each(["card", "class"] as const)("refuses a character that cannot quest, held by its %s, in any game (rr.cannot)", (by) => {
+    const hook = record("pipe:action:1", "pipe", "action", [{ verb: "Pick", pick: { type: "ally", control: "you" } }, { verb: "CommitToQuest", target: "picked" }]);
+    const { state: base } = table();
+    const ally = add(base, "eagle", "play");
+    const source = add(ally.state, "pipe", "play");
+    const done = run(barred(source.state, by, ally.id), hook, source.id, [hook]);
+    expect(done.cards[ally.id]?.committed).toBe(false);
+    const free = run(source.state, hook, source.id, [hook]);
+    expect(free.cards[ally.id]?.committed).toBe(true);
+  });
+
+  it("does not offer Late Adventurer for a character that cannot quest, so no cost is paid for nothing (131017:A:1)", () => {
+    const late = QUEST_RECORDS.find((item) => item.id === "131017:action:1")!;
+    const spare = late.condition?.kind === "all" ? late.condition.conditions.find((item) => item.kind === "canPick") : undefined;
+    expect(spare).toBeDefined();
+    const { state: base } = table();
+    const scope = { actor: 0, sourceId: null, returned: 0 };
+    const ctx = { effects: [late], cards };
+    expect(holds(base, spare!, scope, ctx)).toBe(true);
+    expect(holds(barred(base, "class", ""), spare!, scope, ctx)).toBe(false);
+  });
+
+  it.each(["12116:response:1", "10007:action:1", "11005:action:1"])("does not offer %s for a host that cannot quest (12116:A:3, 10007:A:2, 11005:A:2)", (id) => {
+    const record = QUEST_RECORDS.find((item) => item.id === id)!;
+    const found = (condition: Condition | undefined): Extract<Condition, { kind: "matches" }> | undefined => (condition?.kind === "matches" ? condition : condition?.kind === "all" ? condition.conditions.map(found).find((item) => item != null) : undefined);
+    const hosted = found(record.condition);
+    expect(hosted).toBeDefined();
+    const { state: base, heroes } = table();
+    const host = heroes[0]?.[0] ?? "";
+    const attached = add(base, "pipe", "play");
+    const state = updateCard(updateCard(attached.state, attached.id, { host }), host, { attachments: [attached.id] });
+    const scope = { actor: 0, sourceId: attached.id, returned: 0 };
+    const ctx = { effects: [record], cards };
+    expect(holds(state, hosted!, scope, ctx)).toBe(true);
+    expect(holds(barred(state, "card", host), hosted!, scope, ctx)).toBe(false);
   });
 
   it("lets a character that can commit while exhausted be committed in the commitment step (11009:A:1)", () => {
