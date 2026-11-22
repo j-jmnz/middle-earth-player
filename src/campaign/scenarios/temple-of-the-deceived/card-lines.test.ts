@@ -1,5 +1,5 @@
 // Rules: dcce.island-map, dcce.exploration, dcce.uncharted, rr.travel, rr.immune, rr.attachment-cards, rr.action, rr.forced (data/rules/entries.json); ledger lines 12068:B:2, 12069:B:2, 12069:B:3,
-// 12069:B:4, 12072:B:2 to 12072:B:4, 12073:B:2 to 12073:B:4, 12074:B:2 to 12074:B:4 (data/printed/dream-chaser.json). The Temple of the Deceived side of the Temple locations and the Lost Island side of
+// 12069:B:4, 12072:B:2, 12072:B:3, 12072:B:4, 12073:B:2, 12073:B:3, 12073:B:4, 12074:B:2, 12074:B:3, 12074:B:4 (data/printed/dream-chaser.json). The Temple of the Deceived side of the Temple locations and the Lost Island side of
 // Jagged Cliffs, Winding Caverns and Jungle Path, each test run on a table of plain-number heroes (test/scenarios/temple-of-the-deceived/scene.ts) and run again with the records of its line left out,
 // where the table must come out otherwise.
 import { beforeAll, describe, expect, it } from "vitest";

@@ -17,7 +17,7 @@ const HIRED_MUSCLE = "50726";
 const LAWLESS_RUFFIAN = "50723";
 const F0 = ["f0", "f0", "f0", "f0"];
 
-describe("Cannot have attachments (50709:A:1 to 50713:A:1)", () => {
+describe("Cannot have attachments (50709:A:1, 50710:A:1, 50711:A:1, 50712:A:1, 50713:A:1)", () => {
   for (const code of SUSPECTS) {
     lineSpec(`${code}:A:1`, "a player attachment cannot attach to the Suspect, in the staging area or engaged", (effects) => {
       const staged = tableFromLayout(SCENARIO, { staging: [code] }, { effects });
