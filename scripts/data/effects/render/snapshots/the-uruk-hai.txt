@@ -212,7 +212,7 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 
 143031:A:1 (front): When Revealed: Each character committed to the quest gets -1 Willpower until the end of the round.
   143031:whenRevealed:1: When revealed
-    - each character (any player controls) committed to the quest: stat willpower -1, until the end of the round
+    - each character (any player controls) committed to the quest (only the cards that match now: one that arrives later does not get it): stat willpower -1, until the end of the round
 
 143031:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   143031:shadow:1: Shadow

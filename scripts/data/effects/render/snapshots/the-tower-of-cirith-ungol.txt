@@ -158,7 +158,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     - for each enemy (any player controls) in the staging area only:
       - deal 1 damage to the picked card
     - then, if the number of enemy (any player controls) in the staging area only is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
-    - every enemy in play: stat threatPerDamage 1, until the end of the phase
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat threatPerDamage 1, until the end of the phase
 
 146023:A:2 (shadow): Shadow: If you are engaged with another enemy, resolve this attack against that enemy.
   146023:shadow:1: Shadow

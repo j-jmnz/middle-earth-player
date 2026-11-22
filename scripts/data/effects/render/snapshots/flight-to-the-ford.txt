@@ -126,7 +126,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141061:A:1 (front): While Ettenmoors is the active location, do not deal Nazgûl enemies a shadow card during the combat phase.
   141061:constant:1: Constant
     only if this card is the active location
-    - every enemy in play (Nazgûl only): stat noShadowDealt 1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts (Nazgûl only): stat noShadowDealt 1, while this card is in play
 
 141061:A:2 (front): Forced: After any amount of progress is placed on Ettenmoors, reduce the Ring-bearer's life by 1.
   141061:forced:1: Forced on the event progressPlaced
@@ -216,7 +216,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141067:A:1 (front): When Revealed: Treat the text box of each character in play as blank (except for Traits) until the end of the round. If there is a Nazgûl enemy in the staging area, The Nine are Abroad gains surge.
   141067:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each character (any player controls): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
+    - each character (any player controls) (only the cards that match now: one that arrives later does not get it): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
     - then, if the number of Nazgûl enemy (any player controls) in the staging area only is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 141067:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
@@ -422,7 +422,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 906305:A:2 (front): While Great East Road is in the staging area, each Nazgûl enemy gets -5 engagement cost.
   906305:constant:2: Constant
     only if this card is in the staging area
-    - every enemy in play (Nazgûl only): stat engagementCost -5, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts (Nazgûl only): stat engagementCost -5, while this card is in play
 
 906305:A:3 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an immediate attack.
   906305:shadow:1: Shadow

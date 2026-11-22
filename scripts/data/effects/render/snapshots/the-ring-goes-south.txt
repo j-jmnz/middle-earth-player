@@ -223,7 +223,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142031:A:1 (front): While Tree-crowned Hill is the active location, each enemy gets -1 Threat.
   142031:constant:1: Constant
     only if this card is the active location
-    - every enemy in play: stat threat -1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat threat -1, while this card is in play
 
 142031:A:2 (front): Forced: When Tree-crowned Hill is explored, the players, as a group, exhaust X characters in play. X is the number of damage here.
   142031:forced:1: Forced after a card leaves play (heard about this card)
@@ -337,7 +337,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
         - choose, among the enemies in the staging area with the trait Warg, the one with the highest engagement cost (ties: the first player chooses), or pick nothing when there is none
         - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
       * option "engagement":
-        - each Warg enemy (any player controls) in the staging area only: stat engagementCost -20, until the end of the round
+        - each Warg enemy (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat engagementCost -20, until the end of the round
     - then, if not (the number of Warg enemy (any player controls) in the staging area only is at least 1) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 142084 Lust for the Ring

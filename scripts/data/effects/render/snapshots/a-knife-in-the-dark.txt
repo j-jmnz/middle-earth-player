@@ -150,7 +150,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141046:A:2 (front): While Weathertop is in the victory display, each enemy in play gets -1 Threat.
   141046:constant:1: Constant
     only if this card is in the victory display
-    - every enemy in play: stat threat -1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat threat -1, while this card is in play
 
 141046:A:3 (front): Travel: The first player must exhaust The One Ring to travel here.
   141046:travel:1: Travel
@@ -164,8 +164,8 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   141047:constant:1: Constant
     only if this card is in the staging area
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - every enemy in play (Spy only): stat threat 1, while this card is in play
-    - every enemy in play (Spy only): stat attack 1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts (Spy only): stat threat 1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts (Spy only): stat attack 1, while this card is in play
 
 141047:A:2 (shadow): Shadow: Defending player discards 1 random card from his hand.
   141047:shadow:1: Shadow
@@ -179,9 +179,9 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   141048:constant:1: Constant
     only if this card is the active location
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - every enemy in play: stat cannotAttack 1, while this card is in play
-    - every enemy in play: stat cannotTakeDamage 1, while this card is in play
-    - every enemy in play: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat cannotAttack 1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat cannotTakeDamage 1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
 
 141048:A:2 (front): Forced: After Midgewater becomes the active location, return each engaged enemy in play to the staging area.
   141048:forced:1: Forced after this location becomes the active location

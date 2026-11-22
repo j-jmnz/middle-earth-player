@@ -161,9 +161,9 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
           - exhaust the card with code 03041
           - the effect's X grows by 1
         * option "keep":
-    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy (any player controls) in the staging area only: stat threat 1, until the end of the phase
-    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
-    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): each Dark location (any player controls) in the staging area only: stat threat 2, until the end of the phase
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): each location (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): each Dark location (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 2, until the end of the phase
 
 03040:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack.
   03040:shadow:1: Shadow

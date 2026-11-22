@@ -49,7 +49,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 19036:A:2 (front): Action: Exhaust Durin's Key to give each location -1 Threat until the end of the phase.
   19036:action:1: Action (cost: exhaust this card)
     who acts: any player may trigger it; the acting player is the one who does
-    - each location (any player controls): stat threat -1, until the end of the phase
+    - each location (any player controls) (only the cards that match now: one that arrives later does not get it): stat threat -1, until the end of the phase
 
 19036:A:3 (front): Forced: At the beginning of the quest phase, the player who controls Durin's Key looks at the top 3 cards of the encounter deck, chooses 1 to reveal, and discards the rest.
   19036:forced:1: Forced when a phase begins

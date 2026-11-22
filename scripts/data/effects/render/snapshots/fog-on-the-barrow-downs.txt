@@ -300,7 +300,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148017:A:2 (front): When Revealed: Until the end of the round, players cannot trigger Action or Response effects.
   148017:whenRevealed:1: When revealed
-    - each player (any player controls) at the acting player's staging area (every area before they are separate): stat cannotTriggerEffects (the holder cannot start its own Action or Response abilities; held by a player, he triggers no Action or Response and plays no event; Constant and Forced effects still work) 1, until the end of the round
+    - each player (any player controls) at the acting player's staging area (every area before they are separate) (only the cards that match now: one that arrives later does not get it): stat cannotTriggerEffects (the holder cannot start its own Action or Response abilities; held by a player, he triggers no Action or Response and plays no event; Constant and Forced effects still work) 1, until the end of the round
 
 148017:A:3 (shadow): Shadow: Until the end of the round, attacking enemy cannot take damage.
   148017:shadow:1: Shadow

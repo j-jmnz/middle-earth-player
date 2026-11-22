@@ -213,7 +213,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     - choose enemy (any player controls) or in the staging area, named "Dagnir"
     - for each player, first player first:
       - if any of: (there is a enemy (any player controls) engaged with you, named "Dagnir" to choose) or (the number of card (any player controls) in the victory display, a quest card of any kind (a quest stage, an encounter side quest or a player side quest) is at least 5): the picked enemy attacks the acting player now, from the staging area, dealt a shadow card (or engaged)
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy (any player controls) or in the staging area, named "Dagnir": stat engagementCost -30, until the end of the round
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy (any player controls) or in the staging area, named "Dagnir" (only the cards that match now: one that arrives later does not get it): stat engagementCost -30, until the end of the round
 
 19132:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   19132:shadow:1: Shadow

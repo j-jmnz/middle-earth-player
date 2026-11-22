@@ -270,7 +270,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
   10139:forced:1: Forced on the event progressPlaced
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each character (any player controls): stat defense -2, until the end of the round
+    - each character (any player controls) (only the cards that match now: one that arrives later does not get it): stat defense -2, until the end of the round
     - then, if the card with code 10127 is in play (checked when this step runs, after the steps above; not tied to whether they did anything): the card with code 10127 in play is flipped to the card with code 10128, where it lies, with its tokens and attachments
 
 10139:A:3 (front): Response: After Furious Charge is defeated, add 10 progress to the main quest.

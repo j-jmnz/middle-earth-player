@@ -361,7 +361,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
   10081:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (this card does not hold the flag progressPlacedHere (the engine puts it on a side quest when progress is placed on it, until the end of the round; once a round))
     who acts: the acting player is the first player (a phase has no player of its own)
-    - every enemy in play: stat engagementCost -20, until the end of the round
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat engagementCost -20, until the end of the round
 
 10081:A:2 (front): Response: After this stage is defeated, choose an enemy in the staging area and shuffle it into the encounter deck.
   10081:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)

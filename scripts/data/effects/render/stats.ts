@@ -34,7 +34,7 @@ const TARGET_STAT: Readonly<Record<string, string>> = {
   stagingCards: "every enemy and location in the staging area, now and arriving there later while the effect lasts",
   locationsInPlay: "every location in play (staging area or active) with the trait, now and arriving later while the effect lasts",
   heroes: "every hero in play",
-  enemies: "every enemy in play",
+  enemies: "every enemy in play, staged or engaged, now and entering later while the effect lasts",
   allies: "every ally in play, now and entering later",
   characters: "every character in play, now and entering later",
   attacker: "the attacking enemy",
@@ -88,7 +88,8 @@ function attachBar(i: Obj): string {
 
 export const STAT_TEMPLATES: Readonly<Record<string, Template>> = {
   ModifyStat: (i, ctx) => {
-    const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
+    const lasting = i.until === "endOfPhase" || i.until === "endOfRound" || i.until === "endOfAttack";
+    const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}${lasting ? " (only the cards that match now: one that arrives later does not get it)" : ""}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
     const per = typeof i.per === "string" ? ` for each ${i.per}` : "";
     const trait = typeof i.trait === "string" ? ` (${i.trait} only)` : "";
     const sign = i.subtract === true ? "minus " : "";

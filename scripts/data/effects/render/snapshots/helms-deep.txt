@@ -159,8 +159,8 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if the card the event is about had enough progress to be explored
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - every enemy in play: stat engagementCost -20, until the end of the round
-    - every enemy in play: stat attack 2, until the end of the round
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat engagementCost -20, until the end of the round
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat attack 2, until the end of the round
 
 ## 143042 Scaling Ladders
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -172,7 +172,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
   143042:whenRevealed:1: When revealed
     - this treachery attaches to the active location, chosen by the first player among them; it stays in the staging area's discard when the location already holds a copy (Limit 1 per location) or none is active; the effect's X is 1 when it attached, else 0
   143042:constant:1: Constant
-    - every enemy in play: stat threat 1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat threat 1, while this card is in play
 
 143042:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 1 progress on the current quest.
   143042:shadow:1: Shadow

@@ -212,7 +212,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144051:A:1 (front): When Revealed: Each location in the staging area gets +1 Threat until the end of the round. If the number of locations in the staging area is less than the number of players in the game, reveal an additional encounter card.
   144051:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each location (any player controls) in the staging area only: stat threat 1, until the end of the round
+    - each location (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the round
     - then, if the number of location (any player controls) in the staging area only is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reveals an encounter card
 
 144051:A:2 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the active location's Threat.
@@ -304,7 +304,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144062:A:1 (front): When Revealed: Shelob gets +2 Attack until the end of the phase. Shelob makes an immediate attack against each player, in player order.
   144062:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each enemy (any player controls) or in the staging area, named "Shelob": stat attack 2, until the end of the phase
+    - each enemy (any player controls) or in the staging area, named "Shelob" (only the cards that match now: one that arrives later does not get it): stat attack 2, until the end of the phase
     - choose enemy (any player controls) or in the staging area, named "Shelob"
     - for each player, first player first:
       - if there is a enemy (any player controls) or in the staging area, named "Shelob" to choose: the picked enemy attacks the acting player now, from the staging area, dealt a shadow card (or engaged)

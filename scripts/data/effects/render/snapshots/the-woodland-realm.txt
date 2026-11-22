@@ -216,7 +216,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51114:A:1 (front): When Revealed: Until the end of the round, treat each character's printed text box as if it were blank (except for Traits).
   51114:whenRevealed:1: When revealed
-    - each character (any player controls): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
+    - each character (any player controls) (only the cards that match now: one that arrives later does not get it): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
 
 51114:A:2 (shadow): Shadow: Treat the defending character's text box as if it were blank until the end of the phase (except for Traits).
   51114:shadow:1: Shadow
@@ -558,7 +558,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51137:A:1 (front): When Revealed: Until the end of the phase, each location in the staging area gets +1 Threat.
   51137:whenRevealed:1: When revealed
-    - each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - each location (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
 
 51137:A:2 (shadow): Shadow: Each enemy engaged with you gets +1 Attack until the end of the phase.
   51137:shadow:1: Shadow

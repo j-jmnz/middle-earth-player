@@ -144,7 +144,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10018:A:1 (front): When Revealed: Each Warg enemy gets +1 Threat until the end of the phase.
   10018:whenRevealed:1: When revealed
-    - every enemy in play (Warg only): stat threat 1, until the end of the phase
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts (Warg only): stat threat 1, until the end of the phase
 
 10018:A:2 (shadow): Shadow: After this attack, attacking enemy engages the next player, then makes an immediate attack (deal a new shadow card for that attack).
   10018:shadow:1: Shadow

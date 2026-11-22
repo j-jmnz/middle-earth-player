@@ -76,8 +76,8 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
   144029:forced:1: Forced after an enemy engages a player (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - every enemy in play (Harad only): stat attack 1, until the end of the round
-    - every enemy in play (Harad only): stat engagementCost -10, until the end of the round
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts (Harad only): stat attack 1, until the end of the round
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts (Harad only): stat engagementCost -10, until the end of the round
 
 144029:A:2 (shadow): Shadow: If this attack destroys a character, return attacking enemy to the staging area.
   144029:shadow:1: Shadow
@@ -135,7 +135,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 144033:A:1 (front): While Foothills of Ephel Dúath is the active location, each Harad enemy gets -1 Threat.
   144033:constant:1: Constant
     only if this card is the active location
-    - every enemy in play (Harad only): stat threat -1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts (Harad only): stat threat -1, while this card is in play
 
 144033:A:2 (front): Travel: The first player engages an enemy in the staging area to travel here.
   144033:travel:1: Travel
@@ -232,7 +232,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144039:A:1 (front): When Revealed: Each Harad enemy gains Archery 2 until the end of the round.
   144039:whenRevealed:1: When revealed
-    - every enemy in play (Harad only): stat archery 2, until the end of the round
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts (Harad only): stat archery 2, until the end of the round
 
 144039:A:2 (shadow): Shadow: Either place attacking enemy facedown under The Black Gate after this attack, or it makes an additional attack against you after this one.
   144039:shadow:1: Shadow

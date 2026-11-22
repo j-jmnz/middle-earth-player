@@ -641,8 +641,8 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51244:A:1 (front): When Revealed: Each enemy and location in the staging area gets +1 Threat until the end of the phase.
   51244:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each enemy (any player controls) in the staging area only: stat threat 1, until the end of the phase
-    - each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - each enemy (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
+    - each location (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
 
 51244:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you are engaged with another enemy).
   51244:shadow:1: Shadow

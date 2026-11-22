@@ -40,7 +40,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01076:A:1 (front): When Revealed: Each character currently committed to a quest gets -1 Willpower until the end of the phase.
   01076:whenRevealed:1: When revealed
-    - each character (any player controls) committed to the quest: stat willpower -1, until the end of the phase
+    - each character (any player controls) committed to the quest (only the cards that match now: one that arrives later does not get it): stat willpower -1, until the end of the phase
 
 01076:A:2 (shadow): Shadow: Raise defending player's threat by 4. (Raise defending player's threat by 8 instead if this attack is undefended.)
   01076:shadow:1: Shadow
@@ -139,8 +139,8 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 01092:A:1 (front): When Revealed: Each enemy and each location currently in the staging area gets +1 Threat until the end of the phase. If there are no cards in the staging area, Driven by Shadow gains surge.
   01092:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each enemy (any player controls) in the staging area only: stat threat 1, until the end of the phase
-    - each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - each enemy (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
+    - each location (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
     - then, if the number of card (any player controls) in the staging area only, other than this card is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 01092:A:2 (shadow): Shadow: Choose and discard 1 attachment from the defending character. (If this attack is undefended, discard all attachments you control.)
@@ -342,7 +342,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 900102:A:1 (front): When Revealed: Until the end of the phase, each character currently committed to the quest gets -2 Willpower and is discarded if its Willpower is 0.
   900102:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each character (any player controls) committed to the quest: stat willpower -2, until the end of the phase
+    - each character (any player controls) committed to the quest (only the cards that match now: one that arrives later does not get it): stat willpower -2, until the end of the phase
     - for each character (any player controls) committed to the quest, with a current Willpower of 0 or less:
       - discard the picked card
 
@@ -358,7 +358,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 900103:A:1 (front): Forced: After you engage Ungoliant's Brood, your cards cannot ready for the remainder of the round.
   900103:forced:1: Forced after an enemy engages a player (heard about this card)
     who acts: the acting player is the player the enemy engaged
-    - each card (you control): stat cannotReady 1, until the end of the round
+    - each card (you control) (only the cards that match now: one that arrives later does not get it): stat cannotReady 1, until the end of the round
 
 900103:A:2 (shadow): Shadow: If this attack is undefended, exhaust all characters you control.
   900103:shadow:1: Shadow

@@ -251,7 +251,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142055:A:1 (front): While Ancient Guardroom is the active location, each enemy in play gets -1 Attack.
   142055:constant:1: Constant
     only if this card is the active location
-    - every enemy in play: stat attack -1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat attack -1, while this card is in play
 
 142055:A:2 (front): Travel: Discard the top card of the encounter deck to travel here. Each player raises his threat by X, where X is the discarded card's Threat.
   142055:travel:1: Travel
@@ -326,7 +326,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142085:A:2 (front): When Revealed: Treat the printed text box of each character in play as blank (except for Traits) until the end of the round.
   142085:whenRevealed:1: When revealed
-    - each character (any player controls): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
+    - each character (any player controls) (only the cards that match now: one that arrives later does not get it): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
 
 142085:A:3 (shadow): Shadow: Defending character does not count its Defense.
   142085:shadow:1: Shadow

@@ -267,7 +267,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
       * option "exhaust":
         - in player order, each player exhausts a ready character they control, choosing it (a player with none exhausts none)
       * option "threat":
-        - each location (any player controls) in the staging area only, that is a double-sided location lying on its Lost Island side (Uncharted): stat threat 1, until the end of the phase
+        - each location (any player controls) in the staging area only, that is a double-sided location lying on its Lost Island side (Uncharted) (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
 
 11033:A:2 (shadow): Shadow: Discard the bottom card of your deck. If that card's printed cost is 2 or less, exhaust a character you control.
   11033:shadow:1: Shadow

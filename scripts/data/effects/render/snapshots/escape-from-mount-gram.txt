@@ -196,8 +196,8 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10049:A:2 (front): When Revealed: Until the end of the round, each enemy gets -10 engagement cost and +1 Attack. If there are no enemies in play, search the encounter deck and discard pile for an enemy and add it to the staging area.
   10049:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - every enemy in play: stat engagementCost -10, until the end of the round
-    - every enemy in play: stat attack 1, until the end of the round
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat engagementCost -10, until the end of the round
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat attack 1, until the end of the round
     - then, if there is no enemy in play (in the staging area or engaged) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
 
 ## 10050 Feeble and Weary
