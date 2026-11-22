@@ -5,13 +5,16 @@
 // error the player should see; a development build logs it. A slot keeps a few players, so quick taps each get one that is not still
 // playing, and all the slots together keep at most PLAYERS_MAX: a new player releases the one used longest ago, so the music always
 // finds a decoder for its next loop.
+//
+// A sound starts with no wait when its player is loaded and stands at its start, so both are done ahead of the moment: a slot whose
+// moment is known to come is loaded before it (primeSounds), and a player that has sounded is put back to its start once it ends (rewind).
 import { createAudioPlayer, type AudioPlayer } from "./audio-player";
 
 import { accessibility } from "../accessibility.ts";
 import { tableSettings } from "../table-settings.ts";
 import { bundledSounds } from "./bundled";
 import { audioFailed, startAudioSession } from "./session.ts";
-import { SOUND_SLOTS, type SoundSlot } from "./slots.ts";
+import { SCREEN_SOUNDS, type SoundSlot } from "./slots.ts";
 
 // The same table sound asked for again this soon (cards drawn in a row, tokens landing together) plays once for all. An interface
 // sound plays for every tap: only a second call for the same tap, this close, is dropped.
@@ -23,17 +26,38 @@ const POOL = 4;
 const BUSY_MS = 400;
 // The most sound players loaded at once, over every slot. Each loaded player holds one of the phone's audio decoders, and Android
 // gives an app only a few dozen: a player for every slot took them all, and the table's music, which loads its loop after the first
-// sound, found none and stayed silent. The music keeps a few players of its own (music.ts).
-export const PLAYERS_MAX = 8;
+// sound, found none and stayed silent. The music keeps a few players of its own (music.ts). It holds the sounds a screen or the table
+// plays most (SCREEN_SOUNDS, TABLE_SOUNDS: slots.ts), so those never load at the moment they play.
+export const PLAYERS_MAX = 12;
+// How long after a sound's end its player is put back to its start, and the longest a player whose length never loads is left to sound
+// (the longest sound is kept to 4.5 s: scripts/build/sound-picks.ts).
+const REWIND_MS = 80;
+// A player asked to play can stay silent (seen on Android: the first play of a slot after other sounds). Each play is checked this
+// long after it, up to CHECKS times, and asked again while this little time has passed: later, the sound's moment has gone.
+const CHECK_MS = 140;
+const CHECKS = 2;
+const LATE_MS = 700;
+// A player past this point of its file has started.
+const STARTED_SECONDS = 0.02;
+const LONGEST_MS = 5000;
 
 // After an Undo, the table's own sounds (the threat dial, the rail, the cards and tokens moving back) stay quiet this long: the
 // state it restores is not news, and Undo has its own sound.
 const UNDO_QUIET_MS = 800;
 
-type Voice = { player: AudioPlayer; started: number };
+// `started`: when it last played (0: never). `used`: when it last played or was asked to be ready, which decides the one released.
+// `cued`: it stands at its start, loaded or loading, so play() alone starts it. `volume`: the level last set on it.
+// `length`: its file's length in ms once loaded (0 before), kept so a native player is not asked again. `check`: checkStarted's timer.
+type Timer = ReturnType<typeof setTimeout> | null;
+type Voice = { player: AudioPlayer; started: number; used: number; cued: boolean; volume: number; length: number; rewind: Timer; check: Timer };
 const pools = new Map<SoundSlot, Voice[]>();
 let quietUntil = 0;
 const lastPlayed = new Map<SoundSlot, number>();
+
+// With Debug tools on, each play and each repair is logged, so a sound that is lost on one phone can be traced from its log.
+function trace(message: string): void {
+  if (tableSettings.getState().settings.debugTools) console.log(`[sound] ${message}`);
+}
 
 /** Whether this bundle carries any sound and can play it: the Sound effects row shows only then. Fixed when the bundle loads. */
 export const SOUNDS_BUNDLED = Object.keys(bundledSounds).length > 0;
@@ -44,19 +68,24 @@ function playerCount(): number {
   return count;
 }
 
-// Releases the player used longest ago that is not sounding (one loaded and never played first), so a new one fits under
-// PLAYERS_MAX. False when every player is still sounding.
-function makeRoom(now: number): boolean {
+// Releases the player used longest ago that is not sounding, so a new one fits under PLAYERS_MAX. A slot in `keep` gives up none.
+// False when every other player is still sounding.
+function makeRoom(now: number, keep?: ReadonlySet<SoundSlot>): boolean {
   if (playerCount() < PLAYERS_MAX) return true;
   let oldest: { slot: SoundSlot; voice: Voice } | null = null;
   for (const [slot, pool] of pools) {
-    for (const voice of pool) if (!busy(voice, now) && (!oldest || voice.started < oldest.voice.started)) oldest = { slot, voice };
+    if (keep?.has(slot)) continue;
+    for (const voice of pool) if (!busy(voice, now) && (!oldest || voice.used < oldest.voice.used)) oldest = { slot, voice };
   }
   if (!oldest) return false;
   const { slot, voice } = oldest;
   const rest = (pools.get(slot) ?? []).filter((other) => other !== voice);
   if (rest.length > 0) pools.set(slot, rest);
   else pools.delete(slot);
+  if (voice.rewind != null) clearTimeout(voice.rewind);
+  if (voice.check != null) clearTimeout(voice.check);
+  voice.rewind = null;
+  voice.check = null;
   try {
     voice.player.remove();
   } catch (error) {
@@ -66,9 +95,9 @@ function makeRoom(now: number): boolean {
 }
 
 // A new player for the slot, when one fits under PLAYERS_MAX.
-function addVoice(slot: SoundSlot, source: number, now: number): Voice | null {
-  if (!makeRoom(now)) return null;
-  const voice = { player: createAudioPlayer(source), started: 0 };
+function addVoice(slot: SoundSlot, source: number, now: number, keep?: ReadonlySet<SoundSlot>): Voice | null {
+  if (!makeRoom(now, keep)) return null;
+  const voice: Voice = { player: createAudioPlayer(source), started: 0, used: now, cued: true, volume: -1, length: 0, rewind: null, check: null };
   pools.set(slot, [...(pools.get(slot) ?? []), voice]);
   return voice;
 }
@@ -76,8 +105,103 @@ function addVoice(slot: SoundSlot, source: number, now: number): Voice | null {
 // Whether a player may still be sounding: it says so, or it started less than its length ago (its own flag turns on a moment after
 // play, so a quick second tap must not take it).
 function busy(voice: Voice, now: number): boolean {
-  const length = voice.player.duration > 0 ? voice.player.duration * 1000 : BUSY_MS;
-  return voice.player.playing || now - voice.started < length;
+  if (now - voice.started < lengthOf(voice)) return true;
+  // Past a known length it has ended. Each read of a native player's state waits for the phone's main thread, so it is asked only
+  // while its length is not known.
+  return voice.length > 0 ? false : voice.player.playing;
+}
+
+function lengthOf(voice: Voice): number {
+  if (voice.length > 0) return voice.length;
+  const seconds = voice.player.duration;
+  if (seconds > 0) voice.length = seconds * 1000;
+  return voice.length > 0 ? voice.length : BUSY_MS;
+}
+
+// Puts a player that has sounded back to its start once the sound has ended, so its next play starts at once and waits for no seek.
+// `token` is the play it follows: a player that has played again since has that play's own rewind.
+function rewindAfter(voice: Voice, token: number, wait: number): void {
+  if (voice.rewind != null) clearTimeout(voice.rewind);
+  voice.rewind = setTimeout(() => rewind(voice, token), wait);
+}
+
+function rewind(voice: Voice, token: number): void {
+  voice.rewind = null;
+  if (voice.started !== token) return;
+  const { player } = voice;
+  try {
+    const since = Date.now() - token;
+    // What the player itself says, not the time since it was asked: on a busy phone a sound starts late (the play waits for the
+    // phone's main thread while a screen is built), and this timer runs late too, so the clock alone would stop a sound that had
+    // just begun.
+    const playing = player.playing;
+    const at = player.currentTime;
+    if (playing && since < LONGEST_MS) return rewindAfter(voice, token, Math.max(REWIND_MS, lengthOf(voice) - at * 1000 + REWIND_MS));
+    // It stands at its start and is not playing: it has not begun yet, or was put back already. It is left as it is.
+    if (!playing && at <= STARTED_SECONDS) {
+      voice.cued = true;
+      return;
+    }
+    // Paused first: a player that reached its end and is still set to play would start again as the seek lands.
+    player.pause();
+    player
+      .seekTo(0)
+      .then(() => {
+        if (voice.started === token) voice.cued = true;
+      })
+      .catch(audioFailed);
+  } catch (error) {
+    audioFailed(error);
+  }
+}
+
+// Checks, a moment after a player was asked to play, that it sounds: one that does not (it is not playing and stands at its start
+// while its sound should still be heard) is put at its start and asked again, and one that still does not is replaced by a new player.
+// A development build logs each, with the slot. `token` is the play it checks: a player that has played again since is left alone.
+function checkStarted(voice: Voice, token: number, slot: SoundSlot, attempt: number): void {
+  if (voice.check != null) clearTimeout(voice.check);
+  voice.check = setTimeout(() => {
+    voice.check = null;
+    if (voice.started !== token) return;
+    try {
+      const since = Date.now() - token;
+      // Checked too late (the JavaScript thread was busy): the sound may have ended, and its moment has gone.
+      if (since >= lengthOf(voice) || since > LATE_MS) return;
+      if (voice.player.playing || voice.player.currentTime > STARTED_SECONDS) return;
+      trace(`${slot} did not start (try ${attempt + 1}): loaded ${String(voice.player.isLoaded)}, at ${voice.player.currentTime}`);
+      if (attempt === 0) {
+        const { player } = voice;
+        player
+          .seekTo(0)
+          .then(() => player.play())
+          .catch(audioFailed);
+      } else {
+        const source = bundledSounds[slot];
+        if (source == null) return;
+        const stale = voice.player;
+        voice.player = createAudioPlayer(source);
+        voice.player.volume = voice.volume;
+        voice.length = 0;
+        voice.player.play();
+        stale.remove();
+      }
+      if (attempt < CHECKS - 1) checkStarted(voice, token, slot, attempt + 1);
+    } catch (error) {
+      audioFailed(error);
+    }
+  }, CHECK_MS);
+}
+
+// Loads a player for each slot that has none, in place of the players used longest ago, and counts the slots' players as just used.
+function load(slots: readonly SoundSlot[], now: number): void {
+  const keep = new Set(slots);
+  for (const slot of keep) {
+    const source = bundledSounds[slot];
+    if (source == null) continue;
+    const pool = pools.get(slot);
+    if (!pool) addVoice(slot, source, now, keep);
+    else for (const voice of pool) voice.used = now;
+  }
 }
 
 // A player of the slot that is not sounding, a new one while the pool and PLAYERS_MAX have room, else the slot's player that started
@@ -98,20 +222,36 @@ function startSession(now: number): void {
   startAudioSession();
   if (loaded) return;
   loaded = true;
-  // The first sound asked for loads the first PLAYERS_MAX slots (the interface's come first: slots.ts), so the next taps start on
-  // time; any other slot loads the first time it plays, in place of the player used longest ago.
-  for (const slot of SOUND_SLOTS) {
-    const source = bundledSounds[slot];
-    if (source == null || pools.has(slot)) continue;
-    if (playerCount() >= PLAYERS_MAX) break;
-    addVoice(slot, source, now);
+  // The first sound asked for loads the screens' sounds when the launch did not (primeSounds), so the next taps start on time; any
+  // other slot loads when it is primed or the first time it plays, in place of the player used longest ago.
+  load(SCREEN_SOUNDS, now);
+}
+
+function soundsOn(): boolean {
+  const { sounds, soundVolume } = tableSettings.getState().settings;
+  return SOUNDS_BUNDLED && sounds && soundVolume > 0;
+}
+
+/**
+ * Loads the slots' players ahead of the moment they play, so each starts with no load: the screens' sounds at launch, the table's as
+ * it opens, a state's motion sounds as it is drawn and a spotlight's strikes as it starts. It plays nothing, and loads nothing while
+ * the sounds are off.
+ */
+export function primeSounds(slots: readonly SoundSlot[]): void {
+  if (slots.length === 0 || !soundsOn()) return;
+  try {
+    startAudioSession();
+    loaded = true;
+    load(slots.slice(0, PLAYERS_MAX), Date.now());
+  } catch (error) {
+    audioFailed(error);
   }
 }
 
 /** Plays a slot's sound from its start, when the setting is on and this bundle has the file. */
 export function playSound(slot: SoundSlot): void {
-  const { sounds, soundVolume } = tableSettings.getState().settings;
-  if (!SOUNDS_BUNDLED || !sounds || soundVolume <= 0) return;
+  if (!soundsOn()) return;
+  const { soundVolume } = tableSettings.getState().settings;
   const source = bundledSounds[slot];
   if (source == null) return;
   const now = Date.now();
@@ -124,20 +264,34 @@ export function playSound(slot: SoundSlot): void {
   try {
     startSession(now);
     const voice = voiceOf(slot, source, now);
-    if (!voice) return;
+    if (!voice) return trace(`${slot}: no player is free`);
     const { player } = voice;
-    const fresh = voice.started === 0;
+    const { cued } = voice;
     voice.started = now;
-    player.volume = soundVolume;
-    // A player that has played before starts again only once its seek to the start is done, so it never plays on from where it stopped.
-    if (fresh) player.play();
-    else {
+    voice.used = now;
+    voice.cued = false;
+    if (voice.volume !== soundVolume) {
+      player.volume = soundVolume;
+      voice.volume = soundVolume;
+    }
+    // A player at its start plays at once. One still sounding, or not yet put back (rewind), starts again only once its seek to the
+    // start is done, so it never plays on from where it stopped.
+    // Each is checked once it has been asked to play (checkStarted).
+    trace(`${slot}: ${cued ? "play" : "seek, then play"}${voice.length > 0 ? "" : " (length not loaded)"}`);
+    if (cued) {
+      player.play();
+      checkStarted(voice, now, slot, 0);
+    } else {
       player.pause();
       player
         .seekTo(0)
-        .then(() => player.play())
+        .then(() => {
+          player.play();
+          if (voice.started === now) checkStarted(voice, now, slot, 0);
+        })
         .catch(audioFailed);
     }
+    rewindAfter(voice, now, lengthOf(voice) + REWIND_MS);
   } catch (error) {
     audioFailed(error);
   }

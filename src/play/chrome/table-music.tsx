@@ -11,7 +11,8 @@ import { useSpotlightHold } from "../spotlight/use-spotlight.ts";
 import type { TableStore } from "../store/store.ts";
 import { combatMusic, newlyEngaged } from "./combat-music.ts";
 import { momentSounds } from "./moment-sounds.ts";
-import { playSound } from "../../ui/sound/sound.ts";
+import { SCREEN_SOUNDS, TABLE_SOUNDS } from "../../ui/sound/slots.ts";
+import { playSound, primeSounds } from "../../ui/sound/sound.ts";
 import { useSkippedStrikes } from "../spotlight/strike-play.ts";
 
 /** The table's music, mounted beside the table view by its routes (src/screens/routes/table, standalone/table); it draws nothing. */
@@ -21,7 +22,17 @@ export function TableMusic({ store }: { store: TableStore }): null {
   useSkippedStrikes(store);
   useEngageSound(store);
   useMomentSounds(store);
+  useTableSounds();
   return null;
+}
+
+// The sounds the table plays most are loaded while it shows, so each starts with no load, and the screens' sounds when it closes or is
+// hidden under a screen opened from it (sound.ts, primeSounds). Shown again by Activity, the table loads its own again.
+function useTableSounds(): void {
+  useEffect(() => {
+    primeSounds(TABLE_SOUNDS);
+    return () => primeSounds(SCREEN_SOUNDS);
+  }, []);
 }
 
 // A deck shuffled in by an accepted intent (moment-sounds.ts) sounds as the state is accepted, as the engagement does: under reduced motion too, and an Undo's restored state is quiet.

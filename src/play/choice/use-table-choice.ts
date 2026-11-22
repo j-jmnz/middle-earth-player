@@ -9,7 +9,7 @@ import { actionsSheet, commitSheet, playSheet, windowSheet } from "./bar-sheets.
 import type { BeatStore } from "../store/beat-store.ts";
 import { tickSent } from "../../ui/haptics.ts";
 import { refusedFeedback } from "../../ui/sound/feedback.ts";
-import { playUndo } from "../../ui/sound/sound.ts";
+import { playSound, playUndo } from "../../ui/sound/sound.ts";
 import { pointTitle } from "../phases/rail.ts";
 import { isFreeResponse, nextStopTitle, passableWindow } from "../phases/stops.ts";
 import { useAutoAnswer, useBanner, useGuide, useSettle } from "./table-hooks.ts";
@@ -205,11 +205,13 @@ export function useTableChoice({
   // The table answers for the player where the player's settings say so (stops.ts); Pass to stop starts a run.
   const sheetOf = useCallback((at: ScenarioState, offered: readonly LegalIntent[]) => sheetFor(at, ctx, offered, names) ?? windowSheet(at, ctx, offered, names), [ctx, names]);
   const { startRun, follow } = useAutoAnswer({ store, ctx, game, sheet, legal, settings, moment, opened: live != null, sheetOf, hold });
+  // `confirm`: a dock button or a card's tap sent it, so its acceptance plays the confirm click (docs/design-system-table.md, Sound).
   const dispatch = useCallback(
-    (intent: PlayerIntent) => {
+    (intent: PlayerIntent, confirm = false) => {
       // The Sent tick plays the moment the reducer accepts the intent, before the next state is built and the save written; a refused intent
       // gets the Refused tick, never both. The moments the table answers after it are answered in the same tap (table-hooks.ts, follow).
       if (store.getState().dispatch(intent, tickSent)) {
+        if (confirm) playSound("ui.confirm");
         reset();
         // An accepted send keeps the card the reader last activated, so focus can stay on it in the next moment.
         resetReader("send");
@@ -274,19 +276,29 @@ export function useTableChoice({
     (button: DockButton) => {
       const action = button.action;
       if ((action.kind === "intent" || action.kind === "outcome" || action.kind === "passToStop" || action.kind === "alwaysUse") && !settled()) return;
-      if (action.kind === "intent") dispatch(action.intent);
+      if (action.kind === "intent") dispatch(action.intent, true);
       else if (action.kind === "passToStop") {
         startRun();
-        dispatch({ type: "Pass" });
+        dispatch({ type: "Pass" }, true);
       } else if (action.kind === "alwaysUse") {
         const current = tableSettings.getState().settings;
         tableSettings.getState().update({ alwaysUse: toggleAlways(current.alwaysUse.filter((id) => id !== action.effectId), action.effectId) });
-        dispatch(action.intent);
+        dispatch(action.intent, true);
       }
-      else if (action.kind === "open") open(action.sheet);
-      else if (action.kind === "outcome") onOutcome();
-      else if (action.kind === "clear") setHeld({ key: sheet.key, ids: [], shares: [] });
-      else closeOverlay();
+      // A button that sends nothing sounds as it is pressed: the next question or the outcome opened, the pick put back.
+      else if (action.kind === "open") {
+        playSound("ui.confirm");
+        open(action.sheet);
+      } else if (action.kind === "outcome") {
+        playSound("ui.confirm");
+        onOutcome();
+      } else if (action.kind === "clear") {
+        playSound("ui.toggle-off");
+        setHeld({ key: sheet.key, ids: [], shares: [] });
+      } else {
+        playSound("ui.toggle-off");
+        closeOverlay();
+      }
     },
     [settled, dispatch, startRun, open, onOutcome, sheet, closeOverlay],
   );
@@ -300,9 +312,15 @@ export function useTableChoice({
       }
       if (result.kind === "refused") refuse(result.reason);
       else if (result.kind === "choice") {
+        // A card picked or given a share, and a card put back, each sound (docs/design-system-table.md, Sound).
+        const chosen = result.choice.ids.includes(id) || result.choice.shares.some((share) => share.id === id);
+        playSound(chosen ? "ui.pick" : "ui.unpick");
         setHeld(result.choice);
         if (result.said) say(result.said);
-      } else if (result.kind === "open") open(result.sheet);
+      } else if (result.kind === "open") {
+        playSound("ui.pick");
+        open(result.sheet);
+      }
       return result.kind !== "none";
     },
     [dock, onButton, sheet, held, table, open, refuse, say],

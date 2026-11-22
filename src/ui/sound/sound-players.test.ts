@@ -19,6 +19,7 @@ vi.mock("./audio-player", () => ({
     calls.players.push(fake);
     return {
       duration: 0.3,
+      currentTime: 1,
       get playing() {
         return fake.playing;
       },
@@ -36,7 +37,8 @@ vi.mock("./audio-player", () => ({
 
 // A fresh sound.ts with this file's mocks: sound.test.ts loads it with its own, and the module cache is shared (vitest.config.mts, isolate).
 vi.resetModules();
-const { playSound, PLAYERS_MAX } = await import("./sound.ts");
+const { playSound, primeSounds, PLAYERS_MAX } = await import("./sound.ts");
+const { SCREEN_SOUNDS, TABLE_SOUNDS } = await import("./slots.ts");
 
 const loaded = () => calls.players.filter((player) => !player.removed);
 const sourceOf = (slot: (typeof SOUND_SLOTS)[number]) => SOUND_SLOTS.indexOf(slot) + 1;
@@ -78,6 +80,28 @@ describe("sound players", () => {
     const live = loaded().map((player) => player.source);
     expect(live).toContain(sourceOf("ui.confirm"));
     expect(live).toContain(sourceOf("dread.win"));
+  });
+
+  it("loads every primed slot at once, within the limit, and plays none", () => {
+    for (const list of [TABLE_SOUNDS, SCREEN_SOUNDS, TABLE_SOUNDS]) {
+      expect(list.length).toBeLessThanOrEqual(PLAYERS_MAX);
+      primeSounds(list);
+      const live = loaded().map((player) => player.source);
+      for (const slot of list) expect(live).toContain(sourceOf(slot));
+      expect(live.length).toBeLessThanOrEqual(PLAYERS_MAX);
+      vi.advanceTimersByTime(1000);
+    }
+    expect(calls.players.some((player) => player.playing)).toBe(false);
+  });
+
+  it("loads a primed slot once, and keeps it when another slot plays", () => {
+    primeSounds(["combat.kill"]);
+    primeSounds(["combat.kill"]);
+    vi.advanceTimersByTime(10);
+    playSound("dread.stage");
+    const live = loaded().map((player) => player.source);
+    expect(live.filter((source) => source === sourceOf("combat.kill"))).toHaveLength(1);
+    expect(live).toContain(sourceOf("dread.stage"));
   });
 
 });

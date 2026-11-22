@@ -15,15 +15,19 @@ export function strikeSounds(clash: { shape: ClashShape; enemyAttack: boolean })
 
 const STRENGTH: readonly SoundSlot[] = ["combat.miss", "combat.block", "combat.strike", "combat.kill"];
 
+/** The sounds of a gate's attacks from `from` on, in order. An attack's target is an enemy when it was engaged with a seat before the attacks. */
+export function gateSounds(gate: SpotlightGate, from: number): SoundSlot[] {
+  const enemy = (clash: Clash) => gate.before?.seats.some((seat) => seat.engaged.includes(clash.target)) === true;
+  return gate.clashes.slice(from).flatMap((clash) => strikeSounds({ shape: { damage: clash.damage, destroyed: clash.destroyed, shadow: false, first: false, last: false }, enemyAttack: !enemy(clash) }));
+}
+
 /**
  * The sounds of a skipped gate's attacks from `from` on: the strongest one (a kill over a strike over a block), with the enemy's death
- * when an enemy the players attacked was destroyed. An attack's target is an enemy when it was engaged with a seat before the attacks.
+ * when an enemy the players attacked was destroyed.
  */
 export function skippedSounds(gate: SpotlightGate, from: number): SoundSlot[] {
-  const left = gate.clashes.slice(from);
-  if (left.length === 0) return [];
-  const enemy = (clash: Clash) => gate.before?.seats.some((seat) => seat.engaged.includes(clash.target)) === true;
-  const sounds = left.flatMap((clash) => strikeSounds({ shape: { damage: clash.damage, destroyed: clash.destroyed, shadow: false, first: false, last: false }, enemyAttack: !enemy(clash) }));
+  const sounds = gateSounds(gate, from);
+  if (sounds.length === 0) return [];
   const strongest = STRENGTH.reduce<SoundSlot | null>((best, slot) => (sounds.includes(slot) ? slot : best), null);
   return [...(strongest ? [strongest] : []), ...(sounds.includes("combat.enemy-death") ? (["combat.enemy-death"] as const) : [])];
 }

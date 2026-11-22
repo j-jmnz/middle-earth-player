@@ -1,10 +1,12 @@
 // The sound chosen for each slot (docs/design-system-table.md, Sound): a Darkest Dungeon II event, by its bank and its name as vgmstream
 // writes it, unpacked from the player's own install (user decision, 2026-11-21), or, where `game` says so, a Hearthstone sound by its
 // file name in the player's rip (the card landing; user choice, 2026-11-21). `lufs` is the loudness the file is levelled to and
-// `maxSeconds` the longest it is kept; each group shares both unless a slot names its own.
+// `maxSeconds` the longest it is kept; each group shares both unless a slot names its own. `onset`: the share of the sound's peak its
+// cut starts at, for a pick that leads in quietly before its hit, so the hit is heard at the moment it is played; without it the cut
+// starts where the silence ends (pack-sounds.ts, soundStart). `pnpm assets sounds --check` lists how long each packed sound takes to rise.
 import type { SoundSlot } from "../../src/ui/sound/slots.ts";
 
-export type SoundPick = { game?: "hearthstone"; bank: string; event: string; lufs: number; maxSeconds: number };
+export type SoundPick = { game?: "hearthstone"; bank: string; event: string; lufs: number; maxSeconds: number; onset?: number };
 
 const ui = { lufs: -24, maxSeconds: 0.8 };
 const card = { lufs: -22, maxSeconds: 1.4 };
@@ -21,11 +23,16 @@ export const SOUND_PICKS: Record<SoundSlot, SoundPick> = {
   "ui.toggle-off": { bank: "ui", event: "ui_shared_skill_unequip_v2", ...ui },
   "ui.tab": { bank: "ui", event: "ui_shared_tab", ...ui },
   "ui.open": { bank: "ui", event: "ui_shared_menu_open", ...ui },
-  "ui.close": { bank: "ui", event: "ui_shared_menu_close", ...ui },
+  "ui.close": { bank: "ui", event: "ui_shared_menu_close", ...ui, onset: 0.3 },
   "ui.notice": { bank: "ui", event: "ui_shr_text_popup", ...ui },
+  "ui.unfold": { bank: "ui", event: "ui_inn_storage_open", ...ui },
+  "ui.fold": { bank: "ui", event: "ui_inn_storage_close", ...ui },
+  // A card picked on the table and one put back: taps made many times a moment, so a dull click, quieter than the buttons (user request, 2026-11-22).
+  "ui.pick": { bank: "ui", event: "ui_shared_minorclick", ...ui, lufs: -29 },
+  "ui.unpick": { bank: "ui", event: "ui_shared_minorclick_back", ...ui, lufs: -29 },
   "card.draw": { bank: "ui", event: "ui_rewards_item_appear", ...card },
   "card.pick": { bank: "ui", event: "ui_heroselect_pickup", ...card },
-  "card.land": { game: "hearthstone", bank: "", event: "credits_card_enter_1", ...card },
+  "card.land": { game: "hearthstone", bank: "", event: "credits_card_enter_1", ...card, onset: 0.3 },
   "card.shuffle": { bank: "ui", event: "ui_heroselect_path_gen", ...card },
   "card.deal": { bank: "ui", event: "ui_battle_turnorder_reveal", ...card },
   "card.flip": { bank: "ui", event: "ui_inn_quirk_reveal_neg", ...card },
@@ -41,7 +48,7 @@ export const SOUND_PICKS: Record<SoundSlot, SoundPick> = {
   "combat.strike": { bank: "shared_enemy", event: "sfx_monster_footsoldier_cut_use", ...combat },
   "combat.block": { bank: "shared_hero", event: "sfx_hero_meleeA_guard_use", ...combat },
   "combat.miss": { bank: "shared_hero", event: "sfx_hero_meleeA_atk_miss", ...combat },
-  "combat.kill": { bank: "battle", event: "sfx_battle_crit_hero", ...combat },
+  "combat.kill": { bank: "battle", event: "sfx_battle_crit_hero", ...combat, onset: 0.25 },
   // Softer than the kill it plays with at the same hit stop (user choice, 2026-11-21).
   "combat.enemy-death": { bank: "battle", event: "sfx_battle_execution", ...combat, lufs: -21 },
   "dread.threat-up": { bank: "battle", event: "sfx_battle_status_stressup", ...dread },
@@ -49,7 +56,7 @@ export const SOUND_PICKS: Record<SoundSlot, SoundPick> = {
   "dread.danger": { bank: "battle", event: "sfx_battle_deathsdoor", ...dread },
   "dread.shadow": { bank: "battle", event: "sfx_battle_status_horror", ...dread },
   "dread.treachery": { bank: "battle", event: "sfx_battle_status_debuff", ...dread },
-  "dread.phase": { bank: "battle", event: "sfx_battle_switch", ...dread },
+  "dread.phase": { bank: "battle", event: "sfx_battle_switch", ...dread, onset: 0.2 },
   "dread.stage": { bank: "battle", event: "ui_battle_dungeon_next", ...dread },
   "dread.win": { bank: "ui", event: "ui_eor_results", ...dread },
   "dread.loss": { bank: "ui", event: "ui_driving_torchlight_out", ...dread },
