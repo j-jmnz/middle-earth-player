@@ -41,7 +41,7 @@ Releases are only ever cut by the release workflow ([docs/releasing.md](docs/rel
 - Code follows [.claude/rules/code-standards.md](./.claude/rules/code-standards.md), and docs follow [.claude/rules/docs-standards.md](./.claude/rules/docs-standards.md). Docs describe the current state only; the history lives in git.
 - Rules come from the printed sources. The code that implements a rule cites its id from `data/rules/entries.json`, and a rule change also updates [docs/brief.md](docs/brief.md). When sources disagree, [.claude/rules/authority.md](./.claude/rules/authority.md) says which one wins.
 - The only files in `data/` you edit by hand are the hand-checked inputs: `data/printed/`, `data/rules/index.json`, `data/rules/columns.json`, `data/overrides.json`, `data/prebuilt-decks.json` and `data/starter-decks.json`. For anything else, change `scripts/data/` and run `pnpm data build`.
-- After you change effect records, run `pnpm effects open`. After you change doc headings or doc citations, run `pnpm doc index`. The tests fail while either output is stale.
+- After you change effect records, run `pnpm effects open`. The tests fail while that output is stale, or while a doc citation names no heading.
 - Move files with `pnpm move`, which keeps every reference to them up to date.
 - Never commit `assets/catalog.db`, card scans, card pictures, PDFs, a filled-in `src/screens/images/scan-map.ts`, secrets or signing keys.
 - Playtest cards, accounts or a backend, online multiplayer and other card games are out of scope. [docs/brief.md](docs/brief.md) has the full list.
@@ -66,7 +66,7 @@ To add a scenario, follow [docs/agents/agent-brief.md](docs/agents/agent-brief.m
 - [docs/development.md](docs/development.md) covers running the app, the test flows and the commands.
 - [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md) describe the screens and the game table.
 - [docs/releasing.md](docs/releasing.md) walks through the release pipeline.
-- [docs/INDEX.md](docs/INDEX.md) is a generated index of every doc, section by section.
+- `docs/INDEX.md` is a generated index of every doc, section by section. It is not committed: `pnpm install` writes it, and `pnpm doc index` writes it again.
 
 ## AI-assisted development
 
