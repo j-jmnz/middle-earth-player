@@ -22,6 +22,8 @@ const COURAGE = "22033";
 const HORN = "22035";
 // The One Ring (the player card, Restricted, Master).
 const ONE_RING = "21001";
+// Ring of Barahir: an Artifact attachment with the Ring trait that is not The One Ring.
+const BARAHIR = "06007";
 // Merry: an ally (21003) and a hero (141003).
 const MERRY_ALLY = "21003";
 const MERRY_HERO = "141003";
@@ -49,7 +51,7 @@ const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Ta
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const codes = [LONGBOW, AXE, COURAGE, HORN, ONE_RING, MERRY_ALLY, MERRY_HERO, ARAGORN, LEGOLAS, EOWYN, BERAVOR, SNOWBOURN, SPEARMAN, PLATE, HENAMARTH, ERESTOR];
+  const codes = [LONGBOW, AXE, COURAGE, HORN, ONE_RING, BARAHIR, MERRY_ALLY, MERRY_HERO, ARAGORN, LEGOLAS, EOWYN, BERAVOR, SNOWBOURN, SPEARMAN, PLATE, HENAMARTH, ERESTOR];
   const cards = new Map([...starter.cards, ...(await loadPrinted(codes))]);
   cards.set(WALL, definePrinted({ code: WALL, name: "Wall", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 9, health: 20 }));
   for (const code of [ONE, TWO, THREE]) cards.set(code, definePrinted({ code, name: code, type: "event", sphere: "lore", cost: 0 }));
@@ -178,6 +180,15 @@ describe("Strength and Courage (22033:A:1, A:2, A:3)", () => {
       expect(hosts(tab, second, run.state)).toEqual([]);
     });
   }
+
+  // "Attach to the hero with The One Ring.": Aragorn holds the Ring of Barahir, an attachment with the Ring trait that is not The One Ring, and is not a host.
+  lineSpec("22033:A:1", "Strength and Courage: a hero with another Ring attachment is not offered", (effects) => {
+    const scene = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: ONE_RING, seat: 0 }, { code: BARAHIR, seat: 0 }], hand: [{ code: COURAGE, seat: 0 }] });
+    const [legolas, aragorn] = [idsOf(scene, LEGOLAS), idsOf(scene, ARAGORN)];
+    const tab = attach(scene, [[idsOf(scene, ONE_RING), legolas], [idsOf(scene, BARAHIR), aragorn]]);
+    expect(tab.state.cards[idsOf(tab, BARAHIR)]?.host).toBe(aragorn);
+    expect(hosts(tab, inHand(tab)[0] ?? "")).toEqual([legolas]);
+  });
 
   // "Response: After attached hero is declared as an attacker, exhaust The One Ring and raise your threat by 1 to double attached hero's
   // printed Attack for this attack.": Legolas (printed 3, +1) attacks; the Ring exhausts, the threat rises from 8 to 9 and the attack

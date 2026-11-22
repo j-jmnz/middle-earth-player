@@ -35,6 +35,9 @@ const WEAK = "weak";
 const NOLDO = "noldo";
 const PAL = "pal";
 const PLAIN = "plain";
+// A neutral event with an Action that changes the threat: another legal Action keeps the action window of a phase open.
+const PAD = "pad";
+const padAction: Effect = { id: "pad:action:1", cardCode: PAD, lines: ["fixture:A:1"], timing: "action", instructions: [{ verb: "SetThreat", value: 40 }] };
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
@@ -45,6 +48,7 @@ beforeAll(async () => {
   const codes = [HAMMER, CHILDREN, WELL, GIMLI, GLOIN, EOWYN, DENETHOR, GUIDE, TOOK, AXEHAND, AXE];
   const cards = new Map([...starter.cards, ...(await loadPrinted(codes))]);
   cards.set(WEAK, definePrinted({ code: WEAK, name: "Weak", type: "enemy", threat: 1, engagementCost: 50, attack: 1, defense: 0, health: 9 }));
+  cards.set(PAD, definePrinted({ code: PAD, name: "Pad", type: "event", sphere: "neutral", cost: 0 }));
   cards.set(NOLDO, definePrinted({ code: NOLDO, name: "Noldo", type: "ally", sphere: "spirit", cost: 1, willpower: 1, attack: 1, defense: 1, health: 2, traits: ["Noldor"] }));
   base = { ...starter, cards };
 });
@@ -76,13 +80,14 @@ describe("The Hammer-stroke (06111:A:1)", () => {
     expect(playable(tab, tab.state, idsOf(tab, HAMMER))).toBe(false);
   });
 
-  // Every enemy in play is already engaged with you: engaging them changes nothing, so the card is not played (rr.triggered-ability).
+  // Every enemy in play is already engaged with you: engaging them changes nothing, so the card is not played (rr.triggered-ability). Another legal Encounter Action
+  // in the hand (the Pad) keeps the Encounter action window open, so the refusal is read in that window.
   it("06111:A:1 The Hammer-stroke: not played when every enemy is engaged with you", () => {
-    const tab = table(EFFECTS, { seats: 2, start: "encounter", heroes: [{ code: GIMLI, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: HAMMER, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] });
+    const tab = table([...EFFECTS, padAction], { seats: 2, start: "encounter", heroes: [{ code: GIMLI, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: HAMMER, seat: 0 }, { code: PAD, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] });
     let run = sendUnledgered(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
     run = sendUnledgered(run, { type: "DeclineEngage" }, tab.ctx);
-    // No window opens for a card that can change nothing: the phase moves past the engagement checks and the Encounter action window.
-    expect(run.state.phase).toBe("Combat");
+    expect(run.state.phase).toBe("Encounter");
+    expect(playable(tab, run.state, idsOf(tab, PAD))).toBe(true);
     expect(playable(tab, run.state, idsOf(tab, HAMMER))).toBe(false);
   });
 });

@@ -55,8 +55,9 @@ export function drawVerb(
   const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, seat, topFrame(state)?.cardId ?? null), ctx);
   const count = (trait == null ? 1 : (state.seats[target]?.heroes ?? []).filter((id) => hasTrait(state, id, trait, ctx)).length) * amount;
   const drawn = drawMany(state, target, count, steps, UNATTRIBUTED, ctx, instruction.from === "bottom", playerSource(state, topFrame(state)?.cardId ?? null, ctx));
-  // The effect notes that a card was drawn, for "Then" text that follows it (the `drew` condition, rr.then), in a game whose records read it.
-  const gained = (drawn.seats[target]?.hand.length ?? 0) - (state.seats[target]?.hand.length ?? 0);
+  // The effect notes that a card was drawn, for "Then" text that follows it (the `drew` condition, rr.then), in a game whose records read it. A card is drawn when it leaves the deck,
+  // so a drawn card that goes straight into play (a hero shuffled into the deck, families/deck/hero.ts) counts, though the hand does not grow.
+  const gained = (state.seats[target]?.deck.length ?? 0) - (drawn.seats[target]?.deck.length ?? 0);
   if (data?.kind !== "effect" || !readsThen(ctx)) return drawn;
   // A draw that found fewer cards than it named is not resolved in full, so what follows "then" is not attempted (the `thenResolves` condition).
   return gained > 0 || count > gained ? patchTop(drawn, { data: { ...data, ...(gained > 0 ? { drew: true } : {}), ...(count > gained ? { short: true } : {}) } }) : drawn;

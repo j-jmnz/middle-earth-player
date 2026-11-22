@@ -17,6 +17,8 @@ import { choices, enter, fillers, hosts, passAll, play, playerTable, printed, qu
 const SWORD = "22083";
 const STONE = "22084";
 const PRESERVED = "22085";
+// Ring of Barahir: an Artifact attachment with the Ring trait that is not The One Ring.
+const BARAHIR = "06007";
 // Core Aragorn and Théodred (Leadership, Noble), Beravor (Lore, not Noble).
 const ARAGORN = "01001";
 const THEODRED = "01002";
@@ -35,7 +37,7 @@ const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Ta
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const cards = new Map([...starter.cards, ...(await loadPrinted([SWORD, STONE, PRESERVED, ARAGORN, THEODRED, BERAVOR]))]);
+  const cards = new Map([...starter.cards, ...(await loadPrinted([SWORD, STONE, PRESERVED, BARAHIR, ARAGORN, THEODRED, BERAVOR]))]);
   cards.set(NOBLE_ALLY, definePrinted({ code: NOBLE_ALLY, name: "Noble Ally", type: "ally", sphere: "leadership", cost: 1, willpower: 1, attack: 1, defense: 1, health: 2, traits: ["Noble"] }));
   cards.set(STRIDER, definePrinted({ code: STRIDER, name: "Strider", type: "hero", sphere: "lore", threat: 9, willpower: 9, attack: 1, defense: 1, health: 5 }));
   cards.set(PLACE, definePrinted({ code: PLACE, name: "Place", type: "location", threat: 1, questPoints: 2 }));
@@ -109,6 +111,13 @@ describe("Well Preserved (22085:A:1, A:2)", () => {
     expect(tab.state.cards[idsOf(tab, RING)]?.host).toBe(frodo);
     expect(hosts(tab, preserved)).toEqual([frodo]);
     expect(play(begin(tab.state), tab, preserved, frodo).state.cards[preserved]?.host).toBe(frodo);
+  });
+
+  // "Attach to the hero with The One Ring.": Aragorn holds the Ring of Barahir (a Ring attachment that is not The One Ring) and is not a host.
+  lineSpec("22085:A:1", "Well Preserved: a hero with another Ring attachment is not offered", (effects) => {
+    const tab = table(effects, { ring: "ready", heroes: [{ code: FRODO, seat: 0 }, { code: BERAVOR, seat: 0 }, { code: ARAGORN, seat: 0 }], attached: [{ code: BARAHIR, host: ARAGORN }], hand: [{ code: PRESERVED, seat: 0 }] });
+    expect(tab.state.cards[idsOf(tab, BARAHIR)]?.host).toBe(idsOf(tab, ARAGORN));
+    expect(hosts(tab, idsOf(tab, PRESERVED))).toEqual([idsOf(tab, FRODO)]);
   });
 
   // "Limit 1 per hero. Attached hero gets + 1 hit point.": played on Frodo, he has his printed hit points + 1, and the second copy has no

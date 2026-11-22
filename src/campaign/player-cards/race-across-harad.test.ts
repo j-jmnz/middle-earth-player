@@ -27,6 +27,8 @@ const HUNTERS = "17032";
 const BACKTRACK = "17034";
 const SECRET = "17036";
 const STEWARD = "17037";
+// Orthanc Guard (Leadership ally): "Response: After you raise your threat from the Doomed keyword, ready Orthanc Guard."
+const ORTHANC_GUARD = "07004";
 // Player side quests: Delay the Enemy (Tactics), Keep Watch (Tactics). Vigilant Guard: "Attach to a Warrior character."
 const DELAY = "10058";
 const KEEP = "17059";
@@ -64,7 +66,7 @@ const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Ta
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const codes = [THURINDIR, TRIBESMAN, STEED, MIGHTY, HUNTERS, BACKTRACK, SECRET, STEWARD, DELAY, KEEP, GUARD, VIGILANT, ARAGORN, GIMLI, DENETHOR, BERAVOR, SON];
+  const codes = [THURINDIR, TRIBESMAN, STEED, MIGHTY, HUNTERS, BACKTRACK, SECRET, STEWARD, DELAY, KEEP, GUARD, VIGILANT, ARAGORN, GIMLI, DENETHOR, BERAVOR, SON, ORTHANC_GUARD];
   const cards = new Map([...starter.cards, ...(await loadPrinted(codes))]);
   cards.set(HARAD, definePrinted({ code: HARAD, name: "Haradrim", type: "hero", sphere: "leadership", threat: 9, willpower: 1, attack: 1, defense: 1, health: 4, traits: ["Harad"] }));
   cards.set(BRAWLER, definePrinted({ code: BRAWLER, name: "Brawler", type: "hero", sphere: "tactics", threat: 9, willpower: 1, attack: 1, defense: 1, health: 4 }));
@@ -321,6 +323,20 @@ describe("Steward of Orthanc (17037:A:1)", () => {
     const planning = tired({ ...withMode(next, "planning"), window: { kind: "pass" as const }, activeSeat: 0, planningSeat: 0 }, tab);
     expect(planning.round).toBe(tab.state.round + 1);
     expect(offered(play(begin(planning), tab, three)).sort()).toEqual([first, other].sort());
+  });
+
+  // "give it Doomed 1": the raise is a Doomed raise, so a card that answers a threat raise from the Doomed keyword answers it: the exhausted Orthanc Guard is offered
+  // its Response (rr.doomed-x) and readies.
+  lineSpec("17037:A:1", "Steward of Orthanc: the threat raise it gives is a raise from the Doomed keyword", (effects) => {
+    const scene = table(effects, { seats: 2, heroes: [{ code: PAL, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: STEWARD, seat: 0 }, { code: ORTHANC_GUARD, seat: 0 }, { code: ALLY, seat: 0 }], hand: fillers(VIGILANT, 1), playerDeck: fillers(CARD, 3) });
+    const [guard, ally] = [idsOf(scene, ORTHANC_GUARD), idsOf(scene, ALLY)];
+    const tab = { ...scene, state: updateCard(updateCard(scene.state, guard, { exhausted: true }), ally, { exhausted: true }) };
+    let run = play(begin(tab.state), tab, idsOf(tab, VIGILANT));
+    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, STEWARD), effectId: "17037:response:1" }, tab.ctx);
+    expect(run.state.seats[0]?.threat).toBe(8 + 1);
+    expect(triggers(run.state, tab)).toContain("07004:response:1");
+    run = sendUnledgered(run, { type: "Trigger", cardId: guard, effectId: "07004:response:1" }, tab.ctx);
+    expect(run.state.cards[guard]?.exhausted).toBe(false);
   });
 
   // With the deck empty nothing can be drawn: the Response is not offered, and the event is not made Doomed for nothing (rr.triggered-ability).

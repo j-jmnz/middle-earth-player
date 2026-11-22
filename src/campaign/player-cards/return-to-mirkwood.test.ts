@@ -44,6 +44,9 @@ const HILL = "hill";
 const WEAK = "weak";
 const ALLY = "ally";
 const PAL = "pal";
+// A neutral event with an Action that changes the threat: another legal Action keeps the combat action window open.
+const PAD = "pad";
+const padAction: Effect = { id: "pad:action:1", cardCode: PAD, lines: ["fixture:A:1"], timing: "action", instructions: [{ verb: "SetThreat", value: 40 }] };
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
@@ -52,6 +55,7 @@ const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Ta
 beforeAll(async () => {
   const starter = await starterBase();
   const cards = new Map([...starter.cards, ...(await loadPrinted([DAIN, SIGNAL, DAWN, SUPPORT, TRAVELLER, SPEED, ARAGORN, THEODRED, GLOIN, LEGOLAS, THALIN, EOWYN, ELEANOR, SNOWBOURN, SLAYER, SPEARMAN]))]);
+  cards.set(PAD, definePrinted({ code: PAD, name: "Pad", type: "event", sphere: "neutral", cost: 0 }));
   cards.set(EAGLE, definePrinted({ code: EAGLE, name: "Eagle", type: "ally", sphere: "tactics", cost: 2, willpower: 0, attack: 3, defense: 2, health: 2, traits: ["Creature", "Eagle"] }));
   cards.set(ROC, definePrinted({ code: ROC, name: "Roc", type: "ally", sphere: "tactics", cost: 2, willpower: 0, attack: 1, defense: 4, health: 2, traits: ["Creature", "Eagle"] }));
   for (const code of [ROAD, FORD, HILL]) cards.set(code, definePrinted({ code, name: code, type: "location", threat: 1, questPoints: 3 }));
@@ -139,11 +143,12 @@ describe("Dúnedain Signal (02117:A:1, A:2, A:3)", () => {
 describe("Dawn Take You All (02118:A:1, A:2)", () => {
   // Aragorn (Leadership) pays 2. A Weak is engaged with each player; the combat phase deals each a shadow card.
   const dawn = (effects: readonly Effect[]): Table =>
-    table(effects, { seats: 2, heroes: [{ code: ARAGORN, seat: 0 }, { code: PAL, seat: 1 }], engaged: [{ code: WEAK, seat: 0 }, { code: WEAK, seat: 1 }], deck: ["f0", "f0", "f0"], hand: [{ code: DAWN, seat: 0 }] });
+    table([...effects, padAction], { seats: 2, heroes: [{ code: ARAGORN, seat: 0 }, { code: PAL, seat: 1 }], engaged: [{ code: WEAK, seat: 0 }, { code: WEAK, seat: 1 }], deck: ["f0", "f0", "f0"], hand: [{ code: DAWN, seat: 0 }, { code: PAD, seat: 0 }] });
   const playable = (run: Run, tab: Table): boolean => legalIntents(run.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === idsOf(tab, DAWN));
 
   // "Play after shadow cards have been dealt, before any attacks have resolved.": it can be played once the shadow cards are dealt; once
-  // the first player's enemy has attacked (Aragorn defends, the damage is dealt), it cannot be played in the next action window.
+  // the first player's enemy has attacked (Aragorn defends, the damage is dealt), it cannot be played in the next action window, which the Pad (another legal
+  // Action in the hand) keeps open between the first attack and the second.
   lineSpec("02118:A:1", "Dawn Take You All: played after the shadow cards are dealt, and not once an attack has resolved", (effects) => {
     const tab = dawn(effects);
     const dealt = combat(tab.state, tab);
@@ -154,8 +159,11 @@ describe("Dawn Take You All (02118:A:1, A:2)", () => {
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, ARAGORN) }, tab.ctx);
     const struck = (next: Run): boolean => next.steps.some((step) => step.kind === "strike" && step.side === "enemy");
     for (let guard = 0; guard < 8 && !struck(run) && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
-    // The first attack has struck: Dawn is not offered in any window that follows (none opens for it any more).
+    // The first attack has struck, the second has not: the combat action window is open (the Pad is legal in it) and Dawn is not offered in it.
     expect(struck(run)).toBe(true);
+    expect(run.state.phase).toBe("Combat");
+    expect(["pass", "frameAction"]).toContain(run.state.window?.kind);
+    expect(legalIntents(run.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === idsOf(tab, PAD))).toBe(true);
     expect(playable(run, tab)).toBe(false);
   });
 

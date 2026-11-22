@@ -88,6 +88,18 @@ export type QuestTotals = { readonly willpower: number; readonly threat: number;
  * `canAdvance` is the core's gate on advancing; the first family with an answer wins. */
 export type QuestResultHook = (state: ScenarioState, totals: QuestTotals, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], canAdvance: (state: ScenarioState) => boolean) => ScenarioState | null;
 
+/** What an idle check of a player card's ability (src/rules/player/idle.ts) reads about the step it is on: the seat, the amount scope, the cards the last Pick of the effect may have chosen (`picked`: null before any Pick) and the seat of the event a Response answers. */
+export type IdleFrame = { seat: number; scope: AmountScope; picked: readonly string[] | null; eventSeat?: number | undefined };
+
+/** What the steps before the one checked leave behind: `short` (a Draw or a discard from the top of a deck found too few cards, so a "Then" part is not attempted) and `event` (the ability is an event's play, whose card is not yet in play). */
+export type IdleMark = { short: boolean; event: boolean };
+
+/** Whether one instruction of the family's verbs would change nothing as the table stands: true when it cannot change the game state, false when it can or the table cannot say, null when the verb is not the family's. The step's own condition is read by the caller. */
+export type IdleHook = (state: ScenarioState, instruction: Instruction, sourceId: string, frame: IdleFrame, ctx: ReduceContext, mark: IdleMark) => boolean | null;
+
+/** The cards an instruction of the family's verbs makes for the steps after it, as a Pick does (PlayFrom: the cards of its pick that could be played now), or null when the verb is not the family's. With any card the step can change the game. */
+export type IdleCardsHook = (state: ScenarioState, instruction: Instruction, sourceId: string, frame: IdleFrame, ctx: ReduceContext) => readonly string[] | null;
+
 export type RulesFamily = {
   /** The folder name, which is also the catalog file name in src/catalog/families. */
   readonly name: string;
@@ -108,4 +120,6 @@ export type RulesFamily = {
   readonly revealed?: RevealHook;
   readonly optionalEngage?: OptionalEngageHook;
   readonly questResult?: QuestResultHook;
+  readonly idle?: IdleHook;
+  readonly idleCards?: IdleCardsHook;
 };

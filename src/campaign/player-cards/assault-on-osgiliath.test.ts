@@ -203,6 +203,17 @@ describe("Gondorian Fire (06085:A:1, A:2)", () => {
     expect(stat(withMode(run.state, "questCommit"), tab, aragorn, "attack")).toBe(attack);
   });
 
+  // "+1 Attack for each resource in its resource pool until the end of the phase": the resources are counted once, when the effect resolves (rr.lasting-effects), so the
+  // bonus does not fall when the hero spends another resource afterwards.
+  lineSpec("06085:A:2", "Gondorian Fire: the bonus is counted once, and does not change when the hero spends a resource afterwards", (effects) => {
+    const { tab, aragorn, card } = fire(effects, 6);
+    const attack = tab.ctx.cards.get(ARAGORN)?.attack ?? 0;
+    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: card, effectId: "06085:action:1", payments: [{ heroId: aragorn, amount: 1 }] }, tab.ctx);
+    expect(stat(run.state, tab, aragorn, "attack")).toBe(attack + 5);
+    const spent = updateCard(run.state, aragorn, { resources: 1 });
+    expect(stat(spent, tab, aragorn, "attack")).toBe(attack + 5);
+  });
+
   // An empty pool: the resource cannot be spent, so the Action is not offered.
   it("06085:A:2 Gondorian Fire: not offered when the hero's pool is empty", () => {
     const { tab } = fire(EFFECTS, 0);

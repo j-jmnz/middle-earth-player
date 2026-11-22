@@ -4,8 +4,9 @@ import { PLAYS } from "./costs-plays.ts";
 // Authored records for costs: discounts, resource matches, who pays for what, icons, optional doomed (docs/agents/effect-authoring.md). A card's other lines may have records in pool/<pack>.ts.
 const DISTINCT_THREE = { verb: "PayDistinctHeroes", min: 3 } as const;
 // "You may give ~ doomed N when you play it from your hand. If you do, it gains: Response: After you play ~, ...": the Response
-// is the choice; taking it gives the card its Doomed (each player raises their threat, rr.doomed-x).
-const doomed = (amount: number) => ({ verb: "RaiseThreat", amount, who: "eachSeat" }) as const;
+// is the choice; taking it gives the card its Doomed: the Doomed verb raises each player's threat with the cause rr.doomed-x, so a card that answers a threat raise
+// from the Doomed keyword (Orthanc Guard, Isengard Messenger, Keys of Orthanc) answers it.
+const doomed = (amount: number) => ({ verb: "Doomed", amount }) as const;
 // Linhir Sea-captain: exactly one hero's pool paid for it.
 const SINGLE_PAYER = { kind: "count", pick: { type: "hero", control: "any", paidFor: "subject" }, min: 1, max: 1 } as const;
 const icon = (stat: "leadershipIcon" | "loreIcon" | "tacticsIcon" | "spiritIcon") => ({ verb: "ModifyStat", stat, amount: 1, until: "endOfPhase", target: "host" }) as const;

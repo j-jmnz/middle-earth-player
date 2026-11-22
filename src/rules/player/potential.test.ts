@@ -1,59 +1,10 @@
 // Rules: rr.triggered-ability, rr.cost, rr.then, rr.search (data/rules/entries.json).
 // Whether an Action of an event can change the game (src/rules/player/potential.ts): for each kind of instruction the check reads, one table where the event is refused and the
-// nearest table where it is offered. The offer in `legalIntents` and the refusal of the PlayCard agree on every table (`seen`); an ability whose effect the table cannot settle is offered.
+// nearest table where it is offered. The offer in `legalIntents` and the refusal of the PlayCard agree on every table (`seenEvent`); an ability whose effect the table cannot settle is offered.
 import { describe, expect, it } from "vitest";
 
-import { z } from "zod";
-
-import { instructionSchema, type Effect } from "../../catalog/boundary.ts";
-import { cardMap, fixtureDefinition, hero } from "../core/test-fixture.ts";
-import { legalIntents, reduce } from "../engine/reduce.ts";
-import { definePrinted } from "../core/printed.ts";
-import { blankScenario, updateCard, withThreat, type ScenarioState } from "../core/state.ts";
-import { spawn, type Destination } from "../core/zones.ts";
-
-const cards = cardMap([
-  hero("hero", "spirit"),
-  definePrinted({ code: "ally", name: "Ally", type: "ally", sphere: "spirit", cost: 1, willpower: 1, traits: ["Rohan"] }),
-  definePrinted({ code: "foe", name: "Foe", type: "enemy", threat: 1, engagementCost: 20, attack: 1, defense: 0, health: 9 }),
-  definePrinted({ code: "ev", name: "Event", type: "event", sphere: "spirit", cost: 0 }),
-  definePrinted({ code: "pricey", name: "Pricey", type: "event", sphere: "spirit", cost: 5 }),
-  definePrinted({ code: "att", name: "Att", type: "attachment", sphere: "spirit", cost: 1 }),
-  definePrinted({ code: "filler", name: "Filler", type: "ally", sphere: "spirit", cost: 9 }),
-]);
-
-type Add = readonly [string, Destination];
-
-// A one-player table in the planning phase: the hero holds 1 resource and the event "ev" is in the hand; `adds` puts more cards on it.
-function table(adds: readonly Add[] = []): { state: ScenarioState; event: string } {
-  let state = blankScenario({ seatCount: 1, seed: 3, definition: fixtureDefinition(["stage"]) });
-  const placed = spawn(state, "hero", { zone: "heroes", seat: 0 });
-  state = updateCard(placed.state, placed.id, { resources: 1 });
-  const event = spawn(state, "ev", { zone: "hand", seat: 0 });
-  state = { ...event.state, phase: "Planning", mode: "planning", window: { kind: "pass" }, activeSeat: 0 };
-  for (const [code, where] of adds) state = spawn(state, code, where).state;
-  return { state, event: event.id };
-}
-
-// Whether the event with this Action is offered, and that the PlayCard agrees with the offer.
-// The instructions are parsed by the schema, so a table cannot hold a record the engine would not load.
-function seen(steps: readonly unknown[], adds: readonly Add[] = [], shape: (state: ScenarioState) => ScenarioState = (state) => state): boolean {
-  const { state: start, event } = table(adds);
-  const state = shape(start);
-  const effect: Effect = { id: "ev:action:1", cardCode: "ev", lines: ["ev:A:1"], timing: "action", instructions: z.array(instructionSchema).parse(steps) };
-  // "pricey" is the event a PlayFrom plays: its own Action sets the threat to 1.
-  const pricey: Effect = { id: "pricey:action:1", cardCode: "pricey", lines: ["pricey:A:1"], timing: "action", instructions: [{ verb: "SetThreat", value: 1 }] };
-  const ctx = { effects: [effect, pricey], cards };
-  const offered = legalIntents(state, ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === event);
-  const result = reduce(state, { type: "PlayCard", cardId: event, payments: [] }, ctx);
-  expect(offered).toBe(result.ok);
-  return offered;
-}
-
-const exhaustAll = (state: ScenarioState): ScenarioState => updateCard(state, Object.values(state.cards).find((card) => card.code === "hero")?.id ?? "", { exhausted: true });
-const inDeck: Add = ["filler", { zone: "deck", seat: 0 }];
-const heroes = { type: "hero", control: "any" } as const;
-const foes = { type: "enemy", control: "any", staging: true } as const;
+import { updateCard, withThreat, type ScenarioState } from "../core/state.ts";
+import { exhaustAll, foes, heroes, inDeck, seenEvent as seen } from "../../../test/harness/potential-kit.ts";
 
 describe("an Action that can change nothing is not offered (rr.triggered-ability)", () => {
   it("a Ready of each card, or of a chosen card, with every candidate ready", () => {

@@ -19,7 +19,7 @@ import { uniqueBlocked } from "../../core/keywords.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { heroPays } from "../../player/payments.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
-import { idleEventReason, noTargetReason } from "../../player/potential.ts";
+import { eventActionReason } from "../../player/potential.ts";
 import { playCard } from "../../player/planning.ts";
 import { printedOf } from "../../core/printed.ts";
 import { finishMulliganChoice } from "../../setup/setup.ts";
@@ -43,7 +43,7 @@ function eventActionsNow(state: ScenarioState, cardId: string, seat: number, ctx
   const scope = { actor: seat, sourceId: cardId, returned: 0 };
   return effectsOf(ctx, code).filter((effect) => {
     if (effect.timing !== "action" || (effect.condition && !holds(state, effect.condition, scope, ctx)) || limitSpent(state, effect, cardId, seat)) return false;
-    return noTargetReason(state, effect.instructions, cardId, seat, ctx) == null && idleEventReason(state, effect.instructions, cardId, seat, ctx) == null;
+    return eventActionReason(state, effect.instructions, cardId, seat, ctx) == null;
   });
 }
 

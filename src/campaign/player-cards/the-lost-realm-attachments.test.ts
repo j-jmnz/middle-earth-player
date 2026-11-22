@@ -1,6 +1,6 @@
 // Rules: rr.attachment-cards, rr.modifiers, rr.staging, rr.staging-area, rr.deckbuilding (data/rules/entries.json).
 // The Lost Realm attachments and player side quest, written from their card text (data/cards/TLR.json; data/printed holds no ledger for this box
-// yet): Heir of Valandil 09010:A:1, Athelas 09011:A:1, Secret Vigil 09012:A:1 and A:2, Star Brooch 09013:A:1, Gather Information 09014:A:1.
+// yet): Heir of Valandil 09010:A:1, Athelas 09011:A:1 and A:2, Secret Vigil 09012:A:1 and A:2, Star Brooch 09013:A:1, Gather Information 09014:A:1.
 
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -12,7 +12,7 @@ import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-pas
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, deckSaveFacts, hosts, packRow, playerTable, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { attach, deckSaveFacts, hosts, packRow, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const HEIR = "09010";
 const ATHELAS = "09011";
@@ -32,6 +32,8 @@ const CAREGIVER = "12008";
 const F3 = "f3";
 const WEAK = "weak";
 const ALLY = "ally";
+// The Favor of the Lady: a Condition attachment.
+const FAVOR = "01055";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
@@ -39,7 +41,7 @@ const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Ta
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const cards = new Map([...starter.cards, ...(await loadPrinted([HEIR, ATHELAS, VIGIL, BROOCH, GATHER, ARAGORN, GLOIN, LEGOLAS, EOWYN, BERAVOR, SON_OF_ARNOR, ERESTOR, CAREGIVER]))]);
+  const cards = new Map([...starter.cards, ...(await loadPrinted([HEIR, ATHELAS, VIGIL, BROOCH, GATHER, ARAGORN, GLOIN, LEGOLAS, EOWYN, BERAVOR, SON_OF_ARNOR, ERESTOR, CAREGIVER, FAVOR]))]);
   cards.set(WEAK, definePrinted({ code: WEAK, name: "Weak", type: "enemy", threat: 2, engagementCost: 40, attack: 1, defense: 0, health: 9 }));
   base = { ...starter, cards };
 });
@@ -60,6 +62,16 @@ describe("Athelas (09011:A:1)", () => {
   lineSpec("09011:A:1", "goes on a Dúnedain or Healer character only", (effects) => {
     const tab = table(effects, { heroes: [{ code: BERAVOR, seat: 0 }, { code: GLOIN, seat: 0 }], allies: [{ code: SON_OF_ARNOR, seat: 0 }, { code: CAREGIVER, seat: 0 }, { code: ALLY, seat: 0 }], hand: [{ code: ATHELAS, seat: 0 }] });
     expect(hosts(tab, idsOf(tab, ATHELAS))).toEqual(sorted(tab, [BERAVOR, SON_OF_ARNOR, CAREGIVER]));
+  });
+});
+
+describe("Athelas (09011:A:2)", () => {
+  // "Action: Discard Athelas and exhaust attached character to heal all damage on a character. You may discard a Condition attachment from that character.": no
+  // character has damage, and Aragorn wears a Condition attachment (The Favor of the Lady) that the Action lets the player choose and discard, so the Action can
+  // change the game and is offered. (The check cannot tell before a character is chosen which one wears a Condition, so it never refuses this Action.)
+  lineSpec("09011:A:2", "Athelas: offered with no damage on any character while a Condition attachment can be discarded", (effects) => {
+    const tab = table(effects, { heroes: [{ code: ARAGORN, seat: 0 }], attached: [{ code: ATHELAS, host: ARAGORN }, { code: FAVOR, host: ARAGORN }] });
+    expect(triggers(begin(tab.state).state, tab)).toContain("09011:action:1");
   });
 });
 

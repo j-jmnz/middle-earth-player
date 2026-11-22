@@ -30,6 +30,7 @@ import { afterProgress } from "../../quest/stage-reveal.ts";
 import { placeProgressOnQuestCard } from "./quest-card.ts";
 import { announceEliminated } from "./eliminated.ts";
 import { resetSweep } from "./reset.ts";
+import { questIdle } from "./idle.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
@@ -190,4 +191,4 @@ function removeProgressUnpayable(state: ScenarioState, instruction: Instruction,
   return (state.questStage ? (state.cards[state.questStage]?.progress ?? 0) : 0) < needed;
 }
 
-export const manifest: RulesFamily = { name: "quest", settle: { before: announceEliminated, sweep: resetSweep }, travel: { unpayable: removeProgressUnpayable }, verbs: ["CommitToQuest", "MakeActive", "MoveProgress", "LowerCardThreat", "DamageEach", "ExhaustEach", "ReadyAll", "BarEngagement", "WaiveQuestThreat", "SkipQuestPhase", "AdvanceStage", "RaiseQuestThreat", "ResetThreat", "ReattachSelf", "BranchStage", "AdvanceIfAttached", "ShuffleStages", "LookAtStages", "RemoveProgressFromQuest", "RemoveAllProgress", "RemoveProgressEach", "PlaceProgressOnQuestCard"], run };
+export const manifest: RulesFamily = { name: "quest", settle: { before: announceEliminated, sweep: resetSweep }, travel: { unpayable: removeProgressUnpayable }, verbs: ["CommitToQuest", "MakeActive", "MoveProgress", "LowerCardThreat", "DamageEach", "ExhaustEach", "ReadyAll", "BarEngagement", "WaiveQuestThreat", "SkipQuestPhase", "AdvanceStage", "RaiseQuestThreat", "ResetThreat", "ReattachSelf", "BranchStage", "AdvanceIfAttached", "ShuffleStages", "LookAtStages", "RemoveProgressFromQuest", "RemoveAllProgress", "RemoveProgressEach", "PlaceProgressOnQuestCard"], run, idle: questIdle };

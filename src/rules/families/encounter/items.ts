@@ -17,7 +17,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, playerCardEffectCanChoose, raiseThreat, uniqueBlocked } from "../../core/keywords.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { heroPays } from "../../player/payments.ts";
-import { idleEventReason, noTargetReason } from "../../player/potential.ts";
+import { eventActionReason } from "../../player/potential.ts";
 import { entersExhausted } from "../../player/planning.ts";
 import { isPlayerType, printedOf } from "../../core/printed.ts";
 import { lastPicked, putOnDeck } from "../../interpret/player-verbs.ts";
@@ -142,7 +142,7 @@ function playableActions(state: ScenarioState, cardId: string, seat: number, ctx
   const scope = { actor: seat, sourceId: cardId, returned: 0 };
   return effectsOf(ctx, code).filter((effect) => {
     if (effect.timing !== "action" || (effect.condition && !holds(state, effect.condition, scope, ctx))) return false;
-    return noTargetReason(state, effect.instructions, cardId, seat, ctx) == null && idleEventReason(state, effect.instructions, cardId, seat, ctx) == null;
+    return eventActionReason(state, effect.instructions, cardId, seat, ctx) == null;
   });
 }
 

@@ -2,7 +2,7 @@
 // rr.engaged, rr.attack-strength, rr.ready, rr.cost, rr.quest-phase, rr.delayed-effects, rr.active-location, rr.limits, rr.unique-cards,
 // rr.cannot (data/rules/entries.json).
 // The A Shadow in the East player cards, each printed line tested from the words on the card: Frodo Baggins 21002:A:1, Merry 21003:A:1,
-// Pippin 21004:A:1 and A:2, Faramir 21005:A:1, Put Off Pursuit 21008:A:1, Sméagol 21072:A:1 and A:3. The lines are the text of
+// Pippin 21004:A:1 and A:2, Faramir 21005:A:1, Put Off Pursuit 21008:A:1, Sméagol 21072:A:1 and A:3, The Ring of Power 21011:A:1. The lines are the text of
 // data/cards (data/printed holds no ledger for this pack), so every intent goes through sendUnledgered.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -14,7 +14,7 @@ import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-pa
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, attacking, choices, endRound, hosts, passAll, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attach, attacking, choices, endRound, hosts, passAll, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const FRODO_HERO = "21002";
 const MERRY_ALLY = "21003";
@@ -22,6 +22,12 @@ const PIPPIN = "21004";
 const FARAMIR = "21005";
 const PURSUIT = "21008";
 const SMEAGOL = "21072";
+const RING_OF_POWER = "21011";
+// The One Ring (a player attachment) and the Ring of Barahir, an Artifact attachment with the Ring trait that is not The One Ring; Core: Aragorn and Éowyn.
+const ONE_RING = "21001";
+const BARAHIR = "06007";
+const ARAGORN = "01001";
+const EOWYN = "01007";
 // Citadel Plate: "Attach to a hero. Restricted.", a Tactics attachment of cost 4.
 const PLATE = "01040";
 // Cards with no text: a Tactics hero and a Lore hero (unique, as heroes are), a unique ally and a second one, a location, enemies of 9 hit points (a non-unique
@@ -47,7 +53,7 @@ const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Ta
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const cards = new Map([...starter.cards, ...(await loadPrinted([FRODO_HERO, MERRY_ALLY, PIPPIN, FARAMIR, PURSUIT, SMEAGOL, PLATE]))]);
+  const cards = new Map([...starter.cards, ...(await loadPrinted([FRODO_HERO, MERRY_ALLY, PIPPIN, FARAMIR, PURSUIT, SMEAGOL, PLATE, RING_OF_POWER, ONE_RING, BARAHIR, ARAGORN, EOWYN]))]);
   cards.set(TACTICIAN, definePrinted({ code: TACTICIAN, name: "Tactician", type: "hero", sphere: "tactics", threat: 8, willpower: 1, attack: 1, defense: 1, health: 4, isUnique: true }));
   cards.set(SAGE, definePrinted({ code: SAGE, name: "Sage", type: "hero", sphere: "lore", threat: 8, willpower: 1, attack: 1, defense: 1, health: 4, isUnique: true }));
   cards.set(UNIQUE, definePrinted({ code: UNIQUE, name: "Unique Ally", type: "ally", sphere: "leadership", cost: 1, willpower: 1, attack: 1, defense: 1, health: 2, isUnique: true }));
@@ -244,5 +250,21 @@ describe("Sméagol (21072:A:1, A:3)", () => {
     const tab = scene(EFFECTS, 0);
     const run = sendUnledgered(begin(tab.state), { type: "Travel", locationId: idsOf(tab, ROAD) }, tab.ctx);
     expect(triggers(run.state, tab)).not.toContain("21072:response:1");
+  });
+});
+
+describe("The Ring of Power (21011:A:1)", () => {
+  // "Action: Exhaust The One Ring and raise your threat by 1 to ready the hero with The One Ring attached. That hero gets +1 Willpower, +1 Attack and +1 Defense until the
+  // end of the phase.": Éowyn holds The One Ring and Aragorn the Ring of Barahir, both exhausted; only Éowyn is the hero with The One Ring, so only she readies and gets the bonus.
+  lineSpec("21011:A:1", "The Ring of Power: ready the hero with The One Ring, not one with another Ring attachment", (effects) => {
+    const scene = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: ARAGORN, seat: 0 }], attached: [{ code: ONE_RING, host: EOWYN }, { code: BARAHIR, host: ARAGORN }], hand: [{ code: RING_OF_POWER, seat: 0 }] });
+    const [eowyn, aragorn] = [idsOf(scene, EOWYN), idsOf(scene, ARAGORN)];
+    const tab = { ...scene, state: updateCard(updateCard(scene.state, eowyn, { exhausted: true }), aragorn, { exhausted: true }) };
+    const run = play(begin(tab.state), tab, idsOf(tab, RING_OF_POWER));
+    expect(run.state.cards[eowyn]?.exhausted).toBe(false);
+    expect(run.state.cards[aragorn]?.exhausted).toBe(true);
+    expect(run.state.cards[idsOf(tab, ONE_RING)]?.exhausted).toBe(true);
+    expect(stat(run.state, tab, eowyn, "willpower")).toBe(printed(tab, EOWYN, "willpower") + 1);
+    expect(stat(run.state, tab, aragorn, "willpower")).toBe(printed(tab, ARAGORN, "willpower"));
   });
 });
