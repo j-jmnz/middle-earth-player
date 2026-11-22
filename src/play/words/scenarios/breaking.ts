@@ -56,6 +56,10 @@ export function breakingPickWords(pick: Instruction, next: Instruction | undefin
   if (pick.pick.type === "player" && next?.verb === "Draw" && next.who === "picked" && typeof next.amount === "number" && lower?.verb === "LowerThreat" && lower.who === "picked" && typeof lower.amount === "number") {
     return { verb: "Choose", prompt: `Choose the player who draws ${next.amount} card${next.amount === 1 ? "" : "s"} and lowers their threat by ${lower.amount}.` };
   }
+  // Guard the Hobbits (142064:B:3): the player whose heroes all ready.
+  if (pick.pick.type === "player" && next?.verb === "Each" && next.instructions.length === 1 && next.instructions[0]?.verb === "Ready") return { verb: "Choose", prompt: "Choose the player whose heroes all ready." };
+  // Slopes of Amon Hen's Travel cost (142079:A:1): an enemy in any staging area that engages the player to travel there.
+  if (pick.pick.type === "enemy" && pick.pick.stagingArea === "any" && next?.verb === "Engage" && next.target === "picked") return { verb: "Engage", prompt: "Choose an enemy in any staging area. It engages you." };
   if (pick.pick.burden === true && next?.verb === "RemoveFromGame") return { verb: "Remove", prompt: "Choose a burden card, in play or in the encounter deck or discard pile, to remove from the game and from the campaign pool." };
   if (pick.pick.type === "enemy" && next?.verb === "MoveToFirstStaging") return { verb: "Move", prompt: `Choose an enemy engaged with you to move to ${firstArea(game)}.` };
   if (pick.pick.type === "player" && next?.verb === "SwitchActor") return { verb: "Choose", prompt: "Choose the player who reveals an encounter card." };

@@ -30,6 +30,7 @@ import { smaugBranchWords } from "./scenarios/standalone-scenarios/smaug.ts";
 import { stormcallerBranchWords } from "./scenarios/stormcaller.ts";
 import { commandBranchWords } from "./command.ts";
 import { wilderlandBranchWords } from "./scenarios/wilderland.ts";
+import { activePickWords, attachEnemyWords } from "./active.ts";
 import { claimedEffectWords } from "./objective.ts";
 import { objectiveTokensWords } from "./scenarios/assault.ts";
 
@@ -140,8 +141,8 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   if (deck) return deck;
   const burden = burdenPickWords(pick, next) ?? moriaPickWords(next, names) ?? breakingPickWords(pick, next, game, after) ?? attackPickWords(pick, next);
   if (burden) return burden;
-  if (pick.verb !== "Pick") return unchartedPickWords(pick, next, names, sourceId) ?? islandPickWords(pick, next, names, sourceId, game) ?? angmarPickWords(pick) ?? aflamePickWords(pick, next, names, sourceId, undefined, game) ?? cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null, game) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick, names.card) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
-  const family = aflamePickWords(pick, next, names, sourceId, amountNow, game) ?? islandPickWords(pick, next, names, sourceId, game);
+  if (pick.verb !== "Pick") return unchartedPickWords(pick, next, names, sourceId) ?? islandPickWords(pick, next, names, sourceId, game) ?? angmarPickWords(pick) ?? aflamePickWords(pick, next, names, sourceId, undefined, game) ?? cavesAttachWords(pick, sourceId ? names.card(sourceId) : null) ?? attachEnemyWords(pick, sourceId ? names.card(sourceId) : null) ?? oathPickWords(pick, names.code, sourceId ? names.card(sourceId) : null, game) ?? cavesPickWords(pick, next) ?? encounterPickWords(pick, next) ?? attachmentPickWords(pick) ?? deckPickWords(pick, names.card) ?? miscPickWords(pick) ?? { verb: "Choose", prompt: "Choose one." };
+  const family = aflamePickWords(pick, next, names, sourceId, amountNow, game) ?? islandPickWords(pick, next, names, sourceId, game) ?? activePickWords(pick, next);
   if (family) return family;
   const noun = `${pick.pick.committed === true ? "questing " : ""}${PICK_NOUNS[pick.pick.type] ?? "card"}`;
   const one = article(noun);

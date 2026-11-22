@@ -28,25 +28,7 @@ const asks = asksPlayer;
 
 // A sentence that is allowed to equal the fallback or to be a bare prompt, by `<record id> @<the instruction's path in the record> <verb | option id>`
 // (test/harness/record-walk.ts). Each entry says why it is fine, and the test fails on an entry no sentence needs any more.
-const OPEN_ACTIVE = "Open: picks the active location, a single card unless a second location is active; the prompt should say what the location is picked for.";
-const OPEN_BALROG = "Open: the Balrog, a named unique staging enemy (stagingOnly); the prompt says only \"an enemy\".";
-const ALLOWED: Readonly<Record<string, string>> = {
-  "141070:whenRevealed:1 @0 AttachSelf": "Open: the Nazgul it attaches to; the prompt should name the card and the enemy.",
-  "141074:whenRevealed:1 @0 AttachSelf": "Open: the Nazgul it attaches to; the prompt should name the card and the enemy.",
-  "142021:forced:1 @0 Pick": OPEN_ACTIVE,
-  "142022:forced:2 @0 Pick": OPEN_ACTIVE,
-  "142027:forced:1 @0 Pick": OPEN_ACTIVE,
-  "142027:shadow:1 @1.0 Pick": OPEN_ACTIVE,
-  "906403:forced:1 @0.damage.0 Pick": OPEN_ACTIVE,
-  "906404:shadow:1 @0.0 Pick": OPEN_ACTIVE,
-  "906404:whenRevealed:1 @1.0 Pick": OPEN_ACTIVE,
-  "906404:whenRevealed:1 @1.2 Pick": OPEN_ACTIVE,
-  "142043:forced:2 @0 Pick": OPEN_BALROG,
-  "142059:whenRevealed:1 @0.balrog.0 Pick": OPEN_BALROG,
-  "142064:response:1 @0 Pick": "Open: the player whose heroes ready; the prompt should name the ready, as 142065's names the draw and the threat.",
-  "142079:travel:1 @0 Pick": "Open: the staging enemy a player engages; the prompt should say it engages the player.",
-  "900303:shadow:1 @0 Pick": "Open: the attacking staging enemy whose delayed threat is raised; the prompt should say what the enemy is picked for.",
-};
+const ALLOWED: Readonly<Record<string, string>> = {};
 
 const cards = new Map(loadCards().map((card) => [card.code, card]));
 const campaigns = loadCampaigns();

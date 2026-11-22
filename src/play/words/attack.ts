@@ -35,8 +35,8 @@ export function attackWords(instruction: Instruction): string | null {
   }
 }
 
-/** A named enemy picked in the staging area (`staging`; the Balrog's `stagingOnly` pick keeps the generic words) that attacks from it (Lashing Tentacles' Thing in the Depths, 12056:A:1 and A:2): its title, and where it attacks from. Null for any other pick. */
+/** A named enemy picked in the staging area (`staging` or `stagingOnly`) that attacks from it (Lashing Tentacles' Thing in the Depths, 12056:A:1 and A:2; the Balrog, 142043:A:2 and 142059:A:2): its title, and where it attacks from. Null for any other pick. */
 export function attackPickWords(pick: Instruction, next: Instruction | undefined): { verb: string; prompt: string } | null {
-  if (pick.verb !== "Pick" || next?.verb !== "AttackFromStaging" || pick.pick.staging !== true || pick.pick.names?.length !== 1) return null;
+  if (pick.verb !== "Pick" || next?.verb !== "AttackFromStaging" || (pick.pick.staging !== true && pick.pick.stagingOnly !== true) || pick.pick.names?.length !== 1) return null;
   return { verb: "Choose", prompt: `Choose ${pick.pick.names[0]} to attack from the staging area.` };
 }
