@@ -31,8 +31,11 @@ export function burdenWords(instruction: Instruction, nameOf: (code: string) => 
     }
     case "RemoveAllQuestProgress":
       return "remove all progress from the current quest";
-    case "SetStatUntil":
-      return `reduce the Ring-bearer's ${instruction.stat} to ${instruction.value} until the end of the ${instruction.until === "endOfRound" ? "round" : "phase"}`;
+    case "SetStatUntil": {
+      // Whose stat it is: the Ring-bearer's, the hero the card is attached to, or each hero or ally the pick matches.
+      const holder = instruction.holders.trait === "Ring-bearer" ? "the Ring-bearer's" : instruction.holders.isHost ? "the attached hero's" : "each matching character's";
+      return `reduce ${holder} ${instruction.stat} to ${instruction.value} until the end of the ${instruction.until === "endOfRound" ? "round" : "phase"}`;
+    }
     default:
       return null;
   }
