@@ -2,7 +2,7 @@
 // for, nothing reaches the module; quick taps each get a player that is not still playing.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[], playing: false }));
+const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[], seeks: 0, playing: false }));
 vi.mock("./session.ts", () => ({ startAudioSession: () => undefined, audioFailed: () => undefined }));
 // The accessibility store is mocked whole: loaded here with the mocked react-native, it would stay in the shared module cache (vitest.config.mts, isolate).
 vi.mock("../accessibility.ts", () => ({ accessibility: () => ({ screenReader: false }) }));
@@ -11,7 +11,7 @@ vi.mock("./audio-player", () => ({
   createAudioPlayer: (source: number) => {
     calls.created.push(source);
     // `calls.playing` stands for a sound still sounding: a quick tap then needs another player.
-    const player = { playing: false, duration: 0.3, seekTo: () => Promise.resolve(), pause: () => undefined, play: () => (calls.played.push(source), (player.playing = calls.playing)) };
+    const player = { playing: false, duration: 0.3, seekTo: () => ((calls.seeks += 1), Promise.resolve()), pause: () => undefined, play: () => (calls.played.push(source), (player.playing = calls.playing)) };
     return player;
   },
 }));
@@ -79,6 +79,35 @@ describe("sound effects", () => {
     await settled();
     expect(calls.played.filter((source) => source === 1)).toHaveLength(3);
     expect(calls.created.length - before).toBe(2);
+  });
+
+  it("starts a sound that has ended at once, since its player was put back to its start", async () => {
+    vi.advanceTimersByTime(1000);
+    playSound("card.land");
+    // The sound is 300 ms long: its player is put back after it, and the next play waits for no seek.
+    vi.advanceTimersByTime(500);
+    await settled();
+    calls.played.length = 0;
+    const seeks = calls.seeks;
+    playSound("card.land");
+    expect(calls.played).toEqual([2]);
+    expect(calls.seeks).toBe(seeks);
+  });
+
+  it("starts a sound that is still sounding again from its start, after the seek", async () => {
+    vi.advanceTimersByTime(1000);
+    playSound("ui.back");
+    vi.advanceTimersByTime(100);
+    calls.played.length = 0;
+    const seeks = calls.seeks;
+    // More taps than the slot keeps players: the one that started longest ago is taken while it sounds.
+    for (let tap = 0; tap < 4; tap += 1) {
+      playSound("ui.back");
+      vi.advanceTimersByTime(30);
+    }
+    expect(calls.seeks).toBeGreaterThan(seeks);
+    await settled();
+    expect(calls.played.filter((source) => source === 3)).toHaveLength(4);
   });
 
   it("is silent while Sound effects is off", () => {
