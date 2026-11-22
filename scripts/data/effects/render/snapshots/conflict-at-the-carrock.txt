@@ -229,7 +229,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
   900501:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the copy of the card with code 900503 in the encounter deck is set aside, out of play
-    - the table: stat noteQuestProgress 1, until the end of the game
+    - the table: stat noteQuestProgress (the engine notes the progress placed on the current quest card in the quest phase, to the end of the round, so a Forced effect at the end of the quest phase can read it) 1, until the end of the game
 
 900501:A:3 (front): Stage 2B should read, "When Revealed: Place Louis, Morris, Rupert and Stuart into the staging area."
   900501:forced:1: Forced on the event stageRevealed

@@ -406,7 +406,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143080:B:3 (back): If a player has 0 cards in his hand, he is eliminated from the game. If the players defeat this stage, they win the game.
   143080:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the table: stat eliminatedAtEmptyHand 1, while this card is in play
-    - the table: stat trackQuestProgress 1, while this card is in play
+    - the table: stat eliminatedAtEmptyHand (a player with no cards in hand is eliminated from the game) 1, while this card is in play
+    - the table: stat trackQuestProgress (the engine notes the progress placed on the current quest card until the end of the phase, so a later effect can take it off again; it is not a win condition: the last stage's win is the engine's own rule) 1, while this card is in play
 
 (rendered pieces: 260 by template, 0 as JSON)
