@@ -132,14 +132,18 @@ export function eliminateSeat(state: ScenarioState, index: number, steps: Engine
   return livingSeats(next).length === 0 ? markLoss(next, "No seats remain") : next;
 }
 
+/** The threat at which a seat is eliminated: 99 while the main quest is Dire (mec113.dire), lowered by a card the seat holds (The One Ring, families/misc.ts). */
+export function eliminationLevel(state: ScenarioState, seat: number): number {
+  return (state.dire ? DIRE_ELIMINATION_LEVEL : ELIMINATION_LEVEL) - Math.max(0, heldAmount(state, `seat:${seat}`, "eliminationReduction"));
+}
+
 // `final`: the play sweep has already let an ally gain the hero card type, so a seat in heroSavers with no heroes is eliminated now.
 export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], final = false): ScenarioState {
   let next = state;
   for (let index = 0; index < next.seatCount; index += 1) {
     const seat = next.seats[index];
     if (!seat || seat.eliminated) continue;
-    // The elimination level (99 while the main quest is Dire, mec113.dire), lowered by a card the seat holds (The One Ring, families/misc.ts).
-    const level = (next.dire ? DIRE_ELIMINATION_LEVEL : ELIMINATION_LEVEL) - Math.max(0, heldAmount(next, `seat:${index}`, "eliminationReduction"));
+    const level = eliminationLevel(next, index);
     if (!final && seat.threat < level && seat.heroes.length === 0 && (state.heroSavers ?? []).includes(index)) continue;
     // A hero an enemy guards is in play, not killed (Carried Away, 18074:B:1; rr.player-elimination): its owner is not out of heroes while it is held.
     const held = seat.threat < level && seat.heroes.length === 0 && Object.values(next.cards).some((card) => heldHero(card) && card.owner === index);
