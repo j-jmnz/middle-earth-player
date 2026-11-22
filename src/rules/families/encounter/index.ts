@@ -75,7 +75,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ReturnFromDiscard":
       return returnFromDiscard(state, instruction, focus, ctx, steps);
     case "ShuffleEncounterDiscard":
-      return instruction.alsoVictory === true ? shuffleDiscardAndVictoryIn(state, ctx, instruction.trait, instruction.type, instruction.name) : shuffleDiscardIn(state, ctx, instruction.trait, instruction.type, instruction.name);
+      return instruction.alsoVictory === true ? shuffleDiscardAndVictoryIn(state, ctx, instruction.trait, instruction.type, instruction.name) : shuffleDiscardIn(state, ctx, instruction.trait, instruction.type, instruction.name, instruction.exceptSource === true ? focus.sourceId : null);
     case "DiscardUntil":
       return discardUntil(state, instruction.types ?? (instruction.type ? [instruction.type] : []), ctx, instruction.trait, instruction.reshuffle === true);
     case "DamageEachWithAttachment":
@@ -161,4 +161,10 @@ export function addTableModifier(state: ScenarioState, modifier: Omit<Modifier, 
   return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", ...modifier }] };
 }
 
-export const manifest: RulesFamily = { name: "encounter", verbs: ["LookAtTop", "PickEncounter", "ArrangeEncounter", "PayResources", "PlayRevealedFree", "MoveEncounterCard", "CountEncounterTop", "RevealEncounter", "RevealTopEnemies", "SearchCollection", "ReturnFromDiscard", "ShuffleEncounterDiscard", "ShuffleVictoryIntoEncounterDeck", "DiscardUntil", "ResolveWhenRevealed", "RevealFewer", "RevealMore", "WatchReveals", "TravelTo", "ProgressQuest", "RaiseThreatTo", "LowerThreatByRaise", "ReturnEventToHand", "AmbushChecks", "DiscardTopEncounter", "RevealEnemies", "FirstEnemyGains", "RevealFromDiscard", "ReplaceEncounterDeck", "DamageEachWithAttachment"], run, revealed: noteFirstEnemy, condition: discardCondition, amount: (state, found, scope, ctx) => attackDamageAmount(state, found, scope, ctx), travel: { unpayable: (state, instruction, ctx) => instruction.verb === "RevealFromDiscard" && topmostInDiscard(state, instruction.trait, ctx) == null }, settle: { sweep: exploreFull } };
+// "Reveal the top card of the encounter deck to travel here": with the deck empty the cost cannot be paid. The deck is reset only in the quest phase (rr.running-out-of-cards), and a Travel cost the players cannot pay bars the travel (rr.travel).
+function travelUnpayable(state: ScenarioState, instruction: Instruction, ctx: ReduceContext): boolean {
+  if (instruction.verb === "RevealEncounter") return state.encounterDeck.length === 0;
+  return instruction.verb === "RevealFromDiscard" && topmostInDiscard(state, instruction.trait, ctx) == null;
+}
+
+export const manifest: RulesFamily = { name: "encounter", verbs: ["LookAtTop", "PickEncounter", "ArrangeEncounter", "PayResources", "PlayRevealedFree", "MoveEncounterCard", "CountEncounterTop", "RevealEncounter", "RevealTopEnemies", "SearchCollection", "ReturnFromDiscard", "ShuffleEncounterDiscard", "ShuffleVictoryIntoEncounterDeck", "DiscardUntil", "ResolveWhenRevealed", "RevealFewer", "RevealMore", "WatchReveals", "TravelTo", "ProgressQuest", "RaiseThreatTo", "LowerThreatByRaise", "ReturnEventToHand", "AmbushChecks", "DiscardTopEncounter", "RevealEnemies", "FirstEnemyGains", "RevealFromDiscard", "ReplaceEncounterDeck", "DamageEachWithAttachment"], run, revealed: noteFirstEnemy, condition: discardCondition, amount: (state, found, scope, ctx) => attackDamageAmount(state, found, scope, ctx), travel: { unpayable: travelUnpayable }, settle: { sweep: exploreFull } };

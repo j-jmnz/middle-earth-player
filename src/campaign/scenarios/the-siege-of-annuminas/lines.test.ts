@@ -8,7 +8,7 @@ import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../rules/
 import type { Effect } from "../../../catalog/boundary.ts";
 import { playerCardEffectCanChoose } from "../../../rules/core/keywords.ts";
 import { whenRevealedUncancelable } from "../../../rules/families/wilderland/heath.ts";
-import { first, opening, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
+import { first, legalTargets, opening, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
 
 const table = (layout: Layout) => tableFromLayout("the-siege-of-annuminas", layout);
 const PLACES = ["place", "place", "place", "place", "place", "place"];
@@ -62,6 +62,23 @@ describe("the Responses at the end of the round", () => {
   it("50805:B:2 is never offered in a Standard game (one stage, so no enemy at another stage), whatever the staging area holds", () => {
     const made = table({ stage: "50805", staging: [CITY(20), "f3", "f0"], engaged: ["f3"], deck: PLACES, threat: [0, 0] });
     expect(offered("50805")(passUntil(made, offered("50805")).state, made.ctx)).toBe(false);
+  });
+});
+
+describe("50820:A:3 City Wall's Travel cost", () => {
+  // Researched (rr.travel, rr.running-out-of-cards; Caleb Grace, ALeP 3.243 and 3.358, docs/scenarios/standalone-scenarios.md): "Reveal the top card of the encounter deck to travel here" is a cost; with an empty deck outside the quest phase it cannot be paid, and the deck is not reset for it.
+  const travelOffered = (layout: Layout): boolean => {
+    const made = table({ stage: "50805", phase: "Travel", staging: ["50820"], ...layout });
+    return legalTargets(made.state, { type: "Travel" }, made.ctx).includes(first(made.state, "50820"));
+  };
+
+  it("50820:A:3 the players cannot travel there with an empty encounter deck, whatever the discard pile holds", () => {
+    expect(travelOffered({ deck: [], discard: ["place", "f0"] })).toBe(false);
+    expect(travelOffered({ deck: [] })).toBe(false);
+  });
+
+  it("50820:A:3 they can with a card in the deck", () => {
+    expect(travelOffered({ deck: ["place"] })).toBe(true);
   });
 });
 
