@@ -314,11 +314,11 @@ export function useTableChoice({
       else if (result.kind === "choice") {
         // A card picked or given a share, and a card put back, each sound (docs/design-system-table.md, Sound).
         const chosen = result.choice.ids.includes(id) || result.choice.shares.some((share) => share.id === id);
-        playSound(chosen ? "ui.select" : "ui.toggle-off");
+        playSound(chosen ? "ui.pick" : "ui.unpick");
         setHeld(result.choice);
         if (result.said) say(result.said);
       } else if (result.kind === "open") {
-        playSound("ui.select");
+        playSound("ui.pick");
         open(result.sheet);
       }
       return result.kind !== "none";

@@ -27,6 +27,9 @@ export const SOUND_PICKS: Record<SoundSlot, SoundPick> = {
   "ui.notice": { bank: "ui", event: "ui_shr_text_popup", ...ui },
   "ui.unfold": { bank: "ui", event: "ui_inn_storage_open", ...ui },
   "ui.fold": { bank: "ui", event: "ui_inn_storage_close", ...ui },
+  // A card picked on the table and one put back: taps made many times a moment, so a dull click, quieter than the buttons (user request, 2026-11-22).
+  "ui.pick": { bank: "ui", event: "ui_shared_minorclick", ...ui, lufs: -29 },
+  "ui.unpick": { bank: "ui", event: "ui_shared_minorclick_back", ...ui, lufs: -29 },
   "card.draw": { bank: "ui", event: "ui_rewards_item_appear", ...card },
   "card.pick": { bank: "ui", event: "ui_heroselect_pickup", ...card },
   "card.land": { game: "hearthstone", bank: "", event: "credits_card_enter_1", ...card, onset: 0.3 },
