@@ -1,6 +1,6 @@
 // The Dream-chaser box's island pieces (src/catalog/families/uncharted.ts and island.ts): the Uncharted and Grotto decks, Lost Islands and their flips, the Island Map and the campaign Setup trades: templates and samples.
-import { amt, type Samples, type Templates } from "./family-kit.ts";
-import { joinAnd, str } from "./kit.ts";
+import { amt, type Samples, type Templates } from "../family-kit.ts";
+import { joinAnd, str } from "../kit.ts";
 
 const codes = (value: unknown): string => joinAnd((Array.isArray(value) ? value : []).map(str));
 const SUBJECT: Readonly<Record<string, string>> = { self: "this card", picked: "the picked card", subject: "the card the event is about" };

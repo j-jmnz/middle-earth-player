@@ -1,6 +1,6 @@
 // The captured family's pieces (src/catalog/families/captured.ts, Escape from Mount Gram; engine: src/rules/families/captured): templates, the three conditions, and the samples read-fields checks them with.
-import { amt, type ConditionTemplates, type Samples, type Templates } from "./family-kit.ts";
-import { str } from "./kit.ts";
+import { amt, type ConditionTemplates, type Samples, type Templates } from "../family-kit.ts";
+import { str } from "../kit.ts";
 
 const END = { top: "top", bottom: "bottom" } as const;
 

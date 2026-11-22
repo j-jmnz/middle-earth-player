@@ -1,5 +1,5 @@
 // The pieces Fog on the Barrow-downs adds (the breaking family's SplitToOwnStage, ReturnToSharedStage and CancelRevealed, the condition allAtStage and the words of the stat flags the scenario adds): templates, flag words and the samples read-fields.test.ts checks them with.
-import { str, type Ctx, type Obj } from "./kit.ts";
+import { str, type Ctx, type Obj } from "../kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 

@@ -1,5 +1,5 @@
 // The pick keys only one family or box reads, each worded from where the engine reads it (src/rules/interpret/pick.ts and src/rules/families/*/pick.ts; the key's comment in src/catalog/effect-schema-pick.ts). picks.ts calls this with its `note`.
-import { isObj, str, type Obj } from "./kit.ts";
+import { isObj, str, type Obj } from "../kit.ts";
 
 type Note = (keys: readonly string[], text: string | null) => void;
 

@@ -1,5 +1,5 @@
 // The pieces Murder at the Prancing Pony adds (the investigation family): the Investigation deck's Setup, the looks at it, the removal and the shuffle, the accusation, and the flag a location holds: templates, flag words and the samples read-fields.test.ts checks them with.
-import { joinAnd, str, type Ctx, type Obj } from "./kit.ts";
+import { joinAnd, str, type Ctx, type Obj } from "../kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 

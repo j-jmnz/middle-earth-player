@@ -1,7 +1,7 @@
 // The wilderland family's pieces (src/catalog/families/wilderland.ts, the Ered Mithrin and Lost in Mirkwood boxes; engine: src/rules/families/wilderland): bypassing, Discover and Deep, Loot and guarded objectives, treasures, pool changes and the Caves deck: templates and samples.
-import { cardRef } from "./amounts.ts";
-import { amt, type Samples, type Templates } from "./family-kit.ts";
-import { joinAnd, str } from "./kit.ts";
+import { cardRef } from "../amounts.ts";
+import { amt, type Samples, type Templates } from "../family-kit.ts";
+import { joinAnd, str } from "../kit.ts";
 
 const codes = (value: unknown): string => joinAnd((Array.isArray(value) ? value : []).map(str));
 const PILE = (value: unknown): string => (str(value) === "caves" ? "the Caves deck" : `the ${str(value)} deck`);

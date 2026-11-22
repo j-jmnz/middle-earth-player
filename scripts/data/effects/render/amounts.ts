@@ -1,6 +1,6 @@
 // Amounts: a printed number, or a number the engine reads ("the number of enemies in play", "the stage number"). `src/catalog/effect-schema-amount.ts` owns the keys.
 import { done, isObj, jsonOf, str, type Ctx, type Obj } from "./kit.ts";
-import { familyAmount } from "./family-amounts.ts";
+import { familyAmount } from "./families/family-amounts.ts";
 import type { PickRenderer } from "./picks.ts";
 
 const CARD_REF: Readonly<Record<string, string>> = {

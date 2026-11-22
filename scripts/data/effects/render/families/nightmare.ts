@@ -1,7 +1,7 @@
 // The nightmare, prisoner and dungeon families' pieces (src/catalog/families/nightmare.ts, prisoner.ts, dungeon.ts): immediate attacks, set-aside engagements, prisoners and Orc Guards: templates and samples.
-import { type Samples, type Templates } from "./family-kit.ts";
-import { cardRef } from "./amounts.ts";
-import { str } from "./kit.ts";
+import { type Samples, type Templates } from "../family-kit.ts";
+import { cardRef } from "../amounts.ts";
+import { str } from "../kit.ts";
 
 export const NIGHTMARE_TEMPLATES: Templates = {
   AttackActor: () => ({ text: "this enemy attacks the acting player now, as an attack outside the combat phase: from the staging area though it is not engaged, or while it is engaged with them; it is dealt a shadow card of its own (nothing when it is engaged with another player or out of play)", read: [] }),

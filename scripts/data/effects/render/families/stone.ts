@@ -1,9 +1,9 @@
 // The pieces Foundations of Stone adds beside the families' own: the nameless family (src/catalog/families/nameless.ts), Washed Away!'s stage draw and deck swap, the Centipede's and Lost and Alone's moves, the ally discard and Drowned Treasury's claim. Templates for the verbs
 // and the samples read-fields.test.ts checks them with.
-import { cardRef } from "./amounts.ts";
+import { cardRef } from "../amounts.ts";
 import { FLAME_SAMPLES, FLAME_TEMPLATES } from "./flame.ts";
-import { joinAnd, str, type Ctx, type Obj } from "./kit.ts";
-import { renderPick } from "./picks.ts";
+import { joinAnd, str, type Ctx, type Obj } from "../kit.ts";
+import { renderPick } from "../picks.ts";
 
 type Made = { text: string; read: readonly string[] };
 

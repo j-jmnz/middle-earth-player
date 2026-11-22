@@ -1,6 +1,6 @@
 // The burden and aflame families' pieces (src/catalog/families/burden.ts and aflame.ts): the Ring-bearer's life, the burden deck, Aflame locations and what a Resolution adds to the Campaign Pool: templates and samples.
-import { amt, pck, type Samples, type Templates } from "./family-kit.ts";
-import { joinAnd, str } from "./kit.ts";
+import { amt, pck, type Samples, type Templates } from "../family-kit.ts";
+import { joinAnd, str } from "../kit.ts";
 
 const codes = (value: unknown): string => joinAnd((Array.isArray(value) ? value : []).map(str));
 

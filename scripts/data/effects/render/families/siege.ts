@@ -1,5 +1,5 @@
 // The pieces The Siege of Annúminas adds (the wilderland family's DiscardHeldHero and ReturnHeldHeroes): templates and the samples read-fields-samples.ts checks them with.
-import { type Obj } from "./kit.ts";
+import { type Obj } from "../kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 

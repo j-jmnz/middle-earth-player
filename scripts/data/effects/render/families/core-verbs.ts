@@ -1,7 +1,7 @@
 // The single verbs of the shared schema, and the breaking, wizardry, defense, deck, caves, objectives, misc, dreamchaser and costs families (src/catalog/effect-schema-verbs.ts and families/): templates and samples.
-import { cardRef } from "./amounts.ts";
-import { amt, pck, who, type Samples, type Templates } from "./family-kit.ts";
-import { isObj, joinAnd, str } from "./kit.ts";
+import { cardRef } from "../amounts.ts";
+import { amt, pck, who, type Samples, type Templates } from "../family-kit.ts";
+import { isObj, joinAnd, str } from "../kit.ts";
 
 const codes = (value: unknown): string => joinAnd((Array.isArray(value) ? value : []).map(str));
 const UNTIL = { endOfPhase: "the end of the phase", endOfRound: "the end of the round" } as const;

@@ -1,6 +1,6 @@
 // The Stormcaller's pieces (src/catalog/families/stormcaller.ts, the Dream-chaser box): the Stormcaller's area, quest deck and progress: templates and samples.
-import { amt, type Samples, type Templates } from "./family-kit.ts";
-import { joinAnd, str } from "./kit.ts";
+import { amt, type Samples, type Templates } from "../family-kit.ts";
+import { joinAnd, str } from "../kit.ts";
 
 export const STORMCALLER_TEMPLATES: Templates = {
   MoveToStormcallerArea: (i) => ({ text: `${i.target === "picked" ? "the last picked card" : "this card"} goes into the Stormcaller's area, instead of the players' staging area`, read: ["target"] }),

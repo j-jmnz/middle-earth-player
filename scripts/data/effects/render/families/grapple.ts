@@ -1,6 +1,6 @@
 // The grapple and campaign families' pieces (src/catalog/families/grapple.ts and campaign.ts): encounter sets, Stormcaller Elite flips, Grapple, and the campaign card's Setup and Resolution lines: templates and samples.
-import { amt, type Samples, type Templates } from "./family-kit.ts";
-import { joinAnd, str } from "./kit.ts";
+import { amt, type Samples, type Templates } from "../family-kit.ts";
+import { joinAnd, str } from "../kit.ts";
 
 const codes = (value: unknown): string => joinAnd((Array.isArray(value) ? value : []).map(str));
 

@@ -1,6 +1,6 @@
 // The south, pelennor and black-gate families' pieces (src/catalog/families/south.ts, pelennor.ts, black-gate.ts): the Ring-bearer's capture, Minas Tirith's damage, shadow cards that engage or attach, and the Embassy: templates and samples.
-import { amt, type Samples, type Templates } from "./family-kit.ts";
-import { str } from "./kit.ts";
+import { amt, type Samples, type Templates } from "../family-kit.ts";
+import { str } from "../kit.ts";
 
 export const SOUTH_TEMPLATES: Templates = {
   AttachToActiveLocation: () => ({ text: "this treachery attaches to the active location, chosen by the first player among them; it stays in the staging area's discard when the location already holds a copy (Limit 1 per location) or none is active; the effect's X is 1 when it attached, else 0", read: [] }),

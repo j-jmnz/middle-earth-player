@@ -1,6 +1,6 @@
 // The sea family's pieces (src/catalog/families/sea.ts, the Dream-chaser box and The Hunt for the Dreadnaught): the fleet and Corsair deck Setup, the heading, the Corsair reveals and the ship effects: templates and samples.
-import { amt, pck, type Samples, type Templates } from "./family-kit.ts";
-import { joinAnd, str } from "./kit.ts";
+import { amt, pck, type Samples, type Templates } from "../family-kit.ts";
+import { joinAnd, str } from "../kit.ts";
 
 const codes = (value: unknown): string => joinAnd((Array.isArray(value) ? value : []).map(str));
 

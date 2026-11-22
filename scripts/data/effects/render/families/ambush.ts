@@ -1,6 +1,6 @@
 // The ambush pieces of the encounter family (src/catalog/families/encounter.ts, dwd.ambush): templates for the verbs the keyword and the Road to Rivendell cards add. read-fields-samples.ts holds their samples.
-import { cardRef } from "./amounts.ts";
-import { isObj, str, type Ctx, type Obj } from "./kit.ts";
+import { cardRef } from "../amounts.ts";
+import { isObj, str, type Ctx, type Obj } from "../kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 

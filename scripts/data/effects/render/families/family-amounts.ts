@@ -1,5 +1,5 @@
 // Amount shapes only one family or box reads (src/catalog/effect-schema-amount.ts; each says where the engine reads it): the captured counts, the excess damage, the island and Stormcaller values and the recorded count.
-import { str, type Obj } from "./kit.ts";
+import { str, type Obj } from "../kit.ts";
 
 type Made = { text: string; read: string[] };
 

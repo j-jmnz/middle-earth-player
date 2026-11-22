@@ -1,5 +1,5 @@
 // The long-dark family's pieces (src/catalog/families/long-dark.ts) and the conditions The Long Dark's cards add beside it: templates for its verbs and conditions and the samples read-fields.test.ts checks them with.
-import { str, type Ctx, type Obj } from "./kit.ts";
+import { str, type Ctx, type Obj } from "../kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 

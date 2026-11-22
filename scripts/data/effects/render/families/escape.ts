@@ -1,7 +1,7 @@
 // The escape family's pieces (src/catalog/families/escape.ts) and the small verbs The Dead Marshes needs beside it: templates for its verbs and conditions, the words of its stat flags and the samples read-fields.test.ts checks them with.
-import { renderAmount } from "./amounts.ts";
-import { isObj, str, type Ctx, type Obj } from "./kit.ts";
-import { renderPick } from "./picks.ts";
+import { renderAmount } from "../amounts.ts";
+import { isObj, str, type Ctx, type Obj } from "../kit.ts";
+import { renderPick } from "../picks.ts";
 
 type Made = { text: string; read: readonly string[] };
 const amount = (value: unknown, ctx: Ctx): string => renderAmount(value, ctx, renderPick);

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { renderAmount } from "./amounts.ts";
-import { FAMILY_AMOUNT_SAMPLES } from "./family-amounts.ts";
+import { FAMILY_AMOUNT_SAMPLES } from "./families/family-amounts.ts";
 import type { Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 import { checkPiece, type Render } from "./read-fields-piece.ts";

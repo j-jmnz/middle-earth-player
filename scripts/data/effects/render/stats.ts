@@ -1,16 +1,16 @@
 // The stat templates: ModifyStat (who holds the stat, what a flag means, how long it lasts) and Restrict (a prohibition read from the record's own fields), with the glosses they share. Beside the other verb modules (verbs.ts).
 import { cardRef, renderAmount } from "./amounts.ts";
-import { ERECH_STAT_NOTES } from "./erech.ts";
-import { ESCAPE_STAT_NOTES } from "./escape.ts";
-import { FOG_STAT_NOTES } from "./fog.ts";
+import { ERECH_STAT_NOTES } from "./families/erech.ts";
+import { ESCAPE_STAT_NOTES } from "./families/escape.ts";
+import { FOG_STAT_NOTES } from "./families/fog.ts";
 import { FLAG_NOTES } from "./stat-notes.ts";
-import { RUINS_STAT_NOTES } from "./ruins.ts";
-import { INVESTIGATION_STAT_NOTES } from "./investigation.ts";
-import { guardianRestrict } from "./guardian.ts";
+import { RUINS_STAT_NOTES } from "./families/ruins.ts";
+import { INVESTIGATION_STAT_NOTES } from "./families/investigation.ts";
+import { guardianRestrict } from "./families/guardian.ts";
 import { isObj, str, type Ctx, type Obj } from "./kit.ts";
-import { longDarkRestrict } from "./long-dark.ts";
+import { longDarkRestrict } from "./families/long-dark.ts";
 import { renderPick } from "./picks.ts";
-import { SMAUG_STAT_NOTES } from "./smaug.ts";
+import { SMAUG_STAT_NOTES } from "./families/smaug.ts";
 
 type Made = { text: string; read: readonly string[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;

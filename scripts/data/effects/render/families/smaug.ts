@@ -1,5 +1,5 @@
 // The smaug family's pieces (src/catalog/families/smaug.ts, The Battle of Lake-town): templates for its verbs, the words of its stat flags and the samples read-fields.test.ts checks them with.
-import { str, type Obj } from "./kit.ts";
+import { str, type Obj } from "../kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 

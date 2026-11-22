@@ -2,7 +2,7 @@
 import { cardRef, renderAmount } from "./amounts.ts";
 import { renderPick } from "./picks.ts";
 import { isObj, str, type Ctx, type Obj } from "./kit.ts";
-import { CORE_TEMPLATES } from "./core-verbs.ts";
+import { CORE_TEMPLATES } from "./families/core-verbs.ts";
 
 type Made = { text: string; read: readonly string[] };
 

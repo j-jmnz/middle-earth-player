@@ -1,5 +1,5 @@
 // The guardian family's pieces (src/catalog/families/guardian.ts, Return to Mirkwood) and the small verbs and conditions the Nightmare deck needs beside it: templates for them, and the samples read-fields.test.ts checks them with.
-import { str, type Ctx, type Obj } from "./kit.ts";
+import { str, type Ctx, type Obj } from "../kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 

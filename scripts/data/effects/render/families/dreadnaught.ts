@@ -1,5 +1,5 @@
 // The pieces The Hunt for the Dreadnaught adds (the sea family's Pillage, PickFewestHitPoints, EngageRandomSetAside, EliminateWithoutShip, GainHeroTraits and FlipShip): templates and the samples read-fields-samples.ts checks them with.
-import { type Obj, str } from "./kit.ts";
+import { type Obj, str } from "../kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 

@@ -1,7 +1,7 @@
 // The play, encounter, quest, sidequests and moria families' pieces (src/catalog/families/play.ts, encounter.ts, quest.ts, sidequests.ts, moria.ts): putting cards into play, travel and progress, the quest deck's order and a few single effects: templates and samples.
-import { cardRef } from "./amounts.ts";
-import { amt, pck, who, type Samples, type Templates } from "./family-kit.ts";
-import { joinAnd, str } from "./kit.ts";
+import { cardRef } from "../amounts.ts";
+import { amt, pck, who, type Samples, type Templates } from "../family-kit.ts";
+import { joinAnd, str } from "../kit.ts";
 
 const UNTIL = { endOfPhase: "the end of the phase", endOfRound: "the end of the round" } as const;
 const THEN = { returnToHand: "returns to its owner's hand", shuffleIntoDeck: "is shuffled into its owner's deck", discard: "is discarded", removeFromGame: "is removed from the game" } as const;

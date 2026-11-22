@@ -1,7 +1,7 @@
 // The Dread Realm's verbs (src/catalog/families/angmar.ts): Reanimated Dead, the cards that deal themselves as shadow cards and the Wraith and Possession that attach.
-import { cardRef, renderAmount } from "./amounts.ts";
-import { str, type Ctx, type Obj } from "./kit.ts";
-import { renderPick } from "./picks.ts";
+import { cardRef, renderAmount } from "../amounts.ts";
+import { str, type Ctx, type Obj } from "../kit.ts";
+import { renderPick } from "../picks.ts";
 
 type Made = { text: string; read: readonly string[] };
 const amount = (value: unknown, ctx: Ctx): string => renderAmount(value, ctx, renderPick);

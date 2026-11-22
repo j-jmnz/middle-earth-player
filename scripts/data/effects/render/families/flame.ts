@@ -1,5 +1,5 @@
 // The pieces Shadow and Flame adds (src/catalog/families/flame.ts): the Balrog deck of the Nightmare deck, Dark Pit's discard of Durin's Bane and the event Counter-Spell cancels, and the samples read-fields.test.ts checks them with.
-import { str, type Ctx, type Obj } from "./kit.ts";
+import { str, type Ctx, type Obj } from "../kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 

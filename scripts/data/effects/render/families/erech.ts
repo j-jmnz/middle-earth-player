@@ -1,5 +1,5 @@
 // The erech family's pieces (src/catalog/families/erech.ts, The Stone of Erech): templates for its verbs, the words of its stat flags, its conditions and the samples read-fields.test.ts checks them with.
-import { str, type Ctx, type Obj } from "./kit.ts";
+import { str, type Ctx, type Obj } from "../kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 

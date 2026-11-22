@@ -2,21 +2,21 @@
 import { cardRef as cardRefWords, renderAmount } from "./amounts.ts";
 import { done, isObj, jsonOf, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
-import { ESCAPE_CONDITIONS } from "./escape.ts";
-import { GUARDIAN_CONDITIONS } from "./guardian.ts";
-import { ERECH_CONDITIONS } from "./erech.ts";
-import { FOG_CONDITIONS } from "./fog.ts";
-import { INVESTIGATION_CONDITIONS } from "./investigation.ts";
-import { LONG_DARK_CONDITIONS } from "./long-dark.ts";
+import { ESCAPE_CONDITIONS } from "./families/escape.ts";
+import { GUARDIAN_CONDITIONS } from "./families/guardian.ts";
+import { ERECH_CONDITIONS } from "./families/erech.ts";
+import { FOG_CONDITIONS } from "./families/fog.ts";
+import { INVESTIGATION_CONDITIONS } from "./families/investigation.ts";
+import { LONG_DARK_CONDITIONS } from "./families/long-dark.ts";
 import { SHARED_CONDITIONS } from "./shared-conditions.ts";
 import { FAMILY_CONDITIONS } from "./families.ts";
 
-export { ESCAPE_CONDITION_SAMPLES } from "./escape.ts";
-export { GUARDIAN_CONDITION_SAMPLES } from "./guardian.ts";
-export { ERECH_CONDITION_SAMPLES } from "./erech.ts";
-export { FOG_CONDITION_SAMPLES } from "./fog.ts";
-export { INVESTIGATION_CONDITION_SAMPLES } from "./investigation.ts";
-export { LONG_DARK_CONDITION_SAMPLES } from "./long-dark.ts";
+export { ESCAPE_CONDITION_SAMPLES } from "./families/escape.ts";
+export { GUARDIAN_CONDITION_SAMPLES } from "./families/guardian.ts";
+export { ERECH_CONDITION_SAMPLES } from "./families/erech.ts";
+export { FOG_CONDITION_SAMPLES } from "./families/fog.ts";
+export { INVESTIGATION_CONDITION_SAMPLES } from "./families/investigation.ts";
+export { LONG_DARK_CONDITION_SAMPLES } from "./families/long-dark.ts";
 export { SHARED_CONDITION_SAMPLES } from "./shared-conditions.ts";
 
 const ZONE: Readonly<Record<string, string>> = {

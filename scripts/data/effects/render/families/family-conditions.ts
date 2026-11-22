@@ -1,6 +1,6 @@
 // Condition kinds that only one family or scenario box reads (src/catalog/effect-schema-conditions.ts; each reads where the engine holds it: src/rules/interpret/conditions.ts or the family it names): templates and samples.
-import type { ConditionTemplates, Samples } from "./family-kit.ts";
-import { str } from "./kit.ts";
+import type { ConditionTemplates, Samples } from "../family-kit.ts";
+import { str } from "../kit.ts";
 
 const bounds = (min: unknown, max: unknown): string => [typeof min === "number" ? `at least ${min}` : "", typeof max === "number" ? `at most ${max}` : ""].filter((part) => part !== "").join(" and ");
 

@@ -1,5 +1,5 @@
 // The pieces The Wizard's Quest adds (the wizards-quest family and its fields): the Quick-build Setup, the search of the top of the encounter deck, the player cards held under an encounter card, the words of the search and pick fields that make "the opposing team" choose, and the samples read-fields.test.ts checks them with.
-import { joinAnd, str, type Obj } from "./kit.ts";
+import { joinAnd, str, type Obj } from "../kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 

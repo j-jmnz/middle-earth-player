@@ -1,6 +1,6 @@
 // Pick filters: the noun phrase a Pick, a count or a holder names ("enemy in play (any player) named \"Urdug\""). `src/catalog/effect-schema-pick.ts` owns the keys.
-import { onWords } from "./escape.ts";
-import { attachmentWords, familyPickNotes } from "./picks-family.ts";
+import { onWords } from "./families/escape.ts";
+import { attachmentWords, familyPickNotes } from "./families/picks-family.ts";
 import { done, isObj, joinAnd, jsonOf, quoted, str, type Ctx, type Obj } from "./kit.ts";
 
 export type PickRenderer = (pick: unknown, ctx: Ctx) => string;

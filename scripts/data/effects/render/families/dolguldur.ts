@@ -1,5 +1,5 @@
 // The pieces Attack on Dol Guldur adds (the wilderland family's TallySiege and SelectRandomStage): templates and the samples read-fields-samples.ts checks them with.
-import { type Obj, str } from "./kit.ts";
+import { type Obj, str } from "../kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 

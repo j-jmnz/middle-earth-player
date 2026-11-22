@@ -1,5 +1,5 @@
 // The pieces The Ruins of Belegost adds (the wilderland family's HideRandomLoot, the quest family's AdvanceIfAttached and the two Discover amounts the locations hold): templates, flag words and the samples read-fields.test.ts checks them with.
-import { joinAnd, str, type Obj } from "./kit.ts";
+import { joinAnd, str, type Obj } from "../kit.ts";
 
 type Made = { text: string; read: readonly string[] };
 
