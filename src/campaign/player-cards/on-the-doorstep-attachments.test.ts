@@ -195,10 +195,8 @@ describe("Expert Treasure-hunter (132017:A:1, A:2)", () => {
     }
   }
 
-  // FAULT: the card answers the attached hero questing successfully, but the engine clears every commitment when the quest resolves
-  // (clearCommitted in quest.ts), before the Response's "committed" condition is read, so the Response is never offered (rr.step-3-4: committed
-  // characters stay committed through the end of the quest phase).
-  it.fails("132017:A:2 after the hero quests successfully, the top card goes to the hand if it is the type named", () => hunted(EFFECTS));
+  // The quest resolves and clears the live committed marks before the Response is read; the round's record of who quested answers (rr.step-3-4).
+  lineSpec("132017:A:2", "after the hero quests successfully, the top card goes to the hand if it is the type named", (effects) => hunted(effects));
 
   // The quest succeeds, but the attached hero did not commit: no Response.
   it("132017:A:2 is not offered when the attached hero did not quest", () => {

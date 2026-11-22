@@ -11,10 +11,11 @@ import { deckPlayHero, markDeckPlay } from "./deck-play.ts";
 import { hasResourceMatch, heroPays, validatePayments } from "./payments.ts";
 import { distinctHeroesReason } from "./cost-rules.ts";
 import { allyPools, noteSpent } from "../families/costs/pay.ts";
+import { noChangeReason } from "./potential.ts";
 import { addToVictory } from "../families/sidequests/victory.ts";
 import { eventPlayReason } from "../families/costs/play.ts";
 import { printedOf, type Sphere } from "../core/printed.ts";
-import type { CardInstance, ScenarioState } from "../core/state.ts";
+import type { CardInstance, GameEvent, ScenarioState } from "../core/state.ts";
 import { flagged, inPlay, updateCard } from "../core/state.ts";
 import { moveCard } from "../core/zones.ts";
 import { queueEvent } from "../windows/queue.ts";
@@ -148,11 +149,12 @@ export function offerable(state: ScenarioState, effect: Effect, sourceId: string
   return costsOf(effect).every((cost) => cost.kind === "resources" || cost.kind === "playEvent" || payable(state, cost, source, seat, ctx));
 }
 
-// True when the costs could be paid and the limit is not spent. Used to decide what to offer.
-export function usable(state: ScenarioState, effect: Effect, sourceId: string, seat: number, ctx: ReduceContext): boolean {
+// True when the costs could be paid, the limit is not spent and a player card's effect could change the game state (rr.triggered-ability, rr.cost: read before the cost is
+// paid). Used to decide what to offer; `event` is the one a Response answers.
+export function usable(state: ScenarioState, effect: Effect, sourceId: string, seat: number, ctx: ReduceContext, event?: GameEvent): boolean {
   const source = state.cards[sourceId];
   if (!source || limitSpent(state, effect, sourceId, seat)) return false;
-  return costsOf(effect).every((cost) => payable(state, cost, source, seat, ctx));
+  return costsOf(effect).every((cost) => payable(state, cost, source, seat, ctx)) && noChangeReason(state, effect, sourceId, seat, ctx, event) == null;
 }
 
 // Why this use is refused, or null. `payments` is what the player offers toward a resource cost.
@@ -163,6 +165,7 @@ export function usageReason(
   seat: number,
   payments: readonly Payment[],
   ctx: ReduceContext,
+  answered?: GameEvent,
 ): string | null {
   const source = state.cards[sourceId];
   if (!source) return "That effect cannot be triggered";
@@ -177,6 +180,8 @@ export function usageReason(
     return validatePayments(state, payments, { seat, sphere: printedOf(ctx.cards, source.code).sphere, amount: price, forCard: sourceId }, ctx) ?? distinctHeroesReason(state, sourceId, payments, ctx);
   }
   for (const cost of costs) if (cost.kind !== "resources" && !payable(state, cost, source, seat, ctx)) return "That cost cannot be paid";
+  const unchanged = noChangeReason(state, effect, sourceId, seat, ctx, answered);
+  if (unchanged) return unchanged;
   const resources = costs.find((cost): cost is Extract<Cost, { kind: "resources" }> => cost.kind === "resources");
   if (!resources) return payments.length > 0 ? "That effect has no resource cost" : null;
   const payer = costPayer(state, resources, source);

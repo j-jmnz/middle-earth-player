@@ -1,10 +1,9 @@
 // Rules: rr.play-restrictions-and-permissions, rr.action, rr.search, rr.the-word-choose, rr.then, rr.resources (data/rules/entries.json).
 // The Flight of the Stormcaller events, written from their card text (data/cards/FotS.json; data/printed holds no ledger for this pack yet):
 // Vanish from Sight 12011:A:1, Heed the Dream 12009:A:1.
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
-import { EFFECTS } from "../../effects/index.ts";
 import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
@@ -100,9 +99,8 @@ describe("Heed the Dream (12009:A:1)", () => {
 
   // rr.then: the text after "Then" resolves only if the search before it resolved in full. The chosen player's deck is empty, so no card is
   // found, and the 3 Leadership resources are not asked for.
-  // FAULT: the card makes the 3-resource search follow "Then" the first search, which adds no card from an empty deck; the engine still offers "spend".
-  it.fails("12009:A:1 does not offer the second search when the first one found no card", () => {
-    const tab = table(EFFECTS, { seats: 2, heroes: [{ code: BERAVOR, seat: 0 }, { code: ARAGORN, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: HEED, seat: 0 }], playerDeck: [{ code: CARD, seat: 0 }] }, 2);
+  lineSpec("12009:A:1", "does not offer the second search when the first one found no card", (effects) => {
+    const tab = table(effects, { seats: 2, heroes: [{ code: BERAVOR, seat: 0 }, { code: ARAGORN, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: HEED, seat: 0 }], playerDeck: [{ code: CARD, seat: 0 }] }, 2);
     const heedId = idsOf(tab, HEED);
     let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: heedId, payments: payFor(tab.state, tab.ctx, heedId) }, tab.ctx);
     run = sendUnledgered(run, { type: "Choose", optionId: "seat:1" }, tab.ctx);

@@ -92,6 +92,9 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: "all", note: "King of Dale counts only player attachments on the hero, not an encounter card such as Caught in a Web." },
   { version: 38, scenarios: "all", note: "Bartering can return only a ready player attachment on a character you control, not one on an enemy or a location." },
   { version: 38, scenarios: "all", note: "A card that gets a bonus from a keyword another card gives it, like Hauberk of Mail on a Redwater Sentry, has the bonus as soon as the keyword arrives." },
+  { version: 38, scenarios: "all", note: "An Action or Response of a player card is not offered when it could change nothing, for example Orophin with no Silvan ally in your discard pile, Mirror of Galadriel with an empty deck, or Aragorn's ready Action while he is ready." },
+  { version: 38, scenarios: "all", note: "Heed the Dream offers the 3 Leadership resources for the second search only when the first search found a card." },
+  { version: 38, scenarios: "all", note: "Responses to a successful quest, like Expert Treasure-hunter, Haleth and Black Key, are offered after the quest resolves, when the character was committed to it." },
 ];
 
 export const ENGINE_VERSION = 38;

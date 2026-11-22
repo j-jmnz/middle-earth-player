@@ -10,7 +10,7 @@ import { EFFECTS } from "../../effects/index.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { attachTo } from "../../rules/core/zones.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
-import { legalTargets } from "../../rules/engine/reduce.ts";
+import { legalTargets, reduce } from "../../rules/engine/reduce.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
@@ -110,18 +110,19 @@ describe("Mirror of Galadriel (08118)", () => {
   // rr.then: with no card to find the search does not resolve, so the random discard after "Then" does not either, and the Action
   // cannot change the game state on its own (rr.triggered-ability).
   const empty = () => table(EFFECTS, { heroes: [{ code: GALADRIEL, seat: 0 }], attached: [{ code: MIRROR, host: GALADRIEL }], hand: [{ code: ALLY, seat: 0 }] });
-  // FAULT: the card discards a random card only "Then", after a search that found a card; with an empty deck the engine still offers the Action.
-  it.fails("08118:A:2 Mirror of Galadriel: with an empty deck the Action is not offered", () => {
+  it("08118:A:2 Mirror of Galadriel: with an empty deck the Action is not offered", () => {
     const tab = empty();
     expect(triggers(tab.state, tab)).not.toContain("08118:action:1");
   });
 
-  // FAULT: with an empty deck the search finds nothing, so the part after "Then" must not resolve; the engine discards the only card in hand.
-  it.fails("08118:A:2 Mirror of Galadriel: a search that finds nothing discards nothing from the hand", () => {
+  // Used anyway, the Action is refused and the only card in the hand stays there.
+  it("08118:A:2 Mirror of Galadriel: a search that finds nothing discards nothing from the hand", () => {
     const tab = empty();
-    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, MIRROR), effectId: "08118:action:1" }, tab.ctx);
-    expect(run.state.seats[0]?.hand).toEqual([idsOf(tab, ALLY)]);
-    expect(run.state.seats[0]?.discard).toEqual([]);
+    const result = reduce(tab.state, { type: "Trigger", cardId: idsOf(tab, MIRROR), effectId: "08118:action:1" }, tab.ctx);
+    expect(result.ok).toBe(false);
+    expect(tab.state.seats[0]?.hand).toEqual([idsOf(tab, ALLY)]);
+    expect(tab.state.seats[0]?.discard).toEqual([]);
+    expect(tab.state.cards[idsOf(tab, MIRROR)]?.exhausted).toBe(false);
   });
 });
 

@@ -169,8 +169,8 @@ describe("Orophin (08114:A:2)", () => {
     expect(run.state.cards[theirs ?? ""]?.zone).toBe("discard");
   });
 
-  // FAULT: the Response can change nothing with no Silvan ally in your discard pile (rr.triggered-ability); the engine still offers it.
-  it.fails("08114:A:2 Orophin: no Response with no Silvan ally in your discard pile", () => {
+  // rr.triggered-ability: the Response can change nothing with no Silvan ally in your discard pile, so it is not offered.
+  it("08114:A:2 Orophin: no Response with no Silvan ally in your discard pile", () => {
     const scene = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: OROPHIN, seat: 0 }] });
     const { tab } = discarded(scene, [[SCOUT, 0], [SILVAN_EVENT, 0]]);
     const run = play(begin(tab.state), tab, idsOf(tab, OROPHIN));

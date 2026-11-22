@@ -121,9 +121,8 @@ describe("Aragorn (146002:A:1, A:2)", () => {
     expect(triggers(updateCard(scene.state, idsOf(scene, ARAGORN), { exhausted: true }), scene)).not.toContain("146002:action:1");
   });
 
-  // FAULT: readying a ready Aragorn changes nothing, so the Action cannot be initiated (rr.triggered-ability); the engine offers it and
-  // would take his resource for nothing.
-  it.fails("146002:A:2 Aragorn: not offered while he is ready", () => {
+  // rr.triggered-ability: readying a ready Aragorn changes nothing, so the Action cannot be initiated and takes no resource.
+  it("146002:A:2 Aragorn: not offered while he is ready", () => {
     const scene = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }, { code: TOM, seat: 0 }] }, 1);
     expect(triggers(scene.state, scene)).not.toContain("146002:action:1");
   });

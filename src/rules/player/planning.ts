@@ -17,7 +17,7 @@ import { pushEffectFrame } from "../interpret/effect-frames.ts";
 import { playElsewhere, playTargets } from "../families/attachments/play.ts";
 import { payerOk } from "../families/costs/pay.ts";
 import { exhaustSlack, extraCostReason } from "../families/costs/play.ts";
-import { alternativeActions, eventLimitReason, noteEventLimits, payingSlack, searchOrLaterPick } from "../families/deck/play.ts";
+import { alternativeActions, eventLimitReason, noteEventLimits, payingSlack } from "../families/deck/play.ts";
 import { gainedDoomed } from "../families/deck/gains-doomed.ts";
 import { doomedRaise } from "../families/deck/rules.ts";
 import { chosenX } from "../families/misc/cost.ts";
@@ -25,10 +25,9 @@ import { playBlocked } from "../families/sidequests/contract.ts";
 import { enterStaging, inPlayLimitReason } from "../families/sidequests/play.ts";
 import type { EngineStep, PlayerIntent } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
-import { pickCandidates } from "../interpret/pick.ts";
+import { noTargetReason } from "./potential.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { playerCardEffectCanChoose, raiseThreat, uniqueBlocked } from "../core/keywords.ts";
-import { targetCandidates } from "../interpret/effect-verbs.ts";
 import { planningTurn } from "../windows/pass.ts";
 import { hasResourceMatch, heroPays } from "./payments.ts";
 import { printedOf, type PrintedCard } from "../core/printed.ts";
@@ -163,16 +162,8 @@ function eventReason(state: ScenarioState, cardId: string, seat: number, ctx: Re
   const limited = eventLimitReason(state, running, cardId, seat);
   if (limited) return limited;
   for (const effect of running) {
-    for (const instruction of effect.instructions) {
-      // "Choose an enemy engaged with a player" with none engaged (Feint): there is no valid target (rr.the-word-choose).
-      if ((instruction.verb === "BarAttack" || instruction.verb === "PlaceProgressOnLocation") && !instruction.when) {
-        if (targetCandidates(state, instruction, seat, ctx).length === 0) return "That card has no legal target";
-        continue;
-      }
-      // A search finds what it finds, and a later or conditional choice is made as the effect resolves (rr.search).
-      if (instruction.verb !== "Pick" || searchOrLaterPick(instruction.pick, instruction.when)) continue;
-      if (pickCandidates(state, instruction.pick, seat, [], cardId, ctx).length === 0) return "That card has no legal target";
-    }
+    const empty = noTargetReason(state, effect.instructions, cardId, seat, ctx);
+    if (empty) return empty;
   }
   return null;
 }
