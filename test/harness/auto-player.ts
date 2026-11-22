@@ -27,7 +27,7 @@ export type PolicyOptions = {
 };
 
 // Out of the Depths (04118:B:2) allows no more allies than heroes among the characters committed: the allies picked last are left out until the limit holds (every other table's set is returned as it is).
-function withinCommitLimit(state: ScenarioState, ids: readonly string[], ctx: ReduceContext): string[] {
+export function withinCommitLimit(state: ScenarioState, ids: readonly string[], ctx: ReduceContext): string[] {
   const kept = [...ids];
   while (kept.length > 0 && commitLimitReason(state, state.activeSeat, kept, ctx.cards) != null) {
     const last = kept.findLastIndex((id) => state.cards[id]?.zone !== "heroes");
@@ -77,24 +77,30 @@ function has(intents: readonly LegalIntent[], type: LegalIntent["type"]): boolea
   return intents.some((intent) => intent.type === type);
 }
 
+// What a Trigger intent costs the active seat to send: the heroes it pays from (empty when it costs no resources), or null when it cannot pay.
+export function triggerPayments(state: ScenarioState, ctx: ReduceContext, intent: Extract<LegalIntent, { type: "Trigger" }>): { heroId: string; amount: number }[] | null {
+  const effect = ctx.effects.find((entry) => entry.id === intent.effectId);
+  const source = state.cards[intent.cardId];
+  if (!effect || !source) return null;
+  const seat = state.activeSeat;
+  let paid: { heroId: string; amount: number }[] | null = [];
+  const resources = costOfKind(effect, "resources");
+  if (costOfKind(effect, "playEvent")) {
+    const cost = playCost(state, intent.cardId, seat, ctx);
+    paid = cost == null ? null : paymentsFor(state, ctx, seat, intent.cardId, cost);
+  } else if (resources) {
+    const payer = costPayer(state, resources, source);
+    paid = payer === null ? null : payer !== undefined ? [{ heroId: payer, amount: resources.amount }] : paymentsFor(state, ctx, seat, intent.cardId, resources.amount);
+  }
+  return paid;
+}
+
 function triggerFor(state: ScenarioState, ctx: ReduceContext, memory: Memory, intents: readonly LegalIntent[]): PlayerIntent | null {
   for (const intent of intents) {
     if (intent.type !== "Trigger") continue;
     const key = `${state.round}:${intent.cardId}:${intent.effectId}`;
     if (memory.has(key)) continue;
-    const effect = ctx.effects.find((entry) => entry.id === intent.effectId);
-    const source = state.cards[intent.cardId];
-    if (!effect || !source) continue;
-    const seat = state.activeSeat;
-    let paid: { heroId: string; amount: number }[] | null = [];
-    const resources = costOfKind(effect, "resources");
-    if (costOfKind(effect, "playEvent")) {
-      const cost = playCost(state, intent.cardId, seat, ctx);
-      paid = cost == null ? null : paymentsFor(state, ctx, seat, intent.cardId, cost);
-    } else if (resources) {
-      const payer = costPayer(state, resources, source);
-      paid = payer === null ? null : payer !== undefined ? [{ heroId: payer, amount: resources.amount }] : paymentsFor(state, ctx, seat, intent.cardId, resources.amount);
-    }
+    const paid = triggerPayments(state, ctx, intent);
     if (!paid) continue;
     memory.add(key);
     return paid.length > 0 ? { type: "Trigger", cardId: intent.cardId, effectId: intent.effectId, payments: paid } : { type: "Trigger", cardId: intent.cardId, effectId: intent.effectId };

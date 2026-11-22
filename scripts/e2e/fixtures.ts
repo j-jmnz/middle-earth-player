@@ -5,6 +5,8 @@
 //   pnpm scenario fixtures                 # `lost` and `duo`, then every other scenario's file
 //   pnpm scenario fixtures --won           # also search for `won`, then write `knife-lost`
 //   pnpm scenario fixtures <scenario-id>   # only that scenario's file (scenario 1's block for its two ids)
+//   pnpm scenario fixtures <scenario-id> --search [--seeds=1-6] [--budget=600] [--plain=0] [--out=<folder>]
+//                                          # a won game the fixed policy never reaches is searched for (scripts/e2e/search/options.ts lists the flags)
 //
 // With a scenario id, a part after the first takes the earlier parts' won games from their committed files, so the other files are not rewritten.
 //
@@ -31,7 +33,7 @@
 // (141078) and Gildor Inglorion (141077), as the scenario-1 tests answer it. Each seat plays its list with
 // a core set hero of the same sphere in place of each hero that fell in that game (REPLACEMENT), and the briefing's threat
 // penalty when one did. Two-handed, Easy, the auto-player's answers, every intent up to the loss.
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
@@ -50,6 +52,7 @@ import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceConte
 import { nextIntent } from "../../test/harness/auto-player.ts";
 import { loadAnyScenario, loadCampaign, loadCampaignsInOrder, loadScenario, scenarioOrder } from "../data/load-scenarios.ts";
 import { prebuiltDeck } from "./seed-kit.ts";
+import { searchFlags } from "./search/options.ts";
 import { WRITERS, isChained, type Chained, type Written } from "./writers.ts";
 import { pastShowcase } from "./showcase-past.ts";
 import { FIXTURE_REGISTRY, fixtureFile, fixtureKindOf, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
@@ -345,13 +348,13 @@ void runScript("e2e-fixtures", async () => {
   const only = scenarioArgument();
   const dir = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "..", "src", "campaign", "fixtures");
   if (only === null || !isChained(only)) writeScenarioOne(dir, searching);
-  if (only === null || isChained(only)) await writeChained(dir, only);
+  if (only === null || isChained(only)) await writeChained(dir, only, searchFlags()?.out ?? null);
 });
 
 // The scenario id named on the command line, or null for every scenario. It must be in the fixture registry.
 function scenarioArgument(): FixtureScenarioId | null {
   const named = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
-  if (named.length > 1) throw new Error("Usage: scripts/e2e/fixtures.ts [<scenario-id>] [--won]");
+  if (named.length > 1) throw new Error("Usage: scripts/e2e/fixtures.ts [<scenario-id>] [--won] [--search ...]");
   const id = named[0];
   if (id === undefined) return null;
   const entry = FIXTURE_REGISTRY.find((one) => one.scenarioId === id);
@@ -388,7 +391,7 @@ function writeScenarioOne(dir: string, searching: boolean): void {
 
 // Every other scenario of the registry (src/campaign/fixtures/registry.ts), in campaign order: a part chains from the games written before it. With `only`,
 // that scenario's file alone, and the earlier parts' games are read from their committed files.
-async function writeChained(dir: string, only: Chained | null): Promise<void> {
+async function writeChained(dir: string, only: Chained | null, out: string | null): Promise<void> {
   const written: Written = {};
   const order = scenarioOrder();
   const rest = FIXTURE_REGISTRY.flatMap((entry) => (isChained(entry.scenarioId) ? [{ ...entry, scenarioId: entry.scenarioId }] : [])).sort((left, right) => position(order, left.scenarioId) - position(order, right.scenarioId));
@@ -404,7 +407,9 @@ async function writeChained(dir: string, only: Chained | null): Promise<void> {
     const name = loadAnyScenario(entry.scenarioId).name;
     const games = await say.stepAsync(`play ${name}'s fixtures`, async () => WRITERS[entry.scenarioId](written));
     Object.assign(written, games);
-    writeFileSync(file, `${JSON.stringify(games)}\n`);
-    say.info(`wrote ${file} (${Object.keys(games).join(", ")})`);
+    const target = out === null ? file : path.join(path.resolve(out), `${fixtureFile(entry)}.json`);
+    if (out !== null) mkdirSync(path.dirname(target), { recursive: true });
+    writeFileSync(target, `${JSON.stringify(games)}\n`);
+    say.info(`wrote ${target} (${Object.keys(games).join(", ")})`);
   }
 }

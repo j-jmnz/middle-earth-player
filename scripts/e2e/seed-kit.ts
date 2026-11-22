@@ -20,6 +20,8 @@ import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import { loadAnyScenario, loadCampaign, loadScenario } from "../data/load-scenarios.ts";
 import type { Log } from "../log.ts";
 import { NO_COPY_LIMITS } from "../../src/campaign/wilderland.ts";
+import { searchWin, type DealtGame } from "./search/find.ts";
+import { searchFlags } from "./search/options.ts";
 
 // The parts every scenario's seed finder (scripts/e2e/<scenario-id>.ts) shares: a printed decklist as a seat's heroes and
 // deck, and a game dealt from a save the way the app deals it (deal, then resume) and played to its end by the scenario's
@@ -47,11 +49,17 @@ export function playDealt(
   answer: (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => PlayerIntent,
   stop?: (state: ScenarioState, played: number) => boolean,
 ): { intents: PlayerIntent[]; state: ScenarioState } {
+  const open = dealOpen(world, save, loadout, seed);
+  return playOut(open.state, open.ctx, limit, answer, stop);
+}
+
+/** Deals `save` with `loadout` and `seed` as the briefing does and resumes it as the table does: the opening state and its context, before any intent. Throws when the deal or the resume is refused. */
+function dealOpen(world: World, save: Save, loadout: StoredLoadout, seed: number): { state: ScenarioState; ctx: ReduceContext } {
   const dealt = deal(save, world, loadout, seed);
   if (!dealt.ok) throw new Error(dealt.briefing.problems.map((problem) => problem.message).join(" "));
   const resumed = resume(dealt.save, world);
   if (!resumed.ok) throw new Error(resumed.reason);
-  return playOut(resumed.state, contextOf(world), limit, answer, stop);
+  return { state: resumed.state, ctx: contextOf(world) };
 }
 
 /** Plays `from` with `answer` until the scenario is lost or its stage is cleared, `stop` says so, or `limit` intents; throws when the reducer refuses an answer. */
@@ -105,8 +113,8 @@ export type SeedSpec<S extends 1 | 2> = {
 export type SeedGame = { loadout: StoredLoadout; intents: PlayerIntent[]; state: ScenarioState };
 export type SeedFixture<S extends 1 | 2> = { campaignId: string; seatCount: S; loadout: StoredLoadout; seed: number; intents: PlayerIntent[] };
 
-/** Plays seed `seed` of the saved decklists, Easy, from a blank save (or the save carrying `log`), until the game ends or `stop` says so. */
-export function playSeed<S extends 1 | 2>(spec: SeedSpec<S>, seed: number): SeedGame {
+/** Deals seed `seed` of the saved decklists, Easy, from a blank save (or the save carrying `log`): the loadout and the opening state, before any intent. */
+export function dealSeed<S extends 1 | 2>(spec: SeedSpec<S>, seed: number): DealtGame<StoredLoadout> {
   const campaign = loadCampaign(spec.campaignId);
   const scenario = loadScenario(spec.scenarioId);
   const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
@@ -117,7 +125,13 @@ export function playSeed<S extends 1 | 2>(spec: SeedSpec<S>, seed: number): Seed
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, [...dealt.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log), ...(spec.codes ?? [])]);
   // The Campaign Setup's offers are declined as many times as it asks (test/harness/setup-answers.ts), unless the spec gives its own answers or a loadout.
   const loadout: StoredLoadout = spec.loadout ?? { scenarioId: scenario.id, difficulty: "Easy", seats, ringBearer: null, choices: [...(spec.choices ?? skippedSetupAnswersOf(world, seats, log))], acceptPenalty: false };
-  return { loadout, ...playDealt(world, spec.log ? { ...save, log: spec.log } : save, loadout, seed, spec.limit ?? 8000, spec.answer, spec.stop) };
+  return { loadout, ...dealOpen(world, spec.log ? { ...save, log: spec.log } : save, loadout, seed) };
+}
+
+/** Plays seed `seed` of the saved decklists, Easy, from a blank save (or the save carrying `log`), until the game ends or `stop` says so. */
+export function playSeed<S extends 1 | 2>(spec: SeedSpec<S>, seed: number): SeedGame {
+  const dealt = dealSeed(spec, seed);
+  return { loadout: dealt.loadout, ...playOut(dealt.state, dealt.ctx, spec.limit ?? 8000, spec.answer, spec.stop) };
 }
 
 export type StandaloneSeedSpec<S extends 1 | 2> = {
@@ -138,8 +152,8 @@ export type StandaloneSeedSpec<S extends 1 | 2> = {
 };
 export type StandaloneSeedFixture<S extends 1 | 2> = { campaignId: string; seatCount: S; loadout: StandaloneLoadout; seed: number; intents: PlayerIntent[] };
 
-/** Plays seed `seed` of a cycle scenario as the standalone briefing deals it (dealStandalone, then resumeStandalone as the table does) until the game ends or `stop` says so. */
-export function playStandaloneSeed<S extends 1 | 2>(spec: StandaloneSeedSpec<S>, seed: number): { loadout: StandaloneLoadout; intents: PlayerIntent[]; state: ScenarioState } {
+/** Deals seed `seed` of a cycle scenario as the standalone briefing does (dealStandalone, then resumeStandalone as the table does): the loadout and the opening state, before any intent. */
+export function dealStandaloneSeed<S extends 1 | 2>(spec: StandaloneSeedSpec<S>, seed: number): DealtGame<StandaloneLoadout> {
   const campaign = loadCampaign(spec.campaignId);
   const scenario = loadAnyScenario(spec.scenarioId);
   const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
@@ -150,7 +164,13 @@ export function playStandaloneSeed<S extends 1 | 2>(spec: StandaloneSeedSpec<S>,
   if (!dealt.ok) throw new Error(dealt.briefing.problems.map((problem) => problem.message).join(" "));
   const resumed = resumeStandalone(dealt.game, world);
   if (!resumed.ok) throw new Error(resumed.reason);
-  return { loadout, ...playOut(resumed.state, contextOf(world), spec.limit ?? 8000, spec.answer, spec.stop) };
+  return { loadout, state: resumed.state, ctx: contextOf(world) };
+}
+
+/** Plays seed `seed` of a cycle scenario as the standalone briefing deals it until the game ends or `stop` says so. */
+export function playStandaloneSeed<S extends 1 | 2>(spec: StandaloneSeedSpec<S>, seed: number): { loadout: StandaloneLoadout; intents: PlayerIntent[]; state: ScenarioState } {
+  const dealt = dealStandaloneSeed(spec, seed);
+  return { loadout: dealt.loadout, ...playOut(dealt.state, dealt.ctx, spec.limit ?? 8000, spec.answer, spec.stop) };
 }
 
 /** The fixtures of a cycle scenario: the first seed whose two-handed standalone game wins (`<prefix>-won`) and the first whose game loses (`<prefix>-lost`), each parked on its end; one not found is left out. */
@@ -172,8 +192,9 @@ export function committedSeed(scenarioId: string, label: string): number {
 /** What `firstSeed` and `firstStandaloneSeed` search over: a game played from a seed, with the loadout that dealt it. */
 type SeedSearch = { campaignId: string; scenarioId: string; seatCount: 1 | 2; seeds?: number };
 
-function searchSeeds<L>(say: Log, spec: SeedSearch, play: (seed: number) => { loadout: L; intents: PlayerIntent[]; state: ScenarioState }, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string) {
-  const limit = Math.max(Number(process.env[seedsVar] ?? spec.seeds ?? 100), committedSeed(spec.scenarioId, label));
+function searchSeeds<L>(say: Log, spec: SeedSearch, play: (seed: number) => { loadout: L; intents: PlayerIntent[]; state: ScenarioState }, deal: (seed: number) => DealtGame<L>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string) {
+  const flags = searchFlags();
+  const limit = Math.max(flags?.plain ?? Number(process.env[seedsVar] ?? spec.seeds ?? 100), committedSeed(spec.scenarioId, label));
   for (let seed = 1; seed <= limit; seed += 1) {
     const game = play(seed);
     const outcome = game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "parked";
@@ -183,6 +204,11 @@ function searchSeeds<L>(say: Log, spec: SeedSearch, play: (seed: number) => { lo
     return { campaignId: spec.campaignId, seatCount: spec.seatCount, loadout: game.loadout, seed, intents: game.intents };
   }
   say.warn(`no ${label} game found in ${limit} seeds`);
+  // `pnpm scenario fixtures <id> --search`: a won game the fixed policy cannot reach is searched for (scripts/e2e/search/).
+  if (flags && label.endsWith("-won")) {
+    const found = searchWin(say, label, deal, wanted, flags);
+    if (found) return { campaignId: spec.campaignId, seatCount: spec.seatCount, loadout: found.loadout, seed: found.seed, intents: found.intents };
+  }
   return null;
 }
 
@@ -193,13 +219,13 @@ function searchSeeds<L>(say: Log, spec: SeedSearch, play: (seed: number) => { lo
  * (`oath-won` at seed 909) is not lost to the default, nor is a fixture that chains from it.
  */
 export function firstSeed<S extends 1 | 2>(say: Log, spec: SeedSpec<S>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string): SeedFixture<S> | null {
-  const found = searchSeeds(say, spec, (seed) => playSeed(spec, seed), seedsVar, wanted, label);
+  const found = searchSeeds(say, spec, (seed) => playSeed(spec, seed), (seed) => dealSeed(spec, seed), seedsVar, wanted, label);
   return found ? { ...found, seatCount: spec.seatCount } : null;
 }
 
 /** `firstSeed` for a cycle scenario's standalone games. */
 export function firstStandaloneSeed<S extends 1 | 2>(say: Log, spec: StandaloneSeedSpec<S>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string): StandaloneSeedFixture<S> | null {
-  const found = searchSeeds(say, spec, (seed) => playStandaloneSeed(spec, seed), seedsVar, wanted, label);
+  const found = searchSeeds(say, spec, (seed) => playStandaloneSeed(spec, seed), (seed) => dealStandaloneSeed(spec, seed), seedsVar, wanted, label);
   return found ? { ...found, seatCount: spec.seatCount } : null;
 }
 
