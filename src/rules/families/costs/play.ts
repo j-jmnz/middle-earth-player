@@ -199,19 +199,23 @@ function queueFront(state: ScenarioState, seat: number, instructions: readonly I
   return patchTop(state, { data: { ...data, queue: [...instructions.map((instruction) => ({ instruction, seat, chosen: null })), ...data.queue] } });
 }
 
+// Whether the card in a hand fits the pick of a PlayFromHand.
+function fitsPick(state: ScenarioState, id: string, instruction: PlayFromHand, seat: number, sourceId: string | null, ctx: ReduceContext): boolean {
+  return matchesPick(state, id, { ...instruction.pick, from: "hand" }, { seat, sourceId, counting: true }, ctx);
+}
+
 // The cards in the actor's hand that a PlayFromHand with no picked cards could play under its terms.
 export function playOptions(state: ScenarioState, instruction: PlayFromHand, seat: number, sourceId: string | null, ctx: ReduceContext): string[] {
   const terms = termsOf(instruction);
-  return (state.seats[seat]?.hand ?? []).filter((id) => matchesPick(state, id, { ...instruction.pick, from: "hand" }, { seat, sourceId, counting: true }, ctx) && playableNow(state, seat, id, terms, sourceId, ctx));
+  return (state.seats[seat]?.hand ?? []).filter((id) => fitsPick(state, id, instruction, seat, sourceId, ctx) && playableNow(state, seat, id, terms, sourceId, ctx));
 }
 
 // PlayFromHand: the actor chooses a card in their hand that can be played under the terms (or plays each picked card), and
 // pays for it with PayToPlay.
 export function playFromHand(state: ScenarioState, instruction: PlayFromHand, seat: number, sourceId: string | null, chosen: string | undefined, ctx: ReduceContext): ScenarioState {
   const terms = termsOf(instruction);
-  const fitsPick = (id: string): boolean => matchesPick(state, id, { ...instruction.pick, from: "hand" }, { seat, sourceId, counting: true }, ctx);
   if (instruction.picked) {
-    const ids = pickedList(state).filter((id, at, all) => id !== "" && all.indexOf(id) === at && fitsPick(id) && playableNow(state, state.cards[id]?.controller ?? seat, id, terms, sourceId, ctx));
+    const ids = pickedList(state).filter((id, at, all) => id !== "" && all.indexOf(id) === at && fitsPick(state, id, instruction, seat, sourceId, ctx) && playableNow(state, state.cards[id]?.controller ?? seat, id, terms, sourceId, ctx));
     return queueFront(state, seat, ids.map((id): PayToPlay => ({ verb: "PayToPlay", card: id, ...terms, paid: [] })));
   }
   if (chosen) return queueFront(state, seat, [{ verb: "PayToPlay", card: chosen, ...terms, paid: [] }]);
