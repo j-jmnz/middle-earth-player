@@ -119,6 +119,8 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: "all", note: "The Eagles Are Coming! lets you add any number of the Eagle cards it finds, down to none." },
   { version: 38, scenarios: "all", note: "Song of Mocking chooses another hero, not the hero it is attached to. Kahliel's Headdress shuffles the topmost Harad ally of the discard pile into the deck even when a plain ally lies above it. Renewed Friendship is offered when another player plays an attachment on a hero you control." },
   { version: 38, scenarios: "all", note: "Dúnedain Warning moves only to another hero, never back to the hero it is on, and is not offered when there is none. Dwalin's Response is not offered after he destroys an enemy that is not an Orc, and Master Ironsmith's when two heroes paid for it." },
+  { version: 38, scenarios: ["the-ring-goes-south", "flight-to-the-ford", "a-knife-in-the-dark"], note: "In the Nightmare decks, an enemy in the staging area is in play: Pale-green Tentacle protects the Watcher in the Water there, Weathertop protects the Witch-king there, and Expanse of Hollin and Great East Road count it." },
+  { version: 38, scenarios: ["flight-to-the-ford", "a-knife-in-the-dark"], note: "In the Nightmare decks, The Old Road and Pathless Wilderness do nothing after \"Then\" when they have no resource token left to discard." },
 ];
 
 export const ENGINE_VERSION = 38;

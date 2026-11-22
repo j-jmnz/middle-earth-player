@@ -117,8 +117,7 @@ describe("Weathertop: The Witch-king cannot be damaged (906204:A:2)", () => {
     expect(flagged(table.state, idOf(table.state, WITCH_KING), "cannotTakeDamage")).toBe(true);
   });
 
-  // FAULT: the card prints "The Witch-king cannot be damaged" with no zone, and a card in the staging area is in play (rr.in-play-and-out-of-play); the record's holders are the enemies players control, so the Witch-king in the staging area can be damaged.
-  it.fails("906204:A:2 the Witch-king in the staging area cannot be damaged either: it is in play", () => {
+  it("906204:A:2 the Witch-king in the staging area cannot be damaged either: it is in play", () => {
     const table = tableFromLayout(SCENARIO, { active: "906204", staging: [WITCH_KING] });
     expect(flagged(table.state, idOf(table.state, WITCH_KING), "cannotTakeDamage")).toBe(true);
   });
@@ -127,8 +126,7 @@ describe("Weathertop: The Witch-king cannot be damaged (906204:A:2)", () => {
 describe("The Old Road's Then (906206:A:2, rr.then)", () => {
   // "Discard 1 resource token here. Then, if there are no resource tokens here, shuffle 1 out of play Ringwraith into the encounter deck.": with no token to discard the part before "then" does not resolve, so
   // no Ringwraith is shuffled in. Not provable without the records: the Ringwraith stays set aside either way.
-  // FAULT: the card prints "Discard 1 resource token here. Then, if there are no resource tokens here, shuffle 1 out of play Ringwraith"; with no token to discard the engine still shuffles a Ringwraith in.
-  it.fails("906206:A:2 with no resource token to discard shuffles no Ringwraith into the encounter deck", () => {
+  it("906206:A:2 with no resource token to discard shuffles no Ringwraith into the encounter deck", () => {
     const table = tableFromLayout(SCENARIO, { staging: [{ code: "906206", resources: 0 }], setAside: [RINGWRAITH], deck: ["f0"] });
     const state = announced(table, { trigger: "endOfRound", seat: 0 } as GameEvent);
     expect(state.cards[idOf(state, RINGWRAITH)]?.zone).toBe("setAside");

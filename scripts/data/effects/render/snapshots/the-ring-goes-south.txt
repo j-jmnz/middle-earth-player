@@ -415,7 +415,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 906402:A:2 (front): Watcher in the Water cannot take damage.
   906402:constant:2: Constant
-    - each enemy (any player controls) named "Watcher in the Water": stat cannotTakeDamage 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Watcher in the Water": stat cannotTakeDamage 1, while this card is in play
 
 906402:A:3 (front): Forced: After Pale-green Tentacle attacks and destroys a character, return Pale-green Tentacle to the staging area.
   906402:forced:1: Forced when this enemy attacks, before the defender is declared
@@ -465,7 +465,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 906405:A:1 (front): X is 1 more than the number of enemies in play.
   906405:constant:1: Constant
-    - this card: stat threat the number of enemy (any player controls) + 1, while this card is in play
+    - this card: stat threat the number of enemy (any player controls) or in the staging area + 1, while this card is in play
 
 906405:A:2 (front): Forced: When Expanse of Hollin is explored, shuffle the encounter discard pile into the encounter deck. Then, discard the top card of the encounter deck for each damage here. Add each enemy discarded by this effect to the staging area.
   906405:forced:1: Forced after a card leaves play (heard about this card)

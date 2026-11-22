@@ -165,8 +165,7 @@ describe("the false cases and durations of the encounter cards", () => {
 describe("Pale-green Tentacle and the Watcher in the Water", () => {
   const hit = (made: LayoutTable, state: ScenarioState, code: string, amount: number) => settle(syncConstants(placeDamage(state, idOf(state, code), amount, made.cards, [], "combat", ruleCause("rr.step-6-8-3")), made.ctx), made.ctx, []);
 
-  // FAULT: the card prints "Watcher in the Water cannot take damage." and the Watcher stays in the staging area (142024:A:2); the record gives the flag only to an enemy a player controls, so the Watcher takes the damage.
-  it.fails("906402:A:2 keeps damage off the Watcher in the Water while it is in play", () => {
+  it("906402:A:2 keeps damage off the Watcher in the Water while it is in play", () => {
     const made = tableFromLayout(SCENARIO, { staging: ["142024"], engaged: ["906402"] });
     const struck = hit(made, made.state, "142024", 3);
     expect(struck.cards[idOf(struck, "142024")]?.damage).toBe(0);
@@ -205,8 +204,7 @@ describe("Hunting Hawk (906403:A:2)", () => {
 });
 
 describe("Expanse of Hollin (906405)", () => {
-  // FAULT: the card prints "X is 1 more than the number of enemies in play", and enemies in the staging area are in play (rr.in-play-and-out-of-play); the engine counts only the enemies engaged with a player.
-  it.fails("906405:A:1 counts the enemies in the staging area as well as the engaged ones", () => {
+  it("906405:A:1 counts the enemies in the staging area as well as the engaged ones", () => {
     const made = tableFromLayout(SCENARIO, { staging: ["906405", "f0"], engaged: ["f3"] });
     expect(statOf(made, made.state, "906405", "threat")).toBe(3);
   });

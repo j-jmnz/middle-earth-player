@@ -7,7 +7,7 @@ import type { Effect, PickSpec } from "../../../catalog/boundary.ts";
 const RING = "141085";
 const LAST_STAGE = "141029";
 const FORD = "906303";
-const NAZGUL: PickSpec = { type: "enemy", control: "any", trait: "Nazgûl" };
+const NAZGUL: PickSpec = { type: "enemy", control: "any", staging: true, trait: "Nazgûl" };
 const TWILIGHT_ON_A_HERO: PickSpec = { type: "card", control: "any", names: ["The Twilight World"], on: { type: "hero", control: "any" } };
 const NEXT_PLAYER_ATTACKS = [{"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}},{"verb":"ImmediateAttack","when":{"kind":"otherPlayer"}}] as const;
 
@@ -28,7 +28,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"906305:shadow:1","cardCode":"906305","lines":["906305:A:3"],"timing":"shadow","instructions":[{"verb":"AfterAttack","instructions":[...NEXT_PLAYER_ATTACKS]}]},
   // 906306 Pathless Wilderness. "Enters play with" is not a Forced effect: it resolves as the card enters play (triggered).
   {"id":"906306:triggered:1","cardCode":"906306","lines":["906306:A:1"],"timing":"triggered","trigger":"encounterEnteredPlay","subject":"self","instructions":[{"verb":"PlaceToken","amount":3}]},
-  {"id":"906306:forced:1","cardCode":"906306","lines":["906306:A:2"],"timing":"forced","trigger":"endOfRound","instructions":[{"verb":"DiscardResources","amount":1,"target":"self"},{"verb":"ReduceLife","amount":3,"when":{"kind":"not","condition":{"kind":"matches","card":"self","pick":{"type":"location","control":"any","hasResources":true}}}}]},
+  {"id":"906306:forced:1","cardCode":"906306","lines":["906306:A:2"],"timing":"forced","trigger":"endOfRound","instructions":[{"verb":"DiscardResources","amount":1,"target":"self"},{"verb":"ReduceLife","amount":3,"when":{"kind":"all","conditions":[{"kind":"thenResolves"},{"kind":"less","left":{"stat":"resources","of":"self"},"right":1}]}}]},
   // 906307 Ettendales: a location leaves play with a leftPlay event when it is explored.
   {"id":"906307:forced:1","cardCode":"906307","lines":["906307:A:1"],"timing":"forced","trigger":"leftPlay","subject":"self","condition":{"kind":"subjectExplored"},"instructions":[{"verb":"MoveBurden","to":"encounterShuffle"}]},
   // 906308 Come Back! (line 1 is Peril and Doomed 1). The defending player chooses.

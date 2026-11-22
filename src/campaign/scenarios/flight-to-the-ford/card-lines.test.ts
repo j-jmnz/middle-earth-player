@@ -114,8 +114,7 @@ describe("Great East Road (906305)", () => {
     expect(threat({ staging: ["906305"], engaged: [{ code: FELL_RIDER, seat: 0 }], effects: without("906305:A:1") })).not.toBe(2);
   });
 
-  // FAULT: the card counts the Nazgûl "in play", and a Nazgûl in the staging area is in play (rr.in-play-and-out-of-play); the engine counts only the engaged ones, so a Fell Rider in the staging area adds nothing.
-  it.fails("906305:A:1 a Nazgûl in the staging area is in play and counts for X", () => {
+  it("906305:A:1 a Nazgûl in the staging area is in play and counts for X", () => {
     expect(threat({ staging: ["906305", FELL_RIDER] })).toBe(2);
     expect(threat({ staging: ["906305", FELL_RIDER], engaged: [{ code: WITCH_KING, seat: 0 }] })).toBe(3);
   });
@@ -162,8 +161,7 @@ describe("Pathless Wilderness (906306)", () => {
     expect(endOfRound(1)).toMatchObject({ resources: 0, lost: 3 });
   });
 
-  // FAULT: the card reduces the life by 3 only "then", after a token was discarded (rr.then); with no token left to discard the engine still reduces the life by 3 at the end of every round.
-  it.fails("906306:A:2 with no token left to discard, the part after Then does not resolve and the life is not reduced (rr.then)", () => {
+  it("906306:A:2 with no token left to discard, the part after Then does not resolve and the life is not reduced (rr.then)", () => {
     expect(endOfRound(0)).toMatchObject({ resources: 0, lost: 0 });
   });
 });
