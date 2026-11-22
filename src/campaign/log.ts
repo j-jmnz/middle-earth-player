@@ -54,7 +54,7 @@ export type CampaignLog = {
   carryIn: readonly PoolCard[];
   // The finished save whose carry-over this one took in, so that save's offer is not made again. Absent when it took nothing.
   carriedFrom?: string;
-  // The finished save of the box before this one that this save continues (a continued save, docs/brief.md, The Two Towers), so that save's continue offer is not made again. Absent when it continued none.
+  // The finished save of the box before this one that this save continues (a continued save, docs/scenarios/the-two-towers.md, The Two Towers), so that save's continue offer is not made again. Absent when it continued none.
   continuedFrom?: string;
   // Dream-chaser's XP (dcce.gaining-xp, dcce.scalable-upgradable; src/campaign/xp.ts). An older log reads with these defaults.
   // The XP each won scenario's Resolution awarded, by scenario id; the unspent XP is this less the boxes marked, never stored.
@@ -74,18 +74,18 @@ export type CampaignLog = {
   beldisUses: readonly number[];
   // The encounter cards in the Campaign Pool and how many copies of each: every later encounter deck holds them, whatever its set (emce.campaign-pool-encounter).
   encounterPool: Readonly<Record<string, number>>;
-  // The Two Towers Campaign Log (docs/brief.md, The Two Towers). A log saved before it reads with these defaults.
+  // The Two Towers Campaign Log (docs/scenarios/the-two-towers.md, The Two Towers). A log saved before it reads with these defaults.
   // The permanent starting threat penalty each seat takes of its own, on top of `threatPenalty` (The Passage of the Marshes: "each player must choose: either take a permanent +2 starting threat penalty, or earn 1 copy of The Searching Eye"). A seat with none read is 0.
   threatPenaltyBySeat: readonly number[];
   // What each seat chose there, by seat; a seat that has not chosen is null.
   marshesChoice: readonly (MarshesChoice | null)[];
   // The enemies underneath The Black Gate when Journey to the Cross-roads was won, by card code and quantity: "the name and quantity of each enemy", shown with the notes (The Black Gate Opens may read it).
   blackGate: Readonly<Record<string, number>>;
-  // The campaign total the finished Fellowship save carried on (a continued save, docs/brief.md, The Two Towers): added to the scenario scores. 0 in a fresh save.
+  // The campaign total the finished Fellowship save carried on (a continued save, docs/scenarios/the-two-towers.md, The Two Towers): added to the scenario scores. 0 in a fresh save.
   scoreBase: number;
   // The campaigns `scoreBase` adds up, in saga order (a Return of the King save continued from a continued Two Towers save: Fellowship and Two Towers), so the log names the base for the whole saga so far. Empty in a fresh save and in one saved before it.
   scoreBaseCampaigns: readonly string[];
-  // The Return of the King's notes section (docs/brief.md, The Return of the King). The resources on The Corsair Fleet counted when The Siege of Gondor was won, and the resource tokens on The Black Gate when The Black Gate Opens was; null
+  // The Return of the King's notes section (docs/scenarios/the-return-of-the-king.md, The Return of the King). The resources on The Corsair Fleet counted when The Siege of Gondor was won, and the resource tokens on The Black Gate when The Black Gate Opens was; null
   // until recorded. How the saga ended once Mount Doom was won ("won", or "lost" when the players kept The One Ring); null until then.
   corsairFleet: number | null;
   blackGateTokens: number | null;

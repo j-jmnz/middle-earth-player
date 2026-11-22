@@ -39,7 +39,7 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
   uncharted: { word: "Uncharted", rules: ["dcce.uncharted"] },
   aflame: { word: "Aflame", rules: ["dcce.aflame"] },
   grapple: { word: "Grapple", rules: ["dcce.grapple"] },
-  // Burn X (The Battle of Lake-town): printed on no rules span; the Quest Companion defines it (docs/brief.md, The Battle of Lake-town, Burn X).
+  // Burn X (The Battle of Lake-town): printed on no rules span; the Quest Companion defines it (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town, Burn X).
   burn: {
     word: "Burn",
     rules: [],
@@ -50,7 +50,7 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
       source: "Quest Companion (community source)",
     },
   },
-  // Pillage X and Massive (The Hunt for the Dreadnaught): the Dream-chaser rules span none of them; the box rulebook defines them (docs/brief.md, The Hunt for the Dreadnaught, readings 17 and 21).
+  // Pillage X and Massive (The Hunt for the Dreadnaught): the Dream-chaser rules span none of them; the box rulebook defines them (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, readings 17 and 21).
   pillage: {
     word: "Pillage",
     rules: [],
@@ -67,7 +67,7 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
       source: "RulesPal transcription of the box rulebook (community source)",
     },
   },
-  // Spectral (The Stone of Erech): from RulesPal's transcription of the scenario's rulesheet, which data/rules does not hold (docs/brief.md, The Stone of Erech, Spectral).
+  // Spectral (The Stone of Erech): from RulesPal's transcription of the scenario's rulesheet, which data/rules does not hold (docs/scenarios/standalone-scenarios.md, The Stone of Erech, Spectral).
   spectral: {
     word: "Spectral",
     rules: [],

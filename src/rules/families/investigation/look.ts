@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (Murder at the Prancing Pony, readings 2 to 6 and 10), rr.forced, rr.search; ledger lines 50715:A:1, 50716:A:1 to 50720:A:1, 50719:A:2, 50722:A:1, 50726:A:2, 50714:A:1. Looking at the Investigation deck: Investigate X shuffles it and looks at the top X cards; every other look (top or bottom) leaves it as it is.
+// Rules: docs/scenarios/standalone-scenarios.md (Murder at the Prancing Pony, readings 2 to 6 and 10), rr.forced, rr.search; ledger lines 50715:A:1, 50716:A:1 to 50720:A:1, 50719:A:2, 50722:A:1, 50726:A:2, 50714:A:1. Looking at the Investigation deck: Investigate X shuffles it and looks at the top X cards; every other look (top or bottom) leaves it as it is.
 // A look shows the cards to the looking seat in a window and moves nothing. The cards looked at are noted on the running effect, and once the whole effect has resolved each hears the look (`lookedAtInvestigationDeck`): Taken by Surprise resolves from the deck (50714:A:1). No step names a card.
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 

@@ -1,4 +1,4 @@
-// Rules: mec113.campaign-mode, rr.campaign-log (data/rules/entries.json). The words of The Return of the King's own Resolution records (docs/brief.md, The Return of the King): the options of Mount Doom's
+// Rules: mec113.campaign-mode, rr.campaign-log (data/rules/entries.json). The words of The Return of the King's own Resolution records (docs/scenarios/the-return-of-the-king.md, The Return of the King): the options of Mount Doom's
 // ChooseOption, the notes of the settled view (the counts recorded in the log's notes section, how the saga ended) and the lines that say how the saga ended. Pure.
 import type { CampaignEnd, RecordedCount } from "../catalog/campaign-record.ts";
 import type { ResolutionLog } from "../rules/core/campaign-state.ts";

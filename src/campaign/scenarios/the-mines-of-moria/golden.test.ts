@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.search, rr.travel, rr.engaged, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, rr.ownership-and-control, ltp.scoring, docs/brief.md (The Mines of Moria) (data/rules/entries.json).
+// Rules: rr.setup, rr.search, rr.travel, rr.engaged, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, rr.ownership-and-control, ltp.scoring, docs/scenarios/standalone-scenarios.md (The Mines of Moria) (data/rules/entries.json).
 import { describe, expect } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";

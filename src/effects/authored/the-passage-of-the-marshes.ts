@@ -8,7 +8,7 @@ import { copyLine, withCopies } from "./reprint.ts";
 
 // Records for The Passage of the Marshes (the-two-towers part 4, campaign card 144067, whose records are in the-two-towers.ts): the Mire keyword (the mire family), Gollum and Sméagol (the gollum family), the Undead enemies, the
 // quest stages and the encounter cards no template reads. Every line is read from the scan ledger (data/printed/the-two-towers.json); a line a template already writes (pnpm data:build) or another card prints word for word needs no
-// record here. See docs/brief.md, The Two Towers, for each reading.
+// record here. See docs/scenarios/the-two-towers.md, The Two Towers, for each reading.
 // Rules: mec112.mire, mec112.gollum-smeagol, mec112.poisoned-counsels-searching-eye, mec112.saga-staging-rules, rr.forced, rr.travel, rr.cannot, rr.first-player, rr.defending-player, rr.effects, rr.search, rr.reveal, rr.victory, rr.attachment-cards (data/rules/entries.json).
 const GOLLUM = "144075";
 const SMEAGOL = "144076";

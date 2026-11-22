@@ -3,7 +3,7 @@
 // The log has the first five parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it (a blank log keeps this part locked and the path opens Voyage Across Belegaer): it is the
 // log of `scripts/e2e/the-thing-in-the-depths.ts` (the Voyage, Fate, Raid and Flight goldens' wins), and on top of it the one of The Thing in the Depths' golden ("two-handed, won"), each run through the same `applyResolution` that writes
 // it in the app, with the goldens' plain-number heroes taken out (the fixture's seats play real decklists). `voyage-won`, `fate-won`, `raid-won`, `stormcaller-won` and `depths-won`, real-decklist wins, are open
-// (docs/phases/STATUS.md). The Campaign Setup asks no choice (its questions, damage for threat and Spyglass for threat, come in the game and the policy answers them); the Resolution asks which player a Recurring Nightmare
+// (GitHub issue #188). The Campaign Setup asks no choice (its questions, damage for threat and Spyglass for threat, come in the game and the policy answers them); the Resolution asks which player a Recurring Nightmare
 // goes to when one was flipped.
 import type { CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";

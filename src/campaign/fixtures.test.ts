@@ -22,7 +22,7 @@ import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
 
 // The fixtures (src/campaign/fixtures/*.json) are real games of saved deck cards: a briefing would deal each
 // loadout, the reducer replays each to its moment, and the A Knife in the Dark one starts from the log scenario 1's won
-// game writes. When this fails, run scripts/e2e/fixtures.ts again. `won` and `knife-lost` are open (docs/phases/STATUS.md):
+// game writes. When this fails, run scripts/e2e/fixtures.ts again. `won` and `knife-lost` are open (GitHub issue #188):
 // no legal win of the two starter decks has been found, so the tests that need them are skipped until they are committed.
 // A scenario of a cycle has no campaign save: its fixtures are one open standalone game each (the describe at the foot).
 const COMMITTED = FIXTURE_NAMES.filter((name) => hasFixture(name) && fixtureKindOf(name) === "campaign");

@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (Murder at the Prancing Pony, readings 1, 7 and 12), rr.in-play-and-out-of-play; ledger lines 50701:A:1, 50702:B:1, 50728:A:1, 50728:A:2. The Investigation deck (core/piles.ts, the named pile `investigation`): built by the Setup, a card removed from it unseen, a card shuffled into it.
+// Rules: docs/scenarios/standalone-scenarios.md (Murder at the Prancing Pony, readings 1, 7 and 12), rr.in-play-and-out-of-play; ledger lines 50701:A:1, 50702:B:1, 50728:A:1, 50728:A:2. The Investigation deck (core/piles.ts, the named pile `investigation`): built by the Setup, a card removed from it unseen, a card shuffled into it.
 // Hidden information: no EngineStep and no log line names a card of the deck or the Suspect and Hideout set aside facedown, so these functions push no step. Only a look window (look.ts) shows cards.
 import type { Instruction } from "../../../catalog/boundary.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";

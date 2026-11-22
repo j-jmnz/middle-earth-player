@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.quest-advancement (data/rules/entries.json); docs/brief.md (The Woodland Realm, The table); ledger lines 51103:B:2, 51104:B:3, 51105:B:2, 51108:B:3.
+// Rules: rr.forced, rr.quest-advancement (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Woodland Realm, The table); ledger lines 51103:B:2, 51104:B:3, 51105:B:2, 51108:B:3.
 // The top-bar dials of The Woodland Realm: the progress cap of stage 2 and the phase tally of stage 3B.
 import { describe, expect, it } from "vitest";
 

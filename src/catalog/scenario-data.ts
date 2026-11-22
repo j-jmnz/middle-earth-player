@@ -7,19 +7,19 @@ import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioD
 // `burden` is the burden deck (Flight to the Ford): a zone beside the quest deck, not part of the encounter deck.
 // `attachedChosen` is a card the quest's Setup attaches to a hero the first player chooses (The Caves of Nibin-Dûm's Cave
 // Torch): out of the encounter deck, dealt by the Setup record, not by `setupInstructions`.
-// Dream-chaser's extra decks (docs/brief.md, Dream-chaser), each a zone the scenario's Setup prepares (the engine reads them from
+// Dream-chaser's extra decks (docs/scenarios/dream-chaser.md, Dream-chaser), each a zone the scenario's Setup prepares (the engine reads them from
 // phase 39 on): `corsairDeck` (the non-ship enemies, "Prepare the Corsair deck", dcce.corsair-deck), `encounterDeck2` (the deck the
 // quest swaps to: The Thing in the Depths 5, The City of Corsairs 9, dcce.from-sea-to-land), `unchartedDeck` (dcce.uncharted-deck),
 // `islandMap` (Temple of the Deceived's fifteen double-sided locations, dcce.island-map), `grottoDeck` (dcce.grotto-deck) and
 // `stormcallerQuests` (stages 2C to 4C beside the Stormcaller, dcce.stormcallers-area). None is part of the encounter deck.
-// Ered Mithrin's decks beside the encounter deck (docs/brief.md, Ered Mithrin), each a zone the scenario's Setup builds from encounter sets:
+// Ered Mithrin's decks beside the encounter deck (docs/scenarios/ered-mithrin.md, Ered Mithrin), each a zone the scenario's Setup builds from encounter sets:
 // `evilCreaturesDeck` (the Wilderlands enemies, emce.evil-creatures-deck), `cavesDeck` (the Lost Caves set and the cards a Setup shuffles in,
 // emce.caves-deck), `sideQuestDeck` (Fire in the Night's eight encounter side quests, emce.side-quests), and Lost in Mirkwood's two decks
 // `spidersDeck` and `orcsDeck` (the Spiders of Mirkwood and Dol Guldur Orcs sets, which the quest swaps into the encounter deck).
 // The Two Towers' second encounter decks (mec112.setup-journey-to-the-cross-roads, mec112.setup-shelobs-lair): `haradDeck` (the Men of Harad set, shuffled and
 // placed facedown under The Cross-roads) and `greatSpiderDeck` (The Great Spider set, set aside). Neither is part of the encounter deck.
 // Angmar Awakened's Orc deck (mec108.orc-deck): `angmarOrcDeck`, the Angmar Orcs enemies and Concealed Orc-camp The Weather Hills' Setup takes out of the encounter deck.
-// The Battle of Lake-town's Smaug deck (docs/brief.md, The Battle of Lake-town): `smaugDeck`, the nine Smaug cards its Setup shuffles into a separate deck, with a discard pile of its own.
+// The Battle of Lake-town's Smaug deck (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town): `smaugDeck`, the nine Smaug cards its Setup shuffles into a separate deck, with a discard pile of its own.
 export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "smaugDeck"] as const;
 export type Pile = (typeof PILES)[number];
 
@@ -45,7 +45,7 @@ const placementSchema = z
   })
   .refine((card) => card.easy <= card.normal, { message: "easy exceeds normal" });
 
-// A scenario's Nightmare deck (docs/brief.md, Nightmare), from its setup card: the standard piles less `removed` (each copy
+// A scenario's Nightmare deck (docs/scenarios/nightmare.md, Nightmare), from its setup card: the standard piles less `removed` (each copy
 // taken from the pile it was in), with the deck's own cards (`cards`, the copies printed) shuffled in. A Nightmare card takes the
 // Setup slot of a removed card of its title (`pile`, `perPlayer`). The setup card is placed next to the quest deck, side A faceup,
 // and its lines stay active all game.
@@ -97,7 +97,7 @@ export const scenarioDataSchema = z
     // The code of the scenario's own mode card (The Siege of Annúminas' Standard Game Mode): its Setup runs before the quest card's, then it is flipped and kept beside the quest deck all game
     // (`ScenarioDefinition.modeCard`). The Dream-chaser Hard/Expert Mode card is not this: a campaign with XP adds it (MODE_CARD_CODE).
     modeCard: z.string().min(1).optional(),
-    // The mode card the app's Easy difficulty deals in its place (The Hunt for the Dreadnaught's Easy Mode, docs/brief.md, The Hunt for the Dreadnaught, reading 1): the Setup, the back and the game are as with `modeCard`.
+    // The mode card the app's Easy difficulty deals in its place (The Hunt for the Dreadnaught's Easy Mode, docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, reading 1): the Setup, the back and the game are as with `modeCard`.
     easyModeCard: z.string().min(1).optional(),
   })
   .superRefine((data, context) => {
@@ -222,7 +222,7 @@ export function normalCopiesByCode(data: AnyScenarioData): Map<string, number> {
   return totals;
 }
 
-// Nightmare plays the scenario's Nightmare deck (docs/brief.md, Nightmare), where it has one (`nightmare`).
+// Nightmare plays the scenario's Nightmare deck (docs/scenarios/nightmare.md, Nightmare), where it has one (`nightmare`).
 export const DIFFICULTIES = ["Easy", "Normal", "Nightmare"] as const;
 export type Difficulty = (typeof DIFFICULTIES)[number];
 

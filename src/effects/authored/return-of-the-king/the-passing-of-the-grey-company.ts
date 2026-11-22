@@ -6,7 +6,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for The Passing of the Grey Company (the-return-of-the-king part 1, campaign card 145066, whose records are in the-return-of-the-king.ts): Overcome by Fear (a card on a player's threat dial), the three stages, the
 // locations, the Oathbreaker enemies (Phantom is a printed keyword, mec113.phantom) and the treacheries no template reads. Every line is read from the scan ledger (data/printed/the-return-of-the-king.json); a line a template
-// already writes (pnpm data build) or another card prints word for word needs no record here. See docs/brief.md, The Return of the King, for each reading.
+// already writes (pnpm data build) or another card prints word for word needs no record here. See docs/scenarios/the-return-of-the-king.md, The Return of the King, for each reading.
 // Rules: mec113.phantom, mec113.army-of-the-dead, mec113.saga-staging-rules, mec113.peril, mec113.fellowship-sphere-heroes, mec113.multiplayer-aragorn, rr.initial-threat-level, rr.setup, rr.lasting-effects, rr.then, rr.effects,
 // rr.forced, rr.travel, rr.search, rr.staging, rr.attachment-cards, rr.quest-advancement, rr.winning-the-game, rr.defending-player, rr.play-and-put-into-play, faq.peril-attacks, faq.additional-attacks (data/rules/entries.json).
 const FEAR = "145016";

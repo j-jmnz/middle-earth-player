@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.response, rr.then, rr.travel, rr.first-player, rr.victory, rr.engaged, rr.destroy, rr.explored, rr.shadow-effects, rr.cancel, rr.in-play-and-out-of-play, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json); docs/brief.md (Attack on Dol Guldur).
+// Rules: rr.forced, rr.response, rr.then, rr.travel, rr.first-player, rr.victory, rr.engaged, rr.destroy, rr.explored, rr.shadow-effects, rr.cancel, rr.in-play-and-out-of-play, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (Attack on Dol Guldur).
 import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, defend, endRound, exhausted, flag, handCount, offers, progressOn, quest, resolve, resourcesOn, respond, reveal, stat, threat, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Attack on Dol Guldur (standalone-scenarios part 9): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).

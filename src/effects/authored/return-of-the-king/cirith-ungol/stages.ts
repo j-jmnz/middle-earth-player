@@ -4,7 +4,7 @@ import { EACH_PLAYER } from "../pelennor/shared.ts";
 import { CONSIDERED_ENGAGED, DISCARD_UNTIL_ENEMY_OR_COPY, LAST_OF_THE_COMPANY, ONE_RING, QUEST_PHASE, STAGE_2, TOPMOST_CHAMBER, WATCHERS_ENEMY, WATCHERS_IN_PLAY, WATCHERS_IN_STAGING, WATCHERS_LOCATION } from "./shared.ts";
 
 // Records for the quest stages of The Tower of Cirith Ungol (146066 to 146068). The cards the quest card's piles place (Shagrat set aside, The Two Watchers and Topmost Chamber in the staging area) are dealt by the data; no record places them.
-// Every line is read from the scan ledger (data/printed/the-return-of-the-king.json). See docs/brief.md, The Return of the King, for each reading.
+// Every line is read from the scan ledger (data/printed/the-return-of-the-king.json). See docs/scenarios/the-return-of-the-king.md, The Return of the King, for each reading.
 // Rules: mec113.setup-the-tower-of-cirith-ungol, mec113.setting-up-the-game, mec113.the-one-ring, mec113.saga-staging-rules, mec113.immune-to-player-card-effects, rr.guarded, rr.objective-cards, rr.quest-advancement, rr.ownership-and-control, rr.engaged, rr.effects,
 // rr.then, rr.lasting-effects, rr.travel, faq.progress-without-advancing, faq.last-encounter-card, faq.next-player (data/rules/entries.json).
 export const STAGE_RECORDS: readonly Effect[] = [

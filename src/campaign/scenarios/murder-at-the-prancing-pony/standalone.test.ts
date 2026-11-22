@@ -1,4 +1,4 @@
-// Rules: rr.setup (data/rules/entries.json); docs/brief.md (Murder at the Prancing Pony).
+// Rules: rr.setup (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (Murder at the Prancing Pony).
 // What is Murder at the Prancing Pony's own in the standalone game. Its Setup is the golden suite's opening check (golden.test.ts); the cycle checks (a part of its cycle, no campaign card, playable, scored and recorded as a
 // standalone run with nothing earned, the loss reasons) are the golden suite's too (test/harness/golden-suite.ts, standalone: true).
 import { describe, expect, it } from "vitest";

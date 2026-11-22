@@ -68,12 +68,12 @@ export type ZoneName =
   // The campaign card next to the quest deck (rr.campaign-cards). Placed only when the card has an ability that works during
   // the scenario (a Response, a Forced effect, a constant, an Action), so it is in play: 141056:A:2.
   | "campaign"
-  // The Nightmare setup card next to the quest deck, side A faceup, on Nightmare (docs/brief.md, Nightmare): in play all game.
+  // The Nightmare setup card next to the quest deck, side A faceup, on Nightmare (docs/scenarios/nightmare.md, Nightmare): in play all game.
   | "nightmare"
   // The Hard/Expert Mode card next to the quest deck, on the side the players chose (dcce.hard-expert): in play all game. A zone of its own, so
   // nothing that reads the Nightmare setup card reads it.
   | "modeCard"
-  // The Night objective beside the current quest (docs/brief.md, The Stone of Erech): in play, controlled by nobody, one card at a time (families/erech/).
+  // The Night objective beside the current quest (docs/scenarios/standalone-scenarios.md, The Stone of Erech): in play, controlled by nobody, one card at a time (families/erech/).
   | "nightObjective"
   // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by nobody; the host is the Watcher.
   | "captive"

@@ -114,7 +114,7 @@ export type EffectData = {
   // names (the enemy a character defends against).
   subject?: string;
   other?: string;
-  // The active location when a Travel effect began (absent: none): a Travel to itself that finds another location active was pre-empted by the effect itself (Dark-wood Grove reveals Giant Web, 51146:A:2; docs/brief.md, The Woodland Realm, reading 20).
+  // The active location when a Travel effect began (absent: none): a Travel to itself that finds another location active was pre-empted by the effect itself (Dark-wood Grove reveals Giant Web, 51146:A:2; docs/scenarios/standalone-scenarios.md, The Woodland Realm, reading 20).
   activeAtStart?: string;
   // The card the source was attached to when its own cost took it out of play ("Discard Cram to ready attached hero", 131011:A:2): "attached hero" still names it.
   host?: string;

@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Battle of Lake-town, Fisherman's Dock: the progress is split freely between the two active locations, FFG's ruling), rr.active-location, rr.step-3-4 (data/rules/entries.json); ledger line 50223:A:2.
+// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town, Fisherman's Dock: the progress is split freely between the two active locations, FFG's ruling), rr.active-location, rr.step-3-4 (data/rules/entries.json); ledger line 50223:A:2.
 // With two active locations, one of them Fisherman's Dock, the progress from questing goes where the players choose: quest/quest.ts places nothing but hands the progress to `askSplit`, which pushes a frame (no record: the Dock's line is a Travel line) whose `SplitProgress` asks the first player how much goes on the first
 // active location (the rest goes on the second), each location taking no more than it has room for. The choice is only asked when the progress does not fill both (`splitRooms`); the options are the shares that leave neither location over its room.
 import type { Instruction } from "../../../catalog/boundary.ts";

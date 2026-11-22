@@ -4,7 +4,7 @@ import { withCopies } from "../reprint.ts";
 
 // The Seventh Level Nightmare (deck 9011, data/printed/nightmare.json). The setup card sets Overseer Maurûl and Chamber of Records aside and, when stage 2B is revealed, makes the Chamber the active location, adds Maurûl to the staging area and shuffles every
 // Balin's Doom in the discard pile back; side B is the recipe the build applies (its lines are inert). The cards put resources on Goblin enemies (the staging area and every player's engaged enemies) and read them.
-// Rules: rr.forced, rr.active-location, rr.immune, rr.cancel, rr.damage, rr.victory, faq.simultaneous-effects, faq.progress-without-advancing, dwd.revealing-enemies (data/rules/entries.json); the readings are in docs/brief.md (The Seventh Level).
+// Rules: rr.forced, rr.active-location, rr.immune, rr.cancel, rr.damage, rr.victory, faq.simultaneous-effects, faq.progress-without-advancing, dwd.revealing-enemies (data/rules/entries.json); the readings are in docs/scenarios/dwarrowdelf.md (The Seventh Level).
 const MAURUL = "901102";
 const CHAMBER = "901103";
 const FATE_OF_BALIN = "The Fate of Balin";

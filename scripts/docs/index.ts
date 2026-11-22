@@ -52,6 +52,7 @@ export function groups(): Group[] {
     { title: "Every session", note: "Read whole.", files: ["CLAUDE.md", ...markdownIn(".claude/rules")] },
     { title: "Agents", note: "Each agent reads its own file.", files: markdownIn(".claude/agents") },
     { title: "Product, code and design", note: "Read the sections your task touches.", files: ["README.md", ...markdownIn("docs", (name) => name === "INDEX.md")] },
+    { title: "Scenarios", note: "One file per box or cycle: each scenario's mechanics, readings, decisions and table pieces. Read the scenario your task names.", files: markdownIn("docs/scenarios") },
     { title: "Agent procedures", note: "The scenario procedure and the effect-authoring cookbook; read when a task names one.", files: markdownIn("docs/agents") },
     { title: "Phases", note: "STATUS.md, then the active phase file.", files: ["docs/phases/STATUS.md", ...markdownIn("docs/phases", (name) => name === "STATUS.md")] },
     { title: "Live plans", note: "Read when a task names the plan.", files: markdownIn("docs/plans") },
@@ -240,7 +241,7 @@ export function sectionText(fileArg: string, headingArg: string): string {
   const text = readFileSync(path.join(ROOT, file), "utf8");
   const headings = headingsOf(text);
   const heading = resolveSection(headings, headingArg);
-  if (!heading) throw new Error(`no heading in ${file} matches "${headingArg}"; its headings: ${headings.map((item) => item.text).join(" | ")}`);
+  if (!heading) throw new Error(`no heading in ${file} matches "${headingArg}"; pnpm doc find "${headingArg}" searches every doc`);
   return `${file}:${heading.start}-${heading.end}\n${text.split("\n").slice(heading.start - 1, heading.end).join("\n")}\n`;
 }
 

@@ -5,7 +5,7 @@ import { runInstruction } from "../../interpret/interpret.ts";
 import { moveCard, spawn } from "../../core/zones.ts";
 import { hero, table } from "../defense/table.ts";
 
-// Rules: dwd.cave-torch-the-long-dark, rr.attachment-cards, rr.in-play-and-out-of-play (data/rules/entries.json); ledger line 03064:A:1 (docs/brief.md, Into the Pit).
+// Rules: dwd.cave-torch-the-long-dark, rr.attachment-cards, rr.in-play-and-out-of-play (data/rules/entries.json); ledger line 03064:A:1 (docs/scenarios/dwarrowdelf.md, Into the Pit).
 // AttachSetAside with `removeWhenLeaving`: "If Cave Torch would leave play, then it is removed from the game": the Torch the Setup attaches goes to no pile, whether it is discarded or its hero leaves play.
 
 const torch = definePrinted({ code: "torch", name: "Cave Torch", type: "attachment" });

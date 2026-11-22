@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Stone of Erech, Spectral); ledger lines 50312:A:1, 50305:A:1, 50311:A:1. Spectral on an enemy: characters attacking it use their Willpower instead of their Attack to determine attack strength; the enemy's Defense is still
+// Rules: docs/scenarios/standalone-scenarios.md (The Stone of Erech, Spectral); ledger lines 50312:A:1, 50305:A:1, 50311:A:1. Spectral on an enemy: characters attacking it use their Willpower instead of their Attack to determine attack strength; the enemy's Defense is still
 // subtracted, and damage that is not an attack (a card effect, archery) is unaffected. The stat read is the character's current Willpower, so a blank text box, a Willpower set to 0 (Driven by Fear) or a modifier changes it as it changes the stat.
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";

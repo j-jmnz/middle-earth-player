@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Battle of Lake-town: the Smaug deck, from the Quest Companion), rr.reveal, rr.first-player, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 50201:A:1, 50204:A:2, 50206:A:3.
+// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town: the Smaug deck, from the Quest Companion), rr.reveal, rr.first-player, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 50201:A:1, 50204:A:2, 50206:A:3.
 // The Smaug deck: at the beginning of every quest phase (round 1 too, before the commitments) the first player chooses the play area or the staging area blind, then reveals the top Smaug card and puts it there. In the play area he engages it at once
 // (not an optional engagement). A Smaug already in play gives the new one all its damage, as the new one is revealed and before its When Revealed effects, and goes to the Smaug discard pile. An empty deck is shuffled from its discard pile. The deck and
 // its discard pile are one of the decks beside the encounter deck (core/piles.ts DECKS); no encounter deck or discard effect touches them.

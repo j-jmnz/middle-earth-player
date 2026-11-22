@@ -1,5 +1,5 @@
 // Rules: dcce.ship-objectives, dcce.ship-enemies, dcce.prepare-your-fleet, dcce.corsair-deck (data/rules/entries.json). The Hunt for the Dreadnaught has no rulesheet in data/rules; its rules are the mode cards', the quest
-// cards' and the box rulebook's (docs/brief.md, The Hunt for the Dreadnaught).
+// cards' and the box rulebook's (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught).
 // The Hunt for the Dreadnaught, the fourteenth and last scenario of the Standalone scenarios cycle (its own file: standalone-scenarios.test.ts is at the file-size limit): its codes, its piles, its mode cards, the
 // stats of its ships and the printed-text ledger read from the scans.
 import { describe, expect, it } from "vitest";

@@ -1,4 +1,4 @@
-// Rules: rr.first-player, dwd.cave-torch-the-long-dark, rr.travel (data/rules/entries.json); ledger lines 03064:A:1, 03067:A:1, 901809:A:2 (docs/brief.md, Into the Pit, The Seventh Level, Shadow and Flame).
+// Rules: rr.first-player, dwd.cave-torch-the-long-dark, rr.travel (data/rules/entries.json); ledger lines 03064:A:1, 03067:A:1, 901809:A:2 (docs/scenarios/dwarrowdelf.md, Into the Pit, The Seventh Level, Shadow and Flame).
 // A Setup line that has the first player pick among the heroes of every player ("have the first player attach Cave Torch to a hero of his choice"): the sheet of that pick names the owner on each row, as a pick that spans seats does
 // in the side quest games (`seatedRows`, read by choice/sheet-parts.ts seatedLabel). Absent when the game deals no such Setup line (every other scenario).
 import type { Instruction } from "../../../catalog/boundary.ts";

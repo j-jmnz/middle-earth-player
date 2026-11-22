@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.player-elimination (data/rules/entries.json); ledger lines 50801:B:2, 50812:A:1, 50812:A:2, 50814:A:2, 50820:A:2 (docs/brief.md, The Siege of Annúminas, The table).
+// Rules: rr.forced, rr.player-elimination (data/rules/entries.json); ledger lines 50801:B:2, 50812:A:1, 50812:A:2, 50814:A:2, 50820:A:2 (docs/scenarios/standalone-scenarios.md, The Siege of Annúminas, The table).
 //
 // The piece The Siege of Annúminas' cards hold on the table, as a top-bar dial: the city strength of Annúminas, the resource tokens on it (the Setup places 20, damage to Annúminas takes them off, none left loses the game). The disc says the strength;
 // the ring fills with the strength lost from the 20 of Standard mode and warms toward the loss. It warns when the damage this round's end brings (1 for each enemy in play, Battering Ram's X, a City Wall that reaches 3 resources)

@@ -1,4 +1,4 @@
-// What a Resolution records in the Campaign Log's notes section for The Return of the King (docs/brief.md, The Return of the King). Plain data, shared by the effect schema (RecordTokens, EndCampaign),
+// What a Resolution records in the Campaign Log's notes section for The Return of the King (docs/scenarios/the-return-of-the-king.md, The Return of the King). Plain data, shared by the effect schema (RecordTokens, EndCampaign),
 // the Resolution, the log and its save.
 
 /** The counts a Resolution records in the notes section: the resources on The Corsair Fleet and the resource tokens on The Black Gate (location). */

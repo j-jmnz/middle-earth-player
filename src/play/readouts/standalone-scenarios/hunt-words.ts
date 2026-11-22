@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Hunt for the Dreadnaught, The table), rr.damage (data/rules/entries.json); ledger lines 40013:A:1, 40013:A:2, 40013:A:3, 40013:B:2, 40004:B:2, 40005:B:1, 40001:B:2, 40002:B:1. The words of the pieces The Hunt for the Dreadnaught's cards hold on the table (hunt.ts beside it): the
+// Rules: docs/scenarios/standalone-scenarios.md (The Hunt for the Dreadnaught, The table), rr.damage (data/rules/entries.json); ledger lines 40013:A:1, 40013:A:2, 40013:A:3, 40013:B:2, 40004:B:2, 40005:B:1, 40001:B:2, 40002:B:1. The words of the pieces The Hunt for the Dreadnaught's cards hold on the table (hunt.ts beside it): the
 // Dreadnaught's hit points and its damage cap for the round, the progress cap of stages 1B and 2B, and the mode card's Quest Action. Pure.
 
 /** The Dreadnaught's damage against its hit points, the way the dial's note says it. `players` started the scenario: 15 hit points for each. */

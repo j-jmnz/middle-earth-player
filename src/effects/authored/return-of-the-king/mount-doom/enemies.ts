@@ -4,7 +4,7 @@ import type { Effect } from "../../../../catalog/boundary.ts";
 import { EACH_PLAYER, WHEN_CAN_PICK } from "../black-gate/shared.ts";
 import { EACH_PLAYER_TESTS, GOLLUM, GOLLUM_IN_PLAY, IN_STAGING, LAST_FORTITUDE_FAILED, THE_ONE_RING_IS_EXHAUSTED, YOU_FAILED_THIS_ROUND } from "./shared.ts";
 
-// Records for the enemies and treacheries of Mount Doom (146049 to 146057; Surge, Peril and Immune to non-Fellowship are keywords or records of Gollum). Every line is read from the scan ledger (data/printed/the-return-of-the-king.json). See docs/brief.md, The Return of the King, for each reading.
+// Records for the enemies and treacheries of Mount Doom (146049 to 146057; Surge, Peril and Immune to non-Fellowship are keywords or records of Gollum). Every line is read from the scan ledger (data/printed/the-return-of-the-king.json). See docs/scenarios/the-return-of-the-king.md, The Return of the King, for each reading.
 // Rules: mec113.fortitude-tests, mec113.immune-to-player-card-effects, mec113.peril, rr.forced, rr.first-player, rr.the-word-choose, rr.attachment-cards, faq.lasting-effects, faq.peril-attacks, faq.additional-attacks (data/rules/entries.json).
 const DISCARDED_FOR_THE_TEST = { type: "card", control: "any", fortitudeDiscarded: true, who: "firstPlayer" } as const;
 const ATTACHMENTS_ON_HOST = { type: "card", control: "any", attachedTo: "host", nonObjective: true } as const;

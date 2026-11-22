@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Battle of Lake-town), rr.step-3-4, rr.quest-advancement, rr.damage (data/rules/entries.json); ledger lines 50202:B:2, 50203:B:3.
+// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town), rr.step-3-4, rr.quest-advancement, rr.damage (data/rules/entries.json); ledger lines 50202:B:2, 50203:B:3.
 // Stage 2B: when the players quest successfully, any number of the progress tokens that would be placed on the quest card (after the active location took its share) may be discarded instead to remove as much damage from Lake-town. The quest
 // holds the flag `progressHealsLakeTown`, so the progress is not placed (quest/quest.ts, PROGRESS_REPLACED) and the stage's record hears it as `progressReplaced` with the amount, which this verb answers: the first player chooses how many to discard (at most
 // the damage on Lake-town), and the rest goes on the quest card as usual. Stage 3B's reading of the score is the amounts `lakeTownDamage` and `victoryDisplay` (amounts.ts).

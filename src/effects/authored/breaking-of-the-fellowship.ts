@@ -148,7 +148,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 142068 Frodo's Choice. If it is discarded it is revealed instead (stage 3B's discards, RevealIfDiscarded). When revealed its player takes the first player token and
   // can never lose it, and takes the Ring-bearer and what is attached to it and attaches to it: stage 2A removed the Ring-bearer from the game, so those two find none and
-  // the card stays in the staging area, in play (docs/brief.md, Breaking of the Fellowship, stage 2B).
+  // the card stays in the staging area, in play (docs/scenarios/fellowship-of-the-ring.md, Breaking of the Fellowship, stage 2B).
   { id: "142068:constant:1", cardCode: FRODOS_CHOICE, lines: ["142068:A:1"], timing: "constant", instructions: [{ verb: "RevealIfDiscarded" }] },
   {
     id: "142068:whenRevealed:1",

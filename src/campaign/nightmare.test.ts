@@ -17,7 +17,7 @@ import { standaloneBriefing, type StandaloneLoadout } from "./standalone.ts";
 import { buildStart } from "./start.ts";
 import { loadWorld, type World } from "./world.ts";
 
-// Nightmare (docs/brief.md, Nightmare): the setup card's recipe deals the Nightmare deck, and the setup card is placed next to
+// Nightmare (docs/scenarios/nightmare.md, Nightmare): the setup card's recipe deals the Nightmare deck, and the setup card is placed next to
 // the quest deck, side A faceup, in its own in-play zone. Only a scenario on NIGHTMARE_PLAYABLE deals on Nightmare.
 const FRODO = "141001";
 const SAM = "141002";

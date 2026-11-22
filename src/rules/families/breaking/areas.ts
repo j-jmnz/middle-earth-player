@@ -211,7 +211,7 @@ export function withView(state: ScenarioState, seat: number | undefined, act: (v
 // An eliminated seat's stage and the encounter cards at it are discarded (mec109.multiple-staging-areas): the cards in its staging area, its active location, go to the
 // encounter discard pile and its stage card to the set-aside pile, as a defeated stage does. Nothing happens when the seat has neither. When players joined the seat
 // (mec108.joining-another-player) they are still in the game and in that area, so the area passes to the first of them clockwise and nothing is discarded
-// (agent recommendation, docs/brief.md, Escape from Mount Gram).
+// (agent recommendation, docs/scenarios/angmar-awakened.md, Escape from Mount Gram).
 export function discardArea(state: ScenarioState, seat: number): ScenarioState {
   const owner = state.seats[seat];
   if (!state.separate || !owner) return state;

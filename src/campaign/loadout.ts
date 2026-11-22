@@ -24,7 +24,7 @@ const upTo = (last: number): number[] => Array.from({ length: last }, (_, index)
 // the campaign card of The King's Quest, the third part, says "Haldan may be included among a player's heroes" (12170:A:2), so the ban holds in every part but that one.
 const HERO_BANS: Readonly<Record<string, HeroBanEntry>> = {
   "dream-chaser": { ban: { code: "12109", name: "Na'asiyah", rule: "dcce.naasiyah" }, parts: upTo(7) },
-  // "When playing campaign mode, the Amarthiúl hero cannot be used until indicated by a campaign card" (mec108.campaign-mode): The Battle of Carn Dûm's campaign card (10188:A:2) is the one that indicates it. From then he stays usable (agent recommendation, docs/brief.md, Angmar Awakened).
+  // "When playing campaign mode, the Amarthiúl hero cannot be used until indicated by a campaign card" (mec108.campaign-mode): The Battle of Carn Dûm's campaign card (10188:A:2) is the one that indicates it. From then he stays usable (agent recommendation, docs/scenarios/angmar-awakened.md, Angmar Awakened).
   "angmar-awakened": { ban: { code: "10115", name: "Amarthiúl", rule: "mec108.campaign-mode" }, parts: upTo(7) },
   "ered-mithrin": { ban: { code: "19026", name: "Haldan", rule: "emce.haldan" }, parts: [1, 2, 4, 5, 6, 7, 8, 9] },
 };

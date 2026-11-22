@@ -1,4 +1,4 @@
-// Rules: mec112.campaign-mode-aragorn (data/rules/entries.json); the Campaign Log columns of The Two Towers (docs/brief.md, The Two Towers). How the log's own columns
+// Rules: mec112.campaign-mode-aragorn (data/rules/entries.json); the Campaign Log columns of The Two Towers (docs/scenarios/the-two-towers.md, The Two Towers). How the log's own columns
 // read on the log screen: the threat each seat starts with, the choice each seat made in The Passage of the Marshes and the enemies under The Black Gate. Pure, so a test reads it.
 import type { CampaignLog, MarshesChoice } from "./log.ts";
 

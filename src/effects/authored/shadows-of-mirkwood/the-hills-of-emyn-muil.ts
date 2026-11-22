@@ -5,7 +5,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 // Records for The Hills of Emyn Muil (Shadows of Mirkwood part 4, standalone, no campaign card). Every line is read from the scan ledger (data/printed/shadows-of-mirkwood.json). The stage has one quest point and two limits: the first treachery revealed
 // each quest phase gains surge while no location is in the staging area, and the players cannot defeat it until no Emyn Muil location is in play and the victory display holds 20 Victory points. The Emyn Muil locations each bend the round while active
 // (Amon Hen bars events, Amon Lhaw blanks attachments, Rauros Falls forces every character to quest, East Wall of Rohan taxes non-Rohan allies, The Outer Ridge raises the Threat of the staging area) or cost something to reach (Shores of Nen Hithoel, The Highlands, The North Stair).
-// Rules: rr.surge, rr.victory, rr.active-location, rr.travel, rr.blank, rr.cannot, rr.step-6-4-3, rr.then, faq.lasting-effects, sotm.setup-the-hills-of-emyn-muil, sotm.emyn-muil-victory-points (data/rules/entries.json); the readings are in docs/brief.md (The Hills of Emyn Muil).
+// Rules: rr.surge, rr.victory, rr.active-location, rr.travel, rr.blank, rr.cannot, rr.step-6-4-3, rr.then, faq.lasting-effects, sotm.setup-the-hills-of-emyn-muil, sotm.emyn-muil-victory-points (data/rules/entries.json); the readings are in docs/scenarios/shadows-of-mirkwood.md (The Hills of Emyn Muil).
 const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
 const EMYN_MUIL_LOCATION: PickSpec = { type: "location", control: "any", trait: "Emyn Muil" };
 const STAGED_LOCATION: PickSpec = { type: "location", control: "any", stagingOnly: true };

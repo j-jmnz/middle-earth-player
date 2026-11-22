@@ -251,7 +251,7 @@ describe("FlipOver `target: subject` (51001:B:1, reading 7)", () => {
 });
 
 
-describe("the fields the judged rows added (docs/brief.md, The Wizard's Quest, readings 14 to 18)", () => {
+describe("the fields the judged rows added (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, readings 14 to 18)", () => {
   it("ForEachPlayer limit: the instructions run for the first players only (51048:A:1, at most 2 locations)", () => {
     const state = [0, 1].reduce((made, seat) => spawn(made, "frodo", { zone: "heroes", seat }).state, idleScenario(2));
     const raised = (limit: number | undefined) => {

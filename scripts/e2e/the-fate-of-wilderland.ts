@@ -3,7 +3,7 @@
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks the first player to search their deck for a boon or treasure card (the pool holds the boon allies the earlier parts earned): the one answer given is "skip", and the log holds no Turayn or Beldis line, so no removal is asked. The Resolution
 // asks nothing ("The players win the campaign!"). A win destroys Urdug once The Heroes' Defense holds 5 resources for each player, so the decklists engage one enemy at a time, defend with the sturdiest character and attack with the rest (test/scenarios/the-fate-of-wilderland/game.ts:
-// two characters of a seat quest, a choice spares the objective and the threat, the Response of The Heroes' Defense is used) with card play on. The won game is OPEN: no seed of the 100 searched, under this policy and four others, wins (docs/phases/STATUS.md): the real heroes die to the first
+// two characters of a seat quest, a choice spares the objective and the threat, the Response of The Heroes' Defense is used) with card play on. The won game is OPEN: no seed of the 100 searched, under this policy and four others, wins (GitHub issue #188): the real heroes die to the first
 // enemies' attacks or the seats' threat reaches 50 before The Heroes' Defense holds 10 resources.
 import type { CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";

@@ -1,4 +1,4 @@
-// Rules: emce.discover, emce.loot, emce.immune, rr.forced, rr.surge, rr.travel, rr.guarded, rr.quest-advancement, rr.restricted, rr.victory, rr.cannot, rr.engaged, rr.shadow-effects, faq.additional-attacks, faq.next-player (data/rules/entries.json); docs/brief.md (The Ruins of Belegost).
+// Rules: emce.discover, emce.loot, emce.immune, rr.forced, rr.surge, rr.travel, rr.guarded, rr.quest-advancement, rr.restricted, rr.victory, rr.cannot, rr.engaged, rr.shadow-effects, faq.additional-attacks, faq.next-player (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Ruins of Belegost).
 import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, endPhase, exhausted, flag, handCount, quest, resolve, resourcesOn, reveal, stat, stagingThreat, respond, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Ruins of Belegost (standalone-scenarios part 6): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).

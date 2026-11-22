@@ -6,7 +6,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 import { AUTHORED_EFFECTS as INTO_THE_PIT } from "./into-the-pit.ts";
 
 // Records for The Seventh Level (Dwarrowdelf part 2, no campaign card). Every line is read from the scan ledger (data/printed/dwarrowdelf.json). Goblin Spearman prints Goblin Swordsman's two lines (03031 = 03061, Into the Pit's records and
-// The Oath's 41041 shadow) and the quest's 1B When Revealed is Entering the Mines' 03064:B:1. The Nightmare deck's records are in ../nightmare/the-seventh-level.ts. The readings are in docs/brief.md (The Seventh Level).
+// The Oath's 41041 shadow) and the quest's 1B When Revealed is Entering the Mines' 03064:B:1. The Nightmare deck's records are in ../nightmare/the-seventh-level.ts. The readings are in docs/scenarios/dwarrowdelf.md (The Seventh Level).
 // Rules: rr.reveal, rr.staging, rr.damage, rr.ranged, rr.first-player, rr.attachment-cards, rr.explored, rr.running-out-of-cards, dwd.last-player, dwd.book-of-mazarbul, dwd.revealing-enemies, faq.additional-attacks (data/rules/entries.json).
 const BOOK = "03024";
 const BOOK_ATTACHED_HERO: PickSpec = { type: "hero", control: "you", state: "ready" };

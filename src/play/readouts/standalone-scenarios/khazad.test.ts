@@ -1,4 +1,4 @@
-// Rules: rr.damage, rr.guarded, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 51301:B:1, 51307:B:2, 51307:B:3, 51340:A:1, 51351:A:1 (docs/brief.md, Escape from Khazad-dûm, The table; docs/design-system-table.md, Top bar).
+// Rules: rr.damage, rr.guarded, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 51301:B:1, 51307:B:2, 51307:B:3, 51340:A:1, 51351:A:1 (docs/scenarios/standalone-scenarios.md, Escape from Khazad-dûm, The table; docs/design-system-table.md, Top bar).
 // The top-bar dials of Escape from Khazad-dûm (the damage on the stage 3B against the 10 that lose the game, Durin's Bane set aside) and the held pills of Nameless Thing's guarded card and Goblin Dungeon's ally.
 import { describe, expect, it } from "vitest";
 

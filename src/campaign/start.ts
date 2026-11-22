@@ -127,7 +127,7 @@ export function buildStart(start: StartInput): StartScenario {
   const dealtDecks = dealtPiles(input.scenario, input.difficulty);
   const removedCaves = standalone ? [] : (input.removedFromCaves ?? []);
   const piles = removedCaves.length > 0 && dealtDecks.cavesDeck ? { ...dealtDecks, cavesDeck: withoutCards(dealtDecks.cavesDeck, removedCaves) } : dealtDecks;
-  // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/brief.md, Nightmare).
+  // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/scenarios/nightmare.md, Nightmare).
   // Its quest cards (a stage after the last printed one) follow the printed stages in the quest deck.
   // A Nightmare quest card that takes the place of a stage the setup card removes (Goblin Ambush for Goblin Patrol, 901001:B:3) stands at that stage's place in the order the stages advance in, not after the last one.
   if (input.difficulty === "Nightmare") {

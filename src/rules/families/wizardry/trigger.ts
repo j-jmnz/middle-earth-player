@@ -30,7 +30,7 @@ export function activeHasWizardry(state: ScenarioState, seat: number, ctx: Reduc
 }
 
 // "As if he is the only player in the game" (143047:A:2): each "each player" is the acting player alone, a number of players is 1, and "characters in play" are the acting player's (read as the card says it,
-// docs/brief.md, The Two Towers). A ForEachPlayer runs its instructions once, for the actor; `eachSeat` becomes the actor. The verbs a Wizardry line uses are listed; the test in index.test.ts reads every
+// docs/scenarios/the-two-towers.md, The Two Towers). A ForEachPlayer runs its instructions once, for the actor; `eachSeat` becomes the actor. The verbs a Wizardry line uses are listed; the test in index.test.ts reads every
 // Wizardry record through asOnlyPlayer and fails on a number of players or an `eachSeat` it left, so a new line that needs another verb is found there.
 function playersAmount(amount: Amount): Amount {
   if (typeof amount === "number" || amount.players !== true) return amount;

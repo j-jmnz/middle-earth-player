@@ -15,7 +15,7 @@ import { EACH_PLAYER } from "./pelennor/shared.ts";
 
 // Records for The Tower of Cirith Ungol (the-return-of-the-king part 4, campaign card 146069, whose Setup, Forced and Resolution records are in the-return-of-the-king.ts): Last of the Company, the locations, Shagrat and the Orcs of Mordor, the treacheries and The Two Watchers' two sides;
 // the quest stages are in return-of-the-king/cirith-ungol/stages.ts. The cards the quest card's piles place or set aside (Shagrat, Topmost Chamber, The Two Watchers, Last of the Company) are dealt by the data; no record places them. Every line is read from the scan ledger
-// (data/printed/the-return-of-the-king.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. See docs/brief.md, The Return of the King, for each reading.
+// (data/printed/the-return-of-the-king.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. See docs/scenarios/the-return-of-the-king.md, The Return of the King, for each reading.
 // Rules: mec113.setup-the-tower-of-cirith-ungol, mec113.setting-up-the-game, mec113.the-one-ring, mec113.saga-staging-rules, mec113.immune-to-player-card-effects, mec113.peril, mec113.archery, mec113.fellowship-sphere-heroes, rr.guarded, rr.objective-cards, rr.effects, rr.then, rr.lasting-effects,
 // rr.travel, rr.active-location, rr.staging, rr.engaged, rr.damage, rr.attachment-cards, faq.lasting-effects, faq.additional-attacks, faq.triggering-forced-effects, faq.last-encounter-card, faq.progress-without-advancing (data/rules/entries.json).
 const RING_READY: Cond = { kind: "exhausted", code: ONE_RING, is: false };

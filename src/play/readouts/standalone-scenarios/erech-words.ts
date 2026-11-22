@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Stone of Erech), rr.forced (data/rules/entries.json); ledger lines 50301:A:1, 50303:B:2, 50304:A:1, 50304:A:4, 50308:A:1, 50308:A:2, 50309:A:1, 50309:A:2, 50310:A:1. The words of the pieces The Stone of Erech's cards hold on the table
+// Rules: docs/scenarios/standalone-scenarios.md (The Stone of Erech), rr.forced (data/rules/entries.json); ledger lines 50301:A:1, 50303:B:2, 50304:A:1, 50304:A:4, 50308:A:1, 50308:A:2, 50309:A:1, 50309:A:2, 50310:A:1. The words of the pieces The Stone of Erech's cards hold on the table
 // (erech.ts beside it): the progress on the Night objective in play against the 4 that brings the next Night in, and who controls Derufin. Pure.
 
 /** The Night objective's progress, the way the dial's note says it (Eventide and Dusk: `next` is the Night that comes in at the limit). */

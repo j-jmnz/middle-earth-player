@@ -3,7 +3,7 @@ import type { Amount, Condition, Effect, Instruction, PickSpec, SimpleInstructio
 type AmountOfCity = Exclude<Amount, number>;
 
 // Records for Attack on Dol Guldur (standalone-scenarios cycle part 9, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints
-// word for word needs no record here. Played in the Standard Game Mode only (docs/brief.md, Attack on Dol Guldur, reading 1): "each stage", "each team" and "at this stage" read as the one table. The mode card 50931 is the scenario's
+// word for word needs no record here. Played in the Standard Game Mode only (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 1): "each stage", "each team" and "at this stage" read as the one table. The mode card 50931 is the scenario's
 // `modeCard`: its front Setup runs with the quest card's, then it is flipped and its back works all game. City strength is the resource tokens on Dol Guldur (reading 3); the Siege values of the enemies destroyed and the locations
 // explored are added to a round tally as they happen (reading 4) and Dol Guldur's Forced effect takes the tally off at the end of the round. At the end of the round at stage 3 the stage's Forced effect (`early`) resolves first, then Dol Guldur's,
 // then the mode card's win check and last its random stage (reading 5).

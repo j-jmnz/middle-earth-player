@@ -31,7 +31,7 @@ export const pickSchema = z.strictObject({
   // The cards "at this stage" (Breaking of the Fellowship, mec109.multiple-staging-areas): once stages are separate the chooser's own staging area, the enemies
   // engaged with the chooser and the characters the chooser controls; with one staging area every card in play of the type. Read by src/rules/interpret/pick.ts.
   atStage: z.literal(true).optional(),
-  // The cards "at another stage" than the chooser's (The Siege of Annúminas' stage 3B, 50805:B:2; docs/brief.md, The Siege of Annúminas, reading 9): a game with one stage, as the Standard Game Mode is, has no card at another stage, so the filter matches nothing. Read by src/rules/interpret/pick.ts.
+  // The cards "at another stage" than the chooser's (The Siege of Annúminas' stage 3B, 50805:B:2; docs/scenarios/standalone-scenarios.md, The Siege of Annúminas, reading 9): a game with one stage, as the Standard Game Mode is, has no card at another stage, so the filter matches nothing. Read by src/rules/interpret/pick.ts.
   atOtherStage: z.literal(true).optional(),
   // With `type: player`: only a player who controls heroes holding this many resources in all, so that he can pay them ("Any player may spend 1 resource to take control of Dúnedain of Annúminas", 50818:A:2). Read by src/rules/families/wilderland/seat-pick.ts.
   canSpendResources: z.number().int().positive().optional(),
@@ -57,7 +57,7 @@ export const pickSchema = z.strictObject({
   // A hero with this printed resource icon ("each hero you control with a printed Spirit resource icon").
   printedIcon: sphereSchema.optional(),
   // `loot`: the loot cards of the chooser's that guard a location, under it (The Burglar's Turn, 22024).
-  // `encounterDiscard`: the encounter discard pile, the card discarded last first ("the opposing team chooses a card in the encounter discard pile", 51116:A:1, docs/brief.md, The Woodland Realm, reading 3).
+  // `encounterDiscard`: the encounter discard pile, the card discarded last first ("the opposing team chooses a card in the encounter discard pile", 51116:A:1, docs/scenarios/standalone-scenarios.md, The Woodland Realm, reading 3).
   // `encounterDeck`: with `looked`, the cards of the encounter deck the running effect looked at ("Look at the top 10 cards of the encounter deck, discard any number of them", 11202:A:5).
   from: z.enum(["play", "hand", "discard", "deck", "victory", "loot", "encounterDeck", "encounterDiscard"]).optional(),
   // From the deck: only its top cards are looked at. The cards still in the deck are the ones ArrangeTop puts back in order.
@@ -347,9 +347,9 @@ export const pickSchema = z.strictObject({
   highestEngagementCost: z.literal(true).optional(),
   // Of the cards that match, only those with the lowest current engagement cost ("the lowest engagement cost enemy in the staging area", 51151:A:2); every one of them when tied, and then the chooser decides.
   lowestEngagementCost: z.literal(true).optional(),
-  // With `type: card`: only an enemy or a location, among the encounter cards in play ("a non-unique enemy or location in play", 51033:A:1, docs/brief.md, The Wizard's Quest, reading 3). Read by src/rules/interpret/pick.ts.
+  // With `type: card`: only an enemy or a location, among the encounter cards in play ("a non-unique enemy or location in play", 51033:A:1, docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 3). Read by src/rules/interpret/pick.ts.
   enemyOrLocation: z.literal(true).optional(),
-  // "The opposing team chooses" (51004:B:1, 51013:A:1, 51017:A:1, 51030:A:1, 51033:A:1): the choice is the engine's, in the manner that gives the players the greatest challenge (docs/brief.md, The Wizard's Quest, reading 3). Of the cards that match (the fields above rank them) only the first stays, the order of seats and then of play breaking a tie, so nobody is asked. With `highestAttack` on enemies, the one with the highest Threat among those level on Attack stays (docs/brief.md, The Mines of Moria, reading 3: Denizen of the Deep).
+  // "The opposing team chooses" (51004:B:1, 51013:A:1, 51017:A:1, 51030:A:1, 51033:A:1): the choice is the engine's, in the manner that gives the players the greatest challenge (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 3). Of the cards that match (the fields above rank them) only the first stays, the order of seats and then of play breaking a tie, so nobody is asked. With `highestAttack` on enemies, the one with the highest Threat among those level on Attack stays (docs/scenarios/standalone-scenarios.md, The Mines of Moria, reading 3: Denizen of the Deep).
   challenge: z.literal(true).optional(),
   // Of the cards that match, only those with the lowest Attack or the lowest Threat, as the table shows it ("the lowest Attack Harad enemy engaged with you", 144036:A:2; "the lowest Threat Harad enemy in the staging area", 144038:A:2); every one of them
   // when tied, and then the chooser (the player who reveals) decides. Read by the harad family (src/rules/families/harad/pick.ts).

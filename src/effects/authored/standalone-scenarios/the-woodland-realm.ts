@@ -2,7 +2,7 @@ import type { Amount, Condition, Effect, Instruction, PickSpec } from "../../../
 
 // Records for The Woodland Realm (standalone-scenarios cycle part 11, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints word for word needs no record here.
 // The scenario is a kit like The Wizard's Quest (the Quick-build, the top-5 searches and the opposing team's policy of src/effects/authored/standalone-scenarios/the-wizards-quest.ts): the quest card 51101's Setup builds the game, Spider Den lies in the staging area from the deal
-// and, explored, flips into Mendor under the first player's control. "The opposing team" chooses and searches in the manner that gives the players the greatest challenge: the engine's fixed policy, never a prompt (docs/brief.md, The Woodland Realm, readings 1 and 3).
+// and, explored, flips into Mendor under the first player's control. "The opposing team" chooses and searches in the manner that gives the players the greatest challenge: the engine's fixed policy, never a prompt (docs/scenarios/standalone-scenarios.md, The Woodland Realm, readings 1 and 3).
 // Rules: rr.search, rr.reveal, rr.cancel, rr.explored, rr.forced, rr.travel, rr.engaged, rr.staging, rr.first-player, rr.ownership-and-control, rr.victory, rr.quest-advancement, rr.attachment-cards, rr.doomed-x, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json).
 const STAGE_1 = "51101";
 const STAGES_2 = ["51103", "51104", "51105"] as const;

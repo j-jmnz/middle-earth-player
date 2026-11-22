@@ -1,5 +1,5 @@
 // Rules: ltp.campaign-log, rr.campaign-log, ltp.fellowship-of-heroes, mec112.campaign-mode, mec113.campaign-mode (data/rules/entries.json). The saga is one campaign across its boxes
-// (docs/brief.md, The Two Towers; The Return of the King): each box is its own campaign and save, and a new save of the next box may take in a finished save of the box before it, copying the
+// (docs/scenarios/the-two-towers.md, The Two Towers; The Return of the King): each box is its own campaign and save, and a new save of the next box may take in a finished save of the box before it, copying the
 // Campaign Log columns the later scenarios read. The finished save is never edited. Pure.
 import { andList } from "./carry-words.ts";
 import { emptyLog, type CampaignLog } from "./log.ts";

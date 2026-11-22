@@ -1,4 +1,4 @@
-// Rules: rr.damage, rr.guarded, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 51301:B:1, 51307:B:2, 51307:B:3, 51351:A:1 (docs/brief.md, Escape from Khazad-dûm, The table). The words of the pieces Escape from Khazad-dûm's cards hold on the table (khazad.ts beside it):
+// Rules: rr.damage, rr.guarded, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 51301:B:1, 51307:B:2, 51307:B:3, 51351:A:1 (docs/scenarios/standalone-scenarios.md, Escape from Khazad-dûm, The table). The words of the pieces Escape from Khazad-dûm's cards hold on the table (khazad.ts beside it):
 // the damage on The Bridge of Khazad-dûm against the number that loses the game, and Durin's Bane while Dark Pit's flip holds it out of play. Each sentence stays at about 25 words. Pure.
 
 /** The damage on the stage 3B that loses the game, the way the dial's note says it. */

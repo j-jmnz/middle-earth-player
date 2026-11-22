@@ -16,7 +16,7 @@ import { seatWord } from "../data/seats";
 /** One offer as the setup screen draws it: the finished campaign, what tells it apart, and its cards in words. */
 export type CarryChoice = { saveId: string; label: string; source: string; words: string; cards: readonly PoolCard[] };
 
-/** One finished save of the box before this one that a new save may continue (docs/brief.md, The Two Towers): the whole log is copied, so the choice carries the save's log and seat count. */
+/** One finished save of the box before this one that a new save may continue (docs/scenarios/the-two-towers.md, The Two Towers): the whole log is copied, so the choice carries the save's log and seat count. */
 export type ContinueChoice = { saveId: string; label: string; source: string; words: string; seatCount: 1 | 2; from: Pick<Save, "id" | "campaignId" | "seatCount" | "log"> };
 
 type Stores = { saves: ListedSave[]; archived: ListedSave[]; saved: ReadonlyMap<string, number> };

@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Battle of Lake-town: Burn X, from the Quest Companion), rr.damage; ledger lines 50205:A:2, 50215:A:1.
+// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town: Burn X, from the Quest Companion), rr.damage; ledger lines 50205:A:2, 50215:A:1.
 // "Resolve all burn damage": the Burn of the locations in play (West Pier's Burn 1 for each included) is a pool the players may assign to characters they exhaust, in turn from the first player; the rest goes on Lake-town.
 import { describe, expect, it } from "vitest";
 

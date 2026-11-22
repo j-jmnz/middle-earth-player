@@ -22,7 +22,7 @@ export const DECKS = {
   evilCreatures: { deck: "evilCreaturesDeck", discard: "evilCreaturesDiscard" },
   // The Balrog deck of Shadow and Flame's Nightmare deck (901801:A:2 to A:4): the shadow cards of Durin's Bane come from it and go to its discard pile.
   balrog: { deck: "balrogDeck", discard: "balrogDiscard" },
-  // The Battle of Lake-town's Smaug deck: nine cards shuffled apart from the encounter deck, with a discard pile of its own (docs/brief.md, The Battle of Lake-town).
+  // The Battle of Lake-town's Smaug deck: nine cards shuffled apart from the encounter deck, with a discard pile of its own (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town).
   smaug: { deck: "smaugDeck", discard: "smaugDiscard" },
 } as const satisfies Record<string, DeckZones>;
 
@@ -39,7 +39,7 @@ const PLAIN_PILES = {
   greatSpider: { deck: "greatSpiderDeck", discard: null },
   // The Weather Hills' Orc deck (mec108.orc-deck): the Angmar Orcs enemies and Concealed Orc-camps, shuffled beside the quest deck; its cards go to the encounter discard pile, an empty deck is ignored.
   angmarOrcs: { deck: "angmarOrcDeck", discard: null },
-  // Murder at the Prancing Pony's Investigation deck (50701:A:1; docs/brief.md, Murder at the Prancing Pony): eight Suspects and Hideouts and Taken by Surprise, facedown beside the quest deck, looked at and never drawn; a card of it that leaves goes to the encounter discard pile or into play.
+  // Murder at the Prancing Pony's Investigation deck (50701:A:1; docs/scenarios/standalone-scenarios.md, Murder at the Prancing Pony): eight Suspects and Hideouts and Taken by Surprise, facedown beside the quest deck, looked at and never drawn; a card of it that leaves goes to the encounter discard pile or into play.
   investigation: { deck: "investigationDeck", discard: null },
 } as const satisfies Record<string, DeckZones>;
 

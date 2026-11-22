@@ -1,4 +1,4 @@
-// Rules: rr.search, rr.then, rr.reveal, rr.cancel, rr.forced, rr.travel, rr.explored, rr.victory, rr.quest-advancement, rr.shadow-effects, faq.additional-attacks (data/rules/entries.json); docs/brief.md (The Woodland Realm).
+// Rules: rr.search, rr.then, rr.reveal, rr.cancel, rr.forced, rr.travel, rr.explored, rr.victory, rr.quest-advancement, rr.shadow-effects, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Woodland Realm).
 import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, exhausted, flag, handCount, lost, progressOn, quest, resolve, respond, resourcesOn, reveal, stat, threat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Woodland Realm (standalone-scenarios part 11): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).

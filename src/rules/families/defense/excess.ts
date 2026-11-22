@@ -130,7 +130,7 @@ export function combatDamage(
 
 // Cave-troll (03020:A:1, flag `excessToDamage`): "For each excess point of combat damage dealt by Cave-troll you must damage another character you control." Once the attack ends, each
 // point is its own choice of the defending player: 1 damage on a character he controls other than the one the attack damaged, and a point that kills a character does not stop the next
-// (FFG's answer, docs/brief.md, The Seventh Level). With no other character the point is lost. The instructions run in the frame the attack's `after` effects use.
+// (FFG's answer, docs/scenarios/dwarrowdelf.md, The Seventh Level). With no other character the point is lost. The instructions run in the frame the attack's `after` effects use.
 export function excessDamageAfter(state: ScenarioState, attack: NonNullable<ScenarioState["pendingAttack"]>, ctx: ReduceContext): { instructions: readonly Instruction[]; cause: Cause | undefined } | null {
   const excess = attack.defense?.excess ?? 0;
   const enemy = state.cards[attack.enemyId];

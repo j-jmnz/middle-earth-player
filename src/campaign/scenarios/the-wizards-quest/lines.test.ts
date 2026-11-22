@@ -1,4 +1,4 @@
-// Rules: rr.guarded, rr.in-play-and-out-of-play, rr.explored, rr.cannot, rr.restricted (data/rules/entries.json); docs/brief.md (The Wizard's Quest, readings 9, 10 and 17).
+// Rules: rr.guarded, rr.in-play-and-out-of-play, rr.explored, rr.cannot, rr.restricted (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Wizard's Quest, readings 9, 10 and 17).
 // The lines a card-spec row cannot express (spec.test.ts holds the rest): what a played card is offered after a held card lies under its holder, a held card that comes back when its holder leaves play, a hero released when its guard leaves play.
 import { describe, expect, it } from "vitest";
 
@@ -74,7 +74,7 @@ describe("effects of the encounter cards that a card-spec row cannot show", () =
     expect(revealed.cards[hero]?.damage).toBe(1);
     expect(healDamage(revealed, hero, 1, made.ctx).healed).toBe(0);
     const other = idOf(revealed, "dh2");
-    // Every damaged character holds the lasting effect, one damaged later too (docs/brief.md, The Wizard's Quest, reading 15).
+    // Every damaged character holds the lasting effect, one damaged later too (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 15).
     expect(healDamage(updateCard(revealed, other, { damage: 1 }), other, 1, made.ctx).healed).toBe(0);
   });
 

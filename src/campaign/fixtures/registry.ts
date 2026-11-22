@@ -3,7 +3,7 @@
 // FixtureName, FIXTURE_NAMES and STORED in ../fixtures.ts, the e2e fixtures script and the per-scenario checks
 // in ../fixtures.test.ts all read it. `file` is the JSON file's name when it is not the scenario id.
 //
-// A name that is not committed is open (docs/phases/STATUS.md): `hasFixture` says so, and the e2e route offers only the
+// A name that is not committed is open (GitHub issue #188): `hasFixture` says so, and the e2e route offers only the
 // committed ones. The scenario's JSON holds the saves; each is a real loadout, a seed and the intents that reach the moment
 // (`won`, `lost` and `duo` are scenario 1 from an empty log; `knife-lost` starts from the log `won` writes; the rest are
 // two-handed games of one scenario, parked on its win or loss, and a part after the first starts from the log the earlier

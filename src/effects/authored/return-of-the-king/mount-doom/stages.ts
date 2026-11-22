@@ -5,7 +5,7 @@ import { EACH_PLAYER, QUEST_PHASE, type Cond } from "../black-gate/shared.ts";
 import { EACH_PLAYER_TESTS, LAST_FORTITUDE_FAILED, LAST_FORTITUDE_PASSED, MORDOR_ROAD, STAGE_1, STAGE_2, STAGE_3, STAGE_4 } from "./shared.ts";
 
 // Records for the quest stages of Mount Doom (146075 to 146078). The cards the quest card's piles place (Mount Doom and The Tower of Barad-dûr in the staging area, Brake of Thorns the active location, the four locations the players search for) are dealt by the data; no record places them.
-// Dire is a keyword the data reads from each stage. Every line is read from the scan ledger (data/printed/the-return-of-the-king.json). See docs/brief.md, The Return of the King, for each reading.
+// Dire is a keyword the data reads from each stage. Every line is read from the scan ledger (data/printed/the-return-of-the-king.json). See docs/scenarios/the-return-of-the-king.md, The Return of the King, for each reading.
 // Rules: mec113.dire, mec113.fortitude-tests, mec113.saga-staging-rules, rr.in-player-order, rr.first-player, rr.search, rr.active-location, rr.travel, rr.quest-advancement, rr.cancel, faq.progress-without-advancing (data/rules/entries.json).
 const MOUNT_DOOM_ACTIVE = { kind: "matches", card: "activeLocation", pick: { type: "location", control: "any", names: ["Mount Doom"] } } satisfies Cond;
 

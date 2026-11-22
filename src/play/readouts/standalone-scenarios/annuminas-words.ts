@@ -1,4 +1,4 @@
-// Rules: docs/brief.md (The Siege of Annúminas, The table), rr.forced (data/rules/entries.json); ledger lines 50801:B:2, 50812:A:1, 50812:A:2, 50814:A:2, 50820:A:2. The words of the city strength dial (annuminas.ts beside it). Pure.
+// Rules: docs/scenarios/standalone-scenarios.md (The Siege of Annúminas, The table), rr.forced (data/rules/entries.json); ledger lines 50801:B:2, 50812:A:1, 50812:A:2, 50814:A:2, 50820:A:2. The words of the city strength dial (annuminas.ts beside it). Pure.
 
 /** What the end of the round deals to Annúminas, the way the dial's note says it: 1 damage for each enemy in play, Battering Ram's X and City Wall's 4 when it is discarded. */
 export const incomingWords = (enemies: number, ram: number, wall: number): string => {

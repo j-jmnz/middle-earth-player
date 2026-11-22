@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.ownership-and-control, rr.first-player, rr.quest-advancement, rr.refresh-phase, rr.step-7-3, rr.attachment-cards, rr.then, rr.lasting-effects (data/rules/entries.json); docs/brief.md (The Woodland Realm, readings 7, 9, 13, 14, 17, 21).
+// Rules: rr.forced, rr.ownership-and-control, rr.first-player, rr.quest-advancement, rr.refresh-phase, rr.step-7-3, rr.attachment-cards, rr.then, rr.lasting-effects (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Woodland Realm, readings 7, 9, 13, 14, 17, 21).
 // The lines a card-spec row cannot express (spec.test.ts holds the rest): the progress caps of stage 2 with and without Mendor, the progress noted on stage 3B, who controls Mendor, the Spider Den flip, Forest of Great Fear
 // when no enemy is found, a bar to readying that player cards face, the 2 resources that lift Caught in a Web, the attachments an enemy bars, an enemy engaged this round and an exhausted character a Forced effect discards.
 import { describe, expect, it } from "vitest";

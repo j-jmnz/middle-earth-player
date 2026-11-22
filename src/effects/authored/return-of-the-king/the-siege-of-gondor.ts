@@ -8,7 +8,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for The Siege of Gondor (the-return-of-the-king part 2, campaign card 145070, whose records are in the-return-of-the-king.ts): the Ship locations, the Corsair enemies, the treacheries, Army of the Dead (the objective
 // ally) and the quest card. The Corsair Fleet and Great Corsair Ship are placed by the scenario's staging pile, so no record places them. Every line is read from the scan ledger (data/printed/the-return-of-the-king.json); a line a
-// template already writes (pnpm data build) or another card prints word for word needs no record here. See docs/brief.md, The Return of the King, for each reading.
+// template already writes (pnpm data build) or another card prints word for word needs no record here. See docs/scenarios/the-return-of-the-king.md, The Return of the King, for each reading.
 // Rules: mec113.saga-staging-rules, mec113.peril, mec113.archery, mec113.army-of-the-dead, mec113.immune-to-player-card-effects, mec113.multiplayer-aragorn, rr.search, rr.then, rr.effects, rr.first-player, rr.cannot,
 // rr.lasting-effects, rr.running-out-of-cards, rr.quest-advancement, rr.winning-the-game, rr.travel, rr.active-location, rr.forced, rr.victory, faq.progress-without-advancing, faq.peril-attacks (data/rules/entries.json).
 const GREAT_SHIP = "145030";

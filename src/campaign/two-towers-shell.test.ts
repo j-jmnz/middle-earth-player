@@ -323,7 +323,7 @@ const finished = (id: string, extra: Partial<CampaignLog> = {}, campaignId = "fe
 });
 const scenariosOf = (id: string) => (id === "fellowship-of-the-ring" ? loadCampaign().scenarios : id === "the-two-towers" ? campaign.scenarios : null);
 
-describe("continuing the saga (docs/brief.md, The Two Towers)", () => {
+describe("continuing the saga (docs/scenarios/the-two-towers.md, The Two Towers)", () => {
   it("offers each finished Fellowship save once, and no other campaign's save or an unfinished one", () => {
     const done = finished("a");
     const unfinished = finished("b", { completed: ["a-shadow-of-the-past"] });

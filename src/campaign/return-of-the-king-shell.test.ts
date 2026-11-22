@@ -152,7 +152,7 @@ const finished = (id: string, extra: Partial<CampaignLog> = {}, campaignId = "th
 });
 const scenariosOf = (id: string) => (id === "the-two-towers" ? twoTowers.scenarios : id === "fellowship-of-the-ring" ? loadCampaign().scenarios : id === "the-return-of-the-king" ? campaign.scenarios : null);
 
-describe("continuing the saga from The Two Towers (docs/brief.md, The Return of the King)", () => {
+describe("continuing the saga from The Two Towers (docs/scenarios/the-return-of-the-king.md, The Return of the King)", () => {
   it("offers each finished Two Towers save once, and no Fellowship save, unfinished save or another campaign's", () => {
     const done = finished("a");
     const unfinished = finished("b", { completed: twoTowers.scenarios.slice(0, 5) });

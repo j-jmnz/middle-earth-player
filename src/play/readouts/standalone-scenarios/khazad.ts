@@ -1,4 +1,4 @@
-// Rules: rr.damage, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 51301:B:1, 51307:B:2, 51307:B:3 (docs/brief.md, Escape from Khazad-dûm, The table; docs/design-system-table.md, Top bar).
+// Rules: rr.damage, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 51301:B:1, 51307:B:2, 51307:B:3 (docs/scenarios/standalone-scenarios.md, Escape from Khazad-dûm, The table; docs/design-system-table.md, Top bar).
 //
 // The pieces Escape from Khazad-dûm's cards hold on the table: the damage on the stage 3B against the number that loses the game (a warming dial), Durin's Bane while it lies set aside (a word dial; a tap shows its card). The engine decided every number; nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
 import type { ScenarioState } from "../../../rules/core/state.ts";
