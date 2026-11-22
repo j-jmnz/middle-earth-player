@@ -206,7 +206,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
               // Only a dial that opens a reading drops its word: a bare number with no press has nothing else to name it.
               return <ThreatRing key={dial.id} {...dialProps(dial)} wordless={wordless && press != null} onPress={press} compact />;
             })}
-            {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} onPress={onDial ? () => onDial(tokens.cardId) : undefined} compact /> : null}
+            {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} hint="Shows the card the tokens are on" onPress={onDial ? () => onDial(tokens.cardId) : undefined} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
             {onNightmare ? (
               // Laid out as Life, Tokens and Burden are (the mark, then its word), with the dials' pressed fill. The word stays at every
