@@ -17,7 +17,7 @@ export function activePickWords(pick: Instruction, next: Instruction | undefined
   // Crazed Captive's shadow (900303:A:3): the attacking enemy, and the threat the defending player raises at the end of the phase if it is not defeated.
   const [raise] = next?.verb === "Delay" && next.subject === "picked" ? next.instructions : [];
   if (pick.pick.attackingEnemy === true && raise?.verb === "RaiseThreat" && typeof raise.amount === "number") {
-    return { verb: "Mark", prompt: `Choose the attacking enemy. If it is not defeated this phase, raise your threat by ${raise.amount} at the end of the phase.` };
+    return { verb: "Choose", prompt: `Choose the attacking enemy. If it is not defeated this phase, raise your threat by ${raise.amount} at the end of the phase.` };
   }
   return null;
 }
