@@ -8,8 +8,10 @@ import { buildGraph, citationsIn, findHeadings, headingsOf, INDEX_PATH, renderIn
 describe("docs index", () => {
   const graph = buildGraph();
 
-  it("is current (pnpm doc index rewrites docs/INDEX.md)", () => {
-    expect(readFileSync(path.join(ROOT, INDEX_PATH), "utf8")).toBe(renderIndex(graph));
+  it("renders the same index from the same docs, and is not committed (a committed index conflicts on every pair of doc changes)", () => {
+    expect(renderIndex(buildGraph())).toBe(renderIndex(graph));
+    for (const indexed of graph.indexed) expect(renderIndex(graph), indexed.file).toContain(indexed.file);
+    expect(readFileSync(path.join(ROOT, ".gitignore"), "utf8").split("\n")).toContain(INDEX_PATH);
   });
 
   it("resolves every doc section a code comment or a live doc cites", () => {

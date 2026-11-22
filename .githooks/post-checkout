@@ -1,0 +1,4 @@
+#!/bin/sh
+# Rewrites docs/INDEX.md, which is not committed, so it matches the docs just checked out (scripts/docs/index.ts).
+# It never stops git: a failure here leaves the old index, and `pnpm doc index` writes it again.
+node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/docs/index.ts --refresh --quiet >/dev/null 2>&1 || true
