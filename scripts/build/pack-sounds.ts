@@ -71,6 +71,45 @@ export function soundStart(samples: Int16Array, rate: number): number {
   return Math.max(0, first) * (window / rate);
 }
 
+/**
+ * When a sound is heard after its file starts to play, in seconds: `silence` to the first 10 ms window over 1% of its peak, `attack`
+ * to the first over half of it. A file cut by cutSounds has no silence; a long attack is the pick's own slow rise.
+ */
+export function soundOnset(samples: Int16Array, rate: number): { silence: number; attack: number } {
+  const window = Math.round(rate / 100);
+  const levels = windowLevels(samples, window);
+  const peak = Math.max(1, ...levels);
+  return { silence: soundStart(samples, rate), attack: Math.max(0, levels.findIndex((level) => level > peak * 0.5)) * (window / rate) };
+}
+
+// The most silence a packed file may start with (two windows: the cut is made on a 10 ms window, and the encoder smears its edge),
+// and the attack past which the check names the pick as slow to rise.
+export const SILENCE_MAX_SECONDS = 0.02;
+const SLOW_ATTACK_SECONDS = 0.08;
+
+/**
+ * Reads every packed sound in `dir` and lists when each is heard (soundOnset), the latest first. Returns the slots that start with more
+ * than SILENCE_MAX_SECONDS of silence: the ones heard after the moment they are played, which a new cut (`--from`) fixes.
+ */
+export function checkSounds(dir: string, log: Log): string[] {
+  const names = existsSync(dir) ? readdirSync(dir).filter((file) => file.endsWith(".m4a")).sort() : [];
+  const rows = names.map((file) => {
+    const pcm = ffmpeg(["-i", path.join(dir, file), "-ac", "1", "-ar", "8000", "-f", "s16le", "-"]);
+    return { slot: file.replace(/\.m4a$/, ""), ...soundOnset(new Int16Array(pcm.buffer, pcm.byteOffset, Math.floor(pcm.length / 2)), 8000) };
+  });
+  rows.sort((a, b) => b.silence - a.silence || b.attack - a.attack);
+  const ms = (seconds: number) => `${Math.round(seconds * 1000)} ms`;
+  for (const { slot, silence, attack } of rows) {
+    const line = `${slot}: silence ${ms(silence)}, half its peak at ${ms(attack)}`;
+    if (silence > SILENCE_MAX_SECONDS) log.warn(`${line}: starts late, cut it again`);
+    else if (attack - silence > SLOW_ATTACK_SECONDS) log.notice(`${line}: rises slowly, which is the pick's own sound`);
+    else log.info(line);
+  }
+  const late = rows.filter((row) => row.silence > SILENCE_MAX_SECONDS).map((row) => row.slot);
+  log.notice(`${rows.length} sounds read, ${late.length} start with more than ${ms(SILENCE_MAX_SECONDS)} of silence`);
+  return late;
+}
+
 /** The filter that cuts a source to `start`..`end` (seconds), fades its tail out and levels it to `lufs`. */
 export function cutFilter(start: number, end: number, lufs: number): string {
   const length = end - start;
@@ -111,10 +150,21 @@ export function packSounds(options: PackPinnedOptions, log: Log): Promise<SoundS
 if (isDirectRun(import.meta.url)) {
   runPack("pack-sounds", "sounds not packed, so this bundle carries none", async (log) => {
     const sourcesPath = path.join(DATA_DIR, "sources.json");
+    // --check reads the packed files and fails on one that starts with silence; it packs nothing.
+    if (process.argv.includes("--check")) {
+      if (!existsSync(SOUND_PACK_DIR) || !readdirSync(SOUND_PACK_DIR).some((file) => file.endsWith(".m4a"))) throw new Error(`no sound is packed in ${SOUND_PACK_DIR}: run pnpm assets sounds first`);
+      const late = checkSounds(SOUND_PACK_DIR, log);
+      if (late.length > 0) throw new Error(`${late.length} sounds start late: ${late.join(", ")}`);
+      return;
+    }
     const from = argument("--from");
     const hearthstone = argument("--hearthstone");
     if (from) {
-      writeSource(sourcesPath, cutSounds({ dd2: path.resolve(from), hearthstone: hearthstone ? path.resolve(hearthstone) : undefined }, SOUND_CACHE_DIR, log));
+      const cut = cutSounds({ dd2: path.resolve(from), hearthstone: hearthstone ? path.resolve(hearthstone) : undefined }, SOUND_CACHE_DIR, log);
+      // The cut is read back before it is pinned: every file must start at its sound.
+      const late = checkSounds(SOUND_CACHE_DIR, log);
+      if (late.length > 0) throw new Error(`${late.length} cut sounds still start late: ${late.join(", ")}`);
+      writeSource(sourcesPath, cut);
       log.notice(`pinned the sounds in ${sourcesPath}: commit it, then run pnpm data mirror push sounds`);
     }
     await packSounds({ sourcesPath, cacheDir: SOUND_CACHE_DIR, outDir: SOUND_PACK_DIR, mirror: mirrorReader(mirrorFromEnv(), log) }, log);
