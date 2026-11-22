@@ -74,6 +74,12 @@ describe("The Thing in the Depths in the Dream-chaser campaign", () => {
     expect(state.staging.map((id) => state.cards[id]?.code).sort()).toEqual([CODES.helm, CODES.umbar].sort());
   });
 
+  it("11194:A:1 deals the Campaign Setup with 1 player: one copy each of both Black Keys, Come Together and Sea Serpent set aside, and The Thing in the Depths set aside on its Campaign Mode only side", () => {
+    const state = opened(depthsStart(1, 1, "Normal"));
+    for (const code of [CODES.blackKey, CODES.blackKeyBurden, CODES.comeTogether, CODES.seaSerpent]) expect(where(state, code).map((card) => card.zone), code).toEqual(["setAside"]);
+    expect(where(state, CODES.thing).map((card) => [card.zone, card.face])).toEqual([["setAside", "B"]]);
+  });
+
   it("attaches Black Key (burden) to Captain Sahír when he enters play (11194:A:2)", () => {
     const made = depthsTable(scene, { campaign: true, staging: [CODES.helm], setAside: [CODES.sahir, CODES.naasiyah, CODES.blackKey, CODES.blackKeyBurden, CODES.comeTogether, CODES.seaSerpent, CODES.thing] });
     // Helm becomes the active location: Sahír joins the staging area and engages the first player; the Forced effect of the campaign card attaches the burden.
