@@ -4,14 +4,25 @@
 // and the dial warms as it nears it: tinted from 40, solid threat red from 45 (docs/design-system-table.md). The change
 // badge says what the last intent did to it ("−6" when it fell, "+2" when it rose).
 import { ELIMINATION_LEVEL } from "../../rules/core/eliminate.ts";
+import type { ScenarioState } from "../../rules/engine/reduce.ts";
+import { heldAmount } from "../../rules/core/state.ts";
 import { DIRE_ELIMINATION_LEVEL } from "../../rules/families/black-gate/dire.ts";
 import type { SoundSlot } from "../../ui/sound/slots.ts";
 
 export const ELIMINATION_THREAT = ELIMINATION_LEVEL;
 /** The elimination level while the main quest has Dire (mec113.dire): the dial's meter, its warming and its words read it. */
 export const DIRE_THREAT = DIRE_ELIMINATION_LEVEL;
-/** The number a threat dial's meter fills toward: 99 under Dire, else the elimination level (undefined: the dial's own default). */
-export const dialLimit = (dire: boolean): number | undefined => (dire ? DIRE_THREAT : undefined);
+/** The number a threat dial's meter fills toward: 99 under Dire, else the elimination level, less what The One Ring's text takes off (`eliminationReduction`); undefined is the dial's own default, 50. */
+export function dialLimit(dire: boolean, reduction = 0): number | undefined {
+  const level = (dire ? DIRE_THREAT : ELIMINATION_THREAT) - Math.max(0, reduction);
+  return level === ELIMINATION_THREAT ? undefined : level;
+}
+
+/** The elimination level of one seat, as the engine reads it (core/eliminate.ts): a seat holding the Master Ring is out five threat sooner. */
+export const seatLevel = (game: ScenarioState, seat: number): number => (game.dire === true ? DIRE_THREAT : ELIMINATION_THREAT) - Math.max(0, heldAmount(game, `seat:${seat}`, "eliminationReduction"));
+
+/** `dialLimit` for one seat of a game. */
+export const seatDialLimit = (game: ScenarioState, seat: number): number | undefined => dialLimit(game.dire === true, heldAmount(game, `seat:${seat}`, "eliminationReduction"));
 const NEAR = 40;
 const CRITICAL = 45;
 

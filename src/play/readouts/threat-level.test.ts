@@ -1,7 +1,9 @@
 // Rules: rr.threat-elimination-level, rr.player-elimination (data/rules/entries.json).
 import { describe, expect, it } from "vitest";
 
-import { ELIMINATION_THREAT, threatDelta, threatDeltaWords, threatLevel, threatMeter, threatSound } from "./threat-level.ts";
+import { blankScenario } from "../../rules/core/state.ts";
+import { fixtureDefinition } from "../../rules/core/test-fixture.ts";
+import { ELIMINATION_THREAT, dialLimit, seatDialLimit, seatLevel, threatDelta, threatDeltaWords, threatLevel, threatMeter, threatSound } from "./threat-level.ts";
 
 describe("threat dial", () => {
   it("fills toward the elimination level, 50", () => {
@@ -24,6 +26,21 @@ describe("threat dial", () => {
     expect(threatDelta(30, 30)).toBeNull();
     expect(threatDeltaWords("Threat", 30, 24)).toBe("Threat lowered by 6, now 24");
     expect(threatDeltaWords("Player 2 threat", 28, 30)).toBe("Player 2 threat raised by 2, now 30");
+  });
+});
+
+describe("a seat holding The One Ring (21001:A:2)", () => {
+  const base = blankScenario({ seatCount: 2, seed: 1, definition: fixtureDefinition(["stage"]) });
+  const ring = { ...base, modifiers: [{ instanceId: "seat:1", sourceId: "ring", stat: "eliminationReduction" as const, amount: 5, until: "endOfGame" as const }] };
+
+  it("reads its own elimination level, 45, in the meter and the warming", () => {
+    expect(seatDialLimit(ring, 1)).toBe(45);
+    expect(seatLevel(ring, 1)).toBe(45);
+    expect(seatDialLimit(ring, 0)).toBeUndefined();
+    expect(threatLevel(36, seatDialLimit(ring, 1))).toBe("near");
+    expect(threatLevel(41, seatDialLimit(ring, 1))).toBe("critical");
+    expect(threatMeter(36, seatDialLimit(ring, 1))).toBe(0.8);
+    expect(dialLimit(true, 5)).toBe(94);
   });
 });
 

@@ -29,7 +29,7 @@ import { lairProgressWords } from "./lair.ts";
 import { blackGateQuestEnd } from "./black-gate.ts";
 import { fortitudeNumbers } from "./fortitude.ts";
 import { mountDoomQuestNote } from "./mount-doom.ts";
-import { DIRE_THREAT, ELIMINATION_THREAT } from "./threat-level.ts";
+import { seatLevel } from "./threat-level.ts";
 import { pelennorQuestWords } from "./pelennor.ts";
 import { siegeProgressWords } from "./siege.ts";
 import { sailingReadout } from "./sea-readout.ts";
@@ -230,8 +230,8 @@ function commitWords(game: ScenarioState, ctx: ReduceContext, picked: readonly s
 // eliminated (rr.threat-elimination-level), and with no seat left the game is lost.
 function eliminationWords(game: ScenarioState, ctx: ReduceContext, shortfall: number, only?: number): string {
   if (shortfall <= 0) return "";
-  // The elimination level: 99 while the main quest is Dire (mec113.dire).
-  const level = game.dire === true ? DIRE_THREAT : ELIMINATION_THREAT;
+  // The elimination level: 99 while the main quest is Dire (mec113.dire), five less for a seat holding The One Ring; when seats differ the first to go says it.
+  const level = seatLevel(game, only ?? livingSeats(game)[0] ?? 0);
   const after = failQuest(game, shortfall, [], only == null ? undefined : [only]);
   // Fog on the Barrow-downs' stage 3B hears an elimination: the players at it raise their threat by 10, which can end the game (148003:B:2).
   const raise = downsRaise(game, ctx, after, level);
