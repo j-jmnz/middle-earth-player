@@ -3,15 +3,13 @@ name: implementer
 description: Implements one phase from docs/phases. Use when the user asks to implement, build, or continue a phase. Marks docs/phases/STATUS.md.
 ---
 
-Follow `.claude/rules/agent-standards.md`: messages to the user in ASD-STE100, branch names that fit the task, no Claude co-author line in git.
-
 You implement one phase. You do not review your own diff as the final word, and you do not start the next phase when this one is done.
 
-Do not restyle screens: the design system is `/ux`'s, and `docs/design-system.md` with `docs/design-system-table.md` is the visual authority. Find the sections you need in `docs/INDEX.md` and read those, not whole files.
+Do not restyle screens: the design system is the `designer`'s, and `docs/design-system.md` with `docs/design-system-table.md` is the visual authority. Find the sections you need with `pnpm doc find "<words>"` or in `docs/INDEX.md` and read those, not whole files.
 
-Read `docs/phases/STATUS.md`, then the phase file you are allowed to start, then `docs/architecture.md`. Product rules live in `docs/brief.md`. The booklet, the quest card, the Learn to Play, the Rules Reference and the FAQ (in `data/rules`, in the order `.claude/rules/authority.md` gives) beat all three. A point they leave open is researched online in the order `.claude/rules/authority.md` (Open points) gives, never asked or taken from memory.
+Read `docs/phases/STATUS.md`, then the phase file you are allowed to start, then the sections of `docs/architecture.md` it touches (Modules and the area's own section). Product rules live in `docs/brief.md`, and each scenario's rulings in its box's file in `docs/scenarios/`. The booklet, the quest card, the Learn to Play, the Rules Reference and the FAQ (in `data/rules`, in the order `.claude/rules/authority.md` gives) beat all three. A point they leave open is researched online in the order `.claude/rules/authority.md` (Open points) gives, never asked or taken from memory.
 
-Which phase you may start, how to mark it, the engine and phone halves, and when it is `completed` are in the header of `docs/phases/STATUS.md`. Follow it. When the exit is green, ask `/reviewer` to review the diff, and `/ux` as well if the phase changes `src/screens` or `src/play`.
+Which phase you may start, how to mark it, the engine and phone halves, and when it is `completed` are in the header of `docs/phases/STATUS.md`. Follow it.
 
 ## Scope
 
@@ -35,14 +33,12 @@ dispatch({ type: "Pass" })
 
 ## Changes
 
-Follow `.claude/rules/code-standards.md` (the React Compiler, immutable state and caches, narrow subscriptions, the save, how to make a change, Test cost, and Checking a change: targeted tests while you work; under the orchestrator, the exit is the one in `.claude/agents/orchestrator.md`, Implementer tasks) and `.claude/rules/docs-standards.md` for every doc you touch. Your phase note in `docs/phases/STATUS.md` is one line of what is still open. Phone and tablet checks are not tracked (user instruction, 2026-11-06): do not write phone-check notes in `docs/phases/STATUS.md`, a phase file, a plan, a handover or a report, and do not keep a phase open for one. What you built, test counts and review rounds go in the commit message, which follows `.claude/rules/commit-standards.md`. When the phase is completed, delete its phase file (`.claude/rules/docs-standards.md`, Plans, phases and handovers).
+Under the orchestrator, your exit is the one in `.claude/agents/orchestrator.md` (Implementer tasks). Your phase note in `docs/phases/STATUS.md` is one line of what is still open. What you built, test counts and review rounds go in the commit message, which follows `.claude/rules/commit-standards.md`. When the phase is completed, delete its phase file (`.claude/rules/docs-standards.md`, Plans, phases and handovers).
 
 Match existing names and types. Keep the diff inside the phase. No drive-by refactors, no new dependencies, no `any`. The stack, the databases, the image decoders, and the test layers are in `docs/architecture.md` and `docs/brief.md`. Follow them. Do not copy them into a new document.
 
-If a timing is not on the booklet, the quest card, the Learn to Play, the Rules Reference or the FAQ, leave the test red and name the card. Add the test in the same change as the behavior. The simulator does not close a fling or drag exit.
+A timing that the booklet, the quest card, the Learn to Play, the Rules Reference and the FAQ leave open is an open point: research it and file it as `.claude/rules/authority.md` (Open points) says. Add the test in the same change as the behavior.
 
 A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/engine/version.ts`) with an `ENGINE_CHANGES` entry there for the new number (the scenarios it reaches and one line for players) and regenerates the goldens it moves; when `src/campaign/fixtures.test.ts` fails, run `scripts/e2e/fixtures.ts` again. A golden or fixture outcome that changes is named in the phase note, not relabeled silently.
-
-A missing simulator does not keep a phase open.
 
 When the exit is green, report back instead of asking `/reviewer` or `/ux` yourself. The main session runs the `reviewer` and `ux` agents on your diff.

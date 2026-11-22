@@ -21,10 +21,10 @@ cards have no file under `src/effects/authored/families/`.
 - You are in your own git worktree. Start from the base: `git fetch origin <BASE> && git checkout -B wip-<F> origin/<BASE>`.
   Your base commit is the tip of `<BASE>` at that moment; `git log -1 --format=%h` says which.
 - If `node_modules` is missing, run `pnpm install --frozen-lockfile --offline` (without `--offline` if that fails).
-- Find docs through `docs/INDEX.md` and read sections (`pnpm doc section <file> "<heading>"`), not whole files.
-- Read first: `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md`, `.claude/rules/docs-standards.md`, `docs/agents/effect-authoring.md` (the cookbook; its "Mechanic
-  families" section describes the files you own), `docs/architecture.md`, the phase file for a scenario phase
-  (`docs/phases/phase-NN-*.md`) and `docs/phases/STATUS.md`, and the schema files `src/catalog/effect-schema*.ts`. Skim
+- Find docs with `pnpm doc find "<words>"` or through `docs/INDEX.md` and read sections (`pnpm doc section <file> "<heading>"`), not whole files. `CLAUDE.md` and `.claude/rules/` are already in your context: do not read them again.
+- Read first: `docs/agents/effect-authoring.md` (the cookbook; its "Mechanic
+  families" section describes the files you own), the sections of `docs/architecture.md` your task names (Engine, Effects), the phase file for a scenario phase
+  (`docs/phases/phase-NN-*.md`) and its scenario's section in `docs/scenarios/`, and the schema files `src/catalog/effect-schema*.ts`. Skim
   `src/rules/interpret/interpret.ts`, `src/rules/interpret/effect-frames.ts`, `src/rules/windows/triggers.ts`, `src/rules/windows/responses.ts` and
   `src/rules/player/usage.ts` to see how records run.
 - Card text: `pnpm effects draft <scenario-id | pack | code,code,...>` writes `.agent/drafts/<code>.md` per card (printed lines,
@@ -81,7 +81,7 @@ work together with yours. A line that restates a rule the engine applies anyway 
    `Pick`, `Choose`, `effect-frames.ts`). If you add a verb that can appear inside a `Choose` option, give it words in
    `src/play/words/instruction.ts` (`instructionWords`): a test checks every branch reads as a sentence.
 6. A line may stay open only if it is genuinely impossible to express in this engine; report it with the reason.
-7. A scenario phase follows the Scenario procedure below. Its skeleton is `pnpm scenario new <scenario-id>`: it writes the game (`test/scenarios/<id>/game.ts`), the golden test, the campaign test and the spec rows (`src/campaign/scenarios/<id>/`), the asks file (`src/play/words/asks/<id>.ts`), the seed finder, the authored effects file (`docs/architecture.md`, Effects) and the empty fixture file, and adds the registry lines (the fixtures in `src/campaign/fixtures/registry.ts`, `src/campaign/fixtures.ts` and `scripts/e2e/fixtures.ts`; the golden registry's two lines as comments). It writes no scene file: the game, the golden test and the campaign test read the scenario from `data/`. Fill the skeletons from the shared kit, keeping only what is the scenario's own: `test/harness/game-kit.ts` (the campaign game and its goldens), `golden-suite.ts` (the golden test's loops), `card-spec.ts` (the spec rows), `scripts/e2e/seed-kit.ts` (the seed finder). The skeletons keep the suite green (the golden suite is skipped and the campaign test has todos), so the golden test is finished by turning `describe.skip` into `describe`, running it to write `golden.json`, and uncommenting the golden registry's two lines in `test/harness/golden-registry.ts` (its test fails on a `golden.json` that is not listed). `src/campaign/scenarios/the-thing-in-the-depths/golden.test.ts` and `golden.json` are the pattern for a golden. A scenario of a cycle (Shadows of Mirkwood, `docs/brief.md`) is standalone only: the command writes the standalone game (`standaloneGame`), a golden test with `standalone: true`, `standalone.test.ts` in place of the campaign test, a seed finder of standalone fixtures (a `kind: "standalone"` registry entry); read "a win runs the campaign card's Resolution" in the exits below as "a win is scored and recorded in History".
+7. A scenario phase follows the Scenario procedure below. Its skeleton is `pnpm scenario new <scenario-id>`: it writes the game (`test/scenarios/<id>/game.ts`), the golden test, the campaign test and the spec rows (`src/campaign/scenarios/<id>/`), the asks file (`src/play/words/asks/<id>.ts`), the seed finder, the authored effects file (`docs/architecture.md`, Effects) and the empty fixture file, and adds the registry lines (the fixtures in `src/campaign/fixtures/registry.ts`, `src/campaign/fixtures.ts` and `scripts/e2e/fixtures.ts`; the golden registry's two lines as comments). It writes no scene file: the game, the golden test and the campaign test read the scenario from `data/`. Fill the skeletons from the shared kit, keeping only what is the scenario's own: `test/harness/game-kit.ts` (the campaign game and its goldens), `golden-suite.ts` (the golden test's loops), `card-spec.ts` (the spec rows), `scripts/e2e/seed-kit.ts` (the seed finder). The skeletons keep the suite green (the golden suite is skipped and the campaign test has todos), so the golden test is finished by turning `describe.skip` into `describe`, running it to write `golden.json`, and uncommenting the golden registry's two lines in `test/harness/golden-registry.ts` (its test fails on a `golden.json` that is not listed). `src/campaign/scenarios/the-thing-in-the-depths/golden.test.ts` and `golden.json` are the pattern for a golden. A scenario of a cycle (`docs/scenarios/shadows-of-mirkwood.md`, Shadows of Mirkwood) is standalone only: the command writes the standalone game (`standaloneGame`), a golden test with `standalone: true`, `standalone.test.ts` in place of the campaign test, a seed finder of standalone fixtures (a `kind: "standalone"` registry entry); read "a win runs the campaign card's Resolution" in the exits below as "a win is scored and recorded in History".
 
 ## Scenario procedure
 
@@ -122,44 +122,32 @@ Each is cited in that section.
 
 **Screen half exit:** the scenario's words and widgets are written and tested, and no control types damage, resources, threat, progress, or life.
 
-## Commit often (API usage limits can stop you mid-task)
+## Measure
+
+The last commit of a scenario phase records these after a line `Pipeline measure:`, so `git log --grep "Pipeline measure"` lists every scenario run. The label is for scenario phases only; any other measured change writes `Measure:` (`.claude/rules/commit-standards.md`, Body).
+
+- The open lines at the start (`pnpm effects draft <scenario-id>`) and the lines templates and copies took.
+- The mechanics added, and the core files they edited outside a family.
+- The build diff and the fix-pass diff, in lines.
+- The review findings by class, and the fix-pass lines by area, with the words and the sheets apart from the rest.
+- The readings asked and the readings ruled.
+- For each task (Read, Build, Judge, Finish, Review, Fix): its full test runs, its wait minutes and its writing minutes. The orchestrator writes these from each task's report.
+
+For each finding class that recurs, add a check, a template or a line in "Readings the review catches" (`docs/agents/effect-authoring.md`), or a step to issue #190.
+
+## A family assignment in a worktree
+
+This section is for a mechanic-family agent the main session runs in its own worktree, beside other agents. A scenario task under the orchestrator works on the session's branch and hands off through `.agent/handoff/<id>.md` (Scenario procedure) instead.
 
 - Keep a handover file at `docs/handover/<F>.md`: what is done, what is in progress, design decisions, next steps, and the
-  lines still open, enough for a fresh agent to continue.
-- After each meaningful step (a mechanic implemented with its tests passing, a batch of records written), commit on your
-  worktree branch with a typed message that says what the step did (`.claude/rules/commit-standards.md`, Commit often; restore `src/effects/open-lines.ts` first), handover file included. If
-  you sense you are running long, commit first. Then push the worktree branch to GitHub (the user allows extra
-  branches): `git push -u origin HEAD:refs/heads/wip/<F>`, retrying on network errors (2s, 4s, 8s, 16s). Never push to
-  `<BASE>` or `main`. Your final commit deletes `docs/handover/<F>.md`.
+  lines still open, enough for a fresh agent to continue if a usage limit stops you. Your final commit deletes it.
+- After each meaningful step (a mechanic implemented with its tests passing, a batch of records written), restore the burn-down list (`git checkout src/effects/open-lines.ts`; the main session regenerates it), then commit on your worktree branch as `.claude/rules/commit-standards.md` says, handover file included. Push it with `git push -u origin HEAD:refs/heads/wip/<F>`, retrying on network errors (2s, 4s, 8s, 16s). Never push to `<BASE>` or `main`.
+- Other agents may share the machine: use generous timeouts and never kill processes you did not start (no `pkill`).
+- Keep shared-file edits small so they apply cleanly in any order, do not depend on another assignment's unmerged code, and say in your report exactly what you changed in each shared file. The main session squashes each branch into `<BASE>` (`git merge --squash`, one message per `.claude/rules/commit-standards.md`), regenerates `src/effects/open-lines.ts` after the last merge, and makes duplicate helpers one.
 
 ## Checks before committing
 
-Other agents share this 4-core machine: use generous timeouts, check as `.claude/rules/code-standards.md` (Checking a
-change) says, and never kill processes you did not start (no `pkill`).
-
-- `pnpm typecheck`
-- `pnpm lint`
-- `pnpm effects open`, then `pnpm vitest run scripts/checks/effect-coverage.test.ts src/effects src/rules/families`
-- `pnpm test smoke <codes>` for every card you wrote records for: no problems reported.
-- `pnpm data check` if you touched anything under `data/` or `scripts/data/`.
-- `pnpm test scenario <scenario-id>` while authoring (the scenario's tests, its goldens, the coverage checks, the card smoke on its player cards and the encounter smoke).
-- Full `pnpm test` once at the end (Scenario procedure). The golden snapshots (`src/campaign/scenarios/<scenario-id>/golden.json` for the scenario games, `src/campaign/starter/golden/` for the
-  starter decks) must not change. If your change alters them, find out why; fix it unless it is a genuine bug fix, and then
-  explain it. A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/engine/version.ts`) and the saves' fixtures are rewritten with `scripts/e2e/fixtures.ts` when `src/campaign/fixtures.test.ts` says so.
-
-## Merge
-
-The main session squashes each branch into `<BASE>` (`git merge --squash`, one message per `.claude/rules/commit-standards.md`), regenerates `src/effects/open-lines.ts` after the last merge, and
-reduces duplicates between branches (two definitions of one helper become one). Expect it to merge in the order it chooses,
-so: keep shared-file edits small so they apply cleanly in any order; do not depend on another assignment's unmerged code;
-say in your report exactly what you changed in each shared file, so the merge can be checked against it.
-
-## Commit
-
-- Before committing, restore the burn-down list: `git checkout src/effects/open-lines.ts` (the main session regenerates it).
-- Commit on your worktree branch with a message that follows `.claude/rules/commit-standards.md` and describes the mechanics added. End the message with the attribution
-  lines your session's instructions give, as `.claude/rules/commit-standards.md` (Body) says: `Co-Authored-By`, never a `Claude-Session` link. Do not put model names elsewhere in the message.
-- Push to `wip/<F>` as above. Do not push to `<BASE>` or `main`.
+Check as `.claude/rules/code-standards.md` (Checking a change) says while you work; the exit of the task is the one in `.claude/agents/orchestrator.md` (Implementer tasks). A family or scenario task also runs `pnpm effects open`, then `pnpm vitest run scripts/checks/effect-coverage.test.ts src/effects src/rules/families`, and `pnpm test smoke <codes>` for every card it wrote records for. No golden snapshot moves unless the rule changed (`.claude/rules/code-standards.md`, State and caches).
 
 ## Report (your final message)
 

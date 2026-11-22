@@ -11,13 +11,13 @@ Read whole.
 - `CLAUDE.md` — Claude Code (~3.4K tok)
   - 7–26 Data (~1.4K)
   - 27–46 Commands (~1.3K)
-  - 47–50 Agents (~180)
+  - 47–50 Agents (~200)
   - 51–54 Skills (~80)
   - 55–58 Cloud sessions (~60)
 - `.claude/rules/agent-standards.md` — Agent standards (~640 tok)
-- `.claude/rules/authority.md` — Authority (~820 tok)
+- `.claude/rules/authority.md` — Authority (~830 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
-- `.claude/rules/commit-standards.md` — Commit standards (~1.2K tok)
+- `.claude/rules/commit-standards.md` — Commit standards (~1.3K tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.2K tok)
 - `.claude/rules/issue-standards.md` — Issue standards (~1.1K tok)
 - `.claude/rules/release-standards.md` — Release standards (~1.4K tok)
@@ -26,13 +26,14 @@ Read whole.
 
 Each agent reads its own file.
 
-- `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.2K tok)
-- `.claude/agents/implementer.md` — Implements one phase from docs/phases (~1.5K tok)
-- `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~2.1K tok)
-- `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap (~1.1K tok)
+- `.claude/agents/designer.md` — Changes the design system and applies it to the screens that use it (~340 tok)
+- `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.0K tok)
+- `.claude/agents/implementer.md` — Implements one phase from docs/phases (~1.3K tok)
+- `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~2.2K tok)
+- `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap (~1.0K tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.5K tok)
 - `.claude/agents/scenario-author.md` — Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note (~1.2K tok)
-- `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
+- `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design (~960 tok)
 
 ## Product, code and design
 
@@ -55,15 +56,15 @@ Read the sections your task touches.
   - 497–500 Support (~90)
   - 501–516 Attribution (~410)
   - 517–520 License (~50)
-- `docs/architecture.md` — Architecture (~29.2K tok)
+- `docs/architecture.md` — Architecture (~25.3K tok)
   - 7–44 Stack (~1.6K)
   - 45–80 Processes (~730)
-  - 81–166 Modules (~2.6K) ← 3
+  - 81–166 Modules (~2.6K) ← 4
     - 130–166 Repository map (~1.0K) ← 1
   - 167–192 State (~1.1K) ← 10
   - 193–214 Play loop (~250)
-  - 215–240 Engine (~5.9K)
-    - 229–240 Mechanic families (~5.0K) ← 5
+  - 215–240 Engine (~2.0K)
+    - 229–240 Mechanic families (~1.0K) ← 6
   - 241–246 Effects (~600) ← 5
   - 247–279 Scenario definition (~800)
   - 280–326 Persistence (~3.4K) ← 2
@@ -72,7 +73,7 @@ Read the sections your task touches.
     - 314–319 Opening a game (~350)
     - 320–326 Continue, Restart and the checkpoint (~380)
   - 327–332 Images (~1.1K) ← 7
-  - 333–388 Screens (~5.4K) ← 9
+  - 333–388 Screens (~5.4K) ← 10
   - 389–400 Desktop (~1.4K) ← 4
   - 401–410 Update check (~680) ← 7
   - 411–416 Catalog build (~410)
@@ -104,7 +105,7 @@ Read the sections your task touches.
   - 530–553 Data sources (~750) ← 3
   - 554–572 Card images (~1.4K) ← 9
   - 573–600 Persistence and shipping (~3.2K) ← 9
-  - 601–643 Screens (~6.0K) ← 2
+  - 601–643 Screens (~6.0K) ← 3
     - 628–643 Table screen (~1.8K) ← 3
   - 644–653 Readings to confirm (~270)
 - `docs/design-system-table.md` — Design system — Table (landscape) (~71.3K tok)
@@ -132,7 +133,7 @@ Read the sections your task touches.
   - 332–335 One answer, one tap (~240)
   - 336–339 Stops and Always use (~250)
   - 340–343 Guide (~120)
-  - 344–360 Choice tray (~5.7K) ← 81
+  - 344–360 Choice tray (~5.7K) ← 80
   - 361–375 Reading panels (~1.7K) ← 5
   - 376–385 Phase carousel (~680)
   - 386–391 Quest advance (~530) ← 1
@@ -187,7 +188,7 @@ Read the sections your task touches.
   - 513–532 States (~620)
 - `docs/development.md` — Development (~5.2K tok)
   - 5–14 In a browser (~170)
-  - 15–32 Checking a screen in a browser (~700) ← 3
+  - 15–32 Checking a screen in a browser (~700) ← 4
   - 33–52 Reading a game as text (~760) ← 4
   - 53–60 On a desktop (~210) ← 1
   - 61–81 On a phone (~350)
@@ -211,6 +212,25 @@ Read the sections your task touches.
   - 170–176 Use it (~80)
   - 177–190 Find a problem (~590)
   - 191–196 Change it (~90)
+- `docs/family-internals.md` — Mechanic family internals (~4.1K tok)
+  - 5–8 wilderland (~750)
+  - 9–12 island (~110)
+  - 13–16 grapple (~150)
+  - 17–20 dreamchaser (~120)
+  - 21–24 sea (~240)
+  - 25–28 campaign (~230)
+  - 29–32 burden (~90)
+  - 33–36 objectives (~120)
+  - 37–40 caves (~130)
+  - 41–44 uncharted (~230)
+  - 45–48 aflame (~80)
+  - 49–52 stormcaller (~210)
+  - 53–56 pursuit (~140)
+  - 57–60 fortress (~210)
+  - 61–64 wizardry (~260)
+  - 65–68 harad (~180)
+  - 69–72 grey-company (~380)
+  - 73–76 mount-doom (~410)
 - `docs/releasing.md` — Releasing (~6.0K tok)
   - 5–20 Start a release (~340) ← 1
   - 21–36 Jobs (~2.1K) ← 4
@@ -309,16 +329,15 @@ One file per box or cycle: each scenario's mechanics, readings, decisions and ta
 The scenario procedure and the effect-authoring cookbook; read when a task names one.
 
 - `docs/agents/agent-brief.md` — Brief for a mechanic-family or scenario agent (~5.1K tok)
-  - 19–37 Setup (~440)
+  - 19–37 Setup (~460)
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
-  - 71–85 Approach (~770) ← 1
+  - 71–85 Approach (~780)
   - 86–124 Scenario procedure (~1.9K) ← 62
-  - 125–134 Commit often (API usage limits can stop you mid-task) (~210)
-  - 135–149 Checks before committing (~310)
-  - 150–156 Merge (~140) ← 1
-  - 157–163 Commit (~140)
-  - 164–171 Report (your final message) (~90) ← 1
+  - 125–137 Measure (~260) ← 3
+  - 138–147 A family assignment in a worktree (~380) ← 1
+  - 148–151 Checks before committing (~130) ← 1
+  - 152–159 Report (your final message) (~90) ← 1
 - `docs/agents/effect-authoring.md` — Authoring effect records (~7.7K tok)
   - 12–33 Workflow (~460)
   - 34–50 Where records live (~390)
@@ -331,8 +350,8 @@ The scenario procedure and the effect-authoring cookbook; read when a task names
   - 155–174 Triggers and stat flags (~440)
   - 175–236 Patterns (~1.4K)
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
-  - 274–291 Readings the review catches (~770) ← 4
-  - 292–311 Not expressible yet: leave open, report (~390)
+  - 274–291 Readings the review catches (~770) ← 3
+  - 292–311 Not expressible yet: leave open, report (~410)
 
 ## Phases
 
@@ -344,20 +363,6 @@ STATUS.md, then the active phase file.
 
 Read when a task names the plan.
 
-- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.6K tok)
-  - 3–14 Context (~440)
-  - 15–24 What does not move (~190)
-  - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~960)
-  - 49–57 B. One registry for scenarios, fixtures and goldens (~300)
-  - 58–70 C. A shared scenario kit and `pnpm scenario new` (~520)
-  - 71–82 D. One manifest per family (~460)
-  - 83–91 E. Data: seed what can be seeded (~300)
-  - 92–112 F. Faster feedback while authoring (~870)
-  - 113–137 Where a scenario's cost is now (~780)
-  - 138–154 Next steps (~410)
-  - 155–166 After each scenario phase (~220)
-  - 167–170 Order (~70)
-  - 171–178 Verification (~100)
 - `docs/plans/sound-and-music.md` — Plan: the rest of the sound (~360 tok)
 
 ## Handovers
@@ -372,7 +377,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts`: development.md, Commands (1)
 - `scripts/build`: design-system-table.md, Sound (4); brief.md, Card images (2); development.md, Asset mirror (1)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
-- `scripts/checks`: architecture.md, Screens (4); design-system.md, Screen reader (2); scenarios/nightmare.md, Nightmare (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); releasing.md, Add the desktop app to a release (1); releasing.md, Caches (1); releasing.md, Jobs (1); scenarios/standalone-scenarios.md, Attack on Dol Guldur (1); scenarios/standalone-scenarios.md, Fog on the Barrow-downs (1); scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught (1); scenarios/standalone-scenarios.md, The Old Forest (1); scenarios/standalone-scenarios.md, The Siege of Annúminas (1)
+- `scripts/checks`: architecture.md, Screens (4); design-system.md, Screen reader (2); scenarios/nightmare.md, Nightmare (2); .claude/rules/code-standards.md, Test cost (1); .claude/rules/release-standards.md, Who releases (1); agents/effect-authoring.md, Templates and copied lines (1); architecture.md, Desktop (1); architecture.md, Modules (1); architecture.md, Repository map (1); architecture.md, Update check (1); releasing.md, Add the desktop app to a release (1); releasing.md, Caches (1); releasing.md, Jobs (1); scenarios/standalone-scenarios.md, Attack on Dol Guldur (1); scenarios/standalone-scenarios.md, Fog on the Barrow-downs (1); scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught (1); scenarios/standalone-scenarios.md, The Old Forest (1); scenarios/standalone-scenarios.md, The Siege of Annúminas (1)
 - `scripts/data`: scenarios/nightmare.md, Nightmare (6); brief.md, Data sources (3); design-system.md, Icons (3); scenarios/dream-chaser.md, Dream-chaser (3); scenarios/ered-mithrin.md, Ered Mithrin (3); development.md, Asset mirror (2); scenarios/mirkwood-paths.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); scenarios/dwarrowdelf.md, Dwarrowdelf (1); scenarios/dwarrowdelf.md, Foundations of Stone (1); scenarios/standalone-scenarios.md, Escape from Khazad-dûm (1); scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught (1); scenarios/the-two-towers.md, The Two Towers (1)
 - `scripts/desktop`: releasing.md, Jobs (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)

@@ -20,7 +20,7 @@ Every session, agent and contributor that commits follows these (user instructio
 
 ## Body
 
-- A blank line, then what changed and why, wrapped near 72 columns. Measured numbers, deviations from a plan and findings left unfixed go here (`.claude/agents/orchestrator.md`), as do lines later work greps for (`Pipeline measure:`).
+- A blank line, then what changed and why, wrapped near 72 columns. Measured numbers, deviations from a plan and findings left unfixed go here (`.claude/agents/orchestrator.md`), as do lines later work greps for: `Pipeline measure:` for a scenario phase only (`docs/agents/agent-brief.md`, Measure), `Measure:` for any other measured change.
 - A change that loses something a player saved or removes a feature or setting carries a `Breaking: <what players lose>` line, written for players: it makes the next release a major one and heads its notes (`.claude/rules/release-standards.md`, Versioning).
 - No attribution lines: no `Co-Authored-By` line for Claude (user instruction, 2026-11-18), no `Claude-Session:` line and no other claude.ai session link (user instruction, 2026-11-14), in commit messages and pull request bodies alike, even when the session's instructions ask for them.
 
@@ -35,4 +35,4 @@ Every session, agent and contributor that commits follows these (user instructio
 - Every branch lands on `main` as one squash commit. No merge commits and no rebased stacks on `main`.
 - The squash commit's subject is the pull request title, and its body is the pull request's description, so open a pull request with both written as that commit (user instruction, 2026-11-17): the title an action that sums up the whole branch, in the Subject line form, not the first commit's subject or the branch name; the description what changed and why, as the Body says, under the template's headings (`.github/PULL_REQUEST_TEMPLATE.md`). Update both when later commits change what the branch does. Its body sums up the branch, keeps every measure, `Breaking:`, `Settles #<n>` and `Refs #<n>` line from the branch's commits, and holds every commit message, as `.claude/rules/agent-standards.md` says. The subject is also a line of the release notes, so it is written for a player.
 - Commits on a branch follow these standards too; each is typed and says what it did (`feat: Build the Lost in Mirkwood engine half`).
-- An agent merging branches locally uses `git merge --squash <branch>` and writes one message, as `docs/agents/agent-brief.md` (Merge) says.
+- An agent merging branches locally uses `git merge --squash <branch>` and writes one message, as `docs/agents/agent-brief.md` (A family assignment in a worktree) says.

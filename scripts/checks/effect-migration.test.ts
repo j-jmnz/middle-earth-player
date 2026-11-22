@@ -7,7 +7,7 @@ import { generateEffects } from "../data/effects/generate.ts";
 import { loadCampaign, loadScenarios } from "../data/load-scenarios.ts";
 import { loadLedger } from "../data/printed/ledger.ts";
 
-// The migration check (docs/plans/scenario-pipeline.md, section A). A template that comes to read a line an authored
+// The migration check (docs/agents/effect-authoring.md, Templates and copied lines). A template that comes to read a line an authored
 // record owns writes a record of its own. Three outcomes:
 //   - same id, deep-equal: the authored record is redundant. Delete it.
 //   - same id, different: the generated record is the one the template writes and the authored one overrides it. That
