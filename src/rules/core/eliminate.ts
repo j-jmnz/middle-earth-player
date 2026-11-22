@@ -166,3 +166,18 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], fina
   if (!next.lost && livingSeats(next).length === 0) next = markLoss(next, "No seats remain");
   return next;
 }
+
+/**
+ * A seat whose last hero left play in a way that did not ask (discarded by a shadow effect, Sleeping Sentry 04046:A:2) is eliminated by the settle sweep (rr.player-elimination), not at the next
+ * threat raise or destruction. Only a seat that has a hero card out of play is one that lost its heroes. The state itself when every living seat has a hero.
+ */
+export function eliminateHeroless(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): ScenarioState {
+  if (state.lost || state.stageCleared) return state;
+  for (let index = 0; index < state.seatCount; index += 1) {
+    const seat = state.seats[index];
+    if (!seat || seat.eliminated || seat.heroes.length > 0) continue;
+    const fallen = Object.values(state.cards).some((card) => (card.owner ?? card.controller) === index && !inPlay(card.zone) && cards.get(card.code)?.type === "hero");
+    if (fallen) return eliminateEmpties(state, steps);
+  }
+  return state;
+}
