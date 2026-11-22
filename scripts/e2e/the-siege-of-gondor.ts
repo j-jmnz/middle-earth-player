@@ -1,8 +1,7 @@
-// The fixtures of The Siege of Gondor (the-return-of-the-king part 2), written into src/campaign/fixtures/the-siege-of-gondor.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
-// Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `gondor-won` is the first seed that wins, parked on the win (the Resolution waits); `gondor-lost` the first
+// The fixtures of The Siege of Gondor (the-return-of-the-king part 2), written into src/campaign/fixtures/the-siege-of-gondor.json by scripts/e2e/fixtures.ts: real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `gondor-won` is the first seed that wins, parked on the win (the Resolution waits); `gondor-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
-// The Campaign Setup asks the first player about the search for Andúril only when a saved deck holds it (the Defenders of Gondor and Swords of the Noldor lists do not), and the Resolution asks nothing (the Fleet's resources are written in the log and the
+// The Campaign Setup asks the first player about the search for Andúril only when a saved deck holds it, and the Resolution asks nothing (the Fleet's resources are written in the log and the
 // Army of the Dead boon leaves the pool). The decklists are played with the scenario's golden policy (test/scenarios/the-siege-of-gondor/game.ts: all but the last character of a seat quest, every choice takes its first option) with card play on.
 import type { CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";

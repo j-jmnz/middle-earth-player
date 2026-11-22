@@ -1,5 +1,4 @@
-// The fixtures of Deadmen's Dike (angmar-awakened part 3), written into src/campaign/fixtures/deadmens-dike.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
-// Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `dike-won` is the first seed that wins, parked on the win (the Resolution waits); `dike-lost` the first
+// The fixtures of Deadmen's Dike (angmar-awakened part 3), written into src/campaign/fixtures/deadmens-dike.json by scripts/e2e/fixtures.ts: real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed, Easy, so each is a real save. `dike-won` is the first seed that wins, parked on the win (the Resolution waits); `dike-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks nothing (Iârion's Pendant is attached, Protect the Innocent staged with the damage the log noted, Mysterious Omens shuffled in from the pool); the Resolution asks the first player for the Pendant or Amarthiúl's Courage (the decklists' policy takes the first

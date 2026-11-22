@@ -8,7 +8,7 @@ const PACKS_URL = "https://ringsdb.com/api/public/packs/";
 const ALEP_PREFIX = "ALeP -";
 
 // The test decks (data/decks/test-decks.json): RingsDB decklists the fixture games play, by decklist id.
-export const TEST_DECKLISTS: readonly number[] = [8682];
+export const TEST_DECKLISTS: readonly number[] = [41298, 53651, 53652];
 
 function decklistUrl(id: number): string {
   return `https://ringsdb.com/api/public/decklist/${id}`;

@@ -89,7 +89,8 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   // Its games start from the log a won fixture of Journey Along the Anduin writes, and no won fixture is searched for (docs/architecture.md, Tests): it writes none.
   "escape-from-dol-guldur": () => dolGuldurFixtures(undefined),
   "the-oath": () => oathFixtures(),
-  "the-caves-of-nibin-dum": (written) => nibinDumFixtures(written["oath-won"] as Parameters<typeof nibinDumFixtures>[0]),
+  // Its games start from the log a won fixture of The Oath writes, and none is committed: it writes none.
+  "the-caves-of-nibin-dum": () => nibinDumFixtures(undefined),
   "voyage-across-belegaer": () => voyageFixtures(),
   "the-fate-of-numenor": () => fateFixtures(),
   "raid-on-the-grey-havens": () => raidFixtures(),

@@ -1,4 +1,4 @@
-// The fixtures of Escape from Dol Guldur (Mirkwood Paths part 3): two real games of saved decklists (The One Deck and the Elves of Lórien lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed,
+// The fixtures of Escape from Dol Guldur (Mirkwood Paths part 3): two real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed,
 // Easy, from the log a won fixture of Journey Along the Anduin writes when it is confirmed (scripts/e2e/journey-along-the-anduin.ts): its prisoner, its pool. No such fixture is
 // committed and none is searched for (docs/architecture.md, Tests), and nothing here builds a log by hand, so the registry names no fixture of this scenario and none is written. Played by the auto-player,
 // every intent one the reducer listed.

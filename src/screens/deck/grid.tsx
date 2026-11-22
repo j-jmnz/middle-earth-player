@@ -194,10 +194,10 @@ export const DeckCardCell = memo(function DeckCardCell({ card, width, full, look
 }, sameCell);
 
 /**
- * A type's heading in the deck: its name, the rule, its count ("2 of 3" for heroes), and Add for a card type (heroes add through their
+ * A type's heading in the deck: its name, the rule, its count ("2 of 3" for heroes, against `heroLimit`: four under Bond of Friendship), and Add for a card type (heroes add through their
  * slots). The side deck's heading (`side`) is one too: its Add opens the pool on the side deck.
  */
-export function DeckSectionHeader({ type, title, count, onAdd }: { type: string; title: string; count: number; onAdd: (type: string) => void }) {
+export function DeckSectionHeader({ type, title, count, heroLimit, onAdd }: { type: string; title: string; count: number; heroLimit?: number; onAdd: (type: string) => void }) {
   const heroSection = type === "hero";
   return (
     <SectionHeading
@@ -206,7 +206,7 @@ export function DeckSectionHeader({ type, title, count, onAdd }: { type: string;
       right={
         <>
           <Text testID={`deck-section-count-${type}`} className="text-label text-faint">
-            {heroSection ? `${count} of 3` : String(count)}
+            {heroSection ? `${count} of ${heroLimit ?? 3}` : String(count)}
           </Text>
           {!heroSection && TYPE_NOUN[type] ? (
             <View className="-mr-3">

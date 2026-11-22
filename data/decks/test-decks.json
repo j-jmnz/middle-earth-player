@@ -1,11 +1,12 @@
 [
   {
-    "id": "the-one-deck",
-    "name": "The One Deck",
-    "source": "https://www.ringsdb.com/decklist/view/8682",
+    "id": "a-modern-one-deck-or-how-friendship-conquers-all",
+    "name": "A Modern One Deck (or How Friendship Conquers All)",
+    "source": "https://www.ringsdb.com/decklist/view/41298",
     "heroes": [
-      "10140",
+      "12001",
       "145002",
+      "04101",
       "04128"
     ],
     "cards": [
@@ -14,19 +15,321 @@
         "count": 1
       },
       {
+        "code": "01023",
+        "count": 2
+      },
+      {
         "code": "01026",
         "count": 2
+      },
+      {
+        "code": "01027",
+        "count": 1
       },
       {
         "code": "01031",
         "count": 1
       },
       {
-        "code": "01045",
+        "code": "01034",
+        "count": 1
+      },
+      {
+        "code": "01050",
         "count": 2
       },
       {
-        "code": "01046",
+        "code": "01057",
+        "count": 2
+      },
+      {
+        "code": "01060",
+        "count": 1
+      },
+      {
+        "code": "01073",
+        "count": 2
+      },
+      {
+        "code": "04058",
+        "count": 1
+      },
+      {
+        "code": "04083",
+        "count": 2
+      },
+      {
+        "code": "04106",
+        "count": 2
+      },
+      {
+        "code": "04107",
+        "count": 1
+      },
+      {
+        "code": "04108",
+        "count": 2
+      },
+      {
+        "code": "04110",
+        "count": 1
+      },
+      {
+        "code": "04135",
+        "count": 1
+      },
+      {
+        "code": "04137",
+        "count": 2
+      },
+      {
+        "code": "05018",
+        "count": 2
+      },
+      {
+        "code": "06005",
+        "count": 1
+      },
+      {
+        "code": "09014",
+        "count": 1
+      },
+      {
+        "code": "10124",
+        "count": 1
+      },
+      {
+        "code": "12009",
+        "count": 2
+      },
+      {
+        "code": "12059",
+        "count": 1
+      },
+      {
+        "code": "12060",
+        "count": 1
+      },
+      {
+        "code": "12091",
+        "count": 1
+      },
+      {
+        "code": "142004",
+        "count": 1
+      },
+      {
+        "code": "146005",
+        "count": 1
+      },
+      {
+        "code": "17006",
+        "count": 1
+      },
+      {
+        "code": "17008",
+        "count": 1
+      },
+      {
+        "code": "19031",
+        "count": 1
+      },
+      {
+        "code": "19089",
+        "count": 1
+      },
+      {
+        "code": "21003",
+        "count": 1
+      },
+      {
+        "code": "21004",
+        "count": 1
+      },
+      {
+        "code": "22008",
+        "count": 1
+      },
+      {
+        "code": "22028",
+        "count": 1
+      },
+      {
+        "code": "22059",
+        "count": 2
+      },
+      {
+        "code": "22090",
+        "count": 1
+      },
+      {
+        "code": "22147",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": "100-fellowship-detours-and-defense",
+    "name": "100% Fellowship - \"Detours and Defense\"",
+    "source": "https://www.ringsdb.com/decklist/view/53651",
+    "heroes": [
+      "10140",
+      "12001",
+      "17028",
+      "05001"
+    ],
+    "cards": [
+      {
+        "code": "01023",
+        "count": 2
+      },
+      {
+        "code": "01026",
+        "count": 2
+      },
+      {
+        "code": "01034",
+        "count": 2
+      },
+      {
+        "code": "01048",
+        "count": 2
+      },
+      {
+        "code": "01050",
+        "count": 2
+      },
+      {
+        "code": "01057",
+        "count": 2
+      },
+      {
+        "code": "01073",
+        "count": 2
+      },
+      {
+        "code": "04107",
+        "count": 2
+      },
+      {
+        "code": "04108",
+        "count": 2
+      },
+      {
+        "code": "04110",
+        "count": 1
+      },
+      {
+        "code": "04129",
+        "count": 2
+      },
+      {
+        "code": "04135",
+        "count": 1
+      },
+      {
+        "code": "04137",
+        "count": 2
+      },
+      {
+        "code": "05018",
+        "count": 2
+      },
+      {
+        "code": "06005",
+        "count": 2
+      },
+      {
+        "code": "09012",
+        "count": 1
+      },
+      {
+        "code": "09014",
+        "count": 1
+      },
+      {
+        "code": "10009",
+        "count": 1
+      },
+      {
+        "code": "10034",
+        "count": 1
+      },
+      {
+        "code": "10086",
+        "count": 1
+      },
+      {
+        "code": "10122",
+        "count": 2
+      },
+      {
+        "code": "10145",
+        "count": 1
+      },
+      {
+        "code": "12059",
+        "count": 2
+      },
+      {
+        "code": "12113",
+        "count": 1
+      },
+      {
+        "code": "143006",
+        "count": 1
+      },
+      {
+        "code": "145008",
+        "count": 2
+      },
+      {
+        "code": "16005",
+        "count": 2
+      },
+      {
+        "code": "17143",
+        "count": 1
+      },
+      {
+        "code": "18007",
+        "count": 1
+      },
+      {
+        "code": "19089",
+        "count": 2
+      },
+      {
+        "code": "22146",
+        "count": 2
+      },
+      {
+        "code": "22147",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": "100-fellowship-out-of-thin-air",
+    "name": "100% Fellowship - \"Out of Thin Air\"",
+    "source": "https://www.ringsdb.com/decklist/view/53652",
+    "heroes": [
+      "22081",
+      "145002",
+      "04101",
+      "04128"
+    ],
+    "cards": [
+      {
+        "code": "01014",
+        "count": 1
+      },
+      {
+        "code": "01023",
+        "count": 2
+      },
+      {
+        "code": "01031",
         "count": 1
       },
       {
@@ -39,59 +342,83 @@
       },
       {
         "code": "01073",
-        "count": 3
-      },
-      {
-        "code": "02079",
-        "count": 1
-      },
-      {
-        "code": "02100",
         "count": 2
-      },
-      {
-        "code": "02119",
-        "count": 3
       },
       {
         "code": "04083",
-        "count": 3
+        "count": 2
       },
       {
         "code": "04106",
-        "count": 3
+        "count": 2
       },
       {
-        "code": "04134",
-        "count": 3
+        "code": "04108",
+        "count": 2
       },
       {
         "code": "04137",
-        "count": 3
+        "count": 1
       },
       {
-        "code": "08146",
+        "code": "05018",
         "count": 2
+      },
+      {
+        "code": "06005",
+        "count": 1
       },
       {
         "code": "09014",
         "count": 1
       },
       {
-        "code": "10145",
-        "count": 2
+        "code": "10009",
+        "count": 1
       },
       {
-        "code": "12006",
+        "code": "10034",
+        "count": 1
+      },
+      {
+        "code": "10122",
+        "count": 1
+      },
+      {
+        "code": "10124",
         "count": 1
       },
       {
         "code": "12009",
-        "count": 3
+        "count": 1
       },
       {
-        "code": "12085",
+        "code": "12059",
         "count": 2
+      },
+      {
+        "code": "12060",
+        "count": 1
+      },
+      {
+        "code": "12091",
+        "count": 1
+      },
+      {
+        "code": "131014",
+        "count": 2
+      },
+      {
+        "code": "143005",
+        "count": 1
+      },
+      {
+        "code": "16005",
+        "count": 2
+      },
+      {
+        "code": "16006",
+        "count": 1
       },
       {
         "code": "17004",
@@ -99,11 +426,51 @@
       },
       {
         "code": "17006",
-        "count": 3
+        "count": 1
       },
       {
         "code": "17008",
-        "count": 3
+        "count": 1
+      },
+      {
+        "code": "17060",
+        "count": 2
+      },
+      {
+        "code": "17136",
+        "count": 1
+      },
+      {
+        "code": "19031",
+        "count": 1
+      },
+      {
+        "code": "19065",
+        "count": 1
+      },
+      {
+        "code": "21003",
+        "count": 1
+      },
+      {
+        "code": "21004",
+        "count": 1
+      },
+      {
+        "code": "22028",
+        "count": 1
+      },
+      {
+        "code": "22059",
+        "count": 2
+      },
+      {
+        "code": "22090",
+        "count": 1
+      },
+      {
+        "code": "22147",
+        "count": 1
       }
     ]
   }

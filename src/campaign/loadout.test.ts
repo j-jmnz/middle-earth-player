@@ -92,6 +92,16 @@ describe("Fellowship loadout", () => {
     expect(second.map((error) => error.rule)).toEqual(["tooManyHeroes"]);
   });
 
+  it("counts the heroes besides the Ring-bearer against the deck's own hero limit: four under a contract that allows four", () => {
+    const four = (heroes: string[]): LoadoutSeat => ({ ...seat(heroes), heroLimit: 4 });
+    expect(validate([four([SAGA_FRODO, "h1", "h2", "h3", "h4"])], cards)).toEqual([]);
+    expect(validate([seat([SAGA_FRODO]), four(["h1", "h2", "h3", "h4"])], cards)).toEqual([]);
+    cards.set("h5", definePrinted({ code: "h5", name: "Hero h5", type: "hero", sphere: "tactics", threat: 8, willpower: 1, attack: 1, defense: 1, health: 3 }));
+    const errors = validate([four([SAGA_FRODO, "h1", "h2", "h3", "h4", "h5"])], cards);
+    expect(errors.map((error) => [error.rule, error.code])).toEqual([["tooManyHeroes", "h5"]]);
+    expect(errors[0]?.message).toContain("a fifth hero is legal only when the extra hero is the Ring-bearer");
+  });
+
   it("refuses The One Ring in a deck and never inserts one", () => {
     const errors = validate([seat([SAGA_FRODO, "h1"], [...DECK, RING])], cards);
     expect(errors.map((error) => error.rule)).toEqual(["ringInDeck"]);

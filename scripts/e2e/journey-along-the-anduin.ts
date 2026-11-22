@@ -1,5 +1,5 @@
 // The fixtures of Journey Along the Anduin (Mirkwood Paths part 2), written into src/campaign/fixtures/journey-along-the-anduin.json by
-// scripts/e2e/fixtures.ts: two real games of saved decklists (The One Deck and the Elves of Lórien lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed,
+// scripts/e2e/fixtures.ts: two real games of saved decklists (the fixture decks of scripts/e2e/seed-kit.ts), two-handed,
 // Easy, from the log the `mirkwood-won` game (scripts/e2e/passage-through-mirkwood.ts) writes when it is confirmed (Passage Through Mirkwood's earned pool reaches
 // this scenario through the Campaign Setup Checklist), played by the auto-player, every intent one the reducer listed.
 // `anduin-won`: the first seed that wins, parked on the win (01130's Resolution asks nothing: each Valor and Scarred attached to a hero goes to the
@@ -83,16 +83,16 @@ function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>
   return nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory);
 }
 
-// A Core Set hero of each sphere, in place of a hero that fell in Passage Through Mirkwood (checklist step 2: a fallen hero cannot start; a
-// player who changes heroes takes the threat penalty, step 3).
-const REPLACEMENT: Readonly<Record<string, string>> = { leadership: "01001", tactics: "01004", spirit: "01007", lore: "01010" };
+// The Core Set heroes of each sphere, in place of a hero that fell in Passage Through Mirkwood (checklist step 2: a fallen hero cannot start; a
+// player who changes heroes takes the threat penalty, step 3). The stand-in keeps the fallen hero's sphere: a fixture deck's contract wants each hero of a different sphere.
+const REPLACEMENT: Readonly<Record<string, readonly string[]>> = { leadership: ["01001", "01002", "01003"], tactics: ["01004", "01005", "01006"], spirit: ["01007", "01008", "01009"], lore: ["01010", "01011", "01012"] };
 
 // `after`: the scenario the heroes fell in, for the line that says who replaces whom.
 export function replaced(loadout: StoredLoadout, log: CampaignLog, after = "Passage Through Mirkwood"): StoredLoadout {
   const fallen = log.fallenHeroesBySeat.flat();
   const spheres = new Map(catalog.select().from(cardRows).where(inArray(cardRows.code, fallen)).all().map((row) => [row.code, row.sphereCode]));
-  // A hero title may be in only one seat (The One Deck has an Éowyn of its own beside the Core Set's), so a candidate is taken by its title.
-  const candidates = [...Object.values(REPLACEMENT), "01002", "01005", "01008", "01011"];
+  // A hero title may be in only one seat (a fixture deck's Éowyn is not the Core Set's), so a candidate is taken by its title.
+  const candidates = Object.values(REPLACEMENT).flat();
   const titles = new Map(catalog.select().from(cardRows).where(inArray(cardRows.code, [...candidates, ...loadout.seats.flatMap((seat) => seat.heroes)])).all().map((row) => [row.code, row.name]));
   const taken = new Set(loadout.seats.flatMap((seat) => seat.heroes.map((code) => titles.get(code) ?? code)));
   const seats = loadout.seats.map((seat, index) => ({
@@ -100,7 +100,8 @@ export function replaced(loadout: StoredLoadout, log: CampaignLog, after = "Pass
     heroes: seat.heroes.map((code) => {
       if (!(log.fallenHeroesBySeat[index] ?? []).includes(code)) return code;
       const sphere = spheres.get(code) ?? "neutral";
-      const candidate = [REPLACEMENT[sphere] ?? "01001", "01002", "01005", "01008", "01011"].find((hero) => !taken.has(titles.get(hero) ?? hero)) ?? "01001";
+      const candidate = (REPLACEMENT[sphere] ?? []).find((hero) => !taken.has(titles.get(hero) ?? hero));
+      if (!candidate) throw new Error(`No Core Set ${sphere} hero is free to replace ${code}`);
       taken.add(titles.get(candidate) ?? candidate);
       say.info(`${code} fell in ${after}: seat ${index + 1} starts ${candidate} in its place`);
       return candidate;

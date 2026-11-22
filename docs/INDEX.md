@@ -58,9 +58,9 @@ Read the sections your task touches.
   - 389–400 Desktop (~1.4K) ← 4
   - 401–410 Update check (~680) ← 7
   - 411–416 Catalog build (~410)
-  - 417–433 Tests (~2.1K) ← 18
+  - 417–433 Tests (~2.2K) ← 18
   - 434–449 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~35.7K tok)
+- `docs/brief.md` — Middle-Earth Player — decisions and implementer brief (~35.8K tok)
   - 17–35 Sections (~420)
   - 36–47 Product (~740) ← 2
   - 48–61 Non-goals (~610)
@@ -77,7 +77,7 @@ Read the sections your task touches.
     - 321–328 Engine steps (~180)
     - 329–366 Core round (~2.3K) ← 5
     - 367–404 Keywords implemented once (~2.1K)
-  - 405–447 Deckbuilding (~2.5K) ← 1
+  - 405–447 Deckbuilding (~2.6K) ← 1
   - 448–530 Effects (~4.2K)
     - 451–511 Three layers (~2.5K) ← 10
     - 512–522 Player side quests, contracts and saga cards (~1.4K) ← 1
@@ -124,7 +124,7 @@ Read the sections your task touches.
   - 420–431 Banner (~750) ← 5
   - 432–451 Screen reader (~3.0K) ← 19
   - 452–455 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~37.4K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~37.5K tok)
   - 7–20 Direction (~660)
   - 21–34 Standards (~750) ← 1
   - 35–45 Performance (~740) ← 6
@@ -155,7 +155,7 @@ Read the sections your task touches.
     - 386–389 Table opens stale (~750) ← 4
     - 390–403 Resolution and standalone outcome (~1.9K) ← 2
     - 404–413 Decks (~920) ← 2
-    - 414–423 Deck builder (deck editor) (~1.1K) ← 3
+    - 414–423 Deck builder (deck editor) (~1.2K) ← 3
     - 424–435 Card pool (the Cards tab) (~1.6K) ← 5
     - 436–447 Card groups (the Cards tab's Encounter cards view) (~1.3K) ← 9
     - 448–453 Card (~490) ← 2

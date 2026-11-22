@@ -8,6 +8,7 @@ import { catalog, worldFor, worldForStandalone } from "../../test/harness/fixtur
 import { skippedSetupAnswersOf } from "../../test/harness/setup-answers.ts";
 
 import { cards as cardRows } from "../catalog/schema.ts";
+import { deckRulesOf } from "../catalog/deck-rules.ts";
 import { deckSaveRefusal, type DeckSaveCard } from "../catalog/deck-save.ts";
 
 import { briefing } from "./briefing.ts";
@@ -83,7 +84,8 @@ describe("Save fixtures", () => {
             .map((row) => [row.code, { name: row.name, typeCode: row.typeCode, sphereCode: row.sphereCode, deckLimit: row.deckLimit, deckLegal: row.deckLegal, traits: row.traits }]),
         );
         const counts = [...new Set(seat.deck)].map((code) => ({ code, count: seat.deck.filter((item) => item === code).length }));
-        expect(deckSaveRefusal(seat.heroes, counts, facts), `${name} ${seat.deckId}`).toBeNull();
+        // The deck's own rules apply, as the deck screen applies them: a contract's hero limit (Bond of Friendship's four).
+        expect(deckSaveRefusal(seat.heroes, counts, facts, [], deckRulesOf(worldFor(name).effects, codes)), `${name} ${seat.deckId}`).toBeNull();
       }
     }
   });
@@ -176,7 +178,7 @@ describe("duo (the peek's two-handed fixture, phase 26)", () => {
   it("is a two-handed game of scenario 1 with one deck per seat, from an empty log", () => {
     const found = fixture("duo");
     expect(found.seatCount).toBe(2);
-    expect(found.loadout.seats.map((seat) => seat.deckId)).toEqual(["the-one-deck", "stealth-and-steadfastness"]);
+    expect(found.loadout.seats.map((seat) => seat.deckId)).toEqual(["100-fellowship-detours-and-defense", "100-fellowship-out-of-thin-air"]);
     expect(found.loadout.scenarioId).toBe("a-shadow-of-the-past");
     expect(found.past).toBeNull();
     expect(found.log.completed).toEqual([]);
