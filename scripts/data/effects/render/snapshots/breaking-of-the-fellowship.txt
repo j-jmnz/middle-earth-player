@@ -25,28 +25,28 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142062:A:1 (front): When Revealed: Remove the Ring-bearer, and each card attached to it, from the game (treat The One Ring's text as blank while resolving this effect). Reduce each enemy's engagement cost to 0 until the end of the encounter phase. Skip the travel phase this round.
   142062:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RemoveRingBearer {"verb":"RemoveRingBearer"}]
-    - [json ZeroEngagementCosts {"verb":"ZeroEngagementCosts"}]
-    - [json SkipTravelPhase {"verb":"SkipTravelPhase"}]
+    - the Ring-bearer, the hero The One Ring is attached to, and every card attached to it are removed from the game, wherever their controllers keep them, without being destroyed or discarded (The One Ring's text is blank, so its leaves-play line does not fire); a seat left with no heroes is eliminated
+    - each enemy's engagement cost is read as 0 until the end of the encounter phase (the table holds engagementCostZero until the end of the round, and the cost is read as 0 only during the encounter phase)
+    - skip the travel phase this round: the table holds skipTravel until the end of the round, and the round goes from the quest phase to the encounter phase with no travel window
 
 142062:B:1 (back): Forced: At the end of the refresh phase, shuffle Seat of Seeing and Frodo's Choice into the encounter discard pile. Then, place the encounter discard pile on the bottom of the encounter deck. Starting with the first player, each player creates his own staging area and advances to a different stage 3A of his choice. In player order, each player moves 1 encounter card from this staging area to his. When there are no encounter cards left at this stage, discard it.
   142062:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShuffleSetAsideIntoDiscard {"verb":"ShuffleSetAsideIntoDiscard","codes":["142074","142068"]}]
-    - [json PlaceDiscardUnderDeck {"verb":"PlaceDiscardUnderDeck"}]
+    - each set-aside card with a printed code in 142074 and 142068 joins the encounter discard pile, and the whole pile is shuffled (a code with no card set aside is skipped)
+    - the encounter discard pile, in the order it is in, goes under the encounter deck
     - for each player, first player first:
       - the acting player chooses (each option once) one of:
         * option "142063":
-          - [json StartSeparateStage {"verb":"StartSeparateStage","code":"142063"}]
+          - the acting player creates a staging area and a quest stage of their own: the quest deck's card with printed code 142063 becomes that seat's stage, stages are separate from now on, and the seat's area is empty (nothing when the code is not in the quest deck)
         * option "142064":
-          - [json StartSeparateStage {"verb":"StartSeparateStage","code":"142064"}]
+          - the acting player creates a staging area and a quest stage of their own: the quest deck's card with printed code 142064 becomes that seat's stage, stages are separate from now on, and the seat's area is empty (nothing when the code is not in the quest deck)
         * option "142065":
-          - [json StartSeparateStage {"verb":"StartSeparateStage","code":"142065"}]
+          - the acting player creates a staging area and a quest stage of their own: the quest deck's card with printed code 142065 becomes that seat's stage, stages are separate from now on, and the seat's area is empty (nothing when the code is not in the quest deck)
         * option "142066":
-          - [json StartSeparateStage {"verb":"StartSeparateStage","code":"142066"}]
-    - [json DealOutStaging {"verb":"DealOutStaging"}]
+          - the acting player creates a staging area and a quest stage of their own: the quest deck's card with printed code 142066 becomes that seat's stage, stages are separate from now on, and the seat's area is empty (nothing when the code is not in the quest deck)
+    - in player order, each living seat in turn picks one card of the shared staging area (the first player chooses when a seat has several; the last one is taken without asking) until it holds none, and the card goes to that seat's own staging area (entering an area is not a reveal)
     - the shared quest stage goes to the set-aside pile, and each living player, first player first, hears that it was discarded for his own stage
 
 ## 142063 Searching the Woods
@@ -174,15 +174,15 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142068:A:1 (front): If Frodo's Choice is discarded, reveal it instead.
   142068:constant:1: Constant
-    - [json RevealIfDiscarded {"verb":"RevealIfDiscarded"}]
+    - (marker) when a card effect discards cards from the top of the encounter deck, this card, if it is among them, is revealed by the seat whose stage it is and is not discarded
 
 142068:A:2 (front): When Revealed: Take control of the first player token and the Ring-bearer (and each card attached to it). Attach to the Ring-bearer. For the rest of the game, you cannot lose control of the first player token.
   142068:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json TakeFirstPlayer {"verb":"TakeFirstPlayer"}]
-    - [json TakeRingBearer {"verb":"TakeRingBearer"}]
-    - [json AttachSelfToRingBearer {"verb":"AttachSelfToRingBearer"}]
-    - [json LockFirstPlayer {"verb":"LockFirstPlayer"}]
+    - the acting player takes the first player token and is the first player from now on
+    - the Ring-bearer, if one is in play, and what is attached to it go to the acting player
+    - this treachery is attached to the Ring-bearer, the hero with the Ring-bearer trait (it stays in the encounter discard pile when there is no Ring-bearer in play)
+    - for the rest of the game the first player token cannot be lost: it does not pass at the end of the refresh phase
 
 ## 142069 Uruk-hai Captain
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -318,8 +318,8 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if all of: (it is the Travel phase) and (this card is in the staging area)
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RaiseThreatAtStage {"verb":"RaiseThreatAtStage","amount":1}]
-    - [json MoveToLeftArea {"verb":"MoveToLeftArea"}]
+    - each player at this card's stage raises their threat by 1 (once the stages are separate, the seat whose staging area holds this card; every player before that)
+    - this card, in a staging area, moves to the staging area to the left, the next living seat's, if able (nothing with one staging area or one seat)
 
 ## 142078 Wooded Shoreline
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -362,16 +362,16 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     - the acting player chooses one of:
       * option "move" (only if the actor has an enemy engaged):
         - choose enemy (you control) engaged with you
-        - [json MoveToFirstStaging {"verb":"MoveToFirstStaging","target":"picked"}]
+        - the last picked enemy, in a staging area or engaged, moves to the first player's staging area (with one staging area it goes to it)
       * option "doomed":
-        - [json Doomed {"verb":"Doomed","amount":2}]
+        - each player raises their threat by 2 from the doomed keyword this card gains (doomedRaised is announced for each)
         - this card gains surge (one more encounter card is revealed when it has been resolved)
 
 142080:A:3 (shadow): Shadow: After this attack, move attacking enemy to the first player's staging area.
   142080:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - [json MoveToFirstStaging {"verb":"MoveToFirstStaging"}]
+      - this card, in a staging area or engaged, moves to the first player's staging area (with one staging area it goes to it)
 
 ## 142081 Orcs of the White Hand
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -410,11 +410,11 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
   142083:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
-    - [json FallIntoEvil {"verb":"FallIntoEvil"}]
+    - the attached non-Fellowship hero moves to the first player's staging area as an enemy (its Threat is its Willpower, its engagement cost its threat cost) and leaves its player's control; its game text is blank while it is one
   142083:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   142083:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
-    - [json ReturnFallenHero {"verb":"ReturnFallenHero"}]
+    - each fallen hero in play goes back among its owner's heroes with its own code; one defeated while it was an enemy goes to its owner's discard pile
 
 ## 142089 Followed by Night
 
@@ -441,4 +441,4 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 213 by template, 33 as JSON)
+(rendered pieces: 235 by template, 11 as JSON)

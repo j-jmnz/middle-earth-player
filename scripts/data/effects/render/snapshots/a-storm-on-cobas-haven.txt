@@ -14,7 +14,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 110102:A:3 (front): Forced: When Dol Amroth Warship is destroyed, set it aside, out of play.
   110102:forced:1: Forced on the event characterDestroyed (heard about this card)
-    - [json SetAsideSelf {"verb":"SetAsideSelf"}]
+    - this card, wherever it is, goes to the set-aside zone with no damage and no controller, so a set-aside copy can be taken again
 
 110102:B:1 (back): Campaign Mode only.
   (inert: the engine applies it by rule, no record)
@@ -34,7 +34,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 110102:B:5 (back): Forced: When Dol Amroth Warship is destroyed, set it aside, out of play.
   110102:forced:2: Forced on the event characterDestroyed (heard about this card)
-    - [json SetAsideSelf {"verb":"SetAsideSelf"}]
+    - this card, wherever it is, goes to the set-aside zone with no damage and no controller, so a set-aside copy can be taken again
 
 ## 11209 A Storm on Cobas Haven
 
@@ -56,9 +56,9 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - a copy of the card with code 11213 is set aside, out of play
     - a copy of the card with code 11214 is set aside, out of play
     - a card with code 11177 from the box joins the encounter deck, which is shuffled
-    - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Raider Flagship"}]
-    - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
+    - Setup: the card with code 11178 joins the Corsair deck the scenario deals, which the quest card's Setup then shuffles
+    - Campaign Setup: the set-aside copy of the card with code 11192 is attached to the card in play named "Raider Flagship" (a card dealt on its Upgraded side stays so)
+    - Campaign Setup, after the quest card's Setup has prepared the fleet: each player in player order takes one of the set-aside cards with codes 11172, 11173, 11174 and 11175 for each ship-objective they control, in the order the ships were taken, and attaches it to that ship (a card dealt on its Upgraded side if the log says it is upgraded)
     - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
     - the set-aside card titled "Gavin" is put into play under a player the first player chooses
     - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
@@ -78,60 +78,60 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - a copy of the card with code 11213 is set aside, out of play
     - a copy of the card with code 11214 is set aside, out of play
     - a card with code 11177 from the box joins the encounter deck, which is shuffled
-    - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Raider Flagship"}]
-    - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
+    - Setup: the card with code 11178 joins the Corsair deck the scenario deals, which the quest card's Setup then shuffles
+    - Campaign Setup: the set-aside copy of the card with code 11192 is attached to the card in play named "Raider Flagship" (a card dealt on its Upgraded side stays so)
+    - Campaign Setup, after the quest card's Setup has prepared the fleet: each player in player order takes one of the set-aside cards with codes 11172, 11173, 11174 and 11175 for each ship-objective they control, in the order the ships were taken, and attaches it to that ship (a card dealt on its Upgraded side if the log says it is upgraded)
     - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
     - the set-aside card titled "Gavin" is put into play under a player the first player chooses
     - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
 
 11209:B:1 (back): Resolution: Add the Círdan's Blessing chosen during setup to the Campaign Pool. The players may spend 4 XP on Gavin to record in the Campaign Log that "Gavin returned."
   11209:resolution:1: Resolution
-    - [json EarnDealt {"verb":"EarnDealt","codes":["11205","11206","11207","11208"]}]
+    - Resolution: one entry for each copy of a card with code 11205, 11206, 11207 and 11208 that a seat chose at the Setup is earned for that seat, wherever the copy is now (in a hand, in the victory display, in a discard pile)
 
 11209:B:2 (back): Gain the following:
   11209:resolution:2: Resolution (record also names 11209:B:3)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11209:B:3 (back): • 1 XP for each surviving player.
   11209:resolution:2: Resolution (record also names 11209:B:2)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11209:B:4 (back): • 1 XP if you ended the game on-course (Sun).
   11209:resolution:3: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"heading","is":"onCourse"}}]
+    - if the Heading card shows Sun (on-course) (false while the game has no Heading card): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11209:B:5 (back): • 1 XP if 2 Dol Amroth Warships are in play.
   11209:resolution:4: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"character","control":"any","names":["Dol Amroth Warship"]},"min":2}}]
+    - if the number of character (any player controls) named "Dol Amroth Warship" is at least 2: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11209:B:6 (back): • 1 XP if the players control 2 Corsair Skirmishers.
   11209:resolution:5: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"character","control":"any","names":["Corsair Skirmisher"]},"min":2}}]
+    - if the number of character (any player controls) named "Corsair Skirmisher" is at least 2: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11209:B:7 (back): • 1 XP if the players control 4 Dol Amroth objectives.
   11209:resolution:6: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"objective","control":"any","trait":"Dol Amroth","controlled":true},"min":4}}]
+    - if the number of Dol Amroth objective (any player controls) that is claimed (attached to a character a player controls) is at least 4: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11209:B:8 (back): • 1 XP for each Corsair Warship in the victory display.
   11209:resolution:7: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"inVictory","codes":["11058"]}}]
+    - Resolution: gain 1 XP for each card with code 11058 in the victory display (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11209:B:9 (back): • 1 XP if Crowley is in the victory display.
   11209:resolution:8: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Crowley"]},"min":1}}]
+    - if the number of card (any player controls) in the victory display, named "Crowley" is at least 1: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11209:B:10 (back): • 2 XP if Raider Flagship is in the victory display.
   11209:resolution:9: Resolution
-    - [json GainXp {"verb":"GainXp","amount":2,"when":{"kind":"inVictory","code":"12124","is":true}}]
+    - if the card with code 12124 is in the victory display: Resolution: gain 2 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11209:B:11 (back): • 2 XP if Thunderstruck is in the victory display.
   11209:resolution:10: Resolution
-    - [json GainXp {"verb":"GainXp","amount":2,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Thunderstruck"]},"min":1}}]
+    - if the number of card (any player controls) in the victory display, named "Thunderstruck" is at least 1: Resolution: gain 2 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11209:B:12 (back): • -1 XP if Ominous Fate is in the victory display.
   11209:resolution:11: Resolution
-    - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
+    - if the number of card (any player controls) in the victory display, named "Ominous Fate" is at least 1: Resolution: lose 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 ## 12120 Outmaneuver the Enemy
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -139,8 +139,8 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12120:A:1 (front): Setup: Prepare the Corsair deck. Players prepare their fleet. Set each copy of Dol Amroth Warship aside, out of play. Search the encounter deck for Raider Flagship and 1 copy of Scouting Ship, and add them to the staging area. Search the encounter deck for a Dol Amroth objective of your choice and add it to the staging area. Then, shuffle the encounter deck and resolve the Guarded keyword on that objective.
   12120:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck"}]
-    - [json PrepareFleet {"verb":"PrepareFleet"}]
+    - Setup: every non-ship enemy still in the encounter deck goes to the Corsair deck, which is shuffled; from then on a non-ship enemy that would be discarded goes to the Corsair discard pile, and the Corsair deck refills from it
+    - Setup: each player in turn takes one of the six ship-objectives set aside (the Dream-chaser is forced on the last player who has not got it; a lone player takes the Dream-chaser and one other), the unused ships leave the game, and the Heading card is attached to the Dream-chaser, set to on-course
     - the acting player finds one Dol Amroth objective in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - shuffle the encounter deck
     - the Guarded keyword: the picked card in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
@@ -153,7 +153,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): choose Ship character (you control)
-    - [json DamageShip {"verb":"DamageShip","amount":2,"when":{"kind":"heading","is":"offCourse"}}]
+    - then, if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the last picked card, a Ship objective, as the encounter or campaign card whose effect it is (a ship is immune to player card effects, not to this)
     - then, if the Heading card shows Sun (on-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the card the event is about
 
 12120:B:3 (back): If your current heading is at the worst setting (Storm), Raider Flagship gets -50 engagement cost.
@@ -225,7 +225,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12123:A:3 (front): Forced: When Dol Amroth Warship is destroyed, set it aside, out of play.
   12123:forced:1: Forced on the event characterDestroyed (heard about this card)
-    - [json SetAsideSelf {"verb":"SetAsideSelf"}]
+    - this card, wherever it is, goes to the set-aside zone with no damage and no controller, so a set-aside copy can be taken again
 
 ## 12124 Raider Flagship
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -245,7 +245,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     only if all of: (it is the Encounter phase) and (this card is engaged with a player (that player is who "you" means in this record))
     who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
-      - [json RevealCorsair {"verb":"RevealCorsair","when":{"kind":"engagedWithActor"}}]
+      - if [json condition {"kind":"engagedWithActor"}]: the acting player reveals the top card of the Corsair deck and puts it into play engaged with them (the deck refills from its discard pile when it runs out)
 
 ## 12125 Corsair Skirmisher
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -260,8 +260,8 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
   12125:response:1: Response after an enemy is destroyed (heard about this card; answered by the player the event happened to)
     only if [json condition {"kind":"alliesWillpower","min":3}]
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardAlliesForWillpower {"verb":"DiscardAlliesForWillpower","willpower":3}]
-    - [json TakeControlAsShip {"verb":"TakeControlAsShip"}]
+    - the acting player chooses allies they control one at a time and each is discarded as it is chosen, until the Willpower of the allies discarded adds up to at least 3
+    - this Ship enemy, from the discard pile it was destroyed to, goes into play under the acting player as a Ship-objective with Willpower equal to its Threat: it loses the Ship-enemy card type and gains the Ship-objective type, keeps its Attack, Defense and hit points and has no damage
 
 ## 12126 Siege Ship
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -328,7 +328,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     only if there is a Ship enemy (any player controls) or in the staging area, that is not guarding an objective to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose Ship enemy (any player controls) or in the staging area, that is not guarding an objective
-    - [json ConsiderOutOfPlay {"verb":"ConsiderOutOfPlay"}]
+    - the last picked enemy goes facedown under this location, out of play, and returns to the staging area, or to the player it was engaged with, once this card is no longer the active location
 
 ## 12130 Cobas Haven
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -345,15 +345,15 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
   12131:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): choose Ship enemy (any player controls) engaged with you, with the highest Attack of those, as the table shows it (ties: the chooser decides)
-    - [json AttackWithPicked {"verb":"AttackWithPicked","raiseStagingThreat":"endOfPhase","when":{"kind":"heading","is":"offCourse"}}]
-    - [json Doomed {"verb":"Doomed","amount":2,"when":{"kind":"noneReturned"}}]
+    - then, if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked enemy makes an immediate attack against the acting player (when it is in the staging area; counted as an attack made, like any attack an effect makes); when the attack ends the total Threat in the staging area is raised, until the end of the phase, by the damage the attack dealt
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 2 from the doomed keyword this card gains (doomedRaised is announced for each)
 
 ## 12132 Taking on Water
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 12132:A:1 (front): When Revealed: Attach to a Ship objective. (Counts as a Condition attachment with the text: "Forced: When attached objective exhausts, deal 2 damage to it. Action: Exhaust 3 characters you control to discard Taking on Water.")
   12132:whenRevealed:1: When revealed
-    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship"}}]
+    - this card attaches itself to a Ship objective the players control, chosen by the first player
   12132:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   12132:forced:1: Forced on the event shipExhausted (heard about the host)
@@ -369,7 +369,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12132:A:2 (shadow): Shadow: If defending character is a Ship, attach Taking on Water to it.
   12132:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship","defender":true}}]
+    - this card attaches itself to the Ship objective defending the attack in progress (nothing happens if the defender is not a Ship)
 
 ## 12133 The Raiders' Assault
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -392,7 +392,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12134:A:2 (front): If Sea-ward Tower is free of encounters, add it to the staging area, controlled by the players.
   12134:constant:1: Constant
-    - [json ControlWhenFree {"verb":"ControlWhenFree"}]
+    - (constant, does nothing when run) this objective in the staging area is controlled by the players as soon as it is free of encounters and no effect is resolving: it is marked claimed, with no controller, so it stays in the staging area
 
 12134:A:3 (front): While the players control Sea-ward Tower, look at 2 additional cards from the top of the encounter deck during each Sailing test.
   12134:constant:2: Constant
@@ -408,7 +408,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12135:A:2 (front): If Tower of the Gull is free of encounters, add it to the staging area, controlled by the players.
   12135:constant:1: Constant
-    - [json ControlWhenFree {"verb":"ControlWhenFree"}]
+    - (constant, does nothing when run) this objective in the staging area is controlled by the players as soon as it is free of encounters and no effect is resolving: it is marked claimed, with no controller, so it stays in the staging area
 
 12135:A:3 (front): Combat Action: If the players control Tower of the Gull, exhaust it to deal 2 damage to a non-unique Ship enemy. Any player may trigger this action.
   12135:action:1: Action (cost: exhaust this card)
@@ -427,7 +427,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12136:A:2 (front): If The Beacon is free of encounters, add it to the staging area, controlled by the players.
   12136:constant:1: Constant
-    - [json ControlWhenFree {"verb":"ControlWhenFree"}]
+    - (constant, does nothing when run) this objective in the staging area is controlled by the players as soon as it is free of encounters and no effect is resolving: it is marked claimed, with no controller, so it stays in the staging area
 
 12136:A:3 (front): Planning Action: If the players control The Beacon, exhaust it and spend 5 resources to take control of 1 set aside copy of Dol Amroth Warship. Any player may trigger this action.
   12136:action:1: Action (cost: exhaust this card and pay 5 resource(s))
@@ -444,11 +444,11 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12137:A:2 (front): If Tower of the Heron is free of encounters, add it to the staging area, controlled by the players.
   12137:constant:1: Constant
-    - [json ControlWhenFree {"verb":"ControlWhenFree"}]
+    - (constant, does nothing when run) this objective in the staging area is controlled by the players as soon as it is free of encounters and no effect is resolving: it is marked claimed, with no controller, so it stays in the staging area
 
 12137:A:3 (front): While Tower of the Heron is controlled by the players, reduce the archery total by 4.
   12137:constant:2: Constant
     only if [json condition {"kind":"controlledByPlayers"}]
     - this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) -4, while this card is in play
 
-(rendered pieces: 223 by template, 43 as JSON)
+(rendered pieces: 276 by template, 8 as JSON)

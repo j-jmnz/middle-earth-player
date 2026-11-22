@@ -8,7 +8,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 12168:A:2 (front): Setup: Any player gains control of Melanwar. The first player may search the encounter deck for a copy of Twilight Hall and add it to the staging area. If they do, the players look at 3 random undiscovered treasures and attach 1 of them to Twilight Hall as a guarded objective. When free of encounters, the players claim the treasure and attach it to any character.
   12168:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"12169"}]
+    - Campaign Setup: the objective ally with code 12169 enters play under the first player (put there, not played: nothing is revealed and no cost is paid; a pool card with this record for itself is put into play at the start of each scenario instead of being shuffled into the encounter deck)
     - [json SearchGuardForTreasure {"verb":"SearchGuardForTreasure","code":"18033"}]
 
 12168:B:1 (back): Resolution: At the edge of the forest, Melanwar pledged his friendship to the heroes, moved by their altruism and their willingness to trust a stranger. If the heroes choose to invite him to join their quest, add Melanwar to the campaign pool (any player may add him to their deck). Otherwise, mark in the campaign log that "Melanwar has given you guidance on traversing Wilderland" (you can more safely navigate the mountains).
@@ -426,4 +426,4 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 253 by template, 41 as JSON)
+(rendered pieces: 254 by template, 40 as JSON)

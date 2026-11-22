@@ -73,7 +73,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
         * option "search":
           - choose card (you control) in the deck, among the top 5
           - move the picked card to hand
-          - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+          - shuffle the acting player's deck
         * option "skip":
 
 ## 01079 Eyes of the Forest
@@ -239,7 +239,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01120:B:1 (back): Forced: When you defeat this stage, proceed to one of the 2 "A Chosen Path" stages, at random.
   01120:forced:1: Forced on the event questCardDefeated (heard about this card)
-    - [json BranchStage {"verb":"BranchStage","codes":["01121","01122"]}]
+    - (the stage's definition carries it; nothing runs when it is resolved) defeating this stage proceeds to one of the stages with codes 01121 and 01122, chosen with the scenario's seed, and the others are removed from the game; the stage reached is the last one: defeating it wins the game
 
 ## 01121 A Chosen Path
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -270,7 +270,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01129:A:2 (front): Setup: Put Mendor into play.
   01129:campaignSetup:1: Campaign setup
-    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"01135"}]
+    - Campaign Setup: the objective ally with code 01135 enters play under the first player (put there, not played: nothing is revealed and no cost is paid; a pool card with this record for itself is put into play at the start of each scenario instead of being shuffled into the encounter deck)
 
 01129:A:3 (front): If Mendor leaves play, the players lose the game.
   01129:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about card (any player controls) or in the staging area or the active location, named "Mendor")
@@ -279,9 +279,9 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 01129:B:1 (back): Resolution: Each player earns 1 copy of the Mendor's Support boon card. Add the earned cards to the Campaign Pool. If stage 3B was Beorn's Path, add the Ungoliant's Swarm burden card to the Campaign Pool. If stage 3B was Don't Leave the Path, add the Lingering Venom burden card to the Campaign Pool.
   01129:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json Earn {"verb":"Earn","codes":["01132"],"eachPlayer":true}]
-    - [json Earn {"verb":"Earn","codes":["01136"],"when":{"kind":"stageReached","code":"01122","is":true}}]
-    - [json Earn {"verb":"Earn","codes":["01137"],"when":{"kind":"stageReached","code":"01121","is":true}}]
+    - Resolution: the cards with codes 01132 are earned, with no choice (one copy for each living player)
+    - then, if [json condition {"kind":"stageReached","code":"01122","is":true}] (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: the cards with codes 01136 are earned, with no choice
+    - then, if [json condition {"kind":"stageReached","code":"01121","is":true}] (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: the cards with codes 01137 are earned, with no choice
 
 === Nightmare deck (the cards the scenario's Nightmare deck adds) ===
 
@@ -443,4 +443,4 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
       - choose ready character (you control)
       - exhaust the picked card
 
-(rendered pieces: 224 by template, 6 as JSON)
+(rendered pieces: 230 by template, 2 as JSON)

@@ -75,11 +75,11 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146029:forced:1: Forced after this location becomes the active location
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a non-unique enemy (any player controls) in the staging area only, without Nazgûl, chosen by the first player to choose: choose non-unique enemy (any player controls) in the staging area only, without Nazgûl, chosen by the first player
-    - [json PlaceUnderSelf {"verb":"PlaceUnderSelf","when":{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true,"nonUnique":true,"notTraits":["Nazgûl"],"who":"firstPlayer"}}}]
+    - then, if there is a non-unique enemy (any player controls) in the staging area only, without Nazgûl, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked card is placed facedown under this location; while it is there it is out of play
 
 146029:A:2 (front): Forced: When Reeking Moat leaves play, put each enemy under it into play engaged with the first player.
   146029:forced:2: Forced after a card leaves play
-    - [json ReturnUnderToStaging {"verb":"ReturnUnderToStaging","to":"engaged"}]
+    - each card under this location is put into play engaged with the first player instead of the staging area, and counts as engaging them
 
 ## 146030 Wall of Morannon
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -283,7 +283,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
       * option "control":
         - the acting player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
       * option "discard" (only if all of: (the actor's heroes that can pay for a fellowship card (with that icon or one they were given) hold at least 1 resource(s) in all) and (there is a non-unique enemy (any player controls) in the staging area only to choose)):
-        - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship"}]
+        - the acting player spend 1 resource(s) from heroes with the fellowship icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
         - choose non-unique enemy (any player controls) in the staging area only
         - discard this card
         - discard the picked card
@@ -304,20 +304,20 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   (the keyword part is owned by the card's keywords; the records cover: When Revealed: In player order, each player places the top card of his deck faceup in front of him until there are a total of 4 faceup player cards between the players. Place the top 4 cards of the encounter deck faceup. Starting with the highest cost player card, pair each player card with the highest threat encounter card remaining until there are 4 pairs. For each pair, the first player must choose: either discard both cards in that pair, or reveal the encounter card to play the player card at no cost.)
   146072:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json EmbassyDeal {"verb":"EmbassyDeal","cards":4}]
+    - in player order, each player places the top card of their deck faceup in front of them until there are 4 faceup player cards between the players (a player with an empty deck passes), and the top 4 cards of the encounter deck are placed faceup; both rows lie set aside, faceup, out of the decks, and are remembered as the Embassy until EmbassyEnd
     - repeat 4 times:
       - choose card (any player controls) or in the staging area or the active location, with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides), chosen by the first player [also {"embassy":"player"}]
       - choose card (any player controls) or in the staging area or the active location, with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), chosen by the first player [also {"embassy":"encounter"}]
-      - [json EmbassyPair {"verb":"EmbassyPair"}]
+      - the last two cards picked (a player card of the row, then an encounter card of it) make one pair, in the order they were paired (with either pick empty no pair is made)
     - repeat 4 times:
-      - [json EmbassyNext {"verb":"EmbassyNext"}]
+      - the next pair, in the order they were paired, becomes the pair the running effect is on: its player card and its encounter card are picked (nothing is picked once the pairs are done)
       - the first player chooses one of:
         * option "discard" (only if [json condition {"kind":"embassy","is":"pair"}]):
-          - [json EmbassyDiscard {"verb":"EmbassyDiscard"}]
+          - the player card of the current pair goes to its owner's discard pile and its encounter card to the encounter discard pile
         * option "play" (only if [json condition {"kind":"embassy","is":"playable"}]):
-          - [json EmbassyReveal {"verb":"EmbassyReveal"}]
-          - [json PlayRevealedFree {"verb":"PlayRevealedFree","embassy":true}]
-    - [json EmbassyEnd {"verb":"EmbassyEnd"}]
+          - the first player reveals the current pair's encounter card as a card revealed in the staging step (Peril, Surge and Doomed apply; "you" is the first player); the player card is played after it
+          - the player card of the Embassy's current pair, lying faceup in front of its owner, is played for no cost by its owner; when it cannot be played it goes to its owner's discard pile
+    - the Embassy is over: an encounter card of the row that was never paired goes back on top of the encounter deck in the order it was placed (a game with too few player cards), and the Embassy is forgotten
 
 ## 146073 The Battle of the Morannon
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -345,4 +345,4 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:constant:2: Constant
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 220 by template, 15 as JSON)
+(rendered pieces: 232 by template, 5 as JSON)

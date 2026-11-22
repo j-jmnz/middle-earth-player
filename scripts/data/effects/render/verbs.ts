@@ -2,6 +2,8 @@
 // The structural verbs (Choose, Each, Delay, AfterAttack, Repeat, ForEachPlayer) hold instructions of their own and print them indented beneath.
 import { cardRef, renderAmount } from "./amounts.ts";
 import { renderCondition } from "./conditions.ts";
+import { who } from "./family-kit.ts";
+import { FAMILY_TEMPLATES } from "./families.ts";
 import { compact, done, isObj, jsonOf, joinAnd, quoted, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 import { ANGMAR_TEMPLATES } from "./angmar.ts";
@@ -33,8 +35,6 @@ const amount = (value: unknown, ctx: Ctx): string => renderAmount(value, ctx, re
 // The most ChooseX allows: its one amount, or the least of several (the engine takes the smallest of `max`).
 const chooseXMost = (max: unknown, ctx: Ctx): string => (Array.isArray(max) ? (max.length === 1 ? amount(max[0], ctx) : `the least of ${joinAnd(max.map((one) => amount(one, ctx)))}`) : "?");
 const pick = (value: unknown, ctx: Ctx): string => renderPick(value, ctx);
-const WHO: Readonly<Record<string, string>> = { actor: "the acting player", firstPlayer: "the first player", picked: "the picked player", eventSeat: "the player the event is about", eachSeat: "each player", guardian: "the player guarding Gollum", defendingPlayer: "the defending player (the player this enemy is engaged with)" };
-const who = (value: unknown): string => WHO[str(value)] ?? str(value);
 
 // A target: a card reference (`self`) or a target object (`{ kind: "picked" }`).
 function target(value: unknown): string {
@@ -76,7 +76,7 @@ const FLIP_GOLLUM = {
 } as const;
 
 export const TEMPLATES: Readonly<Record<string, Template>> = {
-  ...ESCAPE_TEMPLATES, ...AMBUSH_TEMPLATES, ...ANGMAR_TEMPLATES, ...LONG_DARK_TEMPLATES, ...STONE_TEMPLATES,
+  ...FAMILY_TEMPLATES, ...ESCAPE_TEMPLATES, ...AMBUSH_TEMPLATES, ...ANGMAR_TEMPLATES, ...LONG_DARK_TEMPLATES, ...STONE_TEMPLATES,
   ...GUARDIAN_TEMPLATES, ...ATTACH_TEMPLATES, ...STAT_TEMPLATES,
   ...SMAUG_TEMPLATES, ...ERECH_TEMPLATES, ...FOG_TEMPLATES, ...RUINS_TEMPLATES, ...SIEGE_TEMPLATES, ...GULDUR_TEMPLATES, ...DREADNAUGHT_TEMPLATES, ...INVESTIGATION_TEMPLATES, ...WIZARDS_QUEST_TEMPLATES,
   Pick: (i, ctx) => ({ text: `choose ${pick(i.pick, ctx)}`, read: ["pick"] }),

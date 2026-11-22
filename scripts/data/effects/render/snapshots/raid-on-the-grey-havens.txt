@@ -7,7 +7,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
   11036:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter deck
-    - [json DiscardUntilAflame {"verb":"DiscardUntilAflame","perPlayer":1}]
+    - Setup: cards are discarded from the top of the encounter deck until 1 location(s) with the Aflame keyword for each player are discarded, or the deck is empty: the cards above them go to the encounter discard pile and each Aflame location found goes to the staging area
     - shuffle the encounter discard pile into the encounter deck
 
 11036:B:1 (back): Forced: At the end of the combat phase, deal X damage to the Aflame location in play with the lowest Aflame value. X is the number of Corsair enemies in play.
@@ -37,7 +37,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
   11037:constant:1: Constant
     - this card: stat progressHeals 1, while this card is in play
   11037:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
-    - [json HealLocations {"verb":"HealLocations","amount":{"x":true}}]
+    - the players remove X damage from the locations in play, one damage at a time from the location the first player chooses (the amount is the progress a stage replaced with healing)
 
 11037:B:2 (back): Each Raider enemy revealed by the encounter deck enters play with 1 resource on it.
   11037:forced:1: Forced after a card is revealed (heard about Raider enemy (any player controls) or in the staging area; only when the encounter deck revealed it)
@@ -88,7 +88,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
         - choose location (any player controls) chosen by the first player [also {"aflame":true}]
         - deal 2 damage to the picked card
       * option "search" (only if the encounter discard pile or deck holds a location with the Aflame keyword):
-        - [json SearchAflame {"verb":"SearchAflame"}]
+        - the Aflame location with the highest Aflame value in the encounter deck and its discard pile is added to the staging area, not revealed (of locations tied on the value that are not copies of one card the first player chooses; the deck is not shuffled)
 
 ## 11041 Sahír's Ravager
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -426,16 +426,16 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - a copy of the card with code 11180 is set aside, out of play
     - a copy of the card with code 11183 is set aside, out of play
-    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"110013"}]
+    - Campaign Setup: the objective ally with code 110013 enters play under the first player (put there, not played: nothing is revealed and no cost is paid; a pool card with this record for itself is put into play at the start of each scenario instead of being shuffled into the encounter deck)
     - a card with code 11188 from the box joins the encounter deck, which is shuffled
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11180","to":"Calphon"}]
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Calphon"}]
+    - Campaign Setup: the set-aside copy of the card with code 11180 is attached to the card in play named "Calphon" (a card dealt on its Upgraded side stays so)
+    - Campaign Setup: the set-aside copy of the card with code 11183 is attached to the card in play named "Calphon" (a card dealt on its Upgraded side stays so)
     - each player in turn may take "11184" or "11185" or "11186" or "11187" into their hand [also {"unearned":true,"afterMulligan":true}]
 
 11182:A:3 (front): Forced: After stage 2B is revealed, remove Calphon and each attachment on him from the game, ignoring his "leaves play" ability.
   11182:forced:1: Forced on the event afterStageRevealed
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Sahír's Advance"
-    - [json RemoveNamedFromGame {"verb":"RemoveNamedFromGame","name":"Calphon"}]
+    - the card in play titled "Calphon" and the cards attached to it leave the game, and none is announced as leaving play, so no "if it leaves play" ability triggers (the campaign pool is left alone)
 
 11182:B:1 (back): Resolution: If Graxar is in the victory display, choose either Parrying Cutlass or Throwing Axe, add it to the Campaign Pool, and record which hero you attach it to.
   11182:resolution:1: Resolution
@@ -443,41 +443,41 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11182:B:2 (back): Add the copies of Galdor's Counsel chosen during setup to the Campaign Pool.
   11182:resolution:2: Resolution
-    - [json EarnDealt {"verb":"EarnDealt","codes":["11184","11185","11186","11187"]}]
+    - Resolution: one entry for each copy of a card with code 11184, 11185, 11186 and 11187 that a seat chose at the Setup is earned for that seat, wherever the copy is now (in a hand, in the victory display, in a discard pile)
 
 11182:B:3 (back): Gain the following:
   11182:resolution:3: Resolution (record also names 11182:B:4)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11182:B:4 (back): • 1 XP for each surviving player.
   11182:resolution:3: Resolution (record also names 11182:B:3)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11182:B:5 (back): • 1 XP if 2 or fewer cards are underneath The Havens Burn (2 XP instead if no cards are underneath it).
   11182:resolution:4: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"underBurn","max":2}}]
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"underBurn","max":0}}]
+    - if [json condition {"kind":"underBurn","max":2}]: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - then, if [json condition {"kind":"underBurn","max":0}] (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11182:B:6 (back): • 1 XP for each Elven Wave-runner in the victory display.
   11182:resolution:5: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"inVictory","codes":["11046"]}}]
+    - Resolution: gain 1 XP for each card with code 11046 in the victory display (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11182:B:7 (back): • 1 XP if Na'asiyah is in the victory display.
   11182:resolution:6: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"inVictory","code":"11078","is":true}}]
+    - if the card with code 11078 is in the victory display: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11182:B:8 (back): • 1 XP if no enemies are in play.
   11182:resolution:7: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"enemyInPlay","is":false}}]
+    - if there is no enemy in play (in the staging area or engaged): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11182:B:9 (back): • 1 XP if each surviving player's threat is 40 or less.
   11182:resolution:8: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"survivorsThreat","max":40}}]
+    - if [json condition {"kind":"survivorsThreat","max":40}]: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11182:B:10 (back): • -1 XP if Ominous Fate is in the victory display.
   11182:resolution:9: Resolution
-    - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
+    - if the number of card (any player controls) in the victory display, named "Ominous Fate" is at least 1: Resolution: lose 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 ## 11188 Graxar
 
@@ -499,4 +499,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with a player (that player is who "you" means in this record)) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 301 by template, 35 as JSON)
+(rendered pieces: 323 by template, 21 as JSON)

@@ -26,7 +26,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
   50302:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - one set-aside card with code 50306 joins the staging area (it is not revealed)
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"50304","to":"The Stone of Erech","uncontrolled":true}]
+    - Campaign Setup: the set-aside copy of the card with code 50304 is attached to the card in play named "The Stone of Erech" (a card dealt on its Upgraded side stays so); it lies attached, controlled by nobody, not revealed, wherever its host lies, and in no play area
 
 50302:B:1 (back): Forced: At the beginning of each round, the players must choose: each player skips the next planning phase, or heroes do not collect resources during the resource phase this round.
   50302:forced:1: Forced when a phase begins
@@ -385,7 +385,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
   50324:whenRevealed:1: When revealed
     - the first player chooses one of:
       * option "skipTravel":
-        - [json SkipTravelPhase {"verb":"SkipTravelPhase"}]
+        - skip the travel phase this round: the table holds skipTravel until the end of the round, and the round goes from the quest phase to the encounter phase with no travel window
       * option "passHands":
         - every player passes his whole hand to the player on his left (the next seat in player order) at once; the only player discards his hand instead
 
@@ -428,4 +428,4 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
   50327:whenRevealed:1: When revealed
     - place 1 progress on the Night objective in play (nothing with none); a Night objective at its limit then gives way to the next
 
-(rendered pieces: 233 by template, 2 as JSON)
+(rendered pieces: 235 by template, 0 as JSON)

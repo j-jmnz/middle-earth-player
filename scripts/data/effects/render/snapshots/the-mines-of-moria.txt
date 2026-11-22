@@ -317,7 +317,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51221:A:2 (shadow): Shadow: Shuffle Moria Bats into the encounter deck.
   51221:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - [json ShuffleSelfIntoEncounterDeck {"verb":"ShuffleSelfIntoEncounterDeck"}]
+    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
 
 ## 51222 Ancient Guardroom
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -757,4 +757,4 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     - for each enemy (any player controls) engaged with you:
       - the picked card: stat attack 1, until the end of the phase
 
-(rendered pieces: 436 by template, 5 as JSON)
+(rendered pieces: 437 by template, 4 as JSON)

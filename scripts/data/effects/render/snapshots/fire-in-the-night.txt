@@ -8,7 +8,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 12187:A:2 (front): Setup: The first player gains control of Beldis. If "Turayn has taken an oath of vigilance," search the encounter deck for 3 non-unique locations and remove them from the game. If "Isolde is on the hunt," search the encounter deck for 3 non-unique enemies and remove them from the game.
   12187:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"12188"}]
+    - Campaign Setup: the objective ally with code 12188 enters play under the first player (put there, not played: nothing is revealed and no cost is paid; a pool card with this record for itself is put into play at the start of each scenario instead of being shuffled into the encounter deck)
     - if the Campaign Log holds "turayn": remove 3 non-unique locations from the encounter deck
     - if the Campaign Log holds "isolde": remove 3 non-unique enemies from the encounter deck
 
@@ -85,8 +85,8 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19068:response:1: Response on the event questDefeated
     - for each player, first player first:
       - choose card (you control) in the deck, among the top 5, of card type ally
-      - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor"}]
-      - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+      - the picked card is put into play from wherever it is out of play (hand, discard pile, deck): it is not played, so no cost is paid and no play restriction applies, and a unique card with a copy in play stays where it is; a hero goes among its controller's heroes, any other card into the play area, ready, under the acting player's control
+      - shuffle the acting player's deck
 
 ## 19069 Douse the Flames
 (the scenario deals it into the sideQuestDeck pile; the piles place it, no record does)
@@ -334,4 +334,4 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19083:constant:2: Constant
     - this card: stat loseAtDamage quest points of this card, while this card is in play
 
-(rendered pieces: 197 by template, 12 as JSON)
+(rendered pieces: 200 by template, 9 as JSON)

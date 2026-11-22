@@ -112,7 +112,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - for each player, first player first:
       - return one enemy engaged with the acting player (that player picks which) to the staging area
     - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
-    - [json Doomed {"verb":"Doomed","amount":1,"when":{"kind":"noneReturned"}}]
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 1 from the doomed keyword this card gains (doomedRaised is announced for each)
 
 09022:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Return attacking enemy to the staging area after this attack.
   09022:shadow:1: Shadow
@@ -322,7 +322,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
   10156:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
     - note the damage on the card with code 10158 in the Campaign Log (replacing the previous number)
-    - [json Earn {"verb":"Earn","codes":["10158"]}]
+    - Resolution: the cards with codes 10158 are earned, with no choice
 
 ## 10157 Iârion's Pendant
 
@@ -353,4 +353,4 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - if not (2 is less than the number of players): this card: stat loseAtDamage 10, while this card is in play
     - then, if 2 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat loseAtDamage 20, while this card is in play
 
-(rendered pieces: 208 by template, 5 as JSON)
+(rendered pieces: 211 by template, 3 as JSON)

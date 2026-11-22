@@ -121,7 +121,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41014:A:2 (front): Response: When Goblin Trail leaves play as an explored location, place 6 progress on the current quest.
   41014:response:1: Response after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
-    - [json ProgressQuest {"verb":"ProgressQuest","amount":6}]
+    - place 6 progress on the current quest; the active location takes it first
 
 ## 41015 Abandoned Camp
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -131,7 +131,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top 1 card(s) of the acting player's deck go to their discard pile
     - choose card (you control) in the discard pile, of card type ally, among the cards this effect looked at or discarded
-    - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor"}]
+    - the picked card is put into play from wherever it is out of play (hand, discard pile, deck): it is not played, so no cost is paid and no play restriction applies, and a unique card with a copy in play stays where it is; a hero goes among its controller's heroes, any other card into the play area, ready, under the acting player's control
 
 41015:A:2 (front): Travel: Discard the top card of the encounter deck. If that card is an enemy, add it to the staging area.
   41015:travel:1: Travel
@@ -167,7 +167,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
     - for each player, first player first:
       - return one enemy engaged with the acting player (that player picks which) to the staging area
     - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
-    - [json Doomed {"verb":"Doomed","amount":1,"when":{"kind":"noneReturned"}}]
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 1 from the doomed keyword this card gains (doomedRaised is announced for each)
 
 41017:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Return attacking enemy to the staging area after this attack.
   41017:shadow:1: Shadow
@@ -328,6 +328,6 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41050:B:1 (back): Resolution: If there are 6 or more resource tokens here, the thought of the captured villagers suffering weighs heavily on you. Add the Guilty Conscience treachery burden to the Campaign Pool.
   41050:resolution:1: Resolution
-    - [json Earn {"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]
+    - if the card with code 41050 in play holds at least 6 resource token(s): Resolution: the cards with codes 41043 are earned, with no choice
 
-(rendered pieces: 187 by template, 4 as JSON)
+(rendered pieces: 193 by template, 0 as JSON)

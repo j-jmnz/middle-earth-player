@@ -56,7 +56,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148003:B:2 (back): Forced: After a player is eliminated (at any stage), raise the threat of each player at this stage by 10.
   148003:forced:1: Forced on the event playerEliminated
-    - [json RaiseThreatAtStage {"verb":"RaiseThreatAtStage","amount":10}]
+    - each player at this card's stage raises their threat by 10 (once the stages are separate, the seat whose staging area holds this card; every player before that)
 
 148003:B:3 (back): The players cannot defeat this stage unless each player in the game is at this stage and Standing Stones is in the victory display. If the players defeat this stage, they win the game.
   148003:constant:2: Constant
@@ -322,9 +322,9 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
   148019:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose player (any player controls) chosen by the first player
-    - [json TakeRevealedCard {"verb":"TakeRevealedCard","who":"picked","committed":true}]
+    - this card, an Encounter-keyword player card just revealed into the staging area, enters the play area of the picked player, committed to the quest, still its owner's card
     - later, at the end of the round (cannot be canceled while the number of hero (any player controls) is at least 0):
       - discard this card [also {"counted":true}]
       - then, if not (the running effect has discarded no card (with DiscardEach)) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
 
-(rendered pieces: 221 by template, 5 as JSON)
+(rendered pieces: 223 by template, 3 as JSON)

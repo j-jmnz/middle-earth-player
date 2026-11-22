@@ -20,7 +20,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - for each player, first player first:
       - choose card (you control) in the deck, among the top 5
       - move the picked card to hand
-      - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+      - shuffle the acting player's deck
 
 51301:B:2 (back): This stage cannot be defeated while Dark Pit is in play.
   51301:constant:1: Constant
@@ -59,7 +59,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
   51304:whenRevealed:2: When revealed
     - for each player, first player first:
       - choose card (you control) in hand
-      - [json ShuffleHandIntoDeck {"verb":"ShuffleHandIntoDeck","keepPicked":true}]
+      - the acting player's hand, but the picked card (all of it when no picked card is in the hand), is shuffled into their deck; the effect's X becomes how many cards that was
 
 ## 51305 Search for an Exit
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -798,4 +798,4 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 463 by template, 9 as JSON)
+(rendered pieces: 465 by template, 7 as JSON)

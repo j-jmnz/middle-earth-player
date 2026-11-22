@@ -166,7 +166,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 03069:A:1 (front): Setup: Prepare the quest deck. Add The Nameless Fear to the staging area. Remove all copies of A Foe Beyond from the encounter deck. Then, shuffle 1 copy of A Foe Beyond per player back into the encounter deck.
   03069:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShuffleStages {"verb":"ShuffleStages","codes":["03070","03071","03072","03073","03074","03075","03076","901202","901203","901204"]}]
+    - Setup: the quest cards with codes 03070, 03071, 03072, 03073, 03074, 03075, 03076, 901202, 901203 and 901204 that are in the quest deck are put in a random order (the scenario's seed) on top of it, the others below them in the order they were; the quest then advances in the order of its quest deck
     - for each player, first player first:
       - one set-aside copy of the card with code 03028 is shuffled into the encounter deck (nothing with none set aside)
     - shuffle the encounter deck
@@ -594,4 +594,4 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the shadow card with code 901209 that the attacking enemy holds goes to the victory display
 
-(rendered pieces: 366 by template, 11 as JSON)
+(rendered pieces: 367 by template, 10 as JSON)

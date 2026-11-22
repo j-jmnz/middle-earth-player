@@ -253,7 +253,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
       * option "look":
         - the acting player looks at the top 2 card(s) of the Investigation deck (nothing is shuffled or moved); a card looked at that hears the look (Taken by Surprise) resolves once this effect is done
       * option "draw":
-        - [json DrawEach {"verb":"DrawEach","amount":2}]
+        - every living player draws 2 card(s), the first player first (unlike ForEachPlayer it can be one branch of a Choose)
 
 ## 50716 Ramshackle Manor
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -302,7 +302,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 50718:A:3 (front): Travel: Each player spends 1 resource to travel here.
   50718:travel:1: Travel
     - for each player, first player first:
-      - [json SpendResources {"verb":"SpendResources","amount":1}]
+      - the acting player spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
 
 ## 50719 Old Warehouse
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -372,7 +372,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
     - raise threat by 1 (the acting player)
     - then, if the actor's heroes that can pay for a card of any sphere hold at least 1 resource(s) in all (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player looks at the bottom card of the Investigation deck (nothing is shuffled or moved); a card looked at that hears the look (Taken by Surprise) resolves once this effect is done
     - then, if the actor's heroes that can pay for a card of any sphere hold at least 1 resource(s) in all (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
-    - [json SpendResources {"verb":"SpendResources","amount":1}]
+    - the acting player spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
 
 ## 50723 Lawless Ruffian
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -493,4 +493,4 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
     who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the Investigate value of the active location (its printed Investigate X; 0 with no active location or none printed), until the end of the attack
 
-(rendered pieces: 260 by template, 6 as JSON)
+(rendered pieces: 263 by template, 3 as JSON)

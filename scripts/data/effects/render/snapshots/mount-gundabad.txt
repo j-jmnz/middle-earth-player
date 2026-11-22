@@ -75,7 +75,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
         * option "do" (only if there is a Item card (you control) in the deck, of card type attachment to choose):
           - choose Item card (you control) in the deck, of card type attachment
           - move the picked card to hand
-          - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+          - shuffle the acting player's deck
         * option "decline":
 
 ## 19124 Throat of the Mountain
@@ -239,7 +239,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
   19134:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the caves deck
-    - [json ShuffleStages {"verb":"ShuffleStages","codes":["19135","19137","19138","19139","19140","19141","19142"]}]
+    - Setup: the quest cards with codes 19135, 19137, 19138, 19139, 19140, 19141 and 19142 that are in the quest deck are put in a random order (the scenario's seed) on top of it, the others below them in the order they were; the quest then advances in the order of its quest deck
     - a copy of the card with code 19143 is set aside, out of play
     - choose hero (you control) that the card with code 19143 can be attached to
     - the set-aside copy of the card with code 19143 is attached to the last picked hero
@@ -256,7 +256,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     - advance to the next quest stage
     - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
   19134:forced:2: Forced on the event questCardDefeated (heard about this card)
-    - [json LookAtStages {"verb":"LookAtStages","count":2,"bottom":true}]
+    - when this stage is defeated, whatever the heading: the first player looks at the top 2 stages of the quest deck and chooses 1 to place on the bottom of the quest deck; the others stay on top in their order and the quest advances to the top stage
 
 ## 19135 Exploring Gundabad
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -429,7 +429,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19140:B:2 (back): Forced: When this stage is defeated, the first player looks at the top 2 cards of the quest deck and chooses 1 to place on the bottom of the quest deck. Then, flip over the top card of the quest deck.
   19140:forced:2: Forced on the event questCardDefeated (heard about this card)
-    - [json LookAtStages {"verb":"LookAtStages","count":2,"bottom":true}]
+    - when this stage is defeated, whatever the heading: the first player looks at the top 2 stages of the quest deck and chooses 1 to place on the bottom of the quest deck; the others stay on top in their order and the quest advances to the top stage
 
 19140:B:3 (back): At the end of the combat phase, the players may bypass this stage.
   19140:forced:3: Forced at the end of the phase
@@ -532,4 +532,4 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
   19144:constant:3: Constant
     - its host: stat lossOnLeavingPlay 1, while this card is in play
 
-(rendered pieces: 316 by template, 41 as JSON)
+(rendered pieces: 320 by template, 37 as JSON)

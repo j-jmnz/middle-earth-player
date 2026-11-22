@@ -8,8 +8,8 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 12170:A:2 (front): Setup: Each player may change hero cards without incurring the +1 threat penalty, and Haldan may be included among a player's heroes. Any player gains control of Isolde. Add The Threat to Wilderland to the staging area, shuffle Dagnir's Spawn into the encounter deck, and shuffle Abandoned Ruin into the Caves deck. If "Turayn has taken an oath of vigilance," search the encounter deck for 3 treacheries and remove them from the game.
   12170:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json WaiveThreatPenalty {"verb":"WaiveThreatPenalty"}]
-    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"12171"}]
+    - Campaign Setup: the voluntary hero change costs no threat penalty in this scenario
+    - Campaign Setup: the objective ally with code 12171 enters play under the first player (put there, not played: nothing is revealed and no cost is paid; a pool card with this record for itself is put into play at the start of each scenario instead of being shuffled into the encounter deck)
     - [json AddToStagingWithResources {"verb":"AddToStagingWithResources","code":"12172","amount":{"part":true}}]
     - a card with code 12173 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoPile {"verb":"ShuffleIntoPile","pile":"caves","code":"12174","placed":true}]
@@ -26,7 +26,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 12170:B:3 (back): Add Abandoned Ruin to the campaign pool. The first player chooses either Threat to Wilderland or Dagnir's Spawn and add it to the campaign pool.
   12170:resolution:3: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json Earn {"verb":"Earn","codes":["12174"]}]
+    - Resolution: the cards with codes 12174 are earned, with no choice
     - the first player takes "12172" or "12173" into the Campaign Pool
 
 ## 18042 Fire-drake
@@ -336,7 +336,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
           - choose Weapon or Armor card (you control) in the deck, of card type attachment
           - move the picked card to hand
         * option "decline":
-      - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+      - shuffle the acting player's deck
 
 ## 18061 Ancient Treasury
 (the scenario deals it into the cavesDeck pile; the piles place it, no record does)
@@ -431,7 +431,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json PutOnPileBottom {"verb":"PutOnPileBottom","pile":"caves","code":"18043"}]
     - one set-aside card with code 18042 joins the staging area (it is not revealed)
-    - [json ShuffleSetAsideSet {"verb":"ShuffleSetAsideSet","set":"Dragon Might"}]
+    - every set-aside card of the encounter set "Dragon Might" joins the encounter deck (the deck is shuffled by the step after)
     - shuffle the encounter deck
 
 18079:B:1 (back): Fire-drake cannot leave the staging area or take damage.
@@ -479,4 +479,4 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18080:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Fire-drake")
     - the players win the game
 
-(rendered pieces: 294 by template, 25 as JSON)
+(rendered pieces: 299 by template, 20 as JSON)

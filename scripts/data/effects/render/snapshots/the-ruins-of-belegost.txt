@@ -177,7 +177,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
   50608:forced:2: Forced on the event stageRevealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - up to resources of this card resource token(s) come off the card with code 50608 in play
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50615"}]
+    - the card in play with code 50615 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
 
 ## 50609 Sword of Belegost
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -413,7 +413,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
   50620:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json EngageShadowCard {"verb":"EngageShadowCard","when":{"kind":"count","pick":{"type":"objective","control":"you","controlled":true,"lootKeyword":true},"min":1}}]
+    - if the number of objective (you control) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] is at least 1: the shadow card this is, an enemy, leaves its attacker and engages the player the attack is against; it enters play there
     - then, if this card is engaged with a player (that player is who "you" means in this record) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is dealt a shadow card
 
 ## 50621 Naurlhûg's Lair
@@ -429,7 +429,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
 50621:A:3 (front): Forced: When Naurlhûg's Lair is explored, add the Loot objective from underneath Stalking the Ruins to the staging area faceup.
   50621:forced:2: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
-    - [json ReturnUnderToStaging {"verb":"ReturnUnderToStaging","from":"50608"}]
+    - each card under the card in play with code 50608 returns to the staging area faceup
 
 50621:A:4 (front): Travel: Place X resources on Stalking the Ruins, where X is the number of players.
   50621:travel:1: Travel
@@ -596,4 +596,4 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy to the staging area
 
-(rendered pieces: 325 by template, 35 as JSON)
+(rendered pieces: 329 by template, 33 as JSON)

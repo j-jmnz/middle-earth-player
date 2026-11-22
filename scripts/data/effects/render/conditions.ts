@@ -9,6 +9,7 @@ import { FOG_CONDITIONS } from "./fog.ts";
 import { INVESTIGATION_CONDITIONS } from "./investigation.ts";
 import { LONG_DARK_CONDITIONS } from "./long-dark.ts";
 import { SHARED_CONDITIONS } from "./shared-conditions.ts";
+import { FAMILY_CONDITIONS } from "./families.ts";
 
 export { ESCAPE_CONDITION_SAMPLES } from "./escape.ts";
 export { GUARDIAN_CONDITION_SAMPLES } from "./guardian.ts";
@@ -47,6 +48,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   ...INVESTIGATION_CONDITIONS,
   ...LONG_DARK_CONDITIONS,
   ...SHARED_CONDITIONS,
+  ...FAMILY_CONDITIONS,
   sourceIn: (c) => ({ text: `this card ${ZONE[str(c.zone)] ?? `is in ${str(c.zone)}`}`, read: ["zone"] }),
   less: (c, ctx) => ({ text: `${renderAmount(c.left, ctx, renderPick)} is less than ${renderAmount(c.right, ctx, renderPick)}`, read: ["left", "right"] }),
   subjectExplored: () => ({ text: "the card the event is about had enough progress to be explored", read: [] }),

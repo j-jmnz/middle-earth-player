@@ -341,7 +341,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
   19024:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json ShuffleSetAsideIntoPile {"verb":"ShuffleSetAsideIntoPile","pile":"caves","code":"19012","count":2}]
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"19011","keepDamage":true}]
+    - the card in play with code 19011 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its other tokens (the damage tokens stay on it); a later step can bring it back (nothing when no card with the code is in play)
     - shuffle the encounter discard pile into the encounter deck
     - for each player, first player first:
       - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
@@ -398,4 +398,4 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - later, at the end of this phase:
       - the players win the game
 
-(rendered pieces: 325 by template, 14 as JSON)
+(rendered pieces: 326 by template, 13 as JSON)

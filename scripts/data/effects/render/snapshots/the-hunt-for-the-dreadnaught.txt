@@ -4,9 +4,9 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40001:A:1 (front): Setup:
   40001:setup:1: Setup (record also names 40001:A:2)
-    - [json PrepareFleet {"verb":"PrepareFleet","own":true}]
+    - Setup: each player in turn takes one of the box's own unique ship-objectives set aside (a lone player takes one), the unused ships stay set aside; there is no Dream-chaser and no Heading card
   40001:setup:2: Setup (record also names 40001:A:3)
-    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck","trait":"Corsair"}]
+    - Setup: every non-ship enemy with the trait Corsair still in the encounter deck goes to the Corsair deck, which is shuffled; from then on such an enemy that would be discarded goes to the Corsair discard pile, and the Corsair deck refills from it
   40001:setup:3: Setup (record also names 40001:A:4)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the copy of the card with code 40026 in the encounter deck is set aside, out of play
@@ -23,11 +23,11 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40001:A:2 (front): • Players prepare their fleet.
   40001:setup:1: Setup (record also names 40001:A:1)
-    - [json PrepareFleet {"verb":"PrepareFleet","own":true}]
+    - Setup: each player in turn takes one of the box's own unique ship-objectives set aside (a lone player takes one), the unused ships stay set aside; there is no Dream-chaser and no Heading card
 
 40001:A:3 (front): • Prepare the Corsair deck.
   40001:setup:2: Setup (record also names 40001:A:1)
-    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck","trait":"Corsair"}]
+    - Setup: every non-ship enemy with the trait Corsair still in the encounter deck goes to the Corsair deck, which is shuffled; from then on such an enemy that would be discarded goes to the Corsair discard pile, and the Corsair deck refills from it
 
 40001:A:4 (front): • Set the following enemies aside: all 7 unique enemies (including the Dreadnaught), 2 copies of Black Sails, and 1 copy of Corsair Warship.
   40001:setup:3: Setup (record also names 40001:A:1)
@@ -69,9 +69,9 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40002:A:1 (front): Setup:
   40002:setup:1: Setup (record also names 40002:A:2)
-    - [json PrepareFleet {"verb":"PrepareFleet","own":true}]
+    - Setup: each player in turn takes one of the box's own unique ship-objectives set aside (a lone player takes one), the unused ships stay set aside; there is no Dream-chaser and no Heading card
   40002:setup:2: Setup (record also names 40002:A:3)
-    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck","trait":"Corsair"}]
+    - Setup: every non-ship enemy with the trait Corsair still in the encounter deck goes to the Corsair deck, which is shuffled; from then on such an enemy that would be discarded goes to the Corsair discard pile, and the Corsair deck refills from it
   40002:setup:3: Setup (record also names 40002:A:4)
     (no instructions)
   40002:setup:4: Setup (record also names 40002:A:5)
@@ -83,11 +83,11 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40002:A:2 (front): • Players prepare their fleet.
   40002:setup:1: Setup (record also names 40002:A:1)
-    - [json PrepareFleet {"verb":"PrepareFleet","own":true}]
+    - Setup: each player in turn takes one of the box's own unique ship-objectives set aside (a lone player takes one), the unused ships stay set aside; there is no Dream-chaser and no Heading card
 
 40002:A:3 (front): • Prepare the Corsair deck.
   40002:setup:2: Setup (record also names 40002:A:1)
-    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck","trait":"Corsair"}]
+    - Setup: every non-ship enemy with the trait Corsair still in the encounter deck goes to the Corsair deck, which is shuffled; from then on such an enemy that would be discarded goes to the Corsair discard pile, and the Corsair deck refills from it
 
 40002:A:4 (front): • Set aside all 7 unique enemies (including the Dreadnaught).
   40002:setup:3: Setup (record also names 40002:A:1)
@@ -147,13 +147,13 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     only if all of: (a copy of the card with code 40012 is set aside, out of play) and (the current quest stage holds at least 5 progress for each player who started the game)
     who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RemoveQuestProgress {"verb":"RemoveQuestProgress","perPlayer":5,"startedPlayers":true}]
-    - [json ShuffleRandomSetAside {"verb":"ShuffleRandomSetAside","name":"Gondorian Warship"}]
+    - remove 5 progress from the current quest card for each player who started the game (it stops at 0)
+    - of the set-aside cards titled "Gondorian Warship" one, chosen with the game's seed, is used: a ship-objective goes into play under the acting player, faceup; any other goes into the encounter deck facedown (the deck is not shuffled here; nothing when none is set aside)
     - shuffle the encounter deck
 
 40005:B:3 (back): Response: When the Dreadnaught attacks you, raise your threat by 4 to cancel the attack.
   40005:response:1: Response on the event enemyAttacks (heard about enemy (any player controls) named "Dreadnaught"; event happened to the controller; cost: raise your threat by 4)
-    - [json CancelAttack {"verb":"CancelAttack"}]
+    - the attack in progress is canceled: no shadow effect or damage resolves after this, and the enemy's attack is used up
 
 40005:B:4 (back): When the Dreadnaught is destroyed, the players win the game.
   40005:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) named "Dreadnaught")
@@ -187,7 +187,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40006:response:1: Response on the event flipped (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each card (you control) in the discard pile (up to 6 chosen):
-      - [json PutOnDeck {"verb":"PutOnDeck","position":"shuffle","target":"picked"}]
+      - the picked card goes into its owner's deck, which is shuffled (a card leaving play this way leaves play)
     - choose location (any player controls)
     - place 6 progress on the picked card
 
@@ -237,7 +237,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40008:A:3 (front): Forced: When you draw your starting hand, draw 5 additional cards, then shuffle 5 cards from your hand into your deck. You cannot take a mulligan.
   40008:forced:1: Forced on the event setupHandDrawn
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShuffleHandIntoDeck {"verb":"ShuffleHandIntoDeck"}]
+    - the acting player's hand (but this card) is shuffled into their deck; the effect's X becomes how many cards that was
     - the acting player draws 6 card(s)
     - the acting player draws 5 card(s)
     - the actor must choose 5 of the card (you control) in hand to keep (all stay with no more than that many; nothing is asked then); for each of the others (the chosen ones get the steps in the second list):
@@ -296,7 +296,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40010:action:1: Action (limit once per round)
     only if all of: (the actor's heroes that can pay for a card of any sphere hold at least 2 resource(s) in all) and (there is a exhausted character (any player controls) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SpendResources {"verb":"SpendResources","amount":2}]
+    - the acting player spend 2 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
     - choose exhausted character (any player controls)
     - ready the picked card
 
@@ -315,7 +315,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40010:action:2: Action (limit once per round)
     only if all of: (the actor's heroes that can pay for a card of any sphere hold at least 1 resource(s) in all) and (there is a exhausted card (any player controls) or in the staging area or the active location to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SpendResources {"verb":"SpendResources","amount":1}]
+    - the acting player spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
     - choose exhausted card (any player controls) or in the staging area or the active location
     - ready the picked card
 
@@ -327,7 +327,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40011:A:2 (front): The first card you play each round does not require a resource match.
   40011:constant:1: Constant
-    - [json IgnoreResourceMatch {"verb":"IgnoreResourceMatch","pick":{"type":"card","control":"you"},"firstEachRound":true}]
+    - (constant) a card (you control) needs no resource match, and any of its controller's heroes may pay for it, only the first such card each round
 
 40011:A:3 (front): Action: Play an ally or attachment from your hand. (Limit once per round.)
   40011:action:1: Action (limit once per round)
@@ -342,7 +342,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40011:B:2 (back): Each card you play does not require a resource match.
   40011:constant:2: Constant
-    - [json IgnoreResourceMatch {"verb":"IgnoreResourceMatch","pick":{"type":"card","control":"you"}}]
+    - (constant) a card (you control) needs no resource match, and any of its controller's heroes may pay for it
 
 40011:B:3 (back): Response: After Twilight's Call flips, draw 3 cards.
   40011:response:1: Response on the event flipped (heard about this card)
@@ -371,7 +371,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40012:A:3 (front): Forced: When Gondorian Warship is destroyed, set it aside, out of play.
   40012:forced:1: Forced on the event characterDestroyed (heard about this card)
-    - [json SetAsideSelf {"verb":"SetAsideSelf"}]
+    - this card, wherever it is, goes to the set-aside zone with no damage and no controller, so a set-aside copy can be taken again
 
 40012:A:4 (shadow): Shadow: Deal 5 damage to attacking enemy.
   40012:shadow:1: Shadow
@@ -400,7 +400,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40013:forced:1: Forced at the end of the round
     only if remaining hit points of this card (its hit points less its damage, at least 0) x 2 is less than hit points of this card
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json FlipCard {"verb":"FlipCard"}]
+    - this card is flipped over: side A becomes side B and side B side A (flipped is announced about it; a contract's records name their side in their line ids and carry a faceUp condition for it)
 
 40013:B:1 (back): Massive. Immune to player card effects. Cannot take more than 5 PerPlayer damage each round.
   40013:constant:3: Constant
@@ -438,7 +438,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40014:forced:1: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (this card is engaged with a player (that player is who "you" means in this record)) and (the number of card (you control) in the deck is at most 0)
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 ## 40015 Commander of the Dreadnaught
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -456,7 +456,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Dreadnaught"
-    - [json AttackWithPicked {"verb":"AttackWithPicked"}]
+    - the last picked enemy makes an immediate attack against the acting player (when it is in the staging area; counted as an attack made, like any attack an effect makes)
 
 ## 40016 Descendant of Castamir
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -472,7 +472,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40016:A:3 (front): Forced: After Descendant of Castamir engages you, put the top 2 cards of the Corsair deck into play engaged with you and deal each of them 1 shadow card.
   40016:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
     who acts: the acting player is the player the enemy engaged
-    - [json RevealCorsair {"verb":"RevealCorsair","count":2,"shadow":1}]
+    - the acting player reveals the top 2 cards of the Corsair deck and puts each into play engaged with them (the deck refills from its discard pile when it runs out); each card put into play is dealt 1 shadow card(s) at once
 
 ## 40017 Hydraken
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -643,8 +643,8 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40028:response:1: Response after an enemy is destroyed (heard about this card; answered by the player the event happened to)
     only if [json condition {"kind":"alliesWillpower","min":3}]
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardAlliesForWillpower {"verb":"DiscardAlliesForWillpower","willpower":3}]
-    - [json TakeControlAsShip {"verb":"TakeControlAsShip"}]
+    - the acting player chooses allies they control one at a time and each is discarded as it is chosen, until the Willpower of the allies discarded adds up to at least 3
+    - this Ship enemy, from the discard pile it was destroyed to, goes into play under the acting player as a Ship-objective with Willpower equal to its Threat: it loses the Ship-enemy card type and gains the Ship-objective type, keeps its Attack, Defense and hit points and has no damage
 
 ## 40029 Corsair Warship
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -676,7 +676,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40030:A:3 (shadow): Shadow: Put the top card of the Corsair deck into play engaged with you and deal it 1 shadow card.
   40030:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - [json RevealCorsair {"verb":"RevealCorsair","shadow":1}]
+    - the acting player reveals the top card of the Corsair deck and puts it into play engaged with them (the deck refills from its discard pile when it runs out); each card put into play is dealt 1 shadow card(s) at once
 
 ## 40031 Slave Ship
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -730,7 +730,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40034:response:1: Response on the event activeExplored (heard about this card)
     only if all of: (the living players' heroes that can pay for a card of any sphere hold at least 5 resource(s) in all) and (there is a Ship character (any player controls) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SpendResources {"verb":"SpendResources","amount":5,"group":true}]
+    - the players as a group spend 5 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
     - choose Ship character (any player controls) chosen by the first player
     - heal 5 damage from the picked card
     - ready the picked card
@@ -835,7 +835,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40041:A:1 (front): When Revealed: Each player puts the top card of the Corsair deck into play engaged with them.
   40041:whenRevealed:1: When revealed
-    - [json RevealCorsair {"verb":"RevealCorsair","who":"eachSeat"}]
+    - each player reveals the top card of the Corsair deck and puts it into play engaged with them (the deck refills from its discard pile when it runs out)
 
 40041:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you control an exhausted Ship objective).
   40041:shadow:1: Shadow
@@ -849,7 +849,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40042:A:1 (front): When Revealed: Attach to a Ship objective. (Counts as a Condition attachment with the text: "Attached objective cannot ready. Action: Exhaust 3 characters to discard Grappled!")
   40042:whenRevealed:1: When revealed
-    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship"}}]
+    - this card attaches itself to a Ship objective the players control, chosen by the first player
   40042:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   40042:constant:2: Constant
@@ -865,7 +865,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40042:A:2 (shadow): Shadow: If defending character is a Ship attach Grappled! to it.
   40042:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship","defender":true}}]
+    - this card attaches itself to the Ship objective defending the attack in progress (nothing happens if the defender is not a Ship)
 
 ## 40043 Out of the Mist
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -875,7 +875,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, in the staging area only, with the highest current engagement cost of those (ties: the chooser decides), chosen by the first player
     - this enemy, in the staging area, engages the first player [also {"target":"picked"}]
-    - [json AttackWithPicked {"verb":"AttackWithPicked","who":"firstPlayer","counted":true}]
+    - the last picked enemy makes an immediate attack against the first player (when it is in the staging area; counted as an attack made, like any attack an effect makes; an enemy that stays in the staging area counts for noneReturned too)
     - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 40043:A:2 (shadow): Shadow: Either raise your threat by 4 or attacking enemy makes an additional attack.
@@ -909,7 +909,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40045:A:1 (front): When Revealed: Attach to a Ship objective. (Counts as a Condition attachment with the text: "Forced: When attached objective exhausts, deal 2 damage to it. Action: Exhaust 3 characters to discard Taking on Water.")
   40045:whenRevealed:1: When revealed
-    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship"}}]
+    - this card attaches itself to a Ship objective the players control, chosen by the first player
   40045:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   40045:forced:1: Forced on the event shipExhausted (heard about the host)
@@ -925,7 +925,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40045:A:2 (shadow): Shadow: If defending character is a Ship, attach Taking on Water to it.
   40045:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship","defender":true}}]
+    - this card attaches itself to the Ship objective defending the attack in progress (nothing happens if the defender is not a Ship)
 
 ## 40046 Violent Tempest
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -942,4 +942,4 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
-(rendered pieces: 522 by template, 40 as JSON)
+(rendered pieces: 556 by template, 8 as JSON)

@@ -55,7 +55,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110137:A:5 (front): If the Dawn Star is destroyed, its controller is eliminated from the game.
   110137:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 110137:B:1 (back): Campaign Mode only.
   (inert: the engine applies it by rule, no record)
@@ -72,7 +72,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110137:B:5 (back): If the Dawn Star is destroyed, its controller is eliminated from the game.
   110137:triggered:4: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 ## 110138 Duskbringer
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -91,7 +91,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110138:A:4 (front): If the Duskbringer is destroyed, its controller is eliminated from the game.
   110138:triggered:2: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 110138:B:1 (back): Campaign Mode only.
   (inert: the engine applies it by rule, no record)
@@ -110,7 +110,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110138:B:5 (back): If the Duskbringer is destroyed, its controller is eliminated from the game.
   110138:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 ## 110139 Glórinaith
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -129,12 +129,12 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
     only if there is a non-unique enemy (any player controls) to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose non-unique enemy (any player controls)
-    - [json DiscardFromAnyDeck {"verb":"DiscardFromAnyDeck","count":2}]
+    - the acting player chooses a deck (each player's deck that holds a card, the encounter deck, the Corsair deck) and its top 2 cards are discarded to its discard pile (when a card was named, X is 1 if one of the cards discarded bears that title, else 0)
     - deal 1 damage to the picked card
 
 110139:A:5 (front): If the Glórinaith is destroyed, its controller is eliminated from the game.
   110139:triggered:2: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 110139:B:1 (back): Campaign Mode only.
   (inert: the engine applies it by rule, no record)
@@ -152,15 +152,15 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   110139:action:2: Action (limit once per round)
     only if there is a non-unique enemy (any player controls) or in the staging area to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json NameCard {"verb":"NameCard"}]
+    - the acting player chooses the title of any card of the game, wherever it is (every card the game holds is offered); it is the effect's named card for the step after
     - choose non-unique enemy (any player controls) or in the staging area
-    - [json DiscardFromAnyDeck {"verb":"DiscardFromAnyDeck","count":3}]
+    - the acting player chooses a deck (each player's deck that holds a card, the encounter deck, the Corsair deck) and its top 3 cards are discarded to its discard pile (when a card was named, X is 1 if one of the cards discarded bears that title, else 0)
     - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
     - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
 
 110139:B:6 (back): If the Glórinaith is destroyed, its controller is eliminated from the game.
   110139:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 ## 110140 Nárelenya
 
@@ -172,11 +172,11 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110140:A:3 (front): Reduce the cost of the first ally you play each round by 1.
   110140:constant:2: Constant
-    - [json ReduceCostOf {"verb":"ReduceCostOf","pick":{"type":"card","control":"you","cardType":"ally"},"amount":1,"firstEachRound":true}]
+    - (constant) a card (you control) of card type ally costs 1 less, only the first such card each round
 
 110140:A:4 (front): If the Nárelenya is destroyed, its controller is eliminated from the game.
   110140:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 110140:B:1 (back): Campaign Mode only.
   (inert: the engine applies it by rule, no record)
@@ -189,11 +189,11 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110140:B:4 (back): Reduce the cost of the first card you play each round by 1.
   110140:constant:3: Constant
-    - [json ReduceCostOf {"verb":"ReduceCostOf","pick":{"type":"card","control":"you"},"amount":1,"firstEachRound":true}]
+    - (constant) a card (you control) costs 1 less, only the first such card each round
 
 110140:B:5 (back): If the Nárelenya is destroyed, its controller is eliminated from the game.
   110140:triggered:4: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 ## 110141 Silver Wing
 
@@ -216,7 +216,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110141:A:6 (front): If the Silver Wing is destroyed, its controller is eliminated from the game.
   110141:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 110141:B:1 (back): Campaign Mode only.
   (inert: the engine applies it by rule, no record)
@@ -240,7 +240,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110141:B:7 (back): If the Silver Wing is destroyed, its controller is eliminated from the game.
   110141:triggered:4: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 ## 11016 Departure from the Havens
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -248,9 +248,9 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11016:A:1 (front): Setup: Prepare the Corsair deck. Players prepare their fleet. Shuffle each stage 2 card in the quest deck so that their order is random, leaving stage 3 on the bottom. Search the encounter deck for 1 copy of Rolling Seas and 1 copy of Scouting Ship, and add them to the staging area. Shuffle the encounter deck.
   11016:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck"}]
-    - [json PrepareFleet {"verb":"PrepareFleet"}]
-    - [json ShuffleStages {"verb":"ShuffleStages","codes":["11017","11018","11019","11020"]}]
+    - Setup: every non-ship enemy still in the encounter deck goes to the Corsair deck, which is shuffled; from then on a non-ship enemy that would be discarded goes to the Corsair discard pile, and the Corsair deck refills from it
+    - Setup: each player in turn takes one of the six ship-objectives set aside (the Dream-chaser is forced on the last player who has not got it; a lone player takes the Dream-chaser and one other), the unused ships leave the game, and the Heading card is attached to the Dream-chaser, set to on-course
+    - Setup: the quest cards with codes 11017, 11018, 11019 and 11020 that are in the quest deck are put in a random order (the scenario's seed) on top of it, the others below them in the order they were; the quest then advances in the order of its quest deck
     - shuffle the encounter deck
 
 11016:B:1: Sailing.
@@ -262,7 +262,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11016:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
   11016:constant:2: Constant
-    - [json LookAtStages {"verb":"LookAtStages","count":2}]
+    - when this stage is defeated: if the heading is on-course (Sun), the first player looks at the top 2 stages of the quest deck and the quest advances to the one they choose, the others going to the bottom; otherwise it advances to the top stage; defeating the last stage wins the game (the stage's definition carries the number)
 
 ## 11017 Into the Storm
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -284,7 +284,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11017:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
   11017:constant:1: Constant
-    - [json LookAtStages {"verb":"LookAtStages","count":2}]
+    - when this stage is defeated: if the heading is on-course (Sun), the first player looks at the top 2 stages of the quest deck and the quest advances to the one they choose, the others going to the bottom; otherwise it advances to the top stage; defeating the last stage wins the game (the stage's definition carries the number)
 
 ## 11018 Cursed Mists
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -304,7 +304,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11018:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
   11018:constant:2: Constant
-    - [json LookAtStages {"verb":"LookAtStages","count":2}]
+    - when this stage is defeated: if the heading is on-course (Sun), the first player looks at the top 2 stages of the quest deck and the quest advances to the one they choose, the others going to the bottom; otherwise it advances to the top stage; defeating the last stage wins the game (the stage's definition carries the number)
 
 ## 11019 Calphon's Divination
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -324,7 +324,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11019:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
   11019:constant:2: Constant
-    - [json LookAtStages {"verb":"LookAtStages","count":2}]
+    - when this stage is defeated: if the heading is on-course (Sun), the first player looks at the top 2 stages of the quest deck and the quest advances to the one they choose, the others going to the bottom; otherwise it advances to the top stage; defeating the last stage wins the game (the stage's definition carries the number)
 
 ## 11020 The Star's Guidance
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -344,7 +344,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11020:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
   11020:constant:2: Constant
-    - [json LookAtStages {"verb":"LookAtStages","count":2}]
+    - when this stage is defeated: if the heading is on-course (Sun), the first player looks at the top 2 stages of the quest deck and the quest advances to the one they choose, the others going to the bottom; otherwise it advances to the top stage; defeating the last stage wins the game (the stage's definition carries the number)
 
 ## 11021 Corsair Pursuit
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -352,8 +352,8 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11021:A:1 (front): When Revealed: Search the encounter deck and discard pile for the Ship enemy with the highest Threat and add it to the staging area (2 Ship enemies with the highest Threat instead if there are 3 or more players in the game). Shuffle the encounter deck.
   11021:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchShips {"verb":"SearchShips","count":1,"when":{"kind":"not","condition":{"kind":"count","pick":{"type":"player","control":"any"},"min":3}}}]
-    - [json SearchShips {"verb":"SearchShips","count":2,"when":{"kind":"count","pick":{"type":"player","control":"any"},"min":3}}]
+    - if not (the number of player (any player controls) is at least 3): the 1 Ship enemies with the highest Threat in the encounter deck and its discard pile are added to the staging area, not revealed (of cards tied on Threat that are not copies of one card the first player chooses; the deck is not shuffled)
+    - then, if the number of player (any player controls) is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): the 2 Ship enemies with the highest Threat in the encounter deck and its discard pile are added to the staging area, not revealed (of cards tied on Threat that are not copies of one card the first player chooses; the deck is not shuffled)
     - shuffle the encounter deck
 
 11021:B:1: Sailing.
@@ -438,13 +438,13 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11051:A:1 (front): Travel: Shift your heading off-course to travel here.
   11051:travel:1: Travel
-    - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
+    - the Heading card shifts one step toward Storm (off-course), never past either end (nothing in a game with no Heading card)
 
 11051:A:2 (shadow): Shadow: If this attack deals damage to a Ship objective, shift your heading off-course.
   11051:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse","when":{"kind":"all","conditions":[{"kind":"dealt"},{"kind":"matches","card":"other","pick":{"type":"character","control":"any","trait":"Ship"}}]}}]
+      - if all of: ([json condition {"kind":"dealt"}]) and (the event's other card is a Ship character (any player controls)): the Heading card shifts one step toward Storm (off-course), never past either end (nothing in a game with no Heading card)
 
 ## 11052 Thrown Off Course
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -456,13 +456,13 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
         - all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
         - raise threat by 4 (each player)
       * option "heading":
-        - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
+        - the Heading card shifts one step toward Storm (off-course), never past either end (nothing in a game with no Heading card)
 
 11052:A:2 (shadow): Shadow: If this attack destroys a character, shift your heading off-course.
   11052:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse","when":{"kind":"x","min":1}}]
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the Heading card shifts one step toward Storm (off-course), never past either end (nothing in a game with no Heading card)
 
 ## 11053 Rough Waters
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -495,7 +495,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   11055:whenRevealed:1: When revealed
     - the acting player chooses one of:
       * option "heading":
-        - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
+        - the Heading card shifts one step toward Storm (off-course), never past either end (nothing in a game with no Heading card)
       * option "damage":
         - deal 1 damage to each exhausted character (any player controls)
 
@@ -506,7 +506,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
     - the attacking enemy: stat excessToShip (the damage its attack deals beyond the hit points the character had left is kept for the effect that deals it to a Ship objective) 1, until the end of the attack
     - when the attack in progress ends:
       - if [json condition {"kind":"excess","min":1}]: choose Ship character (you control)
-      - [json DamageShip {"verb":"DamageShip","amount":{"excess":true},"when":{"kind":"excess","min":1}}]
+      - then, if [json condition {"kind":"excess","min":1}] (checked when this step runs, after the steps above; not tied to whether they did anything): deal [json amount {"excess":true}] damage to the last picked card, a Ship objective, as the encounter or campaign card whose effect it is (a ship is immune to player card effects, not to this)
 
 ## 11056 Winds of Wrath
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -520,7 +520,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
     who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "heading":
-        - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
+        - the Heading card shifts one step toward Storm (off-course), never past either end (nothing in a game with no Heading card)
       * option "undefended":
         - this attack is considered undefended
 
@@ -560,7 +560,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11059:A:1 (front): When Revealed: Each player reveals the top card of the Corsair deck and puts it into play, engaged with him.
   11059:whenRevealed:1: When revealed
-    - [json RevealCorsair {"verb":"RevealCorsair","who":"eachSeat"}]
+    - each player reveals the top card of the Corsair deck and puts it into play engaged with them (the deck refills from its discard pile when it runs out)
 
 11059:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you control an exhausted Ship objective).
   11059:shadow:1: Shadow
@@ -600,7 +600,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11062:A:1 (front): Forced: When Vicious Marauder engages you, discard a random card from your hand and place resources on it equal to that card's printed cost.
   11062:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
     who acts: the acting player is the player the enemy engaged
-    - [json PlunderHand {"verb":"PlunderHand"}]
+    - a card of the acting player's hand, chosen by the game's seed, is discarded; this enemy gets as many resources as its printed cost (none for a card with no cost or an X cost)
 
 11062:A:2 (front): Forced: When Vicious Marauder attacks you, distribute damage among characters you control equal to the number of resources on it.
   11062:forced:2: Forced when this enemy attacks, before the defender is declared (heard about this card)
@@ -653,7 +653,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11081:A:5 (front): If the Dawn Star is destroyed, its controller is eliminated from the game.
   11081:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 ## 11082 Nárelenya
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -666,11 +666,11 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11082:A:3 (front): Reduce the cost of the first ally you play each round by 1.
   11082:constant:2: Constant
-    - [json ReduceCostOf {"verb":"ReduceCostOf","pick":{"type":"card","control":"you","cardType":"ally"},"amount":1,"firstEachRound":true}]
+    - (constant) a card (you control) of card type ally costs 1 less, only the first such card each round
 
 11082:A:4 (front): If the Nárelenya is destroyed, its controller is eliminated from the game.
   11082:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 ## 11083 Silver Wing
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -694,7 +694,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11083:A:6 (front): If the Silver Wing is destroyed, its controller is eliminated from the game.
   11083:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
-    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+    - the acting player is eliminated from the game by a card effect
 
 ## 11171 Voyage Across Belegaer
 
@@ -710,48 +710,48 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
     - a copy of the card with code 11175 is set aside, out of play
     - a card with code 11176 from the box joins the encounter deck, which is shuffled
     - a card with code 11177 from the box joins the encounter deck, which is shuffled
-    - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
-    - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
-    - [json TradeShipDamage {"verb":"TradeShipDamage","damage":2,"resources":1}]
+    - Setup: the card with code 11178 joins the Corsair deck the scenario deals, which the quest card's Setup then shuffles
+    - Campaign Setup, after the quest card's Setup has prepared the fleet: each player in player order takes one of the set-aside cards with codes 11172, 11173, 11174 and 11175 for each ship-objective they control, in the order the ships were taken, and attaches it to that ship (a card dealt on its Upgraded side if the log says it is upgraded)
+    - Campaign Setup: in player order, the controller of each ship chooses to trade or keep: a trade deals 2 damage to the ship and adds 1 resource(s) to a hero's pool of their choice
 
 11171:B:1 (back): Resolution: Add Ominous Fate to the Campaign Pool.
   11171:resolution:1: Resolution
-    - [json Earn {"verb":"Earn","codes":["11176"]}]
+    - Resolution: the cards with codes 11176 are earned, with no choice
 
 11171:B:2 (back): Gain the following:
   11171:resolution:2: Resolution (record also names 11171:B:3)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11171:B:3 (back): • 1 XP for each surviving player.
   11171:resolution:2: Resolution (record also names 11171:B:2)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11171:B:4 (back): • 1 XP if 4 stage 2B quest cards are in the victory display.
   11171:resolution:3: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Into the Storm","Cursed Mists","Calphon's Divination","The Star's Guidance"]},"min":4}}]
+    - if the number of card (any player controls) in the victory display, named "Into the Storm" or "Cursed Mists" or "Calphon's Divination" or "The Star's Guidance" is at least 4: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11171:B:5 (back): • 1 XP if you ended the game on-course (Sun).
   11171:resolution:4: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"heading","is":"onCourse"}}]
+    - if the Heading card shows Sun (on-course) (false while the game has no Heading card): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11171:B:6 (back): • 1 XP if no Ship enemies are in play.
   11171:resolution:5: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"enemyInPlay","trait":"Ship","is":false}}]
+    - if there is no Ship enemy in play (in the staging area or engaged): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11171:B:7 (back): • 1 XP for each Corsair Warship in the victory display.
   11171:resolution:6: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"inVictory","codes":["11058"]}}]
+    - Resolution: gain 1 XP for each card with code 11058 in the victory display (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11171:B:8 (back): • 1 XP if Crowley is in the victory display.
   11171:resolution:7: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"inVictory","codes":["11178"]},"max":1}]
+    - Resolution: gain 1 XP for each card with code 11178 in the victory display, at most 1 XP from the line (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11171:B:9 (back): • 2 XP if Thunderstruck is in the victory display.
   11171:resolution:8: Resolution
-    - [json GainXp {"verb":"GainXp","amount":2,"each":{"kind":"inVictory","codes":["11177"]},"max":2}]
+    - Resolution: gain 2 XP for each card with code 11177 in the victory display, at most 2 XP from the line (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11171:B:10 (back): • -1 XP if Ominous Fate is in the victory display.
   11171:resolution:9: Resolution
-    - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
+    - if the number of card (any player controls) in the victory display, named "Ominous Fate" is at least 1: Resolution: lose 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
-(rendered pieces: 279 by template, 54 as JSON)
+(rendered pieces: 348 by template, 6 as JSON)

@@ -7,9 +7,9 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10038:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json ShuffleHandIntoDeck {"verb":"ShuffleHandIntoDeck"}]
+      - the acting player's hand (but this card) is shuffled into their deck; the effect's X becomes how many cards that was
       - choose hero (you control)
-      - [json PrepareCapturedDeck {"verb":"PrepareCapturedDeck"}]
+      - Setup, for each player after the starting hero is chosen: their captured deck is every ally, Item, Mount and Artifact attachment of their deck and every hero but the starting hero, shuffled, with one of those heroes (chosen with the game's seed) put on top; the starting hero gets 2 resources and the player's threat is set to its threat cost; a hero's permanent boons wait for the campaign card's Setup
     - shuffle the encounter deck
     - for each player, first player first:
       - the acting player draws 3 card(s)
@@ -17,20 +17,20 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10038:B:1 (back): When Revealed: Each player creates his own staging area and advances to a different stage 2A.
   10038:whenRevealed:1: When revealed
     - for each player, first player first:
-      - [json StartSeparateStage {"verb":"StartSeparateStage","code":"10039","reveal":true}]
+      - the acting player creates a staging area and a quest stage of their own: the quest deck's card with printed code 10039 becomes that seat's stage, stages are separate from now on, and the seat's area is empty; the stage is revealed for the seat as it becomes its stage: its When Revealed effects resolve (nothing when the code is not in the quest deck)
 
 ## 10039 Gornákh's Dungeons
 (the scenario deals it into the quest pile; the piles place it, no record does)
 
 10039:A:1 (front): Capture 7.
   10039:constant:1: Constant
-    - [json Capture {"verb":"Capture","amount":7}]
+    - Capture 7 (a marker, the verb does nothing when run): when this card enters play (revealed, added to the staging area, put into play engaged, or a quest card that becomes a stage), before its When Revealed resolves, each player sharing its staging area captures the top 7 cards of their captured deck underneath it (fewer when the deck is shorter)
 
 10039:A:2 (front): When Revealed: Search the encounter deck for 1 copy of Prison Cell, reveal it, and add it to your staging area. Then, capture an additional 2 cards from the top of your captured deck underneath that copy of Prison Cell.
   10039:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player searches the encounter deck (not its discard pile) for the card with code 10046, a a card, reveals it and adds it to the staging area
-    - [json CaptureFromDeck {"verb":"CaptureFromDeck","amount":2,"end":"top","under":{"code":"10046"}}]
+    - the acting player captures 2 cards from the top of their captured deck underneath the card in play with code 10046 (the cards that are left when the deck is shorter)
 
 10039:B:1 (back): Any time players would place progress tokens on this quest, rescue an equal number of captured cards at random from underneath it instead. (Progress is placed on the active location before triggering this effect.)
   10039:constant:2: Constant
@@ -38,7 +38,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10039:B:2 (back): Forced: If there are no captured cards underneath Gornákh's Dungeons, join another player at the beginning of the travel phase. If you cannot join another player, all players advance to stage 3A together.
   10039:forced:1: Forced when a phase begins
-    only if all of: (it is the Travel phase) and ([json condition {"kind":"captured","is":"noneUnderSelf"}])
+    only if all of: (it is the Travel phase) and (no card is captured underneath this card)
     who acts: the acting player is the first player (a phase has no player of its own)
     - the player whose stage this is joins another player: his staging cards move to that player's area, his active location is discarded and he shares that area and stage from then on; with no other area every player advances together to the stage with code 10040
 
@@ -50,7 +50,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - one set-aside card with code 10042 joins the staging area (it is not revealed)
     - one set-aside card with code 10041 joins the staging area (it is not revealed)
-    - [json ShuffleSetAsideSet {"verb":"ShuffleSetAsideSet","set":"Angmar Orcs"}]
+    - every set-aside card of the encounter set "Angmar Orcs" joins the encounter deck (the deck is shuffled by the step after)
     - shuffle the encounter deck
     - for each player, first player first:
       - the acting player reveals an encounter card
@@ -72,7 +72,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10041:forced:1: Forced on the event capturedRescued (heard about card (any player controls) or in the staging area or the active location)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose player (any player controls) with the highest threat among the players still in the game (ties: the chooser decides), chosen by the first player
-    - [json EngageSelfWithPicked {"verb":"EngageSelfWithPicked"}]
+    - this enemy engages the player the last pick chose, leaving any other engagement, and keeps it with no engagement check
     - the effect goes on with the picked player as the acting player
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
@@ -90,39 +90,39 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10042:A:3 (front): Forced: When Southern Gate becomes the active location, each player with less than 35 threat must raise his threat to 35.
   10042:forced:1: Forced after this location becomes the active location (heard about this card)
     - for each player, first player first:
-      - [json RaiseThreatTo {"verb":"RaiseThreatTo","amount":35}]
+      - the acting player's threat becomes 35 if it is lower
 
 ## 10043 Cruel Torturer
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 10043:A:1 (front): Capture 1.
   10043:constant:1: Constant
-    - [json Capture {"verb":"Capture","amount":1}]
+    - Capture 1 (a marker, the verb does nothing when run): when this card enters play (revealed, added to the staging area, put into play engaged, or a quest card that becomes a stage), before its When Revealed resolves, each player sharing its staging area captures the top 1 cards of their captured deck underneath it (fewer when the deck is shorter)
 
 10043:A:2 (front): Forced: When Cruel Torturer would damage an ally by an attack, capture that ally underneath Cruel Torturer instead.
   10043:forced:1: Forced on the event wouldDamageAlly (heard about this card)
-    - [json CaptureInsteadOfDamage {"verb":"CaptureInsteadOfDamage"}]
+    - an ally the attack would damage is captured underneath the attacking enemy instead, with no damage dealt (on the enemy this is a marker the damage step reads; as a Shadow effect it makes the attack in progress do it)
 
 ## 10044 Dungeon Guard
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 10044:A:1 (front): Capture 1.
   10044:constant:1: Constant
-    - [json Capture {"verb":"Capture","amount":1}]
+    - Capture 1 (a marker, the verb does nothing when run): when this card enters play (revealed, added to the staging area, put into play engaged, or a quest card that becomes a stage), before its When Revealed resolves, each player sharing its staging area captures the top 1 cards of their captured deck underneath it (fewer when the deck is shorter)
 
 10044:A:2 (front): Response: After the captured card(s) underneath Dungeon Guard are rescued, the players may put 1 of them into play at no cost.
   10044:response:1: Response on the event capturedRescued (heard about this card; answered by the player the event happened to)
     only if there is a card (any player controls) or in the staging area or the active location, chosen by the first player [also {"captured":"rescued"}] to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose card (any player controls) or in the staging area or the active location, chosen by the first player [also {"captured":"rescued"}]
-    - [json PutCapturedIntoPlay {"verb":"PutCapturedIntoPlay"}]
+    - the last card picked is put into play at no cost under its owner: an ally or a hero, or an attachment attached to a hero its owner controls (the owner chooses which when several can have it); any other card stays where it is
 
 ## 10045 Goblin Tormentor
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 10045:A:1 (front): Capture 1.
   10045:constant:1: Constant
-    - [json Capture {"verb":"Capture","amount":1}]
+    - Capture 1 (a marker, the verb does nothing when run): when this card enters play (revealed, added to the staging area, put into play engaged, or a quest card that becomes a stage), before its When Revealed resolves, each player sharing its staging area captures the top 1 cards of their captured deck underneath it (fewer when the deck is shorter)
 
 10045:A:2 (front): X is the number of cards in play with 1 or more captured cards underneath them.
   10045:constant:2: Constant
@@ -132,29 +132,29 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10045:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"captured","is":"noneUnderAttacker"}]: the attacking enemy: stat attack 2, until the end of the attack
-    - then, if not ([json condition {"kind":"captured","is":"noneUnderAttacker"}]) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+    - if no card is captured underneath the attacking enemy: the attacking enemy: stat attack 2, until the end of the attack
+    - then, if not (no card is captured underneath the attacking enemy) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
 ## 10046 Prison Cell
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 10046:A:1 (front): Capture 1.
   10046:constant:1: Constant
-    - [json Capture {"verb":"Capture","amount":1}]
+    - Capture 1 (a marker, the verb does nothing when run): when this card enters play (revealed, added to the staging area, put into play engaged, or a quest card that becomes a stage), before its When Revealed resolves, each player sharing its staging area captures the top 1 cards of their captured deck underneath it (fewer when the deck is shorter)
 
 10046:A:2 (front): Response: After the players travel to Prison Cell, look at the captured card(s) underneath it and choose 1 to put into play at no cost. Place the other cards back underneath Prison Cell.
   10046:response:1: Response after the players travel (heard about this card)
     only if there is a card (any player controls) or in the staging area or the active location, chosen by the first player [also {"captured":"underSelf"}] to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose card (any player controls) or in the staging area or the active location, chosen by the first player [also {"captured":"underSelf"}]
-    - [json PutCapturedIntoPlay {"verb":"PutCapturedIntoPlay"}]
+    - the last card picked is put into play at no cost under its owner: an ally or a hero, or an attachment attached to a hero its owner controls (the owner chooses which when several can have it); any other card stays where it is
 
 ## 10047 Patrol Room
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 10047:A:1 (front): Capture 2.
   10047:constant:1: Constant
-    - [json Capture {"verb":"Capture","amount":2}]
+    - Capture 2 (a marker, the verb does nothing when run): when this card enters play (revealed, added to the staging area, put into play engaged, or a quest card that becomes a stage), before its When Revealed resolves, each player sharing its staging area captures the top 2 cards of their captured deck underneath it (fewer when the deck is shorter)
 
 10047:A:2 (front): Travel: Each player raises his threat by 3 to travel here.
   10047:travel:1: Travel
@@ -173,7 +173,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10048:A:1 (front): Capture 1.
   10048:constant:1: Constant
-    - [json Capture {"verb":"Capture","amount":1}]
+    - Capture 1 (a marker, the verb does nothing when run): when this card enters play (revealed, added to the staging area, put into play engaged, or a quest card that becomes a stage), before its When Revealed resolves, each player sharing its staging area captures the top 1 cards of their captured deck underneath it (fewer when the deck is shorter)
 
 10048:A:2 (front): X is the number of captured cards underneath Tunnels of Mount Gram.
   10048:constant:2: Constant
@@ -182,7 +182,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10048:A:3 (shadow): Shadow: Capture each attachment attached to the defending character underneath the attacking enemy.
   10048:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - [json CaptureAttachments {"verb":"CaptureAttachments"}]
+    - each attachment attached to the defending character is captured underneath the attacking enemy (an encounter attachment too, rescued to the encounter discard pile)
 
 ## 10049 Sound the Alarm!
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -226,12 +226,12 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
     - for each player, first player first:
       - choose ally (you control)
       - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), chosen by the first player [also {"captured":"hosts"}]
-      - [json CapturePicked {"verb":"CapturePicked"}]
+      - the card picked before the last pick, an ally the acting player controls, is captured from play underneath the card the last pick chose (nothing when the earlier pick found no ally)
 
 10051:A:2 (shadow): Shadow: If this attack would damage an ally, capture that ally underneath the attacking enemy instead.
   10051:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - [json CaptureInsteadOfDamage {"verb":"CaptureInsteadOfDamage"}]
+    - an ally the attack would damage is captured underneath the attacking enemy instead, with no damage dealt (on the enemy this is a marker the damage step reads; as a Shadow effect it makes the attack in progress do it)
 
 ## 10052 Interrogation
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -239,8 +239,8 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10052:A:1 (front): When Revealed: Each player discards the top card of his captured deck and raises his threat by that card's printed resource cost. If at least 1 player discarded no cards from this effect, Interrogation gains doomed 2.
   10052:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardCapturedTop {"verb":"DiscardCapturedTop","raiseByCost":true}]
-    - [json Doomed {"verb":"Doomed","amount":2,"when":{"kind":"captured","is":"someoneEmpty"}}]
+    - each player sharing the staging area, in turn, discards the top card of their captured deck to their discard pile and raises their threat by its printed resource cost (a hero counts 0); a player with no card to discard discards none
+    - then, if the Interrogation that resolved found a captured deck with no card to discard (at least 1 player discarded none) (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 2 from the doomed keyword this card gains (doomedRaised is announced for each)
 
 10052:A:2 (shadow): Shadow: Discard a random card from your hand and raise your threat by its printed cost.
   10052:shadow:1: Shadow
@@ -252,7 +252,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10053:A:1 (front): Capture 5.
   10053:constant:1: Constant
-    - [json Capture {"verb":"Capture","amount":5}]
+    - Capture 5 (a marker, the verb does nothing when run): when this card enters play (revealed, added to the staging area, put into play engaged, or a quest card that becomes a stage), before its When Revealed resolves, each player sharing its staging area captures the top 5 cards of their captured deck underneath it (fewer when the deck is shorter)
 
 10053:A:2 (front): Time 4.
   10053:constant:2: Constant
@@ -261,7 +261,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10053:A:3 (front): Forced: When the last time counter is removed from this quest, discard its captured cards and remove this quest from the game. Then, raise each player's threat by 3 for each of his characters that was discarded by this effect.
   10053:forced:1: Forced on the event lastTimeCounterRemoved (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardCapturedUnder {"verb":"DiscardCapturedUnder","threat":3}]
+    - this card discards each card captured underneath it, each to its owner's discard pile (a hero there is dead), and each player raises their threat by 3 for each of their own characters (heroes and allies) so discarded
     - this card is removed from the game
 
 ## 10174 Escape from Mount Gram
@@ -272,9 +272,9 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10174:A:2 (front): Setup: Set aside any permanent boon attachments on heroes that are added to a player's captured deck. Add the Loot the Dungeons side quest to the staging area, capturing the bottom 5 cards of each player's captured deck underneath it. Flip this card over.
   10174:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAsideCapturedBoons {"verb":"SetAsideCapturedBoons"}]
+    - Campaign Setup: the permanent boons attached to heroes in a captured deck are set aside, still the hero's; they are attached again when the hero is put into play
     - the card with code 10175 is added to the staging area (the copy a Setup search found, else one the Setup deals)
-    - [json CaptureFromDeck {"verb":"CaptureFromDeck","amount":5,"end":"bottom","under":{"code":"10175"},"who":"eachSeat"}]
+    - each living player, the first player first, captures 5 cards from the bottom of their captured deck underneath the card in play with code 10175 (the cards that are left when the deck is shorter)
 
 10174:B:1 (back): Forced: Instead of raising their threat by 1 during the refresh phase, each player raises their threat by the number of completed quest cards plus the number of side quests in the victory display.
   10174:forced:1: Forced at the end of the phase
@@ -284,12 +284,12 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10174:B:2 (back): Forced: After a hero enters play, attach to that hero each set-aside permanent boon attachment assigned to that character in the Campaign Log.
   10174:forced:2: Forced on the event heroEnteredPlay (heard about hero (any player controls))
-    - [json AttachHeroBoons {"verb":"AttachHeroBoons"}]
+    - campaign mode: each permanent boon set aside for the hero that just entered play is attached to it, in the order they were set aside
 
 10174:B:3 (back): Resolution: Each player must make note of which unique cards are still in their captured deck and not in play at the end of the game. Those cards cannot be included in that player's deck for the rest of the campaign.
   10174:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RecordStolenCards {"verb":"RecordStolenCards"}]
+    - Resolution, for each player: the unique cards still in their captured deck are recorded as stolen in the Campaign Log, and the campaign refuses them in that player's deck for the rest of the campaign (a recorded hero is not refused)
     - mark in the Campaign Log, as "determined", each character in play that a copy of the card with code 10172 is attached to
 
 ## 10175 Loot the Dungeons
@@ -297,12 +297,12 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10175:A:1 (front): Loot the Dungeons is considered to be in each player's staging area and gets +4 quest points for each player in the game at every staging area.
   10175:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json InEveryArea {"verb":"InEveryArea"}]
+    - (marker) this card is considered to be in each player's staging area: while the stages are separate it is in every seat's area, one card with one set of tokens and one pile of captured cards
     - this card: stat questPoints [json amount {"captured":"players","times":4}], while this card is in play
 
 10175:A:2 (front): Forced: When Loot the Dungeons is defeated, each player (at every staging area) may choose one of the following boons and add it to their hand: Berelind, Chieftain's Brooch, Coruhaer, Laermuin, Mail of Eärnur, or Silverthorn. Add the chosen cards to the Campaign Pool.
   10175:forced:1: Forced on the event questDefeated (heard about this card)
-    - [json ChooseBoonToHand {"verb":"ChooseBoonToHand","codes":["10176","10177","10178","10179","10180","10181"]}]
+    - in order from the first player, each player may choose one of the boons with codes 10176, 10177, 10178, 10179, 10180, 10181 that are still set aside and add it to their hand, and it joins the Campaign Pool (a boon taken is not offered again)
 
 ## 10176 Berelind
 
@@ -368,4 +368,4 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10181:response:1: Response after a player's attack destroys an enemy (heard about the host; limit once per game)
     - the event's other card is added to the victory display
 
-(rendered pieces: 157 by template, 46 as JSON)
+(rendered pieces: 191 by template, 13 as JSON)

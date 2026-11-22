@@ -68,9 +68,9 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 50903:A:1 (front): When Revealed: Remove all tokens from the Lieutenant enemy at this stage and set it aside, out of play. Add the set aside Bane of Amon Lanc to the staging area, unless it is in a victory display. If Dol Guldur's city strength is 5 or lower (10 or lower if playing epic multiplayer mode), Bane of Amon Lanc makes an immediate attack against each player in turn order.
   50903:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50911"}]
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50912"}]
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50913"}]
+    - the card in play with code 50911 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
+    - the card in play with code 50912 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
+    - the card in play with code 50913 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
     - one set-aside card with code 50910 joins the staging area (it is not revealed)
     - then, if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Bane of Amon Lanc" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, named "Bane of Amon Lanc"
     - for each player, first player first:
@@ -101,9 +101,9 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 50904:A:1 (front): When Revealed: Remove all tokens from the Lieutenant enemy at this stage and set it aside, out of play. Add the set aside Sorcerer of Dol Guldur to the staging area, unless it is in a victory display. If Dol Guldur's city strength is 5 or lower (10 or lower if playing epic multiplayer mode), Sorcerer of Dol Guldur makes an immediate attack against each player in turn order.
   50904:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50910"}]
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50912"}]
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50913"}]
+    - the card in play with code 50910 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
+    - the card in play with code 50912 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
+    - the card in play with code 50913 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
     - one set-aside card with code 50911 joins the staging area (it is not revealed)
     - then, if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Sorcerer of Dol Guldur" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, named "Sorcerer of Dol Guldur"
     - for each player, first player first:
@@ -127,7 +127,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
             - the rest of the effect is carried out by the last player picked
             - choose card (you control) in the deck
             - move the picked card to hand
-            - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+            - shuffle the acting player's deck
           * option "decline":
       * option "penalty" (only if [json condition {"kind":"anyHand","min":2}]):
     - for each player, first player first:
@@ -140,9 +140,9 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 50905:A:1 (front): When Revealed: Remove all tokens from the Lieutenant enemy at this stage and set it aside, out of play. Add the set aside Chieftain Morlug to the staging area, unless it is in a victory display. If Dol Guldur's city strength is 5 or lower (10 or lower if playing epic multiplayer mode), Chieftain Morlug makes an immediate attack against each player in turn order.
   50905:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50910"}]
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50911"}]
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50913"}]
+    - the card in play with code 50910 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
+    - the card in play with code 50911 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
+    - the card in play with code 50913 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
     - one set-aside card with code 50912 joins the staging area (it is not revealed)
     - then, if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Chieftain Morlug" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, named "Chieftain Morlug"
     - for each player, first player first:
@@ -176,9 +176,9 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 50906:A:1 (front): When Revealed: Remove all tokens from the Lieutenant enemy at this stage and set it aside, out of play. Add the set aside Dungeon Dweller to the staging area, unless it is in a victory display. If Dol Guldur's city strength is 5 or lower (10 or lower if playing epic multiplayer mode), Dungeon Dweller makes an immediate attack against each player in turn order.
   50906:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50910"}]
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50911"}]
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"50912"}]
+    - the card in play with code 50910 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
+    - the card in play with code 50911 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
+    - the card in play with code 50912 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
     - one set-aside card with code 50913 joins the staging area (it is not revealed)
     - then, if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6) and (there is a enemy (any player controls) or in the staging area, named "Dungeon Dweller" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, named "Dungeon Dweller"
     - for each player, first player first:
@@ -201,7 +201,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
             - choose player (any player controls) chosen by the first player
             - the rest of the effect is carried out by the last player picked
             - choose card (you control) in the deck, among the top 10, of card type ally [also {"intoPlay":true}]
-            - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor"}]
+            - the picked card is put into play from wherever it is out of play (hand, discard pile, deck): it is not played, so no cost is paid and no play restriction applies, and a unique card with a copy in play stays where it is; a hero goes among its controller's heroes, any other card into the play area, ready, under the acting player's control
           * option "decline":
       * option "penalty" (only if there is a ally (any player controls) to choose):
     - for each player, first player first:
@@ -462,7 +462,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     - this card: stat noProgressPlaced 1, while this card is in play
   50922:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if all of: (it is the Quest phase) and (this card is in the staging area)
-    - [json AttachFacedown {"verb":"AttachFacedown"}]
+    - the card the event is about, now in a discard pile, is attached facedown to this card: out of play under it, with no text, and discarded to its owner's discard pile when this card leaves play
 
 ## 50923 Dungeon Door
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -638,4 +638,4 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     who acts: the acting player is the first player (a phase has no player of its own)
     - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 1) and (the number of Lieutenant enemy (any player controls) or in the staging area is at most 0): the players win the game
 
-(rendered pieces: 501 by template, 21 as JSON)
+(rendered pieces: 516 by template, 6 as JSON)

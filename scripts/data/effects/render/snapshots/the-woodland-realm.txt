@@ -274,7 +274,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51118:A:2 (shadow): Shadow: Shuffle Black Forest Bats into the encounter deck.
   51118:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - [json ShuffleSelfIntoEncounterDeck {"verb":"ShuffleSelfIntoEncounterDeck"}]
+    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
 
 ## 51119 Enchanted Stream
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -719,7 +719,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top 1 card(s) of the acting player's deck go to their discard pile
     - choose card (you control) in the discard pile, of card type ally, among the cards this effect looked at or discarded
-    - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor"}]
+    - the picked card is put into play from wherever it is out of play (hand, discard pile, deck): it is not played, so no cost is paid and no play restriction applies, and a unique card with a copy in play stays where it is; a hero goes among its controller's heroes, any other card into the play area, ready, under the acting player's control
 
 51149:A:2 (front): Travel: Discard the top card of the encounter deck, if that card is an enemy, add it to the staging area.
   51149:travel:1: Travel
@@ -793,4 +793,4 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 473 by template, 5 as JSON)
+(rendered pieces: 475 by template, 3 as JSON)

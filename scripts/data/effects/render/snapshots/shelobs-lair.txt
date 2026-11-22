@@ -218,7 +218,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144052:A:2 (front): Setup: Attach to the Ring-bearer.
   144052:setup:1: Setup
-    - [json AttachToRingBearer {"verb":"AttachToRingBearer","code":"144052"}]
+    - Setup: the card with code 144052 is attached to the Ring-bearer, the hero with that trait (the first player's hero is searched first, then the other seats in order); with no Ring-bearer the setup fails
 
 144052:A:3 (front): Forced: At the end of the planning phase, either raise each player's threat by 1, or exhaust the Ring-bearer.
   144052:forced:1: Forced at the end of the phase
@@ -351,7 +351,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144071:B:2 (back): Each player cannot play, or put into play, more than 1 ally each round.
   144071:constant:2: Constant
-    - [json LimitEntries {"verb":"LimitEntries","cardType":"ally","max":1,"perPlayer":true}]
+    - no more than 1 ally cards can enter play each round, played or put into play, counted for each player on their own (by the seat that controls the ally as it enters) (an ally that entered play and left again counts)
 
 144071:B:3 (back): No more than 4 progress can be placed on this stage each round.
   144071:constant:3: Constant
@@ -382,4 +382,4 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     only if any of: (the card with code 144040 is not in the victory display) or (the card with code 144075 is not in the victory display)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 248 by template, 6 as JSON)
+(rendered pieces: 250 by template, 4 as JSON)

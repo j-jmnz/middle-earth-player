@@ -8,7 +8,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 120165:A:2 (front): Setup: Any player gains control of Turayn. Shuffle A Growing Threat into the encounter deck.
   120165:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"12166"}]
+    - Campaign Setup: the objective ally with code 12166 enters play under the first player (put there, not played: nothing is revealed and no cost is paid; a pool card with this record for itself is put into play at the start of each scenario instead of being shuffled into the encounter deck)
     - a card with code 12167 from the box joins the encounter deck, which is shuffled
 
 120165:A:3 (front): Response: After you explore a non-unique location, put a resource here. Then, if there are X resources here, the players look at 3 random undiscovered treasures and choose 1 to attach to an eligible character. X is 3 more than the number of players in the game.
@@ -17,7 +17,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     - 1 resource token(s) are placed on this card
     - [json ClaimRandomTreasure {"verb":"ClaimRandomTreasure","count":3,"when":{"kind":"all","conditions":[{"kind":"less","left":{"players":true,"plus":2},"right":{"stat":"resources","of":"self"}},{"kind":"less","left":{"stat":"resources","of":"self"},"right":{"players":true,"plus":4}}]}}]
     - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, chosen by the first player [also {"hostForPicked":true}]
-    - [json AttachPicked {"verb":"AttachPicked","when":{"kind":"all","conditions":[{"kind":"less","left":{"players":true,"plus":2},"right":{"stat":"resources","of":"self"}},{"kind":"less","left":{"stat":"resources","of":"self"},"right":{"players":true,"plus":4}}]}}]
+    - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before the last pick (an attachment) is attached to the last picked card
 
 120165:B:1 (back): Resolution: The heroes' selfless valor in protecting the refugees from Harad has inspired Turayn. If the heroes choose to accept his aid, add Turayn to the campaign pool (any player may add him to their deck). Otherwise, mark in the campaign log that "Turayn has taken an oath of vigilance" (he will follow the heroes' example and continue to protect the free folk of Wilderland).
   120165:resolution:1: Resolution
@@ -77,7 +77,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18018:A:2 (shadow): Shadow: Attach this card to attacking enemy.
   18018:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"attackingEnemy"}}]
+    - this card attaches itself to the enemy making the attack in progress
 
 ## 18019 Dangerous Crossing
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -176,7 +176,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18024:A:2 (front): While Lonely Lands is in the staging area, it gains: "Forced: After an event is played during the quest phase, place it facedown under Lonely Lands."
   18024:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if all of: (it is the Quest phase) and (this card is in the staging area)
-    - [json AttachFacedown {"verb":"AttachFacedown"}]
+    - the card the event is about, now in a discard pile, is attached facedown to this card: out of play under it, with no text, and discarded to its owner's discard pile when this card leaves play
 
 ## 18025 Ruined Supplies
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -344,4 +344,4 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     - the players lose the game
 
-(rendered pieces: 212 by template, 15 as JSON)
+(rendered pieces: 223 by template, 11 as JSON)

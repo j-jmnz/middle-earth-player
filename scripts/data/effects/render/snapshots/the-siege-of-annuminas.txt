@@ -134,7 +134,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - return this card to the staging area
-    - [json AttackFirstPlayer {"verb":"AttackFirstPlayer"}]
+    - this enemy, in the staging area or engaged with any player, attacks the first player now, dealt a shadow card for the attack
 
 ## 50814 Battering Ram
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -220,7 +220,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
       * option "control" (only if there is a player (any player controls) who controls heroes holding 1 resource or more in all to choose):
         - choose player (any player controls) who controls heroes holding 1 resource or more in all
         - the effect goes on with the picked player as the acting player
-        - [json SpendResources {"verb":"SpendResources","amount":1}]
+        - the acting player spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
         - the acting player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
       * option "discard":
         - discard this card
@@ -479,4 +479,4 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
     - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
-(rendered pieces: 298 by template, 5 as JSON)
+(rendered pieces: 300 by template, 3 as JSON)

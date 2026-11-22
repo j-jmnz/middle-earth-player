@@ -43,7 +43,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41006:A:1 (front): When Revealed: Set Goblin Chieftain aside, out of play. Add Cracked Pillar to the staging area.
   41006:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"41027"}]
+    - the card in play with code 41027 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
     - one set-aside card with code 41028 joins the staging area (it is not revealed)
 
 41006:B:1 (back): Forced: Reveal an additional encounter card during the quest phase.
@@ -159,7 +159,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     only if all of: (the actor controls the card with code 41029) and (the card with code 41029 in play is ready)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust the card with code 41029
-    - [json CancelAttack {"verb":"CancelAttack"}]
+    - the attack in progress is canceled: no shadow effect or damage resolves after this, and the enemy's attack is used up
     - return this card to the staging area
 
 41031:A:2 (shadow): Shadow: If this attack destroys a character, return attacking enemy to the staging area after this attack.
@@ -209,7 +209,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player looks at the top 3 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
     - choose an encounter card among the cards the effect looked at (none when no card matches)
-    - [json BottomOtherLooked {"verb":"BottomOtherLooked"}]
+    - the cards the look showed that are still on top of the encounter deck, except the picked one, go to the bottom of the deck in the order they were in; the picked card is then the top card, and the reveal after it reveals it
     - the acting player reveals an encounter card
 
 ## 41035 Collapsed Mine
@@ -238,8 +238,8 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose card (you control) in the deck, among the top 5, of card type ally
-    - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor"}]
-    - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+    - the picked card is put into play from wherever it is out of play (hand, discard pile, deck): it is not played, so no cost is paid and no play restriction applies, and a unique card with a copy in play stays where it is; a hero goes among its controller's heroes, any other card into the play area, ready, under the acting player's control
+    - shuffle the acting player's deck
 
 ## 41037 Crumbling Stairs
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -306,7 +306,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41051:A:2 (front): Setup: Each player adds 1 copy of the "No Time to Waste!" boon to their hand after drawing their starting hand (including taking a mulligan). Add each copy of "No Time to Waste!" in a player's hand to the Campaign Pool. Shuffle the Shiny Distraction burden into the encounter deck and add it to the Campaign Pool.
   41051:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddToHandAfterMulligan {"verb":"AddToHandAfterMulligan","code":"41048"}]
+    - Campaign Setup: each player adds a copy of the card with code 41048 to their hand after drawing their starting hand, a mulligan included (it joins the hand once every player has chosen)
     - the card with code 41048 is added to the Campaign Pool (a copy for each player)
     - a card with code 41042 from the box joins the encounter deck, which is shuffled
     - the card with code 41042 is added to the Campaign Pool
@@ -314,7 +314,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41051:B:1 (back): Resolution: Check the final threat of the player with the highest threat: If it is under 40, you have rescued a retired Ranger who shares his wisdom with you. Each player may add 1 copy of Ranger Sense to their deck and to the Campaign Pool. At the start of your next campaign, each player may also shuffle 1 copy of Ranger Sense into their deck and add it to the Campaign Pool.
   41051:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json Earn {"verb":"Earn","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
-    - [json CarryOver {"verb":"CarryOver","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
+    - if [json condition {"kind":"highestThreat","max":39}]: Resolution: the cards with codes 41049 are earned, with no choice (one copy for each living player)
+    - then, if [json condition {"kind":"highestThreat","max":39}] (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: the cards with codes 41049 go to the NEXT campaign, not this one (one copy for each player); a new save takes them in from a finished one
 
-(rendered pieces: 182 by template, 9 as JSON)
+(rendered pieces: 190 by template, 3 as JSON)

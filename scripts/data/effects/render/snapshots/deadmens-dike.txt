@@ -366,11 +366,11 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
   10166:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
     - note the damage on the card with code 10158 in the Campaign Log (replacing the previous number)
-    - [json RemoveFromPoolByCode {"verb":"RemoveFromPoolByCode","codes":["10158"]}]
-    - [json Earn {"verb":"Earn","codes":["100158"]}]
+    - Resolution: each card with code 10158 leaves the Campaign Pool, once (nothing for a code the pool does not hold)
+    - Resolution: the cards with codes 100158 are earned, with no choice
     - the first player takes "10157" or "10167" for a player (shuffled into their deck) [also {"only":true}]
     - each copy of code 10161, code 10162, code 10163, code 10164 and code 10165 attached to a hero in play joins the Campaign Pool attached to that hero
-    - [json EarnAllBurdens {"verb":"EarnAllBurdens"}]
+    - Resolution: every burden in play, in the encounter deck and in the encounter discard pile is earned
 
 ## 10167 Amarthiúl's Courage
 
@@ -440,4 +440,4 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
     - its host: stat defense -2, while this card is in play
     - its host: stat cannotBeHealed 1, while this card is in play
 
-(rendered pieces: 251 by template, 4 as JSON)
+(rendered pieces: 254 by template, 1 as JSON)

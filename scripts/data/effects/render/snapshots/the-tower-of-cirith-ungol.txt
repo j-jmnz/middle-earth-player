@@ -6,8 +6,8 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146014:A:1 (front): Attached hero gains the Ring-bearer trait and the Fellowship sphere. You cannot lose control of the first player token.
   146014:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json GrantTrait {"verb":"GrantTrait","trait":"Ring-bearer"}]
-    - [json GrantIcon {"verb":"GrantIcon","sphere":"fellowship"}]
+    - (constant on an attachment) the attached card gains the trait Ring-bearer
+    - (constant on an attachment) the attached hero also pays for fellowship cards and counts as fellowship hero for a filter that reads the sphere
     - the table: stat firstPlayerLocked 1, while this card is in play
 
 146014:A:2 (front): Action: Exhaust The One Ring and raise your threat by 1 to choose an enemy. Until the end of the phase, that enemy gets -X Threat, where X is the attached hero's Willpower.
@@ -285,7 +285,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146066:A:1 (front): Setup: Set Shagrat aside, out of play. Add The Two Watchers (location side faceup) and Topmost Chamber to the staging area. The first player loses control of the Ring-bearer and places it faceup under Topmost Chamber as a guarded objective. Then, the first player attaches Last of the Company to a hero he controls and attaches The One Ring to that hero.
   146066:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json CaptureRingBearer {"verb":"CaptureRingBearer","under":"146015","guarded":true}]
+    - the Ring-bearer (the hero with that trait a player controls) lies faceup under the card in play with code 146015 as a guarded objective, keeping its tokens and its attachments faceup; nobody controls it, it takes no damage while so held and its owner is not out of heroes; FreeRingBearer gives it back
     - a copy of the card with code 146014 is set aside, out of play
     - choose hero (you control) chosen by the first player
     - the set-aside copy of the card with code 146014 is attached to the last picked hero
@@ -401,4 +401,4 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     who acts: the acting player is the defending player (the player the attack is against)
     - this card: stat phantom (its attacks' damage is canceled and the defending player raises his threat by as much instead) 1, until the end of the attack
 
-(rendered pieces: 268 by template, 13 as JSON)
+(rendered pieces: 271 by template, 10 as JSON)

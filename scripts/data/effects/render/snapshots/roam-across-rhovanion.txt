@@ -29,8 +29,8 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 12184:B:3 (back): Resolution: If there are 3 or more resources on Urdug, each player adds a copy of Misplaced Trust to the campaign pool (and their deck). Otherwise, each player adds a copy of Urdug's Cunning to the campaign pool.
   12184:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json Earn {"verb":"Earn","codes":["12186"],"eachPlayer":true,"afterHand":true,"when":{"kind":"less","left":2,"right":{"resourcesOn":{"type":"card","control":"any","names":["Urdug"],"engagedEnemies":true}}}}]
-    - [json Earn {"verb":"Earn","codes":["12185"],"eachPlayer":true,"when":{"kind":"not","condition":{"kind":"less","left":2,"right":{"resourcesOn":{"type":"card","control":"any","names":["Urdug"],"engagedEnemies":true}}}}}]
+    - if 2 is less than the resource tokens on card (any player controls) or in the staging area or the active location, named "Urdug", (enemies engaged with a player included): Resolution: the cards with codes 12186 are earned, with no choice (one copy for each living player); the copy goes into its player's deck, shuffled in once the starting hand is drawn
+    - then, if not (2 is less than the resource tokens on card (any player controls) or in the staging area or the active location, named "Urdug", (enemies engaged with a player included)) (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: the cards with codes 12185 are earned, with no choice (one copy for each living player)
 
 12184:B:4 (back): Each player chooses a location in the staging area and adds a copy of it to the campaign pool. Players must choose different locations, if able.
   12184:resolution:2: Resolution
@@ -361,7 +361,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 19051:B:2 (back): Forced: When the players quest unsuccessfully, they do not raise their threat. Instead, place X progress here, where X is the amount by which they would have raised their threat. Then, if this stage has progress equal to its quest points, the players lose the game.
   19051:forced:1: Forced after the players quest unsuccessfully (event happened to the controller)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json WaiveQuestThreat {"verb":"WaiveQuestThreat","who":"eachSeat","until":"endOfPhase"}]
+    - each player does not raise their threat from questing unsuccessfully until the end of the phase
     - progress equal to X is placed on the main quest stage (a quest effect: a full stage advances)
     - then, if the current quest stage holds at least 5 progress (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (Urdug's Gambit holds as much progress as it has quest points)
 
@@ -439,4 +439,4 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     who acts: the acting player is the player the enemy engaged
     - engage this card
 
-(rendered pieces: 330 by template, 22 as JSON)
+(rendered pieces: 340 by template, 19 as JSON)

@@ -13,7 +13,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142040:B:1 (back): Forced: After a player optionally engages an enemy, remove 1 damage token from Doom, Doom, Doom.
   142040:forced:1: Forced on the event optionallyEngaged
-    - [json RemoveDamageFrom {"verb":"RemoveDamageFrom","code":"142043","amount":1}]
+    - up to 1 damage token(s) come off the card in play with printed code 142043; it stops at 0
 
 ## 142041 Drums in the Deep
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -46,7 +46,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     - one set-aside card with code 142050 joins the staging area (it is not revealed)
     - for each player, first player first:
       - the acting player reveals an encounter card
-      - [json RemoveDamageFrom {"verb":"RemoveDamageFrom","code":"142043","amount":1}]
+      - up to 1 damage token(s) come off the card in play with printed code 142043; it stops at 0
 
 142042:B:1 (back): No more than 5 progress can be placed on this stage each round.
   142042:constant:1: Constant
@@ -69,7 +69,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     only if it is the Quest phase
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RemoveDamageFrom {"verb":"RemoveDamageFrom","code":"142043","amount":1}]
+    - up to 1 damage token(s) come off the card in play with printed code 142043; it stops at 0
     - then, if [json condition {"kind":"damageHere","max":0}] (checked when this step runs, after the steps above; not tied to whether they did anything): one set-aside card with code 142044 joins the staging area (it is not revealed)
 
 142043:A:2 (front): Forced: At the end of the quest phase, The Balrog makes an attack if it is in play.
@@ -148,7 +148,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
   142048:whenRevealed:1: When revealed
     - the acting player chooses one of:
       * option "doom":
-        - [json RemoveDamageFrom {"verb":"RemoveDamageFrom","code":"142043","amount":1}]
+        - up to 1 damage token(s) come off the card in play with printed code 142043; it stops at 0
       * option "reveal":
         - the acting player reveals an encounter card
 
@@ -182,7 +182,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     only if all of: (the card the event is about had enough progress to be explored) and (the card with code 142044 is in play)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (any player controls)
-    - [json SacrificeForDamage {"verb":"SacrificeForDamage","code":"142044"}]
+    - the last picked hero is discarded from play to deal X damage to the card in play with printed code 142044, X being that hero's threat cost; then that card loses all keywords for the rest of the game (the damage is an encounter card's, so the Balrog's immunity does not stop it; nothing with no such card in play)
 
 ## 142051 Chamber of Mazarbul
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -305,7 +305,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
   142059:whenRevealed:1: When revealed
     - the acting player chooses one of:
       * option "doom":
-        - [json RemoveDamageFrom {"verb":"RemoveDamageFrom","code":"142043","amount":1}]
+        - up to 1 damage token(s) come off the card in play with printed code 142043; it stops at 0
       * option "balrog" (only if the card with code 142044 is in play):
         - choose enemy (any player controls) in the staging area only, named "The Balrog"
         - the picked enemy attacks the first player now, from the staging area
@@ -372,11 +372,11 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142088:A:2 (front): Forced: After a hero takes damage, if Grievous Wound is unattached, attach to that hero. (Counts as a Condition attachment with the text: "Forced: After attached hero exhausts, deal 1 damage to it.")
   142088:forced:1: Forced after a card takes damage (heard about hero (any player controls))
     only if this card is in the staging area
-    - [json AttachToSubject {"verb":"AttachToSubject"}]
+    - this objective, in the staging area, attaches to the hero the answered event was about (a card that is attached already stays where it is)
   142088:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   142088:forced:2: Forced on the event exhausted (heard about the host)
     only if not (this card is in the staging area)
     - deal 1 damage to its host
 
-(rendered pieces: 200 by template, 8 as JSON)
+(rendered pieces: 207 by template, 1 as JSON)

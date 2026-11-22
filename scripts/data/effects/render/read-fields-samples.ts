@@ -1,3 +1,4 @@
+import { FAMILY_SAMPLES } from "./families.ts";
 import type { Obj } from "./kit.ts";
 import { DREADNAUGHT_SAMPLES, ERECH_SAMPLES, ESCAPE_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, RUINS_SAMPLES, SIEGE_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES, WIZARDS_QUEST_SAMPLES } from "./verbs.ts";
 
@@ -5,6 +6,7 @@ import { DREADNAUGHT_SAMPLES, ERECH_SAMPLES, ESCAPE_SAMPLES, FOG_SAMPLES, GULDUR
 // every field the template reads; removing a field must change the text. A new template needs a sample here.
 export const HERO = { type: "hero", control: "you" };
 export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
+  ...FAMILY_SAMPLES,
   ...ESCAPE_SAMPLES,
   ...LONG_DARK_SAMPLES,
   ...STONE_SAMPLES,
@@ -76,7 +78,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   SetX: [{ verb: "SetX", value: 2 }],
   DiscardTopOfDeck: [{ verb: "DiscardTopOfDeck" }],
   DiscardResources: [{ verb: "DiscardResources", amount: 2, target: "self" }, { verb: "DiscardResources", all: true, target: "self" }],
-  SpendResources: [{ verb: "SpendResources", amount: 1, target: "picked" }],
+  SpendResources: [{ verb: "SpendResources", amount: 1, target: "picked" }, ...(FAMILY_SAMPLES.SpendResources ?? [])],
   PlaceFacedownUnder: [{ verb: "PlaceFacedownUnder", code: "144027", target: "self", afterAttack: true }, { verb: "PlaceFacedownUnder", host: "self", target: "subject" }],
   AttachToDial: [{ verb: "AttachToDial", code: "145016" }, { verb: "AttachToDial", firstPlayer: true, unlimited: true }],
   DetachFromDial: [{ verb: "DetachFromDial", code: "145016" }],
@@ -203,7 +205,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   DamageHeldCaptive: [{ verb: "DamageHeldCaptive", amount: 1 }],
   DiscardRandomFromHand: [{ verb: "DiscardRandomFromHand", amount: 2, who: "eachSeat", remember: true }, { verb: "DiscardRandomFromHand", who: "eachSeat", raiseStagingByCost: true }],
   SearchReveal: [{ verb: "SearchReveal", trait: "Uruk-hai", type: "enemy", who: "firstPlayer", to: "engaged", cost: true, code: "04023" }, { verb: "SearchReveal", traits: ["Shadow", "Flame"], type: "treachery", deckOnly: true }],
-  AttachSelf: [
+  AttachSelf: [...(FAMILY_SAMPLES.AttachSelf ?? []),
     { verb: "AttachSelf", to: { kind: "hero", trait: "Warrior" } },
     { verb: "AttachSelf", to: { kind: "enemy", trait: "Troll", challenge: true } },
     { verb: "AttachSelf", to: { kind: "hero", control: "firstPlayer" } },

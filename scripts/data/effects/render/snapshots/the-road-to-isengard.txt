@@ -16,7 +16,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
         - this card is removed from the Campaign Pool
         - this card is added to the victory display (the players' own, the group's)
         - choose player (any player controls)
-        - [json RevealFewer {"verb":"RevealFewer","amount":1,"min":0,"who":"picked"}]
+        - the staging step of this phase reveals 1 fewer card(s) for the player picked last (the reveals the players make in turn skip that player's; nothing else is shortened), to a minimum of 0 (a player's own reveal is one card, so a minimum of 1 leaves it as it is)
       * option "skip":
 
 ## 143046 Ent of Fangorn
@@ -44,7 +44,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 
 143047:A:2 (front): Forced: When Saruman is dealt a shadow card with a Wizardry effect, the defending player resolves that Wizardry effect as if he is the only player in the game.
   143047:forced:1: Forced on the event shadowWizardry (heard about this card)
-    - [json TriggerWizardry {"verb":"TriggerWizardry","target":"shadowCard","asOnlyPlayer":true}]
+    - triggers the Wizardry effect on the shadow card the answered event names; the acting player resolves it as if they are the only player in the game, so each "each player" reads them alone and the number of players is 1 (nothing for a card with no Wizardry line)
 
 ## 143048 Saruman's Staff
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -268,7 +268,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
   143062:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not ([json condition {"kind":"hasWizardry"}]): this card gains surge (one more encounter card is revealed when it has been resolved)
-    - [json TriggerWizardry {"verb":"TriggerWizardry","target":"activeLocation"}]
+    - triggers the Wizardry effect on the active location, without exploring it (nothing for a card with no Wizardry line)
 
 143062:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, discard 1 random card from your hand.
   143062:shadow:1: Shadow
@@ -369,7 +369,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
       - the acting player draws 6 card(s)
     - for each player, first player first:
       - discard the cards in your hand - 6 cards from hand
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"143048","to":"Saruman"}]
+    - Campaign Setup: the set-aside copy of the card with code 143048 is attached to the card in play named "Saruman" (a card dealt on its Upgraded side stays so)
 
 143080:B:1 (back): While Orthanc is the active location, Saruman is considered to be engaged with the first player.
   143080:constant:1: Constant
@@ -380,7 +380,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
   143080:forced:1: Forced after a card leaves play (heard about location (any player controls) named "Orthanc")
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json CancelPhaseProgress {"verb":"CancelPhaseProgress"}]
+    - the progress placed on the current quest card since the phase began, the overflow of an explored active location included, is taken off it and forgotten
     - the card the event is about goes to the staging area (it is not revealed)
 
 143080:B:3 (back): If a player has 0 cards in his hand, he is eliminated from the game. If the players defeat this stage, they win the game.
@@ -389,4 +389,4 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - the table: stat eliminatedAtEmptyHand 1, while this card is in play
     - the table: stat trackQuestProgress 1, while this card is in play
 
-(rendered pieces: 253 by template, 7 as JSON)
+(rendered pieces: 258 by template, 2 as JSON)

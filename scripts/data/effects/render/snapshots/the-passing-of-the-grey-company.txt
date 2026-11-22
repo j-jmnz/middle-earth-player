@@ -18,7 +18,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
     - raise threat by 1 (the acting player)
     - the acting player chooses one of:
       * option "detach" (only if the actor's heroes that can pay for a fellowship card (with that icon or one they were given) hold at least 1 resource(s) in all):
-        - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship"}]
+        - the acting player spend 1 resource(s) from heroes with the fellowship icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
         - this card is detached from the acting player's threat dial and set aside, out of play
       * option "keep":
 
@@ -75,7 +75,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145020:A:2 (front): Travel: Spend 1 Fellowship resource to travel here.
   145020:travel:1: Travel
-    - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship","group":true}]
+    - the players as a group spend 1 resource(s) from heroes with the fellowship icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
 
 ## 145021 Haunted Path
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -348,4 +348,4 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
         - choose ally (you control)
         - discard the picked card
 
-(rendered pieces: 196 by template, 2 as JSON)
+(rendered pieces: 198 by template, 0 as JSON)

@@ -107,7 +107,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player looks at the top 3 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
     - choose an encounter card among the cards the effect looked at (none when no card matches)
-    - [json BottomOtherLooked {"verb":"BottomOtherLooked"}]
+    - the cards the look showed that are still on top of the encounter deck, except the picked one, go to the bottom of the deck in the order they were in; the picked card is then the top card, and the reveal after it reveals it
     - the acting player reveals an encounter card
 
 ## 03037 Lightless Passage
@@ -486,7 +486,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 901005:A:3 (shadow): Shadow: Shuffle Shadow Dweller back into the encounter deck.
   901005:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - [json ShuffleSelfIntoEncounterDeck {"verb":"ShuffleSelfIntoEncounterDeck"}]
+    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
 
 ## 901006 Twisting Shadows
 
@@ -532,7 +532,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
   901008:constant:2: Constant
     only if not (this card is in the staging area)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json GrantTrait {"verb":"GrantTrait","trait":"Dark"}]
+    - (constant on an attachment) the attached card gains the trait Dark
     - its host: stat questPoints 3, while this card is in play
 
 901008:A:3 (shadow): Shadow: Attacking enemy gets +3 Defense this phase.
@@ -540,4 +540,4 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
     who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat defense 3, until the end of the phase
 
-(rendered pieces: 301 by template, 4 as JSON)
+(rendered pieces: 304 by template, 1 as JSON)

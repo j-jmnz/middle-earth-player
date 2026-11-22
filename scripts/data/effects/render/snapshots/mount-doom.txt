@@ -295,7 +295,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 146045 in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed); it is the picked card afterward
     - shuffle the encounter discard pile into the encounter deck
-    - [json TravelTo {"verb":"TravelTo","target":"picked","unlessActive":true}]
+    - the players travel to the picked card without resolving its Travel effect (an active location already there returns to the staging area first; nothing happens if the players cannot travel there); they travel only when no location is active: an active location stays, and the location stays in the staging area
 
 146076:B:1 (back): Dire. Forced: After placing progress here from questing successfully, each player makes a Fortitude test. If a player passes this test, he places a resource here. If a player fails this test, he discards cards from the top of the encounter deck until an enemy is discarded and puts that enemy into play engaged with him.
   (the keyword part is owned by the card's keywords; the records cover: Forced: After placing progress here from questing successfully, each player makes a Fortitude test. If a player passes this test, he places a resource here. If a player fails this test, he discards cards from the top of the encounter deck until an enemy is discarded and puts that enemy into play engaged with him.)
@@ -355,7 +355,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
   (the keyword part is owned by the card's keywords; the records cover: Allies cannot enter play and 'when revealed' effects cannot be canceled.)
   146078:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json LimitEntries {"verb":"LimitEntries","cardType":"ally","max":0}]
+    - no more than 0 ally cards can enter play each round, played or put into play (an ally that entered play and left again counts)
     - while this card is in play (under its condition), the When Revealed effects of cards cannot be canceled
 
 146078:B:2 (back): Forced: When Mount Doom is explored, the first player makes a Fortitude test. Discard 1 extra encounter card for each player. If the first player fails this test, the Ring-bearer claims The One Ring and the players lose the game. If the test is successful, the Ring-bearer completes the quest and the players win the game.
@@ -365,4 +365,4 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Ring-bearer claimed The One Ring)
     - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
 
-(rendered pieces: 240 by template, 3 as JSON)
+(rendered pieces: 242 by template, 1 as JSON)

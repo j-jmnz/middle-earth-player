@@ -8,64 +8,64 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 11200:A:2 (front): Setup: Attach Black Key (boon) to Captain Sahír. Shuffle Revenant into the encounter deck. Each player may choose one copy of Command and add it to their hand. For this game, X is plus 1 for each of those copies.
   11200:campaignSetup:1: Campaign setup (record also names 11200:A:3)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
+    - (marker, changes nothing when run) the campaign card stays beside the quest deck while the scenario is played, so a card of the scenario can place resources on it and the Resolution can count them
     - a copy of the card with code 11183 is set aside, out of play
     - a card with code 11181 from the box joins the encounter deck, which is shuffled
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
+    - Campaign Setup: the set-aside copy of the card with code 11183 is attached to the card in play named "Captain Sahír" (a card dealt on its Upgraded side stays so)
     - each player in turn may take "11201" or "11202" or "11203" or "11204" into their hand [also {"unearned":true,"afterMulligan":true}]
     - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
-    - [json TradeDamageForThreat {"verb":"TradeDamageForThreat","damage":1,"threat":1}]
+    - Campaign Setup: in player order, each character in play is offered to its controller to trade or keep: a trade deals 1 damage to it and lowers that player's threat by 1
 
 11200:A:3 (front): One player may choose one copy of Círdan's Blessing and add it to their hand. For each character in play, its controller may deal 1 damage to it to reduce their threat by 1.
   11200:campaignSetup:1: Campaign setup (record also names 11200:A:2)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
+    - (marker, changes nothing when run) the campaign card stays beside the quest deck while the scenario is played, so a card of the scenario can place resources on it and the Resolution can count them
     - a copy of the card with code 11183 is set aside, out of play
     - a card with code 11181 from the box joins the encounter deck, which is shuffled
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
+    - Campaign Setup: the set-aside copy of the card with code 11183 is attached to the card in play named "Captain Sahír" (a card dealt on its Upgraded side stays so)
     - each player in turn may take "11201" or "11202" or "11203" or "11204" into their hand [also {"unearned":true,"afterMulligan":true}]
     - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
-    - [json TradeDamageForThreat {"verb":"TradeDamageForThreat","damage":1,"threat":1}]
+    - Campaign Setup: in player order, each character in play is offered to its controller to trade or keep: a trade deals 1 damage to it and lowers that player's threat by 1
 
 11200:B:1 (back): Resolution: Add each copy of Command and Círdan's Blessing chosen during setup to the Campaign Pool.
   11200:resolution:1: Resolution
-    - [json EarnDealt {"verb":"EarnDealt","codes":["11201","11202","11203","11204","11205","11206","11207","11208"]}]
+    - Resolution: one entry for each copy of a card with code 11201, 11202, 11203, 11204, 11205, 11206, 11207 and 11208 that a seat chose at the Setup is earned for that seat, wherever the copy is now (in a hand, in the victory display, in a discard pile)
 
 11200:B:2 (back): Gain the following:
   11200:resolution:2: Resolution (record also names 11200:B:3)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11200:B:3 (back): • 1 XP for each surviving player.
   11200:resolution:2: Resolution (record also names 11200:B:2)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11200:B:4 (back): • 1 XP for each resource on this card (to a maximum of 3 XP).
   11200:resolution:3: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"tokens","code":"11200"},"max":3}]
+    - Resolution: gain 1 XP for each resource token on the card with code 11200, at most 3 XP from the line (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11200:B:5 (back): • 1 XP if Na'asiyah has 5 or more resources.
   11200:resolution:4: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"card","control":"any","names":["Na'asiyah"],"minResources":5},"min":1}}]
+    - if the number of card (any player controls) or in the staging area or the active location, named "Na'asiyah" [also {"minResources":5}] is at least 1: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11200:B:6 (back): • 1 XP if no enemies are in play.
   11200:resolution:6: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"enemyInPlay","is":false}}]
+    - if there is no enemy in play (in the staging area or engaged): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11200:B:7 (back): • 1 XP if 5 or more Underwater locations are in the victory display.
   11200:resolution:7: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","trait":"Underwater"},"min":5}}]
+    - if the number of Underwater card (any player controls) in the victory display is at least 5: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11200:B:8 (back): • 2 XP if Shrine to Morgoth (Grotto side) is in the victory display.
   11200:resolution:10: Resolution
-    - [json GainXp {"verb":"GainXp","amount":2,"when":{"kind":"inVictory","code":"12094","is":true}}]
+    - if the card with code 12094 is in the victory display: Resolution: gain 2 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11200:B:9 (back): • 1 XP if each surviving player's threat is 40 or less.
   11200:resolution:8: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"survivorsThreat","max":40}}]
+    - if [json condition {"kind":"survivorsThreat","max":40}]: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11200:B:10 (back): • -1 XP if Ominous Fate is in the victory display.
   11200:resolution:9: Resolution
-    - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
+    - if the number of card (any player controls) in the victory display, named "Ominous Fate" is at least 1: Resolution: lose 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 ## 12092 The Grotto
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -73,9 +73,9 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 12092:A:1 (front): Setup: Set Shrine to Morgoth aside, out of play. Prepare the Grotto deck. Add the top 2 locations from the Grotto deck to the staging area, Grotto side faceup (the top 3 instead if there are 3 or more players in the game). The first player takes control of Captain Sahír, and the last player takes control of Na'asiyah (objective-ally sides faceup).
   12092:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PrepareGrottoDeck {"verb":"PrepareGrottoDeck"}]
-    - [json AddFromGrottoDeck {"verb":"AddFromGrottoDeck","count":2,"when":{"kind":"not","condition":{"kind":"count","pick":{"type":"player","control":"any"},"min":3}}}]
-    - [json AddFromGrottoDeck {"verb":"AddFromGrottoDeck","count":3,"when":{"kind":"count","pick":{"type":"player","control":"any"},"min":3}}]
+    - Setup: the double-sided locations the scenario dealt as its Grotto deck are shuffled; each lies Grotto side faceup and its Underwater side is never looked at before a flip
+    - then, if not (the number of player (any player controls) is at least 3) (checked when this step runs, after the steps above; not tied to whether they did anything): the top 2 cards of the Grotto deck join the staging area without being revealed, Grotto side faceup
+    - then, if the number of player (any player controls) is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): the top 3 cards of the Grotto deck join the staging area without being revealed, Grotto side faceup
     - the set-aside card titled "Captain Sahír" is put into play under the first player
     - the set-aside card titled "Na'asiyah" is put into play under the last player
 
@@ -88,7 +88,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 
 12092:B:2 (back): Forced: After a double-sided location is explored, add the top location from the Grotto deck to the staging area, Grotto side faceup.
   12092:forced:2: Forced on the event locationExplored (heard about location (any player controls) [also {"doubleSided":true}])
-    - [json AddFromGrottoDeck {"verb":"AddFromGrottoDeck","count":1}]
+    - the top 1 cards of the Grotto deck join the staging area without being revealed, Grotto side faceup
 
 12092:B:3 (back): You cannot advance unless there are at least 3 Underwater locations in the victory display.
   12092:constant:2: Constant
@@ -102,9 +102,9 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
   12093:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the set-aside card with code 12094 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
-    - [json FlipEliteAndAttack {"verb":"FlipEliteAndAttack","name":"Captain Sahír"}]
+    - the Stormcaller Elite card in play titled "Captain Sahír" (its objective ally side) turns to its enemy side in the staging area, faceup and without tokens, and attacks the first player now, dealt a shadow card as an attack outside the combat phase is; the effect goes on once the attack is over
     - when the attack in progress ends:
-      - [json RemoveNamedFromGame {"verb":"RemoveNamedFromGame","name":"Captain Sahír"}]
+      - the card in play titled "Captain Sahír" and the cards attached to it leave the game, and none is announced as leaving play, so no "if it leaves play" ability triggers (the campaign pool is left alone)
       - for each player, first player first:
         - the acting player finds one Undead enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
       - shuffle the encounter deck
@@ -129,7 +129,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
   12094:forced:1: Forced when a phase begins
     only if it is the Quest phase
     who acts: the acting player is the first player (a phase has no player of its own)
-    - [json FlipDoubleSided {"verb":"FlipDoubleSided","keepProgress":true}]
+    - this card, a double-sided location whose two sides are two cards, shows its other side and keeps its progress; the flip is announced like FlipUncharted's (nothing while the table holds noFlipActive and the card is the active location)
 
 12094:A:3 (front): When Shrine to Morgoth is placed in the victory display, the players have escaped from the flooded grotto and win the game.
   12094:constant:2: Constant
@@ -191,18 +191,18 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 12098:A:1 (front): While Undersea Grotto is the active location, reduce the cost of the first ally played by the players each round by 1.
   12098:constant:1: Constant
     only if this card is the active location
-    - [json ReduceCostOf {"verb":"ReduceCostOf","pick":{"type":"card","control":"you","cardType":"ally"},"amount":1,"firstEachRound":true,"anyPlayer":true}]
+    - (constant) a card (you control) of card type ally costs 1 less, only the first such card each round, counting the cards all the players play together; the discount is every player's, whoever controls this card
 
 12098:A:2 (front): Response: After you travel to Undersea Grotto, you may flip it to its Underwater side.
   12098:response:1: Response after the players travel (heard about this card)
-    - [json FlipDoubleSided {"verb":"FlipDoubleSided"}]
+    - this card, a double-sided location whose two sides are two cards, shows its other side and loses all its progress; the flip is announced like FlipUncharted's (nothing while the table holds noFlipActive and the card is the active location)
 
 ## 12099 Cursed Caverns
 (the scenario deals it into the grottoDeck pile; the piles place it, no record does)
 
 12099:A:1 (front): Response: After you travel to Cursed Caverns, you may flip it to its Underwater side.
   12099:response:1: Response after the players travel (heard about this card)
-    - [json FlipDoubleSided {"verb":"FlipDoubleSided"}]
+    - this card, a double-sided location whose two sides are two cards, shows its other side and loses all its progress; the flip is announced like FlipUncharted's (nothing while the table holds noFlipActive and the card is the active location)
 
 12099:A:2 (front): Response: After the players explore Cursed Caverns as the active location, each player may raise his threat by 2 to draw the bottom card of his deck.
   12099:response:2: Response on the event activeExplored (heard about this card)
@@ -223,7 +223,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 
 12100:A:2 (front): Response: After you travel to Water-logged Halls, you may flip it to its Underwater side.
   12100:response:1: Response after the players travel (heard about this card)
-    - [json FlipDoubleSided {"verb":"FlipDoubleSided"}]
+    - this card, a double-sided location whose two sides are two cards, shows its other side and loses all its progress; the flip is announced like FlipUncharted's (nothing while the table holds noFlipActive and the card is the active location)
 
 ## 12101 Dark Abyss
 
@@ -241,7 +241,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
       - deal 1 damage to the picked card
     - the first player chooses one of:
       * option "flip":
-        - [json FlipDoubleSided {"verb":"FlipDoubleSided"}]
+        - this card, a double-sided location whose two sides are two cards, shows its other side and loses all its progress; the flip is announced like FlipUncharted's (nothing while the table holds noFlipActive and the card is the active location)
       * option "stay":
 
 ## 12102 Twisting Hollow
@@ -261,7 +261,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
       - discard the picked card
     - the first player chooses one of:
       * option "flip":
-        - [json FlipDoubleSided {"verb":"FlipDoubleSided"}]
+        - this card, a double-sided location whose two sides are two cards, shows its other side and loses all its progress; the flip is announced like FlipUncharted's (nothing while the table holds noFlipActive and the card is the active location)
       * option "stay":
 
 ## 12103 Sunken Temple
@@ -282,7 +282,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
       - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
     - the first player chooses one of:
       * option "flip":
-        - [json FlipDoubleSided {"verb":"FlipDoubleSided"}]
+        - this card, a double-sided location whose two sides are two cards, shows its other side and loses all its progress; the flip is announced like FlipUncharted's (nothing while the table holds noFlipActive and the card is the active location)
       * option "stay":
 
 ## 12104 Drowned Cave
@@ -314,8 +314,8 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
   12105:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the table: stat noFlipActive 1, until the end of the round
-    - [json ResolveActiveForced {"verb":"ResolveActiveForced","phase":"Quest","when":{"kind":"matches","card":"activeLocation","pick":{"type":"location","control":"any","trait":"Underwater"}}}]
-    - [json Doomed {"verb":"Doomed","amount":3,"when":{"kind":"not","condition":{"kind":"matches","card":"activeLocation","pick":{"type":"location","control":"any","trait":"Underwater"}}}}]
+    - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the active location hears the end of the Quest phase now: only its own Forced effects (and Responses) answer, and their conditions read that phase
+    - then, if not (the active location is a Underwater location (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 3 from the doomed keyword this card gains (doomedRaised is announced for each)
 
 ## 12106 Into the Abyss
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -364,7 +364,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 
 12108:A:1 (front): When Revealed: Add the top location from the Grotto deck to the staging area and flip that location to its Underwater side. This effect cannot be canceled.
   12108:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
-    - [json AddFromGrottoDeck {"verb":"AddFromGrottoDeck","count":1,"flip":true}]
+    - the top 1 cards of the Grotto deck join the staging area without being revealed, Grotto side faceup; each is then flipped to its Underwater side, losing its progress (none yet), and announced as flipped over
 
 12108:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location is Underwater).
   12108:shadow:1: Shadow
@@ -373,4 +373,4 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
-(rendered pieces: 205 by template, 43 as JSON)
+(rendered pieces: 256 by template, 12 as JSON)

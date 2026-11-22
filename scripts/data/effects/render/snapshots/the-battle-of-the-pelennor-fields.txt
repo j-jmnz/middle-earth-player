@@ -15,7 +15,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145014:A:4 (front): Attached hero gains the Rohan trait.
   145014:constant:1: Constant
-    - [json GrantTrait {"verb":"GrantTrait","trait":"Rohan"}]
+    - (constant on an attachment) the attached card gains the trait Rohan
 
 145014:A:5 (front): Attached hero gets +1 Attack while attacking with another Rohan character.
   145014:constant:2: Constant
@@ -34,7 +34,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145015:A:3 (front): Attached hero gains the Gondor trait.
   145015:constant:1: Constant
-    - [json GrantTrait {"verb":"GrantTrait","trait":"Gondor"}]
+    - (constant on an attachment) the attached card gains the trait Gondor
 
 145015:A:4 (front): Attached hero gets +1 Willpower while committed to the quest with another Gondor character.
   145015:constant:2: Constant
@@ -52,7 +52,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145043:forced:1: Forced at the end of the round
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":{"count":{"type":"enemy","control":"any","stagingOnly":true}}}]
+    - deal the number of enemy (any player controls) in the staging area only damage to the objective Minas Tirith, through the City Wall (damageFirst), while it is in play (nothing with it out of play)
     - then, if not (damage of this card is less than hit points of this card) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (Minas Tirith has no hit points remaining)
 
 ## 145044 Grond
@@ -71,7 +71,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 resource tokens on this card
-    - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":{"stat":"resources","of":"self"}}]
+    - deal resources of this card damage to the objective Minas Tirith, through the City Wall (damageFirst), while it is in play (nothing with it out of play)
 
 145044:A:4 (front): Travel: The Witch-king makes an immediate attack against each player, in turn order.
   145044:travel:1: Travel
@@ -184,14 +184,14 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "city" (only if the card with code 145043 is in play):
-        - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":3}]
+        - deal 3 damage to the objective Minas Tirith, through the City Wall (damageFirst), while it is in play (nothing with it out of play)
       * option "attack":
         - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 145052:A:2 (shadow): Shadow: Deal 1 damage to Minas Tirith.
   145052:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":1}]
+    - deal 1 damage to the objective Minas Tirith, through the City Wall (damageFirst), while it is in play (nothing with it out of play)
 
 ## 145053 Morgul Captain
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -222,7 +222,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
         - choose hero (you control)
         - deal 2 damage to the picked card
       * option "city" (only if the card with code 145043 is in play):
-        - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":2}]
+        - deal 2 damage to the objective Minas Tirith, through the City Wall (damageFirst), while it is in play (nothing with it out of play)
 
 145054:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has the Mordor trait).
   145054:shadow:1: Shadow
@@ -246,7 +246,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145055:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json EngageShadowCard {"verb":"EngageShadowCard","when":{"kind":"inPlay","code":"145043","is":true}}]
+    - if the card with code 145043 is in play: the shadow card this is, an enemy, leaves its attacker and engages the player the attack is against; it enters play there
     - then, if this card is engaged with a player (that player is who "you" means in this record) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt a shadow card
 
 ## 145056 The Rammas is Breached
@@ -264,7 +264,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "city" (only if the card with code 145043 is in play):
-        - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":3}]
+        - deal 3 damage to the objective Minas Tirith, through the City Wall (damageFirst), while it is in play (nothing with it out of play)
       * option "attack":
         - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
@@ -306,7 +306,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145058:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - [json AttachShadowToHero {"verb":"AttachShadowToHero","code":"145058","when":{"kind":"dealt"}}]
+      - if [json condition {"kind":"dealt"}]: when the attack ends: the attacking enemy's shadow card with code 145058 attaches faceup to the hero the attack damaged (its defender, or the hero an undefended attack landed on), unless that hero carries one already (Limit 1 per hero); a damaged ally or no damage attaches nothing
 
 ## 145059 Spells of Ruin
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -318,7 +318,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
         - for each exhausted character (any player controls):
           - deal 1 damage to the picked card
       * option "city" (only if the card with code 145043 is in play):
-        - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":5}]
+        - deal 5 damage to the objective Minas Tirith, through the City Wall (damageFirst), while it is in play (nothing with it out of play)
 
 145059:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, deal 2 damage to Minas Tirith.
   145059:shadow:1: Shadow
@@ -326,7 +326,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
-      - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":2,"when":{"kind":"x","min":1}}]
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): deal 2 damage to the objective Minas Tirith, through the City Wall (damageFirst), while it is in play (nothing with it out of play)
 
 ## 145060 Dread and Despair
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -394,7 +394,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - up to 1 resource token(s) come off the card with code 145072 in play
-    - [json ReturnSetAsideHero {"verb":"ReturnSetAsideHero","code":"145001","when":{"kind":"less","left":{"stat":"resources","of":"self"},"right":1}}]
+    - then, if resources of this card is less than 1 (checked when this step runs, after the steps above; not tied to whether they did anything): the first player takes control of the set-aside hero with code 145001, with the cards attached to him: he enters play ready under the first player (nothing with no such hero set aside)
     - then, if resources of this card is less than 1 (checked when this step runs, after the steps above; not tied to whether they did anything): this card is added to the victory display (the players' own, the group's)
 
 ## 145073 The Garrison of Gondor
@@ -436,7 +436,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
       - one set-aside card with code 145062 joins the staging area (it is not revealed)
       - the acting player reveals an encounter card
     - for each player, first player first:
-      - [json DiscardAllyToStaging {"verb":"DiscardAllyToStaging"}]
+      - the acting player discards cards from the top of their deck until they discard an ally that is not in play (an ally whose title a unique ally in play holds is skipped as one in play), and puts it into play in the staging area, its text box treated as blank until the end of the phase; it stays its owner's, under nobody's control (nothing is staged with no ally in the deck); a destroyed one goes to its owner's discard pile
 
 145074:B:1 (back): X is the total cost of all allies in the staging area.
   145074:constant:1: Constant
@@ -460,7 +460,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145075:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json TakeControlOfStagedAllies {"verb":"TakeControlOfStagedAllies"}]
+      - the acting player takes control of each ally they own in the staging area and exhausts it: the allies come into their owner's play area
     - one set-aside card with code 145043 joins the staging area (it is not revealed)
     - one set-aside card with code 145044 joins the staging area (it is not revealed)
     - one set-aside card with code 145079 joins the staging area (it is not revealed)
@@ -482,7 +482,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145075:B:4 (back): Forced: When an enemy is destroyed, place progress on this stage equal to that enemy's total Threat (progress must be placed on the active location first).
   145075:forced:1: Forced after an enemy is destroyed
-    - [json PlaceProgressActiveFirst {"verb":"PlaceProgressActiveFirst","amount":{"x":true}}]
+    - place X progress on the active location, up to its quest points, and what it cannot take on the current quest stage, whatever bars the stage's progress from questing or player cards (the assault flag); the stage advances when it is full
 
 ## 145076 Rohan has Come!
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -490,11 +490,11 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 145076:A:1 (front): When Revealed: Set The Witch-king aside, out of play. Each player searches the top 10 cards of his deck for an ally that matches the sphere of a hero he controls and puts it into play under his control. Each player shuffles his deck.
   145076:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"145079"}]
+    - the card in play with code 145079 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
     - for each player, first player first:
       - choose card (you control) in the deck, among the top 10, of card type ally [also {"heroSphere":true,"intoPlay":true}]
-      - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor"}]
-      - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+      - the picked card is put into play from wherever it is out of play (hand, discard pile, deck): it is not played, so no cost is paid and no play restriction applies, and a unique card with a copy in play stays where it is; a hero goes among its controller's heroes, any other card into the play area, ready, under the acting player's control
+      - shuffle the acting player's deck
 
 145076:B:1 (back): Progress that would be placed on this stage by questing successfully is instead assigned as damage among enemies in play. (Progress must be placed on the active location first.)
   145076:constant:1: Constant
@@ -528,7 +528,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145077:B:2 (back): Forced: When an enemy attacks and destroys a character, deal 1 damage to Minas Tirith.
   145077:forced:1: Forced on the event characterDestroyedByAttack
-    - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":1}]
+    - deal 1 damage to the objective Minas Tirith, through the City Wall (damageFirst), while it is in play (nothing with it out of play)
 
 145077:B:3 (back): This stage cannot be defeated unless Aragorn is in play and The Witch-king is in the victory display. If the players defeat this stage, they win the game.
   145077:constant:2: Constant
@@ -540,10 +540,10 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 145078:A:1 (front): Setup: Set each Harad enemy recorded in the campaign log aside, out of play. The first player attaches Andúril and Banner of Elendil to Aragorn and sets him aside, out of play. Add The Corsair Fleet to the staging area (Gondor side faceup) and place X resources on it, where X is the number recorded in the campaign log. Remove each burden with the following burden set icons from the encounter deck, then flip this card over: A Shadow of the Past, Flight to the Ford, The Ring Goes South, The Passage of the Marshes, Shelob's Lair
   145078:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAsideLogged {"verb":"SetAsideLogged","trait":"Harad"}]
-    - [json SetAsideHeroWithAttachments {"verb":"SetAsideHeroWithAttachments","hero":"145001","attach":["142014","145013"]}]
+    - Campaign Setup: each enemy recorded in the Campaign Log under The Black Gate with the trait Harad is set aside, out of play, one copy for each recorded (nothing is set aside with no log)
+    - Campaign Setup: the first player attaches the cards with codes 142014 and 145013, from the supply, to the hero with code 145001 and sets him aside, out of play, with an empty resource pool (he returns with an empty one)
     - [json AddToStagingWithResources {"verb":"AddToStagingWithResources","code":"145072","amount":{"recorded":"corsairFleet"}}]
-    - [json RemoveBurdenSets {"verb":"RemoveBurdenSets","sets":["A Shadow of the Past","Flight to the Ford","The Ring Goes South","The Passage of the Marshes","Shelob's Lair"]}]
+    - Campaign Setup: the pool's burdens of the burden sets "A Shadow of the Past", "Flight to the Ford", "The Ring Goes South", "The Passage of the Marshes", "Shelob's Lair" are not dealt this scenario; they stay in the pool, only left out of the decks the setup builds (the encounter deck)
 
 145078:B:1 (back): Forced: When the players advance to stage 5B, add each set aside Harad enemy to the staging area.
   145078:forced:1: Forced on the event afterStageRevealed
@@ -553,7 +553,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 145078:B:2 (back): Resolution: Add 1 copy, per player, of Wraith on Wings to the campaign pool. The players have earned those burdens. If Esquire of Gondor, or Esquire of Rohan, is attached to a hero, that hero's controller has earned that boon.
   145078:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json Earn {"verb":"Earn","codes":["145062"],"eachPlayer":true}]
+    - Resolution: the cards with codes 145062 are earned, with no choice (one copy for each living player)
     - each copy of code 145015 and code 145014 attached to a hero in play joins the Campaign Pool attached to that hero
 
 ## 145079 The Witch-king
@@ -590,4 +590,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - this enemy, in the staging area, engages the first player
     - then, if this card is engaged with a player (that player is who "you" means in this record) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 325 by template, 29 as JSON)
+(rendered pieces: 357 by template, 6 as JSON)

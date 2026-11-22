@@ -124,7 +124,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
       - the acting player chooses one of:
         * option "attach" (only if there is a Weapon or Armour card (you control) in hand, of card type attachment to choose):
           - choose Weapon or Armour card (you control) in hand, of card type attachment
-          - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor","host":{"type":"character","control":"you"}}]
+          - the picked card is put into play from wherever it is out of play (hand, discard pile, deck): it is not played, so no cost is paid and no play restriction applies, and a unique card with a copy in play stays where it is; a hero goes among its controller's heroes, any other card into the play area, ready, under the acting player's control; an attachment goes on character (you control) chosen by the acting player (it stays where it is when none can take it)
         * option "keep":
 
 ## 03067 Search for the Chamber
@@ -328,4 +328,4 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
       - if the number of Goblin enemy (any player controls) engaged with you is at most 0: the effect's X grows by 1
     - reveal the top X cards of the encounter deck one at a time: each enemy is revealed in full (its When Revealed, Surge, Doomed and the Forced effects of a reveal) and added to the staging area, every other card is discarded unresolved (the discard pile is shuffled back when the deck runs out)
 
-(rendered pieces: 168 by template, 1 as JSON)
+(rendered pieces: 170 by template, 0 as JSON)

@@ -59,7 +59,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) [also {"island":"temple"}]
-    - [json LookAtFacedown {"verb":"LookAtFacedown","target":"picked"}]
+    - the acting player looks at the facedown side of the picked card in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
 110078:B:1 (back): Campaign Mode only.
   (inert: the engine applies it by rule, no record)
@@ -82,10 +82,10 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     - the acting player chooses one of:
       * option "temple" (only if there is a location (any player controls) [also {"island":"temple"}] to choose):
         - choose location (any player controls) [also {"island":"temple"}]
-        - [json LookAtFacedown {"verb":"LookAtFacedown","target":"picked"}]
+        - the acting player looks at the facedown side of the picked card in a look window (it stays facedown and none of the Forced effects of its other side happen)
       * option "secret" (only if there is a card (any player controls) or in the staging area or the active location [also {"island":"secret"}] to choose):
         - choose card (any player controls) or in the staging area or the active location [also {"island":"secret"}]
-        - [json LookAtSecret {"verb":"LookAtSecret"}]
+        - the acting player looks at the picked secret (a facedown Temple of the Deceived location or secret), which stays facedown
 
 ## 11197 Temple of the Deceived
 
@@ -95,27 +95,27 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 11197:A:2 (front): Setup: Attach Black Key (boon) to Captain Sahír. Shuffle Revenant into the encounter deck. Shuffle Starla and both Recurring Nightmares together and place one facedown under each Temple of the Deceived location, as secrets. For each character in play, its controller may deal 1 damage to it to reduce their threat by 1. One player may raise their threat by 4 to attach Spyglass to a hero.
   11197:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
+    - (marker, changes nothing when run) the campaign card stays beside the quest deck while the scenario is played, so a card of the scenario can place resources on it and the Resolution can count them
     - a copy of the card with code 11180 is set aside, out of play
     - a copy of the card with code 11183 is set aside, out of play
     - a copy of the card with code 11198 is set aside, out of play
     - a copy of the card with code 11199 is set aside, out of play
     - a copy of the card with code 11199 is set aside, out of play
     - a card with code 11181 from the box joins the encounter deck, which is shuffled
-    - [json FlipSetAside {"verb":"FlipSetAside","name":"Temple Guardian"}]
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
-    - [json PlaceSecrets {"verb":"PlaceSecrets","codes":["11198","11199","11199"]}]
-    - [json TradeDamageForThreat {"verb":"TradeDamageForThreat","damage":1,"threat":1}]
-    - [json RaiseThreatToAttach {"verb":"RaiseThreatToAttach","code":"11180","amount":4}]
+    - Campaign Setup: the card titled "Temple Guardian", the set-aside one or the one the scenario dealt to the staging area, shows its 'Campaign Mode only' side B, with the stats and text printed there
+    - Campaign Setup: the set-aside copy of the card with code 11183 is attached to the card in play named "Captain Sahír" (a card dealt on its Upgraded side stays so)
+    - Campaign Setup: the set-aside copies of the cards with codes 11198, 11199 and 11199 are shuffled and lie facedown under the Temple of the Deceived locations, one each, in the order the seed gives, as secrets
+    - Campaign Setup: in player order, each character in play is offered to its controller to trade or keep: a trade deals 1 damage to it and lowers that player's threat by 1
+    - Campaign Setup: in player order each player is offered to raise their threat by 4 (if it can rise by that much without reaching 50); the first to accept raises it and chooses a hero, any player's, for the set-aside copy of the card with code 11180 to attach to; nobody is offered it after that
 
 11197:A:3 (front): Travel Action: Flip over a secret at your location. If it is a Recurring Nightmare, it engages you. If it is Starla, you gain control of her (ready).
   11197:action:1: Action (any player may use it)
     only if all of: (it is the Travel phase) and (there is a card (any player controls) or in the staging area or the active location [also {"island":"here"}] to choose)
-    - [json FlipSecret {"verb":"FlipSecret"}]
+    - the secret under the active location turns faceup and the acting player takes the card as the line says (a Recurring Nightmare engages them, Starla comes under their control ready); nothing when the active location has no secret
 
 11197:B:1 (back): Resolution: If Starla is under a player's control, add her to the Campaign Pool. For each Recurring Nightmare that is not a secret, add it to the Campaign Pool and choose a player. For the remainder of the campaign, that player shuffles that Recurring Nightmare into their deck after they draw their starting hand.
   11197:resolution:1: Resolution
-    - [json Earn {"verb":"Earn","codes":["11198"],"when":{"kind":"count","pick":{"type":"ally","control":"any","names":["Starla"]},"min":1}}]
+    - if the number of ally (any player controls) named "Starla" is at least 1: Resolution: the cards with codes 11198 are earned, with no choice
   11197:resolution:2: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if [json condition {"kind":"island","revealed":{"code":"11199","min":1}}]: the first player takes "11199" for a player (shuffled into their deck)
@@ -123,35 +123,35 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 
 11197:B:2 (back): Gain the following:
   11197:resolution:3: Resolution (record also names 11197:B:3)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11197:B:3 (back): • 1 XP for each surviving player.
   11197:resolution:3: Resolution (record also names 11197:B:2)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11197:B:4 (back): • 1 XP for each resource on this card (to a maximum of 3 XP).
   11197:resolution:4: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"tokens","code":"11197"},"max":3}]
+    - Resolution: gain 1 XP for each resource token on the card with code 11197, at most 3 XP from the line (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11197:B:5 (back): • 1 XP for each faceup Temple Halls.
   11197:resolution:5: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"islandFaceup","code":"12069"}}]
+    - Resolution: gain 1 XP for each location of the Island Map with code 12069 that has been flipped over, showing the location it is (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11197:B:6 (back): • 1 XP if 4 or fewer Uncharted locations are faceup.
   11197:resolution:6: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"island","flippedAtMost":4}}]
+    - if [json condition {"kind":"island","flippedAtMost":4}]: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11197:B:7 (back): • 1 XP if Temple Guardian is in the victory display.
   11197:resolution:7: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"any","conditions":[{"kind":"inVictory","code":"12070","is":true},{"kind":"inVictory","code":"110077","is":true}]}}]
+    - if any of: (the card with code 12070 is in the victory display) or (the card with code 110077 is in the victory display): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11197:B:8 (back): • 1 XP if each surviving player's threat is 40 or less.
   11197:resolution:8: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"survivorsThreat","max":40}}]
+    - if [json condition {"kind":"survivorsThreat","max":40}]: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11197:B:9 (back): • -1 XP if Ominous Fate is in the victory display.
   11197:resolution:9: Resolution
-    - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
+    - if the number of card (any player controls) in the victory display, named "Ominous Fate" is at least 1: Resolution: lose 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 ## 12067 Searching the Island
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -159,13 +159,13 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 12067:A:1 (front): Setup: Prepare the Island Map (see insert). Flip over the top-left and bottom-left locations of the Island Map (without resolving their Forced effects, if any), and choose one as the players' starting active location, using a resource token to represent which location is active. The first player takes control of Captain Sahír, and the last player takes control of Na'asiyah (objective-ally sides faceup). Add Temple Guardian to the staging area and attach Gate Key to it, guarded. Shuffle the encounter deck.
   12067:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PrepareIslandMap {"verb":"PrepareIslandMap","temple":["12068","12069"]}]
-    - [json RevealIslandCorners {"verb":"RevealIslandCorners"}]
+    - Setup: the double-sided locations dealt as the Uncharted deck are separated: those with codes 12068 and 12069 (the Temple of the Deceived locations) are shuffled and laid in the right-hand column, the others are shuffled and fill the first four columns, a grid of three rows by five; each lies with its Lost Island (or Temple) side up, which nobody looks at
+    - Setup: the top-left and bottom-left locations of the Island Map turn to their other side, with no flip announced (their Forced effects do not resolve)
     - choose location (any player controls) chosen by the first player [also {"island":"start"}]
-    - [json SetIslandActive {"verb":"SetIslandActive"}]
+    - Setup: the picked location becomes the active location where it lies (not a travel: no Travel effect, no traveled event, no Forced effect of becoming active)
     - the set-aside card titled "Captain Sahír" is put into play under the first player
     - the set-aside card titled "Na'asiyah" is put into play under the first player
-    - [json AttachGuarded {"verb":"AttachGuarded","name":"Gate Key","to":"Temple Guardian"}]
+    - Setup: the set-aside copy of "Gate Key" (whichever printing is dealt) is attached to the card in play titled "Temple Guardian", guarded, and stays so until that card leaves play, when it returns to the staging area
     - shuffle the encounter deck
 
 12067:B:1 (back): Exploration.
@@ -184,7 +184,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 12068:A:1 (front): Forced: When The Grotto's Entrance is flipped over while active, put Temple Guardian into play from the victory display, engaged with the player with the highest threat.
   12068:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
-    - [json EngageFromVictory {"verb":"EngageFromVictory","name":"Temple Guardian"}]
+    - the card titled "Temple Guardian" leaves the victory display for the engagement area of the player with the highest threat (the first player chooses among those tied; nothing when it is in play or not in the victory display)
 
 12068:A:2 (front): When the 8th progress is placed on The Grotto's Entrance, the players have found the sunken ruins and win the game.
   12068:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressPlaced (heard about this card)
@@ -203,7 +203,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 
 12068:B:4 (back): Forced: After Temple of the Deceived becomes the active location, flip it over.
   12068:forced:2: Forced after this location becomes the active location (heard about this card)
-    - [json FlipUncharted {"verb":"FlipUncharted"}]
+    - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 RECORD NAMING NO LINE OF THIS CARD (12068:B:2)
   12068:constant:2: Constant
@@ -222,7 +222,7 @@ RECORD NAMING NO LINE OF THIS CARD (12068:B:2)
 12069:A:2 (front): Forced: When Temple Halls is flipped over while active, put Temple Guardian into play from the victory display, engaged with the player with the highest threat.
   12069:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
-    - [json EngageFromVictory {"verb":"EngageFromVictory","name":"Temple Guardian"}]
+    - the card titled "Temple Guardian" leaves the victory display for the engagement area of the player with the highest threat (the first player chooses among those tied; nothing when it is in play or not in the victory display)
 
 12069:B:1: Uncharted.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -236,7 +236,7 @@ RECORD NAMING NO LINE OF THIS CARD (12068:B:2)
 
 12069:B:4 (back): Forced: After Temple of the Deceived becomes the active location, flip it over.
   12069:forced:2: Forced after this location becomes the active location (heard about this card)
-    - [json FlipUncharted {"verb":"FlipUncharted"}]
+    - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
   12069:constant:2: Constant
@@ -281,7 +281,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) [also {"island":"temple"}]
-    - [json LookAtFacedown {"verb":"LookAtFacedown","target":"picked"}]
+    - the acting player looks at the facedown side of the picked card in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
 ## 12072 Jagged Cliffs
 (the scenario deals it into the islandMap pile; the piles place it, no record does)
@@ -295,7 +295,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
   12072:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
     - for each location (any player controls) [also {"island":"adjacent"}]:
-      - [json LookAtFacedown {"verb":"LookAtFacedown","target":"picked"}]
+      - the acting player looks at the facedown side of the picked card in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
 12072:B:1: Uncharted.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -306,13 +306,13 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12072:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   12072:forced:2: Forced after this location becomes the active location (heard about this card)
-    - [json FlipUncharted {"verb":"FlipUncharted"}]
+    - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 12072:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   12072:action:1: Action (any player may use it)
     only if this card is a location (any player controls) [also {"minProgress":4}]
     who acts: any player may trigger it; the acting player is the one who does
-    - [json LookAtFacedown {"verb":"LookAtFacedown","remove":4}]
+    - the acting player looks at the facedown side of this card, after 4 progress is taken off it in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
 ## 12073 Winding Caverns
 (the scenario deals it into the islandMap pile; the piles place it, no record does)
@@ -336,13 +336,13 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12073:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   12073:forced:1: Forced after this location becomes the active location (heard about this card)
-    - [json FlipUncharted {"verb":"FlipUncharted"}]
+    - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 12073:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   12073:action:1: Action (any player may use it)
     only if this card is a location (any player controls) [also {"minProgress":4}]
     who acts: any player may trigger it; the acting player is the one who does
-    - [json LookAtFacedown {"verb":"LookAtFacedown","remove":4}]
+    - the acting player looks at the facedown side of this card, after 4 progress is taken off it in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
 ## 12074 Jungle Path
 (the scenario deals it into the islandMap pile; the piles place it, no record does)
@@ -368,13 +368,13 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12074:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   12074:forced:2: Forced after this location becomes the active location (heard about this card)
-    - [json FlipUncharted {"verb":"FlipUncharted"}]
+    - this card turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear
 
 12074:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   12074:action:1: Action (any player may use it)
     only if this card is a location (any player controls) [also {"minProgress":4}]
     who acts: any player may trigger it; the acting player is the one who does
-    - [json LookAtFacedown {"verb":"LookAtFacedown","remove":4}]
+    - the acting player looks at the facedown side of this card, after 4 progress is taken off it in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
 ## 12075 Faithless Desecrator
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -430,7 +430,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
   12078:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if 0 is less than [json amount {"islandLeft":true}]: the total Threat in the staging area is [json amount {"islandLeft":true}] higher until the end of the phase
-    - [json Doomed {"verb":"Doomed","amount":1,"when":{"kind":"less","left":{"islandLeft":true},"right":1}}]
+    - then, if [json amount {"islandLeft":true}] is less than 1 (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 1 from the doomed keyword this card gains (doomedRaised is announced for each)
 
 ## 12079 Furious Rainstorm
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -456,7 +456,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12080:A:1 (front): When Revealed: Each player must randomly discard cards from his hand until he has no more than 3 cards in his hand. If no cards were discarded by this effect, Dwindling Supplies gains doomed 2.
   12080:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json Doomed {"verb":"Doomed","amount":2,"when":{"kind":"handSize","max":3}}]
+    - if no player holds more than 3 cards in hand: each player raises their threat by 2 from the doomed keyword this card gains (doomedRaised is announced for each)
     - for each player, first player first:
       - the acting player discards the cards in your hand - 3 random card(s) from hand
 
@@ -480,4 +480,4 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each hero (any player controls) with resources on it:
       - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
 
-(rendered pieces: 258 by template, 60 as JSON)
+(rendered pieces: 304 by template, 26 as JSON)

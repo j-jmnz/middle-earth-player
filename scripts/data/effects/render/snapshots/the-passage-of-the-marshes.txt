@@ -105,7 +105,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144020:A:3 (front): Travel: Spend 1 Fellowship resource to travel here.
   144020:travel:1: Travel
-    - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship","group":true}]
+    - the players as a group spend 1 resource(s) from heroes with the fellowship icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
 
 ## 144021 Haunted Mere
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -257,7 +257,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
       * option "attack" (only if the card with code 144075 is in play):
         - Gollum, if he is in play, makes an immediate attack against the player he is engaged with
       * option "cancel" (only if all of: (the number of card (any player controls) or in the staging area or the active location, named "Gollum" or "Sméagol", (enemies engaged with a player included) is at least 1) and (the actor's heroes that can pay for a fellowship card (with that icon or one they were given) hold at least 1 resource(s) in all) and (the card with code 144063 in play is ready)):
-        - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship"}]
+        - the acting player spend 1 resource(s) from heroes with the fellowship icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
         - exhaust the card with code 144063
         - the effect being resolved is canceled: nothing after this resolves
 
@@ -274,7 +274,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144064:A:1 (front): Setup: Put Gollum into play engaged with the first player. Each player searches the encounter deck for 1 location, reveals it, and adds it to the staging area. Shuffle the encounter deck.
   144064:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json EngageSetAside {"verb":"EngageSetAside","code":"144075"}]
+    - one set-aside copy of the card with code 144075 is put into play engaged with the acting player (nothing with no copy set aside)
     - for each player, first player first:
       - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
@@ -373,4 +373,4 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144076:triggered:1: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
     - the players lose the game (Sméagol was destroyed)
 
-(rendered pieces: 239 by template, 3 as JSON)
+(rendered pieces: 242 by template, 0 as JSON)
