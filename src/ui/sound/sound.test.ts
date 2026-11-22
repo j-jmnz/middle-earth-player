@@ -2,8 +2,8 @@
 // for, nothing reaches the module; quick taps each get a player that is not still playing.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// `loaded`: whether a new player's file has loaded when it is made. `load`: reports each waiting player's load, sounding or not.
-const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[], seeks: 0, playing: false, loaded: true, heard: [] as ((status: { isLoaded: boolean; playing: boolean }) => void)[] }));
+// `silent`: a player asked to play does not start (it is not playing and stays at its start), as an Android player sometimes does.
+const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[], seeks: 0, pauses: 0, playing: false, silent: false }));
 vi.mock("./session.ts", () => ({ startAudioSession: () => undefined, audioFailed: () => undefined }));
 // The accessibility store is mocked whole: loaded here with the mocked react-native, it would stay in the shared module cache (vitest.config.mts, isolate).
 vi.mock("../accessibility.ts", () => ({ accessibility: () => ({ screenReader: false }) }));
@@ -12,7 +12,24 @@ vi.mock("./audio-player", () => ({
   createAudioPlayer: (source: number) => {
     calls.created.push(source);
     // `calls.playing` stands for a sound still sounding: a quick tap then needs another player.
-    const player = { playing: false, duration: 0.3, isLoaded: calls.loaded, addListener: (_: string, heard: (status: { isLoaded: boolean; playing: boolean }) => void) => (calls.heard.push(heard), { remove: () => undefined }), seekTo: () => ((calls.seeks += 1), Promise.resolve()), pause: () => undefined, play: () => (calls.played.push(source), (player.playing = calls.playing)) };
+    const player = {
+      playing: false,
+      duration: 0.3,
+      currentTime: 0,
+      volume: 1,
+      seekTo: () => ((calls.seeks += 1), Promise.resolve()),
+      isLoaded: true,
+      pause: () => {
+        calls.pauses += 1;
+        player.playing = false;
+      },
+      remove: () => undefined,
+      play: () => {
+        calls.played.push(source);
+        player.playing = calls.playing && !calls.silent;
+        player.currentTime = calls.silent ? 0 : 0.1;
+      },
+    };
     return player;
   },
 }));
@@ -38,8 +55,7 @@ afterEach(() => {
   tableSettings.getState().update({ sounds: true });
   calls.played.length = 0;
   calls.playing = false;
-  calls.loaded = true;
-  calls.heard.length = 0;
+  calls.silent = false;
   vi.useRealTimers();
 });
 
@@ -113,29 +129,50 @@ describe("sound effects", () => {
     expect(calls.played.filter((source) => source === 3)).toHaveLength(4);
   });
 
-  it("asks a new player that stayed silent to play again as its file loads, but not once the moment has gone", () => {
+  it("asks a player that did not start to play again, then puts a new player in its place", async () => {
     vi.advanceTimersByTime(1000);
-    calls.loaded = false;
-    calls.playing = true;
-    // Four plays while each still sounds: the last ones are on new players, asked to play before their files have loaded.
-    for (let play = 0; play < 4; play += 1) {
-      playSound("card.land");
-      vi.advanceTimersByTime(70);
-    }
-    expect(calls.heard.length).toBeGreaterThanOrEqual(2);
-    const waiting = calls.heard.at(-1);
-    expect(waiting).toBeDefined();
-    calls.played.length = 0;
-    waiting?.({ isLoaded: false, playing: false });
-    expect(calls.played).toEqual([]);
-    waiting?.({ isLoaded: true, playing: false });
+    calls.silent = true;
+    const made = calls.created.length;
+    playSound("card.land");
+    await settled();
     expect(calls.played).toEqual([2]);
-    // One that loads sounding is left alone, and so is one that loads late.
-    calls.played.length = 0;
-    calls.heard.at(-2)?.({ isLoaded: true, playing: true });
-    vi.advanceTimersByTime(2000);
-    calls.heard.at(-2)?.({ isLoaded: true, playing: false });
-    expect(calls.played).toEqual([]);
+    // The first check: it has not started, so it is put at its start and asked again.
+    const seeks = calls.seeks;
+    vi.advanceTimersByTime(150);
+    await settled();
+    expect(calls.seeks).toBe(seeks + 1);
+    expect(calls.played).toEqual([2, 2]);
+    // The second check: still silent, so a new player takes its place and plays.
+    calls.silent = false;
+    vi.advanceTimersByTime(150);
+    expect(calls.created.length).toBe(made + 1);
+    expect(calls.played).toEqual([2, 2, 2]);
+    // It sounds now: nothing more is asked.
+    vi.advanceTimersByTime(1000);
+    await settled();
+    expect(calls.played).toEqual([2, 2, 2]);
+  });
+
+  it("does not stop a sound that started late and still sounds when its rewind is due", async () => {
+    vi.advanceTimersByTime(1000);
+    calls.playing = true;
+    playSound("card.land");
+    await settled();
+    const pauses = calls.pauses;
+    // Past its length on the clock, but the player says it is still playing: it is left to sound.
+    vi.advanceTimersByTime(600);
+    await settled();
+    expect(calls.pauses).toBe(pauses);
+    expect(calls.played).toEqual([2]);
+  });
+
+  it("leaves a player that started alone", async () => {
+    vi.advanceTimersByTime(1000);
+    playSound("card.land");
+    await settled();
+    vi.advanceTimersByTime(1000);
+    await settled();
+    expect(calls.played).toEqual([2]);
   });
 
   it("is silent while Sound effects is off", () => {

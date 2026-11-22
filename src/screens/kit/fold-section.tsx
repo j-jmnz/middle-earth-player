@@ -103,7 +103,7 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, le
         accessibilityState={{ expanded: !folded }}
         accessibilityLabel={foldWords(title, folded, counted)}
         onPress={() => {
-          playSound(folded ? "ui.toggle-on" : "ui.toggle-off");
+          playSound(folded ? "ui.unfold" : "ui.fold");
           onFold(!folded);
           announce(`${title} ${folded ? "unfolded" : "folded"}`);
         }}

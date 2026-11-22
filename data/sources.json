@@ -46430,9 +46430,9 @@
       "site": "Darkest Dungeon II and Hearthstone (the player's own copies, cut by pnpm assets sounds --from and --hearthstone)",
       "pin": {
         "kind": "sha256",
-        "value": "cb55c34ed6a766de41f90745f9d1f0642b76389ca5f1913c67f3d3a1d8d639de"
+        "value": "e8c32c573e5d0b8f65f4612a2abaa3a0f58ee527bb5a52a4c69886a188d7d8cb"
       },
-      "fetchedAt": "2026-11-22T17:38:10.534Z",
+      "fetchedAt": "2026-11-22T19:27:14.052Z",
       "files": [
         {
           "path": "sounds/ui.select.m4a",
@@ -46493,6 +46493,18 @@
           "url": "ui.bank#ui_shr_text_popup",
           "sha256": "8679e4c160c6504525b34696e8fc74a662db1eab4007540abfb41f349baea52c",
           "bytes": 7737
+        },
+        {
+          "path": "sounds/ui.unfold.m4a",
+          "url": "ui.bank#ui_inn_storage_open",
+          "sha256": "0095783f8763b9584a338642423ef55b2e0e52d429ae6a140a4fa23d28053285",
+          "bytes": 7440
+        },
+        {
+          "path": "sounds/ui.fold.m4a",
+          "url": "ui.bank#ui_inn_storage_close",
+          "sha256": "3c6738181a75ef16b9a64baf815caeccbc8f82b6a5154435426f3d7c027cca2b",
+          "bytes": 8448
         },
         {
           "path": "sounds/card.draw.m4a",
