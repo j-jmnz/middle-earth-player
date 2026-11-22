@@ -34,6 +34,19 @@ describe("effects render templates", () => {
     );
   });
 
+  it("says a record with no subject hears events about its own card only", () => {
+    const lines = renderRecord({ id: "x:forced:1", cardCode: "1", lines: ["1:A:1"], timing: "forced", trigger: "lastTimeCounterRemoved", instructions: [] }, newCtx());
+    expect(lines.join("\n")).toContain("heard about this card only");
+    expect(lines.join("\n")).toContain("after the last time counter is removed");
+  });
+
+  it("names the Travel steps the engine reads as costs", () => {
+    const travel = (instructions: readonly Obj[]) => renderRecord({ id: "x:travel:1", cardCode: "1", lines: ["1:A:1"], timing: "travel", instructions }, newCtx()).join("\n");
+    expect(travel([{ verb: "RevealBurden" }])).toContain("the burden deck is empty");
+    expect(travel([{ verb: "SpendResources", amount: 1, when: { kind: "firstPlayer" } }])).toContain("owed only while");
+    expect(travel([{ verb: "AdvanceStage" }])).not.toContain("this Travel effect is a cost");
+  });
+
   it("renders each cost a record can name", () => {
     const ctx = newCtx();
     expect(renderCost({ kind: "addSelfToVictory" }, ctx)).toContain("victory display");

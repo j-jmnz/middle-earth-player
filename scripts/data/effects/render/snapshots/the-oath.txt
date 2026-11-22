@@ -90,6 +90,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41011:A:2 (front): Travel: Each player must discard 1 random card from his hand to travel here.
   41011:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's hand holds fewer cards than they must discard
     - for each player, first player first:
       - the acting player discards 1 random card(s) from hand
 

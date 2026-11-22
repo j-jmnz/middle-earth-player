@@ -301,6 +301,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50718:A:3 (front): Travel: Each player spends 1 resource to travel here.
   50718:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's heroes hold fewer resources than they must spend (read by the investigation family)
     - for each player, first player first:
       - the acting player spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
 

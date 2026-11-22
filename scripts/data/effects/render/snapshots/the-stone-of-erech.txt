@@ -68,7 +68,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
     - the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
 
 50303:B:3 (back): If the players defeat this stage, they have escaped the Blackroot Vale with Derufin and won the game.
-  50303:triggered:1: Triggered (mandatory, not printed as Forced) on the event questDefeated
+  50303:triggered:1: Triggered (mandatory, not printed as Forced) after a side quest is defeated (its progress reached its quest points) (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - the players win the game
 
 ## 50304 Derufin

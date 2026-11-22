@@ -82,6 +82,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 
 02088:A:1 (front): Travel: The first player must discard 1 event card from his hand to travel to this location.
   02088:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no card matches the line's choose step
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose card (you control) in hand, of card type event, chosen by the first player
     - discard the picked card

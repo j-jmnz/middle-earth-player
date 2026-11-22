@@ -32,6 +32,9 @@ const ZONE: Readonly<Record<string, string>> = {
   attached: "is attached to a card",
 };
 
+// What a flag a condition reads means where its name would not say it (where the engine sets it).
+const FLAG_WORDS: Readonly<Record<string, string>> = { progressPlacedHere: " (the engine puts it on a side quest when progress is placed on it, until the end of the round; once a round)" };
+
 const range = (min: unknown, max: unknown): string => {
   const parts = [typeof min === "number" ? `at least ${min}` : "", typeof max === "number" ? `at most ${max}` : ""].filter((part) => part !== "");
   return parts.join(" and ");
@@ -55,7 +58,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   x: (c) => ({ text: `X is at least ${str(c.min)} (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)`, read: ["min"] }),
   shadowBlank: () => ({ text: "the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)", read: [] }),
   namedFlag: (c) => ({ text: `the card in play titled "${str(c.name)}" holds the flag ${str(c.stat)}`, read: ["name", "stat"] }),
-  flag: (c) => ({ text: `${c.holder === "seat" ? "the actor's seat" : c.holder === "table" ? "the table" : "this card"} ${c.is === false ? "does not hold" : "holds"} the flag ${str(c.stat)}`, read: ["stat", "holder", "is"] }),
+  flag: (c) => ({ text: `${c.holder === "seat" ? "the actor's seat" : c.holder === "table" ? "the table" : "this card"} ${c.is === false ? "does not hold" : "holds"} the flag ${str(c.stat)}${FLAG_WORDS[str(c.stat)] ?? ""}`, read: ["stat", "holder", "is"] }),
   canPick: (c, ctx) => ({ text: `there is a ${renderPick(c.pick, ctx)} to choose`, read: ["pick"] }),
   optionTaken: (c) => ({ text: `the running effect took the option "${str(c.id)}" (a choice made earlier in it, or the stage picked at random)`, read: ["id"] }),
   attackedThisPhase: (c) => ({ text: `"${str(c.name)}" has resolved an attack this phase`, read: ["name"] }),

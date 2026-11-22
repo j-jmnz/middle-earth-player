@@ -18,7 +18,7 @@ Scenario piles that place cards with no record (quest: 19168 Urdug's Assault; qu
 
 12195:B:1 (back): Resolution: The players win the campaign!
   12195:resolution:1: Resolution
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 ## 19155 The Goblins' Assault
 (the scenario deals it into the staging pile; the piles place it, no record does)

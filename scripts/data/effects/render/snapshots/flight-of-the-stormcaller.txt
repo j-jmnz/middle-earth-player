@@ -338,6 +338,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12026:A:1 (front): Travel: Move 2 progress from the main quest to the Stormcaller's quest stage.
   12026:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the current quest card holds less progress than must be moved
     - up to 2 progress comes off the current quest card and goes on the Stormcaller's current quest stage, which advances when it is full (nothing moves when the quest holds none)
 
 12026:A:2 (front): Response: After Hidden Cove becomes the active location, heal 4 damage from each Ship objective.

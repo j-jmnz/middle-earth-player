@@ -125,6 +125,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144032:A:2 (front): Travel: The first player reveals the top facedown card under The Cross-roads and adds it to the staging area to travel here.
   144032:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the pile and its discard pile are empty (read by the wilderland family)
     - the acting player reveals the top card of the harad deck and resolves its staging, into the staging area, as if it was just revealed from the encounter deck (nothing with the deck empty)
 
 ## 144033 Foothills of Ephel Dúath
@@ -137,6 +138,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144033:A:2 (front): Travel: The first player engages an enemy in the staging area to travel here.
   144033:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no enemy matches the choose step (read by the angmar family); or when no card matches the line's choose step
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, chosen by the first player
     - engage the picked card

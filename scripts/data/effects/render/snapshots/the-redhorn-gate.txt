@@ -429,6 +429,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 901305:A:2 (front): Travel: Search the encounter deck and discard pile for 1 copy of Freezing Cold and reveal it to travel here. Shuffle the encounter deck.
   901305:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no matching card is in the encounter deck or its discard pile (read by the angmar family)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player searches the encounter deck and discard pile for the card with code 04023, a a card, reveals it and adds it to the staging area (a Travel cost: payable only when a card is found)
     - shuffle the encounter deck

@@ -365,6 +365,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 
 901809:A:2 (front): Travel: Each player must move 1 damage from Durin's Bane to a hero to travel here.
   901809:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when Durin's Bane holds less damage than there are players (read by the flame family)
     - for each player, first player first:
       - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
       - choose hero (any player controls)

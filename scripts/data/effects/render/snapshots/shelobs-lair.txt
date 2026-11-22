@@ -82,6 +82,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144044:A:2 (front): Travel: Either exhaust Sméagol, or discard 1 random card from each player's hand.
   144044:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no option can be taken
     - the first player chooses one of:
       * option "exhaust" (only if the card with code 144076 in play is ready):
         - exhaust the card with code 144076
@@ -115,6 +116,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144045:A:3 (front): Travel: Place 1 resource on Shelob to travel here.
   144045:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no enemy matches the choose step (read by the angmar family); or when no card matches the line's choose step
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Shelob"
     - place 1 resource tokens on the picked card
@@ -162,6 +164,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144048:A:2 (front): Travel: Exhaust Sméagol to travel here.
   144048:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no ready copy of the card it exhausts is in play
     - exhaust the card with code 144076
 
 ## 144049 Den of Night
@@ -176,6 +179,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144049:A:2 (front): Travel: Place 1 resource on Shelob to travel here.
   144049:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no enemy matches the choose step (read by the angmar family); or when no card matches the line's choose step
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Shelob"
     - place 1 resource tokens on the picked card

@@ -201,7 +201,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00016:A:1 (front): Setup: Search the encounter deck for 12 Scout cards, and add 3 per player (one of each title), to the staging area. Remove The Witch-king from the encounter deck and set him aside, out of play. Shuffle any unused Scout cards back into the encounter deck.
   00016:setup:1: Setup
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 00016:B:1 (back): Players cannot travel to West Bank locations.
   00016:constant:1: Constant

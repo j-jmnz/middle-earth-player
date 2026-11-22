@@ -177,6 +177,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51211:A:4 (front): Travel: Each player discards 1 random card from his hand.
   51211:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's hand holds fewer cards than they must discard
     - for each player, first player first:
       - the acting player discards 1 random card(s) from hand
 
@@ -370,6 +371,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51225:A:2 (front): Travel: Each player exhausts a character.
   51225:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player has no card to choose and exhaust
     - for each player, first player first:
       - choose ready character (you control)
       - exhaust the picked card
@@ -460,6 +462,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51231:A:1 (front): Travel: Remove 2 progress from the main quest.
   51231:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the current quest card holds less progress than must be removed (read by the quest family)
     - remove 2 progress from the current quest card (all of it when it holds less)
 
 51231:A:2 (shadow): Shadow: Remove 2 progress from the main quest.
@@ -509,6 +512,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51234:A:2 (front): Travel: Each player discards 1 random card from his hand.
   51234:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's hand holds fewer cards than they must discard
     - for each player, first player first:
       - the acting player discards 1 random card(s) from hand
 

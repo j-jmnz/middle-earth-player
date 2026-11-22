@@ -12,7 +12,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
     - Time 5: when this card is revealed, 5 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
 
 10094:B:2 (back): Forced: After the last time counter is removed from Secrets of Rhudaur, remove each Treachery of Rhudaur side quest from the game and immediately advance to stage 2.
-  10094:forced:1: Forced on the event lastTimeCounterRemoved (heard about this card)
+  10094:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each card in the staging area titled "Quiet the Spirits" or "Sift through the Debris" or "Decipher Ancient Texts" (an encounter side quest, quest side up) is removed from the game, not added to the victory display; its attachments are discarded
     - advance to the next quest stage
@@ -147,6 +147,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10103:A:2 (front): Travel: Return the topmost Undead enemy in the encounter discard pile to the staging area.
   10103:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the encounter discard pile holds no card of the kind (read by the angmar family)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the topmost enemy with the trait Undead in the encounter discard pile (the last put there) is picked (nothing with none)
     - the picked card goes to the staging area (it is not revealed)

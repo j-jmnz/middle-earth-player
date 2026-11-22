@@ -4,7 +4,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143021:A:1 (front): Poisoned Counsels functions like a player card.
   143021:constant:1: Constant
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 143021:A:2 (front): Forced: After you draw this card, discard all other cards in your hand.
   143021:forced:1: Forced on the event enteredHand (heard about this card)

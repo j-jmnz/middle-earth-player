@@ -19,7 +19,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     - for each player, first player first:
       - each hero the acting player controls gains 1 resource(s)
   40001:setup:6: Setup (record also names 40001:A:7)
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 40001:A:2 (front): • Players prepare their fleet.
   40001:setup:1: Setup (record also names 40001:A:1)
@@ -48,7 +48,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40001:A:7 (front): • Flip this card over and place it next to the quest deck.
   40001:setup:6: Setup (record also names 40001:A:1)
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 40001:B:1 (back): Each player draws 1 additional card during the resource phase.
   40001:constant:1: Constant
@@ -73,13 +73,13 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40002:setup:2: Setup (record also names 40002:A:3)
     - Setup: every non-ship enemy with the trait Corsair still in the encounter deck goes to the Corsair deck, which is shuffled; from then on such an enemy that would be discarded goes to the Corsair discard pile, and the Corsair deck refills from it
   40002:setup:3: Setup (record also names 40002:A:4)
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
   40002:setup:4: Setup (record also names 40002:A:5)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter deck
     - discard cards from the top of the encounter deck until 1 location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area
   40002:setup:5: Setup (record also names 40002:A:6)
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 40002:A:2 (front): • Players prepare their fleet.
   40002:setup:1: Setup (record also names 40002:A:1)
@@ -91,7 +91,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40002:A:4 (front): • Set aside all 7 unique enemies (including the Dreadnaught).
   40002:setup:3: Setup (record also names 40002:A:1)
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 40002:A:5 (front): • Shuffle the encounter deck and discard cards from the top until 2 locations are discarded (3 locations instead if there are 3 or more players). Add those locations to the staging area.
   40002:setup:4: Setup (record also names 40002:A:1)
@@ -101,7 +101,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40002:A:6 (front): • Flip this card over and place it next to the quest deck.
   40002:setup:5: Setup (record also names 40002:A:1)
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 40002:B:1 (back): Quest Action: Deal 10 damage to a non-unique enemy engaged with a player in any group. Reveal the top card of the encounter deck. (Group limit once per game.)
   40002:action:1: Action (limit oncePerGameGroup)
@@ -184,7 +184,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     - each hero (you control): stat willpower 2, while this card is in play
 
 40006:B:3 (back): Response: After Eithiliant flips, shuffle up to 6 cards from your discard pile into your deck. Place 6 progress on a location in any group.
-  40006:response:1: Response on the event flipped (heard about this card)
+  40006:response:1: Response after a card is flipped over (the FlipCard verb) (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each card (you control) in the discard pile (up to 6 chosen):
       - the picked card goes into its owner's deck, which is shuffled (a card leaving play this way leaves play)
@@ -218,7 +218,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     - each hero (you control): stat ranged 1, while this card is in play
 
 40007:B:3 (back): Response: After Golden Wing flips, deal 6 damage to an enemy in any group.
-  40007:response:1: Response on the event flipped (heard about this card)
+  40007:response:1: Response after a card is flipped over (the FlipCard verb) (heard about this card)
     only if there is a enemy (any player controls) or in the staging area to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area
@@ -250,7 +250,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     - each hero (you control): stat defense 2, while this card is in play
 
 40008:B:3 (back): Response: After Pride of Lebennin flips, heal 2 damage from a character. Choose up to 2 cards from the encounter discard pile and add them to the victory display.
-  40008:response:1: Response on the event flipped (heard about this card)
+  40008:response:1: Response after a card is flipped over (the FlipCard verb) (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (any player controls)
     - heal 2 damage from the picked card
@@ -275,7 +275,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 40009:B:2 (back): Response: After Silent Mist flips, choose up to 2 events from your discard pile and/or your collection and add them to your hand (following deckbuilding rules).
-  40009:response:1: Response on the event flipped (heard about this card)
+  40009:response:1: Response after a card is flipped over (the FlipCard verb) (heard about this card)
     - the acting player chooses up to 2 events, one at a time, from their discard pile and from their collection (never a third copy of a title they hold 3 of) and adds them to their hand; they may stop
 
 40009:B:3 (back): Action: Play an event from your hand with a cost of 3 or more, reducing its cost by 2.
@@ -304,7 +304,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 40010:B:2 (back): Response: After Swan Ship of Dol Amroth flips, add 2 resources to a hero's resource pool. Ready a card.
-  40010:response:1: Response on the event flipped (heard about this card)
+  40010:response:1: Response after a card is flipped over (the FlipCard verb) (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (any player controls)
     - add 2 resources to the picked card
@@ -345,7 +345,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     - (constant) a card (you control) needs no resource match, and any of its controller's heroes may pay for it
 
 40011:B:3 (back): Response: After Twilight's Call flips, draw 3 cards.
-  40011:response:1: Response on the event flipped (heard about this card)
+  40011:response:1: Response after a card is flipped over (the FlipCard verb) (heard about this card)
     - the acting player draws 3 card(s)
 
 40011:B:4 (back): Action: Play an ally or attachment from your hand.
@@ -417,7 +417,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     - this card: stat hitPoints the number of players who started the game, an eliminated one included x 15, while this card is in play
 
 40013:B:3 (back): Forced: After the Dreadnaught flips, each player puts 1 set-aside unique Corsair enemy into play at random engaged with them.
-  40013:forced:2: Forced on the event flipped (heard about this card)
+  40013:forced:2: Forced after a card is flipped over (the FlipCard verb) (heard about this card)
     - for each player, first player first:
       - put 1 set-aside unique Corsair enemy chosen at random into play engaged with the acting player, not revealed and dealt no shadow card
 
@@ -427,7 +427,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40014:A:1 (front): Immune to player card effects. Pillage 8.
   (the keyword part is owned by the card's keywords; the records cover: Pillage 8.)
   40014:constant:1: Constant
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 40014:A:2 (front): Engaged player cannot attack the Dreadnaught.
   40014:constant:2: Constant
@@ -541,7 +541,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40021:A:1 (front): Pillage 2. (After this enemy attacks you, discard the top 2 cards of your deck.)
   40021:constant:1: Constant
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 40021:A:2 (front): Forced: After an event card is discarded from your deck by Corsair Plunderer's Pillage keyword, discard an attachment you control.
   40021:forced:1: Forced on the event pillaged (heard about this card)
@@ -555,7 +555,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40022:A:1 (front): Pillage 3. (After this enemy attacks you, discard the top 3 cards of your deck.)
   40022:constant:1: Constant
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 40022:A:2 (front): Forced: After an event card is discarded from your deck by Daring Buccaneer's Pillage keyword, deal 1 damage to a character you control.
   40022:forced:1: Forced on the event pillaged (heard about this card)
@@ -569,7 +569,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40023:A:1 (front): Pillage 3. (After this enemy attacks you, discard the top 3 cards of your deck.)
   40023:constant:1: Constant
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 40023:A:2 (front): Forced: After an event card is discarded from your deck by Fierce Marauder's Pillage keyword, discard 1 resource from the resource pool of a hero you control.
   40023:forced:1: Forced on the event pillaged (heard about this card)
@@ -817,7 +817,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40040:A:1 (front): Doomed 1. (Raise each player's threat by 1.)
   (the keyword part is owned by the card's keywords; the records cover: (Raise each player's threat by 1.))
   40040:constant:1: Constant
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 40040:A:2 (front): When Revealed: Until the end of the round, each Ship enemy gains Archery 2.
   40040:whenRevealed:1: When revealed

@@ -91,6 +91,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141058:A:3 (front): Travel: The first player must reveal the top card of the burden deck and resolve that card as if it were just revealed from the encounter deck to travel here.
   141058:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the burden deck is empty
     - the acting player reveals the top card of the burden deck and resolves it as if just revealed from the encounter deck: its keywords and When Revealed effects resolve and a treachery goes to the encounter discard pile; no cancel of a card revealed from the encounter deck is offered against it (nothing when the burden deck is empty)
 
 ## 141059 Ford of Bruinen

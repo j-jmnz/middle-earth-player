@@ -51,7 +51,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
     - Campaign Setup: the set-aside copy of the card with code 11192 is attached to the card in play named "Captain Sahír" (a card dealt on its Upgraded side stays so)
 
 11194:A:3 (front): Forced: After Captain Sahír flips over, remove Black Key (burden) from the game and attach Black Key (boon) to him. Add Sea Serpent (Menacing side) to the staging area. One player adds Come Together to their hand. For this game, X is plus 1 for Come Together.
-  11194:forced:2: Forced on the event flipped (heard about card (any player controls) or in the staging area or the active location, named "Captain Sahír")
+  11194:forced:2: Forced after a card is flipped over (the FlipCard verb) (heard about card (any player controls) or in the staging area or the active location, named "Captain Sahír")
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card in play with code 11192 is removed from the game, wherever it is (in the staging area or attached)
     - Campaign Setup: the set-aside copy of the card with code 11183 is attached to the card in play named "Captain Sahír" (a card dealt on its Upgraded side stays so)

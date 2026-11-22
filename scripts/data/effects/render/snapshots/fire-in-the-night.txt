@@ -66,7 +66,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
     - each card (any player controls) or in the staging area or the active location, named "Dagnir", (enemies engaged with a player included): stat defenseIgnored 1, while this card is in play
 
 19067:A:2 (front): Response: When Fortify the Defense is defeated, each player chooses: either draw 3 cards, or each hero he controls gains 1 resource.
-  19067:response:1: Response on the event questDefeated
+  19067:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "draw":
@@ -82,7 +82,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
     - each card (any player controls) or in the staging area or the active location, named "Dagnir", (enemies engaged with a player included): stat alliesCannotAttack (allies cannot be declared as attackers against it) 1, while this card is in play
 
 19068:A:2 (front): Response: When Rally the Woodmen is defeated, each player searches the top 5 cards of his deck for an ally, puts it into play and shuffles his deck.
-  19068:response:1: Response on the event questDefeated
+  19068:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - for each player, first player first:
       - choose card (you control) in the deck, among the top 5, of card type ally
       - the picked card is put into play from wherever it is out of play (hand, discard pile, deck): it is not played, so no cost is paid and no play restriction applies, and a unique card with a copy in play stays where it is; a hero goes among its controller's heroes, any other card into the play area, ready, under the acting player's control
@@ -98,7 +98,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
     - deal 5 damage to the current quest stage
 
 19069:A:2 (front): Response: When Douse the Flames is defeated, remove 10 damage from Hrogar's Hill.
-  19069:response:1: Response on the event questDefeated
+  19069:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - heal 10 damage from the current quest stage
 
 ## 19070 Hold the Door
@@ -109,7 +109,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
     - each player: stat threatReductionBarred 1, while this card is in play
 
 19070:A:2 (front): Response: When Hold the Door is defeated, reduce each player's threat by 5.
-  19070:response:1: Response on the event questDefeated
+  19070:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - lower threat by 5 (each player)
 
 ## 19071 Defend the Town
@@ -151,7 +151,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
     - heal 5 damage from the picked card
 
 19073:A:2 (front): Forced: After Face the Dragon is defeated, deal 5 damage to Dagnir.
-  19073:forced:2: Forced on the event questDefeated
+  19073:forced:2: Forced after a side quest is defeated (its progress reached its quest points) (heard about this card only: with no subject, an event about one card is heard by that card alone)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose card (any player controls) or in the staging area or the active location, named "Dagnir", (enemies engaged with a player included)
     - deal 5 damage to the picked card
@@ -230,6 +230,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19077:A:2 (front): Travel: Dagnir makes an immediate attack against the first player.
   19077:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no enemy matches the choose step (read by the angmar family)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Dagnir"
     - the picked enemy attacks the first player now, from the staging area

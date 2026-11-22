@@ -154,6 +154,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19042:A:2 (front): Travel: The first player must either exhaust Urdug, or raise each player's threat by 2 to travel here.
   19042:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no option can be taken
     - the first player chooses one of:
       * option "exhaust" (only if there is a ready card (you control) named "Urdug", chosen by the first player to choose):
         - choose ready card (you control) named "Urdug", chosen by the first player

@@ -153,6 +153,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141046:A:3 (front): Travel: The first player must exhaust The One Ring to travel here.
   141046:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no ready copy of the card it exhausts is in play under the first player's control
     - exhaust the card with code 141085 (controlled by the first player)
 
 ## 141047 Chetwood

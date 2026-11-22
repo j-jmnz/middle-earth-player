@@ -211,6 +211,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10023:A:2 (front): Travel: The first player engages a Warg enemy in the staging area and deals it a shadow card.
   10023:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no enemy matches the choose step (read by the angmar family); or when no card matches the line's choose step
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose Warg enemy (any player controls) in the staging area only, chosen by the first player
     - engage the picked card
@@ -224,6 +225,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10024:A:2 (front): Travel: The first player searches the encounter deck and discard pile for a Warg enemy, reveals it, and puts it into play engaged with him. Shuffle the encounter deck.
   10024:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no matching card is in the encounter deck or its discard pile (read by the angmar family)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player searches the encounter deck and discard pile for a Warg enemy, reveals it and puts it into play engaged with them (a Travel cost: payable only when a card is found)
     - shuffle the encounter deck
@@ -301,7 +303,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
     - each card (any player controls) or in the staging area or the active location, of card type event gains doomed 1 (each player raises their threat by that much more when one is played)
 
 10173:A:2 (front): Forced: When Fend Off Despair is defeated, mark in the Campaign Log that each player's starting threat is reduced by 2. (This reduction is cumulative.)
-  10173:forced:1: Forced on the event questDefeated (heard about this card)
+  10173:forced:1: Forced after a side quest is defeated (its progress reached its quest points) (heard about this card)
     - mark in the Campaign Log that each player's starting threat is reduced by 2 (cumulative; written when the scenario is won)
 
 (rendered pieces: 183 by template, 0 as JSON)

@@ -115,6 +115,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 
 41028:A:2 (front): Travel: Remove 4 damage from Cracked Pillar to travel here.
   41028:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when this location holds less damage than must be removed
     - heal 4 damage from this card
 
 ## 41029 Cave Torch
@@ -188,6 +189,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 
 41033:A:1 (front): Travel: Players must exhaust a Cave Torch to travel here.
   41033:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no ready copy of the card it exhausts is in play
     - exhaust "Cave Torch"
 
 41033:A:2 (shadow): Shadow: Cancel all combat damage dealt to attacking enemy.

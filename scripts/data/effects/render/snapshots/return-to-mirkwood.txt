@@ -94,6 +94,7 @@ Scenario piles that place cards with no record (quest: 02126 Through the Forest;
 
 02133:A:1 (front): Travel: The player guarding Gollum must exhaust a hero he controls to travel to Woodman's Glade.
   02133:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player has no card to choose and exhaust
     - for the player guarding Gollum (and, while a card says an effect that targets him targets each other player, for each of them after him, first player first):
       - choose ready hero (you control)
       - exhaust the picked card

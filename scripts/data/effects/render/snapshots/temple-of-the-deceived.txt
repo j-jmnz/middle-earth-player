@@ -199,6 +199,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 
 12068:B:3 (back): Travel: Exhaust the Gate Key to travel here.
   12068:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no ready copy of the card it exhausts is in play
     - exhaust "Gate Key"
 
 12068:B:4 (back): Forced: After Temple of the Deceived becomes the active location, flip it over.
@@ -232,6 +233,7 @@ RECORD NAMING NO LINE OF THIS CARD (12068:B:2)
 
 12069:B:3 (back): Travel: Exhaust the Gate Key to travel here.
   12069:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no ready copy of the card it exhausts is in play
     - exhaust "Gate Key"
 
 12069:B:4 (back): Forced: After Temple of the Deceived becomes the active location, flip it over.

@@ -54,6 +54,7 @@ Scenario piles that place cards with no record (quest: 10150 The Catacombs of Ca
 
 101159:A:2 (front): Travel: Deal 1 shadow card to each Undead enemy in play to travel here.
   101159:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the shadow card cannot be dealt (read by the angmar family)
     - each Undead enemy in play (in the staging area or engaged) is dealt 1 shadow card from the encounter deck (in a Travel line this is a cost: the players cannot travel unless the encounter deck holds a card for each of them)
 
 ## 101160 Dark Halls

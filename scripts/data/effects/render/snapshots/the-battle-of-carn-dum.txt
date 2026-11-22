@@ -5,7 +5,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10125:A:1 (front): Setup: Add Thaurdir to the staging area, Captain side faceup. Add 1 copy of Carn Dûm Garrison per player to the staging area. Search the encounter deck for 1 copy of Accursed Battlefield and make it the active location. Shuffle the encounter deck.
   10125:setup:1: Setup
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 10125:B:1 (back): Thaurdir cannot leave the staging area and cannot take damage. At the end of the round, if Thaurdir is Champion side faceup, flip him.
   10125:constant:1: Constant
@@ -185,6 +185,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10134:A:2 (front): Travel: Deal each enemy in play 1 shadow card to travel here.
   10134:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the shadow card cannot be dealt (read by the angmar family)
     - each enemy in play (in the staging area or engaged) is dealt 1 shadow card from the encounter deck (in a Travel line this is a cost: the players cannot travel unless the encounter deck holds a card for each of them)
 
 10134:A:3 (shadow): Shadow: If the attacking enemy is Thaurdir, heal 3 damage from him.
@@ -263,7 +264,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
     - then, if the card with code 10127 is in play (checked when this step runs, after the steps above; not tied to whether they did anything): the card with code 10127 in play is flipped to the card with code 10128, where it lies, with its tokens and attachments
 
 10139:A:3 (front): Response: After Furious Charge is defeated, add 10 progress to the main quest.
-  10139:response:1: Response on the event questDefeated (heard about this card)
+  10139:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
     - add 10 progress to the main quest (the main quest card takes it: the active location takes it first only while the main quest is the current quest)
 
 ## 10189 Elrond's Champion

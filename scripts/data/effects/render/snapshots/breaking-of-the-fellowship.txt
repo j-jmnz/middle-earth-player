@@ -5,7 +5,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142061:A:1 (front): Setup: Set Frodo's Choice, Seat of Seeing, and Parth Galen aside, out of play. Add The Argonath and Sarn Gebir to the staging area.
   142061:setup:1: Setup
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 142061:B:1 (back): Enemies get +2 Defense and cannot be engaged. Skip the encounter phase.
   142061:constant:2: Constant
@@ -340,6 +340,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142079:A:1 (front): Travel: A player at this staging area must engage an enemy in any staging area to travel here.
   142079:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no enemy matches the choose step (read by the angmar family); or when no card matches the line's choose step
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in any player's staging area, in the staging area only
     - engage the picked card

@@ -54,6 +54,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01077:A:1 (front): Travel: Each player must exhaust 1 hero he controls to travel here.
   01077:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player has no card to choose and exhaust
     - for each player, first player first:
       - choose ready hero (you control)
       - exhaust the picked card
@@ -163,6 +164,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01094:A:1 (front): Travel: The first player must discard 2 cards from his hand at random to travel here.
   01094:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the first player's hand holds fewer cards than must be discarded
     - the first player discards 2 random card(s) from hand
 
 ## 01095 Enchanted Stream

@@ -51,7 +51,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
     - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
 
 09036:A:2 (front): Forced: After the last time counter is removed from Broken Battlements, each player discards the top 5 cards of his deck and places 1 time counter here.
-  09036:forced:1: Forced on the event lastTimeCounterRemoved (heard about this card)
+  09036:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
     - for each player, first player first:
       - the top 5 card(s) of the acting player's deck go to their discard pile
       - place 1 resource tokens on this card
@@ -71,6 +71,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09037:A:2 (front): Travel: Return the topmost enemy in the encounter discard pile to the staging area.
   09037:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the encounter discard pile holds no card of the kind (read by the angmar family)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the topmost enemy in the encounter discard pile (the last put there) is picked (nothing with none)
     - the picked card goes to the staging area (it is not revealed)
@@ -273,7 +274,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
     - the table: stat discardLocked (no player card effect takes a card out of a discard pile; an encounter card's effect is not stopped) 1, while this card is in play
 
 09067:A:3 (front): Forced: After this stage is defeated, each player shuffles the top 5 cards of his discard pile back into his deck.
-  09067:forced:1: Forced on the event questDefeated (heard about this card)
+  09067:forced:1: Forced after a side quest is defeated (its progress reached its quest points) (heard about this card)
     - for each card (any player controls) in the discard pile, among the top 5:
       - the picked card goes into its owner's deck, which is shuffled
 

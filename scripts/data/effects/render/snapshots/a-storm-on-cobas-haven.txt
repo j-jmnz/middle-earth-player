@@ -307,6 +307,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12128:A:2 (front): Travel: Exhaust a Ship objective to travel here.
   12128:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the line's choose step finds fewer cards than it must exhaust
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready Ship character (any player controls)
     - exhaust the picked card

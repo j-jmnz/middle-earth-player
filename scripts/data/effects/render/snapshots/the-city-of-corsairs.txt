@@ -97,7 +97,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 11215:B:4 (back): Resolution: The players win the campaign!
   11215:resolution:1: Resolution
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 11215:B:5 (back): Gain the following:
   11215:resolution:2: Resolution (record also names 11215:B:6)
@@ -262,6 +262,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12154:A:1 (front): Travel: One player must reveal the top card of the Corsair deck and engage it to travel here.
   12154:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the Corsair deck and its discard pile are empty (read by the sea family)
     - one player, named by the first player (the only player takes it without being asked), reveals the top card of the Corsair deck and puts it into play engaged with them (the deck refills from its discard pile when it runs out)
 
 12154:A:2 (shadow): Shadow: If this attack destroys a character, discard an ally controlled by the defending player.

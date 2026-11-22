@@ -4,7 +4,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144015:A:1 (front): The Searching Eye functions like a player card.
   144015:constant:1: Constant
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 144015:A:2 (front): Forced: After you draw this card, either exhaust each hero you control, or reveal the top card of the encounter deck.
   144015:forced:1: Forced on the event enteredHand (heard about this card)
@@ -105,6 +105,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144020:A:3 (front): Travel: Spend 1 Fellowship resource to travel here.
   144020:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the heroes hold fewer resources than the cost
     - the players as a group spend 1 resource(s) from heroes with the fellowship icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
 
 ## 144021 Haunted Mere
@@ -120,6 +121,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144021:A:2 (front): Travel: Exhaust Sméagol to travel here.
   144021:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no ready copy of the card it exhausts is in play
     - exhaust the card with code 144076
 
 ## 144022 Stagnant Pools
@@ -137,6 +139,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144022:A:3 (front): Travel: Exhaust Sméagol to travel here.
   144022:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no ready copy of the card it exhausts is in play
     - exhaust the card with code 144076
 
 ## 144023 Soft Mires

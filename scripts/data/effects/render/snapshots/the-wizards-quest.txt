@@ -251,6 +251,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51016:A:2 (front): Travel: Each player exhausts a character.
   51016:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player has no card to choose and exhaust
     - for each player, first player first:
       - choose ready character (you control)
       - exhaust the picked card
@@ -548,6 +549,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51038:A:2 (front): Travel: The highest Attack enemy in the staging area makes an immediate attack against the first player.
   51038:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no enemy matches the choose step (read by the angmar family)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area

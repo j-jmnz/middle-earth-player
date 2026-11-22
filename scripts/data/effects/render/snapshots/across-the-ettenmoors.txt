@@ -350,12 +350,12 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 
 10081:A:1 (front): Forced: At the end of the quest phase, if no progress was placed on Lie Low this round, each enemy gets -20 engagement cost until the end of the round.
   10081:forced:1: Forced at the end of the phase
-    only if all of: (it is the Quest phase) and (this card does not hold the flag progressPlacedHere)
+    only if all of: (it is the Quest phase) and (this card does not hold the flag progressPlacedHere (the engine puts it on a side quest when progress is placed on it, until the end of the round; once a round))
     who acts: the acting player is the first player (a phase has no player of its own)
     - every enemy in play: stat engagementCost -20, until the end of the round
 
 10081:A:2 (front): Response: After this stage is defeated, choose an enemy in the staging area and shuffle it into the encounter deck.
-  10081:response:1: Response on the event questDefeated (heard about this card)
+  10081:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, chosen by the first player
     - the picked card is shuffled into the encounter deck
@@ -368,7 +368,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
     - deal 1 damage to the card the event is about
 
 10082:A:2 (front): Response: After this stage is defeated, heal 1 damage from each hero.
-  10082:response:1: Response on the event questDefeated (heard about this card)
+  10082:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
     - for each hero (any player controls):
       - heal 1 damage from the picked card
 
@@ -380,7 +380,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
     - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) or in the staging area or the active location costs 1 more (every player's; several such cards stack)
 
 10083:A:2 (front): Forced: When this stage is defeated, search the encounter deck and discard pile for a Troll enemy and put it into play engaged with the player with the highest threat. Each player may play a card from his hand, at no cost.
-  10083:forced:1: Forced on the event questDefeated (heard about this card)
+  10083:forced:1: Forced after a side quest is defeated (its progress reached its quest points) (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the player with the highest threat becomes the picked player (the first player chooses among a tie)
     - the acting player finds one Troll enemy in the encounter deck or its discard pile and puts it into play engaged with the picked player (it is not revealed)

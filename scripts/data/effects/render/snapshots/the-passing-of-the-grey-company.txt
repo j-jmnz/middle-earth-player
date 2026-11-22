@@ -37,6 +37,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145017:A:3 (front): Travel: Remove 5 progress from stage 3B to travel here.
   145017:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the current quest card holds less progress than must be removed (read by the quest family)
     - remove 5 progress from the current quest card (all of it when it holds less)
 
 ## 145018 Dark Door
@@ -75,6 +76,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145020:A:2 (front): Travel: Spend 1 Fellowship resource to travel here.
   145020:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the heroes hold fewer resources than the cost
     - the players as a group spend 1 resource(s) from heroes with the fellowship icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
 
 ## 145021 Haunted Path

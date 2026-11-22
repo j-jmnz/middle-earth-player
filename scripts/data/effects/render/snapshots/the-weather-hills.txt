@@ -71,6 +71,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09029:A:2 (front): Travel: Remove 1 resource token from the Mission objective.
   09029:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no card the line's choose step finds holds a resource token (read by the angmar family)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose Mission objective (any player controls)
     - up to 1 resource token(s) come off the picked card
@@ -113,7 +114,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
     - Time 4: when this card is revealed, 4 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
 
 09032:A:2 (front): Forced: After the last time counter is removed from this quest card, each player deals 4 damage to a hero he controls. Then, place 4 time counters on this quest card.
-  09032:forced:1: Forced on the event lastTimeCounterRemoved (heard about this card)
+  09032:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - choose hero (you control)
@@ -176,7 +177,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
     - each character (any player controls): stat cannotBeHealed 1, while this card is in play
 
 09055:A:3 (front): Response: After Make Camp is defeated, each player heals up to 3 damage from a hero he controls.
-  09055:response:1: Response on the event questDefeated (heard about this card)
+  09055:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
     - for each player, first player first:
       - choose damaged hero (you control)
       - heal 3 damage from the picked card
@@ -233,7 +234,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
     - raise threat by 2 (each player)
 
 09059:A:3 (front): Response: After Search the Ruins is defeated, reduce each player's threat by 3.
-  09059:response:1: Response on the event questDefeated (heard about this card)
+  09059:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
     - lower threat by 3 (each player)
 
 ## 09069 Scattered Among the Hills
@@ -339,7 +340,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
       - the acting player discards 1 random card(s) from hand
 
 10160:A:3 (front): Forced: When Mysterious Omens is defeated, remove it from the Campaign Pool. Then, each player may choose 1 of the following boons and attach it to a hero they control: Cunning, Hardy, Resolute, Ruthless, or Stalwart.
-  10160:forced:2: Forced on the event questDefeated (heard about this card)
+  10160:forced:2: Forced after a side quest is defeated (its progress reached its quest points) (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card is removed from the Campaign Pool
     - starting with the first player, each player may choose 1 of the boons still set aside (code 10161, code 10162, code 10163, code 10164 and code 10165) and attach it to a hero they control; a boon taken is not offered again
