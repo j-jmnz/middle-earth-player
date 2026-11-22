@@ -60,14 +60,15 @@ export function soundEnd(samples: Int16Array, rate: number): number {
 }
 
 /**
- * Where the sound begins, in seconds: the start of the first 10 ms window over 1% of its peak. The silence a source file holds before
- * it is cut off, so the sound is heard at the moment it is played.
+ * Where the sound begins, in seconds: the start of the first 10 ms window over `share` of its peak (1% unless the pick names its own
+ * `onset`). The silence a source file holds before it is cut off, and with a higher share a quiet lead-in too, so the sound is heard at
+ * the moment it is played.
  */
-export function soundStart(samples: Int16Array, rate: number): number {
+export function soundStart(samples: Int16Array, rate: number, share = 0.01): number {
   const window = Math.round(rate / 100);
   const levels = windowLevels(samples, window);
   const peak = Math.max(1, ...levels);
-  const first = levels.findIndex((level) => level > peak * 0.01);
+  const first = levels.findIndex((level) => level > peak * share);
   return Math.max(0, first) * (window / rate);
 }
 
@@ -110,11 +111,15 @@ export function checkSounds(dir: string, log: Log): string[] {
   return late;
 }
 
-/** The filter that cuts a source to `start`..`end` (seconds), fades its tail out and levels it to `lufs`. */
-export function cutFilter(start: number, end: number, lufs: number): string {
+// A cut made inside the sound (a pick's `onset`) fades in this long, so it starts with no click.
+const FADE_IN_SECONDS = 0.008;
+
+/** The filter that cuts a source to `start`..`end` (seconds), fades its tail out and levels it to `lufs`; `fadeIn` for a cut made inside the sound. */
+export function cutFilter(start: number, end: number, lufs: number, fadeIn = false): string {
   const length = end - start;
   const fade = Math.min(0.15, length / 3);
-  return `atrim=${start.toFixed(3)}:${end.toFixed(3)},asetpts=PTS-STARTPTS,afade=t=out:st=${(length - fade).toFixed(3)}:d=${fade.toFixed(3)},loudnorm=I=${lufs}:TP=-1.5:LRA=11`;
+  const rise = fadeIn ? `afade=t=in:st=0:d=${FADE_IN_SECONDS},` : "";
+  return `atrim=${start.toFixed(3)}:${end.toFixed(3)},asetpts=PTS-STARTPTS,${rise}afade=t=out:st=${(length - fade).toFixed(3)}:d=${fade.toFixed(3)},loudnorm=I=${lufs}:TP=-1.5:LRA=11`;
 }
 
 /** Cuts, levels and encodes each slot's pick into `cacheDir`, and returns the `sounds` source that pins every file. */
@@ -127,15 +132,15 @@ export function cutSounds(from: SoundFolders, cacheDir: string, log: Log): Sourc
     if (!source) throw new Error(pick.game === "hearthstone" ? `${slot}: ${pick.event}.ogg is not in ${from.hearthstone ?? "the Hearthstone folder (--hearthstone)"}` : `${slot}: ${pick.bank}/<n>-${pick.event}.ogg is not in ${from.dd2}`);
     const pcm = ffmpeg(["-i", source, "-ac", "1", "-ar", "8000", "-f", "s16le", "-"]);
     const samples = new Int16Array(pcm.buffer, pcm.byteOffset, Math.floor(pcm.length / 2));
-    const start = soundStart(samples, 8000);
+    const start = soundStart(samples, 8000, pick.onset);
     const end = Math.min(soundEnd(samples, 8000) + TAIL_SECONDS, start + pick.maxSeconds);
     const target = path.join(cacheDir, `${slot}.m4a`);
-    ffmpeg(["-y", "-i", source, "-ac", "1", "-ar", "44100", "-af", cutFilter(start, end, pick.lufs), "-c:a", "aac", "-b:a", "96k", "-movflags", "+faststart", target]);
+    ffmpeg(["-y", "-i", source, "-ac", "1", "-ar", "44100", "-af", cutFilter(start, end, pick.lufs, pick.onset != null), "-c:a", "aac", "-b:a", "96k", "-movflags", "+faststart", target]);
     const body = readFileSync(target);
     // No URL can fetch it: the file's "url" names the bank and the event it was cut from, or the Hearthstone sound.
     const origin = pick.game === "hearthstone" ? `hearthstone#${pick.event}` : `${pick.bank}.bank#${pick.event}`;
     files.push({ path: `sounds/${slot}.m4a`, url: origin, sha256: sha256(body), bytes: body.length });
-    log.debug(`${slot}: ${pick.event}, ${(end - start).toFixed(2)} s, ${Math.round(start * 1000)} ms of silence cut from its start`);
+    log.debug(`${slot}: ${pick.event}, ${(end - start).toFixed(2)} s, ${Math.round(start * 1000)} ms cut from its start`);
   }
   log.info(`cut ${files.length} sounds into ${cacheDir}`);
   return audioSource(SOUND_SOURCE, SITE, files);
