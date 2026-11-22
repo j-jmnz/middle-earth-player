@@ -5,10 +5,12 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09025:A:1 (front): Forced: After Cornered Orc engages a player, it makes an immediate attack.
   09025:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 09025:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is damaged).
   09025:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -48,12 +50,14 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 09028:A:1 (front): While Exposed Ridge is the active location, it gains: "Forced: At the end of the refresh phase, each player deals 1 damage to a character he controls."
   09028:forced:1: Forced at the end of the phase
     only if all of: (it is the Refresh phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - choose character (you control)
       - deal 1 damage to the picked card
 
 09028:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each damaged character the defending player controls.
   09028:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the number of damaged character (you control), until the end of the attack
 
 ## 09029 Sheltered Valley
@@ -97,6 +101,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09031:A:2 (shadow): Shadow: Assign X damage among characters you control. X is the number of quest cards in play.
   09031:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player assigns the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1) damage among the character (you control), one at a time
 
 ## 09032 Find Shelter
@@ -124,6 +129,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09052:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
   09052:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
 ## 09053 Freezing Blast
@@ -139,6 +145,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09053:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack for each damaged character the defending player controls.
   09053:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the number of damaged character (you control), until the end of the attack
 
 ## 09054 Cold from Angmar
@@ -154,7 +161,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
   09054:constant:1: Constant
     only if not (this card is in the staging area)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each damaged character (any player controls): stat blankText (its text box is blank) 1, while this card is in play
+    - each damaged character (any player controls): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
     - each damaged character (any player controls): stat keepsKeywords 1, while this card is in play
 
 ## 09055 Make Camp
@@ -184,6 +191,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09056:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, the defending player raises his threat by 2.
   09056:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -205,6 +213,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09058:A:2 (shadow): Shadow: Defending player either raises his threat by 3, or this attack is considered undefended.
   09058:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "threat":
         - raise threat by 3 (the acting player)
@@ -220,6 +229,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 09059:A:2 (front): Forced: At the end of the refresh phase, raise each player's threat by 2.
   09059:forced:1: Forced at the end of the phase
     only if all of: (it is the Refresh phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 2 (each player)
 
 09059:A:3 (front): Response: After Search the Ruins is defeated, reduce each player's threat by 3.
@@ -264,15 +274,16 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 09070:B:2 (back): Forced: At the beginning of the quest phase, either discard 1 resource token from Savage Counter-attack, or reveal an additional encounter card this phase.
   09070:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "discard" (only if the card with code 09072 in play holds at least 1 resource token(s)):
         - up to 1 resource token(s) come off the card with code 09072 in play
       * option "reveal":
-        - reveal 1 additional encounter card(s) in the staging step this phase
+        - reveal 1 additional encounter card(s) in the staging step this phase (the extra reveals go to the players in turn after the one each player makes, so the first player makes the first of them; while the stages are separate, to the player whose stage holds the effect)
 
 09070:B:3 (back): If the players defeat this stage, they win the game.
   09070:constant:2: Constant
-    (no instructions)
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
 ## 09071 Hunting the Orcs
 (the scenario deals it into the staging pile; the piles place it, no record does)

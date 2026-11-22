@@ -79,7 +79,7 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 
 143022:A:1 (front): Treat each Captive's text box as blank. Captives are in play but are not under any player's control. If there are no Captives in play, the players lose the game.
   143022:constant:1: Constant
-    - each hero (in play, controlled by no player) that is a Captive (held by an enemy or lying free): stat blankText (its text box is blank) 1, while this card is in play
+    - each hero (in play, controlled by no player) that is a Captive (held by an enemy or lying free): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
   143022:constant:2: Constant
     only if the number of Captives in play is at most 0
     - the players lose the game (No Captive is left in play)
@@ -87,6 +87,7 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 143022:A:2 (front): Forced: At the end of the refresh phase, increase the pursuit value by 1. Then, if the pursuit value is 30 or greater, the players lose the game.
   143022:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - increase the pursuit value by 1
     - then, if the pursuit value is at least 30 (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (To Isengard!: the pursuit value reached 30)
@@ -102,7 +103,7 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 143023:A:2 (front): Allies cannot be declared as attackers or defenders against Uglúk.
   143023:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each card (any player controls) named "Uglúk", (enemies engaged with a player included): stat alliesCannotAttack (allies cannot be declared as attackers against it) 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, named "Uglúk", (enemies engaged with a player included): stat alliesCannotAttack (allies cannot be declared as attackers against it) 1, while this card is in play
     - allies cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)
 
 ## 143024 Grishnákh
@@ -119,6 +120,7 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 143024:A:2 (front): Forced: At the end of the quest phase, deal 1 damage to the attached Captive.
   143024:forced:3: Forced at the end of the phase
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - deal 1 damage to the Captive this card holds
 
 ## 143025 Uglúk's Uruk-hai
@@ -168,6 +170,7 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 
 143028:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, increase the pursuit value by 1.
   143028:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -182,6 +185,7 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 
 143029:A:2 (shadow): Shadow: Either increase the pursuit value by 1, or this attack is considered undefended.
   143029:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "pursuit":
         - increase the pursuit value by 1
@@ -209,6 +213,7 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 
 143031:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   143031:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -217,10 +222,11 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 
 143032:A:1 (front): When Revealed: The players cannot place more than 3 progress on the current quest this round. (This does not count progress placed on any active location.)
   143032:whenRevealed:1: When revealed
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 3, until the end of the round
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 3, until the end of the round
 
 143032:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, increase the pursuit value by 1.
   143032:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -248,11 +254,13 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 
 143064:A:2 (front): Forced: After Uruk-hai Fighter attacks and destroys a character, return it to the staging area.
   143064:forced:1: Forced when this enemy attacks, before the defender is declared
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
 143064:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
   143064:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control) that is not an objective
     - discard the picked card
@@ -296,6 +304,7 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 
 143067:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, return attacking enemy to the staging area.
   143067:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -327,6 +336,7 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 143069:B:3 (back): Forced: At the end of the combat phase, increase the pursuit value by 1 for each enemy in the staging area.
   143069:forced:1: Forced at the end of the phase
     only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - increase the pursuit value by the number of enemy (any player controls) in the staging area only
 
 ## 143070 Rescue the Captives

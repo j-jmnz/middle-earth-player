@@ -45,6 +45,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 110078:A:1 (front): If unattached, return Gate Key to the staging area and it gains: "Action: Exhaust a hero to claim Gate Key and attach it to that hero."
   110078:action:1: Action
     only if all of: (this card is in the staging area) and (there is a ready hero (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
@@ -55,6 +56,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 110078:A:2 (front): Action: Exhaust Gate Key and attached hero and spend 3 resources from attached hero's resource pool to look at the facedown side of a Temple of the Deceived location.
   110078:action:2: Action (cost: exhaust this card and exhaust the attached card and pay 3 resource(s) from the host's pool)
     only if all of: (its host is a hero (any player controls)) and (there is a location (any player controls) [also {"island":"temple"}] to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) [also {"island":"temple"}]
     - [json LookAtFacedown {"verb":"LookAtFacedown","target":"picked"}]
@@ -65,6 +67,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 110078:B:2 (back): If unattached, return Gate Key to the staging area and it gains: "Action: Exhaust a hero to claim Gate Key and attach it to that hero."
   110078:action:3: Action
     only if all of: (this card is in the staging area) and (there is a ready hero (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
@@ -75,12 +78,13 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 110078:B:3 (back): Action: Exhaust Gate Key and attached hero to look at the facedown side of a Temple of the Deceived location or secret.
   110078:action:4: Action (cost: exhaust this card and exhaust the attached card)
     only if its host is a hero (any player controls)
+    who acts: any player may trigger it; the acting player is the one who does
     - the acting player chooses one of:
       * option "temple" (only if there is a location (any player controls) [also {"island":"temple"}] to choose):
         - choose location (any player controls) [also {"island":"temple"}]
         - [json LookAtFacedown {"verb":"LookAtFacedown","target":"picked"}]
-      * option "secret" (only if there is a card (any player controls) [also {"island":"secret"}] to choose):
-        - choose card (any player controls) [also {"island":"secret"}]
+      * option "secret" (only if there is a card (any player controls) or in the staging area or the active location [also {"island":"secret"}] to choose):
+        - choose card (any player controls) or in the staging area or the active location [also {"island":"secret"}]
         - [json LookAtSecret {"verb":"LookAtSecret"}]
 
 ## 11197 Temple of the Deceived
@@ -106,7 +110,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 
 11197:A:3 (front): Travel Action: Flip over a secret at your location. If it is a Recurring Nightmare, it engages you. If it is Starla, you gain control of her (ready).
   11197:action:1: Action (any player may use it)
-    only if all of: (it is the Travel phase) and (there is a card (any player controls) [also {"island":"here"}] to choose)
+    only if all of: (it is the Travel phase) and (there is a card (any player controls) or in the staging area or the active location [also {"island":"here"}] to choose)
     - [json FlipSecret {"verb":"FlipSecret"}]
 
 11197:B:1 (back): Resolution: If Starla is under a player's control, add her to the Campaign Pool. For each Recurring Nightmare that is not a secret, add it to the Campaign Pool and choose a player. For the remainder of the campaign, that player shuffles that Recurring Nightmare into their deck after they draw their starting hand.
@@ -263,6 +267,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12071:A:1 (front): If unattached, return Gate Key to the staging area and it gains: "Action: Exhaust a hero to claim Gate Key and attach it to that hero."
   12071:action:1: Action
     only if all of: (this card is in the staging area) and (there is a ready hero (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
@@ -273,6 +278,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12071:A:2 (front): Action: Exhaust Gate Key and attached hero and spend 3 resources from attached hero's resource pool to look at the facedown side of a Temple of the Deceived.
   12071:action:2: Action (cost: exhaust this card and exhaust the attached card and pay 3 resource(s) from the host's pool)
     only if all of: (its host is a hero (any player controls)) and (there is a location (any player controls) [also {"island":"temple"}] to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) [also {"island":"temple"}]
     - [json LookAtFacedown {"verb":"LookAtFacedown","target":"picked"}]
@@ -296,7 +302,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12072:B:2 (back): Cannot have player card attachments.
   12072:constant:2: Constant
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
 
 12072:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   12072:forced:2: Forced after this location becomes the active location (heard about this card)
@@ -305,6 +311,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12072:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   12072:action:1: Action (any player may use it)
     only if this card is a location (any player controls) [also {"minProgress":4}]
+    who acts: any player may trigger it; the acting player is the one who does
     - [json LookAtFacedown {"verb":"LookAtFacedown","remove":4}]
 
 ## 12073 Winding Caverns
@@ -325,7 +332,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12073:B:2 (back): Cannot have player card attachments.
   12073:constant:3: Constant
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
 
 12073:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   12073:forced:1: Forced after this location becomes the active location (heard about this card)
@@ -334,6 +341,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12073:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   12073:action:1: Action (any player may use it)
     only if this card is a location (any player controls) [also {"minProgress":4}]
+    who acts: any player may trigger it; the acting player is the one who does
     - [json LookAtFacedown {"verb":"LookAtFacedown","remove":4}]
 
 ## 12074 Jungle Path
@@ -356,7 +364,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12074:B:2 (back): Cannot have player card attachments.
   12074:constant:2: Constant
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
 
 12074:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
   12074:forced:2: Forced after this location becomes the active location (heard about this card)
@@ -365,6 +373,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12074:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   12074:action:1: Action (any player may use it)
     only if this card is a location (any player controls) [also {"minProgress":4}]
+    who acts: any player may trigger it; the acting player is the one who does
     - [json LookAtFacedown {"verb":"LookAtFacedown","remove":4}]
 
 ## 12075 Faithless Desecrator
@@ -372,11 +381,12 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12075:A:1 (front): While engaged with a player, Faithless Desecrator contributes its Threat to the total Threat in the staging area.
   12075:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - this card: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, while this card is in play
 
 12075:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location is a Ruins location).
   12075:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -391,6 +401,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12076:A:2 (front): While Island Watcher is in the staging area, it gains: "Forced: At the beginning of the encounter phase, if the active location has the Ruins trait, Island Watcher engages the player with the highest threat. Then, deal it 2 shadow cards."
   12076:forced:1: Forced when a phase begins
     only if all of: (it is the Encounter phase) and (this card is in the staging area) and (the active location is a Ruins location (any player controls))
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the player with the highest threat becomes the picked player (the first player chooses among a tie)
     - the effect goes on with the picked player as the acting player
@@ -403,12 +414,13 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12077:A:1 (front): Forced: When you travel to the right, Profane Dead makes an immediate attack against the engaged player.
   12077:forced:1: Forced after the players travel (heard about location (any player controls))
-    only if all of: ([json condition {"kind":"island","movedRight":true}]) and (this card is engaged with the player)
+    only if all of: ([json condition {"kind":"island","movedRight":true}]) and (this card is engaged with a player (that player is who "you" means in this record))
     - for each player, first player first:
       - if [json condition {"kind":"engagedWithActor"}]: this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 12077:A:2 (shadow): Shadow: Attacking enemy gets +3 Attack if the players control the Gate Key.
   12077:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the number of objective (any player controls) named "Gate Key", that is claimed (attached to a character a player controls) is at least 1: the attacking enemy: stat attack 3, until the end of the attack
 
 ## 12078 Deeper into the Ruins
@@ -434,6 +446,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12079:A:2 (shadow): Shadow: If this attack destroys a character, raise your threat by the attacking enemy's Threat.
   12079:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by threat of this card (the acting player)
 
@@ -449,6 +462,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12080:A:2 (shadow): Shadow: Defending character gets -2 Defense for this attack.
   12080:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat defense -2, until the end of the attack
 
 ## 12081 Sunken Ruins

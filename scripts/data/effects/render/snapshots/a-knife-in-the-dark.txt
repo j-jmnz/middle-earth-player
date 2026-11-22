@@ -90,6 +90,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141026:B:2 (back): Forced: At the end of the round, either remove X progress from the current quest or shuffle 1 out of play Ringwraith into the encounter deck. X is the number of players in the game.
   141026:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "progress" (only if [json condition {"kind":"questProgress"}]):
         - [json RemoveQuestProgress {"verb":"RemoveQuestProgress","perPlayer":1}]
@@ -166,6 +167,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141047:A:2 (shadow): Shadow: Defending player discards 1 random card from his hand.
   141047:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player discards 1 random card(s) from hand
 
 ## 141048 Midgewater
@@ -202,11 +204,11 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141050:A:1 (front): Cannot have non-Morgul attachments.
   141050:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+    - no card can be attached to this card except a card with the trait Morgul
 
 141050:A:2 (front): While Rider of Mordor is engaged with a player, characters that player controls get -1 Willpower.
   141050:constant:2: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - engagedSeatCharacters: stat willpower -1, while this card is in play
 
 141050:A:3 (front): While The One Ring is exhausted, Rider of Mordor gets -10 engagement cost.
@@ -223,6 +225,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141051:A:2 (front): Forced: At the beginning of the staging step, either shuffle 1 out of play Ringwraith into the encounter deck or each player raises his threat by 1 for each non-Fellowship hero he committed to the quest.
   141051:forced:1: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
         - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
@@ -239,6 +242,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141052:A:2 (shadow): Shadow: Defending character gets -1 Defense (-2 Defense instead if The One Ring is exhausted).
   141052:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the defender: stat defense -1, until the end of the attack
     - then, if the card with code 141085 in play is exhausted (checked when this step runs, after the steps above; not tied to whether they did anything): the defender: stat defense -1, until the end of the attack
@@ -273,6 +277,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141054:A:3 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   141054:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -313,15 +318,17 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141069:A:1 (front): Cannot have non-Morgul attachments.
   141069:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+    - no card can be attached to this card except a card with the trait Morgul
 
 141069:A:2 (front): Forced: When Ringwraith attacks, deal it an additional shadow card if The One Ring is exhausted.
   141069:forced:1: Forced when this enemy attacks, before the defender is declared
     only if the card with code 141085 in play is exhausted
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
 
 141069:A:3 (shadow): Shadow: Shuffle this card into the encounter deck.
   141069:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - [json ShuffleSelfIntoEncounterDeck {"verb":"ShuffleSelfIntoEncounterDeck"}]
 
 ## 141070 Pale Blade
@@ -349,6 +356,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141071:A:2 (shadow): Shadow: Discard a non-objective attachment you control.
   141071:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -363,6 +371,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141072:A:2 (shadow): Shadow: After this attack, the attacking enemy engages the next player then makes an immediate attack.
   141072:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if another player is still in the game: the attacking enemy engages the next player
       - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
@@ -385,6 +394,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141073:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   141073:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -404,6 +414,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141076:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if The One Ring is exhausted).
   141076:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the card with code 141085 in play is exhausted (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -417,7 +428,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141085:A:2 (front): Attached hero does not count against the hero limit. The first player gains control of attached hero.
   141085:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"heroLimit"}]
+    - the hero this card is, or is attached to, does not count against the hero limit
   141085:forced:1: Forced on the event firstPlayerTokenPassed
     - [json TransferHost {"verb":"TransferHost","who":"firstPlayer"}]
 
@@ -467,10 +478,10 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 906202:A:1 (front): Cannot have non-Morgul attachments.
   906202:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+    - no card can be attached to this card except a card with the trait Morgul
 
 906202:A:2 (front): Forced: After The One Ring is exhausted, Menacing Wraith engages the first player and makes an immediate attack.
-  906202:forced:1: Forced on the event exhausted (heard about card (any player controls) named "The One Ring")
+  906202:forced:1: Forced on the event exhausted (heard about card (any player controls) or in the staging area or the active location, named "The One Ring")
     - for each player, first player first:
       - if the actor holds the first player token: engage this card
       - then, if the actor holds the first player token (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
@@ -487,6 +498,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 906203:A:2 (shadow): Shadow: Defending character gets -1 Defense (-3 Defense instead if The One Ring is exhausted).
   906203:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the defender: stat defense -1, until the end of the attack
     - then, if the card with code 141085 in play is exhausted (checked when this step runs, after the steps above; not tied to whether they did anything): the defender: stat defense -2, until the end of the attack
@@ -504,7 +516,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906204:forced:1: Forced after this location becomes the active location
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust the card with code 141085
-    - choose card (any player controls) named "The One Ring"
+    - choose card (any player controls) or in the staging area or the active location, named "The One Ring"
     - the picked card: stat cannotReady 1, while this card is in play
 
 ## 906205 Weather Hills
@@ -521,6 +533,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 906205:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
   906205:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 2, until the end of the attack
 
 ## 906206 The Old Road
@@ -531,6 +544,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 906206:A:2 (front): Forced: At the end of the round, discard 1 resource token here. Then, if there are no resource tokens here, shuffle 1 out of play Ringwraith into the encounter deck.
   906206:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource(s) come off the resource pool of this card (discarded, not spent)
     - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069","when":{"kind":"not","condition":{"kind":"matches","card":"self","pick":{"type":"location","control":"any","hasResources":true}}}}]
@@ -557,6 +571,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 906208:A:2 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an immediate attack.
   906208:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if another player is still in the game: the attacking enemy engages the next player
       - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
@@ -568,11 +583,13 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 906209:A:2 (shadow): Shadow: If the defending character is damaged by this attack, attach Blade Tip to that character. (Counts as a Condition attachment with the text: "Forced: At the end of the refresh phase, raise your threat by 2.")
   906209:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - [json AttachToDamagedDefender {"verb":"AttachToDamagedDefender"}]
   906209:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 2 (hostController)
   906209:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 244 by template, 32 as JSON)
+(rendered pieces: 248 by template, 28 as JSON)

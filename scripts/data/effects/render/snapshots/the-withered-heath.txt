@@ -18,24 +18,24 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - if the Campaign Log holds "isolde": remove 3 non-unique enemies from the encounter deck
 
 12175:B:1 (back): Forced: After a main quest stage is defeated, any player who does not control an Accolade boon may attach one of the following boons to one of their heroes and memorialize their valorous deeds, based on which quest stage was defeated:
-  12175:forced:1: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:2)
-    only if the card the event is about is a card (any player controls) named "Searching for Dragon Sign" that is out of play now
+  12175:forced:1: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location) (record also names 12175:B:2)
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Searching for Dragon Sign" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12176"}]) and (there is a hero (you control) that the card with code 12176 can be attached to to choose)):
           - choose hero (you control) that the card with code 12176 can be attached to
           - the set-aside copy of the card with code 12176 is attached to the last picked hero
         * option "decline":
-  12175:forced:2: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:3)
-    only if the card the event is about is a card (any player controls) named "The Cold-Drake Attacks!" that is out of play now
+  12175:forced:2: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location) (record also names 12175:B:3)
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "The Cold-Drake Attacks!" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12177"}]) and (there is a hero (you control) that the card with code 12177 can be attached to to choose)):
           - choose hero (you control) that the card with code 12177 can be attached to
           - the set-aside copy of the card with code 12177 is attached to the last picked hero
         * option "decline":
-  12175:forced:3: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:4)
-    only if the card the event is about is a card (any player controls) named "Hunting the Beast" that is out of play now
+  12175:forced:3: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location) (record also names 12175:B:4)
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Hunting the Beast" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12178"}]) and (there is a hero (you control) that the card with code 12178 can be attached to to choose)):
@@ -52,8 +52,8 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
         * option "decline":
 
 12175:B:2 (back): Stage 1: Attach Master of the Hunt to a hero.
-  12175:forced:1: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:1)
-    only if the card the event is about is a card (any player controls) named "Searching for Dragon Sign" that is out of play now
+  12175:forced:1: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location) (record also names 12175:B:1)
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Searching for Dragon Sign" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12176"}]) and (there is a hero (you control) that the card with code 12176 can be attached to to choose)):
@@ -62,8 +62,8 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
         * option "decline":
 
 12175:B:3 (back): Stage 2: Attach Unbroken to a hero.
-  12175:forced:2: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:1)
-    only if the card the event is about is a card (any player controls) named "The Cold-Drake Attacks!" that is out of play now
+  12175:forced:2: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location) (record also names 12175:B:1)
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "The Cold-Drake Attacks!" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12177"}]) and (there is a hero (you control) that the card with code 12177 can be attached to to choose)):
@@ -72,8 +72,8 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
         * option "decline":
 
 12175:B:4 (back): Stage 3: Attach The Steadfast to a hero.
-  12175:forced:3: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:1)
-    only if the card the event is about is a card (any player controls) named "Hunting the Beast" that is out of play now
+  12175:forced:3: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location) (record also names 12175:B:1)
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Hunting the Beast" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12178"}]) and (there is a hero (you control) that the card with code 12178 can be attached to to choose)):
@@ -123,6 +123,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19011:A:3 (front): Forced: After Cold-Drake is dealt a shadow card with no shadow effect, the defending character cannot ready until the end of the round.
   19011:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    who acts: the acting player is the defending player (the player the attack is against)
     - the event's other card: stat cannotReady 1, until the end of the round
 
 ## 19012 Dragon Sign
@@ -134,7 +135,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19012:A:2 (front): Attached enemy or location is immune to player card effects.
   19012:constant:1: Constant
-    - each card (any player controls) attached to this card: stat immuneToPlayerCards 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, attached to this card: stat immuneToPlayerCards 1, while this card is in play
 
 19012:A:3 (front): When Dragon Sign is free of encounters, add it to the victory display.
   19012:constant:2: Constant
@@ -145,15 +146,17 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19013:A:1 (front): Cannot have player card attachments.
   19013:constant:1: Constant
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
 
 19013:A:2 (front): Forced: After Snow-troll attacks and destroys a character, return it to the staging area.
   19013:forced:1: Forced when this enemy attacks, before the defender is declared
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
 19013:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   19013:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
 
@@ -168,6 +171,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19014:A:2 (shadow): Shadow: Until the end of the phase, attacking enemy gets +1 Attack and +1 Defense for each Dragon Sign in the victory display.
   19014:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack the number of card (any player controls) in the victory display, named "Dragon Sign", until the end of the phase
     - the attacking enemy: stat defense the number of card (any player controls) in the victory display, named "Dragon Sign", until the end of the phase
@@ -253,6 +257,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19020:A:3 (shadow): Shadow: Exhaust a character you control.
   19020:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -267,6 +272,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19021:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if defending character is damaged).
   19021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -320,7 +326,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19023:B:3 (back): No more than 6 damage can be placed on Cold-Drake each round, and it cannot have more than 18 damage.
   19023:constant:3: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each enemy (any player controls) or in the staging area, named "Cold-Drake": stat damageCap 6, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Cold-Drake": stat damageCap (it takes no more than this much damage each round; damage past it is not placed) 6, while this card is in play
     - each enemy (any player controls) or in the staging area, named "Cold-Drake": stat damageCeiling 18, while this card is in play
 
 19023:B:4 (back): This stage cannot be defeated while Cold-Drake has hit points remaining.
@@ -351,6 +357,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19024:B:2 (back): Forced: At the end of the round, remove 3 damage tokens from the set-aside Cold-Drake.
   19024:forced:2: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json RemoveSetAsideDamage {"verb":"RemoveSetAsideDamage","code":"19011","amount":3}]
 
 19024:B:3 (back): The players cannot defeat this stage unless at least 3 Dragon Signs are in the victory display.
@@ -371,11 +378,12 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19025:B:1 (back): Cold-Drake cannot take more than X damage each round, where X is the number of Dragon Signs in the victory display.
   19025:constant:1: Constant
-    - each enemy (any player controls) or in the staging area, named "Cold-Drake": stat damageCap the number of card (any player controls) in the victory display, named "Dragon Sign", while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Cold-Drake": stat damageCap (it takes no more than this much damage each round; damage past it is not placed) the number of card (any player controls) in the victory display, named "Dragon Sign", while this card is in play
 
 19025:B:2 (back): Forced: At the beginning of the quest phase, return Cold-Drake to the staging area. It makes an immediate attack against each player in turn order.
   19025:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Cold-Drake"
     - return the picked card to the staging area

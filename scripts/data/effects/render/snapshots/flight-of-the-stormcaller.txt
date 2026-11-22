@@ -7,7 +7,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 110042:A:2 (front): Cannot have player attachments.
   110042:constant:1: Constant
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
 
 110042:A:3 (front): When the Stormcaller advances to the next quest stage, return it to the Stormcaller's area.
   110042:triggered:2: Triggered (mandatory, not printed as Forced) on the event stormcallerAdvanced (event happened to the controller)
@@ -25,7 +25,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 110042:B:3 (back): If you are at the Stormcaller's stage, no more than 9 progress can be placed on your quest each round.
   110042:constant:2: Constant
-    - if [json condition {"kind":"stormcaller","is":"sameStage"}]: the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 9, while this card is in play
+    - if [json condition {"kind":"stormcaller","is":"sameStage"}]: the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 9, while this card is in play
 
 110042:B:4 (back): When the Stormcaller advances to the next quest stage, return it to the Stormcaller's area.
   110042:triggered:4: Triggered (mandatory, not printed as Forced) on the event stormcallerAdvanced (event happened to the controller)
@@ -109,6 +109,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12012:B:2 (back): Forced: At the end of the quest phase, if you are off-course (Cloud, Rain, or Storm), move 2 progress from Swift Departure to the Stormcaller's quest stage.
   12012:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and ([json condition {"kind":"heading","is":"offCourse"}])
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json MoveProgressToStormcaller {"verb":"MoveProgressToStormcaller","amount":2}]
 
 ## 12013 Full Sail Ahead
@@ -125,9 +126,9 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12013:B:2 (back): No more than 8 progress can be placed here each round. If you are off-course (Cloud, Rain, or Storm), no more than 4 progress can be placed here each round instead.
   12013:constant:1: Constant
-    - if not ([json condition {"kind":"heading","is":"offCourse"}]): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 8, while this card is in play
+    - if not ([json condition {"kind":"heading","is":"offCourse"}]): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 8, while this card is in play
   12013:constant:2: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 4, while this card is in play
+    - if [json condition {"kind":"heading","is":"offCourse"}]: the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 4, while this card is in play
 
 12013:B:3 (back): When you defeat this stage, if the Stormcaller is at stage 2, you have caught up to the Stormcaller and win the game. Otherwise, advance to the next stage.
   12013:constant:3: Constant
@@ -179,10 +180,11 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12016:B:2 (back): No more than 4 damage may be placed on the Stormcaller each round.
   12016:constant:2: Constant
-    - stormcaller: stat damageCap 4, while this card is in play
+    - stormcaller: stat damageCap (it takes no more than this much damage each round; damage past it is not placed) 4, while this card is in play
 
 12016:B:3 (back): Forced: At the end of the round, discard the top card of the encounter deck. The Stormcaller places progress on this stage equal to its Threat plus the Threat of the discarded card.
   12016:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json StormcallerProgress {"verb":"StormcallerProgress"}]
 
 ## 12017 The Weather Turns Foul
@@ -200,10 +202,11 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12017:B:2 (back): No more than 8 damage may be placed on the Stormcaller each round.
   12017:constant:2: Constant
-    - stormcaller: stat damageCap 8, while this card is in play
+    - stormcaller: stat damageCap (it takes no more than this much damage each round; damage past it is not placed) 8, while this card is in play
 
 12017:B:3 (back): Forced: At the end of the round, discard the top card of the encounter deck. The Stormcaller places progress on this stage equal to its Threat plus the Threat of the discarded card.
   12017:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json StormcallerProgress {"verb":"StormcallerProgress"}]
 
 ## 12018 The Cape of Andrast
@@ -211,6 +214,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12018:B:1 (back): Forced: At the end of the round, discard the top card of the encounter deck. The Stormcaller places progress on this stage equal to its Threat plus the Threat of the discarded card.
   12018:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json StormcallerProgress {"verb":"StormcallerProgress"}]
 
 12018:B:2 (back): If the Stormcaller defeats this stage, Captain Sahír has gotten away with the key, and the players lose the game.
@@ -281,6 +285,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12022:A:3 (front): Forced: When Corsair Skiff engages you from the staging area, either raise your threat by 3 or it gains Boarding 1.
   12022:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
     only if [json condition {"kind":"fromStaging"}]
+    who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "threat":
         - raise threat by 3 (the acting player)
@@ -296,12 +301,12 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12023:A:2 (front): Forced: After the engaged player commits a hero to a Sailing test or to a quest, move 1 resource from that hero's resource pool to Corsair Seafarer.
   12023:forced:1: Forced after a card is committed to the quest (heard about hero (you control); event happened to the controller)
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the card the event is about is a hero (any player controls) with resources on it: place 1 resource tokens on this card
     - then, if the card the event is about is a hero (any player controls) with resources on it (checked when this step runs, after the steps above; not tied to whether they did anything): 1 resource(s) come off the resource pool of the card the event is about (discarded, not spent)
   12023:forced:2: Forced on the event committedToSailing (heard about hero (you control); event happened to the controller)
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the card the event is about is a hero (any player controls) with resources on it: place 1 resource tokens on this card
     - then, if the card the event is about is a hero (any player controls) with resources on it (checked when this step runs, after the steps above; not tied to whether they did anything): 1 resource(s) come off the resource pool of the card the event is about (discarded, not spent)
@@ -311,7 +316,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12024:A:1 (front): Forced: When the Stormcaller advances to the next quest stage, Serpent's Blade makes an immediate attack against the engaged player.
   12024:forced:1: Forced on the event stormcallerAdvanced (event happened to the controller)
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - [json AttackActor {"verb":"AttackActor"}]
 
 ## 12025 Jagged Reef
@@ -323,6 +328,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12025:A:2 (front): Forced: At the beginning of the travel phase, if you are on-course (Sun), place 2 progress on Jagged Reef. If you are off-course (Cloud, Rain, or Storm), deal 2 damage to each Ship objective instead.
   12025:forced:1: Forced when a phase begins
     only if it is the Travel phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if [json condition {"kind":"heading","is":"onCourse"}]: place 2 progress on this card
     - then, if [json condition {"kind":"heading","is":"offCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to each Ship character (any player controls)
@@ -348,6 +354,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12027:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack if you are at the same stage as the Stormcaller.
   12027:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if [json condition {"kind":"stormcaller","is":"sameStage"}]: the attacking enemy: stat attack 2, until the end of the attack
 
 ## 12028 Man Overboard!
@@ -361,6 +368,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12028:A:2 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the Stormcaller's current quest stage.
   12028:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack [json amount {"stormcallerStage":true}], until the end of the attack
 
 ## 12029 Raging Squall

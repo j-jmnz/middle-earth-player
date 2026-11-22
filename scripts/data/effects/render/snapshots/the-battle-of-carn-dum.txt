@@ -14,6 +14,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
     - each enemy (any player controls) or in the staging area, named "Thaurdir": stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
     - each enemy (any player controls) or in the staging area, named "Thaurdir": stat cannotTakeDamage 1, while this card is in play
   10125:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - if the card with code 10128 is in play: the card with code 10128 in play is flipped to the card with code 10127, where it lies, with its tokens and attachments
 
 10125:B:2 (back): Do not discard unresolved shadow cards at the end of the combat phase.
@@ -44,6 +45,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
     - each enemy (any player controls) or in the staging area, named "Thaurdir": stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
     - each enemy (any player controls) or in the staging area, named "Thaurdir": stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
   10126:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - if the card with code 10127 is in play: the card with code 10127 in play is flipped to the card with code 10128, where it lies, with its tokens and attachments
 
 10126:B:2 (back): While Midwinter's Crux has 15 or more progress on it, Thaurdir loses indestructible. You cannot defeat this stage while Thaurdir is in play.
@@ -110,6 +112,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10129:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each shadow card currently dealt to it.
   10129:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack shadowCards of the attacking enemy, until the end of the attack
 
 ## 10130 Orc Grunts
@@ -124,13 +127,14 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10130:A:3 (shadow): Shadow: Add Orc Grunts to the staging area.
   10130:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this card goes to the staging area (it is not revealed)
 
 ## 10131 Werewolf of Angmar
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 10131:A:1 (front): Forced: After an event card is played, deal 1 shadow card to Werewolf of Angmar.
-  10131:forced:1: Forced after this card is played (heard about card (any player controls) of card type event)
+  10131:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
     - this card is dealt 1 shadow card from the encounter deck, wherever it is
 
 10131:A:2 (front): Forced: If there are 3 shadow cards dealt to Werewolf of Angmar and it is in the staging area, it engages the first player and makes an immediate attack (do not deal it another shadow card for this attack).
@@ -138,7 +142,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
     only if all of: (this card is in the staging area) and (2 is less than shadowCards of this card) and (shadowCards of this card is less than 4)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this enemy, in the staging area, engages the first player
-    - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt no new shadow card (the shadow cards it holds all resolve)
+    - then, if this card is engaged with a player (that player is who "you" means in this record) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt no new shadow card (the shadow cards it holds all resolve)
 
 ## 10132 Accursed Battlefield
 (the scenario deals it into the activeLocation pile; the piles place it, no record does)
@@ -152,6 +156,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10132:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the defending player's threat is higher than the attacking enemy's engagement cost).
   10132:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (engagement cost of the attacking enemy is less than your threat): the attacking enemy: stat attack 1, until the end of the attack
     - then, if engagement cost of the attacking enemy is less than your threat (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
@@ -166,6 +171,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10133:A:2 (shadow): Shadow: Raise defending player's threat by 2.
   10133:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by 2 (the acting player)
 
 ## 10134 Blight of Carn Dûm
@@ -174,6 +180,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 10134:A:1 (front): Forced: After an enemy attacks, heal 1 damage from it.
   10134:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about enemy (any player controls) or in the staging area)
     only if any of: (this card is in the staging area) or (this card is the active location)
+    who acts: the acting player is the defending player (the player the attack is against)
     - heal 1 damage from the card the event is about
 
 10134:A:2 (front): Travel: Deal each enemy in play 1 shadow card to travel here.
@@ -182,6 +189,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10134:A:3 (shadow): Shadow: If the attacking enemy is Thaurdir, heal 3 damage from him.
   10134:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a enemy (any player controls) or in the staging area, named "Thaurdir": heal 3 damage from the attacking enemy
 
 ## 10135 Fortress Walls
@@ -194,6 +202,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10135:A:2 (shadow): Shadow: If your threat is 40 or higher, attacking enemy makes an additional attack against you after this one.
   10135:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the actor's threat is at least 40: the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 10136 The Sky Darkens
@@ -207,6 +216,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10136:A:2 (shadow): Shadow: Discard a random card from the defending player's hand.
   10136:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player discards 1 random card(s) from hand
 
 ## 10137 Vile Affliction
@@ -219,6 +229,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10137:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys an ally, search your deck for another copy of that ally and discard it, if able.
   10137:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -235,6 +246,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10138:A:2 (shadow): Shadow: Flip Thaurdir after this attack.
   10138:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the card with code 10127 or 10128 in play is flipped to show the other of the two, where it lies, with its damage, tokens, shadow cards and attachments
 

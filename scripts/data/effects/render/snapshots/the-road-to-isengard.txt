@@ -25,6 +25,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143046:A:1 (front): While Ent of Fangorn is in the staging area, it gains: "Quest Action: Exhaust a hero you control to discard the top card of the encounter deck. If that hero's Willpower is greater than the discarded card's Threat, place 1 resource here. Then, if there are 3 resources here, discard them to take control of Ent of Fangorn. Any player may trigger this effect."
   143046:action:1: Action (any player may use it)
     only if all of: (it is the Quest phase) and (this card is in the staging area) and (there is a ready hero (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
@@ -67,12 +68,14 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 
 143049:A:2 (front): Forced: After Gríma attacks a player, that player shuffles Gríma back into the encounter deck and reveals an encounter card.
   143049:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card is shuffled into the encounter deck
     - the player the event is about reveals an encounter card
 
 143049:A:3 (shadow): Shadow: This attack is considered undefended.
   143049:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this attack is considered undefended
 
 ## 143050 Lieutenant of Orthanc
@@ -99,6 +102,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 
 143051:A:3 (shadow): Shadow: Until the end of the round, attacking enemy gets +2 Defense.
   143051:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat defense 2, until the end of the round
 
 ## 143052 Wolf of Isengard
@@ -114,6 +118,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 
 143052:A:2 (shadow): Shadow: Deal 1 damage to defending character.
   143052:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
 ## 143053 Orthanc
@@ -166,6 +171,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143056:A:1 (front): While Underground Armoury is in the staging area, it gains: "Forced: After an enemy engages a player, deal it a shadow card."
   143056:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls))
     only if this card is in the staging area
+    who acts: the acting player is the player the enemy engaged
     - the card the event is about is dealt a shadow card
 
 143056:A:2 (front): Wizardry: Each player exhausts a character he controls.
@@ -200,7 +206,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143058:A:2 (front): While Plain of Isengard is in the staging area, archery damage must be assigned to allies, if able.
   143058:constant:2: Constant
     only if this card is in the staging area
-    - the table: stat archeryToAllies 1, while this card is in play
+    - the table: stat archeryToAllies (archery damage must be assigned to allies, if able) 1, while this card is in play
 
 143058:A:3 (front): Wizardry: Each player discards 1 ally he controls.
   143058:forced:1: Forced on the event wizardry (heard about this card)
@@ -231,6 +237,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 
 143060:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player has 1 or fewer cards in his hand).
   143060:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the number of card (you control) in hand is at most 1): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the number of card (you control) in hand is at most 1 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -245,10 +252,11 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
   143061:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust each damaged character (any player controls)
-    - damagedCharacters: stat blankText (its text box is blank) 1, endOfCombat
+    - damagedCharacters: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, endOfCombat
 
 143061:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
   143061:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control) that is not an objective
     - discard the picked card
@@ -264,6 +272,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 
 143062:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, discard 1 random card from your hand.
   143062:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -308,6 +317,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 
 143078:B:2 (back): Forced: At the end of the round, place 1 resource here. Then, the players may advance to stage 2. If the players advance, the first player shuffles the encounter discard pile into the encounter deck and reveals 1 encounter card for each resource here. Then, remove each Ent objective in the staging area from the game.
   143078:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource token(s) are placed on this card
     - the acting player chooses one of:
@@ -342,6 +352,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143079:B:3 (back): Quest Action: Exhaust Ent of Fangorn to place 2 progress on a non-unique location.
   143079:action:1: Action
     only if all of: (it is the Quest phase) and (there is a ready ally (you control) named "Ent of Fangorn" to choose) and (there is a non-unique location (any player controls) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready ally (you control) named "Ent of Fangorn"
     - exhaust the picked card

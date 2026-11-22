@@ -5,7 +5,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10011:A:1 (front): It is Day. Enemies do not make engagement checks.
   10011:constant:1: Constant
-    - the table: stat noEngagementChecks 1, while this card is in play
+    - the table: stat noEngagementChecks (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing) 1, while this card is in play
 
 10011:A:2 (front): Forced: When it becomes Day, return each enemy in play to the staging area.
   10011:forced:1: Forced on the event becameDay
@@ -13,15 +13,16 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10011:A:3 (front): Forced: At the end of the round, flip this objective.
   10011:forced:2: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the Time objective is flipped to its other side; a flip to the side already up changes nothing, and any other flip is heard as "it becomes Day or Night"
 
 ## 10012 Nightfall
 
 10012:A:1 (front): It is Night. Progress cannot be placed on quest cards. Encounter card effects cannot be canceled.
   10012:constant:1: Constant
-    - the table: stat noQuestProgress 1, while this card is in play
+    - the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
   10012:constant:2: Constant
-    - the table: stat encounterUncancelable 1, while this card is in play
+    - the table: stat encounterUncancelable (no Response cancels an encounter card's When Revealed or Shadow effect, and no paid cancel is offered against one) 1, while this card is in play
 
 10012:A:2 (front): Forced: When it becomes Night, reveal an encounter card.
   10012:forced:1: Forced on the event becameNight
@@ -29,6 +30,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10012:A:3 (front): Forced: At the end of the round, flip this objective.
   10012:forced:2: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the Time objective is flipped to its other side; a flip to the side already up changes nothing, and any other flip is heard as "it becomes Day or Night"
 
 ## 10013 Across the Wastes
@@ -124,6 +126,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10017:A:3 (front): Forced: After Pack Leader engages you, exhaust a character you control for each Warg enemy engaged with you.
   10017:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - repeat the number of Warg enemy (any player controls) engaged with you times:
       - choose ready character (you control)
       - exhaust the picked card
@@ -137,6 +140,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10018:A:2 (shadow): Shadow: After this attack, attacking enemy engages the next player, then makes an immediate attack (deal a new shadow card for that attack).
   10018:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if another player is still in the game: the attacking enemy engages the next player
       - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
@@ -149,7 +153,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
     only if this card is in the staging area
     (steps run in order; a step depends on an earlier one only through its own condition)
     - engage this card
-    - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
+    - then, if this card is engaged with a player (that player is who "you" means in this record) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 ## 10020 Hunting Pack
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -160,13 +164,14 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10020:A:2 (front): While a player is making an engagement check against Hunting Pack, it gets -1 engagement cost for each damaged character that player controls.
   10020:constant:2: Constant
-    - this card: stat checkCostPerDamaged -1, while this card is in play
+    - this card: stat checkCostPerDamaged (while a player makes an engagement check against it, its engagement cost changes by this amount for each damaged character that player controls, not below 0; an optional engagement does not read it) -1, while this card is in play
 
 ## 10021 White Warg
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 10021:A:1 (front): Forced: After White Warg engages you, deal 1 damage to a character you control (2 damage instead if it is Night).
   10021:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control)
     - then, if not (it is Night (Nightfall is faceup)) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
@@ -174,6 +179,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10021:A:2 (shadow): Shadow: If it is Night, attacking enemy makes an additional attack after this one.
   10021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if it is Night (Nightfall is faceup): the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -190,6 +196,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10022:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it is Night).
   10022:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (it is Night (Nightfall is faceup)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if it is Night (Nightfall is faceup) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -200,7 +207,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 10023:A:1 (front): While Eriador Wastes is in the staging area, no more than 5 progress can be placed on the current quest each round.
   10023:constant:1: Constant
     only if this card is in the staging area
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 5, while this card is in play
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 5, while this card is in play
 
 10023:A:2 (front): Travel: The first player engages a Warg enemy in the staging area and deals it a shadow card.
   10023:travel:1: Travel
@@ -231,6 +238,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10025:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove all progress from the current quest.
   10025:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -247,6 +255,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10026:A:2 (shadow): Shadow: Put the topmost Warg enemy from the discard pile into play engaged with you and deal it a shadow card.
   10026:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the topmost Warg enemy in the encounter discard pile is put into play engaged with the acting player (not revealed) and dealt a shadow card
 
 ## 10027 Predatory Wolves
@@ -266,6 +275,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10027:A:2 (shadow): Shadow: Exhaust a character you control.
   10027:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -288,7 +298,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10173:A:1 (front): Each event card gains doomed 1.
   10173:constant:1: Constant
-    - each card (any player controls) of card type event gains doomed 1 (each player raises their threat by that much more when one is played)
+    - each card (any player controls) or in the staging area or the active location, of card type event gains doomed 1 (each player raises their threat by that much more when one is played)
 
 10173:A:2 (front): Forced: When Fend Off Despair is defeated, mark in the Campaign Log that each player's starting threat is reduced by 2. (This reduction is cumulative.)
   10173:forced:1: Forced on the event questDefeated (heard about this card)

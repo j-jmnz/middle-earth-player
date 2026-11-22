@@ -6,7 +6,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 146024:A:1 (front): Immune to player card effects. The players cannot travel here.
   (the keyword part is owned by the card's keywords; the records cover: The players cannot travel here.)
   146024:constant:1: Constant
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
 
 146024:A:2 (front): The Black Gate gets +1 Threat for each resource on it.
   146024:constant:2: Constant
@@ -15,6 +15,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 146024:A:3 (front): Forced: At the beginning of the quest phase, place 1 resource here and raise each player's threat by 1.
   146024:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 resource tokens on this card
     - raise threat by 1 (each player)
@@ -45,8 +46,8 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 146026:A:2 (front): Forced: After Beleaguered Hills becomes the active location, each player engages a non-unique enemy in the staging area.
   146026:forced:1: Forced after this location becomes the active location
     - for each player, first player first:
-      - if there is a non-unique enemy (any player controls) in the staging area only [also {"engageable":true}] to choose: choose non-unique enemy (any player controls) in the staging area only [also {"engageable":true}]
-      - then, if there is a non-unique enemy (any player controls) in the staging area only [also {"engageable":true}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): engage the picked card
+      - if there is a non-unique enemy (any player controls) in the staging area only, that the chooser may engage (not one that cannot be engaged, nor one barred to this seat) to choose: choose non-unique enemy (any player controls) in the staging area only, that the chooser may engage (not one that cannot be engaged, nor one barred to this seat)
+      - then, if there is a non-unique enemy (any player controls) in the staging area only, that the chooser may engage (not one that cannot be engaged, nor one barred to this seat) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): engage the picked card
 
 ## 146027 Waste of Dagorlad
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -54,7 +55,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 146027:A:1 (front): While Waste of Dagorlad is the active location, treat the printed text box of each ally as if it were blank (except for Traits).
   146027:constant:1: Constant
     only if this card is the active location
-    - each ally (any player controls): stat blankText (its text box is blank) 1, while this card is in play
+    - each ally (any player controls): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
 
 ## 146028 Slopes of Cirith Gorgor
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -113,10 +114,11 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 146032:A:1 (front): Cannot have non-Morgul attachments.
   146032:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+    - no card can be attached to this card except a card with the trait Morgul
 
 146032:A:2 (front): Forced: After Nazgûl of Mordor attacks, either raise your threat by 4, or return Nazgûl of Mordor to the staging area.
   146032:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "threat":
         - raise threat by 4 (the acting player)
@@ -151,6 +153,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146034:A:3 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an attack.
   146034:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if another player is still in the game: the attacking enemy engages the next player
       - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
@@ -169,6 +172,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146035:A:3 (shadow): Shadow: Defending character cannot ready until the end of the round.
   146035:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat cannotReady 1, until the end of the round
 
 ## 146036 Hell-hawk
@@ -211,6 +215,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146037:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
   146037:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control) that is not an objective
     - discard the picked card
@@ -224,6 +229,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146038:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each resource on The Black Gate.
   146038:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack resources of "The Black Gate", until the end of the attack
 
 ## 146039 Rage Filled Him
@@ -240,6 +246,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146039:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if it is The Mouth of Sauron).
   146039:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attacking enemy is a enemy (any player controls) named "The Mouth of Sauron": the attacking enemy: stat attack 3, until the end of the attack
     - then, if not (the attacking enemy is a enemy (any player controls) named "The Mouth of Sauron") (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -258,6 +265,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146040:A:2 (shadow): Shadow: Choose a non-unique enemy in the staging area. Engage it and deal it a shadow card.
   146040:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a non-unique enemy (any player controls) in the staging area only, chosen by the first player to choose: choose non-unique enemy (any player controls) in the staging area only, chosen by the first player
     - then, if there is a non-unique enemy (any player controls) in the staging area only, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): engage the picked card
@@ -282,6 +290,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146041:A:3 (shadow): Shadow: This attack deals no damage.
   146041:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat dealsNoDamage 1, until the end of the attack
 
 ## 146072 Embassy from the Dark Tower
@@ -297,8 +306,8 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json EmbassyDeal {"verb":"EmbassyDeal","cards":4}]
     - repeat 4 times:
-      - choose card (any player controls) with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides), chosen by the first player [also {"embassy":"player"}]
-      - choose card (any player controls) chosen by the first player [also {"embassy":"encounter","highestThreat":true}]
+      - choose card (any player controls) or in the staging area or the active location, with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides), chosen by the first player [also {"embassy":"player"}]
+      - choose card (any player controls) or in the staging area or the active location, with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), chosen by the first player [also {"embassy":"encounter"}]
       - [json EmbassyPair {"verb":"EmbassyPair"}]
     - repeat 4 times:
       - [json EmbassyNext {"verb":"EmbassyNext"}]
@@ -318,15 +327,15 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one Orc or Troll or Nazgûl enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
+      - the acting player finds one Orc or Troll or Nazgûl enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
     - one set-aside copy of the card with code 146041 is shuffled into the encounter deck (nothing with none set aside)
 
 146073:B:1 (back): Dire. During the staging step, the first player does not reveal an encounter card as normal. Instead, he reveals 1 encounter card for each resource on The Black Gate.
   (the keyword part is owned by the card's keywords; the records cover: During the staging step, the first player does not reveal an encounter card as normal. Instead, he reveals 1 encounter card for each resource on The Black Gate.)
   146073:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the table: stat firstPlayerReveals 1, while this card is in play
-    - the table: stat firstPlayerRevealCount resources of "The Black Gate", while this card is in play
+    - the table: stat firstPlayerReveals (marker: the first player's own reveal of the staging step is replaced by firstPlayerRevealCount reveals, all his, before the next player's own) 1, while this card is in play
+    - the table: stat firstPlayerRevealCount (how many cards the first player reveals in the staging step while firstPlayerReveals holds) resources of "The Black Gate", while this card is in play
 
 146073:B:2 (back): Forced: After the players quest unsuccessfully, discard the active location.
   146073:forced:1: Forced after the players quest unsuccessfully
@@ -336,4 +345,4 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:constant:2: Constant
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 210 by template, 23 as JSON)
+(rendered pieces: 215 by template, 18 as JSON)

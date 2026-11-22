@@ -93,14 +93,14 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
   (the keyword part is owned by the card's keywords; the records cover: X is 1 more than the number of quest cards in the victory display.)
   19125:constant:1: Constant (record also names 19125:A:2)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat damageCap the number of card (any player controls) in the victory display, a quest card of any kind (a quest stage, an encounter side quest or a player side quest) + 1, while this card is in play
-    - this card: stat damageCapSparesQuest 1, while this card is in play
+    - this card: stat damageCap (it takes no more than this much damage each round; damage past it is not placed) the number of card (any player controls) in the victory display, a quest card of any kind (a quest stage, an encounter side quest or a player side quest) + 1, while this card is in play
+    - this card: stat damageCapSparesQuest (damage from a quest card is not held to its damage cap) 1, while this card is in play
 
 19125:A:2 (front): Cannot take more than X damage each round.
   19125:constant:1: Constant (record also names 19125:A:1)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat damageCap the number of card (any player controls) in the victory display, a quest card of any kind (a quest stage, an encounter side quest or a player side quest) + 1, while this card is in play
-    - this card: stat damageCapSparesQuest 1, while this card is in play
+    - this card: stat damageCap (it takes no more than this much damage each round; damage past it is not placed) the number of card (any player controls) in the victory display, a quest card of any kind (a quest stage, an encounter side quest or a player side quest) + 1, while this card is in play
+    - this card: stat damageCapSparesQuest (damage from a quest card is not held to its damage cap) 1, while this card is in play
 
 19125:A:3 (front): While there are 5 or more quest cards in the victory display, Dagnir cannot leave the staging area and is considered to be engaged with each player.
   19125:constant:2: Constant
@@ -120,6 +120,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19126:A:2 (shadow): Shadow: Attacking enemy gets +2 Defense until the end of the phase.
   19126:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat defense 2, until the end of the phase
 
 ## 19127 Dagnir's Slave
@@ -131,6 +132,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19127:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if Dagnir is engaged with you).
   19127:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (there is a enemy (any player controls) engaged with you, named "Dagnir" to choose): the attacking enemy: stat attack 1, until the end of the attack
     - then, if there is a enemy (any player controls) engaged with you, named "Dagnir" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -140,6 +142,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19128:A:1 (front): Forced: When Deep-dweller engages you, it makes an immediate attack.
   19128:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 19128:A:2 (front): Forced: After Deep-dweller takes any amount of damage (and survives), return it to the staging area.
@@ -159,6 +162,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19129:A:3 (shadow): Shadow: If attacking enemy is Dagnir, the defending player must assign X damage among characters he controls, where X is 1 more than the number of quest cards in the victory display.
   19129:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a enemy (any player controls) or in the staging area, named "Dagnir": the acting player assigns the number of card (any player controls) in the victory display, a quest card of any kind (a quest stage, an encounter side quest or a player side quest) + 1 damage among the character (you control), one at a time
 
 ## 19130 Narrow Stair
@@ -170,10 +174,11 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19130:A:2 (front): When faced with the option to travel, the players must travel to Narrow Stair.
   19130:constant:2: Constant
-    - [json Restrict {"verb":"Restrict","what":"travelOnly"}]
+    - while no location is the active location and the players can travel to this location, they must travel to it: the travel step offers no way to decline it or to go elsewhere
 
 19130:A:3 (shadow): Shadow: Until the end of the round, defending character cannot be readied by player card effects.
   19130:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat cannotReadyByPlayerCard 1, until the end of the round
 
 ## 19131 Desecrated Ruins
@@ -190,6 +195,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19131:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, each player discards a random card from his hand.
   19131:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -208,6 +214,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19132:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   19132:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
 
@@ -220,6 +227,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19133:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if there are 3 or more quests in the victory display).
   19133:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the number of card (any player controls) in the victory display, a quest card of any kind (a quest stage, an encounter side quest or a player side quest) is at least 3): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the number of card (any player controls) in the victory display, a quest card of any kind (a quest stage, an encounter side quest or a player side quest) is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
@@ -243,6 +251,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 19134:B:1 (back): Forced: At the end of the planning phase, the first player looks at the top 2 cards of the quest deck and chooses 1 to place on the bottom of the quest deck. Then, add The Side Door to the victory display and advance to the top stage 2A of the quest deck.
   19134:forced:1: Forced at the end of the phase
     only if it is the Planning phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - advance to the next quest stage
     - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
@@ -263,10 +272,12 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
   19135:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
 
 19135:B:1 (back): Forced: After characters are committed to the quest, raise each player's threat by 1.
   19135:forced:2: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 1 (each player)
 
 19135:B:2 (back): Forced: When this stage is defeated, shuffle The First Forge into the Caves deck.
@@ -276,6 +287,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 19135:B:3 (back): At the end of the combat phase, the players may bypass this stage.
   19135:forced:4: Forced at the end of the phase
     only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if [json condition {"kind":"questDeck"}]):
         - [json BypassStage {"verb":"BypassStage"}]
@@ -295,6 +307,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
   19137:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
 
 19137:B:1 (back): The "when revealed" effects of the first treachery revealed each round cannot be canceled.
@@ -310,6 +323,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 19137:B:3 (back): At the end of the combat phase, the players may bypass this stage.
   19137:forced:3: Forced at the end of the phase
     only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if [json condition {"kind":"questDeck"}]):
         - [json BypassStage {"verb":"BypassStage"}]
@@ -329,10 +343,12 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
   19138:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
 
 19138:B:1 (back): Forced: After characters are committed to the quest, discard the top 5 cards of the encounter deck. Add a random enemy discarded this way to the staging area.
   19138:forced:2: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard 5 card(s) from the top of the encounter deck
     - [json StageRandomDiscarded {"verb":"StageRandomDiscarded","type":"enemy"}]
@@ -344,6 +360,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 19138:B:3 (back): At the end of the combat phase, the players may bypass this stage.
   19138:forced:4: Forced at the end of the phase
     only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if [json condition {"kind":"questDeck"}]):
         - [json BypassStage {"verb":"BypassStage"}]
@@ -363,10 +380,12 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
   19139:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
 
 19139:B:1 (back): Forced: After characters are committed to the quest, Dagnir makes an immediate attack against each player with 6 or more characters.
   19139:forced:2: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Dagnir"
     - for each player, first player first:
@@ -381,6 +400,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 19139:B:3 (back): At the end of the combat phase, the players may bypass this stage.
   19139:forced:4: Forced at the end of the phase
     only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if [json condition {"kind":"questDeck"}]):
         - [json BypassStage {"verb":"BypassStage"}]
@@ -400,6 +420,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
   19140:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
 
 19140:B:1 (back): Each player cannot play more than 1 card each phase.
@@ -413,6 +434,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 19140:B:3 (back): At the end of the combat phase, the players may bypass this stage.
   19140:forced:3: Forced at the end of the phase
     only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if [json condition {"kind":"questDeck"}]):
         - [json BypassStage {"verb":"BypassStage"}]
@@ -432,10 +454,12 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
   19141:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
 
 19141:B:1 (back): Forced: After characters are committed to the quest, each player must deal 2 damage to a questing character he controls.
   19141:forced:2: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - if there is a character (you control) committed to the quest to choose: choose character (you control) committed to the quest
       - then, if there is a character (you control) committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
@@ -449,6 +473,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 19141:B:3 (back): At the end of the combat phase, the players may bypass this stage.
   19141:forced:4: Forced at the end of the phase
     only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "bypass" (only if [json condition {"kind":"questDeck"}]):
         - [json BypassStage {"verb":"BypassStage"}]
@@ -468,6 +493,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
   19142:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
 
 19142:B:1 (back): Dagnir gets -5 engagement cost for each character the first player controls.
@@ -489,6 +515,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 19142:B:3 (back): At the end of the combat phase, if there are 4 or fewer quests in the victory display, the players must bypass this stage.
   19142:forced:2: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (the number of card (any player controls) in the victory display, a quest card of any kind (a quest stage, an encounter side quest or a player side quest) is at most 4)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json BypassStage {"verb":"BypassStage"}]
 
 ## 19144 Wormsbane
@@ -505,4 +532,4 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
   19144:constant:3: Constant
     - its host: stat lossOnLeavingPlay 1, while this card is in play
 
-(rendered pieces: 309 by template, 48 as JSON)
+(rendered pieces: 310 by template, 47 as JSON)

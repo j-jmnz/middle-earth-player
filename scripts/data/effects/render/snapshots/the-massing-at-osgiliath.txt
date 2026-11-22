@@ -5,7 +5,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00001:A:1 (front): Players cannot play attachments on The Witch-king.
   00001:constant:1: Constant
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
 
 00001:A:2 (front): While The Witch-king is in the staging area, each character gets -1 Willpower.
   00001:constant:2: Constant
@@ -14,6 +14,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00001:A:3 (front): Forced: After The Witch-king attacks, he returns to the staging area unless the defending player raises his threat by 3.
   00001:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "threat":
         - raise threat by 3 (the player the event is about)
@@ -26,6 +27,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 00002:A:1 (front): Forced: At the beginning of the encounter phase, all copies of Snaga Scouts engage the player with the lowest threat. (The first player chooses in case of a tie.)
   00002:forced:1: Forced when a phase begins
     only if it is the Encounter phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - every copy of this enemy, in the staging area or engaged with a player, engages the player with the lowest threat (the first player chooses among tied players)
 
 ## 00003 Wolves from Mordor
@@ -38,6 +40,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00003:A:2 (shadow): Shadow: Deal 2 damage to the defending character.
   00003:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 2 damage to the defender
 
 ## 00004 Wainriders
@@ -45,7 +48,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00004:A:1 (front): Each damage dealt by Wainriders raises the defending player's threat by 1.
   00004:constant:1: Constant
-    - this card: stat damageToThreat 1, while this card is in play
+    - this card: stat damageToThreat (the damage its attack lands also raises the defending player's threat by that much; outside an attack, its controller's) 1, while this card is in play
 
 ## 00005 Wainrider Captain
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -58,6 +61,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00005:A:2 (shadow): Shadow: If this attack is undefended, attacking enemy gets +2 Attack if it is a Scout.
   00005:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if all of: (the attack has no defender) and (the attacking enemy is a Scout enemy (any player controls)): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 00006 Uruk Vanguard
@@ -70,6 +74,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00006:A:2 (shadow): Shadow: attacking enemy gets +1 Attack. (+2 Attack instead if players have crossed the Anduin).
   00006:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the players are on stage 4): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the players are on stage 4 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -84,6 +89,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00007:A:2 (shadow): Shadow: Remove all defending characters from combat. This attack is considered undefended.
   00007:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this attack is considered undefended
 
 ## 00008 Emyn Arnen Overlook
@@ -103,6 +109,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00009:A:2 (shadow): Shadow: If the players have not yet crossed the Anduin, return any current active location to the staging area. Morgulduin becomes the active location.
   00009:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if not (the players are on stage 4): this card becomes the active location
 
 ## 00010 Pelennor Fields
@@ -134,6 +141,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00012:A:3 (shadow): Shadow: Defending player must discard 1 ally card from his hand or attacking enemy gets +3 Attack. (2 allies instead if this attack is undefended.)
   00012:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "discard" (only if all of: (the attack has a defender) and (the number of card (you control) in hand, of card type ally is at least 1)):
         - choose card (you control) in hand, of card type ally
@@ -178,6 +186,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00015:A:2 (shadow): Shadow: Deal 2 damage to attacking enemy. The defending player may exhaust a character he controls to take control of Ranger of Ithilien.
   00015:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - deal 2 damage to the attacking enemy
     - the acting player chooses one of:
@@ -214,7 +223,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00018:B:1 (back): Progress tokens from card effects cannot be placed on this quest card or the active location.
   00018:constant:1: Constant
-    - this card: stat noEffectProgress 1, while this card is in play
+    - this card: stat noEffectProgress (card effects cannot place progress on this stage or on an active location; the progress a successful quest places is not an effect) 1, while this card is in play
 
 00018:B:2 (back): Players cannot travel to East Bank or West Bank locations.
   00018:constant:2: Constant
@@ -225,6 +234,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 00018:B:3 (back): In order to commit characters to the quest, a player must first choose a hero or 1 Ranger of Ithilien card he controls. Discard each chosen card from play.
   00018:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "hero" (only if there is a hero (you control) to choose):
@@ -249,6 +259,6 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00019:B:3 (back): If the players defeat this stage, they have won the game.
   00019:constant:2: Constant
-    (no instructions)
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
 (rendered pieces: 155 by template, 0 as JSON)

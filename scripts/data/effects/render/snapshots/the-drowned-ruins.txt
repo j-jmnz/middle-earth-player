@@ -128,6 +128,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 12094:A:2 (front): Forced: At the beginning of the quest phase, flip Shrine to Morgoth to its Underwater side, without removing its progress tokens.
   12094:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json FlipDoubleSided {"verb":"FlipDoubleSided","keepProgress":true}]
 
 12094:A:3 (front): When Shrine to Morgoth is placed in the victory display, the players have escaped from the flooded grotto and win the game.
@@ -146,6 +147,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 12095:A:2 (front): Forced: If Shrine to Morgoth is the active location at the end of the quest phase, raise each player's threat by 5.
   12095:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - raise threat by 5 (the acting player)
 
@@ -164,6 +166,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 
 12096:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location is Underwater).
   12096:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -178,7 +181,8 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 
 12097:A:2 (front): Forced: At the beginning of the encounter phase, return Cave Eel to the staging area unless the active location is Underwater.
   12097:forced:1: Forced when a phase begins
-    only if all of: (it is the Encounter phase) and (this card is engaged with the player)
+    only if all of: (it is the Encounter phase) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the first player (a phase has no player of its own)
     - if not (the active location is a Underwater location (any player controls)): return this card to the staging area
 
 ## 12098 Undersea Grotto
@@ -231,6 +235,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 12101:A:2 (front): Forced: If Dark Abyss is the active location at the end of the quest phase, deal 1 damage to each character in play. Then, you may flip Dark Abyss to its Grotto side.
   12101:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each character (any player controls):
       - deal 1 damage to the picked card
@@ -249,6 +254,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 12102:A:2 (front): Forced: If Twisting Hollow is the active location at the end of the quest phase, each player must discard 1 character. Then, you may flip Twisting Hollow to its Grotto side.
   12102:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - choose character (you control)
@@ -263,11 +269,12 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 12103:A:1 (front): While Sunken Temple is the active location, treat each attachment as if its printed text box is blank (except for Traits).
   12103:constant:1: Constant
     only if this card is the active location
-    - each attachment (any player controls): stat blankText (its text box is blank) 1, while this card is in play
+    - each attachment (any player controls): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
 
 12103:A:2 (front): Forced: If Sunken Temple is the active location at the end of the quest phase, discard 1 resource from each objective-ally and each hero's resource pool. Then, you may flip Sunken Temple to its Grotto side.
   12103:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each ally (any player controls) named "Captain Sahír" or "Na'asiyah":
       - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
@@ -291,6 +298,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 12104:A:2 (front): Forced: If Drowned Cave is the active location at the end of the quest phase, each player must discard the top 10 cards of his deck. Then, you may return Drowned Cave to the staging area.
   12104:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the top 10 card(s) of the acting player's deck go to their discard pile
@@ -331,6 +339,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 
 12106:A:2 (shadow): Shadow: If the active location is Underwater, search the encounter deck and discard pile for a Creature enemy, and add it to the staging area.
   12106:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the active location is a Underwater location (any player controls): the acting player finds one Creature enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
 
 ## 12107 Tangling and Grasping
@@ -345,6 +354,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 
 12107:A:2 (shadow): Shadow: Discard an attachment you control.
   12107:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -358,6 +368,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 
 12108:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location is Underwater).
   12108:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack

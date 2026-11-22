@@ -39,11 +39,13 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 50203:B:1 (back): Forced: During the quest phase, reveal 1 additional card from the encounter deck
   50203:forced:1: Forced when a phase begins
     only if it is the Quest phase
-    - reveal 1 additional encounter card(s) in the staging step this phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - reveal 1 additional encounter card(s) in the staging step this phase (the extra reveals go to the players in turn after the one each player makes, so the first player makes the first of them; while the stages are separate, to the player whose stage holds the effect)
 
 50203:B:2 (back): Refresh Action: Reset the quest deck to stage 2B.
   50203:action:1: Action
     only if it is the Refresh phase
+    who acts: any player may trigger it; the acting player is the one who does
     - the players return to stage 2 of the quest deck (side B: the stage comes back as if just beginning, with no progress; the progress on the active location and every other card stay; no When Revealed or Setup resolves again)
 
 50203:B:3 (back): The players must defeat Smaug to defeat this stage. When Smaug is defeated, compare the number of damage tokens on Lake-town with the number of victory points in the victory display. If the players have more victory points, they have won the game. Otherwise, Lake-town has burned and the players have lost.
@@ -104,6 +106,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 50208:A:2 (front): Action: Exhaust a hero to claim this objective and attach it to that hero when it is free of encounters. (Counts as an attachment with the text: "If detached, discard The Old Thrush. Response: After attached hero exhausts to attack Smaug, discard X cards from hand to reduce Smaug's Defense by X.")
   50208:action:1: Action (any player may use it)
     only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (there is a ready hero (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
@@ -128,6 +131,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 
 50209:A:2 (shadow): Shadow: Deal 1 damage to each character in play. Any player may discard a hero to cancel this effect.
   50209:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player chooses one of:
@@ -147,6 +151,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 
 50210:A:2 (shadow): Shadow: Resolve this card's "When Revealed" effect. Any player may discard a hero to cancel this effect.
   50210:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player chooses one of:
@@ -179,6 +184,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 
 50212:A:2 (shadow): Shadow: If this attack destroys a character, Smaug engages the next player and makes an immediate attack against that player.
   50212:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (another player is still in the game): the attacking enemy engages the next player
       - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (another player is still in the game) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
@@ -197,6 +203,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 
 50213:A:2 (shadow): Shadow: Defending character gets -2 Defense.
   50213:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat defense -2, until the end of the attack
 
 ## 50214 Reckless in His Rage
@@ -213,6 +220,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 
 50214:A:2 (shadow): Shadow: If this attack destroys a character, resolve all burn damage on locations in play.
   50214:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): resolve all burn damage: the Burn of every location in play (staging area or active, the Burn 1 West Pier gives each included) is a pool; each player in turn from the first player may exhaust ready characters he controls and assign any of the pool to each, up to its remaining hit points, and the rest goes on Lake-town
 
@@ -235,6 +243,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 
 50216:A:3 (shadow): Shadow: If this attack destroys a character, defending player discards his hand.
   50216:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player discards all the cards in their hand
 
@@ -267,6 +276,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 50219:A:2 (front): Travel Action: Deal 2 damage per player to Lake-town to add this location to the victory display.
   50219:action:1: Action
     only if it is the Travel phase
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - place 2 damage token(s) on the card in play with code 50207 (placed, not dealt: nothing cancels or reduces them)
@@ -274,6 +284,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 
 50219:A:3 (shadow): Shadow: Deal 1 damage on Lake-town. (4 damage instead if undefended.)
   50219:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attack has a defender: place 1 damage token(s) on the card in play with code 50207 (placed, not dealt: nothing cancels or reduces them)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): place 4 damage token(s) on the card in play with code 50207 (placed, not dealt: nothing cancels or reduces them)
@@ -325,6 +336,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 
 50223:A:3 (shadow): Shadow: Add this location to the staging area.
   50223:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this card goes to the staging area (it is not revealed)
 
 ## 50224 Esgaroth Wharf
@@ -339,6 +351,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 
 50224:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack. Then, it makes an additional attack after this one.
   50224:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 2, until the end of the attack
     - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card

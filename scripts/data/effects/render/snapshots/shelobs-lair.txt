@@ -15,6 +15,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144040:A:3 (front): Forced: At the beginning of the quest phase, either place 1 resource on Shelob, or she makes an immediate attack against the first player.
   144040:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "place":
         - place 1 resource tokens on this card
@@ -37,6 +38,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144041:A:3 (shadow): Shadow: If this attack destroys a character, discard 1 random card from your hand.
   144041:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player discards 1 random card(s) from hand
 
@@ -140,10 +142,12 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     - each Orc enemy (any player controls) or in the staging area: stat engagementCost -5, while this card is in play
   144047:forced:1: Forced after an enemy engages a player (heard about Orc enemy (any player controls))
     only if this card is in the staging area
+    who acts: the acting player is the player the enemy engaged
     - the card the event is about is dealt a shadow card
 
 144047:A:2 (shadow): Shadow: Deal the attacking enemy 2 additional shadow cards.
   144047:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy is dealt a shadow card
     - the attacking enemy is dealt a shadow card
@@ -188,6 +192,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144050:A:2 (shadow): Shadow: Discard a non-objective attachment you control.
   144050:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control) that is not an objective
     - discard the picked card
@@ -203,6 +208,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144051:A:2 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the active location's Threat.
   144051:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack threat of the active location, until the end of the attack
 
 ## 144052 A Heavy Burden
@@ -217,6 +223,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144052:A:3 (front): Forced: At the end of the planning phase, either raise each player's threat by 1, or exhaust the Ring-bearer.
   144052:forced:1: Forced at the end of the phase
     only if it is the Planning phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "threat":
         - raise threat by 1 (each player)
@@ -233,6 +240,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144059:A:2 (front): Action: Exhaust a character with a Weapon attachment to place 3 progress on Blocked Tunnel. (Any player may trigger this effect.)
   144059:action:1: Action (any player may use it)
     only if there is a ready character (you control) with a Weapon card attached to choose
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control) with a Weapon card attached
     - exhaust the picked card
@@ -250,11 +258,12 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached
     - this attachment may be attached to a hero (limit 1 of it per host)
-    - its host: stat blankText (its text box is blank) 1, while this card is in play
+    - its host: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
     - its host: stat cannotReady 1, while this card is in play
 
 144060:A:2 (shadow): Shadow: If attacking enemy is Shelob, resolve the 'When Revealed' effect on Shelob's Poison.
   144060:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a enemy (any player controls) named "Shelob": the When Revealed effects of this card resolve as if it had just been revealed
 
 ## 144061 Lurking Malice
@@ -275,6 +284,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144061:A:3 (shadow): Shadow: If attacking enemy is Shelob, place 1 resource on her. Then, she gets +1 Attack for each resource on her.
   144061:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attacking enemy is a enemy (any player controls) named "Shelob": place 1 resource tokens on the attacking enemy
     - then, if the attacking enemy is a enemy (any player controls) named "Shelob" (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack resources of the attacking enemy, until the end of the attack
@@ -292,6 +302,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144062:A:2 (shadow): Shadow: If attacking enemy is Shelob, she makes an additional attack against you after this one.
   144062:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a enemy (any player controls) named "Shelob": the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 144070 The Stairs of Cirith Ungol
@@ -318,6 +329,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144070:B:3 (back): Forced: At the end of the quest phase, if Sméagol's Secret Way is in the victory display, advance to stage 2A.
   144070:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (the card with code 144044 is in the victory display)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - advance to the next quest stage
 
 ## 144071 The Spider's Pass
@@ -343,7 +355,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144071:B:3 (back): No more than 4 progress can be placed on this stage each round.
   144071:constant:3: Constant
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 4, while this card is in play
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 4, while this card is in play
 
 ## 144072 Gollum's Betrayal
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -363,7 +375,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144072:B:2 (back): While Shelob has at least 1 resource on her, she gains: "Forced: When Shelob is dealt any amount of damage, cancel that damage and discard 1 resource from Shelob instead."
   144072:constant:1: Constant
-    - each enemy (any player controls) or in the staging area, named "Shelob", with resources on it: stat resourceCancel 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Shelob", with resources on it: stat resourceCancel (damage it would be dealt, all of one instance, is canceled and 1 resource is discarded from it instead while it has one) 1, while this card is in play
 
 144072:B:3 (back): The players cannot defeat this stage unless both Shelob and Gollum are in the victory display. If the players defeat this stage, they win the game.
   144072:constant:2: Constant

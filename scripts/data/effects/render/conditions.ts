@@ -19,7 +19,7 @@ export { LONG_DARK_CONDITION_SAMPLES } from "./long-dark.ts";
 const ZONE: Readonly<Record<string, string>> = {
   activeLocation: "is the active location",
   staging: "is in the staging area",
-  engaged: "is engaged with the player",
+  engaged: "is engaged with a player (that player is who \"you\" means in this record)",
   questStage: "is the quest stage",
   play: "is in play",
   victory: "is in the victory display",

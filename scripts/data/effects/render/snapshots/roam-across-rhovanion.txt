@@ -21,10 +21,10 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   12184:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - ignore the deep keyword(s)
-    - each card (any player controls) named "Urdug", (enemies engaged with a player included): stat willpower the resource tokens on card (any player controls) named "Urdug", (enemies engaged with a player included), while this card is in play
-    - each card (any player controls) named "Urdug", (enemies engaged with a player included): stat threat the resource tokens on card (any player controls) named "Urdug", (enemies engaged with a player included), while this card is in play
-    - each card (any player controls) named "Urdug", (enemies engaged with a player included): stat attack the resource tokens on card (any player controls) named "Urdug", (enemies engaged with a player included), while this card is in play
-    - each card (any player controls) named "Urdug", (enemies engaged with a player included): stat defense the resource tokens on card (any player controls) named "Urdug", (enemies engaged with a player included), while this card is in play
+    - each card (any player controls) or in the staging area or the active location, named "Urdug", (enemies engaged with a player included): stat willpower the resource tokens on card (any player controls) or in the staging area or the active location, named "Urdug", (enemies engaged with a player included), while this card is in play
+    - each card (any player controls) or in the staging area or the active location, named "Urdug", (enemies engaged with a player included): stat threat the resource tokens on card (any player controls) or in the staging area or the active location, named "Urdug", (enemies engaged with a player included), while this card is in play
+    - each card (any player controls) or in the staging area or the active location, named "Urdug", (enemies engaged with a player included): stat attack the resource tokens on card (any player controls) or in the staging area or the active location, named "Urdug", (enemies engaged with a player included), while this card is in play
+    - each card (any player controls) or in the staging area or the active location, named "Urdug", (enemies engaged with a player included): stat defense the resource tokens on card (any player controls) or in the staging area or the active location, named "Urdug", (enemies engaged with a player included), while this card is in play
 
 12184:B:3 (back): Resolution: If there are 3 or more resources on Urdug, each player adds a copy of Misplaced Trust to the campaign pool (and their deck). Otherwise, each player adds a copy of Urdug's Cunning to the campaign pool.
   12184:resolution:1: Resolution
@@ -47,11 +47,13 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19036:A:2 (front): Action: Exhaust Durin's Key to give each location -1 Threat until the end of the phase.
   19036:action:1: Action (cost: exhaust this card)
+    who acts: any player may trigger it; the acting player is the one who does
     - each location (any player controls): stat threat -1, until the end of the phase
 
 19036:A:3 (front): Forced: At the beginning of the quest phase, the player who controls Durin's Key looks at the top 3 cards of the encounter deck, chooses 1 to reveal, and discards the rest.
   19036:forced:1: Forced when a phase begins
     only if all of: (it is the Quest phase) and (the number of objective (any player controls) named "Durin's Key", that is claimed (attached to a character a player controls) is at least 1)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player looks at the top 3 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
     - choose an encounter card among the cards the effect looked at (none when no card matches)
@@ -73,6 +75,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     - discard 1 card(s) from the top of the encounter deck
     - its host: stat attack printed threat of the top card of the encounter discard pile, until the end of the phase
   19037:forced:2: Forced when this enemy attacks, before the defender is declared (heard about the host)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard 1 card(s) from the top of the encounter deck
     - its host: stat attack printed threat of the top card of the encounter discard pile, until the end of the phase
@@ -83,10 +86,11 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 19038:A:1 (front): Cannot have non-objective attachments.
   19038:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective"}]
+    - no card can be attached to this card except a card with the trait objective
 
 19038:A:2 (front): Forced: When Grey Mountain Giant engages you, discard the top 5 cards of your deck. Assign damage among characters you control equal to the number of allies discarded by this effect.
   19038:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top 5 card(s) of the acting player's deck go to their discard pile; X becomes how many of them are a ally (any player controls) among the cards this effect looked at or discarded
     - the acting player assigns X damage among the character (you control), one at a time
@@ -102,11 +106,13 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 19039:A:2 (front): Forced: When the encounter phase begins, Hunting Eagle engages the first player.
   19039:forced:1: Forced when a phase begins
     only if it is the Encounter phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - if the actor holds the first player token: engage this card
 
 19039:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if attacking enemy has the Creature trait).
   19039:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attacking enemy is a Creature enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attacking enemy is a Creature enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -134,6 +140,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19041:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   19041:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -143,7 +150,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 19042:A:1 (front): While Deep Ravine is in the staging area, no more than 1 progress can be placed on locations in the staging area each round.
   19042:constant:1: Constant
     only if this card is in the staging area
-    - each location (any player controls) in the staging area only: stat progressCapShared 1, while this card is in play
+    - each location (any player controls) in the staging area only: stat progressCapShared (all the locations holding it share one limit: no more than this much progress in all can be placed on them each round) 1, while this card is in play
 
 19042:A:2 (front): Travel: The first player must either exhaust Urdug, or raise each player's threat by 2 to travel here.
   19042:travel:1: Travel
@@ -169,6 +176,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19043:A:3 (shadow): Shadow: If the first player controls Urdug, exhaust him.
   19043:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the number of card (you control) named "Urdug", chosen by the first player is at least 1: choose card (you control) named "Urdug", chosen by the first player
     - then, if the number of card (you control) named "Urdug", chosen by the first player is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): exhaust the picked card
@@ -194,6 +202,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19045:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, exhaust a character you control.
   19045:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -207,9 +216,9 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19046:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - if not (there is a enemy (any player controls) in the staging area only [also {"engageable":true}] to choose): the effect's X grows by 1
-      - then, if there is a enemy (any player controls) in the staging area only [also {"engageable":true}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only [also {"engageable":true}]
-      - then, if there is a enemy (any player controls) in the staging area only [also {"engageable":true}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): engage the picked card
+      - if not (there is a enemy (any player controls) in the staging area only, that the chooser may engage (not one that cannot be engaged, nor one barred to this seat) to choose): the effect's X grows by 1
+      - then, if there is a enemy (any player controls) in the staging area only, that the chooser may engage (not one that cannot be engaged, nor one barred to this seat) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only, that the chooser may engage (not one that cannot be engaged, nor one barred to this seat)
+      - then, if there is a enemy (any player controls) in the staging area only, that the chooser may engage (not one that cannot be engaged, nor one barred to this seat) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): engage the picked card
     - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): cards are discarded from the top of the encounter deck until an enemy with the trait Creature is discarded, or the deck is empty; that card becomes the picked card
     - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
@@ -242,8 +251,8 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 19041 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - one set-aside card with code 19054 joins the staging area (it is not revealed)
-    - then, if the picked card is a card (any player controls) named "Grey Moorland" (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Tiny"
-    - then, if the picked card is a card (any player controls) named "Tiny" (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Grey Moorland" (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Tiny"
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Tiny" (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
     - shuffle the encounter deck
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card
@@ -275,8 +284,8 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 19038 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - one set-aside card with code 19037 joins the staging area (it is not revealed)
-    - then, if the picked card is a card (any player controls) named "Grey Mountain Giant" (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Urdug's Horn"
-    - then, if the picked card is a card (any player controls) named "Urdug's Horn" (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Grey Mountain Giant" (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Urdug's Horn"
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Urdug's Horn" (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
     - shuffle the encounter deck
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card
@@ -307,15 +316,15 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 19042 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - one set-aside card with code 19036 joins the staging area (it is not revealed)
-    - then, if the picked card is a card (any player controls) named "Deep Ravine" (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Durin's Key"
-    - then, if the picked card is a card (any player controls) named "Durin's Key" (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Deep Ravine" (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Durin's Key"
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Durin's Key" (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
     - shuffle the encounter deck
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card
 
 19050:B:1 (back): Each encounter card guarding a card is immune to player card effects.
   19050:constant:1: Constant
-    - each card (any player controls) (enemies engaged with a player included) [also {"guardsCard":true}]: stat immuneToPlayerCards 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, (enemies engaged with a player included) [also {"guardsCard":true}]: stat immuneToPlayerCards 1, while this card is in play
 
 19050:B:2 (back): Forced: When the players defeat this stage, remove it from the game. Advance to a random stage 2A, if able. Otherwise, advance to stage 3A.
   19050:forced:1: Forced on the event questCardDefeated (heard about this card)
@@ -346,7 +355,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 19051:B:1 (back): Progress cannot be placed on this quest from questing successfully.
   19051:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the table: stat noQuestProgress 1, while this card is in play
+    - the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
     - the players cannot defeat this stage while this holds
 
 19051:B:2 (back): Forced: When the players quest unsuccessfully, they do not raise their threat. Instead, place X progress here, where X is the amount by which they would have raised their threat. Then, if this stage has progress equal to its quest points, the players lose the game.
@@ -382,19 +391,20 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19053:A:2 (front): While Urdug is engaged with a player, he gains, "Forced: At the beginning of the quest phase, Urdug makes an immediate attack. If this attack deals damage, return Urdug and Tiny (if he is in play) to the staging area."
   19053:forced:1: Forced when a phase begins
-    only if all of: (it is the Quest phase) and (this card is engaged with the player)
+    only if all of: (it is the Quest phase) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the first player (a phase has no player of its own)
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
   19053:forced:2: Forced on the event damagedByAttack (heard about character (any player controls))
-    only if all of: (it is the Quest phase) and (this card is engaged with the player) and (the event's other card is a enemy (any player controls) named "Urdug")
+    only if all of: (it is the Quest phase) and (this card is engaged with a player (that player is who "you" means in this record)) and (the event's other card is a enemy (any player controls) named "Urdug")
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Tiny"
-    - then, if the picked card is a card (any player controls) named "Tiny" (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Tiny" (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
     - return this card to the staging area
   19053:forced:3: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if all of: (it is the Quest phase) and (this card is engaged with the player) and (the event's other card is a enemy (any player controls) named "Urdug")
+    only if all of: (it is the Quest phase) and (this card is engaged with a player (that player is who "you" means in this record)) and (the event's other card is a enemy (any player controls) named "Urdug")
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Tiny"
-    - then, if the picked card is a card (any player controls) named "Tiny" (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Tiny" (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
     - return this card to the staging area
 
 ## 19054 Tiny
@@ -426,6 +436,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19055:A:3 (front): Forced: After Urdug engages a player, Tiny engages that player.
   19055:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) named "Urdug")
+    who acts: the acting player is the player the enemy engaged
     - engage this card
 
-(rendered pieces: 325 by template, 27 as JSON)
+(rendered pieces: 330 by template, 22 as JSON)

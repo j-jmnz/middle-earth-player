@@ -19,7 +19,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144016:A:1 (front): The engaged player cannot reduce his threat.
   144016:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - engagedSeat: stat threatReductionBarred 1, while this card is in play
 
 144016:A:2 (front): Forced: After Groping Dead destroys a character, place 1 mire token on the active location.
@@ -29,6 +29,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144016:A:3 (shadow): Shadow: If this attack destroys a character, place 1 mire token on the active location.
   144016:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): place 1 mire token(s) (resources) on the active location; a location whose mire tokens then reach its Mire X is discarded by the Mire keyword
 
@@ -37,7 +38,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144017:A:1 (front): The engaged player cannot reduce his threat.
   144017:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - engagedSeat: stat threatReductionBarred 1, while this card is in play
 
 144017:A:2 (front): Forced: After Dead Things destroys a character, the defending player must raise his threat by 3.
@@ -47,6 +48,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144017:A:3 (shadow): Shadow: Raise your threat by 1 for each Undead enemy engaged with you.
   144017:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by the number of Undead enemy (any player controls) engaged with you (the acting player)
 
 ## 144018 Candle-bearer
@@ -54,7 +56,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144018:A:1 (front): The engaged player cannot reduce his threat.
   144018:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - engagedSeat: stat threatReductionBarred 1, while this card is in play
 
 144018:A:2 (front): Forced: After Candle-bearer destroys a character, it cannot take damage until the end of the round.
@@ -64,6 +66,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144018:A:3 (shadow): Shadow: Until the end of the round, attacking enemy cannot take damage.
   144018:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat cannotTakeDamage 1, until the end of the round
 
 ## 144019 Evil-smelling Fens
@@ -81,6 +84,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144019:A:3 (shadow): Shadow: Deal 1 damage to defending character.
   144019:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
 ## 144020 Shifting Quagmire
@@ -161,6 +165,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
     - this card counts as a Condition attachment while it is attached
   144024:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each location (any player controls) in the staging area only:
       - place 1 mire token(s) (resources) on the picked card; a location whose mire tokens then reach its Mire X is discarded by the Mire keyword
@@ -182,6 +187,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144025:A:3 (shadow): Shadow: Raise your threat by the attacking enemy's Threat.
   144025:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by threat of the attacking enemy (the acting player)
 
 ## 144026 A Fell Light
@@ -199,6 +205,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144026:A:3 (shadow): Shadow: Return the topmost Undead enemy in the encounter discard pile to the staging area.
   144026:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the topmost enemy with the trait Undead in the encounter discard pile (the last put there) is picked (nothing with none)
     - the picked card goes to the staging area (it is not revealed)
@@ -209,7 +216,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144053:A:1 (front): Cannot have non-Morgul attachments.
   144053:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+    - no card can be attached to this card except a card with the trait Morgul
 
 144053:A:2 (front): While The One Ring is exhausted, Morgul Wraith gets -30 engagement cost and gains: "Immune to player card effects."
   144053:constant:2: Constant
@@ -232,6 +239,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144054:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   144054:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
 
@@ -248,13 +256,14 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
         - flip Sméagol to Gollum: discard his damage; he enters play ready, engaged with the first player (nothing if Sméagol is not in play)
       * option "attack" (only if the card with code 144075 is in play):
         - Gollum, if he is in play, makes an immediate attack against the player he is engaged with
-      * option "cancel" (only if all of: (the number of card (any player controls) named "Gollum" or "Sméagol", (enemies engaged with a player included) is at least 1) and ([json condition {"kind":"resources","min":1,"sphere":"fellowship"}]) and (the card with code 144063 in play is ready)):
+      * option "cancel" (only if all of: (the number of card (any player controls) or in the staging area or the active location, named "Gollum" or "Sméagol", (enemies engaged with a player included) is at least 1) and ([json condition {"kind":"resources","min":1,"sphere":"fellowship"}]) and (the card with code 144063 in play is ready)):
         - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship"}]
         - exhaust the card with code 144063
         - the effect being resolved is canceled: nothing after this resolves
 
 144055:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the attacking enemy is Gollum).
   144055:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attacking enemy is a enemy (any player controls) named "Gollum"): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attacking enemy is a enemy (any player controls) named "Gollum" (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
@@ -320,7 +329,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144066:B:1 (back): While any player is engaged with an Undead enemy, progress cannot be placed on this stage.
   144066:constant:1: Constant
     only if any of: (there is a Undead enemy (any player controls) engaged with you to choose) or (there is a Undead enemy (any player controls) engaged with another player to choose)
-    - the table: stat noQuestProgress 1, while this card is in play
+    - the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
 
 144066:B:2 (back): The players cannot defeat this stage unless the first player controls Sméagol. If the players defeat this stage, they win the game.
   144066:constant:2: Constant
@@ -339,6 +348,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144075:A:2 (front): Forced: After Gollum engages the first player during the refresh phase, he makes an immediate attack.
   144075:forced:1: Forced after an enemy engages a player (heard about this card)
     only if it is the Refresh phase
+    who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 144075:A:3 (front): Forced: When Gollum is defeated, flip him to Sméagol and exhaust Sméagol.
@@ -363,4 +373,4 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144076:triggered:1: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
     - the players lose the game (Sméagol was destroyed)
 
-(rendered pieces: 237 by template, 5 as JSON)
+(rendered pieces: 238 by template, 4 as JSON)

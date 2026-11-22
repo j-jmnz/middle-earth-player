@@ -11,6 +11,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01074:A:2 (shadow): Shadow: Defending player must choose and exhaust 1 character he controls. (2 characters instead if this attack is undefended.)
   01074:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -22,12 +23,14 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01075:A:1 (front): Forced: After Hummerhorns engages you, deal 5 damage to a single hero you control.
   01075:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - deal 5 damage to the picked card
 
 01075:A:2 (shadow): Shadow: Deal 1 damage to each character the defending player controls. (2 damage instead if this attack is undefended.)
   01075:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): deal 1 damage to each character (you control)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to each character (you control)
@@ -41,6 +44,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01076:A:2 (shadow): Shadow: Raise defending player's threat by 4. (Raise defending player's threat by 8 instead if this attack is undefended.)
   01076:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): raise threat by 4 (the acting player)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 8 (the acting player)
@@ -103,6 +107,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01089:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if this attack is undefended.)
   01089:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
@@ -116,6 +121,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01090:A:2 (front): Forced: After Chieftain Ufthak attacks, place 1 resource token on him.
   01090:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - add 1 resources to this card
 
 ## 01091 Dol Guldur Beastmaster
@@ -123,6 +129,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01091:A:1 (front): Forced: When Dol Guldur Beastmaster attacks, deal it 1 additional shadow card.
   01091:forced:1: Forced when this enemy attacks, before the defender is declared
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
 
 ## 01092 Driven by Shadow
@@ -137,6 +144,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01092:A:2 (shadow): Shadow: Choose and discard 1 attachment from the defending character. (If this attack is undefended, discard all attachments you control.)
   01092:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): choose attachment (any player controls) attached to the defending character
     - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -170,10 +178,12 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01096:A:1 (front): Forced: After Forest Spider engages a player, it gets +1 Attack until the end of the round.
   01096:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - this card: stat attack 1, until the end of the round
 
 01096:A:2 (shadow): Shadow: Defending player must choose and discard 1 attachment he controls.
   01096:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -183,6 +193,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01097:A:1 (shadow): Shadow: Attacking enemy gets +1 Attack. (If this attack is undefended, also raise your threat by 3.)
   01097:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 3 (the acting player)
@@ -262,7 +273,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
     - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"01135"}]
 
 01129:A:3 (front): If Mendor leaves play, the players lose the game.
-  01129:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about card (any player controls) named "Mendor")
+  01129:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about card (any player controls) or in the staging area or the active location, named "Mendor")
     - the players lose the game
 
 01129:B:1 (back): Resolution: Each player earns 1 copy of the Mendor's Support boon card. Add the earned cards to the Campaign Pool. If stage 3B was Beorn's Path, add the Ungoliant's Swarm burden card to the Campaign Pool. If stage 3B was Don't Leave the Path, add the Lingering Venom burden card to the Campaign Pool.
@@ -331,6 +342,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 900102:A:2 (shadow): Shadow: Raise defending player's threat by 5. (Raise defending player's threat by 10 instead if undefended.)
   900102:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): raise threat by 5 (the acting player)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 10 (the acting player)
@@ -339,10 +351,12 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 900103:A:1 (front): Forced: After you engage Ungoliant's Brood, your cards cannot ready for the remainder of the round.
   900103:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - each card (you control): stat cannotReady 1, until the end of the round
 
 900103:A:2 (shadow): Shadow: If this attack is undefended, exhaust all characters you control.
   900103:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attack has no defender: for each ready character (you control):
       - exhaust the picked card
 
@@ -350,10 +364,12 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 900104:A:1 (front): Forced: After you engage Forest Flies, deal 1 damage to each exhausted character you control.
   900104:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - deal 1 damage to each exhausted character (you control)
 
 900104:A:2 (shadow): Shadow: If attacking enemy is an Insect, deal it 2 additional Shadow cards.
   900104:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attacking enemy is a Insect enemy (any player controls): the attacking enemy is dealt a shadow card
     - then, if the attacking enemy is a Insect enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt a shadow card
@@ -362,11 +378,12 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 900105:A:1 (front): While it is engaged with you, Spiders of Mirkwood gets +1 Attack for each exhausted character you control.
   900105:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - this card: stat attack the number of exhausted character (you control), while this card is in play
 
 900105:A:2 (shadow): Shadow: Choose and exhaust 1 character you control. If this attack was undefended, also deal that character 2 damage.
   900105:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -399,6 +416,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 900107:A:3 (shadow): Shadow: Deal and resolve the topmost Shadow effect in the encounter discard pile for this attack.
   900107:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the topmost card with a Shadow effect in the encounter discard pile is dealt to the attacking enemy as one more shadow card for this attack (nothing with none there)
 
 ## 900108 Abandoned Camp
@@ -412,6 +430,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 900108:A:3 (shadow): Shadow: If this attack is undefended, discard all attachment cards players control.
   900108:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attack has no defender: for each attachment (any player controls) that is a player card:
       - discard the picked card
 

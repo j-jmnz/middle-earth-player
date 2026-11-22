@@ -7,7 +7,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
   147001:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
     - shuffle the encounter deck
 
 147001:B:1 (back): When Revealed: Each player draws 1 card. Advance to a random stage 2A.
@@ -29,6 +29,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 147002:B:1 (back): Forced: At the end of the planning phase, each player must exhaust a hero he controls.
   147002:forced:1: Forced at the end of the phase
     only if it is the Planning phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - choose ready hero (you control)
       - exhaust the picked card
@@ -51,6 +52,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 147003:B:1 (back): Forced: At the beginning of the round, remove all progress from each location in play.
   147003:forced:1: Forced when a phase begins
     only if it is the Resource phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - remove all the progress from each location (any player controls)
 
 147003:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
@@ -70,6 +72,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147004:B:1 (back): Forced: At the end of the round, discard a random location from the victory display.
   147004:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - discard a random location from the victory display to the encounter discard pile (chosen with the game's seed; X becomes its Victory points)
 
 147004:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
@@ -90,7 +93,8 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 147005:B:1 (back): Forced: The first player reveals 1 additional encounter card during the quest phase.
   147005:forced:1: Forced when a phase begins
     only if it is the Quest phase
-    - reveal 1 additional encounter card(s) in the staging step this phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - reveal 1 additional encounter card(s) in the staging step this phase (the extra reveals go to the players in turn after the one each player makes, so the first player makes the first of them; while the stages are separate, to the player whose stage holds the effect)
 
 147005:B:2 (back): Forced: After placing progress as the result of questing successfully, if there are X or more total victory points on locations in the victory display, advance to stage 3A. Otherwise, advance to a different random stage 2A. X is the number of players in the game times 5.
   147005:forced:2: Forced once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)
@@ -120,7 +124,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147006:B:2 (back): If the players defeat this stage, they win the game.
   147006:constant:2: Constant
-    (no instructions)
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
 ## 147007 Old Man Willow
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -130,6 +134,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147007:A:2 (front): Forced: When Old Man Willow attacks, discard a random location from the victory display. The defending player raises his threat by X, where X is that location's victory point value.
   147007:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard a random location from the victory display to the encounter discard pile (chosen with the game's seed; X becomes its Victory points)
     - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by X (the acting player)
@@ -147,6 +152,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147009:A:1 (front): Forced: After Grasping Root engages a player, that player must assign X damage among characters he controls. X is the number of locations in the victory display.
   147009:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - the acting player assigns the number of location (any player controls) in the victory display damage among the character (you control), one at a time
 
 ## 147010 Army of Flies
@@ -157,12 +163,14 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147010:A:2 (front): Forced: After Army of Flies engages a player, that player discards a non-objective attachment he controls.
   147010:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control) that is not an objective
     - discard the picked card
 
 147010:A:3 (shadow): Shadow: Defending player discards a non-objective attachment he controls.
   147010:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control) that is not an objective
     - discard the picked card
@@ -180,7 +188,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 147011:A:3 (front): While Withywindle is the active location, the first player reveals 1 additional encounter card during the quest phase.
   147011:constant:2: Constant
     only if this card is the active location
-    - the table: stat revealMore 1, while this card is in play
+    - the table: stat revealMore (the staging step reveals this many more cards, after the one each player makes; they go to the players in turn, the first player first, and while the stages are separate to the player whose stage holds the effect) 1, while this card is in play
 
 ## 147012 Misleading Path
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -190,10 +198,11 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147012:A:2 (front): When faced with the option to travel, the players must travel to Misleading Path if there is no active location.
   147012:constant:1: Constant
-    - [json Restrict {"verb":"Restrict","what":"travelOnly"}]
+    - while no location is the active location and the players can travel to this location, they must travel to it: the travel step offers no way to decline it or to go elsewhere
 
 147012:A:3 (shadow): Shadow: Defending player discards each ally card in his hand.
   147012:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - for each ally (you control) in hand:
       - discard the picked card
 
@@ -215,6 +224,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147014:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise each player's threat by 2.
   147014:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -245,6 +255,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147016:A:2 (shadow): Shadow: If there are no locations in the staging area, add this location to the staging area.
   147016:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the number of location (any player controls) in the staging area only is at most 0: this card goes to the staging area (it is not revealed)
 
 ## 147017 Swaying Without Wind
@@ -273,6 +284,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147018:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is an ally.)
   147018:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the defender is a ally (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a ally (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -293,7 +305,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached
     - this attachment may be attached to a hero (limit 1 of it per host)
-    - its host: stat blankText (its text box is blank) 1, while this card is in play
+    - its host: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
     - its host: stat cannotReady 1, while this card is in play
 
 ## 147020 Lost and Witless
@@ -321,6 +333,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147021:A:3 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   147021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -336,4 +349,4 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
       - discard this card [also {"counted":true}]
       - then, if not (the running effect has discarded no card (with DiscardEach)) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
 
-(rendered pieces: 212 by template, 8 as JSON)
+(rendered pieces: 214 by template, 6 as JSON)

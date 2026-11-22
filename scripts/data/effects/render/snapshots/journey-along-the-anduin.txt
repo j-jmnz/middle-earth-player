@@ -8,6 +8,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01081:A:2 (shadow): Shadow: Wolf Rider attacks the defending player. That player may declare 1 character as a defender. Deal Wolf Rider its own Shadow card. After combat, return Wolf Rider to the top of the encounter deck.
   01081:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - [json ShadowAttacks {"verb":"ShadowAttacks"}]
 
 ## 01082 Hill Troll
@@ -15,7 +16,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01082:A:1 (front): Excess combat damage dealt by Hill Troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) must be assigned as an increase to your threat.
   01082:constant:1: Constant
-    - this card: stat excessToThreat 1, while this card is in play
+    - this card: stat excessToThreat (the damage its attack deals beyond the hit points the character had left raises its controller's threat by that much) 1, while this card is in play
 
 ## 01083 Goblin Sniper
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -28,6 +29,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01083:A:2 (front): Forced: If Goblin Sniper is in the staging area at the end of the combat phase, each player deals 1 point of damage to 1 character he controls.
   01083:forced:1: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - choose character (you control)
       - deal 1 damage to the picked card
@@ -37,6 +39,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01084:A:1 (front): Forced: Each time Marsh Adder attacks you, raise your threat by 1.
   01084:forced:1: Forced when this enemy attacks, before the defender is declared
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by 1 (the acting player)
 
 ## 01085 Wargs
@@ -45,10 +48,12 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01085:A:1 (front): Forced: If Wargs is dealt a shadow card with no effect, return Wargs to the staging area after it attacks.
   01085:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    who acts: the acting player is the defending player (the player the attack is against)
     - return this card to the staging area
 
 01085:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if this attack is undefended.)
   01085:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -62,6 +67,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01086:A:2 (shadow): Shadow: Defending character does not count its Defense.
   01086:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat defense minus (defense of the defender), until the end of the attack
 
 ## 01087 The Brown Lands
@@ -76,17 +82,19 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01088:A:1 (front): When faced with the option to travel, the players must travel to The East Bight if there is no active location.
   01088:constant:1: Constant
-    - [json Restrict {"verb":"Restrict","what":"travelOnly"}]
+    - while no location is the active location and the players can travel to this location, they must travel to it: the travel step offers no way to decline it or to go elsewhere
 
 ## 01111 Misty Mountain Goblins
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 01111:A:1 (front): Forced: After Misty Mountain Goblins attacks, remove 1 progress token from the current quest.
   01111:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - remove 1 progress from the current quest card (all of it when it holds less)
 
 01111:A:2 (shadow): Shadow: Remove 1 progress token from the current quest. (3 progress tokens instead if this attack is undefended.)
   01111:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): remove 1 progress from the current quest card (all of it when it holds less)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): remove 3 progress from the current quest card (all of it when it holds less)
@@ -101,6 +109,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01112:A:2 (shadow): Shadow: Deal X shadow cards to this attacker. X is the number of players in the game.
   01112:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - repeat the number of players times:
       - the attacking enemy is dealt a shadow card
 
@@ -117,6 +126,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01114:A:1 (front): Forced: While Gladden Fields is the active location, each player must raise his threat by an additional point during the refresh phase.
   01114:forced:1: Forced at the end of the phase
     only if all of: (it is the Refresh phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 1 (each player)
 
 ## 01115 Eastern Crows
@@ -131,6 +141,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01115:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if defending player's threat is 35 or higher.)
   01115:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the actor's threat is at most 34: the attacking enemy: stat attack 1, until the end of the attack
     - then, if the actor's threat is at least 35 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -153,6 +164,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01117:A:2 (shadow): Shadow: Defending player chooses and returns 1 exhausted ally he controls to its owner's hand. If he controls no exhausted allies, raise his threat by 3.
   01117:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (there is a exhausted ally (you control) to choose): raise threat by 3 (the acting player)
     - then, if there is a exhausted ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose exhausted ally (you control)
@@ -193,8 +205,8 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01127:B:1 (back): Reveal 1 additional card from the encounter deck each quest phase. Do not make engagement checks during the encounter phase. (Each player may still optionally engage 1 enemy each encounter phase.)
   01127:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the table: stat revealMore 1, while this card is in play
-    - the table: stat noEngagementChecks 1, while this card is in play
+    - the table: stat revealMore (the staging step reveals this many more cards, after the one each player makes; they go to the players in turn, the first player first, and while the stages are separate to the player whose stage holds the effect) 1, while this card is in play
+    - the table: stat noEngagementChecks (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing) 1, while this card is in play
 
 ## 01128 Ambush on the Shore
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -242,7 +254,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
       - the set-aside copy of the card with code 01138 is attached to the last picked hero
 
 01130:A:5 (front): If Mendor leaves play, the players lose the game.
-  01130:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about card (any player controls) named "Mendor")
+  01130:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about card (any player controls) or in the staging area or the active location, named "Mendor")
     - the players lose the game
 
 01130:B:1 (back): Resolution: Add each copy of Valor and Scarred in play to the Campaign Pool. Record the names of heroes with Valor and/or Scarred attached in the notes section of the Campaign Log and attach them to those heroes when setting up each subsequent scenario in this campaign. The hero with the most damage will be taken prisoner at the beginning of Escape from Dol Guldur (in case of a tie, randomly select among the heroes with the most damage). Record the name of the "prisoner" in the notes section of the Campaign Log.
@@ -306,11 +318,12 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 900202:A:1 (front): If you are engaged with this enemy, you cannot attack or deal damage (through effects) to enemies with a title other than Marshland Outlaws.
   900202:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - engagedSeat: stat attackOnlyTitle 1, while this card is in play
 
 900202:A:2 (shadow): Shadow: Raise your threat by X. X is the amount of damage dealt by this attack.
   900202:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - raise threat by the damage just dealt (the acting player)
 
@@ -323,6 +336,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 900203:A:2 (front): Forced: At the beginning of the combat phase, Anduin Troll Spawn engages a player engaged with a Hill Troll.
   900203:forced:1: Forced when a phase begins
     only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - this enemy engages a player engaged with a enemy (any player controls) named "Hill Troll" (the first player chooses among several; nothing when it is already engaged with that player)
 
 ## 900204 Brown Water Rats
@@ -344,17 +358,19 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 900204:A:3 (shadow): Shadow: Attacking enemy cannot be damaged this round.
   900204:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat cannotTakeDamage 1, until the end of the round
 
 ## 900205 A Flooded Ford
 
 900205:A:1 (front): Each card revealed by the encounter deck gains doomed X. X is the number of progress tokens on this card.
-  900205:triggered:1: Triggered (mandatory, not printed as Forced) after a card is revealed (heard about card (any player controls); only when the encounter deck revealed it)
+  900205:triggered:1: Triggered (mandatory, not printed as Forced) after a card is revealed (heard about card (any player controls) or in the staging area or the active location; only when the encounter deck revealed it)
     only if this card is in play
     - raise threat by progress of this card (each player)
 
 900205:A:2 (shadow): Shadow: If this attack is undefended, put A Flooded Ford into the staging area with 1 progress token on it.
   900205:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attack has no defender: this card goes to the staging area (it is not revealed)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 progress on this card
@@ -364,6 +380,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 900206:A:1 (front): Action: Deal 1 damage to a hero you control to reduce Gladden Marshlands' Threat by 1 until the end of the phase. Any player may trigger this effect.
   900206:action:1: Action (any player may use it)
     only if there is a hero (you control) to choose
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - deal 1 damage to the picked card
@@ -371,6 +388,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 900206:A:2 (shadow): Shadow: Each enemy engaged with the defending player gets +1 Attack until the end of the phase. (+2 Attack instead if this attack is undefended.)
   900206:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): each enemy (any player controls) engaged with you: stat attack 1, until the end of the phase
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy (any player controls) engaged with you: stat attack 2, until the end of the phase
@@ -394,6 +412,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 900208:A:2 (shadow): Shadow: If attacking enemy is a Troll, resolve this attack against each player. (Attack is undefended against each player not engaged with this enemy.)
   900208:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - [json AttackOthersUndefended {"verb":"AttackOthersUndefended","when":{"kind":"matches","card":"self","pick":{"type":"enemy","control":"any","trait":"Troll"}}}]
 
@@ -407,9 +426,10 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 900209:A:2 (shadow): Shadow: Move all damage on this enemy to the defending character. (If undefended, move the damage to the hero damaged by this attack.)
   900209:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): all the damage on the attacking enemy moves to the defender (placed, not dealt; it can destroy a character at its limit; nothing with the target out of play)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): when the attack in progress ends:
       - all the damage on this card moves to the event's other card (placed, not dealt; it can destroy a character at its limit; nothing with the target out of play)
 
-(rendered pieces: 229 by template, 11 as JSON)
+(rendered pieces: 230 by template, 10 as JSON)

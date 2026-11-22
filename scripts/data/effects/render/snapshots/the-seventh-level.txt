@@ -5,7 +5,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 03020:A:1 (front): For each excess point of combat damage dealt by Cave-troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) you must damage another character you control.
   03020:constant:1: Constant
-    - this card: stat excessToDamage 1, while this card is in play
+    - this card: stat excessToDamage (for each point of damage its attack deals beyond the hit points the character had left, the defending player assigns 1 damage to another character he controls once the attack ends) 1, while this card is in play
 
 ## 03021 Orc Horn Blower
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -37,6 +37,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 03024:A:2 (front): Action: Exhaust a hero to claim this objective. Then, attach Book of Mazarbul to that hero. (If detached, return Book of Mazarbul to the staging area.)
   03024:action:1: Action
     only if there is a ready hero (you control) to choose
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
@@ -59,6 +60,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 03030:A:2 (shadow): Shadow: Attacking enemy attacks again after this attack. Deal it another shadow card for the next attack.
   03030:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 03031 Goblin Spearman
@@ -71,6 +73,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 03031:A:2 (shadow): Shadow: Add Goblin Spearman to the staging area.
   03031:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this card goes to the staging area (it is not revealed)
 
 ## 03032 Goblin Archer
@@ -101,6 +104,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 03033:A:2 (shadow): Shadow: If the defending character is an ally, discard it from play.
   03033:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): choose ally (you control) defending
     - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -152,7 +156,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 03068:B:3 (back): If the players defeat this stage, they win the game.
   03068:constant:1: Constant
-    (no instructions)
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
 === Nightmare deck (the cards the scenario's Nightmare deck adds) ===
 
@@ -169,7 +173,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 901101:A:3 (front): Forced: When stage 2B is revealed, make Chamber of Records the active location (returning any currently active location to the staging area) and add Overseer Maurûl to the staging area. Then, shuffle all copies of Balin's Doom in the encounter discard pile back into the encounter deck.
   901101:forced:1: Forced on the event stageRevealed
-    only if the card the event is about is a card (any player controls) named "The Fate of Balin"
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "The Fate of Balin"
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the set-aside card with code 901103 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
     - one set-aside card with code 901102 joins the staging area (it is not revealed)
@@ -236,6 +240,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 901103:A:3 (front): Forced: When a Goblin enemy engages a player, add 2 resources to that enemy.
   901103:forced:1: Forced after an enemy engages a player (heard about Goblin enemy (any player controls))
+    who acts: the acting player is the player the enemy engaged
     - place 2 resource tokens on the card the event is about
 
 ## 901104 Orc Taskmaster
@@ -259,6 +264,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 901105:A:2 (shadow): Shadow: Deal X damage to defending character. X is the number of resources on attacking enemy.
   901105:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal resources of the attacking enemy damage to the defender
 
 ## 901106 Pit Goblin
@@ -269,6 +275,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 901106:A:2 (shadow): Shadow: If attacking enemy is a Goblin, add 1 resource to it.
   901106:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a Goblin enemy (any player controls): place 1 resource tokens on the attacking enemy
 
 ## 901107 Deep-Mines
@@ -280,6 +287,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 901107:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Then, if attacking enemy is a Goblin, deal it another shadow card.
   901107:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attacking enemy is a Goblin enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt a shadow card
@@ -307,6 +315,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 901109:A:3 (shadow): Shadow: If attacking enemy is a Goblin, add 1 resource to it.
   901109:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a Goblin enemy (any player controls): place 1 resource tokens on the attacking enemy
 
 ## 901110 Beats and Echoes

@@ -35,6 +35,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01103:A:2 (shadow): Shadow: Choose and discard 1 attachment you control. Discarded objective cards are returned to the staging area. (If this attack is undefended, discard all attachments you control.)
   01103:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): choose attachment (you control)
     - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -50,6 +51,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01104:A:2 (shadow): Shadow: Defending player raises his threat by the number of enemies with which he is engaged.
   01104:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
 
 ## 01105 Iron Shackles
@@ -63,6 +65,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01105:A:2 (shadow): Shadow: Resolve the "When Revealed" effect of Iron Shackles.
   01105:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the When Revealed effects of this card resolve as if it had just been revealed
 
 ## 01107 Tower Gate
@@ -83,6 +86,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01108:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Gandalf's Map to a hero you control. (Counts as an attachment. If detached, return Gandalf's Map to the staging area.)
   01108:action:1: Action (cost: raise your threat by 2)
     only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters))
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -107,6 +111,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01109:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Dungeon Torch to a hero you control. (Counts as an attachment. If detached, return Dungeon Torch to the staging area.)
   01109:action:1: Action (cost: raise your threat by 2)
     only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters))
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -118,6 +123,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01109:A:3 (front): Forced: At the end of each round, raise attached hero's controller's threat by 2.
   01109:forced:1: Forced at the end of the round
     only if its host is a hero (any player controls)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 2 (hostController)
 
 ## 01110 Shadow Key
@@ -130,6 +136,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01110:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Shadow Key to a hero you control. (Counts as an attachment. If detached, return Shadow Key to the staging area.)
   01110:action:1: Action (cost: raise your threat by 2)
     only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters))
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -141,6 +148,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01110:A:3 (front): Forced: At the end of each round, attached hero suffers 1 damage.
   01110:forced:1: Forced at the end of the round
     only if its host is a hero (any player controls)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - deal 1 damage to its host
 
 ## 01123 The Necromancer's Tower
@@ -189,6 +197,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01125:B:1 (back): Forced: At the beginning of each quest phase, each player places the top card of his deck, face down in front of him, as if it just engaged him from the staging area. These cards are called "Orc Guard," and act as enemies with: 1 hit point, 1 Attack, and 1 Defense.
   01125:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - [json PlaceOrcGuard {"verb":"PlaceOrcGuard"}]
 
@@ -289,6 +298,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 900302:A:2 (shadow): Shadow: Any hero damaged (but not defeated) by this attack is turned face down, as a "prisoner." Then, if the players are on stage 3, return to stage 2B of the quest.
   900302:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - [json TakeHeroPrisoner {"verb":"TakeHeroPrisoner","card":"other","dealt":true}]
       - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the players are on stage 3) (checked when this step runs, after the steps above; not tied to whether they did anything): the players return to stage 2 of the quest deck (side B: the stage comes back as if just beginning, with no progress; the progress on the active location and every other card stay; no When Revealed or Setup resolves again)
@@ -304,6 +314,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 900303:A:3 (shadow): Shadow: If attacking enemy is not defeated this phase, raise defending player's threat by 7 at the end of the phase.
   900303:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area [also {"attackingEnemy":true}]
     - later, at the end of this phase, acting on the card last picked:
@@ -317,6 +328,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 900304:A:2 (shadow): Shadow: Attacking enemy gets +3 Attack for each unclaimed objective in play.
   900304:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the number of objective (any player controls) in the staging area only x 3, until the end of the attack
 
 ## 900305 Torture Chamber
@@ -328,6 +340,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 900305:A:2 (front): Forced: At the end of each round, place 1 resource token on each Dol Guldur location in play.
   900305:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each Dol Guldur location (any player controls):
       - place 1 resource tokens on the picked card
 
@@ -341,6 +354,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 900306:A:2 (front): Forced: At the end of each round, place 1 resource token on Dungeon Labyrinth for each player in the game.
   900306:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - place the number of players resource tokens on this card
 
 ## 900307 Sentinel of Shadow
@@ -364,6 +378,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 900308:A:3 (shadow): Shadow: If there is a Dol Guldur location in the staging area, move 1 resource token from each of your heroes' resource pools to that location. (Resolve this effect for each Dol Guldur location.)
   900308:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - for each Dol Guldur location (any player controls) in the staging area only:
       - 1 resource moves from the pool of each hero the acting player controls that has one to the picked card
 
@@ -377,10 +392,11 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 900309:A:2 (shadow): Shadow: Discard each card you control that has at least 1 copy of itself in your discard pile. (If this attack is undefended, each player must resolve this effect.)
   900309:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): for each card (you control) with a copy of it (the same title) in its controller's discard pile:
       - discard the picked card
-    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each card (any player controls) with a copy of it (the same title) in its controller's discard pile:
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each card (any player controls) or in the staging area or the active location, with a copy of it (the same title) in its controller's discard pile:
       - discard the picked card
 
 (rendered pieces: 201 by template, 24 as JSON)

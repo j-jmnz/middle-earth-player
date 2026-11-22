@@ -11,6 +11,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03014:A:2 (shadow): Shadow: Cancel all damage dealt to this enemy.
   03014:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat cannotTakeDamage 1, until the end of the attack
 
 ## 03015 Signs of Conflict
@@ -21,6 +22,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03015:A:2 (shadow): Shadow: Defending player raises his threat by 2.
   03015:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by 2 (the acting player)
 
 ## 03016 East-gate
@@ -34,7 +36,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
   03016:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the table: stat cannotBeOptionallyEngaged 1, while this card is in play
-    - the table: stat noEngagementChecks 1, while this card is in play
+    - the table: stat noEngagementChecks (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing) 1, while this card is in play
 
 03016:A:3 (front): Forced: After East-gate leaves play as an explored location, add First Hall to the staging area.
   03016:forced:1: Forced after a card leaves play (heard about this card)
@@ -72,6 +74,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03019:A:2 (shadow): Shadow: Defending player must choose and exhaust 1 character he controls.
   03019:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -85,6 +88,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03035:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if attacking the last player.)
   03035:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the actor is the last player (to the first player's right; the only player of a solo game)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the actor is the last player (to the first player's right; the only player of a solo game) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -115,6 +119,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03037:A:2 (shadow): Shadow: Cancel all combat damage dealt to attacking enemy.
   03037:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat combatDamageCanceled 1, until the end of the attack
 
 ## 03038 Zigil Mineshaft
@@ -122,6 +127,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03038:A:1 (front): Action: Raise each player's threat by 1 to place 1 progress token on Zigil Mineshaft.
   03038:action:1: Action
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (each player)
     - place 1 progress on this card
@@ -155,6 +161,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03040:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack.
   03040:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 2, until the end of the attack
 
 ## 03041 Cave Torch
@@ -167,6 +174,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 03041:A:2 (front): Action: Exhaust Cave Torch to place up to 3 progress tokens on a Dark location.
   03041:action:1: Action
     only if all of: (the card with code 03041 in play is ready) and (there is a Dark location (any player controls) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust this card
     - the acting player chooses X, from 1 to 3
@@ -212,6 +220,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03050:A:2 (shadow): Shadow: Deal 1 damage to the defending character. (Attacking enemy gets +2 Attack instead if this attack is undefended.)
   03050:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): deal 1 damage to the defender
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -227,6 +236,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03051:A:2 (shadow): Shadow: Discard the defending character from play.
   03051:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): choose character (you control) defending
     - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -264,7 +274,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03060:A:1 (front): Each player with a threat of 25 or higher cannot optionally engage Goblin Scout.
   03060:constant:1: Constant
-    - this card: stat optionalEngageThreat 25, while this card is in play
+    - this card: stat optionalEngageThreat (a player whose threat is at least this much cannot optionally engage it; an engagement check still engages him) 25, while this card is in play
 
 ## 03061 Goblin Swordsman
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -276,6 +286,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03061:A:2 (shadow): Shadow: Add Goblin Swordsman to the staging area.
   03061:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this card goes to the staging area (it is not revealed)
 
 ## 03062 Watchful Eyes
@@ -288,6 +299,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
     - this card counts as a Condition attachment while it is attached
   03062:forced:1: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (its host is a exhausted hero (any player controls))
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the acting player reveals an encounter card
 
 ## 03063 Goblin Tunnels
@@ -300,6 +312,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03063:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if attacking enemy is a Goblin.)
   03063:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attacking enemy is a Goblin enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attacking enemy is a Goblin enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
@@ -354,7 +367,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03066:B:2 (back): If the players defeat this stage, they win the game.
   03066:constant:2: Constant
-    (no instructions)
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
 === Nightmare deck (the cards the scenario's Nightmare deck adds) ===
 
@@ -364,7 +377,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
   (inert: the engine applies it by rule, no record)
 
 901001:A:2 (front): Forced: After Cave Torch exhausts, place 1 damage token on this card. Then, if there are 5 or more damage tokens on this card, remove Cave Torch from the game.
-  901001:forced:1: Forced on the event exhausted (heard about card (any player controls) named "Cave Torch")
+  901001:forced:1: Forced on the event exhausted (heard about card (any player controls) or in the staging area or the active location, named "Cave Torch")
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 damage token(s) on this card (placed, not dealt: nothing cancels or reduces them)
     - then, if 4 is less than damage of this card (checked when this step runs, after the steps above; not tied to whether they did anything): the card the event is about is removed from the game
@@ -426,17 +439,18 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 901002:B:3 (back): Progress cannot be placed on Goblin Ambush except by the above effect.
   901002:constant:2: Constant
-    - the table: stat noQuestProgress 1, while this card is in play
+    - the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
 
 ## 901003 Patrol Sentry
 
 901003:A:1 (front): Forced: After Cave Torch exhausts, Patrol Sentry makes an immediate attack against the engaged player, if able.
-  901003:forced:1: Forced on the event exhausted (heard about card (any player controls) named "Cave Torch")
-    only if this card is engaged with the player
+  901003:forced:1: Forced on the event exhausted (heard about card (any player controls) or in the staging area or the active location, named "Cave Torch")
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 901003:A:2 (shadow): Shadow: Add Patrol Sentry to the staging area.
   901003:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this card goes to the staging area (it is not revealed)
 
 ## 901004 Goblin Lurker
@@ -454,6 +468,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 901004:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if the active location is a Dark location.)
   901004:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Dark location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -466,10 +481,11 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 901005:A:2 (front): Shadow Dweller does not make engagement checks while Cave Torch is in play.
   901005:constant:1: Constant
     only if the card with code 03041 is in play
-    - this card: stat noEngagementChecks 1, while this card is in play
+    - this card: stat noEngagementChecks (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing) 1, while this card is in play
 
 901005:A:3 (shadow): Shadow: Shuffle Shadow Dweller back into the encounter deck.
   901005:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - [json ShuffleSelfIntoEncounterDeck {"verb":"ShuffleSelfIntoEncounterDeck"}]
 
 ## 901006 Twisting Shadows
@@ -484,6 +500,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 901006:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack for each Dark location in play.
   901006:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the number of Dark location (any player controls) or in the staging area, until the end of the attack
 
 ## 901007 Narrow Fissure
@@ -520,6 +537,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 901008:A:3 (shadow): Shadow: Attacking enemy gets +3 Defense this phase.
   901008:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat defense 3, until the end of the phase
 
 (rendered pieces: 301 by template, 4 as JSON)

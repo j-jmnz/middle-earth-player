@@ -10,7 +10,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - the first player chooses one of the quest cards with codes 51303, 51304 and 51305 in the quest deck; the others lie set aside, out of play, and leave the quest's order
     - the first player chooses one of the quest cards with codes 51307, 51308 and 51309 in the quest deck; the others lie set aside, out of play, and leave the quest's order
     - for each player, first player first:
-      - the acting player finds one enemy or location with a printed cost of 0 or less in the encounter deck and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top [also {"different":true}]
+      - the acting player finds one enemy or location with a printed cost of 0 or less in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found; the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
 
 51301:B:1 (back): Forced: When Dark Pit is explored, flip it over and set Durin's Bane aside, out of play. Each player searches the top 5 cards of his deck for a card, adds it to his hand, and shuffles his deck.
@@ -70,11 +70,11 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51305:B:1 (back): Add the active location's Threat to the staging area.
   51305:constant:1: Constant
-    - each location (any player controls) that is the active location: stat activeThreat 1, while this card is in play
+    - each location (any player controls) that is the active location: stat activeThreat (while the location is the active location its Threat counts in the staging area's total) 1, while this card is in play
 
 51305:B:2 (back): During the travel phase, the players must travel to a location, if able.
   51305:constant:2: Constant
-    - the table: stat mustTravel 1, while this card is in play
+    - the table: stat mustTravel (in the travel phase the players cannot decline to travel while a location in the staging area could be traveled to and an active location slot is free) 1, while this card is in play
 
 ## 51307 Nearing the Gate
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -89,11 +89,12 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51307:B:1 (back): No more than 5 progress can be placed here each round.
   51307:constant:1: Constant
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 5, while this card is in play
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 5, while this card is in play
 
 51307:B:2 (back): Forced: At the beginning of the quest phase, Durin's Bane makes an attack against the first player. Any undefended or excess damage dealt by this attack must be placed here.
   51307:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
     - the picked enemy attacks the first player now, from the staging area (or engaged), undefended damage going to the stage [also {"excessToStage":true}]
@@ -123,7 +124,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51308:B:2 (back): Durin's Bane cannot take more than X damage each round, where X is the number of progress tokens on this stage.
   51308:constant:1: Constant
-    - each enemy (any player controls) or in the staging area, named "Durin's Bane": stat damageCap progress of this card, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Durin's Bane": stat damageCap (it takes no more than this much damage each round; damage past it is not placed) progress of this card, while this card is in play
   51308:constant:2: Constant
     only if not (the current quest stage holds at least 1 progress)
     - each enemy (any player controls) or in the staging area, named "Durin's Bane": stat cannotTakeDamage 1, while this card is in play
@@ -205,6 +206,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51312:A:2 (shadow): Shadow: Either raise your threat by 2, or this attack is considered undefended.
   51312:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "threat":
         - raise threat by 2 (the acting player)
@@ -234,6 +236,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51314:A:2 (shadow): Shadow: Each character you control gets -1 Attack and -1 Defense until the end of the phase.
   51314:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - ownCharacters: stat attack -1, until the end of the phase
     - ownCharacters: stat defense -1, until the end of the phase
@@ -243,6 +246,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51315:A:1 (front): Forced: When Cave Spider attacks, either remove 2 progress from the main quest, or Cave Spider gets +2 Attack for this attack.
   51315:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "progress":
         - remove 2 progress from the current quest card (all of it when it holds less)
@@ -251,6 +255,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51315:A:2 (shadow): Shadow: Either remove 2 progress from the main quest or attacking enemy gets +2 Attack.
   51315:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "progress":
         - remove 2 progress from the current quest card (all of it when it holds less)
@@ -281,6 +286,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - this card counts as a Condition attachment while it is attached
   51317:forced:1: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (its host is a exhausted hero (any player controls))
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the acting player reveals an encounter card
 
 ## 51318 Cave-troll
@@ -289,7 +295,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51318:A:1 (front): Cannot have non-objective player card attachments.
   51318:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+    - no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can)
 
 51318:A:2 (front): Allies cannot be declared as attackers or defenders against Cave-troll.
   51318:constant:2: Constant
@@ -326,7 +332,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51321:A:1 (front): Cannot have non-objective player card attachments.
   51321:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+    - no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can)
 
 51321:A:2 (front): Forced: After Old Stone-troll attacks and destroys a character you control, raise your threat by 1 for each excess point of damage dealt.
   51321:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
@@ -362,6 +368,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51323:A:2 (shadow): Shadow: Raise your threat by 1 for each enemy engaged with you.
   51323:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
 
 ## 51324 Rock Adder
@@ -369,10 +376,11 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51324:A:1 (front): Players cannot declare defenders against Rock Adder.
   51324:constant:1: Constant
-    - characters cannot be declared as defenders against this card's attacks (only this card's, not another enemy's) [also {"anyDefender":true}]
+    - no character can be declared as a defender against this card's attacks (only this card's, not another enemy's)
 
 51324:A:2 (shadow): Shadow: If this attack is undefended, attacking enemy gets +2 Attack.
   51324:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attack has no defender: the attacking enemy: stat attack 2, until the end of the attack
 
 ## 51325 Bottomless Chasm
@@ -381,10 +389,11 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51325:A:1 (front): When faced with the option to travel, the players must travel to Bottomless Chasm, if able.
   51325:constant:1: Constant
     only if this card is in the staging area
-    - [json Restrict {"verb":"Restrict","what":"travelOnly"}]
+    - while no location is the active location and the players can travel to this location, they must travel to it: the travel step offers no way to decline it or to go elsewhere
 
 51325:A:2 (shadow): Shadow: Attacking enemy gets +2 Defense until the end of the phase.
   51325:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat defense 2, until the end of the phase
 
 ## 51326 Lost and Alone
@@ -398,6 +407,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51326:A:2 (shadow): Shadow: Defending character cannot ready until the end of the round.
   51326:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat cannotReady 1, until the end of the round
 
 ## 51327 Hobgoblin
@@ -405,10 +415,12 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51327:A:1 (front): Forced: After Hobgoblin engages a player, it cannot take damage until the end of the round.
   51327:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - this card: stat cannotTakeDamage 1, until the end of the round
 
 51327:A:2 (shadow): Shadow: Attacking enemy cannot take damage this phase.
   51327:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat cannotTakeDamage 1, until the end of the phase
 
 ## 51328 Western Hall
@@ -422,6 +434,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51328:A:2 (shadow): Shadow: If this attack destroys a character, reveal the top card of the encounter deck.
   51328:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player reveals an encounter card
 
@@ -430,23 +443,26 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51329:A:1 (front): When Revealed: Until the end of the round, treat each character's text box as if it were blank, except for Traits.
   51329:whenRevealed:1: When revealed
-    - every character in play, now and entering later: stat blankText (its text box is blank) 1, until the end of the round
+    - every character in play, now and entering later: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
 
 51329:A:2 (shadow): Shadow: Until the end of the phase, treat the defending character's text box as blank, except for Traits.
   51329:shadow:1: Shadow
-    - the defender: stat blankText (its text box is blank) 1, until the end of the phase
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the defender: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the phase
 
 ## 51330 Unspeakable Thing
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 51330:A:1 (front): Forced: When Unspeakable Thing attacks you, discard the top card of your deck. Unspeakable Thing gets +X Attack for this attack, where X is the discarded card's printed cost.
   51330:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top 1 card(s) of the acting player's deck go to their discard pile
     - this card: stat attack the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0), until the end of the attack
 
 51330:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack.
   51330:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 1, until the end of the attack
 
 ## 51331 Lightless Grotto
@@ -470,13 +486,14 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
   51332:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one location with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top [also {"different":true}]
+      - the acting player finds one location with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found; the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
 
 51332:A:2 (shadow): Shadow: The opposing team shuffles a location from the encounter discard pile into the encounter deck.
   51332:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose location (any player controls) encounterDiscard, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked) [also {"highestThreat":true}]
+    - choose location (any player controls) encounterDiscard, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the highest current Threat of those (no Threat counts 0; ties: the chooser decides)
     - the picked card is shuffled into the encounter deck
 
 ## 51333 Shadow Dweller
@@ -485,12 +502,13 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51333:A:1 (front): Cannot have non-objective player card attachments or take non-combat damage.
   51333:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+    - no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can)
   51333:constant:2: Constant
     - this card: stat cannotTakeNonCombatDamage 1, while this card is in play
 
 51333:A:2 (front): Forced: When Shadow Dweller attacks you, discard the top card of your deck and assign X damage among characters you control, where X is the discarded card's cost.
   51333:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top 1 card(s) of the acting player's deck go to their discard pile
     - the acting player assigns the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0) damage among the character (you control), one at a time
@@ -504,6 +522,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51334:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack.
   51334:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 1, until the end of the attack
 
 ## 51335 Fatigue
@@ -519,6 +538,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51335:A:2 (shadow): Shadow: Remove the defending character from the attack. A different defending character may be declared.
   51335:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defending character leaves the attack in progress, still exhausted, and cannot be declared as its defender again; the defending player may declare another defender, or none (the attack is then undefended)
 
 ## 51336 Elder Nameless Thing
@@ -531,6 +551,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51336:A:2 (front): While Elder Nameless Thing is in the staging area, it gains: 'Forced: After players have committed characters to the quest, Elder Nameless Thing makes an attack against the first player.'
   51336:forced:1: Forced when the staging step begins, before the first card is revealed
     only if this card is in the staging area
+    who acts: the acting player is the first player (a phase has no player of its own)
     - this card attacks the first player now, from the staging area
 
 ## 51337 Silent Caverns
@@ -539,7 +560,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51337:A:1 (front): While Silent Caverns is in the staging area, each player's threat cannot be reduced by more than 1 each round.
   51337:constant:1: Constant
     only if this card is in the staging area
-    - each player: stat threatReductionCap 1, while this card is in play
+    - each player: stat threatReductionCap (the player's threat is lowered by card effects by at most this much each round) 1, while this card is in play
 
 51337:A:2 (front): Travel: Raise each player's threat by 2.
   51337:travel:1: Travel
@@ -556,6 +577,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51338:A:2 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the stage number of the main quest.
   51338:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the stage number of the quest, until the end of the attack
 
 ## 51339 Orc Horn Blower
@@ -564,11 +586,13 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51339:A:1 (front): Forced: At the beginning of the combat phase, deal each engaged enemy an additional shadow card.
   51339:forced:1: Forced when a phase begins
     only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each enemy (any player controls):
       - the picked card is dealt a shadow card
 
 51339:A:2 (shadow): Shadow: Deal attacking enemy 2 additional shadow cards.
   51339:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy is dealt a shadow card
     - the attacking enemy is dealt a shadow card
@@ -594,6 +618,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51341:A:2 (shadow): Shadow: Deal 1 damage to a character you control.
   51341:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control)
     - deal 1 damage to the picked card
@@ -603,10 +628,11 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51342:A:1 (front): While Black Uruks is attacking, it gets +1 Attack for each shadow card dealt for this attack.
   51342:constant:1: Constant
-    - this card: stat attackPerShadow 1, while this card is in play
+    - this card: stat attackPerShadow (while it attacks it gets this much Attack for each shadow card it holds) 1, while this card is in play
 
 51342:A:2 (shadow): Shadow: The opposing team searches the top 5 cards of the encounter deck for a card and deals it to attacking enemy as a shadow card.
   51342:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the opposing team searches the top 5 cards of the encounter deck and deals one to the attacking enemy as a shadow card, face down, not revealed, nobody being asked: an enemy of the highest Attack, else the card nearest the top; it resolves after the shadow card being resolved; the encounter deck is not shuffled
 
 ## 51343 Dreadful Gap
@@ -620,7 +646,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51343:A:2 (front): Travel: The opposing team chooses a card in the encounter discard pile and shuffles it into the encounter deck.
   51343:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) encounterDiscard, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked) [also {"highestThreat":true}]
+    - choose card (any player controls) encounterDiscard, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the highest current Threat of those (no Threat counts 0; ties: the chooser decides)
     - the picked card is shuffled into the encounter deck
 
 ## 51344 Orcish Howls
@@ -636,6 +662,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51344:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it is an Uruk).
   51344:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attacking enemy is a Uruk enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attacking enemy is a Uruk enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -645,10 +672,12 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51345:A:1 (front): Forced: After Orc Raiders engages a player, deal it a shadow card.
   51345:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - this card is dealt a shadow card
 
 51345:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Deal it an additional shadow card.
   51345:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
@@ -659,7 +688,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51346:A:1 (front): While The Great Bridge is in the staging area, no more than 1 character can be declared as an attacker against each enemy.
   51346:constant:1: Constant
     only if this card is in the staging area
-    - each enemy (any player controls) or in the staging area: stat singleAttacker 1, while this card is in play
+    - each enemy (any player controls) or in the staging area: stat singleAttacker (a player attack against it is declared with one attacker; each ranged character of another player may attack in turn) 1, while this card is in play
 
 51346:A:2 (front): Forced: When The Great Bridge is explored, reveal 1 encounter card per player.
   51346:forced:1: Forced on the event locationExplored (heard about this card)
@@ -687,7 +716,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51348:A:1 (front): Cannot have non-objective player card attachments or take non-combat damage.
   51348:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+    - no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can)
   51348:constant:2: Constant
     - this card: stat cannotTakeNonCombatDamage 1, while this card is in play
 
@@ -697,6 +726,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51348:A:3 (front): Forced: When Chieftain of the Pit attacks, deal it an additional shadow card.
   51348:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
 
 ## 51349 Forked Passage
@@ -705,6 +735,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51349:A:1 (front): While Forked Passage is in the staging area, raise each player's threat by 1 additional point during the refresh phase.
   51349:forced:1: Forced at the end of the phase
     only if all of: (it is the Refresh phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 1 (each player)
 
 51349:A:2 (front): Travel: Raise each player's threat by 1.
@@ -717,12 +748,13 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51350:A:1 (front): When Revealed: The highest Attack enemy in the staging area makes an attack against the first player. If no attack is made this way, Chance Encounter gains surge.
   51350:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose enemy (any player controls) in the staging area only, chosen by the first player [also {"highestAttack":true}]
+    - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area
     - then, if not (there is a enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 51350:A:2 (shadow): Shadow: If attacking enemy is unique, it makes an additional attack against you after this one.
   51350:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a unique enemy (any player controls): when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -761,8 +793,9 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51353:A:2 (shadow): Shadow: Discard an attachment you control.
   51353:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 448 by template, 24 as JSON)
+(rendered pieces: 459 by template, 13 as JSON)

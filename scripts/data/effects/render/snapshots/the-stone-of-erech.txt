@@ -31,6 +31,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 50302:B:1 (back): Forced: At the beginning of each round, the players must choose: each player skips the next planning phase, or heroes do not collect resources during the resource phase this round.
   50302:forced:1: Forced when a phase begins
     only if it is the Beginning of round phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "skipPlanning":
         - the table: stat skipPlanning (the planning phase is skipped: no window opens) 1, until the end of the round
@@ -64,7 +65,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 50303:B:2 (back): Players cannot place progress on this stage unless they control Derufin.
   50303:constant:2: Constant
     only if not (a player controls the card with code 50304)
-    - the table: stat noQuestProgress 1, while this card is in play
+    - the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
 
 50303:B:3 (back): If the players defeat this stage, they have escaped the Blackroot Vale with Derufin and won the game.
   50303:triggered:1: Triggered (mandatory, not printed as Forced) on the event questDefeated
@@ -101,8 +102,8 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50305:A:2 (front): While you are engaged with The Lord of the Dead, treat all printed text boxes on characters you control as if they were blank (except for Traits.)
   50305:constant:2: Constant
-    only if this card is engaged with the player
-    - engagedSeatCharacters: stat blankText (its text box is blank) 1, while this card is in play
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    - engagedSeatCharacters: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
 
 ## 50306 The Stone of Erech
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -127,6 +128,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 50307:A:1 (front): While Tarlang's Neck is the active location, it gains, 'Forced: At the beginning of the encounter phase, the players must either immediately end the encounter phase, or the first player must engage all enemies in the staging area.'
   50307:forced:1: Forced when a phase begins
     only if all of: (it is the Encounter phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "endPhase":
         - the phase in progress ends once this effect has finished (what is left of it is skipped: in the quest phase the characters stay exhausted and uncommitted and the quest is not resolved; in the combat phase no attack is made); its end-of-phase Forced effects resolve as it ends
@@ -138,6 +140,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50308:A:1 (front): Forced: At the end of the round, place 1 progress on Eventide.
   50308:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - place 1 progress on this card
 
 50308:A:2 (front): If there are 4 or more progress on Eventide, add it to the victory display and put Dusk into play.
@@ -149,6 +152,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50309:A:1 (front): Forced: At the end of the round, place 1 progress on Dusk.
   50309:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - place 1 progress on this card
 
 50309:A:2 (front): If there are 4 or more progress on Dusk, add it to the victory display and put Midnight into play.
@@ -160,6 +164,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50310:A:1 (front): Forced: At the end of the round, place 1 progress on Midnight. Then, raise each player's threat by the number of progress on Midnight.
   50310:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 progress on this card
     - raise threat by progress of this card (each player)
@@ -170,6 +175,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 50311:A:1 (front): Midnight. Action: Claim this objective and attach it to a hero you control. Counts as an Artifact attachment with the text: 'When attached hero attacks an Oathbreaker, that enemy loses the Spectral keyword until the end of the phase.'
   50311:action:1: Action (any player may use it)
     only if all of: (the Night objective in play is Midnight) and (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (there is a hero (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -191,6 +197,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50312:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (Dusk. +2 Attack instead. Midnight. +3 Attack instead).
   50312:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the Night objective in play is Dusk or Midnight): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the Night objective in play is Dusk (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -252,6 +259,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50316:A:2 (shadow): Shadow: Deal attacking enemy 1 additional shadow card (Dusk. 2 additional cards instead. Midnight. 3 additional cards instead).
   50316:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
     - then, if the Night objective in play is Dusk or Midnight (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
@@ -267,6 +275,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50317:A:2 (shadow): Shadow: If this attack destroys a character, add 1 progress to the current Night objective.
   50317:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): place 1 progress on the Night objective in play (nothing with none); a Night objective at its limit then gives way to the next
 
@@ -296,6 +305,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50319:A:2 (shadow): Shadow: If defending character has 0 Willpower, deal 2 damage to that character.
   50319:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the defender is a character (any player controls) with a current Willpower of 0 or less: deal 2 damage to the defender
 
 ## 50320 Shadow of Dwimorberg
@@ -322,6 +332,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 50321:A:2 (front): Planning Action: Exhaust a hero. Any player may trigger this action.
   50321:action:1: Action (any player may use it)
     only if all of: (it is the Planning phase) and (there is a ready hero (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
@@ -345,6 +356,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50322:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (Dusk. +2 Attack instead. Midnight. +3 Attack instead).
   50322:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the Night objective in play is Dusk or Midnight): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the Night objective in play is Dusk (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -359,6 +371,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50323:A:2 (shadow): Shadow: Dusk/Midnight. Attacking enemy makes an additional attack after this one.
   50323:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the Night objective in play is Dusk or Midnight: the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 50323:A:3 (front): Midnight. This effect cannot be canceled.
@@ -393,7 +406,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
     only if its host is a hero (any player controls)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card this one is attached to: stat willpower is set to 0, overriding every other modifier of it
-    - its host: stat blankText (its text box is blank) 1, while this card is in play
+    - its host: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
 
 ## 50326 The Dead Ride Behind
 (the scenario deals it into the encounter pile; the piles place it, no record does)

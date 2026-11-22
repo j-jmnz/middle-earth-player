@@ -11,17 +11,18 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50701:B:1 (back): No more than 4 progress can be placed on this stage each round.
   50701:constant:1: Constant
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 4, while this card is in play
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 4, while this card is in play
 
 50701:B:2 (back): Forced: At the beginning of the quest phase, each player must choose: either raise his threat by 2, or reveal an additional encounter card this phase.
   50701:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "threat":
           - raise threat by 2 (the acting player)
         * option "reveal":
-          - reveal 1 additional encounter card(s) in the staging step this phase
+          - reveal 1 additional encounter card(s) in the staging step this phase (the extra reveals go to the players in turn after the one each player makes, so the first player makes the first of them; while the stages are separate, to the player whose stage holds the effect)
 
 ## 50702 Running out of Time
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -65,6 +66,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 50703:B:2 (back): Forced: At the beginning of the encounter phase, each suspect enemy in play engages the first player.
   50703:forced:1: Forced when a phase begins
     only if it is the Encounter phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each Suspect enemy (any player controls) or in the staging area:
       - engage the picked card
 
@@ -87,7 +89,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
     only if this card is in the victory display
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each Suspect enemy (any player controls) or in the staging area: stat immuneToPlayerCards 1, while this card is in play
-    - each Suspect enemy (any player controls) or in the staging area: stat shadowsImmune 1, while this card is in play
+    - each Suspect enemy (any player controls) or in the staging area: stat shadowsImmune (the shadow cards dealt to it are immune to player card effects, so no Response cancels their effects) 1, while this card is in play
 
 50704:A:3 (front): Travel: Search the encounter deck, discard pile, and victory display for Bill Ferny and add him to the staging area. Shuffle the encounter deck.
   50704:travel:1: Travel
@@ -121,6 +123,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 50706:A:2 (front): While Combe Storehouse is in the victory display, each Suspect gains: "Forced: After this enemy engages a player, it makes an immediate attack."
   50706:forced:1: Forced after an enemy engages a player (heard about Suspect enemy (any player controls) or in the staging area; used from the victory display)
     only if this card is in the victory display
+    who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"target":"subject"}]
 
 50706:A:3 (front): Travel: Search the encounter deck and discard pile for a Lawless Ruffian and add it to the staging area. Shuffle the encounter deck.
@@ -138,7 +141,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 50707:A:2 (front): While Archet Trading Post is in the victory display, each Suspect cannot take more than 5 damage each round.
   50707:constant:1: Constant
     only if this card is in the victory display
-    - each Suspect enemy (any player controls) or in the staging area: stat damageCap 5, while this card is in play
+    - each Suspect enemy (any player controls) or in the staging area: stat damageCap (it takes no more than this much damage each round; damage past it is not placed) 5, while this card is in play
 
 50707:A:3 (front): Travel: Search the encounter deck and discard pile for a Bree-land Informant and add it to the staging area. Shuffle the encounter deck.
   50707:travel:1: Travel
@@ -175,7 +178,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50709:A:2 (front): Excess combat damage dealt by Todd the Troll (damage dealt beyond the remaining hit points of the character damaged by this attack) must be assigned as an increase to your threat.
   50709:constant:2: Constant
-    - this card: stat excessToThreat 1, while this card is in play
+    - this card: stat excessToThreat (the damage its attack deals beyond the hit points the character had left raises its controller's threat by that much) 1, while this card is in play
 
 ## 50710 Susie the Spider
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -214,6 +217,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50712:A:2 (front): Forced: When Johnny Goblin-fingers attacks, the defending player discards 1 random card from his hand and raises his threat by X, where X is the printed cost of the discarded card.
   50712:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player discards 1 random card(s) from hand [also {"raiseByCost":true}]
 
 ## 50713 Old Orc-eyes
@@ -226,6 +230,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 50713:A:2 (front): Forced: After an attack resolves in which Old Orc-eyes was dealt a shadow card with no shadow effect, he makes an additional attack against you. Do not deal Old Orc-eyes a shadow card for this attack.
   50713:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    who acts: the acting player is the defending player (the player the attack is against)
     - this enemy attacks now, dealt no shadow card [also {"target":"subject"}]
 
 ## 50714 Taken by Surprise
@@ -350,6 +355,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50721:A:3 (shadow): Shadow: Either raise your threat by 4, or this attack is considered undefended.
   50721:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "threat":
         - raise threat by 4 (the acting player)
@@ -373,11 +379,12 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50723:A:1 (front): While engaged with a player with threat 35 or higher, Lawless Ruffian gets +2 Attack.
   50723:constant:1: Constant
-    only if all of: (this card is engaged with the player) and (the actor's threat is at least 35)
+    only if all of: (this card is engaged with a player (that player is who "you" means in this record)) and (the actor's threat is at least 35)
     - this card: stat attack 2, while this card is in play
 
 50723:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   50723:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 50724 Greenway Footpad
@@ -393,6 +400,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50724:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if your threat is 35 or higher).
   50724:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the actor's threat is at least 35: the attacking enemy: stat attack 2, until the end of the attack
     - then, if not (the actor's threat is at least 35) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -406,6 +414,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50725:A:2 (shadow): Shadow: Either raise your threat by 2, or return attacking enemy to the staging area after this attack.
   50725:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "threat":
         - raise threat by 2 (the acting player)
@@ -446,6 +455,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50727:A:2 (shadow): Shadow: Discard an attachment you control.
   50727:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -463,6 +473,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50728:A:2 (shadow): Shadow: If this attack destroys a character, either raise your threat by 2, or shuffle Rising Body Count into the Investigation deck.
   50728:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "threat":
         - when the attack in progress ends:
@@ -479,6 +490,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50729:A:2 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the Investigate value of the active location.
   50729:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the Investigate value of the active location (its printed Investigate X; 0 with no active location or none printed), until the end of the attack
 
 (rendered pieces: 257 by template, 9 as JSON)

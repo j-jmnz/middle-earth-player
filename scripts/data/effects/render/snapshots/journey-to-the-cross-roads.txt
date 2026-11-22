@@ -44,6 +44,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 144027:A:1 (front): Forced: At the end of the planning phase, place each Harad enemy in the staging area facedown under The Black Gate.
   144027:forced:1: Forced at the end of the phase
     only if all of: (it is the Planning phase) and (the number of location (any player controls) named "Henneth Annûn", that is the active location is at most 0)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each Harad enemy (any player controls) in the staging area only:
       - place the picked card facedown under the card with code 144027 in play (out of play there; its attachments are discarded, its tokens go)
 
@@ -60,10 +61,12 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144028:A:2 (front): Forced: After Man of Harad engages you, discard 1 random card from your hand.
   144028:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - the acting player discards 1 random card(s) from hand
 
 144028:A:3 (shadow): Shadow: Discard 1 random card from your hand.
   144028:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player discards 1 random card(s) from hand
 
 ## 144029 Captain of Harad
@@ -71,12 +74,14 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144029:A:1 (front): Forced: After Captain of Harad engages you, each Harad enemy gets +1 Attack and -10 engagement cost until the end of the round.
   144029:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - every enemy in play (Harad only): stat attack 1, until the end of the round
     - every enemy in play (Harad only): stat engagementCost -10, until the end of the round
 
 144029:A:2 (shadow): Shadow: If this attack destroys a character, return attacking enemy to the staging area.
   144029:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -91,10 +96,10 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
     - this card: stat threat minus (the number of cards left in the Harad deck), while this card is in play
   144030:constant:2: Constant
     only if the number of cards in the Harad deck is at least 1
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
   144030:constant:3: Constant
     only if not (the current quest stage holds at least 20 progress)
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
 
 ## 144031 Henneth Annûn
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -142,6 +147,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 144034:A:1 (front): While Ithilien Woods is the active location, it gains: "Forced: After a player engages a Harad enemy, he readies a character he controls."
   144034:forced:1: Forced after an enemy engages a player (heard about Harad enemy (any player controls))
     only if this card is the active location
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose exhausted character (you control)
     - ready the picked card
@@ -156,10 +162,12 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 144035:A:1 (front): While Hills of Ithilien is the active location, it gains: "Forced: After a player engages a Harad enemy, deal 1 damage to that enemy."
   144035:forced:1: Forced after an enemy engages a player (heard about Harad enemy (any player controls))
     only if this card is the active location
+    who acts: the acting player is the player the enemy engaged
     - deal 1 damage to the card the event is about
 
 144035:A:2 (shadow): Shadow: Discard a non-objective attachment you control.
   144035:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control) that is not an objective
     - discard the picked card
@@ -193,6 +201,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144037:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place attacking enemy facedown under The Black Gate.
   144037:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -224,6 +233,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144039:A:2 (shadow): Shadow: Either place attacking enemy facedown under The Black Gate after this attack, or it makes an additional attack against you after this one.
   144039:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "place":
         - once the attack in progress has ended, place this card facedown under the card with code 144027 in play (out of play there; its attachments are discarded, its tokens go)
@@ -237,15 +247,17 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
   144056:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat cannotHaveAttachments 1, while this card is in play
-    - this card: stat damageCap 3, while this card is in play
+    - this card: stat damageCap (it takes no more than this much damage each round; damage past it is not placed) 3, while this card is in play
 
 144056:A:2 (front): Forced: After Oliphaunt engages you, exhaust each ally you control.
   144056:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - for each ally (you control):
       - exhaust the picked card
 
 144056:A:3 (shadow): Shadow: Attacking enemy gets +3 Attack.
   144056:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 3, until the end of the attack
 
 ## 144057 Haradrim Soldier
@@ -253,10 +265,12 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144057:A:1 (front): Forced: After Haradrim Soldier engages you, it makes an immediate attack.
   144057:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 144057:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   144057:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 144058 Haradrim Archer
@@ -270,10 +284,12 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144058:A:2 (front): Forced: After Haradrim Archer engages you, assign X damage among characters you control.
   144058:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - the acting player assigns the number of players damage among the character (you control), one at a time
 
 144058:A:3 (shadow): Shadow: Deal 1 damage to the defending character.
   144058:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
 ## 144068 Ambush the Men of Harad
@@ -284,12 +300,13 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the harad deck
     - for each player, first player first:
-      - if not (the actor holds the first player token): the acting player finds one non-unique location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
+      - if not (the actor holds the first player token): the acting player finds one non-unique location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
     - shuffle the encounter deck
 
 144068:B:1 (back): Forced: At the beginning of the quest phase, reveal the top facedown card from under The Cross-roads and add it to the staging area.
   144068:forced:1: Forced when a phase begins
     only if all of: (it is the Quest phase) and (the number of location (any player controls) named "Henneth Annûn", that is the active location is at most 0)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the acting player reveals the top card of the harad deck and resolves its staging, into the staging area, as if it was just revealed from the encounter deck (nothing with the deck empty)
 
 144068:B:2 (back): The players cannot defeat this stage while The Cross-roads is in play. When The Cross-roads is explored, the players win the game.
@@ -299,4 +316,4 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
   144068:forced:2: Forced on the event locationExplored (heard about location (any player controls) named "The Cross-roads")
     - the players win the game
 
-(rendered pieces: 202 by template, 2 as JSON)
+(rendered pieces: 203 by template, 1 as JSON)

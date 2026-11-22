@@ -29,10 +29,10 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18028:A:1 (front): Each objective-location, and each card guarding one, is immune to player card effects.
   18028:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each card (any player controls) [also {"objectiveLocation":true}]: stat immuneToPlayerCards 1, while this card is in play
-    - each card (any player controls) attached to an objective-location as its guard: stat immuneToPlayerCards 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location [also {"objectiveLocation":true}]: stat immuneToPlayerCards 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, attached to an objective-location as its guard: stat immuneToPlayerCards 1, while this card is in play
   18028:constant:2: Constant
-    only if not (there is a card (any player controls) [also {"objectiveLocation":true}] to choose)
+    only if not (there is a card (any player controls) or in the staging area or the active location [also {"objectiveLocation":true}] to choose)
     - currentQuest: stat progressDiscards 1, while this card is in play
 
 18028:A:2 (front): Forced: When progress would be placed on the main quest, if there are no objective-locations in play, discard an equal number of cards from the top of the encounter deck instead. Then, put the topmost objective-location in the encounter discard pile into play.
@@ -123,7 +123,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     - this card: stat threat resources of this card x 2, while this card is in play
   18033:constant:2: Constant
     only if not (0 is less than resources of this card)
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
 
 18033:A:2 (front): Forced: After a Forest location is explored, place 1 resource here.
   18033:forced:1: Forced on the event locationExplored (heard about Forest location (any player controls))
@@ -139,12 +139,14 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18034:A:1 (front): Forced: At the end of the encounter phase, if Mirkwood Patrol is in the staging area with an unguarded objective-location, attach that objective-location to Mirkwood Patrol, guarding it.
   18034:forced:1: Forced at the end of the phase
     only if all of: (it is the Encounter phase) and (this card is in the staging area) and (there is a objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters) [also {"objectiveLocation":true}] to choose)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters) [also {"objectiveLocation":true}]
     - this card becomes the guard of the picked card, attached to it in the staging area
 
 18034:A:2 (shadow): Shadow: The defender cannot ready this round.
   18034:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat doesNotReady 1, until the end of the round
 
 ## 18035 Ravenous Spider
@@ -152,10 +154,12 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18035:A:1 (front): Forced: After Ravenous Spider engages you, it makes an immediate attack.
   18035:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 18035:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   18035:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
 
@@ -172,6 +176,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18036:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack and +2 Defense until the end of the phase if it is guarding a card.
   18036:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if any of: (the attacking enemy is a enemy (any player controls) that is attached to an objective as its guard) or (the attacking enemy is a enemy (any player controls) [also {"guardsHero":true}]): the attacking enemy: stat attack 2, until the end of the phase
     - then, if any of: (the attacking enemy is a enemy (any player controls) that is attached to an objective as its guard) or (the attacking enemy is a enemy (any player controls) [also {"guardsHero":true}]) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat defense 2, until the end of the phase
@@ -192,7 +197,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18038:A:1 (front): While Accursed Forest is in the staging area, 'when revealed' effects cannot be canceled.
   18038:constant:1: Constant
     only if this card is in the staging area
-    - the table: stat encounterUncancelable 1, while this card is in play
+    - the table: stat encounterUncancelable (no Response cancels an encounter card's When Revealed or Shadow effect, and no paid cancel is offered against one) 1, while this card is in play
 
 18038:A:2 (front): Travel: Reveal the top card of the encounter deck.
   18038:travel:1: Travel
@@ -204,7 +209,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18039:A:1 (front): While Dark Black Woods is in the staging area, no more than 1 progress can be placed on each Forest location in the staging area each round.
   18039:constant:1: Constant
     only if this card is in the staging area
-    - each Forest location (any player controls) in the staging area only: stat progressCap 1, while this card is in play
+    - each Forest location (any player controls) in the staging area only: stat progressCap (no more than this much progress can be placed on this location each round) 1, while this card is in play
 
 18039:A:2 (front): Travel: Each player discards the top card of the encounter deck. Add each enemy discarded this way to the staging area.
   18039:travel:1: Travel
@@ -229,6 +234,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18040:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, discard an ally you control.
   18040:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -249,6 +255,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18041:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defender has an attachment).
   18041:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the defender is a character (any player controls) [also {"hasAttachment":{}}]): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a character (any player controls) [also {"hasAttachment":{}}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -271,6 +278,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18071:B:2 (back): Forced: After an enemy engages a player, raise that player's threat by 1.
   18071:forced:1: Forced after an enemy engages a player
+    who acts: the acting player is the player the enemy engaged
     - raise threat by 1 (the player the event is about)
 
 ## 18072 Spiders of Mirkwood
@@ -329,7 +337,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     - each enemy (any player controls) or in the staging area [also {"guardsHero":true}]: stat cannotTakeNonCombatDamage 1, while this card is in play
 
 18074:B:2 (back): Forced: When an enemy guarding a hero is defeated, return that hero to its owner's control, exhausted.
-  18074:forced:1: Forced after a card leaves play (heard about card (any player controls) [also {"guardsHero":true}])
+  18074:forced:1: Forced after a card leaves play (heard about card (any player controls) or in the staging area or the active location [also {"guardsHero":true}])
     - [json ReleaseGuardedHero {"verb":"ReleaseGuardedHero"}]
 
 18074:B:3 (back): When the players advance from this stage, discard each guarded hero.
@@ -352,12 +360,12 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
   18075:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each location (any player controls): stat questPoints 1, while this card is in play [also {"eachAttached":{"type":"card","control":"any","facedownUnder":true}}]
-    - each card (any player controls) [also {"objectiveLocation":true}]: stat questPoints 1, while this card is in play [also {"eachAttached":{"type":"card","control":"any","facedownUnder":true}}]
+    - each card (any player controls) or in the staging area or the active location [also {"objectiveLocation":true}]: stat questPoints 1, while this card is in play [also {"eachAttached":{"type":"card","control":"any","facedownUnder":true}}]
 
 18075:B:2 (back): Forced: When a location with a facedown player card under it is explored, return each facedown player card under that location to its owner's hand.
-  18075:forced:1: Forced on the event locationExplored (heard about card (any player controls) [also {"hasFacedownUnder":true}])
+  18075:forced:1: Forced on the event locationExplored (heard about card (any player controls) or in the staging area or the active location [also {"hasFacedownUnder":true}])
     - [json ReturnFacedownToHands {"verb":"ReturnFacedownToHands"}]
-  18075:forced:2: Forced on the event activeExplored (heard about card (any player controls) [also {"hasFacedownUnder":true}])
+  18075:forced:2: Forced on the event activeExplored (heard about card (any player controls) or in the staging area or the active location [also {"hasFacedownUnder":true}])
     - [json ReturnFacedownToHands {"verb":"ReturnFacedownToHands"}]
 
 18075:B:3 (back): When the players advance from this stage, discard each facedown player card under each location.
@@ -383,6 +391,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18076:B:2 (back): Forced: At the end of the round, return the nemesis to the staging area and it makes an attack against the first player.
   18076:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json NemesisAttacks {"verb":"NemesisAttacks"}]
 
 18076:B:3 (back): This stage cannot be defeated while the nemesis is in play. The nemesis cannot take damage unless there is at least 8 progress on this stage. If the players defeat the nemesis, they win the game.
@@ -408,6 +417,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18077:B:1 (back): Forced: At the end of the round, raise each player's threat by 1 for each enemy engaged with him.
   18077:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
 

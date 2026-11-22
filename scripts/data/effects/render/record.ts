@@ -2,6 +2,7 @@
 import { renderCondition } from "./conditions.ts";
 import { done, isObj, jsonOf, str, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
+import { actorNote } from "./actor.ts";
 import { barNote } from "./bars.ts";
 import { renderInstruction } from "./verbs.ts";
 
@@ -53,6 +54,8 @@ const TRIGGER: Readonly<Record<string, string>> = {
   progressWouldBePlaced: "before progress is placed on this location (the whole placement, the effect's X, waits for this effect)",
   progressPlacedOnSelf: "after progress is placed on this card, the placement that explores it included (X is the amount placed; the card may have left play)",
   questProgressPlacedOnStage: "once, after a quest that succeeded has placed progress on the stage itself",
+  escapeFailed: "after an escape test that this card's own effect made is failed (no other card hears it; the event happened to the player who made the test)",
+  escapePassed: "after an escape test that this card's own effect made is passed (no other card hears it; the event happened to the player who made the test)",
   questProgressPlaced: "once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)",
 };
 
@@ -113,9 +116,13 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   const lines = [`${str(effect.id)}: ${head}`];
   if (effect.condition !== undefined) lines.push(`  only if ${renderCondition(effect.condition, ctx)}`);
   const instructions = Array.isArray(effect.instructions) ? effect.instructions : [];
+  const actor = actorNote(effect, ctx);
+  if (actor && instructions.length > 0) lines.push(`  who acts: ${actor}`);
   const barred = barNote(effect, ctx);
   if (barred) lines.push(`  note: ${barred}`);
-  if (instructions.length === 0) lines.push("  (no instructions)");
+  // The last stage's win is the engine's own rule, not a record's: a constant on its side B that runs nothing only names the printed line.
+  const winsOnDefeat = ctx.finalStage === true && effect.timing === "constant" && Array.isArray(effect.lines) && effect.lines.every((id) => typeof id === "string" && id.includes(":B:"));
+  if (instructions.length === 0) lines.push(winsOnDefeat ? "  (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)" : "  (no instructions)");
   if (instructions.length > 1) lines.push("  (steps run in order; a step depends on an earlier one only through its own condition)");
   const inner = effect.trigger === "engaged" ? { ...ctx, engagedSeat: true } : ctx;
   instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, inner, 1, at > 0)));

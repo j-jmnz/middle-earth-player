@@ -279,6 +279,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11017:B:2 (back): Forced: At the end of the quest phase, if you are off-course (Cloud, Rain, or Storm), each player must distribute 5 damage among characters he controls.
   11017:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and ([json condition {"kind":"heading","is":"offCourse"}])
+    who acts: the acting player is the first player (a phase has no player of its own)
     - each player assigns 5 damage among the character (you control), one at a time
 
 11017:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
@@ -360,7 +361,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11021:B:2 (back): You cannot place progress on Corsair Pursuit unless you are on-course (Sun).
   11021:constant:1: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: the table: stat noQuestProgress 1, while this card is in play
+    - if [json condition {"kind":"heading","is":"offCourse"}]: the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
 
 11021:B:3 (back): If there are no Ship enemies in play, you have defeated your pursuers, and win the game.
   11021:constant:2: Constant
@@ -395,6 +396,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11023:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you are off-course).
   11023:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not ([json condition {"kind":"heading","is":"offCourse"}]): the attacking enemy: stat attack 1, until the end of the attack
     - then, if [json condition {"kind":"heading","is":"offCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -406,12 +408,13 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   11024:constant:1: Constant
     only if this card is the active location
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each Ship enemy (any player controls) or in the staging area: stat noEngagementChecks 1, while this card is in play
+    - each Ship enemy (any player controls) or in the staging area: stat noEngagementChecks (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing) 1, while this card is in play
     - each Ship enemy (any player controls) or in the staging area: stat cannotAttack 1, while this card is in play
     - each Ship enemy (any player controls) or in the staging area: stat cannotBeAttacked 1, while this card is in play
 
 11024:A:2 (shadow): Shadow: If your heading is at the worst setting (Storm), attacking enemy makes an additional attack after this one.
   11024:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if [json condition {"kind":"heading","is":"worst"}]: when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -425,6 +428,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11050:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if attacking enemy is a Ship enemy).
   11050:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attacking enemy is a Ship enemy (any player controls) or in the staging area): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attacking enemy is a Ship enemy (any player controls) or in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
@@ -438,6 +442,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11051:A:2 (shadow): Shadow: If this attack deals damage to a Ship objective, shift your heading off-course.
   11051:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse","when":{"kind":"all","conditions":[{"kind":"dealt"},{"kind":"matches","card":"other","pick":{"type":"character","control":"any","trait":"Ship"}}]}}]
 
@@ -455,6 +460,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11052:A:2 (shadow): Shadow: If this attack destroys a character, shift your heading off-course.
   11052:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse","when":{"kind":"x","min":1}}]
 
@@ -468,6 +474,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11053:A:2 (shadow): Shadow: If you are off-course (Cloud, Rain, or Storm), attacking enemy gets +2 Attack.
   11053:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if [json condition {"kind":"heading","is":"offCourse"}]: the attacking enemy: stat attack 2, until the end of the attack
 
 ## 11054 Waterspout
@@ -475,7 +482,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11054:A:1 (front): While your heading is at the worst setting (Storm), when faced with the option to travel, the players must travel to Waterspout, if able.
   11054:constant:1: Constant
-    - [json Restrict {"verb":"Restrict","what":"travelOnly","when":{"kind":"heading","is":"worst"}}]
+    - if [json condition {"kind":"heading","is":"worst"}]: while no location is the active location and the players can travel to this location, they must travel to it: the travel step offers no way to decline it or to go elsewhere
 
 11054:A:2 (front): Forced: After traveling to Waterspout, deal 4 damage to each Ship objective.
   11054:forced:1: Forced after the players travel (heard about this card)
@@ -494,8 +501,9 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11055:A:2 (shadow): Shadow: Excess damage from this attack is dealt to a Ship objective you control.
   11055:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the attacking enemy: stat excessToShip 1, until the end of the attack
+    - the attacking enemy: stat excessToShip (the damage its attack deals beyond the hit points the character had left is kept for the effect that deals it to a Ship objective) 1, until the end of the attack
     - when the attack in progress ends:
       - if [json condition {"kind":"excess","min":1}]: choose Ship character (you control)
       - [json DamageShip {"verb":"DamageShip","amount":{"excess":true},"when":{"kind":"excess","min":1}}]
@@ -509,6 +517,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11056:A:2 (shadow): Shadow: Either shift your heading off-course or treat this attack as undefended.
   11056:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "heading":
         - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
@@ -555,6 +564,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11059:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you control an exhausted Ship objective).
   11059:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the number of exhausted Ship character (you control) is at least 1): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the number of exhausted Ship character (you control) is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -564,7 +574,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11060:A:1 (front): While Southron Sailor is engaged with you, each Ship enemy engaged with you contributes its Threat to the total Threat in the staging area.
   11060:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - each Ship enemy (any player controls) engaged with you: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, while this card is in play
 
 ## 11061 Cunning Pirate
@@ -578,6 +588,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11061:A:2 (front): Forced: When Cunning Pirate engages you, discard an attachment you control and place resources on Cunning Pirate equal to that attachment's printed cost.
   11061:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a attachment (you control) to choose: choose attachment (you control)
     - then, if there is a attachment (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): add cost of the picked card resources to this card
@@ -588,10 +599,12 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11062:A:1 (front): Forced: When Vicious Marauder engages you, discard a random card from your hand and place resources on it equal to that card's printed cost.
   11062:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+    who acts: the acting player is the player the enemy engaged
     - [json PlunderHand {"verb":"PlunderHand"}]
 
 11062:A:2 (front): Forced: When Vicious Marauder attacks you, distribute damage among characters you control equal to the number of resources on it.
   11062:forced:2: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player assigns resources of this card damage among the character (you control), one at a time
 
 ## 11063 Umbar Captain
@@ -599,7 +612,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11063:A:1 (front): While you are engaged with Umbar Captain, characters you control cannot attack Ship enemies.
   11063:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - each character (you control): stat cannotAttackShips 1, while this card is in play
 
 ## 11080 Dream-chaser
@@ -741,4 +754,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   11171:resolution:9: Resolution
     - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
 
-(rendered pieces: 263 by template, 69 as JSON)
+(rendered pieces: 264 by template, 69 as JSON)

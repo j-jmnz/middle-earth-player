@@ -10,7 +10,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 145030:A:2 (front): The players cannot travel here unless there are at least 3 Ship locations in the victory display.
   145030:constant:2: Constant
     only if the number of Ship location (any player controls) in the victory display is at most 2
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
 
 145030:A:3 (front): Travel: Each player searches the encounter deck and discard pile for a Corsair enemy and adds it to the staging area. One of those enemies must be Corsair Captain, if able.
   145030:travel:1: Travel
@@ -57,6 +57,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 
 145033:A:2 (shadow): Shadow: If this attack damages a character, that character cannot ready until the end of the round.
   145033:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if [json condition {"kind":"dealt"}]: the event's other card: stat cannotReady 1, until the end of the round
 
@@ -65,6 +66,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 
 145034:A:1 (front): Forced: At the end of the round, place a damage token here. Then, if there are 4 damage tokens here, discard Pelargir Quays and assign 4 damage among characters in play.
   145034:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 damage token(s) on this card (placed, not dealt: nothing cancels or reduces them)
     - then, if 3 is less than damage of this card (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player assigns 4 damage among the character (any player controls) chosen by the first player, one at a time
@@ -83,6 +85,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
     - this card: stat engagementCost -30, while this card is in play
   145035:forced:1: Forced after an enemy engages a player (heard about this card)
     only if the active location is a Ship location (any player controls)
+    who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 ## 145036 Corsair of Umbar
@@ -97,6 +100,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 
 145036:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location is a Ship).
   145036:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Ship location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -110,12 +114,14 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 
 145037:A:2 (front): Forced: When Umbar Pirate Crew engages you, exhaust a character you control.
   145037:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
 
 145037:A:3 (shadow): Shadow: If the active location is a Ship, return attacking enemy to the staging area after this attack.
   145037:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the active location is a Ship location (any player controls): when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -124,6 +130,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 
 145038:A:1 (front): Forced: When Haradrim Pirate engages you, deal 1 damage to a character you control (2 damage instead if the active location is a Ship).
   145038:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control)
     - then, if not (the active location is a Ship location (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
@@ -131,6 +138,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 
 145038:A:2 (shadow): Shadow: Defending character gets -1 Defense for each damage on it.
   145038:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat defense minus (damage of the defender), until the end of the attack
 
 ## 145039 Fell Folk of Umbar
@@ -178,6 +186,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 
 145041:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, discard an attachment you control.
   145041:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -200,6 +209,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 
 145042:A:3 (shadow): Shadow: Exhaust a character you control.
   145042:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -245,6 +255,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 
 145071:A:1 (front): Forced: At the beginning of the staging step, place 1 resource on this objective. Then, each player must choose: either reveal an encounter card, or assign X damage among characters he controls. X is the number of resources here.
   145071:forced:1: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 resource tokens on this card
     - for each player, first player first:

@@ -35,7 +35,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18042:A:1 (front): Cannot have non-Dragon attachments.
   18042:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Dragon"}]
+    - no card can be attached to this card except a card with the trait Dragon
 
 18042:A:2 (front): X is 1 more than the number of players.
   18042:constant:2: Constant
@@ -109,7 +109,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18046:A:2 (front): When faced with the option to travel, the players must travel to Deep Chasm if there is no active location.
   18046:constant:2: Constant
-    - [json Restrict {"verb":"Restrict","what":"travelOnly"}]
+    - while no location is the active location and the players can travel to this location, they must travel to it: the travel step offers no way to decline it or to go elsewhere
 
 ## 18047 Denizen of the Deep
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -117,12 +117,13 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18047:A:1 (front): When Revealed: The highest Attack enemy in the staging area makes an immediate attack against the first player. If no attack is made this way, Denizen of the Deep gains surge.
   18047:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose enemy (any player controls) in the staging area only, chosen by the first player [also {"highestAttack":true}]
+    - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area
     - then, if not (there is a enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 18047:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   18047:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
 
@@ -139,7 +140,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     only if there is a Dark location (any player controls) that is the active location to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card this one is attached to: stat willpower is set to 0, overriding every other modifier of it
-    - its host: stat blankText (its text box is blank) 1, while this card is in play
+    - its host: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
   18048:constant:2: Constant
     - this card counts as a Condition attachment while it is attached
 
@@ -148,7 +149,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18049:A:1 (front): Cannot have player card attachments.
   18049:constant:1: Constant
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
 
 18049:A:2 (front): Forced: After Stone-troll attacks and destroys a character you control, discard 1 card from your hand for each excess point of damage dealt.
   18049:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls); event happened to the controller)
@@ -157,6 +158,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18049:A:3 (shadow): Shadow: Discard an attachment you control.
   18049:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -187,12 +189,14 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18051:A:2 (front): Forced: After Werewolf is dealt a shadow card with no shadow effect, deal 1 damage to it and to the defending character.
   18051:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - deal 1 damage to this card
     - deal 1 damage to the event's other card
 
 18051:A:3 (shadow): Shadow: Deal 1 damage to the defender.
   18051:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
 ## 18052 Giant Spider
@@ -205,6 +209,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18052:A:2 (shadow): Shadow: The defender cannot ready until the end of the round.
   18052:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat doesNotReady 1, until the end of the round
 
 ## 18053 Black Bats
@@ -220,6 +225,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18053:A:3 (shadow): Shadow: If the active location has the Dark trait, attacking enemy cannot take damage this phase.
   18053:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if there is a Dark location (any player controls) that is the active location to choose: the attacking enemy: stat cannotTakeDamage 1, until the end of the phase
 
 ## 18054 Dark Tunnel
@@ -262,6 +268,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18056:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack.
   18056:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 1, until the end of the attack
 
 ## 18057 Eyes in the Dark
@@ -282,6 +289,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18057:A:3 (shadow): Shadow: If this attack is undefended, discard an ally you control.
   18057:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attack has no defender: choose ally (you control)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -360,6 +368,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18063:A:1 (front): Forced: After the players commit characters to the quest, discard cards from the encounter deck until a treachery is discarded. Resolve the 'when revealed' effect on that treachery.
   18063:forced:1: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until a treachery is discarded, or the deck is empty; that card becomes the picked card
     - then, if the picked card is a treachery (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the When Revealed effects of the picked card resolve as if it had just been revealed
@@ -400,6 +409,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18078:B:1 (back): Forced: At the beginning of the quest phase, discard cards from the top of the encounter deck until a location is discarded. Either add that location to the staging area, or raise each player's threat by X, where X is that location's printed Threat.
   18078:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
     - the first player chooses one of:
@@ -469,4 +479,4 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18080:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Fire-drake")
     - the players win the game
 
-(rendered pieces: 284 by template, 33 as JSON)
+(rendered pieces: 287 by template, 30 as JSON)

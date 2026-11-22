@@ -35,7 +35,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 04040:B:3 (back): If the players defeat this stage, they have won the game.
   04040:constant:2: Constant
-    (no instructions)
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
 ## 04041 Arwen Undómiel
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -68,6 +68,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 04042:A:2 (shadow): Shadow: Return attacking enemy to the staging area after it attacks.
   04042:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -80,6 +81,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
     - the first enemy revealed from the encounter deck each round gains ambush (counted from the round's start, whether or not this card is in play)
   04043:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) that has the ambush keyword because a card gave it (the round's first enemy revealed, even one that prints Ambush))
     only if this card is the active location
+    who acts: the acting player is the player the enemy engaged
     - the card the event is about (an enemy engaged with the actor) makes an immediate attack against the actor, dealt a shadow card of its own
 
 ## 04044 Pathless Country
@@ -91,6 +93,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 04044:A:2 (shadow): Shadow: Deal 1 damage to each ally in play.
   04044:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to each ally (any player controls)
 
 ## 04045 Barren Hills
@@ -103,6 +106,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 04045:A:2 (shadow): Shadow: Return attacking enemy to the staging area after it attacks.
   04045:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -118,6 +122,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 04046:A:2 (shadow): Shadow: Defending player must discard all exhausted characters he controls.
   04046:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player discards each exhausted character (you control)
 
 ## 04047 Followed by Night
@@ -134,6 +139,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 04047:A:2 (shadow): Shadow: Return attacking enemy to the staging area after it attacks.
   04047:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -161,6 +167,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 04049:A:2 (front): Forced: After Goblin Taskmaster engages a player, that player deals 2 damage to 1 character he controls.
   04049:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control)
     - deal 2 damage to the picked card
@@ -173,6 +180,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 04050:A:2 (front): Forced: After Orc Raiders engages a player, that player discards 2 attachments he controls, if able.
   04050:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - repeat 2 times:
       - choose attachment (you control)
       - discard the picked card
@@ -186,10 +194,11 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 04051:A:2 (front): While Crebain is in the staging area, encounter card effects cannot be canceled.
   04051:constant:1: Constant
     only if this card is in the staging area
-    - the table: stat encounterUncancelable 1, while this card is in play
+    - the table: stat encounterUncancelable (no Response cancels an encounter card's When Revealed or Shadow effect, and no paid cancel is offered against one) 1, while this card is in play
 
 04051:A:3 (shadow): Shadow: Return attacking enemy to the staging area after it attacks.
   04051:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -201,6 +210,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 04052:A:2 (front): Forced: After Wild Bear engages a player, it makes an immediate attack.
   04052:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 === Nightmare deck (the cards the scenario's Nightmare deck adds) ===
@@ -213,6 +223,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 901401:A:2 (front): Forced: When an enemy with the ambush keyword engages a player during the quest phase, it contributes its Threat to the total Threat in the staging area until the end of the phase.
   901401:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) with the ambush keyword, printed or gained)
     only if it is the Quest phase
+    who acts: the acting player is the player the enemy engaged
     - the card the event is about: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, until the end of the phase
 
 901401:B:1 (back): Begin with the standard quest deck and encounter deck for the Road to Rivendell scenario.
@@ -283,7 +294,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 901402:B:3 (back): Progress cannot be placed on this stage unless the players control Arwen Undómiel.
   901402:constant:2: Constant
-    - if the number of ally (any player controls) named "Arwen Undómiel", that a player controls (not one a guard holds in the staging area) is at most 0: the table: stat noQuestProgress 1, while this card is in play
+    - if the number of ally (any player controls) named "Arwen Undómiel", that a player controls (not one a guard holds in the staging area) is at most 0: the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
 
 ## 901403 Uruk Elf-stalker
 
@@ -294,11 +305,12 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
   901403:forced:1: Forced on the event characterDestroyedByAttack
     only if the event's other card is a enemy (any player controls) that is this card itself
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) named "Arwen Undómiel"
+    - choose card (any player controls) or in the staging area or the active location, named "Arwen Undómiel"
     - deal 1 damage to the picked card
 
 901403:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
   901403:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 2, until the end of the attack
 
 ## 901404 Gobline Trapper
@@ -308,12 +320,14 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 901404:A:2 (front): Forced: After Goblin Trapper engages a player, that player must exhaust a character he controls.
   901404:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
 
 901404:A:3 (shadow): Shadow: Add Goblin Trapper to the staging area.
   901404:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this card goes to the staging area (it is not revealed)
 
 ## 901405 Raiding Party
@@ -323,6 +337,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 901405:A:2 (front): Forced: After Raiding Party engages a player, each player discards the top card of the encounter deck, starting with the first player. Each player who discards an enemy with the ambush keyword must make an engagement check against that enemy.
   901405:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - for each player, first player first:
       - the acting player discards the top card of the encounter deck; an enemy with the ambush keyword so discarded makes one engagement check against that player alone: it engages them from the discard pile when their threat reaches its engagement cost, else it stays in the discard pile
 
@@ -333,7 +348,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 901406:A:2 (front): While Vicious Trackers is engaged with a player, that player is considered to have +20 threat for the purposes of engagement checks only.
   901406:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - engagedSeat: stat engagementThreat 20, while this card is in play
 
 ## 901407 Treacherous Bluffs
@@ -341,10 +356,12 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 901407:A:1 (front): Forced: When an enemy with the ambush keyword engages a player, Treacherous Bluffs gets +2 Threat until the end of the phase.
   901407:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) with the ambush keyword, printed or gained)
     only if any of: (this card is in the staging area) or (this card is the active location)
+    who acts: the acting player is the player the enemy engaged
     - this card: stat threat 2, until the end of the phase
 
 901407:A:2 (shadow): Shadow: Excess damage dealt by this attack must be assigned to Arwen Undómiel.
   901407:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the damage this attack deals beyond the remaining hit points of the character it damages is assigned to the card in play titled Arwen Undómiel, wherever it lies (an undefended attack has none)
 
 ## 901408 Concealed Woods
@@ -356,6 +373,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 901408:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack if engaged with the first player.
   901408:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the actor holds the first player token: the attacking enemy: stat attack 2, until the end of the attack
 
 ## 901409 Tumultuous Assault

@@ -10,7 +10,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
     - the first player chooses one of the quest cards with codes 51103, 51104 and 51105 in the quest deck; the others lie set aside, out of play, and leave the quest's order
     - the first player chooses one of the quest cards with codes 51107, 51108 and 51109 in the quest deck; the others lie set aside, out of play, and leave the quest's order
     - for each player, first player first:
-      - the acting player finds one enemy or location with a printed cost of 0 or less in the encounter deck and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top [also {"different":true}]
+      - the acting player finds one enemy or location with a printed cost of 0 or less in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found; the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
 
 51101:B:1 (back): Forced: When Spider Den is explored, flip it over and put Mendor into play under the first player's control, ready.
@@ -35,9 +35,10 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51103:B:2 (back): Forced: After characters are committed to the quest, no more than 5 progress can be placed here this round (10 progress instead if Mendor is committed to the quest).
   51103:forced:1: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (there is a ally (any player controls) named "Mendor", committed to the quest to choose): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 5, until the end of the round
-    - then, if there is a ally (any player controls) named "Mendor", committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 10, until the end of the round
+    - if not (there is a ally (any player controls) named "Mendor", committed to the quest to choose): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 5, until the end of the round
+    - then, if there is a ally (any player controls) named "Mendor", committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 10, until the end of the round
 
 ## 51104 A Chosen Path
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -52,13 +53,14 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51104:B:2 (back): During the travel phase, the players must travel to a location, if able.
   51104:constant:2: Constant
-    - the table: stat mustTravel 1, while this card is in play
+    - the table: stat mustTravel (in the travel phase the players cannot decline to travel while a location in the staging area could be traveled to and an active location slot is free) 1, while this card is in play
 
 51104:B:3 (back): Forced: After characters are committed to the quest, no more than 5 progress can be placed here this round (10 progress instead if Mendor is committed to the quest).
   51104:forced:1: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (there is a ally (any player controls) named "Mendor", committed to the quest to choose): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 5, until the end of the round
-    - then, if there is a ally (any player controls) named "Mendor", committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 10, until the end of the round
+    - if not (there is a ally (any player controls) named "Mendor", committed to the quest to choose): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 5, until the end of the round
+    - then, if there is a ally (any player controls) named "Mendor", committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 10, until the end of the round
 
 ## 51105 A Chosen Path
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -76,9 +78,10 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51105:B:2 (back): Forced: After characters are committed to the quest, no more than 5 progress can be placed here this round (10 progress instead if Mendor is committed to the quest).
   51105:forced:1: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (there is a ally (any player controls) named "Mendor", committed to the quest to choose): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 5, until the end of the round
-    - then, if there is a ally (any player controls) named "Mendor", committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 10, until the end of the round
+    - if not (there is a ally (any player controls) named "Mendor", committed to the quest to choose): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 5, until the end of the round
+    - then, if there is a ally (any player controls) named "Mendor", committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 10, until the end of the round
 
 ## 51107 On the Trail
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -92,7 +95,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward; the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
-    - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with a printed cost of at least 2 (a card with no printed cost never matches) [also {"highestThreat":true}]
+    - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) or in the staging area, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with a printed cost of at least 2 (a card with no printed cost never matches), with the highest current Threat of those (no Threat counts 0; ties: the chooser decides)
     - then, if the picked card is a enemy (any player controls) with a printed cost of at least 2 (a card with no printed cost never matches) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the picked card
     - then, if the picked card is a enemy (any player controls) with a printed cost of at least 2 (a card with no printed cost never matches) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat attack 2, while this card is in play
     - then, if the picked card is a enemy (any player controls) with a printed cost of at least 2 (a card with no printed cost never matches) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat defense 2, while this card is in play
@@ -118,7 +121,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51108:B:2 (back): Each player's threat cannot be reduced by more than 1 each round.
   51108:constant:2: Constant
-    - each player: stat threatReductionCap 1, while this card is in play
+    - each player: stat threatReductionCap (the player's threat is lowered by card effects by at most this much each round) 1, while this card is in play
   51108:constant:3: Constant
     - the table: stat noteQuestProgress 1, while this card is in play
 
@@ -141,6 +144,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51109:B:1 (back): Forced: At the beginning of the quest phase, discard cards from the top of the encounter deck until a location is discarded. Add that location to the staging area.
   51109:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
     - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
@@ -180,7 +184,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51112:A:1 (front): Cannot have non-objective player card attachments or take non-combat damage.
   51112:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+    - no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can)
   51112:constant:2: Constant
     - this card: stat cannotTakeNonCombatDamage 1, while this card is in play
 
@@ -209,11 +213,12 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51114:A:1 (front): When Revealed: Until the end of the round, treat each character's printed text box as if it were blank (except for Traits).
   51114:whenRevealed:1: When revealed
-    - each character (any player controls): stat blankText (its text box is blank) 1, until the end of the round
+    - each character (any player controls): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
 
 51114:A:2 (shadow): Shadow: Treat the defending character's text box as if it were blank until the end of the phase (except for Traits).
   51114:shadow:1: Shadow
-    - the defender: stat blankText (its text box is blank) 1, until the end of the phase
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the defender: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the phase
 
 ## 51115 Chieftain Ufthak
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -221,12 +226,13 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51115:A:1 (front): Cannot have non-objective player card attachments or take non-combat damage.
   51115:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+    - no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can)
   51115:constant:2: Constant
     - this card: stat cannotTakeNonCombatDamage 1, while this card is in play
 
 51115:A:2 (front): Forced: After Chieftain Ufthak engages you, the opposing team searches the encounter deck and discard pile for an Orc enemy of cost 1 or less and puts it into play engaged with you. Shuffle the encounter deck.
   51115:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one Orc enemy with a printed cost of 1 or less in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
@@ -238,7 +244,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
   51116:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) encounterDiscard, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked) [also {"highestThreat":true}]
+    - choose card (any player controls) encounterDiscard, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the highest current Threat of those (no Threat counts 0; ties: the chooser decides)
     - the picked card is shuffled into the encounter deck
 
 ## 51117 Gathering Gloom
@@ -251,6 +257,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51117:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if your threat is 35 or higher).
   51117:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the actor's threat is at least 35): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the actor's threat is at least 35 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -266,6 +273,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51118:A:2 (shadow): Shadow: Shuffle Black Forest Bats into the encounter deck.
   51118:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - [json ShuffleSelfIntoEncounterDeck {"verb":"ShuffleSelfIntoEncounterDeck"}]
 
 ## 51119 Enchanted Stream
@@ -274,7 +282,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51119:A:1 (front): While Enchanted Stream is in the staging area, progress cannot be placed on the main quest.
   51119:constant:1: Constant
     only if this card is in the staging area
-    - the table: stat noQuestProgress 1, while this card is in play
+    - the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
 
 51119:A:2 (front): Travel: Each player exhausts a hero he controls. Those heroes cannot ready while Enchanted Stream is the active location.
   51119:travel:1: Travel
@@ -296,6 +304,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51120:A:2 (shadow): Shadow: Defending character cannot ready until the end of the round.
   51120:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat cannotReady 1, until the end of the round
 
 ## 51121 Spiders of Mirkwood
@@ -303,12 +312,14 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51121:A:1 (front): Forced: After Spiders of Mirkwood engages you, exhaust a character you control.
   51121:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
 
 51121:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has the Spider trait).
   51121:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attacking enemy is a Spider enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attacking enemy is a Spider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -351,6 +362,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51124:A:2 (shadow): Shadow: If attacking enemy is an Orc, put Wolf Rider into play engaged with you.
   51124:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a Orc enemy (any player controls): this card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 ## 51125 The Goblins' Caves
@@ -373,7 +385,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51126:A:1 (front): When Revealed: The opposing team attaches Driven by Shadow to an enemy and returns it to the staging area. (Counts as a Condition attachment with the text: 'Limit 1 per enemy. Attached enemy gets +2 Threat, +2 Attack, +2 Defense and is immune to player card effects.') If there is no enemy in play, Driven by Shadow gains surge.
   51126:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose enemy (any player controls) or in the staging area, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with no attachment named "Driven by Shadow" [also {"highestThreat":true}]
+    - choose enemy (any player controls) or in the staging area, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), with no attachment named "Driven by Shadow"
     - this card attaches to the picked card (nowhere if that card carries one of its title already)
     - return the picked card to the staging area
     - then, if not (there is a enemy (any player controls) or in the staging area to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
@@ -395,6 +407,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51127:A:2 (front): Forced: When Beast of Taur-nu-Fuin is dealt a shadow card with no shadow effect, deal 1 damage to it and the defending character.
   51127:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - deal 1 damage to this card
     - deal 1 damage to the event's other card
@@ -426,6 +439,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51129:A:2 (shadow): Shadow: Discard 1 random card from your hand.
   51129:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player discards 1 random card(s) from hand
 
 ## 51130 Giant Spider
@@ -439,6 +453,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51130:A:2 (shadow): Shadow: Exhaust a character you control.
   51130:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -464,6 +479,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51132:A:3 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the stage number of the current quest.
   51132:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the stage number of the quest, until the end of the attack
 
 ## 51133 Mirkwood Patrol
@@ -476,6 +492,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51133:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it was engaged this round).
   51133:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attacking enemy is a enemy (any player controls) [also {"engagedThisRound":true}]): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attacking enemy is a enemy (any player controls) [also {"engagedThisRound":true}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -486,10 +503,12 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51134:A:1 (front): While Mountains of Mirkwood is in the staging area, it gains: 'Forced: At the end of the round, raise each player's threat by 2.'
   51134:forced:1: Forced at the end of the round
     only if this card is in the staging area
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 2 (each player)
 
 51134:A:2 (shadow): Shadow: Either raise your threat by 2, or the attacking enemy gets +2 Attack.
   51134:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "threat":
         - raise threat by 2 (the acting player)
@@ -507,6 +526,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51135:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Deal it an additional shadow card. That card's shadow effects cannot be canceled.
   51135:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - the attacking enemy: stat shadowsUncancelable 1, until the end of the attack
@@ -523,6 +543,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51136:A:2 (shadow): Shadow: Attacking enemy gets +X Defense until the end of the phase, where X is the stage number of the main quest.
   51136:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat defense the stage number of the quest, until the end of the phase
 
 ## 51137 Labyrinthine Woods
@@ -534,6 +555,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51137:A:2 (shadow): Shadow: Each enemy engaged with you gets +1 Attack until the end of the phase.
   51137:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - for each enemy (any player controls) engaged with you:
       - the picked card: stat attack 1, until the end of the phase
 
@@ -546,6 +568,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51138:A:2 (shadow): Shadow: If this attack destroys a character, reveal the top card of the encounter deck.
   51138:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player reveals an encounter card
 
@@ -557,6 +580,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51139:A:2 (shadow): Shadow: Add Mirkwood Flock to the staging area.
   51139:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this card goes to the staging area (it is not revealed)
 
 ## 51140 The Eaves of Mirkwood
@@ -565,7 +589,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51140:A:1 (front): While The Eaves of Mirkwood is in the staging area, no more than 1 progress can be placed on each location in the staging area each round.
   51140:constant:1: Constant
     only if this card is in the staging area
-    - each location (any player controls) in the staging area only: stat progressCap 1, while this card is in play
+    - each location (any player controls) in the staging area only: stat progressCap (no more than this much progress can be placed on this location each round) 1, while this card is in play
 
 51140:A:2 (front): Travel: Each player discards 1 random card from his hand.
   51140:travel:1: Travel
@@ -579,11 +603,12 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
   51141:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player (at most 2 players), first player first:
-      - the acting player finds one enemy with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top [also {"different":true}]
+      - the acting player finds one enemy with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found; the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
 
 51141:A:2 (shadow): Shadow: If this attack destroys a character, attacking enemy makes an additional attack against you after this one.
   51141:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -593,10 +618,12 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51142:A:1 (front): Forced: After Wild Wargs is dealt a shadow card with no shadow effect, return it to the staging area.
   51142:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    who acts: the acting player is the defending player (the player the attack is against)
     - return this card to the staging area
 
 51142:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   51142:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -606,7 +633,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51143:A:1 (front): While Dry Watercourse is in the staging area, each player cannot reduce his threat by more than 1 each round.
   51143:constant:1: Constant
     only if this card is in the staging area
-    - each player: stat threatReductionCap 1, while this card is in play
+    - each player: stat threatReductionCap (the player's threat is lowered by card effects by at most this much each round) 1, while this card is in play
 
 51143:A:2 (front): Travel: Raise each player's threat by 1.
   51143:travel:1: Travel
@@ -631,13 +658,14 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51145:A:1 (front): Cannot have non-objective player card attachments or take non-combat damage.
   51145:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+    - no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can)
   51145:constant:2: Constant
     - this card: stat cannotTakeNonCombatDamage 1, while this card is in play
 
 51145:A:2 (front): Forced: After Pack of Wargs is dealt a shadow card with no shadow effect, it makes an additional attack after this one. Do not deal it a shadow card for this attack.
   51145:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    who acts: the acting player is the defending player (the player the attack is against)
     - this enemy attacks now, dealt no shadow card
 
 ## 51146 Dark-wood Grove
@@ -663,6 +691,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51147:A:2 (shadow): Shadow: If this attack is undefended, discard an ally you control.
   51147:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attack has no defender: choose ally (you control)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -672,12 +701,14 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51148:A:1 (front): Forced: After Wicked Spider engages you, discard an exhausted character you control.
   51148:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose exhausted character (you control)
     - discard the picked card
 
 51148:A:2 (shadow): Shadow: Attacking enemy cannot take damage this phase.
   51148:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat cannotTakeDamage 1, until the end of the phase
 
 ## 51149 Old Forest Road
@@ -711,6 +742,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51150:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise each player's threat by 1.
   51150:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -727,6 +759,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51151:A:2 (shadow): Shadow: Engage the lowest engagement cost enemy in the staging area and deal it a shadow card.
   51151:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, with the lowest current engagement cost of those (ties: the chooser decides)
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): engage the picked card
@@ -755,8 +788,9 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51153:A:2 (shadow): Shadow: Discard an attachment you control.
   51153:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 465 by template, 13 as JSON)
+(rendered pieces: 473 by template, 5 as JSON)

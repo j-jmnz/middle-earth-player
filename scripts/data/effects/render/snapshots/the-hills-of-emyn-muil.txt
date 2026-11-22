@@ -30,7 +30,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 02083:A:2 (front): While Amon Hen is the active location, players cannot play events.
   02083:constant:2: Constant
     only if this card is the active location
-    - no player can play, or put into play, a card (any player controls) of card type event
+    - no player can play, or put into play, a card (any player controls) or in the staging area or the active location, of card type event
 
 ## 02084 Amon Lhaw
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -43,7 +43,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
   02084:constant:2: Constant
     only if this card is the active location
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each attachment (any player controls): stat blankText (its text box is blank) 1, while this card is in play
+    - each attachment (any player controls): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
     - each attachment (any player controls): stat blanksTraits 1, while this card is in play
 
 ## 02085 The East Wall of Rohan
@@ -52,7 +52,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 02085:A:1 (front): While The East Wall of Rohan is the active location, non-Rohan characters cost 2 additional matching resources to play.
   02085:constant:1: Constant
     only if this card is the active location
-    - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) without Rohan, of card type ally costs 2 more (every player's; several such cards stack)
+    - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) or in the staging area or the active location, without Rohan, of card type ally costs 2 more (every player's; several such cards stack)
 
 ## 02086 The North Stair
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -73,6 +73,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 
 02087:A:2 (shadow): Shadow: After this attack resolves, return attacking enemy to the staging area.
   02087:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -87,6 +88,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 
 02088:A:2 (shadow): Shadow: After this attack resolves, return attacking enemy to the staging area.
   02088:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -100,6 +102,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 
 02089:A:2 (shadow): Shadow: After this attack resolves, return attacking enemy to the staging area.
   02089:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -129,6 +132,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 
 02092:A:2 (shadow): Shadow: Remove defending character from combat. This attack is considered undefended.
   02092:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this attack is considered undefended
 
 ## 02093 Slick Footing
@@ -160,7 +164,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 
 900701:A:2 (front): No more than 1 progress may be placed on each location in the staging area each round.
   900701:constant:1: Constant
-    - each location (any player controls) in the staging area only: stat progressCap 1, while this card is in play
+    - each location (any player controls) in the staging area only: stat progressCap (no more than this much progress can be placed on this location each round) 1, while this card is in play
 
 900701:B:1 (back): Begin with the standard quest deck and encounter deck for The Hills of Emyn Muil scenario.
   (inert: the engine applies it by rule, no record)
@@ -224,7 +228,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 
 900702:A:2 (front): If there is no active location, return Tunneling Nameless Thing to the staging area.
   900702:constant:1: Constant
-    - this card: stat returnsWithoutActive 1, while this card is in play
+    - this card: stat returnsWithoutActive (while no location is the active location an engaged holder goes back to the staging area at once, whatever engaged it) 1, while this card is in play
 
 ## 900703 Orc Interceptor
 
@@ -264,6 +268,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 
 900706:A:2 (shadow): Shadow: Attacking enemy gets +X Attack. X is the Threat of the active location.
   900706:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack threat of the active location, until the end of the attack
 
 ## 900707 Blast of Savage Wind
@@ -279,6 +284,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 
 900707:A:3 (shadow): Shadow: Remove all progress from each Emyn Muil location in play.
   900707:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - remove all the progress from each Emyn Muil location (any player controls)
 
 ## 900708 Hazardous Terrain
@@ -292,6 +298,7 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 
 900708:A:3 (shadow): Shadow: Shuffle all Hazard cards in the encounter discard pile back into the encounter deck. Then, deal another shadow card for this attack.
   900708:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the Hazard cards of the encounter discard pile into the encounter deck
     - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has

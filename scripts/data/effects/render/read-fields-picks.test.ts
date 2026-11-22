@@ -91,6 +91,12 @@ describe("effects render read fields, picks", () => {
     participating: true,
     controlledBy: "attackers",
     sideQuest: true,
+    stagingArea: "any",
+    engagedWith: "picked",
+    engageable: true,
+    highestThreat: true,
+    highestAttack: true,
+    notHost: true,
   };
   const SAMPLES: readonly Obj[] = [
     BIG,
@@ -105,6 +111,11 @@ describe("effects render read fields, picks", () => {
     { type: "character", control: "any", controlledBy: "actor" },
     { type: "character", control: "any", controlledBy: "host" },
     { type: "character", control: "any", controlledBy: "picked" },
+    { type: "character", control: "any", controlledBy: "firstPlayer" },
+    { type: "enemy", control: "any", stagingOnly: true, stagingArea: "shared", engagedWith: "notYou" },
+    { type: "enemy", control: "any", stagingArea: "own", engagedWith: "host" },
+    { type: "player", control: "any", highestThreat: true },
+    { type: "card", control: "any" },
   ];
   const render: Render = (value, ctx) => renderPick(value, ctx);
 

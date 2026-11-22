@@ -9,6 +9,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50901:B:1 (back): Forced: At the end of the round, place 1 resource here and move all progress from this stage to Power of Lórien. If there are 3 resources here, advance to stage 2A.
   50901:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 resource tokens on this card
     - choose objective (any player controls) named "Power of Lórien"
@@ -81,6 +82,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50903:B:2 (back): Forced: At the end of the round, remove 5 progress from this stage or increase Dol Guldur's city strength by 3. The first player may remove an additional 5 progress to reduce Dol Guldur's city strength by 3.
   50903:forced:1: Forced at the end of the round (resolves before the other Forced effects of the moment)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses (each option once) one of:
       * option "progress" (only if the current quest stage holds at least 5 progress):
@@ -113,6 +115,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50904:B:2 (back): Forced: At the end of the round, remove 5 progress from this stage or each player at each stage discards all but 1 card from his hand. The first player may remove an additional 5 progress from this stage to choose a player at any stage. That player searches his deck for a card, adds it to his hand, and shuffles his deck.
   50904:forced:1: Forced at the end of the round (resolves before the other Forced effects of the moment)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses (each option once) one of:
       * option "progress" (only if the current quest stage holds at least 5 progress):
@@ -151,6 +154,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50905:B:2 (back): Forced: At the end of the round, remove 5 progress from this stage or each player at each stage discards cards from the top of the encounter deck until an enemy is discarded and puts it into play engaged with him. (If the last card of the encounter deck is discarded resolving this effect, shuffle the discard pile back into the encounter deck.) The first player may remove an additional 5 progress from this stage to choose a non-unique enemy at any stage and destroy it.
   50905:forced:1: Forced at the end of the round (resolves before the other Forced effects of the moment)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses (each option once) one of:
       * option "progress" (only if the current quest stage holds at least 5 progress):
@@ -186,6 +190,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50906:B:2 (back): Forced: At the end of the round, remove 5 progress from this stage or each player at each stage discards an ally he controls. The first player may remove an additional 5 progress from this stage to choose a player at any stage. That player searches the top 10 cards of his deck for an ally and puts it into play.
   50906:forced:1: Forced at the end of the round (resolves before the other Forced effects of the moment)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses (each option once) one of:
       * option "progress" (only if the current quest stage holds at least 5 progress):
@@ -213,6 +218,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     - add the Siege value printed on the card the event is about (a destroyed enemy, an explored location; 0 when it prints none) to this round's Siege tally
   50907:forced:3: Forced at the end of the round
     only if 2 is less than the stage number of the quest
+    who acts: the acting player is the first player (a phase has no player of its own)
     - up to the Siege values added up this round: each enemy destroyed and each location explored adds its printed Siege value resource token(s) come off the card with code 50907 in play
 
 ## 50908 Power of Lórien
@@ -250,6 +256,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50910:A:2 (front): Forced: When Bane of Amon Lanc attacks you, discard a random card from your hand. Bane of Amon Lanc gets +X Attack for this attack, where X is that card's printed cost.
   50910:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
     - this card: stat attack printed cost of the picked card, until the end of the attack
@@ -262,6 +269,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50911:A:2 (front): Forced: When Sorcerer of Dol Guldur attacks you, discard the top card of your deck. Then, discard each copy of that card from play.
   50911:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top 1 card(s) of the acting player's deck go to their discard pile
     - discard each card in play, whoever controls it, with the title of the card this effect last discarded from a deck
@@ -274,6 +282,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50912:A:2 (front): Forced: When Chieftain Morlug attacks you, discard cards from the top of the encounter deck until an enemy is discarded and put it into play engaged with you.
   50912:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
     - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
@@ -286,6 +295,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50913:A:2 (front): Forced: When Dungeon Dweller attacks you, discard an ally you control.
   50913:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ally (you control)
     - discard the picked card
@@ -308,6 +318,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 50914:A:4 (front): Forced: At the end of the encounter phase, if Host of Dol Guldur is in the staging area, remove X progress from the main quest.
   50914:forced:1: Forced at the end of the phase
     only if all of: (it is the Encounter phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - remove the number of players progress from the current quest card (all of it when it holds less)
 
 ## 50915 Mirkwood Olog-hai
@@ -320,6 +331,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50915:A:2 (shadow): Shadow: Either remove 2 progress from the main quest, or return attacking enemy to the staging area.
   50915:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
         - remove 2 progress from the current quest card (all of it when it holds less)
@@ -338,6 +350,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50916:A:2 (front): Forced: When Beast of Taur-nu-Fuin attacks, either remove 2 progress from the main quest or deal it an additional shadow card.
   50916:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - the first player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
         - remove 2 progress from the current quest card (all of it when it holds less)
@@ -352,6 +365,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50917:A:2 (front): Forced: After Amon Lanc Archer engages you, either remove 2 progress from the main quest, or deal 2 damage to an ally you control.
   50917:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
         - remove 2 progress from the current quest card (all of it when it holds less)
@@ -361,6 +375,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50917:A:3 (shadow): Shadow: Exhaust a character you control.
   50917:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -376,6 +391,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50918:A:2 (front): Forced: When Dol Guldur Marauder attacks, either remove 1 progress from the main quest or place 1 resource on Dol Guldur Marauder.
   50918:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - the first player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
         - remove 1 progress from the current quest card (all of it when it holds less)
@@ -390,6 +406,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50919:A:2 (front): Forced: After Battle Warg engages you, either remove 1 progress from the main quest or discard an attachment you control.
   50919:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
         - remove 1 progress from the current quest card (all of it when it holds less)
@@ -399,6 +416,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50919:A:3 (shadow): Shadow: Discard an attachment you control.
   50919:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -410,7 +428,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
   50920:constant:1: Constant
     only if all of: (this card is in the staging area) and (the card with code 50903 is not in play)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
     - this card: stat noProgressPlaced 1, while this card is in play
   50920:constant:2: Constant
     only if this card is in the staging area
@@ -423,7 +441,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
   50921:constant:1: Constant
     only if all of: (this card is in the staging area) and (the card with code 50904 is not in play)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
     - this card: stat noProgressPlaced 1, while this card is in play
   50921:forced:1: Forced on the event whenRevealedCanceled
     only if this card is in the staging area
@@ -440,9 +458,9 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
   50922:constant:1: Constant
     only if all of: (this card is in the staging area) and (the card with code 50905 is not in play)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
     - this card: stat noProgressPlaced 1, while this card is in play
-  50922:forced:1: Forced after this card is played (heard about card (any player controls) of card type event)
+  50922:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if all of: (it is the Quest phase) and (this card is in the staging area)
     - [json AttachFacedown {"verb":"AttachFacedown"}]
 
@@ -453,7 +471,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
   50923:constant:1: Constant
     only if all of: (this card is in the staging area) and (the card with code 50906 is not in play)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
     - this card: stat noProgressPlaced 1, while this card is in play
   50923:constant:2: Constant
     only if this card is in the staging area
@@ -484,6 +502,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50925:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove 3 progress from the main quest.
   50925:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -503,6 +522,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50926:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   50926:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 50927 Power Sevenfold
@@ -533,6 +553,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50928:A:2 (shadow): Shadow: Deal 1 damage to the defending character. Until the end of the phase, the defending character gets -1 Defense for each damage on it.
   50928:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - deal 1 damage to the defender
     - the defender: stat defense minus (damage of the defender), until the end of the phase
@@ -553,6 +574,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50929:A:3 (shadow): Shadow: Defending character cannot ready until the end of the round.
   50929:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat cannotReady 1, until the end of the round
 
 ## 50930 Fastness of Mirkwood
@@ -561,11 +583,12 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 50930:A:1 (front): When Revealed: No more than 5 progress can be placed on the current quest this round. If Dol Guldur's city strength is 5 or lower, Fastness of Mirkwood gains surge.
   50930:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 5, until the end of the round
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 5, until the end of the round
     - then, if the resource tokens on objective (any player controls) named "Dol Guldur" is less than 6 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 50930:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack and +1 Defense until the end of the phase (+2 Attack and +2 Defense instead if at least 5 progress is on the quest).
   50930:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the phase
     - the attacking enemy: stat defense 1, until the end of the phase
@@ -586,6 +609,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 50931:B:2 (back): While the players are at stage 3, this card gains: 'Forced: After resolving the Forced effect on Dol Guldur, randomly select a stage 3 that was not in play this round and resolve its Forced effect. Then, discard all progress from the current stage 3 and advance to a new stage 3 of your choice.'
   50931:forced:2: Forced at the end of the round
     only if 2 is less than the stage number of the quest
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose at random, with the game's seed, one of the stages 50903, 50904, 50905, 50906 but the current one, and note it as the option taken
     - then, if the running effect took the option "50903" (a choice made earlier in it, or the stage picked at random) (checked when this step runs, after the steps above; not tied to whether they did anything): place 3 resource tokens on the card in play with code 50907 (when it is not in play, on the card that holds redirectResources, else nowhere)
@@ -611,6 +635,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50931:B:3 (back): At the end of the round, if Dol Guldur's city strength is 0 and there are no Lieutenant enemies in play, Dol Guldur is captured and the players win the game.
   50931:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 1) and (the number of Lieutenant enemy (any player controls) or in the staging area is at most 0): the players win the game
 
 (rendered pieces: 490 by template, 31 as JSON)

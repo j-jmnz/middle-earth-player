@@ -13,6 +13,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11036:B:1 (back): Forced: At the end of the combat phase, deal X damage to the Aflame location in play with the lowest Aflame value. X is the number of Corsair enemies in play.
   11036:forced:1: Forced at the end of the phase
     only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the number of Corsair enemy (any player controls) or in the staging area is at least 1: choose location (any player controls) chosen by the first player [also {"aflame":true,"lowestAflame":true}]
     - then, if the number of Corsair enemy (any player controls) or in the staging area is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): deal the number of Corsair enemy (any player controls) or in the staging area damage to the picked card
@@ -71,7 +72,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11039:A:3 (front): The players cannot travel to the Dream-chaser.
   11039:constant:1: Constant
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
 
 11039:A:4 (front): When the Dream-chaser is placed underneath The Havens Burn, the players lose the game.
   11039:triggered:1: Triggered (mandatory, not printed as Forced) on the event placedUnder (heard about this card)
@@ -94,6 +95,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11041:A:1 (front): Forced: After Sahír's Ravager attacks, place 1 resource on it. Then, deal X damage to the Aflame location in play with the lowest Aflame value, where X is the number of resources on Sahír's Ravager.
   11041:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 resource tokens on this card
     - choose location (any player controls) chosen by the first player [also {"aflame":true,"lowestAflame":true}]
@@ -112,6 +114,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11042:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack for each damage token on the active location.
   11042:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack damage of the active location, until the end of the attack
 
 ## 11043 Burning Piers
@@ -132,6 +135,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11043:A:4 (shadow): Shadow: Add Burning Piers to the staging area.
   11043:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this card goes to the staging area (it is not revealed)
 
 ## 11044 Pillaged Ship
@@ -151,6 +155,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11044:A:3 (shadow): Shadow: If attacking enemy is a Raider, move all resources from defending character to attacking enemy.
   11044:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attacking enemy is a Raider enemy (any player controls): choose character (any player controls) defending
     - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) [also {"attackingEnemy":true}]
@@ -187,6 +192,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11046:A:3 (shadow): Shadow: If attacking enemy is a Raider, discard a card at random from your hand and place 1 resource on attacking enemy.
   11046:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attacking enemy is a Raider enemy (any player controls): the acting player discards 1 random card(s) from hand
     - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) [also {"attackingEnemy":true}]
@@ -222,6 +228,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11048:A:2 (shadow): Shadow: If the active location has the Aflame keyword, either deal it 3 damage or deal the defending character 1 damage.
   11048:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "location" (only if the active location is a location (any player controls) [also {"aflame":true}]):
         - deal 3 damage to the active location
@@ -242,6 +249,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11049:A:3 (shadow): Shadow: If this attack destroys a character, deal 1 damage to each Aflame location in play.
   11049:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): deal 1 damage to each location (any player controls) [also {"aflame":true}]
 
@@ -254,6 +262,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11064:A:2 (front): Forced: After Umbar Raider attacks you, move 1 resource from one of your heroes' resource pools to Umbar Raider.
   11064:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card; event happened to the controller)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control) with resources on it
     - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
@@ -264,12 +273,13 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11065:A:1 (front): Forced: When Corsair Infiltrator attacks, deal it 1 additional shadow card for each resource on it.
   11065:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - repeat resources of this card times:
       - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
 
 11065:A:2 (front): Forced: After the engaged player collects resources at the beginning of the resource phase, that player moves 1 resource from one of his heroes' pools to Corsair Infiltrator.
   11065:forced:2: Forced on the event resourcesCollected (event happened to the controller)
-    only if all of: (this card is engaged with the player) and (there is a hero (you control) with resources on it to choose)
+    only if all of: (this card is engaged with a player (that player is who "you" means in this record)) and (there is a hero (you control) with resources on it to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control) with resources on it
     - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
@@ -284,6 +294,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11066:A:2 (front): Forced: When Raid Leader engages you, move 1 resource from each of your heroes' resource pools to Raid Leader.
   11066:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+    who acts: the acting player is the player the enemy engaged
     - 1 resource moves from the pool of each hero the acting player controls that has one to this card
 
 ## 11067 Battle-Hardened
@@ -299,6 +310,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11067:A:2 (shadow): Shadow: If the attacking enemy is a Raider, place 2 resources on it.
   11067:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attacking enemy is a Raider enemy (any player controls): choose enemy (any player controls) [also {"attackingEnemy":true}]
     - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): place 2 resource tokens on the picked card
@@ -316,6 +328,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11076:A:3 (front): Forced: After Captain Sahír attacks, place 2 resource tokens on him (4 instead if his attack destroyed a character).
   11076:forced:2: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)): place 2 resource tokens on this card
       - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): place 4 resource tokens on this card
@@ -335,6 +348,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11077:A:3 (front): Action: Spend 1 resource from a hero you control to place 1 resource on Captain Sahír. (Limit once per round.)
   11077:action:1: Action (limit once per round)
     only if there is a hero (you control) with resources on it to choose
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control) with resources on it
     - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
@@ -353,6 +367,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11078:A:2 (front): Forced: When Na'asiyah engages you, discard each event in your hand. Add 1 resource to Na'asiyah for each event discarded in this way.
   11078:forced:2: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+    who acts: the acting player is the player the enemy engaged
     - for each card (you control) in hand, of card type event:
       - discard the picked card
       - place 1 resource tokens on this card
@@ -365,6 +380,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - later, when the attack ends:
       - 1 resource(s) come off the resource pool of this card (discarded, not spent)
   11078:forced:3: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat attack resources of this card, until the end of the attack
     - this card: stat defense resources of this card, until the end of the attack
@@ -380,6 +396,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11079:A:2 (front): Action: While Na'asiyah is attacking or defending, spend 1 resource from her to give her +2 Attack or +2 Defense for this attack.
   11079:action:2: Action (cost: pay 1 resource(s) from this card's pool)
     only if any of: (this card is attacking) or (this card is a character (any player controls) defending)
+    who acts: any player may trigger it; the acting player is the one who does
     - the acting player chooses one of:
       * option "attack" (only if this card is attacking):
         - this card: stat attack 2, until the end of the attack
@@ -389,6 +406,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11079:A:3 (front): Action: Spend 1 resource from a hero you control to place 1 resource on Na'asiyah. (Limit once per round.)
   11079:action:1: Action (limit once per round)
     only if there is a hero (you control) with resources on it to choose
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control) with resources on it
     - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
@@ -416,7 +434,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11182:A:3 (front): Forced: After stage 2B is revealed, remove Calphon and each attachment on him from the game, ignoring his "leaves play" ability.
   11182:forced:1: Forced on the event afterStageRevealed
-    only if the card the event is about is a card (any player controls) named "Sahír's Advance"
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Sahír's Advance"
     - [json RemoveNamedFromGame {"verb":"RemoveNamedFromGame","name":"Calphon"}]
 
 11182:B:1 (back): Resolution: If Graxar is in the victory display, choose either Parrying Cutlass or Throwing Axe, add it to the Campaign Pool, and record which hero you attach it to.
@@ -478,7 +496,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11188:A:4 (front): Forced: When Graxar is dealt a shadow card, place 1 resource on him.
   11188:forced:1: Forced on the event shadowsDealt (event happened to the controller)
-    only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
+    only if all of: (this card is engaged with a player (that player is who "you" means in this record)) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
 (rendered pieces: 301 by template, 35 as JSON)

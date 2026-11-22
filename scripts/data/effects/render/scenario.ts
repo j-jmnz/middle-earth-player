@@ -9,7 +9,8 @@ import type { Card } from "../../../../src/catalog/card-facts.ts";
 import { EFFECTS } from "../../../../src/effects/index.ts";
 import type { Log } from "../../../log.ts";
 import { loadCards } from "../../load-cards.ts";
-import { dealtCodes, loadCampaigns, loadAnyScenario, nightmareCodes } from "../../load-scenarios.ts";
+import { questDeckCodes } from "../../../../src/catalog/scenario-data.ts";
+import { dealtCodes, loadCampaigns, loadAnyScenario, loadLedgeredScenarios, nightmareCodes } from "../../load-scenarios.ts";
 import { ROOT } from "../../paths.ts";
 import { keyOf, lineId, loadLedger } from "../../printed/ledger.ts";
 import { withPool } from "../../printed/pool.ts";
@@ -55,6 +56,13 @@ async function authoredCodes(scenarioId: string, log: Log, nightmare = false): P
   return new Set(loaded.AUTHORED_EFFECTS.map((effect) => effect.cardCode));
 }
 
+// The last stage of each scenario's quest deck, on Normal and on Nightmare: defeating one leaves no stage after it, which ends the game as a win (advanceStage in src/rules/quest/quest.ts).
+let finalStages: ReadonlySet<string> | undefined;
+function finalStageCodes(): ReadonlySet<string> {
+  finalStages ??= new Set(loadLedgeredScenarios().flatMap((scenario) => (scenario.nightmare ? (["Normal", "Nightmare"] as const) : (["Normal"] as const)).map((difficulty) => questDeckCodes(scenario, difficulty).at(-1) ?? "")).filter((code) => code !== ""));
+  return finalStages;
+}
+
 // `piles`: where the scenario deals each code, so a card the piles place says so.
 // `nightmare`: the scenario's Nightmare deck cards, printed after the others under their own heading.
 export function renderCodes(env: RenderEnv, codes: readonly string[], piles: ReadonlyMap<string, string> = new Map(), nightmare: readonly string[] = []): Rendered {
@@ -69,7 +77,7 @@ export function renderCodes(env: RenderEnv, codes: readonly string[], piles: Rea
     const card = env.byCode.get(code);
     if (!card) continue;
     const rawLines = (["A", "B"] as const).flatMap((side) => (env.ledger.byKey.get(keyOf(code, side))?.lines ?? []).map((line, at) => ({ lineId: lineId(code, side, at + 1), line })));
-    const rendered = renderCard(card, segmentsOf(card, env.ledger), EFFECTS, env.inertIds, { ...(rawLines.length > 0 ? { rawLines } : {}), ...(piles.has(code) ? { pile: piles.get(code) } : {}) });
+    const rendered = renderCard(card, segmentsOf(card, env.ledger), EFFECTS, env.inertIds, { ...(rawLines.length > 0 ? { rawLines } : {}), ...(piles.has(code) ? { pile: piles.get(code) } : {}), ...(finalStageCodes().has(code) ? { finalStage: true } : {}) });
     total.template += rendered.tally.template;
     total.json += rendered.tally.json;
     sections.push(rendered.text);

@@ -32,6 +32,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142062:B:1 (back): Forced: At the end of the refresh phase, shuffle Seat of Seeing and Frodo's Choice into the encounter discard pile. Then, place the encounter discard pile on the bottom of the encounter deck. Starting with the first player, each player creates his own staging area and advances to a different stage 3A of his choice. In player order, each player moves 1 encounter card from this staging area to his. When there are no encounter cards left at this stage, discard it.
   142062:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json ShuffleSetAsideIntoDiscard {"verb":"ShuffleSetAsideIntoDiscard","codes":["142074","142068"]}]
     - [json PlaceDiscardUnderDeck {"verb":"PlaceDiscardUnderDeck"}]
@@ -67,9 +68,9 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142063:B:3 (back): Response: After you quest successfully, discard a non-unique location in any staging area.
   142063:response:1: Response after the players quest successfully (event happened to the controller)
-    only if there is a non-unique location (any player controls) in the staging area only [also {"stagingArea":"any"}] to choose
+    only if there is a non-unique location (any player controls) in any player's staging area, in the staging area only to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose non-unique location (any player controls) in the staging area only [also {"stagingArea":"any"}]
+    - choose non-unique location (any player controls) in any player's staging area, in the staging area only
     - discard the picked card
 
 ## 142064 Guard the Hobbits
@@ -155,7 +156,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142067:B:1 (back): During the quest phase, reveal 1 additional encounter card for each player in the game.
   142067:constant:1: Constant
-    - the table: stat revealMore the number of players, while this card is in play
+    - the table: stat revealMore (the staging step reveals this many more cards, after the one each player makes; they go to the players in turn, the first player first, and while the stages are separate to the player whose stage holds the effect) the number of players, while this card is in play
 
 142067:B:2 (back): Response: After an enemy is revealed at this stage, raise your threat by X to engage that enemy. X is that enemy's Threat. Each player (at any stage) may trigger this ability once per round.
   142067:response:1: Response after a card is revealed (heard about enemy (any player controls); event happened to the controller; limit once per round for each player; any player may use it; only when the encounter deck revealed it)
@@ -166,7 +167,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142067:B:3 (back): When this stage is defeated, the players win the game.
   142067:constant:2: Constant
-    (no instructions)
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
 ## 142068 Frodo's Choice
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -197,6 +198,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142069:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   142069:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -230,6 +232,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142071:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
   142071:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control) that is not an objective
     - discard the picked card
@@ -274,9 +277,9 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142074:A:2 (front): Response: When Seat of Seeing is explored, choose a burden card in play, in the encounter deck, or in the discard pile, and remove it from the game. Shuffle the encounter deck. (If you are playing campaign mode, remove that card from the campaign pool.)
   142074:response:1: Response after a card leaves play (heard about this card)
-    only if all of: (the card the event is about had enough progress to be explored) and (there is a card (any player controls) [also {"burden":true}] to choose)
+    only if all of: (the card the event is about had enough progress to be explored) and (there is a card (any player controls) or in the staging area or the active location [also {"burden":true}] to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) [also {"burden":true}]
+    - choose card (any player controls) or in the staging area or the active location [also {"burden":true}]
     - the last picked card is removed from the game
     - shuffle the encounter deck
 
@@ -291,7 +294,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142075:A:2 (front): The players cannot travel here while Sarn Gebir is in play. While The Argonath is the active location, skip the combat phase.
   142075:constant:2: Constant
     only if the card with code 142076 is in play
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
   142075:constant:3: Constant
     only if this card is the active location
     - the table: stat skipCombat 1, while this card is in play
@@ -313,6 +316,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142077:A:1 (front): While River Anduin is in the staging area it gains: "Forced: At the end of the travel phase, each player at this stage raises his threat by 1. Then, River Anduin moves to the staging area to the left, if able."
   142077:forced:1: Forced at the end of the phase
     only if all of: (it is the Travel phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json RaiseThreatAtStage {"verb":"RaiseThreatAtStage","amount":1}]
     - [json MoveToLeftArea {"verb":"MoveToLeftArea"}]
@@ -323,7 +327,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142078:A:1 (front): While Wooded Shoreline is in the staging area, it gains archery 2.
   142078:constant:1: Constant
     only if this card is in the staging area
-    - this card: stat archeryBonus 2, while this card is in play
+    - this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) 2, while this card is in play
 
 142078:A:2 (front): Travel: Search the encounter deck and discard pile for an enemy and add it to this staging area to travel here. Shuffle the encounter deck.
   142078:travel:1: Travel
@@ -337,11 +341,12 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142079:A:1 (front): Travel: A player at this staging area must engage an enemy in any staging area to travel here.
   142079:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose enemy (any player controls) in the staging area only [also {"stagingArea":"any"}]
+    - choose enemy (any player controls) in any player's staging area, in the staging area only
     - engage the picked card
 
 142079:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character has fewer printed hit points than the attacking enemy).
   142079:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}]): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -364,6 +369,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142080:A:3 (shadow): Shadow: After this attack, move attacking enemy to the first player's staging area.
   142080:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - [json MoveToFirstStaging {"verb":"MoveToFirstStaging"}]
 
@@ -380,6 +386,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142081:A:2 (shadow): Shadow: If the defending character has fewer printed hit points than the attacking enemy, this attack is considered undefended.
   142081:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}]: this attack is considered undefended
 
 ## 142082 Black Feathered Arrows
@@ -387,10 +394,11 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142082:A:1 (front): When Revealed: Until the end of the round, add 1 to the archery total at this stage for each ally currently at this stage.
   142082:whenRevealed:1: When revealed
-    - actorSeat: stat archeryBonus the number of ally (any player controls) at the acting player's staging area (every area before they are separate), until the end of the round
+    - actorSeat: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) the number of ally (any player controls) at the acting player's staging area (every area before they are separate), until the end of the round
 
 142082:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character has fewer printed hit points than the attacking enemy).
   142082:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}]): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -433,4 +441,4 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 206 by template, 40 as JSON)
+(rendered pieces: 209 by template, 37 as JSON)

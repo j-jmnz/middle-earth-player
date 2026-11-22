@@ -10,7 +10,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
     - the first player chooses one of the quest cards with codes 51003, 51004 and 51005 in the quest deck; the others lie set aside, out of play, and leave the quest's order
     - the first player chooses one of the quest cards with codes 51007, 51008 and 51009 in the quest deck; the others lie set aside, out of play, and leave the quest's order
     - for each player, first player first:
-      - the acting player finds one enemy or location with a printed cost of 0 or less in the encounter deck and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top [also {"different":true}]
+      - the acting player finds one enemy or location with a printed cost of 0 or less in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found; the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
 
 51001:B:1 (back): Forced: When Rhosgobel is explored, flip it over and add Rider of Mirkwood to the staging area.
@@ -79,6 +79,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51005:B:2 (back): Forced: At the beginning of the quest phase, Rider of Mirkwood makes an immediate attack against the first player.
   51005:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Rider of Mirkwood"
     - the picked enemy attacks the first player now, from the staging area
@@ -92,6 +93,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51007:B:1 (back): Forced: After the players have committed characters to the quest, discard cards from the top of the encounter deck until a treachery is discarded. Reveal that treachery.
   51007:forced:1: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until a treachery is discarded, or the deck is empty; that card becomes the picked card
     - then, if the picked card is a treachery (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is revealed in full (its keywords and When Revealed effects)
@@ -118,7 +120,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
       - [json CarryAwayHero {"verb":"CarryAwayHero","keepAttachments":true}]
 
 51008:B:2 (back): If there is an unguarded hero in the staging area, return it to its owner's control, exhausted. This stage cannot be defeated while there is a guarded objective in play. If the players defeat this stage, they win the game.
-  51008:forced:1: Forced after a card leaves play (heard about card (any player controls) [also {"guardsHero":true}])
+  51008:forced:1: Forced after a card leaves play (heard about card (any player controls) or in the staging area or the active location [also {"guardsHero":true}])
     - [json ReleaseGuardedHero {"verb":"ReleaseGuardedHero"}]
   51008:constant:1: Constant
     only if there is a enemy (any player controls) or in the staging area [also {"guardsHero":true}] to choose
@@ -186,12 +188,13 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51012:A:1 (front): Cannot have non-objective player card attachments or take non-combat damage.
   51012:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+    - no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can)
   51012:constant:2: Constant
     - this card: stat cannotTakeNonCombatDamage 1, while this card is in play
 
 51012:A:2 (front): Forced: After Nazgûl of Dol Guldur attacks you, either return it to the staging area or raise your threat by 3.
   51012:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "return":
         - return this card to the staging area
@@ -215,12 +218,13 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51014:A:1 (front): When Revealed: The highest Attack enemy in the staging area makes an immediate attack against the first player. If no attack is made this way, Pursued by Shadow gains surge.
   51014:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose enemy (any player controls) in the staging area only, chosen by the first player [also {"highestAttack":true}]
+    - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area
     - then, if not (there is a enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 51014:A:2 (shadow): Shadow: If attacking enemy is unique, it makes an additional attack against you after this one.
   51014:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a unique enemy (any player controls): when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -230,7 +234,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51015:A:1 (front): Cannot have non-objective player card attachments.
   51015:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+    - no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can)
 
 51015:A:2 (front): Forced: After Bane of Amon Lanc attacks and destroys an ally, the defending player discards 1 card from his hand for each excess point of damage dealt by this attack.
   51015:forced:1: Forced on the event characterDestroyedByAttack (heard about ally (any player controls); event happened to the controller)
@@ -273,6 +277,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51018:A:2 (shadow): Shadow: Raise your threat by 1 for each enemy engaged with you.
   51018:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
 
 ## 51019 Twilight Hall
@@ -284,7 +289,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51019:A:2 (front): Twilight Hall gets +1 Threat for each character controlled by the first player.
   51019:constant:2: Constant
-    - this card: stat threat the number of character (any player controls) [also {"controlledBy":"firstPlayer"}], while this card is in play
+    - this card: stat threat the number of character (any player controls) controlled by the first player, while this card is in play
 
 51019:A:3 (front): Forced: When Twilight Hall is explored, reveal 1 encounter card per player.
   51019:forced:1: Forced on the event locationExplored (heard about this card)
@@ -302,6 +307,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51020:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character has an attachment).
   51020:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the defender is a character (any player controls) [also {"hasAttachment":{}}]): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a character (any player controls) [also {"hasAttachment":{}}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -316,12 +322,14 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51021:A:2 (front): Forced: At the end of the combat phase, each player deals 1 damage to a hero he controls.
   51021:forced:1: Forced at the end of the phase
     only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - choose hero (you control)
       - deal 1 damage to the picked card
 
 51021:A:3 (shadow): Shadow: Defending character does not count its Defense.
   51021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat defenseIgnored 1, until the end of the attack
 
 ## 51022 Pine Slopes
@@ -354,12 +362,14 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51024:A:1 (front): Forced: After Necromancer's Warg engages you, deal 1 damage to a character you control.
   51024:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control)
     - deal 1 damage to the picked card
 
 51024:A:2 (shadow): Shadow: If you are engaged with an Orc enemy and a Warg enemy, discard a character you control.
   51024:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if all of: (there is a Orc enemy (any player controls) engaged with you to choose) and (there is a Warg enemy (any player controls) engaged with you to choose): choose character (you control)
     - then, if all of: (there is a Orc enemy (any player controls) engaged with you to choose) and (there is a Warg enemy (any player controls) engaged with you to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -369,6 +379,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51025:A:1 (front): Forced: After Dol Guldur Beastmaster engages you, the opposing team searches the encounter deck and discard pile for a Necromancer's Warg and puts it into play engaged with you. Shuffle the encounter deck.
   51025:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 51024 in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - shuffle the encounter deck
@@ -396,6 +407,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51027:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
   51027:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
 ## 51028 Spider of Dol Guldur
@@ -408,6 +420,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51028:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   51028:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -417,12 +430,14 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51029:A:1 (front): Forced: At the beginning of the staging step, discard Patch of Midnight and reveal the top card of the encounter deck.
   51029:forced:1: Forced when the staging step begins, before the first card is revealed
     only if this card is in the staging area
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard this card
     - the acting player reveals an encounter card
 
 51029:A:2 (shadow): Shadow: If this attack destroys a character, reveal the top card of the encounter deck.
   51029:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player reveals an encounter card
 
@@ -438,6 +453,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51030:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise each player's threat by 1.
   51030:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -471,12 +487,13 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51033:A:1 (front): When Revealed: The opposing team chooses any number of non-unique encounter cards in play. Discard the chosen cards and reveal an equal number of cards from the top of the encounter deck.
   51033:whenRevealed:1: When revealed
-    - for each card (any player controls) that is an enemy or a location, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the lowest Threat of those (ties: the chooser decides), (enemies engaged with a player included) [also {"unique":false}]:
+    - for each card (any player controls) or in the staging area or the active location, that is an enemy or a location, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the lowest Threat of those (ties: the chooser decides), (enemies engaged with a player included) [also {"unique":false}]:
       - discard the picked card
       - the acting player reveals an encounter card
 
 51033:A:2 (shadow): Shadow: Either reveal an encounter card, or treat this attack as undefended.
   51033:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "reveal":
         - the acting player reveals an encounter card
@@ -506,6 +523,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
   51036:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   51036:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (any player controls) attached to this card's host, other than this card
     - then, if there is a attachment (any player controls) attached to this card's host, other than this card to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -516,6 +534,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51037:A:1 (front): Forced: After Hunting Warg engages a player, it makes an immediate attack. If Hunting Warg is dealt a shadow card with no shadow effect for this attack, it gets +2 Attack until the end of the phase.
   51037:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded; when the shadow card dealt for it has no shadow effect the enemy gets +2 Attack for this attack
 
 ## 51038 Hunter's Lookout
@@ -524,12 +543,13 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51038:A:1 (front): While Hunter's Lookout is in the staging area, it gains: 'Forced: At the end of the round, raise each player's threat by 1 for each enemy in the staging area.'
   51038:forced:1: Forced at the end of the round
     only if this card is in the staging area
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by the number of enemy (any player controls) in the staging area only (each player)
 
 51038:A:2 (front): Travel: The highest Attack enemy in the staging area makes an immediate attack against the first player.
   51038:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose enemy (any player controls) in the staging area only, chosen by the first player [also {"highestAttack":true}]
+    - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area
 
 ## 51039 Restless Hunters
@@ -543,6 +563,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51039:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, return attacking enemy to the staging area.
   51039:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -559,6 +580,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51040:A:2 (shadow): Shadow: Defending character gets -1 Defense for each damage on it.
   51040:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat defense minus (damage of the defender), until the end of the attack
 
 ## 51041 The Shadow Road
@@ -586,6 +608,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51042:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is damaged).
   51042:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -602,6 +625,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51043:A:2 (shadow): Shadow: If this attack destroys a character, exhaust a character you control.
   51043:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose ready character (you control)
       - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): exhaust the picked card
@@ -615,6 +639,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51044:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each enemy engaged with you.
   51044:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the number of enemy (any player controls) engaged with you, until the end of the attack
 
 ## 51045 Nightfall
@@ -630,6 +655,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
     - this card counts as a Condition attachment while it is attached
   51045:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 1 (the acting player)
 
 ## 51046 Venomous Spider
@@ -642,6 +668,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51046:A:2 (shadow): Shadow: Defending character cannot ready until the end of the round.
   51046:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat cannotReady 1, until the end of the round
 
 ## 51047 Pitch-dark Thicket
@@ -654,6 +681,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51047:A:2 (shadow): Shadow: If attacking enemy was engaged this round, it cannot take damage until the end of the round.
   51047:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a enemy (any player controls) [also {"engagedThisRound":true}]: the attacking enemy: stat cannotTakeDamage 1, until the end of the round
 
 ## 51048 Fastness of Mirkwood
@@ -663,11 +691,12 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
   51048:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player (at most 2 players), first player first:
-      - the acting player finds one location with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top [also {"different":true}]
+      - the acting player finds one location with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found; the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
 
 51048:A:2 (shadow): Shadow: If this attack destroys a character, return the active location to the staging area.
   51048:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the active location to the staging area
 
@@ -683,6 +712,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51049:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Deal it an additional shadow card.
   51049:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
@@ -693,6 +723,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51050:A:1 (front): While Forest Stream is in the staging area, it gains: 'Forced: At the end of the round, remove 2 progress from the main quest.'
   51050:forced:1: Forced at the end of the round
     only if this card is in the staging area
+    who acts: the acting player is the first player (a phase has no player of its own)
     - remove 2 progress from the current quest card (all of it when it holds less)
 
 51050:A:2 (front): Travel: Raise each player's threat by 2.
@@ -710,6 +741,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51051:A:2 (shadow): Shadow: Each enemy engaged with you gets +1 Attack and +1 Defense until the end of the phase.
   51051:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - for each enemy (any player controls) engaged with you:
       - the picked card: stat attack 1, until the end of the phase
       - the picked card: stat defense 1, until the end of the phase
@@ -725,6 +757,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51052:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has the Warg trait).
   51052:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attacking enemy is a Warg enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attacking enemy is a Warg enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -755,8 +788,9 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51054:A:2 (shadow): Shadow: Discard an attachment from the defending character.
   51054:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (any player controls) attached to the defending character
     - discard the picked card
 
-(rendered pieces: 467 by template, 21 as JSON)
+(rendered pieces: 474 by template, 14 as JSON)

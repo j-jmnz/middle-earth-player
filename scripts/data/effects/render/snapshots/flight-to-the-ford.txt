@@ -22,6 +22,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141028:B:2 (back): Forced: At the end of the round, reduce the Ring-bearer's life by 1.
   141028:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json ReduceLife {"verb":"ReduceLife","amount":1}]
 
 ## 141029 Race to Rivendell
@@ -40,6 +41,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141029:B:3 (back): Forced: At the end of the round, reduce the Ring-bearer's life by 1.
   141029:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json ReduceLife {"verb":"ReduceLife","amount":1}]
 
 141029:B:4 (back): If the players defeat this stage, they have won the game.
@@ -135,6 +137,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141062:A:1 (front): Action: Place the top card of the burden deck on top of the encounter deck to place 4 progress on The Old Road. (Use this action only if you are playing campaign mode.)
   141062:action:1: Action
     only if all of: ([json condition {"kind":"campaign"}]) and ([json condition {"kind":"burdenDeck"}])
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json MoveBurden {"verb":"MoveBurden","to":"encounterTop"}]
     - place 4 progress on this card
@@ -145,11 +148,12 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141063:A:1 (front): Cannot have non-Morgul attachments.
   141063:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+    - no card can be attached to this card except a card with the trait Morgul
 
 141063:A:2 (front): While Fell Rider is in the staging area, it gains: "Forced: At the beginning of the encounter phase, the first player must either reduce the Ring-bearer's life by 1 or engage Fell Rider."
   141063:forced:1: Forced when a phase begins
     only if all of: (it is the Encounter phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "life":
         - [json ReduceLife {"verb":"ReduceLife","amount":1}]
@@ -183,6 +187,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141065:A:2 (shadow): Shadow: If this attack destroys a character, remove all progress from the current quest.
   141065:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
 
@@ -199,6 +204,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141066:A:2 (shadow): Shadow: If this attack destroys a character, reduce the Ring-bearer's life by 1.
   141066:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - [json ReduceLife {"verb":"ReduceLife","amount":1,"when":{"kind":"x","min":1}}]
 
@@ -208,11 +214,12 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141067:A:1 (front): When Revealed: Treat the text box of each character in play as blank (except for Traits) until the end of the round. If there is a Nazgûl enemy in the staging area, The Nine are Abroad gains surge.
   141067:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each character (any player controls): stat blankText (its text box is blank) 1, until the end of the round
+    - each character (any player controls): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
     - then, if the number of Nazgûl enemy (any player controls) in the staging area only is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 141067:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   141067:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -227,11 +234,12 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
     - [json AttachSelfToRingBearer {"verb":"AttachSelfToRingBearer"}]
   141080:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "exhaust" (only if the card with code 141085 in play is ready):
         - exhaust the card with code 141085
       * option "reveal":
-        - reveal 1 additional encounter card(s) in the staging step this phase
+        - reveal 1 additional encounter card(s) in the staging step this phase (the extra reveals go to the players in turn after the one each player makes, so the first player makes the first of them; while the stages are separate, to the player whose stage holds the effect)
 
 ## 141081 Fear of Discovery
 (the scenario deals it into the burden pile; the piles place it, no record does)
@@ -250,6 +258,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141081:A:3 (shadow): Shadow: Defending player raises his threat by 3.
   141081:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by 3 (the acting player)
 
 ## 141082 Eaten Alive!
@@ -266,6 +275,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141082:A:3 (shadow): Shadow: Deal 1 damage to defending character.
   141082:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
 ## 141083 Panicked
@@ -282,6 +292,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141083:A:3 (shadow): Shadow: Defending player exhausts a character he controls.
   141083:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -302,6 +313,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141084:A:3 (shadow): Shadow: Defending player discards 1 card at random from his hand.
   141084:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player discards 1 random card(s) from hand
 
 === Nightmare deck (the cards the scenario's Nightmare deck adds) ===
@@ -360,15 +372,17 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 906302:A:1 (front): Cannot have non-Morgul attachments.
   906302:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+    - no card can be attached to this card except a card with the trait Morgul
 
 906302:A:2 (front): Forced: After Fell Rider attacks and destroys a character, reduce the Ring-bearer's life by 1.
   906302:forced:1: Forced when this enemy attacks, before the defender is declared
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - [json ReduceLife {"verb":"ReduceLife","amount":1,"when":{"kind":"x","min":1}}]
 
 906302:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if The One Ring is exhausted).
   906302:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the card with code 141085 in play is exhausted (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -409,6 +423,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 906305:A:3 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an immediate attack.
   906305:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if another player is still in the game: the attacking enemy engages the next player
       - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
@@ -421,6 +436,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 906306:A:2 (front): Forced: At the end of the round, discard 1 resource token here. Then, if there are no resource tokens here, reduce the Ring-bearer's life by 3.
   906306:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource(s) come off the resource pool of this card (discarded, not spent)
     - [json ReduceLife {"verb":"ReduceLife","amount":3,"when":{"kind":"not","condition":{"kind":"matches","card":"self","pick":{"type":"location","control":"any","hasResources":true}}}}]
@@ -434,6 +450,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 906307:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack. If this attack destroys a character, reduce the Ring-bearer's life by 1.
   906307:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 2, until the end of the attack
     - when the attack in progress ends:
@@ -452,6 +469,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 906308:A:3 (shadow): Shadow: Either reduce the Ring-bearer's life by 1, or this attack is considered undefended.
   906308:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "life":
         - [json ReduceLife {"verb":"ReduceLife","amount":1}]
@@ -468,6 +486,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
     - [json AttachSelfToRingBearer {"verb":"AttachSelfToRingBearer","when":{"kind":"count","pick":{"type":"card","control":"any","names":["The Twilight World"],"on":{"type":"hero","control":"any"}},"max":0}}]
   906309:forced:1: Forced when a phase begins
     only if it is the Planning phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "exhaust" (only if the card with code 141085 in play is ready):
         - exhaust the card with code 141085
@@ -476,4 +495,4 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   906309:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 188 by template, 36 as JSON)
+(rendered pieces: 190 by template, 34 as JSON)

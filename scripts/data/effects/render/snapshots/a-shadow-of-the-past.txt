@@ -136,7 +136,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 141035:A:2 (front): While there is at least 1 other location in play, the players cannot travel here.
   141035:constant:1: Constant
     only if [json condition {"kind":"otherLocationInPlay"}]
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
 
 141035:A:3 (front): Travel: The first player must make a Hide 3 test to travel here.
   141035:travel:1: Travel
@@ -156,6 +156,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141036:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you have failed a Hide test this round).
   141036:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if [json condition {"kind":"hideFailed","scope":"round"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -181,6 +182,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141038:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player failed a Hide test this round).
   141038:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if [json condition {"kind":"hideFailed","scope":"round"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -192,7 +194,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   (the keyword part is owned by the card's keywords; the records cover: Cannot have non-Morgul attachments.)
   141039:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+    - no card can be attached to this card except a card with the trait Morgul
 
 141039:A:2 (front): Forced: After engaged player fails a Hide test, Black Rider makes an immediate attack.
   141039:forced:1: Forced on the event hideFailed
@@ -204,11 +206,12 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141040:A:1 (front): While Evil Crow is engaged with a player, that player adds 1 to the Hide value for each Hide test he makes.
   141040:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - engagedSeat: stat hideValue 1, while this card is in play
 
 141040:A:2 (shadow): Shadow: If you have failed a Hide test this round, this attack is considered undefended.
   141040:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if [json condition {"kind":"hideFailed","scope":"round"}]: this attack is considered undefended
 
 ## 141041 Crawling Towards Him
@@ -223,6 +226,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141041:A:3 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   141041:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -265,6 +269,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141072:A:2 (shadow): Shadow: After this attack, the attacking enemy engages the next player then makes an immediate attack.
   141072:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if another player is still in the game: the attacking enemy engages the next player
       - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
@@ -287,6 +292,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141073:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   141073:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -303,6 +309,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - attach this card to an enemy in play with the trait Nazgûl
   141074:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - return its host to the staging area
 
 ## 141075 Rode Like a Gale
@@ -316,6 +323,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141075:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   141075:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -335,6 +343,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141076:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if The One Ring is exhausted).
   141076:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the card with code 141085 in play is exhausted (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -347,6 +356,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141077:A:2 (front): Forced: At the end of the round, discard Gildor Inglorion. The first player may spend 1 Fellowship resource to cancel this effect.
   141077:forced:1: Forced at the end of the round (may be canceled by paying 1)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - discard this card
 
 ## 141078 Gandalf's Delay
@@ -378,7 +388,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 141085:A:2 (front): Attached hero does not count against the hero limit. The first player gains control of attached hero.
   141085:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"heroLimit"}]
+    - the hero this card is, or is attached to, does not count against the hero limit
   141085:forced:1: Forced on the event firstPlayerTokenPassed
     - [json TransferHost {"verb":"TransferHost","who":"firstPlayer"}]
 
@@ -394,7 +404,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 906101:A:2 (front): Forced: When stage 3A is revealed, if Khamûl the Easterling is not in play, the first player searches the encounter deck, discard pile, and victory display for Khamûl the Easterling and adds it to the staging area. Shuffle the encounter deck.
   906101:forced:1: Forced on the event stageRevealed
-    only if all of: (the card the event is about is a card (any player controls) named "Escape to Buckland") and (the card with code 906102 is not in play)
+    only if all of: (the card the event is about is a card (any player controls) or in the staging area or the active location, named "Escape to Buckland") and (the card with code 906102 is not in play)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - search the encounter deck, discard pile and victory display for the card with code 906102 and add it to the staging area (not revealed; nothing when none is found)
     - shuffle the encounter deck
@@ -437,7 +447,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 906102:A:1 (front): Cannot have non-Morgul attachments.
   906102:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+    - no card can be attached to this card except a card with the trait Morgul
 
 906102:A:2 (front): Khamûl the Easterling gets -30 engagement cost while The One Ring is exhausted.
   906102:constant:2: Constant
@@ -446,7 +456,8 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 906102:A:3 (front): Forced: At the beginning of the refresh phase, the engaged player makes a Hide 2 test. If the engaged player fails the hide test, Khamûl the Easterling makes an immediate attack.
   906102:forced:1: Forced when a phase begins
-    only if all of: (it is the Refresh phase) and (this card is engaged with the player)
+    only if all of: (it is the Refresh phase) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - [json HideTest {"verb":"HideTest","x":2,"when":{"kind":"engagedWithActor"}}]
       - then, if all of: ([json condition {"kind":"engagedWithActor"}]) and ([json condition {"kind":"lastHideFailed"}]) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
@@ -459,7 +470,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 906103:A:2 (front): Cannot have non-Morgul attachments.
   906103:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+    - no card can be attached to this card except a card with the trait Morgul
 
 906103:A:3 (front): While Dark Horseman is engaged with you, characters you control get -1 Willpower during Hide tests.
   906103:constant:2: Constant
@@ -488,6 +499,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 906105:A:3 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an immediate attack.
   906105:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if another player is still in the game: the attacking enemy engages the next player
       - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
@@ -505,6 +517,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 906106:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack (+3 Attack instead if you have failed a Hide test this round).
   906106:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 2, until the end of the attack
     - then, if [json condition {"kind":"hideFailed","scope":"round"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -532,6 +545,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 906108:A:2 (shadow): Shadow: If the defending player has failed a Hide test this round, this attack is considered undefended.
   906108:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if [json condition {"kind":"hideFailed","scope":"round"}]: this attack is considered undefended
 
 ## 906109 Sniffing and Hissing
@@ -550,9 +564,10 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 906109:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack. If this attack destroys a character, raise your threat by 3.
   906109:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 2, until the end of the attack
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 225 by template, 33 as JSON)
+(rendered pieces: 229 by template, 29 as JSON)

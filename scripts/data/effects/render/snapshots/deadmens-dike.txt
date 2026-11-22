@@ -21,6 +21,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09034:A:1 (front): Forced: After Thaurdir's Damned engages you, discard the top 2 cards of your deck and assign X damage among characters you control. X is the combined printed cost of the discarded cards.
   09034:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top 2 card(s) of the acting player's deck go to their discard pile
     - the acting player assigns the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0) damage among the character (you control), one at a time
@@ -30,12 +31,14 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09035:A:1 (front): Forced: When Baleful Shade attacks, the defending player discards the top card of his deck. If the discarded card is an ally, Baleful Shade gets +2 Attack for this attack.
   09035:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top 1 card(s) of the acting player's deck go to their discard pile; X becomes how many of them are a ally (any player controls) among the cards this effect looked at or discarded
     - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, until the end of the attack
 
 09035:A:2 (shadow): Shadow: Exhaust a character you control.
   09035:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -94,6 +97,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09039:A:2 (shadow): Shadow: Defending player discards the top card of his deck. Attacking enemy gets +X Attack where X is the discarded card's printed cost.
   09039:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top 1 card(s) of the acting player's deck go to their discard pile
     - the attacking enemy: stat attack the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0), until the end of the attack
@@ -102,12 +106,13 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 09040:A:1 (front): While Deadmen's Gate is the active location, it gains: "Forced: After a player triggers an 'Action' or 'Response' effect, he must discard the top card of his deck."
-  09040:forced:1: Forced on the event playerAbilityTriggered (heard about card (any player controls))
+  09040:forced:1: Forced on the event playerAbilityTriggered (heard about card (any player controls) or in the staging area or the active location)
     only if this card is the active location
     - the top 1 card(s) of the acting player's deck go to their discard pile
 
 09040:A:2 (shadow): Shadow: Discard an attachment you control.
   09040:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -137,6 +142,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 09042:A:2 (front): Forced: At the end of the refresh phase, each player discards the top X cards of his deck, where X is the number of Undead enemies engaged with him.
   09042:forced:1: Forced at the end of the phase
     only if all of: (it is the Refresh phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - the top the number of Undead enemy (any player controls) engaged with you card(s) of the acting player's deck go to their discard pile
 
@@ -145,12 +151,14 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09060:A:1 (front): Forced: After Dead Lord engages you, put the topmost Undead enemy in the discard pile into play engaged with you.
   09060:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the topmost enemy with the trait Undead in the encounter discard pile (the last put there) is picked (nothing with none)
     - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 09060:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, reveal 1 encounter card.
   09060:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -165,6 +173,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09061:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if there is a copy of the defending character in its owner's discard pile).
   09061:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a character (any player controls) with a card of its title in its owner's discard pile (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -183,6 +192,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09062:A:2 (shadow): Shadow: Each Undead enemy engaged with you gets +1 Attack and +1 Defense until the end of the round.
   09062:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - for each Undead enemy (any player controls) engaged with you:
       - the picked card: stat attack 1, until the end of the round
       - the picked card: stat defense 1, until the end of the round
@@ -196,6 +206,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 09063:A:2 (front): Forced: At the end of the refresh phase, discard the top 3 cards of the encounter deck. Return the topmost Undead enemy in the encounter discard pile to the staging area.
   09063:forced:1: Forced at the end of the phase
     only if all of: (it is the Refresh phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard 3 card(s) from the top of the encounter deck
     - the topmost enemy with the trait Undead in the encounter discard pile (the last put there) is picked (nothing with none)
@@ -213,6 +224,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09064:A:2 (shadow): Shadow: Defending player discards the top 3 cards of his deck. Attacking enemy gets +1 Attack for each different card type discarded this way.
   09064:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top 3 card(s) of the acting player's deck go to their discard pile
     - the attacking enemy: stat attack the number of different card types among the cards this effect has discarded from decks, all the players' together, until the end of the attack
@@ -230,6 +242,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09065:A:3 (shadow): Shadow: Discard the defending character if there is a copy of that character in its owner's discard pile.
   09065:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (any player controls) defending, with a card of its title in its owner's discard pile
     - discard the picked card
@@ -246,7 +259,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
   09066:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached
-    - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) with a card of its title in its owner's discard pile costs 1 more (every player's; several such cards stack)
+    - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) or in the staging area or the active location, with a card of its title in its owner's discard pile costs 1 more (every player's; several such cards stack)
 
 ## 09067 The Power of Angmar
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -257,7 +270,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 09067:A:2 (front): Cards in each player's discard pile cannot leave that player's discard pile by player card effect.
   09067:constant:1: Constant
     only if this card is in the staging area
-    - the table: stat discardLocked 1, while this card is in play
+    - the table: stat discardLocked (no player card effect takes a card out of a discard pile; an encounter card's effect is not stopped) 1, while this card is in play
 
 09067:A:3 (front): Forced: After this stage is defeated, each player shuffles the top 5 cards of his discard pile back into his deck.
   09067:forced:1: Forced on the event questDefeated (heard about this card)
@@ -285,12 +298,13 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 09073:B:2 (back): Forced: At the end of the refresh phase, each player discards the top card of his deck.
   09073:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - the top 1 card(s) of the acting player's deck go to their discard pile
 
 09073:B:3 (back): If a player has no cards in his deck, he is eliminated from the game.
   09073:constant:1: Constant
-    - the table: stat eliminatedAtEmptyDeck 1, while this card is in play
+    - the table: stat eliminatedAtEmptyDeck (a player with no cards in his deck is eliminated from the game) 1, while this card is in play
 
 ## 09074 A Fell Wraith
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -313,7 +327,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 
 09074:B:2 (back): If a player has no cards in his deck, he is eliminated from the game. The players cannot defeat this stage while Thaurdir has any hit points remaining. If the players defeat this stage, they win the game.
   09074:constant:1: Constant
-    - the table: stat eliminatedAtEmptyDeck 1, while this card is in play
+    - the table: stat eliminatedAtEmptyDeck (a player with no cards in his deck is eliminated from the game) 1, while this card is in play
   09074:constant:2: Constant
     only if the card with code 09033 in play has damage below its hit points (any hit points remaining)
     - the players cannot defeat this stage while this holds
@@ -389,7 +403,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
     only if its host is a hero (any player controls)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - its host: stat willpower -2, while this card is in play
-    - its host: stat blankText (its text box is blank) 1, while this card is in play
+    - its host: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
     - its host: stat blanksTraits 1, while this card is in play
 
 ## 10169 Thaurdir's Majesty

@@ -13,6 +13,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145016:A:3 (front): Forced: At the end of the round, raise your threat by 1. Then, you may spend 1 Fellowship resource to detach Overcome by Fear and set it aside, out of play.
   145016:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (the acting player)
     - the acting player chooses one of:
@@ -89,6 +90,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145021:A:3 (shadow): Shadow: Either raise your threat by 2, or return attacking enemy to the staging area after this attack.
   145021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "threat":
         - raise threat by 2 (the acting player)
@@ -104,6 +106,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145022:A:2 (front): Forced: After Dead Man of Dunharrow engages you, either attach a set aside Overcome by Fear to your threat dial, or raise your threat by 2.
   145022:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
         - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
@@ -112,6 +115,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145022:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack.
   145022:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 1, until the end of the attack
 
 ## 145023 Faithless Dead
@@ -130,6 +134,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145023:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack and loses the Phantom keyword for this attack.
   145023:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - the attacking enemy: stat losesPhantom 1, until the end of the attack
@@ -156,6 +161,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145025:A:2 (front): Forced: When Shadow Host engages you, either attach a set aside Overcome by Fear to your threat dial, or it makes an immediate attack.
   145025:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
         - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
@@ -175,6 +181,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145026:A:3 (shadow): Shadow: If your threat is 35 or higher, defending character cannot ready until the end of the round.
   145026:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the actor's threat is at least 35: the defender: stat cannotReady 1, until the end of the round
 
 ## 145027 The Way is Shut
@@ -189,7 +196,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
       * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
         - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
       * option "noProgress":
-        - the table: stat noQuestProgress 1, until the end of the round
+        - the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, until the end of the round
 
 ## 145028 Whispers in the Dark
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -209,6 +216,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145028:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if undefended).
   145028:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -228,6 +236,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145029:A:2 (shadow): Shadow: Either attach a set aside Overcome by Fear to your threat dial, or attacking enemy makes an additional attack after this one.
   145029:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
         - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
@@ -256,6 +265,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 145063:B:2 (back): Forced: At the end of the planning phase, discard all cards in each player's hand and advance to stage 2A.
   145063:forced:1: Forced at the end of the phase
     only if it is the Planning phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player discards all the cards in their hand
@@ -268,7 +278,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
   145064:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one location in the encounter deck and adds it to the staging area (it is not revealed) [also {"different":true}]
+      - the acting player finds one location in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
     - shuffle the encounter deck
 
 145064:B:1 (back): X is the threat of the player with the highest threat.
@@ -277,11 +287,12 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145064:B:2 (back): Each player cannot reduce his threat below his initial threat level.
   145064:constant:2: Constant
-    - each player: stat threatFloor 1, while this card is in play
+    - each player: stat threatFloor (the player's threat cannot be reduced below his starting threat level) 1, while this card is in play
 
 145064:B:3 (back): Forced: At the beginning of the planning phase each player must choose: either raise your threat by 1, or you cannot play cards this phase.
   145064:forced:1: Forced when a phase begins
     only if it is the Planning phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "threat":
@@ -329,6 +340,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145067:A:3 (front): Forced: When Army of the Dead attacks, you must either attach a set aside Overcome by Fear to your threat dial, or discard an ally you control.
   145067:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
         - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
@@ -336,4 +348,4 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
         - choose ally (you control)
         - discard the picked card
 
-(rendered pieces: 194 by template, 4 as JSON)
+(rendered pieces: 195 by template, 3 as JSON)

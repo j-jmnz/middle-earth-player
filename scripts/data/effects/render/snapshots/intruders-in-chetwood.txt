@@ -15,7 +15,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - this card is controlled by the first player while this holds
 
 09016:A:3 (front): Response: After a side quest is revealed from the encounter deck, ready Iârion.
-  09016:response:1: Response after a card is revealed (heard about card (any player controls) of card type encounter-side-quest; not for a card found in the encounter discard pile)
+  09016:response:1: Response after a card is revealed (heard about card (any player controls) or in the staging area or the active location, of card type encounter-side-quest; not for a card found in the encounter discard pile)
     only if this card is a exhausted character (you control)
     - ready this card
 
@@ -52,6 +52,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09018:A:2 (shadow): Shadow: Defending player either exhausts a hero he controls, or returns attacking enemy to the staging area after this attack.
   09018:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "exhaust" (only if there is a ready hero (you control) to choose):
         - choose ready hero (you control)
@@ -66,12 +67,14 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 09019:A:1 (front): While Borders of Bree-land is in the staging area, it gains: "Forced: At the beginning of the quest phase, return 1 enemy engaged with a player to the staging area."
   09019:forced:1: Forced when a phase begins
     only if all of: (it is the Quest phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) chosen by the first player
     - return the picked card to the staging area
 
 09019:A:2 (shadow): Shadow: Defending character gets -1 Defense for each quest stage in play.
   09019:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat defense minus (the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1)), until the end of the attack
 
 ## 09020 Outlying Homestead
@@ -113,6 +116,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09022:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Return attacking enemy to the staging area after this attack.
   09022:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -124,7 +128,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 09023:A:1 (front): No more than 3 progress tokens can be placed on the current quest each round.
   09023:constant:1: Constant
     only if this card is in the staging area
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 3, while this card is in play
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 3, while this card is in play
 
 09023:A:2 (front): While Orc Rearguard is the current quest it gains: "Forced: At the end of the staging step, reveal 1 card from the encounter deck."
   09023:forced:1: Forced on the event stagingStepEnds
@@ -160,6 +164,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09043:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys an ally, return attacking enemy to the staging area.
   09043:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -171,10 +176,12 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 09044:A:1 (front): Forced: After Angmar Marauder attacks and destroys an ally, return it to the staging area.
   09044:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the event's other card is a ally (any player controls) that is out of play now
+    who acts: the acting player is the defending player (the player the attack is against)
     - return this card to the staging area
 
 09044:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each ally the defending player controls.
   09044:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the number of ally (you control), until the end of the attack
 
 ## 09045 Angmar Captain
@@ -183,6 +190,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 09045:A:1 (front): Forced: After Angmar Captain attacks and destroys an ally, discard the top card of the defending player's deck. If the discarded card is an ally, Angmar Captain makes an additional attack against the defending player.
   09045:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the event's other card is a ally (any player controls) that is out of play now
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top 1 card(s) of the acting player's deck go to their discard pile; X becomes how many of them are a ally (any player controls) among the cards this effect looked at or discarded
     - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
@@ -215,6 +223,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09047:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each quest card in play.
   09047:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1), until the end of the attack
 
 ## 09048 Shrouded Hills
@@ -254,6 +263,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09050:A:2 (shadow): Shadow: Defending player discards 1 attachment he controls for each quest card in play.
   09050:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - repeat the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1) times:
       - choose attachment (you control)
       - discard the picked card
@@ -278,16 +288,17 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the set-aside card titled "Iârion" is put into play under the first player
     - for each player, first player first:
-      - the acting player finds one location in the encounter deck and adds it to the staging area (it is not revealed) [also {"different":true}]
+      - the acting player finds one location in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
     - shuffle the encounter deck
 
 09068:B:1 (back): Enemies do not make engagement checks.
   09068:constant:1: Constant
-    - the table: stat noEngagementChecks 1, while this card is in play
+    - the table: stat noEngagementChecks (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing) 1, while this card is in play
 
 09068:B:2 (back): Forced: At the end of the refresh phase, raise each player's threat by 1 for each enemy in the staging area.
   09068:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by the number of enemy (any player controls) in the staging area only (each player)
 
 09068:B:3 (back): The players cannot defeat this stage unless the first player controls Iârion. If the players defeat this stage, they win the game.
@@ -321,7 +332,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - its host: stat willpower 1, while this card is in play
 
 10157:A:2 (front): Response: Add Iârion's Pendant to the victory display to cancel the 'when revealed' effects of a card that was just revealed from the encounter deck, or to cancel a shadow effect just triggered.
-  10157:response:1: Response on the event whenRevealedPending (heard about card (any player controls); cost: [json cost {"kind":"addSelfToVictory"}])
+  10157:response:1: Response on the event whenRevealedPending (heard about card (any player controls) or in the staging area or the active location; cost: [json cost {"kind":"addSelfToVictory"}])
     - the effect being resolved is canceled: nothing after this resolves
   10157:response:2: Response on the event shadowPending (cost: [json cost {"kind":"addSelfToVictory"}])
     - the effect being resolved is canceled: nothing after this resolves
@@ -342,4 +353,4 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - if not (2 is less than the number of players): this card: stat loseAtDamage 10, while this card is in play
     - then, if 2 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat loseAtDamage 20, while this card is in play
 
-(rendered pieces: 207 by template, 6 as JSON)
+(rendered pieces: 208 by template, 5 as JSON)

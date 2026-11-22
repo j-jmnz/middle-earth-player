@@ -3,6 +3,7 @@ import { cardRef, renderAmount } from "./amounts.ts";
 import { ERECH_STAT_NOTES } from "./erech.ts";
 import { ESCAPE_STAT_NOTES } from "./escape.ts";
 import { FOG_STAT_NOTES } from "./fog.ts";
+import { FLAG_NOTES } from "./stat-notes.ts";
 import { RUINS_STAT_NOTES } from "./ruins.ts";
 import { INVESTIGATION_STAT_NOTES } from "./investigation.ts";
 import { guardianRestrict } from "./guardian.ts";
@@ -50,10 +51,10 @@ const STAT_NOTE: Readonly<Record<string, string>> = {
   ...FOG_STAT_NOTES,
   ...RUINS_STAT_NOTES,
   ...INVESTIGATION_STAT_NOTES,
-  questProgressCap: " (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count)",
+  ...FLAG_NOTES,
   cannotLeaveStaging: " (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect)",
   cannotBeEngaged: " (no player engages it: not optionally, not by an engagement check, not by an effect)",
-  blankText: " (its text box is blank)",
+  blankText: " (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay)",
   engagedThreatSeat: " (each enemy engaged with that player adds its Threat to the staging area's total, counted live: an enemy that engages later counts too)",
   cannotHaveTreachery: " (no treachery card can be attached to it)",
   alliesCannotAttack: " (allies cannot be declared as attackers against it)",
@@ -77,6 +78,14 @@ const STAT_NOTE: Readonly<Record<string, string>> = {
   mustCommit: " (in the quest phase its controller cannot pass the commitment while it is able to commit and has not)",
 };
 
+// Which cards the host refuses (restrictions.ts, attachBlocked): every one, but for those the exception names.
+function attachBar(i: Obj): string {
+  const boon = i.exceptBoon === true ? "a boon (a card the campaign pool holds as one)" : null;
+  if (i.exceptTrait === "objective player card") return `no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can${boon ? `, and so can ${boon}` : ""})`;
+  const except = [typeof i.exceptTrait === "string" ? `a card with the trait ${i.exceptTrait}` : null, boon].filter((one) => one !== null);
+  return `no card can be attached to this card${except.length > 0 ? ` except ${except.join(" or ")}` : ""}`;
+}
+
 export const STAT_TEMPLATES: Readonly<Record<string, Template>> = {
   ModifyStat: (i, ctx) => {
     const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
@@ -91,9 +100,13 @@ export const STAT_TEMPLATES: Readonly<Record<string, Template>> = {
   Restrict: (i, ctx) => {
     if (i.what === "advance") return { text: "the players cannot defeat this stage while this holds", read: ["what"] };
     if (i.what === "defend") {
+      if (i.anyDefender === true) return { text: "no character can be declared as a defender against this card's attacks (only this card's, not another enemy's)", read: ["what", "anyDefender"] };
       const who = i.allies === true ? "allies" : i.belowSourceHitPoints === true ? "allies with fewer printed hit points than this card" : typeof i.maxWillpower === "number" ? `characters with Willpower ${i.maxWillpower} or less` : "characters";
       return { text: `${who}${typeof i.exceptTrait === "string" ? ` (except those with the trait ${i.exceptTrait})` : ""} cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)`, read: ["what", "allies", "maxWillpower", "belowSourceHitPoints", "exceptTrait"] };
     }
+    if (i.what === "attach") return { text: attachBar(i), read: ["what", "exceptTrait", "exceptBoon"] };
+    if (i.what === "heroLimit") return { text: "the hero this card is, or is attached to, does not count against the hero limit", read: ["what"] };
+    if (i.what === "travelOnly") return { text: "while no location is the active location and the players can travel to this location, they must travel to it: the travel step offers no way to decline it or to go elsewhere", read: ["what"] };
     const guarded = guardianRestrict(i);
     if (guarded) return guarded;
     if (i.what === "commit") return { text: `a player who does not control a ${pick(i.unlessControls, ctx)} cannot commit characters to the quest`, read: ["what", "unlessControls"] };
@@ -102,7 +115,7 @@ export const STAT_TEMPLATES: Readonly<Record<string, Template>> = {
     if (i.what === "draw") return { text: `a player who does not control a ${pick(i.unlessControls, ctx)} cannot draw cards through card effects (the framework's draws are not card effects)`, read: ["what", "unlessControls"] };
     if (i.what === "travel" && i.withResources === true) return { text: "the players cannot travel to a location that holds resource tokens while this holds", read: ["what", "withResources"] };
     if (i.what === "travel" && i.exceptSelf === true) return { text: "the players cannot travel to any location but this one while this card is in play (a Travel Action is not traveling)", read: ["what", "exceptSelf"] };
-    if (i.what === "travel") return { text: `the players cannot travel to ${typeof i.location === "string" ? `the location with code ${i.location}${typeof i.guarding === "string" ? ` that guards ${i.guarding}` : ""}` : typeof i.trait === "string" ? `locations with the trait ${i.trait}` : "any location"} while this holds`, read: ["what", "location", "guarding", "trait"] };
+    if (i.what === "travel") return { text: `the players cannot travel to ${typeof i.location === "string" ? `the location with code ${i.location}${typeof i.guarding === "string" ? ` that guards ${i.guarding}` : ""}` : typeof i.trait === "string" ? `locations with the trait ${i.trait}` : "this location"} while this holds`, read: ["what", "location", "guarding", "trait"] };
     return null;
   },
 };

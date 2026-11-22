@@ -150,6 +150,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12120:B:2 (back): Forced: When a Ship enemy engages you, if you are off-course (Cloud, Rain, or Storm), deal 2 damage to a Ship objective you control. If you are on-course (Sun), deal 2 damage to that Ship enemy instead.
   12120:forced:1: Forced after an enemy engages a player (heard about Ship enemy (any player controls) or in the staging area)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if [json condition {"kind":"heading","is":"offCourse"}]: choose Ship character (you control)
     - [json DamageShip {"verb":"DamageShip","amount":2,"when":{"kind":"heading","is":"offCourse"}}]
@@ -241,7 +242,8 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12124:A:4 (front): Forced: At the end of the encounter phase, the engaged player reveals the top card of the Corsair deck and engages it.
   12124:forced:1: Forced at the end of the phase
-    only if all of: (it is the Encounter phase) and (this card is engaged with the player)
+    only if all of: (it is the Encounter phase) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - [json RevealCorsair {"verb":"RevealCorsair","when":{"kind":"engagedWithActor"}}]
 
@@ -274,6 +276,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12126:A:3 (front): While Siege Ship is in the staging area, it gains: "Forced: At the end of the quest phase, if Siege Ship is not guarding an objective and there is an unguarded objective in the staging area, attach Siege Ship to that objective, guarding it."
   12126:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (this card is in the staging area) and (this card is a enemy (any player controls) that is not guarding an objective) and (there is a objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters) to choose)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose objective (any player controls) in the staging area only, that has no encounter card attached (free of encounters)
     - this card becomes the guard of the picked card, attached to it in the staging area
@@ -310,6 +313,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12128:A:3 (shadow): Shadow: If you are off-course (Cloud, Rain, or Storm), attacking enemy gets +2 Attack.
   12128:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if [json condition {"kind":"heading","is":"offCourse"}]: the attacking enemy: stat attack 2, until the end of the attack
 
 ## 12129 Belfalas Islet
@@ -317,7 +321,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12129:A:1 (front): You cannot travel to Belfalas Islet if you are off-course (Cloud, Rain, or Storm).
   12129:constant:1: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: the players cannot travel to any location while this holds
+    - if [json condition {"kind":"heading","is":"offCourse"}]: the players cannot travel to this location while this holds
 
 12129:A:2 (front): Response: After you travel to Belfalas Islet, choose a Ship enemy that is not guarding an objective. While Belfalas Islet is the active location, the chosen enemy is considered to be out of play.
   12129:response:1: Response after the players travel (heard about this card)
@@ -340,7 +344,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12131:A:1 (front): When Revealed: If you are off-course (Cloud, Rain, or Storm), the engaged Ship enemy with the highest Attack makes an immediate attack. Until the end of the phase, add 1 to the total Threat in the staging area for each damage dealt by this attack. If no attack is made as a result of this effect, Ramming Speed! gains doomed 2.
   12131:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"heading","is":"offCourse"}]: choose Ship enemy (any player controls) engaged with you [also {"highestAttack":true}]
+    - if [json condition {"kind":"heading","is":"offCourse"}]: choose Ship enemy (any player controls) engaged with you, with the highest Attack of those, as the table shows it (ties: the chooser decides)
     - [json AttackWithPicked {"verb":"AttackWithPicked","raiseStagingThreat":"endOfPhase","when":{"kind":"heading","is":"offCourse"}}]
     - [json Doomed {"verb":"Doomed","amount":2,"when":{"kind":"noneReturned"}}]
 
@@ -364,6 +368,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12132:A:2 (shadow): Shadow: If defending character is a Ship, attach Taking on Water to it.
   12132:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship","defender":true}}]
 
 ## 12133 The Raiders' Assault
@@ -408,6 +413,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12135:A:3 (front): Combat Action: If the players control Tower of the Gull, exhaust it to deal 2 damage to a non-unique Ship enemy. Any player may trigger this action.
   12135:action:1: Action (cost: exhaust this card)
     only if all of: (it is the Combat phase) and ([json condition {"kind":"controlledByPlayers"}]) and (there is a non-unique Ship enemy (any player controls) or in the staging area to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose non-unique Ship enemy (any player controls) or in the staging area
     - deal 2 damage to the picked card
@@ -426,6 +432,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12136:A:3 (front): Planning Action: If the players control The Beacon, exhaust it and spend 5 resources to take control of 1 set aside copy of Dol Amroth Warship. Any player may trigger this action.
   12136:action:1: Action (cost: exhaust this card and pay 5 resource(s))
     only if all of: (it is the Planning phase) and ([json condition {"kind":"controlledByPlayers"}])
+    who acts: any player may trigger it; the acting player is the one who does
     - the set-aside card titled "Dol Amroth Warship" is put into play under the acting player
 
 ## 12137 Tower of the Heron
@@ -442,6 +449,6 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12137:A:3 (front): While Tower of the Heron is controlled by the players, reduce the archery total by 4.
   12137:constant:2: Constant
     only if [json condition {"kind":"controlledByPlayers"}]
-    - this card: stat archeryBonus -4, while this card is in play
+    - this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) -4, while this card is in play
 
-(rendered pieces: 205 by template, 61 as JSON)
+(rendered pieces: 206 by template, 60 as JSON)

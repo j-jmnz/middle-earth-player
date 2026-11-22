@@ -35,6 +35,7 @@ Scenario piles that place cards with no record (quest: 10150 The Catacombs of Ca
 
 101158:A:2 (shadow): Shadow: Discard the top 2 cards of the encounter deck. Resolve the "when revealed" effects of each Sorcery card discarded by this effect.
   101158:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard 2 card(s) from the top of the encounter deck
     - the "when revealed" effects of each Sorcery card this effect discarded from the top of the encounter deck resolve, in the order discarded, the acting player revealing them
@@ -44,6 +45,7 @@ Scenario piles that place cards with no record (quest: 10150 The Catacombs of Ca
 
 101159:A:1 (front): Forced: At the end of the round, discard the top card of each player's deck. Each player must reanimate each ally he discarded by this effect.
   101159:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the top 1 card(s) of the acting player's deck go to their discard pile
@@ -66,6 +68,7 @@ Scenario piles that place cards with no record (quest: 10150 The Catacombs of Ca
 
 101160:A:2 (shadow): Shadow: If there is a copy of the defending character in your discard pile, reanimate it and deal it 1 shadow card.
   101160:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose card (you control) in the discard pile, with the title of the defending character
     - then, if there is a card (you control) in the discard pile, with the title of the defending character to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reanimates the picked card, if it lies in a discard pile: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
@@ -80,6 +83,7 @@ Scenario piles that place cards with no record (quest: 10150 The Catacombs of Ca
 
 101161:A:2 (shadow): Shadow: If this attack destroys a character, reanimate that character and deal it 1 shadow card.
   101161:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player reanimates the character the attack in progress destroyed, if it lies in a discard pile: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
       - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is dealt 1 shadow card from the encounter deck, wherever it is
@@ -124,11 +128,12 @@ Scenario piles that place cards with no record (quest: 10150 The Catacombs of Ca
   101164:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
-    - then, if this card is attached to a card (checked when this step runs, after the steps above; not tied to whether they did anything): the first player reanimates the top X card(s) of their deck, X being the number of card (any player controls) named "Death and Calamity", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+    - then, if this card is attached to a card (checked when this step runs, after the steps above; not tied to whether they did anything): the first player reanimates the top X card(s) of their deck, X being the number of card (any player controls) or in the staging area or the active location, named "Death and Calamity", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
 
 101164:A:2 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the number of Sorcery cards in play.
   101164:shadow:1: Shadow
-    - the attacking enemy: stat attack the number of Sorcery card (any player controls) in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not, until the end of the attack
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the number of Sorcery card (any player controls) or in the staging area or the active location, in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not, until the end of the attack
 
 ## 10150 The Catacombs of Carn Dûm
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -188,9 +193,11 @@ Scenario piles that place cards with no record (quest: 10150 The Catacombs of Ca
 10152:B:3 (back): Forced: At the end of the quest phase, if there are any locations in play, deal 1 damage to all characters in play. If there are no locations in play, the players have escaped Carn Dûm, and win the game.
   10152:forced:2: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (the number of location (any player controls) is at least 1)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - deal 1 damage to each character (any player controls)
   10152:forced:3: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (the number of location (any player controls) is at most 0)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the players win the game
 
 ## 10153 Daechanar
@@ -202,17 +209,17 @@ Scenario piles that place cards with no record (quest: 10150 The Catacombs of Ca
 
 10153:A:2 (front): Daechanar gets +1 Attack for each Sorcery card in play, and gains indestructible while at least 1 Sorcery card is in play.
   10153:constant:2: Constant
-    - this card: stat attack the number of Sorcery card (any player controls) in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not, while this card is in play
+    - this card: stat attack the number of Sorcery card (any player controls) or in the staging area or the active location, in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not, while this card is in play
   10153:constant:3: Constant
-    only if the number of Sorcery card (any player controls) in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not is at least 1
+    only if the number of Sorcery card (any player controls) or in the staging area or the active location, in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not is at least 1
     - this card: stat indestructible 1, while this card is in play
 
 10153:A:3 (front): Forced: When Daechanar is damaged, if there is at least 1 Sorcery card in play, cancel all damage just dealt and remove a Sorcery card from the game.
   10153:forced:1: Forced after a card takes damage (heard about this card)
-    only if the number of Sorcery card (any player controls) in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not is at least 1
+    only if the number of Sorcery card (any player controls) or in the staging area or the active location, in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not is at least 1
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cancel all of the damage just dealt
-    - choose Sorcery card (any player controls) chosen by the first player, in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not
+    - choose Sorcery card (any player controls) or in the staging area or the active location, chosen by the first player, in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not
     - the picked card is removed from the game (neither discarded nor lost from the Campaign Pool)
 
 ## 10154 Altar of Midwinter
@@ -243,6 +250,7 @@ Scenario piles that place cards with no record (quest: 10150 The Catacombs of Ca
 
 10155:A:2 (shadow): Shadow: If this attack destroys a character, reanimate that character and deal it 1 shadow card.
   10155:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player reanimates the character the attack in progress destroyed, if it lies in a discard pile: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
       - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is dealt 1 shadow card from the encounter deck, wherever it is

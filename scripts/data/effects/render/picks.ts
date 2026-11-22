@@ -42,6 +42,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["top"], typeof pick.top === "number" ? `among the top ${pick.top}` : null);
   note(["bottom"], typeof pick.bottom === "number" ? `among the bottom ${pick.bottom}` : null);
   note(["staging"], pick.staging === true ? "or in the staging area" : null);
+  note(["stagingArea"], pick.stagingArea === "shared" ? "in the shared staging area (the one stage 2B deals out)" : pick.stagingArea === "any" ? "in any player's staging area" : pick.stagingArea === "own" ? "in the chooser's own staging area (the only one while the stages are not separate)" : null);
   note(["otherArea"], pick.otherArea === true ? "whose staging area is a different one from the chooser's (every other player while the areas are not separate)" : null);
   note(["atOtherStage"], pick.atOtherStage === true ? "at another stage than the chooser's (none while the game has one stage)" : null);
   note(["canSpendResources"], typeof pick.canSpendResources === "number" ? `who controls heroes holding ${pick.canSpendResources} resource${pick.canSpendResources === 1 ? "" : "s"} or more in all` : null);
@@ -51,6 +52,8 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["highestThreatPlusRemaining"], pick.highestThreatPlusRemaining === true ? "with the highest sum of its current Threat and its remaining quest points (the quest points less the progress on it; a tie is the chooser's)" : null);
   note(["attachable"], typeof pick.attachable === "string" ? `that the card with code ${pick.attachable} can be attached to` : null);
   note(["engaged"], typeof pick.engaged === "string" ? (ENGAGED[pick.engaged] ?? pick.engaged) : null);
+  note(["engagedWith"], pick.engagedWith === "picked" ? "engaged with the player picked last" : pick.engagedWith === "notYou" ? "not engaged with the chooser (in the staging area when that is in the filter, or engaged with another player)" : pick.engagedWith === "host" ? "engaged with the controller of the card this card is attached to" : null);
+  note(["engageable"], pick.engageable === true ? "that the chooser may engage (not one that cannot be engaged, nor one barred to this seat)" : null);
   note(["names"], Array.isArray(pick.names) ? `named ${quoted(pick.names)}` : null);
   note(["exceptNames"], Array.isArray(pick.exceptNames) ? `not named ${quoted(pick.exceptNames)}` : null);
   note(["notTraits"], Array.isArray(pick.notTraits) ? `without ${joinAnd(pick.notTraits.map(str))}` : null);
@@ -77,6 +80,9 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["lowestAttack"], pick.lowestAttack === true ? "with the lowest Attack of those (ties: the chooser decides)" : null);
   note(["minCost"], typeof pick.minCost === "number" ? `with a printed cost of at least ${pick.minCost} (a card with no printed cost never matches)` : null);
   note(["highestCost"], pick.highestCost === true ? "with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides)" : null);
+  note(["highestThreat"], pick.highestThreat === true ? (pick.type === "player" ? "with the highest threat among the players still in the game (ties: the chooser decides)" : "with the highest current Threat of those (no Threat counts 0; ties: the chooser decides)") : null);
+  note(["highestAttack"], pick.highestAttack === true ? "with the highest Attack of those, as the table shows it (ties: the chooser decides)" : null);
+  note(["notHost"], pick.notHost === true ? "other than the card this card is attached to" : null);
   note(["lowestThreat"], pick.lowestThreat === true ? "with the lowest Threat of those (ties: the chooser decides)" : null);
   note(["fortitudeDiscarded"], pick.fortitudeDiscarded === true ? "discarded for the Fortitude test in progress and still in the encounter discard pile" : null);
   note(["who"], pick.who === "firstPlayer" ? "chosen by the first player" : null);
@@ -93,7 +99,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["hasAttachment"], attachedTraitNone ? `with no ${attachedTraitNone} card attached` : attached ? `${attached.none === true ? "with no" : "with an"} attachment named ${quoted(attached.names as unknown[])}` : attachedTrait ? `with a ${attachedTrait} card attached` : attachedNone ? "with no attachment of any kind" : null);
   note(["active"], pick.active === true ? "that is the active location" : null);
   note(["participating"], pick.participating === true ? "that took part in the attack this effect answers" : null);
-  note(["controlledBy"], pick.controlledBy === "actor" ? "controlled by the player this effect runs for" : pick.controlledBy === "attackers" ? "controlled by a player whose character took part in the attack this effect answers" : pick.controlledBy === "source" ? "controlled by the player this card is engaged with" : pick.controlledBy === "host" ? "controlled by the player who controls this card's host" : pick.controlledBy === "picked" ? "controlled by the player picked last" : null);
+  note(["controlledBy"], pick.controlledBy === "firstPlayer" ? "controlled by the first player" : pick.controlledBy === "actor" ? "controlled by the player this effect runs for" : pick.controlledBy === "attackers" ? "controlled by a player whose character took part in the attack this effect answers" : pick.controlledBy === "source" ? "controlled by the player this card is engaged with" : pick.controlledBy === "host" ? "controlled by the player who controls this card's host" : pick.controlledBy === "picked" ? "controlled by the player picked last" : null);
   note(["hasGuard"], pick.hasGuard === true ? "that has an encounter card attached as its guard" : pick.hasGuard === false ? "that has no encounter card attached (free of encounters)" : null);
   note(["isGuard"], pick.isGuard === true ? "that is attached to an objective as its guard" : pick.isGuard === false ? "that is not guarding an objective" : null);
   note(["questedThisRound"], pick.questedThisRound === true ? "that was committed to this round's quest (the quest's resolution already cleared the commitment)" : null);
@@ -120,6 +126,8 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["copyInDiscard"], pick.copyInDiscard === true ? "with a copy of it (the same title) in its controller's discard pile" : pick.copyInDiscard === "owner" ? "with a card of its title in its owner's discard pile" : null);
   // A Captive is in play but no player controls it (families/captives owns "Captives are in play but are not under any player's control", 143022:A:1).
   const control = pick.captive === "only" || pick.captive === "free" ? "in play, controlled by no player" : typeof pick.control === "string" ? (CONTROL[pick.control] ?? pick.control) : "";
+  // A card of any player's reaches past the table: the staging area's cards and the active location answer it too (interpret/pick.ts).
+  if (pick.type === "card" && pick.control === "any" && pick.stagingOnly !== true && (pick.from === undefined || pick.from === "play")) after.unshift("or in the staging area or the active location");
   const noun = [...front, str(pick.type)].join(" ");
   const text = `${noun} (${control})${after.length > 0 ? ` ${after.join(", ")}` : ""}`;
   return done(ctx, text, pick, read);

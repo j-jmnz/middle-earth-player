@@ -20,6 +20,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143033:A:2 (front): Forced: At the end of the quest phase, place 1 resource token here.
   143033:forced:1: Forced at the end of the phase (record also names 143033:A:3)
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource token(s) are placed on this card
     - then, if the card with code 143033 in play holds at least 8 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is added to the victory display (the players' own, the group's)
@@ -28,6 +29,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143033:A:3 (front): If there are 8 resource tokens here, add The Defense of Helm's Deep to the victory display and advance to stage 5A.
   143033:forced:1: Forced at the end of the phase (record also names 143033:A:2)
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource token(s) are placed on this card
     - then, if the card with code 143033 in play holds at least 8 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is added to the victory display (the players' own, the group's)
@@ -38,10 +40,12 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143034:A:1 (front): Forced: After Wild Hillman attacks, place 1 progress on the active location.
   143034:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - place 1 progress on the active location
 
 143034:A:2 (shadow): Shadow: Place 1 progress on the active location. Attacking enemy gets +1 Attack for each progress on the active location.
   143034:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a location (any player controls) that is the active location to choose: choose location (any player controls) that is the active location
     - then, if there is a location (any player controls) that is the active location to choose (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 progress on the picked card
@@ -75,6 +79,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143036:A:3 (shadow): Shadow: Exhaust a character you control.
   143036:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -85,7 +90,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143037:A:1 (front): While The Hornburg is the active location, reduce the archery total by 1 for each player in the game.
   143037:constant:1: Constant
     only if this card is the active location
-    - this card: stat archeryBonus minus (the number of players), while this card is in play
+    - this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) minus (the number of players), while this card is in play
 
 143037:A:2 (front): Forced: When The Hornburg is explored, assign X damage among characters in play. X is the number of enemies in play.
   143037:forced:1: Forced after a card leaves play (heard about this card)
@@ -162,6 +167,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143042:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 1 progress on the current quest.
   143042:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -174,10 +180,11 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
   143043:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 3 progress is placed on the main quest stage (a quest effect: a full stage advances)
-    - every character in play, now and entering later: stat blankText (its text box is blank) 1, until the end of the round
+    - every character in play, now and entering later: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
 
 143043:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack and gains Toughness 2 until the end of the round.
   143043:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 2, until the end of the round
     - the attacking enemy: stat toughness 2, until the end of the round
@@ -191,12 +198,13 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143044:A:2 (front): When Revealed: The enemy in the staging area with the highest Attack makes an immediate attack against you. If no attack is made this way, Reckless Hate gains surge.
   143044:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose enemy (any player controls) in the staging area only [also {"highestAttack":true}]
+    - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides)
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area
     - then, if not (there is a enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 143044:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   143044:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -217,6 +225,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143045:A:3 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   143045:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -244,6 +253,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143072:B:3 (back): Forced: At the end of the round, advance to stage 2A.
   143072:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143073"}]
 
 ## 143073 Assault on Helm's Deep
@@ -266,10 +276,12 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143073:B:2 (back): Forced: At the end of the combat phase, if the number of enemies in the staging area is less than the number of players in the game, the first player reveals an encounter card.
   143073:forced:1: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (the number of enemy (any player controls) in the staging area only is less than the number of players)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the acting player reveals an encounter card
 
 143073:B:3 (back): Forced: At the end of the round place 1 progress here for each enemy in the staging area (bypassing any active location).
   143073:forced:2: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - progress equal to the number of enemy (any player controls) in the staging area only is placed on the main quest stage (a quest effect: a full stage advances)
 
 ## 143074 The Hosts of Isengard
@@ -333,4 +345,4 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if there is no enemy in play (in the staging area or engaged)
     - the players win the game
 
-(rendered pieces: 182 by template, 12 as JSON)
+(rendered pieces: 183 by template, 11 as JSON)

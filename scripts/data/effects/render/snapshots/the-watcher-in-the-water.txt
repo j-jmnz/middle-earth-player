@@ -17,6 +17,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
     - its host: stat cannotReady 1, while this card is in play
   040076:triggered:1: Triggered (mandatory, not printed as Forced) at the end of the round
     only if all of: (this card is attached to a card) and (its host is a hero (any player controls))
+    who acts: the acting player is the first player (a phase has no player of its own)
     - discard its host
   040076:action:1: Action (any player may use it)
     only if all of: (it is the Combat phase) and (there is a ready hero (you control) that can exhaust (not held by a rule that stops it exhausting), with no Tentacle card attached to choose)
@@ -51,17 +52,18 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
     only if the Victory points of the cards in the victory display added up (read live) is less than 3
     - the players cannot defeat this stage while this holds
   04064:constant:2: Constant
-    (no instructions)
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
 ## 04065 Doors of Durin
 (the scenario deals it into the setAside pile; the piles place it, no record does)
 
 04065:A:1 (front): Progress tokens that would be placed on Doors of Durin are instead placed on the current quest card.
   04065:constant:1: Constant
-    - this card: stat progressToQuest 1, while this card is in play
+    - this card: stat progressToQuest (progress that a card effect would place on this location goes on the current quest instead, and it is never explored) 1, while this card is in play
 
 04065:A:2 (front): Action: Each player may discard any number of cards from his hand. Then, discard the top card of the encounter deck. If the first letter of the encounter card's title matches that of one of the discarded player cards, add Doors of Durin to your victory display. (Limit once per round.)
   04065:action:1: Action (limit once per round; any player may use it)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - for each card (you control) in hand (up to any number chosen):
@@ -82,6 +84,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 04066:A:2 (shadow): Shadow: Remove 1 progress token from the current quest.
   04066:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - remove 1 progress from the current quest card (all of it when it holds less)
 
 ## 04067 Perilous Swamp
@@ -89,10 +92,11 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 04067:A:1 (front): No more than 1 progress token can be placed on Perilous Swamp each round.
   04067:constant:1: Constant
-    - this card: stat progressCap 1, while this card is in play
+    - this card: stat progressCap (no more than this much progress can be placed on this location each round) 1, while this card is in play
 
 04067:A:2 (shadow): Shadow: Remove 1 progress token from the current quest.
   04067:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - remove 1 progress from the current quest card (all of it when it holds less)
 
 ## 04068 Makeshift Passage
@@ -125,6 +129,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 04070:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if it is a Tentacle.)
   04070:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attacking enemy is a Tentacle enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attacking enemy is a Tentacle enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
@@ -143,6 +148,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 04072:A:3 (front): If The Watcher is in the staging area at the end of the combat phase, each player must deal 3 damage to 1 character he controls.
   04072:forced:1: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - each player assigns 3 damage to 1 of the character (you control), all of it
 
 ## 04073 Grasping Tentacle
@@ -179,6 +185,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 04075:A:1 (front): Forced: When Striking Tentacle attacks, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, this attack is considered undefended.
   04075:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): this attack is considered undefended
@@ -246,18 +253,21 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 901502:A:2 (front): If The Watcher is in the staging area at the end of the combat phase, each player must deal 3 damage to 1 character he controls.
   901502:forced:1: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - each player assigns 3 damage to 1 of the character (you control), all of it
 
 ## 901503 Writing Tentacle
 
 901503:A:1 (front): Forced: When Writhing Tentacle engages a player, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, Writhing Tentacle makes an immediate attack, then attaches to the defending character as a Tentacle attachment with the text: "Attached character cannot commit to the quest."
   901503:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attachesAfterAttack 1, until the end of the phase
     - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
   901503:forced:2: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if this card holds the flag attachesAfterAttack
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this enemy attaches to the event's other card (the defending character, when there was one and it is still in play) as an attachment: it has no enemy text there and is discarded to the encounter discard pile with it when that card leaves play (it is no enemy while it lies there)
     - this card: stat attachesAfterAttack -1, until the end of the phase
@@ -271,6 +281,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 901504:A:1 (front): Forced: After resolving an attack made by Choking Tentacle, discard the top card of the encounter deck. If that card has a shadow effect or is a Tentacle enemy, attach Choking Tentacle to a character the defending player controls as a Tentacle attachment with the text: "Forced: After attached character readies, deal it 1 damage."
   901504:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the encounter card this effect just discarded from the top of the deck has a shadow effect (a printed Shadow line) or is a Tentacle enemy (false when nothing was discarded) (checked when this step runs, after the steps above; not tied to whether they did anything): choose character (any player controls) chosen by the first player, controlled by the player this card is engaged with
@@ -290,6 +301,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 901505:A:2 (shadow): Shadow: For each point of damage dealt by this attack, the defending player must discard a random card from his hand.
   901505:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the acting player discards the damage just dealt random card(s) from hand
 
@@ -313,6 +325,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 901507:A:2 (shadow): Shadow: If the defending character has a Tentacle attachment, discard that character.
   901507:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a character (any player controls) defending, with a Tentacle card attached to choose: choose character (any player controls) defending, with a Tentacle card attached
     - then, if there is a character (any player controls) defending, with a Tentacle card attached to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card

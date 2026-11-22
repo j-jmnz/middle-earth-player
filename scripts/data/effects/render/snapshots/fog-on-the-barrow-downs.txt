@@ -13,6 +13,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148001:B:2 (back): Forced: At the end of the round, place 1 progress on this stage.
   148001:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
 
 ## 148002 Across the Downs
@@ -28,6 +29,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 148002:B:1 (back): Forced: At the end of the refresh phase, raise each player's threat by 1.
   148002:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 1 (each player)
 
 148002:B:2 (back): The players cannot defeat this stage unless Hollow Circle is in the victory display.
@@ -95,7 +97,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
       - place 1 progress on the picked card
   148004:forced:3: Forced on the event playerEliminated (event happened to the controller)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose location (any player controls) named "Great Barrow", chosen by the first player [also {"stagingArea":"any"}]
+    - choose location (any player controls) in any player's staging area, named "Great Barrow", chosen by the first player
     - the picked card is added to the victory display
 
 ## 148005 Hollow Circle
@@ -129,7 +131,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 148007:A:1 (front): Peril. Immune to player card effects. The players cannot travel here.
   (the keyword part is owned by the card's keywords; the records cover: The players cannot travel here.)
   148007:constant:1: Constant
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
 
 148007:A:2 (front): Forced: After Great Barrow enters the staging area, remove each character you control from the quest and create your own staging area. Then advance to a separate stage 4A by yourself.
   148007:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
@@ -184,6 +186,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148010:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack. If this attack destroys a character, raise each player's threat by 2.
   148010:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 2, until the end of the attack
     - when the attack in progress ends:
@@ -195,7 +198,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148011:A:1 (front): While Barrow-wight is engaged with a player, that player's threat cannot be reduced.
   148011:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - engagedSeat: stat threatReductionBarred 1, while this card is in play
 
 148011:A:2 (front): Forced: After Barrow-wight attacks and destroys a character, that character's controller raises his threat by 2.
@@ -208,7 +211,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148012:A:1 (front): While Cold-wight is engaged with a player, that player cannot draw cards from card effects.
   148012:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - engagedSeat: stat noCardDraw (the player cannot draw cards from card effects; the opening hand and the resource phase's draw are not) 1, while this card is in play
 
 148012:A:2 (front): Forced: After Cold-wight attacks and destroys a character, that character's controller discards a random card from his hand.
@@ -221,7 +224,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148013:A:1 (front): While Dark-wight is engaged with a player, that player's heroes cannot gain resources from card effects.
   148013:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - each hero (you control): stat noCardResources (the hero cannot gain resources from card effects; the resources it collects in the resource phase are not one) 1, while this card is in play
 
 148013:A:2 (front): Forced: After Dark-wight attacks and destroys a character, that character's controller discards all resources from each hero he controls.
@@ -241,6 +244,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148014:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the defending character is an ally).
   148014:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the defender is a ally (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a ally (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
@@ -272,6 +276,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148016:A:2 (shadow): Shadow: Raise your threat by 1 for each damage dealt by this attack.
   148016:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - raise threat by the damage just dealt (the acting player)
 
@@ -283,10 +288,11 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 
 148017:A:2 (front): When Revealed: Until the end of the round, players cannot trigger Action or Response effects.
   148017:whenRevealed:1: When revealed
-    - each player (any player controls) at the acting player's staging area (every area before they are separate): stat cannotTriggerEffects 1, until the end of the round
+    - each player (any player controls) at the acting player's staging area (every area before they are separate): stat cannotTriggerEffects (the holder cannot start its own Action or Response abilities; held by a player, he triggers no Action or Response and plays no event; Constant and Forced effects still work) 1, until the end of the round
 
 148017:A:3 (shadow): Shadow: Until the end of the round, attacking enemy cannot take damage.
   148017:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat cannotTakeDamage 1, until the end of the round
 
 ## 148018 Dreadful Song
@@ -306,7 +312,8 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
     - the card this one is attached to: stat willpower is set to 0, overriding every other modifier of it
   148018:forced:1: Forced at the end of the round
     only if not (this card is in the staging area)
-    - raise threat by the number of Wight enemy (any player controls) [also {"engagedWith":"host"}] (hostController)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - raise threat by the number of Wight enemy (any player controls) engaged with the controller of the card this card is attached to (hostController)
 
 ## 148019 Tom Bombadil
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -320,4 +327,4 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
       - discard this card [also {"counted":true}]
       - then, if not (the running effect has discarded no card (with DiscardEach)) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
 
-(rendered pieces: 218 by template, 8 as JSON)
+(rendered pieces: 220 by template, 6 as JSON)

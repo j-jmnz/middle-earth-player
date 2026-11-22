@@ -51,7 +51,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Captain Sahír"}]
 
 11194:A:3 (front): Forced: After Captain Sahír flips over, remove Black Key (burden) from the game and attach Black Key (boon) to him. Add Sea Serpent (Menacing side) to the staging area. One player adds Come Together to their hand. For this game, X is plus 1 for Come Together.
-  11194:forced:2: Forced on the event flipped (heard about card (any player controls) named "Captain Sahír")
+  11194:forced:2: Forced on the event flipped (heard about card (any player controls) or in the staging area or the active location, named "Captain Sahír")
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card in play with code 11192 is removed from the game, wherever it is (in the staging area or attached)
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
@@ -113,11 +113,12 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 12039:B:2 (back): Forced: At the end of the round, if Captain Sahír and Na'asiyah are not in play, add 1 resource to each of them.
   12039:forced:1: Forced at the end of the round
     only if all of: (the card with code 11076 is not in play) and (the card with code 11078 is not in play)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - [json AddResourcesSetAside {"verb":"AddResourcesSetAside","codes":["11076","11078"],"amount":1}]
 
 12039:B:3 (back): Progress cannot be placed on this stage unless Helm of the Stormcaller is in the victory display.
   12039:constant:2: Constant
-    - if the card with code 12042 is not in the victory display: the table: stat noQuestProgress 1, while this card is in play
+    - if the card with code 12042 is not in the victory display: the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
 
 ## 12040 Change of Plans
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -148,6 +149,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 12041:B:2 (back): At the end of the round, if the total Threat of any one Ship location is 9 or higher, the Stormcaller is destroyed, and the players lose the game.
   12041:forced:1: Forced at the end of the round
     only if [json condition {"kind":"locationThreat","trait":"Ship","min":9}]
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the players lose the game (The Stormcaller was destroyed: a Ship location's Threat reached 9)
 
 12041:B:3 (back): When The Thing in the Depths is destroyed, the players win the game.
@@ -181,6 +183,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12043:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if defending character has no resources on it or in its resource pool).
   12043:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -196,6 +199,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12044:A:2 (shadow): Shadow: Exhaust a character you control.
   12044:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -210,6 +214,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12045:A:2 (shadow): Shadow: Until the end of the phase, attacking enemy gets +2 Defense.
   12045:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat defense 2, until the end of the phase
 
 ## 12046 Crew Quarters
@@ -217,11 +222,12 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12046:A:1 (front): Travel: Add 1 resource to each Raider card in play to travel here.
   12046:travel:1: Travel
-    - for each Raider card (any player controls) (enemies engaged with a player included):
+    - for each Raider card (any player controls) or in the staging area or the active location, (enemies engaged with a player included):
       - place 1 resource tokens on the picked card
 
 12046:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack.
   12046:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 2, until the end of the attack
 
 ## 12047 Quarter Deck
@@ -235,6 +241,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12047:A:2 (shadow): Shadow: Discard an attachment you control.
   12047:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -249,6 +256,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12048:A:2 (shadow): Shadow: If the defending character has 0 Defense, discard it. Otherwise, the defending character gets -2 Defense for this attack.
   12048:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (any player controls) defending [also {"maxDefense":0}]
     - discard the picked card
@@ -284,7 +292,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12050:A:3 (front): While Eye of the Beast is engaged with a player, The Thing in the Depths attacks that player during the combat phase (deal and resolve a shadow card for this attack).
   12050:constant:2: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat relaysAttack 1, while this card is in play
     - each enemy (any player controls) or in the staging area, named "The Thing in the Depths": stat attacksViaRelay 1, while this card is in play
@@ -297,7 +305,8 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12051:A:2 (front): Forced: At the end of the combat phase, if Thrashing Arm is engaged with you, deal 3 damage to a character you control.
   12051:forced:1: Forced at the end of the phase
-    only if all of: (it is the Combat phase) and (this card is engaged with the player)
+    only if all of: (it is the Combat phase) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - if [json condition {"kind":"engagedWithActor"}]: choose character (you control)
       - then, if [json condition {"kind":"engagedWithActor"}] (checked when this step runs, after the steps above; not tied to whether they did anything): deal 3 damage to the picked card
@@ -323,12 +332,14 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12053:A:2 (front): Forced: When Grasping Arm attacks, the engaged player must exhaust a character he controls.
   12053:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
 
 12053:A:3 (shadow): Shadow: If this attack is undefended, resolve Grasping Arm's Grapple keyword.
   12053:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - [json ResolveGrapple {"verb":"ResolveGrapple","target":"self","when":{"kind":"undefended"}}]
 
 ## 12054 Giant Arm
@@ -343,6 +354,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12054:A:3 (shadow): Shadow: After this attack, either put Giant Arm into play engaged with you and deal it a shadow card, or resolve its Grapple keyword.
   12054:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - [json EngageOrGrapple {"verb":"EngageOrGrapple"}]
 
 ## 12055 From the Depths
@@ -354,6 +366,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12055:A:2 (shadow): Shadow: Assign damage among characters you control equal to the number of enemies grappled with locations in the staging area.
   12055:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player assigns [json amount {"grappled":true}] damage among the character (you control), one at a time
 
 ## 12056 Lashing Tentacles
@@ -367,6 +380,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12056:A:2 (shadow): Shadow: After this attack, The Thing in the Depths makes an attack against the defending player (deal a shadow card for this attack).
   12056:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
       - the picked enemy attacks the acting player now, from the staging area

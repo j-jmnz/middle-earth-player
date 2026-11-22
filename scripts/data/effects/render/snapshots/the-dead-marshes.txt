@@ -25,7 +25,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 02106:B:2 (back): If this final Escape test is passed, the players have captured Gollum and won the game.
   02106:constant:1: Constant
     - this card: stat holdsWin (defeating this final stage does not win the game: it stays the current quest card, defeated, and its own Forced effects win the game or reset the quest) 1, while this card is in play
-  02106:forced:2: Forced on the event escapePassed
+  02106:forced:2: Forced after an escape test that this card's own effect made is passed (no other card hears it; the event happened to the player who made the test)
     - the players win the game
 
 ## 02107 Gollum
@@ -38,6 +38,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 02107:A:2 (front): Forced: At the end of the quest phase, the party must make an escape test, dealing 1 card per player from the encounter deck. If this test is failed, place 2 resource tokens on Gollum.
   02107:forced:1: Forced at the end of the phase
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the party: every player, the first player first, commits to one shared test makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then a number of cards equal to the number of players are dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
     - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 2 resource tokens on this card
@@ -109,6 +110,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 02112:A:1 (front): Forced: Remove 2 damage from Giant Marsh Worm at the end of each round.
   02112:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - heal 2 damage from this card
 
 02112:A:2 (front): Escape: 2
@@ -257,6 +259,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 900803:A:3 (shadow): Shadow: Perform an escape test, dealing 1 card from the encounter deck. If this test is failed, discard the defending character.
   900803:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then 1 card is dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
     - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): choose character (any player controls) defending
@@ -270,6 +273,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 900804:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if attacking enemy is Undead.)
   900804:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attacking enemy is a Undead enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attacking enemy is a Undead enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -278,6 +282,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 900805:A:1 (front): Forced: After Marsh-wight engages a player, that player makes an escape test, dealing 3 cards from the encounter deck. If this test is failed, place 2 resource tokens on Gollum and Marsh-wight makes an immediate attack.
   900805:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then 3 cards are dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
     - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 2 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
@@ -301,6 +306,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 900807:A:2 (shadow): Shadow: Discard all attachments from each character you control with 3 or more Willpower.
   900807:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - for each attachment (any player controls) attached to a character (you control) with 3 or more Willpower:
       - discard the picked card
 

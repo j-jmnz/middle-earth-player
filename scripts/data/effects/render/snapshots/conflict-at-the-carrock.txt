@@ -47,6 +47,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 02037:A:3 (front): Action: Spend 1 Leadership resource to place that resource on Grimbeorn the Old.
   02037:action:1: Action (cost: pay 1 leadership resource(s); any player may use it)
+    who acts: any player may trigger it; the acting player is the one who does
     - place 1 resource tokens on this card
 
 ## 02038 Louis
@@ -54,7 +55,8 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 02038:A:1 (front): While Louis is engaged with a player, all Troll enemies gain, "Forced: After this enemy attacks, the defending player must raise his threat by 3."
   02038:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about Troll enemy (any player controls) or in the staging area)
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by 3 (the player the event is about)
 
 02038:A:2 (front): Response: After defeating Louis, you may choose and discard 1 "Sacked!" card from play.
@@ -69,7 +71,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 02039:A:1 (front): While Morris is engaged with a player, all Troll enemies get +1 Attack.
   02039:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - each Troll enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
 
 02039:A:2 (front): Response: After defeating Morris, you may choose and discard 1 "Sacked!" card from play.
@@ -84,7 +86,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 02040:A:1 (front): While Stuart is engaged with a player, all Troll enemies get +1 Defense.
   02040:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - each Troll enemy (any player controls) or in the staging area: stat defense 1, while this card is in play
 
 02040:A:2 (front): Response: After defeating Stuart, you may choose and discard 1 "Sacked!" card from play.
@@ -99,6 +101,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 02041:A:1 (front): Forced: After Rupert attacks, shuffle all copies of the "Sacked!" card from the discard pile back into the encounter deck.
   02041:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - every card with code 02048 in the encounter discard pile goes back into the encounter deck, which is shuffled (nothing with none there)
 
 02041:A:2 (front): Response: After defeating Rupert, you may choose and discard 1 "Sacked!" card from play.
@@ -117,6 +120,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 02042:A:2 (shadow): Shadow: Defending character gets -1 Defense for the duration of this attack.
   02042:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat defense -1, until the end of the attack
 
 ## 02043 The Carrock
@@ -189,11 +193,12 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
     - its host: stat cannotAttack 1, while this card is in play
     - its host: stat cannotDefend 1, while this card is in play
     - its host: stat cannotQuest 1, while this card is in play
-    - its host: stat cannotTriggerEffects 1, while this card is in play
+    - its host: stat cannotTriggerEffects (the holder cannot start its own Action or Response abilities; held by a player, he triggers no Action or Response and plays no event; Constant and Forced effects still work) 1, while this card is in play
     - its host: stat noCollection 1, while this card is in play
 
 02048:A:2 (shadow): Shadow: If attacking enemy is a Troll, resolve this card's "when revealed" effect.
   02048:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a Troll enemy (any player controls): the When Revealed effects of this card resolve as if it had just been revealed
 
 ## 02049 Roasted Slowly
@@ -208,6 +213,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 02049:A:2 (shadow): Shadow: If attacking enemy is a Troll, remove 2 damage tokens from it.
   02049:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a Troll enemy (any player controls): heal 2 damage from the attacking enemy
 
 === Nightmare deck (the cards the scenario's Nightmare deck adds) ===
@@ -225,7 +231,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 900501:A:3 (front): Stage 2B should read, "When Revealed: Place Louis, Morris, Rupert and Stuart into the staging area."
   900501:forced:1: Forced on the event stageRevealed
-    only if the card the event is about is a card (any player controls) named "Against the Trolls"
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Against the Trolls"
     (steps run in order; a step depends on an earlier one only through its own condition)
     - one set-aside card with code 900504 joins the staging area (it is not revealed)
     - one set-aside card with code 900505 joins the staging area (it is not revealed)
@@ -235,6 +241,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 900501:A:4 (front): Forced: At the end of the quest phase, if no progress was placed on the current quest this phase, place 1 progress on the current quest (bypassing the active location).
   900501:forced:2: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (no progress was placed on the current quest card this quest phase (the quest card itself; progress an active location took does not count))
+    who acts: the acting player is the first player (a phase has no player of its own)
     - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
 
 900501:A:5 (front): Response: After defeating a unique Troll enemy, you may choose and discard 1 "Sacked!" card from play.
@@ -313,6 +320,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 900502:A:2 (shadow): Shadow: If attacking enemy is a Troll, defending character does not ready during the refresh phase this round.
   900502:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a Troll enemy (any player controls): the defender: stat cannotReady 1, until the end of the round
 
 ## 900503 Rob and Bob
@@ -320,6 +328,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 900503:A:1 (front): Forced: After Rob & Bob makes its first attack each round, if there are two or more players, it engages the next player and makes an additional attack (discard and deal a new shadow card for this attack).
   900503:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card; limit once per round)
     only if another player is still in the game
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy engages the next player
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
@@ -328,11 +337,13 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 900504:A:1 (front): Forced: After Louis attacks, the defending player must raise his threat by 3.
   900504:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by 3 (the player the event is about)
 
 900504:A:2 (front): While Louis is in the victory display, each Troll enemy gains, "Forced: After this enemy attacks, the defending player must raise his threat by 1."
   900504:forced:2: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about Troll enemy (any player controls) or in the staging area; used from the victory display)
     only if this card is in the victory display
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by 1 (the player the event is about)
 
 ## 900505 Morris
@@ -363,14 +374,14 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 900507:A:1 (front): Cannot have player attachments.
   900507:constant:1: Constant
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
 
 900507:A:2 (front): While Stuart is in the victory display, each Troll enemy gets +1 Defense and gains "Cannot have player attachments."
   900507:constant:2: Constant
     only if this card is in the victory display
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each Troll enemy (any player controls) or in the staging area: stat defense 1, while this card is in play
-    - each Troll enemy (any player controls) or in the staging area: stat noPlayerAttachments 1, while this card is in play
+    - each Troll enemy (any player controls) or in the staging area: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
 
 ## 900508 Troll Lair
 
@@ -381,6 +392,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 900508:A:2 (shadow): Shadow: If attacking enemy is a Troll, remove 4 damage tokens from it.
   900508:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a Troll enemy (any player controls): heal 4 damage from the attacking enemy
 
 ## 900509 Hives and Hives
@@ -391,6 +403,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 900509:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack.
   900509:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 2, until the end of the attack
 
 ## 900510 Time for Supper

@@ -16,7 +16,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource token(s) are placed on this card
     - [json ClaimRandomTreasure {"verb":"ClaimRandomTreasure","count":3,"when":{"kind":"all","conditions":[{"kind":"less","left":{"players":true,"plus":2},"right":{"stat":"resources","of":"self"}},{"kind":"less","left":{"stat":"resources","of":"self"},"right":{"players":true,"plus":4}}]}}]
-    - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) chosen by the first player [also {"hostForPicked":true}]
+    - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, chosen by the first player [also {"hostForPicked":true}]
     - [json AttachPicked {"verb":"AttachPicked","when":{"kind":"all","conditions":[{"kind":"less","left":{"players":true,"plus":2},"right":{"stat":"resources","of":"self"}},{"kind":"less","left":{"stat":"resources","of":"self"},"right":{"players":true,"plus":4}}]}}]
 
 120165:B:1 (back): Resolution: The heroes' selfless valor in protecting the refugees from Harad has inspired Turayn. If the heroes choose to accept his aid, add Turayn to the campaign pool (any player may add him to their deck). Otherwise, mark in the campaign log that "Turayn has taken an oath of vigilance" (he will follow the heroes' example and continue to protect the free folk of Wilderland).
@@ -57,6 +57,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18017:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
   18017:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
 ## 18018 Frenzied Creature
@@ -75,6 +76,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18018:A:2 (shadow): Shadow: Attach this card to attacking enemy.
   18018:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"attackingEnemy"}}]
 
 ## 18019 Dangerous Crossing
@@ -88,6 +90,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18019:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defender is damaged).
   18019:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -97,17 +100,18 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18020:A:1 (front): Cannot have player card attachments.
   18020:constant:1: Constant
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
 
 18020:A:2 (front): While Goblin Troop is engaged with you, each other Goblin enemy engaged with you gets +1 Attack and +1 Defense.
   18020:constant:2: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each Goblin enemy (any player controls) engaged with you, other than this card: stat attack 1, while this card is in play
     - each Goblin enemy (any player controls) engaged with you, other than this card: stat defense 1, while this card is in play
 
 18020:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
   18020:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 2, until the end of the attack
 
 ## 18021 Stray Goblin
@@ -121,10 +125,12 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18021:A:2 (front): While Stray Goblin is in the staging area, it gains: "Forced: After a player engages an enemy, Stray Goblin engages that player."
   18021:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) other than this card)
     only if this card is in the staging area
+    who acts: the acting player is the player the enemy engaged
     - engage this card
 
 18021:A:3 (shadow): Shadow: Add Stray Goblin to staging area.
   18021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this card goes to the staging area (it is not revealed)
 
 ## 18022 Pack of Wargs
@@ -133,10 +139,12 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18022:A:1 (front): Forced: If Pack of Wargs is dealt a shadow card with no effect, it makes an additional attack after this one. (Do not deal it a shadow card.)
   18022:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    who acts: the acting player is the defending player (the player the attack is against)
     - this enemy attacks now, dealt no shadow card
 
 18022:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   18022:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -152,6 +160,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18023:A:2 (front): Quest Action: Exhaust a character to reduce Hills of Wilderland Threat by 1 until the end of the phase. Only the first player can trigger this ability.
   18023:action:1: Action
     only if all of: (it is the Quest phase) and (the actor holds the first player token) and (there is a ready character (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -165,7 +174,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     - this card: stat threat [json amount {"facedown":true,"times":2}], while this card is in play
 
 18024:A:2 (front): While Lonely Lands is in the staging area, it gains: "Forced: After an event is played during the quest phase, place it facedown under Lonely Lands."
-  18024:forced:1: Forced after this card is played (heard about card (any player controls) of card type event)
+  18024:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if all of: (it is the Quest phase) and (this card is in the staging area)
     - [json AttachFacedown {"verb":"AttachFacedown"}]
 
@@ -186,6 +195,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18025:A:3 (shadow): Shadow: Raise your threat by 1 for each enemy engaged with you.
   18025:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
 
 ## 18026 Lost in the Wild
@@ -214,11 +224,11 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     - this card counts as a Condition attachment while it is attached
   18027:forced:1: Forced on the event readied (heard about the host)
     - the acting player chooses one of:
-      * option "other" (only if there is a card (any player controls) that is not an objective, attached to this card's host, other than this card to choose):
-        - choose card (any player controls) attached to this card's host, other than this card
+      * option "other" (only if there is a card (any player controls) or in the staging area or the active location, that is not an objective, attached to this card's host, other than this card to choose):
+        - choose card (any player controls) or in the staging area or the active location, attached to this card's host, other than this card
         - discard the picked card
-      * option "self" (only if not (there is a card (any player controls) that is not an objective, attached to this card's host, other than this card to choose)):
-        - choose card (any player controls) attached to this card's host
+      * option "self" (only if not (there is a card (any player controls) or in the staging area or the active location, that is not an objective, attached to this card's host, other than this card to choose)):
+        - choose card (any player controls) or in the staging area or the active location, attached to this card's host
         - discard the picked card
 
 ## 18066 Traveling North
@@ -245,6 +255,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18066:B:2 (back): Forced: At the beginning of the encounter phase, remove 1 resource from this stage. Then, add the top card of the Evil Creatures deck to the staging area.
   18066:forced:2: Forced when a phase begins
     only if it is the Encounter phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if 0 is less than resources of this card: for the acting player, the top card(s) of the evilCreatures deck go to the staging area
     - 1 resource(s) come off the resource pool of this card (discarded, not spent)
@@ -266,7 +277,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18067:B:1 (back): No more than 1 progress can be placed on each location in the staging area each round.
   18067:constant:1: Constant
-    - each location (any player controls) in the staging area only: stat progressCap 1, while this card is in play
+    - each location (any player controls) in the staging area only: stat progressCap (no more than this much progress can be placed on this location each round) 1, while this card is in play
 
 18067:B:2 (back): Forced: After the players travel to a location, add the top card of the Evil Creatures deck to the staging area.
   18067:forced:1: Forced after the players travel (heard about location (any player controls))
@@ -295,6 +306,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18068:B:2 (back): Forced: At the beginning of the quest phase, add the top card of the Evil Creatures deck to the staging area.
   18068:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for the acting player, the top card(s) of the evilCreatures deck go to the staging area
 
 18068:B:3 (back): This stage cannot be defeated while The Old Ford is in play. When The Old Ford is explored, the players win the game.

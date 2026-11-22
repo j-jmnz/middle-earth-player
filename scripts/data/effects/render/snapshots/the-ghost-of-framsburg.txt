@@ -21,7 +21,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     - ignore the deep keyword(s)
 
 12189:B:2 (back): Response: After Fram's Shade engages a player while the players are at stage 1B or 2B, look at 3 random undiscovered treasures and attach 1 of them to Fram's Shade as a guarded objective. When the treasure is free of encounters, the players claim it and attach it to an eligible character. (Group limit once per game.)
-  12189:response:1: Response after an enemy engages a player (heard about card (any player controls) named "Fram's Shade", (enemies engaged with a player included); limit oncePerGameGroup)
+  12189:response:1: Response after an enemy engages a player (heard about card (any player controls) or in the staging area or the active location, named "Fram's Shade", (enemies engaged with a player included); limit oncePerGameGroup)
     only if any of: (the players are on stage 1) or (the players are on stage 2)
     - [json AttachRandomTreasure {"verb":"AttachRandomTreasure","to":"subject"}]
 
@@ -84,6 +84,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 19095:A:3 (front): Action: Exhaust Old Lantern to choose a player to look at the top X cards of his deck, where X is the Discover value of the active location. He adds one of those cards to his hand and places the rest on the bottom of his deck.
   19095:action:1: Action (cost: exhaust this card)
     only if not ([json condition {"kind":"discoverUnavailable"}])
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose player (any player controls)
     - the effect goes on with the picked player as the acting player
@@ -108,6 +109,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19096:A:3 (front): Action: Exhaust Scatha's Teeth and attached hero to choose a player. That player reduces his threat by 2.
   19096:action:1: Action (cost: exhaust this card and exhaust the attached card)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose player (any player controls)
     - lower threat by 2 (the picked player)
@@ -121,7 +123,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 19097:A:2 (front): The players cannot travel to The Cursed Tomb unless they control 3 Loot objectives.
   19097:constant:1: Constant
     only if not (the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] is at least 3)
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
 
 19097:A:3 (front): Forced: After the players travel to The Cursed Tomb, search the encounter deck and discard pile for Fram's Shade and add it to the staging area. Shuffle the encounter deck. Fram's Shade makes an immediate attack against each player in turn order.
   19097:forced:1: Forced after the players travel (heard about this card)
@@ -138,7 +140,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 19098:A:1 (front): Cannot have non-objective attachments.
   19098:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective"}]
+    - no card can be attached to this card except a card with the trait objective
 
 19098:A:2 (front): Fram's Shade gets +1 Threat, +1 Attack, and +1 Defense for each Loot objective the players control.
   19098:constant:2: Constant
@@ -163,10 +165,12 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19099:A:2 (front): Forced: When Crypt Stalker attacks, raise the defending player's threat by 1.
   19099:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by 1 (the acting player)
 
 19099:A:3 (shadow): Shadow: Either raise your threat by 2, or return attacking enemy to the staging area.
   19099:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "threat":
         - raise threat by 2 (the acting player)
@@ -183,6 +187,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19100:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location has the Dark trait.)
   19100:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the active location is a Dark location (any player controls): the attacking enemy: stat attack 2, until the end of the attack
     - then, if not (the active location is a Dark location (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -241,6 +246,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19104:A:3 (shadow): Shadow: Raise your threat by 1.
   19104:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by 1 (the acting player)
 
 ## 19105 Cursed Tower
@@ -251,12 +257,13 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     - [json Discover {"verb":"Discover","amount":3}]
 
 19105:A:2 (front): While Cursed Tower is in the staging area, it gains: "Forced: After a player plays an event, raise his threat by 1."
-  19105:forced:2: Forced after this card is played (heard about card (any player controls) of card type event)
+  19105:forced:2: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if this card is in the staging area
     - raise threat by 1 (the player the event is about)
 
 19105:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
   19105:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -274,6 +281,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19106:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   19106:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
 
@@ -289,6 +297,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19107:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise the defending player's threat by 3.
   19107:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -315,7 +324,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
   19109:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
     - shuffle the encounter deck
 
 19109:B:1 (back): This stage cannot be defeated unless the players control at least 1 Loot objective.
@@ -336,6 +345,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 19110:B:1 (back): Forced: At the beginning of the quest phase, the first player must choose: either raise each player's threat by 2, or discard cards from the top of the encounter deck until a location is discarded and add that location to the staging area.
   19110:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "threat":
         - raise threat by 2 (each player)
@@ -361,16 +371,16 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19111:B:1 (back): Fram's Shade is immune to player card effects.
   19111:constant:1: Constant
-    - each card (any player controls) named "Fram's Shade", (enemies engaged with a player included): stat immuneToPlayerCards 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, named "Fram's Shade", (enemies engaged with a player included): stat immuneToPlayerCards 1, while this card is in play
 
 19111:B:2 (back): While The Cursed Tomb is in the victory display, Fram's Shade gains victory 6.
   19111:constant:2: Constant
     only if the card with code 19097 is in the victory display
-    - each card (any player controls) named "Fram's Shade", (enemies engaged with a player included): stat gainsVictory 6, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, named "Fram's Shade", (enemies engaged with a player included): stat gainsVictory 6, while this card is in play
 
 19111:B:3 (back): This stage cannot be defeated unless Fram's Shade is in the victory display. When the players defeat this stage, they win the game.
   19111:constant:3: Constant
     only if the card with code 19098 is not in the victory display
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 196 by template, 39 as JSON)
+(rendered pieces: 198 by template, 37 as JSON)

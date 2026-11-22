@@ -58,6 +58,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 02063:A:2 (front): Action: Exhaust a hero to claim this objective if it has no encounters attached. Then, attach Athelas to that hero.
   02063:action:1: Action (any player may use it)
     only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (there is a ready hero (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
@@ -69,11 +70,12 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 02064:A:1 (front): No attachments. The first player gains control of Wilyador, as an ally.
   02064:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
     - this card is controlled by the first player while this holds (a card in the staging area joins that player's play area, faceup and ready), and passes to each new first player when the token moves
 
 02064:A:2 (front): Forced: At the end of each round, Wilyador suffers 2 damage.
   02064:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - deal 2 damage to this card
 
 02064:A:3 (front): Wilyador cannot be healed of more than 5 wounds by a single effect. If Wilyador leaves play, the players have lost the game.
@@ -97,7 +99,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 02065:A:3 (front): Travel: Players must complete stage one of this quest before they can travel to Rhosgobel.
   02065:constant:3: Constant
     only if the players are on stage 1
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
 
 ## 02066 Forest Grove
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -117,6 +119,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 02067:A:2 (shadow): Shadow: Deal 1 damage to each exhausted character.
   02067:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to each exhausted character (any player controls)
 
 ## 02068 Swarming Insects
@@ -128,6 +131,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 02068:A:2 (shadow): Shadow: If a character (including Wilyador) has more damage than each other character, deal 3 additional damage to that character.
   02068:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (any player controls) with more damage than each other character in play (a tie for the most matches none)
     - then, if there is a character (any player controls) with more damage than each other character in play (a tie for the most matches none) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 3 damage to the picked card
@@ -141,6 +145,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 02069:A:2 (shadow): Shadow: Deal 1 damage to each wounded character. (2 damage instead if this attack is undefended.)
   02069:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): deal 1 damage to each damaged character (any player controls)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to each damaged character (any player controls)
@@ -154,6 +159,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 02070:A:2 (shadow): Shadow: If this attack is undefended, the damage must be placed on Wilyador.
   02070:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attack has no defender: the damage of this attack, if undefended, must go on a character (any player controls) named "Wilyador" in play, whoever controls it, if able (a defended attack still damages its defender)
 
 ## 02071 Black Forest Bats
@@ -165,6 +171,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 02071:A:2 (shadow): Shadow: If this attack is undefended, the damage must be placed on Wilyador.
   02071:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attack has no defender: the damage of this attack, if undefended, must go on a character (any player controls) named "Wilyador" in play, whoever controls it, if able (a defended attack still damages its defender)
 
 === Nightmare deck (the cards the scenario's Nightmare deck adds) ===
@@ -244,12 +251,14 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 900602:A:2 (front): Forced: At the end of the combat phase, deal 1 damage to Wilyador.
   900602:forced:1: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (there is a character (any player controls) named "Wilyador" to choose)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (any player controls) named "Wilyador"
     - deal 1 damage to the picked card
 
 900602:A:3 (shadow): Shadow: If Wilyador has 10 or less damage on him, deal 2 damage to Wilyador.
   900602:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (any player controls) named "Wilyador"
     - then, if not (10 is less than damage of the picked card) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
@@ -258,12 +267,13 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 900603:A:1 (front): While Treetop Bird-eater is engaged with a player, characters controlled by that player cannot be healed.
   900603:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - engagedSeatCharacters: stat cannotBeHealed 1, while this card is in play
 
 900603:A:2 (front): Forced: At the beginning of the encounter phase, Treetop Bird-eater engages the player who controls Wilyador (regardless of threat).
   900603:forced:1: Forced when a phase begins
     only if it is the Encounter phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - this enemy engages the player who controls a character (you control) named "Wilyador" (the first player chooses among several; nothing when it is already engaged with that player; an enemy engaged with another player leaves that player)
 
 ## 900604 Dark-wood Grove
@@ -271,11 +281,12 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 900604:A:1 (front): Dark-wood Grove gets +1 Threat and +1 quest point for each Athelas card in play.
   900604:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat threat the number of card (any player controls) named "Athelas", while this card is in play
-    - this card: stat questPoints the number of card (any player controls) named "Athelas", while this card is in play
+    - this card: stat threat the number of card (any player controls) or in the staging area or the active location, named "Athelas", while this card is in play
+    - this card: stat questPoints the number of card (any player controls) or in the staging area or the active location, named "Athelas", while this card is in play
 
 900604:A:2 (shadow): Shadow: If defending player controls at least 1 Athelas card, attacking enemy makes an additional attack after this one.
   900604:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if there is a character (you control) with an attachment named "Athelas" to choose: the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 900605 Labyrinthine Woods
@@ -289,6 +300,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 900605:A:2 (shadow): Shadow: After this attack, attacking enemy engages the next player and makes an additional attack.
   900605:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if another player is still in the game: the attacking enemy engages the next player
       - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
@@ -302,6 +314,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 900606:A:2 (shadow): Shadow: Attacking enemy cannot be attacked by characters with the ranged keyword until the end of the phase.
   900606:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat cannotBeAttackedByRanged 1, until the end of the phase
 
 ## 900607 Shot from the Sky
@@ -321,6 +334,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 900607:A:3 (shadow): Shadow: Resolve the "when revealed" effect of Shot from the Sky.
   900607:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the When Revealed effects of this card resolve as if it had just been revealed
 
 ## 900608 Noxious Supplies

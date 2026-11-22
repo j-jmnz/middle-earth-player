@@ -50,7 +50,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19066:A:1 (front): Shadow cards dealt to Dagnir are immune to player card effects and their effects cannot be canceled.
   19066:constant:1: Constant
-    - each card (any player controls) named "Dagnir", (enemies engaged with a player included): stat shadowsImmune 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, named "Dagnir", (enemies engaged with a player included): stat shadowsImmune (the shadow cards dealt to it are immune to player card effects, so no Response cancels their effects) 1, while this card is in play
 
 19066:A:2 (front): Forced: After Draw Her Fire becomes the current quest, Dagnir makes an immediate attack against the first player.
   19066:forced:1: Forced on the event becameCurrentQuest
@@ -63,7 +63,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19067:A:1 (front): Characters do not count their Defense when defending against Dagnir.
   19067:constant:1: Constant
-    - each card (any player controls) named "Dagnir", (enemies engaged with a player included): stat defenseIgnored 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, named "Dagnir", (enemies engaged with a player included): stat defenseIgnored 1, while this card is in play
 
 19067:A:2 (front): Response: When Fortify the Defense is defeated, each player chooses: either draw 3 cards, or each hero he controls gains 1 resource.
   19067:response:1: Response on the event questDefeated
@@ -79,7 +79,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19068:A:1 (front): Allies cannot be declared as attackers against Dagnir.
   19068:constant:1: Constant
-    - each card (any player controls) named "Dagnir", (enemies engaged with a player included): stat alliesCannotAttack (allies cannot be declared as attackers against it) 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, named "Dagnir", (enemies engaged with a player included): stat alliesCannotAttack (allies cannot be declared as attackers against it) 1, while this card is in play
 
 19068:A:2 (front): Response: When Rally the Woodmen is defeated, each player searches the top 5 cards of his deck for an ally, puts it into play and shuffles his deck.
   19068:response:1: Response on the event questDefeated
@@ -94,6 +94,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 19069:A:1 (front): Forced: At the end of the quest phase, deal 5 damage to Hrogar's Hill.
   19069:forced:1: Forced at the end of the phase
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - deal 5 damage to the current quest stage
 
 19069:A:2 (front): Response: When Douse the Flames is defeated, remove 10 damage from Hrogar's Hill.
@@ -117,11 +118,12 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 19071:A:1 (front): While Defend the Town is the current quest, reveal an additional encounter card during the quest phase.
   19071:constant:1: Constant
     only if this card holds the flag currentQuest
-    - the table: stat revealMore 1, while this card is in play
+    - the table: stat revealMore (the staging step reveals this many more cards, after the one each player makes; they go to the players in turn, the first player first, and while the stages are separate to the player whose stage holds the effect) 1, while this card is in play
 
 19071:A:2 (front): Forced: At the end of the encounter phase, deal 1 damage to Hrogar's Hill for each enemy in the staging area.
   19071:forced:1: Forced at the end of the phase
     only if it is the Encounter phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - deal the number of enemy (any player controls) in the staging area only damage to the current quest stage
 
 ## 19072 Rout the Goblins
@@ -135,7 +137,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19072:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one Goblin enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed) [also {"different":true}]
+      - the acting player finds one Goblin enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed); its title must differ from every card an earlier search of this effect found
     - shuffle the encounter deck
 
 ## 19073 Face the Dragon
@@ -143,15 +145,15 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19073:A:1 (front): Forced: After Dagnir attacks and destroys a character, heal 5 damage from her.
   19073:forced:1: Forced on the event characterDestroyedByAttack
-    only if the event's other card is a card (any player controls) named "Dagnir", (enemies engaged with a player included)
+    only if the event's other card is a card (any player controls) or in the staging area or the active location, named "Dagnir", (enemies engaged with a player included)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) named "Dagnir", (enemies engaged with a player included)
+    - choose card (any player controls) or in the staging area or the active location, named "Dagnir", (enemies engaged with a player included)
     - heal 5 damage from the picked card
 
 19073:A:2 (front): Forced: After Face the Dragon is defeated, deal 5 damage to Dagnir.
   19073:forced:2: Forced on the event questDefeated
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) named "Dagnir", (enemies engaged with a player included)
+    - choose card (any player controls) or in the staging area or the active location, named "Dagnir", (enemies engaged with a player included)
     - deal 5 damage to the picked card
 
 ## 19074 Dagnir
@@ -166,8 +168,8 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19074:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
-    - this card: stat damageCap the number of card (any player controls) in the victory display, a side quest of either kind (player or encounter) + 1, while this card is in play
-    - this card: stat damageCapSparesQuest 1, while this card is in play
+    - this card: stat damageCap (it takes no more than this much damage each round; damage past it is not placed) the number of card (any player controls) in the victory display, a side quest of either kind (player or encounter) + 1, while this card is in play
+    - this card: stat damageCapSparesQuest (damage from a quest card is not held to its damage cap) 1, while this card is in play
 
 19074:A:3 (front): While at least 3 side quests are in the victory display, Dagnir is considered to be engaged with each player.
   19074:constant:3: Constant
@@ -182,6 +184,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19075:A:1 (front): Forced: After The Dragon's Thrall engages you, either deal 3 damage to Hrogar's Hill, or it makes an immediate attack against you.
   19075:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "hill":
         - deal 3 damage to the current quest stage
@@ -190,6 +193,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19075:A:2 (shadow): Shadow: If this attack destroys a character, deal 3 damage to Hrogar's Hill.
   19075:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): deal 3 damage to the current quest stage
 
@@ -207,6 +211,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19076:A:2 (shadow): Shadow: Attacker gets +1 Attack (+2 Attack instead if Hrogar's Hill has at least 25 damage on it).
   19076:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (24 is less than damage of the current quest stage): the attacking enemy: stat attack 1, until the end of the attack
     - then, if 24 is less than damage of the current quest stage (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -217,6 +222,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 19077:A:1 (front): While Town Gate is in the staging area, it gains: 'Forced: At the end of the quest phase, place 1 resource here. Then, if there are 3 resources here, discard Town Gate and deal 4 damage to Hrogar's Hill.'
   19077:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 resource tokens on this card
     - then, if 2 is less than resources of this card (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
@@ -234,7 +240,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 19078:A:1 (front): While Wooden Palisade is the active location, Dagnir gets -2 Attack.
   19078:constant:1: Constant
     only if this card is the active location
-    - each card (any player controls) named "Dagnir", (enemies engaged with a player included): stat attack -2, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, named "Dagnir", (enemies engaged with a player included): stat attack -2, while this card is in play
 
 19078:A:2 (front): Travel: The first player readies a hero he controls.
   19078:travel:1: Travel
@@ -269,6 +275,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19080:A:3 (shadow): Shadow: Excess damage from this attack must be dealt to Hrogar's Hill.
   19080:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - [json ExcessToStage {"verb":"ExcessToStage"}]
 
 ## 19081 The Dragon's Fury
@@ -282,6 +289,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19081:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   19081:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
 
@@ -294,6 +302,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19082:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each side quest in the victory display.
   19082:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the number of card (any player controls) in the victory display, a side quest of either kind (player or encounter), until the end of the attack
 
 ## 19083 Hrogar's Hill
@@ -310,6 +319,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 19083:B:1 (back): Forced: At the end of the planning phase, reveal the top card of the side quest deck and add it to the staging area. Dagnir makes an attack against Hrogar's Hill. Do not deal a shadow card for this attack. The first player may declare a defender for this attack. Excess damage must be dealt to Hrogar's Hill.
   19083:forced:1: Forced at the end of the phase
     only if it is the Planning phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json RevealSideQuest {"verb":"RevealSideQuest"}]
     - choose enemy (any player controls) or in the staging area, named "Dagnir"
@@ -324,4 +334,4 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19083:constant:2: Constant
     - this card: stat loseAtDamage quest points of this card, while this card is in play
 
-(rendered pieces: 196 by template, 13 as JSON)
+(rendered pieces: 197 by template, 12 as JSON)
