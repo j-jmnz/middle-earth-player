@@ -221,9 +221,7 @@ describe("Fallen Into Evil (142083:A:1) and Ill Fate (142090:A:2) count as Condi
     expect(state.cards[first(state, FALLEN)]?.zone).toBe("encounterDiscard");
   });
 
-  // FAULT: the card prints "If Fallen into Evil is discarded, return attached hero to its owner's control", but discarded by a player card (Miner of the Iron Hills) it
-  // leaves the hero in the staging area as the enemy weak~enemy: no leftPlay event is announced for it, so 142083:triggered:1 never runs.
-  it.fails("142083:A:1 discarded by a player card, it returns the attached hero to its owner's control", () => {
+  it("142083:A:1 discarded by a player card, it returns the attached hero to its owner's control", () => {
     const { state, hero } = fallAndDiscard();
     expect(state.cards[hero]?.code).toBe("weak");
     expect(state.cards[hero]?.controller).toBe(1);

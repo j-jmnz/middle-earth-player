@@ -125,6 +125,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: ["lost-in-mirkwood"], note: "Unseen Danger discards the character it removed from the quest when the discarded card's printed Threat is greater than that character's Willpower, not the encounter card." },
   { version: 38, scenarios: ["lost-in-mirkwood", "the-siege-of-annuminas"], note: "While Accursed Forest or Hills of Evendim is in the staging area, only 'when revealed' effects cannot be canceled: a Shadow effect can still be canceled." },
   { version: 38, scenarios: ["into-the-pit", "the-caves-of-nibin-dum", "mount-gundabad", "foundations-of-stone", "the-long-dark"], note: "A Restricted attachment a Setup attaches, like Cave Torch or Wormsbane, counts toward the limit of 2 Restricted attachments on a hero: a third one makes one of them go to the discard pile." },
+  { version: 38, scenarios: ["breaking-of-the-fellowship"], note: "When a player card discards Fallen into Evil, the hero it holds returns to its owner's control, as it does when the card leaves play any other way." },
 ];
 
 export const ENGINE_VERSION = 38;
