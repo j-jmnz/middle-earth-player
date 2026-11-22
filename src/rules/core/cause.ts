@@ -26,8 +26,16 @@ export const UNATTRIBUTED: { rule: string } = { rule: "rr.effects" };
 // while one is active takes it, and any other step takes the rule its framework code names.
 const active = new WeakMap<object, Cause[]>();
 
+// Test only: the golden suite installs a set that notes each effect record whose instructions run (test/harness/reached.ts), so `pnpm test scenario` can list the records no golden resolves. Nothing reads it in the app; a run with none installed does one null check.
+let reached: Set<string> | null = null;
+
+export function recordReached(into: Set<string> | null): void {
+  reached = into;
+}
+
 export function inCause<T>(steps: object, cause: Cause | undefined, run: () => T): T {
   if (!cause) return run();
+  if (reached && "effect" in cause) reached.add(cause.effect);
   const stack = active.get(steps) ?? [];
   active.set(steps, [...stack, cause]);
   try {

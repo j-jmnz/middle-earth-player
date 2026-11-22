@@ -10,7 +10,7 @@ Read whole.
 
 - `CLAUDE.md` — Claude Code (~3.5K tok)
   - 7–26 Data (~1.4K)
-  - 27–46 Commands (~1.3K)
+  - 27–46 Commands (~1.4K)
   - 47–50 Agents (~200)
   - 51–54 Skills (~80)
   - 55–58 Cloud sessions (~60)
