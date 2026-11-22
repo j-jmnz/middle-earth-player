@@ -131,7 +131,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 (the scenario deals it into the staging pile; the piles place it, no record does)
 
 141045:A:1 (front): Response: After the players travel here, the first player puts 1 ally into play from his hand.
-  141045:response:1: Response after the players travel
+  141045:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ally (you control) in hand, chosen by the first player, that can be put into play (a unique card with a copy in play, or one a play restriction bars, cannot be chosen)
     - move the picked card into play under the first player's control
@@ -192,7 +192,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 141049:A:1 (front): Response: After the players travel here, place 1 non-unique enemy in play facedown under this location. While an enemy is under this location, it is out of play.
-  141049:response:1: Response after the players travel
+  141049:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose non-unique enemy (any player controls) or in the staging area
     - the last picked card is placed facedown under this location; while it is there it is out of play

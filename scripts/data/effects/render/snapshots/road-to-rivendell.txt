@@ -59,7 +59,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 04042:A:1 (front): Response: After you travel to Ruined Road, the first player places 2 progress tokens on it or readies 1 hero he controls.
-  04042:response:1: Response after the players travel
+  04042:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - the first player chooses one of:
       * option "progress":
         - place 2 progress on this card

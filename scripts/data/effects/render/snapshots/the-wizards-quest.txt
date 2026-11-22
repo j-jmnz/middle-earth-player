@@ -164,7 +164,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 51010:A:2 (front): Response: After the players travel to Rhosgobel, add 1 resource to each hero's pool and each player draws 1 card.
-  51010:response:1: Response after the players travel
+  51010:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each hero (any player controls):
       - add 1 resources to the picked card
@@ -514,7 +514,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 51035:A:1 (front): Response: After the players travel to Troll Cave, each player draws 1 card.
-  51035:response:1: Response after the players travel
+  51035:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - for each player, first player first:
       - the acting player draws 1 card(s)
 

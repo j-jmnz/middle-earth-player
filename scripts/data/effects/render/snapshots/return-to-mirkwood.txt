@@ -109,7 +109,7 @@ Scenario piles that place cards with no record (quest: 02126 Through the Forest;
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 02134:A:1 (front): Response: After the players travel to Wood Elf Path, the player guarding Gollum may choose a new player to guard him.
-  02134:response:1: Response after the players travel (answered by the player guarding Gollum)
+  02134:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone; answered by the player guarding Gollum)
     only if the player guarding Gollum may choose a new player: no card says he cannot change and another player is still in the game
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose player (another player controls)

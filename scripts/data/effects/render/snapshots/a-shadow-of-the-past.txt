@@ -123,7 +123,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 141034:A:1 (front): Response: After the players travel to Bamfurlong, each player engaged with a Nazgûl enemy may ready a hero he controls.
-  141034:response:1: Response after the players travel
+  141034:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "ready" (only if the actor has a Nazgûl enemy engaged):

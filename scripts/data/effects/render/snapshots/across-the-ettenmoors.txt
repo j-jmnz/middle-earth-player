@@ -97,7 +97,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
   10068:constant:4: Constant
     only if this card is the active location
     - each card (any player controls) or in the staging area or the active location, of card type encounter-side-quest: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
-  10068:forced:1: Forced after the players travel
+  10068:forced:1: Forced after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return every enemy engaged with a player to the staging area
   10068:forced:2: Forced at the end of the phase
@@ -109,7 +109,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 10068:A:3 (front): Response: After you travel to Secluded Cave, each player draws 3 cards.
-  10068:response:1: Response after the players travel
+  10068:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - for each player, first player first:
       - the acting player draws 3 card(s)
 
@@ -130,7 +130,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
   10069:constant:4: Constant
     only if this card is the active location
     - each card (any player controls) or in the staging area or the active location, of card type encounter-side-quest: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
-  10069:forced:1: Forced after the players travel
+  10069:forced:1: Forced after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return every enemy engaged with a player to the staging area
   10069:forced:2: Forced at the end of the phase
@@ -142,7 +142,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 10069:A:3 (front): Response: After you travel to The Hoarwell, heal 1 damage from each character in play.
-  10069:response:1: Response after the players travel
+  10069:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - for each character (any player controls):
       - heal 1 damage from the picked card
 
@@ -163,7 +163,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
   10070:constant:4: Constant
     only if this card is the active location
     - each card (any player controls) or in the staging area or the active location, of card type encounter-side-quest: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
-  10070:forced:1: Forced after the players travel
+  10070:forced:1: Forced after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return every enemy engaged with a player to the staging area
   10070:forced:2: Forced at the end of the phase
@@ -175,7 +175,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 10070:A:3 (front): Response: After you travel to Abandoned Camp, each player may return 1 card from his discard pile to his hand.
-  10070:response:1: Response after the players travel
+  10070:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "return" (only if there is a card (you control) in the discard pile to choose):
@@ -200,7 +200,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
   10071:constant:4: Constant
     only if this card is the active location
     - each card (any player controls) or in the staging area or the active location, of card type encounter-side-quest: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
-  10071:forced:1: Forced after the players travel
+  10071:forced:1: Forced after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return every enemy engaged with a player to the staging area
   10071:forced:2: Forced at the end of the phase
@@ -212,7 +212,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 10071:A:3 (front): Response: After you travel to Patch of Woods, each player adds 1 resource to each of his heroes' resource pools.
-  10071:response:1: Response after the players travel
+  10071:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - for each player, first player first:
       - each hero the acting player controls gains 1 resource(s)
 

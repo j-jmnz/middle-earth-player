@@ -172,7 +172,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 19043:A:2 (front): Response: After the players travel to Slopes of Ered Mithrin, the first player may ready a character he controls.
-  19043:response:1: Response after the players travel
+  19043:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     only if there is a exhausted character (you control) chosen by the first player to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose exhausted character (you control) chosen by the first player

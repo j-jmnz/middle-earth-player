@@ -724,7 +724,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 51149:A:1 (front): Response: After the players travel to Old Forest Road, the first player discards the top card of his deck. If that card is an ally, he puts it into play.
-  51149:response:1: Response after the players travel
+  51149:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top 1 card(s) of the acting player's deck go to their discard pile
     - choose card (you control) in the discard pile, of card type ally, among the cards this effect looked at or discarded
