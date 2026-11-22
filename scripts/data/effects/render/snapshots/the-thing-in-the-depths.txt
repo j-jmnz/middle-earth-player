@@ -73,16 +73,16 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 11194:B:4 (back): • 1 XP if Captain Sahír has 5 or more resources.
   11194:resolution:3: Resolution
-    - if the number of card (any player controls) or in the staging area or the active location, named "Captain Sahír" [also {"minResources":5}] is at least 1: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - if the number of card (any player controls) or in the staging area or the active location, named "Captain Sahír", with at least 5 resources on it is at least 1: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11194:B:5 (back): • 1 XP if Na'asiyah has 5 or more resources.
   11194:resolution:4: Resolution
-    - if the number of card (any player controls) or in the staging area or the active location, named "Na'asiyah" [also {"minResources":5}] is at least 1: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - if the number of card (any player controls) or in the staging area or the active location, named "Na'asiyah", with at least 5 resources on it is at least 1: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11194:B:6 (back): • 1 XP if Sea Serpent (Enraged side) is in play (2 XP instead if it is in the victory display).
   11194:resolution:5: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if the number of enemy (any player controls) or in the staging area, named "Sea Serpent" [also {"side":"B"}] is at least 1: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - if the number of enemy (any player controls) or in the staging area, named "Sea Serpent", showing side B is at least 1: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
     - then, if the card with code 11196 is in the victory display (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: gain 2 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11194:B:7 (back): • 1 XP if each hero has no damage on it.
@@ -251,16 +251,16 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12048:A:1 (front): When Revealed: Exhaust each character with 1 Defense or less.
   12048:whenRevealed:1: When revealed
-    - for each character (any player controls) [also {"maxDefense":1}]:
+    - for each character (any player controls) with a current Defense of 1 or less:
       - exhaust the picked card
 
 12048:A:2 (shadow): Shadow: If the defending character has 0 Defense, discard it. Otherwise, the defending character gets -2 Defense for this attack.
   12048:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose character (any player controls) defending [also {"maxDefense":0}]
+    - choose character (any player controls) defending, with a current Defense of 0 or less
     - discard the picked card
-    - then, if not (the defender is a character (any player controls) [also {"maxDefense":0}]) (checked when this step runs, after the steps above; not tied to whether they did anything): the defender: stat defense -2, until the end of the attack
+    - then, if not (the defender is a character (any player controls) with a current Defense of 0 or less) (checked when this step runs, after the steps above; not tied to whether they did anything): the defender: stat defense -2, until the end of the attack
 
 ## 12049 The Thing in the Depths
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -385,4 +385,4 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
       - the picked enemy attacks the acting player now, from the staging area
 
-(rendered pieces: 211 by template, 6 as JSON)
+(rendered pieces: 217 by template, 0 as JSON)

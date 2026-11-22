@@ -1,5 +1,6 @@
 // Pick filters: the noun phrase a Pick, a count or a holder names ("enemy in play (any player) named \"Urdug\""). `src/catalog/effect-schema-pick.ts` owns the keys.
 import { onWords } from "./escape.ts";
+import { attachmentWords, familyPickNotes } from "./picks-family.ts";
 import { done, isObj, joinAnd, jsonOf, quoted, str, type Ctx, type Obj } from "./kit.ts";
 
 export type PickRenderer = (pick: unknown, ctx: Ctx) => string;
@@ -96,7 +97,8 @@ export const renderPick: PickRenderer = (value, ctx) => {
   const attachedNone = isObj(pick.hasAttachment) && pick.hasAttachment.none === true && Object.keys(pick.hasAttachment).length === 1;
   const attachedTrait = isObj(pick.hasAttachment) && typeof pick.hasAttachment.trait === "string" && Object.keys(pick.hasAttachment).length === 1 ? pick.hasAttachment.trait : null;
   const attachedTraitNone = isObj(pick.hasAttachment) && typeof pick.hasAttachment.trait === "string" && pick.hasAttachment.none === true && Object.keys(pick.hasAttachment).length === 2 ? pick.hasAttachment.trait : null;
-  note(["hasAttachment"], attachedTraitNone ? `with no ${attachedTraitNone} card attached` : attached ? `${attached.none === true ? "with no" : "with an"} attachment named ${quoted(attached.names as unknown[])}` : attachedTrait ? `with a ${attachedTrait} card attached` : attachedNone ? "with no attachment of any kind" : null);
+  note(["hasAttachment"], attachedTraitNone ? `with no ${attachedTraitNone} card attached` : attached ? `${attached.none === true ? "with no" : "with an"} attachment named ${quoted(attached.names as unknown[])}` : attachedTrait ? `with a ${attachedTrait} card attached` : attachedNone ? "with no attachment of any kind" : attachmentWords(pick.hasAttachment));
+  familyPickNotes(pick, note);
   note(["active"], pick.active === true ? "that is the active location" : null);
   note(["participating"], pick.participating === true ? "that took part in the attack this effect answers" : null);
   note(["controlledBy"], pick.controlledBy === "firstPlayer" ? "controlled by the first player" : pick.controlledBy === "actor" ? "controlled by the player this effect runs for" : pick.controlledBy === "attackers" ? "controlled by a player whose character took part in the attack this effect answers" : pick.controlledBy === "source" ? "controlled by the player this card is engaged with" : pick.controlledBy === "host" ? "controlled by the player who controls this card's host" : pick.controlledBy === "picked" ? "controlled by the player picked last" : null);

@@ -106,7 +106,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 146031:A:2 (front): Forced: After a player cancels a 'when revealed' effect, The Mouth of Sauron makes an immediate attack against that player.
   146031:forced:1: Forced on the event whenRevealedCanceled
     only if this card is in the staging area
-    - this card attacks the acting player now, from the staging area
+    - this card attacks the player the event is about now, from the staging area
 
 ## 146032 Nazgûl of Mordor
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -242,7 +242,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146039:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a enemy (any player controls) in the staging area only, named "The Mouth of Sauron" to choose: choose enemy (any player controls) in the staging area only, named "The Mouth of Sauron"
-    - then, if there is a enemy (any player controls) in the staging area only, named "The Mouth of Sauron" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area [also {"raiseThreatIfDestroys":4}]
+    - then, if there is a enemy (any player controls) in the staging area only, named "The Mouth of Sauron" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area; once the attack ends the player attacked raises their threat by 4 if it destroyed a character
 
 146039:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if it is The Mouth of Sauron).
   146039:shadow:1: Shadow
@@ -306,8 +306,8 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
     (steps run in order; a step depends on an earlier one only through its own condition)
     - in player order, each player places the top card of their deck faceup in front of them until there are 4 faceup player cards between the players (a player with an empty deck passes), and the top 4 cards of the encounter deck are placed faceup; both rows lie set aside, faceup, out of the decks, and are remembered as the Embassy until EmbassyEnd
     - repeat 4 times:
-      - choose card (any player controls) or in the staging area or the active location, with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides), chosen by the first player [also {"embassy":"player"}]
-      - choose card (any player controls) or in the staging area or the active location, with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), chosen by the first player [also {"embassy":"encounter"}]
+      - choose card (any player controls) or in the staging area or the active location, with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides), chosen by the first player, a player card of the Embassy's faceup row that is not paired yet
+      - choose card (any player controls) or in the staging area or the active location, with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), chosen by the first player, an encounter card of the Embassy's faceup row that is not paired yet
       - the last two cards picked (a player card of the row, then an encounter card of it) make one pair, in the order they were paired (with either pick empty no pair is made)
     - repeat 4 times:
       - the next pair, in the order they were paired, becomes the pair the running effect is on: its player card and its encounter card are picked (nothing is picked once the pairs are done)
@@ -345,4 +345,4 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:constant:2: Constant
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 234 by template, 3 as JSON)
+(rendered pieces: 237 by template, 0 as JSON)

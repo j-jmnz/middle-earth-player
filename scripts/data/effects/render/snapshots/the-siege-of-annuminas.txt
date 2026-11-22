@@ -51,7 +51,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
   50804:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
-    - discard from the top of the encounter deck until 1 enemy for each player less 1 is discarded; add those enemies to the staging area [also {"atLeast":1}]
+    - discard from the top of the encounter deck until 1 enemy for each player less 1, at least 1, is discarded; add those enemies to the staging area
 
 50804:B:1 (back): This stage gets -10 quest points for each Host of Angmar in a victory display.
   50804:constant:1: Constant
@@ -92,11 +92,11 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50805:B:2 (back): Response: At the end of the round, raise each player's threat by 1 and reveal an encounter card to choose a non-unique enemy worth no victory points at another stage. Discard the chosen enemy.
   50805:response:1: Response at the end of the round
-    only if there is a non-unique enemy (any player controls) at another stage than the chooser's (none while the game has one stage) [also {"noVictory":true}] to choose
+    only if there is a non-unique enemy (any player controls) at another stage than the chooser's (none while the game has one stage), that prints no victory points to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (each player)
     - the acting player reveals an encounter card
-    - choose non-unique enemy (any player controls) at another stage than the chooser's (none while the game has one stage) [also {"noVictory":true}]
+    - choose non-unique enemy (any player controls) at another stage than the chooser's (none while the game has one stage), that prints no victory points
     - discard the picked card
 
 50805:B:3 (back): If Lieutenant of Angmar is in a victory display at the end of the round, the players have routed the enemy and win the game.
@@ -479,4 +479,4 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
     - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
-(rendered pieces: 300 by template, 3 as JSON)
+(rendered pieces: 303 by template, 0 as JSON)

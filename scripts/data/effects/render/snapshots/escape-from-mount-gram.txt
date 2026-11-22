@@ -112,9 +112,9 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10044:A:2 (front): Response: After the captured card(s) underneath Dungeon Guard are rescued, the players may put 1 of them into play at no cost.
   10044:response:1: Response on the event capturedRescued (heard about this card; answered by the player the event happened to)
-    only if there is a card (any player controls) or in the staging area or the active location, chosen by the first player [also {"captured":"rescued"}] to choose
+    only if there is a card (any player controls) or in the staging area or the active location, chosen by the first player, that the last rescue put into a hand and is still there to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) or in the staging area or the active location, chosen by the first player [also {"captured":"rescued"}]
+    - choose card (any player controls) or in the staging area or the active location, chosen by the first player, that the last rescue put into a hand and is still there
     - the last card picked is put into play at no cost under its owner: an ally or a hero, or an attachment attached to a hero its owner controls (the owner chooses which when several can have it); any other card stays where it is
 
 ## 10045 Goblin Tormentor
@@ -144,9 +144,9 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10046:A:2 (front): Response: After the players travel to Prison Cell, look at the captured card(s) underneath it and choose 1 to put into play at no cost. Place the other cards back underneath Prison Cell.
   10046:response:1: Response after the players travel (heard about this card)
-    only if there is a card (any player controls) or in the staging area or the active location, chosen by the first player [also {"captured":"underSelf"}] to choose
+    only if there is a card (any player controls) or in the staging area or the active location, chosen by the first player, captured underneath this card (any owner's; one its owner cannot put into play is left out) to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) or in the staging area or the active location, chosen by the first player [also {"captured":"underSelf"}]
+    - choose card (any player controls) or in the staging area or the active location, chosen by the first player, captured underneath this card (any owner's; one its owner cannot put into play is left out)
     - the last card picked is put into play at no cost under its owner: an ally or a hero, or an attachment attached to a hero its owner controls (the owner chooses which when several can have it); any other card stays where it is
 
 ## 10047 Patrol Room
@@ -225,7 +225,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10051:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose ally (you control)
-      - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), chosen by the first player [also {"captured":"hosts"}]
+      - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), chosen by the first player, among the encounter cards in play in the asking player's staging area (the staged cards, the active location and the enemies engaged with a player there)
       - the card picked before the last pick, an ally the acting player controls, is captured from play underneath the card the last pick chose (nothing when the earlier pick found no ally)
 
 10051:A:2 (shadow): Shadow: If this attack would damage an ally, capture that ally underneath the attacking enemy instead.
@@ -245,7 +245,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10052:A:2 (shadow): Shadow: Discard a random card from your hand and raise your threat by its printed cost.
   10052:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - the acting player discards 1 random card(s) from hand [also {"raiseByCost":true}]
+    - the acting player discards 1 random card(s) from hand; the discarding player's threat is raised by the discarded card's printed cost (0 for a card with no printed cost or an X cost)
 
 ## 10053 Stop the Executioners!
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -320,7 +320,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10177:A:2 (front): Each ally that shares a Trait with attached hero gets +1 Willpower.
   10177:constant:2: Constant
-    - each ally (any player controls) [also {"sharesTrait":"host"}]: stat willpower 1, while this card is in play
+    - each ally (any player controls) that shares at least one Trait with this card's host (never that card itself): stat willpower 1, while this card is in play
 
 ## 10178 Coruhaer
 
@@ -368,4 +368,4 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10181:response:1: Response after a player's attack destroys an enemy (heard about the host; limit once per game)
     - the event's other card is added to the victory display
 
-(rendered pieces: 197 by template, 7 as JSON)
+(rendered pieces: 204 by template, 0 as JSON)

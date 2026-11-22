@@ -15,7 +15,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if it is the Combat phase
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if the number of Corsair enemy (any player controls) or in the staging area is at least 1: choose location (any player controls) chosen by the first player [also {"aflame":true,"lowestAflame":true}]
+    - if the number of Corsair enemy (any player controls) or in the staging area is at least 1: choose location (any player controls) chosen by the first player, that prints the Aflame keyword, with the lowest Aflame value of those (every one of them when tied, and then the chooser decides)
     - then, if the number of Corsair enemy (any player controls) or in the staging area is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): deal the number of Corsair enemy (any player controls) or in the staging area damage to the picked card
 
 ## 11037 Sahír's Advance
@@ -84,8 +84,8 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11040:A:1 (front): When Revealed: Either deal 2 damage to an Aflame location in play, or search the encounter deck and discard pile for the Aflame location with the highest Aflame value, and add it to the staging area.
   11040:whenRevealed:1: When revealed
     - the first player chooses one of:
-      * option "damage" (only if there is a location (any player controls) [also {"aflame":true}] to choose):
-        - choose location (any player controls) chosen by the first player [also {"aflame":true}]
+      * option "damage" (only if there is a location (any player controls) that prints the Aflame keyword to choose):
+        - choose location (any player controls) chosen by the first player, that prints the Aflame keyword
         - deal 2 damage to the picked card
       * option "search" (only if the encounter discard pile or deck holds a location with the Aflame keyword):
         - the Aflame location with the highest Aflame value in the encounter deck and its discard pile is added to the staging area, not revealed (of locations tied on the value that are not copies of one card the first player chooses; the deck is not shuffled)
@@ -98,7 +98,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 resource tokens on this card
-    - choose location (any player controls) chosen by the first player [also {"aflame":true,"lowestAflame":true}]
+    - choose location (any player controls) chosen by the first player, that prints the Aflame keyword, with the lowest Aflame value of those (every one of them when tied, and then the chooser decides)
     - deal resources of this card damage to the picked card
 
 ## 11042 Mithlond Harbor
@@ -158,7 +158,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attacking enemy is a Raider enemy (any player controls): choose character (any player controls) defending
-    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) [also {"attackingEnemy":true}]
+    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) that is the enemy making the attack in progress
     - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): move all the resource tokens from the card picked before the last to the last card picked
 
 ## 11045 White Ship
@@ -195,7 +195,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attacking enemy is a Raider enemy (any player controls): the acting player discards 1 random card(s) from hand
-    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) [also {"attackingEnemy":true}]
+    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) that is the enemy making the attack in progress
     - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the picked card
 
 ## 11047 Elven Caravel
@@ -222,17 +222,17 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
         * option "character" (only if there is a character (you control) to choose):
           - choose character (you control)
           - deal 3 damage to the picked card
-        * option "location" (only if there is a location (any player controls) [also {"aflame":true}] to choose):
-          - choose location (any player controls) [also {"aflame":true}]
+        * option "location" (only if there is a location (any player controls) that prints the Aflame keyword to choose):
+          - choose location (any player controls) that prints the Aflame keyword
           - deal 3 damage to the picked card
 
 11048:A:2 (shadow): Shadow: If the active location has the Aflame keyword, either deal it 3 damage or deal the defending character 1 damage.
   11048:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
-      * option "location" (only if the active location is a location (any player controls) [also {"aflame":true}]):
+      * option "location" (only if the active location is a location (any player controls) that prints the Aflame keyword):
         - deal 3 damage to the active location
-      * option "character" (only if all of: (the active location is a location (any player controls) [also {"aflame":true}]) and (there is a character (any player controls) defending to choose)):
+      * option "character" (only if all of: (the active location is a location (any player controls) that prints the Aflame keyword) and (there is a character (any player controls) defending to choose)):
         - deal 1 damage to the defender
 
 ## 11049 The Fires Spread
@@ -244,14 +244,14 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11049:A:2 (front): When Revealed: Deal 1 damage to each Aflame location in play. If less than 3 total damage is dealt by this effect, The Fires Spread gains surge.
   11049:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if the number of location (any player controls) [also {"aflame":true}] is at most 2: this card gains surge (one more encounter card is revealed when it has been resolved)
-    - deal 1 damage to each location (any player controls) [also {"aflame":true}]
+    - if the number of location (any player controls) that prints the Aflame keyword is at most 2: this card gains surge (one more encounter card is revealed when it has been resolved)
+    - deal 1 damage to each location (any player controls) that prints the Aflame keyword
 
 11049:A:3 (shadow): Shadow: If this attack destroys a character, deal 1 damage to each Aflame location in play.
   11049:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): deal 1 damage to each location (any player controls) [also {"aflame":true}]
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): deal 1 damage to each location (any player controls) that prints the Aflame keyword
 
 ## 11064 Umbar Raider
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -312,7 +312,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
   11067:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if the attacking enemy is a Raider enemy (any player controls): choose enemy (any player controls) [also {"attackingEnemy":true}]
+    - if the attacking enemy is a Raider enemy (any player controls): choose enemy (any player controls) that is the enemy making the attack in progress
     - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): place 2 resource tokens on the picked card
 
 ## 11076 Captain Sahír
@@ -430,7 +430,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - a card with code 11188 from the box joins the encounter deck, which is shuffled
     - Campaign Setup: the set-aside copy of the card with code 11180 is attached to the card in play named "Calphon" (a card dealt on its Upgraded side stays so)
     - Campaign Setup: the set-aside copy of the card with code 11183 is attached to the card in play named "Calphon" (a card dealt on its Upgraded side stays so)
-    - each player in turn may take "11184" or "11185" or "11186" or "11187" into their hand [also {"unearned":true,"afterMulligan":true}]
+    - each player in turn may take "11184" or "11185" or "11186" or "11187" into their hand (the card joins the hand once the mulligan is over, so a mulligan cannot shuffle it into the deck) (dealt there but not earned: the scenario's Resolution decides whether it joins the pool)
 
 11182:A:3 (front): Forced: After stage 2B is revealed, remove Calphon and each attachment on him from the game, ignoring his "leaves play" ability.
   11182:forced:1: Forced on the event afterStageRevealed
@@ -439,7 +439,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11182:B:1 (back): Resolution: If Graxar is in the victory display, choose either Parrying Cutlass or Throwing Axe, add it to the Campaign Pool, and record which hero you attach it to.
   11182:resolution:1: Resolution
-    - if the card with code 11188 is in the victory display: the first player takes "11189" or "11190" attached to a hero [also {"anyHero":true}]
+    - if the card with code 11188 is in the victory display: the first player takes "11189" or "11190" attached to a hero (the hero may be any player's, not only the chooser's)
 
 11182:B:2 (back): Add the copies of Galdor's Counsel chosen during setup to the Campaign Pool.
   11182:resolution:2: Resolution
@@ -499,4 +499,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with a player (that player is who "you" means in this record)) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 328 by template, 16 as JSON)
+(rendered pieces: 344 by template, 0 as JSON)

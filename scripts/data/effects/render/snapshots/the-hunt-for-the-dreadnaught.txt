@@ -874,7 +874,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40043:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, in the staging area only, with the highest current engagement cost of those (ties: the chooser decides), chosen by the first player
-    - this enemy, in the staging area, engages the first player [also {"target":"picked"}]
+    - the picked enemy, in the staging area, engages the first player
     - the last picked enemy makes an immediate attack against the first player (when it is in the staging area; counted as an attack made, like any attack an effect makes; an enemy that stays in the staging area counts for noneReturned too)
     - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
@@ -942,4 +942,4 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
-(rendered pieces: 563 by template, 1 as JSON)
+(rendered pieces: 564 by template, 0 as JSON)

@@ -32,11 +32,11 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 50902:A:1 (front): When Revealed: The first player may remove 10 progress from Power of Lórien to take control of the set-aside Host of Lórien. Then, he may remove an additional 20 progress from Power of Lórien to place it in his play area under his control, otherwise discard it.
   50902:whenRevealed:1: When revealed
     - the first player chooses one of:
-      * option "host" (only if there is a objective (any player controls) named "Power of Lórien" [also {"minProgress":10}] to choose):
+      * option "host" (only if there is a objective (any player controls) named "Power of Lórien", with at least 10 progress on it to choose):
         - remove 10 progress from "Power of Lórien"
         - the set-aside card with code 50909 enters play under the first player's control, ready
         - the first player chooses one of:
-          * option "power" (only if there is a objective (any player controls) named "Power of Lórien" [also {"minProgress":20}] to choose):
+          * option "power" (only if there is a objective (any player controls) named "Power of Lórien", with at least 20 progress on it to choose):
             - remove 20 progress from "Power of Lórien"
             - the card in the staging area with code 50908 enters the first player's play area under his control, faceup and ready
           * option "discard":
@@ -200,7 +200,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
             - remove 5 progress from the current quest card (all of it when it holds less)
             - choose player (any player controls) chosen by the first player
             - the rest of the effect is carried out by the last player picked
-            - choose card (you control) in the deck, among the top 10, of card type ally [also {"intoPlay":true}]
+            - choose card (you control) in the deck, among the top 10, of card type ally, that can be put into play (a unique card with a copy in play, or one a play restriction bars, cannot be chosen)
             - the picked card is put into play from wherever it is out of play (hand, discard pile, deck): it is not played, so no cost is paid and no play restriction applies, and a unique card with a copy in play stays where it is; a hero goes among its controller's heroes, any other card into the play area, ready, under the acting player's control
           * option "decline":
       * option "penalty" (only if there is a ally (any player controls) to choose):
@@ -638,4 +638,4 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     who acts: the acting player is the first player (a phase has no player of its own)
     - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 1) and (the number of Lieutenant enemy (any player controls) or in the staging area is at most 0): the players win the game
 
-(rendered pieces: 519 by template, 3 as JSON)
+(rendered pieces: 522 by template, 0 as JSON)

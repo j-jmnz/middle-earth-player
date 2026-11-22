@@ -16,7 +16,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource token(s) are placed on this card
     - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): 3 treasures the log has not recorded and the game has not dealt are drawn with the game's seed and the first player chooses one: it is the picked card, set aside until a later pick of a card it may attach to and the attach step put it on that character; the players claim it
-    - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, chosen by the first player [also {"hostForPicked":true}]
+    - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, chosen by the first player, that the last picked attachment may be attached to
     - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before the last pick (an attachment) is attached to the last picked card
 
 120165:B:1 (back): Resolution: The heroes' selfless valor in protecting the refugees from Harad has inspired Turayn. If the heroes choose to accept his aid, add Turayn to the campaign pool (any player may add him to their deck). Otherwise, mark in the campaign log that "Turayn has taken an oath of vigilance" (he will follow the heroes' example and continue to protect the free folk of Wilderland).
@@ -262,7 +262,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18066:B:3 (back): This stage cannot be defeated while an enemy from the Evil Creatures deck is in play.
   18066:constant:1: Constant
-    only if there is a enemy (any player controls) or in the staging area [also {"fromDeck":"evilCreatures"}] to choose
+    only if there is a enemy (any player controls) or in the staging area, dealt into the Evil Creatures deck, in play or not to choose
     - the players cannot defeat this stage while this holds
 
 ## 18067 Woodmen Under Attack
@@ -344,4 +344,4 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     - the players lose the game
 
-(rendered pieces: 239 by template, 2 as JSON)
+(rendered pieces: 241 by template, 0 as JSON)

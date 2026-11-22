@@ -416,7 +416,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51228:A:2 (shadow): Shadow: If attacking enemy was engaged this round, it cannot take damage this phase.
   51228:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - if the attacking enemy is a enemy (any player controls) [also {"engagedThisRound":true}]: the attacking enemy: stat cannotTakeDamage 1, until the end of the phase
+    - if the attacking enemy is a enemy (any player controls) that engaged a player this round: the attacking enemy: stat cannotTakeDamage 1, until the end of the phase
 
 ## 51229 Sudden Pitfall
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -636,8 +636,8 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
   51244:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose): the attacking enemy: stat attack 1, until the end of the attack
-    - then, if there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - if not (there is a enemy (any player controls) engaged with you, other than the enemy making the attack in progress to choose): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if there is a enemy (any player controls) engaged with you, other than the enemy making the attack in progress to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 51245 Goblin Archer
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -757,4 +757,4 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     - for each enemy (any player controls) engaged with you:
       - the picked card: stat attack 1, until the end of the phase
 
-(rendered pieces: 438 by template, 3 as JSON)
+(rendered pieces: 441 by template, 0 as JSON)

@@ -324,7 +324,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
     - choose player (any player controls) chosen by the first player
     - this card, an Encounter-keyword player card just revealed into the staging area, enters the play area of the picked player, committed to the quest, still its owner's card
     - later, at the end of the round (cannot be canceled while the number of hero (any player controls) is at least 0):
-      - discard this card [also {"counted":true}]
+      - discard this card (a card discarded out of play counts for the effect's noneDiscarded condition: the part after "then" resolves only if the discard did)
       - then, if not (the running effect has discarded no card (with DiscardEach)) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
 
-(rendered pieces: 225 by template, 1 as JSON)
+(rendered pieces: 226 by template, 0 as JSON)

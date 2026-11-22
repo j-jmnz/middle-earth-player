@@ -84,7 +84,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 110138:A:3 (front): Response: After you play a card with an odd printed cost, add 1 resource to a hero's resource pool. (Limit once per round.)
-  110138:response:1: Response after this card is played (heard about card (you control) [also {"oddCost":true}]; limit once per round)
+  110138:response:1: Response after this card is played (heard about card (you control) with an odd printed cost (a card with no printed cost, or with X, is not); limit once per round)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - add 1 resources to the picked card
@@ -103,7 +103,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 110138:B:4 (back): Response: After you play a card with an odd printed cost, add 1 resource to a hero's resource pool. (Limit twice per round.)
-  110138:response:2: Response after this card is played (heard about card (you control) [also {"oddCost":true}]; limit twice per round)
+  110138:response:2: Response after this card is played (heard about card (you control) with an odd printed cost (a card with no printed cost, or with X, is not); limit twice per round)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - add 1 resources to the picked card
@@ -754,4 +754,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   11171:resolution:9: Resolution
     - if the number of card (any player controls) in the victory display, named "Ominous Fate" is at least 1: Resolution: lose 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
-(rendered pieces: 352 by template, 2 as JSON)
+(rendered pieces: 354 by template, 0 as JSON)

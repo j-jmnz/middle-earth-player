@@ -120,10 +120,10 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
       - the hero picked before the last pick (the enemy found is in the staging area) loses its tokens (its attachments stay on it) and lies facedown under the enemy (in play, controlled by no one), flagged as guarded; the enemy guards it (nothing when no enemy was found)
 
 51008:B:2 (back): If there is an unguarded hero in the staging area, return it to its owner's control, exhausted. This stage cannot be defeated while there is a guarded objective in play. If the players defeat this stage, they win the game.
-  51008:forced:1: Forced after a card leaves play (heard about card (any player controls) or in the staging area or the active location [also {"guardsHero":true}])
+  51008:forced:1: Forced after a card leaves play (heard about card (any player controls) or in the staging area or the active location, that guards a hero, in play or not)
     - the hero the event's subject (the enemy) guarded comes back among its owner's heroes, faceup and exhausted (when the enemy leaves play in any way)
   51008:constant:1: Constant
-    only if there is a enemy (any player controls) or in the staging area [also {"guardsHero":true}] to choose
+    only if there is a enemy (any player controls) or in the staging area, that guards a hero, in play or not to choose
     - the players cannot defeat this stage while this holds
   51008:questResolution:1: Quest resolution
     - the players win the game
@@ -309,8 +309,8 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
   51020:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (the defender is a character (any player controls) [also {"hasAttachment":{}}]): the attacking enemy: stat attack 1, until the end of the attack
-    - then, if the defender is a character (any player controls) [also {"hasAttachment":{}}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - if not (the defender is a character (any player controls) with an attachment): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a character (any player controls) with an attachment (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 51021 Goblin Sniper
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -487,7 +487,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51033:A:1 (front): When Revealed: The opposing team chooses any number of non-unique encounter cards in play. Discard the chosen cards and reveal an equal number of cards from the top of the encounter deck.
   51033:whenRevealed:1: When revealed
-    - for each card (any player controls) or in the staging area or the active location, that is an enemy or a location, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the lowest Threat of those (ties: the chooser decides), (enemies engaged with a player included) [also {"unique":false}]:
+    - for each card (any player controls) or in the staging area or the active location, that is an enemy or a location, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the lowest Threat of those (ties: the chooser decides), (enemies engaged with a player included), (unique: false filters nothing: the engine reads only unique: true):
       - discard the picked card
       - the acting player reveals an encounter card
 
@@ -682,7 +682,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51047:A:2 (shadow): Shadow: If attacking enemy was engaged this round, it cannot take damage until the end of the round.
   51047:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - if the attacking enemy is a enemy (any player controls) [also {"engagedThisRound":true}]: the attacking enemy: stat cannotTakeDamage 1, until the end of the round
+    - if the attacking enemy is a enemy (any player controls) that engaged a player this round: the attacking enemy: stat cannotTakeDamage 1, until the end of the round
 
 ## 51048 Fastness of Mirkwood
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -782,8 +782,8 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51054:A:1 (front): When Revealed: Exhaust each character with an attachment. If no character is exhausted this way, Weighed Down gains surge.
   51054:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (there is a ready character (any player controls) [also {"hasAttachment":{}}] to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
-    - for each ready character (any player controls) [also {"hasAttachment":{}}]:
+    - if not (there is a ready character (any player controls) with an attachment to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - for each ready character (any player controls) with an attachment:
       - exhaust the picked card
 
 51054:A:2 (shadow): Shadow: Discard an attachment from the defending character.
@@ -793,4 +793,4 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
     - choose attachment (any player controls) attached to the defending character
     - discard the picked card
 
-(rendered pieces: 480 by template, 8 as JSON)
+(rendered pieces: 488 by template, 0 as JSON)

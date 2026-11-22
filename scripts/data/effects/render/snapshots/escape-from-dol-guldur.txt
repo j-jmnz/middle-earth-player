@@ -316,7 +316,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
   900303:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose enemy (any player controls) or in the staging area [also {"attackingEnemy":true}]
+    - choose enemy (any player controls) or in the staging area, that is the enemy making the attack in progress
     - later, at the end of this phase, acting on the card last picked:
       - if the picked card is in play now: raise threat by 7 (the acting player)
 
@@ -335,7 +335,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 900305:A:1 (front): If Torture Chamber has 4 or more resource tokens on it, all "prisoners" were killed, and the players have lost the game.
   900305:constant:1: Constant
-    only if this card is a location (any player controls) [also {"minResources":4}]
+    only if this card is a location (any player controls) with at least 4 resources on it
     - the players lose the game
 
 900305:A:2 (front): Forced: At the end of each round, place 1 resource token on each Dol Guldur location in play.
@@ -399,4 +399,4 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each card (any player controls) or in the staging area or the active location, with a copy of it (the same title) in its controller's discard pile:
       - discard the picked card
 
-(rendered pieces: 224 by template, 2 as JSON)
+(rendered pieces: 226 by template, 0 as JSON)

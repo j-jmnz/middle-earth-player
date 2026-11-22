@@ -133,7 +133,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141045:A:1 (front): Response: After the players travel here, the first player puts 1 ally into play from his hand.
   141045:response:1: Response after the players travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose ally (you control) in hand, chosen by the first player [also {"intoPlay":true}]
+    - choose ally (you control) in hand, chosen by the first player, that can be put into play (a unique card with a copy in play, or one a play restriction bars, cannot be chosen)
     - move the picked card into play under the first player's control
 
 141045:A:2 (front): Forced: After The Prancing Pony leaves play, discard cards from the top of the encounter deck until X enemies have been discarded. X is the number of players in the game. Put each enemy discarded by this effect into play engaged with the first player.
@@ -592,4 +592,4 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906209:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 278 by template, 1 as JSON)
+(rendered pieces: 279 by template, 0 as JSON)

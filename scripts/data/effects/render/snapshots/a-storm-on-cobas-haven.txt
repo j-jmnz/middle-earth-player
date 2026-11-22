@@ -61,7 +61,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - Campaign Setup, after the quest card's Setup has prepared the fleet: each player in player order takes one of the set-aside cards with codes 11172, 11173, 11174 and 11175 for each ship-objective they control, in the order the ships were taken, and attaches it to that ship (a card dealt on its Upgraded side if the log says it is upgraded)
     - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
     - the set-aside card titled "Gavin" is put into play under a player the first player chooses
-    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
+    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand (the card joins the hand once the mulligan is over, so a mulligan cannot shuffle it into the deck) (dealt there but not earned: the scenario's Resolution decides whether it joins the pool)
 
 11209:A:3 (front): Put Calaerion into play under the control of the player with the Dream-chaser. Put Gavin into play under any player's control. One player may choose a copy of Círdan's Blessing not in the Campaign Pool and add it to their hand.
   11209:campaignSetup:1: Campaign setup (record also names 11209:A:2)
@@ -83,7 +83,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - Campaign Setup, after the quest card's Setup has prepared the fleet: each player in player order takes one of the set-aside cards with codes 11172, 11173, 11174 and 11175 for each ship-objective they control, in the order the ships were taken, and attaches it to that ship (a card dealt on its Upgraded side if the log says it is upgraded)
     - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
     - the set-aside card titled "Gavin" is put into play under a player the first player chooses
-    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
+    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand (the card joins the hand once the mulligan is over, so a mulligan cannot shuffle it into the deck) (dealt there but not earned: the scenario's Resolution decides whether it joins the pool)
 
 11209:B:1 (back): Resolution: Add the Círdan's Blessing chosen during setup to the Campaign Pool. The players may spend 4 XP on Gavin to record in the Campaign Log that "Gavin returned."
   11209:resolution:1: Resolution
@@ -451,4 +451,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     only if the players control this objective: a freed objective in the staging area, or one a player claimed and attached to a hero
     - this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) -4, while this card is in play
 
-(rendered pieces: 282 by template, 2 as JSON)
+(rendered pieces: 284 by template, 0 as JSON)

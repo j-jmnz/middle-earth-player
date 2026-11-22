@@ -293,8 +293,8 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 19049:B:1 (back): Each enemy with 1 or more guarded attachments gets +2 Threat and +2 Defense.
   19049:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each enemy (any player controls) or in the staging area [also {"guardsCard":true}]: stat threat 2, while this card is in play
-    - each enemy (any player controls) or in the staging area [also {"guardsCard":true}]: stat defense 2, while this card is in play
+    - each enemy (any player controls) or in the staging area, that guards a card, as the guard of an objective or as the keeper of a player card held under it: stat threat 2, while this card is in play
+    - each enemy (any player controls) or in the staging area, that guards a card, as the guard of an objective or as the keeper of a player card held under it: stat defense 2, while this card is in play
 
 19049:B:2 (back): Forced: When the players defeat this stage, remove it from the game. Advance to a random stage 2A, if able. Otherwise, advance to stage 3A.
   19049:forced:1: Forced on the event questCardDefeated (heard about this card)
@@ -303,7 +303,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 19049:B:3 (back): The Grey Mountain Giant guarding Urdug's Horn cannot take damage unless there is at least 5 progress on this stage. This stage cannot be defeated unless the first player controls Urdug with Urdug's Horn attached.
   19049:constant:2: Constant
     only if not (the current quest stage holds at least 5 progress)
-    - each enemy (any player controls) or in the staging area, named "Grey Mountain Giant" [also {"guardsNamed":"Urdug's Horn"}]: stat cannotTakeDamage 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Grey Mountain Giant", attached as the guard of the objective titled "Urdug's Horn": stat cannotTakeDamage 1, while this card is in play
   19049:constant:3: Constant
     only if not (the number of card (you control) named "Urdug", chosen by the first player, with an attachment named "Urdug's Horn" is at least 1)
     - the players cannot defeat this stage while this holds
@@ -324,7 +324,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19050:B:1 (back): Each encounter card guarding a card is immune to player card effects.
   19050:constant:1: Constant
-    - each card (any player controls) or in the staging area or the active location, (enemies engaged with a player included) [also {"guardsCard":true}]: stat immuneToPlayerCards 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, (enemies engaged with a player included), that guards a card, as the guard of an objective or as the keeper of a player card held under it: stat immuneToPlayerCards 1, while this card is in play
 
 19050:B:2 (back): Forced: When the players defeat this stage, remove it from the game. Advance to a random stage 2A, if able. Otherwise, advance to stage 3A.
   19050:forced:1: Forced on the event questCardDefeated (heard about this card)
@@ -439,4 +439,4 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     who acts: the acting player is the player the enemy engaged
     - engage this card
 
-(rendered pieces: 355 by template, 4 as JSON)
+(rendered pieces: 359 by template, 0 as JSON)

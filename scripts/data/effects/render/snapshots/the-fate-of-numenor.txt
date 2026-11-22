@@ -67,7 +67,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
     - progress equal to printed quest points of the card the event is about is placed on the main quest stage (a quest effect: a full stage advances)
 
 11025:B:3 (back): Forced: When an Uncharted location becomes the active location, add 1 copy of Lost Island from the top of the Uncharted deck to the staging area.
-  11025:forced:2: Forced after this location becomes the active location (heard about location (any player controls) [also {"uncharted":true}])
+  11025:forced:2: Forced after this location becomes the active location (heard about location (any player controls) that is a double-sided location lying on its Lost Island side (Uncharted))
     - the top 1 cards of the Uncharted deck join the staging area without being revealed, Lost Island side up (the deck is not shuffled)
 
 ## 11026 A Fateful Discovery
@@ -82,7 +82,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11026:B:1 (back): Forced: After a location is explored, if it would be shuffled into the Uncharted deck, add it to the victory display, instead.
   11026:forced:1: Forced after a card leaves play (heard about location (any player controls))
-    only if all of: (the card the event is about had enough progress to be explored) and (the card the event is about is a location (any player controls) [also {"uncharted":true}])
+    only if all of: (the card the event is about had enough progress to be explored) and (the card the event is about is a location (any player controls) that is a double-sided location lying on its Lost Island side (Uncharted))
     - the card the event is about is added to the victory display
 
 11026:B:2 (back): The players cannot defeat this stage unless Shrine to Morgoth is in the victory display. When Shrine to Morgoth is added to the victory display, the players win the game.
@@ -104,7 +104,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
   11027:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - exhaust each ally (any player controls) of card type ally [also {"maxCost":2}]
+    - exhaust each ally (any player controls) of card type ally, with a printed cost of 2 or less
     - for each player, first player first:
       - the acting player finds one Undead enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - shuffle the encounter deck
@@ -122,7 +122,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11027:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   11027:action:1: Action (any player may use it)
-    only if this card is a location (any player controls) [also {"minProgress":4}]
+    only if this card is a location (any player controls) with at least 4 progress on it
     who acts: any player may trigger it; the acting player is the one who does
     - the acting player looks at the facedown side of this card, after 4 progress is taken off it in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
@@ -157,8 +157,8 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player looks at the top 1 card(s) of their own deck (a card with a Forced effect for being looked at acts at once and is not one of them)
-    - then, if the picked card is a card (any player controls) or in the staging area or the active location [also {"maxCost":2}] (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card (only from deck) goes to the bottom of its owner's deck
-    - then, if the picked card is a card (any player controls) or in the staging area or the active location [also {"maxCost":2}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, until the end of the round
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, with a printed cost of 2 or less (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card (only from deck) goes to the bottom of its owner's deck
+    - then, if the picked card is a card (any player controls) or in the staging area or the active location, with a printed cost of 2 or less (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, until the end of the round
 
 ## 11030 Lush Jungle
 (the scenario deals it into the unchartedDeck pile; the piles place it, no record does)
@@ -192,7 +192,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11030:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   11030:action:1: Action (any player may use it)
-    only if this card is a location (any player controls) [also {"minProgress":4}]
+    only if this card is a location (any player controls) with at least 4 progress on it
     who acts: any player may trigger it; the acting player is the one who does
     - the acting player looks at the facedown side of this card, after 4 progress is taken off it in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
@@ -225,7 +225,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11031:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   11031:action:1: Action (any player may use it)
-    only if this card is a location (any player controls) [also {"minProgress":4}]
+    only if this card is a location (any player controls) with at least 4 progress on it
     who acts: any player may trigger it; the acting player is the one who does
     - the acting player looks at the facedown side of this card, after 4 progress is taken off it in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
@@ -234,9 +234,9 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11032:A:1 (front): Response: After Steep Plateau is explored, look at the facedown side of an Uncharted location in the staging area.
   11032:response:1: Response after a card leaves play (heard about this card)
-    only if all of: (the card the event is about had enough progress to be explored) and (there is a location (any player controls) in the staging area only [also {"uncharted":true}] to choose)
+    only if all of: (the card the event is about had enough progress to be explored) and (there is a location (any player controls) in the staging area only, that is a double-sided location lying on its Lost Island side (Uncharted) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose location (any player controls) in the staging area only [also {"uncharted":true}]
+    - choose location (any player controls) in the staging area only, that is a double-sided location lying on its Lost Island side (Uncharted)
     - the acting player looks at the facedown side of the picked card in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
 11032:A:2 (shadow): Shadow: Discard the bottom card of the defending player's deck. If that card's printed cost is 2 or less, attacking enemy gets +2 Attack.
@@ -255,7 +255,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
       * option "exhaust":
         - in player order, each player exhausts a ready character they control, choosing it (a player with none exhausts none)
       * option "threat":
-        - each location (any player controls) in the staging area only [also {"uncharted":true}]: stat threat 1, until the end of the phase
+        - each location (any player controls) in the staging area only, that is a double-sided location lying on its Lost Island side (Uncharted): stat threat 1, until the end of the phase
 
 11033:A:2 (shadow): Shadow: Discard the bottom card of your deck. If that card's printed cost is 2 or less, exhaust a character you control.
   11033:shadow:1: Shadow
@@ -319,7 +319,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 11069:A:2 (front): Forced: When Soulless Cadaver engages you, place each card in your hand with printed cost 2 or less on the bottom of your deck.
   11069:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
     who acts: the acting player is the player the enemy engaged
-    - for each card (you control) in hand [also {"maxCost":2}]:
+    - for each card (you control) in hand, with a printed cost of 2 or less:
       - the picked card (only from hand) goes to the bottom of its owner's deck
 
 ## 11070 Throngs of Unfaithful
@@ -339,7 +339,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11071:A:1 (front): When Revealed: Deal 1 damage to each non-objective ally with printed cost 2 or less. Place each ally that is destroyed by this effect on the bottom of its owner's deck.
   11071:whenRevealed:1: When revealed
-    - for each ally (any player controls) of card type ally [also {"maxCost":2}]:
+    - for each ally (any player controls) of card type ally, with a printed cost of 2 or less:
       - deal 1 damage to the picked card
       - the picked card (only from discard) goes to the bottom of its owner's deck
 
@@ -372,7 +372,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11072:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   11072:action:1: Action (any player may use it)
-    only if this card is a location (any player controls) [also {"minProgress":4}]
+    only if this card is a location (any player controls) with at least 4 progress on it
     who acts: any player may trigger it; the acting player is the one who does
     - the acting player looks at the facedown side of this card, after 4 progress is taken off it in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
@@ -399,7 +399,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11073:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   11073:action:1: Action (any player may use it)
-    only if this card is a location (any player controls) [also {"minProgress":4}]
+    only if this card is a location (any player controls) with at least 4 progress on it
     who acts: any player may trigger it; the acting player is the one who does
     - the acting player looks at the facedown side of this card, after 4 progress is taken off it in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
@@ -424,7 +424,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11074:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   11074:action:1: Action (any player may use it)
-    only if this card is a location (any player controls) [also {"minProgress":4}]
+    only if this card is a location (any player controls) with at least 4 progress on it
     who acts: any player may trigger it; the acting player is the one who does
     - the acting player looks at the facedown side of this card, after 4 progress is taken off it in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
@@ -434,11 +434,11 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 11075:A:1 (front): When Revealed: The players, as a group, must remove characters with a total of at least X Willpower from the quest. X is the number of Uncharted locations in the staging area. The first player may give Aimless Wandering doomed 2 to look at the facedown side of an Uncharted location in the staging area.
   11075:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the first player removes committed characters of any player from the quest, one at a time, until their Willpower adds up to the number of location (any player controls) in the staging area only [also {"uncharted":true}] or none is left
+    - the first player removes committed characters of any player from the quest, one at a time, until their Willpower adds up to the number of location (any player controls) in the staging area only, that is a double-sided location lying on its Lost Island side (Uncharted) or none is left
     - the first player chooses one of:
-      * option "look" (only if there is a location (any player controls) in the staging area only [also {"uncharted":true}] to choose):
+      * option "look" (only if there is a location (any player controls) in the staging area only, that is a double-sided location lying on its Lost Island side (Uncharted) to choose):
         - each player raises their threat by 2 from the doomed keyword this card gains (doomedRaised is announced for each)
-        - choose location (any player controls) in the staging area only [also {"uncharted":true}]
+        - choose location (any player controls) in the staging area only, that is a double-sided location lying on its Lost Island side (Uncharted)
         - the acting player looks at the facedown side of the picked card in a look window (it stays facedown and none of the Forced effects of its other side happen)
       * option "skip":
 
@@ -480,4 +480,4 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
   11179:resolution:5: Resolution
     - if the number of card (any player controls) in the victory display, named "Ominous Fate" is at least 1: Resolution: lose 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
-(rendered pieces: 270 by template, 19 as JSON)
+(rendered pieces: 289 by template, 0 as JSON)

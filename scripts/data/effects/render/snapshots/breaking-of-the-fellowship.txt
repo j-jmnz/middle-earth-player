@@ -277,9 +277,9 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142074:A:2 (front): Response: When Seat of Seeing is explored, choose a burden card in play, in the encounter deck, or in the discard pile, and remove it from the game. Shuffle the encounter deck. (If you are playing campaign mode, remove that card from the campaign pool.)
   142074:response:1: Response after a card leaves play (heard about this card)
-    only if all of: (the card the event is about had enough progress to be explored) and (there is a card (any player controls) or in the staging area or the active location [also {"burden":true}] to choose)
+    only if all of: (the card the event is about had enough progress to be explored) and (there is a card (any player controls) or in the staging area or the active location, that is a burden card (Campaign Mode) in play, in the encounter deck or in the encounter discard pile to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) or in the staging area or the active location [also {"burden":true}]
+    - choose card (any player controls) or in the staging area or the active location, that is a burden card (Campaign Mode) in play, in the encounter deck or in the encounter discard pile
     - the last picked card is removed from the game
     - shuffle the encounter deck
 
@@ -348,8 +348,8 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
   142079:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}]): the attacking enemy: stat attack 1, until the end of the attack
-    - then, if the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - if not (the defender is a character (any player controls) with fewer printed hit points than the enemy making the attack in progress): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a character (any player controls) with fewer printed hit points than the enemy making the attack in progress (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 142080 Growing Threat
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -387,7 +387,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142081:A:2 (shadow): Shadow: If the defending character has fewer printed hit points than the attacking enemy, this attack is considered undefended.
   142081:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - if the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}]: this attack is considered undefended
+    - if the defender is a character (any player controls) with fewer printed hit points than the enemy making the attack in progress: this attack is considered undefended
 
 ## 142082 Black Feathered Arrows
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -400,8 +400,8 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
   142082:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}]): the attacking enemy: stat attack 1, until the end of the attack
-    - then, if the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - if not (the defender is a character (any player controls) with fewer printed hit points than the enemy making the attack in progress): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a character (any player controls) with fewer printed hit points than the enemy making the attack in progress (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 142083 Fallen Into Evil
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -441,4 +441,4 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 239 by template, 7 as JSON)
+(rendered pieces: 246 by template, 0 as JSON)

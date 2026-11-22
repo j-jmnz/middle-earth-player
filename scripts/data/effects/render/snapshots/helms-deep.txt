@@ -243,7 +243,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143072:B:1 (back): When Revealed: Each player chooses 1 ally in his hand that matches the sphere of a hero he controls and puts it into play under his control.
   143072:whenRevealed:1: When revealed
     - for each player, first player first:
-      - the acting player must choose up to 1 ally (you control) [also {"heroSphere":true}] card(s) in their hand and put it into play, one at a time (they may not stop while a card matches; nothing enters play with none that matches); each card is picked for the steps after it
+      - the acting player must choose up to 1 ally (you control) whose printed sphere is the printed sphere of a hero the chooser controls (a neutral card, or a Fellowship hero, matches no sphere) card(s) in their hand and put it into play, one at a time (they may not stop while a card matches; nothing enters play with none that matches); each card is picked for the steps after it
 
 143072:B:2 (back): Skip the quest phase and combat phase.
   143072:constant:1: Constant
@@ -345,4 +345,4 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if there is no enemy in play (in the staging area or engaged)
     - the players win the game
 
-(rendered pieces: 197 by template, 1 as JSON)
+(rendered pieces: 198 by template, 0 as JSON)

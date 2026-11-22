@@ -97,7 +97,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
-    - the picked enemy attacks the first player now, from the staging area (or engaged), undefended damage going to the stage [also {"excessToStage":true}]
+    - the picked enemy attacks the first player now, from the staging area (or engaged), undefended damage going to the stage, the damage beyond the defender's remaining hit points going on the main quest card too
 
 51307:B:3 (back): If this stage has damage on it equal to or greater than its quest points, the players lose the game. If this stage is defeated, the players win the game.
   51307:constant:2: Constant
@@ -118,9 +118,9 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51308:B:1 (back): Durin's Bane engages the first player.
   51308:forced:1: Forced after an encounter card is added to the staging area (heard about enemy (any player controls) or in the staging area, named "Durin's Bane")
-    - this enemy, in the staging area, engages the first player [also {"target":"subject"}]
+    - the enemy the event is about, in the staging area, engages the first player
   51308:forced:2: Forced on the event returnedToStaging (heard about enemy (any player controls) or in the staging area, named "Durin's Bane")
-    - this enemy, in the staging area, engages the first player [also {"target":"subject"}]
+    - the enemy the event is about, in the staging area, engages the first player
 
 51308:B:2 (back): Durin's Bane cannot take more than X damage each round, where X is the number of progress tokens on this stage.
   51308:constant:1: Constant
@@ -798,4 +798,4 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 469 by template, 3 as JSON)
+(rendered pieces: 472 by template, 0 as JSON)

@@ -494,8 +494,8 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
   51133:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (the attacking enemy is a enemy (any player controls) [also {"engagedThisRound":true}]): the attacking enemy: stat attack 1, until the end of the attack
-    - then, if the attacking enemy is a enemy (any player controls) [also {"engagedThisRound":true}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - if not (the attacking enemy is a enemy (any player controls) that engaged a player this round): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a enemy (any player controls) that engaged a player this round (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 51134 Mountains of Mirkwood
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -793,4 +793,4 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
     - choose attachment (you control)
     - discard the picked card
 
-(rendered pieces: 476 by template, 2 as JSON)
+(rendered pieces: 478 by template, 0 as JSON)

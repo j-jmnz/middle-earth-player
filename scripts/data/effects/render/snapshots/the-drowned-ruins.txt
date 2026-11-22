@@ -12,8 +12,8 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - a copy of the card with code 11183 is set aside, out of play
     - a card with code 11181 from the box joins the encounter deck, which is shuffled
     - Campaign Setup: the set-aside copy of the card with code 11183 is attached to the card in play named "Captain Sahír" (a card dealt on its Upgraded side stays so)
-    - each player in turn may take "11201" or "11202" or "11203" or "11204" into their hand [also {"unearned":true,"afterMulligan":true}]
-    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
+    - each player in turn may take "11201" or "11202" or "11203" or "11204" into their hand (the card joins the hand once the mulligan is over, so a mulligan cannot shuffle it into the deck) (dealt there but not earned: the scenario's Resolution decides whether it joins the pool)
+    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand (the card joins the hand once the mulligan is over, so a mulligan cannot shuffle it into the deck) (dealt there but not earned: the scenario's Resolution decides whether it joins the pool)
     - Campaign Setup: in player order, each character in play is offered to its controller to trade or keep: a trade deals 1 damage to it and lowers that player's threat by 1
 
 11200:A:3 (front): One player may choose one copy of Círdan's Blessing and add it to their hand. For each character in play, its controller may deal 1 damage to it to reduce their threat by 1.
@@ -23,8 +23,8 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - a copy of the card with code 11183 is set aside, out of play
     - a card with code 11181 from the box joins the encounter deck, which is shuffled
     - Campaign Setup: the set-aside copy of the card with code 11183 is attached to the card in play named "Captain Sahír" (a card dealt on its Upgraded side stays so)
-    - each player in turn may take "11201" or "11202" or "11203" or "11204" into their hand [also {"unearned":true,"afterMulligan":true}]
-    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
+    - each player in turn may take "11201" or "11202" or "11203" or "11204" into their hand (the card joins the hand once the mulligan is over, so a mulligan cannot shuffle it into the deck) (dealt there but not earned: the scenario's Resolution decides whether it joins the pool)
+    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand (the card joins the hand once the mulligan is over, so a mulligan cannot shuffle it into the deck) (dealt there but not earned: the scenario's Resolution decides whether it joins the pool)
     - Campaign Setup: in player order, each character in play is offered to its controller to trade or keep: a trade deals 1 damage to it and lowers that player's threat by 1
 
 11200:B:1 (back): Resolution: Add each copy of Command and Círdan's Blessing chosen during setup to the Campaign Pool.
@@ -45,7 +45,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 
 11200:B:5 (back): • 1 XP if Na'asiyah has 5 or more resources.
   11200:resolution:4: Resolution
-    - if the number of card (any player controls) or in the staging area or the active location, named "Na'asiyah" [also {"minResources":5}] is at least 1: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - if the number of card (any player controls) or in the staging area or the active location, named "Na'asiyah", with at least 5 resources on it is at least 1: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11200:B:6 (back): • 1 XP if no enemies are in play.
   11200:resolution:6: Resolution
@@ -87,7 +87,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - no player can play, or put into play, a card (you control) of card type attachment
 
 12092:B:2 (back): Forced: After a double-sided location is explored, add the top location from the Grotto deck to the staging area, Grotto side faceup.
-  12092:forced:2: Forced on the event locationExplored (heard about location (any player controls) [also {"doubleSided":true}])
+  12092:forced:2: Forced on the event locationExplored (heard about location (any player controls) that is a double-sided location, whichever side it shows)
     - the top 1 cards of the Grotto deck join the staging area without being revealed, Grotto side faceup
 
 12092:B:3 (back): You cannot advance unless there are at least 3 Underwater locations in the victory display.
@@ -326,15 +326,15 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - for each player, first player first:
       - the acting player chooses one of:
         * option "ally":
-          - the acting player discards each card (you control) in hand [also {"notCardType":"ally"}]
+          - the acting player discards each card (you control) in hand, whose printed type is not ally
         * option "attachment":
-          - the acting player discards each card (you control) in hand [also {"notCardType":"attachment"}]
+          - the acting player discards each card (you control) in hand, whose printed type is not attachment
         * option "event":
-          - the acting player discards each card (you control) in hand [also {"notCardType":"event"}]
+          - the acting player discards each card (you control) in hand, whose printed type is not event
         * option "player-side-quest":
-          - the acting player discards each card (you control) in hand [also {"notCardType":"player-side-quest"}]
+          - the acting player discards each card (you control) in hand, whose printed type is not player-side-quest
         * option "treasure":
-          - the acting player discards each card (you control) in hand [also {"notCardType":"treasure"}]
+          - the acting player discards each card (you control) in hand, whose printed type is not treasure
     - then, if the running effect has discarded no card (with DiscardEach) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 12106:A:2 (shadow): Shadow: If the active location is Underwater, search the encounter deck and discard pile for a Creature enemy, and add it to the staging area.
@@ -373,4 +373,4 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
-(rendered pieces: 257 by template, 11 as JSON)
+(rendered pieces: 268 by template, 0 as JSON)

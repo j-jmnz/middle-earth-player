@@ -55,10 +55,10 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 
 110078:A:2 (front): Action: Exhaust Gate Key and attached hero and spend 3 resources from attached hero's resource pool to look at the facedown side of a Temple of the Deceived location.
   110078:action:2: Action (cost: exhaust this card and exhaust the attached card and pay 3 resource(s) from the host's pool)
-    only if all of: (its host is a hero (any player controls)) and (there is a location (any player controls) [also {"island":"temple"}] to choose)
+    only if all of: (its host is a hero (any player controls)) and (there is a location (any player controls) in the Temple column of the Island Map that lies facedown, wherever it is on the map to choose)
     who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose location (any player controls) [also {"island":"temple"}]
+    - choose location (any player controls) in the Temple column of the Island Map that lies facedown, wherever it is on the map
     - the acting player looks at the facedown side of the picked card in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
 110078:B:1 (back): Campaign Mode only.
@@ -80,11 +80,11 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     only if its host is a hero (any player controls)
     who acts: any player may trigger it; the acting player is the one who does
     - the acting player chooses one of:
-      * option "temple" (only if there is a location (any player controls) [also {"island":"temple"}] to choose):
-        - choose location (any player controls) [also {"island":"temple"}]
+      * option "temple" (only if there is a location (any player controls) in the Temple column of the Island Map that lies facedown, wherever it is on the map to choose):
+        - choose location (any player controls) in the Temple column of the Island Map that lies facedown, wherever it is on the map
         - the acting player looks at the facedown side of the picked card in a look window (it stays facedown and none of the Forced effects of its other side happen)
-      * option "secret" (only if there is a card (any player controls) or in the staging area or the active location [also {"island":"secret"}] to choose):
-        - choose card (any player controls) or in the staging area or the active location [also {"island":"secret"}]
+      * option "secret" (only if there is a card (any player controls) or in the staging area or the active location, that is a card facedown under a Temple location (a secret) to choose):
+        - choose card (any player controls) or in the staging area or the active location, that is a card facedown under a Temple location (a secret)
         - the acting player looks at the picked secret (a facedown Temple of the Deceived location or secret), which stays facedown
 
 ## 11197 Temple of the Deceived
@@ -110,7 +110,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 
 11197:A:3 (front): Travel Action: Flip over a secret at your location. If it is a Recurring Nightmare, it engages you. If it is Starla, you gain control of her (ready).
   11197:action:1: Action (any player may use it)
-    only if all of: (it is the Travel phase) and (there is a card (any player controls) or in the staging area or the active location [also {"island":"here"}] to choose)
+    only if all of: (it is the Travel phase) and (there is a card (any player controls) or in the staging area or the active location, that is the secret under the active location to choose)
     - the secret under the active location turns faceup and the acting player takes the card as the line says (a Recurring Nightmare engages them, Starla comes under their control ready); nothing when the active location has no secret
 
 11197:B:1 (back): Resolution: If Starla is under a player's control, add her to the Campaign Pool. For each Recurring Nightmare that is not a secret, add it to the Campaign Pool and choose a player. For the remainder of the campaign, that player shuffles that Recurring Nightmare into their deck after they draw their starting hand.
@@ -161,7 +161,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     (steps run in order; a step depends on an earlier one only through its own condition)
     - Setup: the double-sided locations dealt as the Uncharted deck are separated: those with codes 12068 and 12069 (the Temple of the Deceived locations) are shuffled and laid in the right-hand column, the others are shuffled and fill the first four columns, a grid of three rows by five; each lies with its Lost Island (or Temple) side up, which nobody looks at
     - Setup: the top-left and bottom-left locations of the Island Map turn to their other side, with no flip announced (their Forced effects do not resolve)
-    - choose location (any player controls) chosen by the first player [also {"island":"start"}]
+    - choose location (any player controls) chosen by the first player, that is a faceup left corner of the Island Map at Setup, before one is the active location
     - Setup: the picked location becomes the active location where it lies (not a travel: no Travel effect, no traveled event, no Forced effect of becoming active)
     - the set-aside card titled "Captain Sahír" is put into play under the first player
     - the set-aside card titled "Na'asiyah" is put into play under the first player
@@ -188,7 +188,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 
 12068:A:2 (front): When the 8th progress is placed on The Grotto's Entrance, the players have found the sunken ruins and win the game.
   12068:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressPlaced (heard about this card)
-    only if this card is a location (any player controls) [also {"minProgress":8}]
+    only if this card is a location (any player controls) with at least 8 progress on it
     - the players win the game
 
 12068:B:1: Uncharted.
@@ -277,10 +277,10 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12071:A:2 (front): Action: Exhaust Gate Key and attached hero and spend 3 resources from attached hero's resource pool to look at the facedown side of a Temple of the Deceived.
   12071:action:2: Action (cost: exhaust this card and exhaust the attached card and pay 3 resource(s) from the host's pool)
-    only if all of: (its host is a hero (any player controls)) and (there is a location (any player controls) [also {"island":"temple"}] to choose)
+    only if all of: (its host is a hero (any player controls)) and (there is a location (any player controls) in the Temple column of the Island Map that lies facedown, wherever it is on the map to choose)
     who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose location (any player controls) [also {"island":"temple"}]
+    - choose location (any player controls) in the Temple column of the Island Map that lies facedown, wherever it is on the map
     - the acting player looks at the facedown side of the picked card in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
 ## 12072 Jagged Cliffs
@@ -294,7 +294,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12072:A:2 (front): Forced: When Jagged Cliffs is flipped over while active, look at the facedown side of each adjacent copy of Lost Island.
   12072:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
-    - for each location (any player controls) [also {"island":"adjacent"}]:
+    - for each location (any player controls) that is a copy of Lost Island (not Temple of the Deceived) next to the active location:
       - the acting player looks at the facedown side of the picked card in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
 12072:B:1: Uncharted.
@@ -310,7 +310,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12072:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   12072:action:1: Action (any player may use it)
-    only if this card is a location (any player controls) [also {"minProgress":4}]
+    only if this card is a location (any player controls) with at least 4 progress on it
     who acts: any player may trigger it; the acting player is the one who does
     - the acting player looks at the facedown side of this card, after 4 progress is taken off it in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
@@ -340,7 +340,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12073:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   12073:action:1: Action (any player may use it)
-    only if this card is a location (any player controls) [also {"minProgress":4}]
+    only if this card is a location (any player controls) with at least 4 progress on it
     who acts: any player may trigger it; the acting player is the one who does
     - the acting player looks at the facedown side of this card, after 4 progress is taken off it in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
@@ -356,7 +356,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
   12074:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
     - for each player, first player first:
-      - choose ready character (you control) [also {"minAttack":2}]
+      - choose ready character (you control) with a current Attack of at least 2
       - exhaust the picked card
 
 12074:B:1: Uncharted.
@@ -372,7 +372,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12074:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
   12074:action:1: Action (any player may use it)
-    only if this card is a location (any player controls) [also {"minProgress":4}]
+    only if this card is a location (any player controls) with at least 4 progress on it
     who acts: any player may trigger it; the acting player is the one who does
     - the acting player looks at the facedown side of this card, after 4 progress is taken off it in a look window (it stays facedown and none of the Forced effects of its other side happen)
 
@@ -474,10 +474,10 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12081:A:2 (front): When Revealed: Each Uncharted location in the staging area gets +1 Threat until the end of the phase. If the active location has the Ruins trait, discard 1 resource from each hero and objective-ally in play.
   12081:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each location (any player controls) in the staging area only [also {"uncharted":true}]: stat threat 1, until the end of the phase
+    - each location (any player controls) in the staging area only, that is a double-sided location lying on its Lost Island side (Uncharted): stat threat 1, until the end of the phase
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each ally (any player controls) that is an objective, with resources on it:
       - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each hero (any player controls) with resources on it:
       - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
 
-(rendered pieces: 313 by template, 17 as JSON)
+(rendered pieces: 330 by template, 0 as JSON)

@@ -86,8 +86,8 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
   146019:forced:1: Forced after the players travel (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
-    - then, if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the number of enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
-    - then, if there is a enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}]
+    - then, if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the number of enemy (any player controls) in the staging area only, with the same title as the last card picked, never that card itself is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+    - then, if there is a enemy (any player controls) in the staging area only, with the same title as the last card picked, never that card itself to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only, with the same title as the last card picked, never that card itself
     - then, if all of: (the picked card is a enemy (any player controls) in the staging area only) and (the card picked before is a enemy (any player controls) that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
 ## 146020 Shagrat
@@ -158,8 +158,8 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
   146023:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose: choose enemy (any player controls) engaged with you [also {"attackingEnemy":false}]
-    - then, if there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the attack in progress is resolved against the last picked enemy instead of the defenders: that enemy takes the damage after its Defense
+    - if there is a enemy (any player controls) engaged with you, other than the enemy making the attack in progress to choose: choose enemy (any player controls) engaged with you, other than the enemy making the attack in progress
+    - then, if there is a enemy (any player controls) engaged with you, other than the enemy making the attack in progress to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the attack in progress is resolved against the last picked enemy instead of the defenders: that enemy takes the damage after its Defense
 
 ## 146058 Orc of Mordor
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -327,8 +327,8 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
-    - then, if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the number of enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
-    - then, if there is a enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}]
+    - then, if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the number of enemy (any player controls) in the staging area only, with the same title as the last card picked, never that card itself is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+    - then, if there is a enemy (any player controls) in the staging area only, with the same title as the last card picked, never that card itself to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only, with the same title as the last card picked, never that card itself
     - then, if all of: (the picked card is a enemy (any player controls) in the staging area only) and (the card picked before is a enemy (any player controls) that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
 146067:B:2 (back): This stage cannot be defeated unless Topmost Chamber is in the victory display. When the Ring-bearer is free of encounters, the first player gains control of it.
@@ -401,4 +401,4 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     who acts: the acting player is the defending player (the player the attack is against)
     - this card: stat phantom (its attacks' damage is canceled and the defending player raises his threat by as much instead) 1, until the end of the attack
 
-(rendered pieces: 272 by template, 9 as JSON)
+(rendered pieces: 281 by template, 0 as JSON)
