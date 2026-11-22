@@ -137,7 +137,8 @@ describe("an explored location leaving play", () => {
       instructions: [{ verb: "Draw", amount: 1 }],
     };
     const ctx = { effects: [scout], cards: cardMap([hero("frodo", "fellowship"), glade]) };
-    const frodo = spawn(idleScenario(1), "frodo", { zone: "heroes", seat: 0 });
+    // The Response draws a card, so the deck holds one (a draw from an empty deck changes nothing, rr.running-out-of-cards).
+    const frodo = spawn(spawn(idleScenario(1), "frodo", { zone: "deck", seat: 0 }).state, "frodo", { zone: "heroes", seat: 0 });
     const location = spawn(frodo.state, "glade", { zone: "activeLocation" });
     const steps: EngineStep[] = [];
     const explored = placeProgress({ ...location.state, activeLocation: location.id }, location.id, 2, ctx, steps);

@@ -178,11 +178,9 @@ describe("Daeron's Runes (04108:A:1)", () => {
     expect(run.state.seats[0]?.deck).toHaveLength(1);
   });
 
-  // FAULT: the card prints "Draw 2 cards. Then, discard 1 card" (rr.then: the part after "Then" resolves only when the draw resolved in
-  // full); with 1 card in the deck the engine draws 1 and still makes the player discard.
   // A deck of 1 card: only 1 is drawn, so the draw did not resolve in full and nothing is discarded.
-  it.fails("04108:A:1 Daeron's Runes: no discard when fewer than 2 cards could be drawn (rr.then)", () => {
-    const tab = runes(EFFECTS, 1);
+  lineSpec("04108:A:1", "Daeron's Runes: no discard when fewer than 2 cards could be drawn (rr.then)", (effects) => {
+    const tab = runes(effects, 1);
     const run = playCode(tab, RUNES);
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.seats[0]?.hand).toHaveLength(2);
@@ -191,8 +189,7 @@ describe("Daeron's Runes (04108:A:1)", () => {
 
   // An empty deck: nothing can be drawn, so the discard after "Then" does not resolve either and the event cannot change the game state
   // (rr.triggered-ability). It is not offered.
-  // FAULT: with an empty deck the card can change nothing (no draw, so no "Then" discard), but the engine offers it to play.
-  it.fails("04108:A:1 Daeron's Runes: not offered with an empty deck", () => {
+  it("04108:A:1 Daeron's Runes: not offered with an empty deck", () => {
     const tab = runes(EFFECTS, 0);
     const runes0 = idsOf(tab, RUNES);
     expect(legalIntents(tab.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === runes0)).toBe(false);

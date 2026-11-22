@@ -133,9 +133,7 @@ describe("Errand-rider (05003:A:1)", () => {
     expect(triggers(tab.state, tab)).not.toContain("05003:action:1");
   });
 
-  // FAULT: with one hero in play there is no other hero to receive the resource, so the effect cannot change the game
-  // (rr.triggered-ability); the engine still offers the Action.
-  it.fails("05003:A:1 is not offered when there is no other hero", () => {
+  it("05003:A:1 is not offered when there is no other hero", () => {
     const tab = table(EFFECTS, { heroes: [{ code: PAL, seat: 0 }], allies: [{ code: ERRAND, seat: 0 }] }, 2);
     expect(triggers(tab.state, tab)).not.toContain("05003:action:1");
   });

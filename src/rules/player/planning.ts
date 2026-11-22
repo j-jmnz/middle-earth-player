@@ -25,7 +25,7 @@ import { playBlocked } from "../families/sidequests/contract.ts";
 import { enterStaging, inPlayLimitReason } from "../families/sidequests/play.ts";
 import type { EngineStep, PlayerIntent } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
-import { noTargetReason } from "./potential.ts";
+import { idleEventReason, noTargetReason } from "./potential.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { playerCardEffectCanChoose, raiseThreat, uniqueBlocked } from "../core/keywords.ts";
 import { planningTurn } from "../windows/pass.ts";
@@ -165,7 +165,9 @@ function eventReason(state: ScenarioState, cardId: string, seat: number, ctx: Re
     const empty = noTargetReason(state, effect.instructions, cardId, seat, ctx);
     if (empty) return empty;
   }
-  return null;
+  // The card is refused as idle only when every Action it can run changes nothing (a card with two Actions to choose from is played for the one that can).
+  const idle = running.map((effect) => idleEventReason(state, effect.instructions, cardId, seat, ctx));
+  return idle.every((reason) => reason != null) ? (idle[0] ?? null) : null;
 }
 
 // The constant records a card in hand carries about its own play: PlayOnlyIf, PlayFromDiscard, EntersPlayExhausted.

@@ -82,9 +82,7 @@ describe("Grave Cairn (04054:A:1)", () => {
     expect(triggers(run.state, tab)).not.toContain("04054:response:1");
   });
 
-  // FAULT: a character of Attack 0 adds nothing, so the Response has no potential to change the game (rr.triggered-ability); the engine
-  // offers it and takes the cost.
-  it.fails("04054:A:1 is not offered when the character that leaves play has Attack 0", () => {
+  it("04054:A:1 is not offered when the character that leaves play has Attack 0", () => {
     const tab = scene(EFFECTS, [NOUGHT, ALLY]);
     const run = destroyed(tab, idsOf(tab, NOUGHT));
     expect(run.state.cards[idsOf(tab, NOUGHT)]?.zone).toBe("discard");

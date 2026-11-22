@@ -15,7 +15,7 @@ export const RECORDS: readonly Effect[] = [
   // 06140 Lay of Nimrodel: the resources are counted as the effect resolves.
   {"id":"06140:action:1","cardCode":"06140","lines":["06140:A:1"],"timing":"action","instructions":[{"verb":"Pick","pick":{"type":"hero","control":"any","spheres":["spirit"]}},{"verb":"ModifyStat","stat":"willpower","amount":{"stat":"resources","of":"picked"},"until":"endOfPhase","target":"picked"}]},
   // 06141 Ered Nimrais Prospector
-  {"id":"06141:response:1","cardCode":"06141","lines":["06141:A:1"],"timing":"response","trigger":"enteredPlay","subject":"self","instructions":[{"verb":"Repeat","times":3,"instructions":[{"verb":"DiscardTopOfDeck"}]},{"verb":"Pick","pick":{"type":"card","control":"you","from":"discard"}},{"verb":"PutOnDeck","position":"shuffle"}]},
+  {"id":"06141:response:1","cardCode":"06141","lines":["06141:A:1"],"timing":"response","trigger":"enteredPlay","subject":"self","instructions":[{"verb":"Repeat","times":3,"instructions":[{"verb":"DiscardTopOfDeck"}]},{"verb":"Pick","pick":{"type":"card","control":"you","from":"discard"},"when":{"kind":"thenResolves"}},{"verb":"PutOnDeck","position":"shuffle","when":{"kind":"thenResolves"}}]},
   // 06142 Scroll of Isildur (06142:constant:1 is the generated "Attach to a Lore hero"). Line 3 plays an event from the
   // discard pile, which no verb does.
   {"id":"06142:constant:2","cardCode":"06142","lines":["06142:A:2"],"timing":"constant","instructions":[{"verb":"ReduceCost","amount":{"count":{"type":"hero","control":"you","printedIcon":"lore"}}}]},

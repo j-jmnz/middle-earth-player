@@ -83,8 +83,7 @@ describe("Dúnedain Remedy (12084:A:1 to A:3)", () => {
   });
 
   // An undamaged hero has nothing to heal: no Response (rr.triggered-ability).
-  // FAULT: a Response that can change nothing cannot be initiated (rr.triggered-ability); the engine offers the heal on an undamaged hero.
-  it.fails("12084:A:2 Dúnedain Remedy: no Response when attached to an undamaged hero", () => {
+  it("12084:A:2 Dúnedain Remedy: no Response when attached to an undamaged hero", () => {
     const tab = table(EFFECTS, { heroes: [{ code: THEODRED, seat: 0 }, { code: DENETHOR, seat: 0 }], hand: [{ code: REMEDY, seat: 0 }] });
     const run = play(begin(tab.state), tab, idsOf(tab, REMEDY), idsOf(tab, DENETHOR));
     expect(run.state.cards[idsOf(tab, REMEDY)]?.host).toBe(idsOf(tab, DENETHOR));
@@ -250,8 +249,7 @@ describe("Robin Smallburrow (12089:A:1)", () => {
 });
 
 // With no enemy in play there is no engagement cost to raise (rr.triggered-ability).
-// FAULT: with no enemy in play the effect changes nothing (rr.cost, rr.triggered-ability); the engine still offers the Response and its Spirit cost.
-it.fails("12089:A:1 Robin Smallburrow: no Response with no enemy in play", () => {
+it("12089:A:1 Robin Smallburrow: no Response with no enemy in play", () => {
   const tab = table(EFFECTS, { start: "travel", heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: ROBIN, seat: 0 }], staging: [GREEN_HILL] }, 2);
   const run = sendUnledgered(begin(tab.state), { type: "Travel", locationId: idsOf(tab, GREEN_HILL) }, tab.ctx);
   expect(run.state.cards[idsOf(tab, GREEN_HILL)]?.zone).toBe("activeLocation");

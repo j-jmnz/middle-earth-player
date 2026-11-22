@@ -195,9 +195,7 @@ describe("Lindir (10120:A:1)", () => {
   });
 });
 
-// FAULT: a Response of a player card is initiated only if its effect can change the game state (rr.triggered-ability); with an empty deck
-// "draw until you have 3 cards" draws nothing (rr.running-out-of-cards), yet the engine offers Lindir's Response.
-it.fails("10120:A:1 Lindir: no Response with an empty deck", () => {
+it("10120:A:1 Lindir: no Response with an empty deck", () => {
   const tab = table(EFFECTS, { heroes: [{ code: ARWEN, seat: 0 }], hand: [{ code: LINDIR, seat: 0 }] });
   const run = play(begin(tab.state), tab, idsOf(tab, LINDIR));
   expect(run.state.seats[0]?.deck).toEqual([]);

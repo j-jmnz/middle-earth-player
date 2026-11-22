@@ -8,6 +8,7 @@ import { hasKeyword } from "../../../rules/core/keywords.ts";
 import { legalIntents } from "../../../rules/engine/legal.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { expireModifiers, flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { spawn } from "../../../rules/core/zones.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { fordTable, loadFordWorld, type FordLayout, type FordWorld } from "../../../../test/scenarios/flight-to-the-ford/scene.ts";
 import { codesOf, FRODO, reveal, RING, SAM } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
@@ -115,7 +116,9 @@ describe("The Nine are Abroad (141067:A:1)", () => {
 
   it("a blank character has none of its Actions, and a card of another type keeps its own", () => {
     const action: Effect = { id: "ally:action:1", cardCode: "ally", lines: ["ally:A:1"], timing: "action", instructions: [{ verb: "Draw" }] };
-    const made = make({ allies: ["ally"], deck: ["141067", "f0", "f0", "f0"] });
+    const bare = make({ allies: ["ally"], deck: ["141067", "f0", "f0", "f0"] });
+    // The ally's Action draws a card, so the player's deck holds one (a draw from an empty deck changes nothing, rr.running-out-of-cards).
+    const made = { ...bare, state: spawn(bare.state, "ally", { zone: "deck", seat: 0 }).state };
     const ctx = { ...made.ctx, effects: [...made.ctx.effects, action] };
     const ally = first(made.state, "ally");
     expect(legalIntents(made.state, ctx)).toContainEqual({ type: "Trigger", cardId: ally, effectId: "ally:action:1" });

@@ -152,8 +152,10 @@ describe("play rules and costs", () => {
       limit: "thricePerPhase",
       instructions: [{ verb: "Draw", amount: 1 }],
     };
-    const { state, heroId, ctx } = table([rally]);
-    let next = state;
+    const { state: bare, heroId, ctx } = table([rally]);
+    // Three cards in the deck: each use draws one, and a draw from an empty deck changes nothing (rr.running-out-of-cards).
+    let next = bare;
+    for (let card = 0; card < 3; card += 1) next = spawn(next, "elf", { zone: "deck", seat: 0 }).state;
     for (let use = 0; use < 3; use += 1) {
       expect(legalIntents(next, ctx)).toContainEqual({ type: "Trigger", cardId: heroId, effectId: "lead:action:1" });
       next = expectOk(reduce(next, { type: "Trigger", cardId: heroId, effectId: "lead:action:1", payments: [{ heroId, amount: 1 }] }, ctx)).state;

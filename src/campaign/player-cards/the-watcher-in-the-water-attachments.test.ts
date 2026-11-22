@@ -171,9 +171,7 @@ describe("Legacy of Durin (04061:A:1, A:2)", () => {
     expect(triggers(run.state, tab)).not.toContain("04061:response:1");
   });
 
-  // FAULT: with an empty deck the draw cannot change the game (rr.triggered-ability), yet the engine offers the Response and exhausts the
-  // Legacy for nothing.
-  it.fails("04061:A:2 is not offered when the deck is empty", () => {
+  it("04061:A:2 is not offered when the deck is empty", () => {
     const tab = scene(EFFECTS, [DWARF], 0);
     const run = play(begin(tab.state), tab, idsOf(tab, DWARF));
     expect(run.state.cards[idsOf(tab, DWARF)]?.zone).toBe("play");

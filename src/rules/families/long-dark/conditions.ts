@@ -10,7 +10,7 @@ import { topFrame } from "../../windows/windows.ts";
 import { lastPlayer } from "../sea/players.ts";
 import { printsPass } from "./locate.ts";
 
-/** `lastLocateFailed`, `lastLocatePassed` (the running effect's last locate test; false before it made one) `engagedWithLastPlayer`, `drew` (the running effect's Draw drew a card), `playerWithoutReady` (some living player controls no unexhausted character) and `hasPass` (the named card prints PASS). Null for any other condition. */
+/** `lastLocateFailed`, `lastLocatePassed` (the running effect's last locate test; false before it made one) `engagedWithLastPlayer`, `drew` (the running effect's Draw drew a card), `thenResolves` (no Draw or discard of the top of the deck of the running effect fell short), `playerWithoutReady` (some living player controls no unexhausted character) and `hasPass` (the named card prints PASS). Null for any other condition. */
 export function longDarkCondition(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean | null {
   if (condition.kind === "hasPass") {
     const id = condition.card === "other" ? scope.other : condition.card === "subject" ? scope.subject : scope.picked?.at(-1);
@@ -19,6 +19,10 @@ export function longDarkCondition(state: ScenarioState, condition: Condition, sc
   if (condition.kind === "drew") {
     const data = topFrame(state)?.data;
     return data?.kind === "effect" && data.drew === true;
+  }
+  if (condition.kind === "thenResolves") {
+    const data = topFrame(state)?.data;
+    return data?.kind !== "effect" || data.short !== true;
   }
   if (condition.kind === "engagedWithLastPlayer") {
     const enemy = scope.sourceId ? state.cards[scope.sourceId] : undefined;

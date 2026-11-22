@@ -6,7 +6,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 
 import { offerResponses } from "../../windows/responses.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { playCtx, seat, triggers } from "./fixture.ts";
+import { playCtx, put, seat, triggers } from "./fixture.ts";
 
 const ACTION: Effect = { id: "dwarf:action:1", cardCode: "dwarf", lines: ["02048:A:1"], timing: "action", instructions: [{ verb: "Draw", amount: 1 }] };
 const RESPONSE: Effect = { id: "dwarf:response:1", cardCode: "dwarf", lines: ["02048:A:1"], timing: "response", trigger: "questSucceeded", instructions: [{ verb: "Draw", amount: 1 }] };
@@ -20,7 +20,9 @@ const heard = (state: ScenarioState) => offerResponses({ ...state, window: null 
 
 describe("02048:A:1 a hero that cannot trigger its effect", () => {
   it("is offered its Action and its Response when it is free", () => {
-    const table = seat(1, ["dwarf"]);
+    // Both draw a card, so the deck holds one (a draw from an empty deck changes nothing, rr.running-out-of-cards).
+    const bare = seat(1, ["dwarf"]);
+    const table = { ...bare, state: put(bare.state, "filler", "deck").state };
     expect(triggers(table.state, ctx, "dwarf:action:1")).toHaveLength(1);
     expect(heard(table.state)).toBeGreaterThan(0);
   });

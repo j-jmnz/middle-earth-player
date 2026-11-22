@@ -223,9 +223,7 @@ describe("Lembas (08064:A:1 to A:3)", () => {
     expect(run.state.cards[idsOf(tab, GLORFINDEL)]?.damage).toBe(0);
   });
 
-  // FAULT: "Discard Lembas to" is the cost (rr.cost, "to"), and readying a ready hero and healing a hero with no damage cannot change the
-  // game (rr.triggered-ability, rr.cost); the engine offers the Action and discards Lembas for nothing.
-  it.fails("08064:A:3 is not offered when the hero is ready and has no damage", () => {
+  it("08064:A:3 is not offered when the hero is ready and has no damage", () => {
     const tab = scene(EFFECTS, false, 0);
     expect(triggers(tab.state, tab)).not.toContain("08064:action:1");
   });

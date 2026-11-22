@@ -99,10 +99,7 @@ describe("Galdor of the Havens (11002:A:1, A:2)", () => {
     expect(triggers({ ...emptied, phase: "Planning", boundaryPhase: "Planning", mode: "planning", window: { kind: "pass" }, activeSeat: 0 }, tab)).not.toContain("11002:action:1");
   });
 
-  // FAULT: an Action of a player card is initiated only if its effect can change the game state (rr.triggered-ability); with an empty hand
-  // and an empty deck "draw 6 cards" draws nothing (rr.running-out-of-cards), yet the engine offers Galdor's Action and would spend its once
-  // per game limit for nothing.
-  it.fails("11002:A:2 Galdor: not offered with an empty hand and an empty deck", () => {
+  it("11002:A:2 Galdor: not offered with an empty hand and an empty deck", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GALDOR, seat: 0 }] });
     expect(tab.state.seats[0]?.deck).toEqual([]);
     expect(triggers(tab.state, tab)).not.toContain("11002:action:1");

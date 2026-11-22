@@ -108,8 +108,7 @@ describe("Pelargir Ship Captain (06135:A:1)", () => {
 });
 
 // "to another hero's resource pool": with a single hero in play there is no other hero to move it to (rr.move), so no Response.
-// FAULT: a move with no valid destination cannot initiate (rr.move); the engine offers the Response with no other hero in play.
-it.fails("06135:A:1 Pelargir Ship Captain: no Response with no other hero", () => {
+it("06135:A:1 Pelargir Ship Captain: no Response with no other hero", () => {
   const tab = table(EFFECTS, { heroes: [{ code: THEODRED, seat: 0 }], hand: [{ code: CAPTAIN, seat: 0 }] }, 3);
   const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, CAPTAIN), payments: [{ heroId: idsOf(tab, THEODRED), amount: 2 }] }, tab.ctx);
   expect(run.state.cards[idsOf(tab, THEODRED)]?.resources).toBe(1);
@@ -266,9 +265,8 @@ describe("Ered Nimrais Prospector (06141:A:1)", () => {
   });
 
   // "Then" (rr.then): with 2 cards in the deck the top 3 cannot be discarded in full, so no card of the discard pile goes back.
-  // FAULT: the card shuffles a card back only after the top 3 are discarded in full; the engine discards 2 and still asks for a card.
-  it.fails("06141:A:1 Ered Nimrais Prospector: with fewer than 3 cards in the deck, nothing is shuffled back", () => {
-    const { tab, vigilant } = scene(EFFECTS, 2);
+  lineSpec("06141:A:1", "Ered Nimrais Prospector: with fewer than 3 cards in the deck, nothing is shuffled back", (effects) => {
+    const { tab, vigilant } = scene(effects, 2);
     let run = play(begin(tab.state), tab, idsOf(tab, PROSPECTOR));
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, PROSPECTOR), effectId: "06141:response:1" }, tab.ctx);
     expect(run.state.seats[0]?.deck).toHaveLength(0);

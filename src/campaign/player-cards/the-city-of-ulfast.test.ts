@@ -93,9 +93,7 @@ describe("Need Drives Them (22029:A:1)", () => {
   });
 
   // Every player below 40: no character readies, so the event can change nothing (rr.triggered-ability) and is not offered.
-  // FAULT: the card readies only the characters of a player at threat 40 or higher; with every player below 40 it can change nothing, but
-  // the engine offers it to play (and takes its 3 resources).
-  it.fails("22029:A:1 Need Drives Them: not offered while no player's threat is 40 or higher", () => {
+  it("22029:A:1 Need Drives Them: not offered while no player's threat is 40 or higher", () => {
     const scene = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: NEED, seat: 0 }] });
     const tab = { ...scene, state: updateCard(withThreat(scene.state, 0, 39), idsOf(scene, ALLY), { exhausted: true }) };
     expect(legalIntents(tab.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === idsOf(tab, NEED))).toBe(false);
