@@ -1,5 +1,5 @@
-// Rules: rr.campaign-setup-checklist, rr.campaign-cards, rr.burdens, mec109.campaign-mode, mec109.setup-the-ring-goes-south,
-// mec109.stage-4 (data/rules/entries.json). The campaign across scenarios 3 and 4.
+// Rules: rr.campaign-setup-checklist, rr.campaign-cards, rr.burdens, rr.boons, mec109.campaign-mode, mec109.setup-the-ring-goes-south,
+// mec109.stage-4 (data/rules/entries.json). The campaign across scenarios 3 and 4; lines 142019:A:2 and 142019:B:1.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
@@ -118,6 +118,41 @@ describe("the campaign across scenarios 3 and 4", () => {
       const log = applyResolution(emptyLog(1), won.scenarioId, won, ctx.cards, NO_COPY_LIMITS);
       expect(log.completed, String(attached)).toEqual(["the-ring-goes-south"]);
       expect(log.campaignPool.map((card) => card.code), String(attached)).toEqual(attached ? [LUST] : []);
+    }
+  });
+
+  // "Setup: Each player may change hero cards he controls without incurring the +1 threat penalty. The players have earned the boon cards: Sting, Mithril Shirt, Glamdring, and Andúril. Each player chooses one and adds
+  // it to his hand. If any of those boon cards remain unchosen, shuffle them into the first player's deck." Two players: each takes one, the two left go into the first player's deck, none into the second's.
+  it("142019:A:2 gives each of two players the boon he chooses, puts the two left in the first player's deck, and changes a hero for no threat", async () => {
+    const cards = new Map([...ctx.cards, ...(await loadPrinted(["141003", "141004", "141005"]))]);
+    const log: CampaignLog = { ...emptyLog(2), heroesBySeat: [[FRODO, SAM], ["141003", "141004"]], completed: ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford"] };
+    const seats = [{ heroes: [FRODO, SAM], deck: DECK }, { heroes: ["141003", "141005"], deck: DECK }];
+    const open = checklist({ log, scenario: south, seats, effects: EFFECTS, cards });
+    expect(open.ok).toBe(false);
+    expect(open.ok ? null : open.needs).toEqual({ seat: 0, options: ["142011", "142012", "142013", "142014"] });
+    const second = checklist({ log, scenario: south, seats, effects: EFFECTS, cards, choices: ["142013"] });
+    expect(second.ok ? null : second.needs).toEqual({ seat: 1, options: ["142011", "142012", "142014"] });
+    const plan = checklist({ log, scenario: south, seats, effects: EFFECTS, cards, choices: ["142013", "142011"] });
+    if (!plan.ok) throw new Error(JSON.stringify(plan));
+    expect(plan.seats.map((seat) => seat.hand)).toEqual([["142013"], ["142011"]]);
+    expect([...(plan.seats[0]?.deck ?? [])].sort()).toEqual([...DECK, "142012", "142014"].sort());
+    expect(plan.seats[1]?.deck).toEqual(DECK);
+    // Pippin was changed for Fatty Bolger: no +1 threat penalty.
+    expect(plan.threatModifier).toBe(0);
+  });
+
+  // "Resolution: If Lust for the Ring is attached to a hero, the players have earned that burden." A hero of the second player counts; a Lust for the Ring in the encounter discard pile earns nothing.
+  it("142019:B:1 earns Lust for the Ring attached to the second player's hero, and not one in the encounter discard pile", () => {
+    for (const attached of [true, false]) {
+      const table = southTable(world, { stage: "142023", seats: 2, active: DOORS, ...(attached ? {} : { discard: [LUST] }) });
+      let state = table.state;
+      if (attached) {
+        const spawned = spawn(state, LUST, { zone: "attached" });
+        state = attachTo(spawned.state, spawned.id, table.merry ?? "");
+      }
+      const won = settle(syncConstants(runInstruction({ ...state, window: null }, { verb: "ProgressQuest", amount: 9 }, { seat: 0, sourceId: state.questStage }, table.ctx, []), table.ctx), table.ctx, []);
+      expect(won.stageCleared, String(attached)).toBe(true);
+      expect(won.resolutionLog.earned.map((item) => item.code), String(attached)).toEqual(attached ? [LUST] : []);
     }
   });
 
