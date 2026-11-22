@@ -10,12 +10,12 @@ import { renderRecord } from "./record.ts";
 export type CardRender = { text: string; tally: Tally };
 
 // `rawLines`: every printed ledger line of the card in order (the ones generate.ts drops as keyword-only included). `pile`: where the scenario deals the card (encounter, quest, staging...), which places it with no record.
-export type CardExtras = { rawLines?: readonly { lineId: string; line: string }[]; pile?: string };
+export type CardExtras = { rawLines?: readonly { lineId: string; line: string }[]; pile?: string; finalStage?: boolean };
 
 // `inert`: the ledger line ids marked inert (a reminder or keyword the engine applies by rule), which need no record.
 export function renderCard(card: Card, segments: readonly Segment[], effects: readonly Effect[], inert: ReadonlySet<string>, extras: CardExtras = {}): CardRender {
   const own = effects.filter((effect) => effect.cardCode === card.code);
-  const ctx = newCtx({ effects: effects as unknown as readonly Obj[], cardName: card.name });
+  const ctx = newCtx({ effects: effects as unknown as readonly Obj[], cardName: card.name, cardType: card.type, ...(extras.finalStage ? { finalStage: true } : {}) });
   const known = new Set(segments.map((segment) => segment.lineId));
   const bySegment = new Map(segments.map((segment) => [segment.lineId, segment]));
   const out: string[] = [`## ${card.code} ${card.name}`];

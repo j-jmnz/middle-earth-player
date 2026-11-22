@@ -48,6 +48,8 @@ export const modifierStatSchema = z.enum([
   "doesNotReady",
   "noThreatContribution",
   "noEngagementChecks",
+  // The table holds it: no engagement check is made during the encounter phase (Anduin Passage); an Ambush check in the quest phase still is.
+  "noEncounterEngagementChecks",
   // Numbers a seat or a hero holds: cards drawn beyond the one in the resource phase (on "seat:N"), resources a hero
   // collects beyond the one, restricted attachments a character may have beyond two.
   "extraDraw",

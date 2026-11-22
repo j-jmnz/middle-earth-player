@@ -15,6 +15,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 110063:A:4 (front): Forced: When a Creature enemy is destroyed, deal damage to The Thing in the Depths equal to that enemy's Threat.
   110063:forced:1: Forced after an enemy is destroyed (heard about Creature enemy (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal printed threat of the card the event is about damage to this card
 
 110063:B:1 (back): Campaign Mode only.
@@ -33,6 +34,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 110063:B:5 (back): Forced: When a Creature enemy is destroyed, deal 2 damage to The Thing in the Depths.
   110063:forced:2: Forced after an enemy is destroyed (heard about Creature enemy (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 2 damage to this card
 
 ## 11194 The Thing in the Depths
@@ -44,20 +46,22 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
     - a copy of the card with code 11192 is set aside, out of play
     - a copy of the card with code 11195 is set aside, out of play
     - a copy of the card with code 11196 is set aside, out of play
-    - [json FlipSetAside {"verb":"FlipSetAside","name":"The Thing in the Depths"}]
+    - Campaign Setup: the card titled "The Thing in the Depths", the set-aside one or the one the scenario dealt to the staging area, shows its 'Campaign Mode only' side B, with the stats and text printed there
 
 11194:A:2 (front): Forced: After Captain Sahír (enemy) enters play, attach Black Key (burden) to him.
   11194:forced:1: Forced after an encounter card is added to the staging area (heard about enemy (any player controls) or in the staging area, named "Captain Sahír")
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Captain Sahír"}]
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - Campaign Setup: the set-aside copy of the card with code 11192 is attached to the card in play named "Captain Sahír" (a card dealt on its Upgraded side stays so)
 
 11194:A:3 (front): Forced: After Captain Sahír flips over, remove Black Key (burden) from the game and attach Black Key (boon) to him. Add Sea Serpent (Menacing side) to the staging area. One player adds Come Together to their hand. For this game, X is plus 1 for Come Together.
-  11194:forced:2: Forced on the event flipped (heard about card (any player controls) named "Captain Sahír")
+  11194:forced:2: Forced after a card is flipped over (the FlipCard verb) (heard about card (any player controls) or in the staging area or the active location, named "Captain Sahír")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card in play with code 11192 is removed from the game, wherever it is (in the staging area or attached)
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
+    - Campaign Setup: the set-aside copy of the card with code 11183 is attached to the card in play named "Captain Sahír" (a card dealt on its Upgraded side stays so)
     - the set-aside card with code 11196 joins the staging area (not revealed)
     - choose player (any player controls)
-    - [json AddSetAsideToHand {"verb":"AddSetAsideToHand","code":"11195"}]
+    - the first player chooses a player; the set-aside card with code 11195 joins that player's hand and is recorded as a card the campaign card gave this game
 
 11194:B:1 (back): Resolution: The players may add Come Together to the Campaign Pool.
   11194:resolution:1: Resolution
@@ -65,39 +69,39 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 11194:B:2 (back): Gain the following:
   11194:resolution:2: Resolution (record also names 11194:B:3)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11194:B:3 (back): • 1 XP for each surviving player.
   11194:resolution:2: Resolution (record also names 11194:B:2)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11194:B:4 (back): • 1 XP if Captain Sahír has 5 or more resources.
   11194:resolution:3: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"card","control":"any","names":["Captain Sahír"],"minResources":5},"min":1}}]
+    - if the number of card (any player controls) or in the staging area or the active location, named "Captain Sahír", with at least 5 resources on it is at least 1: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11194:B:5 (back): • 1 XP if Na'asiyah has 5 or more resources.
   11194:resolution:4: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"card","control":"any","names":["Na'asiyah"],"minResources":5},"min":1}}]
+    - if the number of card (any player controls) or in the staging area or the active location, named "Na'asiyah", with at least 5 resources on it is at least 1: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11194:B:6 (back): • 1 XP if Sea Serpent (Enraged side) is in play (2 XP instead if it is in the victory display).
   11194:resolution:5: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"enemy","control":"any","staging":true,"names":["Sea Serpent"],"side":"B"},"min":1}}]
-    - [json GainXp {"verb":"GainXp","amount":2,"when":{"kind":"inVictory","code":"11196","is":true}}]
+    - if the number of enemy (any player controls) or in the staging area, named "Sea Serpent", showing side B is at least 1: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - then, if the card with code 11196 is in the victory display (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: gain 2 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11194:B:7 (back): • 1 XP if each hero has no damage on it.
   11194:resolution:6: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"hero","control":"any","damaged":true},"max":0}}]
+    - if the number of damaged hero (any player controls) is at most 0: Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11194:B:8 (back): • 1 XP if each surviving player's threat is 40 or less (2 XP instead if their threat is 30 or less).
   11194:resolution:7: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"survivorsThreat","max":40}}]
-    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"survivorsThreat","max":30}}]
+    - if each surviving player's threat is 40 or less (read at a campaign card's Resolution; true with no surviving player): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
+    - then, if each surviving player's threat is 30 or less (read at a campaign card's Resolution; true with no surviving player) (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: gain 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11194:B:9 (back): • -1 XP if Ominous Fate is in the victory display.
   11194:resolution:8: Resolution
-    - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
+    - if the number of card (any player controls) in the victory display, named "Ominous Fate" is at least 1: Resolution: lose 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 ## 12039 Take the Ship!
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -113,11 +117,12 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 12039:B:2 (back): Forced: At the end of the round, if Captain Sahír and Na'asiyah are not in play, add 1 resource to each of them.
   12039:forced:1: Forced at the end of the round
     only if all of: (the card with code 11076 is not in play) and (the card with code 11078 is not in play)
-    - [json AddResourcesSetAside {"verb":"AddResourcesSetAside","codes":["11076","11078"],"amount":1}]
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the set-aside cards with codes 11076 and 11078 get 1 resource(s) each, and hold the tokens until they enter play
 
 12039:B:3 (back): Progress cannot be placed on this stage unless Helm of the Stormcaller is in the victory display.
   12039:constant:2: Constant
-    - if the card with code 12042 is not in the victory display: the table: stat noQuestProgress 1, while this card is in play
+    - if the card with code 12042 is not in the victory display: the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
 
 ## 12040 Change of Plans
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -125,12 +130,12 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 12040:B:1 (back): When Revealed: Flip Captain Sahír and Na'asiyah to their objective sides, removing all tokens from them. Search the encounter deck, discard pile and all play areas for each encounter card from the Corsair Raiders encounter set and remove each of those cards from the game. Add The Thing in the Depths to the staging area. Shuffle the encounter discard pile and the previously set aside The Thing in the Depths encounter set into the encounter deck. Advance to stage 3.
   12040:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json FlipElite {"verb":"FlipElite","name":"Captain Sahír","to":"firstPlayer"}]
-    - [json FlipElite {"verb":"FlipElite","name":"Na'asiyah","to":"lastPlayer"}]
-    - [json RemoveEncounterSet {"verb":"RemoveEncounterSet","set":"Corsair Raiders"}]
+    - the card in play titled "Captain Sahír" (the enemy side of a Stormcaller Elite card) turns into its objective ally side, loses its tokens and joins the play area of the first player; it hears that it flipped over (a card out of play stays so)
+    - the card in play titled "Na'asiyah" (the enemy side of a Stormcaller Elite card) turns into its objective ally side, loses its tokens and joins the play area of the last player; it hears that it flipped over (a card out of play stays so)
+    - every card of the encounter set "Corsair Raiders" in the encounter deck, the encounter discard pile, the staging area, a player's engaged enemies, the active location, and the cards attached to them leaves the game
     - the set-aside card titled "The Thing in the Depths" joins the staging area (not revealed)
     - shuffle the encounter discard pile into the encounter deck
-    - [json ShuffleSetAsideSet {"verb":"ShuffleSetAsideSet","set":"The Thing in the Depths"}]
+    - every set-aside card of the encounter set "The Thing in the Depths" joins the encounter deck (the deck is shuffled by the step after)
     - shuffle the encounter deck
     - advance to the next quest stage
 
@@ -139,7 +144,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12041:A:1 (front): When Revealed: Discard cards from the top of the encounter deck until X Tentacle enemies are discarded, where X is 1 more than the number of players in the game. Resolve the Grapple keyword on each of those enemies.
   12041:whenRevealed:1: When revealed
-    - [json DiscardUntilGrapple {"verb":"DiscardUntilGrapple","trait":"Tentacle","count":{"players":true,"plus":1}}]
+    - cards are discarded from the top of the encounter deck until the number of players + 1 enemies with the trait Tentacle are discarded, or the deck is empty; then each of them resolves its Grapple keyword
 
 12041:B:1 (back): During the travel phase, the players may travel to a location in the staging area even if another location is currently active. If they do, return the currently active location to the staging area.
   12041:constant:1: Constant
@@ -147,11 +152,13 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12041:B:2 (back): At the end of the round, if the total Threat of any one Ship location is 9 or higher, the Stormcaller is destroyed, and the players lose the game.
   12041:forced:1: Forced at the end of the round
-    only if [json condition {"kind":"locationThreat","trait":"Ship","min":9}]
+    only if a location in play with the trait Ship has a total Threat of at least 9, its grappled enemies' Threat included
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the players lose the game (The Stormcaller was destroyed: a Ship location's Threat reached 9)
 
 12041:B:3 (back): When The Thing in the Depths is destroyed, the players win the game.
   12041:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "The Thing in the Depths")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 12042 Helm of the Stormcaller
@@ -166,6 +173,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12042:A:3 (front): Forced: When Helm of the Stormcaller becomes the active location, add Captain Sahír and Na'asiyah to the staging area from out of play (enemy side faceup).
   12042:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the set-aside card with code 11078 joins the staging area (not revealed)
     - the set-aside card with code 11076 joins the staging area (not revealed)
@@ -175,12 +183,14 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12043:A:1 (front): Forced: After you travel to Forecastle Deck, search the encounter deck and discard pile for an enemy and reveal it. Shuffle the encounter deck.
   12043:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player searches the encounter deck and discard pile for a enemy, reveals it and adds it to the staging area
     - shuffle the encounter deck
 
 12043:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if defending character has no resources on it or in its resource pool).
   12043:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -196,6 +206,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12044:A:2 (shadow): Shadow: Exhaust a character you control.
   12044:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -210,6 +221,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12045:A:2 (shadow): Shadow: Until the end of the phase, attacking enemy gets +2 Defense.
   12045:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat defense 2, until the end of the phase
 
 ## 12046 Crew Quarters
@@ -217,11 +229,12 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12046:A:1 (front): Travel: Add 1 resource to each Raider card in play to travel here.
   12046:travel:1: Travel
-    - for each Raider card (any player controls) (enemies engaged with a player included):
+    - for each Raider card (any player controls) or in the staging area or the active location, (enemies engaged with a player included):
       - place 1 resource tokens on the picked card
 
 12046:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack.
   12046:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 2, until the end of the attack
 
 ## 12047 Quarter Deck
@@ -230,11 +243,13 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 12047:A:1 (front): While Quarter Deck is the active location, deal each enemy an additional shadow card at the beginning of the combat phase.
   12047:forced:1: Forced on the event shadowsDealt
     only if all of: (it is the Combat phase) and (this card is the active location)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each enemy (any player controls) engaged with you:
       - the picked card is dealt a shadow card
 
 12047:A:2 (shadow): Shadow: Discard an attachment you control.
   12047:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -244,15 +259,16 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12048:A:1 (front): When Revealed: Exhaust each character with 1 Defense or less.
   12048:whenRevealed:1: When revealed
-    - for each character (any player controls) [also {"maxDefense":1}]:
+    - for each character (any player controls) with a current Defense of 1 or less:
       - exhaust the picked card
 
 12048:A:2 (shadow): Shadow: If the defending character has 0 Defense, discard it. Otherwise, the defending character gets -2 Defense for this attack.
   12048:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose character (any player controls) defending [also {"maxDefense":0}]
+    - choose character (any player controls) defending, with a current Defense of 0 or less
     - discard the picked card
-    - then, if not (the defender is a character (any player controls) [also {"maxDefense":0}]) (checked when this step runs, after the steps above; not tied to whether they did anything): the defender: stat defense -2, until the end of the attack
+    - then, if not (the defender is a character (any player controls) with a current Defense of 0 or less) (checked when this step runs, after the steps above; not tied to whether they did anything): the defender: stat defense -2, until the end of the attack
 
 ## 12049 The Thing in the Depths
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -270,6 +286,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12049:A:4 (front): Forced: When a Creature enemy is destroyed, deal damage to The Thing in the Depths equal to that enemy's Threat.
   12049:forced:1: Forced after an enemy is destroyed (heard about Creature enemy (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal printed threat of the card the event is about damage to this card
 
 ## 12050 Eye of the Beast
@@ -284,7 +301,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12050:A:3 (front): While Eye of the Beast is engaged with a player, The Thing in the Depths attacks that player during the combat phase (deal and resolve a shadow card for this attack).
   12050:constant:2: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat relaysAttack 1, while this card is in play
     - each enemy (any player controls) or in the staging area, named "The Thing in the Depths": stat attacksViaRelay 1, while this card is in play
@@ -297,10 +314,11 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12051:A:2 (front): Forced: At the end of the combat phase, if Thrashing Arm is engaged with you, deal 3 damage to a character you control.
   12051:forced:1: Forced at the end of the phase
-    only if all of: (it is the Combat phase) and (this card is engaged with the player)
+    only if all of: (it is the Combat phase) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
-      - if [json condition {"kind":"engagedWithActor"}]: choose character (you control)
-      - then, if [json condition {"kind":"engagedWithActor"}] (checked when this step runs, after the steps above; not tied to whether they did anything): deal 3 damage to the picked card
+      - if this card is an enemy engaged with the acting player: choose character (you control)
+      - then, if this card is an enemy engaged with the acting player (checked when this step runs, after the steps above; not tied to whether they did anything): deal 3 damage to the picked card
 
 ## 12052 Crushing Arm
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
@@ -313,7 +331,8 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12052:A:3 (front): Forced: After Crushing Arm is detached from a location, it makes an immediate attack against the first player.
   12052:forced:1: Forced on the event grappleDetached (heard about this card)
-    - this card attacks the first player now, from the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card attacks the first player now, from the staging area, dealt a shadow card
 
 ## 12053 Grasping Arm
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
@@ -323,13 +342,15 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12053:A:2 (front): Forced: When Grasping Arm attacks, the engaged player must exhaust a character he controls.
   12053:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
 
 12053:A:3 (shadow): Shadow: If this attack is undefended, resolve Grasping Arm's Grapple keyword.
   12053:shadow:1: Shadow
-    - [json ResolveGrapple {"verb":"ResolveGrapple","target":"self","when":{"kind":"undefended"}}]
+    who acts: the acting player is the defending player (the player the attack is against)
+    - if the attack has no defender: this enemy with the Grapple keyword attaches facedown to the staging-area location the keyword names, the first player choosing among those tied; with no location in the staging area it is added to the staging area
 
 ## 12054 Giant Arm
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
@@ -343,18 +364,20 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12054:A:3 (shadow): Shadow: After this attack, either put Giant Arm into play engaged with you and deal it a shadow card, or resolve its Grapple keyword.
   12054:shadow:1: Shadow
-    - [json EngageOrGrapple {"verb":"EngageOrGrapple"}]
+    who acts: the acting player is the defending player (the player the attack is against)
+    - (a shadow effect) the acting player chooses as it resolves, and once the attack is over this shadow card either comes into play engaged with them and is dealt a shadow card of its own, or resolves its Grapple keyword (both are always possible)
 
 ## 12055 From the Depths
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
 
 12055:A:1 (front): When Revealed: Discard the top 3 cards of the encounter deck. Resolve the Grapple keyword on each enemy discarded by this effect.
   12055:whenRevealed:1: When revealed
-    - [json DiscardTopGrapple {"verb":"DiscardTopGrapple","count":3}]
+    - discard the top 3 cards of the encounter deck; each enemy among them resolves its Grapple keyword, in the order discarded
 
 12055:A:2 (shadow): Shadow: Assign damage among characters you control equal to the number of enemies grappled with locations in the staging area.
   12055:shadow:1: Shadow
-    - the acting player assigns [json amount {"grappled":true}] damage among the character (you control), one at a time
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player assigns the number of enemies grappled with locations in the staging area damage among the character (you control), one at a time
 
 ## 12056 Lashing Tentacles
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
@@ -363,12 +386,13 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
   12056:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
-      - the picked enemy attacks the acting player now, from the staging area
+      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
 
 12056:A:2 (shadow): Shadow: After this attack, The Thing in the Depths makes an attack against the defending player (deal a shadow card for this attack).
   12056:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
-      - the picked enemy attacks the acting player now, from the staging area
+      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
 
-(rendered pieces: 172 by template, 30 as JSON)
+(rendered pieces: 217 by template, 0 as JSON)

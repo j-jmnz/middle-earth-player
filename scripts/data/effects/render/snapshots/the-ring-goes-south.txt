@@ -15,11 +15,12 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142020:B:1 (back): Forced: At the end of the planning phase, each player places the top card of his deck faceup in front of him, in player order, until there are a total of 4 faceup cards between the players. The first player chooses 1 faceup card to be played for 0 cost, 1 to add to its owner's hand, 1 to discard, and 1 to shuffle into its owner's deck. Then, either shuffle Lust for the Ring into the encounter deck, or raise each player's threat by 5. Advance to stage 2.
   142020:forced:1: Forced at the end of the phase
     only if it is the Planning phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AssignFaceup {"verb":"AssignFaceup","cards":4,"outcomes":["play","hand","discard","shuffle"]}]
+    - Setup: each player in player order places the top card of their deck faceup until 4 are faceup between them; the first player then assigns them to the outcomes in order (play, hand, discard, shuffle), one distinct card to each: play is played for no cost by its owner, hand goes to its owner's hand, discard to its owner's discard pile, shuffle is shuffled into its owner's deck
     - the first player chooses one of:
-      * option "lust" (only if [json condition {"kind":"outOfPlay","code":"142084"}]):
-        - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"142084"}]
+      * option "lust" (only if a copy of the card with code 142084 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game)):
+        - one out-of-play copy of the card with code 142084 (set aside, in the encounter discard pile, in the victory display or under a card) joins the encounter deck, which is shuffled (when copies are out of play in more than one zone the first player chooses which; nothing with no copy left)
       * option "threat":
         - raise threat by 5 (each player)
     - advance to the next quest stage
@@ -35,10 +36,11 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142021:B:1 (back): During the travel phase, the players must travel to a location, if able.
   142021:constant:1: Constant
-    - the table: stat mustTravel 1, while this card is in play
+    - the table: stat mustTravel (in the travel phase the players cannot decline to travel while a location in the staging area could be traveled to and an active location slot is free) 1, while this card is in play
 
 142021:B:2 (back): Forced: After an enemy engages a player, place 1 damage on the active location, if able.
   142021:forced:1: Forced after an enemy engages a player
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) chosen by the first player, that is the active location
     - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
@@ -55,14 +57,16 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142022:B:1 (back): During the travel phase, the players must travel to a location, if able.
   142022:constant:1: Constant
-    - the table: stat mustTravel 1, while this card is in play
+    - the table: stat mustTravel (in the travel phase the players cannot decline to travel while a location in the staging area could be traveled to and an active location slot is free) 1, while this card is in play
 
 142022:B:2 (back): Forced: After a location enters play, place 1 damage on it.
   142022:forced:1: Forced on the event encounterEnteredPlay (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 damage token(s) on the card the event is about (placed, not dealt: nothing cancels or reduces them)
 
 142022:B:3 (back): Forced: After an enemy engages a player, place 1 damage on the active location, if able.
   142022:forced:2: Forced after an enemy engages a player
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) chosen by the first player, that is the active location
     - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
@@ -75,22 +79,24 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the set-aside card with code 142030 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
     - one set-aside card with code 142024 joins the staging area (it is not revealed)
-    - [json CaptureRingBearer {"verb":"CaptureRingBearer","under":"142024"}]
+    - the Ring-bearer (the hero with that trait a player controls) loses every token (damage, resources, progress), and it and each card attached to it are placed facedown under the card in play with code 142024; they stay in play and nobody controls them
 
 142023:B:1 (back): There can be 2 active locations. During the travel phase, the players must travel to a location, if able.
   142023:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the table: stat extraActiveLocation 1, while this card is in play
-    - the table: stat mustTravel 1, while this card is in play
+    - the table: stat mustTravel (in the travel phase the players cannot decline to travel while a location in the staging area could be traveled to and an active location slot is free) 1, while this card is in play
 
 142023:B:2 (back): Forced: After an enemy engages a player, place 1 damage on each active location.
   142023:forced:1: Forced after an enemy engages a player
+    who acts: the acting player is the player the enemy engaged
     - for each location (any player controls) that is the active location:
       - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
 
 142023:B:3 (back): If Doors of Durin is explored, the players win the game.
   142023:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about location (any player controls) named "Doors of Durin")
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 142024 Watcher in the Water
@@ -109,8 +115,9 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142024:A:3 (front): Forced: After placing the 6th damage here, the first player takes control of the Ring-bearer, exhausted with 1 damage on it.
   142024:forced:1: Forced after a card takes damage (heard about this card)
-    only if [json condition {"kind":"damageReached","nth":6}]
-    - [json ReleaseRingBearer {"verb":"ReleaseRingBearer","damage":1}]
+    only if the damaged event the card answers placed this card's 6th damage token: it holds at least that many now and held fewer before
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the first player takes control of the Ring-bearer facedown under this card and of the cards attached to it: it returns to play faceup in their play area exhausted with 1 damage on it
 
 ## 142025 Great Warg Chief
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -121,6 +128,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142025:A:2 (front): Forced: After Great Warg Chief engages you, discard cards from the encounter deck until a Warg enemy is discarded. Put that enemy into play engaged with you.
   142025:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until an enemy with the trait Warg is discarded, or the deck is empty; that card becomes the picked card
     - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
@@ -137,21 +145,24 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142026:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it was engaged this round).
   142026:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (the attacking enemy is a enemy (any player controls) [also {"engagedThisRound":true}]): the attacking enemy: stat attack 1, until the end of the attack
-    - then, if the attacking enemy is a enemy (any player controls) [also {"engagedThisRound":true}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - if not (the attacking enemy is a enemy (any player controls) that engaged a player this round): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a enemy (any player controls) that engaged a player this round (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 142027 Howling Warg
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 142027:A:1 (front): Forced: When Howling Warg attacks, place 1 damage on an active location.
   142027:forced:1: Forced when this enemy attacks, before the defender is declared
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) chosen by the first player, that is the active location
     - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
 
 142027:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 1 damage on an active location.
   142027:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -175,6 +186,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142028:A:3 (front): Forced: After Crebain from Dunland engages a player, reveal the top card of the encounter deck.
   142028:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - the player the event is about reveals an encounter card
 
 ## 142029 Redhorn Pass
@@ -186,6 +198,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142029:A:2 (front): Forced: When Redhorn Pass is explored, each player assigns X damage among characters he controls. X is the number of damage here.
   142029:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each player assigns damage of this card damage among the character (you control), one at a time
 
 ## 142030 Doors of Durin
@@ -210,11 +223,12 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142031:A:1 (front): While Tree-crowned Hill is the active location, each enemy gets -1 Threat.
   142031:constant:1: Constant
     only if this card is the active location
-    - every enemy in play: stat threat -1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat threat -1, while this card is in play
 
 142031:A:2 (front): Forced: When Tree-crowned Hill is explored, the players, as a group, exhaust X characters in play. X is the number of damage here.
   142031:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - repeat damage of this card times:
       - choose ready character (any player controls) chosen by the first player
       - exhaust the picked card
@@ -230,6 +244,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142032:A:2 (front): Forced: When Hills of Hollin is explored, each player raises his threat by 1 for each damage here.
   142032:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by damage of this card (each player)
 
 ## 142033 Redhorn Foothills
@@ -238,11 +253,13 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142033:A:1 (front): While Redhorn Foothills is the active location, it gains: "Forced: After an enemy is added to the staging area, it gets -5 engagement cost until the end of the round."
   142033:forced:1: Forced after an encounter card is added to the staging area (heard about enemy (any player controls))
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about: stat engagementCost -5, until the end of the round
 
 142033:A:2 (front): Forced: When Redhorn Foothills is explored, each player must discard X cards from his hand at random. X is the number of damage here.
   142033:forced:2: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player discards damage of this card random card(s) from hand
 
@@ -252,12 +269,14 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142034:A:1 (front): Forced: When Eregion is explored, the players, as a group, must discard X allies from play. X is the number of damage here.
   142034:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - repeat damage of this card times:
       - choose ally (any player controls) chosen by the first player
       - discard the picked card
 
 142034:A:2 (shadow): Shadow: Defending player discards a non-objective attachment he controls.
   142034:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -272,7 +291,8 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142035:A:2 (shadow): Shadow: Undefended damage from this attack must be assigned to the active location.
   142035:shadow:1: Shadow
-    - [json DamageActiveLocation {"verb":"DamageActiveLocation"}]
+    who acts: the acting player is the defending player (the player the attack is against)
+    - (a shadow effect) the undefended damage of the attack in progress is placed on an active location instead of a hero, the defending player choosing the location (the damage goes to the hero as usual when no location is active)
 
 ## 142036 Snowdrifts
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -280,10 +300,10 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142036:A:1 (front): When Revealed: Attach to the active location. (Counts as a Condition attachment with the text, "Limit 1 per location. No more than 3 progress can be placed on attached location each round.") If Snowdrifts is not attached to the active location, it gains surge.
   142036:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AttachToActiveLocation {"verb":"AttachToActiveLocation"}]
+    - this treachery attaches to the active location, chosen by the first player among them; it stays in the staging area's discard when the location already holds a copy (Limit 1 per location) or none is active; the effect's X is 1 when it attached, else 0
     - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
   142036:constant:1: Constant
-    - its host: stat progressCap 3, while this card is in play
+    - its host: stat progressCap (no more than this much progress can be placed on this location each round) 3, while this card is in play
 
 ## 142037 Bitter Cold
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -299,6 +319,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 
 142037:A:2 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   142037:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -313,10 +334,10 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player chooses one of:
       * option "attack" (only if there is a Warg enemy (any player controls) in the staging area only to choose):
-        - [json PickHighestEngagement {"verb":"PickHighestEngagement","trait":"Warg"}]
-        - the picked enemy attacks the acting player now, from the staging area
+        - choose, among the enemies in the staging area with the trait Warg, the one with the highest engagement cost (ties: the first player chooses), or pick nothing when there is none
+        - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
       * option "engagement":
-        - each Warg enemy (any player controls) in the staging area only: stat engagementCost -20, until the end of the round
+        - each Warg enemy (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat engagementCost -20, until the end of the round
     - then, if not (the number of Warg enemy (any player controls) in the staging area only is at least 1) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 142084 Lust for the Ring
@@ -328,9 +349,182 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142084:A:2 (front): When Revealed: Attach to a non-Fellowship hero in play. Counts as a Condition attachment with the text: "Forced: After The One Ring exhausts, raise each player's threat by 1 and reduce attached hero's Willpower to 0 until the end of the round."
   142084:whenRevealed:1: When revealed
     - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
-  142084:forced:1: Forced on the event exhausted (heard about card (any player controls) named "The One Ring")
+  142084:forced:1: Forced on the event exhausted (heard about card (any player controls) or in the staging area or the active location, named "The One Ring")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (each player)
-    - [json SetStatUntil {"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","isHost":true}}]
+    - each hero (any player controls) that this card is attached to now: willpower is set to 0 until the end of the round, whatever else modifies it (the most recent set wins)
 
-(rendered pieces: 184 by template, 12 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 906401 The Ring Goes South Nightmare
+
+906401:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+906401:A:2 (front): Setup: Set each copy of Pale-green Tentacle aside, out of play.
+  906401:setup:1: Setup
+    - the copy of the card with code 906402 in the encounter deck is set aside, out of play
+
+906401:A:3 (front): Forced: When the players advance to stage 4B, each player puts 1 copy of Pale-green Tentacle into play engaged with him. Shuffle any remaining copies, and the encounter discard pile, into the encounter deck.
+  906401:forced:1: Forced on the event stageRevealed
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "The Gates of Moria"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - one set-aside copy of the card with code 906402 is put into play engaged with the acting player (nothing with no copy set aside)
+    - repeat 4 times:
+      - one set-aside copy of the card with code 906402 is shuffled into the encounter deck (nothing with none set aside)
+    - shuffle the encounter discard pile into the encounter deck
+
+906401:B:1 (back): Begin with the standard quest deck and encounter deck for the The Ring Goes South scenario.
+  (inert: the engine applies it by rule, no record)
+
+906401:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+906401:B:3 (back): 2x Crebain from Dunland
+  (inert: the engine applies it by rule, no record)
+
+906401:B:4 (back): 2x Howling Warg
+  (inert: the engine applies it by rule, no record)
+
+906401:B:5 (back): 1x Tree-crowned Hill
+  (inert: the engine applies it by rule, no record)
+
+906401:B:6 (back): 3x Hills of Hollin
+  (inert: the engine applies it by rule, no record)
+
+906401:B:7 (back): 2x Snowdrifts
+  (inert: the engine applies it by rule, no record)
+
+906401:B:8 (back): 1x Storm of Howls
+  (inert: the engine applies it by rule, no record)
+
+906401:B:9 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Ring Goes South encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+906401:B:10 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 906402 Pale-green Tentacle
+
+906402:A:1 (front): Cannot have attachments.
+  906402:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+906402:A:2 (front): Watcher in the Water cannot take damage.
+  906402:constant:2: Constant
+    - each enemy (any player controls) named "Watcher in the Water": stat cannotTakeDamage 1, while this card is in play
+
+906402:A:3 (front): Forced: After Pale-green Tentacle attacks and destroys a character, return Pale-green Tentacle to the staging area.
+  906402:forced:1: Forced when this enemy attacks, before the defender is declared
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 906403 Hunting Hawk
+
+906403:A:1 (front): Cannot have attachments or be optionally engaged.
+  906403:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+906403:A:2 (front): While Hunting Hawk is in the staging area it gains, "Forced: After a player plays an ally, he must either exhaust it, or place 1 damage on an active location."
+  906403:forced:1: Forced after this card is played (heard about ally (any player controls))
+    only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player chooses one of:
+      * option "exhaust":
+        - exhaust the card the event is about
+      * option "damage" (only if there is a location (any player controls) chosen by the first player, that is the active location to choose):
+        - choose location (any player controls) chosen by the first player, that is the active location
+        - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
+
+## 906404 Misty Mountain Warg
+
+906404:A:1 (front): When Revealed: Misty Mountain Warg makes an immediate attack against you. If it destroys a character, place 2 damage on each active location.
+  906404:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this enemy attacks the acting player now, as an attack outside the combat phase: from the staging area though it is not engaged, or while it is engaged with them; it is dealt a shadow card of its own (nothing when it is engaged with another player or out of play)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose location (any player controls) chosen by the first player, that is the active location
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): place 2 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) chosen by the first player, that is the active location, other than the cards this effect already picked
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): place 2 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
+
+906404:A:2 (shadow): Shadow: If this attack destroys a character, place 1 damage on an active location.
+  906404:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose location (any player controls) chosen by the first player, that is the active location
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
+
+## 906405 Expanse of Hollin
+
+906405:A:1 (front): X is 1 more than the number of enemies in play.
+  906405:constant:1: Constant
+    - this card: stat threat the number of enemy (any player controls) + 1, while this card is in play
+
+906405:A:2 (front): Forced: When Expanse of Hollin is explored, shuffle the encounter discard pile into the encounter deck. Then, discard the top card of the encounter deck for each damage here. Add each enemy discarded by this effect to the staging area.
+  906405:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - repeat damage of this card times:
+      - the top card of the encounter deck goes to the encounter discard pile
+      - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+## 906406 Slopes of Hithaeglir
+
+906406:A:1 (front): Forced: After a 'when revealed' effect is canceled, place 1 damage on each active location.
+  906406:forced:1: Forced on the event whenRevealedCanceled
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each location (any player controls) that is the active location:
+      - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
+
+906406:A:2 (front): Forced: When Slopes of Hithaeglir is explored, each player raises his threat by 1 for each damage here.
+  906406:forced:2: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - raise threat by damage of this card (each player)
+
+## 906407 Hunted in Hollin
+
+906407:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+906407:A:2 (front): When Revealed: Either raise your threat by 6, or engage the lowest engagement cost enemy in the staging area and reveal an encounter card.
+  906407:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 6 (the acting player)
+      * option "engage" (only if there is a enemy (any player controls) in the staging area only to choose):
+        - the enemy in the staging area with the lowest engagement cost becomes the picked card (the first player chooses among a tie; nothing is picked when there is none)
+        - engage the picked card
+        - the acting player reveals an encounter card
+
+906407:A:3 (shadow): Shadow: Raise your threat by 1 for each enemy engaged with you.
+  906407:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
+
+## 906408 Shelterless Land
+
+906408:A:1: Surge. Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+906408:A:2 (front): When Revealed: Until the end of the phase, add 1 to the total Threat in the staging area for each damage on each active location.
+  906408:whenRevealed:1: When revealed
+    - for each location (any player controls) that is the active location:
+      - the total Threat in the staging area is damage of the picked card higher until the end of the phase
+
+906408:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack for each damage on each active location.
+  906408:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - for each location (any player controls) that is the active location:
+      - the attacking enemy: stat attack damage of the picked card, until the end of the attack
+
+(rendered pieces: 296 by template, 0 as JSON)

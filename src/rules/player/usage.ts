@@ -5,6 +5,7 @@ import { costsOf } from "../../catalog/costs.ts";
 import { playCost } from "./attach.ts";
 import type { EngineStep, Payment } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
+import { readyNamedCard } from "../interpret/restrictions.ts";
 import { destroyCard, placeDamage, raiseThreat } from "../core/keywords.ts";
 import { deckPlayHero, markDeckPlay } from "./deck-play.ts";
 import { hasResourceMatch, heroPays, validatePayments } from "./payments.ts";
@@ -108,6 +109,8 @@ function payable(state: ScenarioState, cost: Cost, source: CardInstance, seat: n
     }
     case "exhaustCode":
       return Object.values(state.cards).some((card) => card.code === cost.code && inPlay(card.zone) && !card.exhausted && (card.controller ?? seat) === seat);
+    case "exhaustNamed":
+      return readyNamedCard(state, ctx, { kind: "byName", name: cost.name }, seat) != null;
     // An attachment whose host just left play answers from its owner's discard pile (families/attachments/hold.ts hostDefeated).
     case "addSelfToVictory":
       return inPlay(source.zone) || source.zone === "discard";
@@ -213,6 +216,11 @@ export function payUsage(
       case "exhaustCode": {
         const ring = Object.values(next.cards).find((card) => card.code === cost.code && inPlay(card.zone) && !card.exhausted && (card.controller ?? seat) === seat);
         if (ring) next = exhaustAnnounced(next, ring.id, ctx);
+        break;
+      }
+      case "exhaustNamed": {
+        const named = readyNamedCard(next, ctx, { kind: "byName", name: cost.name }, seat);
+        if (named) next = exhaustAnnounced(next, named.id, ctx);
         break;
       }
       case "addSelfToVictory":

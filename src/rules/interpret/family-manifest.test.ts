@@ -25,6 +25,7 @@ const READ_AS_DATA: Record<string, string> = {
   CannotPlay: "src/rules/families/sidequests/contract.ts",
   ReduceFirstOnEachHero: "src/rules/families/sidequests/contract.ts",
   DeckRule: "src/catalog/deck-rules.ts",
+  CountsAs: "src/rules/interpret/conditions.ts",
 };
 
 // Verbs a runner answers that the core schema (src/catalog/effect-schema-verbs.ts) declares, not a family.

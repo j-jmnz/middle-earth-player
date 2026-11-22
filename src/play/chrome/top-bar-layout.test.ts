@@ -11,6 +11,7 @@ import {
   DIAL_PAD,
   dialScale,
   DIAL_SIZE,
+  dialZones,
   EDGE_FADE,
   HEADING_BADGE_OVER,
   HEADING_BADGE_W,
@@ -264,5 +265,35 @@ describe("the seat dials at Extra large", () => {
     expect(zones.scroll).toBe(false);
     expect(content).toBeLessThanOrEqual(zones.left);
     expect(Math.abs(zones.left + zones.rail / 2 - bar / 2)).toBeLessThanOrEqual(0.5);
+  });
+});
+
+describe("the scenario dials' words (dialZones)", () => {
+  // The Hunt for the Dreadnaught at stage 1B on 844 x 390: two seats, the Action dial and the Cap dial, each with its word, then without it.
+  const bar = 844 - 2 * 8;
+  const word = DIAL_LABEL_GAP + 36;
+  const seats = 2 * SEAT_DIAL + DIAL_GAP;
+  const scenario = 2 * (2 * DIAL_PAD + DIAL_SIZE) + 2 * DIAL_GAP;
+  const labelled = seats + scenario + 2 * word + DIAL_GAP;
+  const bare = seats + scenario + DIAL_GAP;
+
+  it("drops the words when the row with them would scroll, so the last dial stands whole and the rail keeps its size", () => {
+    const withWords = barZones(bar, labelled, 1, bar / 2);
+    expect(withWords.scroll).toBe(true);
+    const zones = dialZones(bar, bare, labelled, 1, bar / 2);
+    expect(zones.wordless).toBe(true);
+    expect(zones.scroll).toBe(false);
+    expect(zones.rail).toBe(withWords.rail);
+    expect(zones.left).toBe(withWords.left);
+  });
+
+  it("keeps the words when the row with them fits, and answers the same whichever width the row has now", () => {
+    expect(dialZones(bar, seats, seats, 1, bar / 2).wordless).toBe(false);
+    expect(dialZones(bar, labelled, 0, 1, bar / 2).wordless).toBe(false);
+    expect(dialZones(bar, labelled, labelled, 1, bar / 2).wordless).toBe(dialZones(bar, bare, labelled, 1, bar / 2).wordless);
+  });
+
+  it("still scrolls when the row is too wide even without the words", () => {
+    expect(dialZones(bar, 600, labelled, 1, bar / 2).scroll).toBe(true);
   });
 });

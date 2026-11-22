@@ -11,7 +11,7 @@ export const RECORDS: readonly Effect[] = [
   // the -1 on it cancels the +1 every unique character of theirs gets, which leaves each other one +1.
   {"id":"22055:constant:1","cardCode":"22055","lines":["22055:A:1","22055:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","hasAttachment":{"trait":"Master"}}],"limitPerHost":true}]},
   {"id":"22055:constant:2","cardCode":"22055","lines":["22055:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"whileSourceInPlay","target":"host"}]},
-  {"id":"22055:response:1","cardCode":"22055","lines":["22055:A:3"],"timing":"response","trigger":"committed","subject":"host","cost":[{"kind":"exhaustCode","code":"21001"},{"kind":"raiseThreat","amount":1}],"instructions":[
+  {"id":"22055:response:1","cardCode":"22055","lines":["22055:A:3"],"timing":"response","trigger":"committed","subject":"host","cost":[{"kind":"exhaustNamed","name":"The One Ring"},{"kind":"raiseThreat","amount":1}],"instructions":[
     {"verb":"ModifyStat","stat":"willpower","amount":1,"until":"endOfPhase","holders":{"type":"character","control":"you","unique":true}},
     {"verb":"ModifyStat","stat":"willpower","amount":-1,"until":"endOfPhase","target":"host"}]},
   // 22059 Nori

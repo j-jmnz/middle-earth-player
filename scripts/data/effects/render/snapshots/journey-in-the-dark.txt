@@ -8,12 +8,13 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 10 damage token(s) on the card in play with code 142043 (placed, not dealt: nothing cancels or reduces them)
     - for each player, first player first:
-      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
     - shuffle the encounter deck
 
 142040:B:1 (back): Forced: After a player optionally engages an enemy, remove 1 damage token from Doom, Doom, Doom.
   142040:forced:1: Forced on the event optionallyEngaged
-    - [json RemoveDamageFrom {"verb":"RemoveDamageFrom","code":"142043","amount":1}]
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - up to 1 damage token(s) come off the card in play with printed code 142043; it stops at 0
 
 ## 142041 Drums in the Deep
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -25,7 +26,8 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142041:B:1 (back): If there are no enemies in the staging area at the beginning of the quest phase, the first player reveals an additional encounter card during the staging step.
   142041:forced:1: Forced when a phase begins
     only if all of: (it is the Quest phase) and (the number of enemy (any player controls) in the staging area only is at most 0)
-    - reveal 1 additional encounter card(s) in the staging step this phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - reveal 1 additional encounter card(s) in the staging step this phase (the extra reveals go to the players in turn after the one each player makes, so the first player makes the first of them; while the stages are separate, to the player whose stage holds the effect)
 
 142041:B:2 (back): The players cannot advance unless there are X resource tokens on this stage. X is the number of players times 3.
   142041:constant:1: Constant
@@ -34,6 +36,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142041:B:3 (back): Forced: After an enemy is defeated, place 1 resource token on this stage.
   142041:forced:2: Forced after an enemy is destroyed
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - 1 resource token(s) are placed on this card
 
 ## 142042 The Bridge of Khazad-dûm
@@ -45,11 +48,11 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     - one set-aside card with code 142050 joins the staging area (it is not revealed)
     - for each player, first player first:
       - the acting player reveals an encounter card
-      - [json RemoveDamageFrom {"verb":"RemoveDamageFrom","code":"142043","amount":1}]
+      - up to 1 damage token(s) come off the card in play with printed code 142043; it stops at 0
 
 142042:B:1 (back): No more than 5 progress can be placed on this stage each round.
   142042:constant:1: Constant
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 5, while this card is in play
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 5, while this card is in play
 
 142042:B:2 (back): The players cannot defeat this stage while The Great Bridge is in play.
   142042:constant:2: Constant
@@ -58,7 +61,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142042:B:3 (back): If the players defeat this stage, they win the game.
   142042:constant:3: Constant
-    (no instructions)
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
 ## 142043 Doom, Doom, Doom
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -66,16 +69,18 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142043:A:1 (front): Forced: At the end of the quest phase, remove 1 damage token from Doom, Doom, Doom. Then, if there are no damage tokens here, add The Balrog to the staging area.
   142043:forced:1: Forced at the end of the phase
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RemoveDamageFrom {"verb":"RemoveDamageFrom","code":"142043","amount":1}]
-    - then, if [json condition {"kind":"damageHere","max":0}] (checked when this step runs, after the steps above; not tied to whether they did anything): one set-aside card with code 142044 joins the staging area (it is not revealed)
+    - up to 1 damage token(s) come off the card in play with printed code 142043; it stops at 0
+    - then, if this card holds at most 0 damage tokens (checked when this step runs, after the steps above; not tied to whether they did anything): one set-aside card with code 142044 joins the staging area (it is not revealed)
 
 142043:A:2 (front): Forced: At the end of the quest phase, The Balrog makes an attack if it is in play.
   142043:forced:2: Forced at the end of the phase
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, named "The Balrog"
-    - the picked enemy attacks the first player now, from the staging area
+    - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
 
 ## 142044 The Balrog
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -86,7 +91,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
     - this card: stat immuneToPlayerCards 1, while this card is in play
-    - this card: stat shadowsImmune 1, while this card is in play
+    - this card: stat shadowsImmune (the shadow cards dealt to it are immune to player card effects, so no Response cancels their effects) 1, while this card is in play
 
 142044:A:2 (front): While in the staging area, The Balrog is considered to be engaged with the first player and only the first player can declare attackers against The Balrog.
   142044:constant:2: Constant
@@ -108,6 +113,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142045:A:2 (front): Forced: At the beginning of the encounter phase, Orc-chieftain engages the first player.
   142045:forced:1: Forced when a phase begins
     only if it is the Encounter phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - if the actor holds the first player token: engage this card
 
@@ -120,17 +126,18 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142046:A:2 (front): For each point of excess combat damage dealt by Great Cave-troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) remove 1 progress from the current quest.
   142046:constant:2: Constant
-    - this card: stat excessToQuestProgress 1, while this card is in play
+    - this card: stat excessToQuestProgress (the damage its attack deals beyond the hit points the character had left takes that much progress off the current quest) 1, while this card is in play
 
 ## 142047 Uruk from Mordor
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 142047:A:1 (front): When Revealed: Uruk from Mordor makes an attack against the first player.
   142047:whenRevealed:1: When revealed
-    - this card attacks the first player now, from the staging area
+    - this card attacks the first player now, from the staging area, dealt a shadow card
 
 142047:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, attacking enemy makes an additional attack.
   142047:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -143,12 +150,13 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
   142048:whenRevealed:1: When revealed
     - the acting player chooses one of:
       * option "doom":
-        - [json RemoveDamageFrom {"verb":"RemoveDamageFrom","code":"142043","amount":1}]
+        - up to 1 damage token(s) come off the card in play with printed code 142043; it stops at 0
       * option "reveal":
         - the acting player reveals an encounter card
 
 142048:A:2 (shadow): Shadow: The defending player raises his threat by 1 for each enemy engaged with him.
   142048:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
 
 ## 142049 Moria Archer
@@ -176,7 +184,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     only if all of: (the card the event is about had enough progress to be explored) and (the card with code 142044 is in play)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (any player controls)
-    - [json SacrificeForDamage {"verb":"SacrificeForDamage","code":"142044"}]
+    - the last picked hero is discarded from play to deal X damage to the card in play with printed code 142044, X being that hero's threat cost; then that card loses all keywords for the rest of the game (the damage is an encounter card's, so the Balrog's immunity does not stop it; nothing with no such card in play)
 
 ## 142051 Chamber of Mazarbul
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -192,7 +200,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
   142051:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); while the card with code 142045 is there to be found, the search must take it (the first search of the effect that can) [also {"different":true}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found; while the card with code 142045 is there to be found, the search must take it (the first search of the effect that can)
     - shuffle the encounter deck
 
 ## 142052 Mines of Moria
@@ -205,6 +213,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142052:A:2 (shadow): Shadow: Defending player discards a non-objective attachment he controls (2 non-objective attachments instead if his threat is 35 or higher).
   142052:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control) that is not an objective
     - discard the picked card
@@ -220,6 +229,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142053:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player's threat is 35 or higher).
   142053:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the actor's threat is at least 35): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the actor's threat is at least 35 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -230,6 +240,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142054:A:1 (front): Forced: After Darkened Stairway is explored, discard the top card of the encounter deck. If the discarded card is a location, add it to the staging area.
   142054:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the picked card is a location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
@@ -240,7 +251,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142055:A:1 (front): While Ancient Guardroom is the active location, each enemy in play gets -1 Attack.
   142055:constant:1: Constant
     only if this card is the active location
-    - every enemy in play: stat attack -1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat attack -1, while this card is in play
 
 142055:A:2 (front): Travel: Discard the top card of the encounter deck to travel here. Each player raises his threat by X, where X is the discarded card's Threat.
   142055:travel:1: Travel
@@ -270,6 +281,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142057:A:2 (shadow): Shadow: Assign X damage among characters you control. X is the number of enemies engaged with you.
   142057:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player assigns the number of enemy (any player controls) engaged with you damage among the character (you control), one at a time
 
 ## 142058 Deep Fissure
@@ -296,13 +308,14 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
   142059:whenRevealed:1: When revealed
     - the acting player chooses one of:
       * option "doom":
-        - [json RemoveDamageFrom {"verb":"RemoveDamageFrom","code":"142043","amount":1}]
+        - up to 1 damage token(s) come off the card in play with printed code 142043; it stops at 0
       * option "balrog" (only if the card with code 142044 is in play):
         - choose enemy (any player controls) in the staging area only, named "The Balrog"
-        - the picked enemy attacks the first player now, from the staging area
+        - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
 
 142059:A:3 (shadow): Shadow: If this attack destroys a character, reveal 1 card from the encounter deck.
   142059:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player reveals an encounter card
 
@@ -313,10 +326,11 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142085:A:2 (front): When Revealed: Treat the printed text box of each character in play as blank (except for Traits) until the end of the round.
   142085:whenRevealed:1: When revealed
-    - each character (any player controls): stat blankText (its text box is blank) 1, until the end of the round
+    - each character (any player controls) (only the cards that match now: one that arrives later does not get it): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
 
 142085:A:3 (shadow): Shadow: Defending character does not count its Defense.
   142085:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat defense minus (defense of the defender), until the end of the attack
 
 ## 142086 Pursued by the Enemy
@@ -330,6 +344,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142086:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   142086:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -342,11 +357,13 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142087:A:2 (front): Forced: After a character is destroyed, if Overcome by Grief is unattached, attach to a hero. (Counts as a Condition attachment with the text: "Forced: After a character you control is destroyed, exhaust attached hero. Until the end of the round, attached hero cannot ready.")
   142087:forced:1: Forced on the event characterDestroyed
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
   142087:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   142087:forced:2: Forced on the event characterDestroyed (heard about character (any player controls) controlled by the player who controls this card's host)
     only if not (this card is in the staging area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust its host
     - its host: stat cannotReady 1, until the end of the round
@@ -360,11 +377,13 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142088:A:2 (front): Forced: After a hero takes damage, if Grievous Wound is unattached, attach to that hero. (Counts as a Condition attachment with the text: "Forced: After attached hero exhausts, deal 1 damage to it.")
   142088:forced:1: Forced after a card takes damage (heard about hero (any player controls))
     only if this card is in the staging area
-    - [json AttachToSubject {"verb":"AttachToSubject"}]
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this objective, in the staging area, attaches to the hero the answered event was about (a card that is attached already stays where it is)
   142088:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   142088:forced:2: Forced on the event exhausted (heard about the host)
     only if not (this card is in the staging area)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to its host
 
-(rendered pieces: 198 by template, 10 as JSON)
+(rendered pieces: 208 by template, 0 as JSON)

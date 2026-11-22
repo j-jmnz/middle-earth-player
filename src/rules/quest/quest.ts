@@ -387,8 +387,8 @@ export function engageWith(state: ScenarioState, seat: number, enemyId: string, 
 }
 
 export function qualifyingEnemies(state: ScenarioState, seat: number, cards: Cards): string[] {
-  // "Do not make engagement checks during the encounter phase" (01127:B:1): the table holds noEngagementChecks.
-  if (flagged(state, "table", "noEngagementChecks")) return [];
+  // "Do not make engagement checks" (the table holds noEngagementChecks) and "during the encounter phase" (01127:B:1, noEncounterEngagementChecks): this is the encounter phase's check.
+  if (flagged(state, "table", "noEngagementChecks") || flagged(state, "table", "noEncounterEngagementChecks")) return [];
   const found: { id: string; cost: number }[] = [];
   // Engagement checks use only the seat's own staging area once stages are separate (mec109.multiple-staging-areas).
   for (const id of stagingEnemies(state, cards, seat)) {

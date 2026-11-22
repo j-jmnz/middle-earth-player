@@ -15,7 +15,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
   41004:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
+      - the acting player finds one location in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
     - shuffle the encounter deck
 
 ## 41005 Surprise Attack
@@ -26,7 +26,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     (steps run in order; a step depends on an earlier one only through its own condition)
     - one set-aside card with code 41027 joins the staging area (it is not revealed)
     - for each player, first player first:
-      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
     - shuffle the encounter deck
 
 41005:B:1 (back): During the encounter phase, treat each enemy's engagement cost as if it were 0.
@@ -43,13 +43,14 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41006:A:1 (front): When Revealed: Set Goblin Chieftain aside, out of play. Add Cracked Pillar to the staging area.
   41006:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"41027"}]
+    - the card in play with code 41027 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
     - one set-aside card with code 41028 joins the staging area (it is not revealed)
 
 41006:B:1 (back): Forced: Reveal an additional encounter card during the quest phase.
   41006:forced:1: Forced when a phase begins
     only if it is the Quest phase
-    - reveal 1 additional encounter card(s) in the staging step this phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - reveal 1 additional encounter card(s) in the staging step this phase (the extra reveals go to the players in turn after the one each player makes, so the first player makes the first of them; while the stages are separate, to the player whose stage holds the effect)
 
 41006:B:2 (back): Progress cannot be placed on Cracked Pillar while it is in the staging area.
   41006:constant:1: Constant
@@ -58,6 +59,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41006:B:3 (back): After Cracked Pillar leaves play as an explored location, advance to stage 4A.
   41006:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about location (any player controls) named "Cracked Pillar")
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - advance to the next quest stage
 
 ## 41007 Oathkeepers
@@ -95,6 +97,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 
 41027:A:3 (front): Forced: After Goblin Chieftain attacks, either remove X progress from the quest, or return it to the staging area.
   41027:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - the first player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
         - remove the stage number of the quest progress from the current quest card (all of it when it holds less)
@@ -113,6 +116,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 
 41028:A:2 (front): Travel: Remove 4 damage from Cracked Pillar to travel here.
   41028:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when this location holds less damage than must be removed
     - heal 4 damage from this card
 
 ## 41029 Cave Torch
@@ -125,6 +129,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41029:A:2 (front): Action: Exhaust Cave Torch to place up to 3 progress tokens on a Dark location.
   41029:action:1: Action
     only if all of: (the card with code 41029 in play is ready) and (there is a Dark location (any player controls) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust this card
     - the acting player chooses X, from 1 to 3
@@ -133,6 +138,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 
 41029:A:3 (front): Forced: After Cave Torch exhausts, discard the top card of the encounter deck. If that card is an enemy, add it to the staging area.
   41029:forced:1: Forced on the event exhausted (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
@@ -146,7 +152,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 
 41030:A:2 (front): For each point of excess combat damage dealt by Great Cave-troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) remove 1 progress from the current quest.
   41030:constant:2: Constant
-    - this card: stat excessToQuestProgress 1, while this card is in play
+    - this card: stat excessToQuestProgress (the damage its attack deals beyond the hit points the character had left takes that much progress off the current quest) 1, while this card is in play
 
 ## 41031 Cavern Warg
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -156,11 +162,12 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     only if all of: (the actor controls the card with code 41029) and (the card with code 41029 in play is ready)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust the card with code 41029
-    - [json CancelAttack {"verb":"CancelAttack"}]
+    - the attack in progress is canceled: no shadow effect or damage resolves after this, and the enemy's attack is used up
     - return this card to the staging area
 
 41031:A:2 (shadow): Shadow: If this attack destroys a character, return attacking enemy to the staging area after this attack.
   41031:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -170,10 +177,12 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41032:A:1 (front): While Goblin Tunnels is in the staging area, it gains: "Forced: After a Goblin is revealed from the encounter deck, remove a progress token from the current quest card."
   41032:forced:1: Forced after a card is revealed (heard about Goblin enemy (any player controls); only when the encounter deck revealed it)
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - remove 1 progress from the current quest card (all of it when it holds less)
 
 41032:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if attacking enemy is a Goblin.)
   41032:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attacking enemy is a Goblin enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attacking enemy is a Goblin enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
@@ -183,10 +192,12 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 
 41033:A:1 (front): Travel: Players must exhaust a Cave Torch to travel here.
   41033:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no ready copy of the card it exhausts is in play
     - exhaust "Cave Torch"
 
 41033:A:2 (shadow): Shadow: Cancel all combat damage dealt to attacking enemy.
   41033:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat combatDamageCanceled 1, until the end of the attack
 
 ## 41034 Branching Paths
@@ -200,10 +211,11 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41034:A:2 (front): Forced: After Branching Paths leaves play as an explored location, look at the top 3 cards of the encounter deck. Players must choose 1 of those to reveal and add to the staging area, moving the other 2 to the bottom of the deck.
   41034:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player looks at the top 3 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
     - choose an encounter card among the cards the effect looked at (none when no card matches)
-    - [json BottomOtherLooked {"verb":"BottomOtherLooked"}]
+    - the cards the look showed that are still on top of the encounter deck, except the picked one, go to the bottom of the deck in the order they were in; the picked card is then the top card, and the reveal after it reveals it
     - the acting player reveals an encounter card
 
 ## 41035 Collapsed Mine
@@ -212,10 +224,11 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41035:A:1 (front): While Collapsed Mine is in the staging area, no more than 4 progress can be placed on the quest each round.
   41035:constant:1: Constant
     only if this card is in the staging area
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 4, while this card is in play
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 4, while this card is in play
 
 41035:A:2 (shadow): Shadow: Raise your threat by 1 for each point of damage dealt by this attack.
   41035:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - raise threat by the damage just dealt (the acting player)
 
@@ -231,8 +244,8 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose card (you control) in the deck, among the top 5, of card type ally
-    - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor"}]
-    - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+    - the picked card is put into play from wherever it is out of play (hand, discard pile, deck): it is not played, so no cost is paid and no play restriction applies, and a unique card with a copy in play stays where it is; a hero goes among its controller's heroes, any other card into the play area, ready, under the acting player's control
+    - shuffle the acting player's deck
 
 ## 41037 Crumbling Stairs
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -245,6 +258,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41037:A:2 (front): Forced: When Crumbling Stairs leaves play as an explored location, discard the top card of the encounter deck. If the discarded card is a location, put it into play as the active location.
   41037:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the picked card is a location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card becomes the active location
@@ -259,7 +273,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
       - exhaust the picked card
       - the effect's X is set to 0
       - the acting player discards the top card of their deck; its printed cost (0 with none or an X cost) is added to the effect's X
-      - then, if [json condition {"kind":"xReachesRemaining"}] (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+      - then, if the running effect's X is at least the remaining hit points of the picked card (its hit points less its damage; false with no picked card) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
 ## 41039 Lost in the Dark
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -271,10 +285,11 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
         * option "exhaust" (only if all of: (the actor controls the card with code 41029) and (the card with code 41029 in play is ready)):
           - exhaust the card with code 41029
         * option "noProgress" (only if the actor controls the card with code 41029):
-          - the table: stat noQuestProgress 1, until the end of the phase
+          - the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, until the end of the phase
 
 41039:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
   41039:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
 ## 41040 Watchful Eyes
@@ -287,6 +302,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     - this card counts as a Condition attachment while it is attached
   41040:forced:1: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (its host is a exhausted hero (any player controls))
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the acting player reveals an encounter card
 
 ## 41051 The Caves of Nibin-Dûm
@@ -297,7 +313,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41051:A:2 (front): Setup: Each player adds 1 copy of the "No Time to Waste!" boon to their hand after drawing their starting hand (including taking a mulligan). Add each copy of "No Time to Waste!" in a player's hand to the Campaign Pool. Shuffle the Shiny Distraction burden into the encounter deck and add it to the Campaign Pool.
   41051:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddToHandAfterMulligan {"verb":"AddToHandAfterMulligan","code":"41048"}]
+    - Campaign Setup: each player adds a copy of the card with code 41048 to their hand after drawing their starting hand, a mulligan included (it joins the hand once every player has chosen)
     - the card with code 41048 is added to the Campaign Pool (a copy for each player)
     - a card with code 41042 from the box joins the encounter deck, which is shuffled
     - the card with code 41042 is added to the Campaign Pool
@@ -305,7 +321,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41051:B:1 (back): Resolution: Check the final threat of the player with the highest threat: If it is under 40, you have rescued a retired Ranger who shares his wisdom with you. Each player may add 1 copy of Ranger Sense to their deck and to the Campaign Pool. At the start of your next campaign, each player may also shuffle 1 copy of Ranger Sense into their deck and add it to the Campaign Pool.
   41051:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json Earn {"verb":"Earn","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
-    - [json CarryOver {"verb":"CarryOver","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
+    - if the highest threat among the players is 39 or less (an eliminated player counts as 50): Resolution: the cards with codes 41049 are earned, with no choice (one copy for each living player)
+    - then, if the highest threat among the players is 39 or less (an eliminated player counts as 50) (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: the cards with codes 41049 go to the NEXT campaign, not this one (one copy for each player); a new save takes them in from a finished one
 
-(rendered pieces: 180 by template, 11 as JSON)
+(rendered pieces: 193 by template, 0 as JSON)

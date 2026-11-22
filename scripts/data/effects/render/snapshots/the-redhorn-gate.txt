@@ -11,6 +11,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 03054:A:2 (shadow): Shadow: If this attack is undefended, deal 2 additional shadow cards to attacking enemy.
   03054:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attack has no defender: the attacking enemy is dealt a shadow card
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt a shadow card
@@ -21,10 +22,12 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 03055:A:1 (front): If Mountain Warg is dealt a shadow card with no effect, return Mountain Warg to the staging area after it attacks.
   03055:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    who acts: the acting player is the defending player (the player the attack is against)
     - return this card to the staging area
 
 03055:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if a Mountain is the active location.)
   03055:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Mountain location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -40,6 +43,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 03056:A:2 (shadow): Shadow: Defending player must discard 2 resources from each hero he controls.
   03056:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - for each hero (you control):
       - 2 resource(s) come off the resource pool of the picked card (discarded, not spent)
 
@@ -49,6 +53,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 03057:A:1 (front): While Knees of the Mountain is in the staging area, it gains: "Forced: After an enemy engages a player, it gets +1 Attack until the end of the round."
   03057:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls))
     only if this card is in the staging area
+    who acts: the acting player is the player the enemy engaged
     - the card the event is about: stat attack 1, until the end of the round
 
 ## 03058 Turbulent Waters
@@ -102,6 +107,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04012:B:2 (back): Forced: After placing the 11th progress token on Snowdrifts, discard any active location. Caradhras becomes the active location.
   04012:forced:1: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the active location is a location (any player controls) named "Caradhras"): discard the active location
     - then, if the encounter deck or its discard pile holds a card with code 04015 (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter deck
@@ -127,7 +133,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04013:B:4 (back): If the players defeat this stage, they have won the game.
   04013:constant:3: Constant
-    (no instructions)
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
 ## 04014 Arwen Undómiel
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -144,6 +150,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04014:A:3 (front): If Arwen Undómiel leaves play, the players are defeated.
   04014:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 04015 Caradhras
@@ -167,6 +174,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
     - each hero (any player controls): stat willpowerCostsResource (its Willpower counts toward the quest only once it holds countsWillpower, which paying 1 resource from its pool gives until the end of the phase) 1, while this card is in play
   04016:forced:1: Forced on the event questTotalCounted
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - for each hero (you control) committed to the quest, with resources on it:
         - the acting player chooses one of:
@@ -181,6 +189,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 04017:A:1 (front): While Celebdil is the active location, remove 2 progress tokens from it at the end of each round.
   04017:forced:1: Forced at the end of the round
     only if this card is the active location
+    who acts: the acting player is the first player (a phase has no player of its own)
     - remove 2 progress from this card
 
 ## 04018 The Dimrill Stair
@@ -205,6 +214,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04019:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each progress token on the active location.
   04019:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack progress of the active location, until the end of the attack
 
 ## 04020 Fell Voices
@@ -226,13 +236,14 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
     - the first player chooses one of:
       * option "remove":
         - remove all the progress from each location (any player controls)
-        - remove all the progress from each card (any player controls) that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
-        - remove all the progress from each card (any player controls) named "Blinding Blizzard"
+        - remove all the progress from each card (any player controls) or in the staging area or the active location, that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
+        - remove all the progress from each card (any player controls) or in the staging area or the active location, named "Blinding Blizzard"
       * option "reveal":
         - the first player reveals 2 encounter cards, one after the other, each in a staging of its own
 
 04021:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each progress token on the active location.
   04021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack progress of the active location, until the end of the attack
 
 ## 04022 Snowstorm
@@ -244,6 +255,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04022:A:2 (shadow): Shadow: Until the end of the phase, characters defending this attack get -1 Willpower and are discarded if their Willpower is 0.
   04022:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the defender: stat willpower -1, until the end of the phase
     - the defender: stat discardAtZeroWillpower (it is discarded from play as soon as its current Willpower is 0) 1, until the end of the phase
@@ -262,6 +274,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
     - its host: stat cannotQuest 1, while this card is in play
   04023:triggered:1: Triggered (mandatory, not printed as Forced) on the event attached (heard about this card)
     only if the number of attachment (any player controls) named "Freezing Cold", attached to this card's host is at least 2
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard its host
 
 ## 04024 Avalanche!
@@ -282,6 +295,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04025:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if the active location is a Mountain.)
   04025:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Mountain location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -295,6 +309,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04026:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if the active location is a Mountain.)
   04026:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Mountain location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
@@ -309,6 +324,160 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 04027:A:2 (front): Forced: After a character is declared as a defender against Snow Warg, deal 1 damage to the defending character, if able.
   04027:forced:1: Forced after a character is declared as a defender (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to the card the event is about
 
-(rendered pieces: 194 by template, 0 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 901301 The Redhorn Gate Nightmare
+
+901301:A:1 (front): You are playing in Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+901301:A:2 (front): Setup: Remove all copies of Blinding Blizzard from the encounter deck and set them aside, out of play. During this game, player cards in the victory display do not count their victory points.
+  901301:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the copy of the card with code 901307 in the encounter deck is set aside, out of play
+    - the table: stat playerVictoryIgnored (the player cards in the victory display are worth no victory points: the amount, the stage's bar and the score) 1, until the end of the game
+
+901301:A:3 (front): Forced: When stage 2b is revealed, shuffle each set aside copy of Blinding Blizzard into the encounter deck.
+  901301:forced:1: Forced on the event stageRevealed
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Snowdrifts"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - repeat 2 times:
+      - one set-aside copy of the card with code 901307 is shuffled into the encounter deck (nothing with none set aside)
+    - shuffle the encounter deck
+
+901301:B:1 (back): Begin with the standard quest deck and encounter deck for The Redhorn Gate scenario.
+  (inert: the engine applies it by rule, no record)
+
+901301:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+901301:B:3 (back): 1x Black Uruks
+  (inert: the engine applies it by rule, no record)
+
+901301:B:4 (back): 3x Mountain Warg
+  (inert: the engine applies it by rule, no record)
+
+901301:B:5 (back): 1x Knees of the Mountain
+  (inert: the engine applies it by rule, no record)
+
+901301:B:6 (back): 2x Turbulent Waters
+  (inert: the engine applies it by rule, no record)
+
+901301:B:7 (back): 2x Warg Lair
+  (inert: the engine applies it by rule, no record)
+
+901301:B:8 (back): 1x The Dimrill Stair
+  (inert: the engine applies it by rule, no record)
+
+901301:B:9 (back): 2x Fell Voices
+  (inert: the engine applies it by rule, no record)
+
+901301:B:10 (back): 2x Fallen Stones
+  (inert: the engine applies it by rule, no record)
+
+901301:B:11 (back): 3x Mountain Goblin
+  (inert: the engine applies it by rule, no record)
+
+901301:B:12 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Redhorn Gate encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+901301:B:13 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 901302 Wolfpelt Goblin
+
+901302:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+901302:A:2 (front): Forced: After engaging Wolfpelt Goblin, the engaged player must deal X damage to 1 character he controls, where X is the active location's remaining quest points. Then, remove 2 progress from the active location, if able.
+  901302:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control)
+    - deal the quest points the active location still needs (its quest points less its progress; 0 with no active location) damage to the picked card
+    - remove 2 progress from the active location
+
+## 901303 Silvertine Marauder
+
+901303:A:1 (front): While attacking, Silvertine Marauder gets +2 Attack if the defending character has less than 2 Willpower.
+  901303:constant:1: Constant
+    - if the card holding this stat is an enemy attacking a declared defender with a current Willpower of 1 or less (modifiers counted): this card: stat attack 2, while this card is in play
+
+901303:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack if the defending character has less than 2 Willpower.
+  901303:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - if the defender is a character (any player controls) with a current Willpower of 1 or less: the attacking enemy: stat attack 2, until the end of the attack
+
+## 901304 Snow-Giant
+
+901304:A:1 (front): While Snow-Giant is in the staging area, it attacks the first player during the combat phase, as if it were engaged.
+  901304:forced:1: Forced when a phase begins
+    only if all of: (it is the Combat phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - this card attacks the first player now, from the staging area, dealt a shadow card
+
+901304:A:2 (front): Forced: After Snow-Giant engages you, discard the ally you control with the highest Willpower.
+  901304:forced:2: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ally (you control) with the highest current Willpower of those (ties: the chooser decides)
+    - discard the picked card
+
+## 901305 Icy Cavern
+
+901305:A:1 (front): X is the number of Snow cards in the staging area.
+  901305:constant:1: Constant
+    - this card: stat threat the number of Snow card (any player controls) in the staging area only, while this card is in play
+
+901305:A:2 (front): Travel: Search the encounter deck and discard pile for 1 copy of Freezing Cold and reveal it to travel here. Shuffle the encounter deck.
+  901305:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no matching card is in the encounter deck or its discard pile (read by the angmar family)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player searches the encounter deck and discard pile for the card with code 04023, a a card, reveals it and adds it to the staging area (a Travel cost: payable only when a card is found)
+    - shuffle the encounter deck
+
+901305:A:3 (shadow): Shadow: Defending character gets -1 Willpower. Deal the attacking enemy 1 additional shadow card.
+  901305:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the defender: stat willpower -1, until the end of the attack
+    - the attacking enemy is dealt a shadow card
+
+## 901306 Frozen Silverlode
+
+901306:A:1 (front): While Frozen Silverlode is in the staging area, characters cannot gain Willpower from player card effects.
+  901306:constant:1: Constant
+    only if this card is in the staging area
+    - the table: stat noWillpowerGain (no character gains Willpower from a player card effect; reductions still apply) 1, while this card is in play
+
+901306:A:2 (shadow): Shadow: Defending character gets -1 Willpower. Deal the attacking enemy 1 additional shadow card.
+  901306:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the defender: stat willpower -1, until the end of the attack
+    - the attacking enemy is dealt a shadow card
+
+## 901307 Blinding Blizzard
+
+901307:A:1 (front): While Blinding Blizzard is in play, heroes do not collect resources during the resource phase.
+  901307:constant:1: Constant
+    - every hero in play: stat noCollection 1, while this card is in play
+
+901307:A:2 (front): When Revealed: Add Blinding Blizzard to the staging area. Progress that would be placed on the current quest or on Snow locations are instead placed on Blinding Blizzard. When the 5th progress is placed on Blinding Blizzard, discard it.
+  901307:whenRevealed:1: When revealed
+    - this card: stat progressRedirect (it stays in the staging area; progress that would be placed on the current quest or on a Snow location is placed on it instead, up to 5, and its 5th progress discards it) 1, while this card is in play
+
+## 901308 Caradhras the Cruel
+
+901308:A:1 (front): When Revealed: Return all Snow cards in the encounter discard pile to the top of the encounter deck, in random order. Reveal the top card of the encounter deck (reveal the top 2 cards instead if there are 3 or 4 players in the game).
+  901308:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - return every Snow card(s) of the encounter discard pile to the top of the encounter deck, in a random order, facedown (the cards ArrangeEncounter may reorder) (they are not revealed: no When Revealed, no engagement; the number returned is counted)
+    - the acting player reveals an encounter card
+    - then, if the number of player (any player controls) is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reveals an encounter card
+
+(rendered pieces: 251 by template, 0 as JSON)

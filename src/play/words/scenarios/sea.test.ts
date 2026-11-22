@@ -20,7 +20,6 @@ import {
   SAILING_COMMIT_TITLE,
   sailingLookWords,
   sailingTitle,
-  secondSlotLine,
   seaWords,
   shipsLine,
 } from "./sea.ts";
@@ -106,11 +105,10 @@ describe("the Sailing test's words", () => {
 });
 
 describe("the piles and the web list's words", () => {
-  it("say a pile's count, the second slot on one line, the ships and the heading", () => {
+  it("say a pile's count, the ships and the heading", () => {
     expect(pileCountWords("Corsair deck", 9)).toBe("Corsair deck, 9 cards");
     expect(pileCountWords("Corsair discard pile", 2)).toBe("Corsair discard pile, 2 cards");
     expect(pileCountWords("Corsair deck", 1)).toBe("Corsair deck, 1 card");
-    expect(secondSlotLine([{ name: "Corsair deck", count: 9 }, { name: "Corsair discard pile", count: 2 }])).toBe("Corsair deck 9 · Corsair discard pile 2");
     expect(shipsLine([{ name: "Dream-chaser", damage: 3 }, { name: "Dawn Star", damage: 0 }])).toBe("Ships: Dream-chaser, 3 damage; Dawn Star");
     expect(headingLine("Rain", false)).toBe("Heading: Rain (off-course)");
     expect(headingLine("Sun", true)).toBe("Heading: Sun (on-course)");

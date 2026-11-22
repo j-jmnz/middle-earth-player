@@ -17,10 +17,6 @@ const VERBS = [
 
 const TRIGGERS = [] as const;
 
-const FLAGS = [
-  // On a seat (target `actorSeat`): each enemy engaged with that seat adds its Threat to the total Threat in the staging area, read live while the effect lasts, so an enemy that engages later counts
-  // ("Until the end of the round, each enemy engaged with you adds its Threat to the total Threat in the staging area", 143065:A:2; rr.lasting-effects).
-  "engagedThreatSeat",
-] as const;
+const FLAGS = [] as const;
 
 export const manifest = { name: "pursuit", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

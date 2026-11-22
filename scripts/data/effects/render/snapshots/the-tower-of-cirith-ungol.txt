@@ -6,13 +6,14 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146014:A:1 (front): Attached hero gains the Ring-bearer trait and the Fellowship sphere. You cannot lose control of the first player token.
   146014:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json GrantTrait {"verb":"GrantTrait","trait":"Ring-bearer"}]
-    - [json GrantIcon {"verb":"GrantIcon","sphere":"fellowship"}]
+    - (constant on an attachment) the attached card gains the trait Ring-bearer
+    - (constant on an attachment) the attached hero also pays for fellowship cards and counts as fellowship hero for a filter that reads the sphere
     - the table: stat firstPlayerLocked 1, while this card is in play
 
 146014:A:2 (front): Action: Exhaust The One Ring and raise your threat by 1 to choose an enemy. Until the end of the phase, that enemy gets -X Threat, where X is the attached hero's Willpower.
   146014:action:1: Action
     only if all of: (the card with code 146065 in play is ready) and (there is a enemy (any player controls) or in the staging area to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust the card with code 146065
     - raise threat by 1 (the acting player)
@@ -28,10 +29,10 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146015:A:2 (front): The players cannot travel here unless there is at least 18 progress on stage 2B.
   146015:constant:1: Constant
     only if not (the current quest stage holds at least 18 progress)
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
   146015:constant:2: Constant
     only if not (the players are on stage 2)
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
 
 146015:A:3 (front): Travel: Add Shagrat to the staging area to travel here.
   146015:travel:1: Travel
@@ -55,9 +56,11 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146017:A:1 (front): While Bloodied Courtyard is the active location, it gains: "Forced: After an enemy enters the staging area, deal 1 damage to it."
   146017:forced:1: Forced after an encounter card is added to the staging area (heard about enemy (any player controls))
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to the card the event is about
   146017:forced:2: Forced on the event returnedToStaging (heard about enemy (any player controls))
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to the card the event is about
 
 146017:A:2 (front): Travel: Raise each player's threat by 1 to travel here.
@@ -74,6 +77,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146018:A:2 (front): Travel: Each player must exhaust a character he controls to travel here.
   146018:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player has no card to choose and exhaust
     - for each player, first player first:
       - choose ready character (you control)
       - exhaust the picked card
@@ -83,10 +87,11 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146019:A:1 (front): Forced: After the players travel to Torch-lit Hall, discard cards from the top of the encounter deck until an enemy is discarded. If there is a copy of that enemy in the staging area, discard that copy as well. If there is not, add the just discarded enemy to the staging area.
   146019:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
-    - then, if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the number of enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
-    - then, if there is a enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}]
+    - then, if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the number of enemy (any player controls) in the staging area only, with the same title as the last card picked, never that card itself is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+    - then, if there is a enemy (any player controls) in the staging area only, with the same title as the last card picked, never that card itself to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only, with the same title as the last card picked, never that card itself
     - then, if all of: (the picked card is a enemy (any player controls) in the staging area only) and (the card picked before is a enemy (any player controls) that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
 ## 146020 Shagrat
@@ -95,7 +100,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146020:A:1 (front): Cannot have non-boon attachments. Cannot take non-combat damage.
   146020:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptBoon":true}]
+    - no card can be attached to this card except a boon (a card the campaign pool holds as one)
     - this card: stat cannotTakeNonCombatDamage 1, while this card is in play
 
 146020:A:2 (front): Allies cannot attack or defend against Shagrat.
@@ -105,7 +110,8 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     - allies cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)
 
 146020:A:3 (front): Forced: After progress is placed on the quest, Shagrat gets -X engagement cost until the end of the round. X is the amount of progress just placed.
-  146020:forced:1: Forced on the event progressPlaced (heard about card (any player controls) named "Pass the Two Watchers" or "Fighting in the Tower" or "Escape from Cirith Ungol")
+  146020:forced:1: Forced on the event progressPlaced (heard about card (any player controls) or in the staging area or the active location, named "Pass the Two Watchers" or "Fighting in the Tower" or "Escape from Cirith Ungol")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card: stat engagementCost minus X, until the end of the round
 
 ## 146021 Gorbag
@@ -117,10 +123,12 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146021:A:2 (front): Forced: After Gorbag engages you, it makes an immediate attack.
   146021:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 146021:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   146021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 146022 Wounded Uruk
@@ -128,14 +136,17 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146022:A:1 (front): Wounded Uruk enters play with 2 damage on it.
   146022:triggered:1: Triggered (mandatory, not printed as Forced) on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 2 damage token(s) on this card (placed, not dealt: nothing cancels or reduces them)
 
 146022:A:2 (front): Forced: After Wounded Uruk engages you, it gets +2 Attack until the end of the round.
   146022:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - this card: stat attack 2, until the end of the round
 
 146022:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack for each damage on it.
   146022:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attackPerDamage 1, until the end of the attack
 
 ## 146023 Orcish Howls
@@ -147,13 +158,14 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     - for each enemy (any player controls) in the staging area only:
       - deal 1 damage to the picked card
     - then, if the number of enemy (any player controls) in the staging area only is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
-    - every enemy in play: stat threatPerDamage 1, until the end of the phase
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat threatPerDamage 1, until the end of the phase
 
 146023:A:2 (shadow): Shadow: If you are engaged with another enemy, resolve this attack against that enemy.
   146023:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose: choose enemy (any player controls) engaged with you [also {"attackingEnemy":false}]
-    - then, if there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the attack in progress is resolved against the last picked enemy instead of the defenders: that enemy takes the damage after its Defense
+    - if there is a enemy (any player controls) engaged with you, other than the enemy making the attack in progress to choose: choose enemy (any player controls) engaged with you, other than the enemy making the attack in progress
+    - then, if there is a enemy (any player controls) engaged with you, other than the enemy making the attack in progress to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the attack in progress is resolved against the last picked enemy instead of the defenders: that enemy takes the damage after its Defense
 
 ## 146058 Orc of Mordor
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -163,12 +175,14 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146058:A:2 (front): Forced: After Orc of Mordor engages you, exhaust a character you control.
   146058:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
 
 146058:A:3 (shadow): Shadow: Exhaust a character you control.
   146058:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -181,12 +195,14 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146059:A:2 (front): Forced: After Snaga Archer engages you, deal 2 damage to a character you control.
   146059:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control)
     - deal 2 damage to the picked card
 
 146059:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is damaged).
   146059:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -196,10 +212,12 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146060:A:1 (front): Forced: After Uruk Soldier engages you, raise your threat by 2.
   146060:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - raise threat by 2 (the player the event is about)
 
 146060:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, return attacking enemy to the staging area.
   146060:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -220,6 +238,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146061:A:2 (shadow): Shadow: Discard a non-objective attachment you control.
   146061:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control) that is not an objective
     - discard the picked card
@@ -241,6 +260,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146062:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   146062:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -259,6 +279,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146063:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, reveal the top card of the encounter deck.
   146063:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -270,7 +291,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146066:A:1 (front): Setup: Set Shagrat aside, out of play. Add The Two Watchers (location side faceup) and Topmost Chamber to the staging area. The first player loses control of the Ring-bearer and places it faceup under Topmost Chamber as a guarded objective. Then, the first player attaches Last of the Company to a hero he controls and attaches The One Ring to that hero.
   146066:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json CaptureRingBearer {"verb":"CaptureRingBearer","under":"146015","guarded":true}]
+    - the Ring-bearer (the hero with that trait a player controls) lies faceup under the card in play with code 146015 as a guarded objective, keeping its tokens and its attachments faceup; nobody controls it, it takes no damage while so held and its owner is not out of heroes; FreeRingBearer gives it back
     - a copy of the card with code 146014 is set aside, out of play
     - choose hero (you control) chosen by the first player
     - the set-aside copy of the card with code 146014 is attached to the last picked hero
@@ -295,7 +316,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     only if any of: (the card with code 146070 is in play) or (the card with code 146071 is in play)
     - the players cannot defeat this stage while this holds
   146066:constant:4: Constant
-    - this card: stat advancesWhenFreed 1, while this card is in play
+    - this card: stat advancesWhenFreed (a stage with no progress and no quest points advances at once when nothing holds it back, with no progress needed) 1, while this card is in play
 
 ## 146067 Fighting in the Tower
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -309,10 +330,11 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146067:B:1 (back): Forced: At the beginning of the quest phase, discard cards from the top of the encounter deck until an enemy is discarded. If there is a copy of that enemy in the staging area, discard that copy as well. If there is not, add the discarded enemy to the staging area.
   146067:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
-    - then, if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the number of enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
-    - then, if there is a enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}]
+    - then, if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the number of enemy (any player controls) in the staging area only, with the same title as the last card picked, never that card itself is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+    - then, if there is a enemy (any player controls) in the staging area only, with the same title as the last card picked, never that card itself to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only, with the same title as the last card picked, never that card itself
     - then, if all of: (the picked card is a enemy (any player controls) in the staging area only) and (the card picked before is a enemy (any player controls) that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
 146067:B:2 (back): This stage cannot be defeated unless Topmost Chamber is in the victory display. When the Ring-bearer is free of encounters, the first player gains control of it.
@@ -328,7 +350,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146068:A:1 (front): When Revealed: Add Last of the Company to the victory display. Attach The One Ring to the Ring-bearer and exhaust the Ring-bearer. The first player moves The Two Watchers from the victory display to the staging area (location side faceup). Each other player reveals an encounter card.
   146068:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) named "Last of the Company"
+    - choose card (any player controls) or in the staging area or the active location, named "Last of the Company"
     - the picked card is added to the victory display
     - the card with code 146065 in play moves, with what is on it, to the Ring-bearer (one card moves; it never leaves play)
     - choose Ring-bearer hero (any player controls)
@@ -371,7 +393,8 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146070:A:3 (front): Forced: After the players travel here, flip The Two Watchers to its enemy side and move it to the staging area.
   146070:forced:1: Forced after the players travel (heard about this card)
-    - [json FlipToEnemySide {"verb":"FlipToEnemySide","code":"146070","into":"146071"}]
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the card in play with code 146070 becomes the card with code 146071, faceup and ready in the staging area, controlled by no one, with no damage; it keeps its resource tokens and its attachments (nothing when no such card is in play)
 
 ## 146071 The Two Watchers
 
@@ -382,6 +405,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146071:A:2 (front): Forced: When The Two Watchers deals any amount of damage, cancel that damage and raise the defending player's threat by X instead. X is the amount of damage just canceled.
   146071:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
-    - this card: stat phantom 1, until the end of the attack
+    who acts: the acting player is the defending player (the player the attack is against)
+    - this card: stat phantom (its attacks' damage is canceled and the defending player raises his threat by as much instead) 1, until the end of the attack
 
-(rendered pieces: 267 by template, 14 as JSON)
+(rendered pieces: 281 by template, 0 as JSON)

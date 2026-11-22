@@ -105,6 +105,8 @@ const game = campaignGame<${P}Decks, ${P}Policy>({
   campaign,
   scenario: ${c},
   stats: HERO_STATS,
+  // The Campaign Setup's offers are declined as many times as it asks, with no count typed (test/harness/setup-answers.ts); a golden that answers them passes \`choices\`.
+  declineSetup: true,
   // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
   codes: [...${c}.cards.map((card) => card.code)],
   intent: ${c}Intent,
@@ -241,7 +243,7 @@ export async function ${logName}(): Promise<CampaignLog> {
   return `// The save fixtures of ${facts.name} (${facts.campaignId} part ${facts.part}), written into src/campaign/fixtures/${facts.id}.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
 // Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. \`${facts.short}-won\` is the first seed that wins, parked on the win (the Resolution waits); \`${facts.short}-lost\` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.${withLog ? "\n// The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it." : ""}
-// TODO: say what the Campaign Setup and the Resolution ask, and which answers the saved decklists' policy gives them.
+// The Campaign Setup's offers are declined, as many times as it asks (\`firstSeed\`, scripts/e2e/seed-kit.ts: no count is typed here). TODO: say what the Resolution asks, and which answers the saved decklists' policy gives it.
 import type { CampaignLog } from "${root}src/campaign/log.ts";
 import type { StoredLoadout } from "${root}src/campaign/save.ts";
 import type { PlayerIntent, ScenarioState } from "${root}src/rules/engine/reduce.ts";

@@ -5,6 +5,7 @@ import { sendAway } from "../families/objectives/claimed.ts";
 import type { Instruction } from "../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "./amounts.ts";
+import { hasTrait } from "./conditions.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 import { characters } from "../combat/combat.ts";
 import { declareAttack } from "../families/attack/index.ts";
@@ -341,7 +342,7 @@ function uncancelableDamage(state: ScenarioState, from: number): ScenarioState {
 export function readyCard(state: ScenarioState, id: string, byPlayerCard = false, cards?: ReadonlyMap<string, PrintedCard>): ScenarioState {
   const card = state.cards[id];
   // "Your cards cannot ready for the remainder of the round" (cannotReady, 900103:A:1).
-  if (!card?.exhausted || readyBarred(state, id, byPlayerCard ? cards : undefined)) return state;
+  if (!card?.exhausted || readyBarred(state, id, byPlayerCard ? cards : undefined, cards ? (trait) => hasTrait(state, id, trait, { effects: [], cards }) : undefined)) return state;
   return queueEvent(updateCard(state, id, readyPatch(state, id)), { trigger: "readied", seat: card.controller, cardId: id, ...(byPlayerCard ? { byPlayerCard: true } : {}) });
 }
 

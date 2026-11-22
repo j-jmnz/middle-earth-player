@@ -247,7 +247,7 @@ export function dealOneShadow(state: ScenarioState, enemyId: string, steps: Engi
 export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext, fromEncounter = false): ScenarioState {
   const balrog = !fromEncounter && given.piles?.balrogDeck !== undefined && flagged(given, enemyId, "shadowsFromBalrog");
   // An empty deck is refilled at once while the Nightmare setup card says so (encounterRefill, 900201:A:3); the reset is logged.
-  const state = balrog ? refillDeck(given, DECKS.balrog) : refillEncounterDeck(given, steps, ctx);
+  const state = balrog ? refillDeck(given, DECKS.balrog, steps) : refillEncounterDeck(given, steps, ctx);
   const enemy = state.cards[enemyId];
   const top = balrog ? state.piles?.balrogDeck?.[0] : state.encounterDeck[0];
   // "Do not deal Nazgûl enemies a shadow card" (141061:A:1).

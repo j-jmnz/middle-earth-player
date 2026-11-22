@@ -9,6 +9,9 @@ import { DATA_DIR, ROOT } from "../data/paths.ts";
 import { duration, runScript, type Log } from "../log.ts";
 import { smokeCodes } from "../card-smoke/world.ts";
 import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
+import { unreachedFile } from "../../test/harness/reached.ts";
+import type { Unreached } from "../../test/harness/reached.ts";
+import { unreachedReport } from "./unreached.ts";
 
 // The tests to run while a scenario is being authored, a fraction of the full suite (docs/development.md, Commands; docs/agents/agent-brief.md, Scenario procedure):
 //
@@ -37,6 +40,8 @@ import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 //              whichever track built it and whether or not it deals player cards
 //   families   the family and pool tests, and the manifest tests, when files of those changed since the merge base with origin/main (HEAD when there is
 //              none), committed, staged, unstaged or untracked (changedFamilyTests)
+//   unreached  not a part: after a run that played the scenario's goldens, the records of its own cards that no golden resolves, with whether a test of the scenario names each
+//              (test/harness/reached.ts writes the list, scripts/tools/unreached.ts prints it); each one needs a card test or a golden that reaches it, and the list never fails the run
 //   budget     the tests part's time, held to the scenario's budget on a full run (Test budget, below)
 // `--list` prints the files and codes without running anything. A file runs once, in the first part that names it.
 
@@ -278,6 +283,9 @@ async function main(log: Log): Promise<void> {
     return;
   }
 
+  // The golden suite writes the records no golden resolves while it plays the scenario's games; the file of an earlier run is not this run's.
+  const unreachedPath = unreachedFile(id);
+  rmSync(unreachedPath, { force: true });
   const results: PartResult[] = [];
   for (const part of parts) {
     if (part.files.length === 0) {
@@ -307,6 +315,12 @@ async function main(log: Log): Promise<void> {
     results.push({ name: smoked.name, ok: outcome.ok, ms: outcome.ms, detail: smoked.detail });
   }
 
+  // The records no golden resolves (the golden suite ran: a full run, or one that named the scenario's golden test).
+  if (existsSync(unreachedPath)) {
+    const rows = (JSON.parse(readFileSync(unreachedPath, "utf8")) as { unreached: Unreached[] }).unreached;
+    const texts = selection.tests.map((file) => readFileSync(path.join(ROOT, file), "utf8"));
+    for (const line of unreachedReport(rows, texts)) log.info(line);
+  }
   for (const result of results) (result.ok ? log.info : log.error)(`${result.name.padEnd(9)} ${result.ok ? "passed" : "FAILED"}  ${result.detail}${result.ms > 0 ? `  (${duration(result.ms)})` : ""}`);
   const failed = results.filter((result) => !result.ok);
   if (failed.length > 0) throw new Error(`failed: ${failed.map((result) => result.name).join(", ")}`);

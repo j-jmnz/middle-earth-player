@@ -2,24 +2,27 @@
 import { cardRef as cardRefWords, renderAmount } from "./amounts.ts";
 import { done, isObj, jsonOf, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
-import { ESCAPE_CONDITIONS } from "./escape.ts";
-import { GUARDIAN_CONDITIONS } from "./guardian.ts";
-import { ERECH_CONDITIONS } from "./erech.ts";
-import { FOG_CONDITIONS } from "./fog.ts";
-import { INVESTIGATION_CONDITIONS } from "./investigation.ts";
-import { LONG_DARK_CONDITIONS } from "./long-dark.ts";
+import { ESCAPE_CONDITIONS } from "./families/escape.ts";
+import { GUARDIAN_CONDITIONS } from "./families/guardian.ts";
+import { ERECH_CONDITIONS } from "./families/erech.ts";
+import { FOG_CONDITIONS } from "./families/fog.ts";
+import { INVESTIGATION_CONDITIONS } from "./families/investigation.ts";
+import { LONG_DARK_CONDITIONS } from "./families/long-dark.ts";
+import { SHARED_CONDITIONS } from "./shared-conditions.ts";
+import { FAMILY_CONDITIONS } from "./families.ts";
 
-export { ESCAPE_CONDITION_SAMPLES } from "./escape.ts";
-export { GUARDIAN_CONDITION_SAMPLES } from "./guardian.ts";
-export { ERECH_CONDITION_SAMPLES } from "./erech.ts";
-export { FOG_CONDITION_SAMPLES } from "./fog.ts";
-export { INVESTIGATION_CONDITION_SAMPLES } from "./investigation.ts";
-export { LONG_DARK_CONDITION_SAMPLES } from "./long-dark.ts";
+export { ESCAPE_CONDITION_SAMPLES } from "./families/escape.ts";
+export { GUARDIAN_CONDITION_SAMPLES } from "./families/guardian.ts";
+export { ERECH_CONDITION_SAMPLES } from "./families/erech.ts";
+export { FOG_CONDITION_SAMPLES } from "./families/fog.ts";
+export { INVESTIGATION_CONDITION_SAMPLES } from "./families/investigation.ts";
+export { LONG_DARK_CONDITION_SAMPLES } from "./families/long-dark.ts";
+export { SHARED_CONDITION_SAMPLES } from "./shared-conditions.ts";
 
 const ZONE: Readonly<Record<string, string>> = {
   activeLocation: "is the active location",
   staging: "is in the staging area",
-  engaged: "is engaged with the player",
+  engaged: "is engaged with a player (that player is who \"you\" means in this record)",
   questStage: "is the quest stage",
   play: "is in play",
   victory: "is in the victory display",
@@ -28,6 +31,9 @@ const ZONE: Readonly<Record<string, string>> = {
   encounterDeck: "is in the encounter deck",
   attached: "is attached to a card",
 };
+
+// What a flag a condition reads means where its name would not say it (where the engine sets it).
+const FLAG_WORDS: Readonly<Record<string, string>> = { progressPlacedHere: " (the engine puts it on a side quest when progress is placed on it, until the end of the round; once a round)" };
 
 const range = (min: unknown, max: unknown): string => {
   const parts = [typeof min === "number" ? `at least ${min}` : "", typeof max === "number" ? `at most ${max}` : ""].filter((part) => part !== "");
@@ -44,13 +50,15 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   ...FOG_CONDITIONS,
   ...INVESTIGATION_CONDITIONS,
   ...LONG_DARK_CONDITIONS,
+  ...SHARED_CONDITIONS,
+  ...FAMILY_CONDITIONS,
   sourceIn: (c) => ({ text: `this card ${ZONE[str(c.zone)] ?? `is in ${str(c.zone)}`}`, read: ["zone"] }),
   less: (c, ctx) => ({ text: `${renderAmount(c.left, ctx, renderPick)} is less than ${renderAmount(c.right, ctx, renderPick)}`, read: ["left", "right"] }),
   subjectExplored: () => ({ text: "the card the event is about had enough progress to be explored", read: [] }),
   x: (c) => ({ text: `X is at least ${str(c.min)} (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)`, read: ["min"] }),
   shadowBlank: () => ({ text: "the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)", read: [] }),
   namedFlag: (c) => ({ text: `the card in play titled "${str(c.name)}" holds the flag ${str(c.stat)}`, read: ["name", "stat"] }),
-  flag: (c) => ({ text: `${c.holder === "seat" ? "the actor's seat" : c.holder === "table" ? "the table" : "this card"} ${c.is === false ? "does not hold" : "holds"} the flag ${str(c.stat)}`, read: ["stat", "holder", "is"] }),
+  flag: (c) => ({ text: `${c.holder === "seat" ? "the actor's seat" : c.holder === "table" ? "the table" : "this card"} ${c.is === false ? "does not hold" : "holds"} the flag ${str(c.stat)}${FLAG_WORDS[str(c.stat)] ?? ""}`, read: ["stat", "holder", "is"] }),
   canPick: (c, ctx) => ({ text: `there is a ${renderPick(c.pick, ctx)} to choose`, read: ["pick"] }),
   optionTaken: (c) => ({ text: `the running effect took the option "${str(c.id)}" (a choice made earlier in it, or the stage picked at random)`, read: ["id"] }),
   attackedThisPhase: (c) => ({ text: `"${str(c.name)}" has resolved an attack this phase`, read: ["name"] }),
@@ -61,6 +69,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   phaseEnded: (c) => ({ text: `the ${str(c.is)} phase has just ended`, read: ["is"] }),
   phase: (c) => ({ text: `it is the ${str(c.is)} phase`, read: ["is"] }),
   hasEngaged: (c) => ({ text: `the actor has ${typeof c.trait === "string" ? `a ${c.trait} ` : "an "}enemy engaged`, read: ["trait"] }),
+  exhaustedNamed: (c) => ({ text: `the card titled ${str(c.name)} in play is ${c.is === true ? "exhausted" : "ready"}`, read: ["name", "is"] }),
   exhausted: (c) => ({ text: `the card with code ${str(c.code)} in play is ${c.is === true ? "exhausted" : "ready"}`, read: ["code", "is"] }),
   count: (c, ctx) => ({ text: `the number of ${renderPick(c.pick, ctx)} is ${range(c.min, c.max)}`, read: ["pick", "min", "max"] }),
   threat: (c) => ({ text: `the actor's threat is ${range(c.min, c.max)}`, read: ["min", "max"] }),
@@ -103,7 +112,13 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   questLeads: () => ({ text: "the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area", read: [] }),
   soleAttacker: () => ({ text: "exactly one character was declared as an attacker in this attack", read: [] }),
   captives: (c) => ({ text: `the number of Captives in play${c.of === "actor" ? " that belong to the acting seat" : ""} is ${range(c.min, c.max)}`, read: ["min", "max", "of"] }),
-  matches: (c, ctx) => ({ text: `${typeof c.card === "string" ? cardRefWords(c.card) : "the card"} is a ${renderPick(c.pick, ctx)}${c.inPlay === false ? " that is out of play now" : ""}${c.inStaging === true ? " that is in the staging area" : ""}`, read: ["card", "pick", "inPlay", "inStaging"] }),
+  matches: (c, ctx) => {
+    const subject = typeof c.card === "string" ? cardRefWords(c.card) : "the card";
+    const where = [c.inPlay === false ? "out of play now" : c.inPlay === true ? "in play now" : "", c.inStaging === true ? "in the staging area" : c.inStaging === false ? "not in the staging area" : ""].filter((part) => part !== "").join(" and ");
+    const kind = c.pick === undefined ? "" : `a ${renderPick(c.pick, ctx)}`;
+    const text = kind === "" ? `${subject} is ${where === "" ? "any card" : where}` : `${subject} is ${kind}${where === "" ? "" : ` that is ${where}`}`;
+    return { text, read: ["card", "pick", "inPlay", "inStaging"] };
+  },
   tokens: (c) => ({ text: `the card with code ${str(c.code)} in play holds at least ${str(c.min)} resource token(s)${c.perPlayer === true ? " for each player" : ""}`, read: ["code", "min", "perPlayer"] }),
   controls: (c) => ({ text: `${c.who === "anyPlayer" ? "a player" : "the actor"} controls the card with code ${str(c.code)}`, read: ["code", "who"] }),
 };

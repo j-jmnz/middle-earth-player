@@ -10,7 +10,7 @@ import { newCtx, type Obj } from "./kit.ts";
 import { BARS } from "./bars.ts";
 import { FAMILY_FLAGS } from "../../../../src/catalog/families/index.ts";
 import { renderPick } from "./picks.ts";
-import { renderRecord } from "./record.ts";
+import { renderCost, renderRecord } from "./record.ts";
 import { renderInstruction } from "./verbs.ts";
 
 // The reading aid (scripts/data/effects/render.ts): a template per piece, JSON for a piece with none, and no field hidden.
@@ -32,6 +32,28 @@ describe("effects render templates", () => {
     expect(renderCondition({ kind: "not", condition: { kind: "namedFlag", name: "The Heroes' Defense", stat: "noResourcesPlaced" } }, ctx)).toBe(
       "not (the card in play titled \"The Heroes' Defense\" holds the flag noResourcesPlaced)",
     );
+  });
+
+  it("says a record with no subject hears events about its own card only", () => {
+    const lines = renderRecord({ id: "x:forced:1", cardCode: "1", lines: ["1:A:1"], timing: "forced", trigger: "lastTimeCounterRemoved", instructions: [] }, newCtx());
+    expect(lines.join("\n")).toContain("heard about this card only");
+    expect(lines.join("\n")).toContain("after the last time counter is removed");
+  });
+
+  it("names the Travel steps the engine reads as costs", () => {
+    const travel = (instructions: readonly Obj[]) => renderRecord({ id: "x:travel:1", cardCode: "1", lines: ["1:A:1"], timing: "travel", instructions }, newCtx()).join("\n");
+    expect(travel([{ verb: "RevealBurden" }])).toContain("the burden deck is empty");
+    expect(travel([{ verb: "SpendResources", amount: 1, when: { kind: "firstPlayer" } }])).toContain("owed only while");
+    expect(travel([{ verb: "AdvanceStage" }])).not.toContain("this Travel effect is a cost");
+  });
+
+  it("renders each cost a record can name", () => {
+    const ctx = newCtx();
+    expect(renderCost({ kind: "addSelfToVictory" }, ctx)).toContain("victory display");
+    expect(renderCost({ kind: "exhaustCode", code: "12345" }, ctx)).toContain("12345");
+    expect(renderCost({ kind: "exhaustNamed", name: "The One Ring" }, ctx)).toContain("The One Ring");
+    expect(renderCost({ kind: "discardDeckTop", amount: 2 }, ctx)).toContain("top 2");
+    expect(ctx.tally.json).toBe(0);
   });
 
   it("renders a Choose with its options indented", () => {
@@ -77,7 +99,7 @@ describe("effects render templates", () => {
     expect(renderRecord({ id: "1:forced:1", cardCode: "1", lines: ["1:A:1"], timing: "forced", trigger: "attacks", subject: "self", instructions: [{ verb: "AttackFromStaging", who: "firstPlayer" }] }, ctx)[0]).toBe(
       "1:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)",
     );
-    expect(renderInstruction({ verb: "AttackFromStaging", who: "firstPlayer" }, ctx)).toEqual(["- the picked enemy attacks the first player now, from the staging area"]);
+    expect(renderInstruction({ verb: "AttackFromStaging", who: "firstPlayer" }, ctx)).toEqual(["- the picked enemy attacks the first player now, from the staging area, dealt a shadow card"]);
   });
 
   it("reads a later step's condition as checked when that step runs", () => {

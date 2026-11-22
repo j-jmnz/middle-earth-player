@@ -12,7 +12,8 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
     - Time 5: when this card is revealed, 5 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
 
 10094:B:2 (back): Forced: After the last time counter is removed from Secrets of Rhudaur, remove each Treachery of Rhudaur side quest from the game and immediately advance to stage 2.
-  10094:forced:1: Forced on the event lastTimeCounterRemoved (heard about this card)
+  10094:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each card in the staging area titled "Quiet the Spirits" or "Sift through the Debris" or "Decipher Ancient Texts" (an encounter side quest, quest side up) is removed from the game, not added to the victory display; its attachments are discarded
     - advance to the next quest stage
@@ -23,7 +24,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10094:B:4 (back): If there are no Treachery of Rhudaur side quests in play, immediately advance to stage 2.
   10094:constant:3: Constant
-    only if the number of card (any player controls) named "Quiet the Spirits" or "Sift through the Debris" or "Decipher Ancient Texts" is at most 0
+    only if the number of card (any player controls) or in the staging area or the active location, named "Quiet the Spirits" or "Sift through the Debris" or "Decipher Ancient Texts" is at most 0
     - this card: stat advanceNow (once nothing is resolving the quest advances to the next stage at once) 1, while this card is in play
 
 ## 10095 Thaurdir's Pursuit
@@ -32,7 +33,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 10095:A:1 (front): When Revealed: Add Thaurdir to the staging area. Each player searches the encounter deck and discard pile for an Undead enemy and adds it to the staging area. Shuffle the encounter deck.
   10095:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the set-aside card with code 10098 is added to the staging area and enters play: the cards that hear it enter play or be added to the staging area hear it
+    - one set-aside card with code 10098 joins the staging area (it is not revealed)
     - for each player, first player first:
       - the acting player finds one Undead enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
@@ -57,6 +58,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10096:A:2 (front): If Amarthiúl leaves play, the players lose the game.
   10096:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 10097 The Great Hall
@@ -64,6 +66,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10097:A:1 (front): Forced: When The Great Hall is explored, each player discards the top 5 cards of the encounter deck and chooses an Undead enemy he discarded in this way to add to the staging area.
   10097:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - discard 5 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
       - the acting player adds one Undead enemy among the cards this effect discarded (still in the encounter discard pile) to the staging area, choosing among those their own discard looked at; not revealed
@@ -80,9 +83,10 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10098:A:3 (front): Forced: After a treachery card with the Sorcery trait is revealed from the encounter deck, Thaurdir heals 3 damage and makes an immediate attack against the first player.
   10098:forced:1: Forced after a card is revealed (heard about Sorcery treachery (any player controls); not for a card found in the encounter discard pile)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - heal 3 damage from this card
-    - this card attacks the first player now, from the staging area (or engaged)
+    - this card attacks the first player now, from the staging area, dealt a shadow card (or engaged)
 
 ## 10099 Wight of Rhudaur
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -102,10 +106,12 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10100:A:1 (front): Forced: When Traitorous Wight engages a player, remove 2 progress from each quest card in play.
   10100:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - remove 2 progress from each quest card in play (the main quest card, each encounter side quest in the staging area and each player side quest) (all of it when it holds less)
 
 10100:A:2 (shadow): Shadow: For each point of damage dealt by this attack, remove 1 progress from each quest in play.
   10100:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - remove the damage just dealt progress from each quest card in play (the main quest card, each encounter side quest in the staging area and each player side quest) (all of it when it holds less)
 
@@ -119,6 +125,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10101:A:2 (front): Forced: If Forbidden Descent leaves play from the staging area, raise each player's threat by 2.
   10101:forced:1: Forced on the event leftStagingArea (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - raise threat by 2 (the acting player)
 
@@ -128,10 +135,12 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 10102:A:1 (front): Action: Raise your threat by 1 to reduce the Threat of Eerie Halls by 1 until the end of the phase. (Any player may trigger this action.)
   10102:action:1: Action (cost: raise your threat by 1; any player may use it)
     only if 0 is less than threat of this card
+    who acts: any player may trigger it; the acting player is the one who does
     - this card: stat threat -1, until the end of the phase
 
 10102:A:2 (shadow): Shadow: If the defending player does not control at least 1 Clue objective, the attacking enemy makes an additional attack after this one.
   10102:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if not (there is a Clue objective (you control) to choose): the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 10103 Ghostly Ruins
@@ -143,6 +152,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10103:A:2 (front): Travel: Return the topmost Undead enemy in the encounter discard pile to the staging area.
   10103:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the encounter discard pile holds no card of the kind (read by the angmar family)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the topmost enemy with the trait Undead in the encounter discard pile (the last put there) is picked (nothing with none)
     - the picked card goes to the staging area (it is not revealed)
@@ -159,6 +169,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10104:A:2 (shadow): Shadow: For each point of damage dealt by this attack, remove 1 progress from each quest in play.
   10104:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - remove the damage just dealt progress from each quest card in play (the main quest card, each encounter side quest in the staging area and each player side quest) (all of it when it holds less)
 
@@ -174,6 +185,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10105:A:3 (shadow): Shadow: If the defending player does not control at least 1 Clue objective, this attack is considered undefended.
   10105:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if not (there is a Clue objective (you control) to choose): this attack is considered undefended
 
 ## 10106 Curse of the Years
@@ -189,6 +201,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10106:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the defending player does not control at least 1 Clue objective).
   10106:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a Clue objective (you control) to choose: the attacking enemy: stat attack 1, until the end of the attack
     - then, if not (there is a Clue objective (you control) to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
@@ -201,13 +214,14 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard 3 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
     - the first player chooses one of:
-      * option "remove" (only if all of: (0 is less than the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0)) and (there is a card (any player controls) with progress on it, that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest) to choose)):
+      * option "remove" (only if all of: (0 is less than the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0)) and (there is a card (any player controls) or in the staging area or the active location, with progress on it, that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest) to choose)):
         - the acting player removes the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0) progress from among the quest cards in play, one token at a time from the card they choose (all of it when fewer are there)
       * option "damage" (only if all of: (0 is less than the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0)) and (there is a character (you control) to choose)):
         - the acting player assigns the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0) damage among the character (you control), one at a time
 
 10107:A:2 (shadow): Shadow: If this attack destroys a character, raise your threat by the destroyed character's Willpower.
   10107:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by the Willpower the destroyed character had in play (last known) (the acting player)
 
@@ -231,6 +245,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 10109:A:1 (front): While Quiet the Spirits is the current quest, each Undead enemy that enters play immediately engages the player with the highest threat. Enemies that engage a player from this effect contribute their Threat to the total Threat in the staging area until the end of the phase.
   10109:forced:1: Forced on the event encounterEnteredPlay (heard about Undead enemy (any player controls) or in the staging area)
     only if this card is the current quest
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the player with the highest threat becomes the picked player (the first player chooses among a tie)
     - the effect goes on with the picked player as the acting player
@@ -238,6 +253,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
     - the card the event is about: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, until the end of the phase
   10109:forced:3: Forced on the event searchedIntoPlay (heard about Undead enemy (any player controls) or in the staging area)
     only if this card is the current quest
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the player with the highest threat becomes the picked player (the first player chooses among a tie)
     - the effect goes on with the picked player as the acting player
@@ -246,8 +262,9 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10109:A:2 (front): Forced: After an enemy is destroyed, place 2 progress on Quiet the Spirits.
   10109:forced:2: Forced after an enemy is destroyed (heard about enemy (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) named "Quiet the Spirits", that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
+    - choose card (any player controls) or in the staging area or the active location, named "Quiet the Spirits", that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
     - place 2 progress on the picked quest card, directly (the active location does not take it)
 
 10109:A:3 (front): When this quest is defeated, flip it over.
@@ -259,6 +276,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 10110:A:1 (front): Action: Exhaust Amarthiúl or a hero to claim Daechanar's Brand. Then, attach Daechanar's Brand to that character.
   10110:action:1: Action (any player may use it)
     only if all of: (this card is in the staging area) and (there is a ready character (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     - the acting player chooses one of:
       * option "hero" (only if there is a ready hero (you control) to choose):
         - choose ready hero (you control)
@@ -283,8 +301,9 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10111:A:2 (front): Forced: After a location is explored, place 2 progress on Sift through the Debris.
   10111:forced:1: Forced on the event locationExplored (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) named "Sift through the Debris", that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
+    - choose card (any player controls) or in the staging area or the active location, named "Sift through the Debris", that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
     - place 2 progress on the picked quest card, directly (the active location does not take it)
 
 10111:A:3 (front): When this quest is defeated, flip it over.
@@ -296,6 +315,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 10112:A:1 (front): Action: Exhaust Amarthiúl or a hero to claim Heirloom of Iârchon. Then, attach Heirloom of Iârchon to that character.
   10112:action:1: Action (any player may use it)
     only if all of: (this card is in the staging area) and (there is a ready character (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     - the acting player chooses one of:
       * option "hero" (only if there is a ready hero (you control) to choose):
         - choose ready hero (you control)
@@ -321,7 +341,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 10113:A:2 (front): Action: Pay 1 resource to place 1 progress on Decipher Ancient Texts. (Any player may trigger this action. Limit 3 times per round.)
   10113:action:1: Action (limit thricePerRound; cost: pay 1 resource(s); any player may use it)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) named "Decipher Ancient Texts", that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
+    - choose card (any player controls) or in the staging area or the active location, named "Decipher Ancient Texts", that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
     - place 1 progress on the picked quest card, directly (the active location does not take it)
 
 10113:A:3 (front): When this quest is defeated, flip it over.
@@ -333,6 +353,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 10114:A:1 (front): Action: Exhaust Amarthiúl or a hero to claim Orders From Angmar. Then, attach Orders From Angmar to that character.
   10114:action:1: Action (any player may use it)
     only if all of: (this card is in the staging area) and (there is a ready character (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     - the acting player chooses one of:
       * option "hero" (only if there is a ready hero (you control) to choose):
         - choose ready hero (you control)

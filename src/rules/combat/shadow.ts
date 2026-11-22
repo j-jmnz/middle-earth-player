@@ -237,7 +237,7 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     if (defender) steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.defenderId, attack: strength, defense, undefended: false, cause: ruleCause("rr.step-6-4-3") });
     // "This attack deals no damage" (a flag the enemy holds, families/misc.ts).
     const raw = defender && !flagged(next, enemy.id, "dealsNoDamage") ? Math.max(0, strength - defense) : 0;
-    const damaged = noteAttackDamage(next, defender ? combatDamage(next, attack.enemyId, attack.defenderId, raw, ctx, steps) : next, ctx);
+    const damaged = noteAttackDamage(next, defender ? combatDamage(noteStruck(next, strength, ctx), attack.enemyId, attack.defenderId, raw, ctx, steps) : next, ctx);
     return damaged.lost ? damaged : afterDamage(damaged, ctx, steps);
   }
   // A shadow effect sent the damage to an active location (families/south/watcher.ts).
@@ -249,8 +249,14 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   if (!next.cards[attack.heroId]) return afterDamage(next, ctx, steps);
   const strength = modifiedStat(next, enemy, "attack", ctx.cards);
   steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.heroId, attack: strength, defense: 0, undefended: true, cause: ruleCause("rr.step-6-4-3") });
-  const hit = noteAttackDamage(next, combatDamage(next, attack.enemyId, attack.heroId, flagged(next, enemy.id, "dealsNoDamage") ? 0 : strength, ctx, steps), ctx);
+  const hit = noteAttackDamage(next, combatDamage(noteStruck(next, strength, ctx), attack.enemyId, attack.heroId, flagged(next, enemy.id, "dealsNoDamage") ? 0 : strength, ctx, steps), ctx);
   return hit.lost ? hit : afterDamage(hit, ctx, steps);
+}
+
+// The Attack the enemy struck with, kept for the effect the attack leaves for its end, only in a game with a card that resolves the attack against each player (900208:A:2).
+function noteStruck(state: ScenarioState, strength: number, ctx: ReduceContext): ScenarioState {
+  const attack = state.pendingAttack;
+  return attack && gameReads(state, ctx, '"AttackOthersUndefended"') ? { ...state, pendingAttack: { ...attack, struck: strength } } : state;
 }
 
 // 6.4.3: combat damage is placed; an action window comes before the attack ends.
@@ -347,6 +353,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       blockCancel: null,
       // An attack that sends its excess damage on (excessToShip) leaves that damage (0 when there was none) for the effect; X is the characters it destroyed.
       ...(sendsExcess ? { excess: attack.defense?.excess ?? 0 } : {}),
+      ...(attack.struck != null ? { struck: attack.struck } : {}),
       ...(destroyed > 0 ? { x: destroyed } : {}),
       // `other`: the defending character, or the hero an undefended attack landed on ("the hero damaged by this attack", 900209:A:2).
       ...(afterTarget(attack) ? { other: afterTarget(attack) } : {}),

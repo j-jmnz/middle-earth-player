@@ -238,10 +238,8 @@ describe("Stand Together (01038:A:1, rr.multiple-defenders)", () => {
     run = passWindows(run, tab.ctx);
     expect(run.state.window?.kind).toBe("defense");
     run = send(run, { type: "DeclareDefender", defenderId: gimli ?? "" }, tab.ctx);
-    // Another defender may be declared, or the declarations end (families/defense/defenders.ts moreDefenders).
-    expect(choices(run, tab)).toEqual(["another", "done"]);
-    run = send(run, { type: "Choose", optionId: "another" }, tab.ctx);
-    expect(choices(run, tab).sort()).toEqual([legolas, thalin].sort());
+    // Another defender may be declared, or the declarations end (families/defense/defenders.ts moreDefenders): "done" is offered with the candidates.
+    expect(choices(run, tab).sort()).toEqual([legolas, thalin, "done"].sort());
     run = send(run, { type: "Choose", optionId: thalin ?? "" }, tab.ctx);
     run = passWindows(send(run, { type: "Choose", optionId: "done" }, tab.ctx), tab.ctx);
     // Attack 6 against Gimli's 2 and Thalin's 2 Defense: 2 damage, all of it on one defender the player chooses.

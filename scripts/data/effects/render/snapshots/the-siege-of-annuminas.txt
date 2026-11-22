@@ -8,7 +8,8 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50801:B:1 (back): Forced: When the players advance to stage 2A (and before resolving its 'when revealed' effect), shuffle each set aside Dúnedain of Annúminas into the encounter deck. Then, shuffle X copies of Host of Angmar into the encounter deck, where X is one less than the number of players in the game, to a minimum of 1.
   50801:forced:1: Forced on the event stageRevealed
-    only if the card the event is about is a card (any player controls) named "Defend the City"
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Defend the City"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - every set-aside copy of the card with code 50818 is shuffled into the encounter deck (nothing with none set aside)
     - one set-aside copy of the card with code 50817 is shuffled into the encounter deck (nothing with none set aside)
@@ -17,6 +18,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50801:B:2 (back): If a player is eliminated from the game, deal 9 damage to Annúminas.
   50801:triggered:1: Triggered (mandatory, not printed as Forced) on the event playerEliminated
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - up to 9 resource token(s) come off the card with code 50812 in play
 
 ## 50803 Rebuild the Defenses
@@ -26,12 +28,13 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
   50803:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one location in the encounter deck and adds it to the staging area (it is not revealed); while the card with code 50819 is there to be found, the search must take it (the first search of the effect that can) [also {"different":true}]
+      - the acting player finds one location in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found; while the card with code 50819 is there to be found, the search must take it (the first search of the effect that can)
     - shuffle the encounter deck
 
 50803:B:1 (back): Forced: At the beginning of the round (before the resource phase), place 1 resource here. Then, if there are 4 resources here, advance to stage 2.
   50803:forced:1: Forced when a phase begins
     only if it is the Resource phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 resource tokens on this card
     - then, if the card with code 50803 in play holds at least 4 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): advance to the next quest stage
@@ -50,7 +53,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
   50804:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
-    - discard from the top of the encounter deck until 1 enemy for each player less 1 is discarded; add those enemies to the staging area [also {"atLeast":1}]
+    - discard from the top of the encounter deck until 1 enemy for each player less 1, at least 1, is discarded; add those enemies to the staging area
 
 50804:B:1 (back): This stage gets -10 quest points for each Host of Angmar in a victory display.
   50804:constant:1: Constant
@@ -58,11 +61,12 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50804:B:2 (back): Forced: After the players have committed characters to the quest, the highest Attack enemy in the staging area makes an attack against each player in turn order. If no attacks are made in this way, reveal the top card of the encounter deck.
   50804:forced:1: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if there is a enemy (any player controls) in the staging area only to choose: choose enemy (any player controls) in the staging area only, chosen by the first player [also {"highestAttack":true}]
+    - if there is a enemy (any player controls) in the staging area only to choose: choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
     - for each player, first player first:
-      - the picked enemy attacks the acting player now, from the staging area
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reveals an encounter card
+      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reveals an encounter card
 
 50804:B:3 (back): Response: At the end of the round, choose a stage. Each player at that stage heals 1 damage from a character he controls.
   50804:response:1: Response at the end of the round
@@ -90,16 +94,17 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50805:B:2 (back): Response: At the end of the round, raise each player's threat by 1 and reveal an encounter card to choose a non-unique enemy worth no victory points at another stage. Discard the chosen enemy.
   50805:response:1: Response at the end of the round
-    only if there is a non-unique enemy (any player controls) at another stage than the chooser's (none while the game has one stage) [also {"noVictory":true}] to choose
+    only if there is a non-unique enemy (any player controls) at another stage than the chooser's (none while the game has one stage), that prints no victory points to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (each player)
     - the acting player reveals an encounter card
-    - choose non-unique enemy (any player controls) at another stage than the chooser's (none while the game has one stage) [also {"noVictory":true}]
+    - choose non-unique enemy (any player controls) at another stage than the chooser's (none while the game has one stage), that prints no victory points
     - discard the picked card
 
 50805:B:3 (back): If Lieutenant of Angmar is in a victory display at the end of the round, the players have routed the enemy and win the game.
   50805:forced:1: Forced at the end of the round
     only if the card with code 50813 is in the victory display
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the players win the game
 
 ## 50812 Annúminas
@@ -107,6 +112,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50812:A:1 (front): Forced: At the end of the round, deal 1 damage to Annúminas for each enemy at each stage.
   50812:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - up to the number of enemy (any player controls) or in the staging area resource token(s) come off the card with code 50812 in play
 
 50812:A:2 (front): If the city strength of Annúminas reaches 0, the city is overrun by the forces of Angmar and all teams lose the game.
@@ -127,9 +133,10 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50813:A:3 (front): Forced: At the end of the round, Lieutenant of Angmar moves to the staging area with the lowest total Threat and makes an immediate attack against the first player.
   50813:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - return this card to the staging area
-    - [json AttackFirstPlayer {"verb":"AttackFirstPlayer"}]
+    - this enemy, in the staging area or engaged with any player, attacks the first player now, dealt a shadow card for the attack
 
 ## 50814 Battering Ram
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -142,6 +149,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50814:A:2 (front): Forced: At the end of the round, place 1 resource on Battering Ram. Then, deal X damage to Annúminas.
   50814:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 resource tokens on this card
     - up to resources of this card + 1 resource token(s) come off the card with code 50812 in play
@@ -158,6 +166,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50815:A:2 (front): Forced: At the end of the round, if Enemy Camp is in play, discard 1 random facedown hero from under each stage 3. If Enemy Camp is in the victory display, return each hero under each stage 3 to its owner's control instead.
   50815:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the card with code 50815 is in play: while the current quest stage is stage 3, discard 1 random hero lying facedown under it, chosen with the game's seed, to its owner's discard pile (a player left with no hero is eliminated)
     - then, if the card with code 50815 is in the victory display (checked when this step runs, after the steps above; not tied to whether they did anything): while the current quest stage is stage 3, return each hero lying facedown under it to its owner's control, exhausted
@@ -174,6 +183,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50816:A:2 (front): Forced: At the end of the round, each team discards from the top of their encounter deck until an enemy is discarded and adds that enemy to their staging area.
   50816:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
     - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
@@ -194,6 +204,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 50817:A:3 (front): Forced: After Host of Angmar attacks and destroys a character, either remove 2 progress from the main quest, or return Host of Angmar to the staging area.
   50817:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
         - remove 2 progress from the current quest card (all of it when it holds less)
@@ -212,13 +223,14 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
       * option "control" (only if there is a player (any player controls) who controls heroes holding 1 resource or more in all to choose):
         - choose player (any player controls) who controls heroes holding 1 resource or more in all
         - the effect goes on with the picked player as the acting player
-        - [json SpendResources {"verb":"SpendResources","amount":1}]
+        - the acting player spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
         - the acting player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
       * option "discard":
         - discard this card
 
 50818:A:3 (shadow): Shadow: Ready the defending character and give it +2 Defense for this attack.
   50818:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - ready the defender
     - the defender: stat defense 2, until the end of the attack
@@ -244,6 +256,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50820:A:2 (front): Forced: At the end of the round, place 1 resource on City Wall. Then, if there are 3 resources here, discard City Wall to deal 4 damage to Annúminas and reveal an encounter card.
   50820:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 resource tokens on this card
     - then, if 2 is less than resources of this card (checked when this step runs, after the steps above; not tied to whether they did anything): up to 4 resource token(s) come off the card with code 50812 in play
@@ -274,7 +287,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 50822:A:1 (front): While Hills of Evendim is in the staging area, 'when revealed' effects cannot be canceled.
   50822:constant:1: Constant
     only if this card is in the staging area
-    - the table: stat encounterUncancelable 1, while this card is in play
+    - the table: stat encounterUncancelable (no Response cancels an encounter card's When Revealed or Shadow effect, and no paid cancel is offered against one) 1, while this card is in play
 
 50822:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until an enemy is discarded. Add the discarded enemy to the staging area to travel here.
   50822:travel:1: Travel
@@ -303,6 +316,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50824:A:2 (front): Forced: After Warg of Carn Dûm engages you, either remove 1 progress from the main quest, or exhaust a character you control.
   50824:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
         - remove 1 progress from the current quest card (all of it when it holds less)
@@ -318,6 +332,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50825:A:2 (front): Forced: When Orc of Angmar attacks, either remove 1 progress from the main quest, or it gets +2 Defense until the end of the phase.
   50825:forced:1: Forced when this enemy attacks, before the defender is declared
+    who acts: the acting player is the defending player (the player the attack is against)
     - the first player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
         - remove 1 progress from the current quest card (all of it when it holds less)
@@ -326,6 +341,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50825:A:3 (shadow): Shadow: Defender gets -2 Defense until end of round.
   50825:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat defense -2, until the end of the round
 
 ## 50826 Angmar Warg-rider
@@ -336,6 +352,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50826:A:2 (front): Forced: After Angmar Warg-rider engages you, either remove 2 progress from the main quest, or it makes an immediate attack.
   50826:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
         - remove 2 progress from the current quest card (all of it when it holds less)
@@ -344,6 +361,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50826:A:3 (shadow): Shadow: Exhaust a character you control.
   50826:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -354,10 +372,12 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 50827:A:1 (front): Forced: After Savage Werewolf attacks and destroys a character, remove 3 progress from the main quest.
   50827:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - remove 3 progress from the current quest card (all of it when it holds less)
 
 50827:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   50827:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 50828 Vanguard of Carn Dûm
@@ -370,10 +390,11 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 50828:A:2 (front): While Vanguard of Carn Dûm is in the staging area, no more than 5 progress can be placed on the main quest each round.
   50828:constant:2: Constant
     only if this card is in the staging area
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 5, while this card is in play
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 5, while this card is in play
 
 50828:A:3 (shadow): Shadow: Defender cannot ready this round.
   50828:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat doesNotReady 1, until the end of the round
 
 ## 50829 The Hordes of Angmar
@@ -385,7 +406,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
     - for each player, first player first:
       - the acting player chooses one of:
         * option "return" (only if the actor has an enemy engaged):
-          - choose enemy (you control) engaged with you [also {"highestThreat":true}]
+          - choose enemy (you control) engaged with you, with the highest current Threat of those (no Threat counts 0; ties: the chooser decides)
           - return the picked card to the staging area
         * option "search" (only if the encounter deck or its discard pile holds an enemy):
           - the acting player finds one enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
@@ -393,6 +414,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50829:A:2 (shadow): Shadow: If this attack destroys a character, reveal the top card of the encounter deck.
   50829:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player reveals an encounter card
 
@@ -414,6 +436,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50830:A:3 (shadow): Shadow: Discard an attachment you control.
   50830:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -433,6 +456,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50831:A:2 (shadow): Shadow: Either remove 2 progress from the main quest, or return attacking enemy to the staging area after this attack.
   50831:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
         - remove 2 progress from the current quest card (all of it when it holds less)
@@ -450,12 +474,13 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
       - choose hero (you control)
       - deal 1 damage to the picked card
       - then, if the picked card is a hero (any player controls) committed to the quest (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked character is removed from the quest (it stays exhausted)
-    - damagedCharacters: stat blankText (its text box is blank) 1, until the end of the round
+    - damagedCharacters: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
 
 50832:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defender is damaged).
   50832:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
-(rendered pieces: 295 by template, 8 as JSON)
+(rendered pieces: 303 by template, 0 as JSON)

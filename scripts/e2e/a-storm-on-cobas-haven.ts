@@ -27,7 +27,7 @@ export async function havenFixtures(): Promise<Partial<Record<HavenFixtureName, 
   const log = await ruinsWonLog();
   const find = (wanted: (state: ScenarioState) => boolean, label: string): HavenFixture | null => {
     // Neither player takes a Círdan's Blessing at the Campaign Setup.
-    const found = firstSeed(say, { campaignId: DREAM_CHASER, scenarioId: "a-storm-on-cobas-haven", seatCount: 2, log, choices: ["skip", "skip"], answer: intentFor }, "HAVEN_SEEDS", wanted, label);
+    const found = firstSeed(say, { campaignId: DREAM_CHASER, scenarioId: "a-storm-on-cobas-haven", seatCount: 2, log, answer: intentFor }, "HAVEN_SEEDS", wanted, label);
     return found && { ...found, log };
   };
   const won = find((state) => state.stageCleared && !state.lost, "haven-won");

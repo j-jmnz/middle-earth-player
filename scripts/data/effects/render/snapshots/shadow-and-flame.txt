@@ -20,6 +20,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 04139:B:1 (back): Forced: If at least 1 hero committed to the quest this round, place 4 progress tokens on The Rear Guard (bypassing any active location) at the end of the quest phase.
   04139:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (a hero of any player was committed to the quest this round (a hero committed when the commit step ended still counts after a card removes it from the quest))
+    who acts: the acting player is the first player (a phase has no player of its own)
     - 4 progress is placed on the main quest stage (a quest effect: a full stage advances)
 
 04139:B:2 (back): If Durin's Bane has 0 hit points, advance to the next stage of the scenario immediately.
@@ -34,7 +35,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
   04140:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
-    - the picked enemy attacks the first player now, from the staging area
+    - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
     - one set-aside card with code 04141 joins the staging area (it is not revealed)
 
 04140:B:2 (back): Players cannot win the game while Durin's Bane is in play. If Durin's Bane leaves play by the effect on Dark Pit, the players have won the game.
@@ -51,6 +52,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 04141:A:1 (front): While Dark Pit is the active location, it gains: "Refresh Action: Exhaust X characters (maximum 3) you control to discard the top X cards of your deck. If all discarded cards have a higher combined printed cost than the remaining hit points of Durin's Bane, discard Durin's Bane from play."
   04141:action:1: Action (any player may use it)
     only if all of: (it is the Refresh phase) and (this card is the active location)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each ready character (you control) (up to 3 chosen):
       - exhaust the picked card
@@ -63,6 +65,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 04142:A:1 (front): While Second Hall is the active location, it gains: "Forced: After a character leaves play, reveal 1 card from the encounter deck and add it to the staging area."
   04142:forced:1: Forced after a card leaves play (heard about character (any player controls))
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 ## 04143 Second Deep
@@ -86,6 +89,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 
 04144:A:2 (shadow): Shadow: The defending player discards 1 ally he controls, if able.
   04144:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ally (you control)
     - discard the picked card
@@ -98,7 +102,8 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
     - attach this card to an enemy in play with the trait Balrog
   04145:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
-  04145:forced:1: Forced after this card is played (heard about card (any player controls) of card type event)
+  04145:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard 1 card(s) from the top of the encounter deck
     - then, if 0 is less than the number of cards this effect discarded from the top of the encounter deck, still in the discard pile, that are treachery (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the effects of the event just played are canceled (it is still played, its cost paid, and it goes to its owner's discard pile)
@@ -120,6 +125,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 
 04146:A:2 (shadow): Shadow: If attacking enemy is Durin's Bane, it gets +3 Attack.
   04146:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a enemy (any player controls) named "Durin's Bane": the attacking enemy: stat attack 3, until the end of the attack
 
 ## 04147 Inner Shadow
@@ -149,6 +155,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 
 04148:A:2 (shadow): Shadow: If attacking enemy is Durin's Bane, the defending player discards all attachments he controls.
   04148:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a enemy (any player controls) named "Durin's Bane": the acting player discards each attachment (you control) that a player controls (not an encounter attachment)
 
 ## 04149 Leaping Flame
@@ -158,10 +165,11 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
   04149:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
-    - the picked enemy attacks the first player now, from the staging area
+    - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
 
 04149:A:2 (shadow): Shadow: If attacking enemy is Durin's Bane, it gets +3 Attack.
   04149:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a enemy (any player controls) named "Durin's Bane": the attacking enemy: stat attack 3, until the end of the attack
 
 ## 04150 Durin's Bane
@@ -170,13 +178,13 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 04150:A:1 (front): Regenerate 3. Indestructible. Players cannot play attachments on Durin's Bane.
   (the keyword part is owned by the card's keywords; the records cover: Players cannot play attachments on Durin's Bane.)
   04150:constant:1: Constant
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
 
 04150:A:2 (front): Durin's Bane cannot leave the staging area, is considered to be engaged with each player whose threat is 1 or greater, and attacks each of those players in turn during the combat phase (deal and discard a new shadow card each attack).
   04150:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
-    - this card: stat engagedWithThreatening 1, while this card is in play
+    - this card: stat engagedWithThreatening (in the staging area it is considered engaged with each player whose threat is 1 or higher, read live: it attacks each of them once in the combat phase and only they declare attackers against it) 1, while this card is in play
     - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
 
 ## 04151 Ranging Goblin
@@ -190,6 +198,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 
 04151:A:2 (front): Forced: After a character leaves play, shuffle Ranging Goblin and the top card in the encounter discard pile back into the encounter deck.
   04151:forced:1: Forced after a card leaves play (heard about character (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter discard pile is shuffled into the encounter deck
     - this card is shuffled into the encounter deck
@@ -214,6 +223,168 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
   04153:constant:1: Constant
     - this card counts as a Weapon attachment while it is attached
   04153:forced:1: Forced when this enemy attacks, before the defender is declared (heard about the host)
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player discards 1 random card(s) from hand
 
-(rendered pieces: 153 by template, 0 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 901801 Shadow and Flame Nightmare
+
+901801:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+901801:A:2 (front): Setup: Shuffle the 10 encounter cards with the Attack trait into a separate "Balrog deck."
+  901801:setup:1: Setup
+    - the encounter cards with the trait Attack leave the encounter deck, facedown, for the Balrog deck, which is shuffled; the Balrog discard pile starts empty
+
+901801:A:3 (front): When Durin's Bane would be dealt a shadow card, deal it from the Balrog deck instead of the encounter deck. Shadow cards dealt from the Balrog deck are discarded into a separate Balrog discard pile.
+  901801:constant:1: Constant (record also names 901801:A:4)
+    - each enemy (any player controls) or in the staging area, named "Durin's Bane": stat shadowsFromBalrog 1, while this card is in play
+
+901801:A:4 (front): At the beginning of each combat phase (or if the Balrog deck runs out of cards), shuffle the Balrog discard pile back into the Balrog deck.
+  901801:constant:1: Constant (record also names 901801:A:3)
+    - each enemy (any player controls) or in the staging area, named "Durin's Bane": stat shadowsFromBalrog 1, while this card is in play
+  901801:forced:1: Forced when a phase begins
+    only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the Balrog discard pile is shuffled back into the Balrog deck (nothing with an empty pile)
+
+901801:B:1 (back): Begin with the standard quest deck and encounter deck for the Shadow and Flame scenario.
+  (inert: the engine applies it by rule, no record)
+
+901801:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+901801:B:3 (back): 3x Goblin Scout
+  (inert: the engine applies it by rule, no record)
+
+901801:B:4 (back): 2x Goblin Tunnels
+  (inert: the engine applies it by rule, no record)
+
+901801:B:5 (back): 3x Stray Goblin
+  (inert: the engine applies it by rule, no record)
+
+901801:B:6 (back): 3x The Mountains' Roots
+  (inert: the engine applies it by rule, no record)
+
+901801:B:7 (back): 3x Ranging Goblin
+  (inert: the engine applies it by rule, no record)
+
+901801:B:8 (back): 1x Fiery Sword
+  (inert: the engine applies it by rule, no record)
+
+901801:B:9 (back): 1x Many Thonged Whip
+  (inert: the engine applies it by rule, no record)
+
+901801:B:10 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Shadow and Flame encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+901801:B:11 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+901801:B:12 (back): Play Tip: This scenario contains 10 treachery cards with the Attack trait that have only a "shadow" effect, and no "when revealed" effect. These cards are never revealed from the encounter deck and are only ever dealt as shadow cards to Durin's Bane.
+  (inert: the engine applies it by rule, no record)
+
+## 901802 Terrible Strength
+
+901802:A:1 (shadow): Shadow: For each excess point of combat damage dealt by this attack (damage that is dealt beyond the remaining hit points of the character damaged by this attack) you must damage another character you control. Exhaust all characters damaged from this effect.
+  901802:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat excessToDamage (for each point of damage its attack deals beyond the hit points the character had left, the defending player assigns 1 damage to another character he controls once the attack ends) 1, until the end of the attack
+    - the attacking enemy: stat excessExhausts 1, until the end of the attack
+
+## 901803 The Dark Fire
+
+901803:A:1 (shadow): Shadow: For each point of damage dealt by this attack, heal 1 damage from Durin's Bane.
+  901803:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
+      - heal the damage just dealt damage from the picked card
+
+## 901804 Blazing Grip
+
+901804:A:1 (shadow): Shadow: Discard all cards attached to the defending character and deal it 1 damage. Cannot be canceled.
+  901804:shadow:1: Shadow (cannot be canceled while the number of hero (any player controls) is at least 0)
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): the acting player discards each attachment (any player controls) attached to the defending character
+    - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the defender (no ability that cancels damage can cancel it; moving it to another card still can)
+
+## 901805 Morgoth's Bidding
+
+901805:A:1 (shadow): Shadow: If this attack destroys a character, Durin's Bane makes an additional attack against the defending player after this one.
+  901805:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose enemy (any player controls) or in the staging area, named "Durin's Bane"
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
+
+## 901806 Flame of Udûn
+
+901806:A:1 (shadow): Shadow: Deal Durin's Bane 3 additional shadow cards from the encounter deck (not the Balrog deck).
+  901806:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy is dealt a shadow card from the encounter deck (never the Balrog deck)
+    - the attacking enemy is dealt a shadow card from the encounter deck (never the Balrog deck)
+    - the attacking enemy is dealt a shadow card from the encounter deck (never the Balrog deck)
+
+## 901807 Servant of Flame
+
+901807:A:1 (front): Forced: While Durin's Bane has no damage, Servant of Flame gets +2 Attack and +2 Defense.
+  901807:constant:1: Constant
+    only if the number of undamaged enemy (any player controls) or in the staging area, named "Durin's Bane" is at least 1
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack 2, while this card is in play
+    - this card: stat defense 2, while this card is in play
+
+901807:A:2 (shadow): Shadow: Search the encounter deck for a treachery card with the Shadow or Flame trait and reveal it, if able. Shuffle the encounter deck.
+  901807:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player searches the encounter deck (not its discard pile) for a Shadow or Flame treachery, reveals it and adds it to the staging area
+    - shuffle the encounter deck
+
+## 901808 Captain of Mordor
+
+901808:A:1 (front): Each enemy gets -20 engagement cost.
+  901808:constant:1: Constant
+    - each enemy (any player controls) or in the staging area: stat engagementCost -20, while this card is in play
+
+901808:A:2 (shadow): Shadow: If this attack destroys a character, attacking enemy cannot take damage this round.
+  901808:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): this card: stat cannotTakeDamage 1, until the end of the round
+
+## 901809 Fiery Depths
+
+901809:A:1 (front): Progress cannot be placed on Fiery Depths while it is in the staging area.
+  901809:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+901809:A:2 (front): Travel: Each player must move 1 damage from Durin's Bane to a hero to travel here.
+  901809:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when Durin's Bane holds less damage than there are players (read by the flame family)
+    - for each player, first player first:
+      - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
+      - choose hero (any player controls)
+      - move 1 damage from the card picked before the last to the last picked card
+
+## 901810 Crumbling Stairs
+
+901810:A:1 (front): While Crumbling Stairs is in the staging area, event cards cost 1 additional matching resource to play from hand.
+  901810:constant:1: Constant
+    only if this card is in the staging area
+    - while this card is in play, each card a player plays (from its owner's hand only) that is a card (any player controls) or in the staging area or the active location, of card type event costs 1 more (every player's; several such cards stack)
+
+901810:A:2 (shadow): Shadow: If this attack destroys a character, the defending player must discard all event cards in his hand.
+  901810:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player discards each card (you control) in hand, of card type event
+
+(rendered pieces: 228 by template, 0 as JSON)

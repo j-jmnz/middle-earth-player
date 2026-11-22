@@ -176,7 +176,9 @@ describe("the words of the Escape from Dol Guldur choices", () => {
     }
     // The Dungeon Jailor's objective, the hero that claims each objective (named by the objective card), the Nazgûl's character, Cavern Guardian's attachment.
     expect(prompts).toContain("Choose an unclaimed objective to shuffle into the encounter deck.");
-    expect(prompts.filter((prompt) => prompt === "Choose a hero to carry 01108." || prompt === "Choose a hero to carry 01109." || prompt === "Choose a hero to carry 01110.")).toHaveLength(3);
+    expect(prompts).toContain("Choose a hero to carry 01108. Attached hero cannot attack or defend.");
+    expect(prompts).toContain("Choose a hero to carry 01109. Forced: At the end of each round, raise attached hero's controller's threat by 2.");
+    expect(prompts).toContain("Choose a hero to carry 01110. Forced: At the end of each round, attached hero suffers 1 damage.");
     expect(prompts).toContain("Choose a character to discard.");
     expect(prompts).toContain("Choose an attachment to discard.");
   });

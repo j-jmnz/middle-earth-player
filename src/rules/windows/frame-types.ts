@@ -60,8 +60,8 @@ export type FortitudeResult = { success: boolean; willpower: number; eyes: numbe
 export type EscapeResult = { success: boolean; committed: number; escape: number };
 
 // One instruction still to run, with the seat it runs for. `chosen` is the card a player picked for it.
-// `offset` is where ArrangeTop has got to in the deck.
-export type QueueItem = { instruction: Instruction; seat: number; chosen: string | null; cause?: Cause; offset?: number };
+// `offset` is where ArrangeTop has got to in the deck. `origin` is the record's instruction an item was expanded from (one pick of a DiscardFromHand), so the words find the record's entry and say which pick of how many it is (`nth` of `of`).
+export type QueueItem = { instruction: Instruction; seat: number; chosen: string | null; cause?: Cause; offset?: number; origin?: Instruction; nth?: number; of?: number };
 
 export type EffectWait =
   | { kind: "branch"; item: QueueItem }
@@ -122,6 +122,8 @@ export type EffectData = {
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip): the X of "excess damage" an effect left for the attack's end reads.
   excess?: number;
+  // The Attack the enemy struck with, for an effect the attack leaves for its end that resolves the same attack against another player (900208:A:2).
+  struck?: number;
   // The ally the attack the effect was left by destroyed (DiscardCopiesFromDeck of "other", 10137:A:2).
   destroyedAlly?: string;
   // The first character the attack the effect was left by destroyed, a hero or an ally ("reanimate that character", 101161:A:2).
@@ -265,6 +267,8 @@ export type PendingAttack = {
   heroId?: string;
   // A shadow effect made the attack count as undefended.
   undefended?: boolean;
+  // The Attack the enemy dealt with, noted at the damage step only in a game with a card that resolves the attack against each player (AttackOthersUndefended).
+  struck?: number;
   // Characters a shadow effect removed from this attack as its defender (RemoveDefender, 51335:A:2): none of them can be declared as a defender again for it.
   removedDefenders?: readonly string[];
   // A shadow effect made the attack capture an ally it would damage instead (CaptureInsteadOfDamage, families/captured/).

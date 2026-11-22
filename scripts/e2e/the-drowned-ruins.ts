@@ -51,7 +51,7 @@ export async function ruinsFixtures(): Promise<Partial<Record<RuinsFixtureName, 
   const log = await templeWonLog();
   const find = (wanted: (state: ScenarioState) => boolean, label: string): RuinsFixture | null => {
     // Neither player takes a Command copy or a Círdan's Blessing at the Campaign Setup.
-    const found = firstSeed(say, { campaignId: DREAM_CHASER, scenarioId: "the-drowned-ruins", seatCount: 2, log, choices: ["skip", "skip", "skip", "skip"], answer: intentForRuins }, "RUINS_SEEDS", wanted, label);
+    const found = firstSeed(say, { campaignId: DREAM_CHASER, scenarioId: "the-drowned-ruins", seatCount: 2, log, answer: intentForRuins }, "RUINS_SEEDS", wanted, label);
     return found && { ...found, log };
   };
   const won = find((state) => state.stageCleared && !state.lost, "ruins-won");

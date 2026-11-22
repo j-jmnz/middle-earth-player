@@ -8,25 +8,25 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 12170:A:2 (front): Setup: Each player may change hero cards without incurring the +1 threat penalty, and Haldan may be included among a player's heroes. Any player gains control of Isolde. Add The Threat to Wilderland to the staging area, shuffle Dagnir's Spawn into the encounter deck, and shuffle Abandoned Ruin into the Caves deck. If "Turayn has taken an oath of vigilance," search the encounter deck for 3 treacheries and remove them from the game.
   12170:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json WaiveThreatPenalty {"verb":"WaiveThreatPenalty"}]
-    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"12171"}]
-    - [json AddToStagingWithResources {"verb":"AddToStagingWithResources","code":"12172","amount":{"part":true}}]
+    - Campaign Setup: the voluntary hero change costs no threat penalty in this scenario
+    - Campaign Setup: the objective ally with code 12171 enters play under the first player (put there, not played: nothing is revealed and no cost is paid; a pool card with this record for itself is put into play at the start of each scenario instead of being shuffled into the encounter deck)
+    - the card with code 12172 enters the staging area with the part number of the campaign card of the scenario being played: its place in its campaign, counting from 1 resource tokens on it (on the campaign card's Setup it is spawned; on the card's own Setup a copy of the pool the Setup search found is placed)
     - a card with code 12173 from the box joins the encounter deck, which is shuffled
-    - [json ShuffleIntoPile {"verb":"ShuffleIntoPile","pile":"caves","code":"12174","placed":true}]
+    - Campaign Setup, after the quest card's Setup shuffled the deck: the copy of the card with code 12174 the game already has (dealt into the encounter deck, or set aside) joins the Caves deck, which is shuffled; with no such deck it is removed from the game (the campaign card's own line: a copy the campaign card brings is spawned into a dealt pile; with no such pile it is not in the game)
     - if the Campaign Log holds "turayn": remove 3 treacheries from the encounter deck
 
 12170:B:1 (back): Resolution: While the Fire-drake has been vanquished, it was not the beast the heroes were sent to defeat. With the Fire-drake's mother still at large, Isolde has resolved to continue the hunt. If the heroes choose to fight alongside her, add Isolde to the campaign pool (any player may add her to their deck). Otherwise, mark in the campaign log that "Isolde is on the hunt" (the dragon's minions will pose less of a threat on your quest).
   12170:resolution:1: Resolution
-    - [json BoonAllyOrLogLine {"verb":"BoonAllyOrLogLine","ally":"12171","line":"isolde"}]
+    - Resolution: the players choose, the first player answering for the group, with no default: accept the aid, and the boon ally with code 12171 joins the Campaign Pool (any player may add it to their deck); or decline, and the line "isolde" is recorded in the Campaign Log
 
 12170:B:2 (back): The players discover each treasure they control.
   12170:resolution:2: Resolution
-    - [json DiscoverTreasure {"verb":"DiscoverTreasure"}]
+    - Resolution: each treasure a player controls, claimed and attached to a character, is written to the log's discovered treasures (a treasure still guarded in the staging area is not controlled and is not discovered)
 
 12170:B:3 (back): Add Abandoned Ruin to the campaign pool. The first player chooses either Threat to Wilderland or Dagnir's Spawn and add it to the campaign pool.
   12170:resolution:3: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json Earn {"verb":"Earn","codes":["12174"]}]
+    - Resolution: the cards with codes 12174 are earned, with no choice
     - the first player takes "12172" or "12173" into the Campaign Pool
 
 ## 18042 Fire-drake
@@ -35,7 +35,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18042:A:1 (front): Cannot have non-Dragon attachments.
   18042:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Dragon"}]
+    - no card can be attached to this card except a card with the trait Dragon
 
 18042:A:2 (front): X is 1 more than the number of players.
   18042:constant:2: Constant
@@ -45,10 +45,11 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18042:A:3 (front): Forced: After the active location is explored, Fire-drake returns to the staging area and makes an immediate attack against each player in turn order.
   18042:forced:1: Forced on the event activeExplored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - return this card to the staging area
     - for each player, first player first:
-      - this card attacks the acting player now, from the staging area
+      - this card attacks the acting player now, from the staging area, dealt a shadow card
 
 ## 18043 Dragon Hoard
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -66,7 +67,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     - choose player (any player controls) chosen by the first player
     - the effect goes on with the picked player as the acting player
     - choose Artifact card (you control) in hand, of card type attachment
-    - [json GuardPickedAttachment {"verb":"GuardPickedAttachment","types":["location"]}]
+    - the last picked card of a hand is guarded by a location of the encounter deck, found as the Guarded keyword does, and lies in the staging area; once nothing guards it the players claim it, the first player choosing the character it attaches to (with none to find it is claimed at once)
 
 ## 18044 Iron Hills Mine
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -94,22 +95,23 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18045:A:2 (front): Forced: After the players travel to Contested Depths, either raise each player's threat by 1 for each location in the victory display, or discard Contested Depths and replace it with the top card of the Caves deck.
   18045:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player chooses one of:
       * option "threat":
         - raise threat by the number of location (any player controls) in the victory display (each player)
-      * option "replace" (only if [json condition {"kind":"cavesDeck"}]):
-        - [json ReplaceFromCaves {"verb":"ReplaceFromCaves"}]
+      * option "replace" (only if the Caves deck holds at least 1 card(s) (a game with no Caves deck holds none)):
+        - this card, the active location, is discarded and the top card of the Caves deck takes its place, as the Deep keyword does but not ignored by a card that ignores the keyword (nothing with the Caves deck empty)
 
 ## 18046 Deep Chasm
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 18046:A:1 (front): Deep.
   18046:constant:1: Constant
-    - [json Deep {"verb":"Deep"}]
+    - (constant, the Deep keyword) after the players travel to this location and the Responses to the travel are done, they discard it and the top card of the Caves deck replaces it as the active location (ignored with the Caves deck empty, once it is no longer the active location, or while a card in play ignores the keyword)
 
 18046:A:2 (front): When faced with the option to travel, the players must travel to Deep Chasm if there is no active location.
   18046:constant:2: Constant
-    - [json Restrict {"verb":"Restrict","what":"travelOnly"}]
+    - while no location is the active location and the players can travel to this location, they must travel to it: the travel step offers no way to decline it or to go elsewhere
 
 ## 18047 Denizen of the Deep
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -117,14 +119,15 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18047:A:1 (front): When Revealed: The highest Attack enemy in the staging area makes an immediate attack against the first player. If no attack is made this way, Denizen of the Deep gains surge.
   18047:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose enemy (any player controls) in the staging area only, chosen by the first player [also {"highestAttack":true}]
-    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area
+    - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
+    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card
     - then, if not (there is a enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 18047:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   18047:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 18048 Afraid of the Dark
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -139,7 +142,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     only if there is a Dark location (any player controls) that is the active location to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card this one is attached to: stat willpower is set to 0, overriding every other modifier of it
-    - its host: stat blankText (its text box is blank) 1, while this card is in play
+    - its host: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
   18048:constant:2: Constant
     - this card counts as a Condition attachment while it is attached
 
@@ -148,15 +151,17 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18049:A:1 (front): Cannot have player card attachments.
   18049:constant:1: Constant
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
 
 18049:A:2 (front): Forced: After Stone-troll attacks and destroys a character you control, discard 1 card from your hand for each excess point of damage dealt.
   18049:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls); event happened to the controller)
     only if the event's other card is a enemy (any player controls) named "Stone-troll"
-    - discard [json amount {"excessOf":"subject"}] cards from hand
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - discard the damage on the card the event is about beyond its printed hit points cards from hand
 
 18049:A:3 (shadow): Shadow: Discard an attachment you control.
   18049:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control)
     - discard the picked card
@@ -167,15 +172,17 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18050:A:1 (front): While Hobgoblin is guarding a card, it gets +X Threat, +X Attack, and +X Defense, where X is that card's cost.
   18050:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat threat [json amount {"guardedCost":true}], while this card is in play
-    - this card: stat attack [json amount {"guardedCost":true}], while this card is in play
-    - this card: stat defense [json amount {"guardedCost":true}], while this card is in play
+    - this card: stat threat the printed cost of the card this card guards (one under it, or the host it guards as a guard; 0 for a card with no printed cost), while this card is in play
+    - this card: stat attack the printed cost of the card this card guards (one under it, or the host it guards as a guard; 0 for a card with no printed cost), while this card is in play
+    - this card: stat defense the printed cost of the card this card guards (one under it, or the host it guards as a guard; 0 for a card with no printed cost), while this card is in play
 
 18050:A:2 (front): Forced: After Hobgoblin enters play, the first player attaches the top card of his deck to Hobgoblin faceup as a guarded attachment. When Hobgoblin leaves play, return the card it was guarding to its owner's hand.
   18050:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
-    - [json GuardWithDeckTop {"verb":"GuardWithDeckTop"}]
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the first player's top deck card lies faceup under this card, which guards it (nothing with an empty deck)
   18050:forced:2: Forced after a card leaves play (heard about this card)
-    - [json ReturnGuardedToHand {"verb":"ReturnGuardedToHand"}]
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - (marker, does nothing when run) when this enemy leaves play, the card it was guarding returns to its owner's hand (the settle sweep returns a card held under an enemy that is out of play)
 
 ## 18051 Werewolf
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -187,12 +194,14 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18051:A:2 (front): Forced: After Werewolf is dealt a shadow card with no shadow effect, deal 1 damage to it and to the defending character.
   18051:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - deal 1 damage to this card
     - deal 1 damage to the event's other card
 
 18051:A:3 (shadow): Shadow: Deal 1 damage to the defender.
   18051:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
 ## 18052 Giant Spider
@@ -201,10 +210,12 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18052:A:1 (front): Forced: After Giant Spider attacks and damages a character, that character cannot ready until the end of the round.
   18052:forced:1: Forced on the event damagedByAttack (heard about character (any player controls))
     only if the attacking enemy is a enemy (any player controls) named "Giant Spider"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about: stat cannotReady 1, until the end of the round
 
 18052:A:2 (shadow): Shadow: The defender cannot ready until the end of the round.
   18052:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat doesNotReady 1, until the end of the round
 
 ## 18053 Black Bats
@@ -220,6 +231,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18053:A:3 (shadow): Shadow: If the active location has the Dark trait, attacking enemy cannot take damage this phase.
   18053:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if there is a Dark location (any player controls) that is the active location to choose: the attacking enemy: stat cannotTakeDamage 1, until the end of the phase
 
 ## 18054 Dark Tunnel
@@ -227,7 +239,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18054:A:1 (front): Deep.
   18054:constant:1: Constant
-    - [json Deep {"verb":"Deep"}]
+    - (constant, the Deep keyword) after the players travel to this location and the Responses to the travel are done, they discard it and the top card of the Caves deck replaces it as the active location (ignored with the Caves deck empty, once it is no longer the active location, or while a card in play ignores the keyword)
 
 18054:A:2 (front): While Dark Tunnel is in the staging area, progress cannot be placed on Dark locations in the staging area.
   18054:constant:2: Constant
@@ -239,14 +251,14 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18055:A:1 (front): Deep.
   18055:constant:1: Constant
-    - [json Deep {"verb":"Deep"}]
+    - (constant, the Deep keyword) after the players travel to this location and the Responses to the travel are done, they discard it and the top card of the Caves deck replaces it as the active location (ignored with the Caves deck empty, once it is no longer the active location, or while a card in play ignores the keyword)
 
 18055:A:2 (front): Response: When you travel to Forked Passage (before resolving the deep keyword), raise each player's threat by 2 to look at the top 2 cards of the Caves deck. Put one on top of the Caves deck and put the other on the bottom. Then, add Forked Passage to the victory display.
   18055:response:1: Response after the players travel (heard about this card)
-    only if [json condition {"kind":"cavesDeck"}]
+    only if the Caves deck holds at least 1 card(s) (a game with no Caves deck holds none)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 2 (each player)
-    - [json ArrangeCaves {"verb":"ArrangeCaves","count":2}]
+    - the first player looks at the top 2 cards of the Caves deck and chooses the one that stays on top; the rest go to the bottom of the deck, in their order (nothing changes with fewer in the deck)
     - this card goes to the victory display
 
 ## 18056 Dark Places
@@ -262,6 +274,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18056:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack.
   18056:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 1, until the end of the attack
 
 ## 18057 Eyes in the Dark
@@ -282,6 +295,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18057:A:3 (shadow): Shadow: If this attack is undefended, discard an ally you control.
   18057:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attack has no defender: choose ally (you control)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -298,6 +312,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18058:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   18058:forced:1: Forced on the event enemyAttacks (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each character (you control):
       - deal 1 damage to the picked card
@@ -328,7 +343,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
           - choose Weapon or Armor card (you control) in the deck, of card type attachment
           - move the picked card to hand
         * option "decline":
-      - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+      - shuffle the acting player's deck
 
 ## 18061 Ancient Treasury
 (the scenario deals it into the cavesDeck pile; the piles place it, no record does)
@@ -351,6 +366,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18062:A:1 (front): Forced: After Frightful Den becomes the active location, shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded, where X is the number of players. Add each enemy discarded this way to the staging area.
   18062:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - discard from the top of the encounter deck until 1 enemy for each player is discarded; add those enemies to the staging area
@@ -360,6 +376,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18063:A:1 (front): Forced: After the players commit characters to the quest, discard cards from the encounter deck until a treachery is discarded. Resolve the 'when revealed' effect on that treachery.
   18063:forced:1: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until a treachery is discarded, or the deck is empty; that card becomes the picked card
     - then, if the picked card is a treachery (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the When Revealed effects of the picked card resolve as if it had just been revealed
@@ -369,6 +386,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18064:A:1 (front): Forced: After Crumbling Cavern becomes the active location, each player assigns X damage among characters he controls, where X is the number of characters he controls.
   18064:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player assigns the number of character (you control) damage among the character (you control), one at a time
 
@@ -378,11 +396,12 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18065:A:1 (front): X is the number of characters controlled by the player with the most characters.
   18065:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat threat [json amount {"mostPerPlayer":{"type":"character","control":"you"}}], while this card is in play
-    - this card: stat questPoints [json amount {"mostPerPlayer":{"type":"character","control":"you"}}], while this card is in play
+    - this card: stat threat the most character (you control) any one player controls, each player counted from their own side, while this card is in play
+    - this card: stat questPoints the most character (you control) any one player controls, each player counted from their own side, while this card is in play
 
 18065:A:2 (front): Forced: After an ally enters play, exhaust it.
   18065:forced:1: Forced after a card enters play (heard about ally (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - exhaust the card the event is about
 
 ## 18078 The Iron Hills
@@ -400,6 +419,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18078:B:1 (back): Forced: At the beginning of the quest phase, discard cards from the top of the encounter deck until a location is discarded. Either add that location to the staging area, or raise each player's threat by X, where X is that location's printed Threat.
   18078:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
     - the first player chooses one of:
@@ -410,7 +430,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18078:B:2 (back): This stage cannot be defeated unless there are 3 locations with victory points in the victory display.
   18078:constant:1: Constant
-    only if the number of location (any player controls) in the victory display [also {"noVictory":false}] is less than 3
+    only if the number of location (any player controls) in the victory display, that prints some victory points is less than 3
     - the players cannot defeat this stage while this holds
 
 ## 18079 The Lower Depths
@@ -419,9 +439,9 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18079:A:1 (front): When Revealed: Place Dragon Hoard on the bottom of the Caves deck. Add Fire-drake to the staging area and shuffle the Dragon Might encounter set into the encounter deck.
   18079:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PutOnPileBottom {"verb":"PutOnPileBottom","pile":"caves","code":"18043"}]
+    - the set-aside (or encounter deck) card with code 18043 goes to the bottom of the Caves deck, facedown (a game with no such pile dealt, or no such card, changes nothing)
     - one set-aside card with code 18042 joins the staging area (it is not revealed)
-    - [json ShuffleSetAsideSet {"verb":"ShuffleSetAsideSet","set":"Dragon Might"}]
+    - every set-aside card of the encounter set "Dragon Might" joins the encounter deck (the deck is shuffled by the step after)
     - shuffle the encounter deck
 
 18079:B:1 (back): Fire-drake cannot leave the staging area or take damage.
@@ -432,13 +452,14 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18079:B:2 (back): Response: After placing progress here from questing successfully, remove 5 progress from this stage to look at the top 2 cards of the Caves deck. Put one on top of the Caves deck and put the other on the bottom.
   18079:response:1: Response on the event progressPlaced (heard about this card)
-    only if all of: (it is the Quest phase) and (the quest succeeded) and (the current quest stage holds at least 5 progress) and ([json condition {"kind":"cavesDeck"}])
+    only if all of: (it is the Quest phase) and (the quest succeeded) and (the current quest stage holds at least 5 progress) and (the Caves deck holds at least 1 card(s) (a game with no Caves deck holds none))
     (steps run in order; a step depends on an earlier one only through its own condition)
     - remove 5 progress from the current quest card (all of it when it holds less)
-    - [json ArrangeCaves {"verb":"ArrangeCaves","count":2}]
+    - the first player looks at the top 2 cards of the Caves deck and chooses the one that stays on top; the rest go to the bottom of the deck, in their order (nothing changes with fewer in the deck)
 
 18079:B:3 (back): After Dragon Hoard becomes the active location, advance to stage 3A.
   18079:triggered:1: Triggered (mandatory, not printed as Forced) after this location becomes the active location (heard about location (any player controls) named "Dragon Hoard")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - advance to the next quest stage
 
 ## 18080 The Fire Worm
@@ -447,7 +468,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18080:A:1 (front): When Revealed: Search the encounter deck and discard pile for a Dragon treachery and attach it to Fire-drake, if able. Shuffle the encounter deck.
   18080:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AttachSearched {"verb":"AttachSearched","type":"treachery","trait":"Dragon","to":"Fire-drake"}]
+    - the first player chooses a treachery with the trait Dragon in the encounter deck or its discard pile (one of each title) that the enemy named "Fire-drake" does not carry yet, and it is attached to that enemy in play (the deck is shuffled by the step after)
     - shuffle the encounter deck
 
 18080:B:1 (back): Ignore the Deep keyword.
@@ -456,6 +477,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18080:B:2 (back): Forced: After a player declares X attackers against Fire-drake, he must remove X progress tokens from the main quest or cancel the attack.
   18080:forced:1: Forced on the event enemyAttacked (heard about enemy (any player controls) named "Fire-drake")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player chooses one of:
       * option "remove" (only if not (progress of this card is less than the number of character (any player controls) that took part in the attack this effect answers)):
         - remove the number of character (any player controls) that took part in the attack this effect answers progress from the current quest card (all of it when it holds less)
@@ -467,6 +489,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     only if there is a enemy (any player controls) or in the staging area, named "Fire-drake" to choose
     - the players cannot defeat this stage while this holds
   18080:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Fire-drake")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
-(rendered pieces: 284 by template, 33 as JSON)
+(rendered pieces: 320 by template, 0 as JSON)

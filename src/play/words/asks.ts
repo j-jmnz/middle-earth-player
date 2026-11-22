@@ -37,7 +37,7 @@ export type Text = string | readonly { when?: Condition; text: string }[];
  * - `labels`: the rows of a Pick that are no card, by option id ("skip", "done"). A key that names a card is refused.
  * - `label`: the row of one branch of a Choose (the entry keyed with the option id).
  * - `bind`: a name for each number a template says, as the `Amount` the engine reads.
- * - `named`: a name for each card a template says, as the `PickSpec` that finds it for the seat asked: the card's name when exactly one card matches, else the words `otherwise` ("your highest-cost ally"), so a row names the card it takes when there is no second step to choose.
+ * - `named`: a name for each card a template says, as the `PickSpec` that finds it for the seat asked: the card's name when exactly one card matches, else the words `otherwise` ("your highest-cost ally"), so a row names the card it takes when there is no second step to choose; `{<name>Cost}` says that card's printed cost.
  * - `caution`: the two-tap warning, said as "Tap again: ..." when `when` holds. It belongs to a row: on a Pick `when` is read once for each row with `picked` set to that row's id, so the confirm arms only on the row that loses
  *   the game, and on a Choose it is read for the branch the entry is keyed with. A warning that holds whatever is picked is a `when` that does not read `picked`; there is no sheet-wide caution.
  */
@@ -95,7 +95,7 @@ export function templatesOf(entry: Ask): string[] {
 
 /** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `subject`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` and `named` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", "picked", "host", "subject", "ringBearer", "pair", "left", "dealt", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...Object.keys(entry.named ?? {})]);
+  const known = new Set(["card", "owner", "picked", "host", "subject", "ringBearer", "pair", "left", "dealt", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...Object.keys(entry.named ?? {}), ...Object.keys(entry.named ?? {}).map((name) => `${name}Cost`)]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -168,6 +168,9 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   for (const [name, named] of Object.entries(entry.named ?? {})) {
     const only = pickCandidates(a.game, named.pick, scope.actor, [], scope.sourceId, a.ctx, undefined, undefined, true);
     values[name] = only.length === 1 && only[0] !== undefined ? a.names.card(only[0]) : named.otherwise;
+    // `{<name>Cost}`: the printed cost of the card the pick finds (cards tied for the highest cost share one; 0 with no card), where a line turns on it.
+    const cost = only[0] === undefined ? undefined : a.ctx.cards.get(a.game.cards[only[0]]?.code ?? "")?.cost;
+    values[`${name}Cost`] = cost ?? 0;
   }
   return { values, scope };
 }

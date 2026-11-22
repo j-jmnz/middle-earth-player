@@ -1,7 +1,9 @@
 // A record's header: its timing, trigger, limit, cost, subject and condition, then its instructions. `src/catalog/effect-schema.ts` owns the fields.
+import { travelNote } from "./travel-note.ts";
 import { renderCondition } from "./conditions.ts";
 import { done, isObj, jsonOf, str, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
+import { actorNote } from "./actor.ts";
 import { barNote } from "./bars.ts";
 import { renderInstruction } from "./verbs.ts";
 
@@ -24,9 +26,15 @@ const TIMING: Readonly<Record<string, string>> = {
   endOfRound: "End of round",
 };
 
+// Events that name one card: a record with no subject hears them only when they are about its own card (src/rules/windows/listen.ts, hears).
+const ABOUT_ONE_CARD: ReadonlySet<string> = new Set(["questDefeated", "lastTimeCounterRemoved", "flipped", "leftPlay", "traveled"]);
+
 // Each trigger as the moment it fires, with its lead word (src/catalog/effect-schema.ts, triggerSchema, says when the engine announces it).
 const TRIGGER: Readonly<Record<string, string>> = {
   questFailed: "after the players quest unsuccessfully",
+  questDefeated: "after a side quest is defeated (its progress reached its quest points)",
+  lastTimeCounterRemoved: "after the last time counter is removed from a card at the end of the refresh phase",
+  flipped: "after a card is flipped over (the FlipCard verb)",
   questSucceeded: "after the players quest successfully",
   enemyDestroyed: "after an enemy is destroyed",
   attacks: "when this enemy attacks, before the defender is declared",
@@ -53,6 +61,8 @@ const TRIGGER: Readonly<Record<string, string>> = {
   progressWouldBePlaced: "before progress is placed on this location (the whole placement, the effect's X, waits for this effect)",
   progressPlacedOnSelf: "after progress is placed on this card, the placement that explores it included (X is the amount placed; the card may have left play)",
   questProgressPlacedOnStage: "once, after a quest that succeeded has placed progress on the stage itself",
+  escapeFailed: "after an escape test that this card's own effect made is failed (no other card hears it; the event happened to the player who made the test)",
+  escapePassed: "after an escape test that this card's own effect made is passed (no other card hears it; the event happened to the player who made the test)",
   questProgressPlaced: "once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)",
 };
 
@@ -76,13 +86,17 @@ const COSTS: Readonly<Record<string, (c: Obj) => string | null>> = {
   returnSelfToHand: () => "return this card to hand",
   resources: (c) => `pay ${str(c.amount)} ${typeof c.sphere === "string" ? `${c.sphere} ` : ""}resource(s)${c.from === "self" ? " from this card's pool" : c.from === "host" ? " from the host's pool" : ""}`,
   playEvent: () => "pay the event's printed cost",
+  addSelfToVictory: () => "add this card to the victory display (payable too from its owner's discard pile, when its host just left play)",
+  exhaustCode: (c) => `exhaust the card in play with code ${str(c.code)} that the acting player controls`,
+  exhaustNamed: (c) => `exhaust the card titled ${str(c.name)} in play that the acting player controls`,
+  discardDeckTop: (c) => `discard the top ${str(c.amount)} card(s) of your deck`,
 };
 
-function renderCost(value: unknown, ctx: Ctx): string {
+export function renderCost(value: unknown, ctx: Ctx): string {
   if (Array.isArray(value)) return value.map((one) => renderCost(one, ctx)).join(" and ");
   if (!isObj(value) || typeof value.kind !== "string") return jsonOf(ctx, "cost", value);
   const said = COSTS[value.kind]?.(value);
-  return said ? done(ctx, said, value, ["kind", "amount", "sphere", "from"]) : jsonOf(ctx, "cost", value);
+  return said ? done(ctx, said, value, ["kind", "amount", "sphere", "from", "code", "name"]) : jsonOf(ctx, "cost", value);
 }
 
 function renderSubject(value: unknown, ctx: Ctx): string {
@@ -96,6 +110,7 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   const trigger = typeof effect.trigger === "string" ? ` ${TRIGGER[effect.trigger] ?? `on the event ${effect.trigger}`}` : "";
   const notes: string[] = [];
   if (effect.subject !== undefined) notes.push(`heard about ${renderSubject(effect.subject, ctx)}`);
+  else if (typeof effect.trigger === "string" && ABOUT_ONE_CARD.has(effect.trigger)) notes.push("heard about this card only: with no subject, an event about one card is heard by that card alone");
   if (effect.eventSeat !== undefined) notes.push(`event happened to ${effect.eventSeat === "you" ? "the controller" : "another player"}`);
   if (typeof effect.limit === "string") notes.push(`limit ${LIMIT[effect.limit] ?? effect.limit}`);
   if (effect.cost !== undefined) notes.push(`cost: ${renderCost(effect.cost, ctx)}`);
@@ -113,9 +128,15 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   const lines = [`${str(effect.id)}: ${head}`];
   if (effect.condition !== undefined) lines.push(`  only if ${renderCondition(effect.condition, ctx)}`);
   const instructions = Array.isArray(effect.instructions) ? effect.instructions : [];
+  const actor = actorNote(effect, ctx);
+  if (actor && instructions.length > 0) lines.push(`  who acts: ${actor}`);
   const barred = barNote(effect, ctx);
   if (barred) lines.push(`  note: ${barred}`);
-  if (instructions.length === 0) lines.push("  (no instructions)");
+  const travel = travelNote(effect, ctx);
+  if (travel) lines.push(`  note: ${travel}`);
+  // The last stage's win is the engine's own rule, not a record's: a constant on its side B that runs nothing only names the printed line.
+  const winsOnDefeat = ctx.finalStage === true && effect.timing === "constant" && Array.isArray(effect.lines) && effect.lines.every((id) => typeof id === "string" && id.includes(":B:"));
+  if (instructions.length === 0) lines.push(winsOnDefeat ? "  (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)" : "  (no instructions: the record only names the printed line, and the engine runs no step for it)");
   if (instructions.length > 1) lines.push("  (steps run in order; a step depends on an earlier one only through its own condition)");
   const inner = effect.trigger === "engaged" ? { ...ctx, engagedSeat: true } : ctx;
   instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, inner, 1, at > 0)));

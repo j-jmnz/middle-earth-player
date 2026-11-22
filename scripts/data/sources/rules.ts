@@ -53,8 +53,8 @@ export const RULE_PDFS = [
     // trg is read for its Setup and special rules (Dwarrowdelf, below) and Secrecy X, which it introduced; bts for one keyword, Valour (Beneath the Sands).
     ["trg", "the-redhorn-gate-rulesheet.pdf"],
     ["bts", "mec58_web_beneath_the_sands-rules.pdf"],
-    // Shadows of Mirkwood's Adventure Pack rulesheets: the encounter sets of the scenario and its special rules. The Hunt for Gollum's and Conflict at the Carrock's rulesheets
-    // (rulesheet-thehuntforgollum.pdf, rulesheet-conflictatthecarrock.pdf) hold their text as outlines with no text layer, so no span can be read from them.
+    // Shadows of Mirkwood's Adventure Pack rulesheets: the encounter sets of the scenario and its special rules. The Hunt for Gollum's and Conflict at the Carrock's rulesheets (htg, cac, below)
+    // hold their text as outlines with no text layer: their markdown is read by eye (`handRead` in data/rules/columns.json).
     ["jtr", "a-journey-to-rhosgobel-rules.pdf"],
     ["hoem", "the_hills_of_emyn_muil_rulesheet.pdf"],
     ["tdm", "the_dead_marshes_rulesheet.pdf"],
@@ -63,6 +63,9 @@ export const RULE_PDFS = [
     ["community-red-arrow", "mec_communitydecklists_theredarrow-compressed.pdf"],
     ["community-noldor", "mec_communitydecklists_theswordsofthenoldor-compressed.pdf"],
   ].map(([doc, file]) => ({ doc: doc as string, file: file as string, url: `${FFG}/${file as string}` })),
+  // The Hunt for Gollum's (MEC02) and Conflict at the Carrock's (MEC03) rulesheets, one page each, on Hall of Beorn's S3 host. The text is outlines, so data/rules/htg.md and cac.md are transcribed from the rendered page.
+  { doc: "htg", file: "mec02_the_hunt_for_gollum_rulesheet.pdf", url: "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC02.pdf" },
+  { doc: "cac", file: "mec03_conflict_at_the_carrock_rulesheet.pdf", url: "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC03.pdf" },
   // Dwarrowdelf's rules inserts: the Khazad-dûm expansion's (MEC08: its three scenarios' encounter sets and special rules) and the Adventure Packs' rulesheets, a page of two columns each (MEC10 to
   // MEC14; The Redhorn Gate's is `trg`, above, the same file as MEC09). They have a text layer. Hall of Beorn's S3 host holds them as Images/LotR/Rules/MEC<n>.pdf.
   ...[

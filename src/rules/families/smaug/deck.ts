@@ -35,7 +35,7 @@ export function askSmaug(state: ScenarioState, ctx: ReduceContext, steps: Engine
 
 /** RevealSmaug: the top of the Smaug deck (refilled from its discard pile first) is revealed by the first player into the play area (engaged with him) or the staging area. Nothing with both piles empty. */
 export function revealSmaug(state: ScenarioState, instruction: Extract<Instruction, { verb: "RevealSmaug" }>, _focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const filled = refillDeck(state, DECKS.smaug);
+  const filled = refillDeck(state, DECKS.smaug, steps);
   const top = topOf(filled, DECKS.smaug.deck);
   if (top == null) return filled;
   return startReveal(filled, filled.firstPlayer, ctx, steps, top, undefined, instruction.to === "play");

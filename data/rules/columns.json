@@ -42,5 +42,7 @@
   "witw": {"default": [{"x": 80, "y": 215, "w": 255, "h": 500}, {"x": 338, "y": 95, "w": 245, "h": 603}]},
   "tld": {"default": [{"x": 80, "y": 215, "w": 255, "h": 500}, {"x": 338, "y": 95, "w": 245, "h": 603}]},
   "fos": {"default": [{"x": 80, "y": 215, "w": 255, "h": 500}, {"x": 338, "y": 95, "w": 245, "h": 603}]},
-  "saf": {"default": [{"x": 80, "y": 215, "w": 255, "h": 500}, {"x": 338, "y": 95, "w": 245, "h": 603}]}
+  "saf": {"default": [{"x": 80, "y": 215, "w": 255, "h": 500}, {"x": 338, "y": 95, "w": 245, "h": 603}]},
+  "htg": {"default": [], "handRead": "by eye from the rendered page of MEC02: the text is outlines"},
+  "cac": {"default": [], "handRead": "by eye from the rendered page of MEC03: the text is outlines"}
 }

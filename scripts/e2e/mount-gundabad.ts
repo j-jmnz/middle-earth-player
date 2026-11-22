@@ -28,7 +28,7 @@ export async function gundabadFixtures(): Promise<Partial<Record<GundabadFixture
   const log = await framsburgWonLog();
   const find = (wanted: (state: ScenarioState) => boolean, label: string): GundabadFixture | null => {
     const answer = (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => gundabadIntent(state, ctx, memory, { ...DEFAULT_POLICY, quest: "all", engage: true, hunt: true, use: true }, { ...GUNDABAD_POLICY, play: true, act: true });
-    const found = firstSeed(say, { campaignId: "ered-mithrin", scenarioId: "mount-gundabad", seatCount: 2, log, choices: ["skip"], answer }, "GUNDABAD_SEEDS", wanted, label);
+    const found = firstSeed(say, { campaignId: "ered-mithrin", scenarioId: "mount-gundabad", seatCount: 2, log, answer }, "GUNDABAD_SEEDS", wanted, label);
     return found && { ...found, log };
   };
   const won = find((state) => state.stageCleared && !state.lost, "gundabad-won");

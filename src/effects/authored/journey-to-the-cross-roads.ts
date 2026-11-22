@@ -173,7 +173,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 144057 Haradrim Soldier.
     copyLine("18035:A:1", "144057:A:1"),
-    // The additional attack its Shadow grants is dealt a new shadow card, the old ones discarded first (faq.additional-attacks); written on its own, not copied from 18035:A:2 (which deals none).
+    // The additional attack its Shadow grants is dealt a new shadow card, the old ones discarded first (faq.additional-attacks).
     { id: "144057:shadow:1", cardCode: "144057", lines: ["144057:A:2"], timing: "shadow", instructions: [{ verb: "ImmediateAttack", afterThis: true }] },
 
     // 144058 Haradrim Archer: Threat X and Archery X, X the number of players (the card prints Threat X).

@@ -5,7 +5,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10125:A:1 (front): Setup: Add Thaurdir to the staging area, Captain side faceup. Add 1 copy of Carn Dûm Garrison per player to the staging area. Search the encounter deck for 1 copy of Accursed Battlefield and make it the active location. Shuffle the encounter deck.
   10125:setup:1: Setup
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 10125:B:1 (back): Thaurdir cannot leave the staging area and cannot take damage. At the end of the round, if Thaurdir is Champion side faceup, flip him.
   10125:constant:1: Constant
@@ -14,6 +14,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
     - each enemy (any player controls) or in the staging area, named "Thaurdir": stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
     - each enemy (any player controls) or in the staging area, named "Thaurdir": stat cannotTakeDamage 1, while this card is in play
   10125:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - if the card with code 10128 is in play: the card with code 10128 in play is flipped to the card with code 10127, where it lies, with its tokens and attachments
 
 10125:B:2 (back): Do not discard unresolved shadow cards at the end of the combat phase.
@@ -23,6 +24,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 10125:B:3 (back): Forced: If there are 3 shadow cards dealt to Thaurdir, flip him.
   10125:forced:2: Forced on the event shadowDealtTo (heard about enemy (any player controls) or in the staging area, named "Thaurdir")
     only if all of: (2 is less than shadowCards of the card the event is about) and (shadowCards of the card the event is about is less than 4)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card with code 10127 or 10128 in play is flipped to show the other of the two, where it lies, with its damage, tokens, shadow cards and attachments
 
 ## 10126 Midwinter's Crux
@@ -44,6 +46,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
     - each enemy (any player controls) or in the staging area, named "Thaurdir": stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
     - each enemy (any player controls) or in the staging area, named "Thaurdir": stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
   10126:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - if the card with code 10127 is in play: the card with code 10127 in play is flipped to the card with code 10128, where it lies, with its tokens and attachments
 
 10126:B:2 (back): While Midwinter's Crux has 15 or more progress on it, Thaurdir loses indestructible. You cannot defeat this stage while Thaurdir is in play.
@@ -56,6 +59,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10126:B:3 (back): If Thaurdir is defeated, you win the game.
   10126:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Thaurdir")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 10127 Thaurdir
@@ -74,8 +78,10 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10127:A:4 (front): Forced: After Thaurdir is flipped or a treachery card with the Sorcery trait is revealed, deal 1 shadow card to each enemy in play.
   10127:forced:1: Forced on the event flippedOver (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each enemy in play (in the staging area or engaged) is dealt 1 shadow card from the encounter deck (in a Travel line this is a cost: the players cannot travel unless the encounter deck holds a card for each of them)
   10127:forced:2: Forced after a card is revealed (heard about Sorcery treachery (any player controls); not for a card found in the encounter discard pile)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each enemy in play (in the staging area or engaged) is dealt 1 shadow card from the encounter deck (in a Travel line this is a cost: the players cannot travel unless the encounter deck holds a card for each of them)
 
 ## 10128 Thaurdir
@@ -93,13 +99,15 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10128:A:4 (front): Forced: After Thaurdir is flipped or a treachery card with the Sorcery trait is revealed, Thaurdir heals 3 damage and makes an immediate attack against the first player.
   10128:forced:1: Forced on the event flippedOver (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - heal 3 damage from this card
-    - this card attacks the first player now, from the staging area (or engaged)
+    - this card attacks the first player now, from the staging area, dealt a shadow card (or engaged)
   10128:forced:2: Forced after a card is revealed (heard about Sorcery treachery (any player controls); not for a card found in the encounter discard pile)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - heal 3 damage from this card
-    - this card attacks the first player now, from the staging area (or engaged)
+    - this card attacks the first player now, from the staging area, dealt a shadow card (or engaged)
 
 ## 10129 Carn Dûm Garrison
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -110,6 +118,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10129:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each shadow card currently dealt to it.
   10129:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack shadowCards of the attacking enemy, until the end of the attack
 
 ## 10130 Orc Grunts
@@ -124,21 +133,24 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10130:A:3 (shadow): Shadow: Add Orc Grunts to the staging area.
   10130:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this card goes to the staging area (it is not revealed)
 
 ## 10131 Werewolf of Angmar
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 10131:A:1 (front): Forced: After an event card is played, deal 1 shadow card to Werewolf of Angmar.
-  10131:forced:1: Forced after this card is played (heard about card (any player controls) of card type event)
+  10131:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card is dealt 1 shadow card from the encounter deck, wherever it is
 
 10131:A:2 (front): Forced: If there are 3 shadow cards dealt to Werewolf of Angmar and it is in the staging area, it engages the first player and makes an immediate attack (do not deal it another shadow card for this attack).
   10131:forced:2: Forced on the event shadowDealtTo (heard about this card)
     only if all of: (this card is in the staging area) and (2 is less than shadowCards of this card) and (shadowCards of this card is less than 4)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this enemy, in the staging area, engages the first player
-    - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt no new shadow card (the shadow cards it holds all resolve)
+    - then, if this card is engaged with a player (that player is who "you" means in this record) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt no new shadow card (the shadow cards it holds all resolve)
 
 ## 10132 Accursed Battlefield
 (the scenario deals it into the activeLocation pile; the piles place it, no record does)
@@ -152,6 +164,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10132:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the defending player's threat is higher than the attacking enemy's engagement cost).
   10132:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (engagement cost of the attacking enemy is less than your threat): the attacking enemy: stat attack 1, until the end of the attack
     - then, if engagement cost of the attacking enemy is less than your threat (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
@@ -166,6 +179,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10133:A:2 (shadow): Shadow: Raise defending player's threat by 2.
   10133:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by 2 (the acting player)
 
 ## 10134 Blight of Carn Dûm
@@ -174,14 +188,17 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 10134:A:1 (front): Forced: After an enemy attacks, heal 1 damage from it.
   10134:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about enemy (any player controls) or in the staging area)
     only if any of: (this card is in the staging area) or (this card is the active location)
+    who acts: the acting player is the defending player (the player the attack is against)
     - heal 1 damage from the card the event is about
 
 10134:A:2 (front): Travel: Deal each enemy in play 1 shadow card to travel here.
   10134:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the shadow card cannot be dealt (read by the angmar family)
     - each enemy in play (in the staging area or engaged) is dealt 1 shadow card from the encounter deck (in a Travel line this is a cost: the players cannot travel unless the encounter deck holds a card for each of them)
 
 10134:A:3 (shadow): Shadow: If the attacking enemy is Thaurdir, heal 3 damage from him.
   10134:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a enemy (any player controls) or in the staging area, named "Thaurdir": heal 3 damage from the attacking enemy
 
 ## 10135 Fortress Walls
@@ -190,10 +207,12 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 10135:A:1 (front): While Fortress Walls is the active location, for each resource spent by a player, raise that player's threat by 1.
   10135:forced:1: Forced on the event resourcesSpent
     only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by X (the player the event is about)
 
 10135:A:2 (shadow): Shadow: If your threat is 40 or higher, attacking enemy makes an additional attack against you after this one.
   10135:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the actor's threat is at least 40: the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 10136 The Sky Darkens
@@ -207,6 +226,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10136:A:2 (shadow): Shadow: Discard a random card from the defending player's hand.
   10136:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player discards 1 random card(s) from hand
 
 ## 10137 Vile Affliction
@@ -219,6 +239,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10137:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys an ally, search your deck for another copy of that ally and discard it, if able.
   10137:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -235,6 +256,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10138:A:2 (shadow): Shadow: Flip Thaurdir after this attack.
   10138:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the card with code 10127 or 10128 in play is flipped to show the other of the two, where it lies, with its damage, tokens, shadow cards and attachments
 
@@ -246,12 +268,13 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10139:A:2 (front): Forced: When at least 1 progress is placed on Furious Charge, each character gets -2 Defense until the end of the round. If Thaurdir is Captain side faceup, flip him.
   10139:forced:1: Forced on the event progressPlaced
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each character (any player controls): stat defense -2, until the end of the round
+    - each character (any player controls) (only the cards that match now: one that arrives later does not get it): stat defense -2, until the end of the round
     - then, if the card with code 10127 is in play (checked when this step runs, after the steps above; not tied to whether they did anything): the card with code 10127 in play is flipped to the card with code 10128, where it lies, with its tokens and attachments
 
 10139:A:3 (front): Response: After Furious Charge is defeated, add 10 progress to the main quest.
-  10139:response:1: Response on the event questDefeated (heard about this card)
+  10139:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
     - add 10 progress to the main quest (the main quest card takes it: the active location takes it first only while the main quest is the current quest)
 
 ## 10189 Elrond's Champion

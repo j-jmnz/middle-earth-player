@@ -3,8 +3,8 @@ import type { Effect } from "../../../catalog/boundary.ts";
 // Records for the MoF player cards whose lines no template reads (data/cards/MoF.json). An id here that a template also
 // produces replaces the generated record; list it in REPLACES.
 export const RECORDS: readonly Effect[] = [
-  // 146001 Frodo Baggins. The One Ring in play is the Fellowship box's (141085), the only one the playable scenarios deal.
-  {"id":"146001:action:1","cardCode":"146001","lines":["146001:A:1"],"timing":"action","condition":{"kind":"phase","is":"Planning"},"cost":{"kind":"exhaustCode","code":"141085"},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"any"}},{"verb":"AddResources","amount":1,"to":"picked"}]},
+  // 146001 Frodo Baggins. The One Ring is the copy the player controls, whichever box printed it.
+  {"id":"146001:action:1","cardCode":"146001","lines":["146001:A:1"],"timing":"action","condition":{"kind":"phase","is":"Planning"},"cost":{"kind":"exhaustNamed","name":"The One Ring"},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"any"}},{"verb":"AddResources","amount":1,"to":"picked"}]},
   // 146002 Aragorn
   {"id":"146002:action:1","cardCode":"146002","lines":["146002:A:2"],"timing":"action","limit":"oncePerPhase","cost":{"kind":"resources","amount":1,"from":"self"},"instructions":[{"verb":"Ready"}]},
   // 146004 Tom Cotton

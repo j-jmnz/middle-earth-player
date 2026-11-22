@@ -1,6 +1,7 @@
 // The table's log: this round's engine steps in words, each with its cause from phase 8d (the rule title, or the card and
 // its printed line), so a player can check a number against its source. It is text, not a control.
 import { plural } from "../words/list.ts";
+import { reshuffleWords } from "./pile-ids.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { discoverLogLine, setAsideLine } from "../words/scenarios/wilderland.ts";
@@ -146,6 +147,8 @@ function words(step: EngineStep, names: LogNames): string | null {
       return setAsideLine(names.card(step.sourceId), names.card(step.cardId));
     case "resetEncounterDeck":
       return `The encounter discard pile (${step.count}) is shuffled into the encounter deck`;
+    case "reshuffleDeck":
+      return reshuffleWords(step.deck, step.count);
     case "discover":
       return discoverLogLine({ location: names.card(step.locationId), looked: step.looked.length, loot: step.loot ? names.card(step.loot) : null, hazard: step.hazard ? names.card(step.hazard) : null });
   }

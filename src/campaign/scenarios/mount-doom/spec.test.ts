@@ -52,6 +52,7 @@ const ROWS: readonly Row[] = [
 
   { line: "146054:A:1", name: "When Revealed: Gollum makes an immediate attack against the first player", layout: { engaged: [{ code: "146049", seat: 0 }], deck: ["f0", "f0", "f0"] }, act: [reveal("146054"), endPhase], expect: attackersOf("dh1", ["146049"]) },
   { line: "146054:A:1", name: "and when he is not in play he is searched for and put into play engaged with the first player", layout: { deck: ["f0", "146049"] }, act: reveal("146054"), expect: zone("146049", "engaged") },
+  { line: "146054:A:2", name: "the additional attack is dealt a new shadow card, so the encounter deck gives one more", layout: { engaged: [{ code: "146049", seat: 0 }], deck: ["f0", "f0", "f0"] }, act: attack("146049", { shadow: "146054", undefended: true }), expect: deckCount(2) },
   { line: "146054:A:2", name: "Shadow: if the attacking enemy is Gollum he makes an additional attack after this one", layout: { engaged: [{ code: "146049", seat: 0 }], deck: ["f0", "f0", "f0"] }, act: attack("146049", { shadow: "146054", undefended: true }), expect: attackersOf("dh1", ["146049", "146049"]) },
 
   { line: "146055:A:2", name: "When Revealed: make a Fortitude test and raise your threat by 10 on a failure", layout: { deck: ["f0", "f0"] }, act: [reveal(LIDLESS), commit()], expect: threat(38) },

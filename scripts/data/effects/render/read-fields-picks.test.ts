@@ -38,6 +38,7 @@ describe("effects render read fields, picks", () => {
     objective: true,
     cardType: "hero",
     committed: true,
+    canQuest: true,
     attacking: true,
     defending: true,
     hasResources: true,
@@ -91,6 +92,12 @@ describe("effects render read fields, picks", () => {
     participating: true,
     controlledBy: "attackers",
     sideQuest: true,
+    stagingArea: "any",
+    engagedWith: "picked",
+    engageable: true,
+    highestThreat: true,
+    highestAttack: true,
+    notHost: true,
   };
   const SAMPLES: readonly Obj[] = [
     BIG,
@@ -105,6 +112,17 @@ describe("effects render read fields, picks", () => {
     { type: "character", control: "any", controlledBy: "actor" },
     { type: "character", control: "any", controlledBy: "host" },
     { type: "character", control: "any", controlledBy: "picked" },
+    { type: "character", control: "any", controlledBy: "firstPlayer" },
+    { type: "enemy", control: "any", stagingOnly: true, stagingArea: "shared", engagedWith: "notYou" },
+    { type: "enemy", control: "any", stagingArea: "own", engagedWith: "host" },
+    { type: "player", control: "any", highestThreat: true },
+    { type: "card", control: "any" },
+    { type: "card", control: "any", lootKeyword: true, minProgress: 2, island: "temple", aflame: true, lowestAflame: true, attackingEnemy: true, uncharted: true, nemesis: true, sameTitleAs: "picked", guardsHero: true, hasFacedownUnder: true, facedownUnder: true, guardsCard: true, guardsNamed: "Urdug's Horn", engagedThisRound: true },
+    { type: "card", control: "any", objectiveLocation: true, notCardType: "ally", maxCost: 2, fewerHitPointsThan: "attackingEnemy", captured: "rescued", minResources: 4, noVictory: true, maxDefense: 1, minAttack: 2, oddCost: true, intoPlay: true, heroSphere: true, embassy: "player", burden: true, side: "B", sharesTrait: "host", hostForPicked: true, fromDeck: "evilCreatures", doubleSided: true },
+    { type: "card", control: "any", aflame: false, attackingEnemy: false, uncharted: false, doubleSided: false, noVictory: false, engagedThisRound: false, island: "secret", captured: "hosts", embassy: "encounter", sharesTrait: "activeLocation", sameTitleAs: "activeLocation" },
+    { type: "card", control: "any", maxCost: { level: true, halved: true, plusChosen: true }, hasAttachment: { playerCard: true, treasure: true, trait: "Item" }, island: "adjacent", captured: "underSelf" },
+    { type: "card", control: "any", hasAttachment: {}, island: "start" },
+    { type: "card", control: "any", island: "here", sharesTrait: "self" },
   ];
   const render: Render = (value, ctx) => renderPick(value, ctx);
 
@@ -117,7 +135,7 @@ describe("effects render read fields, picks", () => {
 
   it("claims no field whose value it leaves unsaid", () => {
     // A false the template has no words for stays out of its claim, so it prints as `[also {...}]` in place of vanishing.
-    for (const key of ["unique", "nonUnique", "hasResources", "attacking", "defending", "staging", "stagingOnly", "hasShadow", "copyInDiscard", "looked", "engagedEnemies", "objective", "nonObjective"]) {
+    for (const key of ["nonUnique", "hasResources", "attacking", "defending", "staging", "stagingOnly", "hasShadow", "copyInDiscard", "looked", "engagedEnemies", "objective", "nonObjective"]) {
       expect(renderPick({ type: "hero", control: "you", [key]: false }, newCtx()), key).toContain(`[also {"${key}":false}]`);
     }
   });

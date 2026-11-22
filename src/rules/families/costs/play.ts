@@ -11,7 +11,7 @@ import { attachmentHostIds, playCost } from "../../player/attach.ts";
 import { effectCause, ruleCause } from "../../core/cause.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { holds } from "../../interpret/conditions.ts";
-import { discountFor } from "../../player/cost-rules.ts";
+import { discountFor, fewestHeroesReason } from "../../player/cost-rules.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { EngineStep, Payment, PlayerIntent } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -53,7 +53,7 @@ export function extraCostReason(state: ScenarioState, cardId: string, seat: numb
   if (need != null) {
     const sphere = printedOf(ctx.cards, state.cards[cardId]?.code ?? "").sphere;
     const pools = [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, cardId, ctx)].filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, sphere, ctx, cardId));
-    if (pools.length < need) return `Pay from at least ${need} different heroes`;
+    if (pools.length < need) return fewestHeroesReason(need);
   }
   return null;
 }

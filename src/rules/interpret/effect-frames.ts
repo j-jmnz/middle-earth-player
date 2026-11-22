@@ -29,6 +29,8 @@ import { patchTop, popFrame, pushFrame, topFrame } from "../windows/windows.ts";
 import { dealOut } from "../families/breaking/deal.ts";
 import { moveCard } from "../core/zones.ts";
 import { chooseAmount } from "../families/defense/index.ts";
+import { DEFENDERS_FRAME } from "../families/defense/defenders.ts";
+import { DONE } from "../families/deck/choose.ts";
 import { dealAttackShadow } from "../families/defense/listen.ts";
 import { discardShadowOf } from "../combat/shadow.ts";
 
@@ -61,6 +63,8 @@ export type EffectSpec = {
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip).
   excess?: number;
+  // The Attack the attack struck with (AttackOthersUndefended).
+  struck?: number;
   // The ally that attack destroyed, for the copies search of 10137:A:2.
   destroyedAlly?: string;
   destroyedCharacter?: string;
@@ -99,6 +103,7 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.activeAtStart ? { activeAtStart: spec.activeAtStart } : {}),
     ...(spec.dealt != null ? { dealt: spec.dealt } : {}),
     ...(spec.excess != null ? { excess: spec.excess } : {}),
+    ...(spec.struck != null ? { struck: spec.struck } : {}),
     ...(spec.destroyedAlly ? { destroyedAlly: spec.destroyedAlly } : {}),
     ...(spec.destroyedCharacter ? { destroyedCharacter: spec.destroyedCharacter } : {}),
     ...(spec.hold ? { hold: spec.hold } : {}),
@@ -327,8 +332,8 @@ function expandDiscards(state: ScenarioState, item: QueueItem, frame: Frame, ctx
   const count = Math.min(resolveAmount(state, instruction.amount, frameScope(state, item.seat, frame.cardId), ctx), discardable);
   const cause = item.cause ? { cause: item.cause } : {};
   const pick = { verb: "Pick" as const, pick: { type: "card" as const, control: "you" as const, from: "hand" as const } };
-  const expanded = Array.from({ length: count }, (): QueueItem[] => [
-    { instruction: pick, seat: item.seat, chosen: null, ...cause },
+  const expanded = Array.from({ length: count }, (_, index): QueueItem[] => [
+    { instruction: pick, seat: item.seat, chosen: null, origin: instruction, nth: index + 1, of: count, ...cause },
     { instruction: { verb: "DiscardPicked" as const }, seat: item.seat, chosen: null, ...cause },
   ]).flat();
   return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });
@@ -377,9 +382,12 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
   const chooser = instruction.pick.who === "firstPlayer" ? state.firstPlayer : item.seat;
   const found = pickCandidates(state, instruction.pick, chooser, data.picked ?? [], frame.cardId, ctx, data.x, data.participants, false, { discards: data.queue[0]?.instruction.verb === "DiscardPicked" });
   const options = (instruction.pick.from ?? "play") === "play" ? found : distinctChoices(state, found);
+  // The further defenders of Stand Together (families/defense/defenders.ts): the pick may be stopped, and then no more are declared.
+  const stoppable = data.effectId === DEFENDERS_FRAME;
+  if (item.chosen === DONE && stoppable) return patchTop(state, { data: { ...data, queue: [] } });
   let chosen = item.chosen;
   if (!chosen) {
-    if (options.length > 1) return askTarget(state, { ...item, seat: chooser }, options);
+    if (options.length > 1 || (stoppable && options.length > 0)) return askTarget(state, { ...item, seat: chooser }, stoppable ? [...options, DONE] : options);
     chosen = options[0] ?? "";
   }
   // A look at the top of a deck: the cards seen are put back by ArrangeTop.

@@ -38,7 +38,7 @@ import { previewCards } from "../../play/cards/table-preview";
 import { pictureKey } from "../../play/canvas/picture-key";
 import { advanceButton, advanceFace, advanceWords } from "../../play/readouts/quest-advance";
 import { QuestAdvanceView } from "../../play/readouts/quest-advance-view";
-import { dialLimit } from "../../play/readouts/threat-level";
+import { seatDialLimit } from "../../play/readouts/threat-level";
 import { useQuestAdvance } from "../../play/readouts/use-quest-advance";
 import { PEEK_ROOM } from "../../play/readouts/peek-banner";
 import { usePeek } from "../../play/store/use-peek";
@@ -256,7 +256,8 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
   const campaign = useMemo(() => campaignTokens(game, ctx.effects, nameOf, peek.shown), [game, ctx, nameOf, peek.shown]);
   const tokenName = campaign?.name ?? null;
   const tokenCount = campaign?.tokens ?? null;
-  const tokens = useMemo(() => (tokenName == null || tokenCount == null ? null : { name: tokenName, tokens: tokenCount }), [tokenName, tokenCount]);
+  const tokenCard = campaign?.cardId ?? null;
+  const tokens = useMemo(() => (tokenName == null || tokenCount == null || tokenCard == null ? null : { name: tokenName, tokens: tokenCount, cardId: tokenCard }), [tokenName, tokenCount, tokenCard]);
   const held = useMemo(() => heldDials(game, nameOf, (code) => ctx.cards.get(code)?.type === "enemy"), [game, nameOf, ctx]);
   const pursuit = usePursuitReadout(game);
   const defense = useDefenseTokens(game, nameOf);
@@ -331,7 +332,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
           stopAhead={stopAhead} carouselOpen={carouselOpen}
           narrow={narrow} areas={game.separate === true}
           ticks={ticks}
-          direLimit={dialLimit(game.dire === true)}
+          limits={threats.map((threat) => seatDialLimit(game, threat.seat))}
           pursuit={pursuit}
           defense={defense}
           scenarioDials={dials}

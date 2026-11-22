@@ -8,30 +8,30 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 120165:A:2 (front): Setup: Any player gains control of Turayn. Shuffle A Growing Threat into the encounter deck.
   120165:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"12166"}]
+    - Campaign Setup: the objective ally with code 12166 enters play under the first player (put there, not played: nothing is revealed and no cost is paid; a pool card with this record for itself is put into play at the start of each scenario instead of being shuffled into the encounter deck)
     - a card with code 12167 from the box joins the encounter deck, which is shuffled
 
 120165:A:3 (front): Response: After you explore a non-unique location, put a resource here. Then, if there are X resources here, the players look at 3 random undiscovered treasures and choose 1 to attach to an eligible character. X is 3 more than the number of players in the game.
   120165:response:1: Response on the event locationExplored (heard about non-unique location (any player controls))
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource token(s) are placed on this card
-    - [json ClaimRandomTreasure {"verb":"ClaimRandomTreasure","count":3,"when":{"kind":"all","conditions":[{"kind":"less","left":{"players":true,"plus":2},"right":{"stat":"resources","of":"self"}},{"kind":"less","left":{"stat":"resources","of":"self"},"right":{"players":true,"plus":4}}]}}]
-    - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) chosen by the first player [also {"hostForPicked":true}]
-    - [json AttachPicked {"verb":"AttachPicked","when":{"kind":"all","conditions":[{"kind":"less","left":{"players":true,"plus":2},"right":{"stat":"resources","of":"self"}},{"kind":"less","left":{"stat":"resources","of":"self"},"right":{"players":true,"plus":4}}]}}]
+    - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): 3 treasures the log has not recorded and the game has not dealt are drawn with the game's seed and the first player chooses one: it is the picked card, set aside until a later pick of a card it may attach to and the attach step put it on that character; the players claim it
+    - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, chosen by the first player, that the last picked attachment may be attached to
+    - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before the last pick (an attachment) is attached to the last picked card
 
 120165:B:1 (back): Resolution: The heroes' selfless valor in protecting the refugees from Harad has inspired Turayn. If the heroes choose to accept his aid, add Turayn to the campaign pool (any player may add him to their deck). Otherwise, mark in the campaign log that "Turayn has taken an oath of vigilance" (he will follow the heroes' example and continue to protect the free folk of Wilderland).
   120165:resolution:1: Resolution
-    - [json BoonAllyOrLogLine {"verb":"BoonAllyOrLogLine","ally":"12166","line":"turayn"}]
+    - Resolution: the players choose, the first player answering for the group, with no default: accept the aid, and the boon ally with code 12166 joins the Campaign Pool (any player may add it to their deck); or decline, and the line "turayn" is recorded in the Campaign Log
 
 120165:B:2 (back): The players discover each treasure they control.
   120165:resolution:2: Resolution
-    - [json DiscoverTreasure {"verb":"DiscoverTreasure"}]
+    - Resolution: each treasure a player controls, claimed and attached to a character, is written to the log's discovered treasures (a treasure still guarded in the staging area is not controlled and is not discovered)
 
 120165:B:3 (back): Add A Growing Threat and each Evil Creatures enemy in play to the campaign pool.
   120165:resolution:3: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddEncounterToPool {"verb":"AddEncounterToPool","codes":["12167"]}]
-    - [json AddEncounterToPool {"verb":"AddEncounterToPool","fromDeck":"evilCreatures"}]
+    - Resolution: encounter cards join the Campaign Pool: one copy of each of the cards with codes 12167 (the log tallies the copies, never past what one collection holds)
+    - Resolution: encounter cards join the Campaign Pool: one copy of each card dealt from the evilCreatures deck that is in play (the log tallies the copies, never past what one collection holds)
 
 ## 18016 The Old Ford
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -45,18 +45,21 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18016:A:3 (front): Forced: After The Old Ford becomes the active location, each enemy in the staging area makes an immediate attack against the first player.
   18016:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each enemy (any player controls) in the staging area only:
-      - the picked enemy attacks the first player now, from the staging area
+      - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
 
 ## 18017 Wooded Riverbank
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 18017:A:1 (front): Forced: When Wooded Riverbank is explored, put the top card of the Evil Creatures deck into play engaged with the first player.
   18017:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for the first player, the top card(s) of the evilCreatures deck go to the engaged area
 
 18017:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
   18017:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
 ## 18018 Frenzied Creature
@@ -75,7 +78,8 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18018:A:2 (shadow): Shadow: Attach this card to attacking enemy.
   18018:shadow:1: Shadow
-    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"attackingEnemy"}}]
+    who acts: the acting player is the defending player (the player the attack is against)
+    - this card attaches itself to the enemy making the attack in progress
 
 ## 18019 Dangerous Crossing
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -88,6 +92,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18019:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defender is damaged).
   18019:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -97,17 +102,18 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18020:A:1 (front): Cannot have player card attachments.
   18020:constant:1: Constant
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
 
 18020:A:2 (front): While Goblin Troop is engaged with you, each other Goblin enemy engaged with you gets +1 Attack and +1 Defense.
   18020:constant:2: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each Goblin enemy (any player controls) engaged with you, other than this card: stat attack 1, while this card is in play
     - each Goblin enemy (any player controls) engaged with you, other than this card: stat defense 1, while this card is in play
 
 18020:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
   18020:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 2, until the end of the attack
 
 ## 18021 Stray Goblin
@@ -121,10 +127,12 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18021:A:2 (front): While Stray Goblin is in the staging area, it gains: "Forced: After a player engages an enemy, Stray Goblin engages that player."
   18021:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) other than this card)
     only if this card is in the staging area
+    who acts: the acting player is the player the enemy engaged
     - engage this card
 
 18021:A:3 (shadow): Shadow: Add Stray Goblin to staging area.
   18021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this card goes to the staging area (it is not revealed)
 
 ## 18022 Pack of Wargs
@@ -133,10 +141,12 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18022:A:1 (front): Forced: If Pack of Wargs is dealt a shadow card with no effect, it makes an additional attack after this one. (Do not deal it a shadow card.)
   18022:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    who acts: the acting player is the defending player (the player the attack is against)
     - this enemy attacks now, dealt no shadow card
 
 18022:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   18022:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -146,12 +156,13 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18023:A:1 (front): X is the number of characters controlled by the player with the most characters.
   18023:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat threat [json amount {"mostPerPlayer":{"type":"character","control":"you"}}], while this card is in play
-    - this card: stat questPoints [json amount {"mostPerPlayer":{"type":"character","control":"you"}}], while this card is in play
+    - this card: stat threat the most character (you control) any one player controls, each player counted from their own side, while this card is in play
+    - this card: stat questPoints the most character (you control) any one player controls, each player counted from their own side, while this card is in play
 
 18023:A:2 (front): Quest Action: Exhaust a character to reduce Hills of Wilderland Threat by 1 until the end of the phase. Only the first player can trigger this ability.
   18023:action:1: Action
     only if all of: (it is the Quest phase) and (the actor holds the first player token) and (there is a ready character (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -162,12 +173,13 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18024:A:1 (front): Lonely Lands gets +2 Threat for each facedown card under it.
   18024:constant:1: Constant
-    - this card: stat threat [json amount {"facedown":true,"times":2}], while this card is in play
+    - this card: stat threat the number of cards attached facedown to this card x 2, while this card is in play
 
 18024:A:2 (front): While Lonely Lands is in the staging area, it gains: "Forced: After an event is played during the quest phase, place it facedown under Lonely Lands."
-  18024:forced:1: Forced after this card is played (heard about card (any player controls) of card type event)
+  18024:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if all of: (it is the Quest phase) and (this card is in the staging area)
-    - [json AttachFacedown {"verb":"AttachFacedown"}]
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the card the event is about, now in a discard pile, is attached facedown to this card: out of play under it, with no text, and discarded to its owner's discard pile when this card leaves play
 
 ## 18025 Ruined Supplies
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -186,6 +198,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18025:A:3 (shadow): Shadow: Raise your threat by 1 for each enemy engaged with you.
   18025:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
 
 ## 18026 Lost in the Wild
@@ -193,11 +206,12 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18026:A:1 (front): When Revealed: The player with the most cards in his hand without a copy of Lost in the Wild adds Lost in the Wild to his hand. (While in a player's hand, Lost in the Wild gains: "Cannot be discarded by player card effects. Forced: After you play a card, discard each card in your hand.")
   18026:whenRevealed:1: When revealed
-    - [json AddSourceToHandOfMost {"verb":"AddSourceToHandOfMost"}]
+    - of the players with no card of this card's title in hand, the one with the most cards in hand takes this card into their hand (the first player chooses among players tied; nothing when every player holds a copy)
   18026:constant:1: Constant
-    - [json Undiscardable {"verb":"Undiscardable"}]
+    - (marker, in a card in a hand, does nothing when run) cannot be discarded by player card effects: a pick from a hand that a player card makes leaves the card out; an encounter card's effect still discards it
   18026:forced:1: Forced after this card is played (heard about card (you control); event happened to the controller; used from hand)
     only if this card is in its player's hand
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player discards each card (you control) in hand
     - discard this card
@@ -213,12 +227,13 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18027:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   18027:forced:1: Forced on the event readied (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player chooses one of:
-      * option "other" (only if there is a card (any player controls) that is not an objective, attached to this card's host, other than this card to choose):
-        - choose card (any player controls) attached to this card's host, other than this card
+      * option "other" (only if there is a card (any player controls) or in the staging area or the active location, that is not an objective, attached to this card's host, other than this card to choose):
+        - choose card (any player controls) or in the staging area or the active location, attached to this card's host, other than this card
         - discard the picked card
-      * option "self" (only if not (there is a card (any player controls) that is not an objective, attached to this card's host, other than this card to choose)):
-        - choose card (any player controls) attached to this card's host
+      * option "self" (only if not (there is a card (any player controls) or in the staging area or the active location, that is not an objective, attached to this card's host, other than this card to choose)):
+        - choose card (any player controls) or in the staging area or the active location, attached to this card's host
         - discard the picked card
 
 ## 18066 Traveling North
@@ -240,18 +255,20 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18066:B:1 (back): Forced: After placing progress here from questing successfully, place 1 resource here.
   18066:forced:1: Forced on the event progressPlaced (heard about this card)
     only if all of: (it is the Quest phase) and (the quest succeeded)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - 1 resource token(s) are placed on this card
 
 18066:B:2 (back): Forced: At the beginning of the encounter phase, remove 1 resource from this stage. Then, add the top card of the Evil Creatures deck to the staging area.
   18066:forced:2: Forced when a phase begins
     only if it is the Encounter phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if 0 is less than resources of this card: for the acting player, the top card(s) of the evilCreatures deck go to the staging area
     - 1 resource(s) come off the resource pool of this card (discarded, not spent)
 
 18066:B:3 (back): This stage cannot be defeated while an enemy from the Evil Creatures deck is in play.
   18066:constant:1: Constant
-    only if there is a enemy (any player controls) or in the staging area [also {"fromDeck":"evilCreatures"}] to choose
+    only if there is a enemy (any player controls) or in the staging area, dealt into the Evil Creatures deck, in play or not to choose
     - the players cannot defeat this stage while this holds
 
 ## 18067 Woodmen Under Attack
@@ -266,10 +283,11 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18067:B:1 (back): No more than 1 progress can be placed on each location in the staging area each round.
   18067:constant:1: Constant
-    - each location (any player controls) in the staging area only: stat progressCap 1, while this card is in play
+    - each location (any player controls) in the staging area only: stat progressCap (no more than this much progress can be placed on this location each round) 1, while this card is in play
 
 18067:B:2 (back): Forced: After the players travel to a location, add the top card of the Evil Creatures deck to the staging area.
   18067:forced:1: Forced after the players travel (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for the acting player, the top card(s) of the evilCreatures deck go to the staging area
 
 18067:B:3 (back): The players cannot defeat this stage unless the first player controls Haldan.
@@ -295,6 +313,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18068:B:2 (back): Forced: At the beginning of the quest phase, add the top card of the Evil Creatures deck to the staging area.
   18068:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for the acting player, the top card(s) of the evilCreatures deck go to the staging area
 
 18068:B:3 (back): This stage cannot be defeated while The Old Ford is in play. When The Old Ford is explored, the players win the game.
@@ -302,6 +321,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     only if the card with code 18016 is in play
     - the players cannot defeat this stage while this holds
   18068:forced:2: Forced on the event locationExplored (heard about location (any player controls) named "The Old Ford")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 18069 Woodmen Village
@@ -313,15 +333,16 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18069:A:2 (front): Forced: When Woodmen Village is explored, add the top card of the Evil Creatures deck to the staging area. Then, flip over Woodmen Village and attach Haldan to the just-added enemy as a guarded objective.
   18069:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for the acting player, the top card(s) of the evilCreatures deck go to the staging area
-    - [json FlipOver {"verb":"FlipOver","into":"18070","guardedBy":"picked"}]
+    - this card, wherever it lies, flips over and shows the card with code 18070, and enters the staging area faceup; the picked card (the enemy the last add put in) guards it (the old side is kept as the card's other side)
 
 ## 18070 Haldan
 
 18070:A:1 (front): The first player gains control of Haldan while he is free of encounters.
   18070:constant:1: Constant
-    - [json GainControlWhenFree {"verb":"GainControlWhenFree","who":"firstPlayer"}]
+    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them
 
 18070:A:2 (front): While there is an active location, Haldan does not exhaust to quest.
   18070:constant:2: Constant
@@ -330,6 +351,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18070:A:3 (front): If Haldan leaves play, the players lose the game.
   18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
-(rendered pieces: 207 by template, 18 as JSON)
+(rendered pieces: 241 by template, 0 as JSON)

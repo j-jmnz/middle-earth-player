@@ -139,8 +139,7 @@ export function moveEncounter(
     case "activeLocation": {
       if (!isLocationId(next, id, ctx.cards)) return next;
       // In a free active location slot, else in place of the last one (families/south/locations.ts).
-      // A shadow card that becomes the active location is no longer attached to the enemy it was dealt to (The Spiders' Ring, 02131:A:2).
-      const placed = updateCard(makeActiveIn(next, id), id, { face: "up", controller: null, ...(card.zone === "shadow" ? { host: undefined } : {}) });
+      const placed = updateCard(makeActiveIn(next, id), id, { face: "up", controller: null });
       const active = queueEvent(placed, { trigger: "becameActive", seat: null, cardId: id });
       return wasInPlay ? active : announceEntered(active, id, seat, ctx);
     }

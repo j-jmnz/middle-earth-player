@@ -131,11 +131,13 @@ function detach(state: ScenarioState, id: string): ScenarioState {
       const left = owner && current.owner != null && owner.captured?.includes(id) ? withSeat(state, current.owner, { ...owner, captured: without(owner.captured, id) }) : state;
       return updateCard(left, id, { host: null });
     }
+    // A shadow card that leaves its enemy is no longer attached to it, wherever it goes next (rr.shadow-effects).
     case "shadow": {
       const enemy = current.host ? state.cards[current.host] : undefined;
-      if (!enemy) return state;
-      if (enemy.shadowId === id) return updateCard(state, enemy.id, { shadowId: null });
-      return withExtraShadows(state, enemy, (enemy.extraShadowIds ?? []).filter((other) => other !== id));
+      const freed = updateCard(state, id, { host: null });
+      if (!enemy) return freed;
+      if (enemy.shadowId === id) return updateCard(freed, enemy.id, { shadowId: null });
+      return withExtraShadows(freed, enemy, (enemy.extraShadowIds ?? []).filter((other) => other !== id));
     }
     default:
       return state;

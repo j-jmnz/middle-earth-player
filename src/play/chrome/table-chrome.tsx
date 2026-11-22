@@ -67,6 +67,7 @@ export function ThreatRing({
   testID,
   icon = "threat",
   compact = false,
+  wordless = false,
   accessibilityName,
   spokenWord,
   role = null,
@@ -92,6 +93,8 @@ export function ThreatRing({
   testID?: string;
   icon?: IconName | null;
   compact?: boolean;
+  // A compact dial drops its word, which the spoken label keeps, while the bar's dials would scroll (the scenario dials: `wordless` in table/top-bar.tsx).
+  wordless?: boolean;
   // What a screen reader says for a short label ("P1" reads "Player 1 threat").
   accessibilityName?: string;
   // A seat's threat dial speaks its number first, as it is drawn ("Threat 20, P1, acting"; peek.ts, dialSpeech): the word before the number.
@@ -136,7 +139,7 @@ export function ThreatRing({
 }) {
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} eliminates={eliminates} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} notch={notch} word={word} voiced={voiced} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} eliminates={eliminates} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} notch={notch} word={word} voiced={voiced} wordless={wordless} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-control">
@@ -175,6 +178,7 @@ function ThreatDial({
   notch,
   word,
   voiced,
+  wordless,
   onPress,
 }: {
   threat: SeatThreat;
@@ -200,6 +204,7 @@ function ThreatDial({
   word?: string;
   // A seat's threat dial: a change plays the threat's sound (threatSound). The other dials are silent.
   voiced?: boolean;
+  wordless?: boolean;
   onPress?: () => void;
 }) {
   const speed = useMotionScale();
@@ -320,10 +325,11 @@ function ThreatDial({
           </>
         ) : null}
       </Animated.View>
+      {wordless === true && !ring ? null : (
       <View className="items-start gap-0.5">
         <View className="flex-row items-center gap-1">
           {/* A seat's label (P1) and Life or Burden stand beside their dials; the lone threat dial is a number and is named "Threat" to a screen reader. */}
-          {label === "Threat" && icon === "threat" ? null : <Text className={`text-label ${role === "acting" ? "text-accent" : role === "viewing" ? "text-bone" : "text-muted"}`}>{label}</Text>}
+          {(label === "Threat" && icon === "threat") || wordless === true ? null : <Text className={`text-label ${role === "acting" ? "text-accent" : role === "viewing" ? "text-bone" : "text-muted"}`}>{label}</Text>}
           {ring ? (
             <View testID={`${id}-ring`}>
               <GameIcon name={ringMark} size={12 * s} tint={ringMark === "oneRing" ? "accent" : "bone"} />
@@ -331,6 +337,7 @@ function ThreatDial({
           ) : null}
         </View>
       </View>
+      )}
       {/* The change badge floats over the disc's foot and takes no room, so the dial's row never changes height when it comes and goes; it ends inside the bar's foot (badgeFoot). */}
       {delta ? (
         <View pointerEvents="none" style={{ position: "absolute", zIndex: 1, bottom: -badgeFoot(s), left: 4 * s, width: DIAL * s, alignItems: "center" }}>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { CONDITION_TEMPLATES, ERECH_CONDITION_SAMPLES, FOG_CONDITION_SAMPLES, INVESTIGATION_CONDITION_SAMPLES, ESCAPE_CONDITION_SAMPLES, GUARDIAN_CONDITION_SAMPLES, LONG_DARK_CONDITION_SAMPLES, renderCondition } from "./conditions.ts";
+import { CONDITION_TEMPLATES, ERECH_CONDITION_SAMPLES, FOG_CONDITION_SAMPLES, INVESTIGATION_CONDITION_SAMPLES, ESCAPE_CONDITION_SAMPLES, GUARDIAN_CONDITION_SAMPLES, LONG_DARK_CONDITION_SAMPLES, renderCondition, SHARED_CONDITION_SAMPLES } from "./conditions.ts";
+import { FAMILY_CONDITION_SAMPLES } from "./families.ts";
 import type { Obj } from "./kit.ts";
 import { checkPiece, type Render } from "./read-fields-piece.ts";
 
@@ -12,7 +13,7 @@ describe("effects render read fields, conditions", () => {
     x: [{ kind: "x", min: 2 }],
     shadowBlank: [{ kind: "shadowBlank" }],
     namedFlag: [{ kind: "namedFlag", name: "A Card", stat: "blankText" }],
-    flag: [{ kind: "flag", stat: "blankText", holder: "seat", is: false }, { kind: "flag", stat: "refreshOnce", holder: "table" }],
+    flag: [{ kind: "flag", stat: "blankText", holder: "seat", is: false }, { kind: "flag", stat: "refreshOnce", holder: "table" }, { kind: "flag", stat: "progressPlacedHere", is: false }],
     canPick: [{ kind: "canPick", pick: { type: "hero", control: "you" } }],
     optionTaken: [{ kind: "optionTaken", id: "penalty" }],
     attackedThisPhase: [{ kind: "attackedThisPhase", name: "A Card" }],
@@ -20,6 +21,7 @@ describe("effects render read fields, conditions", () => {
     phaseEnded: [{ kind: "phaseEnded", is: "Quest" }],
     hasEngaged: [{ kind: "hasEngaged", trait: "Orc" }],
     exhausted: [{ kind: "exhausted", code: "12345", is: true }],
+    exhaustedNamed: [{ kind: "exhaustedNamed", name: "The One Ring", is: true }],
     count: [{ kind: "count", pick: { type: "hero", control: "you" }, min: 1, max: 3 }],
     threat: [{ kind: "threat", min: 20, max: 30 }],
     inPlay: [{ kind: "inPlay", code: "12345", is: true }],
@@ -67,11 +69,13 @@ describe("effects render read fields, conditions", () => {
     ...INVESTIGATION_CONDITION_SAMPLES,
     ...GUARDIAN_CONDITION_SAMPLES,
     ...LONG_DARK_CONDITION_SAMPLES,
+    ...SHARED_CONDITION_SAMPLES,
+    ...FAMILY_CONDITION_SAMPLES,
     lastFortitudePassed: [{ kind: "lastFortitudePassed" }],
     fortitudeFailed: [{ kind: "fortitudeFailed", scope: "round", who: "any" }],
     hostControlledByActor: [{ kind: "hostControlledByActor" }],
     captives: [{ kind: "captives", min: 1, max: 2, of: "actor" }],
-    matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: false, inStaging: true }],
+    matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: false, inStaging: true }, { kind: "matches", card: "self", inPlay: true }, { kind: "matches", card: "self", inStaging: false }],
     controls: [{ kind: "controls", code: "12345" }, { kind: "controls", code: "12345", who: "anyPlayer" }],
     freeOfEncounters: [{ kind: "freeOfEncounters" }],
     // The combinators are not in the table: renderCondition words them.

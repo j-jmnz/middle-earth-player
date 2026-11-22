@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { renderAmount } from "./amounts.ts";
+import { FAMILY_AMOUNT_SAMPLES } from "./families/family-amounts.ts";
 import type { Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 import { checkPiece, type Render } from "./read-fields-piece.ts";
@@ -38,6 +39,14 @@ describe("effects render read fields, amounts", () => {
     { attackDamage: true },
     { resourcesOn: PICK, max: true },
     { damageOn: PICK },
+    { facedown: true, times: 2 },
+    { firstPlayerTens: true },
+    { mostPerPlayer: PICK },
+    { guardedCost: true },
+    { discoverValue: true, plus: 1 },
+    { totalOf: PICK, stat: "threat" },
+    { totalOf: PICK, stat: "cost" },
+    ...FAMILY_AMOUNT_SAMPLES,
   ];
   const render: Render = (value, ctx) => renderAmount(value, ctx, renderPick);
 

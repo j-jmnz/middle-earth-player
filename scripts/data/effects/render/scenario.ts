@@ -9,7 +9,8 @@ import type { Card } from "../../../../src/catalog/card-facts.ts";
 import { EFFECTS } from "../../../../src/effects/index.ts";
 import type { Log } from "../../../log.ts";
 import { loadCards } from "../../load-cards.ts";
-import { dealtCodes, loadCampaigns, loadAnyScenario } from "../../load-scenarios.ts";
+import { questDeckCodes } from "../../../../src/catalog/scenario-data.ts";
+import { dealtCodes, loadCampaigns, loadAnyScenario, loadLedgeredScenarios, nightmareCodes } from "../../load-scenarios.ts";
 import { ROOT } from "../../paths.ts";
 import { keyOf, lineId, loadLedger } from "../../printed/ledger.ts";
 import { withPool } from "../../printed/pool.ts";
@@ -24,6 +25,8 @@ export type RenderEnv = {
   ledger: ReturnType<typeof withPool>;
   inertIds: ReadonlySet<string>;
 };
+
+export const NIGHTMARE_HEADING = "=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===";
 
 export type Rendered = { text: string; tally: Tally };
 
@@ -40,8 +43,9 @@ export function loadRenderEnv(): RenderEnv {
 }
 
 // The cards the scenario's authored file has records for, or null when it has no such file (the caller says so and renders every dealt card). A file that fails to load throws: it is not "no file".
-async function authoredCodes(scenarioId: string, log: Log): Promise<Set<string> | null> {
-  const rel = `src/effects/authored/${authoredRelOfScenario(scenarioId)}.ts`;
+async function authoredCodes(scenarioId: string, log: Log, nightmare = false): Promise<Set<string> | null> {
+  const rel = `src/effects/authored/${nightmare ? "nightmare/" : ""}${nightmare ? scenarioId : authoredRelOfScenario(scenarioId)}.ts`;
+  if (nightmare && !existsSync(path.join(ROOT, rel))) return new Set();
   const file = path.join(ROOT, rel);
   if (!existsSync(file)) {
     log.warn(`${rel} does not exist: rendering every card the scenario deals (as --all-dealt does)`);
@@ -52,18 +56,28 @@ async function authoredCodes(scenarioId: string, log: Log): Promise<Set<string> 
   return new Set(loaded.AUTHORED_EFFECTS.map((effect) => effect.cardCode));
 }
 
+// The last stage of each scenario's quest deck, on Normal and on Nightmare: defeating one leaves no stage after it, which ends the game as a win (advanceStage in src/rules/quest/quest.ts).
+let finalStages: ReadonlySet<string> | undefined;
+function finalStageCodes(): ReadonlySet<string> {
+  finalStages ??= new Set(loadLedgeredScenarios().flatMap((scenario) => (scenario.nightmare ? (["Normal", "Nightmare"] as const) : (["Normal"] as const)).map((difficulty) => questDeckCodes(scenario, difficulty).at(-1) ?? "")).filter((code) => code !== ""));
+  return finalStages;
+}
+
 // `piles`: where the scenario deals each code, so a card the piles place says so.
-export function renderCodes(env: RenderEnv, codes: readonly string[], piles: ReadonlyMap<string, string> = new Map()): Rendered {
+// `nightmare`: the scenario's Nightmare deck cards, printed after the others under their own heading.
+export function renderCodes(env: RenderEnv, codes: readonly string[], piles: ReadonlyMap<string, string> = new Map(), nightmare: readonly string[] = []): Rendered {
   const sections: string[] = [];
   // The cards the scenario's piles place with no record (the staging and quest piles), so a Setup line that says "Add X to the staging area" is seen to be done by the piles.
   const placed = [...piles].filter(([, pile]) => pile !== "encounter").map(([code, pile]) => `${pile}: ${code} ${env.byCode.get(code)?.name ?? ""}`);
   if (placed.length > 0) sections.push(`Scenario piles that place cards with no record (${placed.join("; ")})`);
   const total = { template: 0, json: 0 };
-  for (const code of codes) {
+  const heading = nightmare.length > 0 ? codes.length : -1;
+  for (const [at, code] of [...codes, ...nightmare].entries()) {
+    if (at === heading) sections.push(NIGHTMARE_HEADING);
     const card = env.byCode.get(code);
     if (!card) continue;
     const rawLines = (["A", "B"] as const).flatMap((side) => (env.ledger.byKey.get(keyOf(code, side))?.lines ?? []).map((line, at) => ({ lineId: lineId(code, side, at + 1), line })));
-    const rendered = renderCard(card, segmentsOf(card, env.ledger), EFFECTS, env.inertIds, { ...(rawLines.length > 0 ? { rawLines } : {}), ...(piles.has(code) ? { pile: piles.get(code) } : {}) });
+    const rendered = renderCard(card, segmentsOf(card, env.ledger), EFFECTS, env.inertIds, { ...(rawLines.length > 0 ? { rawLines } : {}), ...(piles.has(code) ? { pile: piles.get(code) } : {}), ...(finalStageCodes().has(code) ? { finalStage: true } : {}) });
     total.template += rendered.tally.template;
     total.json += rendered.tally.json;
     sections.push(rendered.text);
@@ -76,7 +90,10 @@ export async function renderScenario(env: RenderEnv, scenarioId: string, allDeal
   const scenario = loadAnyScenario(scenarioId);
   const dealt = [...dealtCodes(loadCampaigns(), [scenario])];
   const owned = allDealt ? null : await authoredCodes(scenario.id, log);
-  const codes = dealt.filter((code) => owned === null || owned.has(code)).sort();
-  log.info(`scenario ${scenario.id}: ${codes.length} cards`);
-  return renderCodes(env, codes, new Map(scenario.cards.map((card) => [card.code, card.pile])));
+  const deck = nightmareCodes([scenario]);
+  const ownedDeck = allDealt ? null : await authoredCodes(scenario.id, log, true);
+  const codes = dealt.filter((code) => (owned === null ? !deck.has(code) : owned.has(code) && !deck.has(code))).sort();
+  const deckCodes = [...deck].filter((code) => (ownedDeck === null || ownedDeck.has(code)) && dealt.includes(code)).sort();
+  log.info(`scenario ${scenario.id}: ${codes.length + deckCodes.length} cards`);
+  return renderCodes(env, codes, new Map(scenario.cards.map((card) => [card.code, card.pile])), deckCodes);
 }

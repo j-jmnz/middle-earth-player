@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect, Instruction } from "../../src/catalog/boundary.ts";
 import type { ReduceContext } from "../../src/rules/engine/reduce.ts";
 
-import { countOf, KNOWN, knownOf, probeTable, problemsOf, smokeScenario, type EncounterSummary } from "./encounter.ts";
+import { countOf, KNOWN, knownOf, probeTable, problemsOf, smokeScenario, type EncounterSummary, type KnownFailure } from "./encounter.ts";
 import { encounterCards, probeCard, type Probe } from "./encounter-cards.ts";
 import { playGame, type GameSummary } from "./encounter-games.ts";
 import type { EncounterWorld } from "./encounter-world.ts";
@@ -94,16 +94,19 @@ describe("known failures and flags", () => {
   });
   const summary = (games: GameSummary[]): EncounterSummary => ({ scenario: "a-shadow-of-the-past", cards: [], games, ms: 0 });
 
+  // The list holds no entry while no engine failure is open, so the matching is tested on a stand-in entry.
+  const listed: readonly KnownFailure[] = [{ scenario: "a-shadow-of-the-past", game: 5, seed: 6, intent: "141024:response:1", error: "Travel was refused", note: "stand-in" }];
+
   it("reports the listed failure as known and fails on anything else", () => {
-    expect(KNOWN.length).toBeGreaterThan(0);
-    expect(problemsOf(summary([game()]))).toEqual([]);
-    expect(knownOf(summary([game()]))).toHaveLength(1);
+    expect(problemsOf(summary([game()]), listed)).toEqual([]);
+    expect(knownOf(summary([game()]), listed)).toHaveLength(1);
     // Another message, another seed, another game or another scenario is not the known one.
-    expect(problemsOf(summary([game({ message: "The reducer refused an offered intent: something else" })]))).toHaveLength(1);
-    expect(problemsOf(summary([game({ seed: 7 })]))).toHaveLength(1);
-    expect(problemsOf(summary([game({ game: 6 })]))).toHaveLength(1);
-    expect(problemsOf({ ...summary([game()]), scenario: "the-oath" })).toHaveLength(1);
-    expect(problemsOf(summary([game({ intent: { type: "Pass" } })]))).toHaveLength(1);
+    expect(problemsOf(summary([game({ message: "The reducer refused an offered intent: something else" })]), listed)).toHaveLength(1);
+    expect(problemsOf(summary([game({ seed: 7 })]), listed)).toHaveLength(1);
+    expect(problemsOf(summary([game({ game: 6 })]), listed)).toHaveLength(1);
+    expect(problemsOf({ ...summary([game()]), scenario: "the-oath" }, listed)).toHaveLength(1);
+    expect(problemsOf(summary([game({ intent: { type: "Pass" } })]), listed)).toHaveLength(1);
+    expect(problemsOf(summary([game()]), KNOWN)).toHaveLength(1);
   });
 
   it("rejects a count that is not a whole number", () => {

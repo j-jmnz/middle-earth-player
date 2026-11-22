@@ -5,7 +5,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 03020:A:1 (front): For each excess point of combat damage dealt by Cave-troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) you must damage another character you control.
   03020:constant:1: Constant
-    - this card: stat excessToDamage 1, while this card is in play
+    - this card: stat excessToDamage (for each point of damage its attack deals beyond the hit points the character had left, the defending player assigns 1 damage to another character he controls once the attack ends) 1, while this card is in play
 
 ## 03021 Orc Horn Blower
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -37,6 +37,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 03024:A:2 (front): Action: Exhaust a hero to claim this objective. Then, attach Book of Mazarbul to that hero. (If detached, return Book of Mazarbul to the staging area.)
   03024:action:1: Action
     only if there is a ready hero (you control) to choose
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
@@ -59,6 +60,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 03030:A:2 (shadow): Shadow: Attacking enemy attacks again after this attack. Deal it another shadow card for the next attack.
   03030:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 03031 Goblin Spearman
@@ -71,6 +73,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 03031:A:2 (shadow): Shadow: Add Goblin Spearman to the staging area.
   03031:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - this card goes to the staging area (it is not revealed)
 
 ## 03032 Goblin Archer
@@ -86,6 +89,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 03032:A:3 (front): Forced: After an enemy is revealed from the encounter deck, the first player must deal 1 damage to 1 character he controls.
   03032:forced:1: Forced after a card is revealed (heard about enemy (any player controls) or in the staging area; only when the encounter deck revealed it)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control) chosen by the first player
     - deal 1 damage to the picked card
@@ -101,6 +105,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 03033:A:2 (shadow): Shadow: If the defending character is an ally, discard it from play.
   03033:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): choose ally (you control) defending
     - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -120,7 +125,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
       - the acting player chooses one of:
         * option "attach" (only if there is a Weapon or Armour card (you control) in hand, of card type attachment to choose):
           - choose Weapon or Armour card (you control) in hand, of card type attachment
-          - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor","host":{"type":"character","control":"you"}}]
+          - the picked card is put into play from wherever it is out of play (hand, discard pile, deck): it is not played, so no cost is paid and no play restriction applies, and a unique card with a copy in play stays where it is; a hero goes among its controller's heroes, any other card into the play area, ready, under the acting player's control; an attachment goes on character (you control) chosen by the acting player (it stays where it is when none can take it)
         * option "keep":
 
 ## 03067 Search for the Chamber
@@ -148,10 +153,184 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 
 03068:B:2 (back): Forced: At the end of the staging step, reveal the top X cards of the encounter deck, adding all enemies to the staging area. Discard the other revealed cards without resolving them. X is the number of players.
   03068:forced:1: Forced on the event stagingStepEnds
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - reveal the top the number of players cards of the encounter deck one at a time: each enemy is revealed in full (its When Revealed, Surge, Doomed and the Forced effects of a reveal) and added to the staging area, every other card is discarded unresolved (the discard pile is shuffled back when the deck runs out)
 
 03068:B:3 (back): If the players defeat this stage, they win the game.
   03068:constant:1: Constant
-    (no instructions)
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
-(rendered pieces: 88 by template, 1 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 901101 The Seventh Level Nightmare
+
+901101:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+901101:A:2 (front): Setup: Set Overseer Maurûl and Chamber of Records aside, out of play.
+  901101:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the copy of the card with code 901102 in the encounter deck is set aside, out of play
+    - the copy of the card with code 901103 in the encounter deck is set aside, out of play
+
+901101:A:3 (front): Forced: When stage 2B is revealed, make Chamber of Records the active location (returning any currently active location to the staging area) and add Overseer Maurûl to the staging area. Then, shuffle all copies of Balin's Doom in the encounter discard pile back into the encounter deck.
+  901101:forced:1: Forced on the event stageRevealed
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "The Fate of Balin"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the set-aside card with code 901103 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
+    - one set-aside card with code 901102 joins the staging area (it is not revealed)
+    - shuffle every copy of Balin's Doom in the encounter discard pile into the encounter deck
+
+901101:B:1 (back): Begin with the standard quest deck and encounter deck for The Seventh Level scenario.
+  (inert: the engine applies it by rule, no record)
+
+901101:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+901101:B:3 (back): 2x Plundered Armoury
+  (inert: the engine applies it by rule, no record)
+
+901101:B:4 (back): 2x Hidden Threat
+  (inert: the engine applies it by rule, no record)
+
+901101:B:5 (back): 2x Upper Hall
+  (inert: the engine applies it by rule, no record)
+
+901101:B:6 (back): 2x Goblin Scout
+  (inert: the engine applies it by rule, no record)
+
+901101:B:7 (back): 2x Goblin Swordsman
+  (inert: the engine applies it by rule, no record)
+
+901101:B:8 (back): 2x Goblin Spearman
+  (inert: the engine applies it by rule, no record)
+
+901101:B:9 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Seventh Level encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+901101:B:10 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+901101:B:11 (back): "Does not stack"
+  (inert: the engine applies it by rule, no record)
+
+901101:B:12 (back): Some cards have passive abilities with the text "This ability does not stack with..." While two or more effects that do not stack with one another are active, only one of them will affect the game state.
+  (inert: the engine applies it by rule, no record)
+
+## 901102 Overseer Maurûl
+
+901102:A:1 (front): Overseer Maurûl gets +X Threat, +X Attack, and +X Defense, where X is the highest number of resources on a Goblin enemy in play.
+  901102:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the resource tokens on Goblin enemy (any player controls) or in the staging area (the most on any one), while this card is in play
+    - this card: stat attack the resource tokens on Goblin enemy (any player controls) or in the staging area (the most on any one), while this card is in play
+    - this card: stat defense the resource tokens on Goblin enemy (any player controls) or in the staging area (the most on any one), while this card is in play
+
+901102:A:2 (front): The players cannot win the game unless Overseer Maurûl is in the victory display.
+  901102:constant:2: Constant
+    only if the card with code 901102 is not in the victory display
+    - the players cannot defeat this stage while this holds
+
+## 901103 Chamber of Records
+
+901103:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+901103:A:2 (front): Each Goblin enemy with at least 1 resource on it is immune to player events.
+  901103:constant:1: Constant
+    - each Goblin enemy (any player controls) or in the staging area, with resources on it: stat immuneToPlayerEvents 1, while this card is in play
+
+901103:A:3 (front): Forced: When a Goblin enemy engages a player, add 2 resources to that enemy.
+  901103:forced:1: Forced after an enemy engages a player (heard about Goblin enemy (any player controls))
+    who acts: the acting player is the player the enemy engaged
+    - place 2 resource tokens on the card the event is about
+
+## 901104 Orc Taskmaster
+
+901104:A:1 (front): When Revealed: Add 1 resource to each Goblin enemy in play.
+  901104:whenRevealed:1: When revealed
+    - for each Goblin enemy (any player controls) or in the staging area:
+      - place 1 resource tokens on the picked card
+
+901104:A:2 (front): Forced: When a Goblin enemy with at least 1 resource on it is dealt any amount of damage, remove 1 resource from that enemy and cancel all damage just dealt to it.
+  901104:forced:1: Forced on the event damageDealt (heard about Goblin enemy (any player controls) or in the staging area, with resources on it)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - up to 1 resource token(s) come off the card the event is about
+    - cancel all of the damage just dealt
+
+## 901105 Goblin Skirmisher
+
+901105:A:1 (front): Each Goblin enemy gets +1 Attack for each resource on it. This ability does not stack with other copies of Goblin Skirmisher.
+  901105:constant:1: Constant
+    - each Goblin enemy (any player controls) or in the staging area: stat attack 1 for each resource on the holder, while this card is in play (does not stack: only the oldest copy of this card in play gives it)
+
+901105:A:2 (shadow): Shadow: Deal X damage to defending character. X is the number of resources on attacking enemy.
+  901105:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - deal resources of the attacking enemy damage to the defender
+
+## 901106 Pit Goblin
+
+901106:A:1 (front): When Revealed: Add 2 resources to Pit Goblin.
+  901106:whenRevealed:1: When revealed
+    - place 2 resource tokens on this card
+
+901106:A:2 (shadow): Shadow: If attacking enemy is a Goblin, add 1 resource to it.
+  901106:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - if the attacking enemy is a Goblin enemy (any player controls): place 1 resource tokens on the attacking enemy
+
+## 901107 Deep-Mines
+
+901107:A:1 (front): Forced: When a Goblin enemy enters play, add 1 resource to that enemy if Deep-Mines is in the staging area.
+  901107:forced:1: Forced on the event encounterEnteredPlay (heard about Goblin enemy (any player controls) or in the staging area)
+    only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 1 resource tokens on the card the event is about
+
+901107:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Then, if attacking enemy is a Goblin, deal it another shadow card.
+  901107:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a Goblin enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt a shadow card
+
+## 901108 Western Hall
+
+901108:A:1 (front): Each Goblin enemy gets +1 Threat for each resource on it. This ability does not stack with other copies of Western Hall.
+  901108:constant:1: Constant
+    - each Goblin enemy (any player controls) or in the staging area: stat threat 1 for each resource on the holder, while this card is in play (does not stack: only the oldest copy of this card in play gives it)
+
+901108:A:2 (front): Travel: Add 1 resource to each Goblin enemy in play.
+  901108:travel:1: Travel
+    - for each Goblin enemy (any player controls) or in the staging area:
+      - place 1 resource tokens on the picked card
+
+## 901109 Balin's Doom
+
+901109:A:1: Surge. Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+901109:A:2 (front): When Revealed: Add 1 resource to each Goblin enemy in play.
+  901109:whenRevealed:1: When revealed
+    - for each Goblin enemy (any player controls) or in the staging area:
+      - place 1 resource tokens on the picked card
+
+901109:A:3 (shadow): Shadow: If attacking enemy is a Goblin, add 1 resource to it.
+  901109:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - if the attacking enemy is a Goblin enemy (any player controls): place 1 resource tokens on the attacking enemy
+
+## 901110 Beats and Echoes
+
+901110:A:1 (front): When Revealed: Reveal the top X cards of the encounter deck, adding all enemies to the staging area. Discard the other revealed cards without resolving them. X is 2 plus the number of players not engaged with a Goblin enemy.
+  901110:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the effect's X is set to 2
+    - for each player, first player first:
+      - if the number of Goblin enemy (any player controls) engaged with you is at most 0: the effect's X grows by 1
+    - reveal the top X cards of the encounter deck one at a time: each enemy is revealed in full (its When Revealed, Surge, Doomed and the Forced effects of a reveal) and added to the staging area, every other card is discarded unresolved (the discard pile is shuffled back when the deck runs out)
+
+(rendered pieces: 170 by template, 0 as JSON)

@@ -1,7 +1,7 @@
 // The encounter sets of the Cards tab's Encounter cards view as data: the products of data/collection.json in its order (Core Set, the cycles with their packs, the saga
 // boxes), each pack's encounter sets, and each set's cards under their type's heading. A set carries its scenario's quest cards, which print
 // the set's name, and a Nightmare deck is its own product at the end (the decks are sold apart from the boxes), one set to a deck with its setup
-// card. A pack with no encounter card is left out, and so is a product with no pack left. Pure; groups/cache.ts reads the rows once per catalog.
+// card and every card its code puts in the deck. A pack with no encounter card is left out, and so is a product with no pack left. Pure; groups/cache.ts reads the rows once per catalog.
 import { printedSetName } from "../../campaign/printed-name";
 import { copiesOf, SCENARIO_TYPES, typeGroups, type Decorate, type EasyCopies, type GroupRow, type TypeGroup } from "./group-types";
 
@@ -48,13 +48,20 @@ function setNode(pack: string, name: string, rows: readonly GroupRow[], decorate
   return { key: `${pack}~${name}`, name, count: copiesOf(deck) || copiesOf(groups), groups };
 }
 
-// The sets of one pack in print order: by the number of their first card.
-function packSets(pack: string, rows: readonly GroupRow[], decorate: Decorate): SetNode[] {
+// A Nightmare card's deck is the first four digits of its code (nightmare-defs.ts: the deck's prefix and the card's two-digit number), and the deck is named by its setup card: a few decks hold a card or three of an
+// encounter set of their own ("Crumbling Stairs" of Shadow and Flame, the Stormcaller's cards of The Thing in the Depths), which still lie in their deck's row.
+const DECK_DIGITS = 4;
+function deckNames(rows: readonly GroupRow[]): ReadonlyMap<string, string> {
+  return new Map(rows.filter((row) => row.typeCode === "nightmare").map((row) => [row.code.slice(0, DECK_DIGITS), row.name]));
+}
+
+// The sets of one pack in print order: by the number of their first card. `named` gives a row's set when it is not the row's own encounter set (the Nightmare decks').
+function packSets(pack: string, rows: readonly GroupRow[], decorate: Decorate, named?: (row: GroupRow) => string | undefined): SetNode[] {
   // A numbered packet of a Fellowship event kit joins its printed set (printedSetName).
   const listed = new Set(rows.map(setName));
   const byName = new Map<string, GroupRow[]>();
   for (const row of rows) {
-    const name = printedSetName(setName(row), listed);
+    const name = named?.(row) ?? printedSetName(setName(row), listed);
     byName.set(name, [...(byName.get(name) ?? []), row]);
   }
   const first = (members: readonly GroupRow[]) => Math.min(...members.map((row) => row.position));
@@ -76,7 +83,8 @@ export function scenarioTree(rows: readonly GroupRow[], collection: readonly Col
     if (nodes.length > 0) products.push({ id: entry.id, title: entry.title, packs: nodes });
   }
   const nightmare = inScenario.filter((row) => row.packCode === NIGHTMARE_PACK);
-  const decks = packSets(NIGHTMARE_PACK, nightmare, decorate);
+  const names = deckNames(nightmare);
+  const decks = packSets(NIGHTMARE_PACK, nightmare, decorate, (row) => names.get(row.code.slice(0, DECK_DIGITS)));
   if (decks.length > 0) products.push({ id: "nightmare", title: "Nightmare decks", packs: [{ code: NIGHTMARE_PACK, name: "Nightmare decks", sets: decks }] });
   const byKey = new Map<string, { product: ProductNode; pack: PackNode; set: SetNode }>();
   for (const product of products) for (const pack of product.packs) for (const set of pack.sets) byKey.set(set.key, { product, pack, set });

@@ -5,6 +5,7 @@
 // per character per round, shared by all of them, counted from the start of the round. The damage healed is kept in `roundHealed` (beside `roundDamage`,
 // the damage-cap ledger) only in a game that has a card with a healCap record, so every other game's state stays as it was; `pruneRoundCaps` clears it.
 import type { ReduceContext } from "../../interpret/interpret.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import { isCharacterType, printedOf } from "../../core/printed.ts";
 import { flaggedByClass } from "../../core/holder-classes.ts";
@@ -34,7 +35,7 @@ export function noteHealed(state: ScenarioState, id: string, amount: number, ctx
 // that cannot be healed loses nothing, a per-effect cap (`healCapPerEffect`) and a reduction to 1 (`healReducedToOne`, `reducer` is the attachment to discard afterward) shape the one heal (families/play/heal.ts).
 export function healDamage(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, by?: HealBy): { state: ScenarioState; healed: number; reducer?: string } {
   const card = state.cards[id];
-  if (!card || card.damage <= 0 || amount <= 0 || flagged(state, id, "cannotBeHealed") || flaggedByClass(state, card, printedOf(ctx.cards, card.code), "cannotBeHealed")) return { state, healed: 0 };
+  if (!card || card.damage <= 0 || amount <= 0 || flagged(state, id, "cannotBeHealed") || flaggedByClass(state, card, printedOf(ctx.cards, card.code), "cannotBeHealed", (trait) => hasTrait(state, id, trait, ctx))) return { state, healed: 0 };
   const reducer = healReducer(state, id, by, ctx);
   const wanted = perEffectCap(state, id, Math.min(card.damage, amount));
   const healed = healAllowed(state, id, reducer ? Math.min(wanted, 1) : wanted, ctx);

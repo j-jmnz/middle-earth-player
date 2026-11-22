@@ -137,8 +137,12 @@ function shadowBySentence(line: string, context: TemplateContext): { drafts: Dra
 // How an unlabelled ability that opens so reads: a triggered one (a conditional or timed sentence), not a constant one.
 const TRIGGERED_OPENING = /^(?:If|When|After|Whenever|Each time|Before) /;
 
+// A leading "If <state>, <card> gets +2 ..." names a state and no event: it holds while the state does, so it is constant.
+const IF_STATE_STAT = /^If [^,]+, .*\bgets? [+-]\d/;
+
 /** Which counter an unlabelled line numbers from, and so which timing a record for it takes: `triggered` when it opens like one, else `constant`. */
-function unlabelledForm(line: string): "constant" | "triggered" {
+export function unlabelledForm(line: string): "constant" | "triggered" {
+  if (IF_STATE_STAT.test(line)) return "constant";
   return TRIGGERED_OPENING.test(line) ? "triggered" : "constant";
 }
 

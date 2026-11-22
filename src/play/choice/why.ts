@@ -4,6 +4,7 @@
 // its heroes cannot pay for it yet. Read only when the player taps a card a moment does not ask about; nothing here decides
 // what is legal (the reducer does).
 import { attachmentTargets, playWindowReason } from "../../rules/player/planning.ts";
+import { fewestHeroesIn } from "../../rules/player/cost-rules.ts";
 import { exhaustSlack } from "../../rules/families/costs/play.ts";
 import { payingSlack } from "../../rules/families/deck/play.ts";
 import { printedOf } from "../../rules/core/printed.ts";
@@ -25,10 +26,10 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
   const refused = playWindowReason(game, cardId, ctx);
   if (refused) {
     // "You must use resources from 3 different heroes' pools" (01036:A:1): the engine counts the pools that can pay.
-    const fewest = /^Pay from at least (\d+) different heroes$/.exec(refused);
-    if (fewest) {
+    const fewest = fewestHeroesIn(refused);
+    if (fewest != null) {
       const pools = playRequest(game, ctx, cardId)?.pools.filter((pool) => pool.max > 0).length ?? 0;
-      return `It is paid from ${fewest[1]} different heroes. ${pools} of yours can pay.`;
+      return `It is paid from ${fewest} different heroes. ${pools} of yours can pay.`;
     }
     switch (refused) {
       case "That intent is not legal in this window":

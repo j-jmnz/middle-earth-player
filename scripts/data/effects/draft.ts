@@ -21,6 +21,8 @@ import { isPoolCard, withPool } from "../printed/pool.ts";
 import { DATA_DIR, RAW_DIR, ROOT } from "../paths.ts";
 import type { RuleEntry } from "../rules/spans.ts";
 import { generateEffects, segmentsOf, selfNamed, type Segment, type Unmatched } from "./generate.ts";
+import { parseOverrides } from "../normalize/overrides.ts";
+import { splitCarried } from "./setup-carried.ts";
 import { vocabulary, vocabularyMarkdown } from "./vocabulary.ts";
 
 // Usage: pnpm effects draft <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,... | code code ...>
@@ -96,7 +98,15 @@ async function main(log: Log): Promise<void> {
     const [code = "", side = "", n] = lineId.split(":");
     return ledger.byKey.get(keyOf(code, side))?.inert.some((mark) => mark.line === Number(n)) ?? false;
   };
-  const open: Unmatched[] = generated.unmatched.filter((line) => dealt.has(line.card.code) && (all || (!inert(line.lineId) && !EFFECTS.some((effect) => effect.lines.includes(line.lineId)))));
+  const unowned: Unmatched[] = generated.unmatched.filter((line) => dealt.has(line.card.code) && (all || (!inert(line.lineId) && !EFFECTS.some((effect) => effect.lines.includes(line.lineId)))));
+  // A Setup line's sentences the scenario's piles (data/overrides.json scenarioPiles) already carry out: marked in the draft, and a line they carry whole is not open.
+  const pileRules = parseOverrides(JSON.parse(readFileSync(path.join(DATA_DIR, "overrides.json"), "utf8")) as unknown).scenarioPiles;
+  const carriedOf = (line: Unmatched): { carried: string[]; open: string[] } =>
+    scenario && /^Setup:/.test(line.line) ? splitCarried(line.line, scenario.id, pileRules, (code) => byCode.get(code)?.name ?? "") : { carried: [], open: [line.line] };
+  const open: Unmatched[] = unowned.filter((line) => {
+    const split = carriedOf(line);
+    return split.carried.length === 0 || split.open.length > 0;
+  });
   const byCard = new Map<string, Unmatched[]>();
   for (const line of open) byCard.set(line.card.code, [...(byCard.get(line.card.code) ?? []), line]);
 
@@ -232,7 +242,10 @@ async function main(log: Log): Promise<void> {
       `Scenario: ${scenarioId}. Write the records into ${targetOf(card)}, each with \`lines\` naming the line ids above, then run \`pnpm effects open\`, \`pnpm vitest run scripts/checks/effect-coverage.test.ts\` and the scenario tests.`,
       ``,
       `## Lines without a record`,
-      ...lines.map((line) => `- ${line.lineId} (${line.side}${line.timing ? `, ${line.timing}` : ""}) ${line.line}`),
+      ...lines.map((line) => {
+        const carried = carriedOf(line).carried;
+        return `- ${line.lineId} (${line.side}${line.timing ? `, ${line.timing}` : ""}) ${line.line}${carried.length > 0 ? ` [${carried.length} sentence${carried.length === 1 ? "" : "s"} carried by the scenario's piles, below]` : ""}`;
+      }),
       ``,
       `## Text of every printing`,
       ...card.printings.map((printing) => `- ${printing.pack} #${printing.number} (${printing.hobSlug ?? "RingsDB"})`),
@@ -255,6 +268,8 @@ async function main(log: Log): Promise<void> {
       const batch = batchOf(line);
       const [writer = line] = batch;
       sections.push(`### ${line.lineId}: ${line.line}`, ``, `Record id: \`${suggestedId(line)}\``, ``);
+      const { carried } = carriedOf(line);
+      if (carried.length > 0) sections.push(`Carried by the scenario's piles (data/overrides.json scenarioPiles deals each card where the sentence puts it at the start): write no record for these sentences.`, ``, ...carried.map((sentence) => `- ${sentence}`), ``);
       if (twins.length > 0) {
         sections.push(`Exact match: the same text, with the card name as {self}, is owned elsewhere. Copy the records below, with this card's code, line id and number.`, ``);
         for (const twin of twins) {

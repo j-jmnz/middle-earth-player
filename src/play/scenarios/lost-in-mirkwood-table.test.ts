@@ -12,7 +12,7 @@ import { CODES, idOf, legalIntents, loadLostmirkWorld, lostmirkTable, type Lostm
 import { cardEffects } from "../cards/card-effects.ts";
 import { dungeonDetail } from "../cards/dungeon-preview.ts";
 import { sheetFor } from "../choice/sheets.ts";
-import { heldDial } from "../readouts/widgets.ts";
+import { heldDial, heldDials } from "../readouts/widgets.ts";
 
 let world: LostmirkWorld;
 beforeAll(async () => {
@@ -36,6 +36,19 @@ describe("an enemy that holds a hero (18074:B:2)", () => {
     expect(heldDial(two.state, (code) => two.t.ctx.cards.get(code)?.name ?? code)).toMatchObject({ seat: 1, mark: "hero" });
     const solo = carried(1);
     expect(dungeonDetail(solo.state, solo.t.ctx, solo.enemy, nameOf(solo.t))).toContain(", your hero, facedown.");
+  });
+});
+
+describe("two heroes held at once (18074:A:1)", () => {
+  it("gives each owner's dial its own mark", () => {
+    const two = carried(2);
+    const other = two.t.hero;
+    const second = two.state.cards[other];
+    expect(second).toBeDefined();
+    if (!second) return;
+    const both = { ...two.state, cards: { ...two.state.cards, [other]: { ...second, zone: "captive" as const, guardedHero: true as const, host: two.enemy, owner: 0 } } };
+    const marks = heldDials(both, (code) => two.t.ctx.cards.get(code)?.name ?? code, () => true);
+    expect(marks.map((mark) => mark.seat).sort()).toEqual([0, 1]);
   });
 });
 

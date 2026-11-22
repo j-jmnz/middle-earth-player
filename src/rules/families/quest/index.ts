@@ -13,10 +13,11 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { addModifier, placeDamage, playerCardEffectCanChoose } from "../../core/keywords.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { exhaustCard, lastPicked, placePlayerDamage, readyCard, seatOf } from "../../interpret/player-verbs.ts";
+import { flaggedByClass } from "../../core/holder-classes.ts";
 import { isCharacterType, isPlayerType, printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { Modifier, QueueItem, ScenarioState } from "../../core/state.ts";
-import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { topFrame } from "../../windows/windows.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
@@ -127,10 +128,10 @@ function askNumber(state: ScenarioState, max: number, option: (n: number) => Sim
   return openBranch(state, item, 0, ctx);
 }
 
-// A character that cannot quest stays out of an effect's commitment too ("Attached hero ... cannot commit to a quest", 04023:A:1). Only a game that deals
-// Freezing Cold (04023, The Redhorn Gate) refuses it, so the earlier games' Hobbit Pony, Grappling Hook, Windfola and Late Adventurer replay as before.
-function barredFromCommitting(state: ScenarioState, id: string): boolean {
-  return flagged(state, id, "cannotQuest") && Object.values(state.cards).some((card) => card.code === "04023");
+// A character that cannot quest stays out of an effect's commitment too, whether the bar is held by the card or by a class it belongs to ("Attached hero ... cannot commit to a quest", 04023:A:1; The Massing at Osgiliath).
+function barredFromCommitting(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+  const card = state.cards[id];
+  return card != null && flaggedByClass(state, card, printedOf(ctx.cards, card.code), "cannotQuest", (trait) => hasTrait(state, id, trait, ctx));
 }
 
 // The card commits to the quest without exhausting (rr.step-3-2 exhausts only for the commitment step itself), and the cards that
@@ -140,7 +141,7 @@ function commitToQuest(state: ScenarioState, instruction: Verb<"CommitToQuest">,
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || card.committed || card.controller == null || (card.zone !== "heroes" && card.zone !== "play")) return state;
   if (!isCharacterType(printedOf(ctx.cards, card.code))) return state;
-  if (barredFromCommitting(state, id)) return state;
+  if (barredFromCommitting(state, id, ctx)) return state;
   let next = updateCard(state, id, { committed: true });
   steps.push({ kind: "commit", cardId: id });
   if (instruction.stat === "attack") next = addModifier(next, id, focus.sourceId ?? id, "questsWithAttack", 1, "endOfPhase");

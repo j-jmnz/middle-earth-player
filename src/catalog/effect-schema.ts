@@ -94,6 +94,8 @@ export const costSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("exhaustHost") }),
   // A card in play with this code exhausts (The One Ring).
   z.strictObject({ kind: z.literal("exhaustCode"), code: z.string().min(1) }),
+  // A card in play that the player controls with this title exhausts, whichever printing the game deals ("exhaust The One Ring", 141001:A:1).
+  z.strictObject({ kind: z.literal("exhaustNamed"), name: z.string().min(1) }),
   z.strictObject({ kind: z.literal("raiseThreat"), amount: z.number().int().positive() }),
   // Damage on the source itself ("Deal 1 damage to ~ to ...").
   z.strictObject({ kind: z.literal("damageSelf"), amount: z.number().int().positive() }),

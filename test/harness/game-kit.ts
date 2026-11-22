@@ -3,8 +3,7 @@ import { tableDigest } from "../../src/campaign/digest.ts";
 import type { LoadoutSeat } from "../../src/campaign/loadout.ts";
 import { emptyLog, poolCard, type CampaignLog } from "../../src/campaign/log.ts";
 import { buildStart } from "../../src/campaign/start.ts";
-import { angmarAwakenedFacts } from "../../src/campaign/log-angmar-awakened.ts";
-import { wilderlandFacts } from "../../src/campaign/wilderland.ts";
+import { logFacts } from "../../src/campaign/log-facts.ts";
 import { namesTreasures } from "../../src/campaign/world.ts";
 import { campaignScenario, type AnyScenarioData, type CampaignData, type Difficulty, type ScenarioData } from "../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
@@ -21,6 +20,7 @@ import { gameCodes } from "../../scripts/data/load-scenarios.ts";
 import { loadPrinted, loadTreasures } from "./catalog.ts";
 import { faceProblems } from "./face-check.ts";
 import { FRODO } from "./scene.ts";
+import { skippedSetupAnswers } from "./setup-answers.ts";
 
 // Test helper. The parts every scenario's seeded whole game (test/scenarios/<scenario-id>/game.ts) shares: the stand-in heroes
 // and the free-event deck, the loop that plays a game to its end, and the auto-player's extra answers most scenarios give
@@ -159,6 +159,8 @@ export type CampaignGoldenBase = { seatCount: 1 | 2; seed: number; difficulty: D
 export type EarlierParts = { xp: readonly number[]; pool: readonly { code: string; seat?: number }[]; marks: Readonly<Record<string, number>> };
 
 export type CampaignGameSpec<D extends string, P extends object> = {
+  /** The Campaign Setup's offers are declined, as many as it asks (test/harness/setup-answers.ts), when a start is given no answers; absent, a Setup that asks refuses it. */
+  declineSetup?: boolean;
   campaign: CampaignData;
   scenario: ScenarioData;
   /** The numbers of the stand-in heroes q1 to q6, by deck. */
@@ -225,7 +227,10 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
   }
 
   function plan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[], difficulty?: Difficulty, loadout: LoadoutSeat[] = spec.loadout?.(seatCount) ?? fillerLoadout(seatCount)) {
-    const checked = checklist({ log, scenario: campaignScenario(spec.scenario), seats: loadout, effects: EFFECTS, cards: cardsOrThrow(), ...(difficulty ? { difficulty } : {}), ...(choices ? { choices } : {}) });
+    const input = { log, scenario: campaignScenario(spec.scenario), seats: loadout, effects: EFFECTS, cards: cardsOrThrow(), ...(difficulty ? { difficulty } : {}) };
+    // With `declineSetup` in the spec and no answers given: the Setup's offers are declined, as many as it asks (test/harness/setup-answers.ts), so a skeleton needs no count typed.
+    const answers = choices ?? (spec.declineSetup ? skippedSetupAnswers(input) : undefined);
+    const checked = checklist({ ...input, ...(answers ? { choices: answers } : {}) });
     if (!checked.ok) throw new Error(checked.errors.join("; ") || "The campaign card asks for a choice");
     return checked;
   }
@@ -233,9 +238,9 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
   function start(seatCount: 1 | 2, seed: number, difficulty: Difficulty, options: StartOptions = {}): StartScenario {
     const { facts, modeCard, choices, loadout, standalone } = options;
     const checked = plan(seatCount, options.log ?? emptyLog(seatCount), choices, difficulty, loadout);
-    // The campaign's own columns of the log reach the game as they do in startFor (src/campaign/briefing.ts); another campaign's are none.
-    const logged = { ...wilderlandFacts(checked.log, spec.campaign.id), ...angmarAwakenedFacts(checked.log, spec.campaign.id) };
-    const dealtFacts = Object.keys(logged).length > 0 ? { prisoner: null, usedOnce: [], counters: {}, ...facts, ...logged } : facts;
+    // The log's facts reach the game as they do in startFor (src/campaign/briefing.ts, `logFacts`): the Dream-chaser marks and the columns of the Wilderland, Two Towers, Return of the King and Angmar Awakened logs; another campaign's are none.
+    const logged = logFacts(options.log ?? emptyLog(seatCount), checked.log, spec.campaign.id, cardsOrThrow());
+    const dealtFacts = Object.keys(logged).length > 0 ? { prisoner: null, usedOnce: [], counters: {}, ...logged, ...facts } : facts;
     return buildStart({
       campaign: spec.campaign,
       scenario: spec.scenario,

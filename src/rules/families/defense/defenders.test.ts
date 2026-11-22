@@ -36,10 +36,14 @@ describe("several defenders against one attack", () => {
     const defense = until(flagged, ctx, defenseWindow);
     // The first defender through the defense window, the others in the frame that follows.
     const more = send(defense, { type: "DeclareDefender", defenderId: ids.a! }, ctx);
-    expect(more.window).toEqual({ kind: "choose", seat: 0, options: ["another", "done"] });
-    const pickB = send(send(more, { type: "Choose", optionId: "another" }, ctx), { type: "Choose", optionId: ids.b! }, ctx);
-    // The last eligible character is taken without asking.
-    const pickC = send(pickB, { type: "Choose", optionId: "another" }, ctx);
+    // The frame asks for the next defender at once and offers the stop with the candidates: the player never has to take one.
+    expect(more.window).toEqual({ kind: "choose", seat: 0, options: [ids.b, ids.c, "done"] });
+    const declined = send(more, { type: "Choose", optionId: "done" }, ctx);
+    expect(declined.pendingAttack?.defense?.extra ?? []).toEqual([]);
+    expect(declined.window?.kind).not.toBe("choose");
+    const pickB = send(more, { type: "Choose", optionId: ids.b! }, ctx);
+    expect(pickB.window).toEqual({ kind: "choose", seat: 0, options: [ids.c, "done"] });
+    const pickC = send(pickB, { type: "Choose", optionId: ids.c! }, ctx);
     expect(pickC.pendingAttack?.defenderId).toBe(ids.a);
     expect(pickC.pendingAttack?.defense?.extra).toEqual([ids.b, ids.c]);
     expect([ids.a, ids.b, ids.c].every((id) => pickC.cards[id!]?.exhausted)).toBe(true);

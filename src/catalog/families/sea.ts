@@ -171,6 +171,9 @@ const FLAGS = [
   // On an enemy engaged with a player: it contributes its Threat to the total Threat in the staging area ("each Ship enemy engaged with you contributes
   // its Threat", 11060:A:1).
   "engagedThreat",
+  // On a seat (target `actorSeat`): each enemy engaged with that seat adds its Threat to the total Threat in the staging area, read live while the effect lasts, so an enemy that engages later counts
+  // ("Until the end of the round, each enemy engaged with you adds its Threat to the total Threat in the staging area", 143065:A:2; rr.lasting-effects; quest/engaged-threat.ts).
+  "engagedThreatSeat",
   // On a card: it takes no more than this much damage each round ("cannot take more than 4 damage each round", 11177:A:4).
   "damageCap",
   // On the table: no more than this much damage can be healed from each character each round, by every effect together ("no more than 1 damage can be healed from each character each round", 145033:A:1; families/dreamchaser/heal-cap.ts).

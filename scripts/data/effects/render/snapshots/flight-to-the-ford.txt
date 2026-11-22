@@ -6,13 +6,13 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141028:A:1 (front): Setup: Shuffle each burden card from the Flight to the Ford burden set into a Burden deck. Attach An Evil Wound to the Ring-bearer. Set Ford of Bruinen and The Witch-king aside, out of play. Add The Last Bridge and 1 Fell Rider per player to the staging area. Set the Ring-bearer's life at 15. Shuffle the encounter deck.
   141028:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShuffleBurdenDeck {"verb":"ShuffleBurdenDeck"}]
-    - [json AttachToRingBearer {"verb":"AttachToRingBearer","code":"141057"}]
+    - Setup: the burden deck is shuffled
+    - Setup: the card with code 141057 is attached to the Ring-bearer, the hero with that trait (the first player's hero is searched first, then the other seats in order); with no Ring-bearer the setup fails
     - a copy of the card with code 141059 is set aside, out of play
     - a copy of the card with code 141068 is set aside, out of play
     - the card with code 141058 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - the card with code 141063 is added to the staging area (the copy a Setup search found, else one the Setup deals)
-    - [json SetLife {"verb":"SetLife","value":15}]
+    - Setup: the Ring-bearer's life is set to 15 (the scenario's definition already starts the game with it)
     - shuffle the encounter deck
 
 141028:B:1 (back): The players cannot advance unless The Last Bridge is in the victory display.
@@ -22,7 +22,8 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141028:B:2 (back): Forced: At the end of the round, reduce the Ring-bearer's life by 1.
   141028:forced:1: Forced at the end of the round
-    - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
 
 ## 141029 Race to Rivendell
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -40,7 +41,8 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141029:B:3 (back): Forced: At the end of the round, reduce the Ring-bearer's life by 1.
   141029:forced:1: Forced at the end of the round
-    - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
 
 141029:B:4 (back): If the players defeat this stage, they have won the game.
   (inert: the engine applies it by rule, no record)
@@ -52,14 +54,14 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141056:A:2 (front): Response: After an enemy is declared as an attacker, shuffle the top card of the burden deck into the encounter deck to cancel that attack. (Any player may trigger this ability.)
   141056:response:1: Response on the event enemyAttacks (heard about enemy (any player controls); any player may use it)
-    only if [json condition {"kind":"burdenDeck"}]
+    only if the burden deck holds at least 1 card(s)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MoveBurden {"verb":"MoveBurden","to":"encounterShuffle"}]
-    - [json CancelAttack {"verb":"CancelAttack"}]
+    - the top card of the burden deck is shuffled into the encounter deck (nothing when the burden deck is empty)
+    - the attack in progress is canceled: no shadow effect or damage resolves after this, and the enemy's attack is used up
 
 141056:B:1 (back): Resolution: Add each burden card in play, in the encounter deck, and in the discard pile to the Campaign Pool. The added cards have been earned by the players.
   141056:resolution:1: Resolution
-    - [json EarnAllBurdens {"verb":"EarnAllBurdens"}]
+    - Resolution: every burden in play, in the encounter deck and in the encounter discard pile is earned
 
 ## 141057 An Evil Wound
 (the scenario deals it into the attached pile; the piles place it, no record does)
@@ -89,7 +91,8 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141058:A:3 (front): Travel: The first player must reveal the top card of the burden deck and resolve that card as if it were just revealed from the encounter deck to travel here.
   141058:travel:1: Travel
-    - [json RevealBurden {"verb":"RevealBurden"}]
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the burden deck is empty
+    - the acting player reveals the top card of the burden deck and resolves it as if just revealed from the encounter deck: its keywords and When Revealed effects resolve and a treachery goes to the encounter discard pile; no cancel of a card revealed from the encounter deck is offered against it (nothing when the burden deck is empty)
 
 ## 141059 Ford of Bruinen
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -123,20 +126,22 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141061:A:1 (front): While Ettenmoors is the active location, do not deal Nazgûl enemies a shadow card during the combat phase.
   141061:constant:1: Constant
     only if this card is the active location
-    - every enemy in play (Nazgûl only): stat noShadowDealt 1, while this card is in play
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts (Nazgûl only): stat noShadowDealt 1, while this card is in play
 
 141061:A:2 (front): Forced: After any amount of progress is placed on Ettenmoors, reduce the Ring-bearer's life by 1.
   141061:forced:1: Forced on the event progressPlaced
-    - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
 
 ## 141062 The Old Road
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 141062:A:1 (front): Action: Place the top card of the burden deck on top of the encounter deck to place 4 progress on The Old Road. (Use this action only if you are playing campaign mode.)
   141062:action:1: Action
-    only if all of: ([json condition {"kind":"campaign"}]) and ([json condition {"kind":"burdenDeck"}])
+    only if all of: (the scenario is played in Campaign Mode, which is when its campaign card is in the game) and (the burden deck holds at least 1 card(s))
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MoveBurden {"verb":"MoveBurden","to":"encounterTop"}]
+    - the top card of the burden deck is placed on top of the encounter deck (nothing when the burden deck is empty)
     - place 4 progress on this card
 
 ## 141063 Fell Rider
@@ -145,14 +150,15 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141063:A:1 (front): Cannot have non-Morgul attachments.
   141063:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+    - no card can be attached to this card except a card with the trait Morgul
 
 141063:A:2 (front): While Fell Rider is in the staging area, it gains: "Forced: At the beginning of the encounter phase, the first player must either reduce the Ring-bearer's life by 1 or engage Fell Rider."
   141063:forced:1: Forced when a phase begins
     only if all of: (it is the Encounter phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "life":
-        - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+        - the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
       * option "engage":
         - engage this card
 
@@ -165,8 +171,8 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141064:A:2 (front): When Revealed: You must either shuffle the top card of the burden deck into the encounter deck and reveal an additional encounter card, or raise each player's threat by 3 and immediately end the quest phase (do not resolve the quest).
   141064:whenRevealed:1: When revealed
     - the acting player chooses one of:
-      * option "burden" (only if [json condition {"kind":"burdenDeck"}]):
-        - [json MoveBurden {"verb":"MoveBurden","to":"encounterShuffle"}]
+      * option "burden" (only if the burden deck holds at least 1 card(s)):
+        - the top card of the burden deck is shuffled into the encounter deck (nothing when the burden deck is empty)
         - this card gains surge (one more encounter card is revealed when it has been resolved)
       * option "threat":
         - raise threat by 3 (each player)
@@ -179,10 +185,11 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   141065:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each enemy engaged with a player makes an immediate attack, each dealt a shadow card of its own
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 141065:A:2 (shadow): Shadow: If this attack destroys a character, remove all progress from the current quest.
   141065:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
 
@@ -192,15 +199,16 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141066:A:1 (front): When Revealed: Reduce the Ring-bearer's life by 1. Then, reduce the Ring-bearer's Willpower, Attack, and Defense to 0 until the end of the round.
   141066:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ReduceLife {"verb":"ReduceLife","amount":1}]
-    - [json SetStatUntil {"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","trait":"Ring-bearer"}}]
-    - [json SetStatUntil {"verb":"SetStatUntil","stat":"attack","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","trait":"Ring-bearer"}}]
-    - [json SetStatUntil {"verb":"SetStatUntil","stat":"defense","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","trait":"Ring-bearer"}}]
+    - the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
+    - each Ring-bearer hero (any player controls) now: willpower is set to 0 until the end of the round, whatever else modifies it (the most recent set wins)
+    - each Ring-bearer hero (any player controls) now: attack is set to 0 until the end of the round, whatever else modifies it (the most recent set wins)
+    - each Ring-bearer hero (any player controls) now: defense is set to 0 until the end of the round, whatever else modifies it (the most recent set wins)
 
 141066:A:2 (shadow): Shadow: If this attack destroys a character, reduce the Ring-bearer's life by 1.
   141066:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - [json ReduceLife {"verb":"ReduceLife","amount":1,"when":{"kind":"x","min":1}}]
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
 
 ## 141067 The Nine are Abroad
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -208,11 +216,12 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141067:A:1 (front): When Revealed: Treat the text box of each character in play as blank (except for Traits) until the end of the round. If there is a Nazgûl enemy in the staging area, The Nine are Abroad gains surge.
   141067:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each character (any player controls): stat blankText (its text box is blank) 1, until the end of the round
+    - each character (any player controls) (only the cards that match now: one that arrives later does not get it): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
     - then, if the number of Nazgûl enemy (any player controls) in the staging area only is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 141067:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   141067:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -224,14 +233,15 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141080:A:2 (front): When Revealed: Attach to the Ring-bearer. (Counts as a Condition attachment with the text: "Forced: At the beginning of each quest phase, either exhaust The One Ring or reveal an additional encounter card this phase.")
   141080:whenRevealed:1: When revealed
-    - [json AttachSelfToRingBearer {"verb":"AttachSelfToRingBearer"}]
+    - this treachery is attached to the Ring-bearer, the hero with the Ring-bearer trait (it stays in the encounter discard pile when there is no Ring-bearer in play)
   141080:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "exhaust" (only if the card with code 141085 in play is ready):
         - exhaust the card with code 141085
       * option "reveal":
-        - reveal 1 additional encounter card(s) in the staging step this phase
+        - reveal 1 additional encounter card(s) in the staging step this phase (the extra reveals go to the players in turn after the one each player makes, so the first player makes the first of them; while the stages are separate, to the player whose stage holds the effect)
 
 ## 141081 Fear of Discovery
 (the scenario deals it into the burden pile; the piles place it, no record does)
@@ -250,6 +260,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141081:A:3 (shadow): Shadow: Defending player raises his threat by 3.
   141081:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by 3 (the acting player)
 
 ## 141082 Eaten Alive!
@@ -266,6 +277,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141082:A:3 (shadow): Shadow: Deal 1 damage to defending character.
   141082:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
 ## 141083 Panicked
@@ -278,10 +290,11 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   141083:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 3 (the first player)
-    - [json PassFirstPlayer {"verb":"PassFirstPlayer"}]
+    - the first player token passes to the next player in the game (with no other player it stays)
 
 141083:A:3 (shadow): Shadow: Defending player exhausts a character he controls.
   141083:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -302,6 +315,189 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141084:A:3 (shadow): Shadow: Defending player discards 1 card at random from his hand.
   141084:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player discards 1 random card(s) from hand
 
-(rendered pieces: 129 by template, 25 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 906301 Flight to the Ford Nightmare
+
+906301:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+906301:A:2 (front): The players cannot win while Ford of Bruinen is in play.
+  906301:constant:1: Constant
+    only if all of: (the card with code 906303 is in play) and (the card with code 141029 is in play)
+    - the players cannot defeat this stage while this holds
+
+906301:B:1 (back): Begin with the standard quest deck and encounter deck for the Flight to the Ford scenario.
+  (inert: the engine applies it by rule, no record)
+
+906301:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+906301:B:3 (back): 4x Fell Rider
+  (inert: the engine applies it by rule, no record)
+
+906301:B:4 (back): 1x Ford of Bruinen
+  (inert: the engine applies it by rule, no record)
+
+906301:B:5 (back): 1x The Troll's Camp
+  (inert: the engine applies it by rule, no record)
+
+906301:B:6 (back): 3x Ettenmoors
+  (inert: the engine applies it by rule, no record)
+
+906301:B:7 (back): 3x Pain Assailed Him
+  (inert: the engine applies it by rule, no record)
+
+906301:B:8 (back): 3x The Old Road
+  (inert: the engine applies it by rule, no record)
+
+906301:B:9 (back): 3x Pathless Country
+  (inert: the engine applies it by rule, no record)
+
+906301:B:10 (back): 3x Stricken Dumb
+  (inert: the engine applies it by rule, no record)
+
+906301:B:11 (back): 2x Rode Like a Gale
+  (inert: the engine applies it by rule, no record)
+
+906301:B:12 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Flight to the Ford encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+906301:B:13 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 906302 Fell Rider
+
+906302:A:1 (front): Cannot have non-Morgul attachments.
+  906302:constant:1: Constant
+    only if this card is in play
+    - no card can be attached to this card except a card with the trait Morgul
+
+906302:A:2 (front): Forced: After Fell Rider attacks and destroys a character, reduce the Ring-bearer's life by 1.
+  906302:forced:1: Forced when this enemy attacks, before the defender is declared
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
+
+906302:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if The One Ring is exhausted).
+  906302:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the card with code 141085 in play is exhausted (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 906303 Ford of Bruinen
+
+906303:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+906303:A:2 (front): Travel: Each player searches the encounter deck and discard pile for a Nazgûl enemy and puts it into play engaged with him. Shuffle the encounter deck.
+  906303:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Nazgûl enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
+    - shuffle the encounter deck
+
+## 906304 Trollshaw Forest
+
+906304:A:1 (front): While Trollshaw Forest is in the staging area, it gains: "Forced: After a 'when revealed' effect is canceled, reduce the Ring-bearer's life by 1."
+  906304:forced:1: Forced on the event whenRevealedCanceled
+    only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
+
+906304:A:2 (front): Travel: Reduce the Ring-bearer's life by 1 to travel here.
+  906304:travel:1: Travel
+    - the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
+
+## 906305 Great East Road
+
+906305:A:1 (front): X is 1 plus the number of Nazgûl enemies in play.
+  906305:constant:1: Constant
+    - this card: stat threat the number of Nazgûl enemy (any player controls) + 1, while this card is in play
+
+906305:A:2 (front): While Great East Road is in the staging area, each Nazgûl enemy gets -5 engagement cost.
+  906305:constant:2: Constant
+    only if this card is in the staging area
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts (Nazgûl only): stat engagementCost -5, while this card is in play
+
+906305:A:3 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an immediate attack.
+  906305:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if another player is still in the game: the attacking enemy engages the next player
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
+
+## 906306 Pathless Wilderness
+
+906306:A:1 (front): Pathless Wilderness enters play with 3 resource tokens on it.
+  906306:triggered:1: Triggered (mandatory, not printed as Forced) on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - 3 resource token(s) are placed on this card
+
+906306:A:2 (front): Forced: At the end of the round, discard 1 resource token here. Then, if there are no resource tokens here, reduce the Ring-bearer's life by 3.
+  906306:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - 1 resource(s) come off the resource pool of this card (discarded, not spent)
+    - then, if not (this card is a location (any player controls) with resources on it) (checked when this step runs, after the steps above; not tied to whether they did anything): the Ring-bearer's life goes down by 3, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
+
+## 906307 Ettendales
+
+906307:A:1 (front): Forced: When Ettendales is explored, shuffle the top card of the burden deck into the encounter deck.
+  906307:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the top card of the burden deck is shuffled into the encounter deck (nothing when the burden deck is empty)
+
+906307:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack. If this attack destroys a character, reduce the Ring-bearer's life by 1.
+  906307:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 2, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
+
+## 906308 Come Back!
+
+906308:A:1: Peril. Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+906308:A:2 (front): When Revealed: Reduce the Ring-bearer's life by 1 and remove all progress from the current quest.
+  906308:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
+    - all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
+
+906308:A:3 (shadow): Shadow: Either reduce the Ring-bearer's life by 1, or this attack is considered undefended.
+  906308:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player chooses one of:
+      * option "life":
+        - the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
+      * option "undefended":
+        - this attack is considered undefended
+
+## 906309 The Twilight World
+
+906309:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+906309:A:2 (front): When Revealed: Attach to the Ring-bearer. Limit 1 per hero. (Counts as a Condition attachment with the text: "Forced: At the beginning of the planning phase, either exhaust The One Ring, or reduce the Ring-bearer's life by 1.")
+  906309:whenRevealed:1: When revealed
+    - if the number of card (any player controls) or in the staging area or the active location, named "The Twilight World", attached to a hero (any player controls) is at most 0: this treachery is attached to the Ring-bearer, the hero with the Ring-bearer trait (it stays in the encounter discard pile when there is no Ring-bearer in play)
+  906309:forced:1: Forced when a phase begins
+    only if it is the Planning phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the first player chooses one of:
+      * option "exhaust" (only if the card with code 141085 in play is ready):
+        - exhaust the card with code 141085
+      * option "life":
+        - the Ring-bearer's life goes down by 1, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
+  906309:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+
+(rendered pieces: 235 by template, 0 as JSON)

@@ -25,6 +25,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 02061:B:2 (back): Forced: After a card effect heals Wilyador, remove that card from the game.
   02061:forced:1: Forced on the event healed (heard about character (any player controls) named "Wilyador")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the event's other card is removed from the game
 
 ## 02062 Return to Rhosgobel
@@ -58,6 +59,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 02063:A:2 (front): Action: Exhaust a hero to claim this objective if it has no encounters attached. Then, attach Athelas to that hero.
   02063:action:1: Action (any player may use it)
     only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (there is a ready hero (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
@@ -69,11 +71,12 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 02064:A:1 (front): No attachments. The first player gains control of Wilyador, as an ally.
   02064:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat noPlayerAttachments 1, while this card is in play
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
     - this card is controlled by the first player while this holds (a card in the staging area joins that player's play area, faceup and ready), and passes to each new first player when the token moves
 
 02064:A:2 (front): Forced: At the end of each round, Wilyador suffers 2 damage.
   02064:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - deal 2 damage to this card
 
 02064:A:3 (front): Wilyador cannot be healed of more than 5 wounds by a single effect. If Wilyador leaves play, the players have lost the game.
@@ -97,7 +100,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 02065:A:3 (front): Travel: Players must complete stage one of this quest before they can travel to Rhosgobel.
   02065:constant:3: Constant
     only if the players are on stage 1
-    - the players cannot travel to any location while this holds
+    - the players cannot travel to this location while this holds
 
 ## 02066 Forest Grove
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -117,6 +120,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 02067:A:2 (shadow): Shadow: Deal 1 damage to each exhausted character.
   02067:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to each exhausted character (any player controls)
 
 ## 02068 Swarming Insects
@@ -128,6 +132,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 02068:A:2 (shadow): Shadow: If a character (including Wilyador) has more damage than each other character, deal 3 additional damage to that character.
   02068:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (any player controls) with more damage than each other character in play (a tie for the most matches none)
     - then, if there is a character (any player controls) with more damage than each other character in play (a tie for the most matches none) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 3 damage to the picked card
@@ -141,6 +146,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 02069:A:2 (shadow): Shadow: Deal 1 damage to each wounded character. (2 damage instead if this attack is undefended.)
   02069:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): deal 1 damage to each damaged character (any player controls)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to each damaged character (any player controls)
@@ -154,6 +160,7 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 02070:A:2 (shadow): Shadow: If this attack is undefended, the damage must be placed on Wilyador.
   02070:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attack has no defender: the damage of this attack, if undefended, must go on a character (any player controls) named "Wilyador" in play, whoever controls it, if able (a defended attack still damages its defender)
 
 ## 02071 Black Forest Bats
@@ -165,6 +172,185 @@ Scenario piles that place cards with no record (quest: 02060 The Wounded Eagle; 
 
 02071:A:2 (shadow): Shadow: If this attack is undefended, the damage must be placed on Wilyador.
   02071:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attack has no defender: the damage of this attack, if undefended, must go on a character (any player controls) named "Wilyador" in play, whoever controls it, if able (a defended attack still damages its defender)
 
-(rendered pieces: 116 by template, 0 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 900601 A Journey to Rhosgobel Nightmare
+
+900601:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+900601:A:2 (front): Setup: Search the encounter deck for 1 copy of Goblin Eagle-hunter and add it to the staging area. Then shuffle the encounter deck.
+  900601:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - search the encounter deck, discard pile and victory display for the card with code 900602 and add it to the staging area (not revealed; nothing when none is found)
+    - shuffle the encounter deck
+    - the table: stat noteEncounterDiscards 1, until the end of the game
+
+900601:A:3 (front): Forced: The first Creature enemy revealed during each quest phase gains surge.
+  900601:forced:1: Forced after a card is revealed (heard about Creature enemy (any player controls); limit once per phase; only when the encounter deck revealed it)
+    only if it is the Quest phase
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the card just revealed gains surge
+
+900601:A:4 (front): Response: After an Athelas card is placed in the discard pile, you may shuffle it into the encounter deck.
+  900601:response:1: Response on the event encounterDiscarded (heard about objective (any player controls) named "Athelas")
+    - one card with code 02063 in the encounter discard pile goes back into the encounter deck, which is shuffled (nothing with none there)
+
+900601:B:1 (back): Begin with the standard quest deck and encounter deck for A Journey to Rhosgobel scenario.
+  (inert: the engine applies it by rule, no record)
+
+900601:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+900601:B:3 (back): 4x Forest Grove
+  (inert: the engine applies it by rule, no record)
+
+900601:B:4 (back): 1x Exhaustion
+  (inert: the engine applies it by rule, no record)
+
+900601:B:5 (back): 2x Swarming Insects
+  (inert: the engine applies it by rule, no record)
+
+900601:B:6 (back): 1x Festering Wounds
+  (inert: the engine applies it by rule, no record)
+
+900601:B:7 (back): 3x Mountains of Mirkwood
+  (inert: the engine applies it by rule, no record)
+
+900601:B:8 (back): 1x Chieftan Ufthak
+  (inert: the engine applies it by rule, no record)
+
+900601:B:9 (back): 2x Dol Guldur Beastmaster
+  (inert: the engine applies it by rule, no record)
+
+900601:B:10 (back): 1x Driven by Shadow
+  (inert: the engine applies it by rule, no record)
+
+900601:B:11 (back): 1x The Necromancer's Reach
+  (inert: the engine applies it by rule, no record)
+
+900601:B:12 (back): 2x Necromancer's Pass
+  (inert: the engine applies it by rule, no record)
+
+900601:B:13 (back): 2x Enchanted Stream
+  (inert: the engine applies it by rule, no record)
+
+900601:B:14 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard A Journey to Rhosgobel encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+900601:B:15 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 900602 Goblin Eagle-hunter
+
+900602:A:1 (front): Goblin Eagle-hunter gets +1 hit point per player.
+  900602:constant:1: Constant
+    - this card: stat hitPoints the number of players, while this card is in play
+
+900602:A:2 (front): Forced: At the end of the combat phase, deal 1 damage to Wilyador.
+  900602:forced:1: Forced at the end of the phase
+    only if all of: (it is the Combat phase) and (there is a character (any player controls) named "Wilyador" to choose)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (any player controls) named "Wilyador"
+    - deal 1 damage to the picked card
+
+900602:A:3 (shadow): Shadow: If Wilyador has 10 or less damage on him, deal 2 damage to Wilyador.
+  900602:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (any player controls) named "Wilyador"
+    - then, if not (10 is less than damage of the picked card) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+
+## 900603 Treetop Bird-eater
+
+900603:A:1 (front): While Treetop Bird-eater is engaged with a player, characters controlled by that player cannot be healed.
+  900603:constant:1: Constant
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    - engagedSeatCharacters: stat cannotBeHealed 1, while this card is in play
+
+900603:A:2 (front): Forced: At the beginning of the encounter phase, Treetop Bird-eater engages the player who controls Wilyador (regardless of threat).
+  900603:forced:1: Forced when a phase begins
+    only if it is the Encounter phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - this enemy engages the player who controls a character (you control) named "Wilyador" (the first player chooses among several; nothing when it is already engaged with that player; an enemy engaged with another player leaves that player)
+
+## 900604 Dark-wood Grove
+
+900604:A:1 (front): Dark-wood Grove gets +1 Threat and +1 quest point for each Athelas card in play.
+  900604:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the number of card (any player controls) or in the staging area or the active location, named "Athelas", while this card is in play
+    - this card: stat questPoints the number of card (any player controls) or in the staging area or the active location, named "Athelas", while this card is in play
+
+900604:A:2 (shadow): Shadow: If defending player controls at least 1 Athelas card, attacking enemy makes an additional attack after this one.
+  900604:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - if there is a character (you control) with an attachment named "Athelas" to choose: the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 900605 Labyrinthine Woods
+
+900605:A:1 (front): While Labyrinthine Woods is in the staging area, Creature enemies get +1 Threat and +1 Attack.
+  900605:constant:1: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Creature enemy (any player controls) or in the staging area: stat threat 1, while this card is in play
+    - each Creature enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
+
+900605:A:2 (shadow): Shadow: After this attack, attacking enemy engages the next player and makes an additional attack.
+  900605:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if another player is still in the game: the attacking enemy engages the next player
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
+
+## 900606 Pitch-dark Thicket
+
+900606:A:1 (front): While Pitch-dark Thicket is the active location, all characters lose the ranged keyword.
+  900606:constant:1: Constant
+    only if this card is the active location
+    - each character (any player controls): stat loseRanged 1, while this card is in play
+
+900606:A:2 (shadow): Shadow: Attacking enemy cannot be attacked by characters with the ranged keyword until the end of the phase.
+  900606:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat cannotBeAttackedByRanged 1, until the end of the phase
+
+## 900607 Shot from the Sky
+
+900607:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+900607:A:2 (front): When Revealed: Attach to an Eagle character. (Counts as a Condition attachment with the text: "Limit 1 per character. Attached character loses the Eagle trait, and takes 1 damage each time it readies.")
+  900607:whenRevealed:1: When revealed
+    - attach this card to a Eagle character of any player (the first player chooses it) that carries no copy of this card; with none this card is discarded
+  900607:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - its host: stat losesEagle 1, while this card is in play
+  900607:triggered:1: Triggered (mandatory, not printed as Forced) on the event readied (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - deal 1 damage to its host
+
+900607:A:3 (shadow): Shadow: Resolve the "when revealed" effect of Shot from the Sky.
+  900607:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the When Revealed effects of this card resolve as if it had just been revealed
+
+## 900608 Noxious Supplies
+
+900608:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+900608:A:2 (front): When Revealed: Attach to Wilyador. (Counts as a Condition attachment with the text: "Forced: When attached character is healed by a card effect other than Athelas, the amount of damage healed is reduced to 1. Then, discard Noxious Supplies.")
+  900608:whenRevealed:1: When revealed
+    - attach this card to the character titled "Wilyador" (any number of copies may be attached); with none this card is discarded
+  900608:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - its host: stat healReducedToOne 1, while this card is in play
+
+(rendered pieces: 195 by template, 0 as JSON)

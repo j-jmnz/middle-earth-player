@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 import { definePrinted } from "../../core/printed.ts";
+import { ruleCause } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
 import { endCorsairDeck, refillCorsairDeck } from "./corsair.ts";
@@ -101,11 +103,14 @@ describe("the Corsair discard pile (dcce.corsair-deck)", () => {
   it("refills a deck that is empty and has a discard pile, whatever emptied it", () => {
     const { state, pirate } = fight([]);
     const emptied = { ...state, corsairDeck: [], corsairDiscard: [pirate], cards: { ...state.cards, [pirate]: { ...state.cards[pirate]!, zone: "corsairDiscard" as const } } };
-    expect(refillCorsairDeck(emptied).corsairDeck).toEqual([pirate]);
-    expect(refillCorsairDeck(emptied).corsairDiscard).toEqual([]);
+    const steps: EngineStep[] = [];
+    expect(refillCorsairDeck(emptied, steps).corsairDeck).toEqual([pirate]);
+    expect(refillCorsairDeck(emptied, []).corsairDiscard).toEqual([]);
+    // The reshuffle is a step of its own, so the log and the shuffle sound say it.
+    expect(steps).toEqual([{ kind: "reshuffleDeck", deck: "corsairDeck", count: 1, cause: ruleCause("dcce.corsair-deck") }]);
     // A deck with cards in it, or no pile to refill from, is left alone.
-    expect(refillCorsairDeck({ ...emptied, corsairDeck: ["x"] })).toEqual({ ...emptied, corsairDeck: ["x"] });
-    expect(refillCorsairDeck({ ...emptied, corsairDiscard: [] }).corsairDeck).toEqual([]);
+    expect(refillCorsairDeck({ ...emptied, corsairDeck: ["x"] }, [])).toEqual({ ...emptied, corsairDeck: ["x"] });
+    expect(refillCorsairDeck({ ...emptied, corsairDiscard: [] }, []).corsairDeck).toEqual([]);
   });
 });
 

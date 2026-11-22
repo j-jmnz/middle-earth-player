@@ -9,6 +9,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 110129:A:2 (front): Forced: At the beginning of the resource phase, place 1 resource on each Raider enemy in play.
   110129:forced:1: Forced when a phase begins (record also names 110129:B:2)
     only if it is the Resource phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each Raider enemy (any player controls) or in the staging area:
       - place 1 resource tokens on the picked card
 
@@ -18,6 +19,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 110129:B:2 (back): Forced: At the beginning of the resource phase, place 1 resource on each Raider enemy in play.
   110129:forced:1: Forced when a phase begins (record also names 110129:A:2)
     only if it is the Resource phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each Raider enemy (any player controls) or in the staging area:
       - place 1 resource tokens on the picked card
 
@@ -42,12 +44,12 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     - a copy of the card with code 11214 is set aside, out of play
     - a copy of the card with code 11216 is set aside, out of play
     - a card with code 11177 from the box joins the encounter deck, which is shuffled
-    - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]
-    - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
+    - Setup: the card with code 11178 joins the Corsair deck the scenario deals, which the quest card's Setup then shuffles
+    - Campaign Setup: the set-aside copy of the card with code 11192 is attached to the card in play named "Stormcaller" (a card dealt on its Upgraded side stays so)
+    - Campaign Setup, after the quest card's Setup has prepared the fleet: each player in player order takes one of the set-aside cards with codes 11172, 11173, 11174 and 11175 for each ship-objective they control, in the order the ships were taken, and attaches it to that ship (a card dealt on its Upgraded side if the log says it is upgraded)
     - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
-    - then, if [json condition {"kind":"upgraded","code":"11210"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the set-aside card titled "Gavin" is put into play under a player the first player chooses
-    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
+    - then, if the Campaign Log marks the card with code 11210 upgraded (every box beside it is marked; false in a game with no campaign facts) (checked when this step runs, after the steps above; not tied to whether they did anything): the set-aside card titled "Gavin" is put into play under a player the first player chooses
+    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand (the card joins the hand once the mulligan is over, so a mulligan cannot shuffle it into the deck) (dealt there but not earned: the scenario's Resolution decides whether it joins the pool)
 
 11215:A:3 (front): Put Calaerion into play under the control of the player with the Dream-chaser. One player may choose a copy of Círdan's Blessing not in the Campaign Pool and add it to their hand. If "Gavin returned," put him into play under any player's control. Flip this card over.
   11215:campaignSetup:1: Campaign setup (record also names 11215:A:2)
@@ -65,57 +67,59 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     - a copy of the card with code 11214 is set aside, out of play
     - a copy of the card with code 11216 is set aside, out of play
     - a card with code 11177 from the box joins the encounter deck, which is shuffled
-    - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]
-    - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
+    - Setup: the card with code 11178 joins the Corsair deck the scenario deals, which the quest card's Setup then shuffles
+    - Campaign Setup: the set-aside copy of the card with code 11192 is attached to the card in play named "Stormcaller" (a card dealt on its Upgraded side stays so)
+    - Campaign Setup, after the quest card's Setup has prepared the fleet: each player in player order takes one of the set-aside cards with codes 11172, 11173, 11174 and 11175 for each ship-objective they control, in the order the ships were taken, and attaches it to that ship (a card dealt on its Upgraded side if the log says it is upgraded)
     - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
-    - then, if [json condition {"kind":"upgraded","code":"11210"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the set-aside card titled "Gavin" is put into play under a player the first player chooses
-    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
+    - then, if the Campaign Log marks the card with code 11210 upgraded (every box beside it is marked; false in a game with no campaign facts) (checked when this step runs, after the steps above; not tied to whether they did anything): the set-aside card titled "Gavin" is put into play under a player the first player chooses
+    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand (the card joins the hand once the mulligan is over, so a mulligan cannot shuffle it into the deck) (dealt there but not earned: the scenario's Resolution decides whether it joins the pool)
 
 11215:B:1 (back): Forced: When stage 2B is revealed, search the encounter deck and discard pile for each boon and non-Ship burden and shuffle them into the second encounter deck.
   11215:forced:1: Forced on the event stageRevealed
-    only if the card the event is about is a card (any player controls) named "Fate of the Dream-chaser"
-    - [json CarryToSecondDeck {"verb":"CarryToSecondDeck","exceptBurdenTrait":"Ship"}]
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Fate of the Dream-chaser"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - every boon, and every burden without the trait Ship, in the encounter deck or its discard pile is marked as carried across to the second encounter deck (a discard-pile card moves to the deck, and the stage's set-aside step keeps the marked cards in it)
 
 11215:B:2 (back): Forced: When Captain Sahír enters play, attach Black Key (burden) and The Black Sword to him.
   11215:forced:2: Forced on the event encounterEnteredPlay (heard about enemy (any player controls) or in the staging area, named "Captain Sahír")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Captain Sahír"}]
-    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11216","to":"Captain Sahír"}]
+    - Campaign Setup: the set-aside copy of the card with code 11192 is attached to the card in play named "Captain Sahír" (a card dealt on its Upgraded side stays so)
+    - Campaign Setup: the set-aside copy of the card with code 11216 is attached to the card in play named "Captain Sahír" (a card dealt on its Upgraded side stays so)
 
 11215:B:3 (back): Refresh Action: Exhaust a hero to move 1 resource from The Black Sword to that hero's resource pool. If The Black Sword has no resources on it, remove it from the game. (Group limit once per round.)
   11215:action:1: Action (limit once per round; any player may use it)
-    only if all of: (it is the Refresh phase) and (there is a card (any player controls) named "The Black Sword", with resources on it to choose) and (there is a ready hero (you control) to choose)
+    only if all of: (it is the Refresh phase) and (there is a card (any player controls) or in the staging area or the active location, named "The Black Sword", with resources on it to choose) and (there is a ready hero (you control) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) named "The Black Sword", with resources on it
+    - choose card (any player controls) or in the staging area or the active location, named "The Black Sword", with resources on it
     - choose ready hero (you control)
     - exhaust the picked card
     - move 1 resource tokens from the card picked before the last to the last card picked
-    - [json RemoveNamedFromGame {"verb":"RemoveNamedFromGame","name":"The Black Sword","when":{"kind":"count","pick":{"type":"card","control":"any","names":["The Black Sword"],"hasResources":true},"max":0}}]
+    - then, if the number of card (any player controls) or in the staging area or the active location, named "The Black Sword", with resources on it is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): the card in play titled "The Black Sword" and the cards attached to it leave the game, and none is announced as leaving play, so no "if it leaves play" ability triggers (the campaign pool is left alone)
 
 11215:B:4 (back): Resolution: The players win the campaign!
   11215:resolution:1: Resolution
-    (no instructions)
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
 
 11215:B:5 (back): Gain the following:
   11215:resolution:2: Resolution (record also names 11215:B:6)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11215:B:6 (back): • 1 XP for each surviving player.
   11215:resolution:2: Resolution (record also names 11215:B:5)
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+    - Resolution: gain 1 XP for each surviving player (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11215:B:7 (back): • 1 XP for each of the following cards in the victory display: Corsair Warship, Shattered Monument, Crowley, and Stormcaller.
   11215:resolution:3: Resolution
-    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"inVictory","codes":["11058","12159","110129","11178","12151"]}}]
+    - Resolution: gain 1 XP for each card with code 11058, 12159, 110129, 11178 and 12151 in the victory display (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11215:B:8 (back): • 2 XP if Thunderstruck is in the victory display.
   11215:resolution:4: Resolution
-    - [json GainXp {"verb":"GainXp","amount":2,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Thunderstruck"]},"min":1}}]
+    - if the number of card (any player controls) in the victory display, named "Thunderstruck" is at least 1: Resolution: gain 2 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 11215:B:9 (back): • -1 XP if Ominous Fate is in the victory display.
   11215:resolution:5: Resolution
-    - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
+    - if the number of card (any player controls) in the victory display, named "Ominous Fate" is at least 1: Resolution: lose 1 XP (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)
 
 ## 12147 The Coast of Umbar
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -123,8 +127,8 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12147:A:1 (front): Setup: Shuffle the Coast of Umbar, Corsair Raiders, Stormy Weather, Umbar Fleet, and Voyage Across Belegaer encounter sets into one encounter deck and make it the active encounter deck. Set The City of Corsairs encounter set aside, as an inactive second encounter deck. Prepare the Corsair deck. Players prepare their fleet. Add the Stormcaller to the staging area. Add 1 copy of Southern Belfalas to the staging area (2 instead if there are 3 or 4 players in the game). Shuffle the encounter deck.
   12147:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck"}]
-    - [json PrepareFleet {"verb":"PrepareFleet"}]
+    - Setup: every non-ship enemy still in the encounter deck goes to the Corsair deck, which is shuffled; from then on a non-ship enemy that would be discarded goes to the Corsair discard pile, and the Corsair deck refills from it
+    - Setup: each player in turn takes one of the six ship-objectives set aside (the Dream-chaser is forced on the last player who has not got it; a lone player takes the Dream-chaser and one other), the unused ships leave the game, and the Heading card is attached to the Dream-chaser, set to on-course
     - shuffle the encounter deck
 
 12147:B:1: Sailing.
@@ -132,10 +136,11 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12147:B:2 (back): Progress cannot be placed on The Coast of Umbar if the players are off-course (Cloud, Rain, or Storm).
   12147:constant:1: Constant
-    - if [json condition {"kind":"heading","is":"offCourse"}]: the table: stat noQuestProgress 1, while this card is in play
+    - if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card): the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
 
 12147:B:3 (back): If the Stormcaller is destroyed (or if this stage has 15 or more progress on it), advance to stage 2.
   12147:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Stormcaller")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - advance to the next quest stage
 
 ## 12148 Fate of the Dream-chaser
@@ -153,9 +158,9 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12148:B:1 (back): When Revealed: Shuffle the Corsair deck and Corsair discard pile into the second encounter deck. Search the encounter deck and discard pile for each copy of Battle-hardened and each copy of Watch Tower, and shuffle them into the second encounter deck. Set the current encounter deck and discard pile aside, inactive. The second encounter deck becomes the active encounter deck. Advance to stage 3.
   12148:whenRevealed:2: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAsideEncounterDeck {"verb":"SetAsideEncounterDeck","carry":["12156","11067"]}]
-    - [json ShuffleSetAsideSet {"verb":"ShuffleSetAsideSet","set":"The City of Corsairs"}]
-    - [json EndCorsairDeck {"verb":"EndCorsairDeck"}]
+    - every card of the encounter deck and its discard pile goes to the set-aside zone (the Corsair piles are left alone; copies in play stay in play), except the cards with codes 12156 and 11067, which stay in the encounter deck (those in the discard pile move to it)
+    - every set-aside card of the encounter set "The City of Corsairs" joins the encounter deck (the deck is shuffled by the step after)
+    - the Corsair deck and Corsair discard pile are shuffled into the encounter deck and the Corsair deck is gone: a non-ship enemy is discarded to the encounter discard pile as in any other game
     - advance to the next quest stage
 
 ## 12149 The Haven of Umbar
@@ -181,7 +186,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - one set-aside card with code 12159 joins the staging area (it is not revealed)
     - one set-aside card with code 110129 joins the staging area (it is not revealed)
-    - [json EngageSetAside {"verb":"EngageSetAside","code":"12158"}]
+    - one set-aside copy of the card with code 12158 is put into play engaged with the acting player (nothing with no copy set aside)
     - for each player, first player first:
       - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
@@ -195,14 +200,17 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12150:B:2 (back): Forced: When a hero or enemy is destroyed, add its resources to Captain Sahír.
   12150:forced:1: Forced on the event characterDestroyed (heard about hero (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each enemy (any player controls) or in the staging area, named "Captain Sahír":
       - place resources of the card the event is about resource tokens on the picked card
   12150:forced:2: Forced after an enemy is destroyed (heard about enemy (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each enemy (any player controls) or in the staging area, named "Captain Sahír":
       - place resources of the card the event is about resource tokens on the picked card
 
 12150:B:3 (back): If Captain Sahír is destroyed, the players have finally put an end to the Corsairs' treacherous plot and win the game.
   12150:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Captain Sahír")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 12151 Stormcaller
@@ -217,12 +225,13 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12151:A:3 (front): Forced: At the end of the round, if the Stormcaller is engaged with a player, either return it to the staging area or shift your heading off-course.
   12151:forced:1: Forced at the end of the round
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the acting player chooses one of:
       * option "staging":
         - return this card to the staging area
       * option "heading":
-        - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
+        - the Heading card shifts one step toward Storm (off-course), never past either end (nothing in a game with no Heading card)
 
 ## 12152 Slave Ship
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -236,8 +245,9 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12152:A:3 (front): For each point of damage that is dealt to a Ship objective by Slave Ship's attack, deal 1 point of damage to a non-Ship character controlled by the defending player, as well.
   12152:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if all of: ([json condition {"kind":"dealt"}]) and (the event's other card is a Ship character (any player controls)): the acting player assigns the damage just dealt damage among the character (you control) without Ship, one at a time
+      - if all of: (the attack that left this effect for its end, or the damage the answered event placed, dealt at least 1 damage) and (the event's other card is a Ship character (any player controls)): the acting player assigns the damage just dealt damage among the character (you control) without Ship, one at a time
 
 ## 12153 Umbar Slaver
 (the scenario deals it into the corsairDeck pile; the piles place it, no record does)
@@ -250,7 +260,8 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12153:A:2 (front): Forced: After the engaged player spends any number of resources, place 1 of those resources on Umbar Slaver.
   12153:forced:1: Forced on the event resourcesSpent (event happened to the controller)
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on this card
 
 ## 12154 Southern Belfalas
@@ -258,10 +269,12 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12154:A:1 (front): Travel: One player must reveal the top card of the Corsair deck and engage it to travel here.
   12154:travel:1: Travel
-    - [json RevealCorsair {"verb":"RevealCorsair","who":"anyPlayer"}]
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the Corsair deck and its discard pile are empty (read by the sea family)
+    - one player, named by the first player (the only player takes it without being asked), reveals the top card of the Corsair deck and puts it into play engaged with them (the deck refills from its discard pile when it runs out)
 
 12154:A:2 (shadow): Shadow: If this attack destroys a character, discard an ally controlled by the defending player.
   12154:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose ally (you control)
       - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -272,13 +285,14 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12155:A:1 (front): While Corsair Waters is the active location, no more than 1 ally can enter play each round.
   12155:constant:1: Constant
     only if this card is the active location
-    - [json LimitEntries {"verb":"LimitEntries","cardType":"ally","max":1}]
+    - no more than 1 ally cards can enter play each round, played or put into play (an ally that entered play and left again counts)
 
 12155:A:2 (shadow): Shadow: Either shift your heading off-course, or treat this attack as undefended.
   12155:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "heading":
-        - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
+        - the Heading card shifts one step toward Storm (off-course), never past either end (nothing in a game with no Heading card)
       * option "undefended":
         - this attack is considered undefended
 
@@ -288,13 +302,15 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12156:A:1 (front): While Watch Tower is in the staging area, it gains: "Forced: When a Raider enemy enters play, add 1 resource to it."
   12156:forced:1: Forced on the event encounterEnteredPlay (heard about Raider enemy (any player controls) or in the staging area)
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on the card the event is about
 
 12156:A:2 (shadow): Shadow: If this attack destroys an ally, add resources to a Raider enemy in play equal to that character's printed resource cost.
   12156:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a card (any player controls) of card type ally that is out of play now): choose Raider enemy (any player controls) or in the staging area
-      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a card (any player controls) of card type ally that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): place cost of the event's other card resource tokens on the picked card
+      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a card (any player controls) or in the staging area or the active location, of card type ally that is out of play now): choose Raider enemy (any player controls) or in the staging area
+      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a card (any player controls) or in the staging area or the active location, of card type ally that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): place cost of the event's other card resource tokens on the picked card
 
 ## 12157 Serpent's Tail
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -304,7 +320,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each Ship enemy (any player controls) or in the staging area:
       - the picked card is dealt a shadow card
-    - then, if [json condition {"kind":"heading","is":"offCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): for each Ship enemy (any player controls) or in the staging area:
+    - then, if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): for each Ship enemy (any player controls) or in the staging area:
       - the picked card: stat engagementCost -10, until the end of the round
 
 ## 12158 Captain Sahír
@@ -312,6 +328,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12158:A:1 (front): Captain Sahír engages the first player.
   12158:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this enemy, in the staging area, engages the first player
 
 12158:A:2 (front): For each point of damage Captain Sahír would take, discard 1 resource from him and cancel that damage.
@@ -321,6 +338,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12158:A:3 (front): For every 5 resources on Captain Sahír, he makes an additional attack against the engaged player each combat phase.
   12158:forced:2: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card; limit once per round)
     only if it is the Combat phase
+    who acts: the acting player is the defending player (the player the attack is against)
     - repeat resources of this card divided by 5, rounded down times:
       - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
@@ -334,6 +352,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12159:A:2 (front): Forced: At the beginning of the resource phase, add 1 resource to each Raider enemy in play.
   12159:forced:1: Forced when a phase begins
     only if it is the Resource phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each Raider enemy (any player controls) or in the staging area:
       - place 1 resource tokens on the picked card
 
@@ -343,10 +362,11 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12160:A:1 (front): When faced with the option to travel, if Streets of Umbar is in the staging area, the players must either travel to a location named Streets of Umbar or add 2 resources to a Raider enemy in play.
   12160:constant:1: Constant
     only if this card is in the staging area
-    - [json TravelOrAddResources {"verb":"TravelOrAddResources","amount":2,"pick":{"type":"enemy","control":"any","staging":true,"trait":"Raider"}}]
+    - while this location is in the staging area, the players cannot decline to travel, and cannot travel to a location with another title, unless the first player chooses a Raider enemy (any player controls) or in the staging area that gets 2 resources instead (with no such card they can only travel to a location with this card's title)
 
 12160:A:2 (shadow): Shadow: If attacking enemy is a Raider, deal it an additional shadow card for each resource token on it, to a maximum of 3 additional shadow cards.
   12160:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - repeat resources of the attacking enemy, at most 3 times:
       - if the attacking enemy is a Raider enemy (any player controls): the attacking enemy is dealt a shadow card
 
@@ -373,9 +393,10 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12162:A:2 (shadow): Shadow: If attacking enemy is a Raider, move 1 resource from a hero you control to attacking enemy.
   12162:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attacking enemy is a Raider enemy (any player controls): choose hero (you control) with resources on it
-    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) [also {"attackingEnemy":true}]
+    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) that is the enemy making the attack in progress
     - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): move 1 resource tokens from the card picked before the last to the last card picked
 
 ## 12163 Foes of Ecthelion
@@ -412,4 +433,4 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
       - the acting player assigns the resource tokens on Raider enemy (any player controls) engaged with you damage among the character (you control), one at a time
     - then, if the number of Raider enemy (any player controls) is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
-(rendered pieces: 272 by template, 34 as JSON)
+(rendered pieces: 313 by template, 0 as JSON)

@@ -5,6 +5,7 @@ import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { updateCard } from "../core/state.ts";
 import { gameReads } from "../core/game-reads.ts";
 import { queueEvent } from "./queue.ts";
+import { shipExhaustedNow } from "../families/sea/water.ts";
 
 // Whether a card in the game answers "After ~ exhausts" (Turayn, 12166:A:2; The One Ring's Forced effect, 142084:A:2).
 export function exhaustHeard(state: ScenarioState, ctx: ReduceContext): boolean {
@@ -24,6 +25,9 @@ export function exhaustAnnounced(
   const card = state.cards[id];
   if (!card) return state;
   const next = updateCard(state, id, { ...patch, exhausted: true });
-  if (card.exhausted || !exhaustHeard(state, ctx)) return next;
-  return queueEvent(next, { trigger: "exhausted", seat: card.controller ?? null, cardId: id, ...event });
+  if (card.exhausted) return next;
+  // A Ship objective that exhausts is announced to the cards that hear `shipExhausted` as it exhausts (Taking on Water, 12132:A:1).
+  const noted = shipExhaustedNow(next, id, ctx);
+  if (!exhaustHeard(state, ctx)) return noted;
+  return queueEvent(noted, { trigger: "exhausted", seat: card.controller ?? null, cardId: id, ...event });
 }

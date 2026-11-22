@@ -98,7 +98,7 @@ describe("02131 The Spiders' Ring", () => {
     expect(fight.run.state.activeLocation).toBe(ring?.id);
     expect(zoneOf(fight.run.state, "place")).toBe("staging");
     // The shadow card is no longer one of the enemy's: the enemy holds none, and the card no longer names it as its host.
-    expect(ring?.host).toBeUndefined();
+    expect(ring?.host).toBeNull();
     expect(shadowCards(fight.run.state.cards[first(fight.run.state, "f3")])).not.toContain(ring?.id);
   });
 

@@ -16,6 +16,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 02106:B:1 (back): Forced: After this stage is defeated, the first player chooses a player. That player must pass an Escape test, dealing 1 card from the encounter deck for each resource token on Gollum, to capture him. If Gollum is not captured at this time, reset the quest deck to stage 1B.
   02106:forced:1: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a objective (any player controls) named "Gollum" to choose: choose player (any player controls) chosen by the first player
     - then, if there is a objective (any player controls) named "Gollum" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then a number of cards equal to resources of "Gollum" are dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
@@ -25,7 +26,8 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 02106:B:2 (back): If this final Escape test is passed, the players have captured Gollum and won the game.
   02106:constant:1: Constant
     - this card: stat holdsWin (defeating this final stage does not win the game: it stays the current quest card, defeated, and its own Forced effects win the game or reset the quest) 1, while this card is in play
-  02106:forced:2: Forced on the event escapePassed
+  02106:forced:2: Forced after an escape test that this card's own effect made is passed (no other card hears it; the event happened to the player who made the test)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 02107 Gollum
@@ -38,6 +40,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 02107:A:2 (front): Forced: At the end of the quest phase, the party must make an escape test, dealing 1 card per player from the encounter deck. If this test is failed, place 2 resource tokens on Gollum.
   02107:forced:1: Forced at the end of the phase
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the party: every player, the first player first, commits to one shared test makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then a number of cards equal to the number of players are dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
     - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 2 resource tokens on this card
@@ -109,6 +112,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 02112:A:1 (front): Forced: Remove 2 damage from Giant Marsh Worm at the end of each round.
   02112:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
     - heal 2 damage from this card
 
 02112:A:2 (front): Escape: 2
@@ -143,10 +147,216 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 02115:A:1 (front): Forced: After the players travel to this location, place 1 resource token on Gollum.
   02115:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
 
 02115:A:2 (front): Escape: 2
   02115:constant:1: Constant
     - this card counts Escape 2 while it is dealt for an escape test (it does nothing in play)
 
-(rendered pieces: 98 by template, 0 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 900801 The Dead Marshes Nightmare
+
+900801:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+900801:A:2 (front): Players cannot reduce their threat.
+  900801:constant:1: Constant
+    - each player: stat noThreatReduction 1, while this card is in play
+
+900801:A:3 (front): Setup: Search the encounter deck for The Mere of Dead Faces, and add it to the staging area. Then, shuffle the encounter deck.
+  900801:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - search the encounter deck, discard pile and victory display for the card with code 900802 and add it to the staging area (not revealed; nothing when none is found)
+    - shuffle the encounter deck
+    - the table: stat noteEncounterDiscards 1, until the end of the game
+
+900801:A:4 (front): Forced: After Gollum is placed in the discard pile, shuffle him into the encounter deck.
+  900801:forced:1: Forced on the event encounterDiscarded (heard about objective (any player controls) named "Gollum")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the card the event is about is shuffled into the encounter deck
+
+900801:B:1 (back): Begin with the standard quest deck and encounter deck for The Dead Marshes scenario.
+  (inert: the engine applies it by rule, no record)
+
+900801:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+900801:B:3 (back): 1x A Wisp of Pale Sheen
+  (inert: the engine applies it by rule, no record)
+
+900801:B:4 (back): 1x Through the Mist
+  (inert: the engine applies it by rule, no record)
+
+900801:B:5 (back): 2x Giant Marsh Worm
+  (inert: the engine applies it by rule, no record)
+
+900801:B:6 (back): 4x Fens and Mires
+  (inert: the engine applies it by rule, no record)
+
+900801:B:7 (back): 3x Eastern Crows
+  (inert: the engine applies it by rule, no record)
+
+900801:B:8 (back): 2x Pursued by Shadow
+  (inert: the engine applies it by rule, no record)
+
+900801:B:9 (back): 2x Treacherous Fog
+  (inert: the engine applies it by rule, no record)
+
+900801:B:10 (back): 1x Wolf Rider
+  (inert: the engine applies it by rule, no record)
+
+900801:B:11 (back): 2x Hill Troll
+  (inert: the engine applies it by rule, no record)
+
+900801:B:12 (back): 2x Goblin Sniper
+  (inert: the engine applies it by rule, no record)
+
+900801:B:13 (back): 2x Wargs
+  (inert: the engine applies it by rule, no record)
+
+900801:B:14 (back): 2x Despair
+  (inert: the engine applies it by rule, no record)
+
+900801:B:15 (back): 2x The Brown Lands
+  (inert: the engine applies it by rule, no record)
+
+900801:B:16 (back): 2x The East Bight
+  (inert: the engine applies it by rule, no record)
+
+900801:B:17 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard The Dead Marshes encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+900801:B:18 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 900802 The Mere of Dead Faces
+
+900802:A:1 (front): X is the number of resource tokens here. Cannot leave the staging area.
+  900802:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat resources of this card, while this card is in play
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+
+900802:A:2 (front): If Gollum is not in play, any resource tokens that would be placed on Gollum are placed here instead.
+  900802:constant:2: Constant
+    - this card: stat redirectResources (resource tokens that would be placed on a card named by its code that is not in play are placed on this card instead) 1, while this card is in play
+
+900802:A:3 (front): Forced: After Gollum enters play, place 2 resource tokens on Gollum, then move all resource tokens from The Mere of Dead Faces to Gollum.
+  900802:forced:1: Forced on the event encounterEnteredPlay (heard about objective (any player controls) named "Gollum")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 2 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
+    - choose location (any player controls) that is this card itself
+    - choose objective (any player controls) named "Gollum"
+    - move all the resource tokens from the card picked before the last to the last card picked
+
+## 900803 Stagnant Quagmire
+
+900803:A:1 (front): While Stagnant Quagmire is in play, it adds its Escape value to all escape tests.
+  900803:constant:1: Constant
+    - this card: stat escapeSelfValue (its own Escape value is added to every escape test while it is in play, once for each such card) 1, while this card is in play
+
+900803:A:2 (front): Escape: 2
+  900803:constant:2: Constant
+    - this card counts Escape 2 while it is dealt for an escape test (it does nothing in play)
+
+900803:A:3 (shadow): Shadow: Perform an escape test, dealing 1 card from the encounter deck. If this test is failed, discard the defending character.
+  900803:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then 1 card is dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
+    - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): choose character (any player controls) defending
+    - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 900804 Things in the Pools
+
+900804:A:1 (front): Forced: After a character commits to an escape test, deal 1 damage to that character.
+  900804:forced:1: Forced on the event committedToEscape (heard about character (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - deal 1 damage to the card the event is about
+
+900804:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if attacking enemy is Undead.)
+  900804:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a Undead enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a Undead enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 900805 Marsh-wight
+
+900805:A:1 (front): Forced: After Marsh-wight engages a player, that player makes an escape test, dealing 3 cards from the encounter deck. If this test is failed, place 2 resource tokens on Gollum and Marsh-wight makes an immediate attack.
+  900805:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then 3 cards are dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
+    - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 2 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
+    - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 900806 Lost Soul of Lórien
+
+900806:A:1 (front): Forced: After Lost Soul of Lórien is destroyed, attach it to a hero with 1 or more Willpower, if able. (Counts as a Condition attachment with the text: "Limit 1 per hero. Attached hero's Willpower is reduced to 0.")
+  900806:forced:1: Forced after an enemy is destroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - attach this card to a hero with 1 or more Willpower of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
+  900806:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the card this one is attached to: stat willpower is set to 0, overriding every other modifier of it
+    - this card counts as a Condition attachment while it is attached
+
+## 900807 Ill-fated Guard
+
+900807:A:1 (front): While Ill-fated Guard is engaged with a player, that player cannot commit more than 1 character to each escape test.
+  900807:constant:1: Constant
+    - engagedSeat: stat escapeCommitLimit (that player cannot commit more than this many characters to an escape test; the tightest limit holds) 1, while this card is in play
+
+900807:A:2 (shadow): Shadow: Discard all attachments from each character you control with 3 or more Willpower.
+  900807:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - for each attachment (any player controls) attached to a character (you control) with 3 or more Willpower:
+      - discard the picked card
+
+## 900808 Candles of Corpses
+
+900808:A:1 (front): When Revealed: Each player makes an escape test, dealing 1 card from the encounter deck. Each player who fails this test must either discard a hero he controls from play or raise his threat by 5.
+  900808:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then 1 card is dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
+      - the acting player chooses one of:
+        * option "discard" (only if all of: (the last escape test the running effect made was failed (false before it has made one)) and (there is a hero (you control) to choose)):
+          - choose hero (you control)
+          - discard the picked card
+        * option "threat" (only if the last escape test the running effect made was failed (false before it has made one)):
+          - raise threat by 5 (the acting player)
+
+900808:A:2 (front): Escape: 5
+  900808:constant:1: Constant
+    - this card counts Escape 5 while it is dealt for an escape test (it does nothing in play)
+
+## 900809 Swarming Mosquitos
+
+900809:A:1 (front): When Revealed: The first player makes an escape test counting Defense instead of Willpower, dealing 2 cards from the encounter deck. If this test is failed, place 1 resource token on Gollum and deal 1 damage to each character in play.
+  900809:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then 2 cards are dealt from the encounter deck, each counting its Escape value; the committed Defense must be higher than the Escape counted (a tie fails)
+    - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
+    - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to each character (any player controls)
+
+900809:A:2 (front): Escape: 3
+  900809:constant:1: Constant
+    - this card counts Escape 3 while it is dealt for an escape test (it does nothing in play)
+
+## 900810 Devilry of the Dark Land
+
+900810:A:1 (front): When Revealed: Return the top X Undead enemies in the encounter discard pile to the staging area, where X is the number of players. If no enemies were returned to the staging area as a result of this effect, Devilry of the Dark Land gains surge.
+  900810:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - return the topmost the number of players Undead enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed; one with the ambush keyword makes its engagement checks on entering the staging area; the number returned is counted)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+900810:A:2 (front): Escape: 10
+  900810:constant:1: Constant
+    - this card counts Escape 10 while it is dealt for an escape test (it does nothing in play)
+
+(rendered pieces: 193 by template, 0 as JSON)

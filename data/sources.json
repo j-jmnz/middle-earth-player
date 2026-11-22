@@ -5706,9 +5706,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "5df241e1031cc7a52fac3efdfde4177de2a04ac73a0806db057b1de607819f4e"
+        "value": "135d2f6bca137fbab91e266293ce2fae4ce16159ffbd4a5dc338444f4340a8e7"
       },
-      "fetchedAt": "2026-11-20T16:38:00.838Z",
+      "fetchedAt": "2026-11-22T10:04:26.661Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -25763,10 +25763,22 @@
           "bytes": 2880965
         },
         {
+          "path": "pictures/40004.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1uAtROGmJc2EWK2qN4NKBjM4nFXW8Sip_&export=download&confirm=t",
+          "sha256": "1b279da3be9d76865343e6e0848685a19cc02b116d391a4fa55f138c10b22b51",
+          "bytes": 2709190
+        },
+        {
           "path": "pictures/40005.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1uJkv03-YgWHJPyVEswqqEESTRk_KBz6I&export=download&confirm=t",
           "sha256": "6e6e235c8a8f337d94e0c43afa1bc3bf38aae30864ca47df032be73c6b4868d9",
           "bytes": 2941098
+        },
+        {
+          "path": "pictures/40005.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1uHM5FQMKA1Zk-jgGf-HJ6IGraHB0a6r6&export=download&confirm=t",
+          "sha256": "968a2d1797bdf1fa3e9aca96eb026c9fe3cf8df855261ec3d528fafc10ccdc8c",
+          "bytes": 2770617
         },
         {
           "path": "pictures/40006.A.jpg",
@@ -27384,45 +27396,45 @@
         },
         {
           "path": "pictures/50901.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-1-front-Quest-Assault_on_the_Golden_Wood-A-Attack_on_Dol_Guldur.jpg",
-          "sha256": "64de30df3fe0b3ab9dfe8819c679949dd3878045213a6dbdd98c18e3232e2322",
-          "bytes": 820553
+          "url": "https://drive.usercontent.google.com/download?id=1nJX4KgzWouT3IjhZXNwAuWivbCzJuf3o&export=download&confirm=t",
+          "sha256": "2358e53809fcf7683c660437fc0cd8554604ecb3497a7a3ec2b9aa1854b7b201",
+          "bytes": 3512368
         },
         {
           "path": "pictures/50901.B.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-1-back-Quest-Assault_on_the_Golden_Wood-A-Attack_on_Dol_Guldur.jpg",
-          "sha256": "8fd5db7d772a7c87f14e71fa8910d513d6a527da66f85afd2a50a45c3c92bd27",
-          "bytes": 772743
+          "url": "https://drive.usercontent.google.com/download?id=1nX5IDg6foglEIzVpSfg5lN2bPOX_eBhf&export=download&confirm=t",
+          "sha256": "0ad39cfd7a3287ccd583ba52b6e8482a7fa44da18555a9067a874ac3b9b57051",
+          "bytes": 3353908
         },
         {
           "path": "pictures/50902.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-2-front-Quest-Crossing_the_Anduin-A-Attack_on_Dol_Guldur.jpg",
-          "sha256": "29a3659b1fba5646bdcfa8ae9d92f482234dfeb15fb94a71613bf11b0e1f467d",
-          "bytes": 816390
+          "url": "https://drive.usercontent.google.com/download?id=1nWmkPsP36H8mGNKF9kkJYV8pPGRQJy4X&export=download&confirm=t",
+          "sha256": "0c2130c395435f681e6950e90d602736beec0636d9c4f318b83e864ce056c719",
+          "bytes": 3535948
         },
         {
           "path": "pictures/50902.B.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-2-back-Quest-Crossing_the_Anduin-A-Attack_on_Dol_Guldur.jpg",
-          "sha256": "e27744c4cf1fc6285501abf20a11bb91a870a0b043bfa8e23c1ce2192b3458fc",
-          "bytes": 791991
+          "url": "https://drive.usercontent.google.com/download?id=1nVxXeDAeYCGUQSv5G6K-0gMcZ3naM_jn&export=download&confirm=t",
+          "sha256": "c6c622a82f8de0fb65e2c39a5fa025abce1c0b97181a2b80ef762c05d5a96552",
+          "bytes": 3557290
         },
         {
           "path": "pictures/50903.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-3-front-Quest-The_Siege_of_Dol_Guldur-A-Attack_on_Dol_Guldur.jpg",
-          "sha256": "7de379354a06dfecde50b87539cb98af75c7f47ff8cc03cd2c85d7f0f0f82e02",
-          "bytes": 831721
+          "url": "https://drive.usercontent.google.com/download?id=1nTuDsl8es9SJNiZgZi4SnIJYbo9EOvuI&export=download&confirm=t",
+          "sha256": "48d4c0d93442e3760bb6dde1578341bd0a8489b5d94a8a29a5528dccc7ee60d1",
+          "bytes": 3665060
         },
         {
           "path": "pictures/50903.B.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-3-back-Quest-The_Siege_of_Dol_Guldur-A-Attack_on_Dol_Guldur.jpg",
-          "sha256": "7776dbf68c92c4ba64f34f317c418a914a518dd7de6f08fb5f2232e437b83174",
-          "bytes": 783720
+          "url": "https://drive.usercontent.google.com/download?id=1njk7NqQCDouKmni0AUBzOqBbwtYwEIm6&export=download&confirm=t",
+          "sha256": "81947f55e81d1b5a393b157d2d6da934ae44fdfc12a959727749fb542e24eb4f",
+          "bytes": 3375586
         },
         {
           "path": "pictures/50904.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-4-front-Quest-The_Tower_of_Sorcery-C-Attack_on_Dol_Guldur.jpg",
-          "sha256": "fc2406c3d0250a0f376929386292b0940b566a9044126183a3cc4036547a20b6",
-          "bytes": 820026
+          "url": "https://drive.usercontent.google.com/download?id=1ngw6fgXY_t61ll9g5naxGRPDj9JRHXb-&export=download&confirm=t",
+          "sha256": "c9aa956b6bd29f464d0db6bfb810bed6e54690e6daad744698965ae69e5047ae",
+          "bytes": 3483725
         },
         {
           "path": "pictures/50904.B.jpg",
@@ -27432,9 +27444,9 @@
         },
         {
           "path": "pictures/50905.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-5-front-Quest-Battle_Under_the_Trees-E-Attack_on_Dol_Guldur.jpg",
-          "sha256": "ea4e0a464c1535729fe00281216240941066f321048e6e5494a0fdf14a366a0d",
-          "bytes": 838616
+          "url": "https://drive.usercontent.google.com/download?id=1nYFeu-_m2yR22NrIgApydb74zP2DfGhS&export=download&confirm=t",
+          "sha256": "a0839332ec0925c2898186294651098d367b88b1d627ac6868ca99b2066fe845",
+          "bytes": 3652005
         },
         {
           "path": "pictures/50905.B.jpg",
@@ -27444,9 +27456,9 @@
         },
         {
           "path": "pictures/50906.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-6-front-Quest-Dungeons_of_the_Necromancer-G-Attack_on_Dol_Guldur.jpg",
-          "sha256": "95d8d8dd633c92eaecc83984a3b92b93ba259d85a20257ea6ad84f79495b5e35",
-          "bytes": 808322
+          "url": "https://drive.usercontent.google.com/download?id=1o1fWrpBpM83OTFjwUCsOlw0fp2JnPoHT&export=download&confirm=t",
+          "sha256": "ff48fc484cca8ffdff19df85f6945d71a5d660117db5d23a798f0d99dcf73829",
+          "bytes": 3764878
         },
         {
           "path": "pictures/50906.B.jpg",
@@ -27456,147 +27468,147 @@
         },
         {
           "path": "pictures/50907.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-7-front-Objective-Dol_Guldur-Attack_on_Dol_Guldur.jpg",
-          "sha256": "1ff92e3c7d602c5969396ce5dc815abdba34fe5e58a5d84271e46e420c7b411f",
-          "bytes": 817238
+          "url": "https://drive.usercontent.google.com/download?id=1lJYfypwvHsACVjKXKhcX8_pxdlObNnoU&export=download&confirm=t",
+          "sha256": "c8edf30a1fe5a4417a93e92bc8c0b42ec160126a5805d64ac4439a13d23ded68",
+          "bytes": 4201321
         },
         {
           "path": "pictures/50908.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-8-front-Objective-Power_of_Lorien-Attack_on_Dol_Guldur.jpg",
-          "sha256": "472a544a6d86817dae053fb440e165d7064320e7b72c134675f3a39d5b748ca4",
-          "bytes": 756262
+          "url": "https://drive.usercontent.google.com/download?id=1lmRR184WgcxRCPtINYoIPV5IN9kprHkQ&export=download&confirm=t",
+          "sha256": "eab808e35b291622cb0068dfb2cc190ef78a0164cd1fea9cdbd3f571149c3152",
+          "bytes": 4316752
         },
         {
           "path": "pictures/50909.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-9-front-ObjectiveAlly-Host_of_Lorien-Attack_on_Dol_Guldur.jpg",
-          "sha256": "ba77e68823af446dd220bb9f5359cf8e1bee0d7d3502be7e09dbc6d9523d150e",
-          "bytes": 785235
+          "url": "https://drive.usercontent.google.com/download?id=1llxcIXdQByo29oOS04TRakgMPE2yGX8g&export=download&confirm=t",
+          "sha256": "a8984a43fe2b485f5261ec5924ebfe9782a775c28c7b9f3fe4ab26b308b2af58",
+          "bytes": 4289572
         },
         {
           "path": "pictures/50910.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-10-front-Enemy-Bane_of_Amon_Lanc-Attack_on_Dol_Guldur.jpg",
-          "sha256": "8043279fbfaaef2fac73ccc86271c1e247403c3b4fc0508bc277beabcc4cda9f",
-          "bytes": 772086
+          "url": "https://drive.usercontent.google.com/download?id=1lir6W-6TbZhfte8wGI09GLbv1bVuSaP5&export=download&confirm=t",
+          "sha256": "57d770e219a3e51626ac4d02b25dc506c5e077569c487dc8280724280e592694",
+          "bytes": 4261922
         },
         {
           "path": "pictures/50911.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-11-front-Enemy-Sorcerer_of_Dol_Guldur-Attack_on_Dol_Guldur.jpg",
-          "sha256": "e97cc6585783cfd82e8c847475334801b6eb9d73511c909eb061d2cbb4d561ff",
-          "bytes": 752856
+          "url": "https://drive.usercontent.google.com/download?id=1lXgnS1JuD3WF16AyJTASH8bU3rgC0Wbh&export=download&confirm=t",
+          "sha256": "1be944481af1517d0b978c542642a83e2de8b083e5829a963cf9512e9223cc56",
+          "bytes": 4546283
         },
         {
           "path": "pictures/50912.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-12-front-Enemy-Chieftain_Morlug-Attack_on_Dol_Guldur.jpg",
-          "sha256": "ddd06b4018ea9102ae5b1b1855313c87929d4bd36da5dc54598efb0eca860762",
-          "bytes": 759054
+          "url": "https://drive.usercontent.google.com/download?id=1lzOTIcTL9nuDbqNXOxQILNaOPOxde1Ed&export=download&confirm=t",
+          "sha256": "c42542ed5c28ec16ca528957de58fc6747cea34c528d0ee6a10c1fb7a1e651b6",
+          "bytes": 4258716
         },
         {
           "path": "pictures/50913.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-13-front-Enemy-Dungeon_Dweller-Attack_on_Dol_Guldur.jpg",
-          "sha256": "e1b72b310d27e5b1ec33e4e357fad5687d467b68c491b30fcb5e10d8fe0fa521",
-          "bytes": 759619
+          "url": "https://drive.usercontent.google.com/download?id=1lv9I1Z7md0PaGIpVN1eKru-OLgFlEIxM&export=download&confirm=t",
+          "sha256": "07ae8bc7a9b5d7881f77de69d5bd6dc2bf082ccb030d947f301fe5da3ebcd828",
+          "bytes": 4376579
         },
         {
           "path": "pictures/50914.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-14-front-Enemy-Host_of_Dol_Guldur-Attack_on_Dol_Guldur.jpg",
-          "sha256": "8f8763db23f0e87431a83252fd1dfbae77d46178fdc73606a8c1bda20ba34f09",
-          "bytes": 753397
+          "url": "https://drive.usercontent.google.com/download?id=1lspv3eS6MDkE6VZpDFouV_gt52TRv-S-&export=download&confirm=t",
+          "sha256": "4d8bec204d9f12f12a5fd3a93934e621369c9d7d3d9dae268bda4499884435e0",
+          "bytes": 4143699
         },
         {
           "path": "pictures/50915.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-15-front-Enemy-Mirkwood_Olog_hai-Attack_on_Dol_Guldur.jpg",
-          "sha256": "a4ac60947e72cd5d36c2d60f4504884c0d75b82b1a60b4a61b4fd303eb53943c",
-          "bytes": 756901
+          "url": "https://drive.usercontent.google.com/download?id=1lmeoFHCZE1tjEQ3HtgBVi1LQBfROW_Nz&export=download&confirm=t",
+          "sha256": "bf06ddb45ec623230e6eed1fd179a42a9d15a4b28a1b997de04d0c4cbc2777c8",
+          "bytes": 4338213
         },
         {
           "path": "pictures/50916.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-16-front-Enemy-Beast_of_Taur_nu_Fuin-Attack_on_Dol_Guldur.jpg",
-          "sha256": "d8ebf5157e888af661eb58fdc0705de85bf5badbbda3e4c8931e9b46c101d6c2",
-          "bytes": 754553
+          "url": "https://drive.usercontent.google.com/download?id=1mEHQ-fGYVsJt-MTX4mrA_KFP-lsHJ8bO&export=download&confirm=t",
+          "sha256": "113748a7acba4e4c9b2607d23c2eaac15cf6f56e5263f073a6a3fcc2ed687511",
+          "bytes": 4214768
         },
         {
           "path": "pictures/50917.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-17-front-Enemy-Amon_Lanc_Archer-Attack_on_Dol_Guldur.jpg",
-          "sha256": "f73e21b2b81339ff4ff4389f00e53b0ce71cec964a0c3834c39b5e9ee83b936e",
-          "bytes": 720623
+          "url": "https://drive.usercontent.google.com/download?id=1m7hmpPA-cvbkQTvBMFmXmrfo9nDMSsM2&export=download&confirm=t",
+          "sha256": "371df469fba0135cf189087847d353708a6e916699f61f1db9789f62f101c001",
+          "bytes": 4255259
         },
         {
           "path": "pictures/50918.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-18-front-Enemy-Dol_Guldur_Marauder-Attack_on_Dol_Guldur.jpg",
-          "sha256": "43f3058e5a99f0cc3fc68aa1159885e7ef155cc569caed656dde2bfe8a28725f",
-          "bytes": 747281
+          "url": "https://drive.usercontent.google.com/download?id=1m6JooT2TQItJgGUcKagZxt36z4amYs6a&export=download&confirm=t",
+          "sha256": "dd281b02a65e7d8824680fdab6b76ca8ea9f2f3dc72c5e6738efd9353e446401",
+          "bytes": 4169437
         },
         {
           "path": "pictures/50919.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-19-front-Enemy-Battle_Warg-Attack_on_Dol_Guldur.jpg",
-          "sha256": "36ffdcab4a76b01721524bda11e5aa05a2ebc4e4763c306386c3e837baad0998",
-          "bytes": 750549
+          "url": "https://drive.usercontent.google.com/download?id=1m404Du1l7lC_rxSEUlk46NapG6GsbNbX&export=download&confirm=t",
+          "sha256": "a1f4c2e864f5ce941b3988498af5122e4f39eba961c92f367efcd07f57bbee64",
+          "bytes": 4259078
         },
         {
           "path": "pictures/50920.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-20-front-Location-Gate_of_Dol_Guldur-Attack_on_Dol_Guldur.jpg",
-          "sha256": "f7ef1210fe6b23db4ec9faedc5a35e7a00e53326006333e317daf4dba4cdf91e",
-          "bytes": 744797
+          "url": "https://drive.usercontent.google.com/download?id=1mRlTZrnaYQFA-X0RXNMWkdqle3pDi_Vn&export=download&confirm=t",
+          "sha256": "93b1be2c3bcd8cae7d2edc44e9bf916b93c33df5e354a9996b8074f29373d6a6",
+          "bytes": 4299910
         },
         {
           "path": "pictures/50921.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-21-front-Location-The_Sorcerers_Tower-Attack_on_Dol_Guldur.jpg",
-          "sha256": "ef9dbb50bc7bc3e5d26b14ed133593f09b117ca9114bf928f56cf959e7392aba",
-          "bytes": 760523
+          "url": "https://drive.usercontent.google.com/download?id=1mOKxGhbGAI9UxWn_1iX6RwaPG6xk_DhP&export=download&confirm=t",
+          "sha256": "fa871d30f55fe098fda86b86ebf0ae224e81e0ec05076765b4ace9e1fc3c6084",
+          "bytes": 4362168
         },
         {
           "path": "pictures/50922.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-22-front-Location-The_Shadow_Road-Attack_on_Dol_Guldur.jpg",
-          "sha256": "d3c0ddf008a7700a5fb2a08917b35b85d7908d729afbed7f66c80eb37f58cbc5",
-          "bytes": 751011
+          "url": "https://drive.usercontent.google.com/download?id=1mNI1ql915I7Y_IHRGDOmr0cR6_75ESzW&export=download&confirm=t",
+          "sha256": "711802f5d50c2e241d2635f96c4cb4186dafb9e5202df99e06f4ef1b9a9384f6",
+          "bytes": 4254212
         },
         {
           "path": "pictures/50923.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-23-front-Location-Dungeon_Door-Attack_on_Dol_Guldur.jpg",
-          "sha256": "71261e4ae7acc9b1a9019a0b36b42cf3513494b699c8f5e5c6f54f6cf3599523",
-          "bytes": 727294
+          "url": "https://drive.usercontent.google.com/download?id=1mEbVXsBBqjeEJZ90j9L_T4B6fUiPObfd&export=download&confirm=t",
+          "sha256": "b143e6263a00501489ef180be2ade37a36c3232fd4134f7dff8faabe992758de",
+          "bytes": 4415603
         },
         {
           "path": "pictures/50924.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-24-front-Location-Forest_Battleground-Attack_on_Dol_Guldur.jpg",
-          "sha256": "52221e56da15e8c233256420d5b52dff91cc4fe108818ff2308ac08833203f1c",
-          "bytes": 760930
+          "url": "https://drive.usercontent.google.com/download?id=1mzRpjeQ06GIUSQzIDD9LYWu_L2WT0Ywg&export=download&confirm=t",
+          "sha256": "1c889669025f881b872b81e3d77705d9f01c61c6448548f936087d1f5ce2a67b",
+          "bytes": 4462068
         },
         {
           "path": "pictures/50925.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-25-front-Location-Blackened_Woods-Attack_on_Dol_Guldur.jpg",
-          "sha256": "7ee2107127e1db8f532992ea5bee9ed4c9ad076c759e9adba6478853e748ef92",
-          "bytes": 750219
+          "url": "https://drive.usercontent.google.com/download?id=1mtR8SlTNXM8Pvhr9n4Zct0yhrtKNnoD1&export=download&confirm=t",
+          "sha256": "ebb9c1378a84bf3f5fa82f9dec16e095b10a5cafd3d55f8bacbc7a539554f3ee",
+          "bytes": 4305206
         },
         {
           "path": "pictures/50926.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-26-front-Treachery-Servant_of_Sauron-Attack_on_Dol_Guldur.jpg",
-          "sha256": "5f3f704a084ce22d052df35b222d4607ea4a6db116fb7760afef83b0b4664b9b",
-          "bytes": 805471
+          "url": "https://drive.usercontent.google.com/download?id=1mp41JXGWT4YVP5oI8q-K-qg3wxDC9127&export=download&confirm=t",
+          "sha256": "4645d2259392814889635a845c8c072352f191a662758c2dcbbced7ba64c3c1d",
+          "bytes": 4271265
         },
         {
           "path": "pictures/50927.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-27-front-Treachery-Power_Sevenfold-Attack_on_Dol_Guldur.jpg",
-          "sha256": "fc9287ef33649f8246d2f791e09e525e694560b06b7152ef7202d7492582d220",
-          "bytes": 801475
+          "url": "https://drive.usercontent.google.com/download?id=1meQaKZQ6mguqCG6sytFS2nkxmlcRi0iz&export=download&confirm=t",
+          "sha256": "68c4be2958da4d4ce7fe1d5c41185d773ad077311ab40508cd598630d168ae7d",
+          "bytes": 4583366
         },
         {
           "path": "pictures/50928.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-28-front-Treachery-The_Necromancers_Rage-Attack_on_Dol_Guldur.jpg",
-          "sha256": "6bb4a364986bddc023bd67fef00467446cfb014bd2967630391e76ddbae5f65d",
-          "bytes": 721222
+          "url": "https://drive.usercontent.google.com/download?id=1nCeAikiSLXPbaaMKJmXbBOqnLvEQTtYa&export=download&confirm=t",
+          "sha256": "898ae68be76eaf6fc13a7fa552e22082a85135d5687823f914d9352464b32bc7",
+          "bytes": 4355932
         },
         {
           "path": "pictures/50929.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-29-front-Treachery-Fear_and_Despair-Attack_on_Dol_Guldur.jpg",
-          "sha256": "efef90b28b265d67e36dba58eb9346613f451d3f31c12a686b48cc0b37f4f3d9",
-          "bytes": 745518
+          "url": "https://drive.usercontent.google.com/download?id=1n92xyxa2LKd7Tn1F8sNhoPKKoS8VMXNt&export=download&confirm=t",
+          "sha256": "8b7be61293b80367f7de86086b66f340d10945ab2f1e7a6889aabd67c7dc74cf",
+          "bytes": 4400792
         },
         {
           "path": "pictures/50930.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/OP050-30-front-Treachery-Fastness_of_Mirkwood-Attack_on_Dol_Guldur.jpg",
-          "sha256": "475791fdcf870c8ebd321052520b5519f8cc560b2f42104f9ab4c734d565cbfb",
-          "bytes": 798840
+          "url": "https://drive.usercontent.google.com/download?id=1n6g2IkVQCkp7e1LhMd-Oqj1MfJdVWX8z&export=download&confirm=t",
+          "sha256": "343862fdcc8cc1d92ffb4de836b432ad9b0f50cec517c20863ee5a05a57c337a",
+          "bytes": 4636568
         },
         {
           "path": "pictures/50931.A.jpg",
@@ -30118,9 +30130,9 @@
       "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
       "pin": {
         "kind": "sha256",
-        "value": "5c535203baa7b6af96cecca46e385c5cf28a3a84aa773b544fafc816b9d3fed7"
+        "value": "f3fa000e5d2e11dfb17cdc13f21124f977eef230f1f704c45ff1fca0c3e51a81"
       },
-      "fetchedAt": "2026-11-17T13:50:12.692Z",
+      "fetchedAt": "2026-11-22T10:05:05.895Z",
       "files": [
         {
           "path": "pdf/mec109_rulebook-compressed.pdf",
@@ -30349,6 +30361,18 @@
           "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec_communitydecklists_theswordsofthenoldor-compressed.pdf",
           "sha256": "f8ba37508167224152585f5f74a6051c787cbedfe2648230a03589dac08a15c6",
           "bytes": 9131141
+        },
+        {
+          "path": "pdf/mec02_the_hunt_for_gollum_rulesheet.pdf",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC02.pdf",
+          "sha256": "cdc2c41387d14f7af75f7f5d2a656884fe52f14b71c9a14cf86a9dc2889ae29f",
+          "bytes": 437456
+        },
+        {
+          "path": "pdf/mec03_conflict_at_the_carrock_rulesheet.pdf",
+          "url": "https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC03.pdf",
+          "sha256": "f8522e5a9f1b69691e69e7e61844148b7d7dd6f831bcb55c0c05d9c750144929",
+          "bytes": 489519
         },
         {
           "path": "pdf/mec08_khazad-dum_rules_insert.pdf",

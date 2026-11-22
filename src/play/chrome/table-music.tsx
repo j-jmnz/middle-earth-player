@@ -1,4 +1,4 @@
-// The open table's music and the engagement sound (docs/design-system-table.md, Sound), mounted by the table's routes beside the table view: its scenario's calm loop, and its combat loop while a fight is on. A fight
+// The open table's music, the engagement sound and the reveal, shuffle, deal and notice sounds (docs/design-system-table.md, Sound), mounted by the table's routes beside the table view: its scenario's calm loop, and its combat loop while a fight is on. A fight
 // is an attack resolving or waiting to (in any phase), or the Combat phase with an enemy engaged with a seat; a spotlight still playing
 // the last attack keeps it on until the attack has shown. An empty Combat phase stays calm, and a game that has ended plays its calm loop
 // under the outcome. Leaving the table hands the music back to the menu's loop (the root layout's route rule, src/screens/nav/route-music.ts).
@@ -10,6 +10,7 @@ import { setTableMusic } from "../../ui/sound/music.ts";
 import { useSpotlightHold } from "../spotlight/use-spotlight.ts";
 import type { TableStore } from "../store/store.ts";
 import { combatMusic, newlyEngaged } from "./combat-music.ts";
+import { momentSounds } from "./moment-sounds.ts";
 import { playSound } from "../../ui/sound/sound.ts";
 import { useSkippedStrikes } from "../spotlight/strike-play.ts";
 
@@ -19,7 +20,17 @@ export function TableMusic({ store }: { store: TableStore }): null {
   // The sounds of the attacks a skipped spotlight did not play (strike-play.ts).
   useSkippedStrikes(store);
   useEngageSound(store);
+  useMomentSounds(store);
   return null;
+}
+
+// A deck shuffled in by an accepted intent (moment-sounds.ts) sounds as the state is accepted, as the engagement does: under reduced motion too, and an Undo's restored state is quiet.
+function useMomentSounds(store: TableStore): void {
+  useEffect(() => store.subscribe((state, before) => {
+    const moment = state.moment;
+    if (moment === before.moment || moment?.kind !== "sent") return;
+    for (const slot of momentSounds(moment.steps)) playSound(slot);
+  }), [store]);
 }
 
 // An enemy engaging a seat sounds as the state that engages it is accepted, under reduced motion too; an Undo's restored state is quiet (sound.ts).

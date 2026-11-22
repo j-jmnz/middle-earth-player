@@ -381,7 +381,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
       { verb: "AddSetAsideToStaging", code: NAURLHUG, when: THREE_ON_STALKING },
     ],
   },
-  // The additional attack is dealt a new shadow card, the old ones discarded first (faq.additional-attacks); written on its own, not copied from 18035:A:2 (which deals none).
+  // The additional attack is dealt a new shadow card, the old ones discarded first (faq.additional-attacks).
   { id: "50628:shadow:1", cardCode: "50628", lines: ["50628:A:2"], timing: "shadow", instructions: [{ verb: "ImmediateAttack", afterThis: true }] },
   // 50629 Concealed Spikes. When Revealed: each player assigns X damage among their characters, X 1 more than the Discover value of the active location. The Shadow: assign X damage, X the attachments you control, unless you discard the highest cost attachment you control.
   { id: "50629:whenRevealed:1", cardCode: "50629", lines: ["50629:A:1"], timing: "whenRevealed", instructions: [EACH_PLAYER([{ verb: "AssignDamage", amount: DISCOVER_PLUS_1, pick: { type: "character", control: "you" } }])] },

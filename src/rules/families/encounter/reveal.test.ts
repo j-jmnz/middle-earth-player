@@ -271,6 +271,27 @@ describe("threat raised by an encounter card effect", () => {
     expect(done.seats[0].threat).toBe(20);
   });
 
+  // The Dream-chaser's Hard and Expert Mode cards (11217:A:1, 11217:B:1, dcce.hard-expert) hold on the seat against every reduction, Free to Choose's included.
+  it("is lowered by no more than the cap of the round while the Hard Mode card holds (11217:A:1)", () => {
+    const built = deck(withThreat(seat().state, 0, 20), ["mist"]);
+    const event = put(built.state, "08062", "hand");
+    const capped: ScenarioState = { ...event.state, modifiers: [...event.state.modifiers, { instanceId: "seat:0", sourceId: "table", stat: "threatReductionCap", amount: 1, until: "endOfRound" }] };
+    const asked = stage(capped);
+    expect(asked.seats[0].threat).toBe(23);
+    const done = send(asked, { type: "Trigger", cardId: event.id, effectId: "08062:response:1" }, ctx);
+    expect(done.seats[0].threat).toBe(22);
+  });
+
+  it("is not lowered at all while the Expert Mode card holds (11217:B:1)", () => {
+    const built = deck(withThreat(seat().state, 0, 20), ["mist"]);
+    const event = put(built.state, "08062", "hand");
+    const barred: ScenarioState = { ...event.state, modifiers: [...event.state.modifiers, { instanceId: "seat:0", sourceId: "table", stat: "threatReductionBarred", amount: 1, until: "endOfRound" }] };
+    const asked = stage(barred);
+    expect(asked.seats[0].threat).toBe(23);
+    const done = send(asked, { type: "Trigger", cardId: event.id, effectId: "08062:response:1" }, ctx);
+    expect(done.seats[0].threat).toBe(23);
+  });
+
   it("is not heard when the threat comes from questing unsuccessfully (rr.step-3-4)", () => {
     const table = seat();
     const built = deck(withThreat(table.state, 0, 20), ["orc"]);

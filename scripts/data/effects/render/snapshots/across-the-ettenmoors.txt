@@ -19,15 +19,18 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 
 10064:B:1 (back): Forced: At the beginning of the quest phase, if there are no encounter side quests in play, discard cards from the top of the encounter deck until a side quest is discarded, reveal it, and add it to the staging area.
   10064:forced:1: Forced when a phase begins
-    only if all of: (it is the Quest phase) and (the number of card (any player controls) of card type encounter-side-quest is at most 0)
+    only if all of: (it is the Quest phase) and (the number of card (any player controls) or in the staging area or the active location, of card type encounter-side-quest is at most 0)
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until a side quest is discarded, or the deck is empty; that card becomes the picked card
     - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
 
 10064:B:2 (back): Forced: When a side quest is defeated, place progress tokens on Into the Ettenmoors equal to that side quest's quest points.
-  10064:forced:2: Forced on the event questCardDefeated (heard about card (any player controls) of card type encounter-side-quest)
+  10064:forced:2: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location, of card type encounter-side-quest)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - progress equal to printed quest points of the card the event is about is placed on the main quest stage (a quest effect: a full stage advances)
-  10064:forced:3: Forced on the event questCardDefeated (heard about card (any player controls) of card type player-side-quest)
+  10064:forced:3: Forced on the event questCardDefeated (heard about card (any player controls) or in the staging area or the active location, of card type player-side-quest)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - progress equal to printed quest points of the card the event is about is placed on the main quest stage (a quest effect: a full stage advances)
 
 ## 10065 A Miserable Journey
@@ -43,7 +46,8 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 10065:B:1 (back): Reveal 1 additional encounter card during the quest phase unless there is an active location with the safe keyword.
   10065:forced:1: Forced when a phase begins
     only if all of: (it is the Quest phase) and (no location with the safe keyword is the active location)
-    - reveal 1 additional encounter card(s) in the staging step this phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - reveal 1 additional encounter card(s) in the staging step this phase (the extra reveals go to the players in turn after the one each player makes, so the first player makes the first of them; while the stages are separate, to the player whose stage holds the effect)
 
 ## 10066 Journey's End
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -73,6 +77,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 
 10067:A:2 (front): If Amarthiúl leaves play, the players lose the game.
   10067:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 ## 10068 Secluded Cave
@@ -85,24 +90,26 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
     - (rule marker) this card has the Safe keyword: when the players travel to it all engaged enemies return to the staging area, and while it is the active location treacheries' When Revealed effects are ignored, encounter side quests' text boxes are blank and enemies make no engagement checks (its other lines say each)
   10068:constant:2: Constant
     only if this card is the active location
-    - the table: stat noEngagementChecks 1, while this card is in play
+    - the table: stat noEngagementChecks (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing) 1, while this card is in play
   10068:constant:3: Constant
     only if this card is the active location
-    - the table: stat treacheryRevealIgnored 1, while this card is in play
+    - the table: stat treacheryRevealIgnored (the When Revealed effects of treachery cards are ignored; the treachery is still revealed and keeps its keywords) 1, while this card is in play
   10068:constant:4: Constant
     only if this card is the active location
-    - each card (any player controls) of card type encounter-side-quest: stat blankText (its text box is blank) 1, while this card is in play
-  10068:forced:1: Forced after the players travel
+    - each card (any player controls) or in the staging area or the active location, of card type encounter-side-quest: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
+  10068:forced:1: Forced after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return every enemy engaged with a player to the staging area
   10068:forced:2: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - this card is added to the victory display
 
 10068:A:2: Immune to player card effects.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 10068:A:3 (front): Response: After you travel to Secluded Cave, each player draws 3 cards.
-  10068:response:1: Response after the players travel
+  10068:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - for each player, first player first:
       - the acting player draws 3 card(s)
 
@@ -116,24 +123,26 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
     - (rule marker) this card has the Safe keyword: when the players travel to it all engaged enemies return to the staging area, and while it is the active location treacheries' When Revealed effects are ignored, encounter side quests' text boxes are blank and enemies make no engagement checks (its other lines say each)
   10069:constant:2: Constant
     only if this card is the active location
-    - the table: stat noEngagementChecks 1, while this card is in play
+    - the table: stat noEngagementChecks (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing) 1, while this card is in play
   10069:constant:3: Constant
     only if this card is the active location
-    - the table: stat treacheryRevealIgnored 1, while this card is in play
+    - the table: stat treacheryRevealIgnored (the When Revealed effects of treachery cards are ignored; the treachery is still revealed and keeps its keywords) 1, while this card is in play
   10069:constant:4: Constant
     only if this card is the active location
-    - each card (any player controls) of card type encounter-side-quest: stat blankText (its text box is blank) 1, while this card is in play
-  10069:forced:1: Forced after the players travel
+    - each card (any player controls) or in the staging area or the active location, of card type encounter-side-quest: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
+  10069:forced:1: Forced after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return every enemy engaged with a player to the staging area
   10069:forced:2: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - this card is added to the victory display
 
 10069:A:2: Immune to player card effects.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 10069:A:3 (front): Response: After you travel to The Hoarwell, heal 1 damage from each character in play.
-  10069:response:1: Response after the players travel
+  10069:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - for each character (any player controls):
       - heal 1 damage from the picked card
 
@@ -147,24 +156,26 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
     - (rule marker) this card has the Safe keyword: when the players travel to it all engaged enemies return to the staging area, and while it is the active location treacheries' When Revealed effects are ignored, encounter side quests' text boxes are blank and enemies make no engagement checks (its other lines say each)
   10070:constant:2: Constant
     only if this card is the active location
-    - the table: stat noEngagementChecks 1, while this card is in play
+    - the table: stat noEngagementChecks (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing) 1, while this card is in play
   10070:constant:3: Constant
     only if this card is the active location
-    - the table: stat treacheryRevealIgnored 1, while this card is in play
+    - the table: stat treacheryRevealIgnored (the When Revealed effects of treachery cards are ignored; the treachery is still revealed and keeps its keywords) 1, while this card is in play
   10070:constant:4: Constant
     only if this card is the active location
-    - each card (any player controls) of card type encounter-side-quest: stat blankText (its text box is blank) 1, while this card is in play
-  10070:forced:1: Forced after the players travel
+    - each card (any player controls) or in the staging area or the active location, of card type encounter-side-quest: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
+  10070:forced:1: Forced after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return every enemy engaged with a player to the staging area
   10070:forced:2: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - this card is added to the victory display
 
 10070:A:2: Immune to player card effects.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 10070:A:3 (front): Response: After you travel to Abandoned Camp, each player may return 1 card from his discard pile to his hand.
-  10070:response:1: Response after the players travel
+  10070:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "return" (only if there is a card (you control) in the discard pile to choose):
@@ -182,24 +193,26 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
     - (rule marker) this card has the Safe keyword: when the players travel to it all engaged enemies return to the staging area, and while it is the active location treacheries' When Revealed effects are ignored, encounter side quests' text boxes are blank and enemies make no engagement checks (its other lines say each)
   10071:constant:2: Constant
     only if this card is the active location
-    - the table: stat noEngagementChecks 1, while this card is in play
+    - the table: stat noEngagementChecks (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing) 1, while this card is in play
   10071:constant:3: Constant
     only if this card is the active location
-    - the table: stat treacheryRevealIgnored 1, while this card is in play
+    - the table: stat treacheryRevealIgnored (the When Revealed effects of treachery cards are ignored; the treachery is still revealed and keeps its keywords) 1, while this card is in play
   10071:constant:4: Constant
     only if this card is the active location
-    - each card (any player controls) of card type encounter-side-quest: stat blankText (its text box is blank) 1, while this card is in play
-  10071:forced:1: Forced after the players travel
+    - each card (any player controls) or in the staging area or the active location, of card type encounter-side-quest: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
+  10071:forced:1: Forced after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return every enemy engaged with a player to the staging area
   10071:forced:2: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - this card is added to the victory display
 
 10071:A:2: Immune to player card effects.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 10071:A:3 (front): Response: After you travel to Patch of Woods, each player adds 1 resource to each of his heroes' resource pools.
-  10071:response:1: Response after the players travel
+  10071:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - for each player, first player first:
       - each hero the acting player controls gains 1 resource(s)
 
@@ -208,11 +221,12 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 
 10072:A:1 (front): Savage Trollspawn gets +1 Attack for each damaged character the engaged player controls.
   10072:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - this card: stat attack the number of damaged character (you control), while this card is in play
 
 10072:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each damaged character the defending player controls.
   10072:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the number of damaged character (you control), until the end of the attack
 
 ## 10073 Coldfell Giant
@@ -220,6 +234,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 
 10073:A:1 (front): Forced: After Coldfell Giant engages you, deal 1 damage to 3 different characters you control.
   10073:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - repeat 3 times:
       - the acting player chooses one of:
         * option "hit" (only if there is a character (you control) other than the cards this effect already picked to choose):
@@ -228,6 +243,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 
 10073:A:2 (shadow): Shadow: If the defending character has at least 1 damage token on it, attacking enemy makes an additional attack after this one.
   10073:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the defender is a damaged character (any player controls): when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -236,7 +252,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 
 10074:A:1 (front): For each excess point of combat damage dealt by Cruel Mountain-troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) you must remove 1 progress from each quest card in play.
   10074:constant:1: Constant
-    - this card: stat excessToEachQuest 1, while this card is in play
+    - this card: stat excessToEachQuest (the damage its attack deals beyond the hit points the character had left takes that much progress off each quest card in play) 1, while this card is in play
 
 ## 10075 Ruthless Hill-troll
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -250,6 +266,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 
 10075:A:2 (shadow): Shadow: Shuffle 1 location with the safe keyword (but not its attached encounter) back into the encounter deck.
   10075:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose objective (any player controls) with the safe keyword
     - the encounter cards that guard the picked card stay in the staging area and no longer guard it
@@ -260,10 +277,11 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 
 10076:A:1 (front): Damaged characters cannot be declared as attackers or defenders against Goblin Pursuer.
   10076:constant:1: Constant
-    - this card: stat damagedCannotFace 1, while this card is in play
+    - this card: stat damagedCannotFace (a damaged character cannot be declared as an attacker against it or as a defender against its attack) 1, while this card is in play
 
 10076:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if this attack is undefended).
   10076:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
@@ -290,6 +308,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 10078:A:1 (front): While Barren Moorland is in the staging area, it gains: "Forced: When an ally enters play, you must either exhaust it or deal 1 damage to it."
   10078:forced:1: Forced after a card enters play (heard about ally (any player controls))
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player chooses one of:
       * option "exhaust" (only if the card the event is about is a ready ally (any player controls)):
         - exhaust the card the event is about
@@ -332,6 +351,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
     - its host: stat cannotReady 1, while this card is in play
     - its host: stat noCollection 1, while this card is in play
   10080:triggered:1: Triggered (mandatory, not printed as Forced) after the players travel (heard about objective (any player controls) with the safe keyword)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard this card
 
 ## 10081 Lie Low
@@ -339,11 +359,12 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 
 10081:A:1 (front): Forced: At the end of the quest phase, if no progress was placed on Lie Low this round, each enemy gets -20 engagement cost until the end of the round.
   10081:forced:1: Forced at the end of the phase
-    only if all of: (it is the Quest phase) and (this card does not hold the flag progressPlacedHere)
-    - every enemy in play: stat engagementCost -20, until the end of the round
+    only if all of: (it is the Quest phase) and (this card does not hold the flag progressPlacedHere (the engine puts it on a side quest when progress is placed on it, until the end of the round; once a round))
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat engagementCost -20, until the end of the round
 
 10081:A:2 (front): Response: After this stage is defeated, choose an enemy in the staging area and shuffle it into the encounter deck.
-  10081:response:1: Response on the event questDefeated (heard about this card)
+  10081:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, chosen by the first player
     - the picked card is shuffled into the encounter deck
@@ -353,10 +374,11 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 
 10082:A:1 (front): Forced: After 1 or more resources are spent from a hero's resource pool, deal 1 damage to that hero.
   10082:forced:1: Forced on the event heroResourcesSpent (heard about hero (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - deal 1 damage to the card the event is about
 
 10082:A:2 (front): Response: After this stage is defeated, heal 1 damage from each hero.
-  10082:response:1: Response on the event questDefeated (heard about this card)
+  10082:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
     - for each hero (any player controls):
       - heal 1 damage from the picked card
 
@@ -365,10 +387,11 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 
 10083:A:1 (front): The cost to play each player card is increased by 1.
   10083:constant:1: Constant
-    - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) costs 1 more (every player's; several such cards stack)
+    - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) or in the staging area or the active location costs 1 more (every player's; several such cards stack)
 
 10083:A:2 (front): Forced: When this stage is defeated, search the encounter deck and discard pile for a Troll enemy and put it into play engaged with the player with the highest threat. Each player may play a card from his hand, at no cost.
-  10083:forced:1: Forced on the event questDefeated (heard about this card)
+  10083:forced:1: Forced after a side quest is defeated (its progress reached its quest points) (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the player with the highest threat becomes the picked player (the first player chooses among a tie)
     - the acting player finds one Troll enemy in the encounter deck or its discard pile and puts it into play engaged with the picked player (it is not revealed)
@@ -396,6 +419,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 10182:A:3 (front): Forced: At the beginning of the quest phase, place 1 resource on this card. Then, if there are 3 or more resources on it, remove 3 resources from it to reveal 1 set-aside copy of Losing Time and place it in the encounter discard pile.
   10182:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource token(s) are placed on this card
     - if this card holds at least 3 resource tokens and a copy of the card with code 10183 is set aside: 3 tokens come off this card and that copy is revealed as an encounter card (nothing otherwise)
@@ -423,6 +447,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
 
 10183:A:3 (shadow): Shadow: Attacking enemy either gets +3 Attack or +3 Defense until the end of the phase.
   10183:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "attack":
         - the attacking enemy: stat attack 3, until the end of the phase

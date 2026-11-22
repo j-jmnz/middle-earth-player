@@ -11,7 +11,9 @@ import { RULE_PDFS } from "../sources/rules.ts";
 // a default for every page and an override for a page that lays out differently.
 export type Box = { x: number; y: number; w: number; h: number };
 // `only` limits extraction to those pages: a product insert whose decklist page is all that is read.
-export type DocColumns = { default: Box[]; pages?: Record<string, Box[]>; only?: number[] };
+// `handRead` names who read a document whose text is outlines (no text layer, so pdftotext reads nothing): its markdown is a transcription made by eye from the
+// rendered pages, committed with the PDF's sha256 and a `readBy` line, as data/printed/ holds a scan read by eye. It is never re-extracted, and a PDF whose sha256 moved fails the build until it is read again.
+export type DocColumns = { default: Box[]; pages?: Record<string, Box[]>; only?: number[]; handRead?: string };
 export type ColumnsFile = Record<string, DocColumns>;
 
 export type Page = { number: number; columns: string[] };
@@ -98,6 +100,11 @@ export function extractAll(outDir: string, pinned: ReadonlyMap<string, string>, 
     const columns = columnsFile[pdf.doc];
     if (!columns) throw new Error(`data/rules/columns.json has no boxes for ${pdf.doc}`);
     const committed = existsSync(target) ? parseDoc(readFileSync(target, "utf8")) : null;
+    if (columns.handRead !== undefined) {
+      if (!committed || committed.sha256 !== wanted) throw new Error(`data/rules/${pdf.doc}.md is missing or was read from another ${pdf.file} (pinned ${wanted}): read the rendered pages again (it has no text layer) and set its sha256 line.`);
+      docs.push(committed);
+      continue;
+    }
     if (committed && committed.sha256 === wanted && committed.columnsSha256 === hashColumns(columns)) {
       docs.push(committed);
     } else if (existsSync(cached) && sha256(readFileSync(cached)) === wanted) {

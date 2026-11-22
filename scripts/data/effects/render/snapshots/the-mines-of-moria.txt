@@ -27,7 +27,8 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51201:B:2 (back): Forced: When The Watcher is defeated, flip it over and add Chamber of Mazarbul to the staging area.
   51201:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls) named "The Watcher")
-    - [json FlipOver {"verb":"FlipOver","into":"51211","target":"subject"}]
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the card the event is about, the explored location, flips over and shows the card with code 51211, and enters the staging area faceup (the old side is kept as the card's other side)
 
 51201:B:3 (back): This stage cannot be defeated while The Watcher is in play.
   51201:constant:2: Constant
@@ -43,6 +44,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51203:B:1 (back): Forced: At the beginning of the staging step, the opposing team looks at the top 2 cards of the encounter deck, puts 1 on the bottom, and puts the other back on top.
   51203:forced:1: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the opposing team looks at the top 2 cards of the encounter deck and nobody is asked: the weaker goes to the bottom, the stronger stays on top (an enemy is stronger than a treachery and a treachery than a location; of two enemies or two locations the one with the higher printed Threat, an enemy then the higher Attack; level, the top card stays)
 
 ## 51204 Journey in the Black Pit
@@ -56,7 +58,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
   51204:whenRevealed:2: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one location with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top [also {"different":true}]
+      - the acting player finds one location with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found; the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
 
 ## 51205 Journey in the Black Pit
@@ -106,11 +108,12 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51208:B:1 (back): Forced: At the beginning of the staging step, the first player must choose: either reveal an additional encounter card this phase, or no more than 5 progress can be placed here this phase.
   51208:forced:1: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "reveal":
         - the acting player reveals an encounter card
       * option "cap":
-        - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 5, until the end of the phase
+        - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 5, until the end of the phase
 
 51208:B:2 (back): This stage cannot be defeated while Chamber of Mazarbul is in play. When this stage is defeated, the players win the game.
   51208:constant:1: Constant
@@ -134,6 +137,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51209:B:2 (back): Forced: When the active location is explored, reveal the top card of the encounter deck.
   51209:forced:1: Forced on the event activeExplored (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 51209:B:3 (back): This stage cannot be defeated while Chamber of Mazarbul is in play. When this stage is defeated, the players win the game.
@@ -175,6 +179,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51211:A:4 (front): Travel: Each player discards 1 random card from his hand.
   51211:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's hand holds fewer cards than they must discard
     - for each player, first player first:
       - the acting player discards 1 random card(s) from hand
 
@@ -184,10 +189,12 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51212:A:1 (front): Forced: After Savage Werewolf is dealt a shadow card with no shadow effect, it makes an additional attack after this one. (Do not deal it a shadow card.)
   51212:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    who acts: the acting player is the defending player (the player the attack is against)
     - this enemy attacks now, dealt no shadow card
 
 51212:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   51212:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -200,6 +207,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51213:A:2 (shadow): Shadow: Discard an attachment from the defending character.
   51213:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (any player controls) attached to the defending character
     - discard the picked card
@@ -215,7 +223,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
   51214:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached
-    - its host: stat blankText (its text box is blank) 1, while this card is in play
+    - its host: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
 
 ## 51215 Deep-dweller
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -226,6 +234,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51215:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it is a Spider).
   51215:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attacking enemy is a Spider enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attacking enemy is a Spider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -236,6 +245,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51216:A:1 (front): While Darkened Stairway is in the staging area, it gains: 'Forced: After a 'when revealed' effect is canceled, reveal the top card of the encounter deck.'
   51216:forced:1: Forced on the event whenRevealedCanceled
     only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player reveals an encounter card
 
 51216:A:2 (front): Travel: Discard the top card of the encounter deck. If that card is a treachery, resolve its 'when revealed' effect.
@@ -249,10 +259,11 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51217:A:1 (front): When Revealed: Until the end of the phase, add X Threat to the staging area, where X is the number of characters controlled by the player with the most characters.
   51217:whenRevealed:1: When revealed
-    - the total Threat in the staging area is [json amount {"mostPerPlayer":{"type":"character","control":"you"}}] higher until the end of the phase
+    - the total Threat in the staging area is the most character (you control) any one player controls, each player counted from their own side higher until the end of the phase
 
 51217:A:2 (shadow): Shadow: Assign X damage among characters you control, where X is the number of enemies engaged with you.
   51217:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player assigns the number of enemy (any player controls) engaged with you damage among the character (you control), one at a time
 
 ## 51218 Spider Broodling
@@ -260,10 +271,12 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51218:A:1 (front): Forced: After Spider Broodling engages you, remove 2 progress from the main quest.
   51218:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - remove 2 progress from the current quest card (all of it when it holds less)
 
 51218:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove 2 progress from the main quest.
   51218:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -279,6 +292,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51219:A:2 (front): Forced: When Spider Burrow is explored, the opposing team searches the encounter deck and discard pile for a Spider enemy with cost 1 or less and adds it to the staging area. Shuffle the encounter deck.
   51219:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one Spider enemy with a printed cost of 1 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
@@ -296,6 +310,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51220:A:2 (shadow): Shadow: Defending character cannot ready until the end of the round.
   51220:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat cannotReady 1, until the end of the round
 
 ## 51221 Moria Bats
@@ -306,7 +321,8 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51221:A:2 (shadow): Shadow: Shuffle Moria Bats into the encounter deck.
   51221:shadow:1: Shadow
-    - [json ShuffleSelfIntoEncounterDeck {"verb":"ShuffleSelfIntoEncounterDeck"}]
+    who acts: the acting player is the defending player (the player the attack is against)
+    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
 
 ## 51222 Ancient Guardroom
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -316,7 +332,8 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     - this card: stat threat resources of this card, while this card is in play
 
 51222:A:2 (front): Forced: After an event is played, place 1 resource here.
-  51222:forced:1: Forced after this card is played (heard about card (any player controls) of card type event)
+  51222:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on this card
 
 51222:A:3 (front): Travel: Assign X damage among characters in play, where X is Ancient Guardroom's Threat.
@@ -329,7 +346,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51223:A:1 (front): When Revealed: The opposing team attaches Denizen of the Deep to a non-unique enemy and returns it to the staging area. If there are no non-unique enemies in play, Denizen of the Deep gains surge. (Counts as a Condition attachment with the text: 'Attached enemy gets +1 Threat, +1 Attack, +1 Defense and is immune to player card effects.')
   51223:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose non-unique enemy (any player controls) or in the staging area, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked) [also {"highestAttack":true}]
+    - choose non-unique enemy (any player controls) or in the staging area, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the highest Attack of those, as the table shows it (ties: the chooser decides)
     - this card attaches to the picked card (nowhere if that card carries one of its title already)
     - return the picked card to the staging area
     - then, if not (there is a non-unique enemy (any player controls) or in the staging area to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
@@ -359,6 +376,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51225:A:2 (front): Travel: Each player exhausts a character.
   51225:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player has no card to choose and exhaust
     - for each player, first player first:
       - choose ready character (you control)
       - exhaust the picked card
@@ -372,10 +390,11 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     - choose location (any player controls) that is the active location
     - return the active location to the staging area
     - each player assigns threat of the picked card damage among the character (you control), one at a time
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 51226:A:2 (shadow): Shadow: If this attack destroys a character, return the active location to the staging area.
   51226:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the active location to the staging area
 
@@ -385,10 +404,12 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51227:A:1 (front): Forced: After Hive Guardian attacks and destroys an ally, return Hive Guardian to the staging area.
   51227:forced:1: Forced on the event characterDestroyedByAttack (heard about ally (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - return this card to the staging area
 
 51227:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   51227:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -402,7 +423,8 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51228:A:2 (shadow): Shadow: If attacking enemy was engaged this round, it cannot take damage this phase.
   51228:shadow:1: Shadow
-    - if the attacking enemy is a enemy (any player controls) [also {"engagedThisRound":true}]: the attacking enemy: stat cannotTakeDamage 1, until the end of the phase
+    who acts: the acting player is the defending player (the player the attack is against)
+    - if the attacking enemy is a enemy (any player controls) that engaged a player this round: the attacking enemy: stat cannotTakeDamage 1, until the end of the phase
 
 ## 51229 Sudden Pitfall
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -416,6 +438,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51229:A:2 (shadow): Shadow: Either discard an ally you control, or attacking enemy cannot take damage this phase.
   51229:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "ally" (only if there is a ally (you control) to choose):
         - choose ally (you control)
@@ -430,12 +453,13 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
   51230:whenRevealed:1: When revealed
     - the first player chooses one of:
       * option "cap":
-        - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 4, until the end of the phase
+        - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 4, until the end of the phase
       * option "surge":
         - this card gains surge (one more encounter card is revealed when it has been resolved)
 
 51230:A:2 (shadow): Shadow: If this attack destroys a character, return attacking enemy to the staging area.
   51230:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
@@ -444,10 +468,12 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51231:A:1 (front): Travel: Remove 2 progress from the main quest.
   51231:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the current quest card holds less progress than must be removed (read by the quest family)
     - remove 2 progress from the current quest card (all of it when it holds less)
 
 51231:A:2 (shadow): Shadow: Remove 2 progress from the main quest.
   51231:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - remove 2 progress from the current quest card (all of it when it holds less)
 
 ## 51232 Foul Air
@@ -464,6 +490,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51232:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
   51232:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
 ## 51233 Brood Mother
@@ -472,14 +499,14 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51233:A:1 (front): Cannot have non-objective player card attachments or take non-combat damage.
   51233:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+    - no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can)
   51233:constant:2: Constant
     - this card: stat cannotTakeNonCombatDamage 1, while this card is in play
 
 51233:A:2 (front): While Brood Mother is in the staging area, no more than 5 progress can be placed on the main quest each round.
   51233:constant:3: Constant
     only if this card is in the staging area
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 5, while this card is in play
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 5, while this card is in play
 
 ## 51234 Lightless Passage
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -487,10 +514,11 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51234:A:1 (front): While Lightless Passage is in the staging area, no more than 1 progress can be placed on each location in the staging area each round.
   51234:constant:1: Constant
     only if this card is in the staging area
-    - each location (any player controls) in the staging area only: stat progressCap 1, while this card is in play
+    - each location (any player controls) in the staging area only: stat progressCap (no more than this much progress can be placed on this location each round) 1, while this card is in play
 
 51234:A:2 (front): Travel: Each player discards 1 random card from his hand.
   51234:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's hand holds fewer cards than they must discard
     - for each player, first player first:
       - the acting player discards 1 random card(s) from hand
 
@@ -507,6 +535,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51235:A:2 (shadow): Shadow: Discard a resource from the resource pool of a hero you control.
   51235:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control) with resources on it
     - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
@@ -517,11 +546,12 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51236:A:1 (front): Cannot have non-objective player card attachments.
   51236:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+    - no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can)
 
 51236:A:2 (front): While Great Cave-troll is in the staging area, it gains: 'Forced: At the end of the encounter phase, raise each player's threat by 2.'
   51236:forced:1: Forced at the end of the phase
     only if all of: (this card is in the staging area) and (it is the Encounter phase)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 2 (each player)
 
 ## 51237 Zigil Mineshaft
@@ -530,6 +560,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51237:A:1 (front): Quest Action: Raise each player's threat by 1 to reduce the total Threat of Zigil Mineshaft by 1 until the end of the phase. The first player may trigger this effect.
   51237:action:1: Action
     only if all of: (it is the Quest phase) and (the actor holds the first player token)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (each player)
     - this card: stat threat -1, until the end of the phase
@@ -543,6 +574,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51238:A:2 (shadow): Shadow: Discard 1 random card from your hand.
   51238:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the acting player discards 1 random card(s) from hand
 
 ## 51239 Goblin Follower
@@ -555,6 +587,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51239:A:2 (front): While Goblin Follower is in the staging area, it gains: 'Forced: After an enemy engages a player, Goblin Follower engages that player.'
   51239:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) other than this card)
     only if this card is in the staging area
+    who acts: the acting player is the player the enemy engaged
     - engage this card
 
 ## 51240 Stairs of Náin
@@ -567,6 +600,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51240:A:2 (front): Forced: When Stairs of Náin is explored, raise each player's threat by 4.
   51240:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 4 (each player)
 
 ## 51241 Hidden Threat
@@ -582,12 +616,13 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51242:A:1 (front): Cannot have non-objective player card attachments or take non-combat damage.
   51242:constant:1: Constant
     only if this card is in play
-    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective player card"}]
+    - no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can)
   51242:constant:2: Constant
     - this card: stat cannotTakeNonCombatDamage 1, while this card is in play
 
 51242:A:2 (front): Forced: After Goblin Warlord enters play, the opposing team searches the encounter deck and discard pile for a 0-cost Goblin enemy and adds it to the staging area. Shuffle the encounter deck.
   51242:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one Goblin enemy with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
@@ -606,14 +641,15 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51244:A:1 (front): When Revealed: Each enemy and location in the staging area gets +1 Threat until the end of the phase.
   51244:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each enemy (any player controls) in the staging area only: stat threat 1, until the end of the phase
-    - each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - each enemy (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
+    - each location (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
 
 51244:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you are engaged with another enemy).
   51244:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose): the attacking enemy: stat attack 1, until the end of the attack
-    - then, if there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - if not (there is a enemy (any player controls) engaged with you, other than the enemy making the attack in progress to choose): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if there is a enemy (any player controls) engaged with you, other than the enemy making the attack in progress to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 51245 Goblin Archer
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -621,6 +657,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51245:A:1 (front): While Goblin Archer is in the staging area, it gains: 'Forced: At the end of the encounter phase, assign X damage among characters in play, where X is the number of enemies in play.'
   51245:forced:1: Forced at the end of the phase
     only if all of: (this card is in the staging area) and (it is the Encounter phase)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - the acting player assigns the number of enemy (any player controls) or in the staging area damage among the character (any player controls), one at a time
 
 ## 51246 Narrow Fissure
@@ -646,6 +683,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51247:A:2 (shadow): Shadow: Exhaust a character you control.
   51247:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -661,6 +699,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51248:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack.
   51248:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 1, until the end of the attack
 
 ## 51249 Plundered Armoury
@@ -679,13 +718,14 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
   51250:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one enemy with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top [also {"different":true}]
+      - the acting player finds one enemy with a printed cost of 0 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found; the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
 
 51250:A:2 (shadow): Shadow: The opposing team shuffles an enemy from the encounter discard pile into the encounter deck.
   51250:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose enemy (any player controls) encounterDiscard, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked) [also {"highestThreat":true}]
+    - choose enemy (any player controls) encounterDiscard, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the highest current Threat of those (no Threat counts 0; ties: the chooser decides)
     - the picked card is shuffled into the encounter deck
 
 ## 51251 Swarming Goblins
@@ -697,6 +737,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51251:A:2 (shadow): Shadow: If the attacking enemy is a Goblin, put Swarming Goblins into play engaged with you.
   51251:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a Goblin enemy (any player controls): this card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 ## 51252 Goblin Tunnels
@@ -709,6 +750,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51252:A:2 (front): Forced: When Goblin Tunnels is explored, the opposing team searches the encounter deck and discard pile for a Goblin enemy with cost 1 or less and adds it to the staging area. Shuffle the encounter deck.
   51252:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one Goblin enemy with a printed cost of 1 or less in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); the opposing team finds it, so nobody is asked: of enemies and locations the one with the highest printed Threat (enemies: then the highest Attack), then the one nearest the top of the deck; of any other card the one nearest the top
     - shuffle the encounter deck
@@ -720,11 +762,12 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
   51253:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each enemy engaged with a player makes an immediate attack, each dealt a shadow card of its own
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 51253:A:2 (shadow): Shadow: Each enemy engaged with you gets +1 Attack.
   51253:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - for each enemy (any player controls) engaged with you:
       - the picked card: stat attack 1, until the end of the phase
 
-(rendered pieces: 427 by template, 13 as JSON)
+(rendered pieces: 441 by template, 0 as JSON)

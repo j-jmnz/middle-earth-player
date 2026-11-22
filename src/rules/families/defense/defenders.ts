@@ -100,14 +100,12 @@ export function defendersDeclared(state: ScenarioState): boolean {
   return state.pendingAttack?.defenderId != null;
 }
 
+// One further defender per candidate left: the Pick asks for the defender and offers the stop itself (`pick`, effect-frames.ts), so a player who chose to declare another can still decline.
 function declareMore(pick: PickSpec, times: number): Instruction[] {
   return Array.from({ length: times }, (): Instruction => ({
     verb: "Choose",
     who: "actor",
-    options: [
-      { id: "another", requires: { kind: "canPick", pick }, instructions: [{ verb: "Pick", pick }, { verb: "AddDefender" }] },
-      { id: "done", instructions: [{ verb: "EndDeclaring" }] },
-    ],
+    options: [{ id: "another", requires: { kind: "canPick", pick }, instructions: [{ verb: "Pick", pick }, { verb: "AddDefender" }] }],
   }));
 }
 

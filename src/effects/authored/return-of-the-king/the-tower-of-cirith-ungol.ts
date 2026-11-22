@@ -150,7 +150,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 146021 Gorbag (A:1, Cannot have attachments, is a keyword; A:4 is a template). Forced: after he engages you he makes an immediate attack (copied from Haradrim Soldier). Shadow: an additional attack against you after this one, dealt a new shadow card.
     copyLine("144057:A:1", "146021:A:2"),
-    // The additional attack is dealt a new shadow card, the old ones discarded first (faq.additional-attacks); written on its own, as Haradrim Soldier's is (144057:shadow:1), not copied from 19081:A:2.
+    // The additional attack is dealt a new shadow card, the old ones discarded first (faq.additional-attacks); written on its own, as Haradrim Soldier's is (144057:shadow:1).
     { id: "146021:shadow:1", cardCode: "146021", lines: ["146021:A:3"], timing: "shadow", instructions: [{ verb: "ImmediateAttack", afterThis: true }] },
 
     // 146022 Wounded Uruk. It enters play with 2 damage on it (staged, engaged or revealed). Forced: after it engages you it gets +2 Attack until the end of the round. Shadow: the attacking enemy gets +1 Attack for each damage on it, recalculated during the attack (faq.lasting-effects).

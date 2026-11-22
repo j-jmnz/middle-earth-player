@@ -107,15 +107,13 @@ describe("several defenders (Stand Together, 01038:A:1)", () => {
     let run = begin(settle({ ...withMode(funded, "combatStart"), window: null }, tab.ctx, []));
     run = send(run, { type: "PlayCard", cardId: stand ?? "", payments: payFor(run.state, tab.ctx, stand ?? "") }, tab.ctx);
     run = send(passWindows(run, tab.ctx), { type: "DeclareDefender", defenderId: gimli ?? "" }, tab.ctx);
-    // Another defender, or done (families/defense/defenders.ts moreDefenders). Holding "another" pools nothing yet.
-    const branch = sheetFor(run.state, tab.ctx, legalIntents(run.state, tab.ctx), names);
-    if (branch?.kind !== "pick") throw new Error("no branch sheet");
-    expect(branch.title).toBe(`${pounder} attacks`);
-    expect(readoutFor(run.state, tab.ctx, branch, { key: branch.key, ids: ["another"], shares: [] }, (id) => id)?.result).not.toContain("one defender you choose");
-    run = send(run, { type: "Choose", optionId: "another" }, tab.ctx);
+    // The next defender is asked for at once (families/defense/defenders.ts moreDefenders), with the stop on the sheet's pass.
     const legal = legalIntents(run.state, tab.ctx);
     const sheet = sheetFor(run.state, tab.ctx, legal, names);
     if (sheet?.kind !== "pick") throw new Error("no second defender pick");
+    expect(sheet.title).toBe(`${pounder} attacks`);
+    expect(sheet.alternative).toMatchObject({ label: "No more defenders", intent: { type: "Choose", optionId: "done" } });
+    expect(sheet.options.map((item) => item.id)).not.toContain("done");
     // Gimli is declared; picking Thalin as well pools 2 + 2 Defense against the attack of 6.
     const readout = readoutFor(run.state, tab.ctx, sheet, { key: sheet.key, ids: [thalin ?? ""], shares: [] }, (id) => id);
     expect(readout?.stats.map((stat) => stat.value)).toEqual([6, 4]);
@@ -150,6 +148,13 @@ describe("the commit and travel", () => {
     expect(readoutFor(staged, table.ctx, null, null, (id) => id)?.result).toBe("Threat +4 if nothing changes; threat reaches 50: the game is lost");
     const safe: ScenarioState = { ...withThreat(table.state, 0, 40), mode: "staging" };
     expect(readoutFor(safe, table.ctx, null, null, (id) => id)?.result).toBe("Threat +4 if nothing changes");
+  });
+
+  it("says the level of the seat that goes out: a seat holding The One Ring is out at 45 while the first living seat's level is 50 (21001:A:2)", () => {
+    const table = buildTable(base, { seats: 2, staging: ["f3"], start: "quest", ring: "none" });
+    const ring = { instanceId: "seat:1", sourceId: "ring", stat: "eliminationReduction" as const, amount: 5, until: "endOfGame" as const };
+    const staged: ScenarioState = { ...withThreat(withThreat(table.state, 0, 30), 1, 43), modifiers: [ring], mode: "staging" };
+    expect(readoutFor(staged, table.ctx, null, null, (id) => id)?.result).toBe("Threat +3 if nothing changes; threat reaches 45: Player 2 is eliminated");
   });
 
   it("while a location is active, says what exploring it still takes", () => {

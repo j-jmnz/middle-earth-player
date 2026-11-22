@@ -6,6 +6,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01101:A:1 (front): Forced: If Dungeon Jailor is in the staging area after the players have just quested unsuccessfully, shuffle 1 unclaimed objective card from the staging area back into the encounter deck.
   01101:forced:1: Forced after the players quest unsuccessfully (limit once per round)
     only if all of: (this card is in the staging area) and (there is a objective (any player controls) in the staging area only, chosen by the first player to choose)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose objective (any player controls) in the staging area only, chosen by the first player
     - the picked card is shuffled into the encounter deck
@@ -19,10 +20,12 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01102:A:2 (front): Forced: When the prisoner is "rescued," move Nazgûl of Dol Guldur into the staging area.
   01102:forced:1: Forced on the event prisonerRescued (heard about hero (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes to the staging area (it is not revealed)
 
 01102:A:3 (front): Forced: After a shadow effect dealt to Nazgûl of Dol Guldur resolves, the engaged player must choose and discard 1 character he controls.
   01102:forced:2: Forced on the event shadowEffectResolved (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control)
     - discard the picked card
@@ -35,6 +38,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01103:A:2 (shadow): Shadow: Choose and discard 1 attachment you control. Discarded objective cards are returned to the staging area. (If this attack is undefended, discard all attachments you control.)
   01103:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): choose attachment (you control)
     - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -50,6 +54,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01104:A:2 (shadow): Shadow: Defending player raises his threat by the number of enemies with which he is engaged.
   01104:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
 
 ## 01105 Iron Shackles
@@ -57,12 +62,13 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01105:A:1 (front): When Revealed: Attach Iron Shackles to the top of the first player's deck. (Counts as a Condition attachment with the text: "The next time a player would draw 1 or more cards from attached deck, discard Iron Shackles instead.")
   01105:whenRevealed:1: When revealed
-    - [json AttachToDeck {"verb":"AttachToDeck","who":"firstPlayer"}]
+    - this treachery, being revealed, is attached to the top of the first player's deck, in play, controlled by nobody; the next draw from that deck is replaced by discarding it (the card's own constant says so)
   01105:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
 01105:A:2 (shadow): Shadow: Resolve the "When Revealed" effect of Iron Shackles.
   01105:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the When Revealed effects of this card resolve as if it had just been revealed
 
 ## 01107 Tower Gate
@@ -70,8 +76,9 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01107:A:1 (front): Forced: After travelling to Tower Gate, each player places the top card of his deck, face down in front of him, as if it just engaged him from the staging area. These cards are called "Orc Guard," and act as enemies with: 1 hit point, 1 Attack, and 1 Defense.
   01107:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
-      - [json PlaceOrcGuard {"verb":"PlaceOrcGuard"}]
+      - the acting player places the top card of their deck facedown in front of them as if it just engaged them: it is an "Orc Guard", an enemy with 1 hit point, 1 Attack and 1 Defense engaged with them, held under an enemy the engine makes as a stand-in (when it leaves play the card goes to its owner's discard pile; nothing with an empty deck)
 
 ## 01108 Gandalf's Map
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -83,6 +90,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01108:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Gandalf's Map to a hero you control. (Counts as an attachment. If detached, return Gandalf's Map to the staging area.)
   01108:action:1: Action (cost: raise your threat by 2)
     only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters))
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -107,6 +115,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01109:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Dungeon Torch to a hero you control. (Counts as an attachment. If detached, return Dungeon Torch to the staging area.)
   01109:action:1: Action (cost: raise your threat by 2)
     only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters))
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -118,6 +127,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01109:A:3 (front): Forced: At the end of each round, raise attached hero's controller's threat by 2.
   01109:forced:1: Forced at the end of the round
     only if its host is a hero (any player controls)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 2 (hostController)
 
 ## 01110 Shadow Key
@@ -130,6 +140,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01110:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Shadow Key to a hero you control. (Counts as an attachment. If detached, return Shadow Key to the staging area.)
   01110:action:1: Action (cost: raise your threat by 2)
     only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters))
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -141,6 +152,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01110:A:3 (front): Forced: At the end of each round, attached hero suffers 1 damage.
   01110:forced:1: Forced at the end of the round
     only if its host is a hero (any player controls)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - deal 1 damage to its host
 
 ## 01123 The Necromancer's Tower
@@ -149,17 +161,17 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01123:A:1 (front): Setup: Search the encounter deck for the 3 objective cards, reveal and place them in the staging area. Also, place the Nazgûl of Dol Guldur face up but out of play, alongside the quest deck. Then, shuffle the encounter deck, and attach 1 encounter to each objective card.
   01123:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json TurnFaceUp {"verb":"TurnFaceUp","code":"01102"}]
+    - Setup: the set-aside card with code 01102 is turned faceup, still out of play
     - for each objective (any player controls) in the staging area only:
       - the Guarded keyword: the picked card in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
 
 01123:B:1 (back): When Revealed: Randomly select 1 hero card (among all the heroes controlled by the players) and turn it facedown. That hero is now considered a "prisoner," cannot be used, cannot be damaged, and does not collect resources, until it is "rescued" (as instructed by card effects) later in this quest.
   01123:whenRevealed:1: When revealed
-    - [json TakePrisoner {"verb":"TakePrisoner"}]
+    - one hero of all the heroes the players control is selected at random with the game's seed and turned facedown: it and each card attached to it become the "prisoner": facedown, blank, in play but controlled by nobody, so nothing can use or damage them, and the hero collects no resources (prisonerTaken is announced about the hero)
 
 01123:B:2 (back): The players, as a group, cannot play more than 1 ally card each round.
   01123:constant:1: Constant
-    - [json LimitPlays {"verb":"LimitPlays","cardType":"ally","max":1}]
+    - the players, as a group, cannot play more than 1 ally cards each round (cards put into play without being played are not counted)
 
 01123:B:3 (back): Players cannot advance to the next stage of this quest unless they have at least 1 objective card.
   01123:constant:2: Constant
@@ -171,16 +183,16 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01124:B:1 (back): Response: After placing any number of progress tokens on this card, flip the "prisoner" hero card face-up, and place 1 damage token on it. This hero has been "rescued," and may now be used by its controller.
   01124:response:1: Response on the event progressPlaced (heard about this card)
-    only if [json condition {"kind":"prisoner","is":true}]
-    - [json RescuePrisoner {"verb":"RescuePrisoner","damage":1}]
+    only if a hero is the "prisoner" now, facedown, until it is rescued
+    - the prisoner hero is flipped faceup with 1 damage placed on it; its controller controls it again, with the cards attached to it faceup; it has been rescued (prisonerRescued is announced) and no hero is the prisoner any more
 
 01124:B:2 (back): The players, as a group, cannot play more than 1 ally card each round.
   01124:constant:1: Constant
-    - [json LimitPlays {"verb":"LimitPlays","cardType":"ally","max":1}]
+    - the players, as a group, cannot play more than 1 ally cards each round (cards put into play without being played are not counted)
 
 01124:B:3 (back): Players cannot advance to the next stage of this quest unless they have rescued the prisoner and have all 3 "Escape from Dol Guldur" objective cards.
   01124:constant:2: Constant
-    only if any of: ([json condition {"kind":"prisoner","is":true}]) or (the number of objective (any player controls) that is attached to another card is at most 2)
+    only if any of: (a hero is the "prisoner" now, facedown, until it is rescued) or (the number of objective (any player controls) that is attached to another card is at most 2)
     - the players cannot defeat this stage while this holds
 
 ## 01125 Out of the Dungeons
@@ -189,8 +201,9 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01125:B:1 (back): Forced: At the beginning of each quest phase, each player places the top card of his deck, face down in front of him, as if it just engaged him from the staging area. These cards are called "Orc Guard," and act as enemies with: 1 hit point, 1 Attack, and 1 Defense.
   01125:forced:1: Forced when a phase begins
     only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
-      - [json PlaceOrcGuard {"verb":"PlaceOrcGuard"}]
+      - the acting player places the top card of their deck facedown in front of them as if it just engaged them: it is an "Orc Guard", an enemy with 1 hit point, 1 Attack and 1 Defense engaged with them, held under an enemy the engine makes as a stand-in (when it leaves play the card goes to its owner's discard pile; nothing with an empty deck)
 
 01125:B:2 (back): Players cannot defeat this stage while Nazgûl of Dol Guldur is in play. If this stage is defeated and Nazgûl of Dol Guldur is not in play, the players have won the game.
   01125:constant:1: Constant
@@ -205,26 +218,192 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01131:A:2 (front): Setup: Put Mendor into play. Attach Appointed by Fate to a hero of the first player's choice.
   01131:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"01135"}]
-    - [json AttachChosen {"verb":"AttachChosen","code":"01134"}]
+    - Campaign Setup: the objective ally with code 01135 enters play under the first player (put there, not played: nothing is revealed and no cost is paid; a pool card with this record for itself is put into play at the start of each scenario instead of being shuffled into the encounter deck)
+    - Campaign Setup: the first player chooses a hero and the card with code 01134 is attached to it (the card is not added to the Campaign Pool)
 
 01131:A:3 (front): Forced: When a hero would be randomly selected to be a "prisoner," the "prisoner" from the Campaign Log is selected instead. Each card attached to that hero is turned facedown until that hero is "rescued." Mendor is captured as well. Place Mendor facedown next to the prisoner (this does not cause him to leave play). Flip this card over.
   01131:forced:1: Forced on the event prisonerTaken (heard about hero (any player controls))
     only if this card shows side A
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SelectLoggedPrisoner {"verb":"SelectLoggedPrisoner"}]
-    - [json CaptureWithPrisoner {"verb":"CaptureWithPrisoner","code":"01135"}]
-    - [json FlipCard {"verb":"FlipCard"}]
+    - the prisoner named in the Campaign Log is selected instead: when the log names a hero the players control, that hero is the prisoner and the one selected at random is back among its player's heroes as it was (nothing with no such hero, so the random one stays)
+    - the card in play with code 01135 is captured as well: placed facedown next to the prisoner, in play but controlled by nobody, and it does not leave play (nothing with no prisoner or no such card)
+    - this card is flipped over: side A becomes side B and side B side A (flipped is announced about it; a contract's records name their side in their line ids and carry a faceUp condition for it)
 
 01131:B:1 (back): Response: After the first objective is claimed, flip Mendor face-up and place 1 damage token on him.
   01131:response:1: Response on the event claimed (heard about objective (any player controls); limit once per game)
     only if all of: (this card shows side B) and (the number of objective (any player controls) that is attached to another card is at most 1)
-    - [json FreeCaptive {"verb":"FreeCaptive","code":"01135","damage":1}]
+    - the captured card in play with code 01135 is flipped faceup with 1 damage placed on it and returns to the first player's play area
 
 01131:B:2 (back): Resolution: Determine one of the following: 1) If Mendor is still in play, add Mendor to the Campaign Pool. If you do, put Mendor into play at the start of each scenario during your next campaign. Each player may include 1 copy of Mendor's Support in their deck during that campaign. 2) If Mendor is not in play, do not adjust the Campaign Pool for your next campaign.
   01131:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json CarryOver {"verb":"CarryOver","codes":["01135"],"when":{"kind":"inPlay","code":"01135","is":true}}]
-    - [json CarryOver {"verb":"CarryOver","codes":["01132"],"eachPlayer":true,"when":{"kind":"inPlay","code":"01135","is":true}}]
+    - if the card with code 01135 is in play: Resolution: the cards with codes 01135 go to the NEXT campaign, not this one; a new save takes them in from a finished one
+    - then, if the card with code 01135 is in play (checked when this step runs, after the steps above; not tied to whether they did anything): Resolution: the cards with codes 01132 go to the NEXT campaign, not this one (one copy for each player); a new save takes them in from a finished one
 
-(rendered pieces: 127 by template, 18 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 900301 Escape from Dol Guldur Nightmare
+
+900301:A:1 (front): You are playing Nightmare Mode.
+  (inert: the engine applies it by rule, no record)
+
+900301:A:2 (front): Forced: When stage 1B is revealed, the number of random heroes captured is determined by the number of players, as follows: 1-2 players = 1 hero captured, 3 players = 2 heroes captured, 4 players = 3 heroes captured. All captured heroes are turned face down and considered "the prisoner," cannot be used, cannot be damaged, and do not collect resources until they are rescued. (A single player cannot have more than 1 hero captured by this effect.)
+  900301:forced:1: Forced on the event prisonerTaken (heard about hero (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - heard when a hero was taken prisoner at stage 1B: more heroes are captured at random with the game's seed, from players who have none captured, until the number captured is 1 with 1 or 2 players, 2 with 3 and 3 with 4; each is facedown, "the prisoner", as the first (nothing is announced for them)
+
+900301:B:1 (back): Begin with the standard quest deck and encounter deck for the Escape from Dol Guldur scenario found in the LOTR LCG core set.
+  (inert: the engine applies it by rule, no record)
+
+900301:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+900301:B:3 (back): 2x Dol Guldur Orcs
+  (inert: the engine applies it by rule, no record)
+
+900301:B:4 (back): 2x Enchanted Stream
+  (inert: the engine applies it by rule, no record)
+
+900301:B:5 (back): 1x Great Forest Web
+  (inert: the engine applies it by rule, no record)
+
+900301:B:6 (back): 3x Mountains of Mirkwood
+  (inert: the engine applies it by rule, no record)
+
+900301:B:7 (back): 2x Caught in a Web
+  (inert: the engine applies it by rule, no record)
+
+900301:B:8 (back): 1x The Necromancer's Reach
+  (inert: the engine applies it by rule, no record)
+
+900301:B:9 (back): 1x Necromancer's Pass
+  (inert: the engine applies it by rule, no record)
+
+900301:B:10 (back): 2x Under the Shadow
+  (inert: the engine applies it by rule, no record)
+
+900301:B:11 (back): 2x Tower Gate
+  (inert: the engine applies it by rule, no record)
+
+900301:B:12 (back): 1x Iron Shackles
+  (inert: the engine applies it by rule, no record)
+
+900301:B:13 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Escape from Dol Guldur encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+900301:B:14 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 900302 Torture Master
+
+900302:A:1 (front): When Revealed: Add 1 resource token to each Dol Guldur location in play.
+  900302:whenRevealed:1: When revealed
+    - for each Dol Guldur location (any player controls):
+      - place 1 resource tokens on the picked card
+
+900302:A:2 (shadow): Shadow: Any hero damaged (but not defeated) by this attack is turned face down, as a "prisoner." Then, if the players are on stage 3, return to stage 2B of the quest.
+  900302:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - when the attack ends: the event's other card, the hero the reference names, if it is still in play, is turned facedown as a "prisoner" when this attack dealt it damage (the attack keeps the damage it dealt for this); it keeps its damage
+      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the players are on stage 3) (checked when this step runs, after the steps above; not tied to whether they did anything): the players return to stage 2 of the quest deck (side B: the stage comes back as if just beginning, with no progress; the progress on the active location and every other card stay; no When Revealed or Setup resolves again)
+
+## 900303 Crazed Captive
+
+900303:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+900303:A:2 (front): Forced: If Crazed Captive is defeated, raise each player's threat by 7.
+  900303:forced:1: Forced after an enemy is destroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - raise threat by 7 (each player)
+
+900303:A:3 (shadow): Shadow: If attacking enemy is not defeated this phase, raise defending player's threat by 7 at the end of the phase.
+  900303:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, that is the enemy making the attack in progress
+    - later, at the end of this phase, acting on the card last picked:
+      - if the picked card is in play now: raise threat by 7 (the acting player)
+
+## 900304 Spider of Dol Guldur
+
+900304:A:1 (front): If there are any unclaimed objectives in play, Spider of Dol Guldur gains surge.
+  900304:whenRevealed:1: When revealed
+    - if the number of objective (any player controls) in the staging area only is at least 1: this card gains surge (one more encounter card is revealed when it has been resolved)
+
+900304:A:2 (shadow): Shadow: Attacking enemy gets +3 Attack for each unclaimed objective in play.
+  900304:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the number of objective (any player controls) in the staging area only x 3, until the end of the attack
+
+## 900305 Torture Chamber
+
+900305:A:1 (front): If Torture Chamber has 4 or more resource tokens on it, all "prisoners" were killed, and the players have lost the game.
+  900305:constant:1: Constant
+    only if this card is a location (any player controls) with at least 4 resources on it
+    - the players lose the game
+
+900305:A:2 (front): Forced: At the end of each round, place 1 resource token on each Dol Guldur location in play.
+  900305:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for each Dol Guldur location (any player controls):
+      - place 1 resource tokens on the picked card
+
+## 900306 Dungeon Labyrinth
+
+900306:A:1 (front): Dungeon Labyrinth gets +1 Threat and +1 quest point for each resource token on it.
+  900306:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat resources of this card, while this card is in play
+    - this card: stat questPoints resources of this card, while this card is in play
+
+900306:A:2 (front): Forced: At the end of each round, place 1 resource token on Dungeon Labyrinth for each player in the game.
+  900306:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - place the number of players resource tokens on this card
+
+## 900307 Sentinel of Shadow
+
+900307:A:1 (front): When Revealed: The staging area gets +X Threat until the end of the phase, where X is twice the number of players in the game. If the players quest unsuccessfully this phase, put the Nazgûl of Dol Guldur into play (from any out of play area), engaged with the first player. (Cannot be canceled.)
+  900307:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the total Threat in the staging area is the number of players x 2 higher until the end of the phase
+    - later, if the players quest unsuccessfully this phase (never, if they do not):
+      - the card with code 01102 is put into play engaged with the first player from wherever it is out of play: set aside, the encounter deck, its discard pile or the victory display (nothing when it is in play)
+
+## 900308 Catacomb Inspection
+
+900308:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+900308:A:2 (front): When Revealed: Add 1 resource token to each Dol Guldur location in play.
+  900308:whenRevealed:1: When revealed
+    - for each Dol Guldur location (any player controls):
+      - place 1 resource tokens on the picked card
+
+900308:A:3 (shadow): Shadow: If there is a Dol Guldur location in the staging area, move 1 resource token from each of your heroes' resource pools to that location. (Resolve this effect for each Dol Guldur location.)
+  900308:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - for each Dol Guldur location (any player controls) in the staging area only:
+      - 1 resource moves from the pool of each hero the acting player controls that has one to the picked card
+
+## 900309 Dark Interrogation
+
+900309:A:1 (front): When Revealed: Each player must choose and discard cards from hand until he has only 2 cards in hand. (Each player with 2 or fewer cards in hand must instead reveal 1 card from the encounter deck.)
+  900309:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - if the number of card (you control) in hand is at most 2: the acting player reveals an encounter card
+      - then, if the number of card (you control) in hand is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): discard the cards in your hand - 2 cards from hand
+
+900309:A:2 (shadow): Shadow: Discard each card you control that has at least 1 copy of itself in your discard pile. (If this attack is undefended, each player must resolve this effect.)
+  900309:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): for each card (you control) with a copy of it (the same title) in its controller's discard pile:
+      - discard the picked card
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each card (any player controls) or in the staging area or the active location, with a copy of it (the same title) in its controller's discard pile:
+      - discard the picked card
+
+(rendered pieces: 226 by template, 0 as JSON)

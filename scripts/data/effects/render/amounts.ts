@@ -1,5 +1,6 @@
 // Amounts: a printed number, or a number the engine reads ("the number of enemies in play", "the stage number"). `src/catalog/effect-schema-amount.ts` owns the keys.
 import { done, isObj, jsonOf, str, type Ctx, type Obj } from "./kit.ts";
+import { familyAmount } from "./families/family-amounts.ts";
 import type { PickRenderer } from "./picks.ts";
 
 const CARD_REF: Readonly<Record<string, string>> = {
@@ -28,6 +29,10 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (isObj(expr.count)) {
     take("count", "distinct");
     return { text: `the number of ${expr.distinct === true ? "different " : ""}${pick(expr.count, ctx)}`, read };
+  }
+  if (isObj(expr.totalOf)) {
+    take("totalOf", "stat");
+    return { text: `${expr.stat === "cost" ? "the printed costs (a card with none counts 0)" : `the ${statName(expr.stat)} as the table shows it now`} of every ${pick(expr.totalOf, ctx)} added up, read live`, read };
   }
   if (typeof expr.stat === "string") {
     take("stat", "of", "ofNamed", "printed", "remaining");
@@ -58,6 +63,11 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.discardedThreat === true) return { text: "the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0)", read: ["discardedThreat"] };
   if (isObj(expr.discardedMatching)) return { text: `the number of cards this effect discarded from the top of the encounter deck, still in the discard pile, that are ${pick(expr.discardedMatching, ctx)}`, read: ["discardedMatching"] };
   if (expr.destroyedWillpower === true) return { text: "the Willpower the destroyed character had in play (last known)", read: ["destroyedWillpower"] };
+  if (expr.facedown === true) return { text: "the number of cards attached facedown to this card", read: ["facedown"] };
+  if (expr.firstPlayerTens === true) return { text: "the tens digit of the first player's threat, whoever the actor is", read: ["firstPlayerTens"] };
+  if (isObj(expr.mostPerPlayer)) return { text: `the most ${pick(expr.mostPerPlayer, ctx)} any one player controls, each player counted from their own side`, read: ["mostPerPlayer"] };
+  if (expr.guardedCost === true) return { text: "the printed cost of the card this card guards (one under it, or the host it guards as a guard; 0 for a card with no printed cost)", read: ["guardedCost"] };
+  if (expr.discoverValue === true) return { text: "the Discover value of the active location (its Discover X, with the adjustment a Response made; 0 when it has none)", read: ["discoverValue"] };
   if (expr.x === true) return { text: "X", read: ["x"] };
   if (expr.stage === true) return { text: "the stage number of the quest", read: ["stage"] };
   if (typeof expr.threat === "string") return { text: expr.threat === "tens" ? "the tens digit of your threat" : "your threat", read: ["threat"] };
@@ -66,7 +76,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.dealt === true) return { text: "the damage just dealt", read: ["dealt"] };
   if (isObj(expr.resourcesOn)) return { text: `the resource tokens on ${pick(expr.resourcesOn, ctx)}${expr.max === true ? " (the most on any one)" : ""}`, read: ["resourcesOn", "max"] };
   if (isObj(expr.damageOn)) return { text: `the damage tokens on ${pick(expr.damageOn, ctx)}`, read: ["damageOn"] };
-  return null;
+  return familyAmount(expr);
 }
 
 export function renderAmount(amount: unknown, ctx: Ctx, pick: PickRenderer): string {

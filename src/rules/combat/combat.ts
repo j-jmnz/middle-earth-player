@@ -31,6 +31,8 @@ import { attackHere, dealForAttack, engagedWithAll, engagedWithThreatening, note
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
 import { barredFromDreadnaught } from "../families/sea/dreadnaught.ts";
 
+import { hasTrait } from "../interpret/conditions.ts";
+
 type Cards = ReadonlyMap<string, PrintedCard>;
 
 // The archery one card in play counts: `keyword` is its printed value and what effects added to it ("gains archery 4", dcce.archery; the effects of several
@@ -38,7 +40,7 @@ type Cards = ReadonlyMap<string, PrintedCard>;
 // 142078:A:1), which can be negative. The total below and the card preview's keyword chips both read it, so they say the same number.
 export function cardArchery(state: ScenarioState, cards: Cards, instance: CardInstance): { keyword: number; own: number } {
   const printed = printedOf(cards, instance.code);
-  const keyword = (printed.keywords.archery ?? 0) + heldAmountByClass(state, instance, printed, "archery");
+  const keyword = (printed.keywords.archery ?? 0) + heldAmountByClass(state, instance, printed, "archery", (trait) => hasTrait(state, instance.id, trait, { effects: [], cards }));
   if (state.modifiers.length === 0) return { keyword, own: 0 };
   // One player at each separate stage, the players in the game before that.
   const players = flagged(state, instance.id, "archeryPlayers") ? (state.separate ? 1 : livingSeats(state).length) : 0;
@@ -139,8 +141,8 @@ export function beginEnemyAttack(
   const here = attacker != null && (attacker.zone === "engaged" || engagedWithAll(state, enemyId) || viaRelay(state, enemyId) || (fromStaging && attacker.zone === "staging"));
   if (!attacker || !here || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
-  // An attack an effect makes from the staging area was dealt its shadow card already (attackFromStaging).
-  const dealt = shadow && (engagedWithAll(state, enemyId) || (viaRelay(state, enemyId) && !fromStaging)) ? dealForAttack(state, enemyId, steps, ctx, seat) : state;
+  // An attack an effect makes from the staging area was dealt its shadow card by the effect (attackNowFromStaging, immediateAttack): one deal per attack.
+  const dealt = shadow && !fromStaging && (engagedWithAll(state, enemyId) || viaRelay(state, enemyId)) ? dealForAttack(state, enemyId, steps, ctx, seat) : state;
   const declared: ScenarioState = { ...dealt, pendingAttack: { enemyId, seat, ...(fromStaging ? { fromStaging: true } : {}) }, activeSeat: seat, window: null };
   const fired = fireForced(declared, { trigger: "attacks", seat, cardId: enemyId }, ctx, steps);
   if (fired.stack.length > declared.stack.length && fired.pendingAttack) {

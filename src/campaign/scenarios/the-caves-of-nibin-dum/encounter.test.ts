@@ -11,6 +11,7 @@ import { settle } from "../../../rules/engine/machine.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { seatThreat } from "../../../rules/families/play/hooks.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
+import { spawn } from "../../../rules/core/zones.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { codesIn, fight, loadCavesWorld, cavesTable, resolveReveal, settleChoices, type CavesLayout, type CavesWorld } from "../../../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
 import { reveal } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
@@ -121,6 +122,15 @@ describe("Collapsed Mine (41035:A:1, 41035:A:2)", () => {
     expect(questProgress(progress(made, 3, first6))).toBe(4);
     const later = { ...first6, modifiers: first6.modifiers.filter((modifier) => modifier.stat !== "questProgressPlaced") };
     expect(questProgress(progress(made, 3, later))).toBe(7);
+  });
+
+  it("counts the progress placed earlier in the round, before the card came to the staging area (41035:A:1)", () => {
+    const made = make({ deck: ["41035"], stage: "41006", progress: 0 });
+    const early = progress(made, 3);
+    expect(questProgress(early)).toBe(3);
+    // The card is revealed after the 3 are placed: this round 1 more fits.
+    const revealed = syncConstants(settle(spawn(early, "41035", { zone: "staging" }).state, made.ctx, []), made.ctx);
+    expect(questProgress(progress(made, 6, revealed))).toBe(4);
   });
 
   it("does not hold back progress on the active location, nor without the card in the staging area (41035:A:1)", () => {

@@ -18,6 +18,7 @@ import { reduce, startScenario, type ReduceContext, type ScenarioState } from ".
 import { ENGINE_VERSION } from "../../src/rules/engine/version.ts";
 
 import { causeProblems, NUMBER_STEPS } from "./cause-check.ts";
+import { ownCodes, unreachedRecords, whileRecording, writeUnreached } from "./reached.ts";
 import type { CampaignGoldenBase, PlayedGame } from "./game-kit.ts";
 import { goldensMovedHint } from "./golden-moved.ts";
 import { nextPartId, nextPartStatus, nextStepKind } from "./next-part.ts";
@@ -73,7 +74,7 @@ export type GoldenSuiteSpec<G extends SuiteGolden<D>, D extends string, P extend
 
 /** The causes of the number-changing steps that name a record of the scenario's own cards (its campaign card, quest cards, encounter cards and the cards its campaign card places, A Heavy Burden). */
 export function ownCauses(scenario: AnyScenarioData, steps: readonly EngineStep[]): Cause[] {
-  const own = new Set([...(scenario.campaignCard === undefined ? [] : [scenario.campaignCard]), ...scenario.stages, ...scenario.campaignPlaced, ...scenario.cards.map((card) => card.code)]);
+  const own = ownCodes(scenario);
   return steps
     .filter((step) => NUMBER_STEPS.has(step.kind))
     .map((step) => (step as { cause: Cause }).cause)
@@ -116,12 +117,18 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
   const index = spec.campaign.scenarios.indexOf(spec.scenario.id);
 
   beforeAll(async () => {
+    // A recorder notes each record the games resolve (reached.ts); the list of the records none does is written for `pnpm test scenario`. It changes nothing a game does.
+    const reached = new Set<string>();
     for (const golden of spec.goldens) {
       // The checklist reads the cards of the world it deals for.
       const world = await spec.world(golden.decks);
       worlds.set(golden.decks, world);
-      games.set(golden.name, spec.play(golden, world.ctx));
+      const played = whileRecording(() => spec.play(golden, world.ctx));
+      for (const id of played.reached) reached.add(id);
+      games.set(golden.name, played.value);
     }
+    const effects = [...worlds.values()].flatMap((world) => world.ctx.effects);
+    writeUnreached(spec.scenario.id, unreachedRecords(effects, ownCodes(spec.scenario), reached));
   }, 240_000);
 
   const game = (golden: G): P => games.get(golden.name)!;

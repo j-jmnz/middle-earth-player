@@ -99,7 +99,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["51307:A:1"],
     timing: "whenRevealed",
     instructions: [
-      { verb: "EnterSetAsideStaging", code: BANE },
+      { verb: "AddSetAsideToStaging", code: BANE },
       { verb: "Pick", pick: THE_BANE_STAGED },
       { verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "endOfRound", target: "picked" },
       { verb: "AttackFromStaging", who: "firstPlayer", orEngaged: true, when: { kind: "less", left: 1, right: { players: true } } },
@@ -119,7 +119,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   wins("51307", "51307:B:3"),
 
   // 51308 Last Lord of Moria (stage 3): Durin's Bane engages the first player, as soon as it is in the staging area (reading 15), so the 3A steps that follow it find it staged or engaged; it takes no more damage each round than the progress tokens here (none with no progress); the stage cannot be defeated while it is in play.
-  { id: "51308:whenRevealed:1", cardCode: "51308", lines: ["51308:A:1"], timing: "whenRevealed", instructions: [{ verb: "EnterSetAsideStaging", code: BANE }, { verb: "Pick", pick: THE_BANE }, { verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "endOfRound", target: "picked" }, { verb: "AttackFromStaging", who: "firstPlayer", orEngaged: true, when: { kind: "less", left: 1, right: { players: true } } }] },
+  { id: "51308:whenRevealed:1", cardCode: "51308", lines: ["51308:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", code: BANE }, { verb: "Pick", pick: THE_BANE }, { verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "endOfRound", target: "picked" }, { verb: "AttackFromStaging", who: "firstPlayer", orEngaged: true, when: { kind: "less", left: 1, right: { players: true } } }] },
   { id: "51308:forced:1", cardCode: "51308", lines: ["51308:B:1"], timing: "forced", trigger: "addedToStaging", subject: THE_BANE, instructions: [{ verb: "EngageFirstPlayer", target: "subject" }] },
   { id: "51308:forced:2", cardCode: "51308", lines: ["51308:B:1"], timing: "forced", trigger: "returnedToStaging", subject: THE_BANE, instructions: [{ verb: "EngageFirstPlayer", target: "subject" }] },
   { id: "51308:constant:1", cardCode: "51308", lines: ["51308:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "damageCap", amount: { stat: "progress", of: "self" }, until: "whileSourceInPlay", holders: THE_BANE }] },
@@ -128,7 +128,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   wins("51308", "51308:B:3"),
 
   // 51309 The Rear Guard (stage 3): no player's threat is reduced by a player card effect; Durin's Bane is considered engaged with each player and cannot leave the staging area (the records of The Watcher, 51201:B:1, with no progress condition).
-  { id: "51309:whenRevealed:1", cardCode: "51309", lines: ["51309:A:1"], timing: "whenRevealed", instructions: [{ verb: "EnterSetAsideStaging", code: BANE }, { verb: "Pick", pick: THE_BANE_STAGED }, { verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "endOfRound", target: "picked" }, { verb: "AttackFromStaging", who: "firstPlayer", orEngaged: true, when: { kind: "less", left: 1, right: { players: true } } }] },
+  { id: "51309:whenRevealed:1", cardCode: "51309", lines: ["51309:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", code: BANE }, { verb: "Pick", pick: THE_BANE_STAGED }, { verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "endOfRound", target: "picked" }, { verb: "AttackFromStaging", who: "firstPlayer", orEngaged: true, when: { kind: "less", left: 1, right: { players: true } } }] },
   { id: "51309:constant:1", cardCode: "51309", lines: ["51309:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noThreatReduction", amount: 1, until: "whileSourceInPlay", target: "eachSeat" }] },
   { id: "51309:constant:2", cardCode: "51309", lines: ["51309:B:2"], timing: "constant", instructions: consideredEngaged(THE_BANE) },
   {

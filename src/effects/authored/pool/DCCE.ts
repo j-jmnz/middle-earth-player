@@ -220,9 +220,8 @@ export const RECORDS: readonly Effect[] = [
   // 11181 Revenant (burden, shuffled into the encounter deck by the campaign card of The Fate of Númenor; Immune to player card effects is a keyword): +2 Attack and +2 Defense for each resource on the
   // campaign card; no more than 2 damage is placed on it at a time; once destroyed it is shuffled into the encounter deck and the campaign card gains a resource.
   {"id":"11181:constant:1","cardCode":"11181","lines":["11181:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":{"stat":"resources","ofNamed":"The Fate of Númenor","times":2},"until":"whileSourceInPlay","target":"self"},{"verb":"ModifyStat","stat":"defense","amount":{"stat":"resources","ofNamed":"The Fate of Númenor","times":2},"until":"whileSourceInPlay","target":"self"}]},
-  // The damage limit is held for as long as Revenant is in play: set when it comes into play (added to the staging area, or put into play engaged), and the smallest limit counts.
-  {"id":"11181:forced:2","cardCode":"11181","lines":["11181:A:3"],"timing":"forced","trigger":"addedToStaging","subject":"self","instructions":[{"verb":"ModifyStat","stat":"damageLimit","amount":2,"until":"whileSourceInPlay","target":"self"}]},
-  {"id":"11181:forced:3","cardCode":"11181","lines":["11181:A:3"],"timing":"forced","trigger":"engaged","subject":"self","instructions":[{"verb":"ModifyStat","stat":"damageLimit","amount":2,"until":"whileSourceInPlay","target":"self"}]},
+  // The damage limit is a replacement effect held for as long as Revenant is in play, however it entered (the smallest limit counts); a constant, not a Forced trigger on one way in (scripts/checks/effect-coverage.test.ts, REPLACEMENT_RECORDS).
+  {"id":"11181:constant:2","cardCode":"11181","lines":["11181:A:3"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"damageLimit","amount":2,"until":"whileSourceInPlay","target":"self"}]},
   {"id":"11181:forced:1","cardCode":"11181","lines":["11181:A:4"],"timing":"forced","trigger":"enemyDestroyed","subject":"self","instructions":[{"verb":"MoveEncounterCard","card":"self","to":"shuffle"},{"verb":"AddCampaignResource","amount":1}]},
 
   // 11183 Black Key (boon), both sides.

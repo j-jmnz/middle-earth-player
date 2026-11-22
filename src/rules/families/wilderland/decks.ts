@@ -19,8 +19,8 @@ import type { Focus } from "../index.ts";
 import { spawnIntoPile } from "./kings.ts";
 
 /** The Evil Creatures deck ran out: its own discard pile is shuffled back into it (emce.evil-creatures-deck). Settle keeps the game's deck refilled. */
-export function refillEvilCreatures(state: ScenarioState): ScenarioState {
-  return refillDeck(state, DECKS.evilCreatures);
+export function refillEvilCreatures(state: ScenarioState, steps: EngineStep[]): ScenarioState {
+  return refillDeck(state, DECKS.evilCreatures, steps);
 }
 
 /** "Create the Caves deck" and its like: the dealt cards shuffled together. A deck the scenario did not deal is left alone. */
@@ -51,7 +51,7 @@ export function addFromNamed(state: ScenarioState, instruction: Extract<Instruct
   if (instruction.reveal) {
     const seat = seats[0] ?? focus.seat;
     // The deck refills from its discard pile first, as the other reveals do (revealTop); the refusal in pileTravelUnpayable counts that pile too.
-    const filled = refillDeck(state, zones);
+    const filled = refillDeck(state, zones, steps);
     const top = topOf(filled, zones.deck);
     if (top === undefined || filled.seats[seat]?.eliminated) return filled;
     return startReveal(markPicked(filled, top), seat, ctx, steps, top, undefined, instruction.to === "engaged");

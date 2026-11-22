@@ -110,7 +110,9 @@ describe("the rules a keyword chip quotes", () => {
   it("find the book of the scenario in play: its setup span, else its campaign's book, else none", () => {
     expect(scenarioRuleDoc("the-passing-of-the-grey-company", "the-return-of-the-king")).toBe("mec113");
     expect(scenarioRuleDoc("a-journey-to-rhosgobel", undefined)).toBe("jtr");
-    expect(scenarioRuleDoc("the-hunt-for-gollum", undefined)).toBeNull();
+    expect(scenarioRuleDoc("the-hunt-for-gollum", undefined)).toBe("htg");
+    expect(scenarioRuleDoc("conflict-at-the-carrock", undefined)).toBe("cac");
+    expect(scenarioRuleDoc("a-scenario-with-no-span", undefined)).toBeNull();
     expect(scenarioRuleDoc("no-such-scenario", "the-two-towers")).toBe("mec112");
     expect(scenarioRuleDoc("no-such-scenario", undefined)).toBeNull();
   });

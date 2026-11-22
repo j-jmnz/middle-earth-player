@@ -8,7 +8,8 @@ import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { startReveal } from "../../windows/frames.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { lowerThreat, playerCardEffectCanChoose, raiseThreat } from "../../core/keywords.ts";
+import { playerCardEffectCanChoose, raiseThreat } from "../../core/keywords.ts";
+import { lowerThreatByEffect } from "../quest/threat.ts";
 import { isPlayerType, printedOf } from "../../core/printed.ts";
 import { placeEffectProgress } from "../quest/effect-progress.ts";
 import { immuneBuffer } from "../../interpret/immune-targets.ts";
@@ -134,7 +135,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "LowerThreatByRaise": {
       const amount = answeredRaise(state);
-      return amount > 0 ? lowerThreat(state, focus.seat, amount, steps, currentCause(steps, UNATTRIBUTED)) : state;
+      return amount > 0 ? lowerThreatByEffect(state, focus.seat, amount, focus.sourceId, ctx, steps, currentCause(steps, UNATTRIBUTED)) : state;
     }
     case "ReturnEventToHand": {
       const data = effectData(state);

@@ -45,11 +45,12 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41008:A:1 (front): While it is engaged with you, Spiders of Mirkwood gets +1 Attack for each exhausted character you control.
   41008:constant:1: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - this card: stat attack the number of exhausted character (you control), while this card is in play
 
 41008:A:2 (shadow): Shadow: Choose and exhaust 1 character you control. If this attack was undefended, also deal that character 2 damage.
   41008:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -60,12 +61,14 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41009:A:1 (front): Forced: After Great Spider engages you, exhaust a character you control.
   41009:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
 
 41009:A:2 (shadow): Shadow: Deal 1 damage to an exhausted character you control.
   41009:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose exhausted character (you control)
     - deal 1 damage to the picked card
@@ -76,7 +79,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41010:A:1 (front): While The Eaves of Mirkwood is the active location, encounter card effects cannot be canceled.
   41010:constant:1: Constant
     only if this card is the active location
-    - the table: stat encounterUncancelable 1, while this card is in play
+    - the table: stat encounterUncancelable (no Response cancels an encounter card's When Revealed or Shadow effect, and no paid cancel is offered against one) 1, while this card is in play
 
 ## 41011 Tangled Grove
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -87,6 +90,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41011:A:2 (front): Travel: Each player must discard 1 random card from his hand to travel here.
   41011:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's hand holds fewer cards than they must discard
     - for each player, first player first:
       - the acting player discards 1 random card(s) from hand
 
@@ -94,7 +98,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 41012:A:1 (front): Response: After you travel to Forest Gate, the first player may draw 2 cards.
-  41012:response:1: Response after the players travel
+  41012:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     - the first player draws 2 card(s)
 
 ## 41013 Spider Den
@@ -103,6 +107,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41013:A:1 (front): Quest Action: Search the encounter deck and discard pile for a Spider enemy and put it into play engaged with you to discard Spider Den. (Any player may trigger this effect.)
   41013:action:1: Action (any player may use it)
     only if all of: (it is the Quest phase) and (the encounter deck or its discard pile holds a Spider card)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one Spider enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - discard this card
@@ -117,17 +122,17 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41014:A:2 (front): Response: When Goblin Trail leaves play as an explored location, place 6 progress on the current quest.
   41014:response:1: Response after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
-    - [json ProgressQuest {"verb":"ProgressQuest","amount":6}]
+    - place 6 progress on the current quest; the active location takes it first
 
 ## 41015 Abandoned Camp
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 41015:A:1 (front): Response: After the players travel to Abandoned Camp, the first player discards the top card of their deck. If that card is an ally, put it into play under their control.
-  41015:response:1: Response after the players travel
+  41015:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top 1 card(s) of the acting player's deck go to their discard pile
     - choose card (you control) in the discard pile, of card type ally, among the cards this effect looked at or discarded
-    - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor"}]
+    - the picked card is put into play from wherever it is out of play (hand, discard pile, deck): it is not played, so no cost is paid and no play restriction applies, and a unique card with a copy in play stays where it is; a hero goes among its controller's heroes, any other card into the play area, ready, under the acting player's control
 
 41015:A:2 (front): Travel: Discard the top card of the encounter deck. If that card is an enemy, add it to the staging area.
   41015:travel:1: Travel
@@ -141,12 +146,13 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41016:A:1 (front): When Revealed: Each enemy and each location currently in the staging area gets +1 Threat until the end of the phase. If there are no cards in the staging area, Driven by Shadow gains surge.
   41016:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each enemy (any player controls) in the staging area only: stat threat 1, until the end of the phase
-    - each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - each enemy (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
+    - each location (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
     - then, if the number of card (any player controls) in the staging area only, other than this card is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 41016:A:2 (shadow): Shadow: Choose and discard 1 attachment from the defending character. (If this attack is undefended, discard all attachments you control.)
   41016:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): choose attachment (any player controls) attached to the defending character
     - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -161,11 +167,12 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - return one enemy engaged with the acting player (that player picks which) to the staging area
-    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
-    - [json Doomed {"verb":"Doomed","amount":1,"when":{"kind":"noneReturned"}}]
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 1 from the doomed keyword this card gains (doomedRaised is announced for each)
 
 41017:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Return attacking enemy to the staging area after this attack.
   41017:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
@@ -192,13 +199,14 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41019:A:2 (front): While Goblin Troop is engaged with you, each other Goblin enemy engaged with you gets +1 Attack and +1 Defense.
   41019:constant:2: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each Goblin enemy (any player controls) engaged with you, other than this card: stat attack 1, while this card is in play
     - each Goblin enemy (any player controls) engaged with you, other than this card: stat defense 1, while this card is in play
 
 41019:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
   41019:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack 2, until the end of the attack
 
 ## 41020 Goblin Sniper
@@ -212,6 +220,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41020:A:2 (front): Forced: If Goblin Sniper is in the staging area at the end of the combat phase, each player deals 1 point of damage to 1 character he controls.
   41020:forced:1: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - choose character (you control)
       - deal 1 damage to the picked card
@@ -224,6 +233,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41021:A:2 (shadow): Shadow: Attacking enemy makes an additional attack immediately after this one. (Deal a new shadow card for that attack.)
   41021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
       - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
@@ -242,6 +252,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41023:A:1 (front): Forced: After Wild Wargs engages you, discard the top card of the encounter deck. If that card is a Goblin enemy, put it into play engaged with you.
   41023:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the top card of the encounter deck goes to the encounter discard pile
     - then, if the picked card is a Goblin enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
@@ -258,6 +269,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41024:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each Goblin enemy engaged with you.
   41024:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the number of Goblin enemy (any player controls) engaged with you, until the end of the attack
 
 ## 41025 Eyes in the Dark
@@ -278,6 +290,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41025:A:3 (shadow): Shadow: If this attack is undefended, discard an ally you control.
   41025:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the attack has no defender: choose ally (you control)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -293,6 +306,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41026:A:2 (shadow): Shadow: Deal 1 damage to a character you control.
   41026:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control)
     - deal 1 damage to the picked card
@@ -315,6 +329,6 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41050:B:1 (back): Resolution: If there are 6 or more resource tokens here, the thought of the captured villagers suffering weighs heavily on you. Add the Guilty Conscience treachery burden to the Campaign Pool.
   41050:resolution:1: Resolution
-    - [json Earn {"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]
+    - if the card with code 41050 in play holds at least 6 resource token(s): Resolution: the cards with codes 41043 are earned, with no choice
 
-(rendered pieces: 187 by template, 4 as JSON)
+(rendered pieces: 193 by template, 0 as JSON)

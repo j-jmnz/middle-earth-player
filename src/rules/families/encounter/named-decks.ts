@@ -10,7 +10,7 @@ import { moveEncounter } from "./moves.ts";
 /** Reveals the top card of the deck and puts it into play (`to`: engaged with the seat, or in the staging area); an announced entry, as every encounter card that enters play. The deck refills from its discard
  * pile first. Null when the deck and its discard pile are both empty. */
 export function revealTop(state: ScenarioState, zones: DeckZones, to: "engaged" | "staging", seat: number, ctx: ReduceContext, steps: EngineStep[]): { state: ScenarioState; id: string | null } {
-  const filled = refillDeck(state, zones);
+  const filled = refillDeck(state, zones, steps);
   const top = topOf(filled, zones.deck);
   if (!top) return { state: filled, id: null };
   return { state: moveEncounter(filled, top, to, seat, ctx, steps), id: top };

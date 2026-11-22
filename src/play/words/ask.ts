@@ -16,6 +16,11 @@ import { wilderlandAsk } from "./scenarios/wilderland.ts";
 import { lootLeaveOutWords } from "./loot.ts";
 
 /** What the instruction a player is asked about says to ask. `queue` is the instructions after the asked one (`queue[0]` is the next instruction), `picked` the card the effect last picked. */
+/** Which of an expanded discard's picks this is, "Card 2 of 4."; none for a discard of one. */
+function withPlace<T extends { prompt: string }>(words: T, place: { nth: number; of: number }): T {
+  return place.of > 1 ? { ...words, prompt: `${words.prompt} Card ${place.nth} of ${place.of}.` } : words;
+}
+
 export function askWords(a: {
   game: ScenarioState;
   ctx: ReduceContext;
@@ -30,10 +35,14 @@ export function askWords(a: {
   // The record the instruction is from: the frame's effect id, and the cause of the queued instruction when the frame runs several records (asks.ts).
   effectId?: string;
   cause?: Cause;
+  // The DiscardFromHand a Pick was expanded from, and the place of this pick among its picks: the record's entry is keyed on the DiscardFromHand, and the sheet says "Card 2 of 4" (effect-frames.ts expandDiscards).
+  origin?: Instruction;
+  place?: { nth: number; of: number };
 }): AskedWords {
   const { game, ctx, names, instruction, queue, options, source, picked, amountNow, effectId, cause } = a;
-  const written = asksPick({ game, ctx, names, instruction, source, amountNow, options, ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });
-  if (written) return written;
+  const asked = a.origin?.verb === "DiscardFromHand" ? a.origin : instruction;
+  const written = asksPick({ game, ctx, names, instruction: asked, source, amountNow, options, ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });
+  if (written) return a.place ? withPlace(written, a.place) : written;
   const traded = instruction.verb === "TradeDamageForThreat" && instruction.character ? game.cards[instruction.character] : undefined;
   if (instruction.verb === "TradeDamageForThreat" && traded) {
     const loses = effectsOf(ctx, traded.code).some((item) => item.trigger === "leftPlay" && item.instructions.some((step) => step.verb === "LoseGame"));
@@ -41,10 +50,11 @@ export function askWords(a: {
   }
   // The Burglar's Turn's Setup with more candidates than the loot deck takes (22024:A:2).
   if (instruction.verb === "BuildLootDeck") return lootLeaveOutWords(options.length, instruction.size);
-  return (
+  const words = (
     grappleAsk(instruction, source, names, grappleFactsOf(game, ctx, instruction, picked)) ??
     wilderlandAsk(instruction, source, names, queue[0], picked, { game, ctx, options }) ??
     seaAsk(instruction, queue[0], options, game, ctx, names, source, queue.slice(1)) ??
     pickWords(instruction, queue[0], names, source, source ? restrictedLimit(game, source) : 2, game, amountNow, queue.slice(1))
   );
+  return a.place && a.origin?.verb === "DiscardFromHand" ? withPlace(words, a.place) : words;
 }

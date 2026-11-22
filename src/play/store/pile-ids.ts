@@ -45,6 +45,16 @@ export const PILE_WORDS: Readonly<Record<PileId, string>> = {
   victory: "Victory display",
 };
 
+const WORDS_BY_ZONE: Readonly<Record<string, string>> = PILE_WORDS;
+
+/** What a named deck's reshuffle says, like the encounter deck's: "The Corsair discard pile (4) is shuffled into the Corsair deck" (`count` left out, no number). A deck with no words says "its deck". */
+export function reshuffleWords(zone: string, count?: number): string {
+  const deck = WORDS_BY_ZONE[zone];
+  const name = deck?.endsWith(" deck") ? deck.slice(0, -" deck".length) : null;
+  const pile = `${name ? `${name} discard pile` : "discard pile"}${count == null ? "" : ` (${count})`}`;
+  return `The ${pile} is shuffled into ${name ? `the ${name} deck` : "its deck"}`;
+}
+
 /** The second slot's piles this game has, one family of them: the Corsair pair once the Corsair deck is prepared, until it ends (families/sea/corsair.ts); the Evil Creatures pair once the scenario has dealt that deck; the Balrog pair once Shadow and Flame Nightmare's setup card has formed it; else the Grotto deck while the scenario deals one (dcce.grotto-deck), else the Uncharted deck while it deals that, else the Harad deck once dealt (Journey to the Cross-roads), else the Caves deck once dealt. */
 export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck" | "uncharted" | "piles">): readonly SecondPileId[] {
   if (game.corsairDeck !== undefined) return SECOND_PILES;

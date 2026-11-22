@@ -8,14 +8,15 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01081:A:2 (shadow): Shadow: Wolf Rider attacks the defending player. That player may declare 1 character as a defender. Deal Wolf Rider its own Shadow card. After combat, return Wolf Rider to the top of the encounter deck.
   01081:shadow:1: Shadow
-    - [json ShadowAttacks {"verb":"ShadowAttacks"}]
+    who acts: the acting player is the defending player (the player the attack is against)
+    - (a shadow effect of an enemy card) once the attack it was dealt to has ended, this enemy attacks the player that attack was made against, and goes to the top of the encounter deck at the end of the combat phase
 
 ## 01082 Hill Troll
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 01082:A:1 (front): Excess combat damage dealt by Hill Troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) must be assigned as an increase to your threat.
   01082:constant:1: Constant
-    - this card: stat excessToThreat 1, while this card is in play
+    - this card: stat excessToThreat (the damage its attack deals beyond the hit points the character had left raises its controller's threat by that much) 1, while this card is in play
 
 ## 01083 Goblin Sniper
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -28,6 +29,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01083:A:2 (front): Forced: If Goblin Sniper is in the staging area at the end of the combat phase, each player deals 1 point of damage to 1 character he controls.
   01083:forced:1: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - choose character (you control)
       - deal 1 damage to the picked card
@@ -37,6 +39,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01084:A:1 (front): Forced: Each time Marsh Adder attacks you, raise your threat by 1.
   01084:forced:1: Forced when this enemy attacks, before the defender is declared
+    who acts: the acting player is the defending player (the player the attack is against)
     - raise threat by 1 (the acting player)
 
 ## 01085 Wargs
@@ -45,10 +48,12 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01085:A:1 (front): Forced: If Wargs is dealt a shadow card with no effect, return Wargs to the staging area after it attacks.
   01085:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    who acts: the acting player is the defending player (the player the attack is against)
     - return this card to the staging area
 
 01085:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if this attack is undefended.)
   01085:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): the attacking enemy: stat attack 1, until the end of the attack
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -62,6 +67,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01086:A:2 (shadow): Shadow: Defending character does not count its Defense.
   01086:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - the defender: stat defense minus (defense of the defender), until the end of the attack
 
 ## 01087 The Brown Lands
@@ -69,6 +75,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01087:A:1 (front): Forced: After the players travel to The Brown Lands, place 1 progress token on it.
   01087:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 progress on this card
 
 ## 01088 The East Bight
@@ -76,17 +83,19 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01088:A:1 (front): When faced with the option to travel, the players must travel to The East Bight if there is no active location.
   01088:constant:1: Constant
-    - [json Restrict {"verb":"Restrict","what":"travelOnly"}]
+    - while no location is the active location and the players can travel to this location, they must travel to it: the travel step offers no way to decline it or to go elsewhere
 
 ## 01111 Misty Mountain Goblins
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 01111:A:1 (front): Forced: After Misty Mountain Goblins attacks, remove 1 progress token from the current quest.
   01111:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
     - remove 1 progress from the current quest card (all of it when it holds less)
 
 01111:A:2 (shadow): Shadow: Remove 1 progress token from the current quest. (3 progress tokens instead if this attack is undefended.)
   01111:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the attack has no defender): remove 1 progress from the current quest card (all of it when it holds less)
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): remove 3 progress from the current quest card (all of it when it holds less)
@@ -101,6 +110,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01112:A:2 (shadow): Shadow: Deal X shadow cards to this attacker. X is the number of players in the game.
   01112:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - repeat the number of players times:
       - the attacking enemy is dealt a shadow card
 
@@ -109,6 +119,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01113:A:1 (front): Forced: If Banks of the Anduin leaves play, return it to the top of the encounter deck instead of placing it in the discard pile.
   01113:forced:1: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes on top of the encounter deck
 
 ## 01114 Gladden Fields
@@ -117,6 +128,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01114:A:1 (front): Forced: While Gladden Fields is the active location, each player must raise his threat by an additional point during the refresh phase.
   01114:forced:1: Forced at the end of the phase
     only if all of: (it is the Refresh phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 1 (each player)
 
 ## 01115 Eastern Crows
@@ -127,10 +139,12 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01115:A:2 (front): Forced: After Eastern Crows is defeated, shuffle it back into the encounter deck.
   01115:forced:1: Forced after an enemy is destroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card is shuffled into the encounter deck
 
 01115:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if defending player's threat is 35 or higher.)
   01115:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the actor's threat is at most 34: the attacking enemy: stat attack 1, until the end of the attack
     - then, if the actor's threat is at least 35 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
@@ -153,10 +167,11 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01117:A:2 (shadow): Shadow: Defending player chooses and returns 1 exhausted ally he controls to its owner's hand. If he controls no exhausted allies, raise his threat by 3.
   01117:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (there is a exhausted ally (you control) to choose): raise threat by 3 (the acting player)
     - then, if there is a exhausted ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose exhausted ally (you control)
-    - [json ReturnToHand {"verb":"ReturnToHand","target":"picked","when":{"kind":"canPick","pick":{"type":"ally","control":"you","state":"exhausted"}}}]
+    - then, if there is a exhausted ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes back to its owner's hand if it is still in play
 
 ## 01118 Treacherous Fog
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -164,7 +179,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01118:A:1 (front): When Revealed: Each location in the staging area gets +1 Threat until the end of the phase. Then, each player with a threat of 35 or higher chooses and discards 1 card from his hand.
   01118:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - each location (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
     - for each player, first player first:
       - if the actor's threat is at least 35: discard 1 cards from hand
 
@@ -193,8 +208,8 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01127:B:1 (back): Reveal 1 additional card from the encounter deck each quest phase. Do not make engagement checks during the encounter phase. (Each player may still optionally engage 1 enemy each encounter phase.)
   01127:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the table: stat revealMore 1, while this card is in play
-    - the table: stat noEngagementChecks 1, while this card is in play
+    - the table: stat revealMore (the staging step reveals this many more cards, after the one each player makes; they go to the players in turn, the first player first, and while the stages are separate to the player whose stage holds the effect) 1, while this card is in play
+    - the table: stat noEncounterEngagementChecks (held by the table, no engagement check is made during the encounter phase; an Ambush check in the quest phase still is) 1, while this card is in play
 
 ## 01128 Ambush on the Shore
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -224,9 +239,9 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01130:A:2 (front): Setup: Put Mendor into play. Set each copy of Valor and Scarred aside, out of play.
   01130:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"01135"}]
-    - [json SetAsideEachPlayer {"verb":"SetAsideEachPlayer","code":"01133"}]
-    - [json SetAsideEachPlayer {"verb":"SetAsideEachPlayer","code":"01138"}]
+    - Campaign Setup: the objective ally with code 01135 enters play under the first player (put there, not played: nothing is revealed and no cost is paid; a pool card with this record for itself is put into play at the start of each scenario instead of being shuffled into the encounter deck)
+    - Campaign Setup: a copy of the card with code 01133 for each player is set aside, out of play (a later attach step takes one copy from the set-aside cards each time)
+    - Campaign Setup: a copy of the card with code 01138 for each player is set aside, out of play (a later attach step takes one copy from the set-aside cards each time)
 
 01130:A:3 (front): Response: After a Hill Troll is defeated, each player attaches 1 set-aside copy of Valor to a hero they control, if able.
   01130:response:1: Response after an enemy is destroyed (heard about enemy (any player controls) named "Hill Troll")
@@ -237,18 +252,192 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01130:A:4 (front): Forced: After a character is destroyed by a Hill Troll, each player attaches 1 set-aside copy of Scarred to a hero they control. (Limit once per game.)
   01130:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls); limit once per game)
     only if the event's other card is a enemy (any player controls) named "Hill Troll"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - choose hero (you control) that the card with code 01138 can be attached to
       - the set-aside copy of the card with code 01138 is attached to the last picked hero
 
 01130:A:5 (front): If Mendor leaves play, the players lose the game.
-  01130:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about card (any player controls) named "Mendor")
+  01130:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about card (any player controls) or in the staging area or the active location, named "Mendor")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game
 
 01130:B:1 (back): Resolution: Add each copy of Valor and Scarred in play to the Campaign Pool. Record the names of heroes with Valor and/or Scarred attached in the notes section of the Campaign Log and attach them to those heroes when setting up each subsequent scenario in this campaign. The hero with the most damage will be taken prisoner at the beginning of Escape from Dol Guldur (in case of a tie, randomly select among the heroes with the most damage). Record the name of the "prisoner" in the notes section of the Campaign Log.
   01130:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each copy of code 01133 and code 01138 attached to a hero in play joins the Campaign Pool attached to that hero
-    - [json NamePrisoner {"verb":"NamePrisoner"}]
+    - Resolution: the hero in play with the most damage is the prisoner, chosen at random with the seed among those tied; the name is written to the Campaign Log's prisoner fact
 
-(rendered pieces: 135 by template, 7 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 900201 Journey Along the Anduin Nightmare
+
+900201:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+900201:A:2 (front): All Troll enemies gain the text: "Cannot have attachments."
+  900201:constant:1: Constant
+    - each Troll enemy (any player controls) or in the staging area: stat cannotHaveAttachments 1, while this card is in play
+
+900201:A:3 (front): If the encounter deck is empty (at any time), shuffle the encounter discard pile back into the encounter deck.
+  900201:constant:2: Constant
+    - the table: stat encounterRefill 1, while this card is in play
+
+900201:B:1 (back): Begin with the standard quest deck and encounter deck for the Journey Along the Anduin scenario found in the LOTR LCG core set.
+  (inert: the engine applies it by rule, no record)
+
+900201:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+900201:B:3 (back): 3x Evil Storm
+  (inert: the engine applies it by rule, no record)
+
+900201:B:4 (back): 2x Treacherous Fog
+  (inert: the engine applies it by rule, no record)
+
+900201:B:5 (back): 2x Banks of the Anduin
+  (inert: the engine applies it by rule, no record)
+
+900201:B:6 (back): 3x Dol Guldur Orcs
+  (inert: the engine applies it by rule, no record)
+
+900201:B:7 (back): 2x Enchanted Stream
+  (inert: the engine applies it by rule, no record)
+
+900201:B:8 (back): 2x Despair
+  (inert: the engine applies it by rule, no record)
+
+900201:B:9 (back): 3x Misty Mountain Goblins
+  (inert: the engine applies it by rule, no record)
+
+900201:B:10 (back): 2x Necromancer's Pass
+  (inert: the engine applies it by rule, no record)
+
+900201:B:11 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard Journey Along the Anduin encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+900201:B:12 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 900202 Marshland Outlaws
+
+900202:A:1 (front): If you are engaged with this enemy, you cannot attack or deal damage (through effects) to enemies with a title other than Marshland Outlaws.
+  900202:constant:1: Constant
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    - engagedSeat: stat attackOnlyTitle 1, while this card is in play
+
+900202:A:2 (shadow): Shadow: Raise your threat by X. X is the amount of damage dealt by this attack.
+  900202:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - raise threat by the damage just dealt (the acting player)
+
+## 900203 Anduin Troll Spawn
+
+900203:A:1 (front): If there is no Hill Troll in play, Anduin Troll Spawn gains surge.
+  900203:whenRevealed:1: When revealed
+    - if the number of enemy (any player controls) or in the staging area, named "Hill Troll" is at most 0: this card gains surge (one more encounter card is revealed when it has been resolved)
+
+900203:A:2 (front): Forced: At the beginning of the combat phase, Anduin Troll Spawn engages a player engaged with a Hill Troll.
+  900203:forced:1: Forced when a phase begins
+    only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - this enemy engages a player engaged with a enemy (any player controls) named "Hill Troll" (the first player chooses among several; nothing when it is already engaged with that player)
+
+## 900204 Brown Water Rats
+
+900204:A:1 (front): Brown Water Rats cannot be damaged.
+  900204:constant:1: Constant
+    - this card: stat cannotTakeDamage 1, while this card is in play
+
+900204:A:2 (front): Forced: If the players are on stage 3 and all remaining enemies have the printed Rat trait, discard Brown Water Rats from play.
+  900204:forced:1: Forced on the event stageRevealed
+    only if all of: (the players are on stage 3) and (the number of enemy (any player controls) or in the staging area, without Rat is at most 0) and (this card is in play)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - discard this card
+  900204:forced:2: Forced after a card leaves play (heard about enemy (any player controls) not named "Brown Water Rats")
+    only if all of: (the players are on stage 3) and (the number of enemy (any player controls) or in the staging area, without Rat is at most 0) and (this card is in play)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - discard this card
+  900204:forced:3: Forced on the event encounterEnteredPlay (heard about this card)
+    only if all of: (the players are on stage 3) and (the number of enemy (any player controls) or in the staging area, without Rat is at most 0) and (this card is in play)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - discard this card
+
+900204:A:3 (shadow): Shadow: Attacking enemy cannot be damaged this round.
+  900204:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat cannotTakeDamage 1, until the end of the round
+
+## 900205 A Flooded Ford
+
+900205:A:1 (front): Each card revealed by the encounter deck gains doomed X. X is the number of progress tokens on this card.
+  900205:constant:1: Constant
+    only if this card is in play
+    - each card (any player controls) or in the staging area or the active location the encounter deck reveals gains doomed progress of this card (each player raises their threat by that much more when one is revealed)
+
+900205:A:2 (shadow): Shadow: If this attack is undefended, put A Flooded Ford into the staging area with 1 progress token on it.
+  900205:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attack has no defender: this card goes to the staging area (it is not revealed)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 progress on this card
+
+## 900206 Gladden Marshlands
+
+900206:A:1 (front): Action: Deal 1 damage to a hero you control to reduce Gladden Marshlands' Threat by 1 until the end of the phase. Any player may trigger this effect.
+  900206:action:1: Action (any player may use it)
+    only if there is a hero (you control) to choose
+    who acts: any player may trigger it; the acting player is the one who does
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control)
+    - deal 1 damage to the picked card
+    - this card: stat threat -1, until the end of the phase
+
+900206:A:2 (shadow): Shadow: Each enemy engaged with the defending player gets +1 Attack until the end of the phase. (+2 Attack instead if this attack is undefended.)
+  900206:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): each enemy (any player controls) engaged with you (only the cards that match now: one that arrives later does not get it): stat attack 1, until the end of the phase
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy (any player controls) engaged with you (only the cards that match now: one that arrives later does not get it): stat attack 2, until the end of the phase
+
+## 900207 Pursuit on the Shore
+
+900207:A:1 (front): When Revealed: Search the victory display and encounter discard pile for the enemy with the most hit points. Return that enemy to the staging area. If no enemy is returned by this effect, Pursuit on the Shore gains surge. (Cannot be canceled.)
+  900207:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the enemy with the most printed hit points in the victory display and the encounter discard pile becomes the picked card (the first player chooses among a tie; nothing is picked with no enemy there)
+    - the picked card goes to the staging area (it is not revealed)
+    - then, if not (the picked card is in play now) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+## 900208 Troll Attack
+
+900208:A:1 (front): When Revealed: All engaged Troll enemies attack. If no Troll enemies are engaged, Troll Attack gains surge.
+  900208:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy engaged with a player with the trait Troll makes an immediate attack, each dealt a shadow card of its own
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+900208:A:2 (shadow): Shadow: If attacking enemy is a Troll, resolve this attack against each player. (Attack is undefended against each player not engaged with this enemy.)
+  900208:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if this card is a Troll enemy (any player controls): (a shadow effect, left for the end of the attack) the attack also resolves against each other player, undefended: each of them chooses a hero they control, which takes the enemy's Attack as damage
+
+## 900209 Smoking Blood
+
+900209:A:1 (front): When Revealed: Remove all damage from all enemies. Then, each player raises his threat by the amount of damage just removed from his engaged enemies. If no damage is removed by this effect, Smoking Blood gains surge.
+  900209:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - all damage is removed from every enemy in play; each player raises their threat by the damage removed from the enemies engaged with them; the effect's X becomes the damage removed
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+900209:A:2 (shadow): Shadow: Move all damage on this enemy to the defending character. (If undefended, move the damage to the hero damaged by this attack.)
+  900209:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): all the damage on the attacking enemy moves to the defender (placed, not dealt; it can destroy a character at its limit; nothing with the target out of play)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): when the attack in progress ends:
+      - all the damage on this card moves to the event's other card (placed, not dealt; it can destroy a character at its limit; nothing with the target out of play)
+
+(rendered pieces: 243 by template, 0 as JSON)

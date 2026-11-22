@@ -20,7 +20,6 @@ import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
 import { angmarDials } from "../readouts/angmar.ts";
 import { scenarioDials, seatMarks } from "../readouts/scenario-dials.ts";
 import { wastesDials } from "../readouts/wastes.ts";
-import { marksText } from "../canvas/table-canvas-views.ts";
 
 const ID = "the-wastes-of-eriador";
 const DAYBREAK = "10011";
@@ -146,11 +145,11 @@ describe("a character that is determined or carries Determination", () => {
     expect(determinedMark(withLog(both.state, ["dh1"]), both.ctx, hero(both))).toMatchObject({ word: "Determined", speech: expect.stringContaining("It carries Determination") });
   });
 
-  it("10172:A:1 puts the mark in the slot's numbers, the reader's line and the web list's words, and wears none on a card out of play or an enemy", () => {
+  it("10172:A:1 puts the mark in the slot's numbers and the reader's line, and wears none on a card out of play or an enemy", () => {
     const made = built({ attached: [{ code: "10172", to: "dh1" }], hand: ["filler"] });
     const info = slotNumbers(made.state, made.ctx, hero(made));
     expect(info.determined?.word).toBe("Determination");
-    expect(marksText(info as never)).toContain("It carries Determination");
+    expect(info.determined?.speech).toContain("It carries Determination");
     expect(slotNumbers(made.state, made.ctx, idOf(made.state, "filler")).determined).toBeNull();
     expect(slotNumbers(made.state, made.ctx, idOf(made.state, DAYBREAK)).determined).toBeNull();
   });

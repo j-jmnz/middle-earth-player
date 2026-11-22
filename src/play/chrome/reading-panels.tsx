@@ -291,7 +291,7 @@ export function ThreatPanel({
       </View>
       <PanelClose testID="threat-panel-close" onPress={onClose} />
       <ScrollView className="mt-3" style={{ flexGrow: 0, flexShrink: 1 }}>
-        <Text className="text-body text-inkMuted">At the engagement checks, each enemy in staging whose engagement cost is at or below your threat engages you. At 50 you are eliminated.</Text>
+        <Text className="text-body text-inkMuted">{`At the engagement checks, each enemy in staging whose engagement cost is at or below your threat engages you. At ${of} you are eliminated.`}</Text>
         {rows.length === 0 ? <Text className="mt-2 text-body text-inkMuted">No enemy is in staging.</Text> : null}
         {rows.map((row) => (
           <View

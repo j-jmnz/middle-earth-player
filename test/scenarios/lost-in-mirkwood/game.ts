@@ -81,7 +81,7 @@ export type LostmirkGolden = { name: string; seatCount: 1 | 2; seed: number; dif
 // The pinned games: wins (true solo and two-handed, Normal and Easy, Melanwar joining the pool and the guidance line, a treasure discovered, the quest through Carried Away and through Truly Lost to Escape from Taur-nu-fuin) and losses (the
 // threat reaching 50, the first player's elimination taking Haldan with it, every hero dead), each on a fixed seed.
 export const LOSTMIRK_GOLDENS: readonly LostmirkGolden[] = [
-  { name: "true solo, won, Melanwar joins the pool, a treasure discovered, a hero carried away", seatCount: 1, seed: 1039, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, won, Melanwar joins the pool, a treasure discovered, a hero carried away", seatCount: 1, seed: 1040, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, won, hands under the locations, a treasure discovered", seatCount: 1, seed: 13, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, won, no treasure discovered", seatCount: 1, seed: 17, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, won, after Journey Up the Anduin (Turayn in the pool)", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", after: true },

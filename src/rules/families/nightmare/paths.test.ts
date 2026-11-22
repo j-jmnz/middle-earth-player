@@ -14,7 +14,9 @@ import { pushCardEffects, pushEffectFrame } from "../../interpret/effect-frames.
 import { cardMap, expectOk, hero, idleScenario } from "../../core/test-fixture.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { dealOneShadow, type ReduceContext } from "../../interpret/interpret.ts";
-import { modifiedStat } from "../../core/keywords.ts";
+import { addModifier, modifiedStat } from "../../core/keywords.ts";
+import { resolveAttack } from "../../combat/shadow.ts";
+import { topFrame } from "../../windows/windows.ts";
 import { settle } from "../../engine/machine.ts";
 import { readyCard } from "../../interpret/player-verbs.ts";
 import { reduce } from "../../engine/reduce.ts";
@@ -22,7 +24,7 @@ import { definePrinted } from "../../core/printed.ts";
 import { doRefresh } from "../../engine/refresh.ts";
 import { finishSetup } from "../../setup/setup.ts";
 import { flagged, updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
-import { fireForced } from "../../windows/triggers.ts";
+import { startReveal } from "../../windows/frames.ts";
 import { spawn } from "../../core/zones.ts";
 import { run as runNightmare } from "./index.ts";
 import { prisonerHeroes, run as runPrisoner } from "../prisoner/index.ts";
@@ -122,6 +124,10 @@ describe("Passage Through Mirkwood Nightmare (900101-900109)", () => {
     expect(state.cards[sam]?.zone).toBe("heroes");
     const gimliCard = state.cards[gimli];
     expect(gimliCard ? modifiedStat(state, gimliCard, "willpower", cards) : -1).toBe(1);
+    // The discard lasts as long as the -2: a committed character whose Willpower falls to 0 later in the phase is discarded too.
+    const lowered = settle(addModifier(state, gimli, gimli, "willpower", -1, "endOfPhase"), ctx, []);
+    expect(lowered.cards[gimli]?.zone).toBe("discard");
+    expect(lowered.cards[sam]?.zone).toBe("heroes");
   });
 
   it("keeps the engaged player's cards from readying for the rest of the round once Ungoliant's Brood engages (900103:A:1, cannotReady)", () => {
@@ -201,10 +207,9 @@ describe("Passage Through Mirkwood Nightmare (900101-900109)", () => {
 
 describe("Journey Along the Anduin Nightmare (900201-900209)", () => {
   const ctx: ReduceContext = { effects: ANDUIN, cards };
-  const choose = (state: ScenarioState, optionId: string): ScenarioState => expectOk(reduce(state, { type: "Choose", optionId }, ctx)).state;
   const fire = (state: ScenarioState, frame: "whenRevealed" | "forced" | "shadow", sourceId: string, id: string) =>
     settle(pushCardEffects(state, frame, sourceId, 0, false, [record(ANDUIN, id)], ctx, []), ctx, []);
-  const runFrame = (state: ScenarioState, sourceId: string, instructions: Parameters<typeof pushEffectFrame>[1]["instructions"], extra: { other?: string } = {}) =>
+  const runFrame = (state: ScenarioState, sourceId: string, instructions: Parameters<typeof pushEffectFrame>[1]["instructions"], extra: { other?: string; struck?: number } = {}) =>
     settle(pushEffectFrame(state, { frame: "shadow", sourceId, actor: 0, peril: false, effectId: "fixture", instructions, cancel: null, blockCancel: null, ...extra }, []), ctx, []);
 
   it("gives Troll enemies \"Cannot have attachments\" and refills an empty encounter deck in any phase (900201:A:2, 900201:A:3)", () => {
@@ -270,16 +275,20 @@ describe("Journey Along the Anduin Nightmare (900201-900209)", () => {
     expect(fire(firstStage.state, "forced", firstStage.id, "900204:forced:3").cards[firstStage.id]?.zone).toBe("staging");
   });
 
-  it("raises each player's threat by A Flooded Ford's progress when the encounter deck reveals a card (900205:A:1)", () => {
+  it("gives each card the encounter deck reveals doomed X, X the progress on A Flooded Ford, as the doomed step (900205:A:1)", () => {
     const { state: base } = table();
     const ford = spawn(base, "900205", { zone: "staging" });
-    const placed = updateCard(deck(ford.state, ["mist"]), ford.id, { progress: 2 });
+    const placed = syncConstants(updateCard(deck(ford.state, ["mist"]), ford.id, { progress: 2 }), ctx);
     const threat = placed.seats[0]?.threat ?? 0;
     const mist = placed.encounterDeck[0] ?? "";
-    // A Flooded Ford in the staging area hears the encounter deck reveal another card.
-    const fired = settle(fireForced(placed, { trigger: "revealed", seat: 0, cardId: mist, fromDeck: true }, ctx, []), ctx, []);
-    expect(settle(fireForced(placed, { trigger: "revealed", seat: 0, cardId: mist }, ctx, []), ctx, []).seats[0]?.threat).toBe(threat);
-    expect(fired.seats[0]?.threat).toBe(threat + 2);
+    const steps: EngineStep[] = [];
+    const revealed = settle(startReveal(placed, 0, ctx, steps), ctx, steps);
+    expect(revealed.seats[0]?.threat).toBe(threat + 2);
+    expect(steps.some((step) => step.kind === "threat" && "rule" in step.cause && step.cause.rule === "rr.doomed-x")).toBe(true);
+    // A card a search or an effect adds is not one the encounter deck revealed, and a Ford with no progress gives nothing.
+    expect(settle(startReveal(placed, 0, ctx, [], mist), ctx, []).seats[0]?.threat).toBe(threat);
+    const bare = syncConstants(updateCard(placed, ford.id, { progress: 0 }), ctx);
+    expect(settle(startReveal(bare, 0, ctx, []), ctx, []).seats[0]?.threat).toBe(threat);
   });
 
   it("returns the enemy with the most hit points from the victory display or discard pile to the staging area (900207:A:1)", () => {
@@ -301,14 +310,29 @@ describe("Journey Along the Anduin Nightmare (900201-900209)", () => {
     expect(done.pendingAttack?.enemyId).toBe(troll.id);
   });
 
-  it("resolves a Troll's attack against each other player as an undefended attack (900208:A:2, AttackOthersUndefended)", () => {
+  it("deals the Attack the enemy struck with, not the one left once the attack's effects expired, as a logged undefended strike (900208:A:2)", () => {
     const { state: base, heroes } = table(2);
     const troll = spawn(base, "01082", { zone: "engaged", seat: 0 });
-    const asked = runFrame(troll.state, troll.id, [{ verb: "AttackOthersUndefended" }]);
     const target = heroes[1]?.[2] ?? "";
-    const hit = choose(asked, target);
-    expect(hit.cards[target]?.damage).toBe(6);
-    for (const id of heroes[0] ?? []) expect(hit.cards[id]?.damage).toBe(0);
+    const steps: EngineStep[] = [];
+    const asked = settle(pushEffectFrame(troll.state, { frame: "shadow", sourceId: troll.id, actor: 0, peril: false, effectId: "fixture", instructions: [{ verb: "AttackOthersUndefended" }], cancel: null, blockCancel: null, struck: 9 }, steps), ctx, steps);
+    const chosen = expectOk(reduce(asked, { type: "Choose", optionId: target }, ctx));
+    expect(chosen.state.cards[target]?.damage).toBe(9);
+    for (const id of heroes[0] ?? []) expect(chosen.state.cards[id]?.damage).toBe(0);
+    expect(chosen.steps.some((step) => step.kind === "strike" && step.undefended && step.targetId === target && step.attack === 9)).toBe(true);
+  });
+
+  it("notes the Attack at the damage step in a game that resolves the attack against each player, and only there (900208:A:2)", () => {
+    const { state: base, heroes } = table();
+    const troll = spawn(base, "01082", { zone: "engaged", seat: 0 });
+    // Attack 6 with a +3 that lasts until the end of the attack: the effect the attack leaves for its end reads 9.
+    const pending = { ...addModifier(troll.state, troll.id, troll.id, "attack", 3, "endOfAttack"), pendingAttack: { enemyId: troll.id, seat: 0, defenderId: heroes[0]?.[0], shadowsDone: true, after: [{ verb: "AttackOthersUndefended" as const }] } };
+    const struck = (state: ScenarioState) => {
+      const data = topFrame(resolveAttack(state, ctx, []))?.data;
+      return data?.kind === "effect" ? data.struck : undefined;
+    };
+    expect(struck(spawn(pending, "900208", { zone: "staging" }).state)).toBe(9);
+    expect(struck(pending)).toBeUndefined();
   });
 
   it("removes all damage from enemies and raises each engaged player's threat by it; with none, gains surge (900209:A:1)", () => {

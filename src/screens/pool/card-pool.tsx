@@ -439,7 +439,7 @@ export function CardPool({
           <ActionBar testID="pool-deck-bar">
             <View className="flex-row items-center gap-3.5">
               <View className="flex-1">
-                <View className="flex-row items-baseline justify-between">
+                <View className="flex-row items-center justify-between">
                   <Text className="text-label text-muted">{side ? "Side deck" : "Deck"}</Text>
                   <Text testID="pool-deck-count" className="text-label text-bone" numberOfLines={1}>
                     {side ? sideDeckLine(sideCount, loot ? { found: lootFound, size: loot.size } : null) : deckCountLine({ heroes, cards: deckCards })}

@@ -187,6 +187,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       const found = Object.values(state.cards).find((card) => card.code === condition.code && inPlay(card.zone));
       return found != null && found.exhausted === condition.is;
     }
+    case "exhaustedNamed":
+      return Object.values(state.cards).some((card) => printedOf(ctx.cards, card.code).name === condition.name && inPlay(card.zone) && card.controller != null && card.exhausted === condition.is);
     case "engagedWithActor": {
       const source = scope.sourceId ? state.cards[scope.sourceId] : undefined;
       return source != null && source.zone === "engaged" && source.controller === scope.actor;

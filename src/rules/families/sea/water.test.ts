@@ -10,6 +10,7 @@ import { legalIntents } from "../../engine/legal.ts";
 import { countsAsAttachment } from "../../interpret/conditions.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { settle } from "../../engine/machine.ts";
+import { exhaustAnnounced } from "../../windows/exhaust.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { attachTo, spawn } from "../../core/zones.ts";
@@ -75,6 +76,15 @@ describe("12132:A:1 Taking on Water: Forced, when the attached objective exhaust
     expect(damage(settled(made, once), host)).toBe(2);
     const again = exhaust({ ...made, state: settled(made, updateCard(once, host, { exhausted: false })) }, host);
     expect(damage(again, host)).toBe(4);
+  });
+
+  it("an exhaust that is readied again within the same step is heard, once (exhaustAnnounced)", () => {
+    const { made, host } = soaked(make({ play: [CODES.dreamChaser] }), CODES.dreamChaser);
+    const exhausted = exhaustAnnounced(made.state, host, made.ctx);
+    // The sweep has not looked yet: the exhaust is already announced, and readying the Ship before it looks does not lose it.
+    expect(damage(settled(made, updateCard(exhausted, host, { exhausted: false })), host)).toBe(2);
+    // Still exhausted at the sweep: the announcement and the sweep make one hit, not two.
+    expect(damage(settled(made, exhausted), host)).toBe(2);
   });
 
   it("another Ship objective that exhausts is not hurt", () => {

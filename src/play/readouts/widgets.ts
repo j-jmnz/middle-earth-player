@@ -55,17 +55,26 @@ export function ringWords(readout: LocationReadout | null, nameOf: (code: string
 export type HeldDial = { seat: number; words: string; mark: "oneRing" | "hero" };
 
 export function heldDial(game: ScenarioState, nameOf: (code: string) => string): HeldDial | null {
+  return heldDialList(game, nameOf)[0] ?? null;
+}
+
+// Every seat's own mark, one per owner seat: the Ring-bearer or a prisoner when there is one, then each seat that has a hero held facedown (Carried Away, 18074:A:1: with two players both captives show a mark). A seat that holds two says both.
+function heldDialList(game: ScenarioState, nameOf: (code: string) => string): readonly HeldDial[] {
   const ring = locationReadout(game);
   const ringLine = ringWords(ring, nameOf);
-  if (ring?.heldBy != null && ringLine) return { seat: ring.heldBy, words: ringLine, mark: "oneRing" };
+  if (ring?.heldBy != null && ringLine) return [{ seat: ring.heldBy, words: ringLine, mark: "oneRing" }];
   const prisoner = Object.values(game.cards).find((card) => card.zone === "captive" && card.prisoner === true && card.host == null && card.owner != null);
-  if (prisoner && prisoner.owner != null) return { seat: prisoner.owner, words: prisonerWords(nameOf(prisoner.code)), mark: "hero" };
-  // A hero an enemy holds (Carried Away, 18074:A:1): the first seat that has one, its dial says which enemy holds which hero.
-  const held = Object.values(game.cards).find((card) => card.zone === "captive" && card.guardedHero === true && card.owner != null);
-  const holder = held?.host ? game.cards[held.host] : undefined;
-  // The Ring-bearer lying faceup under Topmost Chamber, a guarded objective (146066:A:1): the first player takes it back, and its dial wears the Ring mark.
-  if (held && held.owner != null && held.face === "up" && holder) return { seat: held.owner, words: captiveDialWords(nameOf(held.code), nameOf(holder.code)), mark: "hero" };
-  return held && held.owner != null ? { seat: held.owner, words: `${nameOf(held.code)} is held facedown${holder ? ` by ${nameOf(holder.code)}` : ""}`, mark: "hero" } : null;
+  if (prisoner && prisoner.owner != null) return [{ seat: prisoner.owner, words: prisonerWords(nameOf(prisoner.code)), mark: "hero" }];
+  const marks = new Map<number, HeldDial>();
+  for (const held of Object.values(game.cards)) {
+    if (held.zone !== "captive" || held.guardedHero !== true || held.owner == null) continue;
+    const holder = held.host ? game.cards[held.host] : undefined;
+    // The Ring-bearer lying faceup under Topmost Chamber, a guarded objective (146066:A:1): the first player takes it back, and its dial wears the Ring mark.
+    const words = held.face === "up" && holder ? captiveDialWords(nameOf(held.code), nameOf(holder.code)) : `${nameOf(held.code)} is held facedown${holder ? ` by ${nameOf(holder.code)}` : ""}`;
+    const before = marks.get(held.owner);
+    marks.set(held.owner, { seat: held.owner, words: before ? `${before.words}. ${words}` : words, mark: "hero" });
+  }
+  return [...marks.values()];
 }
 
 /**
@@ -74,8 +83,7 @@ export function heldDial(game: ScenarioState, nameOf: (code: string) => string):
  */
 export function heldDials(game: ScenarioState, nameOf: (code: string) => string, isEnemy: (code: string) => boolean): readonly HeldDial[] {
   const dials = new Map<number, HeldDial>();
-  const first = heldDial(game, nameOf);
-  if (first) dials.set(first.seat, first);
+  for (const mark of heldDialList(game, nameOf)) dials.set(mark.seat, mark);
   for (const card of captivesOf(game)) {
     if (card.owner == null) continue;
     const host = card.host ? game.cards[card.host] : undefined;
@@ -121,7 +129,8 @@ export function usePursuitReadout(game: ScenarioState): PursuitReadout | null {
   return useMemo(() => (value == null || limit == null ? null : { value, limit }), [value, limit]);
 }
 
-export type TokenReadout = { name: string; tokens: number };
+// `cardId` is the card that holds the tokens: a press on the dial opens its preview.
+export type TokenReadout = { name: string; tokens: number; cardId: string };
 
 // The quest stage of the seat the table shows: the one stage before stages are separate, that seat's own after.
 function stageCard(game: ScenarioState, seat: number) {
@@ -139,7 +148,7 @@ export function campaignTokens(game: ScenarioState, effects: readonly Effect[], 
   const places = (code: string) => effects.some((effect) => effect.cardCode === code && effect.instructions.some((instruction) => instruction.verb === "PlaceToken"));
   const holders = [Object.values(game.cards).find((entry) => entry.zone === "campaign"), stageCard(game, seat)];
   const card = holders.find((entry) => entry != null && places(entry.code));
-  return card ? { name: nameOf(card.code), tokens: card.resources } : null;
+  return card ? { name: nameOf(card.code), tokens: card.resources, cardId: card.id } : null;
 }
 
 /** The Nightmare setup card's instance next to the quest deck (zone `nightmare`), or null on Easy and Normal. */

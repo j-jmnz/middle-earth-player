@@ -21,6 +21,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 
 04112:B:1 (back): Forced: After a player commits characters to the quest, he must discard the top 2 cards of his deck.
   04112:forced:1: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - if there is a character (you control) committed to the quest to choose: the top 2 card(s) of the acting player's deck go to their discard pile
 
@@ -30,7 +31,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 04113:B:1 (back): When Revealed: Discard all Item, Armor, Weapon, Light cards and all encounter deck cards from play. Shuffle all enemy and treachery cards in the encounter discard pile together with the Foundations of Stone encounter set. This deck becomes the new encounter deck. Remove all other encounter deck cards from the game. Then, starting with the first player, each player draws a random stage 4 quest card. Remove all other stage 4 quest cards from the game.
   04113:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - discard every card in play that matches Item or Armor or Weapon or Light card (any player controls) (not destroyed: no Victory, no "when destroyed"), its attachments with it; an encounter card goes to the encounter discard pile, a player's card to its owner's
+    - discard every card in play that matches Item or Armor or Weapon or Light card (any player controls) or in the staging area or the active location (not destroyed: no Victory, no "when destroyed"), its attachments with it; an encounter card goes to the encounter discard pile, a player's card to its owner's
     - discard every card in play that matches enemy (any player controls) or in the staging area (not destroyed: no Victory, no "when destroyed"), its attachments with it; an encounter card goes to the encounter discard pile, a player's card to its owner's
     - discard every card in play that matches location (any player controls) (not destroyed: no Victory, no "when destroyed"), its attachments with it; an encounter card goes to the encounter discard pile, a player's card to its owner's
     - discard every card in play that matches attachment (any player controls) that is an encounter card (not destroyed: no Victory, no "when destroyed"), its attachments with it; an encounter card goes to the encounter discard pile, a player's card to its owner's
@@ -51,6 +52,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 04114:B:2 (back): Forced: After the 11th progress token is placed on Sheltered Rocks, join another player at the beginning of the travel phase. If you cannot join another player, all players continue on to stage 5 together.
   04114:forced:1: Forced when a phase begins
     only if all of: (it is the Travel phase) and (10 is less than progress of this card)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - (the stage is complete at its quest points and does not advance by the ordinary rule) the player whose stage this is joins another player: his staging cards move to that player's area, his active location is discarded and he shares that area and stage from then on; with no other area every player advances together to the stage with code 04118
 
 ## 04115 Below the Mines
@@ -64,6 +66,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 04115:B:2 (back): Forced: After the 17th progress token is placed on The Endless Caves, join another player at the beginning of the travel phase. If you cannot join another player, all players continue on to stage 5 together.
   04115:forced:1: Forced when a phase begins
     only if all of: (it is the Travel phase) and (16 is less than progress of this card)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - (the stage is complete at its quest points and does not advance by the ordinary rule) the player whose stage this is joins another player: his staging cards move to that player's area, his active location is discarded and he shares that area and stage from then on; with no other area every player advances together to the stage with code 04118
 
 ## 04116 Below the Mines
@@ -78,6 +81,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 04116:B:2 (back): Forced: After the 7th progress token is placed on The Shivering Bank, join another player at the beginning of the travel phase. If you cannot join another player, all players continue on to stage 5 together.
   04116:forced:1: Forced when a phase begins
     only if all of: (it is the Travel phase) and (6 is less than progress of this card)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - (the stage is complete at its quest points and does not advance by the ordinary rule) the player whose stage this is joins another player: his staging cards move to that player's area, his active location is discarded and he shares that area and stage from then on; with no other area every player advances together to the stage with code 04118
 
 ## 04117 Below the Mines
@@ -90,6 +94,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 04117:B:2 (back): Forced: After the 5th progress token is placed on Old One Lair, join another player at the beginning of the travel phase. If you cannot join another player, all players continue on to stage 5 together.
   04117:forced:1: Forced when a phase begins
     only if all of: (it is the Travel phase) and (4 is less than progress of this card)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - (the stage is complete at its quest points and does not advance by the ordinary rule) the player whose stage this is joins another player: his staging cards move to that player's area, his active location is discarded and he shares that area and stage from then on; with no other area every player advances together to the stage with code 04118
 
 ## 04118 Out of the Depths
@@ -102,11 +107,11 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 
 04118:B:2 (back): Each player cannot commit more allies to the quest than the number of heroes he is also committing to the quest.
   04118:constant:1: Constant
-    - the table: stat commitAlliesLimitByHeroes 1, while this card is in play
+    - the table: stat commitAlliesLimitByHeroes (a player cannot commit more allies to the quest than the number of heroes he is also committing) 1, while this card is in play
 
 04118:B:3 (back): If the players defeat this stage, they have won the game.
   04118:constant:2: Constant
-    (no instructions)
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
 ## 04119 Durin's Axe
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
@@ -125,6 +130,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 04119:A:3 (front): Action: Exhaust a hero to claim this objective. Then, attach Durin's Axe to that hero as an attachment.
   04119:action:1: Action (any player may use it)
     only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (there is a ready hero (you control) that can exhaust (not held by a rule that stops it exhausting) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control) that can exhaust (not held by a rule that stops it exhausting)
     - exhaust the picked card
@@ -147,6 +153,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 04120:A:3 (front): Action: Exhaust a hero to claim this objective. Then, attach Durin's Helm to that hero as an attachment.
   04120:action:1: Action (any player may use it)
     only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (there is a ready hero (you control) that can exhaust (not held by a rule that stops it exhausting) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control) that can exhaust (not held by a rule that stops it exhausting)
     - exhaust the picked card
@@ -158,6 +165,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 04121:A:1 (front): If Drowned Treasury is the active location at the end of the quest phase, each player must discard 1 character he controls.
   04121:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and (this card is the active location)
+    who acts: the acting player is the first player (a phase has no player of its own)
     - for each player, first player first:
       - choose character (you control)
       - discard the picked card
@@ -184,6 +192,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 04122:A:2 (front): While Mithril Lode is the active location, it gains: "Refresh Action: Exhaust a character you control to place X progress tokens on the current quest card, bypassing any active location. X is the exhausted character's Willpower. (Limit once per round.)"
   04122:action:1: Action (limit once per round; any player may use it)
     only if all of: (it is the Refresh phase) and (this card is the active location) and (there is a ready character (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
     - exhaust the picked card
@@ -202,6 +211,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 
 04123:A:3 (shadow): Shadow: If attacking enemy is Nameless, the defending player must discard his hand.
   04123:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a Nameless enemy (any player controls): the acting player discards all the cards in their hand
 
 ## 04124 Lost and Alone
@@ -215,6 +225,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 
 04124:A:2 (shadow): Shadow: If attacking enemy is Nameless, the defending player must discard his hand.
   04124:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
     - if the attacking enemy is a Nameless enemy (any player controls): the acting player discards all the cards in their hand
 
 ## 04125 Nameless Thing
@@ -222,6 +233,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 
 04125:A:1 (front): Forced: After Nameless Thing engages a player, attach the top 2 cards of that player's deck to it.
   04125:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - attach the top 2 cards of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to this enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
 
 04125:A:2 (front): X is the printed cost of all attached cards on this card. If there are no cards attached, X is 3.
@@ -235,6 +247,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 
 04126:A:1 (front): Forced: After Elder Nameless Thing engages a player, attach the top 3 cards of that player's deck to it.
   04126:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
     - attach the top 3 cards of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to this enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
 
 04126:A:2 (front): X is the printed cost of all attached cards on this card. If there are no cards attached, X is 4.
@@ -248,11 +261,170 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 
 04127:A:1 (front): Only characters with ranged can attack or defend against Moria Bats.
   04127:constant:1: Constant
-    - this card: stat onlyRangedCombat 1, while this card is in play
+    - this card: stat onlyRangedCombat (only characters with the Ranged keyword can attack or defend against it; with none able its attack is undefended) 1, while this card is in play
 
 04127:A:2 (front): While Moria Bats is engaged with a player, it gets +1 Attack for each other enemy engaged with that player.
   04127:constant:2: Constant
-    only if this card is engaged with the player
+    only if this card is engaged with a player (that player is who "you" means in this record)
     - this card: stat attack the number of enemy (any player controls) engaged with you, other than this card, while this card is in play
 
-(rendered pieces: 179 by template, 0 as JSON)
+=== Nightmare deck (the cards the scenario's Nightmare deck adds) ===
+
+## 901701 Foundations of Stone Nightmare
+
+901701:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+901701:A:2 (front): Forced: When stage 3b is revealed, discard all Mount and Artifact cards from play. Each player must also discard allies he controls until the total printed cost of allies he controls is 6 or less.
+  901701:forced:1: Forced on the event stageRevealed
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Washed Away!"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard every card in play that matches Mount or Artifact card (any player controls) or in the staging area or the active location (not destroyed: no Victory, no "when destroyed"), its attachments with it; an encounter card goes to the encounter discard pile, a player's card to its owner's
+    - for each player, first player first:
+      - the acting player chooses and discards allies he controls, one at a time, until the total printed cost of the allies he controls is 6 or less
+
+901701:B:1 (back): Begin with the standard quest deck and encounter deck for the Foundations of Stone scenario.
+  (inert: the engine applies it by rule, no record)
+
+901701:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+901701:B:3 (back): 3x Goblin Scout
+  (inert: the engine applies it by rule, no record)
+
+901701:B:4 (back): 2x Goblin Swordsman
+  (inert: the engine applies it by rule, no record)
+
+901701:B:5 (back): 1x Goblin Follower
+  (inert: the engine applies it by rule, no record)
+
+901701:B:6 (back): 3x Burning Low
+  (inert: the engine applies it by rule, no record)
+
+901701:B:7 (back): 1x Branching Paths
+  (inert: the engine applies it by rule, no record)
+
+901701:B:8 (back): 1x Many Roads
+  (inert: the engine applies it by rule, no record)
+
+901701:B:9 (back): 3x Cave In
+  (inert: the engine applies it by rule, no record)
+
+901701:B:10 (back): 3x Drowned Treasury
+  (inert: the engine applies it by rule, no record)
+
+901701:B:11 (back): 1x Mitril Lode
+  (inert: the engine applies it by rule, no record)
+
+901701:B:12 (back): 4x Moria Bats
+  (inert: the engine applies it by rule, no record)
+
+901701:B:13 (back): During setup, players are instructed to set the Foundations of Stone encounter set aside, out of play. Shuffle the encounter cards in this Nightmare Deck with the Goblins of the Deep encounter set icon into the standard encounter deck. Then, shuffle the encounter cards in this Nightmare Deck with the Foundations of Stone encounter set icon into the remainder of the set aside Foundations of Stone encounter set.
+  (inert: the engine applies it by rule, no record)
+
+901701:B:14 (back): Finally, flip this card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 901702 Mithril Seeker
+
+901702:A:1 (front): Mithril Seeker gets +1 Attack for each resource on it.
+  901702:constant:1: Constant
+    - this card: stat attack resources of this card, while this card is in play
+
+901702:A:2 (front): Forced: When Mithril Seeker attacks, move 1 resource from each of the defending player's heroes to Mithril Seeker.
+  901702:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
+    - 1 resource moves from the pool of each hero the acting player controls that has one to this card
+
+## 901703 Giant Cave Centipede
+
+901703:A:1 (front): When Revealed: Each player at this stage shuffles the card in his hand with the highest printed cost back into his deck.
+  901703:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player shuffles the card in his hand with the highest printed cost (no printed cost counts 0; he chooses among ties) into his deck; nothing from an empty hand
+
+901703:A:2 (front): Forced: At the end of the combat phase, if Giant Cave Centipede is engaged with a player, that player chooses and adds it to a different player's staging area.
+  901703:forced:1: Forced at the end of the phase
+    only if all of: (it is the Combat phase) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for the player this enemy is engaged with:
+      - if there is a player (another player controls) whose staging area is a different one from the chooser's (every other player while the areas are not separate) to choose: choose player (another player controls) whose staging area is a different one from the chooser's (every other player while the areas are not separate)
+      - this enemy, engaged with a player, moves to the staging area of the player picked, as a staging card (with no other area to pick, to the area the players share; with one player it stays engaged)
+
+## 901704 Unspeakable Thing
+
+901704:A:1 (front): Forced: When Unspeakable Thing engages a player or attacks a player, attach the top card of that player's deck to it.
+  901704:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    - attach the top card of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to this enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
+  901704:forced:2: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
+    - attach the top card of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to this enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
+
+901704:A:2 (front): X is the printed cost of all attached cards on this card. If there are no cards attached, X is 5.
+  901704:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack the total printed cost of the player cards attached to this card from the top of a deck (a hero, an X cost or no printed cost counts 0), or 5 when none is attached, while this card is in play
+    - this card: stat hitPoints the total printed cost of the player cards attached to this card from the top of a deck (a hero, an X cost or no printed cost counts 0), or 5 when none is attached, while this card is in play
+
+## 901705 Primeval Thing
+
+901705:A:1 (front): Forced: When Primeval Thing enters play, attach cards from the top of the first player's deck to it until the total printed cost of all attached cards is 6 or higher.
+  901705:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - attach cards one after another until the printed cost of all the cards attached to this enemy is 6 or more (or the deck is empty), starting with the top card of the first player's deck (of the staging area, once the areas are separate) to this enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
+
+901705:A:2 (front): X is the printed cost of all attached cards on this card. If there are no cards attached, X is 6.
+  901705:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack the total printed cost of the player cards attached to this card from the top of a deck (a hero, an X cost or no printed cost counts 0), or 6 when none is attached, while this card is in play
+    - this card: stat hitPoints the total printed cost of the player cards attached to this card from the top of a deck (a hero, an X cost or no printed cost counts 0), or 6 when none is attached, while this card is in play
+
+## 901706 Nest of Horrors
+
+901706:A:1 (front): While Nest of Horrors is in the staging area, it gains: "Forced: When one or more cards are attached to a Nameless enemy from the top of a player's deck, attach an additional card from the top of that player's deck."
+  901706:forced:1: Forced on the event attachedFromDeck
+    only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - attach the top card of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to the enemy the event is about, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached this way are not a new event for the Forced effects that hear one
+
+901706:A:2 (front): Travel: Each player at this stage discards the top card of the encounter deck to travel here. Reveal each Nameless enemy discarded by this effect.
+  901706:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard the top card of the encounter deck for each player at this stage (fewer from a short deck); they are the cards this effect looked at
+    - the acting player reveals, in full, each Nameless enemy among the cards this effect discarded that still lies in the encounter discard pile, one after another (its When Revealed resolves and it enters the staging area)
+
+## 901707 Shivering River
+
+901707:A:1 (front): While Shivering River is in the staging area, it contributes its Threat to the total Threat in each other player's staging area.
+  901707:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat threatInOtherAreas 1, while this card is in play
+
+901707:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if there is more than one player at this staging area.)
+  901707:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of players at the acting player's staging area (every player before the areas are separate) is less than 2: the attacking enemy: stat attack 1, until the end of the attack
+    - then, if 1 is less than the number of players at the acting player's staging area (every player before the areas are separate) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 901708 Chill of the Roots
+
+901708:A:1 (front): When Revealed: Each player must either discard his hand, or raise his threat by the number of cards in his hand. If no cards were discarded by this effect, Chill of the Roots gains surge.
+  901708:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "discard":
+          - the acting player discards each card (you control) in hand
+        * option "raise":
+          - raise threat by the cards in your hand (the acting player)
+    - then, if the running effect has discarded no card (with DiscardEach) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+901708:A:2 (shadow): Shadow: If attacking enemy is Nameless, attach the top card of the defending player's deck to it.
+  901708:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - if the attacking enemy is a Nameless enemy (any player controls): attach the top card of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to the attacking enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
+
+(rendered pieces: 251 by template, 0 as JSON)
