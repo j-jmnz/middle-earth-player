@@ -1,4 +1,4 @@
-// What names the desktop app to the system and to the page. Every value here is permanent once a release ships (docs/agents/release-standards.md, Tags and releases says
+// What names the desktop app to the system and to the page. Every value here is permanent once a release ships (.claude/rules/release-standards.md, Tags and releases says
 // why: the saves live under the origin and the profile folder). APP_ID is the installer's and the OS's name for the app (an update installs over the last one by it).
 // desktop/identity.test.ts pins them.
 export const APP_SCHEME = "app";
