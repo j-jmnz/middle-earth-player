@@ -10,7 +10,8 @@ import { modifiedStat } from "../../core/keywords.ts";
 import { settle } from "../../engine/machine.ts";
 import { offerResponses } from "../../windows/responses.ts";
 import { updateCard, withThreat, type ScenarioState } from "../../core/state.ts";
-import { attachTo } from "../../core/zones.ts";
+import { attachTo, spawn } from "../../core/zones.ts";
+import { moveEncounter } from "./moves.ts";
 import { deck, encounterCtx, offered, play, put, resolveChoices, seat, send } from "./fixture.ts";
 
 const ctx = encounterCtx(RECORDS);
@@ -166,6 +167,18 @@ describe("the encounter discard pile and the encounter deck", () => {
     const asked = respond(event.state, { trigger: "leftPlay", seat: null, cardId: marsh.id });
     const done = send(asked, { type: "Trigger", cardId: event.id, effectId: "05012:response:1" }, ctx);
     expect(done.encounterDeck[0]).toBe(marsh.id);
+  });
+});
+
+describe("an attachment that leaves play (rr.in-play-and-out-of-play)", () => {
+  it("announces its leaving once when an encounter effect discards it", () => {
+    const table = seat();
+    const made = spawn(table.state, "mist", { zone: "removed" });
+    const attached = attachTo(updateCard(made.state, made.id, { zone: "attached", controller: 0 }), made.id, table.heroes[0] ?? "");
+    const done = moveEncounter(attached, made.id, "discard", 0, ctx, []);
+    expect(done.cards[made.id]?.zone).toBe("encounterDiscard");
+    const left = (done.pendingEvents ?? []).filter((event) => event.trigger === "leftPlay" && "cardId" in event && event.cardId === made.id);
+    expect(left).toHaveLength(1);
   });
 });
 

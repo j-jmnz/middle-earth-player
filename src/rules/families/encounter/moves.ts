@@ -69,10 +69,10 @@ export function leavePlay(state: ScenarioState, id: string, ctx: ReduceContext, 
   if (!card || !inPlay(card.zone)) return state;
   const left = updateCard(releaseAttachments(state, id, ctx.cards, steps), id, { damage: 0, progress: 0, resources: 0, exhausted: false });
   // The card is announced to the abilities that hear it leave play ("After this location leaves play", 141049:A:2). moveCard announces a card that leaves a
-  // player's area, an ally a guard holds in the staging area and an enemy that guards a hero; an explored location is announced where it is explored
+  // player's area, an attachment, an ally a guard holds in the staging area and an enemy that guards a hero; an explored location is announced where it is explored
   // (quest/stage-reveal.ts).
   const guardedAlly = card.zone === "staging" && state.modifiers.length > 0 && flagged(state, id, "guardedAlly");
-  const announcedElsewhere = card.zone === "play" || card.zone === "heroes" || guardedAlly || Object.values(state.cards).some((other) => heldHero(other) && other.host === id);
+  const announcedElsewhere = card.zone === "play" || card.zone === "heroes" || card.zone === "attached" || guardedAlly || Object.values(state.cards).some((other) => heldHero(other) && other.host === id);
   return announcedElsewhere ? left : queueEvent(left, { trigger: "leftPlay", seat: null, cardId: id });
 }
 
