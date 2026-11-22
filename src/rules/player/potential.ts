@@ -134,7 +134,11 @@ function pickedStepsIdle(state: ScenarioState, instructions: readonly Instructio
   }
   const act = steps.find((step) => step.verb !== "Pick");
   if (act?.verb === "ModifyStat" && act.when == null && typeof act.amount === "object" && act.amount.stat != null && settledAmount(act.amount)) {
-    return resolveAmount(state, act.amount, scope, ctx) === 0;
+    // An amount that reads the chosen card ("X is the chosen enemy's printed Threat", Emyn Arnen Ranger 17141:A:1) is 0 only when it is 0 for every candidate of the one choice before it;
+    // with a second choice in between, the table cannot settle it and the ability is offered.
+    if (steps.filter((step) => step.verb === "Pick").length > 0) return false;
+    const amount = act.amount;
+    return candidates.every((picked) => resolveAmount(state, amount, { ...scope, picked: [picked] }, ctx) === 0);
   }
   return false;
 }
