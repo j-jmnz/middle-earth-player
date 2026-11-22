@@ -11,14 +11,13 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { settle } from "../../rules/engine/machine.ts";
+import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
 import { legalIntents, legalTargets } from "../../rules/engine/reduce.ts";
-import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, FRODO, idsOf, SAM, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, FRODO, idsOf, SAM, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { choices, endRound, enter, hosts, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN_CORE = "01001";
 const THEODRED = "01002";
@@ -37,6 +36,7 @@ const GUTHWINE = "146011";
 const ORC = "orc";
 const MAN = "man";
 const SOFT = "soft";
+const TOUGH = "tough";
 const HOBBIT = "hobbit";
 const CHEAP = "cheap";
 const DEAR = "dear";
@@ -54,31 +54,10 @@ beforeAll(async () => {
   cards.set(ORC, definePrinted({ code: ORC, name: "Orc", type: "enemy", traits: ["Orc"], threat: 1, engagementCost: 8, attack: 2, defense: 0, health: 9 }));
   cards.set(MAN, definePrinted({ code: MAN, name: "Man", type: "enemy", traits: ["Brigand"], threat: 1, engagementCost: 8, attack: 2, defense: 0, health: 9 }));
   cards.set(SOFT, definePrinted({ code: SOFT, name: "Soft", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 0, health: 9 }));
+  cards.set(TOUGH, definePrinted({ code: TOUGH, name: "Tough", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 1, health: 9 }));
   cards.set(HOBBIT, definePrinted({ code: HOBBIT, name: "Hobbit", type: "ally", traits: ["Hobbit"], sphere: "leadership", cost: 1, willpower: 1, attack: 1, defense: 1, health: 1 }));
   base = { ...starter, cards };
 });
-
-function play(run: Run, tab: Table, cardId: string, hostId?: string): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId), ...(hostId ? { hostId } : {}) }, tab.ctx);
-}
-
-function hosts(tab: Table, cardId: string): string[] {
-  return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-// The engine moves on to `mode` (its phase begins) and runs to its next window.
-function enter(state: ScenarioState, tab: Table, mode: Parameters<typeof withMode>[1]): Run {
-  return begin(settle({ ...withMode(state, mode), window: null }, tab.ctx, []));
-}
-
-// The end of the round: its action window is passed, so the round ends.
-function endRound(state: ScenarioState, tab: Table): Run {
-  let run = enter(state, tab, "endRound");
-  for (let guard = 0; guard < 10 && run.state.window?.kind === "frameAction"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
-  return run;
-}
-
-const printed = (tab: Table, code: string, which: "attack" | "defense" | "willpower"): number => tab.ctx.cards.get(code)?.[which] ?? 0;
 
 // The enemies that attack in the combat phase that follows: each defence window is answered undefended with Sam.
 function attacks(state: ScenarioState, tab: Table): string[] {
@@ -130,9 +109,8 @@ describe("Aragorn (146002:A:1, A:2)", () => {
 
 describe("Éomer (146003:A:1)", () => {
   // "Response: After Éomer commits to the quest, spend 1 resource from his resource pool to immediately declare him as an attacker
-  // (and resolve his attack) against an enemy in the staging area.": committing exhausts him and an exhausted character is not declared
-  // as an attacker, so Captains of the West (Éomer is Noble) keeps him ready. Éomer (3 Attack) attacks the Soft enemy (0 Defense) in the
-  // staging area, not the enemy engaged with the player.
+  // (and resolve his attack) against an enemy in the staging area.": Captains of the West (Éomer is Noble) keeps him ready when he commits.
+  // Éomer (3 Attack) attacks the Soft enemy (0 Defense) in the staging area, not the enemy engaged with the player.
   lineSpec("146003:A:1", "Éomer: after he commits, spend 1 resource to attack an enemy in the staging area", (effects) => {
     const tab = table(effects, { start: "quest", heroes: [{ code: EOMER, seat: 0 }, { code: ARAGORN_CORE, seat: 0 }], staging: [SOFT], engaged: [{ code: DEAR, seat: 0 }], hand: [{ code: CAPTAINS, seat: 0 }] }, 0);
     const [eomer, soft, dear] = [idsOf(tab, EOMER), idsOf(tab, SOFT), idsOf(tab, DEAR)];
@@ -150,10 +128,24 @@ describe("Éomer (146003:A:1)", () => {
     expect(run.state.cards[dear]?.damage).toBe(0);
   });
 
-  // Without Captains of the West, committing exhausts him, so no Response either.
-  it("146003:A:1 Éomer: no Response with an empty pool, no enemy in the staging area, or once committing exhausted him", () => {
-    const tired = table(EFFECTS, { start: "quest", heroes: [{ code: EOMER, seat: 0 }], staging: [SOFT] }, 1);
-    expect(triggers(sendUnledgered(begin(tired.state), { type: "Commit", cardIds: [idsOf(tired, EOMER)] }, tired.ctx).state, tired)).not.toContain("146003:response:1");
+  // Reading (docs/brief.md, Three layers): "immediately declare him as an attacker" overrides the requirement that an attacker is ready, so
+  // the Response is offered after an ordinary commit that exhausted him. He attacks the enemy in the staging area with his Attack, and stays
+  // exhausted and committed. The Soft enemy has no Defense; the Tough one has 2, so it takes his Attack minus its Defense.
+  lineSpec("146003:A:1", "Éomer: offered after a normal commit, he attacks the staging area enemy and stays exhausted and committed", (effects) => {
+    const tab = table(effects, { start: "quest", heroes: [{ code: EOMER, seat: 0 }], staging: [TOUGH] }, 1);
+    const [eomer, tough] = [idsOf(tab, EOMER), idsOf(tab, TOUGH)];
+    let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [eomer] }, tab.ctx);
+    expect(run.state.cards[eomer]).toMatchObject({ exhausted: true, committed: true });
+    expect(triggers(run.state, tab)).toContain("146003:response:1");
+    run = sendUnledgered(run, { type: "Trigger", cardId: eomer, effectId: "146003:response:1", payments: [{ heroId: eomer, amount: 1 }] }, tab.ctx);
+    if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: tough }, tab.ctx);
+    expect(run.state.cards[eomer]).toMatchObject({ resources: 0, exhausted: true, committed: true });
+    expect(run.state.cards[tough]?.damage).toBe(Math.max(0, printed(tab, EOMER, "attack") - printed(tab, TOUGH, "defense")));
+    expect(run.state.cards[tough]?.damage).toBeGreaterThan(0);
+  });
+
+  // With an empty pool, or no enemy in the staging area (the enemy engaged with the player is not one), the Response is not offered.
+  it("146003:A:1 Éomer: no Response with an empty pool or no enemy in the staging area", () => {
     const broke = table(EFFECTS, { start: "quest", heroes: [{ code: EOMER, seat: 0 }], staging: [SOFT] }, 0);
     expect(triggers(sendUnledgered(begin(broke.state), { type: "Commit", cardIds: [idsOf(broke, EOMER)] }, broke.ctx).state, broke)).not.toContain("146003:response:1");
     const empty = table(EFFECTS, { start: "quest", heroes: [{ code: EOMER, seat: 0 }], engaged: [{ code: SOFT, seat: 0 }] }, 1);

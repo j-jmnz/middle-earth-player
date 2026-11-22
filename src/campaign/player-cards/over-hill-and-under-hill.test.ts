@@ -8,14 +8,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { settle } from "../../rules/engine/machine.ts";
-import type { ReduceContext } from "../../rules/engine/reduce.ts";
-import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
+import { updateCard } from "../../rules/core/state.ts";
 import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { choices, enter, fillers, passAll, playCode, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const BILBO = "131001";
 const THORIN = "131002";
@@ -46,31 +44,11 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-// The harness's passWindows on this file's send: the framework action windows are passed until the game asks for something else.
-function passWindows(run: Run, ctx: ReduceContext): Run {
-  let next = run;
-  for (let guard = 0; guard < 20 && next.state.window?.kind === "frameAction"; guard += 1) next = sendUnledgered(next, { type: "Pass" }, ctx);
-  return next;
-}
-
-function play(tab: Table, code: string, run: Run = begin(tab.state)): Run {
-  const card = tab.ids[code]?.find((id) => run.state.cards[id]?.zone === "hand") ?? idsOf(tab, code);
-  return sendUnledgered(run, { type: "PlayCard", cardId: card, payments: payFor(run.state, tab.ctx, card) }, tab.ctx);
-}
-
 // The reason the attachment cannot be played on the host, or null when it can.
 function onto(tab: Table, code: string, hostId: string): string | null {
   const card = idsOf(tab, code);
   return refusal(tab.state, { type: "PlayCard", cardId: card, hostId, payments: payFor(tab.state, tab.ctx, card) }, tab.ctx);
 }
-
-// The engine moves on to `mode` (its phase begins) and runs to its next window.
-function enter(state: ScenarioState, tab: Table, mode: Parameters<typeof withMode>[1]): Run {
-  return begin(settle({ ...withMode(state, mode), window: null }, tab.ctx, []));
-}
-
-// A deck of `count` filler cards for the first seat.
-const fillers = (count: number) => Array.from({ length: count }, () => ({ code: "card", seat: 0 }));
 
 describe("Bilbo Baggins (131001:A:1, A:2)", () => {
   // "The first player gains control of Bilbo Baggins."
@@ -93,7 +71,7 @@ describe("Bilbo Baggins (131001:A:1, A:2)", () => {
   });
 
   it("131001:A:2 still collects his resource in the resource phase (a framework step, not a player card effect)", () => {
-    const tab = table(EFFECTS, { heroes: [{ code: BILBO, seat: 0 }, { code: THORIN, seat: 0 }], playerDeck: fillers(3) }, 0);
+    const tab = table(EFFECTS, { heroes: [{ code: BILBO, seat: 0 }, { code: THORIN, seat: 0 }], playerDeck: fillers("card", 3) }, 0);
     const run = enter(tab.state, tab, "beginRound");
     expect(run.state.cards[idsOf(tab, BILBO)]?.resources).toBe(1);
   });
@@ -103,7 +81,7 @@ describe("Thorin Oakenshield (131002:A:1) and Ori (131004:A:1)", () => {
   // Thorin, Nori and Ori, and Fili and Kili when `allies` is 2: five Dwarf characters.
   function dwarves(effects: readonly Effect[], allies: number): Table {
     const all = [FILI, KILI].slice(0, allies).map((code) => ({ code, seat: 0 }));
-    return table(effects, { heroes: [{ code: THORIN, seat: 0 }, { code: NORI, seat: 0 }, { code: ORI, seat: 0 }], allies: all, playerDeck: fillers(6) }, 0);
+    return table(effects, { heroes: [{ code: THORIN, seat: 0 }, { code: NORI, seat: 0 }, { code: ORI, seat: 0 }], allies: all, playerDeck: fillers("card", 6) }, 0);
   }
 
   // "If you control at least 5 Dwarf characters, add 1 additional resource to Thorin Oakenshield's pool when you collect resources during the resource phase."
@@ -130,18 +108,18 @@ describe("Nori (131003:A:1)", () => {
   lineSpec("131003:A:1", "lowers your threat by 1 after you play a Dwarf ally from your hand", (effects) => {
     const tab = table(effects, { heroes: [{ code: NORI, seat: 0 }, { code: ORI, seat: 0 }], hand: [{ code: KILI, seat: 0 }] });
     const threat = tab.state.seats[0]?.threat ?? 0;
-    let run = play(tab, KILI);
+    let run = playCode(tab, KILI);
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, NORI), effectId: "131003:response:1" }, tab.ctx);
     expect(run.state.seats[0]?.threat).toBe(threat - 1);
   });
 
   it("131003:A:1 is not offered after an ally that is not a Dwarf, or a Dwarf put into play from the deck", () => {
     const tab = table(EFFECTS, { heroes: [{ code: NORI, seat: 0 }, { code: THORIN, seat: 0 }], hand: [{ code: "ally", seat: 0 }, { code: FILI, seat: 0 }], playerDeck: [{ code: KILI, seat: 0 }] });
-    const plain = play(tab, "ally");
+    const plain = playCode(tab, "ally");
     expect(triggers(plain.state, tab)).not.toContain("131003:response:1");
     // Fili is played from the hand: Nori answers it. Fili's Response then puts Kili into play from the deck, which is not playing him from the hand.
     const threat = plain.state.seats[0]?.threat ?? 0;
-    let run = play(tab, FILI, plain);
+    let run = playCode(tab, FILI, plain);
     expect(triggers(run.state, tab).sort()).toEqual(["131003:response:1", "131006:response:1"]);
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, NORI), effectId: "131003:response:1" }, tab.ctx);
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, FILI), effectId: "131006:response:1" }, tab.ctx);
@@ -164,7 +142,7 @@ describe("Beorn (131005:A:1, A:3)", () => {
     // Fili can still attack afterwards, so the combat phase stops at the player attacks and the refresh phase does not ready Beorn.
     const tab = table(effects, { heroes: [{ code: BEORN, seat: 0 }], allies: [{ code: FILI, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] });
     const beorn = idsOf(tab, BEORN);
-    let run = passWindows(enter(tab.state, tab, "combatStart"), tab.ctx);
+    let run = passAll(enter(tab.state, tab, "combatStart"), tab.ctx);
     expect(run.state.window?.kind).toBe("defense");
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: beorn }, tab.ctx);
     expect(run.state.cards[beorn]?.exhausted).toBe(false);
@@ -176,11 +154,11 @@ describe("Fili and Kili (131006:A:1, 131007:A:1)", () => {
   // Kili's line is the same with the names swapped.
   for (const [code, other, line, effect] of [[FILI, KILI, "131006:A:1", "131006:response:1"], [KILI, FILI, "131007:A:1", "131007:response:1"]] as const) {
     lineSpec(line, `after it is played in the planning phase, puts the other brother from the deck into play`, (effects) => {
-      const deck = [{ code: "card", seat: 0 }, { code: other, seat: 0 }, ...fillers(4)];
+      const deck = [{ code: "card", seat: 0 }, { code: other, seat: 0 }, ...fillers("card", 4)];
       const tab = table(effects, { heroes: [{ code: THORIN, seat: 0 }, { code: NORI, seat: 0 }], hand: [{ code, seat: 0 }], playerDeck: deck });
       const brother = idsOf(tab, other);
       const cursor = tab.state.seedCursor;
-      let run = play(tab, code);
+      let run = playCode(tab, code);
       run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, code), effectId: effect }, tab.ctx);
       if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: brother }, tab.ctx);
       expect(run.state.cards[brother]).toMatchObject({ zone: "play", controller: 0 });

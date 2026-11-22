@@ -10,15 +10,13 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { destroyCard } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
+import { updateCard } from "../../rules/core/state.ts";
 import { playCost } from "../../rules/player/attach.ts";
-import { settle } from "../../rules/engine/machine.ts";
-import { legalTargets } from "../../rules/engine/reduce.ts";
-import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, choices, combat, enter, hosts, play, playerTable, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const GIMLI = "01004";
@@ -56,24 +54,6 @@ beforeAll(async () => {
   cards.set(BRUTE, definePrinted({ code: BRUTE, name: "Brute", type: "enemy", threat: 1, engagementCost: 40, attack: 3, defense: 1, health: 9 }));
   base = { ...starter, cards };
 });
-
-function hosts(tab: Table, cardId: string): string[] {
-  return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-function play(run: Run, tab: Table, cardId: string, hostId?: string): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId), ...(hostId ? { hostId } : {}) }, tab.ctx);
-}
-
-// The engine moves on to `mode` (its phase begins) and runs to its next window.
-function enter(state: ScenarioState, tab: Table, mode: Parameters<typeof withMode>[1]): Run {
-  return begin(settle({ ...withMode(state, mode), window: null }, tab.ctx, []));
-}
-
-const printed = (tab: Table, code: string, which: "attack" | "defense" | "willpower"): number => tab.ctx.cards.get(code)?.[which] ?? 0;
-
-// The quest phase's commit step on this state, the lasting effects kept.
-const questing = (state: ScenarioState): ScenarioState => ({ ...state, phase: "Quest", boundaryPhase: "Quest", mode: "questCommit", window: { kind: "pass" }, activeSeat: 0 });
 
 describe("Radagast (19145)", () => {
   // "While playing a Creature ally, Radagast gains the printed Leadership, Spirit, and Tactics icons.": Radagast (Lore) alone pays for

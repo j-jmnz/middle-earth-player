@@ -8,16 +8,16 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { ruleCause } from "../../rules/core/cause.ts";
-import { hasKeyword, modifiedStat, placeDamage } from "../../rules/core/keywords.ts";
+import { hasKeyword, placeDamage } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { withMode } from "../../rules/core/state.ts";
 import { attackBarred } from "../../rules/interpret/constants.ts";
 import { playCost } from "../../rules/player/attach.ts";
-import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { choices, combat, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "145001";
 const GRIMBOLD = "145004";
@@ -49,16 +49,6 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-function play(tab: Table, cardId: string, hostId?: string, run: Run = begin(tab.state)): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId), ...(hostId ? { hostId } : {}) }, tab.ctx);
-}
-
-function engagementCost(state: Run["state"], tab: Table, id: string): number {
-  const card = state.cards[id];
-  if (!card) throw new Error(`no card ${id}`);
-  return modifiedStat(state, card, "engagementCost", tab.ctx.cards);
-}
-
 describe("Aragorn (145001:A:1, A:2)", () => {
   // "The first player gains control of Aragorn."
   lineSpec("145001:A:1", "Aragorn: the first player gains control of him", (effects) => {
@@ -88,7 +78,7 @@ describe("Aragorn (145001:A:1, A:2)", () => {
     const tab = table(effects, { heroes: [{ code: ARAGORN, seat: 0 }, { code: DENETHOR, seat: 0 }], hand: [{ code: BANNER, seat: 0 }], deck: ["f0", "f0"] });
     const aragorn = idsOf(tab, ARAGORN);
     expect(hasKeyword(tab.state, aragorn, "sentinel", tab.ctx.cards)).toBe(false);
-    const played = play(tab, idsOf(tab, BANNER), aragorn);
+    const played = play(begin(tab.state), tab, idsOf(tab, BANNER), aragorn);
     expect(played.state.cards[idsOf(tab, BANNER)]?.host).toBe(aragorn);
     expect(hasKeyword(played.state, aragorn, "sentinel", tab.ctx.cards)).toBe(true);
     const quest = { ...played.state, phase: "Quest" as const, boundaryPhase: "Quest" as const, mode: "questCommit" as const, window: { kind: "pass" as const } };
@@ -160,11 +150,11 @@ describe("Halbarad (145006:A:1, A:2)", () => {
   lineSpec("145006:A:2", "Halbarad: each enemy engaged with you gets +10 engagement cost", (effects) => {
     const tab = halbaradTable(effects);
     const [staged, first, second, theirs] = tab.ids[WEAK] ?? [];
-    const run = play(tab, idsOf(tab, HALBARAD));
-    expect(engagementCost(run.state, tab, first ?? "")).toBe(40);
-    expect(engagementCost(run.state, tab, second ?? "")).toBe(40);
-    expect(engagementCost(run.state, tab, theirs ?? "")).toBe(30);
-    expect(engagementCost(run.state, tab, staged ?? "")).toBe(30);
+    const run = play(begin(tab.state), tab, idsOf(tab, HALBARAD));
+    expect(stat(run.state, tab, first ?? "", "engagementCost")).toBe(40);
+    expect(stat(run.state, tab, second ?? "", "engagementCost")).toBe(40);
+    expect(stat(run.state, tab, theirs ?? "", "engagementCost")).toBe(30);
+    expect(stat(run.state, tab, staged ?? "", "engagementCost")).toBe(30);
   });
 });
 

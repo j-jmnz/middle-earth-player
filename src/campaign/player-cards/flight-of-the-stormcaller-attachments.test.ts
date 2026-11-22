@@ -6,14 +6,13 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
-import { legalTargets } from "../../rules/engine/reduce.ts";
+import { updateCard } from "../../rules/core/state.ts";
 import { hasTrait } from "../../rules/interpret/conditions.ts";
 import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { fillers, hosts, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const DENETHOR = "12001";
 const ROD = "12002";
@@ -36,12 +35,6 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-function hosts(tab: Table, cardId: string, state: ScenarioState = tab.state): string[] {
-  return [...legalTargets(state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-const fillers = (count: number) => Array.from({ length: count }, () => ({ code: CARD, seat: 0 }));
-
 describe("Rod of the Steward (12002:A:1, A:2)", () => {
   // "Attach to a Gondor hero.": Denethor and Eleanor are offered; Glóin (not Gondor) and the Guard of the Citadel (a Gondor ally) are not.
   lineSpec("12002:A:1", "goes on a Gondor hero only", (effects) => {
@@ -52,7 +45,7 @@ describe("Rod of the Steward (12002:A:1, A:2)", () => {
   // "Action: Spend 2 resources from attached hero's resource pool to draw 1 card.": Denethor holds the Rod and 3 resources; Eleanor's pool is
   // not touched.
   lineSpec("12002:A:2", "spends 2 resources from the attached hero's pool to draw 1 card", (effects) => {
-    const scene = table(effects, { heroes: [{ code: DENETHOR, seat: 0 }, { code: ELEANOR, seat: 0 }], attached: [{ code: ROD, host: DENETHOR }], playerDeck: fillers(3) }, 3);
+    const scene = table(effects, { heroes: [{ code: DENETHOR, seat: 0 }, { code: ELEANOR, seat: 0 }], attached: [{ code: ROD, host: DENETHOR }], playerDeck: fillers(CARD, 3) }, 3);
     const [rod, denethor, eleanor] = [idsOf(scene, ROD), idsOf(scene, DENETHOR), idsOf(scene, ELEANOR)];
     // The cost is paid from the attached hero's pool only: Eleanor's resources are refused.
     expect(refusal(scene.state, { type: "Trigger", cardId: rod, effectId: "12002:action:1", payments: [{ heroId: eleanor, amount: 2 }] }, scene.ctx)).not.toBeNull();
@@ -64,7 +57,7 @@ describe("Rod of the Steward (12002:A:1, A:2)", () => {
   });
 
   it("12002:A:2 is not offered while the attached hero holds fewer than 2 resources, whatever the other heroes hold", () => {
-    const tab = table(EFFECTS, { heroes: [{ code: DENETHOR, seat: 0 }, { code: ELEANOR, seat: 0 }], attached: [{ code: ROD, host: DENETHOR }], playerDeck: fillers(3) }, 5);
+    const tab = table(EFFECTS, { heroes: [{ code: DENETHOR, seat: 0 }, { code: ELEANOR, seat: 0 }], attached: [{ code: ROD, host: DENETHOR }], playerDeck: fillers(CARD, 3) }, 5);
     expect(triggers(updateCard(tab.state, idsOf(tab, DENETHOR), { resources: 1 }), tab)).not.toContain("12002:action:1");
   });
 });

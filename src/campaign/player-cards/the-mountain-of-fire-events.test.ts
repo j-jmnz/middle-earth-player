@@ -7,14 +7,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { settle } from "../../rules/engine/machine.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
-import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, playerTable, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { choices, endRound, play, playerTable, printed, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
 
 const ARAGORN_CORE = "01001";
 const GIMLI = "01004";
@@ -40,24 +38,6 @@ beforeAll(async () => {
   cards.set(HOBBIT, definePrinted({ code: HOBBIT, name: "Hobbit", type: "ally", traits: ["Hobbit"], sphere: "leadership", cost: 1, willpower: 1, attack: 1, defense: 1, health: 1 }));
   base = { ...starter, cards };
 });
-
-function play(run: Run, tab: Table, cardId: string, hostId?: string): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId), ...(hostId ? { hostId } : {}) }, tab.ctx);
-}
-
-// The engine moves on to `mode` (its phase begins) and runs to its next window.
-function enter(state: ScenarioState, tab: Table, mode: Parameters<typeof withMode>[1]): Run {
-  return begin(settle({ ...withMode(state, mode), window: null }, tab.ctx, []));
-}
-
-// The end of the round: its action window is passed, so the round ends.
-function endRound(state: ScenarioState, tab: Table): Run {
-  let run = enter(state, tab, "endRound");
-  for (let guard = 0; guard < 10 && run.state.window?.kind === "frameAction"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
-  return run;
-}
-
-const printed = (tab: Table, code: string, which: "attack" | "defense" | "willpower"): number => tab.ctx.cards.get(code)?.[which] ?? 0;
 
 describe("Captains of the West (146010:A:1)", () => {
   // "Quest Action: Until the end of the phase, each Noble hero gets +1 Willpower and does not exhaust to commit to the quest.":

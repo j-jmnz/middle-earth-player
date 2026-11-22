@@ -1,22 +1,18 @@
 // Rules: rr.attachment-cards, rr.modifiers, rr.staging, rr.staging-area, rr.deckbuilding (data/rules/entries.json).
 // The Lost Realm attachments and player side quest, written from their card text (data/cards/TLR.json; data/printed holds no ledger for this box
 // yet): Heir of Valandil 09010:A:1, Athelas 09011:A:1, Secret Vigil 09012:A:1 and A:2, Star Brooch 09013:A:1, Gather Information 09014:A:1.
-import { readFileSync } from "node:fs";
 
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
-import { deckSaveRefusal, type DeckSaveCard } from "../../catalog/deck-save.ts";
+import { deckSaveRefusal } from "../../catalog/deck-save.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { attachTo } from "../../rules/core/zones.ts";
-import { legalTargets } from "../../rules/engine/reduce.ts";
-import { syncConstants } from "../../rules/interpret/constants.ts";
 import { stagingThreat } from "../../rules/quest/quest.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { playerTable, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { attach, deckSaveFacts, hosts, packRow, playerTable, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
 
 const HEIR = "09010";
 const ATHELAS = "09011";
@@ -47,17 +43,6 @@ beforeAll(async () => {
   cards.set(WEAK, definePrinted({ code: WEAK, name: "Weak", type: "enemy", threat: 2, engagementCost: 40, attack: 1, defense: 0, health: 9 }));
   base = { ...starter, cards };
 });
-
-function hosts(tab: Table, cardId: string): string[] {
-  return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-// Attaches cards the scene put in play to the hosts named, then brings the constants up to date.
-function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
-  let state = tab.state;
-  for (const [id, host] of pairs) state = attachTo(state, id, host);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
 
 const sorted = (tab: Table, codes: readonly string[]) => codes.map((code) => idsOf(tab, code)).sort();
 
@@ -121,12 +106,9 @@ describe("Gather Information (09014:A:1)", () => {
   // "Limit 1 per deck." The deck check reads the card's deck limit (data/cards/TLR.json), which the DeckLimit record restates, so this is a
   // plain test: a deck with two copies is refused, one with one copy is not.
   it("09014:A:1 a deck holds at most 1 copy", () => {
-    const rows = JSON.parse(readFileSync(new URL("../../../data/cards/TLR.json", import.meta.url), "utf8")) as { code: string; name: string; type: string; sphere: string | null; deckLimit: number | null }[];
-    const row = rows.find((card) => card.code === GATHER);
+    const row = packRow("TLR", GATHER);
     expect(row?.deckLimit).toBe(1);
-    const fact = (name: string, typeCode: string, sphereCode: string | null, deckLimit: number | null): DeckSaveCard => ({ name, typeCode, sphereCode, deckLimit, deckLegal: true, traits: null });
-    const facts = new Map<string, DeckSaveCard>([["h1", fact("Hero", "hero", "leadership", null)], [GATHER, fact(row?.name ?? "", row?.type ?? "", row?.sphere ?? null, row?.deckLimit ?? null)]]);
-    for (let index = 0; index < 50; index += 1) facts.set(`e${index}`, fact(`Event ${index}`, "event", "leadership", 3));
+    const facts = deckSaveFacts(row);
     const events = Array.from({ length: 50 }, (_, index) => ({ code: `e${index}`, count: 1 }));
     expect(deckSaveRefusal(["h1"], [...events, { code: GATHER, count: 1 }], facts)).toBeNull();
     expect(deckSaveRefusal(["h1"], [...events, { code: GATHER, count: 2 }], facts)).toMatchObject({ cardCode: GATHER });

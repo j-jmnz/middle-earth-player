@@ -8,17 +8,16 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { ruleCause } from "../../rules/core/cause.ts";
-import { modifiedStat, placeDamage } from "../../rules/core/keywords.ts";
+import { placeDamage } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
+import { updateCard } from "../../rules/core/state.ts";
 import { attachTo } from "../../rules/core/zones.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
-import { legalTargets } from "../../rules/engine/reduce.ts";
 import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, choices, hosts, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARMOR = "19028";
 const GLAMDRING = "19029";
@@ -52,20 +51,6 @@ beforeAll(async () => {
   cards.set(WEAK, definePrinted({ code: WEAK, name: "Weak", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 0, health: 1 }));
   base = { ...starter, cards };
 });
-
-function hosts(tab: Table, cardId: string): string[] {
-  return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-function play(tab: Table, cardId: string, hostId?: string, run: Run = begin(tab.state)): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId), ...(hostId ? { hostId } : {}) }, tab.ctx);
-}
-
-function questPoints(state: ScenarioState, tab: Table, id: string): number {
-  const card = state.cards[id];
-  if (!card) throw new Error(`no card ${id}`);
-  return modifiedStat(state, card, "questPoints", tab.ctx.cards);
-}
 
 describe("Ancestral Armor (19028:A:1, A:2, A:3)", () => {
   // Aragorn pays; Théodred already wears an Armor.
@@ -103,7 +88,7 @@ describe("Ancestral Armor (19028:A:1, A:2, A:3)", () => {
   lineSpec("19028:A:3", "Ancestral Armor: +2 Defense and +2 hit points", (effects) => {
     const tab = table(effects, { heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: ARMOR, seat: 0 }] });
     const aragorn = idsOf(tab, ARAGORN);
-    const run = play(tab, idsOf(tab, ARMOR), aragorn);
+    const run = play(begin(tab.state), tab, idsOf(tab, ARMOR), aragorn);
     expect(stat(run.state, tab, aragorn, "defense")).toBe(2 + 2);
     expect(stat(run.state, tab, aragorn, "hitPoints")).toBe(5 + 2);
   });
@@ -115,7 +100,7 @@ describe("Glamdring (19029)", () => {
     const tab = table(effects, { heroes: [{ code: DENETHOR, seat: 0 }, { code: EOWYN, seat: 0 }], allies: [{ code: GANDALF, seat: 0 }, { code: ALLY, seat: 0 }], hand: [{ code: GLAMDRING, seat: 0 }], deck: [CRAWLING, "f3"] });
     const glamdring = idsOf(tab, GLAMDRING);
     const [hostId] = hosts(tab, glamdring);
-    return { tab, run: play(tab, glamdring, hostId) };
+    return { tab, run: play(begin(tab.state), tab, glamdring, hostId) };
   }
 
   // "Guarded (enemy or location)": cards are discarded from the encounter deck until an enemy, which is added to the staging area with
@@ -167,6 +152,20 @@ describe("Glamdring (19029)", () => {
   });
 });
 
+// Reading (docs/brief.md, Three layers): an attack the attached character takes part in counts, so the Response is offered when
+// he and another character attack one enemy together and destroy it.
+describe("Glamdring (19029:A:4), an attack together", () => {
+  it("19029:A:4 Glamdring: offered when the attached character and another attack one enemy together and destroy it", () => {
+    const tab = table(EFFECTS, { heroes: [{ code: DENETHOR, seat: 0 }, { code: EOWYN, seat: 0 }], attached: [{ code: GLAMDRING, host: DENETHOR }], engaged: [{ code: WEAK, seat: 0 }], playerDeck: [{ code: "card", seat: 0 }, { code: "card", seat: 0 }] });
+    const weak = idsOf(tab, WEAK);
+    let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: weak, attackerIds: [idsOf(tab, DENETHOR), idsOf(tab, EOWYN)] }, tab.ctx);
+    // Éowyn's own Action opens a framework action window first.
+    for (let guard = 0; guard < 10 && run.state.window?.kind === "frameAction" && !triggers(run.state, tab).includes("19029:response:1"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    expect(run.state.cards[weak]?.zone).toBe("encounterDiscard");
+    expect(triggers(run.state, tab)).toContain("19029:response:1");
+  });
+});
+
 describe("Woodmen's Path (19030:A:1, A:2)", () => {
   // "Attach to a location with no progress tokens on it.": the staging area's location with no progress and the active location with none
   // are offered; a location with 1 progress, an enemy and a hero are not.
@@ -176,7 +175,7 @@ describe("Woodmen's Path (19030:A:1, A:2)", () => {
     const tab = { ...scene, state: updateCard(scene.state, marked ?? "", { progress: 1 }) };
     expect(hosts(tab, idsOf(tab, PATH))).toEqual([clear ?? "", active ?? ""].sort());
     expect(refusal(tab.state, { type: "PlayCard", cardId: idsOf(tab, PATH), hostId: idsOf(tab, DENETHOR), payments: payFor(tab.state, tab.ctx, idsOf(tab, PATH)) }, tab.ctx)).not.toBeNull();
-    expect(play(tab, idsOf(tab, PATH), clear).state.cards[idsOf(tab, PATH)]?.host).toBe(clear);
+    expect(play(begin(tab.state), tab, idsOf(tab, PATH), clear).state.cards[idsOf(tab, PATH)]?.host).toBe(clear);
   });
 
   // "While attached location is the active location, reduce its quest point value to 1.": played on a Glade in the staging area (5 quest
@@ -184,18 +183,18 @@ describe("Woodmen's Path (19030:A:1, A:2)", () => {
   lineSpec("19030:A:2", "Woodmen's Path: while the attached location is active, its quest point value is 1", (effects) => {
     const tab = table(effects, { heroes: [{ code: DENETHOR, seat: 0 }], hand: [{ code: PATH, seat: 0 }], staging: [GLADE, GLADE] });
     const [glade, other] = tab.ids[GLADE] ?? [];
-    const played = play(tab, idsOf(tab, PATH), glade);
-    expect(questPoints(played.state, tab, glade ?? "")).toBe(5);
+    const played = play(begin(tab.state), tab, idsOf(tab, PATH), glade);
+    expect(stat(played.state, tab, glade ?? "", "questPoints")).toBe(5);
     const travel = { ...played.state, phase: "Travel" as const, boundaryPhase: "Travel" as const, mode: "travel" as const, window: { kind: "travel" as const } };
     const run = sendUnledgered(begin(travel), { type: "Travel", locationId: glade ?? "" }, tab.ctx);
     expect(run.state.cards[glade ?? ""]?.zone).toBe("activeLocation");
-    expect(questPoints(run.state, tab, glade ?? "")).toBe(1);
-    expect(questPoints(run.state, tab, other ?? "")).toBe(5);
+    expect(stat(run.state, tab, glade ?? "", "questPoints")).toBe(1);
+    expect(stat(run.state, tab, other ?? "", "questPoints")).toBe(5);
   });
 
   // The other Glade, active with no Path, keeps its 5.
   it("19030:A:2 Woodmen's Path: an active location without it keeps its quest points", () => {
     const tab = table(EFFECTS, { heroes: [{ code: DENETHOR, seat: 0 }], active: GLADE });
-    expect(questPoints(tab.state, tab, idsOf(tab, GLADE))).toBe(5);
+    expect(stat(tab.state, tab, idsOf(tab, GLADE), "questPoints")).toBe(5);
   });
 });

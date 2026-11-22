@@ -7,7 +7,6 @@ import { beforeAll, describe, expect } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { hasKeyword } from "../../rules/core/keywords.ts";
-import { attachTo } from "../../rules/core/zones.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { playCost } from "../../rules/player/attach.ts";
 import { legalTargets, type PlayerIntent } from "../../rules/engine/reduce.ts";
@@ -15,7 +14,7 @@ import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-o
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, playerTable, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { attach, choices, playerTable, printed, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const GIMLI = "01004";
@@ -48,17 +47,6 @@ beforeAll(async () => {
   const codes = [ARAGORN, GIMLI, DENETHOR, SPEARMAN, STEWARD, PLATE, BRAND, BARD, SENTRY, LOOKOUT, WARRIOR, TRADER, HAUBERK, BOW, MAP, SWORD, NECKLACE, GREEN_HILL];
   base = { ...starter, cards: new Map([...starter.cards, ...(await loadPrinted(codes))]) };
 });
-
-// Attaches cards the scene put in play to the hosts named (the scene attaches only to heroes), then brings the constants up to date.
-function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
-  let state = tab.state;
-  for (const [id, host] of pairs) state = attachTo(state, id, host);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
-
-function printed(tab: Table, code: string, which: "attack" | "defense" | "health" | "willpower"): number {
-  return tab.ctx.cards.get(code)?.[which] ?? 0;
-}
 
 describe("Brand son of Bain (18001:A:1)", () => {
   // "Each Dale character you control with a player attachment gets +1 Willpower.": Bard (Dale, Hauberk) and a Warrior of Dale (Dale,

@@ -10,12 +10,11 @@ import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { attachTo } from "../../rules/core/zones.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
-import { legalTargets } from "../../rules/engine/reduce.ts";
-import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { combat, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { combat, hosts, passAll, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "145001";
 const HALBARAD = "145006";
@@ -52,14 +51,6 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-function hosts(tab: Table, cardId: string): string[] {
-  return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-function play(tab: Table, cardId: string, hostId?: string, run: Run = begin(tab.state)): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId), ...(hostId ? { hostId } : {}) }, tab.ctx);
-}
-
 describe("Golden Shield (145010:A:1, A:2)", () => {
   // "Attach to a Rohan hero.": Théodred and Éowyn (Rohan heroes) are offered; Legolas (the Tactics hero who pays) and the Snowbourn
   // Scout (a Rohan ally) are not.
@@ -67,14 +58,14 @@ describe("Golden Shield (145010:A:1, A:2)", () => {
     const tab = table(effects, { heroes: [{ code: THEODRED, seat: 0 }, { code: EOWYN, seat: 0 }, { code: LEGOLAS, seat: 0 }], allies: [{ code: SNOWBOURN, seat: 0 }], hand: [{ code: SHIELD, seat: 0 }] });
     const shield = idsOf(tab, SHIELD);
     expect(hosts(tab, shield)).toEqual([idsOf(tab, THEODRED), idsOf(tab, EOWYN)].sort());
-    expect(play(tab, shield, idsOf(tab, EOWYN)).state.cards[shield]?.host).toBe(idsOf(tab, EOWYN));
+    expect(play(begin(tab.state), tab, shield, idsOf(tab, EOWYN)).state.cards[shield]?.host).toBe(idsOf(tab, EOWYN));
   });
 
   // "Response: After attached hero is declared as a defender, exhaust Golden Shield to add attached hero's Willpower to its Defense for this
   // Théodred defends while Éowyn holds the Shield: no Response.
   it("145010:A:2 Golden Shield: not offered when another character defends", () => {
     const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }, { code: THEODRED, seat: 0 }], attached: [{ code: SHIELD, host: EOWYN }], engaged: [{ code: WEAK, seat: 0 }] });
-    let run = passWindowsUnledgered(combat(tab.state, tab), tab);
+    let run = passAll(combat(tab.state, tab), tab.ctx);
     expect(run.state.window?.kind).toBe("defense");
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, THEODRED) }, tab.ctx);
     expect(triggers(run.state, tab)).not.toContain("145010:response:1");
@@ -85,15 +76,15 @@ describe("Golden Shield (145010:A:1, A:2)", () => {
   lineSpec("145010:A:2", "Golden Shield: after the hero is declared as a defender, exhaust it to add her Willpower to her Defense", (effects) => {
     const tab = table(effects, { heroes: [{ code: EOWYN, seat: 0 }], attached: [{ code: SHIELD, host: EOWYN }], engaged: [{ code: WEAK, seat: 0 }, { code: WEAK, seat: 0 }] });
     const [eowyn, shield, first] = [idsOf(tab, EOWYN), idsOf(tab, SHIELD), idsOf(tab, WEAK)];
-    let run = passWindowsUnledgered(combat(tab.state, tab), tab);
+    let run = passAll(combat(tab.state, tab), tab.ctx);
     // The player picks which engaged enemy attacks first.
-    if (run.state.window?.kind === "chooseEnemy") run = passWindowsUnledgered(sendUnledgered(run, { type: "ChooseEnemy", enemyId: first }, tab.ctx), tab);
+    if (run.state.window?.kind === "chooseEnemy") run = passAll(sendUnledgered(run, { type: "ChooseEnemy", enemyId: first }, tab.ctx), tab.ctx);
     expect(run.state.window?.kind).toBe("defense");
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: eowyn }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("145010:response:1");
     const before = run.steps.length;
-    run = passWindowsUnledgered(sendUnledgered(run, { type: "Trigger", cardId: shield, effectId: "145010:response:1" }, tab.ctx), tab);
-    if (run.state.window?.kind === "chooseEnemy") run = passWindowsUnledgered(sendUnledgered(run, { type: "ChooseEnemy", enemyId: tab.ids[WEAK]?.[1] ?? "" }, tab.ctx), tab);
+    run = passAll(sendUnledgered(run, { type: "Trigger", cardId: shield, effectId: "145010:response:1" }, tab.ctx), tab.ctx);
+    if (run.state.window?.kind === "chooseEnemy") run = passAll(sendUnledgered(run, { type: "ChooseEnemy", enemyId: tab.ids[WEAK]?.[1] ?? "" }, tab.ctx), tab.ctx);
     const strikes = run.steps.slice(before).filter((step) => step.kind === "strike" && step.side === "enemy");
     expect(strikes.map((step) => (step.kind === "strike" ? [step.targetId, step.defense] : []))).toEqual([[eowyn, 1 + 4]]);
     expect(run.state.window?.kind).toBe("defense");
@@ -102,20 +93,13 @@ describe("Golden Shield (145010:A:1, A:2)", () => {
   });
 });
 
-// The framework action windows are passed until the game asks for something else (scene.ts passWindows on sendUnledgered).
-function passWindowsUnledgered(run: Run, tab: Table): Run {
-  let next = run;
-  for (let guard = 0; guard < 20 && next.state.window?.kind === "frameAction"; guard += 1) next = sendUnledgered(next, { type: "Pass" }, tab.ctx);
-  return next;
-}
-
 describe("Livery of the Tower (145011:A:1)", () => {
   // "Attach to a Gondor hero.": Denethor and Eleanor (Gondor heroes) are offered; Théodred (Rohan hero) and the Gondorian Spearman (a Gondor ally) are not.
   lineSpec("145011:A:1", "Livery of the Tower: Attach to a Gondor hero", (effects) => {
     const tab = table(effects, { heroes: [{ code: DENETHOR, seat: 0 }, { code: ELEANOR, seat: 0 }, { code: THEODRED, seat: 0 }], allies: [{ code: SPEARMAN, seat: 0 }], hand: [{ code: LIVERY, seat: 0 }] });
     const livery = idsOf(tab, LIVERY);
     expect(hosts(tab, livery)).toEqual([idsOf(tab, DENETHOR), idsOf(tab, ELEANOR)].sort());
-    expect(play(tab, livery, idsOf(tab, ELEANOR)).state.cards[livery]?.host).toBe(idsOf(tab, ELEANOR));
+    expect(play(begin(tab.state), tab, livery, idsOf(tab, ELEANOR)).state.cards[livery]?.host).toBe(idsOf(tab, ELEANOR));
   });
 });
 
@@ -125,7 +109,7 @@ describe("Roheryn (145012:A:1, A:2)", () => {
     const tab = table(effects, { heroes: [{ code: CORE_ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }, { code: DENETHOR, seat: 0 }], allies: [{ code: HALBARAD, seat: 0 }], hand: [{ code: ROHERYN, seat: 0 }] });
     const roheryn = idsOf(tab, ROHERYN);
     expect(hosts(tab, roheryn)).toEqual([idsOf(tab, CORE_ARAGORN), idsOf(tab, BERAVOR)].sort());
-    expect(play(tab, roheryn, idsOf(tab, BERAVOR)).state.cards[roheryn]?.host).toBe(idsOf(tab, BERAVOR));
+    expect(play(begin(tab.state), tab, roheryn, idsOf(tab, BERAVOR)).state.cards[roheryn]?.host).toBe(idsOf(tab, BERAVOR));
   });
 
   // "If the attached hero is Aragorn, he gains a Tactics icon.": Aragorn (Fellowship) with Roheryn pays for Citadel Plate (Tactics) alone.
@@ -157,7 +141,7 @@ describe("Banner of Elendil (145013:A:1, A:2)", () => {
     const tab = table(effects, { seats: 2, heroes: [{ code: ARAGORN, seat: 0 }, { code: DENETHOR, seat: 0 }, { code: CORE_ARAGORN, seat: 1 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: BANNER, seat: 0 }] });
     const banner = idsOf(tab, BANNER);
     expect(hosts(tab, banner)).toEqual([idsOf(tab, ARAGORN), idsOf(tab, CORE_ARAGORN)].sort());
-    expect(play(tab, banner, idsOf(tab, ARAGORN)).state.cards[banner]?.host).toBe(idsOf(tab, ARAGORN));
+    expect(play(begin(tab.state), tab, banner, idsOf(tab, ARAGORN)).state.cards[banner]?.host).toBe(idsOf(tab, ARAGORN));
   });
 
   // "While Aragorn is committed to the quest, each other questing character you control gets +1 Willpower.": Aragorn, Denethor and the ally

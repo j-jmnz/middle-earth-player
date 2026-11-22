@@ -7,14 +7,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { spawn } from "../../rules/core/zones.ts";
-import { legalIntents, type ReduceContext } from "../../rules/engine/reduce.ts";
+import { withMode } from "../../rules/core/state.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { attacking, choices, combat, discarded, passAll, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const SKIN_CHANGER = "19004";
 const RAGE = "19005";
@@ -48,28 +46,13 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-// A card of the first seat put in its discard pile.
-function discarded(tab: Table, code: string): { tab: Table; id: string } {
-  const made = spawn(tab.state, code, { zone: "discard", seat: 0 });
-  return { tab: { ...tab, state: made.state }, id: made.id };
-}
-
-// Passes the open action and response windows until the game asks for something else.
-function passAll(run: Run, ctx: ReduceContext): Run {
-  let next = run;
-  const open = (state: ScenarioState) => (state.window?.kind === "frameAction" || state.window?.kind === "response") && legalIntents(state, ctx).some((intent) => intent.type === "Pass");
-  for (let guard = 0; guard < 30 && open(next.state); guard += 1) next = sendUnledgered(next, { type: "Pass" }, ctx);
-  return next;
-}
-
 describe("Beorning Skin-changer (19004:A:1)", () => {
   // The Skin-changer in play; in hand Giant Bear (Beorning, cost 5), a second Skin-changer (Beorning, cost 2) and the Brute (cost 4, not a
   // Beorning); in the discard pile the Guardian (Beorning, cost 3) and another Brute.
   function scene(effects: readonly Effect[]): { tab: Table; guardian: string; brute: string } {
     const start = table(effects, { heroes: [{ code: TACTICIAN, seat: 0 }], allies: [{ code: SKIN_CHANGER, seat: 0 }], hand: [{ code: BEAR, seat: 0 }, { code: SKIN_CHANGER, seat: 0 }, { code: BRUTE, seat: 0 }], engaged: [{ code: BRUTISH, seat: 0 }] });
-    const guardian = discarded(start, GUARDIAN);
-    const brute = discarded(guardian.tab, BRUTE);
-    return { tab: brute.tab, guardian: guardian.id, brute: brute.id };
+    const { tab, ids: [guardian = "", brute = ""] } = discarded(start, [[GUARDIAN, 0], [BRUTE, 0]]);
+    return { tab, guardian, brute };
   }
   const changer = (tab: Table) => tab.ids[SKIN_CHANGER]?.find((id) => tab.state.cards[id]?.zone === "play") ?? "";
 
@@ -145,7 +128,7 @@ describe("Beorn's Rage (19005:A:1)", () => {
     const tab = scene(effects);
     const enemy = idsOf(tab, BRUTISH);
     const rage = idsOf(tab, RAGE);
-    let run = passAll(combat(tab.state, tab), tab.ctx);
+    let run = passAll(combat(tab.state, tab), tab.ctx, { responses: true });
     expect(run.state.window?.kind).toBe("defense");
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, SKIN_CHANGER) }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("19005:response:2");
@@ -160,7 +143,7 @@ describe("Beorn's Rage (19005:A:1)", () => {
     const enemy = idsOf(tab, BRUTISH);
     const attack = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: enemy, attackerIds: [idsOf(tab, ALLY)] }, tab.ctx);
     expect(triggers(attack.state, tab).filter((id) => id.startsWith("19005:"))).toEqual([]);
-    const defense = sendUnledgered(passAll(combat(tab.state, tab), tab.ctx), { type: "DeclareDefender", defenderId: idsOf(tab, ALLY) }, tab.ctx);
+    const defense = sendUnledgered(passAll(combat(tab.state, tab), tab.ctx, { responses: true }), { type: "DeclareDefender", defenderId: idsOf(tab, ALLY) }, tab.ctx);
     expect(triggers(defense.state, tab).filter((id) => id.startsWith("19005:"))).toEqual([]);
   });
 });

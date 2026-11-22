@@ -10,15 +10,14 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { hasKeyword } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
-import { attachTo, spawn } from "../../rules/core/zones.ts";
+import { updateCard } from "../../rules/core/state.ts";
+import { attachTo } from "../../rules/core/zones.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
-import { legalTargets } from "../../rules/engine/reduce.ts";
-import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { attach, attacking, choices, combat, discarded, hosts, play, playerTable, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const THEODRED = "01002";
@@ -54,38 +53,6 @@ beforeAll(async () => {
   cards.set(BRUTE, definePrinted({ code: BRUTE, name: "Brute", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 9, health: 9 }));
   base = { ...starter, cards };
 });
-
-// Attaches cards the scene put in play to the hosts named (the scene attaches only to heroes), then brings the constants up to date.
-function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
-  let state = tab.state;
-  for (const [id, host] of pairs) state = attachTo(state, id, host);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
-
-function hosts(tab: Table, cardId: string): string[] {
-  return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-function play(run: Run, tab: Table, cardId: string, hostId?: string): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId), ...(hostId ? { hostId } : {}) }, tab.ctx);
-}
-
-const printed = (tab: Table, code: string, which: "attack" | "defense" | "willpower"): number => tab.ctx.cards.get(code)?.[which] ?? 0;
-
-// The quest phase's commit step on this state, the lasting effects kept.
-const questing = (state: ScenarioState): ScenarioState => ({ ...state, phase: "Quest", boundaryPhase: "Quest", mode: "questCommit", window: { kind: "pass" }, activeSeat: 0 });
-
-// Cards of these codes put into a seat's discard pile.
-function discarded(tab: Table, rows: readonly (readonly [string, number])[]): { tab: Table; ids: string[] } {
-  let state = tab.state;
-  const ids: string[] = [];
-  for (const [code, seat] of rows) {
-    const made = spawn(state, code, { zone: "discard", seat });
-    state = made.state;
-    ids.push(made.id);
-  }
-  return { tab: { ...tab, state }, ids };
-}
 
 describe("Galadriel (08112:A:1)", () => {
   // "Galadriel cannot quest, attack, or defend.": a Commit, an attack and a defence with her are refused, and Éowyn can do each.

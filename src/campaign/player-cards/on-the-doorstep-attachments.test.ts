@@ -10,15 +10,13 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { copyCapRule } from "../../catalog/deck-save.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
-import { attachTo } from "../../rules/core/zones.ts";
-import { syncConstants } from "../../rules/interpret/constants.ts";
-import { legalIntents, legalTargets, type ReduceContext } from "../../rules/engine/reduce.ts";
+import { updateCard } from "../../rules/core/state.ts";
+import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { attach, choices, combat, hosts, passAll, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const BARD = "132003";
 const YEW = "132014";
@@ -52,25 +50,6 @@ beforeAll(async () => {
   cards.set(SOFT, definePrinted({ code: SOFT, name: "Soft", type: "enemy", threat: 0, engagementCost: 50, attack: 1, defense: 1, health: 9 }));
   base = { ...starter, cards };
 });
-
-function hosts(tab: Table, cardId: string): string[] {
-  return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-// Attaches cards the scene put in play to the hosts named, then brings the constants up to date.
-function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
-  let state = tab.state;
-  for (const [id, host] of pairs) state = attachTo(state, id, host);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
-
-// Passes the open action and response windows until the game asks for something else.
-function passAll(run: Run, ctx: ReduceContext): Run {
-  let next = run;
-  const open = (state: ScenarioState) => (state.window?.kind === "frameAction" || state.window?.kind === "response") && legalIntents(state, ctx).some((intent) => intent.type === "Pass");
-  for (let guard = 0; guard < 30 && open(next.state); guard += 1) next = sendUnledgered(next, { type: "Pass" }, ctx);
-  return next;
-}
 
 describe("Ranged hosts (132014:A:1, 132015:A:1)", () => {
   // Legolas and Bard (printed ranged heroes), the Pal (a hero that gains ranged from Dúnedain Cache), a Dwarf hero without ranged and
@@ -125,7 +104,7 @@ describe("Great Yew Bow (132014:A:2)", () => {
     }
     expect(run.state.cards[yew]?.exhausted).toBe(true);
     expect(run.state.cards[legolas]?.exhausted).toBe(true);
-    run = passAll(run, tab.ctx);
+    run = passAll(run, tab.ctx, { responses: true });
     const strikes = run.steps.flatMap((step) => (step.kind === "strike" && step.side === "player" ? [step] : []));
     expect(strikes).toHaveLength(1);
     expect(run.state.cards[staged ?? ""]?.damage).toBe((tab.ctx.cards.get(LEGOLAS)?.attack ?? 0) - 1);
@@ -140,7 +119,7 @@ describe("Great Yew Bow (132014:A:2)", () => {
     const soft = idsOf(tab, SOFT);
     let run = sendUnledgered(combat(tab.state, tab), { type: "Trigger", cardId: idsOf(tab, YEW), effectId: "132014:action:1" }, tab.ctx);
     if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: soft }, tab.ctx);
-    run = passAll(run, tab.ctx);
+    run = passAll(run, tab.ctx, { responses: true });
     expect(run.state.cards[soft]?.damage).toBe(tab.ctx.cards.get(BARD)?.attack ?? 0);
   });
 

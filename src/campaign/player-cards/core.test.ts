@@ -14,7 +14,7 @@ import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-o
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, passWindows, send, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { combat, playerTable, stat } from "../../../test/harness/player-table.ts";
+import { combat, playerTable, printed, stat } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const THEODRED = "01002";
@@ -60,10 +60,6 @@ beforeAll(async () => {
 // The cards the engine offers as the host of the attachment in hand.
 function hosts(tab: Table, code: string): string[] {
   return [...legalTargets(tab.state, { type: "PlayCard", cardId: idsOf(tab, code) }, tab.ctx)].sort();
-}
-
-function printed(tab: Table, code: string, which: "attack" | "defense" | "health" | "willpower"): number {
-  return tab.ctx.cards.get(code)?.[which] ?? 0;
 }
 
 // "Attach to a hero.": in a two-player game the heroes of both players are offered and no ally is; the card goes onto the

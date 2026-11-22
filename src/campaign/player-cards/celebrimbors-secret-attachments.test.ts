@@ -8,14 +8,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { updateCard } from "../../rules/core/state.ts";
-import { attachTo } from "../../rules/core/zones.ts";
-import { syncConstants } from "../../rules/interpret/constants.ts";
-import { legalTargets, reduce } from "../../rules/engine/reduce.ts";
-import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { reduce } from "../../rules/engine/reduce.ts";
+import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { attach, choices, hosts, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const THEODRED = "01002";
@@ -44,21 +42,6 @@ beforeAll(async () => {
   const cards = new Map([...starter.cards, ...(await loadPrinted(codes))]);
   base = { ...starter, cards };
 });
-
-// Attaches cards the scene put in play to the hosts named (the scene attaches only to heroes), then brings the constants up to date.
-function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
-  let state = tab.state;
-  for (const [id, host] of pairs) state = attachTo(state, id, host);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
-
-function hosts(tab: Table, cardId: string): string[] {
-  return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-function play(run: Run, tab: Table, cardId: string, hostId?: string): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId), ...(hostId ? { hostId } : {}) }, tab.ctx);
-}
 
 const printed = (tab: Table, code: string, which: "attack" | "defense" | "willpower"): number => tab.ctx.cards.get(code)?.[which] ?? 0;
 

@@ -15,12 +15,11 @@ import { attachTo, spawn } from "../../rules/core/zones.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { playCost } from "../../rules/player/attach.ts";
 import { settle } from "../../rules/engine/machine.ts";
-import { legalTargets } from "../../rules/engine/reduce.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attach, choices, hosts, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const THEODRED = "01002";
@@ -59,21 +58,6 @@ beforeAll(async () => {
   cards.set(WALL, definePrinted({ code: WALL, name: "Wall", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 9, health: 9 }));
   base = { ...starter, cards };
 });
-
-// Attaches cards the scene put in play to the hosts named (the scene attaches only to heroes), then brings the constants up to date.
-function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
-  let state = tab.state;
-  for (const [id, host] of pairs) state = attachTo(state, id, host);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
-
-function hosts(tab: Table, cardId: string): string[] {
-  return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-function printed(tab: Table, code: string, which: "attack" | "defense" | "health" | "willpower"): number {
-  return tab.ctx.cards.get(code)?.[which] ?? 0;
-}
 
 describe("Hauberk of Mail (18007)", () => {
   // "Attach to a Dale or Warrior character. Limit 1 per character.": Bard (Dale hero), the Gondorian Spearman (Warrior ally) and the

@@ -14,7 +14,7 @@ import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-o
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { answerFirst, attacking, choices, chooseIfAsked, fillers, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const DENETHOR = "12001";
 const AZAIN = "12004";
@@ -46,19 +46,6 @@ beforeAll(async () => {
   cards.set(TROLL, definePrinted({ code: TROLL, name: "Troll", type: "enemy", traits: ["Troll"], threat: 1, engagementCost: 40, attack: 1, defense: 0, health: 9 }));
   base = { ...starter, cards };
 });
-
-const fillers = (count: number, seat = 0) => Array.from({ length: count }, () => ({ code: CARD, seat }));
-
-function chooseIfAsked(run: Run, tab: Table, optionId: string): Run {
-  return run.state.window?.kind === "choose" ? sendUnledgered(run, { type: "Choose", optionId }, tab.ctx) : run;
-}
-
-// Answers the questions an effect asks with their first option, while it asks one.
-function answerFirst(run: Run, tab: Table): Run {
-  let next = run;
-  for (let guard = 0; guard < 4 && next.state.window?.kind === "choose"; guard += 1) next = sendUnledgered(next, { type: "Choose", optionId: choices(next.state, tab)[0] ?? "" }, tab.ctx);
-  return next;
-}
 
 describe("Denethor (12001:A:2)", () => {
   // "Action: Move 1 resource from Denethor's resource pool to another Gondor hero's resource pool. (Limit once per round.)": Eleanor (Gondor) is a
@@ -144,7 +131,7 @@ describe("Glorfindel (12006:A:1, A:2)", () => {
 
   // "Action: Discard a card from your hand to ready Glorfindel. (Limit once per phase.)"
   lineSpec("12006:A:2", "discards a card from the hand to ready himself, once a phase", (effects) => {
-    const scene = table(effects, { heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: GLORFINDEL, seat: 0 }], hand: fillers(2) });
+    const scene = table(effects, { heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: GLORFINDEL, seat: 0 }], hand: fillers(CARD, 2) });
     const glorfindel = idsOf(scene, GLORFINDEL);
     const tab = { ...scene, state: updateCard(scene.state, glorfindel, { exhausted: true }) };
     let run = answerFirst(sendUnledgered(begin(tab.state), { type: "Trigger", cardId: glorfindel, effectId: "12006:action:1" }, tab.ctx), tab);
@@ -157,7 +144,7 @@ describe("Glorfindel (12006:A:1, A:2)", () => {
   });
 
   it("12006:A:2 is not offered while Glorfindel is ready, or with an empty hand", () => {
-    const ready = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: GLORFINDEL, seat: 0 }], hand: fillers(2) });
+    const ready = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: GLORFINDEL, seat: 0 }], hand: fillers(CARD, 2) });
     expect(triggers(ready.state, ready)).not.toContain("12006:action:1");
     const empty = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: GLORFINDEL, seat: 0 }] });
     expect(triggers(updateCard(empty.state, idsOf(empty, GLORFINDEL), { exhausted: true }), empty)).not.toContain("12006:action:1");
@@ -168,7 +155,7 @@ describe("Imladris Caregiver (12008:A:1)", () => {
   // "Action: Discard a card from your hand to heal 1 damage on any character. (Limit twice per round).": the other player's damaged hero is healed
   // twice; a third use is not offered.
   lineSpec("12008:A:1", "discards a card from the hand to heal 1 damage on any character, twice a round", (effects) => {
-    const scene = table(effects, { seats: 2, heroes: [{ code: EOWYN, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: CAREGIVER, seat: 0 }], hand: fillers(3) });
+    const scene = table(effects, { seats: 2, heroes: [{ code: EOWYN, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: CAREGIVER, seat: 0 }], hand: fillers(CARD, 3) });
     const [caregiver, pal] = [idsOf(scene, CAREGIVER), idsOf(scene, PAL)];
     const tab = { ...scene, state: updateCard(scene.state, pal, { damage: 2 }) };
     let run = begin(tab.state);
@@ -188,7 +175,7 @@ describe("Imladris Caregiver (12008:A:1)", () => {
   });
 
   it("12008:A:1 is not offered with no damaged character", () => {
-    const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: CAREGIVER, seat: 0 }], hand: fillers(2) });
+    const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: CAREGIVER, seat: 0 }], hand: fillers(CARD, 2) });
     expect(triggers(tab.state, tab)).not.toContain("12008:action:1");
   });
 });
@@ -196,14 +183,14 @@ describe("Imladris Caregiver (12008:A:1)", () => {
 describe("Guardian of Rivendell (12010:A:1)", () => {
   // "As an additional cost to play Guardian of Rivendell from your hand, you must discard 2 cards from your hand."
   lineSpec("12010:A:1", "is played from the hand only by discarding 2 more cards from it", (effects) => {
-    const tab = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: GLOIN, seat: 0 }], hand: [{ code: GUARDIAN, seat: 0 }, ...fillers(3)] });
+    const tab = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: GLOIN, seat: 0 }], hand: [{ code: GUARDIAN, seat: 0 }, ...fillers(CARD, 3)] });
     const guardian = idsOf(tab, GUARDIAN);
     const run = answerFirst(sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: guardian, payments: payFor(tab.state, tab.ctx, guardian) }, tab.ctx), tab);
     expect(run.state.cards[guardian]?.zone).toBe("play");
     expect(run.state.seats[0]?.hand).toHaveLength(1);
     expect(run.state.seats[0]?.discard).toHaveLength(2);
     // With 1 other card in hand the cost cannot be paid.
-    const short = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: GLOIN, seat: 0 }], hand: [{ code: GUARDIAN, seat: 0 }, ...fillers(1)] });
+    const short = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: GLOIN, seat: 0 }], hand: [{ code: GUARDIAN, seat: 0 }, ...fillers(CARD, 1)] });
     const held = idsOf(short, GUARDIAN);
     expect(refusal(short.state, { type: "PlayCard", cardId: held, payments: payFor(short.state, short.ctx, held) }, short.ctx)).not.toBeNull();
   });

@@ -244,7 +244,8 @@ export const RECORDS: readonly Effect[] = [
   // Banner of Elendil: while Aragorn attacks, the other attacking characters of his player get +1 Attack.
   { id: "145013:constant:3", cardCode: "145013", lines: ["145013:A:3"], timing: "constant", condition: { kind: "matches", card: "host", pick: { type: "character", control: "any", attacking: true } }, instructions: [{ verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", holders: { type: "character", control: "you", attacking: true, notHost: true } }] },
 
-  // Éomer: after he commits to the quest, he attacks an enemy in the staging area (he must be ready to be declared).
+  // Éomer: after he commits to the quest, he attacks an enemy in the staging area. "Immediately declare him as an attacker" overrides the
+  // requirement that an attacker is ready, so he attacks though committing exhausted him, and stays exhausted (`exhausted`: no readiness check, no exhaust).
   {
     id: "146003:response:1",
     cardCode: "146003",
@@ -253,8 +254,8 @@ export const RECORDS: readonly Effect[] = [
     trigger: "committed",
     subject: "self",
     cost: { kind: "resources", amount: 1, from: "self" },
-    condition: { kind: "all", conditions: [{ kind: "matches", card: "self", pick: { type: "hero", control: "any", state: "ready" } }, { kind: "canPick", pick: IN_STAGING }] },
-    instructions: [{ verb: "Pick", pick: IN_STAGING }, { verb: "DeclareAttack", attacker: "self" }],
+    condition: { kind: "canPick", pick: IN_STAGING },
+    instructions: [{ verb: "Pick", pick: IN_STAGING }, { verb: "DeclareAttack", attacker: "self", exhausted: true }],
   },
 
   // Gúthwinë, Haradrim Spear, Riddermark Knight: Attack for this attack, and what happens when it ends.

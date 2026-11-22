@@ -9,14 +9,13 @@ import { modifiedStat } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
 import { attachTo, spawn } from "../../rules/core/zones.ts";
-import { syncConstants } from "../../rules/interpret/constants.ts";
 import { playCost } from "../../rules/player/attach.ts";
-import { legalIntents, type ReduceContext } from "../../rules/engine/reduce.ts";
+import { legalIntents } from "../../rules/engine/reduce.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { attach, choices, combat, passAll, play, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const GIMLI = "01004";
@@ -58,27 +57,8 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-// Attaches cards the scene put in play to the hosts named (the scene attaches only to heroes), then brings the constants up to date.
-function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
-  let state = tab.state;
-  for (const [id, host] of pairs) state = attachTo(state, id, host);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
-
-// Passes the open action and response windows until the game asks for something else.
-function passAll(run: Run, ctx: ReduceContext): Run {
-  let next = run;
-  const open = (state: ScenarioState) => (state.window?.kind === "frameAction" || state.window?.kind === "response") && legalIntents(state, ctx).some((intent) => intent.type === "Pass");
-  for (let guard = 0; guard < 20 && open(next.state); guard += 1) next = sendUnledgered(next, { type: "Pass" }, ctx);
-  return next;
-}
-
 function playable(state: ScenarioState, tab: Table): string[] {
   return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
-}
-
-function play(run: Run, tab: Table, cardId: string): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId) }, tab.ctx);
 }
 
 describe("Traffic from Dale (18012:A:1)", () => {
@@ -147,7 +127,7 @@ describe("Valour of the North (18014:A:1)", () => {
     let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, ORC), attackerIds: [warrior] }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("18014:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: valour, effectId: "18014:response:1", payments: payFor(run.state, tab.ctx, valour) }, tab.ctx);
-    run = passAll(run, tab.ctx);
+    run = passAll(run, tab.ctx, { responses: true });
     expect(strikes(run, "player").map((strike) => strike.attack)).toEqual([(tab.ctx.cards.get(WARRIOR)?.attack ?? 0) + 3]);
     // The bonus ends with the attack.
     const after = run.state.cards[warrior];
@@ -160,12 +140,12 @@ describe("Valour of the North (18014:A:1)", () => {
     const tab = scene(effects);
     const gimli = idsOf(tab, GIMLI);
     const valour = idsOf(tab, VALOUR);
-    let run = passAll(combat(tab.state, tab), tab.ctx);
+    let run = passAll(combat(tab.state, tab), tab.ctx, { responses: true });
     expect(run.state.window?.kind).toBe("defense");
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: gimli }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("18014:response:2");
     run = sendUnledgered(run, { type: "Trigger", cardId: valour, effectId: "18014:response:2", payments: payFor(run.state, tab.ctx, valour) }, tab.ctx);
-    run = passAll(run, tab.ctx);
+    run = passAll(run, tab.ctx, { responses: true });
     expect(strikes(run, "enemy").map((strike) => strike.defense)).toEqual([(tab.ctx.cards.get(GIMLI)?.defense ?? 0) + 3]);
     expect(run.state.cards[gimli]?.damage).toBe(0);
   });

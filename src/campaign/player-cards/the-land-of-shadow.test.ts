@@ -7,7 +7,6 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
-import { modifiedStat } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
 import { settle } from "../../rules/engine/machine.ts";
@@ -16,7 +15,7 @@ import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-o
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, choices, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const FARAMIR = "144002";
 const DAMROD = "144003";
@@ -51,16 +50,6 @@ beforeAll(async () => {
   cards.set(NEAR, definePrinted({ code: NEAR, name: "Near", type: "enemy", threat: 0, engagementCost: 5, attack: 1, defense: 1, health: 9 }));
   base = { ...starter, cards };
 });
-
-function engagementCost(state: ScenarioState, tab: Table, id: string): number {
-  const card = state.cards[id];
-  if (!card) throw new Error(`no card ${id}`);
-  return modifiedStat(state, card, "engagementCost", tab.ctx.cards);
-}
-
-function play(tab: Table, cardId: string, run: Run = begin(tab.state)): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId) }, tab.ctx);
-}
 
 // The round ends and the next begins; the engine runs to its next window.
 function nextRound(state: ScenarioState, tab: Table): ScenarioState {
@@ -162,9 +151,9 @@ describe("Anborn (144004:A:1)", () => {
     expect(triggers(revealed.state, tab)).toContain("144004:response:1");
     const run = sendUnledgered(revealed, { type: "Trigger", cardId: idsOf(tab, ANBORN), effectId: "144004:response:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, ANBORN)]?.exhausted).toBe(true);
-    expect(engagementCost(run.state, tab, weak)).toBe(35);
+    expect(stat(run.state, tab, weak, "engagementCost")).toBe(35);
     expect(run.state.cards[weak]?.damage).toBe(1);
-    expect(engagementCost(nextRound(run.state, tab), tab, weak)).toBe(30);
+    expect(stat(nextRound(run.state, tab), tab, weak, "engagementCost")).toBe(30);
   });
 
   // A location added to the staging area is not an enemy: no Response.
@@ -180,7 +169,7 @@ describe("Mablung (144005:A:1)", () => {
   function entered(effects: readonly Effect[]): { tab: Table; run: Run; staged: string; engaged: string } {
     const tab = table(effects, { heroes: [{ code: DENETHOR, seat: 0 }], hand: [{ code: MABLUNG, seat: 0 }], staging: [WEAK], engaged: [{ code: WEAK, seat: 0 }] });
     const [staged, engaged] = tab.ids[WEAK] ?? [];
-    let run = play(tab, idsOf(tab, MABLUNG));
+    let run = play(begin(tab.state), tab, idsOf(tab, MABLUNG));
     expect(triggers(run.state, tab)).toContain("144005:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, MABLUNG), effectId: "144005:response:1" }, tab.ctx);
     // "choose an enemy": the enemy in the staging area and the engaged one.
@@ -193,18 +182,18 @@ describe("Mablung (144005:A:1)", () => {
   lineSpec("144005:A:1", "Mablung: the chosen enemy gets +5 engagement cost until the end of the round, then the player may engage it", (effects) => {
     const { tab, run: chosen, staged } = entered(effects);
     let run = sendUnledgered(chosen, { type: "Choose", optionId: staged }, tab.ctx);
-    expect(engagementCost(run.state, tab, staged)).toBe(35);
+    expect(stat(run.state, tab, staged, "engagementCost")).toBe(35);
     expect(choices(run.state, tab)).toContain("engage");
     run = sendUnledgered(run, { type: "Choose", optionId: "engage" }, tab.ctx);
     expect(run.state.cards[staged]?.zone).toBe("engaged");
-    expect(engagementCost(nextRound(run.state, tab), tab, staged)).toBe(30);
+    expect(stat(nextRound(run.state, tab), tab, staged, "engagementCost")).toBe(30);
   });
 
   // The engaged enemy is chosen and returned to the staging area.
   lineSpec("144005:A:1", "Mablung: or the player returns the chosen enemy to the staging area", (effects) => {
     const { tab, run: chosen, engaged } = entered(effects);
     let run = sendUnledgered(chosen, { type: "Choose", optionId: engaged }, tab.ctx);
-    expect(engagementCost(run.state, tab, engaged)).toBe(35);
+    expect(stat(run.state, tab, engaged, "engagementCost")).toBe(35);
     expect(choices(run.state, tab)).toContain("return");
     run = sendUnledgered(run, { type: "Choose", optionId: "return" }, tab.ctx);
     expect(run.state.cards[engaged]?.zone).toBe("staging");
@@ -215,7 +204,7 @@ describe("Mablung (144005:A:1)", () => {
     const { tab, run: chosen, engaged } = entered(EFFECTS);
     const run = sendUnledgered(sendUnledgered(chosen, { type: "Choose", optionId: engaged }, tab.ctx), { type: "Choose", optionId: "neither" }, tab.ctx);
     expect(run.state.cards[engaged]?.zone).toBe("engaged");
-    expect(engagementCost(run.state, tab, engaged)).toBe(35);
+    expect(stat(run.state, tab, engaged, "engagementCost")).toBe(35);
   });
 });
 
@@ -223,7 +212,7 @@ describe("Skinbark (144006:A:1, A:2)", () => {
   // "Cannot have restricted attachments. Enters play exhausted."
   lineSpec("144006:A:1", "Skinbark: enters play exhausted", (effects) => {
     const tab = table(effects, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: SKINBARK, seat: 0 }] });
-    const run = play(tab, idsOf(tab, SKINBARK));
+    const run = play(begin(tab.state), tab, idsOf(tab, SKINBARK));
     expect(run.state.cards[idsOf(tab, SKINBARK)]).toMatchObject({ zone: "play", exhausted: true });
   });
 

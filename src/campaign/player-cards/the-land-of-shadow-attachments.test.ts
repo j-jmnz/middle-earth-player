@@ -11,13 +11,12 @@ import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { withMode, type ScenarioState } from "../../rules/core/state.ts";
 import { settle } from "../../rules/engine/machine.ts";
-import { legalTargets } from "../../rules/engine/reduce.ts";
 import { playCost } from "../../rules/player/attach.ts";
-import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { combat, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { combat, hosts, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const FARAMIR = "144002";
 const STAFF = "144008";
@@ -56,14 +55,6 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-function hosts(tab: Table, cardId: string): string[] {
-  return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-function play(tab: Table, cardId: string, hostId?: string, run: Run = begin(tab.state)): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId), ...(hostId ? { hostId } : {}) }, tab.ctx);
-}
-
 // The quest phase: the characters commit, the player passes and the staging step reveals the encounter deck's top card.
 function quest(tab: Table, cardIds: readonly string[], state: ScenarioState = tab.state): Run {
   const committed = sendUnledgered(begin({ ...withMode(state, "questCommit"), phase: "Quest", boundaryPhase: "Quest", window: { kind: "pass" } }), { type: "Commit", cardIds }, tab.ctx);
@@ -77,7 +68,7 @@ describe("Staff of Lebethron (144008:A:1)", () => {
     const tab = table(effects, { heroes: [{ code: ARAGORN, seat: 0 }, { code: DENETHOR, seat: 0 }, { code: PAL, seat: 0 }], allies: [{ code: SPEARMAN, seat: 0 }, { code: TOOK, seat: 0 }], hand: [{ code: STAFF, seat: 0 }] });
     const staff = idsOf(tab, STAFF);
     expect(hosts(tab, staff)).toEqual([idsOf(tab, DENETHOR), idsOf(tab, PAL)].sort());
-    expect(play(tab, staff, idsOf(tab, PAL)).state.cards[staff]?.host).toBe(idsOf(tab, PAL));
+    expect(play(begin(tab.state), tab, staff, idsOf(tab, PAL)).state.cards[staff]?.host).toBe(idsOf(tab, PAL));
   });
 });
 
@@ -90,7 +81,7 @@ describe("Ambush (144009:A:1)", () => {
     const ambush = idsOf(tab, AMBUSH);
     const [first, second] = tab.ids[WEAK] ?? [];
     expect(hosts(tab, ambush)).toEqual(["staging"]);
-    const played = play(tab, ambush, "staging");
+    const played = play(begin(tab.state), tab, ambush, "staging");
     expect(played.state.cards[ambush]).toMatchObject({ zone: "staging", host: null, controller: 0 });
     let run = quest(tab, [idsOf(tab, DENETHOR)], played.state);
     expect(run.state.cards[idsOf(tab, GREEN_HILL)]?.zone).toBe("staging");
@@ -110,7 +101,7 @@ describe("Snowmane (144010:A:1, A:3)", () => {
     const tab = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: THEODRED, seat: 0 }, { code: ELEANOR, seat: 0 }], allies: [{ code: SNOWBOURN, seat: 0 }], hand: [{ code: SNOWMANE, seat: 0 }] });
     const snowmane = idsOf(tab, SNOWMANE);
     expect(hosts(tab, snowmane)).toEqual([idsOf(tab, EOWYN), idsOf(tab, THEODRED)].sort());
-    expect(play(tab, snowmane, idsOf(tab, THEODRED)).state.cards[snowmane]?.host).toBe(idsOf(tab, THEODRED));
+    expect(play(begin(tab.state), tab, snowmane, idsOf(tab, THEODRED)).state.cards[snowmane]?.host).toBe(idsOf(tab, THEODRED));
   });
 
   // "Response: After attached hero quests successfully, ready attached hero.": Éowyn (Willpower 4) quests with Snowmane against a Threat 0
@@ -164,7 +155,7 @@ describe("In the Shadows (144012:A:1, A:2)", () => {
     const tab = table(effects, { seats: 2, heroes: [{ code: DENETHOR, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: SHADOWS, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }, { code: LOW, seat: 0 }, { code: WEAK, seat: 1 }] });
     const [mine, theirs] = tab.ids[WEAK] ?? [];
     const low = idsOf(tab, LOW);
-    const run = play(tab, idsOf(tab, SHADOWS), undefined, combat(tab.state, tab));
+    const run = play(combat(tab.state, tab), tab, idsOf(tab, SHADOWS));
     expect(run.state.cards[idsOf(tab, SHADOWS)]?.zone).toBe("discard");
     expect([stat(run.state, tab, mine ?? "", "attack"), stat(run.state, tab, mine ?? "", "defense")]).toEqual([2, 1]);
     expect([stat(run.state, tab, low, "attack"), stat(run.state, tab, low, "defense")]).toEqual([3, 2]);
@@ -176,6 +167,6 @@ describe("In the Shadows (144012:A:1, A:2)", () => {
   // A Combat Action: it cannot be played in the planning phase.
   it("144012:A:2 In the Shadows: not playable outside the combat phase", () => {
     const tab = table(EFFECTS, { heroes: [{ code: DENETHOR, seat: 0 }], hand: [{ code: SHADOWS, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] });
-    expect(() => play(tab, idsOf(tab, SHADOWS))).toThrow(/refused/);
+    expect(() => play(begin(tab.state), tab, idsOf(tab, SHADOWS))).toThrow(/refused/);
   });
 });

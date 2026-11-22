@@ -18,8 +18,8 @@ import { setAsideEncounterCards } from "../../rules/families/sidequests/encounte
 import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { choices, play, playerTable, questing, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const HALDAN = "19026";
 const WIGLAF = "19027";
@@ -54,14 +54,6 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-function play(tab: Table, cardId: string, hostId?: string, run: Run = begin(tab.state)): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId), ...(hostId ? { hostId } : {}) }, tab.ctx);
-}
-
-function quest(state: ScenarioState): ScenarioState {
-  return { ...withMode(state, "questCommit"), phase: "Quest", boundaryPhase: "Quest", window: { kind: "pass" } };
-}
-
 // The table with `cardId` attached to `hostId` and the constants brought up to date.
 function attached(tab: Table, cardId: string, hostId: string, state: ScenarioState = tab.state): ScenarioState {
   return syncConstants(attachTo(state, cardId, hostId), tab.ctx);
@@ -73,9 +65,9 @@ describe("Haldan (19026:A:1)", () => {
   lineSpec("19026:A:1", "Haldan: does not exhaust to quest while the active location has an attachment", (effects) => {
     const tab = table(effects, { heroes: [{ code: HALDAN, seat: 0 }], hand: [{ code: PATH, seat: 0 }], active: GLADE, deck: ["f0", "f0"] });
     const haldan = idsOf(tab, HALDAN);
-    const played = play(tab, idsOf(tab, PATH), idsOf(tab, GLADE));
+    const played = play(begin(tab.state), tab, idsOf(tab, PATH), idsOf(tab, GLADE));
     expect(played.state.cards[idsOf(tab, PATH)]?.host).toBe(idsOf(tab, GLADE));
-    const run = sendUnledgered(begin(quest(played.state)), { type: "Commit", cardIds: [haldan] }, tab.ctx);
+    const run = sendUnledgered(begin(questing(played.state)), { type: "Commit", cardIds: [haldan] }, tab.ctx);
     expect(run.state.cards[haldan]).toMatchObject({ committed: true, exhausted: false });
   });
 
@@ -139,7 +131,7 @@ describe("Meneldor (19031:A:1, A:2)", () => {
   lineSpec("19031:A:2", "Meneldor: after he enters play, place 2 progress on a location", (effects) => {
     const tab = table(effects, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: MENELDOR, seat: 0 }], staging: [GLADE], active: GLADE });
     const [staged, active] = tab.ids[GLADE] ?? [];
-    let run = play(tab, idsOf(tab, MENELDOR));
+    let run = play(begin(tab.state), tab, idsOf(tab, MENELDOR));
     expect(triggers(run.state, tab)).toContain("19031:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, MENELDOR), effectId: "19031:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([staged ?? "", active ?? ""].sort());
@@ -163,7 +155,7 @@ describe("Meneldor (19031:A:1, A:2)", () => {
   // With no location in play there is nowhere for the progress: no Response.
   it("19031:A:2 Meneldor: not offered with no location in play", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: MENELDOR, seat: 0 }] });
-    expect(triggers(play(tab, idsOf(tab, MENELDOR)).state, tab)).not.toContain("19031:response:1");
+    expect(triggers(play(begin(tab.state), tab, idsOf(tab, MENELDOR)).state, tab)).not.toContain("19031:response:1");
   });
 });
 
@@ -201,7 +193,7 @@ describe("South Away! (19034:A:1)", () => {
     // The travel step is passed by (an active location is in play): the Travel phase's action window (4.2) opens.
     const declined = sendUnledgered(begin(tab.state), { type: "DeclineTravel" }, tab.ctx);
     expect(declined.state.phase).toBe("Travel");
-    let run = play(tab, idsOf(tab, SOUTH), undefined, declined);
+    let run = play(declined, tab, idsOf(tab, SOUTH));
     if (run.state.window?.kind === "choose") {
       expect(choices(run.state, tab)).toEqual([chosen]);
       run = sendUnledgered(run, { type: "Choose", optionId: chosen }, tab.ctx);

@@ -11,15 +11,14 @@ import { ruleCause } from "../../rules/core/cause.ts";
 import { placeDamage } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { withMode } from "../../rules/core/state.ts";
-import { spawn } from "../../rules/core/zones.ts";
 import { settle } from "../../rules/engine/machine.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import { playCost } from "../../rules/player/attach.ts";
-import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { attacking, choices, discarded, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const BILBO = "132001";
 const BARD = "132003";
@@ -54,18 +53,8 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-function play(run: Run, tab: Table, cardId: string): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId) }, tab.ctx);
-}
-
 // `count` Dwarf allies with no text in play for the first seat.
 const dwarves = (count: number) => Array.from({ length: count }, () => ({ code: DWARF, seat: 0 }));
-
-// A card of the first seat put in its discard pile.
-function discarded(tab: Table, code: string): { tab: Table; id: string } {
-  const made = spawn(tab.state, code, { zone: "discard", seat: 0 });
-  return { tab: { ...tab, state: made.state }, id: made.id };
-}
 
 describe("Bilbo Baggins (132001:A:3)", () => {
   // "If Bilbo Baggins leaves play, the players have lost the game.": Bilbo is destroyed while another hero is still in play, and the
@@ -177,7 +166,7 @@ describe("Glóin and Bifur (132006:A:1, 132007:A:1)", () => {
   it("132006:A:1 132007:A:1 no Response when put into play from the discard pile", () => {
     for (const [code, effect] of [[GLOIN, "132006:response:1"], [BIFUR, "132007:response:1"]] as const) {
       const scene = table(EFFECTS, { heroes: [{ code: DWARF_HERO, seat: 0 }, { code: PAL, seat: 0 }, { code: SAGE, seat: 0 }], allies: dwarves(3), hand: [{ code: KINSFOLK, seat: 0 }] });
-      const { tab, id } = discarded(scene, code);
+      const { tab, ids: [id = ""] } = discarded(scene, [[code, 0]]);
       let run = play(begin(tab.state), tab, idsOf(tab, KINSFOLK));
       if (run.state.window?.kind === "choose") run = sendUnledgered(run, { type: "Choose", optionId: id }, tab.ctx);
       expect(run.state.cards[id]?.zone).toBe("play");
@@ -211,10 +200,8 @@ describe("To me! O my kinsfolk! (132012:A:1)", () => {
   function scene(effects: readonly Effect[], dwarf: boolean): { tab: Table; gloin: string; plain: string; other: string } {
     const heroes = dwarf ? [{ code: DWARF_HERO, seat: 0 }, { code: PAL, seat: 0 }] : [{ code: PAL, seat: 0 }];
     const start = table(effects, { heroes, allies: dwarf ? [] : dwarves(1), hand: [{ code: KINSFOLK, seat: 0 }], playerDeck: [{ code: "card", seat: 0 }, { code: "card", seat: 0 }] });
-    const gloin = discarded(start, GLOIN);
-    const plain = discarded(gloin.tab, ALLY);
-    const other = discarded(plain.tab, DWARF);
-    return { tab: other.tab, gloin: gloin.id, plain: plain.id, other: other.id };
+    const { tab, ids: [gloin = "", plain = "", other = ""] } = discarded(start, [[GLOIN, 0], [ALLY, 0], [DWARF, 0]]);
+    return { tab, gloin, plain, other };
   }
 
   // "Action: If you control at least 1 Dwarf hero, put a Dwarf ally from your discard pile into play under your control. Put that ally

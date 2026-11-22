@@ -15,7 +15,7 @@ import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-o
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, choices, chooseIfAsked, combat, fillers, playCode, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 
 const ARAGORN = "09001";
@@ -57,20 +57,9 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-const fillers = (count: number, seat = 0) => Array.from({ length: count }, () => ({ code: CARD, seat }));
-
-function play(tab: Table, code: string, run: Run = begin(tab.state)): Run {
-  const card = tab.ids[code]?.find((id) => run.state.cards[id]?.zone === "hand") ?? idsOf(tab, code);
-  return sendUnledgered(run, { type: "PlayCard", cardId: card, payments: payFor(run.state, tab.ctx, card) }, tab.ctx);
-}
-
 function playable(state: ScenarioState, tab: Table, code: string): string | null {
   const card = idsOf(tab, code);
   return refusal(state, { type: "PlayCard", cardId: card, payments: payFor(state, tab.ctx, card) }, tab.ctx);
-}
-
-function chooseIfAsked(run: Run, tab: Table, optionId: string): Run {
-  return run.state.window?.kind === "choose" ? sendUnledgered(run, { type: "Choose", optionId }, tab.ctx) : run;
 }
 
 // Passes the action windows until a Response is offered or the game asks for something else.
@@ -158,7 +147,7 @@ describe("Weather Hills Watchman (09003:A:1)", () => {
     const tab = table(effects, { heroes: [{ code: CORE_ARAGORN, seat: 0 }], hand: [{ code: WATCHMAN, seat: 0 }], playerDeck: deck });
     const [near, deep] = tab.ids[SUMMONS] ?? [];
     const cursor = tab.state.seedCursor;
-    let run = play(tab, WATCHMAN);
+    let run = playCode(tab, WATCHMAN);
     expect(triggers(run.state, tab)).toContain("09003:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, WATCHMAN), effectId: "09003:response:1" }, tab.ctx);
     if (run.state.window?.kind === "choose") {
@@ -176,8 +165,8 @@ describe("Sarn Ford Sentry (09005:A:1)", () => {
   // "Response: After Sarn Ford Sentry enters play, draw 1 card for each enemy engaged with you.": 2 enemies are engaged with you, 1 with the other
   // player: 2 cards.
   lineSpec("09005:A:1", "after it enters play, draws 1 card for each enemy engaged with you", (effects) => {
-    const tab = table(effects, { seats: 2, heroes: [{ code: BERAVOR, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: SENTRY, seat: 0 }], playerDeck: fillers(5), engaged: [{ code: WEAK, seat: 0 }, { code: WEAK, seat: 0 }, { code: WEAK, seat: 1 }] });
-    let run = play(tab, SENTRY);
+    const tab = table(effects, { seats: 2, heroes: [{ code: BERAVOR, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: SENTRY, seat: 0 }], playerDeck: fillers(CARD, 5), engaged: [{ code: WEAK, seat: 0 }, { code: WEAK, seat: 0 }, { code: WEAK, seat: 1 }] });
+    let run = playCode(tab, SENTRY);
     expect(triggers(run.state, tab)).toContain("09005:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, SENTRY), effectId: "09005:response:1" }, tab.ctx);
     expect(run.state.seats[0]?.hand).toHaveLength(2);
@@ -235,7 +224,7 @@ describe("Tireless Hunters (09008:A:1, A:2)", () => {
     const dealt = spawn(opened.state, CARD, { zone: "shadow", enemyId: weak }, "down");
     const tab = { ...scene, state: dealt.state };
     expect(tab.state.cards[weak]?.shadowId).toBe(dealt.id);
-    let run = play(tab, HUNTERS, begin(tab.state));
+    let run = playCode(tab, HUNTERS, begin(tab.state));
     // The enemy already engaged with you is no choice.
     expect(choices(run.state, tab)).not.toContain(idsOf(tab, FRAIL));
     run = chooseIfAsked(run, tab, "otherPlayer");
@@ -248,7 +237,7 @@ describe("Tireless Hunters (09008:A:1, A:2)", () => {
 
   lineSpec("09008:A:2", "engages a staged enemy that holds no shadow card", (effects) => {
     const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }], hand: [{ code: HUNTERS, seat: 0 }], staging: [F3], engaged: [{ code: FRAIL, seat: 0 }] });
-    let run = play(tab, HUNTERS, combat(tab.state, tab));
+    let run = playCode(tab, HUNTERS, combat(tab.state, tab));
     run = chooseIfAsked(run, tab, "staging");
     run = chooseIfAsked(run, tab, idsOf(tab, F3));
     expect(run.state.cards[idsOf(tab, F3)]).toMatchObject({ zone: "engaged", controller: 0 });

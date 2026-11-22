@@ -509,6 +509,10 @@ A cost of X that the player chooses may be 0 (`rr.the-letter-x`): X is offered f
 
 A hero that gains a resource icon belongs to that sphere as well, for paying and for every card that reads a hero's sphere (`rr.spheres-of-influence`: a card with a sphere's icon belongs to that sphere). Aragorn with Celebrían's Stone (01027:A:3) is a Spirit hero while it is attached. Status: researched (the designer's answer in the semi-official FAQ, https://alongextendedparty.com/semi-official-errata-faq-1-10/).
 
+Éomer (146003:A:1): "immediately declare him as an attacker" overrides the requirement that an attacker is ready. The Response is offered after an ordinary commit that exhausted him, he attacks the chosen enemy in the staging area with his Attack, and he stays exhausted and committed. It is not offered with no resource in his pool or no enemy in the staging area. Status: recommended (agent recommendation, no ruling found; read: http://www.cardgamedb.com/index.php/lotr/lord-of-the-rings-card-spoiler/_/lord-of-the-rings-saga-expansions/the-mountain-of-fire/eomer-r2246 and the FAQ 1.7, https://images-cdn.fantasyflightgames.com/ffg_content/lotr-lcg/support/LotR-FAQ-Printer-Friendly.pdf, whose Quick Strike entry declares an exhausted character as an attacker).
+
+Glamdring (19029:A:4): an attack the attached character takes part in counts, so "After attached character destroys an enemy" is offered when he and another character attack one enemy together and destroy it. Status: recommended (agent recommendation, no ruling found; read: https://hallofbeorn.com/LotR/Details/Glamdring-RAR and https://community.fantasyflightgames.com/topic/287449-glamdring/).
+
 Campaign-dealt cards cannot be inactive. That includes encounter cards, quest cards, boons, burdens, and The One Ring. A missing effect id there fails the coverage test, and the scenario stays unplayable.
 
 ### Player side quests, contracts and saga cards
@@ -652,4 +656,6 @@ Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open point
 - A card played from the hand or the deck "at no cost" (Host of Galadhrim, Send for Help, Scavenge for Supplies) needs no resource match (community-sourced, docs/brief.md, Core round).
 - A resource moved to a hero's pool (Errand-rider) is gained, not added: Heir of Mardil answers it, Harbor Master does not (community-sourced, docs/brief.md, Core round).
 - East Road Ranger 10008:A:1: "committed to a side quest" means committed while a side quest is the current quest (`recommended`).
+- Éomer 146003:A:1: his Response is offered after a commit that exhausted him, and he attacks while exhausted (`recommended`, docs/brief.md, Three layers).
+- Glamdring 19029:A:4: an attack the attached character takes part in with another character counts (`recommended`, docs/brief.md, Three layers).
 - The Messenger of the King heroes keep RingsDB's pictures (about 430×600): no larger source was found (agent recommendation, not user-confirmed).

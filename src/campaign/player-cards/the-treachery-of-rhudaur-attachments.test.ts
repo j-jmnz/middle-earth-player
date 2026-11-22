@@ -6,17 +6,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { attachTo } from "../../rules/core/zones.ts";
-import { settle } from "../../rules/engine/machine.ts";
-import { legalTargets } from "../../rules/engine/reduce.ts";
 import { hasTrait } from "../../rules/interpret/conditions.ts";
-import { syncConstants } from "../../rules/interpret/constants.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { answerFirst, attach, enter, fillers, hosts, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ERESTOR = "10084";
 const SPEAR = "10087";
@@ -42,44 +37,13 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-// A hand or deck of `count` filler cards for a seat.
-const fillers = (count: number, seat = 0) => Array.from({ length: count }, () => ({ code: CARD, seat }));
-
-// The engine moves on to `mode` (its phase begins) and runs to its next window.
-function enter(state: ScenarioState, tab: Table, mode: Parameters<typeof withMode>[1]): Run {
-  return begin(settle({ ...withMode(state, mode), window: null }, tab.ctx, []));
-}
-
-function hosts(tab: Table, cardId: string, state: ScenarioState = tab.state): string[] {
-  return [...legalTargets(state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-function play(tab: Table, code: string, hostId: string): Run {
-  const card = idsOf(tab, code);
-  return sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: card, hostId, payments: payFor(tab.state, tab.ctx, card) }, tab.ctx);
-}
-
-// Attaches cards the scene put in play to the hosts named, then brings the constants up to date.
-function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
-  let state = tab.state;
-  for (const [id, host] of pairs) state = attachTo(state, id, host);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
-
-// Answers the question an effect asks with its first option, while it asks one.
-function answerFirst(run: Run, tab: Table): Run {
-  let next = run;
-  for (let guard = 0; guard < 4 && next.state.window?.kind === "choose"; guard += 1) next = sendUnledgered(next, { type: "Choose", optionId: choices(next.state, tab)[0] ?? "" }, tab.ctx);
-  return next;
-}
-
 describe("Elven Spear (10087:A:1, A:2)", () => {
   // "Attach to a Noldor or Silvan hero.": Erestor (Noldor hero) and Legolas (Silvan hero) are offered; Aragorn (a hero of neither trait) and
   // Galdor of the Havens (a Noldor ally, not a hero) are not.
   lineSpec("10087:A:1", "goes on a Noldor or Silvan hero only", (effects) => {
     const tab = table(effects, { heroes: [{ code: ERESTOR, seat: 0 }, { code: LEGOLAS, seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: GALDOR, seat: 0 }], hand: [{ code: SPEAR, seat: 0 }] });
     expect(hosts(tab, idsOf(tab, SPEAR))).toEqual([idsOf(tab, ERESTOR), idsOf(tab, LEGOLAS)].sort());
-    const run = play(tab, SPEAR, idsOf(tab, LEGOLAS));
+    const run = play(begin(tab.state), tab, idsOf(tab, SPEAR), idsOf(tab, LEGOLAS));
     expect(run.state.cards[idsOf(tab, SPEAR)]?.host).toBe(idsOf(tab, LEGOLAS));
   });
 
@@ -96,7 +60,7 @@ describe("Elven Spear (10087:A:1, A:2)", () => {
 
   // "Action: Discard a card from your hand to give attached hero +1 Attack until the end of the phase. Limit 3 times per phase."
   lineSpec("10087:A:2", "discards a card from the hand for +1 Attack to the end of the phase, 3 times a phase", (effects) => {
-    const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }, { code: ARAGORN, seat: 0 }], attached: [{ code: SPEAR, host: LEGOLAS }], hand: fillers(4) });
+    const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }, { code: ARAGORN, seat: 0 }], attached: [{ code: SPEAR, host: LEGOLAS }], hand: fillers(CARD, 4) });
     const [spear, legolas] = [idsOf(tab, SPEAR), idsOf(tab, LEGOLAS)];
     const printed = stat(tab.state, tab, legolas, "attack");
     let run = begin(tab.state);
@@ -131,7 +95,7 @@ describe("Silver Harp (10090:A:2, A:3)", () => {
   // "Response: After a card is discarded from your hand, exhaust Silver Harp to return that card to your hand.": the Elven Spear's cost
   // discards the card.
   lineSpec("10090:A:3", "after a card is discarded from your hand, exhausts to return that card to the hand", (effects) => {
-    const tab = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: LEGOLAS, seat: 0 }], attached: [{ code: HARP, host: EOWYN }, { code: SPEAR, host: LEGOLAS }], hand: fillers(1) });
+    const tab = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: LEGOLAS, seat: 0 }], attached: [{ code: HARP, host: EOWYN }, { code: SPEAR, host: LEGOLAS }], hand: fillers(CARD, 1) });
     const [harp, card] = [idsOf(tab, HARP), idsOf(tab, CARD)];
     let run = answerFirst(sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, SPEAR), effectId: "10087:action:1" }, tab.ctx), tab);
     expect(run.state.cards[card]?.zone).toBe("discard");
@@ -143,7 +107,7 @@ describe("Silver Harp (10090:A:2, A:3)", () => {
   });
 
   it("10090:A:3 is not offered when a card is discarded from another player's hand", () => {
-    const scene = table(EFFECTS, { seats: 2, heroes: [{ code: EOWYN, seat: 0 }, { code: LEGOLAS, seat: 1 }], allies: [{ code: SPEAR, seat: 1 }], attached: [{ code: HARP, host: EOWYN }], hand: fillers(1, 1) });
+    const scene = table(EFFECTS, { seats: 2, heroes: [{ code: EOWYN, seat: 0 }, { code: LEGOLAS, seat: 1 }], allies: [{ code: SPEAR, seat: 1 }], attached: [{ code: HARP, host: EOWYN }], hand: fillers(CARD, 1, 1) });
     const tab = attach(scene, [[idsOf(scene, SPEAR), idsOf(scene, LEGOLAS)]]);
     const theirs = { ...tab.state, activeSeat: 1 };
     const run = answerFirst(sendUnledgered(begin(theirs), { type: "Trigger", cardId: idsOf(tab, SPEAR), effectId: "10087:action:1" }, tab.ctx), tab);
@@ -167,7 +131,7 @@ describe("Elf-friend (10093:A:1, A:2)", () => {
     const tab = table(effects, { heroes: [{ code: ARAGORN, seat: 0 }, { code: LEGOLAS, seat: 0 }], hand: [{ code: ELF_FRIEND, seat: 0 }, { code: SPEAR, seat: 0 }] });
     const aragorn = idsOf(tab, ARAGORN);
     expect(hosts(tab, idsOf(tab, SPEAR))).not.toContain(aragorn);
-    const run = play(tab, ELF_FRIEND, aragorn);
+    const run = play(begin(tab.state), tab, idsOf(tab, ELF_FRIEND), aragorn);
     expect(hasTrait(run.state, aragorn, "Noldor", tab.ctx)).toBe(true);
     expect(hasTrait(run.state, aragorn, "Silvan", tab.ctx)).toBe(true);
     expect(hasTrait(run.state, idsOf(tab, LEGOLAS), "Noldor", tab.ctx)).toBe(false);

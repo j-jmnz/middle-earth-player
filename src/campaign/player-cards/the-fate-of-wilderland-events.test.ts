@@ -7,15 +7,13 @@ import { beforeAll, describe, expect } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { spawn } from "../../rules/core/zones.ts";
-import { settle } from "../../rules/engine/machine.ts";
+import { type ScenarioState } from "../../rules/core/state.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
-import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, playerTable, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { choices, combat, discarded, endRound, play, playerTable, sendUnledgered } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const GIMLI = "01004";
@@ -62,36 +60,8 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-function play(run: Run, tab: Table, cardId: string, hostId?: string): Run {
-  return sendUnledgered(run, { type: "PlayCard", cardId, payments: payFor(run.state, tab.ctx, cardId), ...(hostId ? { hostId } : {}) }, tab.ctx);
-}
-
 function playable(state: ScenarioState, tab: Table): string[] {
   return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
-}
-
-// The engine moves on to `mode` (its phase begins) and runs to its next window.
-function enter(state: ScenarioState, tab: Table, mode: Parameters<typeof withMode>[1]): Run {
-  return begin(settle({ ...withMode(state, mode), window: null }, tab.ctx, []));
-}
-
-// The end of the round: its action window is passed, so the round ends.
-function endRound(state: ScenarioState, tab: Table): Run {
-  let run = enter(state, tab, "endRound");
-  for (let guard = 0; guard < 10 && run.state.window?.kind === "frameAction"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
-  return run;
-}
-
-// Cards of these codes put into a seat's discard pile.
-function discarded(tab: Table, rows: readonly (readonly [string, number])[]): { tab: Table; ids: string[] } {
-  let state = tab.state;
-  const ids: string[] = [];
-  for (const [code, seat] of rows) {
-    const made = spawn(state, code, { zone: "discard", seat });
-    state = made.state;
-    ids.push(made.id);
-  }
-  return { tab: { ...tab, state }, ids };
 }
 
 describe("The King's Return (19147:A:1)", () => {

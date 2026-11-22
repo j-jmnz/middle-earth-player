@@ -95,6 +95,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: "all", note: "An Action or Response of a player card is not offered when it could change nothing, for example Orophin with no Silvan ally in your discard pile, Mirror of Galadriel with an empty deck, or Aragorn's ready Action while he is ready." },
   { version: 38, scenarios: "all", note: "Heed the Dream offers the 3 Leadership resources for the second search only when the first search found a card." },
   { version: 38, scenarios: "all", note: "Responses to a successful quest, like Expert Treasure-hunter, Haleth and Black Key, are offered after the quest resolves, when the character was committed to it." },
+  { version: 38, scenarios: "all", note: "After Éomer commits to the quest, his Response is offered although committing exhausted him: he attacks an enemy in the staging area and stays exhausted." },
 ];
 
 export const ENGINE_VERSION = 38;

@@ -8,18 +8,14 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { attachTo } from "../../rules/core/zones.ts";
-import { settle } from "../../rules/engine/machine.ts";
-import { legalTargets } from "../../rules/engine/reduce.ts";
-import { syncConstants } from "../../rules/interpret/constants.ts";
+import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
 import { playCost } from "../../rules/player/attach.ts";
 import { engagementCostOf, stagingThreat } from "../../rules/quest/quest.ts";
-import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, MERRY, SAM, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attach, choices, chooseIfAsked, combat, enter, hosts, playCode, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const FATTY = "141005";
 const BARLIMAN = "141007";
@@ -52,31 +48,6 @@ beforeAll(async () => {
   cards.set(WEAK, definePrinted({ code: WEAK, name: "Weak", type: "enemy", threat: 1, engagementCost: 6, attack: 2, defense: 0, health: 9 }));
   base = { ...starter, cards };
 });
-
-// The engine moves on to `mode` (its phase begins) and runs to its next window.
-function enter(state: ScenarioState, tab: Table, mode: Parameters<typeof withMode>[1]): Run {
-  return begin(settle({ ...withMode(state, mode), window: null }, tab.ctx, []));
-}
-
-function hosts(tab: Table, cardId: string): string[] {
-  return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-function play(tab: Table, code: string, run: Run = begin(tab.state)): Run {
-  const card = tab.ids[code]?.find((id) => run.state.cards[id]?.zone === "hand") ?? idsOf(tab, code);
-  return sendUnledgered(run, { type: "PlayCard", cardId: card, payments: payFor(run.state, tab.ctx, card) }, tab.ctx);
-}
-
-// Attaches cards the scene put in play to the hosts named, then brings the constants up to date.
-function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
-  let state = tab.state;
-  for (const [id, host] of pairs) state = attachTo(state, id, host);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
-
-function chooseIfAsked(run: Run, tab: Table, optionId: string): Run {
-  return run.state.window?.kind === "choose" ? sendUnledgered(run, { type: "Choose", optionId }, tab.ctx) : run;
-}
 
 describe("Dagger of Westernesse (141014:A:1)", () => {
   // "Attach to a hero. Restricted.": Legolas and Aragorn are offered; a plain ally is not.
@@ -139,7 +110,7 @@ describe("Farmer Maggot (141008:A:1)", () => {
   for (const [enemy, damage] of [[CHEAP, 1], [DEAR, 2]] as const) {
     lineSpec("141008:A:1", `after it enters play, deals ${damage} damage to an engaged enemy of engagement cost ${enemy === CHEAP ? "2" : "50"}`, (effects) => {
       const tab = table(effects, { seats: 2, heroes: [{ code: LEGOLAS, seat: 0 }, { code: "pal", seat: 1 }], hand: [{ code: MAGGOT, seat: 0 }], engaged: [{ code: enemy, seat: 0 }, { code: WEAK, seat: 1 }] });
-      let run = play(tab, MAGGOT);
+      let run = playCode(tab, MAGGOT);
       expect(triggers(run.state, tab)).toContain("141008:response:1");
       run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, MAGGOT), effectId: "141008:response:1" }, tab.ctx);
       // The enemy engaged with the other player is no choice.
@@ -153,14 +124,14 @@ describe("Farmer Maggot (141008:A:1)", () => {
   // "After Farmer Maggot enters play": another ally entering play while Maggot is already in play is not his triggering condition.
   it("141008:A:1 is not offered when another ally enters play", () => {
     const tab = table(EFFECTS, { heroes: [{ code: LEGOLAS, seat: 0 }, { code: SAM, seat: 0 }], allies: [{ code: MAGGOT, seat: 0 }], hand: [{ code: ALLY, seat: 0 }], engaged: [{ code: DEAR, seat: 0 }] });
-    const run = play(tab, ALLY);
+    const run = playCode(tab, ALLY);
     expect(run.state.cards[idsOf(tab, ALLY)]?.zone).toBe("play");
     expect(triggers(run.state, tab)).not.toContain("141008:response:1");
   });
 
   it("141008:A:1 is not offered with no enemy engaged with you", () => {
     const tab = table(EFFECTS, { heroes: [{ code: LEGOLAS, seat: 0 }], hand: [{ code: MAGGOT, seat: 0 }], staging: [WEAK] });
-    expect(triggers(play(tab, MAGGOT).state, tab)).not.toContain("141008:response:1");
+    expect(triggers(playCode(tab, MAGGOT).state, tab)).not.toContain("141008:response:1");
   });
 });
 
@@ -179,7 +150,7 @@ describe("Smoke Rings (141010:A:1)", () => {
     const tab = attach(scene, [[a ?? "", idsOf(scene, FATTY)], [b ?? "", idsOf(scene, SAM)], [c ?? "", idsOf(scene, MERRY)]]);
     const willpower = (state: ScenarioState, code: string) => stat(state, tab, idsOf(tab, code), "willpower");
     const before = [FATTY, SAM, MERRY, "141004"].map((code) => willpower(tab.state, code));
-    let run = play(tab, SMOKE_RINGS);
+    let run = playCode(tab, SMOKE_RINGS);
     // The threat is lowered by an event: the Hobbit Pipes' Response (141015:A:2) is offered and passed.
     for (let guard = 0; guard < 4 && run.state.window?.kind === "response"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
     expect(run.state.seats[0]?.threat).toBe(6);
@@ -206,7 +177,7 @@ describe("Take No Notice (141011:A:1, A:2)", () => {
     const tab = table(effects, { heroes: [{ code: BERAVOR, seat: 0 }, { code: GLOIN, seat: 0 }], hand: [{ code: TAKE_NO_NOTICE, seat: 0 }], staging: [WEAK], engaged: [{ code: CHEAP, seat: 0 }] });
     const [weak, cheap] = [idsOf(tab, WEAK), idsOf(tab, CHEAP)];
     const cost = (state: ScenarioState, id: string) => engagementCostOf(state, state.cards[id]!, tab.ctx.cards);
-    const run = play(tab, TAKE_NO_NOTICE);
+    const run = playCode(tab, TAKE_NO_NOTICE);
     expect(cost(run.state, weak)).toBe(6 + 5);
     expect(cost(run.state, cheap)).toBe(2 + 5);
     expect(cost(enter(run.state, tab, "questCommit").state, weak)).toBe(6 + 5);

@@ -9,16 +9,14 @@ import { EFFECTS } from "../../effects/index.ts";
 import { ruleCause } from "../../rules/core/cause.ts";
 import { placeDamage } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { attachTo } from "../../rules/core/zones.ts";
-import { syncConstants } from "../../rules/interpret/constants.ts";
+import { updateCard, withMode } from "../../rules/core/state.ts";
 import { settle } from "../../rules/engine/machine.ts";
-import { legalIntents, legalTargets, type ReduceContext } from "../../rules/engine/reduce.ts";
+import { legalIntents } from "../../rules/engine/reduce.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attach, choices, hosts, passAll, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const HELM = "19003";
 const CLEARING = "19006";
@@ -52,27 +50,6 @@ beforeAll(async () => {
   cards.set(CHIEF, definePrinted({ code: CHIEF, name: "Chief", type: "enemy", isUnique: true, threat: 1, engagementCost: 3, attack: 2, defense: 1, health: 6 }));
   base = { ...starter, cards };
 });
-
-function hosts(tab: Table, cardId: string): string[] {
-  return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-// Attaches cards the scene put in play to the hosts named, then brings the constants up to date.
-function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
-  let state = tab.state;
-  for (const [id, host] of pairs) state = attachTo(state, id, host);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
-
-// Passes the open action and response windows until the game asks for something else.
-function passAll(run: Run, ctx: ReduceContext): Run {
-  let next = run;
-  const open = (state: ScenarioState) => (state.window?.kind === "frameAction" || state.window?.kind === "response" || state.window?.kind === "optionalEngage") && legalIntents(state, ctx).some((intent) => intent.type === "Pass");
-  for (let guard = 0; guard < 30 && open(next.state); guard += 1) next = sendUnledgered(next, { type: "Pass" }, ctx);
-  return next;
-}
-
-const printed = (tab: Table, code: string, which: "health" | "willpower"): number => tab.ctx.cards.get(code)?.[which] ?? 0;
 
 describe("Squire's Helm (19003)", () => {
   // "Attach to an ally. Restricted. Limit 1 per ally.": the Snowbourn Scout and the Champion; not the heroes, nor the ally that wears
@@ -158,7 +135,7 @@ describe("Grey Cloak (19009)", () => {
     }
     expect(run.state.cards[dunhere]?.exhausted).toBe(true);
     expect(run.state.cards[cloak]?.zone).toBe("discard");
-    run = passAll(run, tab.ctx);
+    run = passAll(run, tab.ctx, { responses: true, engage: true });
     expect(run.state.cards[chief]?.zone).toBe("engaged");
     expect(run.state.cards[cheap]?.zone).toBe("staging");
   });
@@ -167,7 +144,7 @@ describe("Grey Cloak (19009)", () => {
   it("19009:A:2 is an Encounter Action, and needs a non-unique enemy in the staging area", () => {
     const { tab, run } = scene(EFFECTS);
     expect(triggers(run.state, tab)).toContain("19009:action:1");
-    expect(passAll(run, tab.ctx).state.cards[idsOf(tab, CHEAP)]?.zone).toBe("engaged");
+    expect(passAll(run, tab.ctx, { responses: true, engage: true }).state.cards[idsOf(tab, CHEAP)]?.zone).toBe("engaged");
     expect(triggers(table(EFFECTS, { heroes: [{ code: DUNHERE, seat: 0 }], attached: [{ code: CLOAK, host: DUNHERE }], staging: [CHEAP] }).state, tab)).not.toContain("19009:action:1");
     const unique = scene(EFFECTS, [CHIEF]);
     expect(triggers(unique.run.state, unique.tab)).not.toContain("19009:action:1");

@@ -10,14 +10,12 @@ import { ruleCause } from "../../rules/core/cause.ts";
 import { placeDamage } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
-import { attachTo } from "../../rules/core/zones.ts";
-import { syncConstants } from "../../rules/interpret/constants.ts";
-import { legalIntents, legalTargets } from "../../rules/engine/reduce.ts";
+import { legalIntents } from "../../rules/engine/reduce.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attach, attacking, choices, hosts, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ELVENKING = "19057";
 const ORCRIST = "19058";
@@ -51,17 +49,6 @@ beforeAll(async () => {
   cards.set(TOUGH, definePrinted({ code: TOUGH, name: "Tough", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 0, health: 20 }));
   base = { ...starter, cards };
 });
-
-function hosts(tab: Table, cardId: string): string[] {
-  return [...legalTargets(tab.state, { type: "PlayCard", cardId }, tab.ctx)].sort();
-}
-
-// Attaches cards the scene put in play to the hosts named, then brings the constants up to date.
-function attach(tab: Table, pairs: readonly (readonly [string, string])[]): Table {
-  let state = tab.state;
-  for (const [id, host] of pairs) state = attachTo(state, id, host);
-  return { ...tab, state: syncConstants(state, tab.ctx) };
-}
 
 describe("The Elvenking (19057)", () => {
   // "Attach to a Silvan hero.": the Silvan Lord; not the Sage, nor the Lórien Guide (a Silvan ally).
