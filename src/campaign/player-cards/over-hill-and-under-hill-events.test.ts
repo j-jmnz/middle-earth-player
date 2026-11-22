@@ -29,6 +29,8 @@ const CLEAVER = "131016";
 const MISCHIEF = "131018";
 // Core Gimli (a Tactics Dwarf hero) and Dwarven Axe (a Weapon attachment).
 const GIMLI = "01004";
+// Core Legolas: a Tactics hero for the second seat.
+const LEGOLAS = "01005";
 const AXE = "01041";
 const WEAK = "weak";
 const TOUGH = "tough";
@@ -38,7 +40,7 @@ let base: Awaited<ReturnType<typeof starterBase>>;
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const cards = new Map([...starter.cards, ...(await loadPrinted([THORIN, ORI, FILI, KILI, BOFUR, GANDALF, TALE, FOE_HAMMER, CLEAVER, MISCHIEF, GIMLI, AXE]))]);
+  const cards = new Map([...starter.cards, ...(await loadPrinted([THORIN, ORI, FILI, KILI, BOFUR, GANDALF, TALE, FOE_HAMMER, CLEAVER, MISCHIEF, GIMLI, AXE, LEGOLAS]))]);
   cards.set(WEAK, definePrinted({ code: WEAK, name: "Weak", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 0, health: 1 }));
   cards.set(TOUGH, definePrinted({ code: TOUGH, name: "Tough", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 0, health: 20 }));
   cards.set(ORC, definePrinted({ code: ORC, name: "Orc", type: "enemy", traits: ["Orc"], threat: 1, engagementCost: 40, attack: 1, defense: 0, health: 20 }));
@@ -177,6 +179,29 @@ describe("Goblin-cleaver (131016:A:1)", () => {
     const unarmed = table(effects, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: CLEAVER, seat: 0 }], engaged: [{ code: TOUGH, seat: 0 }] });
     const window = combat(unarmed.state, unarmed);
     if (window.state.window?.kind === "frameAction") expect(playable(window.state, unarmed, CLEAVER)).not.toBeNull();
+  });
+});
+
+describe("Goblin-cleaver with another player's Weapon (131016:A:1)", () => {
+  // "Exhaust a Weapon card attached to a hero you control": seat 1 plays Dwarven Axe on seat 0's Gimli. rr.attachment-cards: "When an attachment enters play attached to a
+  // character under another player's control, that player gains control of the attachment", so seat 0 controls the Axe and can exhaust it for Goblin-cleaver.
+  it("131016:A:1 exhausts a Weapon another player played on your hero", () => {
+    const made = buildTable(base, { ring: "none", start: "planning", seats: 2, heroes: [{ code: GIMLI, seat: 0 }, { code: LEGOLAS, seat: 1 }], hand: [{ code: CLEAVER, seat: 0 }, { code: AXE, seat: 1 }], engaged: [{ code: TOUGH, seat: 0 }], effects: EFFECTS });
+    const tab = { ...made, state: syncConstants(fund(fund(made.state, 0, 3), 1, 3), made.ctx) };
+    const [axe, gimli, tough, cleaver] = [idsOf(tab, AXE), idsOf(tab, GIMLI), idsOf(tab, TOUGH), idsOf(tab, CLEAVER)];
+    // Seat 1's planning turn: it pays for the Axe and attaches it to Gimli.
+    const turn = { ...tab.state, activeSeat: 1, planningSeat: 1 };
+    const planned = send(begin(turn), { type: "PlayCard", cardId: axe, hostId: gimli, payments: payFor(turn, tab.ctx, axe, 1) }, tab.ctx);
+    expect(planned.state.cards[axe]).toMatchObject({ host: gimli, controller: 0, owner: 1 });
+    // The combat phase's action window: seat 0 plays Goblin-cleaver.
+    const opened = combat(planned.state, tab);
+    expect(opened.state.activeSeat).toBe(0);
+    let run = playIn(opened.state, tab, CLEAVER);
+    if (choices(run.state, tab).includes(axe)) run = send(run, { type: "Choose", optionId: axe }, tab.ctx);
+    if (choices(run.state, tab).includes(tough)) run = send(run, { type: "Choose", optionId: tough }, tab.ctx);
+    expect(run.state.cards[axe]?.exhausted).toBe(true);
+    expect(run.state.cards[tough]?.damage).toBe(2);
+    expect(run.state.cards[cleaver]?.zone).toBe("discard");
   });
 });
 

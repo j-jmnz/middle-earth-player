@@ -277,6 +277,25 @@ describe("Gandalf (131010:A:1, A:2)", () => {
   });
 });
 
+describe("Spare Hood and Cloak (131012:A:2)", () => {
+  // "Action: Exhaust Spare Hood and Cloak and exhaust attached character to ready another character. Then, attach Spare Hood and Cloak to that character."
+  // rr.then: the text after "Then" resolves only if the text before it resolved in full. Readying a character that is already ready does not resolve,
+  // so the Cloak must stay where it is (or the ready character must not be a legal choice).
+  // FAULT: with the only other character already ready, the engine picks it without asking, "readies" it and moves the Cloak to it anyway.
+  it.fails("131012:A:2 does not move the Cloak to a character that was already ready", () => {
+    const tab = table(EFFECTS, { heroes: [{ code: NORI, seat: 0 }], attached: [{ code: HOOD, host: NORI }], allies: [{ code: FILI, seat: 0 }] });
+    const [nori, hood, fili] = [idsOf(tab, NORI), idsOf(tab, HOOD), idsOf(tab, FILI)];
+    expect(tab.state.cards[fili]?.exhausted).toBe(false);
+    const result = reduce(tab.state, { type: "Trigger", cardId: hood, effectId: "131012:action:1" }, tab.ctx);
+    // The Action is refused: nothing is changed, which the card allows.
+    if (!result.ok) return;
+    let run: Run = { state: result.state, steps: [...result.steps] };
+    if (choices(run.state, tab).includes(fili)) run = send(run, { type: "Choose", optionId: fili }, tab.ctx);
+    expect(run.state.cards[hood]?.host).toBe(nori);
+    expect(run.state.cards[fili]?.attachments).not.toContain(hood);
+  });
+});
+
 describe("Cram, Spare Hood and Cloak, Thrór's Map (131011:A:1, 131012:A:1, 131013:A:1)", () => {
   // "Attach to a hero."
   for (const [code, line] of [[CRAM, "131011:A:1"], [MAP, "131013:A:1"]] as const) {
