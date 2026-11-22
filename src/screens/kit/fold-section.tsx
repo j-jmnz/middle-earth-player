@@ -18,6 +18,7 @@ import { usePalette } from "./palette-hook";
 import { readSections, writeSection, writeSections } from "../data/section-store";
 import { Text } from "../../ui/text";
 import { announce } from "../../ui/announce";
+import { playSound } from "../../ui/sound/sound";
 
 export type FoldIds = readonly { id: string; defaultFolded: boolean }[];
 
@@ -102,6 +103,7 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, le
         accessibilityState={{ expanded: !folded }}
         accessibilityLabel={foldWords(title, folded, counted)}
         onPress={() => {
+          playSound(folded ? "ui.unfold" : "ui.fold");
           onFold(!folded);
           announce(`${title} ${folded ? "unfolded" : "folded"}`);
         }}

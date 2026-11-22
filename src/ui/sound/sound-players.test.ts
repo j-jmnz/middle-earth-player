@@ -19,6 +19,7 @@ vi.mock("./audio-player", () => ({
     calls.players.push(fake);
     return {
       duration: 0.3,
+      currentTime: 1,
       get playing() {
         return fake.playing;
       },
