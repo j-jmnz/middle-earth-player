@@ -1,4 +1,4 @@
-// Rules: rr.card-types, rr.ownership-and-control, rr.constant-ability, rr.player-elimination, hob.bilbo-multiplayer-ohauh, hob.bilbo-multiplayer-otd (data/rules/entries.json).
+// Rules: rr.card-types, rr.ownership-and-control, rr.constant-ability, rr.player-elimination, hob.bilbo-multiplayer-ohauh, hob.bilbo-multiplayer-otd, mec113.multiplayer-aragorn, mec112.aragorn (data/rules/entries.json).
 //
 // Rules the play family's constants keep true at all times, checked by settle (machine.ts) with the other sweeps: an ally that
 // gained the hero card type sits among its controller's heroes and functions as a hero ("Attached character loses the ally card
@@ -138,7 +138,7 @@ export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: Engin
       } else if (id && held?.zone === "staging" && instruction.intoPlay === true) next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up", exhausted: false });
       else if (id && (instruction.intoPlay !== true || instruction.follows === true) && held?.controller !== holder) {
         next = giveControl(next, id, holder, ctx.cards);
-        // "If Bilbo Baggins is the last hero under a player's control, and he then leaves that player's control, that player is immediately eliminated" (hob.bilbo-multiplayer-ohauh, hob.bilbo-multiplayer-otd; rr.player-elimination).
+        // "If Bilbo Baggins is the last hero under a player's control, and he then leaves that player's control, that player is immediately eliminated" (hob.bilbo-multiplayer-ohauh, hob.bilbo-multiplayer-otd); the same words for Aragorn (mec113.multiplayer-aragorn; in The Two Towers, mec112.aragorn with rr.player-elimination: a player with no heroes is eliminated).
         if (held?.zone === "heroes") next = eliminateEmpties(next, steps);
       }
     } else if (instruction.verb === "DiscardWhen" && modifiedStat(next, source, instruction.stat, ctx.cards) <= instruction.max) {
