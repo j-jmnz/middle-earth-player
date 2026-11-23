@@ -8,6 +8,7 @@ import { compact, done, isObj, jsonOf, joinAnd, quoted, str, withArticle, type C
 import { renderPick } from "./picks.ts";
 import { ANGMAR_TEMPLATES } from "./families/angmar.ts";
 import { ESCAPE_TEMPLATES } from "./families/escape.ts";
+import { BURGLE_TEMPLATES } from "./families/burgle.ts";
 import { ATTACH_TEMPLATES } from "./attach.ts";
 import { GUARDIAN_SAMPLES, GUARDIAN_TEMPLATES } from "./families/guardian.ts";
 import { AMBUSH_TEMPLATES } from "./families/ambush.ts";
@@ -25,6 +26,7 @@ import { INVESTIGATION_SAMPLES, INVESTIGATION_TEMPLATES } from "./families/inves
 import { searchLimits, searchPolicy, WIZARDS_QUEST_SAMPLES, WIZARDS_QUEST_TEMPLATES } from "./families/wizards-quest.ts";
 
 export { ESCAPE_SAMPLES } from "./families/escape.ts";
+export { BURGLE_SAMPLES } from "./families/burgle.ts";
 export { DREADNAUGHT_SAMPLES, ERECH_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, RUINS_SAMPLES, SIEGE_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES, WIZARDS_QUEST_SAMPLES };
 
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
@@ -76,7 +78,7 @@ const FLIP_GOLLUM = {
 } as const;
 
 export const TEMPLATES: Readonly<Record<string, Template>> = {
-  ...FAMILY_TEMPLATES, ...ESCAPE_TEMPLATES, ...AMBUSH_TEMPLATES, ...ANGMAR_TEMPLATES, ...LONG_DARK_TEMPLATES, ...STONE_TEMPLATES,
+  ...FAMILY_TEMPLATES, ...ESCAPE_TEMPLATES, ...BURGLE_TEMPLATES, ...AMBUSH_TEMPLATES, ...ANGMAR_TEMPLATES, ...LONG_DARK_TEMPLATES, ...STONE_TEMPLATES,
   ...GUARDIAN_TEMPLATES, ...ATTACH_TEMPLATES, ...STAT_TEMPLATES,
   ...SMAUG_TEMPLATES, ...ERECH_TEMPLATES, ...FOG_TEMPLATES, ...RUINS_TEMPLATES, ...SIEGE_TEMPLATES, ...GULDUR_TEMPLATES, ...DREADNAUGHT_TEMPLATES, ...INVESTIGATION_TEMPLATES, ...WIZARDS_QUEST_TEMPLATES,
   PlayOnlyIf: (i, ctx) => ({ text: `(constant on a card in hand, read when it would be played) it can only be played while ${renderCondition(i.condition, ctx)}`, read: ["condition"] }),
