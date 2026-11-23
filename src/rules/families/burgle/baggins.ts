@@ -1,4 +1,4 @@
-// Rules: rr.resources, rr.cost, rr.then (data/rules/entries.json); ledger lines 132048:A:2, 132045:A:2. The conditions and the one spending verb the Lonely Mountain's cards add to the core's: Baggins resources, the top card of the encounter deck.
+// Rules: rr.resources, rr.cost, rr.then, rr.first-player (data/rules/entries.json); ledger lines 132048:A:2, 132045:A:2. The conditions and the one spending verb the Lonely Mountain's cards add to the core's: Baggins resources, the top card of the encounter deck.
 import type { Condition, Instruction } from "../../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -17,7 +17,7 @@ const read = (scope: Scope): AmountScope => ({ actor: scope.actor, sourceId: sco
 export function bagginsCondition(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean | null {
   switch (condition.kind) {
     case "bagginsAtLeast":
-      return spendablePools(state, scope.actor, { sphere: "baggins" }, ctx).total >= resolveAmount(state, condition.amount, read(scope), ctx);
+      return spendablePools(state, state.firstPlayer, { sphere: "baggins" }, ctx).total >= resolveAmount(state, condition.amount, read(scope), ctx);
     case "encounterTop": {
       const top = state.encounterDeck[0];
       const card = top ? state.cards[top] : undefined;
@@ -28,10 +28,10 @@ export function bagginsCondition(state: ScenarioState, condition: Condition, sco
   }
 }
 
-/** SpendBaggins: the actor spends the amount from the pools of the heroes he controls with a Baggins icon, the pool with the most first; with fewer than that nothing is spent. Announced as spent, so what hears a hero's spending hears it. */
+/** SpendBaggins: the first player (Bilbo's controller, whoever revealed the card) spends the amount from the pools of the heroes he controls with a Baggins icon, the pool with the most first; with fewer than that nothing is spent. Announced as spent, so what hears a hero's spending hears it. */
 export function spendBaggins(state: ScenarioState, instruction: Extract<Instruction, { verb: "SpendBaggins" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
   const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
-  const { pools, total } = spendablePools(state, focus.seat, { sphere: "baggins" }, ctx);
+  const { pools, total } = spendablePools(state, state.firstPlayer, { sphere: "baggins" }, ctx);
   if (amount <= 0 || total < amount) return state;
   let next = state;
   let left = amount;

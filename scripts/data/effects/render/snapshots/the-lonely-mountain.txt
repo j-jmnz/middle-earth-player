@@ -118,19 +118,19 @@ Scenario piles that place cards with no record (quest: 132071 A Warm Welcome; qu
     - the first player chooses one of:
       * option "enemy":
         - travel to this location
-        - [json LookAtEncounterTop {"verb":"LookAtEncounterTop"}]
+        - the acting player looks at the top card of the encounter deck in a look window (it is not revealed and stays on the deck)
         - then, if not (the top card of the encounter deck is an enemy (false with an empty deck)) (checked when this step runs, after the steps above; not tied to whether they did anything): return this card to the staging area
       * option "location":
         - travel to this location
-        - [json LookAtEncounterTop {"verb":"LookAtEncounterTop"}]
+        - the acting player looks at the top card of the encounter deck in a look window (it is not revealed and stays on the deck)
         - then, if not (the top card of the encounter deck is a location (false with an empty deck)) (checked when this step runs, after the steps above; not tied to whether they did anything): return this card to the staging area
       * option "treachery":
         - travel to this location
-        - [json LookAtEncounterTop {"verb":"LookAtEncounterTop"}]
+        - the acting player looks at the top card of the encounter deck in a look window (it is not revealed and stays on the deck)
         - then, if not (the top card of the encounter deck is a treachery (false with an empty deck)) (checked when this step runs, after the steps above; not tied to whether they did anything): return this card to the staging area
       * option "objective":
         - travel to this location
-        - [json LookAtEncounterTop {"verb":"LookAtEncounterTop"}]
+        - the acting player looks at the top card of the encounter deck in a look window (it is not revealed and stays on the deck)
         - then, if not (the top card of the encounter deck is a objective (false with an empty deck)) (checked when this step runs, after the steps above; not tied to whether they did anything): return this card to the staging area
 
 ## 132046 Desolation of Smaug
@@ -313,4 +313,4 @@ Scenario piles that place cards with no record (quest: 132071 A Warm Welcome; qu
     - one set-aside card with code 132040 joins the staging area (it is not revealed)
     - the players return to stage 2 of the quest deck (side B: the stage comes back as if just beginning, with no progress; the progress on the active location and every other card stay; no When Revealed or Setup resolves again)
 
-(rendered pieces: 191 by template, 8 as JSON)
+(rendered pieces: 195 by template, 4 as JSON)
