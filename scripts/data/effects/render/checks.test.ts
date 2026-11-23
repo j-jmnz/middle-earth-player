@@ -19,9 +19,29 @@ describe("render checks", () => {
     expect(tags("Any player may exhaust a Lore hero.")).toEqual(["any-player", "sphere"]);
   });
 
-  it("tags an enemy named with no zone, and not one with a zone", () => {
-    expect(tags("Each enemy gets +1 Attack.")).toEqual(["enemy-zone"]);
-    expect(tags("Each enemy engaged with you gets +1 Attack.")).toEqual([]);
+  it("names the doc entry each check stands for", () => {
+    const [check] = lineChecks("Deal 1 damage, then draw a card.", []);
+    expect(check).toMatchObject({ tag: "then", entry: "Then" });
+    expect(checkLines("Deal 1 damage, then draw a card.", [])[0]).toMatch(/\[entry: Then\]$/);
+  });
+
+  it("tags a sphere by a sphere word or icon, not by every non-", () => {
+    expect(tags("Choose a non-Fellowship hero.")).toEqual(["sphere"]);
+    expect(tags("Each hero with a printed resource icon of that sphere gets +1 Willpower.")).toContain("sphere");
+    expect(tags("Attach to a non-unique enemy.")).toEqual([]);
+    expect(tags("Choose a non-Ship objective.")).toEqual([]);
+    expect(tags("Discard the top card of the encounter deck. If it is a non-unique location, add it to the staging area.")).toEqual([]);
+  });
+
+  it("tags an enemy filter with no zone from the record, not from the word enemy", () => {
+    const loose = record("action", [{ verb: "Pick", pick: { type: "enemy", control: "you" } }]);
+    const zoned = record("action", [{ verb: "Pick", pick: { type: "enemy", staging: true } }]);
+    expect(tags("Choose an enemy.", [loose])).toContain("enemy-zone");
+    expect(tags("Choose an enemy.", [zoned])).not.toContain("enemy-zone");
+    // Lines that name enemies and pick none.
+    expect(tags("Pillage. (After this enemy attacks, discard 1 card from your hand.)")).toEqual([]);
+    expect(tags("Set aside all 7 unique enemies from the encounter deck.")).toEqual([]);
+    expect(tags("Each enemy gets +1 Attack.")).toEqual([]);
   });
 
   it("tags an Action or a Response whose first step is a Pick, from the record", () => {
