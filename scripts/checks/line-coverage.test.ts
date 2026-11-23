@@ -1,12 +1,9 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-
 import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../src/effects/index.ts";
 
 import { loadCards } from "../data/load-cards.ts";
-import { ROOT, tracked } from "./tracked.ts";
+import { namedInTests } from "./tracked.ts";
 
 // Every effect record is named by a test: its id, or one of the printed lines it implements, stands in a test file. That holds for the deck-legal player cards and for every other card (encounter cards,
 // quest stages, objectives, campaign cards, boons, burdens and treasures). The smokes (scripts/card-smoke) only show that a record runs without breaking the game, so they do not count. A record that no
@@ -20,16 +17,6 @@ const EXEMPT: Readonly<Record<string, string>> = {};
 
 // The card types a player builds a deck from.
 const PLAYER_TYPES = new Set(["hero", "ally", "attachment", "event", "player-side-quest", "contract"]);
-// A record id (01026:action:1) or a printed line id (01026:A:1), as a whole token.
-const NAME = /(?<![\w:])(\d{2,6}:[A-Za-z]+:\d+)(?![\w])/g;
-
-/** Every record id and line id that a test file names. */
-function namedInTests(): Set<string> {
-  const named = new Set<string>();
-  const files = tracked(["src", "test"]).filter((file) => /\.(ts|tsx)$/.test(file) && (file.startsWith("test/") || /\.test\.tsx?$/.test(file)));
-  for (const file of files) for (const found of readFileSync(path.join(ROOT, file), "utf8").matchAll(NAME)) named.add(found[1]!);
-  return named;
-}
 
 describe("line coverage", () => {
   const playerCodes = new Set(loadCards().filter((card) => PLAYER_TYPES.has(card.type) && card.deckLegal).map((card) => card.code));
