@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town), rr.cancel, rr.damage, faq.additional-attacks, rr.keywords; ledger lines 50209:A:2, 50224:A:3, 50206:A:3, 50216:A:2, 50202:B:2, Burn X.
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town), rr.cancel, rr.damage, faq.additional-attacks, rr.keywords; ledger lines 50209:A:2, 50224:A:3, 50206:A:3, 50216:A:2, 50202:B:2, Burn X.
 // What the records of the scenario need from the engine beyond the family's verbs: a Shadow effect that any player cancels by discarding a hero, Esgaroth Wharf's additional attack in Smaug's attack against Lake-town, the card refs `smaug` and `lakeTown`,
 // and the Burn keyword.
 import { describe, expect, it } from "vitest";

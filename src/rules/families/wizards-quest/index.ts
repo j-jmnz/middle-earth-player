@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Wizard's Quest), rr.search, rr.guarded (data/rules/entries.json); ledger lines 51001:A:1, 51003:A:1, 51004:B:1, 51013:A:1.
+// Rules: docs/scenarios/standalone-scenarios/the-wizards-quest.md (The Wizard's Quest), rr.search, rr.guarded (data/rules/entries.json); ledger lines 51001:A:1, 51003:A:1, 51004:B:1, 51013:A:1.
 // The verbs src/catalog/families/wizards-quest.ts adds: the kit's Quick-build (quick.ts), the quest stages' searches of the top of the encounter deck (top.ts) and the player cards held under an encounter card (held.ts).
 import type { Instruction } from "../../../catalog/boundary.ts";
 

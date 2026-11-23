@@ -1,4 +1,4 @@
-// Rules: rr.search, rr.reveal, rr.forced, rr.travel, rr.explored, rr.shadow-effects, rr.staging-area, rr.damage, rr.surge (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Mines of Moria).
+// Rules: rr.search, rr.reveal, rr.forced, rr.travel, rr.explored, rr.shadow-effects, rr.staging-area, rr.damage, rr.surge (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-mines-of-moria.md (The Mines of Moria).
 import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, drew, exhausted, flag, handCount, progressOn, quest, resolve, resourcesOn, respond, reveal, stagingThreat, stat, threat, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Mines of Moria (standalone-scenarios part 12): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).

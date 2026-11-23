@@ -1,4 +1,4 @@
-// Rules: rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 50701:A:1, 50702:B:2 (docs/scenarios/standalone-scenarios.md, Murder at the Prancing Pony, reading 23 and The table).
+// Rules: rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 50701:A:1, 50702:B:2 (docs/scenarios/standalone-scenarios/murder-at-the-prancing-pony.md, Murder at the Prancing Pony, reading 23 and The table).
 //
 // The Investigation List of the insert as a top-bar dial: the names of the 5 Suspects and 5 Hideouts the players have checked off. A name is checked off once a look window showed its card (`seen`), or the card is in play, in the victory display or in the
 // discard pile; a card that is set aside or in the Investigation deck and was never shown, and one removed from the game unseen, stays unchecked, so the dial never tells the hidden Suspect and Hideout apart from the deck. The Investigation deck itself is a pile that shows

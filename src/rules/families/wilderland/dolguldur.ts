@@ -1,4 +1,4 @@
-// Rules: rr.destroy, rr.explored, rr.the-word-choose (data/rules/entries.json); ledger lines 50907:A:1, 50931:B:2, 50903:B:2 to 50906:B:2 (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, readings 4, 5, 6 and 8).
+// Rules: rr.destroy, rr.explored, rr.the-word-choose (data/rules/entries.json); ledger lines 50907:A:1, 50931:B:2, 50903:B:2 to 50906:B:2 (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, readings 4, 5, 6 and 8).
 //
 // The Siege value an Attack on Dol Guldur card prints is added to a tally for the round when an enemy is destroyed or a location explored (TallySiege); Dol Guldur's Forced effect reads it at the end of the round (the amount `siegeTally`). The tally belongs to
 // one round: it is read as 0 in any other. SelectRandomStage notes one of the other stage 3s as an option taken by the running effect, so the penalty records that follow it (`optionTaken`) apply it.

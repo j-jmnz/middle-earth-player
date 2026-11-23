@@ -49,12 +49,26 @@ function markdownIn(dir: string, skip: (name: string) => boolean = () => false):
     .map((name) => `${dir}/${name}`);
 }
 
+const stem = (name: string): string => name.replace(/\.md$/, "");
+
+// A folder's files and those of the folders in it (docs/scenarios/<box>/<scenario-id>.md); a box file comes before its folder.
+export function markdownTree(dir: string): string[] {
+  if (!existsSync(path.join(ROOT, dir))) return [];
+  return readdirSync(path.join(ROOT, dir), { withFileTypes: true })
+    .sort((a, b) => stem(a.name).localeCompare(stem(b.name)) || Number(a.isDirectory()) - Number(b.isDirectory()))
+    .flatMap((entry) => {
+      const child = `${dir}/${entry.name}`;
+      if (entry.isDirectory()) return markdownTree(child);
+      return entry.name.endsWith(".md") ? [child] : [];
+    });
+}
+
 export function groups(): Group[] {
   return [
     { title: "Every session", note: "Read whole.", files: ["CLAUDE.md", ...markdownIn(".claude/rules")] },
     { title: "Agents", note: "Each agent reads its own file.", files: markdownIn(".claude/agents") },
     { title: "Product, code and design", note: "Read the sections your task touches.", files: markdownIn("docs", (name) => name === "INDEX.md") },
-    { title: "Scenarios", note: "One file per box or cycle: each scenario's mechanics, readings, decisions and table pieces. Read the scenario your task names.", files: markdownIn("docs/scenarios") },
+    { title: "Scenarios", note: "A box file (docs/scenarios/<box>.md) holds what its scenarios share: campaign rules, pool cards, shared readings. A scenario file (docs/scenarios/<box>/<scenario-id>.md) holds that scenario's mechanics, readings, decisions and table pieces. Read the scenario your task names.", files: markdownTree("docs/scenarios") },
     { title: "Agent procedures", note: "The scenario procedure, the effect-authoring cookbook and the card audit; read when a task names one.", files: markdownIn("docs/agents") },
     { title: "Phases", note: "STATUS.md, then the active phase file.", files: ["docs/phases/STATUS.md", ...markdownIn("docs/phases", (name) => name === "STATUS.md")] },
     { title: "Live plans", note: "Read when a task names the plan.", files: markdownIn("docs/plans") },

@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town); ledger lines 50201:B:1, 50202:B:1, 50203:B:3, 50207:A:1.
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town); ledger lines 50201:B:1, 50202:B:1, 50203:B:3, 50207:A:1.
 // The top-bar dials of The Battle of Lake-town and the Smaug piles of its table: the damage on Lake-town against 50 (it warms near the limit), on stage 3 the Victory points against that damage, and the damage on Smaug against the cap of the stage.
 import { describe, expect, it } from "vitest";
 

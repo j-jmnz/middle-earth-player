@@ -1,4 +1,4 @@
-// Rules: rr.search, rr.reveal, rr.forced, rr.travel, rr.explored, rr.shadow-effects, rr.staging, rr.damage, rr.surge, rr.engaged, rr.lasting-effects, rr.blank, docs/scenarios/standalone-scenarios.md (Escape from Khazad-dûm) (data/rules/entries.json).
+// Rules: rr.search, rr.reveal, rr.forced, rr.travel, rr.explored, rr.shadow-effects, rr.staging, rr.damage, rr.surge, rr.engaged, rr.lasting-effects, rr.blank, docs/scenarios/standalone-scenarios/escape-from-khazad-dum.md (Escape from Khazad-dûm) (data/rules/entries.json).
 import { describe, it } from "vitest";
 
 import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, defender, exhausted, flag, handCount, progressOn, quest, resolve, resourcesOn, respond, reveal, stagingThreat, stat, threat, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";

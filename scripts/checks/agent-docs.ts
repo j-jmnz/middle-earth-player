@@ -86,7 +86,7 @@ export function statusProblems(): string[] {
   return problems;
 }
 
-/** Headings of docs/brief.md that are a scenario's name: a scenario's rulings belong in its box's file in docs/scenarios/. */
+/** Headings of docs/brief.md that are a scenario's name: a scenario's rulings belong in its own file in docs/scenarios/<box>/. */
 export function scenarioHeadingsInBrief(): string[] {
   const names = new Set(
     readdirSync(path.join(ROOT, "data/scenarios"))

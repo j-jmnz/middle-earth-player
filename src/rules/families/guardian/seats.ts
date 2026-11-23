@@ -40,7 +40,7 @@ export function guardianCanChange(state: ScenarioState): boolean {
 
 /**
  * The seats a ForEachPlayer with `seats: "guardian"` runs for: the guard, and, when the effect's source is a treachery card's When Revealed or Shadow effect while a card holds `treacheryHitsAll` (Dry Watercourse, 02132:A:1), or a shadow card dealt to an enemy
- * that holds `shadowHitsAll` (Ambushing Orcs, 900902:A:1), each other player after him in player order. A treachery card's Shadow effect is covered too: the printed line says "all treachery card effects" (docs/scenarios/shadows-of-mirkwood.md, Return to Mirkwood).
+ * that holds `shadowHitsAll` (Ambushing Orcs, 900902:A:1), each other player after him in player order. A treachery card's Shadow effect is covered too: the printed line says "all treachery card effects" (docs/scenarios/shadows-of-mirkwood/return-to-mirkwood.md, Return to Mirkwood).
  */
 export function guardianSeats(state: ScenarioState, ctx: ReduceContext, sourceId: string | null): number[] {
   const guard = guardianSeat(state);
