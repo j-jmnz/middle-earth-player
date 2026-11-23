@@ -350,12 +350,6 @@ export function isAllyLike(printed: PrintedCard): boolean {
   return printed.type === "ally" || ((printed.type === "objective" || printed.type === "treasure") && printed.health != null);
 }
 
-// A card played from the hand onto a host: an attachment, or a treasure. The treasures of The Hobbit are added to a deck at the start of a scenario, drawn into the hand and played like
-// attachments, each printing an "Attach to ..." line (hob.treasure-ohauh, hob.treasure-otd: "Treasure cards added to a deck").
-export function playsOntoHost(printed: PrintedCard): boolean {
-  return printed.type === "attachment" || printed.type === "treasure";
-}
-
 export function isCharacterType(printed: PrintedCard): boolean {
   return printed.type === "hero" || isAllyLike(printed);
 }
@@ -382,6 +376,12 @@ export function isQuestCardType(type: CardType): boolean {
 // A side quest, encounter or player (mec108.side-quests).
 export function isSideQuestType(type: CardType): boolean {
   return type === "encounter-side-quest" || type === "player-side-quest";
+}
+
+// A card played onto a host from the hand: an attachment, or a treasure, which prints a cost and an "Attach to" line
+// (emce.treasure, rr.attachment-cards).
+export function playsOntoHost(printed: PrintedCard): boolean {
+  return printed.type === "attachment" || printed.type === "treasure";
 }
 
 // A treasure is a player card ("Treasure is a new type of player card", emce.treasure).

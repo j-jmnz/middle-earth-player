@@ -7,7 +7,7 @@ const GOLLUM = "02130";
 const guarded = { play: [{ code: GOLLUM, seat: 0 }] };
 
 // Card specs for Return to Mirkwood (shadows-of-mirkwood part 6): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The lines of the guard's own rules (loss, redirected damage, locks, the stage bars) are
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The lines of the guard's own rules (loss, redirected damage, locks, the stage bars) are
 // tests of lines.test.ts, guardian.test.ts and nightmare.test.ts, which build their moment with the scene kit.
 const ROWS: readonly Row[] = [
   { line: "02126:A:1", name: "Setup: Gollum is found and put in front of the player who guards him", layout: { stage: "02126", setAside: [GOLLUM], deck: ["f0", "f0"] }, act: resolve("02126", "setup"), expect: [zone(GOLLUM, "play")] },

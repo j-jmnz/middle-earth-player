@@ -47,8 +47,9 @@ describe("Wild Stallion", () => {
     state = send(state, { type: "Choose", optionId: rider.id }, ctx);
     state = syncConstants(run(state, ctx), ctx);
     expect(state.cards[second.id]?.host).toBeNull();
-    // The second Stallion has no other ally to go on than the one that has a copy: nothing changes.
-    const again = trigger(state, second.id, "19033:action:1", ctx);
+    // The second Stallion has no other ally to go on than the one that has a copy (Limit 1 per ally): its Action is not offered, so nothing is paid for nothing (19033:A:2).
+    expect(triggers(state, ctx, "19033:action:1").filter((intent) => intent.type === "Trigger" && intent.cardId === second.id)).toEqual([]);
+    const again = state;
     expect(again.cards[second.id]?.host).toBeNull();
     expect(again.cards[rider.id]?.attachments).toEqual([first.id]);
     // Two other Restricted attachments and the Stallion are one too many.

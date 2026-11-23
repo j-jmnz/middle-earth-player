@@ -176,6 +176,18 @@ describe("19036 Durin's Key", () => {
     expect(threatOf(run.state, CODES.deepRavine)).toBe((world.cards.get(CODES.deepRavine)?.threat ?? 0) - 1);
   });
 
+  // rr.cost: "An ability's cost cannot be paid if the resolution of its effect does not have the potential to change the game state." The players use the Key's Action themselves, so it is not offered with no location in play.
+  it("19036:A:2 is offered with a location in play and not offered with none: its cost cannot be paid for nothing", () => {
+    const offered = (staging: readonly string[]) => {
+      const t = rhovanionTable(world, { staging: [...staging], phase: "Planning" });
+      const key = spawn(t.state, CODES.durinSKey, { zone: "attached" });
+      const held = updateCard(attachTo(key.state, key.id, t.hero), key.id, { claimed: true, controller: 0, face: "up" });
+      return legalIntents(start(held).state, t.ctx).some((intent) => intent.type === "Trigger" && intent.effectId === "19036:action:1");
+    };
+    expect(offered([CODES.greyMoorland])).toBe(true);
+    expect(offered([])).toBe(false);
+  });
+
   it("19036:A:3 at the beginning of the quest phase the player who controls it looks at the top 3 cards, reveals 1 and discards the rest; guarded, it does nothing", () => {
     const deck = ["f0", "f3", "treachery", "place", "f0"];
     const planning = (claimed: boolean): Table => {

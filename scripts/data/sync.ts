@@ -4,6 +4,7 @@ import path from "node:path";
 import { duration, runScript, type Log } from "../log.ts";
 import { packBookletsHere } from "../build/pack-booklets.ts";
 import { DATA_DIR } from "./paths.ts";
+import { SYNC_USAGE, syncArguments } from "./sync-args.ts";
 import { syncDragnCards } from "./sources/dragncards.ts";
 import { recordChanges, type SourceRecord } from "./sources/fetch.ts";
 import { syncHallOfBeorn } from "./sources/hallofbeorn.ts";
@@ -16,7 +17,7 @@ import { syncScans } from "./sources/scans.ts";
 
 // The only network command. Refreshes data/raw and .cache/pdf, then records every pin in data/sources.json.
 // Usage: pnpm data sync [ringsdb|hallofbeorn|dragncards|rules|scans|pictures|nightmare|icons]... [--verbose]
-// --verbose logs every request with its status, size and time.
+// `scans --pack <id>` and `--codes <code,...>` pin only that pack's or those player cards (sources/scans.ts). --verbose logs every request with its status, size and time.
 const ADAPTERS: Record<string, (log: Log) => Promise<SourceRecord>> = {
   ringsdb: syncRingsDb,
   hallofbeorn: syncHallOfBeorn,
@@ -40,7 +41,11 @@ function readSources(file: string, log: Log): Record<string, SourceRecord> {
 }
 
 void runScript("data:sync", async (log) => {
-  const wanted = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
+  const { wanted, help } = syncArguments(process.argv.slice(2));
+  if (help) {
+    log.info(SYNC_USAGE);
+    return;
+  }
   const unknown = wanted.filter((id) => !ADAPTERS[id]);
   if (unknown.length > 0) throw new Error(`Unknown source ${unknown.join(", ")}. Sources: ${Object.keys(ADAPTERS).join(", ")}`);
   const ids = wanted.length > 0 ? wanted : Object.keys(ADAPTERS);

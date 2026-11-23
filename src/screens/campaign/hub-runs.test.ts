@@ -54,9 +54,9 @@ describe("comingScenarios", () => {
   it("lists the unplayable scenarios in book order, captioned with their box and place", () => {
     const playable = new Set(["a", "e"]);
     expect(comingScenarios(boxes, (id) => playable.has(id), nameOf)).toEqual([
-      { id: "b", name: "Name of b", caption: "Coming soon · Box One · 2" },
-      { id: "c", name: "Name of c", caption: "Coming soon · Box One · 3" },
-      { id: "d", name: "Name of d", caption: "Coming soon · Box Two · 1" },
+      { id: "b", name: "Name of b", caption: "Coming soon · Box One · 2", find: "Box One" },
+      { id: "c", name: "Name of c", caption: "Coming soon · Box One · 3", find: "Box One" },
+      { id: "d", name: "Name of d", caption: "Coming soon · Box Two · 1", find: "Box Two" },
     ]);
   });
 

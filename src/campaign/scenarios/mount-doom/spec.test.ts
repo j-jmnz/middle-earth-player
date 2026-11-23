@@ -2,7 +2,7 @@
 import { announce, answer, attack, attackersOf, cardSpecs, commit, damageOn, deckCount, defend, endPhase, exhausted, flag, frame, lost, quest, resourcesOn, respond, reveal, resolve, stat, threat, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Mount Doom (the-return-of-the-king, part 6 of the box): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot hold (a bar on travel, the stages' own flow,
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). What a row cannot hold (a bar on travel, the stages' own flow,
 // the order of several players' tests) is in lines.test.ts, each test titled with its line; the campaign card is in campaign.test.ts and the golden.
 // The stand-in heroes dh1 and dh2 have 2 Willpower, 2 Attack, 2 Defense and 6 hit points and every seat starts at threat 28, so X is 2 and a Fortitude test discards two cards: f0 and f3 print no Sauron's Eye icon, so a test with
 // a committed hero passes (2 against 0) and one with none fails (0 against 0, a tie fails). The cards that print icons are named by code (146054 prints 3, 146052 prints 1).

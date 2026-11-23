@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, drew, exhausted, flag, lost, offers, progressOn, quest, resolve, resourcesOn, respond, reveal, stat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Redhorn Gate (dwarrowdelf part 4): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The mechanics that need several steps (Arwen's control, Snowstorm's later commits,
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The mechanics that need several steps (Arwen's control, Snowstorm's later commits,
 // the zero-Willpower discard, Freezing Cold's second copy, the 3B bar, Blinding Blizzard's fifth progress, Rocky Crags for each player, Icy Cavern's travel) are in lines.test.ts. The stand-in heroes dh1 and dh2 have 2 Willpower, 2 Attack, 2 Defense.
 const ROWS: readonly Row[] = [
   // 03054 Black Uruks: the first player discards an attachment on a questing character; an undefended attack makes its Shadow deal 2 more shadow cards.

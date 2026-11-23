@@ -13,6 +13,7 @@ import { attachTo } from "../../rules/core/zones.ts";
 import { legalIntents, legalTargets, reduce } from "../../rules/engine/reduce.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { table as attackTable } from "../../rules/families/attack/fixture.ts";
+import { declaredDefenders } from "../../rules/families/defense/defenders.ts";
 import { enemy, hero, offered, send as defend, table as defenseTable, until } from "../../rules/families/defense/table.ts";
 import { PLAY_CARDS, put, run, seat, triggers } from "../../rules/families/play/fixture.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
@@ -104,6 +105,28 @@ describe("131020:A:1 to A:3 Sting", () => {
   it("131020:A:3 is not offered when another hero defends", () => {
     const { built, defended } = scene(EFFECTS, "other-hero");
     expect(offered(legalIntents(defended, built.ctx), "131020:response:1")).toBe(false);
+  });
+
+  // An effect makes the exhausted Bilbo a defender: the declaration does not exhaust him, so he did not "exhaust to defend".
+  const ADD_EXHAUSTED: Effect = { id: "test:add-exhausted", cardCode: STING, lines: [], timing: "action", instructions: [{ verb: "Pick", pick: { type: "hero", control: "you", state: "exhausted" } }, { verb: "AddDefender" }] };
+  it("131020:A:3 is not offered when an already exhausted Bilbo is declared a defender by an effect", () => {
+    const built = defenseTable({
+      cards: [hero(BILBO_OHAUH, { sphere: "baggins", defense: 1, health: 3, traits: ["Hobbit"] }), hero("other-hero"), real.get(STING)!, enemy("orc", { attack: 3, defense: 1, health: 6, threat: 1 }), enemy("stonetroll", { threat: 3 }), definePrinted({ code: "mist", name: "Mist", type: "treachery" })],
+      effects: [...EFFECTS, ADD_EXHAUSTED],
+      heroes: [{ code: BILBO_OHAUH }, { code: "other-hero" }],
+      attachments: [{ code: STING, host: BILBO_OHAUH }],
+      enemies: [{ code: "orc" }],
+      encounter: ["mist", "stonetroll"],
+    });
+    const tired = updateCard(built.state, built.ids[BILBO_OHAUH]!, { exhausted: true });
+    const defending = until(defend(tired, { type: "DeclineEngage" }, built.ctx), built.ctx, (current) => current.window?.kind === "defense");
+    const declared = defend(defending, { type: "DeclareDefender", defenderId: built.ids["other-hero"]! }, built.ctx);
+    expect(offered(legalIntents(declared, built.ctx), "test:add-exhausted")).toBe(true);
+    const picked = defend(declared, { type: "Trigger", cardId: built.ids[STING]!, effectId: "test:add-exhausted" }, built.ctx);
+    const added = defend(picked, { type: "Choose", optionId: built.ids[BILBO_OHAUH]! }, built.ctx);
+    // The precondition: he is now a defender, still exhausted, and the answered declaration is announced.
+    expect(declaredDefenders(added.pendingAttack ?? null)).toContain(built.ids[BILBO_OHAUH]);
+    expect(offered(legalIntents(added, built.ctx), "131020:response:1")).toBe(false);
   });
 });
 
@@ -242,6 +265,25 @@ describe("132019:A:1 to A:3 Bilbo's Magic Ring", () => {
     expect(used.seats[0]?.threat).toBe(threat + 3);
     const done = until(used, built.ctx, (current) => current.window?.kind === "defense" || (current.cards[bilbo]?.damage ?? 0) > 0 || current.round > 1);
     expect(done.cards[bilbo]?.damage).toBe(0);
+  });
+
+  // An effect makes the exhausted Bilbo a defender: he did not "exhaust to defend", so the Ring cannot answer.
+  it("132019:A:3 is not offered when an already exhausted Bilbo is declared a defender by an effect", () => {
+    const add: Effect = { id: "test:add-exhausted", cardCode: RING, lines: [], timing: "action", instructions: [{ verb: "Pick", pick: { type: "hero", control: "you", state: "exhausted" } }, { verb: "AddDefender" }] };
+    const built = defenseTable({
+      cards: [hero(BILBO_OTD, { sphere: "baggins", defense: 1, health: 3, traits: ["Hobbit"] }), hero("other-hero"), real.get(RING)!, enemy("orc", { attack: 3, defense: 1, health: 6, threat: 1 })],
+      effects: [...EFFECTS, add],
+      heroes: [{ code: BILBO_OTD }, { code: "other-hero" }],
+      attachments: [{ code: RING, host: BILBO_OTD }],
+      enemies: [{ code: "orc" }],
+    });
+    const tired = updateCard(built.state, built.ids[BILBO_OTD]!, { exhausted: true });
+    const defending = until(defend(tired, { type: "DeclineEngage" }, built.ctx), built.ctx, (current) => current.window?.kind === "defense");
+    const declared = defend(defending, { type: "DeclareDefender", defenderId: built.ids["other-hero"]! }, built.ctx);
+    const picked = defend(declared, { type: "Trigger", cardId: built.ids[RING]!, effectId: "test:add-exhausted" }, built.ctx);
+    const added = defend(picked, { type: "Choose", optionId: built.ids[BILBO_OTD]! }, built.ctx);
+    expect(declaredDefenders(added.pendingAttack ?? null)).toContain(built.ids[BILBO_OTD]);
+    expect(offered(legalIntents(added, built.ctx), "132019:response:1")).toBe(false);
   });
 });
 

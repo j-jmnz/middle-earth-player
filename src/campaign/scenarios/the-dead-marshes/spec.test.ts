@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, attack, cardSpecs, commit, damageOn, frame, flag, reveal, resourcesOn, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Dead Marshes (shadows-of-mirkwood part 5): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
 const ROWS: readonly Row[] = [
   { line: "02107:A:2", name: "Forced: at the end of the quest phase a party that fails the escape test places 2 resource tokens on Gollum", layout: { seats: 2, phase: "Quest", staging: [{ code: "02107" }], deck: ["02111", "02111"] }, act: [announce("endOfPhase", undefined, { phase: "Quest" }), commit(), commit()], expect: [resourcesOn("02107", 2), frame("escape")] },
   { line: "02109:A:1", name: "When Revealed: a failed escape test puts 1 token on Gollum and raises each player's threat by 2", layout: { staging: [{ code: "02107" }], deck: ["02111", "02111"] }, act: [reveal("02109"), commit("dh1")], expect: [resourcesOn("02107", 1), threat(30), frame("escape")] },

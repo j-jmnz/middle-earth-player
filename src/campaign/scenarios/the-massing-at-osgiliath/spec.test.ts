@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, damageOn, defend, endPhase, exhausted, flag, quest, resolve, reveal, stat, stagingThreat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Massing at Osgiliath (standalone-scenarios part 1): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
 // The lines a row cannot express (a card committed, an instruction run alone, a count of games) are tests in lines.test.ts; the players have crossed the Anduin on stage 4 (00019), so a row that needs it names that stage.
 const CROSSED = "00019";
 const QUEST_START = { seat: null, phase: "Quest" } as const;

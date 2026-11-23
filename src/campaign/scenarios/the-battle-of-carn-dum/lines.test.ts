@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
+import { EFFECTS } from "../../../effects/index.ts";
 import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { moveCard, shadowCards } from "../../../rules/core/zones.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
@@ -21,6 +22,10 @@ import { fightEnemy, finish, idOf, legalIntents, send, start, tableFromLayout, t
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { seatThreat } from "../../../rules/families/play/hooks.ts";
 import { travelUnpayable } from "../../../rules/families/angmar/travel.ts";
+import { declaredDefenders } from "../../../rules/families/defense/defenders.ts";
+import { ally as defenseAlly, enemy as defenseEnemy, hero as defenseHero, offered as responseOffered, send as defend, table as defenseTable, until } from "../../../rules/families/defense/table.ts";
+import { definePrinted } from "../../../rules/core/printed.ts";
+import { lineSpec } from "../../../../test/harness/line-spec.ts";
 
 const SCENARIO = "the-battle-of-carn-dum";
 const CAPTAIN = "10127";
@@ -383,5 +388,43 @@ describe("Blight of Carn Dûm and Fortress Walls", () => {
     };
     expect(threatAfterPlaying(true)).toBe(1);
     expect(threatAfterPlaying(false)).toBe(0);
+  });
+});
+
+// Rivendell Skirmishers (10192:A:1): "After Rivendell Skirmishers exhausts to defend an attack from non-unique enemy, discard each shadow card from that enemy." The orc is not unique and holds the shadow card dealt for its attack.
+describe("10192:A:1 Rivendell Skirmishers: after it exhausts to defend", () => {
+  const ADD_EXHAUSTED: Effect = { id: "test:add-exhausted-ally", cardCode: "10192", lines: [], timing: "action", instructions: [{ verb: "Pick", pick: { type: "ally", control: "you", state: "exhausted" } }, { verb: "AddDefender" }] };
+  const skirmish = (effects: readonly Effect[]) => {
+    const built = defenseTable({
+      cards: [defenseHero("guard"), defenseAlly("10192", { sphere: "neutral", health: 2 }), defenseEnemy("orc", { attack: 3, defense: 1, health: 6, threat: 1 }), definePrinted({ code: "mist", name: "Mist", type: "treachery" })],
+      effects: [...effects, ADD_EXHAUSTED],
+      heroes: [{ code: "guard" }],
+      allies: [{ code: "10192" }],
+      enemies: [{ code: "orc" }],
+      encounter: ["mist"],
+    });
+    const defending = until(defend(built.state, { type: "DeclineEngage" }, built.ctx), built.ctx, (current) => current.window?.kind === "defense");
+    return { built, defending, skirmishers: built.ids["10192"]!, orc: built.ids.orc! };
+  };
+
+  lineSpec("10192:A:1", "after it exhausts to defend, discards the shadow card of a non-unique enemy", (effects) => {
+    const { built, defending, skirmishers, orc } = skirmish(effects);
+    const declared = defend(defending, { type: "DeclareDefender", defenderId: skirmishers }, built.ctx);
+    expect(declared.cards[skirmishers]?.exhausted, "declaring exhausts it").toBe(true);
+    expect(shadowCards(declared.cards[orc])).toHaveLength(1);
+    expect(responseOffered(legalIntents(declared, built.ctx), "10192:response:1")).toBe(true);
+    const used = defend(declared, { type: "Trigger", cardId: skirmishers, effectId: "10192:response:1" }, built.ctx);
+    expect(shadowCards(used.cards[orc])).toHaveLength(0);
+  });
+
+  // FAULT: the card prints "after Rivendell Skirmishers exhausts to defend", so an already exhausted Skirmishers that an effect declares a defender did not exhaust to defend and the Response is not offered (the same reading as Sting's 131020:A:3); the engine reads "is exhausted" and offers it.
+  it.fails("10192:A:1 is not offered when an already exhausted Rivendell Skirmishers is declared a defender by an effect", () => {
+    const { built, defending, skirmishers } = skirmish(EFFECTS);
+    const tired = defend({ ...defending, cards: { ...defending.cards, [skirmishers]: { ...defending.cards[skirmishers]!, exhausted: true } } }, { type: "DeclareDefender", defenderId: built.ids.guard! }, built.ctx);
+    expect(responseOffered(legalIntents(tired, built.ctx), "test:add-exhausted-ally")).toBe(true);
+    // The only exhausted ally is the candidate: the effect takes it with no question.
+    const added = defend(tired, { type: "Trigger", cardId: skirmishers, effectId: "test:add-exhausted-ally" }, built.ctx);
+    expect(declaredDefenders(added.pendingAttack ?? null)).toContain(skirmishers);
+    expect(responseOffered(legalIntents(added, built.ctx), "10192:response:1")).toBe(false);
   });
 });

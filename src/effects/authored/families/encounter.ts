@@ -103,8 +103,8 @@ export const RECORDS: readonly Effect[] = [
   {"id":"132011:action:1","cardCode":"132011","lines":["132011:A:1"],"timing":"action","condition":{"kind":"canPick","pick":{"type":"hero","control":"you","state":"ready"}},"instructions":[
     {"verb":"Pick","pick":{"type":"hero","control":"you","state":"ready"}},{"verb":"Exhaust","target":{"kind":"picked"}},{"verb":"ShuffleEncounterDeck"},{"verb":"LookAtTop"},
     {"verb":"ProgressQuest","amount":{"stat":"threat","of":"picked","printed":true}}]},
-  // 142011 Sting: the hero exhausted to defend (it is exhausted once declared).
-  {"id":"142011:response:1","cardCode":"142011","lines":["142011:A:3"],"timing":"response","trigger":"declaredDefender","subject":"host","condition":{"kind":"matches","card":"host","pick":{"type":"hero","control":"any","state":"exhausted"}},"instructions":[
+  // 142011 Sting: the hero exhausted to defend (the declaration exhausted it).
+  {"id":"142011:response:1","cardCode":"142011","lines":["142011:A:3"],"timing":"response","trigger":"declaredDefender","subject":"host","condition":{"kind":"exhaustedToDefend"},"instructions":[
     {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"},{"verb":"DamageCard","amount":{"stat":"threat","of":"picked","printed":true},"target":"attacker"}]},
   // 143004 Gimli: "after an enemy is revealed from the encounter deck" is the encounterRevealed window (as 10001).
   {"id":"143004:response:1","cardCode":"143004","lines":["143004:A:2"],"timing":"response","trigger":"encounterRevealed","subject":{"type":"enemy","control":"any"},"condition":{"kind":"matches","card":"self","pick":{"type":"ally","control":"any","state":"exhausted"}},"instructions":[{"verb":"Ready"}]},

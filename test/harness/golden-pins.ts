@@ -1,0 +1,325 @@
+// Test helper. The goldens whose final state golden.json stores (scripts/game/golden-file.ts): the ones a test reads with `goldenState` instead of playing
+// the game again. Every other golden stores the hash of its final state. A test that needs one more adds its name here; the scenario's golden test
+// then writes the state, and fails while a name here is no golden of the scenario.
+//
+// The readers (`pnpm test pins` runs them and lists a pin none of them reads, which is then removed here):
+//   - tests that call `goldenState`: a later part's campaign test and world (src/campaign/scenarios/*/campaign.test.ts, test/scenarios/*/game.ts) read the earlier
+//     parts' golden states, and a standalone test reads its own (`goldenState`, `goldenResolved`, test/harness/campaign-kit.ts);
+//   - the seed finders and fixture writers under scripts/e2e, which `pnpm scenario fixtures` runs and the suite does not: a `wonLog` call that names a
+//     `scenarioId` reads that golden (`seedFinderReads`, test/harness/golden-readers.ts; scripts/checks/golden-pins.test.ts holds each to a pin).
+// Pinning a golden means writing its scenario's golden.json again; `pnpm game moved` must then report only a storage change for that file, so a move
+// nobody looked at is never accepted with it (the golden suite refuses the write otherwise, test/harness/golden-suite.ts, `goldenRows`).
+export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
+  "a-journey-to-rhosgobel": [
+    "Nightmare two-handed win",
+  ],
+  "across-the-ettenmoors": [
+    "true solo, lost, threat reaches 50",
+    "true solo, won, a safe location in the victory display",
+    "two-handed, won, a safe location in the victory display",
+  ],
+  "conflict-at-the-carrock": [
+    "Nightmare two-handed win",
+  ],
+  "deadmens-dike": [
+    "true solo, lost, Protect the Innocent holds 10 damage",
+    "true solo, lost, every hero destroyed",
+    "true solo, lost, threat reaches 50",
+    "true solo, won, Normal",
+    "two-handed, lost, a deck runs out and Iârion leaves play",
+    "two-handed, won, Normal",
+  ],
+  "escape-from-dol-guldur": [
+    "two-handed, won",
+  ],
+  "escape-from-mount-gram": [
+    "true solo, lost, every hero is destroyed",
+    "true solo, lost, threat reaches 50",
+    "true solo, won, Normal",
+    "two-handed, won, Normal",
+  ],
+  "fire-in-the-night": [
+    "true solo, Easy, won, Melanwar's and Isolde's lines, a side quest every round, Hill attack defended, no response used",
+    "true solo, Easy, won, the oath and guidance lines, every other round, Hill attack defended, the last card of the pool removed",
+    "true solo, brittle, lost with every hero dead",
+    "true solo, weak, lost with Hrogar's Hill holding 50 damage",
+    "true solo, won, after the earlier parts, a side quest every round, Hill attack defended, Beldis's line, a copy of a location removed from the pool",
+    "true solo, won, after the earlier parts, every other round, Hill attack defended, the last treasure, the last card of the pool removed",
+    "two-handed, Easy, won from a blank log, Hill attack defended, enemies engaged, Beldis heals, Beldis for the second player",
+    "two-handed, Easy, won, Melanwar's and Isolde's lines, a side quest every round, Hill attack defended, no treasure",
+    "two-handed, brittle, lost with every hero dead",
+    "two-handed, weak, lost on threat",
+    "two-handed, won from a blank log, every other round, Hill attack defended, the last treasure, Beldis's line",
+    "two-handed, won, after the earlier parts, Misplaced Trust, every other round, a card of the pool removed for each player",
+    "two-handed, won, after the earlier parts, Urdug's Cunning, every other round, a copy of a location removed for each player",
+  ],
+  "flight-from-moria": [
+    "Easy solo win",
+    "Easy two-handed win",
+    "Nightmare solo win",
+    "Nightmare two-handed win",
+    "solo win",
+    "two-handed win",
+  ],
+  "foundations-of-stone": [
+    "Easy solo win",
+    "Nightmare solo win",
+    "solo win",
+  ],
+  "helms-deep": [
+    "two-handed, won, Normal",
+  ],
+  "into-the-pit": [
+    "Easy two-handed win",
+    "Nightmare solo win",
+    "Nightmare two-handed win",
+    "solo win",
+    "two-handed win",
+  ],
+  "intruders-in-chetwood": [
+    "true solo, lost, Protect the Innocent holds 10 damage",
+    "true solo, won, Normal",
+    "true solo, won, every choice the first option",
+    "two-handed, lost, Rescue Iârion runs out of time",
+    "two-handed, won, Normal",
+  ],
+  "journey-along-the-anduin": [
+    "two-handed, brittle heroes, won with a Valor and a Scarred",
+  ],
+  "journey-in-the-dark": [
+    "true solo, strong, won",
+  ],
+  "journey-to-the-cross-roads": [
+    "true solo, won, Easy",
+    "true solo, won, Normal",
+    "true solo, won, Normal, the player takes Brace of Coneys",
+    "two-handed, won, Easy",
+    "two-handed, won, Normal",
+    "two-handed, won, Normal, both players take Brace of Coneys",
+    "two-handed, won, Normal, one player takes Brace of Coneys",
+  ],
+  "journey-up-the-anduin": [
+    "true solo, Easy, won, the oath line",
+    "true solo, weak, lost on threat",
+    "true solo, won, Turayn joins the pool",
+    "two-handed, Easy, won, a treasure discovered, the oath line",
+    "two-handed, won, a treasure discovered, Turayn joins the pool",
+  ],
+  "lost-in-mirkwood": [
+    "true solo, Easy, won, the guidance line",
+    "true solo, weak, lost on threat",
+    "true solo, won, Melanwar joins the pool, a treasure discovered, a hero carried away",
+    "two-handed, Easy, won, the guidance line",
+    "two-handed, won, Melanwar joins the pool, a treasure discovered",
+  ],
+  "mount-doom": [
+    "true solo, Normal, after the earlier parts, The One Ring destroyed",
+    "true solo, Normal, with no earlier log, The One Ring destroyed",
+    "true solo, lost, the Ring-bearer is destroyed",
+    "true solo, lost, the campaign card's last token is removed",
+    "true solo, lost, the last Fortitude test fails",
+    "true solo, lost, the threat reaches 99",
+    "two-handed, Easy, after the earlier parts, The One Ring kept",
+    "two-handed, Normal, after the earlier parts, The One Ring destroyed",
+  ],
+  "mount-gundabad": [
+    "true solo, Easy, lost after the earlier parts, Melanwar's and Isolde's lines",
+    "true solo, Easy, won, Melanwar's and Isolde's lines, a stage bypassed",
+    "true solo, lost with the hero who carries Wormsbane destroyed",
+    "true solo, lost with the threat at 50",
+    "true solo, won, after the earlier parts, A Growing Threat in the pool removed by the Resolution",
+    "true solo, won, after the earlier parts, Beldis's line, Dagnir hunted and engaged",
+    "true solo, won, after the earlier parts, no stage bypassed",
+    "two-handed, Easy, won, the oath and guidance lines, a stage bypassed",
+    "two-handed, lost after the earlier parts, Misplaced Trust, A Growing Threat stays in the pool",
+    "two-handed, lost with the threat of every player at 50",
+    "two-handed, won, after the earlier parts, Misplaced Trust, no stage bypassed",
+    "two-handed, won, after the earlier parts, Urdug's Cunning, Dragon-sickness in the encounter deck",
+    "two-handed, won, after the earlier parts, Urdug's Cunning, Dragon-sickness in the encounter deck, a stage bypassed",
+  ],
+  "passage-through-mirkwood": [
+    "two-handed, won on Beorn's Path",
+  ],
+  "return-to-mirkwood": [
+    "Nightmare two-handed win",
+  ],
+  "road-to-rivendell": [
+    "Easy solo win",
+    "Nightmare solo win",
+    "solo win",
+  ],
+  "roam-across-rhovanion": [
+    "true solo, Easy, won, Melanwar's and Isolde's lines, Key, Horn, Tiny",
+    "true solo, Easy, won, the oath and guidance lines, Key, Tiny, Horn",
+    "true solo, weak, lost on threat",
+    "true solo, won, after the earlier parts, Horn, Tiny, Key",
+    "two-handed, Easy, won, Melanwar's and Isolde's lines, Horn, Key, Tiny",
+    "two-handed, won, after the earlier parts, Horn, Tiny, Key, one title in the staging area twice, so both players choose it",
+    "two-handed, won, after the earlier parts, Key, Horn, Tiny, trust twice, Urdug's Cunning for each player",
+    "two-handed, won, after the earlier parts, Tiny, Horn, Key",
+  ],
+  "shadow-and-flame": [
+    "Easy solo win",
+    "Nightmare solo win",
+    "solo win",
+  ],
+  "shelobs-lair": [
+    "true solo, won, Normal",
+    "two-handed, won, Normal",
+  ],
+  "the-battle-of-carn-dum": [
+    "true solo, won, Thaurdir destroyed on stage 2B",
+    "two-handed, won, Thaurdir destroyed on stage 2B",
+  ],
+  "the-battle-of-the-pelennor-fields": [
+    "true solo, won, Normal, after the Siege",
+    "two-handed, lost, Minas Tirith destroyed",
+    "two-handed, won, Normal, after the Siege",
+    "two-handed, won, after the Siege, no Esquire, the City damaged",
+  ],
+  "the-black-gate-opens": [
+    "true solo, ended, Normal, after the earlier parts, three rounds, Gwaihir held",
+    "true solo, lost, standalone, the last player is eliminated",
+    "two-handed, ended, Normal, after the earlier parts, Gwaihir held by the first player",
+    "two-handed, ended, Normal, after the earlier parts, every hero destroyed",
+    "two-handed, ended, Normal, after the earlier parts, the first player out first",
+    "two-handed, lost, Aragorn leaves play",
+  ],
+  "the-caves-of-nibin-dum": [
+    "true solo, brittle heroes, lost",
+    "true solo, steady heroes, lost",
+    "true solo, weak, lost on threat",
+    "two-handed, steady heroes, lost",
+    "two-handed, weak, lost on threat",
+  ],
+  "the-city-of-corsairs": [
+    "true solo, after A Storm on Cobas Haven, Ominous Fate in the victory display, won",
+  ],
+  "the-dead-marshes": [
+    "Nightmare two-handed win",
+  ],
+  "the-fate-of-wilderland": [
+    "true solo, Easy, lost after the earlier parts, Melanwar's and Isolde's lines, every Choose window places progress",
+    "true solo, Easy, won, Melanwar's and Isolde's lines, the attacks made together",
+    "true solo, lost after the earlier parts",
+    "true solo, won, after the earlier parts",
+    "true solo, won, after the earlier parts, Beldis's line, the last option of every Choose window",
+    "two-handed, Easy, lost after the earlier parts, the oath and guidance lines, nobody engaged",
+    "two-handed, Easy, won, the oath and guidance lines, the attacks made together",
+    "two-handed, lost after the earlier parts, Misplaced Trust, every seat eliminated",
+    "two-handed, lost after the earlier parts, Urdug's Cunning",
+    "two-handed, won, after the earlier parts, Misplaced Trust",
+    "two-handed, won, after the earlier parts, Urdug's Cunning, the last option of every Choose window",
+  ],
+  "the-ghost-of-framsburg": [
+    "true solo, Easy, won, Melanwar's and Isolde's lines, a burden of the two Hazard cards for the pool",
+    "true solo, brittle, lost with every hero dead",
+    "true solo, weak, lost on threat",
+    "true solo, won, after the earlier parts, Beldis's line, a treasure attached to Fram's Shade, Gundabad Stalker",
+    "true solo, won, after the earlier parts, the encounter discard pile shuffled, Gundabad Hunter",
+    "two-handed, Easy, won, the oath and guidance lines, a treasure attached to Fram's Shade",
+    "two-handed, brittle, lost with every hero dead",
+    "two-handed, weak, lost on threat",
+    "two-handed, won, after the earlier parts, Misplaced Trust, the discard pile shuffled",
+    "two-handed, won, after the earlier parts, Urdug's Cunning, a treasure attached to Fram's Shade",
+  ],
+  "the-hills-of-emyn-muil": [
+    "Nightmare two-handed win",
+  ],
+  "the-hunt-for-gollum": [
+    "Nightmare two-handed win",
+  ],
+  "the-kings-quest": [
+    "true solo, Easy, won, Turayn's oath, Isolde joins the pool, a treasure discovered",
+    "true solo, Easy, won, Turayn's oath, Isolde's line, Dagnir's Spawn, no treasure",
+    "true solo, weak, lost on threat",
+    "true solo, won, after the earlier parts, Isolde joins the pool, The Threat to Wilderland, a treasure discovered",
+    "two-handed, Easy, won, Turayn's oath, Isolde's line, Dagnir's Spawn, a treasure discovered",
+    "two-handed, won, after the earlier parts, a treasure discovered",
+  ],
+  "the-long-dark": [
+    "Easy solo win",
+    "Nightmare solo win",
+    "solo win",
+  ],
+  "the-oath": [
+    "true solo, the Fervor of Lore already used, won",
+    "two-handed, steady heroes, 6 tokens placed, won with Guilty Conscience",
+  ],
+  "the-passage-of-the-marshes": [
+    "true solo, won, Normal",
+    "two-handed, won, Normal",
+    "two-handed, won, Normal, each player takes the Searching Eye",
+  ],
+  "the-passing-of-the-grey-company": [
+    "true solo, won, Normal",
+    "two-handed, lost, threat reaches 50",
+    "two-handed, won, Normal",
+    "two-handed, won, engaging and defending",
+  ],
+  "the-redhorn-gate": [
+    "Easy solo win",
+    "Nightmare solo win",
+    "solo win",
+  ],
+  "the-road-to-isengard": [
+    "two-handed, won, Normal",
+  ],
+  "the-seventh-level": [
+    "Easy two-handed win",
+    "Nightmare solo win",
+    "Nightmare two-handed win",
+    "solo win",
+    "two-handed win",
+  ],
+  "the-siege-of-gondor": [
+    "true solo, won, Normal",
+    "two-handed, lost, threat reaches 50",
+    "two-handed, won, Normal",
+    "two-handed, won, after the Grey Company, answering the Fleet with damage",
+    "two-handed, won, after the Grey Company, engaging",
+  ],
+  "the-tower-of-cirith-ungol": [
+    "two-handed, lost, The One Ring leaves play",
+    "two-handed, won, Easy, after the earlier parts, Shagrat defeated before stage 3A",
+    "two-handed, won, Normal, after the earlier parts, Shagrat defeated",
+    "two-handed, won, Normal, after the earlier parts, Shagrat left in play",
+  ],
+  "the-treachery-of-rhudaur": [
+    "true solo, won, two side quests flipped and one removed when the time ran out",
+    "two-handed, won, no side quest chosen and all three removed when the time ran out",
+  ],
+  "the-uruk-hai": [
+    "two-handed, won, Normal",
+  ],
+  "the-wastes-of-eriador": [
+    "true solo, lost, Amarthiúl leaves play",
+    "true solo, lost, every hero destroyed",
+    "true solo, lost, threat reaches 50",
+    "true solo, won, Fend Off Despair defeated",
+    "true solo, won, Normal",
+    "two-handed, won, Normal",
+  ],
+  "the-watcher-in-the-water": [
+    "Easy solo win",
+    "Nightmare solo win",
+    "Nightmare two-handed win",
+    "solo win",
+  ],
+  "the-weather-hills": [
+    "true solo, lost, Protect the Innocent holds 10 damage",
+    "true solo, lost, Savage Counter-attack holds no token",
+    "true solo, lost, every hero destroyed",
+    "true solo, lost, threat reaches 50",
+    "true solo, won, Normal",
+    "two-handed, won, Normal",
+  ],
+  "the-withered-heath": [
+    "true solo, Easy, won, Melanwar's and Isolde's lines, The Steadfast, no Song, 4 Dragon Signs",
+    "true solo, Easy, won, the oath and guidance lines, Unbroken, Rhyme of the Slayer, 4 Dragon Signs",
+    "true solo, weak, lost on threat",
+    "true solo, won, after the earlier parts, Dragon-slayer, 4 Dragon Signs, a treasure chosen",
+    "two-handed, Easy, won, Melanwar's and Isolde's lines, 4 Dragon Signs",
+    "two-handed, won, after the earlier parts, an Accolade boon for each player, 4 Dragon Signs",
+  ],
+};
