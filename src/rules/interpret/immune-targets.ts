@@ -1,4 +1,4 @@
-// Rules: rr.immune, mec109.immune-to-player-card-effects, dwd.immune-to-card-effects, faq.legolas-immune-location (data/rules/entries.json).
+// Rules: rr.immune, mec109.immune-to-player-card-effects, hob.immune-to-player-card-effects, dwd.immune-to-card-effects, faq.legolas-immune-location (data/rules/entries.json).
 // A card immune to an effect "cannot be chosen as the target for or affected by" it (rr.immune). A pick never offers such a card (pick.ts), and damage
 // skips it (placeDamage); this guards the cards an instruction names without a pick: the active location, the subject of the event, the other card of it,
 // the attacking enemy. An immune card there ignores the instruction (Lórien Guide's progress on Bucklebury Ferry, Fastred returning Revenant).

@@ -1,4 +1,4 @@
-// Rules: rr.immune, rr.resources, rr.ownership-and-control, rr.effects, mec109.setup, rr.lasting-effects (data/rules/entries.json).
+// Rules: rr.immune, rr.resources, rr.ownership-and-control, rr.effects, mec109.setup, rr.lasting-effects, rr.player-elimination, hob.bilbo-multiplayer-ohauh, hob.bilbo-multiplayer-otd (data/rules/entries.json).
 // The Bilbo, Sméagol and Ring-bearer cards of the misc family, and The One Ring's immunity, run through its real records.
 import { describe, expect, it } from "vitest";
 
@@ -56,6 +56,51 @@ describe("Bilbo Baggins gains no resources from some cards", () => {
     expect(used.cards[bilbo]?.resources).toBe(1);
     expect(used.seats[0]?.hand).toContain(treasure.id);
     expect(used.seats[0]?.hand).not.toContain(one.id);
+  });
+});
+
+describe("Bilbo Baggins follows the first player token (hob.bilbo-multiplayer-ohauh, hob.bilbo-multiplayer-otd)", () => {
+  // Two players with a hero each; Bilbo is the first player's, carries a Short Sword and holds 3 resources.
+  const twoSeats = (bilbo: string) => {
+    const table = seat(2, ["rohan"]);
+    const made = put(table.state, bilbo, "heroes", 0);
+    const sword = put(made.state, "sword", "play", 0);
+    const held = updateCard(attachTo(sword.state, sword.id, made.id), made.id, { resources: 3 });
+    return { state: run(syncConstants(held, ctx), ctx), bilbo: made.id, sword: sword.id, table };
+  };
+
+  it.each([["131001"], ["132001"]])("%s:A:1 the new first player gains control of Bilbo Baggins, the resources in his pool and the cards attached to him", (code) => {
+    const { state, bilbo, sword } = twoSeats(code);
+    expect(state.cards[bilbo]?.controller).toBe(0);
+    const passed = run({ ...state, firstPlayer: 1 }, ctx);
+    expect(passed.cards[bilbo]?.controller).toBe(1);
+    expect(passed.cards[bilbo]?.resources).toBe(3);
+    expect(passed.cards[sword]?.controller).toBe(1);
+    expect(passed.cards[sword]?.host).toBe(bilbo);
+    // He is still seat 0's card: it takes him back when the token comes round again.
+    expect(passed.cards[bilbo]?.owner).toBe(0);
+    const back = run({ ...passed, firstPlayer: 0 }, ctx);
+    expect(back.cards[bilbo]?.controller).toBe(0);
+    expect(back.cards[sword]?.controller).toBe(0);
+    expect(passed.seats.map((one) => one.eliminated)).toEqual([false, false]);
+  });
+
+  it("131001:A:1 a player whose only other hero is gone is eliminated when Bilbo passes to the new first player", () => {
+    const { state, bilbo, table } = twoSeats("131001");
+    const lone = table.heroes[0] ?? "";
+    const without = { ...state, seats: [{ ...state.seats[0], heroes: state.seats[0].heroes.filter((id) => id !== lone) }, state.seats[1]] as typeof state.seats, cards: Object.fromEntries(Object.entries(state.cards).filter(([id]) => id !== lone)) };
+    const passed = run({ ...without, firstPlayer: 1 }, ctx);
+    expect(passed.cards[bilbo]?.controller).toBe(1);
+    expect(passed.seats[0]?.eliminated).toBe(true);
+    expect(passed.seats[1]?.eliminated).toBe(false);
+    expect(passed.lost).toBeFalsy();
+  });
+
+  it("132001:A:1 a player with another hero is not eliminated when Bilbo passes on", () => {
+    const { state } = twoSeats("132001");
+    const passed = run({ ...state, firstPlayer: 1 }, ctx);
+    expect(passed.seats[0]?.eliminated).toBe(false);
+    expect(passed.seats[0]?.heroes).toHaveLength(1);
   });
 });
 

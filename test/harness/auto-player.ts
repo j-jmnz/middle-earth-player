@@ -2,7 +2,7 @@ import { costOfKind } from "../../src/catalog/costs.ts";
 import { playCost } from "../../src/rules/player/attach.ts";
 import { expectOk } from "../../src/rules/core/test-fixture.ts";
 import { heroPays } from "../../src/rules/player/payments.ts";
-import { printedOf, type Sphere } from "../../src/rules/core/printed.ts";
+import { playsOntoHost, printedOf, type Sphere } from "../../src/rules/core/printed.ts";
 import { costPayer, costSphere } from "../../src/rules/player/usage.ts";
 import { distinctRule } from "../../src/rules/families/costs/pay.ts";
 import { firstShares, sharesReady, toPayments } from "../../src/play/choice/pay.ts";
@@ -62,8 +62,8 @@ function playable(state: ScenarioState, ctx: ReduceContext, intents: readonly Le
     if (intent.type !== "PlayCard") continue;
     const printed = printedOf(ctx.cards, state.cards[intent.cardId]?.code ?? "");
     // An attachment's cost can depend on its host (a discount for the first restricted attachment on a hero): the host comes first.
-    const host = printed.type === "attachment" ? legalTargets(state, { type: "PlayCard", cardId: intent.cardId }, ctx)[0] : undefined;
-    if (printed.type === "attachment" && !host) continue;
+    const host = playsOntoHost(printed) ? legalTargets(state, { type: "PlayCard", cardId: intent.cardId }, ctx)[0] : undefined;
+    if (playsOntoHost(printed) && !host) continue;
     const cost = playCost(state, intent.cardId, seat, ctx, host ?? null);
     if (cost == null) continue;
     const paid = paymentsFor(state, ctx, seat, intent.cardId, cost);

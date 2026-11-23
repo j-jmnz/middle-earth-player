@@ -1,5 +1,5 @@
 // Rules: rr.the-word-choose, hob.treasure-ohauh, hob.treasure-otd, hob.bilbo-baggins-ohauh, hob.bilbo-baggins-otd (data/rules/entries.json). The shared words of The Hobbit's cards (src/play/words/hobbit-asks.ts): every Pick and
-// every ChooseX of Bilbo Baggins, the Baggins events and the nine treasures has an entry that fills and reads as a sentence, and every entry names a record path of one of those cards.
+// every ChooseX of Bilbo Baggins and the nine treasures has an entry that fills and reads as a sentence, and every entry names a record path of one of those cards.
 import { describe, expect, it } from "vitest";
 
 import { scenarioDefinition } from "../../catalog/scenario-data.ts";
@@ -12,9 +12,12 @@ import { asksPlayer, walk } from "../../../test/harness/record-walk.ts";
 
 import { asksPick, templatesOf, unknownPlaceholders } from "./asks.ts";
 import type { ChoiceNames } from "./choice.ts";
-import { HOBBIT_ASKS } from "./hobbit-asks.ts";
+import { HOBBIT_BILBO_ASKS, HOBBIT_TREASURE_ASKS } from "./hobbit-asks.ts";
 
-const SHARED = ["131001", "132001", "131019", "132013", "131020", "131021", "131022", "132019", "132020", "132021", "132022", "132023", "132024"];
+const HOBBIT_ASKS = { ...HOBBIT_BILBO_ASKS, ...HOBBIT_TREASURE_ASKS };
+
+// Bilbo Baggins of each box and the nine treasures: the cards a Hobbit scenario deals (`sagaStart`, `ScenarioData.treasures`). The two Baggins events are no scenario's card and are worded by the chain.
+const SHARED = ["131001", "132001", "131020", "131021", "131022", "132019", "132020", "132021", "132022", "132023", "132024"];
 const cards = new Map(loadCards().map((card) => [card.code, card]));
 const names: ChoiceNames = { card: (key) => cards.get(key)?.name ?? key, code: (code) => cards.get(code)?.name ?? code };
 const ctx: ReduceContext = { effects: EFFECTS, cards: new Map() };

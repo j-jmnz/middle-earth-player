@@ -7,9 +7,6 @@ import { boxPacks, undealtBoxCards } from "./box-dealt.ts";
 // Every card with text in the packs a campaign's encounter cards come from, of a non-player type or a boon or burden,
 // is dealt by some scenario (dealtCodes over all of them), or is named here with the reason the app does not deal it.
 const EXCEPTIONS: Readonly<Record<string, string>> = {
-  "131020": "Sting, a treasure card of We Must Away, Ere Break of Day: the players discover it in play (131025:B:1, hob.treasure-ohauh) and add it to a deck at a later Setup; no scenario deals it.",
-  "131021": "Orcrist, a treasure card of We Must Away, Ere Break of Day: the players discover it in play (131025:B:1, hob.treasure-ohauh) and add it to a deck at a later Setup; no scenario deals it.",
-  "131022": "Glamdring, a treasure card of We Must Away, Ere Break of Day: the players discover it in play (131025:B:1, hob.treasure-ohauh) and add it to a deck at a later Setup; no scenario deals it.",
   "140077": "Stricken Dumb as printed in The Road Darkens (TRD 77), Flight to the Ford: the same card as 141064 (TBR 64), which Flight to the Ford deals; the app deals the Black Riders print.",
   "140151": "The Argonath as printed in The Road Darkens (TRD 151), Breaking of the Fellowship: the same card as 142075 (TRD 75), which Breaking of the Fellowship deals.",
   "146064": "In Darkness Bind Them (epic multiplayer mode only): the Epic Multiplayer Mode campaign card's Setup shuffles one copy into each encounter deck (mec113.epic-multiplayer-mode); epic multiplayer mode is not built.",

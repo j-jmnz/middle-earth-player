@@ -4,6 +4,9 @@ import type { Effect } from "../../catalog/boundary.ts";
 // scripts/data/effects/templates.ts holds the sentence patterns; src/effects/authored/ holds the rest.
 export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"131001:triggered:1","cardCode":"131001","lines":["131001:A:3"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
+  {"id":"131021:constant:1","cardCode":"131021","lines":["131021:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero"}}]},
+  {"id":"131021:constant:2","cardCode":"131021","lines":["131021:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"whileSourceInPlay","target":"host"}]},
+  {"id":"131022:constant:1","cardCode":"131022","lines":["131022:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"whileSourceInPlay","target":"host"}]},
   {"id":"131059:shadow:1","cardCode":"131059","lines":["131059:A:2"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"endOfAttack","target":"attacker"}]},
   {"id":"132020:constant:1","cardCode":"132020","lines":["132020:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero"}}]},
   {"id":"132022:constant:1","cardCode":"132022","lines":["132022:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero"}}]},

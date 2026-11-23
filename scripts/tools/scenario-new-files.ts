@@ -1,5 +1,6 @@
 import { authoredRel } from "../data/effects/authored-paths.ts";
 import { finderImport } from "../data/effects/seed-finder-paths.ts";
+import { loadAnyScenario } from "../data/load-scenarios.ts";
 
 // The skeleton files `pnpm scenario new` writes (scripts/tools/scenario-new.ts). Each function returns one file's text from the plan's facts.
 // A skeleton compiles, passes lint and leaves the suite green: its golden test is a skipped suite and its campaign test one real check and some
@@ -289,13 +290,23 @@ export const AUTHORED_REPLACES: readonly string[] = [];
 `;
 }
 
-/** src/play/words/asks/<id>.ts the scenario's choice words as data (src/play/words/asks.ts). pnpm data build adds it to the barrel. */
+/**
+ * src/play/words/asks/<id>.ts the scenario's choice words as data (src/play/words/asks.ts). pnpm data build adds it to the barrel. A scenario of The Hobbit spreads the shared words of the cards it deals that ask
+ * (src/play/words/hobbit-asks.ts): the On the Doorstep Bilbo Baggins, and the dragon treasure set where its Setup lists it (`ScenarioData.sagaStart`, `ScenarioData.treasures`).
+ */
 export function asksFile(facts: Facts): string {
+  const data = facts.campaignId === "the-hobbit" ? loadAnyScenario(facts.id) : null;
+  const shared = [
+    ...(data?.sagaStart && "hero" in data.sagaStart && data.sagaStart.hero === "132001" ? ["HOBBIT_BILBO_ASKS"] : []),
+    ...(data?.treasures?.includes("132020") ? ["HOBBIT_TREASURE_ASKS"] : []),
+  ];
+  const imported = shared.length > 0 ? `import { ${shared.join(", ")} } from "../hobbit-asks.ts";\n` : "";
+  const spread = shared.length > 0 ? `{ ${shared.map((name) => `...${name}`).join(", ")} }` : "{}";
   return `import type { Ask } from "../asks.ts";
-
+${imported}
 // The choice words of ${facts.name} (${facts.campaignId} part ${facts.part}), one entry for each Pick and Choose of its records: \`<record id> @<instruction path> <verb | option id>\` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // \`pnpm test scenario ${facts.id} --words\` fails on a Pick or Choose with neither an entry nor words of its own, and \`WORDS_DUMP=${facts.id}\` prints each sentence.
-export const ASKS: Readonly<Record<string, Ask>> = {};
+export const ASKS: Readonly<Record<string, Ask>> = ${spread};
 `;
 }
 
