@@ -19,6 +19,7 @@ import { advanceHold, questObjective, stagePoints } from "./objective.ts";
 import { isTrapStage, trapAdvance } from "./standalone-scenarios/barrow-downs.ts";
 import { questSeat } from "../store/selectors.ts";
 import { STAGE_LOSS } from "../words/scenarios/stormcaller.ts";
+import { stageAdvanceWords } from "./hobbit/roast-mutton.ts";
 import type { TableMoment } from "../store/store.ts";
 
 /**
@@ -127,7 +128,7 @@ export function advanceWords(
   const points = stage ? stagePoints(view, stage, ctx) : null;
   const hold = advanceHold(view, ctx, line);
   const objective = points == null ? questObjective(view, ctx, line) : null;
-  const won = points != null ? `${points} quest point${points === 1 ? "" : "s"} to complete it` : objective ? `To win: ${objective}` : null;
+  const won = points != null ? `${points} quest point${points === 1 ? "" : "s"} to complete it` : objective ? `To win: ${objective}` : stage ? stageAdvanceWords(view, stage) : null;
   // A stage with Defense says where questing's progress goes, one whose filling loses the game says so (mec112.defense, 143075:B:3).
   const detail = (stage ? stageDetail(view, ctx, stage.code, points, hold, won) : [hold ?? won].filter((text) => text != null)).join(". ") || null;
   const who = seat != null && game.seatCount > 1 ? `Player ${seat + 1}` : null;

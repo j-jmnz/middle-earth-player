@@ -61,7 +61,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       const seat = instruction.who === "eventSeat" ? (effectData(state)?.eventSeat ?? focus.seat) : instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
       if (state.seats[seat]?.eliminated) return state;
       // `times` cards, one after the other: the rest wait in the effect's queue behind this reveal.
-      const times = instruction.times == null ? 1 : resolveAmount(state, instruction.times, frameScope(state, focus.seat, focus.sourceId), ctx);
+      const scope = frameScope(state, focus.seat, focus.sourceId);
+      const named = instruction.times == null ? 1 : resolveAmount(state, instruction.times, scope, ctx);
+      const times = instruction.lessX === true ? Math.max(1, named - (scope.x ?? 0)) : named;
       if (times <= 0) return state;
       const rest: Instruction = { verb: "RevealEncounter", ...(instruction.who ? { who: instruction.who } : {}), times: times - 1 };
       const queued = times > 1 && effectData(state) ? queueFront(state, [{ instruction: rest, seat: focus.seat, chosen: null }]) : state;

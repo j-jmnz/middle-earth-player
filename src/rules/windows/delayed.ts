@@ -24,7 +24,7 @@ export function scheduleDelayed(
     until: instruction.until,
     sourceId: focus.sourceId,
     seat: focus.seat,
-    phase: state.phase,
+    phase: instruction.phase ?? state.phase,
     instructions: instruction.instructions,
     uncancelable: instruction.uncancelable ?? null,
     cause,

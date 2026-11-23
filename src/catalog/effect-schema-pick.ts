@@ -22,6 +22,8 @@ export const pickSchema = z.strictObject({
   // Only an enemy in the staging area ("an enemy in the staging area"), or only one engaged with a player. With `type: card`:
   // any card in the staging area ("choose a card in the staging area").
   stagingOnly: z.boolean().optional(),
+  // With `type: objective`: the objectives an encounter card's effect attached to a character in play count too, claimed or not and whoever controls the character ("remove 1 Sack card from a character", 131036:A:2). Read by src/rules/interpret/pick.ts.
+  onCharacter: z.literal(true).optional(),
   // An enemy in the Stormcaller's area counts too: it is in play, though not in the staging area while the players are at another stage ("if Captain Sahír is in play", 11192:A:3; dcce.stormcallers-area). Read by src/rules/interpret/pick.ts.
   inStormcallerArea: z.literal(true).optional(),
   // With `type: card`: only the cards of the riddle area (Dungeons Deep and Caverns Dim, hob.riddle-area): stage 2, Gollum, Bilbo Baggins and the Ring attached to him while they are in it. Read by src/rules/interpret/pick.ts through the riddles family's pool.

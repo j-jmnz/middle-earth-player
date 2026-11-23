@@ -52,6 +52,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["atStage"], pick.atStage === true ? "at the acting player's staging area (every area before they are separate)" : null);
   note(["playerCard"], pick.playerCard === true ? "that is a player card" : pick.playerCard === false ? "that is an encounter card" : null);
   note(["stagingOnly"], pick.stagingOnly === true ? "in the staging area only" : null);
+  note(["onCharacter"], pick.onCharacter === true ? "including the ones an encounter card attached to a character" : null);
   note(["highestThreatPlusRemaining"], pick.highestThreatPlusRemaining === true ? "with the highest sum of its current Threat and its remaining quest points (the quest points less the progress on it; a tie is the chooser's)" : null);
   note(["attachable"], typeof pick.attachable === "string" ? `that the card with code ${pick.attachable} can be attached to` : null);
   note(["engaged"], typeof pick.engaged === "string" ? (ENGAGED[pick.engaged] ?? pick.engaged) : null);

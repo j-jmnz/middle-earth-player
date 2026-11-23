@@ -180,9 +180,13 @@ const delaySchema = z.strictObject({
   // put the Nazgûl of Dol Guldur into play", 900307:A:1; rr.step-3-4).
   until: z.enum(["endOfPhase", "endOfRound", "questSucceeded", "questFailed", "endOfAttack", "startOfGame", "beginningOfTravel"]),
   uncancelable: conditionSchema.optional(),
+  // With `endOfPhase`: the named phase, not the one running now ("At the end of the quest phase", 131073:A:1; revealed in another phase it waits for the next quest phase).
+  phase: z.literal("Quest").optional(),
   // The delayed instructions act on the card the last Pick chose (Sneak Attack's ally).
   subject: z.literal("picked").optional(),
   instructions: z.array(simpleInstructionSchema),
+  // The Delay is scheduled only when this holds ("The first player chooses a Stone-giant ... it engages ... at the end of the quest phase", 131073:A:1).
+  ...when,
 });
 
 // Runs the instructions once for each card that matches the filter now, each time with that card as the picked card ("Ready

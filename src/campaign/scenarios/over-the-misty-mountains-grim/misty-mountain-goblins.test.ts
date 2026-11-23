@@ -3,7 +3,7 @@
 // Dungeons Deep and Caverns Dim both deal. They run on this scenario's table, as any scenario that deals the set could run them.
 import { expect } from "vitest";
 
-import { attack, cardSpecs, damageOn, defend, exhausted, reveal, resolve, stat, threat, zone, answer, type Row } from "../../../../test/harness/card-spec.ts";
+import { attack, cardSpecs, damageOn, defend, exhausted, reveal, resolve, stat, threat, window, zone, answer, type Row } from "../../../../test/harness/card-spec.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import { finish, idOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
@@ -34,9 +34,12 @@ const ROWS: readonly Row[] = [
   { line: "131061:A:2", name: "Shadow: the defending player exhausts 1 character he controls", layout: { stage: "131027", engaged: ["f3"], deck: ["f0", "f0", "f0"] }, act: [attack("f3", { shadow: DRIVER, undefended: true }), answer("dh2")], expect: [exhausted("dh2"), exhausted("dh1", false)] },
   { line: "131065:A:1", name: "While The Goblins' Caves is the active location, Goblin enemies get +1 Threat", layout: { stage: "131027", staging: [AXEMAN], active: CAVES }, act: [], expect: [stat(AXEMAN, "threat", 3)] },
   { line: "131065:A:2", name: "Shadow: the defending player raises his threat by the Goblin enemies engaged with him", layout: { stage: "131027", threat: [30, 30], engaged: ["f3", AXEMAN, MINERS], deck: ["f0", "f0", "f0"] }, act: [attack("f3", { shadow: CAVES }), defend("dh1")], expect: [threat(32)] },
-  { line: "131065:A:2", name: "Shadow: a Goblin enemy engaged with another player is not counted, and a second Goblin is counted again", layout: { stage: "131027", seats: 2, threat: [30, 30], engaged: ["f3", AXEMAN], deck: ["f0", "f0", "f0"] }, act: [attack("f3", { shadow: CAVES }), defend("dh1")], expect: [threat(31)] },
+  { line: "131065:A:2", name: "Shadow: a Goblin enemy engaged with another player is not counted, and a second Goblin is counted again", layout: { stage: "131027", seats: 2, threat: [30, 30], engaged: ["f3", AXEMAN, { code: MINERS, seat: 1 }], deck: ["f0", "f0", "f0"] }, act: [attack("f3", { shadow: CAVES }), defend("dh1")], expect: [threat(31)] },
   { line: "131070:A:1", name: "When Revealed: the first player adds a Goblin enemy of the discard pile to the staging area", layout: { stage: "131027", discard: [AXEMAN, "f0"] }, act: resolve(GRIP, "whenRevealed"), expect: [zone(AXEMAN, "staging"), zone("f0", "encounterDiscard")] },
+  { line: "131070:A:1", name: "with two players each chooses a Goblin enemy of the discard pile, the first player first", layout: { stage: "131027", seats: 2, discard: [AXEMAN, MINERS, RUNNERS] }, act: [resolve(GRIP, "whenRevealed"), answer(RUNNERS), answer(AXEMAN)], expect: [zone(RUNNERS, "staging"), zone(AXEMAN, "staging"), zone(MINERS, "encounterDiscard")] },
+  { line: "131070:A:1", name: "and the second player adds none when the first player took the only Goblin enemy", layout: { stage: "131027", seats: 2, discard: [AXEMAN, "f0"] }, act: resolve(GRIP, "whenRevealed"), expect: [zone(AXEMAN, "staging"), zone("f0", "encounterDiscard"), window("choose", false)] },
   { line: "131070:A:2", name: "Shadow: the defending player deals damage among his characters equal to the Goblin enemies engaged with him", layout: { stage: "131027", engaged: ["f3", AXEMAN, MINERS], deck: ["f0", "f0", "f0"] }, act: [attack("f3", { shadow: GRIP }), defend("dh1"), answer("dh2"), answer("dh2")], expect: [damageOn("dh2", 2)] },
+  { line: "131070:A:2", name: "Shadow: a Goblin enemy engaged with another player is not counted", layout: { stage: "131027", seats: 2, engaged: ["f3", AXEMAN, { code: MINERS, seat: 1 }], deck: ["f0", "f0", "f0"] }, act: [attack("f3", { shadow: GRIP }), defend("dh1"), answer("dh2")], expect: [damageOn("dh2", 1)] },
 ];
 
 cardSpecs(ID, ROWS);

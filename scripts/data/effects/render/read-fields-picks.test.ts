@@ -22,6 +22,7 @@ describe("effects render read fields, picks", () => {
     bottom: 2,
     staging: true,
     stagingOnly: true,
+    onCharacter: true,
     atStage: true,
     otherArea: true,
     atOtherStage: true,

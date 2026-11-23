@@ -68,8 +68,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("CountEncounterTop"), top: z.number().int().positive(), type: encounterType, not: z.boolean().optional(), ...when }),
   // Reveals the top card of the encounter deck for the actor, or for the player the answered event happened to
   // (`eventSeat`), in a staging of its own (rr.reveal, rr.staging): the effect goes on once that card is resolved.
+  // `lessX` (with `times`): the effect's X, which an earlier ChooseX fixed, fewer cards, at least 1 ("Reveal 3 encounter cards per player, Bilbo Baggins may spend X resources to reduce the total number of encounter cards revealed by X. (To a minimum of 1.)", 131028:B:2).
   // `times`: that many cards, one after the other, each in a staging of its own ("reveals 1 encounter card for each resource here", 143078:B:2; read once, when the first is revealed).
-  verbFlags(z.strictObject({ verb: z.literal("RevealEncounter"), who: z.enum(["actor", "eventSeat", "firstPlayer"]).optional(), times: positiveAmountSchema.optional(), ...when }), { runsInFrame: true, setupRuns: "inForEachPlayer" }),
+  verbFlags(z.strictObject({ verb: z.literal("RevealEncounter"), who: z.enum(["actor", "eventSeat", "firstPlayer"]).optional(), times: positiveAmountSchema.optional(), lessX: z.literal(true).optional(), ...when }), { runsInFrame: true, setupRuns: "inForEachPlayer" }),
   // Searches the encounter deck, then its discard pile, then the player's collection (in that order, "search the encounter deck, discard pile, and
   // your collection for a Goblin Sniper", 41041:A:1) for a card with the printed title of `code`, and adds it to the staging area. The app tracks
   // no collection (docs/brief.md): the collection holds every card the game knows, so a copy of `code` is made when neither the deck nor the pile

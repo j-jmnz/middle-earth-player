@@ -6,7 +6,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import type { AmountScope } from "../../interpret/amounts.ts";
+import { frameScope, resolveAmount, type AmountScope } from "../../interpret/amounts.ts";
 import type { Focus } from "../index.ts";
 import { spendablePools } from "../costs/verbs.ts";
 import { livingSeats } from "../../core/state.ts";
@@ -53,7 +53,7 @@ function amount(state: ScenarioState, found: Exclude<Amount, number>, scope: Amo
 function unpayable(state: ScenarioState, instruction: Instruction, ctx: ReduceContext): boolean {
   if (instruction.verb !== "ForEachPlayer") return false;
   const spend = instruction.instructions.find((inner) => inner.verb === "SpendResources");
-  return spend?.verb === "SpendResources" && livingSeats(state).some((seat) => spendablePools(state, seat, {}, ctx).total < spend.amount);
+  return spend?.verb === "SpendResources" && livingSeats(state).some((seat) => spendablePools(state, seat, {}, ctx).total < resolveAmount(state, spend.amount, frameScope(state, seat, null), ctx));
 }
 
 export const manifest: RulesFamily = {

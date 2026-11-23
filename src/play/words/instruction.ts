@@ -186,7 +186,8 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
     // The costs family's verbs (src/catalog/families/costs.ts).
     case "SpendResources": {
       const sphere = instruction.sphere ? `${capital(instruction.sphere)} ` : "";
-      return `${instruction.group ? "the players as a group spend" : "spend"} ${instruction.amount} ${sphere}resource${instruction.amount === 1 ? "" : "s"}`;
+      const amount = amountWords(instruction.amount);
+      return `${instruction.group ? "the players as a group spend" : "spend"} ${amount} ${sphere}resource${amount === "1" ? "" : "s"}`;
     }
     case "SetX":
       return `X is ${instruction.value}`;
