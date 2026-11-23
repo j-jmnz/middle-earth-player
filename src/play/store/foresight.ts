@@ -49,7 +49,10 @@ function leavesPlayLoss(game: ScenarioState, ctx: ReduceContext, cardId: string)
 /** Whether discarding a card from play would lose the game now (a hero who carries Wormsbane, the One Ring's bearer, Bilbo Baggins): the reason, or null. */
 export function discardLoss(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
   const after = destroyCard(game, cardId, ctx.cards, []);
-  return after.lost && !game.lost ? (after.lossReason ?? "The game is lost") : leavesPlayLoss(game, ctx, cardId);
+  if (after.lost && !game.lost) return after.lossReason ?? "The game is lost";
+  // A card that stayed in play (a destruction that something replaced) leaves no record to hear.
+  const left = after.cards[cardId];
+  return left == null || !inPlay(left.zone) ? leavesPlayLoss(game, ctx, cardId) : null;
 }
 
 /** What placing `damage` combat damage on a card would do now. */

@@ -112,8 +112,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   { id: "131037:forced:1", cardCode: "131037", lines: ["131037:A:2"], timing: "forced", trigger: "traveled", subject: "self", instructions: [{ verb: "SpendBagginsToTravel", ...TRAVEL_COST }] },
 
   // 131038 Hobbit-lands.
-  // Hobbit-lands has 1 quest point, so any progress placed on it explores it, and a location the progress explored has left play and hears nothing (families/burden/effects.ts announceProgress). The Response is therefore heard as the card leaves play explored (rr.explored); every placement on it is that one.
-  { id: "131038:response:1", cardCode: "131038", lines: ["131038:A:1"], timing: "response", trigger: "leftPlay", subject: "self", condition: { kind: "subjectExplored" }, instructions: [{ verb: "Draw", amount: 1, who: "firstPlayer" }] },
+  // Hobbit-lands has 1 quest point, so every placement of progress on it explores it. Like Dreary Hills and Lone-Lands (set-western-lands.ts) the Response hears `progressPlacedOnSelf`, which is announced for the exploring placement too (families/burden/effects.ts).
+  { id: "131038:response:1", cardCode: "131038", lines: ["131038:A:1"], timing: "response", trigger: "progressPlacedOnSelf", subject: "self", instructions: [{ verb: "Draw", amount: 1, who: "firstPlayer" }] },
   { id: "131038:shadow:1", cardCode: "131038", lines: ["131038:A:2"], timing: "shadow", instructions: [{ verb: "MoveEncounterCard", card: "discardTop", to: "deckTop" }] },
 
   // 131042 Troll Purse, 131043 Troll Key.
