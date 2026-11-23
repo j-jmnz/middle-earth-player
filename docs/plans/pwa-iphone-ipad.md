@@ -50,7 +50,7 @@ If Phase 0 shows that a deploy of the whole export is too slow or too large, the
 
 1. **Public pictures and music.** Settled: the site is public and serves every card picture and the music loops (user decisions, 2026-11-23). A complaint to Cloudflare can take it down.
 2. **The domain.** Settled: the origin is `https://ringsplayer.app` (user decision, 2026-11-23), the `production` environment of `webapp/wrangler.toml`. It holds the saves, so it never changes after players use it, like the desktop's names (`desktop/identity.ts`). The name has no trademark in it, so a domain dispute is unlikely to take it.
-3. **What "offline" means on the web.** The phone and desktop builds carry every picture. A gigabyte before the first game is too much in a browser. Recommendation: the app shell is cached at install (it plays offline with cards drawn as text), each picture is cached when first shown, and Settings has Download pictures for each campaign and for all, with the size and progress.
+3. **What "offline" means on the web.** Settled (user decision, 2026-11-23): the app shell is cached at install, so the app always opens and plays with no network, and a card with no picture on the device is drawn as its text. Pictures come as the player plays, with no page to find (Phase 2: offline and updates, Pictures without a search).
 4. **Save sync between devices.** Possible later with a Worker and R2 or D1, but it sends saves off the device, which the app never does today. Recommendation: not in this plan; Back up saves and Restore cover a move between devices.
 5. **Keeping the SideStore IPA and TestFlight.** The web app does not replace them until it has proved stable. Recommendation: keep both.
 
@@ -71,15 +71,24 @@ Exit: a short report with each answer. The user decides to go on, to change the 
 - A build flag beside `EXPO_PUBLIC_DESKTOP` (`EXPO_PUBLIC_WEBAPP=1`) and `pnpm webapp build`: the packs, the export, the manifest, the service worker and the `_headers` file. The desktop export and the phone bundles do not change (`pnpm test phone-bundle`, `scripts/checks/phone-files.test.ts`).
 - Headers: COOP `same-origin`, COEP `require-corp`, and the CSP of `desktop/serve.ts` with the web app's `connect-src`. `desktop/serve.ts` and `scripts/browser/web-export.ts` keep `credentialless` for Electron, or move to `require-corp` too if Phase 0 shows no cost, so one policy is tested.
 - Manifest and iOS tags: name, icons (a 180 px `apple-touch-icon`, maskable icons), `display: standalone`, theme and background colours, `viewport-fit=cover` with the safe-area insets the screens already read, a black status bar.
-- Pictures follow decision 3: `src/screens/images/remote.ts` gets a web app rule that reads the origin's packed pictures.
+- Pictures: `src/screens/images/remote.ts` gets a web app rule that reads the origin's packed pictures, so each picture loads when its card is first shown.
 - Settings on the web app: the desktop's categories, without the update check's link to an installer.
 
 ## Phase 2: offline and updates
 
 - A service worker precaches the shell (the routes' HTML, the bundle, CanvasKit, the `expo-sqlite` and pdf.js workers, `catalog.db`, fonts, icons, sound effects) by content hash, and answers pictures, music and booklets cache-first from a second cache. Cached responses keep the COOP and COEP headers, so an offline launch is still isolated.
-- Download pictures (decision 3): a queue in the page, time-boxed like the phone's download queue, that fills the picture cache and shows its size. It asks `navigator.storage.persist()` and reports the quota from `navigator.storage.estimate()`.
+- A picture queue in the page, time-boxed like the phone's download queue, fills the picture cache. It asks `navigator.storage.persist()`, compares a download's size with `navigator.storage.estimate()` before it starts, and goes on from where it stopped when the app is opened again, since iOS stops a web app in the background. A release that changes a picture gives it a new path: the queue fetches the changed ones and drops the old.
 - Updates: a new service worker waits until no game is on screen, then the app shows the update ribbon (`src/ui/update`) with Reload in place of the release link. A reload lands on the same checks an app update does (`docs/architecture.md`, Open games across an update). An old tab never runs a new `user.db` migration under old code: the page reloads when the worker changes.
 - One page at a time: a second tab or window of the same origin shows "The app is open in another tab" in place of opening the database (Web Locks), because WebKit gives one writer to an OPFS file.
+
+### Pictures without a search
+
+No player has to find a Settings page to get pictures (user decision, 2026-11-23).
+
+- **Automatic.** Opening a scenario's briefing queues that scenario's pictures; choosing a campaign queues its next scenarios; saving a deck queues the deck's pictures. Nothing is tapped. The music loops and the booklets are cached when first used.
+- **One question at first launch.** "Download as I play" (the default, the automatic queue), "Download everything now" (every picture, the booklets and the music, with its size and a progress bar), or "Only download when I ask" (for mobile data: a browser on iOS cannot tell Wi-Fi from it). Settings changes the answer.
+- **Status where the player is.** The campaign hub marks each campaign "Ready offline" or shows its progress, and a tap starts or stops that campaign's download. With no network, a briefing whose pictures are not all on the device says how many cards will be drawn as text before the game starts.
+- **Settings only manages.** A Pictures page shows the storage used for each campaign, the decks and all, with Remove. Remove deletes the pictures no other kept group uses, and never a save or a deck.
 
 ## Phase 3: iPhone and iPad fit
 
@@ -99,4 +108,4 @@ Exit: a short report with each answer. The user decides to go on, to change the 
 
 ## Order and size
 
-Phase 0 is days and needs the user's devices and a Cloudflare account. Phases 1 and 2 are the bulk of the code and can be checked in Chromium. Phase 3 needs the devices again. Phase 4 can start after Phase 1. Decision 3 is needed before Phase 1.
+Phase 0 is days and needs the user's devices and a Cloudflare account. Phases 1 and 2 are the bulk of the code and can be checked in Chromium. Phase 3 needs the devices again. Phase 4 can start after Phase 1.
