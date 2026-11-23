@@ -12,7 +12,6 @@ import { gainSeatResources, runInstruction } from "../../../rules/interpret/inte
 import { settle } from "../../../rules/engine/machine.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
-import { stagingThreat } from "../../../rules/quest/quest.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
 import { finish, fightEnemy, first, revealedTop, idOf, legalIntents, legalTargets, opening, resolveRecords, revealFromTop, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
@@ -438,19 +437,6 @@ describe("Stage 5 (132079:B:1, 132079:B:2, 132079:B:3)", () => {
     const before = table({ stage: S1, staging: ["132053"] });
     const unsynced = syncConstants(before.state, before.ctx);
     expect(flagged(unsynced, idOf(unsynced, "132053"), "engagedWithFirst")).toBe(false);
-  });
-
-  // Bolg is considered engaged but stays in the staging area, so he keeps adding his Threat to it, as Durin's Bane does (dwd.durins-bane; the card says nothing against it).
-  it("132079:B:2 Bolg, engaged with the first player in the staging area, still adds his Threat to the staging area", () => {
-    for (const seats of [1, 2] as const) {
-      const five = table({ seats, stage: S5, staging: ["132053"] });
-      const synced = syncConstants(five.state, five.ctx);
-      expect(flagged(synced, idOf(synced, "132053"), "engagedWithFirst")).toBe(true);
-      expect(flagged(synced, idOf(synced, "132053"), "noThreatContribution")).toBe(false);
-      expect(stagingThreat(synced, five.ctx.cards)).toBe(seats);
-      const before = table({ seats, stage: S1, staging: ["132053"] });
-      expect(stagingThreat(syncConstants(before.state, before.ctx), before.ctx.cards)).toBe(seats);
-    }
   });
 
   it("132079:B:3 damage that destroys Bolg in the staging area discards him and wins the game", () => {

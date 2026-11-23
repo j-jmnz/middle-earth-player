@@ -3,12 +3,12 @@
 import { describe, expect, it } from "vitest";
 
 import { modifiedStat } from "../../../rules/core/keywords.ts";
-import type { ScenarioState } from "../../../rules/core/state.ts";
+import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { askCurrentStage, stageComplete } from "../../../rules/families/armies/stages.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
-import { committedWillpower } from "../../../rules/quest/quest.ts";
+import { committedWillpower, stagingThreat } from "../../../rules/quest/quest.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { EFFECTS } from "../../../effects/index.ts";
@@ -183,6 +183,19 @@ describe("stage 5 takes no progress (132079:B:2)", () => {
       const made = { ...inPlay({ seats }), state: table({ seats, stage: S5, staging: ["132053"] }).state };
       const placed = place(made, 4);
       expect(progressOn(placed, S5)).toBe(0);
+    }
+  });
+
+  // Bolg is considered engaged but stays in the staging area, so he keeps adding his Threat to it, as Durin's Bane does (dwd.durins-bane; the card says nothing against it).
+  it("132079:B:2 Bolg, engaged with the first player in the staging area, still adds his Threat to the staging area", () => {
+    for (const seats of [1, 2] as const) {
+      const five = table({ seats, stage: S5, staging: ["132053"] });
+      const synced = syncConstants(five.state, five.ctx);
+      expect(flagged(synced, idOf(synced, "132053"), "engagedWithFirst")).toBe(true);
+      expect(flagged(synced, idOf(synced, "132053"), "noThreatContribution")).toBe(false);
+      expect(stagingThreat(synced, five.ctx.cards)).toBe(seats);
+      const before = table({ seats, stage: S1, staging: ["132053"] });
+      expect(stagingThreat(syncConstants(before.state, before.ctx), before.ctx.cards)).toBe(seats);
     }
   });
 
