@@ -26,6 +26,7 @@ export const ASIDE_SITES: Readonly<Record<string, AsideSite>> = {
   "families/black-gate/embassy.ts": { functions: ["layFaceup"], group: "public", why: "The embassy's row is laid faceup." },
   "families/breaking/areas.ts": { functions: ["discardArea"], group: "notListed", why: "A seat's quest stage." },
   "families/breaking/index.ts": { functions: ["advanceToStage", "discardSharedStage", "shuffleSetAsideIntoDiscard", "startRandomSeparateStage"], group: "notListed", why: "Quest stages, the random separate stage among them." },
+  "families/burgle/stack.ts": { functions: ["stackUnder"], group: "public", why: "StackUnder: the Setup names the Erebor treasures; they leave the set-aside zone to lie facedown under The Lonely Mountain, so none stays set aside and the shuffle only orders the stack." },
   "families/campaign/aside.ts": { functions: ["setAsideHeroWithAttachments", "setAsideLogged"], group: "public", why: "A named hero with his attachments, and the cards the campaign log records." },
   "families/campaign/index.ts": { functions: ["run"], group: "public", why: "SetAsideEachPlayer: a named card for each player." },
   "families/captured/deck.ts": { functions: ["prepareCapturedDeck", "setAsideCapturedBoons"], group: "public", why: "The boons of a captured hero, faceup; the captured deck is not in the set-aside zone." },

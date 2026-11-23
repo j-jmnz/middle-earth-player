@@ -79,6 +79,7 @@ import { grimFixtures } from "./the-hobbit/over-the-misty-mountains-grim.ts";
 import { spidersFixtures } from "./the-hobbit/flies-and-spiders.ts";
 import { dayFixtures } from "./the-hobbit/we-must-away-ere-break-of-day.ts";
 import { dimFixtures } from "./the-hobbit/dungeons-deep-and-caverns-dim.ts";
+import { mountainFixtures } from "./the-hobbit/the-lonely-mountain.ts";
 import { ithilienFixtures } from "./against-the-shadow/into-ithilien.ts";
 
 // The scenarios scenario 1's block writes by hand (`won` is the one fixture not committed that the registry names, `knife-lost` starts from its log).
@@ -171,4 +172,5 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "over-the-misty-mountains-grim": () => grimFixtures(),
   "dungeons-deep-and-caverns-dim": () => dimFixtures(),
   "flies-and-spiders": () => spidersFixtures(),
+  "the-lonely-mountain": () => mountainFixtures(),
 };

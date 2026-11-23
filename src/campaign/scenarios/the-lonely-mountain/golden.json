@@ -1,0 +1,48 @@
+[
+{
+"name":"solo win",
+"seatCount":1,
+"seed":9,
+"difficulty":"Normal",
+"decks":"strong",
+"outcome":"won",
+"intents":[{"type":"Pass"},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i40","i41","i42"]},{"type":"Pass"},{"type":"Choose","optionId":"spend"},{"type":"Pass"},{"type":"Choose","optionId":"discard"},{"type":"Choose","optionId":"advance"},{"type":"Travel","locationId":"i18"},{"type":"DeclineEngage"},{"type":"Undefended","heroId":"i40"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i40","i41","i42"]},{"type":"Pass"},{"type":"Choose","optionId":"leadership"},{"type":"Pass"},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"DeclineEngage"},{"type":"Undefended","heroId":"i40"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i40","i41","i42"]},{"type":"Pass"},{"type":"Undefended","heroId":"i40"},{"type":"Pass"}],
+"checks":[1470458201,1397040523,2843633782,2576005905,1634933396,716297153,1181406631,4105088222,1227773243,2283602293,1948479287,2949348,1388810688,1718986338,1853737877,3201811568,399706267,1137472302,3698033368,3698033368,1643880054,3690997480,4275746562,389790910,2360670373,2293258114,2307663045,3852845505,2163105376,2690437466],
+"end":{"round":4,"lost":false,"cleared":true,"hash":"094cff92f2d73d90b8a523a3"}
+},
+{
+"name":"Easy two-handed win",
+"seatCount":2,
+"seed":7,
+"difficulty":"Easy",
+"decks":"strong",
+"outcome":"won",
+"intents":[{"type":"Keep"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i62","i63","i64","i29"]},{"type":"Pass"},{"type":"Commit","cardIds":["i30","i31"]},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Choose","optionId":"discard"},{"type":"Choose","optionId":"advance"},{"type":"Travel","locationId":"i24"},{"type":"DeclineEngage"},{"type":"DeclineEngage"},{"type":"Undefended","heroId":"i62"},{"type":"Undefended","heroId":"i62"},{"type":"Undefended","heroId":"i62"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i30","i31","i29"]},{"type":"Pass"},{"type":"Commit","cardIds":["i62","i63","i64"]},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"}],
+"checks":[2386149183,2386149183,1290901100,1290901100,1290901100,1290901100,740975934,3750407754,3750407754,1491892845,1491892845,1491892845,1491892845,2919263656,636702684,636702684,230513530,4108277543,4108277543,4158603671,1244716085,3537760898,2653112588,2653112588,365386207,3142685548,4160393163,3410362418,3410362418,1536440069,1536440069,1536440069,1536440069,1470812448,993025477,993025477,1175219184,4068588186,4068588186,156977300],
+"end":{"round":3,"lost":false,"cleared":true,"hash":"5eeb57377a74b07a54287682"}
+},
+{
+"name":"solo loss: threat 50",
+"seatCount":1,
+"seed":5,
+"difficulty":"Normal",
+"decks":"weak",
+"outcome":"lost",
+"lossReason":"No seats remain",
+"intents":[{"type":"Pass"},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i40","i41","i42"]},{"type":"Pass"},{"type":"Choose","optionId":"spend"},{"type":"DeclineTravel"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i40","i41","i42"]},{"type":"Pass"},{"type":"Choose","optionId":"spend"},{"type":"Undefended","heroId":"i40"},{"type":"DeclineTravel"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i40","i41","i42"]},{"type":"Pass"},{"type":"Travel","locationId":"i13"},{"type":"Undefended","heroId":"i40"},{"type":"Undefended","heroId":"i40"}],
+"checks":[1287468210,1589183716,1995103167,1151637052,908939975,452362098,1472262188,1113015365,4197881214,1645665221,2275573030,2205508599,557866811,2204540071,42502010,1108113661,4279725030,762035269,2266013900,2409789058,2812832841,2686992444,352631843],
+"end":{"round":4,"lost":true,"cleared":false,"lossReason":"No seats remain","hash":"c778b88dbb822147617a0b36"}
+},
+{
+"name":"two-handed loss: Bilbo Baggins leaves play",
+"seatCount":2,
+"seed":3,
+"difficulty":"Normal",
+"decks":"brittle",
+"outcome":"lost",
+"lossReason":"Bilbo Baggins left play",
+"intents":[{"type":"Keep"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i73","i74","i75","i40"]},{"type":"Pass"},{"type":"Commit","cardIds":["i41","i42"]},{"type":"Pass"},{"type":"Choose","optionId":"i73"},{"type":"Pass"},{"type":"Pass"},{"type":"Choose","optionId":"discard"},{"type":"Choose","optionId":"advance"},{"type":"DeclineTravel"},{"type":"Undefended","heroId":"i73"},{"type":"Undefended","heroId":"i74"},{"type":"Undefended","heroId":"i75"},{"type":"Undefended","heroId":"i40"}],
+"checks":[1513344390,1513344390,1727226241,1727226241,1727226241,1727226241,3058316579,3066673937,3066673937,2820139282,2820139282,2820139282,2820139282,3228835021,2001224111,2001224111,2923223625,3448067310,2235742947,2235742947,2204100347,1662419200,1524271459,2584401573,2780056430,1881140399,2923345844,2703325514],
+"end":{"round":2,"lost":true,"cleared":false,"lossReason":"Bilbo Baggins left play","hash":"b79d7ab6df05333e2ebc572c"}
+}
+]
