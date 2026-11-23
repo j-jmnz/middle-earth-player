@@ -4,10 +4,9 @@
 // that need two steps, a second player or a false case build the same table. The stand-in heroes dh1 and dh2 have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; the ally stand-in has 1 Defense and 2 hit points.
 import { describe, expect, it } from "vitest";
 
-import { EFFECTS } from "../../../effects/index.ts";
 import { attachBlocked } from "../../../rules/interpret/restrictions.ts";
-import { play } from "../../../../test/harness/card-spec-play.ts";
-import { answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, exhausted, flag, offers, respond, reveal, stat, threat, zone, type Act, type Row } from "../../../../test/harness/card-spec.ts";
+import { playedLayout } from "../../../../test/harness/card-spec-play.ts";
+import { answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, exhausted, flag, offers, respond, reveal, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { finish, idOf, type Layout, legalIntents, resolveRecords, type Run, send, start, statOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
@@ -80,11 +79,9 @@ const ROWS: readonly Row[] = [
 
 cardSpecs(SCENARIO, ROWS);
 
-const played = (layout: Layout, act: Act | readonly Act[]) => play(SCENARIO, { line: "", layout, act, expect: [] } satisfies Row, EFFECTS, false);
-
 describe("Journey Up the Anduin encounter lines that need more than one row", () => {
   it("18017:A:1 engages the enemy with the first player, not the player the event names", () => {
-    const done = played({ seats: 2, firstPlayer: 1, staging: [WOODED_RIVERBANK], piles: evil(HILL_TROLL) }, { act: "announce", trigger: "locationExplored", code: WOODED_RIVERBANK });
+    const done = playedLayout(SCENARIO, { seats: 2, firstPlayer: 1, staging: [WOODED_RIVERBANK], piles: evil(HILL_TROLL) }, { act: "announce", trigger: "locationExplored", code: WOODED_RIVERBANK });
     expect(done.run.state.cards[idOf(done.run.state, HILL_TROLL)]).toMatchObject({ zone: "engaged", controller: 1 });
   });
 
@@ -97,26 +94,26 @@ describe("Journey Up the Anduin encounter lines that need more than one row", ()
   });
 
   it("18017:A:2 deals no damage of its own to an undefended attack: there is no defending character", () => {
-    const done = played({}, attack("f0", { shadow: WOODED_RIVERBANK, undefended: true }));
+    const done = playedLayout(SCENARIO, {}, attack("f0", { shadow: WOODED_RIVERBANK, undefended: true }));
     // The filler's 1 Attack lands on the hero; the Shadow adds nothing.
     expect(done.run.state.cards[done.table.hero]?.damage).toBe(1);
   });
 
   it("18018:A:2 attaches to Goblin Troop as well: an encounter card is not a player card attachment", () => {
-    const done = played({}, [attack(GOBLIN_TROOP, { shadow: FRENZIED_CREATURE }), defend("dh1")]);
+    const done = playedLayout(SCENARIO, {}, [attack(GOBLIN_TROOP, { shadow: FRENZIED_CREATURE }), defend("dh1")]);
     const troop = done.run.state.cards[idOf(done.run.state, GOBLIN_TROOP)]!;
     expect(troop.attachments.map((id) => done.run.state.cards[id]?.code)).toContain(FRENZIED_CREATURE);
   });
 
   it("18019:A:1 makes each of two players assign X damage among the characters he controls", () => {
-    const done = played({ seats: 2, active: GLADDEN, deck: ["f0"] }, reveal(DANGEROUS_CROSSING));
+    const done = playedLayout(SCENARIO, { seats: 2, active: GLADDEN, deck: ["f0"] }, reveal(DANGEROUS_CROSSING));
     const { state } = done.run;
     expect((state.cards[done.table.hero]?.damage ?? 0) + (state.cards[done.table.hero2]?.damage ?? 0)).toBe(3);
     expect(state.cards[done.table.seat1Hero ?? ""]?.damage).toBe(3);
   });
 
   it("18019:A:1 gains surge with no active location (X is 0) and deals no damage", () => {
-    const done = played({ deck: ["f0"] }, reveal(DANGEROUS_CROSSING));
+    const done = playedLayout(SCENARIO, { deck: ["f0"] }, reveal(DANGEROUS_CROSSING));
     expect(done.run.state.cards[idOf(done.run.state, "f0")]?.zone).toBe("staging");
     expect((done.run.state.cards[done.table.hero]?.damage ?? 0) + (done.run.state.cards[done.table.hero2]?.damage ?? 0)).toBe(0);
   });
@@ -150,12 +147,12 @@ describe("Journey Up the Anduin encounter lines that need more than one row", ()
   });
 
   it("18022:A:1 attacks once when its shadow card has an effect", () => {
-    const done = played({}, attack(PACK_OF_WARGS, { shadow: WOODED_RIVERBANK, undefended: true }));
+    const done = playedLayout(SCENARIO, {}, attack(PACK_OF_WARGS, { shadow: WOODED_RIVERBANK, undefended: true }));
     expect(done.run.state.cards[done.table.hero]?.damage).toBe(4);
   });
 
   it("18023:A:2 ends its -1 Threat at the end of the phase", () => {
-    const done = played({ phase: "Quest", staging: [HILLS], deck: ["f0"] }, [respond(HILLS), answer("dh2"), { act: "endPhase" }]);
+    const done = playedLayout(SCENARIO, { phase: "Quest", staging: [HILLS], deck: ["f0"] }, [respond(HILLS), answer("dh2"), { act: "endPhase" }]);
     expect(done.run.state.phase).not.toBe("Quest");
     expect(statOf(done.run.state, done.table.ctx.cards, HILLS, "threat")).toBe(2);
   });

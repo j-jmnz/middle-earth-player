@@ -4,7 +4,6 @@
 // line's records; the other tests build the same table. The stand-in heroes dh1 and dh2 quest for 4 Willpower together.
 import { describe, expect, it } from "vitest";
 
-import { EFFECTS } from "../../../effects/index.ts";
 import { updateCard, withMode, type ScenarioState } from "../../../rules/core/state.ts";
 import { attachTo, moveCard, spawn } from "../../../rules/core/zones.ts";
 import { settle } from "../../../rules/engine/machine.ts";
@@ -13,7 +12,7 @@ import { placeProgress } from "../../../rules/interpret/effect-verbs.ts";
 import { openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, type PlayerIntent, type ReduceContext } from "../../../rules/engine/reduce.ts";
-import { play } from "../../../../test/harness/card-spec-play.ts";
+import { playedLayout } from "../../../../test/harness/card-spec-play.ts";
 import { cardSpecs, defend, attack, lost, quest, resolve, resourcesOn, revealedBy, travel, won, zone, deckCount, type Act, type Row } from "../../../../test/harness/card-spec.ts";
 import { finish, idOf, legalIntents, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
@@ -61,13 +60,12 @@ const ROWS: readonly Row[] = [
 
 cardSpecs(SCENARIO, ROWS);
 
-const played = (layout: Layout, act: Act | readonly Act[]) => play(SCENARIO, { line: "", layout, act, expect: [] } satisfies Row, EFFECTS, false);
 const codeAt = (state: ScenarioState, ids: readonly string[]) => ids.map((id) => state.cards[id]?.code);
 
 describe("18066 Traveling North", () => {
   it("18066:B:1 places no resource when the quest's progress all goes to the active location", () => {
     // Lonely Lands, active with 5 quest points, takes the 4 progress: none is placed on the stage.
-    const done = played({ stage: TRAVELING_NORTH, active: LONELY_LANDS, deck: ["f0"] }, quest("success"));
+    const done = playedLayout(SCENARIO, { stage: TRAVELING_NORTH, active: LONELY_LANDS, deck: ["f0"] }, quest("success"));
     expect(done.run.state.cards[idOf(done.run.state, LONELY_LANDS)]?.progress).toBe(4);
     expect(done.run.state.cards[idOf(done.run.state, TRAVELING_NORTH)]).toMatchObject({ progress: 0, resources: 0 });
   });
@@ -106,7 +104,7 @@ describe("18066 Traveling North", () => {
 
 describe("18067 Woodmen Under Attack", () => {
   it("18067:A:1 with one player adds only Woodmen Village and reveals nothing", () => {
-    const done = played({ stage: WOODMEN_UNDER_ATTACK, setAside: [WOODMEN_VILLAGE], deck: ["f0", "f0"] }, resolve(WOODMEN_UNDER_ATTACK, "whenRevealed"));
+    const done = playedLayout(SCENARIO, { stage: WOODMEN_UNDER_ATTACK, setAside: [WOODMEN_VILLAGE], deck: ["f0", "f0"] }, resolve(WOODMEN_UNDER_ATTACK, "whenRevealed"));
     expect(codeAt(done.run.state, done.run.state.staging)).toEqual([WOODMEN_VILLAGE]);
     expect(done.run.state.encounterDeck).toHaveLength(2);
   });
@@ -129,7 +127,7 @@ describe("18067 Woodmen Under Attack", () => {
   });
 
   it("18067:B:3 is defeated once the first player controls Haldan", () => {
-    const done = played({ stage: WOODMEN_UNDER_ATTACK, progress: 1, play: [HALDAN], deck: ["f0"] }, quest("success"));
+    const done = playedLayout(SCENARIO, { stage: WOODMEN_UNDER_ATTACK, progress: 1, play: [HALDAN], deck: ["f0"] }, quest("success"));
     expect(done.run.state.cards[idOf(done.run.state, WOODMEN_UNDER_ATTACK)]?.zone).not.toBe("questStage");
     expect(done.run.state.cards[done.run.state.questStage ?? ""]?.code).toBe(PASSAGE);
   });
@@ -137,13 +135,13 @@ describe("18067 Woodmen Under Attack", () => {
 
 describe("18068 The Passage of the Ford", () => {
   it("18068:A:1 with one player adds only The Old Ford", () => {
-    const done = played({ stage: PASSAGE, setAside: [OLD_FORD], piles: evil(HILL_TROLL) }, resolve(PASSAGE, "whenRevealed"));
+    const done = playedLayout(SCENARIO, { stage: PASSAGE, setAside: [OLD_FORD], piles: evil(HILL_TROLL) }, resolve(PASSAGE, "whenRevealed"));
     expect(codeAt(done.run.state, done.run.state.staging)).toEqual([OLD_FORD]);
     expect(done.run.state.piles?.evilCreaturesDeck).toHaveLength(1);
   });
 
   it("18068:B:2 adds nothing at the beginning of another phase", () => {
-    const done = played({ stage: PASSAGE, phase: "Travel", staging: ["f0"], piles: evil(HILL_TROLL) }, endPhase);
+    const done = playedLayout(SCENARIO, { stage: PASSAGE, phase: "Travel", staging: ["f0"], piles: evil(HILL_TROLL) }, endPhase);
     expect(done.run.state.phase).toBe("Encounter");
     expect(done.run.state.cards[idOf(done.run.state, HILL_TROLL)]?.zone).toBe("evilCreaturesDeck");
   });
@@ -167,7 +165,7 @@ describe("18068 The Passage of the Ford", () => {
   });
 
   it("18068:B:3 does not win when another location is explored", () => {
-    const done = played({ stage: PASSAGE, active: BANKS }, { act: "announce", trigger: "locationExplored", code: BANKS });
+    const done = playedLayout(SCENARIO, { stage: PASSAGE, active: BANKS }, { act: "announce", trigger: "locationExplored", code: BANKS });
     expect(done.run.state.stageCleared).not.toBe(true);
   });
 });
@@ -194,7 +192,7 @@ describe("18070 Haldan", () => {
   });
 
   it("18070:A:3 does not lose the game when another card leaves play", () => {
-    const done = played({ play: [HALDAN, "ally"] }, { act: "announce", trigger: "leftPlay", code: "ally" });
+    const done = playedLayout(SCENARIO, { play: [HALDAN, "ally"] }, { act: "announce", trigger: "leftPlay", code: "ally" });
     expect(done.run.state.lost).not.toBe(true);
   });
 });

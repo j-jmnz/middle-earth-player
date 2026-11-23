@@ -12,8 +12,8 @@ import { spawn } from "../../../rules/core/zones.ts";
 import { buildStart } from "../../start.ts";
 import { applyResolution, emptyLog } from "../../log.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
-import { play } from "../../../../test/harness/card-spec-play.ts";
-import { quest, type Row } from "../../../../test/harness/card-spec.ts";
+import { playedLayout } from "../../../../test/harness/card-spec-play.ts";
+import { quest } from "../../../../test/harness/card-spec.ts";
 import { idOf, idsOf, legalIntents, resolveRecords, send, start, tableFromLayout, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
 import { campaign, scenario } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
 import { RING_BEARER, starterLoadout, starterStart, starterWorld } from "../../../../test/scenarios/a-shadow-of-the-past/game.ts";
@@ -22,7 +22,6 @@ const SCENARIO = "a-shadow-of-the-past";
 const RING = "141085";
 const UNDERHILL = "141017";
 const table = (layout: Layout): LayoutTable => tableFromLayout(SCENARIO, layout, { extra: [RING, RING_BEARER, UNDERHILL] });
-const played = (layout: Layout, act: Row["act"]) => play(SCENARIO, { line: "", layout, act, expect: [] }, EFFECTS, false);
 const without = (...ids: string[]): readonly Effect[] => EFFECTS.filter((effect) => !ids.includes(effect.id));
 
 // The codes of the cards attached to a card.
@@ -148,7 +147,7 @@ describe("141030 A Shadow of the Past, the campaign card", () => {
 
   // "Resolution: Choose Gandalf's Delay or The Ring Draws Them and add it to the Campaign Pool. Then, choose Gildor Inglorion or Mr. Underhill and add it to the Campaign Pool."
   it("141030:B:1 the first player chooses one card of each pair, in the card's order, and both go into the Campaign Pool", () => {
-    const done = played({ stage: "141024", campaign: true, active: { code: "141035", progress: 8 }, deck: ["f0", "f0", "f0"] }, quest("success"));
+    const done = playedLayout(SCENARIO, { stage: "141024", campaign: true, active: { code: "141035", progress: 8 }, deck: ["f0", "f0", "f0"] }, quest("success"));
     const ctxOf = done.table.ctx;
     const options = (state: ScenarioState) => reduceOptions(state, ctxOf);
     let state = done.run.state;
@@ -177,14 +176,14 @@ function accept(state: ScenarioState, optionId: string, ctx: ReduceContext): Sce
 describe("141035 Bucklebury Ferry", () => {
   // "After Bucklebury Ferry leaves play as an explored location, the players win the game." It has 9 quest points; dh1 and dh2 quest for 4 against no Threat.
   it("141035:A:4 the players win when the quest explores it", () => {
-    const done = played({ stage: "141024", active: { code: "141035", progress: 8 }, deck: ["f0", "f0", "f0"] }, quest("success"));
+    const done = playedLayout(SCENARIO, { stage: "141024", active: { code: "141035", progress: 8 }, deck: ["f0", "f0", "f0"] }, quest("success"));
     expect(done.run.state.cards[idOf(done.run.state, "141035")]?.zone).toBe("encounterDiscard");
     expect(done.run.state.stageCleared).toBe(true);
     expect(done.run.state.lost).toBe(false);
   });
 
   it("141035:A:4 a quest that leaves it short of its quest points wins nothing", () => {
-    const done = played({ stage: "141024", active: "141035", deck: ["f0", "f0", "f0"] }, quest("success"));
+    const done = playedLayout(SCENARIO, { stage: "141024", active: "141035", deck: ["f0", "f0", "f0"] }, quest("success"));
     expect(done.run.state.cards[idOf(done.run.state, "141035")]?.zone).toBe("activeLocation");
     expect(done.run.state.stageCleared).toBe(false);
   });

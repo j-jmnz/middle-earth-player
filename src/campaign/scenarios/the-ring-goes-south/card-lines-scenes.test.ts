@@ -14,12 +14,11 @@ import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
 import { attachmentTargets } from "../../../rules/player/planning.ts";
-import { play } from "../../../../test/harness/card-spec-play.ts";
-import { attack, defend, endPhase, endRound, quest, reveal, announce, type Act } from "../../../../test/harness/card-spec.ts";
+import { play, playedLayout } from "../../../../test/harness/card-spec-play.ts";
+import { attack, defend, endPhase, endRound, quest, reveal, announce } from "../../../../test/harness/card-spec.ts";
 import { finish, idOf, idsOf, type Layout, type LayoutTable, legalIntents, send, start, statOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "the-ring-goes-south";
-const played = (layout: Layout, act: Act | readonly Act[]) => play(SCENARIO, { line: "", layout, act, expect: [] }, EFFECTS, false).run.state;
 const zonesOf = (state: ScenarioState, code: string) => idsOf(state, code).map((id) => state.cards[id]?.zone);
 
 // A table with these player cards among its cards, `heroes` among the first seat's heroes (after the stand-ins).
@@ -66,7 +65,7 @@ describe("enemies that cannot have attachments", () => {
 describe("Forced effects after an enemy engages a player", () => {
   // 142025 Great Warg Chief: "Forced: After Great Warg Chief engages you, discard cards from the encounter deck until a Warg enemy is discarded. Put that enemy into play engaged with you." Howling Warg (142027) is a Warg.
   it("142025:A:2 puts the first Warg discarded into play engaged with the player it engaged, the other cards discarded before it", () => {
-    const state = played({ seats: 2, engaged: [{ code: "142025", seat: 1 }], deck: ["place", "f0", "142027", "f3"] }, announce("engaged", "142025", { seat: 1 }));
+    const state = playedLayout(SCENARIO, { seats: 2, engaged: [{ code: "142025", seat: 1 }], deck: ["place", "f0", "142027", "f3"] }, announce("engaged", "142025", { seat: 1 })).run.state;
     expect(state.seats[1]?.engaged.map((id) => state.cards[id]?.code).sort()).toEqual(["142025", "142027"]);
     expect(state.seats[0]?.engaged).toEqual([]);
     expect(state.encounterDiscard.map((id) => state.cards[id]?.code).sort()).toEqual(["f0", "place"]);
@@ -74,7 +73,7 @@ describe("Forced effects after an enemy engages a player", () => {
   });
 
   it("142025:A:2 discards the whole encounter deck and puts nothing into play when it holds no Warg", () => {
-    const state = played({ engaged: ["142025"], deck: ["place", "f0"] }, announce("engaged", "142025"));
+    const state = playedLayout(SCENARIO, { engaged: ["142025"], deck: ["place", "f0"] }, announce("engaged", "142025")).run.state;
     expect(state.encounterDeck).toEqual([]);
     expect(zonesOf(state, "f0")).toEqual(["encounterDiscard"]);
     expect(state.seats[0]?.engaged.map((id) => state.cards[id]?.code)).toEqual(["142025"]);
@@ -82,7 +81,7 @@ describe("Forced effects after an enemy engages a player", () => {
 
   // 142028 Crebain from Dunland: "After Crebain from Dunland engages a player": another enemy engaging reveals nothing.
   it("142028:A:3 reveals nothing when another enemy engages a player", () => {
-    const state = played({ staging: ["142028"], engaged: ["f0"], deck: ["f3"] }, announce("engaged", "f0"));
+    const state = playedLayout(SCENARIO, { staging: ["142028"], engaged: ["f0"], deck: ["f3"] }, announce("engaged", "f0")).run.state;
     expect(zonesOf(state, "f3")).toEqual(["encounterDeck"]);
   });
 });
@@ -96,7 +95,7 @@ describe("the false cases and durations of the encounter cards", () => {
 
   // 142022 The Hunt is Up!: "After a location enters play, place 1 damage on it": an enemy that enters play gets none.
   it("142022:B:2 places no damage on an enemy that enters play", () => {
-    const state = played({ stage: "142022", deck: ["f0"] }, reveal("f3"));
+    const state = playedLayout(SCENARIO, { stage: "142022", deck: ["f0"] }, reveal("f3")).run.state;
     expect(state.cards[idOf(state, "f3")]?.damage).toBe(0);
   });
 
@@ -119,7 +118,7 @@ describe("the false cases and durations of the encounter cards", () => {
     expect(round.round).toBe(made.state.round + 1);
     expect(zonesOf(round, "f3")).toEqual(["staging"]);
     expect(statOf(round, made.cards, "f3", "engagementCost")).toBe(50);
-    const staged = played({ staging: ["142033"], deck: ["f0"] }, reveal("f3"));
+    const staged = playedLayout(SCENARIO, { staging: ["142033"], deck: ["f0"] }, reveal("f3")).run.state;
     expect(statOf(staged, made.cards, "f3", "engagementCost")).toBe(50);
   });
 
@@ -152,10 +151,10 @@ describe("the false cases and durations of the encounter cards", () => {
   it("906408:A:2 adds to the staging area's Threat until the end of the phase only", () => {
     const made = tableFromLayout(SCENARIO, {});
     const layout: Layout = { stage: "142022", phase: "Planning", active: { code: "place", damage: 2 }, deck: ["f0", "f0", "f0", "f0", "f0"] };
-    const during = played(layout, reveal("906408"));
+    const during = playedLayout(SCENARIO, layout, reveal("906408")).run.state;
     expect(stagingThreat(during, made.cards)).toBe(2);
     // Every other card is the 0-Threat f0, so only the effect could add Threat once the planning phase is over (stage 3 has no Forced effect at its end).
-    const after = played(layout, [reveal("906408"), endPhase]);
+    const after = playedLayout(SCENARIO, layout, [reveal("906408"), endPhase]).run.state;
     expect(after.phase).not.toBe("Planning");
     expect(stagingThreat(after, made.cards)).toBe(0);
   });

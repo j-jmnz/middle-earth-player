@@ -5,7 +5,6 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { definePrinted } from "../../../rules/core/printed.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
-import type { EngineStep } from "../../../rules/core/intents.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { legalIntents } from "../../../rules/engine/legal.ts";
 import { updateCard, withMode, type ScenarioState } from "../../../rules/core/state.ts";
@@ -14,7 +13,7 @@ import { attachBlocked } from "../../../rules/interpret/restrictions.ts";
 import { hasTrait } from "../../../rules/interpret/conditions.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { areaOf } from "../../../rules/families/stormcaller/zone.ts";
-import { revealFromTop } from "../../../../test/harness/scene-kit.ts";
+import { revealedTop } from "../../../../test/harness/scene-kit.ts";
 import { CODES, SHIPS, finish, flightFight, flightTable, idOf, idsOf, loadFlightWorld, resolveRecords, send, start, type FlightLayout, type FlightWorld } from "../../../../test/scenarios/flight-of-the-stormcaller/scene.ts";
 
 let world: FlightWorld;
@@ -41,10 +40,6 @@ const commit = (made: Table, state: ScenarioState, seat: number, ids: readonly s
 const allyIds = (state: ScenarioState, seat: number): string[] => Object.values(state.cards).filter((item) => item.code === "ally" && item.controller === seat).map((item) => item.id);
 // The round ends: the Stormcaller's stage takes its progress.
 const endRound = (made: Table, state: ScenarioState): ScenarioState => finish({ state: settle({ ...state, phase: "Beginning of round", boundaryPhase: "End of round", mode: "beginRound", window: null }, made.ctx, []), steps: [] }, made.ctx).state;
-const revealed = (made: Table, code: string): ScenarioState => {
-  const steps: EngineStep[] = [];
-  return finish({ state: revealFromTop(made.state, made.ctx, code, steps).state, steps }, made.ctx).state;
-};
 
 describe("the Ship enemies' Cannot have attachments (12020:A:2, 12021:A:2, 12022:A:2)", () => {
   it("12020:A:2 12021:A:2 12022:A:2 refuse a player attachment and an encounter card alike", () => {
@@ -58,7 +53,7 @@ describe("the Ship enemies' Cannot have attachments (12020:A:2, 12021:A:2, 12022
 
 describe("Sahír's Escort (12020)", () => {
   it("12020:A:4 goes to the Stormcaller's area, not the staging area, when it is revealed", () => {
-    const state = revealed(make({ deck: ["f0"] }), CODES.escort);
+    const state = revealedTop(make({ deck: ["f0"] }), CODES.escort);
     expect(card(state, CODES.escort)?.zone).toBe("stormcallerArea");
     expect(state.staging.map((id) => state.cards[id]?.code)).not.toContain(CODES.escort);
   });
@@ -187,7 +182,7 @@ describe("Hidden Cove (12026)", () => {
 
 describe("Vast Coastland (12027) and Man Overboard! (12028)", () => {
   it("12027:A:1 goes to the Stormcaller's area when it is revealed", () => {
-    const state = revealed(make({ deck: ["f0"] }), CODES.coastland);
+    const state = revealedTop(make({ deck: ["f0"] }), CODES.coastland);
     expect(card(state, CODES.coastland)?.zone).toBe("stormcallerArea");
     expect(areaOf(state)?.members).toContain(idOf(state, CODES.coastland));
   });
@@ -211,7 +206,7 @@ describe("Vast Coastland (12027) and Man Overboard! (12028)", () => {
 describe("Raging Squall (12029)", () => {
   it("12029:A:2 attaches to the current quest when it is revealed and counts there as a Condition attachment", () => {
     const made = make({ stage: "12013", caller: 3, deck: ["f0"] });
-    const state = revealed(made, CODES.squall);
+    const state = revealedTop(made, CODES.squall);
     const squall = idOf(state, CODES.squall);
     expect(state.cards[squall]).toMatchObject({ zone: "attached", host: state.questStage });
     expect(hasTrait(state, squall, "Condition", made.ctx)).toBe(true);

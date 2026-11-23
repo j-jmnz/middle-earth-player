@@ -5,22 +5,16 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { EFFECTS } from "../../../effects/index.ts";
-import type { EngineStep } from "../../../rules/core/intents.ts";
-import type { ScenarioState } from "../../../rules/core/state.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { attachmentHostIds } from "../../../rules/player/attach.ts";
 import { withoutLines } from "../../../../test/harness/card-spec.ts";
-import { fightEnemy, finish, idOf, type Layout, type LayoutTable, legalIntents, resolveRecords, revealFromTop, send, statOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
+import { fightEnemy, idOf, type Layout, type LayoutTable, legalIntents, resolveRecords, revealedTop, send, statOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "into-the-pit";
 const TORCH = "03041";
 const make = (layout: Layout, effects: readonly Effect[] = EFFECTS): LayoutTable => tableFromLayout(ID, layout, { effects });
 
 // The card is revealed from the top of the encounter deck and its choices take their first option.
-function revealed(made: LayoutTable, code: string): ScenarioState {
-  const steps: EngineStep[] = [];
-  return finish({ state: revealFromTop(made.state, made.ctx, code, steps).state, steps }, made.ctx).state;
-}
 
 describe("901006 Twisting Shadows", () => {
   // "When Revealed: Remove all progress from each Dark location in play." In play is the staging area too (rr.in-play-and-out-of-play; docs/scenarios/dwarrowdelf.md, Into the Pit: "in play" counts the staging area
@@ -28,7 +22,7 @@ describe("901006 Twisting Shadows", () => {
   it("901006:A:2 removes all progress from a Dark location in the staging area", () => {
     const layout: Layout = { staging: [{ code: "03038", progress: 2 }], deck: ["f0"] };
     const progress = (effects: readonly Effect[]): number => {
-      const state = revealed(make(layout, effects), "901006");
+      const state = revealedTop(make(layout, effects), "901006");
       return state.cards[idOf(state, "03038")]?.progress ?? 0;
     };
     expect(progress(EFFECTS)).toBe(0);

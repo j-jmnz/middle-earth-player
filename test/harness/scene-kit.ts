@@ -103,6 +103,12 @@ export function resolveRecords(state: ScenarioState, ctx: ReduceContext, code: s
   return { ...run, id: spawned.id };
 }
 
+/** The state after the first card of `code` is revealed from the top of the encounter deck of `made` and the effects it opens are resolved. */
+export function revealedTop(made: { state: ScenarioState; ctx: ReduceContext }, code: string): ScenarioState {
+  const steps: EngineStep[] = [];
+  return finish({ state: revealFromTop(made.state, made.ctx, code, steps).state, steps }, made.ctx).state;
+}
+
 export type ScenePhase = "Quest" | "Encounter" | "Combat" | "Travel" | "Refresh" | "Planning" | "PlayerAttacks";
 
 const OPENINGS = {

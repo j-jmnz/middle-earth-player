@@ -19,7 +19,7 @@ import { attachBlocked } from "../../../rules/interpret/restrictions.ts";
 import { startReveal } from "../../../rules/windows/frames.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import { withoutLines } from "../../../../test/harness/card-spec.ts";
-import { fightEnemy, finish, idOf, revealFromTop, tableFromLayout, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
+import { fightEnemy, finish, idOf, type Layout, type LayoutTable, revealedTop, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "the-city-of-corsairs";
 const SAHIR = "12158";
@@ -39,10 +39,6 @@ function announce(state: ScenarioState, event: GameEvent, ctx: ReduceContext): S
 }
 
 // The card is revealed from the top of the encounter deck and its choices take their first option.
-function revealed(made: LayoutTable, code: string): ScenarioState {
-  const steps: EngineStep[] = [];
-  return finish({ state: revealFromTop(made.state, made.ctx, code, steps).state, steps }, made.ctx).state;
-}
 
 const resources = (state: ScenarioState, code: string): number => state.cards[idOf(state, code)]?.resources ?? 0;
 
@@ -82,10 +78,10 @@ describe("12155 Corsair Waters", () => {
 describe("12156 Watch Tower", () => {
   // "While Watch Tower is in the staging area, it gains: 'Forced: When a Raider enemy enters play, add 1 resource to it.'"
   it("12156:A:1 gives a revealed Raider 1 resource from the staging area only: not as the active location, and not without its record", () => {
-    expect(resources(revealed(make({ staging: ["12156"], deck: ["f0"] }), "11064"), "11064")).toBe(1);
-    expect(resources(revealed(make({ active: "12156", deck: ["f0"] }), "11064"), "11064")).toBe(0);
-    expect(resources(revealed(make({ staging: ["12156"], deck: ["f0"] }), "f3"), "f3")).toBe(0);
-    expect(resources(revealed(make({ staging: ["12156"], deck: ["f0"] }, { effects: withoutLines(EFFECTS, "12156:A:1") }), "11064"), "11064")).toBe(0);
+    expect(resources(revealedTop(make({ staging: ["12156"], deck: ["f0"] }), "11064"), "11064")).toBe(1);
+    expect(resources(revealedTop(make({ active: "12156", deck: ["f0"] }), "11064"), "11064")).toBe(0);
+    expect(resources(revealedTop(make({ staging: ["12156"], deck: ["f0"] }), "f3"), "f3")).toBe(0);
+    expect(resources(revealedTop(make({ staging: ["12156"], deck: ["f0"] }, { effects: withoutLines(EFFECTS, "12156:A:1") }), "11064"), "11064")).toBe(0);
   });
 });
 
@@ -99,18 +95,18 @@ describe("12157 Serpent's Tail", () => {
   // The box's ruling (docs/scenarios/dream-chaser.md, the Raiders of the City of Corsairs; user ruling, 2026-11-05): only an engaged Ship enemy is dealt one, a Ship in the staging area is not (rr.step-6-2).
   it("12157:A:1 deals a shadow card to the engaged Ship enemy, and none to the Ship in the staging area or to another enemy", () => {
     const made = make(layout, { heading: "Sun" });
-    const state = revealed(made, "12157");
+    const state = revealedTop(made, "12157");
     expect(shadowOf(state, "11057")).not.toBeNull();
     expect(shadowOf(state, "12152")).toBeNull();
     expect(shadowOf(state, "11064")).toBeNull();
     const bare = make(layout, { heading: "Sun", effects: withoutLines(EFFECTS, "12157:A:1") });
-    expect(shadowOf(revealed(bare, "12157"), "11057")).toBeNull();
+    expect(shadowOf(revealedTop(bare, "12157"), "11057")).toBeNull();
   });
 
   // Researched (rr.then; Caleb Grace, ALeP 3.119): "each ... Then" follows only when the first part found a Ship enemy in play. With none, nothing is dealt and no -10 applies, not even to a Ship enemy that enters play later in the round.
   it("12157:A:1 with no Ship enemy in play nothing follows, off-course too: a Ship enemy that enters play later that round keeps its engagement cost", () => {
     const made = make({ staging: ["11064"], deck: ["f0", "f0", "f0", "f0"] }, { heading: "Rain" });
-    const state = revealed(made, "12157");
+    const state = revealedTop(made, "12157");
     const later = spawn(state, "12152", { zone: "staging" });
     expect(cost(made, later.state, "12152")).toBe(32);
     expect(shadowOf(later.state, "11064")).toBeNull();
@@ -118,14 +114,14 @@ describe("12157 Serpent's Tail", () => {
 
   it("12157:A:1 then, off-course, each Ship enemy gets -10 engagement cost until the end of the round; on-course it does not", () => {
     const off = make(layout, { heading: "Rain" });
-    const offState = revealed(off, "12157");
+    const offState = revealedTop(off, "12157");
     expect(cost(off, offState, "12152")).toBe(22);
     expect(cost(off, offState, "11057")).toBe(27);
     expect(cost(off, offState, "11064")).toBe(24);
     const on = make(layout, { heading: "Sun" });
-    expect(cost(on, revealed(on, "12157"), "12152")).toBe(32);
+    expect(cost(on, revealedTop(on, "12157"), "12152")).toBe(32);
     const bare = make(layout, { heading: "Rain", effects: withoutLines(EFFECTS, "12157:A:1") });
-    expect(cost(bare, revealed(bare, "12157"), "12152")).toBe(32);
+    expect(cost(bare, revealedTop(bare, "12157"), "12152")).toBe(32);
   });
 });
 
