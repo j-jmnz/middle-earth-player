@@ -20,17 +20,17 @@ import type { ReduceContext } from "../interpret/interpret.ts";
 import type { CardInstance, Frame, GameEvent, ScenarioState } from "../core/state.ts";
 import { inPlay } from "../core/state.ts";
 import { patchTop, popFrame, pushFrame } from "./windows.ts";
-import { isolatedAreas, sideOf } from "../families/breaking/areas.ts";
+import { sideOf } from "../families/breaking/areas.ts";
 
 type Found = { effect: Effect; instance: CardInstance };
 
 // Whose a Forced effect is: a player card's, its controller's ("Forced: After ~ attacks, discard ~ or discard a card from your
-// hand"); an encounter card's, the player the event happened to, or, when the event is no player's and the areas are isolated, the first player of the area the card lies in
+// hand"); an encounter card's, the player the event happened to, or, when the event is no player's and the areas are isolated by a stage (Fog on the Barrow-downs, Flies and Spiders, not the captured areas of Escape from Mount Gram), the first player of the area the card lies in
 // ("the resolution of each phase occurs as if only the player or players that share any given staging area are currently present in the game", hob.staging-area-creating).
 function forcedActor(state: ScenarioState, instance: CardInstance, event: GameEvent, ctx: ReduceContext): number {
   const player = instance.controller != null && isPlayerType(printedOf(ctx.cards, instance.code));
   if (player) return instance.controller ?? state.firstPlayer;
-  return event.seat ?? (isolatedAreas(state) ? (sideOf(state, instance) ?? state.firstPlayer) : state.firstPlayer);
+  return event.seat ?? (state.isolated === true && state.capture == null ? (sideOf(state, instance) ?? state.firstPlayer) : state.firstPlayer);
 }
 
 // A card set aside faceup next to the quest deck hears that the prisoner was rescued: its ability says it works from out of play
