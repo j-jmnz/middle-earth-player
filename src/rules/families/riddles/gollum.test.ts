@@ -91,10 +91,10 @@ describe("Bilbo takes damage only from Gollum while he is in the riddle area (ho
   });
 });
 
-// The state with Bilbo as seat 0's only hero.
-function bilboAlone(state: ScenarioState, bilbo: string): ScenarioState {
+// The state with Bilbo as seat 0's only hero, or with one other hero.
+function bilboAlone(state: ScenarioState, bilbo: string, other?: string): ScenarioState {
   const [first, second] = state.seats;
-  return first && second ? { ...state, seats: [{ ...first, heroes: [bilbo] }, second] } : state;
+  return first && second ? { ...state, seats: [{ ...first, heroes: other ? [other, bilbo] : [bilbo] }, second] } : state;
 }
 
 // Wild Wargs (a Creature, not Gollum) is engaged with seat 0 and attacks it at the defense window; `soleBilbo` leaves Bilbo the seat's only hero.
@@ -134,8 +134,12 @@ describe("an attack of another enemy cannot be put on Bilbo while he is in the r
 
   it("keeps Bilbo out of a character chosen to take damage", () => {
     const made = riddleTable({ seats: 2 });
+    // Seat 0 has Bilbo and one other hero, so the one left to choose takes the damage with no question.
+    const state = bilboAlone(made.state, made.bilbo, made.hero);
     const steps: EngineStep[] = [];
-    const asked = assignDamage(made.state, { verb: "AssignDamage", amount: 1, left: 1, of: 1, pick: { type: "character", control: "you" } }, { seat: 0, sourceId: idOf(made.state, "f0"), chosen: made.bilbo }, made.ctx, steps);
+    const asked = assignDamage(state, { verb: "AssignDamage", amount: 1, left: 1, of: 1, pick: { type: "character", control: "you" } }, { seat: 0, sourceId: idOf(state, "f0"), chosen: made.bilbo }, made.ctx, steps);
     expect(asked.cards[made.bilbo]?.damage).toBe(0);
+    // Without the filter the chosen Bilbo stays the target and the damage is lost; with it the other hero takes the 1.
+    expect(asked.cards[made.hero]?.damage).toBe(1);
   });
 });

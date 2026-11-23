@@ -78,8 +78,8 @@ const FLAGS: readonly { flag: FlagStat; icon: IconName; word: string }[] = [
   { flag: "cannotAttack", icon: "attack", word: "Cannot attack" },
   // Bilbo Baggins in the riddle area (131030:B:3, hob.riddle-area): the stage's other limits on him, as the preview lists them.
   { flag: "cannotQuest", icon: "willpower", word: "Cannot quest" },
-  { flag: "noPlayerAttachments", icon: "defense", word: "Takes no attachments from players" },
-  { flag: "bilboLimitedToGollum", icon: "defense", word: "Defends and takes damage only against Gollum" },
+  { flag: "noPlayerAttachments", icon: "attachment", word: "Takes no attachments from players" },
+  { flag: "bilboLimitedToGollum", icon: "defense", word: "Defends against and takes damage from Gollum only" },
   { flag: "cannotTakeDamage", icon: "hitPoints", word: "Takes no damage" },
   { flag: "cannotTakeNonCombatDamage", icon: "hitPoints", word: "Takes only combat damage" },
   { flag: "cannotBeEngaged", icon: "engagementCost", word: "Cannot be engaged" },
