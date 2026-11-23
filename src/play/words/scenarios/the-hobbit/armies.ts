@@ -4,6 +4,7 @@
 import type { Instruction } from "../../../../catalog/boundary.ts";
 import { modifiedStat } from "../../../../rules/core/keywords.ts";
 import type { ScenarioState } from "../../../../rules/core/state.ts";
+import { stageKeyword } from "../../../../rules/families/armies/stages.ts";
 import type { ReduceContext } from "../../../../rules/interpret/interpret.ts";
 
 import type { ChoiceNames } from "../../choice.ts";
@@ -29,10 +30,8 @@ export function armiesBranchRows(game: ScenarioState, ctx: ReduceContext, choose
       const stage = game.cards[option.id];
       if (!stage) return [option.id, ""];
       const points = modifiedStat(game, stage, "questPoints", ctx.cards);
-      // The keyword the stage prints (its record gives it while the stage is the current one), so a stage that is not current still tells what choosing it brings.
-      const gives = (stat: "battle" | "siege"): boolean => ctx.effects.some((effect) => effect.cardCode === stage.code && effect.instructions.some((step) => step.verb === "ModifyStat" && step.stat === stat));
-      const keyword = gives("battle") ? ", Battle" : gives("siege") ? ", Siege" : "";
-      return [option.id, `${stage.progress} of ${points} progress${keyword}${game.questStage === option.id ? ", the current stage" : ""}`];
+      const keyword = stageKeyword(ctx, stage.code);
+      return [option.id, `${stage.progress} of ${points} progress${keyword ? `, ${keyword}` : ""}${game.questStage === option.id ? ", the current stage" : ""}`];
     }),
   );
 }

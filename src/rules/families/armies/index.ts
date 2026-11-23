@@ -9,7 +9,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { mostDamagedReason, mustDefendMostDamaged } from "./defender.ts";
 import { noteFirstRevealed, stageTopmostFromDiscard } from "./reveal.ts";
-import { putStagesIntoPlay, removeProgressFromStages, setCurrentStage, stageComplete, stageWithCode, stagesInPlay } from "./stages.ts";
+import { putStagesIntoPlay, removeProgressFromStages, setCurrentStage, stageComplete, stageHasNoProgress, stageWithCode, stagesInPlay } from "./stages.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
@@ -36,7 +36,7 @@ function condition(state: ScenarioState, found: Condition, ctx: ReduceContext): 
   if (found.kind === "stageIsCurrent") return state.questStage != null && state.cards[state.questStage]?.code === found.code;
   if (found.kind === "stageNoProgress") {
     const id = stageWithCode(state, found.code);
-    return id != null && (state.cards[id]?.progress ?? 0) === 0;
+    return id != null && stageHasNoProgress(state, id);
   }
   if (found.kind !== "stagesComplete") return null;
   const all = found.codes.every((code) => {
@@ -48,7 +48,7 @@ function condition(state: ScenarioState, found: Condition, ctx: ReduceContext): 
 
 /** The amount `stagesNoProgress`: the quest stages in play with no progress on them. */
 function amount(state: ScenarioState, found: Exclude<Amount, number>): number | null {
-  return found.stagesNoProgress ? stagesInPlay(state).filter((id) => (state.cards[id]?.progress ?? 0) === 0).length : null;
+  return found.stagesNoProgress ? stagesInPlay(state).filter((id) => stageHasNoProgress(state, id)).length : null;
 }
 
 export const manifest: RulesFamily = {

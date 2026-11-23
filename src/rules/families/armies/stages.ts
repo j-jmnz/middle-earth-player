@@ -26,6 +26,22 @@ export function stageWithCode(state: ScenarioState, code: string): string | unde
   return stagesInPlay(state).find((id) => state.cards[id]?.code === code);
 }
 
+/** The stage has no progress on it: the "no progress" of its end-of-round Forced effect and of the quest stages counted by 132054:A:2 and the cards like it. */
+export function stageHasNoProgress(state: ScenarioState, id: string): boolean {
+  return (state.cards[id]?.progress ?? 0) === 0;
+}
+
+/** The Battle or Siege a stage prints, read from its records (they give it while the stage is the current one), so a stage that is not current still tells what choosing it brings. */
+export function stageKeyword(ctx: ReduceContext, code: string): "Battle" | "Siege" | null {
+  const gives = (stat: "battle" | "siege"): boolean => ctx.effects.some((effect) => effect.cardCode === code && effect.instructions.some((step) => step.verb === "ModifyStat" && step.stat === stat));
+  return gives("battle") ? "Battle" : gives("siege") ? "Siege" : null;
+}
+
+/** The stage's number in the quest definition (stage 2 is the second stage, hob.multiple-stages-in-play). */
+export function stageNumberOf(state: ScenarioState, code: string): number {
+  return state.stages.findIndex((entry) => entry.code === code) + 1;
+}
+
 /** The stage holds at least its quest points in progress (a stage that prints none is never complete). */
 export function stageComplete(state: ScenarioState, id: string, cards: ReadonlyMap<string, PrintedCard>): boolean {
   const stage = state.cards[id];
