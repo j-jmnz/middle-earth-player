@@ -45,8 +45,8 @@ function sheetOf(code: string, timing: "whenRevealed" | "forced" | "shadow", sea
 
 describe("the encounter choices name their owner and the full effect", () => {
   it("131061:A:1 Goblin Driver: the first player chooses a character he controls to exhaust", () => {
-    expect(sheetOf("131061", "whenRevealed", 2)?.note).toContain("Player 1: 131061: choose a character you control to exhaust.");
-    expect(sheetOf("131061", "whenRevealed", 1)?.note).toContain("131061: choose a character you control to exhaust.");
+    expect(sheetOf("131061", "whenRevealed", 2)?.note).toContain("Player 1, 131061: when revealed, choose a character you control to exhaust.");
+    expect(sheetOf("131061", "whenRevealed", 1)?.note).toContain("131061: when revealed, choose a character you control to exhaust.");
   });
 
   it("131061:A:2 Goblin Driver Shadow: the defending player chooses a character he controls to exhaust", () => {
