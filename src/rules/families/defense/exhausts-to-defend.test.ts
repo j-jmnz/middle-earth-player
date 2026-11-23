@@ -1,4 +1,4 @@
-// Rules: rr.triggered-ability, rr.response, rr.defending (data/rules/entries.json); ledger lines 17006:A:2, 144008:A:2, 06062:A:1, 142001:A:1.
+// Rules: rr.triggered-ability, rr.response, rr.defending-player (data/rules/entries.json); ledger lines 17006:A:2, 144008:A:2, 06062:A:1, 142001:A:1.
 // "After X exhausts to defend an attack" (the condition `exhaustedToDefend`): the Response is open to a character that the declaration exhausted, not to one that was exhausted already
 // when an effect added it to the defenders (AddDefender). One card of each kind that prints the words: an ally (Jubayr), an attachment (Staff of Lebethron), an event (Small Target) and a
 // hero (Frodo Baggins), with the real records and the printed numbers the line reads.
