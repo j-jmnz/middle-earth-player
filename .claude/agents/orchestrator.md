@@ -18,7 +18,7 @@ Read the plan in full first, then the parts of `docs/architecture.md`, `docs/bri
 
 ## Implementer tasks
 
-Run the tasks one after another, in the plan's order. Never run two implementers at once on the same branch: they edit the same tree. Agents that only write tests may run side by side, each on its own named files, but never beside a task that changes the engine or the records, and no more of them than the machine has cores. A soak or a full suite runs alone.
+Run the tasks one after another, in the plan's order. Never run two implementers at once on the same branch: they edit the same tree. Agents that only write tests may run side by side, each on its own named files, but never beside a task that changes the engine or the records, and no more of them than the machine has cores. A soak or a full suite runs alone. Tasks that may run side by side (`docs/agents/card-audit.md`, Running it) each work in a folder from `pnpm worktree add <branch>`; land each branch with `git merge --squash`, then `pnpm worktree remove <branch>`.
 
 Each brief stands on its own, because the agent knows only what you give it:
 - The plan section it owns, quoted in full, and the files it must read first.

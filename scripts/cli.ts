@@ -99,6 +99,10 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     find: { steps: [{ script: "docs/index.ts", args: ["find"] }], about: 'lists the doc headings that hold the words: "<words>"' },
     rulings: { steps: [{ script: "docs/rulings.ts" }], about: 'prints each reading a doc stamps as the user\'s (file, section, sentence, date, card codes and line ids), filtered by [<words>]' },
   },
+  worktree: {
+    add: { steps: [{ script: "tools/worktree.ts", args: ["add"] }], about: "<branch> [<base-ref>]: a git worktree beside the repository with the dependencies installed (shared store), hooks, docs index and .cache linked" },
+    remove: { steps: [{ script: "tools/worktree.ts", args: ["remove"] }], about: "<branch> [--force]: removes that worktree's folder, keeps the branch" },
+  },
   release: {
     plan: { steps: [{ script: "release/plan.ts" }], about: "prints the next tag and its notes (--dry-run)" },
     source: { steps: [{ script: "release/sideload-source.ts" }], about: "writes a release's SideStore and AltStore source" },
