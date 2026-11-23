@@ -27,11 +27,11 @@ const SCENARIOS = path.join(ROOT, "src/campaign/scenarios");
 const read = (file: string): string => readFileSync(file, "utf8");
 const testFiles = (dir: string): string[] => readdirSync(dir).filter((name) => name.endsWith(".test.ts")).map((name) => path.join(dir, name));
 
-/** The lines a test file covers: the rows it holds and the tests whose title starts with a line id. */
+/** The lines a test file covers: the rows it holds and the tests whose title starts with a line id (`lineSpec`, test/harness/line-spec.ts, titles its two tests with the line id it is given). */
 function coveredIn(source: string): Set<string> {
   const covered = new Set<string>();
   for (const found of source.matchAll(/\bline:\s*["']([^"']+)["']/g)) covered.add(found[1]!);
-  for (const found of source.matchAll(new RegExp(String.raw`\b(?:it|test)(?:\.(?:only|skip))?\(\s*["'\`](${LINE})(?![\w:])`, "g"))) covered.add(found[1]!);
+  for (const found of source.matchAll(new RegExp(String.raw`\b(?:it|test|lineSpec)(?:\.(?:only|skip))?\(\s*["'\`](${LINE})(?![\w:])`, "g"))) covered.add(found[1]!);
   return covered;
 }
 
