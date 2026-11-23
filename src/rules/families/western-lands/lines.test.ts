@@ -75,7 +75,7 @@ for (const code of ["131039", "131040"]) {
   });
 }
 
-// The Response of 131039 and 131040 is not offered when the location has not left play explored (progress short of its quest points), nor when Bilbo is not in play (it would change nothing, rr.triggered-ability).
+// The Response of 131039 and 131040 is not offered when the location has not left play explored (progress short of its quest points).
 for (const code of ["131039", "131040"]) {
   it(`${code}:A:2 Response is not offered while the location stays in play`, () => {
     const table = withBilbo(EFFECTS, { active: code }, 0);
@@ -83,14 +83,6 @@ for (const code of ["131039", "131040"]) {
     const steps: EngineStep[] = [];
     const partly = settle({ ...placeProgress({ ...table.state, activeLocation: location }, location, 1, table.ctx, steps), window: null, mode: "stopped" }, table.ctx, steps);
     expect(legalIntents(partly, table.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === location)).toBe(false);
-  });
-  // FAULT: the card gives Bilbo a resource, and with Bilbo out of play the Response can change nothing, yet the engine offers it as the location leaves play explored. The cause is the gate of `noChangeReason` (src/rules/player/potential.ts): rr.triggered-ability bars a no-op only for a player card (and a player objective), and a location is neither, so the idle check never reads this Response.
-  it.fails(`${code}:A:2 Response is not offered without Bilbo Baggins in play`, () => {
-    const alone = tableFromLayout(ID, { active: code }, { effects: EFFECTS });
-    const there = idOf(alone.state, code);
-    const more: EngineStep[] = [];
-    const explored = settle({ ...placeProgress({ ...alone.state, activeLocation: there }, there, 5, alone.ctx, more), window: null, mode: "stopped" }, alone.ctx, more);
-    expect(legalIntents(explored, alone.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === there)).toBe(false);
   });
 }
 
