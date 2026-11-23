@@ -386,7 +386,8 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   // A player card that leaves play is announced to the abilities that hear it ("After ~ leaves play", "After a character
   // leaves play"). An encounter card's leaving is announced where it happens (stage-reveal.ts).
   // An ally a guard holds in the staging area (Arwen under Goblin Gate, `guardedAlly`) leaves play the same way.
-  if ((current.zone === "play" || current.zone === "heroes" || (current.zone === "staging" && state.modifiers.length > 0 && flagged(state, id, "guardedAlly"))) && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });
+  // An attachment announces it like any card in play (rr.in-play-and-out-of-play): Fallen into Evil, discarded while a hero is fallen, returns the hero ("If Fallen into Evil is discarded, return attached hero to its owner's control", 142083:A:1).
+  if ((current.zone === "play" || current.zone === "heroes" || current.zone === "attached" || (current.zone === "staging" && state.modifiers.length > 0 && flagged(state, id, "guardedAlly"))) && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });
   // A card that holds the sponge (Forbidden Descent, 10101:A:2) leaves play from the staging area: announced to its own Forced effect, whether it was explored there by progress or discarded.
   if (current.zone === "staging" && !inPlay(dest.zone) && flagged(state, id, "progressSponge")) moved = queueEvent(moved, { trigger: "leftStagingArea", seat: null, cardId: id });
   // An enemy that guards a hero (Carried Away, 18074:B:2) is announced when it leaves play in any way; only a game that holds such a hero asks.

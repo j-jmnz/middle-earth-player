@@ -28,6 +28,10 @@ describe("the first guess at a payment", () => {
   it("names the first single pool that holds it all for 'a single hero's resource pool'", () => {
     expect(firstShares({ ...request({ max: 1 }, 2), pools: [{ heroId: "c", max: 1 }, ...pools.slice(0, 2)] })).toEqual([{ id: "a", amount: 2 }]);
   });
+
+  it("is empty when no one pool holds it all, so the sheet cannot confirm a split the card forbids", () => {
+    expect(firstShares({ ...request({ max: 1 }, 2), pools: [{ heroId: "c", max: 1 }, { heroId: "d", max: 1 }] })).toEqual([]);
+  });
 });
 
 // Bifur (03002:A:1): "Pay 1 resource from a hero's resource pool to add 1 resource to Bifur's resource pool." The first guess

@@ -9,12 +9,11 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { withThreat } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, discarded, enter, fillers, passAll, play, playCode, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf } from "../../../test/harness/scene.ts";
+import { atDefense, attacking, choices, combat, discarded, enter, fillers, passAll, play, playableCards, playCode, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARWEN = "10140";
 const BOWMAN = "10143";
@@ -34,7 +33,7 @@ const ALLY = "ally";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -45,7 +44,6 @@ beforeAll(async () => {
 });
 
 // The card ids a PlayCard intent is offered for.
-const playable = (tab: Table, state = tab.state) => legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
 
 describe("Arwen Undómiel (10140:A:1)", () => {
   // Arwen and Glorfindel (Noldor) and Legolas (not Noldor) for the first player, core Aragorn for the second; an event and an ally (or the
@@ -122,8 +120,7 @@ describe("Hour of Wrath (10144:A:1, A:2)", () => {
     expect(run.state.cards[gimli]?.exhausted).toBe(false);
     // The next phase: the lasting effect is over, so Gimli exhausts to defend.
     const later = enter(run.state, tab, "questCommit");
-    let next = passAll(combat(later.state, tab), tab.ctx);
-    expect(next.state.window?.kind).toBe("defense");
+    let next = atDefense(tab, later.state);
     next = sendUnledgered(next, { type: "DeclareDefender", defenderId: gimli }, tab.ctx);
     expect(next.state.cards[gimli]?.exhausted).toBe(true);
   });
@@ -154,7 +151,7 @@ describe("Elven-light (10145:A:2)", () => {
   lineSpec("10145:A:2", "Elven-light: returns to the hand from the discard pile, then draws 1 card", (effects) => {
     const start = table(effects, { heroes: [{ code: ARWEN, seat: 0 }], playerDeck: fillers(CARD, 3) });
     const { tab, ids: [light = ""] } = discarded(start, [[ELVEN_LIGHT, 0]]);
-    expect(playable(tab)).toContain(light);
+    expect(playableCards(tab.state, tab)).toContain(light);
     const run = play(begin(tab.state), tab, light);
     expect(run.state.cards[light]?.zone).toBe("hand");
     expect(run.state.seats[0]?.hand).toHaveLength(2);

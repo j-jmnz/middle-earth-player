@@ -15,8 +15,8 @@ import { withThreat } from "../../rules/core/state.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { answerFirst, attach, attacking, choices, combat, deckSaveFacts, discarded, enter, fillers, packRow, playCode, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
+import { answerFirst, attach, attacking, choices, combat, deckSaveFacts, discarded, enter, fillers, packRow, passWhile, playCode, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ERESTOR = "10084";
 const REINFORCEMENTS = "10085";
@@ -37,7 +37,7 @@ const CARD = "card";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -149,7 +149,7 @@ describe("Galadhrim Weaver (10089:A:1, A:2)", () => {
     const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }], allies: [{ code: WEAVER, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] });
     const [weaver, legolas, weak] = [idsOf(tab, WEAVER), idsOf(tab, LEGOLAS), idsOf(tab, WEAK)];
     let run = combat(tab.state, tab);
-    for (let guard = 0; guard < 6 && run.state.window?.kind === "frameAction"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.window?.kind === "frameAction", 6);
     expect(run.state.window?.kind).toBe("defense");
     expect(refusal(run.state, { type: "DeclareDefender", defenderId: legolas }, tab.ctx)).toBeNull();
     expect(refusal(run.state, { type: "DeclareDefender", defenderId: weaver }, tab.ctx)).not.toBeNull();

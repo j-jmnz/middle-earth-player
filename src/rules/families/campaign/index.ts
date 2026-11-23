@@ -8,6 +8,8 @@ import { printedOf } from "../../core/printed.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { enforceRestricted } from "../../player/attach.ts";
 import { attachTo, moveCard, spawn } from "../../core/zones.ts";
 import { inPlay, updateCard } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
@@ -18,7 +20,7 @@ import { attachToHeroWith, guardWithSetAside, moveAttachment } from "./guarded.t
 // The verbs src/catalog/families/campaign.ts adds. Only PutObjectiveAllyIntoPlay runs in the engine: it is a Setup instruction the
 // campaign checklist hands the start. The others are dealt before the game starts (AttachChosen, AddToHandAfterMulligan,
 // AddToPool: campaign/checklist.ts) or run by the Resolution (CarryOver: rules/setup/resolution.ts), so they change nothing here.
-export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext): ScenarioState | null {
+export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "PutObjectiveAllyIntoPlay":
       // Under the first player, ready (no Hide test, no reveal).
@@ -30,7 +32,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return next;
     }
     case "AttachSetAside":
-      return attachSetAside(state, instruction.code, lastPicked(state), instruction.removeWhenLeaving === true, instruction.claimed === true, ctx);
+      return attachSetAside(state, instruction.code, lastPicked(state), instruction.removeWhenLeaving === true, instruction.claimed === true, ctx, steps);
     case "SetAsideHeroWithAttachments":
       return setAsideHeroWithAttachments(state, instruction);
     case "ReturnSetAsideHero":
@@ -105,7 +107,7 @@ export function tokensOn(state: ScenarioState, code: string): number {
 }
 
 // The last picked hero takes a set-aside copy of the card: it comes into its controller's play area attached to the hero (an objective card is claimed by it).
-function attachSetAside(state: ScenarioState, code: string, hostId: string, temporary: boolean, claim: boolean, ctx: ReduceContext): ScenarioState {
+function attachSetAside(state: ScenarioState, code: string, hostId: string, temporary: boolean, claim: boolean, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const host = state.cards[hostId];
   const copy = state.setAside.find((id) => state.cards[id]?.code === code);
   if (!host || host.controller == null || host.zone !== "heroes" || !copy) return state;
@@ -115,7 +117,8 @@ function attachSetAside(state: ScenarioState, code: string, hostId: string, temp
     return queueEvent(claimed, { trigger: "claimed", seat: host.controller, cardId: copy });
   }
   const placed = updateCard(moveCard(state, copy, { zone: "play", seat: host.controller }), copy, { face: "up", ...(temporary ? { temporary: true as const } : {}) });
-  return queueEvent(attachTo(placed, copy, hostId), { trigger: "attached", seat: host.controller, subject: copy, other: hostId });
+  // A Restricted attachment that makes a third on the hero sends one of them to the discard pile at once (rr.restricted).
+  return enforceRestricted(queueEvent(attachTo(placed, copy, hostId), { trigger: "attached", seat: host.controller, subject: copy, other: hostId }), hostId, ctx, steps);
 }
 
 export const manifest: RulesFamily = { name: "campaign", verbs: ["SetAsideHeroWithAttachments", "ReturnSetAsideHero", "SetAsideLogged", "PutObjectiveAllyIntoPlay", "SetAsideEachPlayer", "AttachSetAside", "PlaceToken", "PlaceLoggedHeroDamage", "SearchBoonToHand", "RecordDamageOn", "RecordHeroDamage", "RecordDetermined", "EarnAttached", "NamePrisoner", "AttachChosen", "AddToHandAfterMulligan", "AddToPool", "CarryOver", "RemovePoolCards", "RemoveBurdenSets", "ShuffleIntoEachDeck", "ChooseCopyOrResources", "ChooseOption", "ThreatPenaltyForPick", "EarnForPick", "EarnHeldCopies", "ReviveFallenHero", "TrimHeroes", "RecordUnderneath", "SearchDeckForCard", "EarnOnThreatDial", "RecordTokens", "RemoveFromPoolByCode", "LoseGuardedBoons", "IgnoreDiscardedHeroes", "EndCampaign", "AttachToHeroWith", "SetAsideBoon", "GuardWithSetAside", "MoveAttachment", "PlaceTokensOnCampaignCard"], run, amount: (state, found) => (found.recorded ? recordedCount(state, found.recorded) : null) };

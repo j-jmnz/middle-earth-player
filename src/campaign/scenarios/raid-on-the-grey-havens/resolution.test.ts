@@ -3,9 +3,12 @@
 // (11182:B:1, 11182:B:2).
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { EFFECTS } from "../../../effects/index.ts";
+import { scenarioDefinition } from "../../../catalog/scenario-data.ts";
 import { openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
-import { CODES, idOf, loadRaidWorld, raidTable, type RaidLayout, type RaidWorld } from "../../../../test/scenarios/raid-on-the-grey-havens/scene.ts";
+import { withoutLine } from "../../../../test/harness/card-spec.ts";
+import { campaign, CODES, dealt, idOf, loadRaidWorld, raidTable, type RaidLayout, type RaidWorld } from "../../../../test/scenarios/raid-on-the-grey-havens/scene.ts";
 
 let world: RaidWorld;
 
@@ -103,5 +106,34 @@ describe("the cards the Resolution earns (11182:B:1, 11182:B:2)", () => {
     expect(intents).toContain(`${CODES.cutlass}>${run.made.hero}`);
     const done = applyResolution(run.state, `${CODES.axe}>${second}`);
     expect(resolutionResult(openResolution(done, run.made.ctx))?.earned).toEqual([expect.objectContaining({ code: CODES.axe, to: "hero", seat: 1, hero: "dh3" })]);
+  });
+});
+
+// The XP of a won table whose Resolution is built without the records of `line`: the line's condition then gains nothing, so each test below shows its record at work.
+const xpWithout = (line: string, layout: RaidLayout = {}): number => xpOf(layout, (state) => ({ ...state, resolution: scenarioDefinition(dealt, campaign, withoutLine(EFFECTS, line)).resolution }));
+
+describe("the campaign card's XP lines, each against its own false case", () => {
+  it("11182:B:6 gains 1 XP for each Elven Wave-runner in the victory display, none for one in play", () => {
+    expect(xpOf({ victory: [CODES.waveRunner, CODES.waveRunner] })).toBe(3);
+    expect(xpOf({ staging: ["f3", CODES.waveRunner], active: CODES.waveRunner })).toBe(1);
+    expect(xpWithout("11182:B:6", { victory: [CODES.waveRunner, CODES.waveRunner] })).toBe(1);
+  });
+
+  it("11182:B:7 gains 1 XP if Na'asiyah is in the victory display, none while she is engaged", () => {
+    expect(xpOf({ victory: [CODES.naasiyah] })).toBe(2);
+    expect(xpOf({ engaged: [{ code: CODES.naasiyah, seat: 0 }] })).toBe(1);
+    expect(xpWithout("11182:B:7", { victory: [CODES.naasiyah] })).toBe(1);
+  });
+
+  it("11182:B:8 gains 1 XP if no enemies are in play: a set-aside enemy is not in play, an enemy engaged with the second player is", () => {
+    expect(xpOf({ staging: [], setAside: [CODES.sahir] })).toBe(2);
+    expect(xpOf({ seats: 2, threat: [45, 45], staging: [], engaged: [{ code: "f3", seat: 1 }] })).toBe(2);
+    expect(xpWithout("11182:B:8", { staging: [] })).toBe(1);
+  });
+
+  it("11182:B:9 gains 1 XP if each surviving player's threat is 40 or less, and none when one of two is over", () => {
+    expect(xpOf({ seats: 2, threat: [40, 40] })).toBe(3);
+    expect(xpOf({ seats: 2, threat: [38, 41] })).toBe(2);
+    expect(xpWithout("11182:B:9", { seats: 2, threat: [40, 40] })).toBe(2);
   });
 });

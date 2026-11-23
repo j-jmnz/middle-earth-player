@@ -1,7 +1,7 @@
 // Rules: mec112.mire, mec112.gollum-smeagol, mec112.saga-staging-rules, rr.forced, rr.reveal, rr.shadow-effects, rr.first-player, rr.defending-player, rr.effects, rr.cancel (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, damageOn, defend, endPhase, exhausted, flag, quest, resolve, resourcesOn, reveal, revealedBy, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, damageOn, defend, endPhase, exhausted, flag, offers, quest, resolve, resourcesOn, reveal, revealedBy, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Passage of the Marshes (the-two-towers part 4): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot hold is a titled test of
@@ -10,6 +10,8 @@ import { announce, answer, attack, cardSpecs, damageOn, defend, endPhase, exhaus
 const TWO = { seats: 2 } as const;
 // Two seats where the second holds the first-player token: an effect that says "the first player" must read seat 1, whoever revealed, attacked or defended.
 const SECOND_FIRST = { seats: 2, firstPlayer: 1 } as const;
+// An enemy engaged with the first seat: the round stops at its attack in the combat phase.
+const HELD = { engaged: ["f3"], deck: ["f0", "f0", "f0"] } as const;
 const DOOMED_ALLY = { code: "ally", damage: 1 } as const;
 
 export const ROWS: readonly Row[] = [
@@ -28,6 +30,12 @@ export const ROWS: readonly Row[] = [
   { line: "144020:A:2", name: "discarded by Mire the first player chooses: a random victory location returns to the staging area", layout: { ...SECOND_FIRST, staging: [{ code: "144020", resources: 0 }], victory: ["144021"] }, act: [announce("discardedByMire", "144020"), answer("return")], expect: zone("144021", "staging") },
   { line: "144022:A:1", name: "discarded by Mire each player raises their threat by 5", layout: { ...TWO, staging: ["144022"] }, act: announce("discardedByMire", "144022"), expect: [threat(33, 0), threat(33, 1)] },
   { line: "144022:A:2", name: "it gets +1 Threat for each mire token on it", layout: { staging: [{ code: "144022", resources: 3 }] }, act: [], expect: stat("144022", "threat", 6) },
+  // "Travel: Exhaust Sméagol to travel here." on Haunted Mere and Stagnant Pools: the travel exhausts him, and with no Sméagol in play it is not offered. An engaged enemy holds the round at its
+  // attack, before the refresh phase readies him.
+  { line: "144021:A:2", name: "Travel: Sméagol is exhausted to travel to Haunted Mere", layout: { phase: "Travel", staging: ["144021"], play: ["144076"], ...HELD }, act: travel("144021"), expect: [exhausted("144076"), zone("144021", "activeLocation")] },
+  { line: "144021:A:2", name: "with no Sméagol in play the players cannot travel to Haunted Mere", layout: { phase: "Travel", staging: ["144021"] }, act: [], expect: offers("Travel", undefined, false) },
+  { line: "144022:A:3", name: "Travel: Sméagol is exhausted to travel to Stagnant Pools", layout: { phase: "Travel", staging: ["144022"], play: ["144076"], ...HELD }, act: travel("144022"), expect: [exhausted("144076"), zone("144022", "activeLocation")] },
+  { line: "144022:A:3", name: "with no Sméagol in play the players cannot travel to Stagnant Pools", layout: { phase: "Travel", staging: ["144022"] }, act: [], expect: offers("Travel", undefined, false) },
   { line: "144019:A:1", name: "discarded by Mire it deals 1 damage to each character", layout: { staging: ["144019"], play: ["ally"] }, act: announce("discardedByMire", "144019"), expect: [damageOn("dh1", 1), damageOn("dh2", 1), damageOn("ally", 1)] },
   { line: "144023:A:1", name: "discarded by Mire the first player reveals the top card, whoever else is acting", layout: { ...SECOND_FIRST, staging: ["144023"], deck: ["f0", "f3"] }, act: announce("discardedByMire", "144023"), expect: revealedBy("f0", 1) },
 

@@ -8,11 +8,11 @@ import { definePrinted } from "../../rules/core/printed.ts";
 import { settle } from "../../rules/engine/machine.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import { withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, playerTable, stat } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Run, type Table } from "../../../test/harness/scene.ts";
+import { attacking, choices, combat, playerTableFor, playRefusal, stat } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "143001";
 const THEODEN = "143002";
@@ -36,7 +36,7 @@ const FELLOW = "fellow";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -53,18 +53,13 @@ function playIn(state: ScenarioState, tab: Table, code: string): Run {
   return send(begin(state), { type: "PlayCard", cardId: card, payments: payFor(state, tab.ctx, card) }, tab.ctx);
 }
 
-function playable(state: ScenarioState, tab: Table, code: string): string | null {
-  const card = idsOf(tab, code);
-  return refusal(state, { type: "PlayCard", cardId: card, payments: payFor(state, tab.ctx, card) }, tab.ctx);
-}
-
 describe("Entmoot (143011:A:1, A:2)", () => {
   // "Play only if you control at least 1 Ent character."
   lineSpec("143011:A:1", "is played only while you control an Ent character", (effects) => {
     const ents = table(effects, { heroes: [{ code: TREEBEARD, seat: 0 }], hand: [{ code: ENTMOOT, seat: 0 }], playerDeck: [{ code: "card", seat: 0 }] });
-    expect(playable(ents.state, ents, ENTMOOT)).toBeNull();
+    expect(playRefusal(ents.state, ents, ENTMOOT)).toBeNull();
     const none = table(effects, { heroes: [{ code: ORI, seat: 0 }], hand: [{ code: ENTMOOT, seat: 0 }], playerDeck: [{ code: "card", seat: 0 }] });
-    expect(playable(none.state, none, ENTMOOT)).not.toBeNull();
+    expect(playRefusal(none.state, none, ENTMOOT)).not.toBeNull();
   });
 
   // "Action: Search the top 5 cards of your deck for any number of Ent cards and add them to your hand. Shuffle the other cards back into your deck."
@@ -102,8 +97,8 @@ describe("Helm! Helm! (143012:A:1, A:2)", () => {
     // The action window before the enemies attack (6.2), Háma's Combat Action keeping it open.
     const before = combat(tab.state, tab);
     expect(before.state.window?.kind).toBe("frameAction");
-    expect(playable(before.state, tab, HELM)).not.toBeNull();
-    expect(playable(afterEnemyAttacks(tab).state, tab, HELM)).toBeNull();
+    expect(playRefusal(before.state, tab, HELM)).not.toBeNull();
+    expect(playRefusal(afterEnemyAttacks(tab).state, tab, HELM)).toBeNull();
   });
 
   // "Combat Action: Exhaust and discard a Rohan ally you control to choose and discard a non-unique enemy engaged with you."
@@ -124,9 +119,9 @@ describe("Helm! Helm! (143012:A:1, A:2)", () => {
 
   lineSpec("143012:A:2", "is not played without a ready Rohan ally of yours", (effects) => {
     const noAlly = table(effects, { heroes: [{ code: THEODEN, seat: 0 }, { code: EOWYN, seat: 0 }], hand: [{ code: HELM, seat: 0 }], engaged: [{ code: TOUGH, seat: 0 }, { code: WEAK, seat: 0 }] });
-    expect(playable(afterEnemyAttacks(noAlly).state, noAlly, HELM)).not.toBeNull();
+    expect(playRefusal(afterEnemyAttacks(noAlly).state, noAlly, HELM)).not.toBeNull();
     const ally = table(effects, { heroes: [{ code: THEODEN, seat: 0 }, { code: EOWYN, seat: 0 }], allies: [{ code: HAMA, seat: 0 }], hand: [{ code: HELM, seat: 0 }], engaged: [{ code: TOUGH, seat: 0 }, { code: WEAK, seat: 0 }] });
-    expect(playable(afterEnemyAttacks(ally).state, ally, HELM)).toBeNull();
+    expect(playRefusal(afterEnemyAttacks(ally).state, ally, HELM)).toBeNull();
   });
 });
 
@@ -142,10 +137,10 @@ describe("The Three Hunters (143013:A:1, A:2)", () => {
   // "Play only if you control Fellowship Aragorn."
   lineSpec("143013:A:1", "is played only while you control the Fellowship Aragorn", (effects) => {
     const fellowship = questing(effects, [ARAGORN, THEODEN, TREEBEARD]);
-    expect(playable(fellowship.run.state, fellowship.tab, HUNTERS)).toBeNull();
+    expect(playRefusal(fellowship.run.state, fellowship.tab, HUNTERS)).toBeNull();
     // Core Aragorn is a Leadership hero, not the Fellowship Aragorn; the Fellow pays for the card.
     const core = questing(effects, [FELLOW, CORE_ARAGORN, THEODEN]);
-    expect(playable(core.run.state, core.tab, HUNTERS)).not.toBeNull();
+    expect(playRefusal(core.run.state, core.tab, HUNTERS)).not.toBeNull();
   });
 
   // "Quest Action: Choose 3 heroes committed to the quest. Ready those heroes. Until the end of the round, each of the chosen heroes gets +1 Willpower, +1 Attack, and +1 Defense."

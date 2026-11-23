@@ -1,5 +1,5 @@
 // One category's page of Settings (docs/design-system.md, Settings): its note when it has one, then its rows, the same rows the search and
-// the table's panel draw. About is its own page (about.tsx); Saves is the web's and the desktop's (`saves`, web/backup-group.tsx).
+// the table's panel draw. About is its own page (about.tsx); Saves is the page it is handed (`saves`: phone-saves.native.tsx, or web/backup-group.tsx on the web and the desktop).
 import type { ComponentRef, ReactNode, RefObject } from "react";
 import { ScrollView, View } from "react-native";
 

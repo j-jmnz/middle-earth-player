@@ -4,7 +4,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/costs.ts";
 
 import { syncConstants } from "../../interpret/constants.ts";
-import { expectOk } from "../../core/test-fixture.ts";
+import { expectOk, hero } from "../../core/test-fixture.ts";
 import { gainSeatResources } from "../../interpret/interpret.ts";
 import { modifiedStat } from "../../core/keywords.ts";
 import { hasResourceMatch, heroPays } from "../../player/payments.ts";
@@ -12,6 +12,7 @@ import { qualifyingEnemies } from "../../quest/quest.ts";
 import { legalIntents, reduce } from "../../engine/reduce.ts";
 import { ruleCause } from "../../core/cause.ts";
 import { updateCard, withThreat } from "../../core/state.ts";
+import { paymentsFor, triggerPayments } from "../../../../test/harness/auto-player.ts";
 import { card, put, table } from "./fixture.ts";
 import { threatCostCut, threatCostOf } from "./stats.ts";
 
@@ -40,7 +41,10 @@ const folco = card("17109", "hero", "spirit", null, { threat: 5, traits: ["Hobbi
 const pippin = card("pippin", "hero", "tactics", null, { threat: 6, traits: ["Hobbit"] });
 const answer = card("answer", "event", "lore", 0);
 
-const CARDS = [thicket, knight, radagast, eagle, mule, naasiyah, amarthiul, orc, goblin, disguise, bard, bow, muster, rohanHero, narvi, mirlonde, folco, pippin, answer];
+const lead2 = hero("lead2", "leadership", 9);
+const ceorl = card("ceorl", "ally", "leadership", 2);
+
+const CARDS = [lead2, ceorl, thicket, knight, radagast, eagle, mule, naasiyah, amarthiul, orc, goblin, disguise, bard, bow, muster, rohanHero, narvi, mirlonde, folco, pippin, answer];
 
 describe("pools that must differ (PayDistinctHeroes)", () => {
   it("refuses 3 resources from one hero for a card paid from 3 different heroes' pools, and the first guess spreads them", () => {
@@ -62,6 +66,36 @@ describe("pools that must differ (PayDistinctHeroes)", () => {
     const ready = updateCard(lone.state, lone.id, { resources: 2 });
     expect(reduce(ready, { type: "PlayCard", cardId: knightCard.id, payments: [{ heroId: ids[0]?.[2] ?? "", amount: 1 }, { heroId: lone.id, amount: 1 }] }, ctx)).toMatchObject({ ok: false, reason: "Pay from a single hero" });
     expect(reduce(ready, { type: "PlayCard", cardId: knightCard.id, payments: [{ heroId: lone.id, amount: 2 }] }, ctx).ok).toBe(true);
+  });
+});
+
+// "Knight of the White Tower's resource cost must be paid from a single hero's resource pool." With 1 resource in each of two
+// pools and a cost of 2, no payment is legal: the card is not offered, the first guess is empty, and the auto-player sends no split.
+describe("a card paid from a single hero's pool, when no one pool holds its cost", () => {
+  it("is not offered, and neither the table's first guess nor the auto-player splits the cost", () => {
+    const { state, ids, ctx } = table(RECORDS, CARDS, [["lead", "lead2"]], 1);
+    const hand = put(state, "12139", "hand");
+    expect(legalIntents(hand.state, ctx)).not.toContainEqual({ type: "PlayCard", cardId: hand.id });
+    expect(paymentsFor(hand.state, ctx, 0, hand.id, 2)).toBeNull();
+    const first = ids[0]?.[0] ?? "";
+    const rich = updateCard(hand.state, first, { resources: 2 });
+    expect(legalIntents(rich, ctx)).toContainEqual({ type: "PlayCard", cardId: hand.id });
+    expect(paymentsFor(rich, ctx, 0, hand.id, 2)).toEqual([{ heroId: first, amount: 2 }]);
+  });
+});
+
+// Ceorl (12058:A:1): a Leadership ally whose Action costs 1 Spirit resource. The auto-player pays an Action from the sphere of its cost,
+// not of the card, so the Leadership hero listed first is not named.
+describe("an Action whose cost names another sphere than its card", () => {
+  const record: Effect = { id: "ceorl:action:1", cardCode: "ceorl", lines: ["ceorl:A:1"], timing: "action", cost: { kind: "resources", amount: 1, sphere: "spirit" }, instructions: [{ verb: "Ready" }] };
+
+  it("is paid by a hero of the cost's sphere, and the reducer accepts it", () => {
+    const { state, ids, ctx } = table([...RECORDS, record], CARDS, [["lead", "spirit"]], 1);
+    const placed = put(state, "ceorl", "play");
+    const tired = updateCard(placed.state, placed.id, { exhausted: true });
+    const paid = triggerPayments(tired, ctx, { type: "Trigger", cardId: placed.id, effectId: record.id });
+    expect(paid).toEqual([{ heroId: ids[0]?.[1], amount: 1 }]);
+    expect(reduce(tired, { type: "Trigger", cardId: placed.id, effectId: record.id, payments: paid ?? [] }, ctx)).toMatchObject({ ok: true });
   });
 });
 

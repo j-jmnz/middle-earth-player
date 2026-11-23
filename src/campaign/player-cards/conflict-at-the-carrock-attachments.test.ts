@@ -13,8 +13,8 @@ import { updateCard } from "../../rules/core/state.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { combat, hosts, passAll, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { atDefense, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const WARNING = "02026";
 const ALOFT = "02029";
@@ -36,7 +36,7 @@ const LORE_ALLY = "lore-ally";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -159,8 +159,7 @@ describe("A Burning Brand (02033:A:1, A:2)", () => {
   // The Black Rider attacks with Green Hill Country (Shadow: +1 Attack) as its shadow card; `defender` defends; Beravor holds the Brand.
   function defended(effects: readonly Effect[], defender: string): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: BERAVOR, seat: 0 }, { code: LEGOLAS, seat: 0 }], attached: [{ code: BRAND, host: BERAVOR }], engaged: [{ code: RIDER, seat: 0 }], deck: [GREEN_HILL] });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx);
     return { tab, run };
   }

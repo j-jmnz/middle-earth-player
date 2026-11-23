@@ -5,7 +5,6 @@
 // the-wilds-of-rhovanion-attachments.test.ts).
 import { beforeAll, describe, expect } from "vitest";
 
-import type { Effect } from "../../catalog/boundary.ts";
 import { hasKeyword } from "../../rules/core/keywords.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { playCost } from "../../rules/player/attach.ts";
@@ -13,8 +12,8 @@ import { legalTargets, type PlayerIntent } from "../../rules/engine/reduce.ts";
 import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, playerTable, printed, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { begin, idsOf } from "../../../test/harness/scene.ts";
+import { attach, choices, playerTableFor, printed, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const GIMLI = "01004";
@@ -40,7 +39,7 @@ const PAL = "pal";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

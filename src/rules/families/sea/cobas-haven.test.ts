@@ -48,12 +48,11 @@ describe("12120:A:1 Outmaneuver the Enemy: Setup", () => {
     // The Corsair deck holds the non-ship enemy; a ship is taken; the Heading is on-course.
     expect(done.state.corsairDeck?.map((id) => done.state.cards[id]?.code)).toEqual([CODES.viciousMarauder]);
     expect(idsOf(done.state, CODES.dreamChaser).some((id) => done.state.cards[id]?.zone === "play")).toBe(true);
-    // One Dol Amroth objective is in the staging area, guarded by the next non-objective card; the other stayed in the deck.
+    // The objective is guarded by the next non-objective card; when the next card is the other Dol Amroth objective, that one is revealed after the guard is used and takes the card after it (rr.guarded): both are in the staging area, each with one guard.
     const towers = [CODES.seaWardTower, CODES.towerOfTheGull].map((code) => idOf(done.state, code));
-    const inStaging = towers.filter((id) => done.state.cards[id]?.zone === "staging");
-    expect(inStaging.length).toBe(1);
-    expect(done.state.cards[inStaging[0] ?? ""]?.attachments.map((id) => done.state.cards[id]?.code)).toEqual([CODES.siegeShip]);
-    expect(towers.filter((id) => done.state.cards[id]?.zone === "encounterDeck").length).toBe(1);
+    expect(towers.map((id) => done.state.cards[id]?.zone)).toEqual(["staging", "staging"]);
+    expect(towers.map((id) => done.state.cards[id]?.attachments.length)).toEqual([1, 1]);
+    expect(towers.flatMap((id) => done.state.cards[id]?.attachments ?? []).map((id) => done.state.cards[id]?.code)).toContain(CODES.siegeShip);
   });
 });
 

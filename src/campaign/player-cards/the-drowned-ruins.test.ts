@@ -15,7 +15,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, endRound, fillers, hosts, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attach, choices, endRound, fillers, hosts, passWhile, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const REMEDY = "12084";
 const MARKSMAN = "12085";
@@ -44,7 +44,7 @@ const PAL = "pal";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -141,7 +141,7 @@ describe("Battle-fury (12086:A:1, A:2)", () => {
     const tab = scene(effects);
     expect(legalIntents(tab.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === idsOf(tab, FURY))).toBe(true);
     let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, EOWYN)] }, tab.ctx);
-    for (let guard = 0; guard < 5 && run.state.mode === "questCommit"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.mode === "questCommit", 5);
     expect(run.state.phase).toBe("Quest");
     expect(run.state.mode).not.toBe("questCommit");
     expect(legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass")).toBe(true);
@@ -271,7 +271,7 @@ describe("Interrogation (12090:A:1)", () => {
     const { tab, deck } = scene(effects);
     const [first = "", second = "", third = "", fourth = "", fifth = ""] = deck;
     let run = play(begin(tab.state), tab, idsOf(tab, INTERROGATION));
-    for (let guard = 0; guard < 4 && run.state.window?.kind === "look"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.window?.kind === "look", 4);
     expect(choices(run.state, tab).sort()).toEqual(["discard", "keep"]);
     run = sendUnledgered(run, { type: "Choose", optionId: "discard" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([first, second, third].sort());

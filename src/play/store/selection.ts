@@ -5,7 +5,7 @@
 // card only. A drop names a zone id or a card id that list returned. A drop is a pick, like a tap: it never sends an intent.
 // The dock asks to confirm what it picked (table-choice.ts), and the card moves only when the reducer accepts that.
 import { askingToCommit } from "../../rules/families/sea/sailing-legal.ts";
-import { printedOf } from "../../rules/core/printed.ts";
+import { playsOntoHost, printedOf } from "../../rules/core/printed.ts";
 import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 
 import type { TableLayout } from "../layout/layout.ts";
@@ -61,7 +61,7 @@ export function dropTargets(game: ScenarioState, ctx: ReduceContext, legal: read
   if (playable(legal, cardId)) {
     const printed = printedOf(ctx.cards, instance.code);
     // A Trap or a Guarded card is played into the staging area: the zone is its target (src/rules/families/attachments/play.ts).
-    if (printed.type === "attachment") return legalTargets(game, { type: "PlayCard", cardId }, ctx).flatMap((id) => hostTarget(game, id) ?? []);
+    if (playsOntoHost(printed)) return legalTargets(game, { type: "PlayCard", cardId }, ctx).flatMap((id) => hostTarget(game, id) ?? []);
     // A player side quest goes to the staging area when it is played (mec108.side-quests-in-play): the staging zone is its target.
     return [{ kind: "zone", zone: printed.type === "player-side-quest" ? "staging" : "play" }];
   }
@@ -92,7 +92,7 @@ function playHost(game: ScenarioState, ctx: ReduceContext, cardId: string, targe
   const printed = printedOf(ctx.cards, game.cards[cardId]?.code ?? "");
   // A player side quest dropped on the staging area is played with no host: the engine puts it there itself.
   if (target.zone === "staging") return printed.type === "player-side-quest" ? null : "staging";
-  return target.zone === "play" && printed.type === "attachment" ? `seat:${game.activeSeat}` : null;
+  return target.zone === "play" && playsOntoHost(printed) ? `seat:${game.activeSeat}` : null;
 }
 
 /** A drop target as one string, so a worklet can carry it: "zone:<id>" or "card:<instance id>". */

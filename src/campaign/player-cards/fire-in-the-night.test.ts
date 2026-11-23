@@ -17,8 +17,8 @@ import { legalTargets } from "../../rules/engine/reduce.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, combat, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { attacking, combat, passWhile, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const TRAVELER = "19059";
 const BEAR = "19061";
@@ -44,7 +44,7 @@ const TOUGH = "tough";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -111,7 +111,7 @@ describe("Galion (19063)", () => {
     const tab = table(effects, { heroes: [{ code: SPIRIT, seat: 0 }], allies: [{ code: GALION, seat: 0 }], engaged: [{ code: TOUGH, seat: 0 }] });
     const galion = idsOf(tab, GALION);
     let run: Run = combat(tab.state, tab);
-    for (let guard = 0; guard < 10 && run.state.window?.kind === "frameAction"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.window?.kind === "frameAction", 10);
     expect(run.state.window?.kind).toBe("defense");
     expect(legalTargets(run.state, { type: "DeclareDefender" }, tab.ctx)).toEqual([idsOf(tab, SPIRIT)]);
     const attack = attacking(tab.state);
@@ -140,7 +140,7 @@ describe("Quicker Than Sight (19064:A:1)", () => {
     let run: Run = combat(tab.state, tab);
     const pass = (next: Run) => {
       let out = next;
-      for (let guard = 0; guard < 10 && out.state.window?.kind === "frameAction"; guard += 1) out = sendUnledgered(out, { type: "Pass" }, tab.ctx);
+      out = passWhile(out, tab, (run) => run.state.window?.kind === "frameAction", 10);
       return out;
     };
     run = pass(run);
@@ -157,7 +157,7 @@ describe("Quicker Than Sight (19064:A:1)", () => {
     expect(triggers(pending.state, tab)).toContain("19064:response:1");
     let run = sendUnledgered(pending, { type: "Trigger", cardId: event, effectId: "19064:response:1", payments: payFor(pending.state, tab.ctx, event) }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
-    for (let guard = 0; guard < 10 && (run.state.window?.kind === "frameAction" || run.state.window?.kind === "response"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => (run.state.window?.kind === "frameAction" || run.state.window?.kind === "response"), 10);
     expect(run.state.cards[idsOf(tab, GUIDE)]?.zone).toBe("hand");
     expect(run.state.cards[idsOf(tab, ALLY)]?.zone).toBe("play");
     expect(run.state.cards[event]?.zone).toBe("discard");

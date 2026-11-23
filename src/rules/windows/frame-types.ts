@@ -147,7 +147,7 @@ export type EffectData = {
   locate?: "failed" | "passed";
   // A Draw this effect ran drew a card (the `drew` condition: the text after "then" resolves only when the draw did, rr.then).
   drew?: boolean;
-  // A Draw or a DiscardTopOfDeck this effect ran found too few cards in the deck (the `thenResolves` condition: the text after "then" is not attempted, rr.then).
+  // A Draw, a DiscardTopOfDeck or a DiscardResources this effect ran found too few cards or tokens (the `thenResolves` condition: the text after "then" is not attempted, rr.then).
   short?: boolean;
 };
 

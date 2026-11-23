@@ -43,6 +43,11 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
   if (own === true) return true;
   if ("when" in instruction && instruction.when != null) {
     if (mark.short && instruction.when.kind === "thenResolves") return true;
+    // A condition on the card an earlier Pick chose ("if that hero is Legolas"): the step does not happen when it fails for every card that Pick may have chosen.
+    if (instruction.when.kind === "matches" && instruction.when.card === "picked" && frame.picked != null) {
+      const scope = conditionScope(frame, sourceId);
+      return frame.picked.every((id) => !holds(state, instruction.when!, { ...scope, picked: [id] }, ctx));
+    }
     // A step whose condition reads only the table and fails does not happen.
     if (!readsTable(instruction.when) || holds(state, instruction.when, conditionScope(frame, sourceId), ctx)) return false;
     return true;

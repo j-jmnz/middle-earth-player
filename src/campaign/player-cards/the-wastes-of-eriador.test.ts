@@ -10,13 +10,11 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { deckSaveRefusal } from "../../catalog/deck-save.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { withThreat } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, deckSaveFacts, enter, packRow, passAll, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { atDefense, canPlay, choices, combat, deckSaveFacts, enter, packRow, passAll, passWhile, play, playerTableFor, sendUnledgered, stat, threatened, triggers } from "../../../test/harness/player-table.ts";
 
 const INGOLD = "10002";
 const RALLYING = "10003";
@@ -49,9 +47,7 @@ const STRIDER = "strider";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
-const playable = (state: Table["state"], tab: Table, id: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
-const threatened = (tab: Table, threat: number, seat = 0): Table => ({ ...tab, state: withThreat(tab.state, seat, threat) });
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -71,8 +67,7 @@ beforeAll(async () => {
 // The combat phase on `tab`: its windows passed to the first defense, `defender` declared, and the run back at the Response window that
 // follows the damage.
 function defended(tab: Table, defender: string): Run {
-  const run = passAll(combat(tab.state, tab), tab.ctx);
-  expect(run.state.window?.kind).toBe("defense");
+  const run = atDefense(tab);
   return passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx);
 }
 
@@ -119,7 +114,7 @@ describe("Rallying Cry (10003:A:1, A:2)", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: ARAGORN, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: ALLY, seat: 1 }], hand: [{ code: RALLYING, seat: 0 }], engaged: [{ code: BRUTE, seat: 1 }] });
     const [ally, cry] = [idsOf(tab, ALLY), idsOf(tab, RALLYING)];
     let run = defended(tab, ALLY);
-    for (let guard = 0; guard < 3 && !triggers(run.state, tab).includes("10003:response:1"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => !triggers(run.state, tab).includes("10003:response:1"), 3);
     expect(triggers(run.state, tab)).toContain("10003:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: cry, effectId: "10003:response:1", payments: [{ heroId: idsOf(tab, ARAGORN), amount: 2 }] }, tab.ctx);
     expect(run.state.seats[1]?.hand).toEqual([ally]);
@@ -140,7 +135,7 @@ describe("Rallying Cry (10003:A:1, A:2)", () => {
     const tab = threatened(table(effects, { heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: RALLYING, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }] }), 40);
     const [ally, cry] = [idsOf(tab, ALLY), idsOf(tab, RALLYING)];
     let run = combat(tab.state, tab);
-    expect(playable(run.state, tab, cry)).toBe(true);
+    expect(canPlay(run.state, tab, cry)).toBe(true);
     run = passAll(play(run, tab, cry), tab.ctx);
     expect(run.state.cards[idsOf(tab, ARAGORN)]?.resources).toBe(6 - 2);
     expect(run.state.window?.kind).toBe("defense");
@@ -169,7 +164,7 @@ describe("Rallying Cry (10003:A:1, A:2)", () => {
     // The combat action window does not open, as nothing can be played in it: the run is at the defense.
     const run = combat(tab.state, tab);
     expect(run.state.window?.kind).toBe("defense");
-    expect(playable(tab.state, tab, idsOf(tab, RALLYING))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, RALLYING))).toBe(false);
   });
 });
 
@@ -225,7 +220,7 @@ describe("Scout Ahead (10009:A:2)", () => {
     run = sendUnledgered(run, { type: "Choose", optionId: scout }, tab.ctx);
     run = sendUnledgered(run, { type: "Commit", cardIds: [idsOf(tab, STRIDER)] }, tab.ctx);
     // The commit passes on to each other player, then the staging step reveals and the quest resolves.
-    for (let guard = 0; guard < 4 && run.state.mode === "questCommit"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.mode === "questCommit", 4);
     run = passAll(run, tab.ctx);
     return { tab, run, scout };
   }

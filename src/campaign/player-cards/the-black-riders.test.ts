@@ -14,8 +14,8 @@ import { engagementCostOf, stagingThreat } from "../../rules/quest/quest.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, MERRY, SAM, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, chooseIfAsked, combat, enter, hosts, playCode, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, MERRY, SAM, type Run, type Table } from "../../../test/harness/scene.ts";
+import { attach, choices, chooseIfAsked, combat, enter, hosts, passWhile, playCode, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const FATTY = "141005";
 const BARLIMAN = "141007";
@@ -40,7 +40,7 @@ const ALLY = "ally";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -153,7 +153,7 @@ describe("Smoke Rings (141010:A:1)", () => {
     const before = [FATTY, SAM, MERRY, "141004"].map((code) => willpower(tab.state, code));
     let run = playCode(tab, SMOKE_RINGS);
     // The threat is lowered by an event: the Hobbit Pipes' Response (141015:A:2) is offered and passed.
-    for (let guard = 0; guard < 4 && run.state.window?.kind === "response"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.window?.kind === "response", 4);
     expect(run.state.seats[0]?.threat).toBe(6);
     expect(run.state.seats[1]?.threat).toBe(tab.state.seats[1]?.threat);
     expect([FATTY, SAM, MERRY, "141004"].map((code) => willpower(run.state, code))).toEqual([before[0]! + 1, before[1]! + 1, before[2]! + 1, before[3]]);
@@ -191,7 +191,7 @@ describe("Barliman Butterbur (141007:A:1)", () => {
   function undefended(effects: readonly Effect[], heroes: readonly string[]): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: heroes.map((code) => ({ code, seat: 0 })), allies: [{ code: BARLIMAN, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] });
     let run = combat(tab.state, tab);
-    for (let guard = 0; guard < 6 && run.state.window?.kind === "frameAction"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.window?.kind === "frameAction", 6);
     expect(run.state.window?.kind).toBe("defense");
     return { tab, run };
   }

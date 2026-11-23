@@ -10,13 +10,12 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { playCost } from "../../rules/player/attach.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, endRound, enter, passAll, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { atDefense, canPlay, choices, endRound, enter, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const BEREGOND = "05001";
 const BOROMIR = "05002";
@@ -49,7 +48,7 @@ const WEAK = "weak";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -60,8 +59,6 @@ beforeAll(async () => {
   cards.set(WEAK, definePrinted({ code: WEAK, name: "Weak", type: "enemy", threat: 1, engagementCost: 30, attack: 1, defense: 0, health: 9 }));
   base = { ...starter, cards };
 });
-
-const playable = (state: Run["state"], tab: Table, id: string) => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
 
 describe("Beregond (05001:A:2)", () => {
   // "Lower the cost to play Weapon and Armor attachments on Beregond by 2.": Citadel Plate (Armor, 4) costs 2 on Beregond; the Blade of
@@ -168,7 +165,7 @@ describe("Wealth of Gondor (05006:A:1)", () => {
   // With no Gondor hero in play there is nothing to choose.
   it("05006:A:1 is not played without a Gondor hero", () => {
     const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: GUARD, seat: 0 }], hand: [{ code: WEALTH, seat: 0 }] });
-    expect(playable(tab.state, tab, idsOf(tab, WEALTH))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, WEALTH))).toBe(false);
   });
 });
 
@@ -176,8 +173,7 @@ describe("Behind Strong Walls (05008:A:1)", () => {
   // Legolas pays (Tactics); `defender` defends the Weak enemy's attack; the Guard of the Citadel stands by.
   function defending(effects: readonly Effect[], defender: string): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }, { code: DENETHOR, seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: GUARD, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }], hand: [{ code: WALLS, seat: 0 }] });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx);
     return { tab, run };
   }
@@ -207,7 +203,7 @@ describe("Behind Strong Walls (05008:A:1)", () => {
   // Aragorn defends (not Gondor): the event cannot be played.
   it("05008:A:1 is not played while the defender is not Gondor", () => {
     const { tab, run } = defending(EFFECTS, ARAGORN);
-    expect(playable(run.state, tab, idsOf(tab, WALLS))).toBe(false);
+    expect(canPlay(run.state, tab, idsOf(tab, WALLS))).toBe(false);
   });
 });
 
@@ -241,8 +237,7 @@ describe("Light the Beacons (05011:A:1)", () => {
     expect(stat(run.state, tab, eleanor, "defense")).toBe(2 + 2);
     expect(stat(run.state, tab, ally ?? "", "defense")).toBe(1 + 2);
     expect(stat(run.state, tab, spirit, "defense")).toBe(1 + 2);
-    run = passAll(combat(run.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    run = atDefense(tab, run.state);
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: ally ?? "" }, tab.ctx);
     expect(run.state.cards[ally ?? ""]?.exhausted).toBe(false);
     expect(stat(endRound(run.state, tab).state, tab, ally ?? "", "defense")).toBe(1);

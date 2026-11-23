@@ -68,7 +68,7 @@ describe("Flight of the Stormcaller in the Dream-chaser campaign", () => {
     expect(start.definition.modeCard).toBeUndefined();
   });
 
-  it("starts with the Stormcaller on its Campaign Mode only side in its area carrying Black Key, Calaerion in play under the player with the Dream-chaser, the ships fitted, and the Stormcaller's stage 2D beside it", () => {
+  it("11191:A:2 starts with the Stormcaller on its Campaign Mode only side in its area carrying Black Key, Calaerion in play under the player with the Dream-chaser, the ships fitted, and the Stormcaller's stage 2D beside it", () => {
     const state = opened(flightStart(2, 1, "Normal"));
     const area = areaOf(state);
     expect(area).toBeDefined();
@@ -133,6 +133,32 @@ describe("Flight of the Stormcaller in the Dream-chaser campaign", () => {
     // The ships are the originals (Duskbringer and Glórinaith are new in the Campaign Expansion and have no original).
     expect(Object.values(state.cards).some((card) => ["110136", "110137", "110140", "110141"].includes(card.code))).toBe(false);
     expect(Object.values(state.cards).filter((card) => card.zone === "play" && card.code.startsWith("1108")).length).toBeGreaterThan(0);
+  });
+
+  // "Setup: Prepare the Corsair deck. Players prepare their fleet. Prepare the Stormcaller's area with a second quest deck consisting of only stages 2C, 3C, and 4C, as well as the Stormcaller (see insert). ...
+  // Shuffle the encounter deck." A standalone deal for one player, so only the quest card's Setup acts.
+  it("12012:A:1 prepares the Corsair deck, the lone player's fleet with the Heading card on the Dream-chaser, and the Stormcaller's area with stages 2 to 4 and the Stormcaller", () => {
+    const plan = flightPlan(1);
+    const state = opened(buildStart({ campaign, scenario: flight, seatCount: 1, seed: 1, threatModifier: plan.threatModifier, seats: plan.seats, effects: EFFECTS, mode: "standalone" }));
+    const printed = (id: string) => cards.get(state.cards[id]?.code ?? "");
+    // A Ship enemy is an enemy with the Ship trait; a non-ship enemy has no such trait.
+    const nonShipEnemy = (id: string): boolean => printed(id)?.type === "enemy" && !(printed(id)?.traits ?? []).includes("Ship");
+    // The Corsair deck: every non-ship enemy, none left in the encounter deck.
+    expect((state.corsairDeck ?? []).length).toBeGreaterThan(0);
+    expect((state.corsairDeck ?? []).every(nonShipEnemy)).toBe(true);
+    expect(state.encounterDeck.filter(nonShipEnemy).map((id) => state.cards[id]?.code)).toEqual([]);
+    // The fleet: a lone player takes the Dream-chaser and one other ship; the Heading card is attached to the Dream-chaser, on-course.
+    const ships = Object.values(state.cards).filter((card) => card.zone === "play" && printed(card.id)?.ship === "objective");
+    expect(ships.map((card) => card.controller)).toEqual([0, 0]);
+    const chaser = ships.find((card) => card.code === "11080");
+    expect(chaser).toBeDefined();
+    expect(state.sea?.heading).toBe("Sun");
+    expect(state.cards[state.sea?.headingCard ?? ""]).toMatchObject({ code: "11084", host: chaser?.id });
+    // The Stormcaller's area: stage 2 on its D side with 3 and 4 below it, and the Stormcaller beside it.
+    const area = areaOf(state);
+    expect(state.cards[area?.stage ?? ""]).toMatchObject({ code: "12016", face: "B", zone: "stormcallerArea" });
+    expect(codes(state, area?.deck ?? [])).toEqual(["12017", "12018"]);
+    expect(state.cards[area?.card ?? ""]).toMatchObject({ code: "12019", zone: "stormcallerArea" });
   });
 
   it("wins by catching up, writes the XP its Resolution awards and unlocks the next part, Heading and ships in the log", () => {

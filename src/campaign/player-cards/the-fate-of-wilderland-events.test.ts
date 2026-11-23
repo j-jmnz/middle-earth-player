@@ -7,13 +7,11 @@ import { beforeAll, describe, expect } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { type ScenarioState } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, discarded, endRound, play, playerTable, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
+import { choices, combat, discarded, endRound, play, playableCards, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const GIMLI = "01004";
@@ -47,7 +45,7 @@ const PAL = "pal";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -59,10 +57,6 @@ beforeAll(async () => {
   cards.set(BRUTE, definePrinted({ code: BRUTE, name: "Brute", type: "enemy", threat: 1, engagementCost: 40, attack: 3, defense: 1, health: 9 }));
   base = { ...starter, cards };
 });
-
-function playable(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
-}
 
 describe("The King's Return (19147:A:1)", () => {
   // "Action: Search your deck for a Guarded attachment and put it into play. Shuffle your deck.": the Mithril Shirt (Guarded) is a
@@ -103,7 +97,7 @@ describe("The Great Hunt (19149)", () => {
   // enemy engaged with the player are not. The card is not played in the planning phase.
   lineSpec("19149:A:2", "The Great Hunt: discard a non-unique enemy in the staging area, in the combat phase", (effects) => {
     const tab = hunt(effects);
-    expect(playable(tab.state, tab)).not.toContain(idsOf(tab, HUNT));
+    expect(playableCards(tab.state, tab)).not.toContain(idsOf(tab, HUNT));
     const payments = [DENETHOR, GLORFINDEL, BERAVOR].map((code) => ({ heroId: idsOf(tab, code), amount: 1 }));
     let run = sendUnledgered(combat(tab.state, tab), { type: "PlayCard", cardId: idsOf(tab, HUNT), payments }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
@@ -119,7 +113,7 @@ describe("Gwaihir's Debt (19151)", () => {
   lineSpec("19151:A:1", "Gwaihir's Debt: played only with a unique Istari and a unique Eagle character", (effects) => {
     const can = (allies: readonly string[]): boolean => {
       const tab = table(effects, { heroes: [{ code: GIMLI, seat: 0 }], allies: allies.map((code) => ({ code, seat: 0 })), hand: [{ code: DEBT, seat: 0 }] });
-      return playable(tab.state, tab).includes(idsOf(tab, DEBT));
+      return playableCards(tab.state, tab).includes(idsOf(tab, DEBT));
     };
     expect(can([GANDALF, LANDROVAL])).toBe(true);
     expect(can([GANDALF, HAWK])).toBe(false);

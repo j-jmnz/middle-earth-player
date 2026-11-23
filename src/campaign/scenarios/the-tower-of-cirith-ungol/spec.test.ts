@@ -63,6 +63,9 @@ const ROWS: readonly Row[] = [
   { line: "146062:A:2", name: "When Revealed: each player discards their hand or reveals an encounter card", layout: { phase: "Encounter", hand: ["filler", "filler", "filler"], deck: ["f3", "f0"] }, act: [reveal("146062"), answer("reveal")], expect: deckCount(0) },
   { line: "146062:A:2", name: "or discards a hand of at least 3 cards", layout: { hand: ["filler", "filler", "filler"], deck: ["f3", "f0"] }, act: [reveal("146062"), answer("discard")], expect: { expect: "handCount", value: 0, seat: 0 } },
 
+  // "Shadow: Attacking enemy makes an additional attack after this one." Undefended, the Attack 1 enemy hits the hero twice.
+  { line: "146062:A:3", name: "Shadow: the attacking enemy makes an additional attack after this one", layout: { ...STAGE2, deck: ["f0", "f0", "f0"] }, act: attack("f3", { shadow: "146062", undefended: true }), expect: [attackersOf("dh1", ["f3", "f3"]), damageOn("dh1", 2)] },
+
   { line: "146063:A:1", name: "When Revealed: you raise your threat by 1 for each questing character you control", layout: { committed: ["dh1", "dh2"], deck: ["f0"] }, act: [reveal("146063"), answer("threat")], expect: threat(30) },
   { line: "146063:A:1", name: "or discard a questing character you control", layout: { committed: ["ally"], play: ["ally"], deck: ["f0"] }, act: [reveal("146063"), answer("discard")], expect: zone("ally", "discard") },
   { line: "146063:A:2", name: "Shadow: +1 Attack", layout: STAGE2, act: attack("f3", { shadow: "146063", undefended: true }), expect: damageOn("dh1", 2) },

@@ -108,13 +108,16 @@ export type TempleLayout = {
   mode?: "A" | "B";
   // Damage on the first card of each code: [code, damage].
   damage?: readonly (readonly [string, number])[];
+  // The records that name these ledger lines are left out of the table's effects (a test run again without the records of its line).
+  without?: readonly string[];
 };
 
 export type TempleTable = { state: ScenarioState; ctx: ReduceContext; hero: string; hero2: string; seat1Hero: string | null; cells: readonly string[] };
 
 export function templeTable(world: TempleWorld, layout: TempleLayout = {}): TempleTable {
   const seats = layout.seats ?? 1;
-  const ctx: ReduceContext = { effects: SCENE_EFFECTS, cards: world.cards };
+  const without = layout.without ?? [];
+  const ctx: ReduceContext = { effects: without.length === 0 ? SCENE_EFFECTS : SCENE_EFFECTS.filter((effect) => !effect.lines.some((line) => without.includes(line))), cards: world.cards };
   let state = blankScenario({ seatCount: seats, seed: layout.seed ?? 3, definition: world.definition });
   const quest = spawn(state, CODES.searching, { zone: "questStage" }, "B");
   state = updateCard(quest.state, quest.id, { progress: layout.progress ?? 0 });

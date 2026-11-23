@@ -1,7 +1,7 @@
 // Rules: rr.cancel, rr.replacement-effects, rr.search, rr.first-player, rr.travel, rr.immune, rr.optional-engagement, rr.engagement-check, rr.active-location, rr.explored, dwd.immune-to-card-effects, dwd.last-player, dwd.cave-torch-the-long-dark, faq.lasting-effects (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, endPhase, endRound, exhausted, flag, handCount, offers, progressOn, quest, resolve, reveal, revealedBy, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, endPhase, endRound, exhausted, flag, handCount, offers, progressOn, quest, resolve, reveal, revealedBy, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Into the Pit (dwarrowdelf part 1): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
@@ -71,6 +71,31 @@ const ROWS: readonly Row[] = [
   { line: "03060:A:1", name: "a player at 25 threat or more cannot optionally engage it", layout: { phase: "Encounter", staging: ["03060"], threat: [40, 28] }, act: [], expect: [offers("Engage", undefined, false)] },
   { line: "901002:B:3", name: "a successful quest places no progress on Goblin Ambush", layout: { stage: "901002", progress: 0 }, act: quest("success"), expect: [progressOn("901002", 0)] },
   { line: "901002:A:1", name: "with two players the first player alone searches for Patrol Sentry, Patrol Leader and 1 more Orc", layout: { seats: 2, stage: "901002", deck: ["03060", "03014", "901003", "901004", "901005"] }, act: resolve("901002", "whenRevealed"), expect: [zone("901003", "staging"), zone("03014", "staging")] },
+  // The audit's lines (each printed line read from data/printed): the Travel cost, the Shadows, the Nightmare constants. Dark locations: Branching Paths 03036, Zigil Mineshaft 03038; First Hall 03017 is not Dark.
+  // 03037 Lightless Passage A:1: "Travel: Players must exhaust a Cave Torch to travel here."
+  // The round runs on to its end, where the refresh readies the Torch: its own Forced (03041:A:3) shows it was exhausted, the top enemy of the encounter deck joining the staging area.
+  { line: "03037:A:1", name: "the players exhaust the Cave Torch to travel here", layout: { phase: "Travel", staging: ["03037"], attached: [{ code: "03041", to: "dh1" }], deck: ["f3", "f0"] }, act: travel("03037"), expect: [zone("03037", "activeLocation"), zone("f3", "staging")] },
+  { line: "03037:A:1", name: "with no Cave Torch in play the players cannot travel here", layout: { phase: "Travel", staging: ["03037"] }, act: [], expect: offers("Travel", undefined, false) },
+  // 03040 Burning Low A:2: "Shadow: Attacking enemy gets +2 Attack." (f3 has 1 Attack.)
+  { line: "03040:A:2", name: "Shadow: the attacking enemy gets +2 Attack", layout: {}, act: attack("f3", { shadow: "03040", undefended: true }), expect: damageOn("dh1", 3) },
+  // 03063 Goblin Tunnels A:2: "Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if attacking enemy is a Goblin.)" Goblin Scout 03060 has 1 Attack.
+  { line: "03063:A:2", name: "Shadow: a non-Goblin attacking enemy gets +1 Attack", layout: {}, act: attack("f3", { shadow: "03063", undefended: true }), expect: damageOn("dh1", 2) },
+  { line: "03063:A:2", name: "Shadow: a Goblin attacking enemy gets +3 Attack instead", layout: {}, act: attack("03060", { shadow: "03063", undefended: true }), expect: damageOn("dh1", 4) },
+  // 901003 Patrol Sentry A:2: "Shadow: Add Patrol Sentry to the staging area."
+  { line: "901003:A:2", name: "Shadow: Patrol Sentry is added to the staging area", layout: {}, act: attack("f3", { shadow: "901003" }), expect: zone("901003", "staging") },
+  // 901004 Goblin Lurker A:1: "Cannot be optionally engaged." A:3: "Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if the active location is a Dark location.)"
+  { line: "901004:A:1", name: "no player can optionally engage Goblin Lurker", layout: { phase: "Encounter", staging: ["901004"] }, act: [], expect: offers("Engage", undefined, false) },
+  { line: "901004:A:3", name: "Shadow: the attacking enemy gets +1 Attack with no Dark active location", layout: { active: "03017" }, act: attack("f3", { shadow: "901004", undefended: true }), expect: damageOn("dh1", 2) },
+  { line: "901004:A:3", name: "Shadow: +3 Attack instead when the active location is Dark", layout: { active: "03036" }, act: attack("f3", { shadow: "901004", undefended: true }), expect: damageOn("dh1", 4) },
+  // 901005 Shadow Dweller A:3: "Shadow: Shuffle Shadow Dweller back into the encounter deck."
+  { line: "901005:A:3", name: "Shadow: Shadow Dweller is shuffled into the encounter deck, not discarded", layout: {}, act: attack("f3", { shadow: "901005" }), expect: zone("901005", "encounterDeck") },
+  // 901006 Twisting Shadows A:2: "When Revealed: Remove all progress from each Dark location in play." A:3: "Shadow: Attacking enemy gets +1 Attack for each Dark location in play."
+  { line: "901006:A:2", name: "all progress leaves the Dark active location; the quest and a non-Dark location keep theirs", layout: { active: { code: "03036", progress: 2 }, staging: [{ code: "03017", progress: 1 }], progress: 2, deck: ["f0"] }, act: reveal("901006"), expect: [progressOn("03036", 0), progressOn("03017", 1), progressOn("03064", 2)] },
+  { line: "901006:A:3", name: "Shadow: +1 Attack for each Dark location in play, in the staging area and active", layout: { staging: ["03038"], active: "03036" }, act: attack("f3", { shadow: "901006", undefended: true }), expect: damageOn("dh1", 3) },
+  // 901007 Narrow Fissure A:2: "Each Dark location in play gets +2 quest points." It is a Hazard, not Dark (1 quest point).
+  { line: "901007:A:2", name: "the Dark active location gets +2 quest points, Narrow Fissure does not", layout: { staging: ["901007"], active: "03036" }, act: [], expect: [stat("03036", "questPoints", 5), stat("901007", "questPoints", 1)] },
+  // 901008 Shadow-fall A:3: "Shadow: Attacking enemy gets +3 Defense this phase." The end of the phase is in card-lines.test.ts.
+  { line: "901008:A:3", name: "Shadow: the attacking enemy has +3 Defense after the attack, in the same phase", layout: {}, act: [attack("f3", { shadow: "901008" }), defend("dh1")], expect: stat("f3", "defense", 4) },
 ];
 
 if (ROWS.length > 0) cardSpecs("into-the-pit", ROWS);

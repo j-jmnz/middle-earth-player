@@ -7,16 +7,14 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
-import { ruleCause } from "../../rules/core/cause.ts";
-import { placeDamage } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, enter, fillers, hosts, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
+import { attach, choices, destroyed, enter, fillers, hosts, passWhile, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const IMRAHIL = "02050";
 const QUEST = "02051";
@@ -47,7 +45,7 @@ const CARD = "card";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -58,7 +56,6 @@ beforeAll(async () => {
 });
 
 // The card `id` is destroyed (9 damage), and a Pass lets the game resolve what that set off.
-const destroyed = (state: Table["state"], tab: Table, id: string): Run => sendUnledgered(begin(placeDamage(state, id, 9, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
 
 describe("Prince Imrahil (02050:A:1)", () => {
   // Imrahil exhausted, two allies of the player and one of the other player's, and a Weak enemy engaged.
@@ -226,7 +223,7 @@ describe("Escort from Edoras (02055:A:1, A:2)", () => {
     const tab = scene(effects);
     const [committed = "", home = ""] = tab.ids[ESCORT] ?? [];
     let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [committed, idsOf(tab, EOWYN)] }, tab.ctx);
-    for (let guard = 0; guard < 20 && run.state.phase === "Quest" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.phase === "Quest" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"), 20);
     expect(run.state.phase).not.toBe("Quest");
     expect(run.state.cards[committed]?.zone).toBe("discard");
     expect(run.state.cards[home]?.zone).toBe("play");
@@ -251,7 +248,7 @@ describe("Ancient Mathom (02056:A:1, A:2)", () => {
     const tab = attach({ ...scene, state: { ...updateCard(scene.state, location, { progress: 2 }), firstPlayer: 1 } }, [[idsOf(scene, MATHOM), location]]);
     const hands = tab.state.seats.map((seat) => seat.hand.length);
     let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, EOWYN)] }, tab.ctx);
-    for (let guard = 0; guard < 20 && !triggers(run.state, tab).includes("02056:response:1") && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => !triggers(run.state, tab).includes("02056:response:1") && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"), 20);
     expect(run.state.cards[location]?.zone).not.toBe("activeLocation");
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, MATHOM), effectId: "02056:response:1" }, tab.ctx);
     expect(run.state.seats[1]?.hand.length).toBe((hands[1] ?? 0) + 3);

@@ -84,6 +84,33 @@ describe("the campaign card's XP list (11194:B:3 to 11194:B:9)", () => {
   });
 });
 
+describe("the campaign card's XP lines by line id", () => {
+  it("11194:B:4 gains 1 XP for 6 resources on Captain Sahír, whoever else holds resources", () => {
+    expect(xpOf({}, resourcesOn(CODES.sahirAlly, 6))).toBe(2);
+  });
+
+  it("11194:B:5 gains 1 XP for exactly 5 resources on Na'asiyah", () => {
+    expect(xpOf({}, resourcesOn(CODES.naasiyahAlly, 5))).toBe(2);
+  });
+
+  it("11194:B:6 gains 1 XP for Sea Serpent on its Enraged side engaged with a player, none on its Menacing side, and 2 XP instead in the victory display", () => {
+    expect(xpOf({ engaged: [{ code: CODES.seaSerpent, seat: 0 }] }, face(CODES.seaSerpent, "B"))).toBe(1 + 1);
+    expect(xpOf({ engaged: [{ code: CODES.seaSerpent, seat: 0 }] })).toBe(1);
+    expect(xpOf({ victory: [CODES.seaSerpent] })).toBe(1 + 2);
+  });
+
+  it("11194:B:7 reads the heroes only: a damaged ally does not lose the XP", () => {
+    expect(xpOf({ damage: [["ally", 1]], play: ["ally"] })).toBe(1 + 1);
+    expect(xpOf({ damage: [[CODES.sahirAlly, 2]] })).toBe(1 + 1);
+  });
+
+  it("11194:B:8 gains 2 XP at threat 30 or less and 1 at 40 or less, and none when one of 2 surviving players is over 40", () => {
+    expect(xpOf({ threat: [30, 26] })).toBe(1 + 2);
+    expect(xpOf({ threat: [40, 26] })).toBe(1 + 1);
+    expect(xpOf({ seats: 2, threat: [30, 41] })).toBe(2);
+  });
+});
+
 describe("the card the Resolution lets the players keep (11194:B:1)", () => {
   it("lets the first player add Come Together to the Campaign Pool, or leave it out", () => {
     const made = depthsTable(world, BASE);

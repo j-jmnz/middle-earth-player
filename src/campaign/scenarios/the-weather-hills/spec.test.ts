@@ -105,6 +105,14 @@ const ROWS: readonly Row[] = [
   { line: "10161:A:2", name: "Setup: attached to a hero, who gets 2 resources", layout: {}, act: [resolve("10161", "setup"), answer("dh1")], expect: resourcesOn("dh1", 2) },
   { line: "10161:A:3", name: "Action: attached hero gets +2 Willpower, Attack and Defense until the end of the phase", layout: { attached: [{ code: "10161", to: "dh1" }] }, act: resolve("10161", "action"), expect: [stat("dh1", "willpower", 4), stat("dh1", "attack", 4), stat("dh1", "defense", 4)] },
   { line: "10162:A:3", name: "attached hero gets +2 hit points", layout: { attached: [{ code: "10162", to: "dh1" }] }, act: [], expect: [stat("dh1", "hitPoints", 8), stat("dh2", "hitPoints", 6)] },
+  // The Setup of each boon (Hardy, Resolute, Ruthless, Stalwart): "Setup: Attach to a hero." The first player chooses the second hero, so the boon's own +X is read on that hero only.
+  { line: "10162:A:2", name: "Setup: Hardy is attached to the hero chosen, who gets its +2 hit points", layout: {}, act: [resolve("10162", "setup"), answer("dh2")], expect: [zone("10162", "attached"), stat("dh2", "hitPoints", 8), stat("dh1", "hitPoints", 6)] },
+  { line: "10163:A:2", name: "Setup: Resolute is attached to the hero chosen, who gets its +1 Willpower", layout: {}, act: [resolve("10163", "setup"), answer("dh2")], expect: [zone("10163", "attached"), stat("dh2", "willpower", 3), stat("dh1", "willpower", 2)] },
+  { line: "10163:A:3", name: "attached hero gets +1 Willpower, and the other hero does not", layout: { attached: [{ code: "10163", to: "dh1" }] }, act: [], expect: [stat("dh1", "willpower", 3), stat("dh2", "willpower", 2)] },
+  { line: "10164:A:2", name: "Setup: Ruthless is attached to the hero chosen, who gets its +1 Attack", layout: {}, act: [resolve("10164", "setup"), answer("dh2")], expect: [zone("10164", "attached"), stat("dh2", "attack", 3), stat("dh1", "attack", 2)] },
+  { line: "10164:A:3", name: "attached hero gets +1 Attack, and the other hero does not", layout: { attached: [{ code: "10164", to: "dh1" }] }, act: [], expect: [stat("dh1", "attack", 3), stat("dh2", "attack", 2)] },
+  { line: "10165:A:2", name: "Setup: Stalwart is attached to the hero chosen, who gets its +1 Defense", layout: {}, act: [resolve("10165", "setup"), answer("dh2")], expect: [zone("10165", "attached"), stat("dh2", "defense", 3), stat("dh1", "defense", 2)] },
+  { line: "10165:A:3", name: "attached hero gets +1 Defense, and the other hero does not", layout: { attached: [{ code: "10165", to: "dh1" }] }, act: [], expect: [stat("dh1", "defense", 3), stat("dh2", "defense", 2)] },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-weather-hills", ROWS);

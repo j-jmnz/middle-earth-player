@@ -5,7 +5,7 @@ import { DEFAULT_SETTINGS, restoreDefaults } from "../../ui/table-settings.ts";
 // The lines that name the phone's own setting follow the platform; the tests read the iOS one.
 vi.mock("react-native", () => ({ Platform: { OS: "ios", select: (choices: { ios?: string; default?: string }) => choices.ios ?? choices.default } }));
 
-const PHONE: SettingsPlatform = { haptics: true, tableList: true, saves: false, computer: false, sounds: true, music: true };
+const PHONE: SettingsPlatform = { haptics: true, tableList: true, saves: true, computer: false, sounds: true, music: true };
 const COMPUTER: SettingsPlatform = { haptics: false, tableList: true, saves: true, computer: true, sounds: false, music: false };
 const ids = (query: string, platform = PHONE) => searchSettings(query, platform).map((hit) => `${hit.kind}:${hit.id}`);
 
@@ -25,9 +25,10 @@ describe("the categories", () => {
     expect(homeOf("awake")).toBe("playing");
   });
 
-  it("show Saves only where the app backs up its saves, and Haptics only on a phone", () => {
-    expect(categoriesFor(PHONE).map((each) => each.id)).not.toContain("saves");
+  it("show Saves where the app backs up its saves, which every client does, and Haptics only on a phone", () => {
+    expect(categoriesFor(PHONE).map((each) => each.id)).toContain("saves");
     expect(categoriesFor(COMPUTER).map((each) => each.id)).toContain("saves");
+    expect(categoriesFor({ ...PHONE, saves: false }).map((each) => each.id)).not.toContain("saves");
     expect(rowsFor(PANEL_ROWS, COMPUTER)).not.toContain("haptics");
     expect(rowsFor(PANEL_ROWS, PHONE)).toContain("haptics");
     expect(isCategoryId("performance")).toBe(true);
@@ -73,7 +74,7 @@ describe("the search", () => {
   it("puts a setting whose name holds the query first, then the categories", () => {
     expect(ids("motion")[0]).toBe("setting:reduceMotion");
     expect(ids("motion").at(-1)).toBe("category:motion");
-    expect(ids("backup")).toEqual([]);
+    expect(ids("backup")).toEqual(["category:saves"]);
     expect(ids("backup", COMPUTER)).toEqual(["category:saves"]);
     expect(ids("privacy")).toEqual(["category:about"]);
   });

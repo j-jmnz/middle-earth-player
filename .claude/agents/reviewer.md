@@ -31,8 +31,9 @@ Trace the change against the phase exit and the rule it claims to implement. Rep
 - A shuffle ignores the seed stored on the scenario, so a relaunch deals a different order.
 - A catalog update replaces `user.db`, or a screen can read only one of the two database handles.
 - An empty `catch`, a default value, or a missing branch turns a failure into a success. A save, a migration, or an image write can fail and the UI continues.
-- The new test asserts the buggy result, or the phase exit has no test for the branch you can break.
-- A change that moves a replayed game leaves `ENGINE_VERSION` where it was, or a golden or fixture changes its outcome with no note saying why.
+- The new test asserts the buggy result, passes without the change, or the phase exit has no test for the branch you can break.
+- A fix in a reader many cards share makes another card wrong: list the cards it reaches and read their printed lines (`docs/agents/card-audit.md`, Fix and review). A check keyed on an unrelated fact hides the fault.
+- A change that moves a replayed game leaves `ENGINE_VERSION` where it was, or a golden or fixture changes its outcome with no note saying why, or with a cause `pnpm game diff` does not bear out.
 
 ## Repetition
 
@@ -74,8 +75,6 @@ Flag a reading of a card or rule that `data/rules/` does not settle and that has
 
 ## Coding practices
 
-Do not spend the review on formatting a formatter would fix.
-
 - No `any`. No empty `catch`. A rejected intent returns a reason.
 - No commented-out code and no unused exports left behind "for later."
 - A behavior change has a Vitest test in the same change, matching what the phase exit requires.
@@ -91,14 +90,8 @@ A bug names the file, the input, and the wrong result. Any other finding names t
 Block: src/rules/quest/quest.ts places progress on the quest while Bag End is active
 Committed willpower 4 against staging threat 1 puts 3 progress on the quest. That progress belongs on the active location first.
 
-Block: src/screens/table/view.tsx applies damage
-The screen adds `attack - defense` itself. That result belongs in the reducer. The screen can only dispatch the defender the player chose.
-
 Change: src/rules/families/south/reveal.ts duplicates staging
 The same reveal-and-surge loop is in src/rules/quest/stage-reveal.ts. Call that function.
-
-Note: src/play/canvas/hand-scrub.native.tsx is 180 lines and still one job
-No split.
 ```
 
 End with what you checked and found sound, in a few lines. Do not praise the diff.

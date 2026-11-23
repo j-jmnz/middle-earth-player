@@ -1,7 +1,7 @@
 // Rules: rr.active-location, rr.attachment-cards, rr.first-player, rr.forced, rr.response, rr.reveal, rr.shadow-effects, rr.search (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, damageOn, deckCount, defend, endPhase, exhausted, flag, quest, resolve, respond, reveal, travel, stat, threat, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, damageOn, deckCount, defend, endPhase, exhausted, flag, quest, resolve, respond, reveal, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Conflict at the Carrock (shadows-of-mirkwood part 2): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
@@ -31,12 +31,15 @@ const ROWS: readonly Row[] = [
   { line: "02045:A:1", name: "Bee Pastures fetches Grimbeorn into the staging area", layout: { staging: ["02045"], deck: ["f0", "02037"], phase: "Travel" }, act: [travel("02045"), respond("02045")], expect: [zone("02037", "staging")] },
   { line: "900503:A:1", name: "Rob and Bob engages the next player and attacks again", layout: { seats: 2, engaged: ["900503"], deck: ["f0", "f0", "f0", "f0"] }, act: [attack("900503", { undefended: true }), endPhase], expect: [damageOn("dh1", 5), damageOn("dh3", 5)] },
   { line: "02037:A:1", name: "Grimbeorn defending against a Troll does not exhaust", layout: { engaged: ["02038"], play: ["02037"] }, act: [attack("02038"), defend("02037")], expect: [exhausted("02037", false)] },
-  { line: "02046:A:1", name: "while Oak-wood Grove is active every hero's pool counts as Leadership", layout: { active: "02046" }, act: resolve("02046", "constant"), expect: [flag("dh1", "leadershipIcon")] },
+  { line: "02046:A:1", name: "while Oak-wood Grove is active every hero's pool counts as Leadership", layout: { active: "02046" }, act: resolve("02046", "constant"), expect: [flag("dh1", "paysAsLeadership")] },
   { line: "900504:A:2", name: "while Louis is in the victory display each Troll raises the defending player's threat by 1 after it attacks", layout: { engaged: ["900502"], victory: ["900504"] }, act: attack("900502", { undefended: true }), expect: [threat(29)] },
   { line: "900506:A:2", name: "while Rupert is in the victory display the Defense of each Troll cannot be reduced", layout: { engaged: ["900502"], victory: ["900506"] }, act: resolve("900506", "constant"), expect: [flag("900502", "cannotReduceDefense")] },
   { line: "900509:A:1", name: "progress placed on Hives and Hives deals 1 damage to each character in play", layout: { active: "900509", staging: ["f3"] }, act: quest("success"), expect: [damageOn("dh1", 1), damageOn("dh2", 1)] },
   { line: "900511:B:1", name: "defeating Rob and Bob wins the game", layout: { stage: "900511", engaged: ["900503"] }, act: announce("enemyDestroyed", "900503"), expect: [won] },
   { line: "02049:A:2", name: "Shadow: against a Troll 2 damage tokens come off the attacker", layout: { engaged: [{ code: "02038", damage: 4 }] }, act: attack("02038", { shadow: "02049" }), expect: [damageOn("02038", 2)] },
+
+  // 900509:A:2 "Shadow: Attacking enemy gets +2 Attack." f0 (1 Attack) undefended deals 3.
+  { line: "900509:A:2", name: "Shadow: the attacking enemy gets +2 Attack", layout: {}, act: attack("f0", { shadow: "900509", undefended: true }), expect: damageOn("dh1", 3) },
 ];
 
 if (ROWS.length > 0) cardSpecs("conflict-at-the-carrock", ROWS);
