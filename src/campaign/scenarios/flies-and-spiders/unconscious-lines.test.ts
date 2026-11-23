@@ -1,4 +1,4 @@
-// Rules: hob.unconscious-characters, rr.in-play-and-out-of-play, rr.leaving-play (data/rules/entries.json). An unconscious character that leaves play comes back as a fresh card: the stage line 132067:B:1 bars the unconscious state, not the card. Ledger line 132067:B:1 (the stages 3B and 4B print it again).
+// Rules: hob.unconscious-characters, rr.in-play-and-out-of-play (data/rules/entries.json). An unconscious character that leaves play comes back as a fresh card: the stage line 132067:B:1 bars the unconscious state, not the card. Ledger line 132067:B:1 (the stages 3B and 4B print it again).
 import { expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";

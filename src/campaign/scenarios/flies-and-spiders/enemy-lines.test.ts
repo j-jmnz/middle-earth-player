@@ -1,4 +1,4 @@
-// Rules: hob.venom-poison, hob.unconscious-characters, hob.staging-area-creating, rr.forced, rr.when-revealed, rr.shadow-effects, rr.attacks-outside-the-combat-phase, rr.then (data/rules/entries.json). The enemies of Flies and Spiders (132028 to 132032), each test from the printed line (data/printed/the-hobbit.json) on a table
+// Rules: hob.venom-poison, hob.unconscious-characters, hob.staging-area-creating, rr.forced, rr.reveal, rr.shadow-effects, rr.attacks-outside-the-combat-phase, rr.then (data/rules/entries.json). The enemies of Flies and Spiders (132028 to 132032), each test from the printed line (data/printed/the-hobbit.json) on a table
 // built from data/ by the layout kit, and run again without the records of its line (`lineSpec`). Venom (132028:A:1, 132029:A:1, 132030:A:1, 132031:A:1, 132032:A:1) is tried on an attack fought out to its damage.
 import { expect } from "vitest";
 

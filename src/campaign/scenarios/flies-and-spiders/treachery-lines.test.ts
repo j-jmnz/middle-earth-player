@@ -1,4 +1,4 @@
-// Rules: hob.venom-poison, hob.unconscious-characters, hob.staging-area-creating, rr.when-revealed, rr.surge, rr.shadow-effects (data/rules/entries.json). The treacheries of Flies and Spiders (132033, 132034), each test from the printed line (data/printed/the-hobbit.json) on a table built from data/ by the layout kit,
+// Rules: hob.venom-poison, hob.unconscious-characters, hob.staging-area-creating, rr.reveal, rr.surge, rr.shadow-effects (data/rules/entries.json). The treacheries of Flies and Spiders (132033, 132034), each test from the printed line (data/printed/the-hobbit.json) on a table built from data/ by the layout kit,
 // and run again without the records of its line (`lineSpec`). Surge is read as the next encounter card revealed: a revealed card with surge leaves the deck one card shorter.
 import { expect } from "vitest";
 
