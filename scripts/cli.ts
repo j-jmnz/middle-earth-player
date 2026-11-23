@@ -67,6 +67,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     fast: { steps: [{ script: VITEST, args: ["run"], env: { VITEST_FAST: "1" } }], about: "vitest run without the slow files" },
     changed: { steps: [{ script: VITEST, args: ["run", "--changed"] }], about: "the tests that import a file changed since the last commit" },
     scenario: { steps: [{ script: "tools/test-scenario.ts" }], about: "one scenario's tests, goldens, checks and smokes" },
+    pins: { steps: [{ script: "tools/test-pins.ts" }], about: "lists the pins in test/harness/golden-pins.ts that no test or seed finder reads" },
     smoke: { steps: [{ script: "card-smoke/run.ts" }], about: "plays seeded games with player cards' records" },
     encounter: { steps: [{ script: "card-smoke/encounter.ts" }], about: "plays a scenario's encounter cards and seeded games" },
     "phone-bundle": { steps: [{ script: "checks/phone-bundle.ts" }], about: "exports the Android and iOS bundles here and at the merge base with origin/main and fails unless each is byte-identical (--base <ref>, --keep, --if-desktop-work)" },

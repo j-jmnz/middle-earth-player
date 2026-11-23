@@ -6,6 +6,7 @@
 //   pnpm game show duo --at 5 --send '{"type":"Pass"}'    # after 5 intents, then what one more intent does, or why it is refused
 //   pnpm game log passage-through-mirkwood/1 --from 40 --to 60 --steps
 //   pnpm game diff passage-through-mirkwood/1             # where the golden played now leaves golden.json
+//   pnpm game diff passage-through-mirkwood/1 --base      # the golden's intents replayed on the base's engine and on this tree: the first table that differs and the fields
 //   pnpm game show encounter:the-oath:7 --at 120          # a game of `pnpm test encounter`; smoke:<code> opens a card smoke failure
 //   pnpm game moved [<base-ref>]                         # each golden whose golden.json differs from the base: result, first differing step, what resolved there
 //   pnpm game scene passage-through-mirkwood '{"phase":"Combat","engaged":["01096"]}' --legal   # a table from a test layout
@@ -17,10 +18,12 @@ import { runScript, type Log } from "../log.ts";
 import { reduce, type PlayerIntent } from "../../src/rules/engine/reduce.ts";
 
 import { firstDifferent, stateDiff } from "./diff.ts";
+import { stateHash } from "./golden-file.ts";
 import { intentText, stepText } from "./names.ts";
 import { layoutOf, sceneSource } from "./scene-source.ts";
 import { ROOT } from "../data/paths.ts";
 import { compareGoldens, type StoredGolden } from "./compare.ts";
+import { baseDiffText, diffAgainstBase } from "./base-diff.ts";
 import { baseRef, changedScenarios, detailOf, goldenAt, renderMoved, type StepDetail } from "./moved.ts";
 import { goldenNames, listSources, loadSource, type GameSource } from "./source.ts";
 import { stateText } from "./state-text.ts";
@@ -30,7 +33,7 @@ const USAGE = `usage:
   pnpm game list
   pnpm game show <source> [--at <n> | --until <cond>] [--legal] [--full] [--json] [--send '<intent json>']...
   pnpm game log <source> [--from <n>] [--to <n>] [--until <cond>] [--steps] [--grep <text>]
-  pnpm game diff <scenario-id>/<golden>
+  pnpm game diff <scenario-id>/<golden> [--base [<ref>]]
   pnpm game moved [<base-ref>]
   pnpm game scene <scenario-id> ['<layout json>' | @<file>] [show's flags]
 <source> is a fixture name, <scenario-id>/<golden number or name>, encounter:<scenario-id>:<game> or smoke:<code>[:<seed>[:<deal>]]; <cond> is lost, won, round=N, phase=X, mode=X, window=X, seat=N or code=X.`;
@@ -93,16 +96,37 @@ function timeline(source: GameSource, args: readonly string[]): void {
   process.stdout.write(`${out.join("\n")}\n`);
 }
 
-function diff(source: GameSource): void {
-  if (!source.played || !source.pinned) throw new Error("diff reads a golden (<scenario-id>/<golden>) that golden.json pins");
+/** The ref after `--base`, undefined for a bare `--base` (the merge base with origin/main); null when the flag is not given. */
+function baseFlag(args: readonly string[]): string | undefined | null {
+  const at = args.indexOf("--base");
+  if (at < 0) return null;
+  const next = args[at + 1];
+  return next === undefined || next.startsWith("--") ? undefined : next;
+}
+
+async function diff(source: GameSource, args: readonly string[]): Promise<void> {
+  if (!source.played || !source.pinned || !source.golden) throw new Error("diff reads a golden (<scenario-id>/<golden>) that golden.json pins");
+  const base = baseFlag(args);
+  if (base !== null) {
+    process.stdout.write(`${baseDiffText(source.label, await diffAgainstBase(source, source.golden.scenarioId, source.golden.name, base)).join("\n")}\n`);
+    return;
+  }
   // The pinned intents follow the opening Keep (source.ts); the played game's do too.
   const pinned = source.intents.slice(1);
   const played = source.played.intents;
   const at = firstDifferent(played, pinned);
   const out = [`${source.label}: played now ${played.length} intents, golden.json ${pinned.length}`];
   if (at === null) {
-    const fields = stateDiff(source.pinned, source.played.state);
-    out.push(fields.length === 0 ? "same intents and same final state: the golden holds" : "same intents, different final state (golden.json → played now):", ...fields.map((line) => `  ${line}`));
+    // golden.json stores a final state only for the goldens a test reads (golden-pins.ts); the others store its hash.
+    const nowHash = stateHash(source.played.state);
+    if (source.pinned.state) {
+      const fields = stateDiff(source.pinned.state, source.played.state);
+      out.push(fields.length === 0 ? "same intents and same final state: the golden holds" : "same intents, different final state (golden.json → played now):", ...fields.map((line) => `  ${line}`));
+    } else if (source.pinned.hash === nowHash) {
+      out.push("same intents and same final state hash: the golden holds");
+    } else {
+      out.push(`same intents, different final state: golden.json stores its hash only (${source.pinned.hash ?? "none"}), the game played now ends on ${nowHash}.`, `  Its fields are not stored. \`pnpm game diff ${source.golden.scenarioId}/${source.golden.number} --base [<ref>]\` replays the golden's intents on the engine of <ref> (default: the merge base with origin/main) and on this tree, and names the first intent after which the tables differ and the fields that differ.`);
+    }
   } else {
     // The state both games share: the pinned game up to the move before they part (+1 for the opening Keep).
     const walked = walk(source, { at: at + 1 });
@@ -132,6 +156,22 @@ async function movedBlocks(ref: string, scenarioId: string): Promise<string[]> {
         else if (last) detail = detailOf(last, source.ctx);
       } catch (error) {
         refused = `not replayed: ${error instanceof Error ? error.message : String(error)}`;
+      }
+    }
+    // Only the final state moved: no per-intent digest differs, so the stored files name no step. Replaying the base's intents on the base's engine and here finds
+    // the first intent after which the whole tables differ and the fields of the final state that do.
+    if (move.kind === "moved" && move.number !== null && !move.storage && move.first === null && move.fields.length === 1 && move.fields[0]?.startsWith("state hash")) {
+      try {
+        const source = await loadSource(`${scenarioId}/${move.number}`);
+        const found = await diffAgainstBase(source, scenarioId, move.name, ref);
+        if (found.finalFields.length > 0) move.fields = found.finalFields.slice(0, 10);
+        if (found.first !== null && found.first >= 1 && found.move) {
+          move.first = found.first - 1;
+          detail = detailOf(found.move, source.ctx);
+        }
+        if (found.refused) refused = found.refused;
+      } catch (error) {
+        refused = `the fields were not found by a replay on the base: ${error instanceof Error ? error.message : String(error)}`;
       }
     }
     blocks.push(renderMoved(scenarioId, move, detail, refused));
@@ -170,7 +210,7 @@ async function main(log: Log): Promise<void> {
   const source = await loadSource(name);
   if (command === "show") show(log, source, args);
   else if (command === "log") timeline(source, args);
-  else diff(source);
+  else await diff(source, args);
 }
 
 await runScript("game", main, { done: false });

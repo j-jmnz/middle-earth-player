@@ -18,8 +18,9 @@ export function goldensMovedHint(file: string, scenarioId: string, out: readonly
     if (move.kind === "removed") return [];
     if (move.kind === "new") return [`${label} is new`];
     if (move.intents === "changed") return [`${label} plays other intents`];
+    if (move.storage) return [`${label} is stored in another format`];
     return [move.fields.length > 0 ? `${label} ends on another state` : `${label} stores other tables`];
   });
   if (moved.length === 0) return undefined;
-  return `${moved.join("; ")}. \`pnpm game diff ${scenarioId}/<number>\` names the move where a golden parts and prints the table there`;
+  return `${moved.join("; ")}. \`pnpm game diff ${scenarioId}/<number> --base\` replays the golden's intents on the base's engine and on this tree and names the first intent after which the tables differ and the fields that differ (without --base it names the move where the played game parts from golden.json)`;
 }
