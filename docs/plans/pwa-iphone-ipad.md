@@ -48,7 +48,7 @@ If Phase 0 shows that a deploy of the whole export is too slow or too large, the
 
 ## Decisions for the user
 
-1. **The music on the public site.** The site is public (user decision, 2026-11-23), so it serves every card picture at a public URL, and a complaint to Cloudflare can take it down. Open: whether it also serves the music loops, which are cut from the film score. Recommendation: leave the music out of the web app, since a recording is the file a rights holder acts on first.
+1. **Public pictures and music.** Settled: the site is public and serves every card picture and the music loops (user decisions, 2026-11-23). A complaint to Cloudflare can take it down.
 2. **The domain.** Settled: the origin is `https://ringsplayer.app` (user decision, 2026-11-23), the `production` environment of `webapp/wrangler.toml`. It holds the saves, so it never changes after players use it, like the desktop's names (`desktop/identity.ts`). The name has no trademark in it, so a domain dispute is unlikely to take it.
 3. **What "offline" means on the web.** The phone and desktop builds carry every picture. A gigabyte before the first game is too much in a browser. Recommendation: the app shell is cached at install (it plays offline with cards drawn as text), each picture is cached when first shown, and Settings has Download pictures for each campaign and for all, with the size and progress.
 4. **Save sync between devices.** Possible later with a Worker and R2 or D1, but it sends saves off the device, which the app never does today. Recommendation: not in this plan; Back up saves and Restore cover a move between devices.
@@ -99,4 +99,4 @@ Exit: a short report with each answer. The user decides to go on, to change the 
 
 ## Order and size
 
-Phase 0 is days and needs the user's devices and a Cloudflare account. Phases 1 and 2 are the bulk of the code and can be checked in Chromium. Phase 3 needs the devices again. Phase 4 can start after Phase 1. Decision 1 is needed before Phase 4 puts the site on its permanent origin; decision 3 before Phase 1.
+Phase 0 is days and needs the user's devices and a Cloudflare account. Phases 1 and 2 are the bulk of the code and can be checked in Chromium. Phase 3 needs the devices again. Phase 4 can start after Phase 1. Decision 3 is needed before Phase 1.
