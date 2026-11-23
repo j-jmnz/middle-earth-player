@@ -58,7 +58,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("lastEscapeFailed") }),
   z.strictObject({ kind: z.literal("lastEscapePassed") }),
   // The burgle family's conditions (src/rules/families/burgle/results.ts, hob.burgle): the last burgle attempt the running effect made succeeded ("If successful", 132039:A:2) or failed; false before it made one. `burgling`: a burgle attempt is in its action window (after step 2, before step 3), and the actor
-  // holds the first player token ("While making a burgle attempt, the first player may", 132043:A:2). `burgleCanDiscard`: the hand holds as many cards matching the revealed card as the burgle effect asks (step 3). `shadowBurgle`: the shadow card the answered event dealt has a burgle effect (132041:A:3).
+  // holds the first player token ("While making a burgle attempt, the first player may", 132043:A:2). `burgleCanDiscard`: the hand holds as many cards matching the revealed card as the burgle effect asks (step 3). `shadowBurgle`: the shadow card the answered event dealt, or one the source enemy holds for its attack, has a burgle effect (132041:A:3).
   z.strictObject({ kind: z.literal("burgleSucceeded") }),
   z.strictObject({ kind: z.literal("burgleFailed") }),
   z.strictObject({ kind: z.literal("burgling") }),

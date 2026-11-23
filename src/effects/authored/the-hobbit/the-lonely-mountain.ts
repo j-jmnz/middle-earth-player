@@ -65,7 +65,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "AdvanceToStage", code: STAGE_4 }],
     },
 
-    // 132041 Smaug the Magnificent. He stays in the staging area, and is considered engaged with the first player as the Balrog is (142044:A:2); his Threat counts. A shadow card with a burgle effect dealt to him gives him an additional attack right after this one.
+    // 132041 Smaug the Magnificent. He stays in the staging area, and is considered engaged with the first player as the Balrog is (142044:A:2); his Threat counts. As he attacks (the shadow card is dealt for the attack), a shadow card with a burgle effect that he holds gives him an additional attack right after this one: the attack must be in progress for it.
     {
       id: "132041:constant:1",
       cardCode: MAGNIFICENT,
@@ -78,7 +78,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "ModifyStat", stat: "engagedWithFirst", amount: 1, until: "whileSourceInPlay", target: "self" },
       ],
     },
-    { id: "132041:forced:1", cardCode: MAGNIFICENT, lines: ["132041:A:3"], timing: "forced", trigger: "shadowDealtTo", subject: "self", condition: { kind: "shadowBurgle" }, instructions: [{ verb: "ImmediateAttack", afterThis: true }] },
+    { id: "132041:forced:1", cardCode: MAGNIFICENT, lines: ["132041:A:3"], timing: "forced", trigger: "attacks", subject: "self", condition: { kind: "shadowBurgle" }, instructions: [{ verb: "ImmediateAttack", afterThis: true }] },
 
     // 132042 Croaking Crows (surge is a keyword). When a location is revealed from the encounter deck, 1 progress goes on Smaug the Golden. A burgle attempt does not reveal the cards it discards, so they do not trigger it.
     {

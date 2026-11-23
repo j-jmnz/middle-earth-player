@@ -4,6 +4,7 @@ import type { Condition } from "../../../catalog/boundary.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { Scope } from "../../interpret/conditions.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { shadowCards } from "../../core/zones.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { bagginsCondition } from "./baggins.ts";
 import { burgleEffectOf, nearestBurgle } from "./match.ts";
@@ -36,8 +37,12 @@ export function burgleCondition(state: ScenarioState, condition: Condition, scop
       return found != null && found.frame.data.need > 0 && found.frame.data.matching.length >= found.frame.data.need;
     }
     case "shadowBurgle": {
-      const code = scope.other != null ? state.cards[scope.other]?.code : undefined;
-      return code != null && burgleEffectOf(ctx, code) != null;
+      // The shadow card an event just dealt, or, as the enemy attacks, the shadow cards it holds for this attack.
+      const dealt = scope.other != null ? [scope.other] : shadowCards(scope.sourceId ? state.cards[scope.sourceId] : undefined);
+      return dealt.some((id) => {
+        const code = state.cards[id]?.code;
+        return code != null && burgleEffectOf(ctx, code) != null;
+      });
     }
     default:
       return bagginsCondition(state, condition, scope, ctx);
