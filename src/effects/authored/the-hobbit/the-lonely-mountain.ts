@@ -240,24 +240,26 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "less", left: { stat: "hitPoints", ofNamed: "Smaug the Magnificent", remaining: true }, right: { stat: "progress", of: "self" } },
       instructions: [{ verb: "SetAsideInPlay", code: MAGNIFICENT, byQuest: true }],
     })),
+    // The stage holds the win (`holdsWin`: no stage follows it): defeated, it stays the current quest card and its own Forced effect wins the game.
+    { id: "132073:constant:2", cardCode: STAGE_3, lines: ["132073:B:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "holdsWin", amount: 1, until: "whileSourceInPlay", target: "self" }] },
     { id: "132073:forced:3", cardCode: STAGE_3, lines: ["132073:B:3"], timing: "forced", trigger: "questCardDefeated", subject: "self", instructions: [{ verb: "WinGame" }] },
 
-    // 132074 Thieves! Fire! Murder! (stage 4). Smaug the Golden loses his progress and is set aside; Smaug the Magnificent joins the staging area. After the 7th progress on this stage, he loses his damage and is set aside with A Bare Patch (in play, attached or in the staging area),
-    // Smaug the Golden returns and the quest deck is reset to stage 2B.
-    { id: "132074:whenRevealed:1", cardCode: STAGE_4, lines: ["132074:A:1"], timing: "whenRevealed", instructions: [{ verb: "SetAsideInPlay", code: GOLDEN }, { verb: "AddSetAsideToStaging", code: MAGNIFICENT }] },
+    // 132074 Thieves! Fire! Murder! (stage 4). Smaug the Golden loses his progress and is set aside; Smaug the Magnificent joins the staging area. The 7th progress on this stage defeats it, but it holds the win (`holdsWin`) and its Forced effect resets the quest instead: Smaug the Magnificent
+    // loses his damage and is set aside with A Bare Patch (in play, attached or in the staging area), Smaug the Golden returns, and stage 2B is the current quest again with no progress on it.
+    // The flag `holdsWin` is set as the stage is revealed: the last stage has no line of its own for it.
+    { id: "132074:whenRevealed:1", cardCode: STAGE_4, lines: ["132074:A:1"], timing: "whenRevealed", instructions: [{ verb: "SetAsideInPlay", code: GOLDEN }, { verb: "AddSetAsideToStaging", code: MAGNIFICENT }, { verb: "ModifyStat", stat: "holdsWin", amount: 1, until: "whileSourceInPlay", target: "self" }] },
     {
       id: "132074:forced:1",
       cardCode: STAGE_4,
       lines: ["132074:B:1"],
       timing: "forced",
-      trigger: "progressPlaced",
+      trigger: "questCardDefeated",
       subject: "self",
-      condition: { kind: "stageProgress", min: 7 },
       instructions: [
         { verb: "SetAsideInPlay", code: PATCH },
         { verb: "SetAsideInPlay", code: MAGNIFICENT, byQuest: true },
         { verb: "AddSetAsideToStaging", code: GOLDEN },
-        { verb: "AdvanceToStage", code: STAGE_2, again: true },
+        { verb: "ReturnToStage", stage: 2 },
       ],
     },
   ],

@@ -288,6 +288,8 @@ Scenario piles that place cards with no record (quest: 132071 A Warm Welcome; qu
     - the card in play with code 132041 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play) [also {"byQuest":true}]
 
 132073:B:3 (back): If the players defeat this stage, they have won the game and discovered any treasure successfully burgled from The Lonely Mountain.
+  132073:constant:2: Constant
+    - this card: stat holdsWin (defeating this final stage does not win the game: it stays the current quest card, defeated, and its own Forced effects win the game or reset the quest) 1, while this card is in play
   132073:forced:3: Forced on the event questCardDefeated (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
@@ -300,15 +302,15 @@ Scenario piles that place cards with no record (quest: 132071 A Warm Welcome; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card in play with code 132040 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
     - one set-aside card with code 132041 joins the staging area (it is not revealed)
+    - this card: stat holdsWin (defeating this final stage does not win the game: it stays the current quest card, defeated, and its own Forced effects win the game or reset the quest) 1, while this card is in play
 
 132074:B:1 (back): Forced: After placing the 7th progress token on this stage, remove all damage from Smaug the Magnificent and set him aside, out of play. Then, add Smaug the Golden to the staging area and reset the quest deck to stage 2B.
-  132074:forced:1: Forced on the event progressPlaced (heard about this card)
-    only if the current quest stage holds at least 7 progress
+  132074:forced:1: Forced on the event questCardDefeated (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card in play with code 132039 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
     - the card in play with code 132041 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play) [also {"byQuest":true}]
     - one set-aside card with code 132040 joins the staging area (it is not revealed)
-    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 132072 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there)
+    - the players return to stage 2 of the quest deck (side B: the stage comes back as if just beginning, with no progress; the progress on the active location and every other card stay; no When Revealed or Setup resolves again)
 
-(rendered pieces: 189 by template, 8 as JSON)
+(rendered pieces: 191 by template, 8 as JSON)
