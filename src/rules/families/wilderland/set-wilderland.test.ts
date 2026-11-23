@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { answer, attack, cardSpecs, committed, defend, reveal, threat, type Row } from "../../../../test/harness/card-spec.ts";
 import { modifiedStat } from "../../core/keywords.ts";
+import { expireModifiers } from "../../core/state.ts";
 import { fightEnemy, first, idOf, legalIntents, revealedTop, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 const table = (layout = {}) => tableFromLayout("the-battle-of-five-armies", layout);
@@ -31,6 +32,26 @@ describe("Wilderland (132035 to 132038)", () => {
     expect(modifiedStat(state, state.cards[ally]!, "willpower", made.ctx.cards)).toBe(Math.max(0, base - 1));
     state = entered(false);
     expect(modifiedStat(state, state.cards[ally]!, "willpower", made.ctx.cards)).toBe(base);
+  });
+
+  it("132038:A:1 an exhausted character gets -1 Willpower, -1 Attack and -1 Defense, of both players, and a ready one gets none", () => {
+    const made = tableFromLayout("the-battle-of-five-armies", { phase: "Quest", deck: ["132038", "f0"], seats: 2 });
+    const heroes = [made.hero, made.seat1Hero!];
+    const stats = ["willpower", "attack", "defense"] as const;
+    const read = (state: typeof made.state, id: string) => stats.map((stat) => modifiedStat(state, state.cards[id]!, stat, made.ctx.cards));
+    const base = heroes.map((id) => read(made.state, id));
+    expect(base.every((values) => values.every((value) => value >= 1))).toBe(true);
+    const revealed = revealedTop(made, "132038");
+    const exhaust = (state: typeof made.state, id: string) => ({ ...state, cards: { ...state.cards, [id]: { ...state.cards[id]!, exhausted: true } } });
+    const both = exhaust(exhaust(revealed, heroes[0]!), heroes[1]!);
+    expect(read(both, heroes[0]!)).toEqual(base[0]!.map((value) => value - 1));
+    expect(read(both, heroes[1]!)).toEqual(base[1]!.map((value) => value - 1));
+    const one = exhaust(revealed, heroes[0]!);
+    expect(read(one, heroes[1]!)).toEqual(base[1]);
+    // The penalty is read each time: a character exhausted before it is revealed gets it too, and it ends with the round.
+    const early = revealedTop({ ...made, state: exhaust(made.state, heroes[0]!) }, "132038");
+    expect(read(early, heroes[0]!)).toEqual(base[0]!.map((value) => value - 1));
+    expect(read(expireModifiers(early, ["endOfRound"]), heroes[0]!)).toEqual(base[0]);
   });
 
   it("132035:A:1 while it is the active location, a location in the staging area gets -1 Threat", () => {
