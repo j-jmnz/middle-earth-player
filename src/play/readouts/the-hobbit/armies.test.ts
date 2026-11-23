@@ -19,6 +19,9 @@ describe("the stage dials of The Battle of Five Armies", () => {
     const dials = armiesDials(state, ctx, nameOf);
     expect(dials.map((dial) => [dial.label, dial.value, dial.limit])).toEqual([["Stage 2", 0, 8], ["Stage 3", 0, 8], ["Stage 4", 0, 8]]);
     expect(dials.map((dial) => dial.note)).toEqual(["Current stage, 8 to go", "Battle, 8 to go", "Siege, 8 to go"]);
+    // The current stage wears the accent ring, the others none, and the spoken name does not repeat what the note says.
+    expect(dials.map((dial) => dial.current === true)).toEqual([true, false, false]);
+    expect(dials.every((dial) => !dial.name.includes("current stage"))).toBe(true);
     expect(dials.every((dial) => dial.goal === true && dial.warn?.words.startsWith("No progress"))).toBe(true);
     expect(scenarioDials(state, ctx, nameOf).filter((dial) => dial.id.startsWith("stage-"))).toHaveLength(3);
   });

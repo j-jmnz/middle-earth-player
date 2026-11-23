@@ -98,6 +98,8 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   const [dials, setDials] = useState(0);
   // The Heading dial's place in the dials row, measured, so the row can scroll to it and the other dials' width can be told from it.
   const [headingBox, setHeadingBox] = useState({ x: 0, w: 0 });
+  const [currentBox, setCurrentBox] = useState({ x: 0, w: 0 });
+  const onCurrent = (event: LayoutChangeEvent) => setCurrentBox({ x: Math.round(event.nativeEvent.layout.x), w: Math.round(event.nativeEvent.layout.width) });
   const onHeading = (event: LayoutChangeEvent) => setHeadingBox({ x: Math.round(event.nativeEvent.layout.x), w: Math.round(event.nativeEvent.layout.width) });
   // The Map chip's width in the row, measured: the chip drops its word "Map" when the dials would scroll with it (chipCompact).
   const [chipW, setChipW] = useState(0);
@@ -133,7 +135,8 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   const chipHere = island != null && onIsland != null;
   const mapCompact = chipHere && bar.width > 0 && dials > 0 && chipCompact(bar.width - 2 * BAR_PAD, dials - chipW - DIAL_GAP * s, s, center);
   // While the dials scroll, the row keeps the Heading dial whole in the zone, clear of the fade (headingOffset).
-  const offset = zones && heading ? headingOffset(zones, { x: headingBox.x, w: headingBox.w }, dials, s) : 0;
+  // Without a Heading dial, a scenario dial that is the current stage of several is kept whole the same way.
+  const offset = zones ? (heading ? headingOffset(zones, { x: headingBox.x, w: headingBox.w }, dials, s) : scenario.some((dial) => dial.current) ? headingOffset(zones, currentBox, dials, s) : 0) : 0;
   useEffect(() => {
     scroller.current?.scrollTo({ x: offset, animated: false });
   }, [offset]);
@@ -204,7 +207,8 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
             {scenario.map((dial) => {
               const press = dial.cardId && onDial ? () => onDial(dial.cardId ?? "", dial.extra) : dial.pile && onDialPile ? () => onDialPile(dial.pile ?? "") : dial.lists && onDialReading ? () => onDialReading(dial.id) : undefined;
               // Only a dial that opens a reading drops its word: a bare number with no press has nothing else to name it.
-              return <ThreatRing key={dial.id} {...dialProps(dial)} wordless={wordless && press != null} onPress={press} compact />;
+              const ring = <ThreatRing key={dial.id} {...dialProps(dial)} wordless={wordless && press != null} onPress={press} compact />;
+              return dial.current ? <View key={dial.id} onLayout={onCurrent}>{ring}</View> : ring;
             })}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} hint="Shows the card the tokens are on" onPress={onDial ? () => onDial(tokens.cardId) : undefined} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}

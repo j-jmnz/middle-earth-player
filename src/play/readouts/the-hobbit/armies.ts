@@ -1,6 +1,6 @@
 // Rules: hob.multiple-stages-in-play, hob.current-quest-stage, hob.battle, hob.siege (data/rules/entries.json); ledger lines 132076:B:1, 132076:B:2, 132077:B:2, 132077:B:3, 132078:B:2, 132078:B:3.
 //
-// The three stages of The Battle of Five Armies that are in play at once (docs/design-system-table.md, Cards, The Battle of Five Armies) as top-bar dials, one for each stage: its progress against its quest points, the current stage marked, the Battle or Siege it brings,
+// The three stages of The Battle of Five Armies that are in play at once (docs/design-system-table.md, Top bar) as top-bar dials, one for each stage: its progress against its quest points, the current stage marked, the Battle or Siege it brings,
 // and a warning while it holds no progress (its Forced effect at the end of the round, 132076:B:2, 132077:B:3, 132078:B:3). A tap on a dial shows the stage card. The engine decided every number (`armies`, the progress on each card); nothing here changes one. Empty in
 // any other scenario and once stage 5 is reached. Pure, so a test reads it.
 import { modifiedStat } from "../../../rules/core/keywords.ts";
@@ -32,13 +32,14 @@ export function armiesDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
       id: `stage-${number}`,
       testID: `armies-stage-${number}`,
       label: `Stage ${number}`,
-      name: `${nameOf(card.code)}, progress against its quest points${current ? ", the current stage" : ""}${keyword ? `, ${keyword}` : ""}:`,
+      name: `${nameOf(card.code)}, progress against its quest points:`,
       value: Math.min(card.progress, points),
       limit: points,
       goal: true,
       limitWords: `${points} quest points`,
       note,
       cardId: id,
+      ...(current ? { current: true as const } : {}),
       ...(stageHasNoProgress(game, id) ? { warn: { level: "near" as const, words: `No progress: at the end of the round ${empty}` } } : {}),
     }];
   });
