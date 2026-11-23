@@ -71,9 +71,5 @@ export function attachLoot(state: ScenarioState, focus: Focus): ScenarioState {
   return { ...moved, lootDecks: (moved.lootDecks ?? []).map((ids, seat) => (seat === focus.seat ? ids.filter((id) => id !== top) : ids)) };
 }
 
-// The loot cards guarding this card: under it, still their player's (a card under Weather Hills has no controller).
-export function lootUnder(state: ScenarioState, hostId: string): string[] {
-  return Object.values(state.cards)
-    .filter((card) => card.zone === "under" && card.host === hostId && card.controller != null)
-    .map((card) => card.id);
-}
+// The loot guarding a card and the attachments on it are read by the core too (the explored event, the pick filters): core/zones.ts.
+export { lootUnder } from "../../core/zones.ts";

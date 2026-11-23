@@ -16,7 +16,7 @@ import { activeOf } from "../families/breaking/areas.ts";
 import { lakeTownId, smaugInPlay } from "../families/smaug/cards.ts";
 import { stageNumber } from "../families/caves/progress.ts";
 import { topFrame } from "../windows/windows.ts";
-import { shadowCards } from "../core/zones.ts";
+import { attachmentsOn, shadowCards } from "../core/zones.ts";
 import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { grappledCount, resourcesOnMatching } from "../families/grapple/values.ts";
 import { leftThreat } from "../families/island/pick.ts";
@@ -119,7 +119,8 @@ function statOf(state: ScenarioState, id: string | null, stat: NonNullable<Exclu
       // With the ThreatCost constants that lower it, unless the printed value is asked for (families/costs/stats.ts).
       return card.type !== "hero" ? 0 : printed ? (card.threat ?? 0) : threatCostOf(state, instance.id, ctx);
     case "attachments":
-      return instance.attachments.length;
+      // With the loot guarding a location (core/zones.ts, attachmentsOn).
+      return attachmentsOn(state, instance.id).length;
     case "shadowCards":
       return shadowCards(instance).length;
     default:
