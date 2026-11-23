@@ -12,7 +12,7 @@ const NAME_A_SPHERE: Instruction = {
   who: "firstPlayer",
   options: SPHERES.map((sphere) => ({
     id: sphere,
-    instructions: [{ verb: "Each", pick: { type: "character", control: "any", committed: true, exceptSphere: [sphere, "baggins"] }, instructions: [{ verb: "RemoveFromQuest" }] }],
+    instructions: [{ verb: "Each", pick: { type: "character", control: "any", committed: true, atStage: true, exceptSphere: [sphere, "baggins"] }, instructions: [{ verb: "RemoveFromQuest" }] }],
   })),
 };
 
