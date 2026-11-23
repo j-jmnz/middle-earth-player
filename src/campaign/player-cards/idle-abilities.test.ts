@@ -28,6 +28,7 @@ const MENDOR = "01135";
 const OUTMATCHED = "19062";
 const SWIFT_AND_SILENT = "08003";
 const DETERMINATION = "10172";
+const GANDALF = "142002";
 const KNIFE_WORK = "12114";
 const ELROND = "08032";
 const ATHELAS = "09011";
@@ -57,7 +58,7 @@ const offeredPlay = (tab: Table, code: string): boolean => playableCards(tab.sta
 
 beforeAll(async () => {
   const starter = await starterBase();
-  base = { ...starter, cards: new Map([...starter.cards, ...(await loadPrinted([STALLION, BILL, RALLYING_CRY, KNIFE_WORK, ELROND, ATHELAS, SHADOW, GIMLI, GRIM_RESOLVE, NORTHERN_TRACKER, WE_DO_NOT_SLEEP, CAPTAINS, MEN_OF_THE_WEST, HUNTER, EXPLORER, WARDEN, CEORL, MENDOR, OUTMATCHED, SWIFT_AND_SILENT, DETERMINATION, ARAGORN_LORE, ARAGORN, BERAVOR, ELEANOR, DUNHERE]))]) };
+  base = { ...starter, cards: new Map([...starter.cards, ...(await loadPrinted([STALLION, BILL, RALLYING_CRY, KNIFE_WORK, ELROND, ATHELAS, SHADOW, GIMLI, GRIM_RESOLVE, NORTHERN_TRACKER, WE_DO_NOT_SLEEP, CAPTAINS, MEN_OF_THE_WEST, HUNTER, EXPLORER, WARDEN, CEORL, MENDOR, OUTMATCHED, SWIFT_AND_SILENT, DETERMINATION, GANDALF, ARAGORN_LORE, ARAGORN, BERAVOR, ELEANOR, DUNHERE]))]) };
   base.cards.set(CONDITION, definePrinted({ code: CONDITION, name: "Condition", type: "attachment", sphere: "neutral", cost: 0, traits: ["Condition"] }));
   base.cards.set(NOBLE, definePrinted({ code: NOBLE, name: "Noble", type: "hero", sphere: "leadership", threat: 9, willpower: 1, attack: 1, defense: 1, health: 3, traits: ["Noble"] }));
 });
@@ -292,14 +293,31 @@ describe("Ceorl 12058:A:1 while he is ready", () => {
   it("is offered once Ceorl is exhausted", () => {
     expect(triggers(ceorl(true).state, ceorl(true))).toContain("12058:action:1");
   });
+
+  it("is not offered while Ceorl is exhausted and cannot ready: the ready would not happen", () => {
+    const tab = ceorl(true);
+    const id = idsOf(tab, CEORL);
+    const state = { ...tab.state, modifiers: [...tab.state.modifiers, { instanceId: id, sourceId: id, stat: "cannotReady" as const, amount: 1, until: "endOfRound" as const }] };
+    expect(triggers(state, tab)).not.toContain("12058:action:1");
+  });
+
+  it("readies Ceorl when it is used", () => {
+    const tab = ceorl(true);
+    const id = idsOf(tab, CEORL);
+    const done = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: id, effectId: "12058:action:1", payments: [{ heroId: idsOf(tab, ELEANOR), amount: 1 }] }, tab.ctx);
+    expect(done.state.cards[id]?.exhausted).toBe(false);
+  });
 });
 
-describe("Mendor 01135:A:3 while he is ready", () => {
-  // "Response: After a quest card is defeated, ready Mendor. Then, each player draws 1 card." The draw resolves only if the ready did (rr.then), so a ready Mendor is not offered.
-  function defeated(exhausted: boolean): { tab: Table; state: ReturnType<typeof settle> } {
-    const base = table({ heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: MENDOR, seat: 0 }] });
-    const tab = exhausted ? exhaust(base, MENDOR) : base;
-    const event = { ...tab.state, window: null, pendingEvents: [{ trigger: "questCardDefeated" as const, seat: 0, cardId: idsOf(tab, MENDOR) }] };
+describe("Mendor 01135:A:3 and the ready before Then", () => {
+  // "Response: After a quest card is defeated, ready Mendor. Then, each player draws 1 card." The draw resolves only if the ready did (rr.then). Mendor is an objective ally a player controls, read like
+  // a player card for rr.triggered-ability: with no ready that can happen the Response changes nothing and is not offered.
+  function defeated(exhausted: boolean, barred = false): { tab: Table; state: ReturnType<typeof settle> } {
+    const base = table({ heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: MENDOR, seat: 0 }], playerDeck: [{ code: GIMLI, seat: 0 }, { code: GIMLI, seat: 0 }] });
+    const exhaustedMendor = exhausted ? exhaust(base, MENDOR) : base;
+    const id = idsOf(base, MENDOR);
+    const tab = barred ? { ...exhaustedMendor, state: { ...exhaustedMendor.state, modifiers: [...exhaustedMendor.state.modifiers, { instanceId: id, sourceId: id, stat: "cannotReady" as const, amount: 1, until: "endOfRound" as const }] } } : exhaustedMendor;
+    const event = { ...tab.state, window: null, pendingEvents: [{ trigger: "questCardDefeated" as const, seat: 0, cardId: id }] };
     return { tab, state: settle(event, tab.ctx, []) };
   }
 
@@ -308,9 +326,18 @@ describe("Mendor 01135:A:3 while he is ready", () => {
     expect(triggers(state, tab)).not.toContain("01135:response:1");
   });
 
-  it("is offered once Mendor is exhausted", () => {
+  it("is not offered while Mendor is exhausted and cannot ready: the ready would not happen and nobody draws", () => {
+    const { tab, state } = defeated(true, true);
+    expect(triggers(state, tab)).not.toContain("01135:response:1");
+  });
+
+  it("readies Mendor and each player draws 1 card when he is exhausted", () => {
     const { tab, state } = defeated(true);
     expect(triggers(state, tab)).toContain("01135:response:1");
+    const hand = (current: typeof state) => current.seats[0]?.hand.length ?? 0;
+    const done = sendUnledgered({ state, steps: [] }, { type: "Trigger", cardId: idsOf(tab, MENDOR), effectId: "01135:response:1" }, tab.ctx);
+    expect(done.state.cards[idsOf(tab, MENDOR)]?.exhausted).toBe(false);
+    expect(hand(done.state)).toBe(hand(state) + 1);
   });
 });
 
@@ -368,6 +395,31 @@ describe("Swift and Silent 08003:A:1 with every hero ready", () => {
   });
 });
 
+describe("Swift and Silent 08003:A:1 on a hero that cannot ready", () => {
+  // "Your cards cannot ready for the remainder of the round" (Ungoliant's Brood 900103:A:1): the ready does not happen, so the part after "Then" is not attempted (rr.then).
+  const barredHero = (): { tab: Table; barred: string } => {
+    const tab = exhaust(exhaust(table({ heroes: [{ code: ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }], hand: [{ code: SWIFT_AND_SILENT, seat: 0 }] }), ARAGORN), BERAVOR);
+    const hero = idsOf(tab, BERAVOR);
+    const state = { ...tab.state, modifiers: [...tab.state.modifiers, { instanceId: hero, sourceId: hero, stat: "cannotReady" as const, amount: 1, until: "endOfRound" as const }] };
+    return { tab: { ...tab, state }, barred: hero };
+  };
+
+  it("is discarded, not returned to the hand, when the hero chosen cannot ready", () => {
+    const { tab, barred } = barredHero();
+    const asked = play(begin(tab.state), tab, idsOf(tab, SWIFT_AND_SILENT));
+    const done = sendUnledgered(asked, { type: "Choose", optionId: barred }, tab.ctx);
+    expect(done.state.cards[barred]?.exhausted).toBe(true);
+    expect(done.state.cards[idsOf(tab, SWIFT_AND_SILENT)]?.zone).toBe("discard");
+  });
+
+  it("is not offered when every hero is exhausted and barred from readying", () => {
+    const { tab } = barredHero();
+    const other = idsOf(tab, ARAGORN);
+    const state = { ...tab.state, modifiers: [...tab.state.modifiers, { instanceId: other, sourceId: other, stat: "cannotReady" as const, amount: 1, until: "endOfRound" as const }] };
+    expect(offeredPlay({ ...tab, state }, SWIFT_AND_SILENT)).toBe(false);
+  });
+});
+
 describe("Determination 10172:A:1 once it is attached", () => {
   // "Action: Attach Determination to a unique character. Then, ready each character with a copy of Determination attached, ..." The Action plays the event from the hand: attached, the card is a Condition attachment and
   // using its Action again would only discard it (the event's cost), with nothing readied.
@@ -382,5 +434,11 @@ describe("Determination 10172:A:1 once it is attached", () => {
 
   it("is offered as the event in the hand when a unique character can carry it", () => {
     expect(offeredPlay(determined(null), DETERMINATION)).toBe(true);
+  });
+
+  it("is offered as the event on the top of the deck while Gandalf lets it be played from there (142002:A:1)", () => {
+    const tab = table({ heroes: [{ code: GANDALF, seat: 0 }, { code: ARAGORN, seat: 0 }], playerDeck: [{ code: DETERMINATION, seat: 0 }] });
+    expect(tab.state.cards[idsOf(tab, DETERMINATION)]?.zone).toBe("deck");
+    expect(offeredPlay(tab, DETERMINATION)).toBe(true);
   });
 });

@@ -193,8 +193,12 @@ describe("Emery (06112:A:1)", () => {
 
   // Fewer than 3 cards in the deck: the cost cannot be paid, and the Action is not offered.
   it("06112:A:1 Emery: not offered with fewer than 3 cards in the deck", () => {
-    const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], hand: [{ code: EMERY, seat: 0 }], playerDeck: fillers(PLAIN, 2) });
-    expect(triggers(tab.state, tab)).not.toContain("06112:action:1");
+    for (const size of [0, 1, 2]) {
+      const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], hand: [{ code: EMERY, seat: 0 }], playerDeck: fillers(PLAIN, size) });
+      expect(triggers(tab.state, tab), `deck of ${size}`).not.toContain("06112:action:1");
+    }
+    const full = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], hand: [{ code: EMERY, seat: 0 }], playerDeck: fillers(PLAIN, 3) });
+    expect(triggers(full.state, full)).toContain("06112:action:1");
   });
 });
 

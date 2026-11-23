@@ -6,7 +6,9 @@ import type { Condition, Instruction, PickSpec } from "../../catalog/boundary.ts
 
 import { inPlay, livingSeats } from "../core/state.ts";
 import type { ScenarioState } from "../core/state.ts";
+import { isPlayerCardEffect } from "../core/keywords.ts";
 import { holds } from "../interpret/conditions.ts";
+import { readyChangesNothing } from "../interpret/player-verbs.ts";
 import type { IdleFrame, IdleMark } from "../interpret/family-manifest.ts";
 import { familyIdle, familyIdleCards } from "../interpret/family-hooks.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
@@ -64,8 +66,9 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
       // "Ready all character cards in play" with none exhausted.
       if (instruction.target === "allCharacters") return livingSeats(state).every((seat) => characters(state, seat, ctx.cards).every((id) => state.cards[id]?.exhausted !== true));
       const cards = namedCards(state, instruction.target, source, "self", frame, mark);
-      const idle = cards != null && cards.every((card) => card != null && !card.exhausted);
-      // A ready of cards that are all ready did nothing, so what follows "Then" is not attempted (rr.then, the `thenResolves` condition).
+      const byPlayerCard = isPlayerCardEffect(state, ctx.cards, sourceId);
+      const idle = cards != null && cards.every((card) => card != null && readyChangesNothing(state, card.id, byPlayerCard, ctx.cards));
+      // A ready of cards that are all ready, or barred from readying, did nothing, so what follows "Then" is not attempted (rr.then, the `thenResolves` condition).
       if (idle) mark.short = true;
       return idle;
     }
@@ -134,6 +137,8 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
       // The chosen option decides: each is out of reach (its requirement fails on the table) or does nothing, and an option with no instruction (a "skip") does nothing.
       if (instruction.upTo != null || (instruction.who != null && instruction.who !== "actor")) return false;
       return instruction.options.every((option) => {
+        // An option for the part after "Then" is out of reach when the part before it fell short (rr.then).
+        if (option.requires != null && mark.short && waitsForThen(option.requires)) return true;
         if (option.requires != null && readsTable(option.requires) && !holds(state, option.requires, conditionScope(frame, sourceId), ctx)) return true;
         // An option that needs something on the card an earlier Pick chose ("discard a Condition attachment from that character") is out of reach when it fails for every card that Pick may have chosen.
         const need = option.requires;

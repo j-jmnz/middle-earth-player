@@ -282,7 +282,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - for each hero (any player controls):
       - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
     - the first player chooses one of:
-      * option "flip" (only if every draw and every discard of the top of the deck this effect ran so far resolved in full (what follows "then" is attempted only when they did)):
+      * option "flip" (only if every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows "then" is attempted only when they all did)):
         - this card, a double-sided location whose two sides are two cards, shows its other side and loses all its progress; the flip is announced like FlipUncharted's (nothing while the table holds noFlipActive and the card is the active location)
       * option "stay":
 
@@ -305,7 +305,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - for each player, first player first:
       - the top 10 card(s) of the acting player's deck go to their discard pile
     - the first player chooses one of:
-      * option "return" (only if every draw and every discard of the top of the deck this effect ran so far resolved in full (what follows "then" is attempted only when they did)):
+      * option "return" (only if every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows "then" is attempted only when they all did)):
         - return this card to the staging area
       * option "stay":
 

@@ -10,7 +10,7 @@ import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 import { characters } from "../combat/combat.ts";
 import { declareAttack } from "../families/attack/index.ts";
 import { enforceRestricted, hostTakesControl } from "../player/attach.ts";
-import { placeProgress, progressPlacer, readsThen } from "./effect-verbs.ts";
+import { markShort, placeProgress, progressPlacer } from "./effect-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { announceAllyLeft } from "../core/ally-left.ts";
 import { announceTopDiscard } from "../families/deck/pressure.ts";
@@ -79,10 +79,10 @@ export function seatsFor(state: ScenarioState, who: "actor" | "picked" | "eachSe
   return [actor];
 }
 
-// A ready of a card that is ready already changes nothing, so it is not resolved in full and what follows "Then" is not attempted (the `thenResolves` condition, rr.then).
-function markShortWhenReady(state: ScenarioState, id: string, ctx: ReduceContext): ScenarioState {
-  const data = topFrame(state)?.data;
-  return state.cards[id]?.exhausted !== true && data?.kind === "effect" && readsThen(ctx) ? patchTop(state, { data: { ...data, short: true } }) : state;
+// A ready that does not happen (the card is ready already, or a rule bars it) is not resolved in full, so what follows "Then" is not attempted (the `thenResolves` condition, rr.then).
+export function readyWithThen(state: ScenarioState, id: string, ctx: ReduceContext, source: boolean): ScenarioState {
+  const readied = readyCard(state, id, source, ctx.cards);
+  return state.cards[id]?.exhausted === true && readied.cards[id]?.exhausted !== true ? readied : markShort(readied, ctx);
 }
 
 // Returns the new state when the instruction is one of these verbs, otherwise null.
@@ -97,12 +97,12 @@ export function runPlayerVerb(
     case "Ready": {
       if (instruction.target === "picked" || instruction.target === "subject" || instruction.target === "defender" || instruction.target === "other") {
         const id = refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) ?? "";
-        return state.cards[id] ? readyCard(markShortWhenReady(state, id, ctx), id, playerSource(state, focus.sourceId, ctx), ctx.cards) : state;
+        return state.cards[id] ? readyWithThen(state, id, ctx, playerSource(state, focus.sourceId, ctx)) : state;
       }
       if (instruction.target === "host") {
         const hostId = refCard(state, "host", frameScope(state, focus.seat, focus.sourceId));
         // Every ready is heard ("After Wellinghall Preserver readies", 10061:A:3; Weighed Down, 18027:A:1).
-        return hostId && state.cards[hostId] ? readyCard(markShortWhenReady(state, hostId, ctx), hostId, playerSource(state, focus.sourceId, ctx), ctx.cards) : state;
+        return hostId && state.cards[hostId] ? readyWithThen(state, hostId, ctx, playerSource(state, focus.sourceId, ctx)) : state;
       }
       if (instruction.target !== "allCharacters") return null;
       let next = state;
@@ -220,8 +220,7 @@ export function runPlayerVerb(
       const card = top ? state.cards[top] : undefined;
       if (!top || !card) {
         // A discard of the top card of an empty deck is not resolved in full (the `thenResolves` condition).
-        const data = topFrame(state)?.data;
-        return data?.kind === "effect" && readsThen(ctx) ? patchTop(state, { data: { ...data, short: true } }) : state;
+        return markShort(state, ctx);
       }
       const discarded = announceTopDiscard(queueEvent(moveCard(state, top, { zone: "discard", seat: focus.seat }), { trigger: "discardedFromDeck", seat: focus.seat, cardId: top }), focus.seat, 1, ctx);
       const data = topFrame(discarded)?.data;
@@ -347,11 +346,15 @@ function uncancelableDamage(state: ScenarioState, from: number): ScenarioState {
   return events.length > from ? { ...state, pendingEvents: events.map((event, index) => (index >= from && event.trigger === "damageDealt" ? { ...event, uncancelable: true as const } : event)) } : state;
 }
 
+/** Whether a ready of the card leaves it as it is: it is ready already, or a rule bars it ("Your cards cannot ready for the remainder of the round", cannotReady, 900103:A:1). */
+export function readyChangesNothing(state: ScenarioState, id: string, byPlayerCard = false, cards?: ReadonlyMap<string, PrintedCard>): boolean {
+  return state.cards[id]?.exhausted !== true || readyBarred(state, id, byPlayerCard ? cards : undefined, cards ? (trait) => hasTrait(state, id, trait, { effects: [], cards }) : undefined);
+}
+
 // A card readies or exhausts, and the Responses that hear it are told ("After ~ readies", "After ~ exhausts").
 export function readyCard(state: ScenarioState, id: string, byPlayerCard = false, cards?: ReadonlyMap<string, PrintedCard>): ScenarioState {
   const card = state.cards[id];
-  // "Your cards cannot ready for the remainder of the round" (cannotReady, 900103:A:1).
-  if (!card?.exhausted || readyBarred(state, id, byPlayerCard ? cards : undefined, cards ? (trait) => hasTrait(state, id, trait, { effects: [], cards }) : undefined)) return state;
+  if (!card || readyChangesNothing(state, id, byPlayerCard, cards)) return state;
   return queueEvent(updateCard(state, id, readyPatch(state, id)), { trigger: "readied", seat: card.controller, cardId: id, ...(byPlayerCard ? { byPlayerCard: true } : {}) });
 }
 

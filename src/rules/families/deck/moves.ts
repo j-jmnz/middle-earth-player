@@ -16,7 +16,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import { announceAllyLeft } from "../../core/ally-left.ts";
 import { discardLockedFor } from "../angmar/lock.ts";
 import { announceTopDiscard } from "./pressure.ts";
-import { readsThen } from "../../interpret/effect-verbs.ts";
+import { markShort } from "../../interpret/effect-verbs.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import type { CardInstance, EffectData, ScenarioState } from "../../core/state.ts";
 import { inPlay, updateCard, withSeat } from "../../core/state.ts";
@@ -163,7 +163,7 @@ export function discardFromDeck(state: ScenarioState, instruction: Verb<"Discard
   for (const id of top) next = queueEvent(moveCard(next, id, { zone: "discard", seat: focus.seat }), { trigger: "discardedFromDeck", seat: focus.seat, cardId: id });
   next = announceTopDiscard(patchData(next, { looked: top, discardedFromDecks: [...(effectData(next)?.discardedFromDecks ?? []), ...top] }), focus.seat, top.length, ctx);
   // A deck of fewer cards than the discard names stops it short, so the text after "then" is not attempted (the `thenResolves` condition, rr.then).
-  if (top.length < amount && readsThen(ctx)) next = patchData(next, { short: true });
+  if (top.length < amount) next = markShort(next, ctx);
   const count = instruction.count;
   if (!count) return next;
   const at = { seat: focus.seat, sourceId: focus.sourceId, counting: true, ...(scope.x != null ? { x: scope.x } : {}) };
