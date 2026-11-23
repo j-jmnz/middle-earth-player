@@ -3,7 +3,7 @@
 // 131028:B:2, 131028:B:3, 131066:A:2, 131067:A:2, 131068:A:1, 131073:A:1.
 import { describe, expect, it } from "vitest";
 
-import { answer, endPhase, endRound, resolve } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, endPhase, endRound, resolve } from "../../../../test/harness/card-spec.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import { playedLayout } from "../../../../test/harness/card-spec-play.ts";
 import { finish, idOf, legalIntents, legalTargets, resolveRecords, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
@@ -175,4 +175,20 @@ lineSpec("131073:A:1", "the chosen Stone-Giant engages only while it is still in
   const leaves = playedLayout(ID, tied, [resolve("131073", "whenRevealed"), resolve("131028", "whenRevealed"), endPhase], effects).run.state;
   expect(leaves.cards[idOf(leaves, "131064")]?.zone).not.toBe("engaged");
   expect(leaves.window?.kind).not.toBe("choose");
+});
+
+// The two-seat and false cases of lines the spec rows try with one player.
+lineSpec("131064:A:2", "after Stone-Giant engages the second player, that player's ally is discarded and the first player's ally is not", (effects) => {
+  const layout = { stage: "131027", seats: 2, staging: ["131064"], play: [{ code: "ally", seat: 0 }, { code: "ally", seat: 1 }] } satisfies Layout;
+  const done = playedLayout(ID, layout, announce("engaged", "131064", { seat: 1 }), effects, true);
+  const discarded = Object.values(done.run.state.cards).filter((card) => card.code === "ally" && card.zone === "discard");
+  expect(discarded.map((card) => card.controller)).toEqual([1]);
+});
+
+lineSpec("131067:A:1", "after a player engages a Goblin enemy he takes 1 damage on a character, and after one that is not a Goblin enemy nobody does", (effects) => {
+  const layout = { stage: "131027", active: "131067", staging: ["131058", "f3"] } satisfies Layout;
+  const goblin = playedLayout(ID, layout, [announce("engaged", "131058", { seat: 0 }), answer("dh1")], effects, true);
+  expect(goblin.run.state.cards[idOf(goblin.run.state, "dh1")]?.damage).toBe(1);
+  const other = playedLayout(ID, layout, [announce("engaged", "f3", { seat: 0 })], effects, true);
+  expect(other.run.state.cards[idOf(other.run.state, "dh1")]?.damage ?? 0).toBe(0);
 });
