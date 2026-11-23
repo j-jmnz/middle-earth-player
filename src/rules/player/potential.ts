@@ -107,8 +107,8 @@ function playerObjective(state: ScenarioState, sourceId: string, ctx: ReduceCont
 /** Why a Trigger of a player card's Action or Response cannot change the game state, or null. `event` is the one a Response answers. */
 export function noChangeReason(state: ScenarioState, effect: Effect, sourceId: string, seat: number, ctx: ReduceContext, event?: GameEvent): string | null {
   if (effect.timing !== "action" && effect.timing !== "response") return null;
-  // An encounter card's ability is the game's, not a player card effect (rr.triggered-ability speaks of player cards); an objective ally a player controls and uses (Mendor, 01135:A:3) is read like a player card.
-  if (!isPlayerCardEffect(state, ctx.cards, sourceId) && !playerObjective(state, sourceId, ctx)) return null;
+  // An encounter card's ability is the game's, not a player card effect (rr.triggered-ability speaks of player cards); an objective ally a player controls and uses is read like a player card when its steps wait for a "Then" (Mendor, 01135:A:3: the ready before it).
+  if (!isPlayerCardEffect(state, ctx.cards, sourceId) && !(playerObjective(state, sourceId, ctx) && JSON.stringify(effect.instructions).includes('"thenResolves"'))) return null;
   const steps = counted(effect);
   const first = steps[0];
   const source = state.cards[sourceId];
