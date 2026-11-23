@@ -13,8 +13,8 @@ export const RECORDS: readonly Effect[] = [
   {"id":"22143:constant:1","cardCode":"22143","lines":["22143:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"character","control":"any","trait":"Warrior"}]},{"verb":"ModifyStat","stat":"ranged","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"sentinel","amount":1,"until":"whileSourceInPlay","target":"host"}]},
   // 22144 Misty Mountain Journeyman
   {"id":"22144:constant:1","cardCode":"22144","lines":["22144:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"hasEngaged"}}]},
-  // 22146 Thorongil: a hero of any sphere but Fellowship and Baggins.
-  {"id":"22146:constant:1","cardCode":"22146","lines":["22146:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"you","spheres":["leadership","lore","spirit","tactics","neutral"]}]}]},
+  // 22146 Thorongil: a hero that is neither Fellowship nor Baggins (printed or with a gained icon).
+  {"id":"22146:constant:1","cardCode":"22146","lines":["22146:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"you","exceptSphere":["fellowship","baggins"]}]}]},
 ];
 
 export const REPLACES: readonly string[] = [];

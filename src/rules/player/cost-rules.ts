@@ -116,6 +116,9 @@ export function fewestHeroesIn(reason: string): number | null {
   return found ? Number(found[1]) : null;
 }
 
+/** The refusal for a card that must be paid from one hero's pool when two or more are used. */
+export const SINGLE_HERO_REASON = "Pay from a single hero";
+
 export function distinctHeroesReason(state: ScenarioState, cardId: string, payments: readonly { heroId: string; amount: number }[], ctx: ReduceContext): string | null {
   const code = state.cards[cardId]?.code ?? "";
   const heroes = new Set(payments.filter((payment) => payment.amount > 0).map((payment) => payment.heroId)).size;
@@ -125,7 +128,7 @@ export function distinctHeroesReason(state: ScenarioState, cardId: string, payme
     for (const instruction of effect.instructions) {
       if (instruction.verb !== "PayDistinctHeroes" || (instruction.when && !holds(state, instruction.when, scope, ctx))) continue;
       if (instruction.min != null && heroes < instruction.min) return fewestHeroesReason(instruction.min);
-      if (instruction.max != null && heroes > instruction.max) return instruction.max === 1 ? "Pay from a single hero" : `Pay from at most ${instruction.max} heroes`;
+      if (instruction.max != null && heroes > instruction.max) return instruction.max === 1 ? SINGLE_HERO_REASON : `Pay from at most ${instruction.max} heroes`;
     }
   }
   return null;

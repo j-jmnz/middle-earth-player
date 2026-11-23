@@ -47,6 +47,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["otherArea"], pick.otherArea === true ? "whose staging area is a different one from the chooser's (every other player while the areas are not separate)" : null);
   note(["atOtherStage"], pick.atOtherStage === true ? "at another stage than the chooser's (none while the game has one stage)" : null);
   note(["canSpendResources"], typeof pick.canSpendResources === "number" ? `who controls heroes holding ${pick.canSpendResources} resource${pick.canSpendResources === 1 ? "" : "s"} or more in all` : null);
+  note(["deckHasCards"], pick.deckHasCards === true ? "whose deck holds a card" : null);
   note(["atStage"], pick.atStage === true ? "at the acting player's staging area (every area before they are separate)" : null);
   note(["playerCard"], pick.playerCard === true ? "that is a player card" : pick.playerCard === false ? "that is an encounter card" : null);
   note(["stagingOnly"], pick.stagingOnly === true ? "in the staging area only" : null);
@@ -71,7 +72,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["affectable"], pick.affectable === true ? "that a card effect can affect (not one immune to card effects)" : null);
   note(["progress"], pick.progress === true ? "with progress on it" : pick.progress === false ? "with no progress on it" : null);
   note(["captive"], typeof pick.captive === "string" ? (pick.captive === "only" ? "that is a Captive (held by an enemy or lying free)" : pick.captive === "free" ? "that is a Captive that no enemy holds" : "(Captives included)") : null);
-  note(["exceptSphere"], typeof pick.exceptSphere === "string" ? `that is not a ${pick.exceptSphere} card` : null);
+  note(["exceptSphere"], typeof pick.exceptSphere === "string" || Array.isArray(pick.exceptSphere) ? `that is not a ${[pick.exceptSphere].flat().join(" or ")} card` : null);
   note(["maxWillpower"], typeof pick.maxWillpower === "number" ? `with a current Willpower of ${pick.maxWillpower} or less` : null);
   note(["highestWillpower"], pick.highestWillpower === true ? "with the highest current Willpower of those (ties: the chooser decides)" : null);
   note(["enemyOrLocation"], pick.enemyOrLocation === true ? "that is an enemy or a location" : null);

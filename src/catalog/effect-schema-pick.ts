@@ -35,6 +35,8 @@ export const pickSchema = z.strictObject({
   atOtherStage: z.literal(true).optional(),
   // With `type: player`: only a player who controls heroes holding this many resources in all, so that he can pay them ("Any player may spend 1 resource to take control of Dúnedain of Annúminas", 50818:A:2). Read by src/rules/families/wilderland/seat-pick.ts.
   canSpendResources: z.number().int().positive().optional(),
+  // With `type: player`: only a player whose deck holds a card, so that the effect on that player can change something (Imladris Stargazer, 04106:A:1; rr.the-word-choose). Read by src/rules/families/wilderland/seat-pick.ts.
+  deckHasCards: z.literal(true).optional(),
   // With `type: player`: only a player whose staging area is a different one from the chooser's, once stages are separate ("a different player's staging area", 901703:A:2); with one staging area every other player. Read by src/rules/interpret/pick.ts.
   otherArea: z.literal(true).optional(),
   // A character whose printed hit points are fewer than those of the enemy making the attack in progress ("if the defending character has fewer printed hit
@@ -49,7 +51,7 @@ export const pickSchema = z.strictObject({
   engagedEnemies: z.literal(true).optional(),
   // A card of this sphere of influence, for a card picked from the hand or a discard pile.
   sphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral"]).optional(),
-  // A card whose printed sphere is the printed sphere of a hero the chooser controls ("an ally that matches the sphere of a hero he controls", 143072:B:1). A neutral card or a Fellowship hero matches
+  // A card whose printed sphere is the printed sphere of a hero the chooser controls ("an ally that matches the sphere of a hero he controls", 143072:B:1). A neutral card, or a Fellowship hero without a gained icon, matches
   // no sphere (rr.neutral-cards). Read by the play family.
   heroSphere: z.literal(true).optional(),
   // A card of any of these spheres ("a Leadership or Lore character"), its printed sphere.
@@ -168,8 +170,8 @@ export const pickSchema = z.strictObject({
   aboveThreat: z.boolean().optional(),
   different: z.boolean().optional(),
   attackableByPicked: z.boolean().optional(),
-  // A card of any sphere but this one ("non-Fellowship hero", 141051:A:2).
-  exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(),
+  // A card of any sphere but this one ("non-Fellowship hero", 141051:A:2), or but these ("non-Fellowship, non-Baggins hero", 22146:A:1). A gained icon does not make it pass: it fails when any of its spheres is listed.
+  exceptSphere: z.union([sphereSchema, z.array(sphereSchema).min(1)]).optional(),
   // A character that could attack some enemy engaged with a player, whether or not it is exhausted yet.
   canAttack: z.boolean().optional(),
   // An ally in a discard pile or the hand whose printed cost is X (Stand and Fight): the amount the effect names.
