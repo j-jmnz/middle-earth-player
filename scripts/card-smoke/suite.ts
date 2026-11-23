@@ -4,6 +4,8 @@ import type { Effect, Instruction } from "../../src/catalog/boundary.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { legalIntents } from "../../src/rules/engine/reduce.ts";
 
+import { formatIdle } from "./idle.ts";
+import { KNOWN_IDLE, KNOWN_IDLE_MOST, staleKnownIdle, unknownIdle } from "./idle-known.ts";
 import { formatProblem, smokeCard, smokeCodes, smokeSource, smokeWorld, type SmokeWorld } from "./run.ts";
 
 // Every player card with an effect record, smoked in a real game (scripts/card-smoke/run.ts): no throw, no refused intent, no
@@ -46,6 +48,11 @@ export function smokeShard(shard: number): void {
         expect(smokeSource("141002", undefined, 9)).toMatch(/^smoke:141002:\d+:9$/);
       });
 
+      it("lists no more known idle abilities than it did, each a record that still exists", () => {
+        expect(Object.keys(KNOWN_IDLE).length).toBeLessThanOrEqual(KNOWN_IDLE_MOST);
+        expect(staleKnownIdle()).toEqual([]);
+      });
+
       it("smokes at least every starter card with a record", () => {
         for (const code of ["141001", "141002", "141003", "141013", "141014", "142004"]) expect(all).toContain(code);
       });
@@ -56,6 +63,8 @@ export function smokeShard(shard: number): void {
       it(`smokes ${code}`, () => {
         const summary = smokeCard(code, { world });
         expect(summary.problems.map((problem) => formatProblem(code, problem))).toEqual([]);
+        // An Action, a Response or an event offered and used that changed nothing (rr.triggered-ability, rr.cost): fix it through src/rules/player/potential.ts, or list it with its reason (idle-known.ts).
+        expect(unknownIdle(summary.idle).map(formatIdle)).toEqual([]);
         if (summary.type !== "hero" && summary.plays === 0) unplayed.push(code);
       }, 30_000);
     }

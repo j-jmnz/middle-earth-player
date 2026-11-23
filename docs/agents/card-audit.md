@@ -4,9 +4,10 @@ The standing procedure to prove that the cards in play do what they print, and t
 
 ## What finds what
 
-Three checks find different faults. None replaces another.
+Four checks find different faults. None replaces another.
 
 - **A soak** finds a throw, a stall, a broken table and an offer the engine then refuses. It plays random games with the pre-built decks and the stand-in heroes on Normal, Easy and Nightmare, with new seeds each run, checks every table (`scripts/card-smoke/invariants.ts`) and tries every offered intent on a share of the tables. `pnpm test encounter --all` is the committed form; a longer run is a scratch script on `scripts/card-smoke/encounter-games.ts`, never committed. It cannot see a card that does the wrong thing on a sound table.
+- **The idle check** of the card smoke (`pnpm test smoke --all`, and the encounter games) finds an Action, a Response or an event that was offered, used and changed nothing (`rr.triggered-ability`, `rr.cost`; `scripts/card-smoke/idle.ts`): a hit is read against the printed line, then fixed through `src/rules/player/potential.ts`, a family `idle` hook or a `canPick` condition on the record, or listed with its reason in `scripts/card-smoke/idle-known.ts`.
 - **A test from the printed line** finds a record that says less, more or other than its card. `scripts/checks/line-coverage.test.ts` fails on a record no test names, so the list of untested records is its failure output.
 - **A review** finds a fix that passes its own tests and is wrong for other cards. Every fix run of an audit is reviewed (Fix and review).
 
