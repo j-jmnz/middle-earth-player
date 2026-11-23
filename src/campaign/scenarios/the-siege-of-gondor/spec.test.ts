@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, attackersOf, cardSpecs, damageOn, defend, endPhase, exhausted, flag, progressOn, quest, resolve, resourcesOn, reveal, revealedBy, stagingThreat, stat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Siege of Gondor (the-return-of-the-king part 14): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot hold (a bar seen only in what is refused,
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). What a row cannot hold (a bar seen only in what is refused,
 // the Corsair Fleet's order across seats, the stage's hold while Great Corsair Ship is in play, the Port's heal cap) is in lines.test.ts, each test titled with its line. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense
 // and 6 hit points; every seat starts at threat 28. `ship` is a stand-in Ship location only where a record reads the active location's trait: the real Umbar War Galley (145031) and Corsair Dromon (145032) are Ships.
 const GREAT_SHIP = "145030";

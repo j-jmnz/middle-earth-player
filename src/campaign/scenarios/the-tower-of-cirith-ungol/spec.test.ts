@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, endPhase, exhausted, flag, reveal, resolve, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Tower of Cirith Ungol (the-return-of-the-king part 16): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot hold (the quest stages' Setup and
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). What a row cannot hold (the quest stages' Setup and
 // advance, the Ring-bearer under Topmost Chamber, a lasting effect read later in the phase, the campaign card's Setup and Forced) is in lines.test.ts, stages.test.ts and set-aside.test.ts, each test titled with its line.
 // The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points and every seat starts at threat 28; f3 is an enemy with Threat 3, Attack 1, Defense 1 and 3 hit points, f0 the same with Threat 0.
 const RING = "146065";

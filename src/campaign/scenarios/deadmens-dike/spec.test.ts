@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, attackersOf, cardSpecs, damageOn, deckCount, endPhase, exhausted, resolve, resourcesOn, reveal, stat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Deadmen's Dike (angmar-awakened part 3): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot express (a card in a discard pile, a deck count, a cost, a pool entry, a tie)
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). What a row cannot express (a card in a discard pile, a deck count, a cost, a pool entry, a tie)
 // is a test titled with its line id in lines.test.ts. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; every seat starts at threat 28; a layout's current stage is on its B side.
 const THAURDIR = "09033";
 const SHADE = "09035";
