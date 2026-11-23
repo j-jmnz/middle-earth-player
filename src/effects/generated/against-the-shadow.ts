@@ -7,7 +7,6 @@ export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"05057:shadow:1","cardCode":"05057","lines":["05057:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker"}]},
   {"id":"06044:whenRevealed:1","cardCode":"06044","lines":["06044:A:1"],"timing":"whenRevealed","instructions":[{"verb":"AddSetAsideToStaging","code":"06045"}]},
   {"id":"06048:shadow:1","cardCode":"06048","lines":["06048:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"endOfAttack","target":"attacker"}]},
-  {"id":"06050:travel:1","cardCode":"06050","lines":["06050:A:2"],"timing":"travel","instructions":[{"verb":"Exhaust","target":{"kind":"byCode","code":"131033"}}]},
   {"id":"06067:whenRevealed:1","cardCode":"06067","lines":["06067:A:1"],"timing":"whenRevealed","instructions":[{"verb":"AddSetAsideToStaging","code":"06071"}]},
   {"id":"06077:travel:1","cardCode":"06077","lines":["06077:A:2"],"timing":"travel","instructions":[{"verb":"RevealEncounter"}]},
   {"id":"06097:travel:1","cardCode":"06097","lines":["06097:A:1"],"timing":"travel","instructions":[{"verb":"RevealEncounter"}]},

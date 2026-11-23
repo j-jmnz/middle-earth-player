@@ -4365,15 +4365,15 @@
       "scenario": "peril-in-pelargir",
       "code": "05020",
       "pile": "encounter",
-      "reason": "DragnCards loads 4 of the 5 Harbor Thug in the staging area (Q03.1; its Easy deck E03.1 stages none). The quest card The Leaping Fish (05065) prints no Setup line that adds an enemy to the staging area, so all 5 copies are in the encounter deck at the start.",
-      "source": "scan 05065.A (hallofbeorn-resources Images/Cards/Heirs-of-Numenor/The-Leaping-Fish-Quest-1A.jpg); dragncards preBuiltDecks.json (Q03.1, E03.1); hallofbeorn.com/Export/Scenarios/Peril-in-Pelargir (5 Normal, 5 Easy)"
+      "reason": "DragnCards loads 4 of the 5 Harbor Thug in the staging area (Q03.1; its Easy deck E03.1 stages none). The quest card The Leaping Fish (05065) prints no Setup line that adds an enemy to the staging area, so all 5 copies are in the encounter deck at the start. The When Revealed of stage 1B (scan 05065.B: \"Each player must search the encounter deck for a copy of Harbor Thug and add it to the staging area.\") is what puts the Harbor Thugs in staging.",
+      "source": "scans 05065.A and 05065.B (hallofbeorn-resources Images/Cards/Heirs-of-Numenor/The-Leaping-Fish-Quest-1A.jpg and -1B.jpg); dragncards preBuiltDecks.json (Q03.1, E03.1); hallofbeorn.com/Export/Scenarios/Peril-in-Pelargir (5 Normal, 5 Easy)"
     },
     {
       "scenario": "the-stewards-fear",
       "code": "06022",
       "pile": "encounter",
       "reason": "DragnCards loads The Fourth Star set aside (Q03.4). The quest card Conspiracy (06011) sets aside only Roots of Mindolluin, the Villain cards and the Plot cards, and the Steward's Fear rulesheet's Setup paragraph names no other card, so The Fourth Star is in the encounter deck at the start.",
-      "source": "Hall of Beorn text of Conspiracy (06011, not yet read against its scan); Steward's Fear rulesheet MEC18 (ats.setup-the-stewards-fear-underworld-deck); dragncards preBuiltDecks.json (Q03.4)"
+      "source": "scan 06011.B (\"When Revealed: Search the encounter deck for The Fourth Star and make it the active location. Shuffle the encounter deck.\"); Steward's Fear rulesheet MEC18 (ats.setup-the-stewards-fear-underworld-deck); dragncards preBuiltDecks.json (Q03.4)"
     }
   ],
   "scenarioRemovals": [

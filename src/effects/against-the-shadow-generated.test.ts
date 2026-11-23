@@ -10,7 +10,6 @@ describe("Against the Shadow's generated records", () => {
     ["05057:shadow:1", "05057:A:3"],
     ["06044:whenRevealed:1", "06044:A:1"],
     ["06048:shadow:1", "06048:A:3"],
-    ["06050:travel:1", "06050:A:2"],
     ["06067:whenRevealed:1", "06067:A:1"],
     ["06077:travel:1", "06077:A:2"],
     ["06097:travel:1", "06097:A:1"],

@@ -4,7 +4,14 @@ import type { NameIndex, SetupClause } from "./setup-text.ts";
 // Rules: ats.setup-the-stewards-fear-underworld-deck, ats.underworld, ats.hidden-cards, ats.setup-the-morgul-vale-to-the-tower (data/rules/entries.json).
 // The sentences of the nine stage 1A cards of Against the Shadow that the other readers do not read. Each pattern is quoted from a Setup line, names the cards it moves, and returns null for a
 // sentence it does not read (or whose card names find no card), so the scenario stays unbuilt and a name is never dropped silently.
-export function readAgainstTheShadow(sentence: string, names: NameIndex): SetupClause[] | null {
+// The Villain cards are enemies and the Plot cards are objectives (06011.A Setup; the card types in data/cards/TSF.json).
+const HIDDEN_TYPE = { Villain: "enemy", Plot: "objective" } as const;
+function hiddenCodes(names: NameIndex, trait: keyof typeof HIDDEN_TYPE): string[] {
+  return names.cards.filter((card) => card.traits.includes(trait) && card.type === HIDDEN_TYPE[trait]).map((card) => card.code);
+}
+
+// `before` is the clauses the earlier sentences of the same Setup read.
+export function readAgainstTheShadow(sentence: string, names: NameIndex, before: readonly SetupClause[]): SetupClause[] | null {
   // A card name that starts with "The" (The Leaping Fish) is found as it is printed.
   const withoutThe = namedBy(names);
   const named = (phrase: string | undefined): string[] => (isNameList(names.without(phrase ?? "")) && names.codesOf(phrase ?? "").length > 0 ? names.codesOf(phrase ?? "") : withoutThe(phrase));
@@ -29,17 +36,18 @@ export function readAgainstTheShadow(sentence: string, names: NameIndex): SetupC
   // The Steward's Fear: "Shuffle all Villain cards and randomly set one aside, out of play, without looking at it. Remove the others from the game. Repeat this with all Plot cards." The three Villain
   // enemies and the three Plot objectives: the first sentence is the step with the cards it chooses from, "Remove the others from the game" is part of it, and "Repeat" is the same step for the Plot cards.
   if ((match = /^Shuffle all (Villain|Plot) cards and randomly set one aside,? out of play,? without looking at it$/i.exec(sentence))) {
-    const trait = (match[1] ?? "").replace(/^./, (letter) => letter.toUpperCase());
-    const codes = names.cards.filter((card) => card.traits.includes(trait) && (card.type === "enemy" || card.type === "objective")).map((card) => card.code);
+    const codes = hiddenCodes(names, /^villain$/i.test(match[1] ?? "") ? "Villain" : "Plot");
     return codes.length === 0 ? null : [stepWith(codes)("hideOneAside", { count: codes.length - 1 })];
   }
-  if (/^Remove the others from the game$/i.test(sentence)) return [];
+  // "Remove the others from the game" is read only straight after that step, so it drops no name for another scenario.
+  const last = before[before.length - 1];
+  if (/^Remove the others from the game$/i.test(sentence)) return last?.kind === "step" && last.step === "hideOneAside" ? [] : null;
   if (/^Repeat this with all Plot cards$/i.test(sentence)) {
-    const codes = names.cards.filter((card) => card.traits.includes("Plot") && card.type === "objective").map((card) => card.code);
+    const codes = hiddenCodes(names, "Plot");
     return codes.length === 0 ? null : [stepWith(codes)("hideOneAside", { count: codes.length - 1 })];
   }
   // The Morgul Vale: "Set aside Lord Alcaron, Nazgûl of Minas Morgul, and The White Bridge." (no "out of play": the later stages add them to the staging area)
-  if ((match = /^Set aside (.+)$/i.exec(sentence)) && !/\baside\b/i.test(match[1] ?? "")) {
+  if ((match = /^Set aside (Lord Alcaron, Nazgûl of Minas Morgul, and The White Bridge)$/i.exec(sentence))) {
     const codes = named(match[1]);
     return codes.length === 0 ? null : [{ kind: "aside", codes, allCopies: false }];
   }

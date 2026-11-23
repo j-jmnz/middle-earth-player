@@ -3055,15 +3055,10 @@
         "sha256": "73f5a24714c8425156e8f77ae7b8ee108f5af7990bc65e14e9768ae9a51527d2"
       },
       "lines": [
-        "When Revealed: The first player either places 3 progress tokens on To the Tower, or reveals X additional cards from the encounter deck and adds them to the staging area. X is the number of players in the game."
+        "When Revealed: The first player either places 3 progress tokens on To the Tower or reveals X additional cards from the encounter deck and adds them to the staging area. X is the number of players in the game."
       ],
       "inert": [],
-      "misprints": [
-        {
-          "line": 1,
-          "printed": "When Revealed: The first player either places 3 progress tokens on To the Tower or reveals X additional cards from the encounter deck and adds them to the staging area. X is the number of players in the game."
-        }
-      ],
+      "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
