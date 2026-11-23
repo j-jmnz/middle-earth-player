@@ -1,11 +1,11 @@
 ---
 name: scenario-author
-description: Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note. Use after the scenario's data exists in data/scenarios.
+description: Builds one scenario's engine half, one task per run (Read, Build, Tests, Words or Games), each run fresh from the hand-off note. Use after the scenario's data exists in data/scenarios.
 model: sonnet
 tools: Read, Grep, Glob, Bash, Edit, Write, Monitor, WebSearch, WebFetch
 ---
 
-You build one scenario's engine half. The procedure is `docs/agents/agent-brief.md` (Scenario procedure); this file says what each task hands back, and the procedure wins where they differ. Your brief names one task: Read, Build or Finish. Do that task and stop: a subagent cannot start agents, so the orchestrator runs the reading judge between Build and Finish. Do not start the next task. You run fresh: the hand-off note (`docs/agents/agent-brief.md`, Scenario procedure, The hand-off note) is everything the earlier tasks knew. Read it first (Read creates it), and end your task by appending your part to it.
+You build one scenario's engine half. The procedure is `docs/agents/agent-brief.md` (Scenario procedure); this file says what each task hands back, and the procedure wins where they differ. Your brief names one task: Read, Build, Tests, Words or Games. Do that task and stop: a subagent cannot start agents, so the orchestrator runs the reading judge between Build and Tests. Do not start the next task. You run fresh: the hand-off note (`docs/agents/agent-brief.md`, Scenario procedure, The hand-off note) is everything the earlier tasks knew. Read it first (Read creates it), and end your task by appending your part to it.
 
 `CLAUDE.md` and `.claude/rules/` are already in your context: do not read them again. Find docs with `pnpm doc find "<words>"` or through `docs/INDEX.md` and read sections (`pnpm doc section <file> "<heading>"`); the scenario's rulings are its section of `docs/scenarios/<box>.md`. Card and rules text come from `data/` (`pnpm data query`), never from memory; a scan you cannot read is a question for the orchestrator, not a guess. Commit and push often as `.claude/rules/commit-standards.md` (Commit often) says, and do not edit `docs/phases/STATUS.md`. Every hand-back also gives your full test runs, your wait minutes and your writing minutes, for the phase's measure (`docs/agents/agent-brief.md`, Measure).
 
@@ -23,9 +23,23 @@ You build one scenario's engine half. The procedure is `docs/agents/agent-brief.
 - Hand back: the render's path, the verbs and families added with the engine files touched, the lines still open with the reason. Do not judge your own render.
 - Checks: `pnpm lint`, `pnpm typecheck`, `pnpm test scenario <id> --quick`, `pnpm test smoke <codes>` for the player cards you wrote records for.
 
-## Finish
+## Tests
 
 - Inputs: the hand-off note and the judge's rows for every line. Research an `ambiguous` row that is a real choice as Read does.
-- Do: fix every line the judge called `wrong` and render again; a spec row or a test for every record, written from the printed line and failing without the line's records (`docs/agents/card-audit.md`, Tests from the printed line; `scripts/checks/line-coverage.test.ts` fails on a record no test names); asks for each Pick and Choose, with `pnpm test scenario <id> --words` read against `docs/design-system-table.md` (Choice tray); the goldens, the seed finder, the `-lost` fixture (no won one: `docs/architecture.md`, Tests) and the campaign test; the Table step (`docs/agents/agent-brief.md`, Scenario procedure, The Table step).
-- Hand back: the report of `docs/agents/agent-brief.md` (Report), each gate with its result and whether the tree changed after it, every golden or fixture outcome that moved (named, not relabelled), and the spec rows that needed a record changed to pass.
-- Checks: `pnpm test scenario <id> --quick` while working; the exit is the one in `.claude/agents/orchestrator.md` (Implementer tasks). The goldens and campaign test keep to `.claude/rules/code-standards.md` (Test cost); the hand-back gives the `budget` line of the full `pnpm test scenario <id>` run. A scenario over its budget is cut (fewer goldens, a scene-kit table in place of a played game), never given a larger budget, unless the user agrees.
+- Do: fix every line the judge called `wrong` and render again; a spec row or a test for every record, written from the printed line and failing without the line's records (`docs/agents/card-audit.md`, Tests from the printed line; `scripts/checks/line-coverage.test.ts` fails on a record no test names).
+- Hand back: the lines fixed, each spec row or test file with the lines it covers, and the spec rows that needed a record changed to pass. This is the last task that changes records.
+- Checks: `pnpm test scenario <id> --quick` while working; the exit is the one in `.claude/agents/orchestrator.md` (Implementer tasks). Change no golden, fixture or asks file.
+
+## Words
+
+- Inputs: the hand-off note with the Tests part. The records are final: a record that must change goes back to the orchestrator.
+- Do: asks for each Pick and Choose, with `pnpm test scenario <id> --words` read against `docs/design-system-table.md` (Choice tray); the Table step (`docs/agents/agent-brief.md`, Scenario procedure, The Table step) with its citations in the scenario's section of `docs/scenarios/<box>.md`.
+- Hand back: the asks entries and the sentences `--words` printed, the Table step's widgets and files, each gate with its result and whether the tree changed after it. Touch no golden, fixture, seed finder or campaign test.
+- Checks: `pnpm test scenario <id> --words`, then the exit.
+
+## Games
+
+- Inputs: the hand-off note with the Tests part. The records are final.
+- Do: the goldens, the seed finder, the `-lost` fixture (no won one: `docs/architecture.md`, Tests) and the campaign test, on the shared kit.
+- Hand back: the report of `docs/agents/agent-brief.md` (Report), each gate with its result and whether the tree changed after it, every golden or fixture outcome that moved (named, not relabelled), and the `budget` line of the full `pnpm test scenario <id>` run. A scenario over its budget is cut (fewer goldens, a scene-kit table in place of a played game), never given a larger budget, unless the user agrees. A record that a game shows to be wrong goes back to the orchestrator; do not change it.
+- Checks: `pnpm test scenario <id> --quick` while working; the exit is the one in `.claude/agents/orchestrator.md` (Implementer tasks). Keep to `.claude/rules/code-standards.md` (Test cost). Touch no asks file or Table step file.
