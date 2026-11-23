@@ -20,6 +20,7 @@ import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/scenarios/island.ts";
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/scenarios/grapple.ts";
 import { isBoonCode } from "../words/scenarios/angmar/angmar-table.ts";
+import { burgleChooseNote } from "../words/scenarios/the-hobbit/burgle.ts";
 import { smaugChooseNote } from "../words/scenarios/standalone-scenarios/smaug.ts";
 import { isFreedTreasureClaim, isTreasureDraw, wilderlandBranchNow, wilderlandChooseNote, wilderlandOptionLabel, wilderlandTravel } from "../words/scenarios/wilderland.ts";
 import { embassyPairCards } from "../readouts/black-gate.ts";
@@ -290,7 +291,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         // The record's asks entries (words/asks.ts) come before the families' words.
         const asked = { game, ctx, names: words, instruction: choose, ...(data?.effectId ? { effectId: data.effectId } : {}), ...(wait.item.cause ? { cause: wait.item.cause } : {}), source };
         const written = { ...asked, at: askAt(asked) };
-        const ask = asksChoose(written)?.note ?? torch?.note ?? smaugChooseNote(choose, game, ctx, words, window.seat) ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
+        const ask = asksChoose(written)?.note ?? torch?.note ?? smaugChooseNote(choose, game, ctx, words, window.seat) ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? burgleChooseNote(choose, game, ctx, words, window.seat) ?? "Choose one.";
         return {
           ...base,
           note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, line].filter((part) => part != null).join(" "),

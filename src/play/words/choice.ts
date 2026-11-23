@@ -77,7 +77,7 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
   if (!option) return capital(optionId);
   const refresh = readyPaymentWords(choose, option, game, names, sourceId);
   if (refresh) return refresh;
-  const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId) ?? (ctx ? smaugBranchWords(choose, optionId, game, ctx, names, sourceId) : null) ?? wilderlandBranchWords(choose, optionId, names, now, sourceId ? names.card(sourceId) : null, game, ctx) ?? burgleBranchWords(choose, optionId, game, names);
+  const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId) ?? (ctx ? smaugBranchWords(choose, optionId, game, ctx, names, sourceId) : null) ?? wilderlandBranchWords(choose, optionId, names, now, sourceId ? names.card(sourceId) : null, game, ctx) ?? burgleBranchWords(choose, optionId, game, names, ctx);
   if (family) return family;
   if (option.instructions.length === 0) return "Do nothing";
   const whole = deckBranchWords(option.instructions) ?? burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions) ?? breakingBranchWords(option.instructions, names, sourceId, game);

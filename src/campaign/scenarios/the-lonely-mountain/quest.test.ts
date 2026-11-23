@@ -97,7 +97,7 @@ describe("132073:B:2 Inside Information: progress above Smaug the Magnificent's 
 
 describe("132074:B:1 Thieves! Fire! Murder!: the stage resets the quest to 2B and the loop can run again", () => {
   const prepared = (effects: readonly Effect[]): LayoutTable => make({ stage: "132072", staging: [{ code: "132040", progress: 5 }, "132043"], setAside: ["132041", "132039"], under: stack(), deck: ["132042", "f0", "f0"], deckOf: ["01016", "01016", "01016"], hand: ["01016"], heroes: [bilbo(0)] }, effects);
-  const rewind = (run: Run, made: LayoutTable): Run => announceAndDrive({ ...made, state: updateCard(run.state, run.state.questStage ?? "", { progress: 7 }) }, { trigger: "questCardDefeated", cardId: run.state.questStage }, {});
+  const rewind = (run: Run, made: LayoutTable): Run => announceAndDrive({ ...made, state: updateCard(run.state, run.state.questStage ?? "", { progress: 7 }) }, { trigger: "questCardDefeated", ...(run.state.questStage ? { cardId: run.state.questStage } : {}) }, {});
   const refill = (run: Run, made: LayoutTable): LayoutTable => ({ ...made, state: updateCard(run.state, idOf(run.state, "132040"), { progress: 5 }) });
 
   lineSpec("132074:B:1", "stage 4B resets the quest to stage 2B with no progress, Smaug the Magnificent and A Bare Patch go aside, Smaug the Golden comes back with none, and the second advance to 4A works again", (effects) => {

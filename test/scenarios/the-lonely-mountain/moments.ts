@@ -41,7 +41,7 @@ export function drive(run: Run, made: LayoutTable, plan: Plan = {}, stopAt: read
       if (asked !== undefined && wanted === undefined) throw new Error(`answer ${asked} is not offered (${window.options.map((option) => current.state.cards[option]?.code ?? option).join(", ")})`);
       current = send(current, { type: "Choose", optionId: wanted ?? window.options[0] ?? "" }, made.ctx);
     } else if (window.kind === "look") current = send(current, { type: "Pass" }, made.ctx);
-    else if (window.kind === "frameAction" || window.kind === "actions") {
+    else if (window.kind === "frameAction") {
       const use = uses.shift();
       if (use) {
         const ids = idsOfCode(current.state, use.code);
