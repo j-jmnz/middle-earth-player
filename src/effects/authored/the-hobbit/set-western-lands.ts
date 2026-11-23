@@ -28,13 +28,13 @@ export const WESTERN_LANDS_EFFECTS: readonly Effect[] = withCopies([
     instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ShuffleShadowIntoEncounterDeck", code: "131035", when: DEALT_DAMAGE }] }],
   },
 
-  // 131039 Dreary Hills. Forced: each player discards 1 card at random from his hand.
+  // 131039 Dreary Hills. Forced: each player discards 1 card at random from his hand. "After placing 1 or more progress tokens" is heard for every placement on it, the one that explores it too (`progressPlacedOnSelf`, as Bottomless Chasm 901606:A:1 is read; docs/scenarios/the-hobbit.md, We Must Away).
   {
     id: "131039:forced:1",
     cardCode: "131039",
     lines: ["131039:A:1"],
     timing: "forced",
-    trigger: "progressPlaced",
+    trigger: "progressPlacedOnSelf",
     subject: "self",
     instructions: [{ verb: "DiscardRandomFromHand", amount: 1, who: "eachSeat" }],
   },
@@ -57,7 +57,7 @@ export const WESTERN_LANDS_EFFECTS: readonly Effect[] = withCopies([
     cardCode: "131040",
     lines: ["131040:A:1"],
     timing: "forced",
-    trigger: "progressPlaced",
+    trigger: "progressPlacedOnSelf",
     subject: "self",
     instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: HERO_WITH_RESOURCES }, { verb: "DiscardResources", amount: 1, target: "picked" }] }],
   },
