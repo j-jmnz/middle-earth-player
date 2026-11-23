@@ -14,6 +14,8 @@ import { playRequest } from "./pay.ts";
 import type { Sheet } from "./sheet-types.ts";
 
 const SPHERE_WORD: Readonly<Record<string, string>> = { leadership: "Leadership", tactics: "Tactics", spirit: "Spirit", lore: "Lore", fellowship: "Fellowship", baggins: "Baggins", neutral: "Neutral" };
+// The plural a card type is named by in the planning-phase refusals.
+const PLANNING_PLAYED: Readonly<Record<string, string>> = { ally: "Allies", attachment: "Attachments", treasure: "Treasures" };
 
 /** Why the hand card cannot be played now, or null when it can (or is not in the hand). */
 export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: string, cardName: (id: string) => string): string | null {
@@ -33,10 +35,10 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
     }
     switch (refused) {
       case "That intent is not legal in this window":
-        if (printed.type === "ally" || playsOntoHost(printed)) return `${printed.type === "ally" ? "Allies" : printed.type === "treasure" ? "Treasures" : "Attachments"} are played in the planning phase.`;
+        if (printed.type === "ally" || playsOntoHost(printed)) return `${PLANNING_PLAYED[printed.type] ?? "Cards"} are played in the planning phase.`;
         return game.window ? "Nothing can be played at this point." : "Nothing can be played right now.";
       case "Only the active player plays allies and attachments now":
-        return "Allies, attachments and treasures are played in your own planning turn.";
+        return `${PLANNING_PLAYED[printed.type] ?? "Allies and attachments"} are played in your own planning turn.`;
       case "A second copy of that unique card cannot enter play":
         return `${cardName(cardId)} is unique and a copy is already in play.`;
       case "No hero matches that card's sphere":
