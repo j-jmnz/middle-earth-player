@@ -150,7 +150,10 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       // A mode card (The Siege of Annúminas' Standard Game Mode) is listed with the quest cards but is no stage; a quest card the scenario never plays is excluded by an override (the Siege's Epic Multiplayer stages).
       return card && card.type === "quest" && !isNightmareCard(card) && !overrides.scenarioExcluded.some((rule) => rule.scenario === id && rule.code === card.code) ? [card.code] : [];
     });
-    for (const rule of overrides.scenarioStages) if (rule.scenario === id && !questCodes.includes(rule.code)) questCodes.push(rule.code);
+    // An added stage takes its place by stage number (The Battle of Five Armies' stage 1A, which Hall of Beorn's list leaves out, opens the deck); the order of the others stays.
+    const added = overrides.scenarioStages.filter((rule) => rule.scenario === id && !questCodes.includes(rule.code));
+    for (const rule of added) questCodes.push(rule.code);
+    if (added.length > 0) questCodes.sort((a, b) => Number.parseInt(byCode.get(a)?.stage ?? "", 10) - Number.parseInt(byCode.get(b)?.stage ?? "", 10));
     let stages = questCodes;
 
     // The printed Setup of the first quest stage and of the campaign card.

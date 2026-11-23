@@ -134,6 +134,16 @@ function decklistCodes(cards: readonly Card[]): string[] {
   return decks.filter((deck) => prefixes.some((prefix) => deck.source.startsWith(prefix))).flatMap((deck) => [...deck.heroes, ...deck.cards.map((slot) => slot.code)]).filter((code) => reprinted.has(code));
 }
 
+// The Hobbit saga boxes' own player cards (hob.bilbo-baggins-ohauh, hob.treasure-ohauh, hob.saga-player-cards-otd): both Bilbo Baggins heroes, the Baggins-sphere events and the nine treasure
+// cards, which only the six scenarios of the boxes use. The scenarios' own piles hold none of them (the first player takes control of Bilbo at the start of every game, the treasures are
+// discovered in play), so no scenario list names them.
+const HOBBIT_PACKS: ReadonlySet<string> = new Set(["OHaUH", "OtD"]);
+function hobbitCodes(): string[] {
+  return loadCards()
+    .filter((card) => card.printings.some((printing) => HOBBIT_PACKS.has(printing.pack)) && (card.sphere === "baggins" || card.type === "treasure" || (card.type === "hero" && card.name === "Bilbo Baggins")))
+    .map((card) => card.code);
+}
+
 // Every card of a Nightmare deck that names its scenario (nightmare-defs.ts): read from its proxy picture whether or not the built scenario carries the deck yet,
 // since the build needs the ledger to resolve the deck's removals.
 function nightmareDeckCodes(): string[] {
@@ -141,7 +151,7 @@ function nightmareDeckCodes(): string[] {
 }
 
 export function scopeCodes(): string[] {
-  return [...new Set<string>([...campaignCards(), ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaigns(), loadScenarios()), ...nightmareDeckCodes(), ...boxCodes(), ...starterCodes(), ...PLAYER_REQUESTS])].sort();
+  return [...new Set<string>([...campaignCards(), ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaigns(), loadScenarios()), ...nightmareDeckCodes(), ...boxCodes(), ...hobbitCodes(), ...starterCodes(), ...PLAYER_REQUESTS])].sort();
 }
 
 type HobImages = { CardSet: string; Slug: string; RingsDbCardId: string | null; Front: { ImagePath: string | null }; Back: { ImagePath: string | null } | null };

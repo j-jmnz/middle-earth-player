@@ -3738,6 +3738,20 @@
       },
       "reason": "Masterwork Bow prints \"Attach to a character. Restricted.\" (line 1 of its ledger entry, read from the scan), but Hall of Beorn lists no Restricted keyword for it, as it does for the other Ered Mithrin treasures that print it. Without the keyword the Bow is never a third Restricted attachment (rr.restricted).",
       "source": "scan 12204.A, data/printed/ered-mithrin.json"
+    },
+    {
+      "match": {
+        "code": "132075"
+      },
+      "set": {
+        "name": "The Gathering of the Clouds",
+        "imageUrls": [
+          "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Gathering-of-the-Clouds-1A.jpg",
+          "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Gathering-of-the-Clouds-1B.jpg"
+        ]
+      },
+      "reason": "Hall of Beorn spells the stage 1 quest card 'The Gathering of Clouds' in its title and slug and in the scan addresses, which answer 403. The card prints 'The Gathering of the Clouds' (the scan, DragnCards' deck Q0A.6), and the spelled-right addresses serve both sides.",
+      "source": "scan 132075.A (hallofbeorn.com/Export/QuestCards, Slug The-Gathering-of-Clouds-THOtD); s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Gathering-of-the-Clouds-1A.jpg; dragncards Q0A.6"
     }
   ],
   "scenarioPiles": [
@@ -4315,6 +4329,30 @@
       "reason": "DragnCards loads Dark Pit set aside (Q99.14) and omits its back, Durin's Bane (the scans number them 1/2 and 2/2, as The Mines of Moria's Watcher and Chamber of Mazarbul; Hall of Beorn files them as two cards, #10 and #11). The quest card Out of the Depths (51301) prints \"Setup: Add Dark Pit to the staging area.\", so it starts in the staging area, and stage 1B flips it over to Durin's Bane. `back` names that side.",
       "source": "scan 51301.A; dragncards preBuiltDecks.json (Q99.14)",
       "back": "51311"
+    },
+    {
+      "scenario": "over-the-misty-mountains-grim",
+      "code": "131064",
+      "from": "staging",
+      "pile": "encounter",
+      "reason": "DragnCards loads one Stone-Giant in the staging area (Q0A.2). The quest card A Short Rest (131026) prints no such Setup line: stage 1B advances at once to stage 2A, whose When Revealed (The Mountain Pass, 131027) searches the encounter deck for 1 copy of Stone-giant and adds it to the staging area. All 3 copies are in the encounter deck at Setup, as Hall of Beorn's count of 3 says (Easy 1).",
+      "source": "cards 131026 and 131027 (data/printed/the-hobbit.json); dragncards preBuiltDecks.json (Q0A.2); hallofbeorn.com/Export/Scenarios/Over-the-Misty-Mountains-Grim"
+    },
+    {
+      "scenario": "dungeons-deep-and-caverns-dim",
+      "code": "131074",
+      "from": "staging",
+      "pile": "encounter",
+      "reason": "DragnCards loads Gollum in the staging area (Q0A.3). Stage 1A (131029) prints \"Create a riddle area with stage 2A and follow the setup instructions on that card\", and stage 2A's Setup (Riddles in the Dark, 131030) searches the encounter deck for Gollum and Bilbo's Magic Ring and places Gollum in the riddle area, which is no part of the staging area. Gollum starts in the encounter deck, as Hall of Beorn's count of 1 says.",
+      "source": "cards 131029 and 131030 (data/printed/the-hobbit.json); hob.riddle-area; dragncards preBuiltDecks.json (Q0A.3)"
+    },
+    {
+      "scenario": "dungeons-deep-and-caverns-dim",
+      "code": "131079",
+      "from": "staging",
+      "pile": "encounter",
+      "reason": "DragnCards loads Bilbo's Magic Ring in the staging area (Q0A.3). Stage 2A's Setup (131030) searches the encounter deck for it and attaches it to Bilbo Baggins in the riddle area, so it starts in the encounter deck, as Hall of Beorn's count of 1 says.",
+      "source": "cards 131029 and 131030 (data/printed/the-hobbit.json); hob.riddle-area; dragncards preBuiltDecks.json (Q0A.3)"
     }
   ],
   "scenarioRemovals": [
@@ -4462,6 +4500,27 @@
       "easy": 2,
       "reason": "DragnCards' Easy deck E05.7 holds 1 Ruins of Arnor; Hall of Beorn gives the card's Easy count as 2 of its 3 copies, as in The Weather Hills' Easy deck, which agrees with it (the golden-bordered set icon marks the copy Easy Mode removes). Settled as researched: the printed icon is the rule, DragnCards' deck removes one copy too many.",
       "source": "Hall of Beorn (data/raw/hallofbeorn/Scenarios/The-Treachery-of-Rhudaur.json, EasyQuantity); data/raw/dragncards (E05.7, E05.2); https://www.fantasyflightgames.com/en/news/2016/8/12/travel-the-darkest-lands-of-the-north/"
+    },
+    {
+      "scenario": "the-lonely-mountain",
+      "code": "132037",
+      "easy": 0,
+      "reason": "DragnCards' Easy deck E0A.5 holds both copies of Fighting Among Friends. The Easy Mode sheet removes 2x Fighting Among Friends from the Wilderland set, Hall of Beorn's Easy count is 0, and DragnCards' Easy decks of the other two scenarios that deal the set (E0A.4, E0A.6) agree with both. The printed sheet wins; E0A.5 keeps the Normal count by mistake.",
+      "source": "data/rules/easy-mode.md (easy-mode.the-hobbit, the Easy Mode sheet, page 3); hallofbeorn.com/Export/Scenarios/The-Lonely-Mountain; dragncards E0A.4, E0A.5, E0A.6"
+    },
+    {
+      "scenario": "the-lonely-mountain",
+      "code": "132038",
+      "easy": 1,
+      "reason": "DragnCards' Easy deck E0A.5 holds both copies of Weighed Down. The Easy Mode sheet removes 1x Weighed Down from the Wilderland set, Hall of Beorn's Easy count is 1, and E0A.4 and E0A.6 agree with both. The printed sheet wins.",
+      "source": "data/rules/easy-mode.md (easy-mode.the-hobbit, the Easy Mode sheet, page 3); hallofbeorn.com/Export/Scenarios/The-Lonely-Mountain; dragncards E0A.4, E0A.5, E0A.6"
+    },
+    {
+      "scenario": "dungeons-deep-and-caverns-dim",
+      "code": "131065",
+      "easy": 2,
+      "reason": "DragnCards' Easy deck E0A.3 holds 1 The Goblins' Caves. The Easy Mode sheet removes 1x The Goblins' Caves of the 3 in the Misty Mountain Goblins set (Easy 2), and Hall of Beorn gives Easy 2. The printed sheet wins.",
+      "source": "data/rules/easy-mode.md (easy-mode.the-hobbit, the Easy Mode sheet, page 3); hallofbeorn.com/Export/Scenarios/Dungeons-Deep-and-Caverns-Dim; dragncards E0A.3"
     }
   ],
   "scenarioCounts": [
@@ -4615,18 +4674,6 @@
     }
   ],
   "campaigns": [
-    {
-      "id": "the-hobbit",
-      "name": "The Hobbit",
-      "kind": "cycle",
-      "products": [
-        "The Hobbit: Over Hill and Under Hill",
-        "The Hobbit: On the Doorstep"
-      ],
-      "released": "2012-08-17",
-      "reason": "No source names the saga. Hall of Beorn lists the three scenarios of each of the two Hobbit saga boxes, which RingsDB numbers as cycle 40. The boxes have no Campaign Mode, so they are one cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 40; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
     {
       "id": "against-the-shadow",
       "name": "Against the Shadow",
@@ -4865,6 +4912,18 @@
       "pack": "EfKD",
       "reason": "DragnCards spells the pack's name without the accent (\"Escape from Khazad-dum\"); its rows' collector numbers (1 to 53) and names find the cards of EfKD, whose Hall of Beorn numbers they equal.",
       "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); data/raw/ringsdb/packs.json"
+    },
+    {
+      "dragncards": "The Hobbit - Over Hill and Under Hill",
+      "pack": "OHaUH",
+      "reason": "DragnCards names the pack \"The Hobbit - Over Hill and Under Hill\" (a hyphen) where Hall of Beorn's product is \"The Hobbit: Over Hill and Under Hill\", so the row's pack does not name the product. Its collector numbers and names are Hall of Beorn's own, so the row's number and name find the card in OHaUH (the rows Hall of Beorn gives no OCTGN guid: Come Down Little Bird, Not Fair! Not Fair!, Grip, grab! Pinch, nab!, The Great Goblin).",
+      "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); DragnCards preBuiltDecks.json (Q0A.1 to Q0A.3)"
+    },
+    {
+      "dragncards": "The Hobbit - On the Doorstep",
+      "pack": "OtD",
+      "reason": "DragnCards names the pack \"The Hobbit - On the Doorstep\" (a hyphen) where Hall of Beorn's product is \"The Hobbit: On the Doorstep\". Its collector numbers and names are Hall of Beorn's own, so the row's number and name find the card in OtD (the rows Hall of Beorn gives no OCTGN guid: The Spider's Glade, The Lonely Mountain).",
+      "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); DragnCards preBuiltDecks.json (Q0A.4 to Q0A.6)"
     }
   ],
   "dragnCardCodes": [
@@ -5272,6 +5331,12 @@
       "code": "147006",
       "reason": "Hall of Beorn's scenario file lists the quest cards of stages 1 and 2 only. The Wicked Willow (stage 3A, 3B, card 6 of 24 in the box; the stage 2B text advances to stage 3A) is a quest card of the encounter set, and DragnCards' deck Q99.04 deals it as the last quest stage.",
       "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
+    },
+    {
+      "scenario": "the-battle-of-five-armies",
+      "code": "132075",
+      "reason": "Hall of Beorn's scenario file lists the quest cards of stages 2 to 5 only. The Gathering of Clouds (stage 1A, card 75 of the box, DragnCards' \"The Gathering of the Clouds\") prints the Setup and is dealt as the first quest stage in DragnCards' deck Q0A.6.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Battle-of-Five-Armies; dragncards Q0A.6"
     }
   ]
 }

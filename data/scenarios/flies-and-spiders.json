@@ -1,0 +1,220 @@
+{
+  "id": "flies-and-spiders",
+  "name": "Flies and Spiders",
+  "number": 4,
+  "stages": [
+    "132067",
+    "132068",
+    "132069",
+    "132070"
+  ],
+  "encounterSets": [
+    {
+      "name": "Flies and Spiders",
+      "count": 28
+    },
+    {
+      "name": "Wilderland",
+      "count": 10
+    }
+  ],
+  "cards": [
+    {
+      "code": "132026",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "132027",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "132028",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "132029",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "132030",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "132031",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "132032",
+      "normal": 5,
+      "easy": 5,
+      "pile": "encounter"
+    },
+    {
+      "code": "132033",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "132034",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "132035",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "132036",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "132037",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "132038",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "132067",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "132068",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "132069",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "132070",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "132025",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "132019",
+      "normal": 3,
+      "easy": 3,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q0A.4",
+    "dragnEasy": "E0A.4",
+    "hobSlug": "Flies-and-Spiders"
+  },
+  "nightmare": {
+    "setupCard": "905801",
+    "removed": [
+      {
+        "code": "132026",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "132031",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "132032",
+        "copies": 5,
+        "pile": "encounter"
+      },
+      {
+        "code": "132035",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "132036",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "132037",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "905802",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "905803",
+        "copies": 5,
+        "pile": "encounter"
+      },
+      {
+        "code": "905804",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "905805",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "905806",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "905807",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "905808",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
+  }
+}

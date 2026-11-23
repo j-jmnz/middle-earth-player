@@ -1,0 +1,274 @@
+{
+  "id": "we-must-away-ere-break-of-day",
+  "name": "We Must Away, Ere Break of Day",
+  "number": 1,
+  "stages": [
+    "131023",
+    "131024",
+    "131025"
+  ],
+  "encounterSets": [
+    {
+      "name": "We Must Away, Ere Break of Day",
+      "count": 18
+    },
+    {
+      "name": "Western Lands",
+      "count": 14
+    }
+  ],
+  "cards": [
+    {
+      "code": "131036",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131038",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "131042",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131043",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131051",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131052",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "131053",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "131054",
+      "normal": 3,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "131035",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "131039",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131040",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "131041",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "131055",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "131056",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131057",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131023",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "131024",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "131025",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "131032",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "131033",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "131034",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "131037",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "131044",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "131045",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "131046",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "131047",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "131048",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "131049",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "131050",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q0A.1",
+    "dragnEasy": "E0A.1",
+    "hobSlug": "We-Must-Away,-Ere-Break-of-Day"
+  },
+  "nightmare": {
+    "setupCard": "905501",
+    "removed": [
+      {
+        "code": "131035",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "131038",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "131039",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "131040",
+        "copies": 1,
+        "pile": "encounter"
+      },
+      {
+        "code": "131052",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ],
+    "cards": [
+      {
+        "code": "905502",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "905503",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "905504",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "905505",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "905506",
+        "copies": 3,
+        "pile": "encounter"
+      },
+      {
+        "code": "905507",
+        "copies": 2,
+        "pile": "encounter"
+      },
+      {
+        "code": "905508",
+        "copies": 2,
+        "pile": "encounter"
+      }
+    ]
+  }
+}

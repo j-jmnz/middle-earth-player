@@ -1,4 +1,5 @@
 import { readDwarrowdelf } from "./setup-dwarrowdelf.ts";
+import { readHobbit } from "./setup-hobbit.ts";
 import { readShadowsOfMirkwood } from "./setup-shadows-of-mirkwood.ts";
 import { readStandaloneScenarios } from "./setup-standalone-scenarios.ts";
 import type { NameIndex, SetupClause } from "./setup-text.ts";
@@ -6,5 +7,5 @@ import type { NameIndex, SetupClause } from "./setup-text.ts";
 // The Setup sentences of the cycles' stage 1A cards (scripts/data/campaign-defs.ts, `kind: "cycle"`): each cycle has a reader of its own, and a sentence none of them reads
 // returns null for the other patterns. A cycle's reader is added here, and nowhere else in the Setup normaliser.
 export function readCycles(sentence: string, names: NameIndex): SetupClause[] | null {
-  return readShadowsOfMirkwood(sentence, names) ?? readDwarrowdelf(sentence, names) ?? readStandaloneScenarios(sentence, names);
+  return readShadowsOfMirkwood(sentence, names) ?? readDwarrowdelf(sentence, names) ?? readHobbit(sentence, names) ?? readStandaloneScenarios(sentence, names);
 }
