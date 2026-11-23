@@ -204,7 +204,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
     const base = printed.type === "ally" && instance.host != null && instance.zone !== "heroes" ? "attachment" : cardTypeOf(instance, printed);
     // An objective ally with printed combat stats (Mendor, 01135) a player controls is an ally in play (isAllyLike), and still an objective card.
     const type = base === "objective" && instance.zone === "play" && instance.host == null && isAllyLike(printed) ? "ally" : base;
-    // An Objective-Location counts as a location as the active location, travelled to, explored or in the victory display, and stays an objective in the staging area (docs/scenarios/ered-mithrin.md, Ered Mithrin): revealing one is no "revealed location".
+    // An Objective-Location counts as a location as the active location, travelled to, explored or in the victory display, and stays an objective in the staging area (docs/scenarios/ered-mithrin/lost-in-mirkwood.md, Lost in Mirkwood): revealing one is no "revealed location".
     const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type || (spec.type === "location" && printed.objectiveLocation && type === "objective" && instance.zone !== "staging") || (spec.type === "objective" && printed.type === "objective") || (spec.type === "attachment" && countsAsAttachment(state, id, ctx));
     if (!typed) return false;
   }
@@ -347,11 +347,11 @@ export function pickCandidates(
   event?: { subject?: string | null; other?: string | null; discards?: boolean },
 ): string[] {
   const found = candidatesOf(state, spec, seat, picked, sourceId, ctx, x, participants, counting, event);
-  // "The opposing team chooses" (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 3): the first of the cards the ranking fields left (with `highestThreat` on enemies, the one with the highest Attack among those level on Threat), the order of seats and then of play breaking a tie, and nobody is asked. A count is not a choice.
+  // "The opposing team chooses" (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, reading 3): the first of the cards the ranking fields left (with `highestThreat` on enemies, the one with the highest Attack among those level on Threat), the order of seats and then of play breaking a tie, and nobody is asked. A count is not a choice.
   if (spec.challenge !== true || counting) return found;
-  // "the highest Threat, then the highest Attack" (docs/scenarios/standalone-scenarios.md, The Woodland Realm, reading 3): level on Threat, the enemy with the highest Attack.
+  // "the highest Threat, then the highest Attack" (docs/scenarios/standalone-scenarios/the-woodland-realm.md, The Woodland Realm, reading 3): level on Threat, the enemy with the highest Attack.
   const level = spec.highestThreat === true && found.length > 1 ? tiedExtreme(found, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "attack", ctx.cards) : 0), "highest") : found;
-  // "the highest Attack, then the highest Threat" (docs/scenarios/standalone-scenarios.md, The Mines of Moria, reading 3: Denizen of the Deep): level on Attack, the enemy with the highest Threat.
+  // "the highest Attack, then the highest Threat" (docs/scenarios/standalone-scenarios/the-mines-of-moria.md, The Mines of Moria, reading 3: Denizen of the Deep): level on Attack, the enemy with the highest Threat.
   const levelAttack = spec.highestAttack === true && level.length > 1 ? tiedExtreme(level, (id) => (state.cards[id] ? modifiedStat(state, state.cards[id], "threat", ctx.cards) : 0), "highest") : level;
   return levelAttack.slice(0, 1);
 }

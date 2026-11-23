@@ -1,4 +1,4 @@
-// Rules: rr.guarded, rr.in-play-and-out-of-play, rr.reveal (data/rules/entries.json); ledger lines 51004:B:1, 51004:B:2, 51013:A:1, 51241:A:1 (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, readings 9 and 3; The Mines of Moria, readings 10 and 11).
+// Rules: rr.guarded, rr.in-play-and-out-of-play, rr.reveal (data/rules/entries.json); ledger lines 51004:B:1, 51004:B:2, 51013:A:1, 51241:A:1 (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, readings 9 and 3; The Mines of Moria, readings 10 and 11).
 // What the table says of the player cards Carried Away, Necromancer's Pass and Narrow Paths hold faceup under them, and of the cards Hidden Threat lays facedown under the main quest (src/play/readouts/standalone-scenarios/wizards-quest.ts). The engine decided who holds what; these only say it. Each sentence stays at about 25 words.
 
 import { plural } from "../../list.ts";

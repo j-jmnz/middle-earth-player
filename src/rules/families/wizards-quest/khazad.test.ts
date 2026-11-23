@@ -1,5 +1,5 @@
 // Rules: rr.explored, rr.search, rr.cancel, rr.shadow-effects, rr.defending-player, rr.damage, rr.engaged, rr.guarded, rr.step-6-2, rr.step-6-4-2, rr.victory, faq.additional-attacks (data/rules/entries.json); ledger lines 51301:B:1, 51304:B:1, 51307:A:1, 51307:B:2, 51308:B:1, 51308:B:2, 51309:B:2, 51320:A:2, 51324:A:1, 51335:A:2, 51340:A:1, 51342:A:2, 51348:A:2
-// (docs/scenarios/standalone-scenarios.md, Escape from Khazad-dûm). The pieces the scenario adds, on its own cards: Dark Pit's flip, A Wrong Turn's kept card, Durin's Bane's entry and its attacks on the stage, Fatigue's removed defender, Rock Adder's bar, Undisturbed Bones, Goblin Dungeon's ally, Black Uruks' dealt card and Chieftain of the Pit.
+// (docs/scenarios/standalone-scenarios/escape-from-khazad-dum.md, Escape from Khazad-dûm). The pieces the scenario adds, on its own cards: Dark Pit's flip, A Wrong Turn's kept card, Durin's Bane's entry and its attacks on the stage, Fatigue's removed defender, Rock Adder's bar, Undisturbed Bones, Goblin Dungeon's ally, Black Uruks' dealt card and Chieftain of the Pit.
 import { describe, expect, it } from "vitest";
 
 import { destroyCard, modifiedStat } from "../../core/keywords.ts";

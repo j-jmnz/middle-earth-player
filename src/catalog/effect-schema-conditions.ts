@@ -48,7 +48,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("lastPlayer") }),
   // The Embassy from the Dark Tower's pair the running effect is on (EmbassyNext): `pair`, there is one (its player card still lies faceup); `playable`, its player card can be played at no cost by its owner now (146072:B:1). Read by src/rules/families/black-gate/embassy.ts.
   z.strictObject({ kind: z.literal("embassy"), is: z.enum(["pair", "playable"]) }),
-  // The erech family's condition (src/rules/families/erech/index.ts). `night`: the Night objective lying beside the quest is Dusk, Midnight, or either ("Dusk. ...", "Midnight. ...", "Dusk/Midnight. ..."; docs/scenarios/standalone-scenarios.md, The Stone of Erech); false with none in play.
+  // The erech family's condition (src/rules/families/erech/index.ts). `night`: the Night objective lying beside the quest is Dusk, Midnight, or either ("Dusk. ...", "Midnight. ...", "Dusk/Midnight. ..."; docs/scenarios/standalone-scenarios/the-stone-of-erech.md, The Stone of Erech); false with none in play.
   z.strictObject({ kind: z.literal("night"), is: z.enum(["dusk", "midnight", "duskOrMidnight"]) }),
   // The mount-doom family's conditions (src/rules/families/mount-doom/conditions.ts). `lastFortitudeFailed`, `lastFortitudePassed`: the last Fortitude test the running effect made was failed, or passed ("If you fail this test", 146051:A:1; "If a player passes this test", 146076:B:1);
   // false before the effect has made one. `fortitudeFailed`: a player failed a Fortitude test this round, `who` the actor ("If you failed a Fortitude test this round", 146055:A:3) or any player ("If a player has failed a Fortitude test this round", 146046:A:1).
@@ -397,7 +397,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The player guarding Gollum may choose a new player now: no card says the guard cannot change and another player is still in the game ("must choose a new player to guard Gollum, if able", 02135:A:1; the option is offered only then, rr.effects). Read by the guardian family.
   z.strictObject({ kind: z.literal("guardianCanChange") }),
   // Progress was placed on the current quest card itself this phase, the overflow of an explored active location included ("if no progress was placed on the current quest this phase", 900501:A:4, `is: false`); read from the note the table's `noteQuestProgress` flag keeps (src/rules/families/wizardry/progress.ts).
-  // `min`: and at least that much progress was noted in all ("if 10 or more progress was placed here this phase", 51108:B:3, docs/scenarios/standalone-scenarios.md, The Woodland Realm, reading 14).
+  // `min`: and at least that much progress was noted in all ("if 10 or more progress was placed here this phase", 51108:B:3, docs/scenarios/standalone-scenarios/the-woodland-realm.md, The Woodland Realm, reading 14).
   z.strictObject({ kind: z.literal("questProgressNoted"), is: z.boolean(), min: z.number().int().positive().optional() }),
   z.strictObject({ kind: z.literal("soleAttacker") }),
   // The Captives in play (the Uruk-hai's heroes under To Isengard! or held by an enemy; src/rules/families/captives): at least `min` and at most `max` of them, or with `of: "actor"` only the acting seat's ("a seat with no Captive chooses one", 143069:A:1; "if there are no Captives in play", 143022:A:1).

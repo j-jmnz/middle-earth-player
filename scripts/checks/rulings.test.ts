@@ -19,7 +19,7 @@ import { NAME, ROOT, testFiles } from "./tracked.ts";
 const MISSES: Readonly<Record<string, number>> = {
   "docs/brief.md": 1, // 141017:A:3
   "docs/scenarios/ered-mithrin.md": 1, // 12168:B:1
-  "docs/scenarios/the-two-towers.md": 1, // 143071:B:1
+  "docs/scenarios/the-two-towers/the-uruk-hai.md": 1, // 143071:B:1
 };
 
 const TITLE = /\b(?:it|test|describe)(?:\.\w+)?\(\s*(["'`])((?:\\.|(?!\1)[^\\])*)\1/g;

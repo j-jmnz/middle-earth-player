@@ -61,9 +61,9 @@ export const printedKeywordsSchema = z.strictObject({
   // Battle / Siege on a quest card: committed characters count Attack / Defense instead of Willpower (hon.battle, hon.siege).
   battle: z.boolean().optional(),
   siege: z.boolean().optional(),
-  // The Siege value box an Attack on Dol Guldur card prints at its bottom right (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2): what a destroyed enemy or an explored location adds to the round's tally. A printed mark, not a quest-card flag.
+  // The Siege value box an Attack on Dol Guldur card prints at its bottom right (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2): what a destroyed enemy or an explored location adds to the round's tally. A printed mark, not a quest-card flag.
   siegeValue: z.number().int().positive().optional(),
-  // Pillage X on an enemy (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, reading 21): after the enemy's attack on a player has resolved, that player discards the top X cards of their deck (src/rules/families/sea/pillage.ts). Not in any source's keyword list for the box: `overrides.cards` sets it from the scan.
+  // Pillage X on an enemy (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, reading 21): after the enemy's attack on a player has resolved, that player discards the top X cards of their deck (src/rules/families/sea/pillage.ts). Not in any source's keyword list for the box: `overrides.cards` sets it from the scan.
   pillage: z.number().int().positive().optional(),
   // Secrecy X: the card costs X less to play while its player's threat is 20 or less.
   secrecy: z.number().int().positive().optional(),
@@ -79,13 +79,13 @@ export const printedKeywordsSchema = z.strictObject({
   uncharted: z.boolean().optional(),
   // Aflame X on a location (dcce.aflame): the damage that destroys it, and puts it facedown underneath The Havens Burn (src/rules/families/aflame/). A numbered keyword with a value of 0 does not exist.
   aflame: z.number().int().positive().optional(),
-  // Burn X on a location (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town): the burn damage "Resolve all burn damage" adds up (src/rules/families/smaug/). A numbered keyword with a value of 0 does not exist.
+  // Burn X on a location (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town): the burn damage "Resolve all burn damage" adds up (src/rules/families/smaug/). A numbered keyword with a value of 0 does not exist.
   burn: z.number().int().positive().optional(),
   // Grapple (highest or lowest printed Threat or quest points) on an enemy (dcce.grapple): the staging-area location it attaches to, facedown, when it is revealed (src/rules/families/grapple/).
   grapple: z.enum(["highestThreat", "lowestThreat", "highestQuestPoints", "lowestQuestPoints"]).optional(),
   // Phantom on an enemy (mec113.phantom): the damage its attack would deal is canceled and the defending player raises their threat by that much (src/rules/families/grey-company/).
   phantom: z.boolean().optional(),
-  // Spectral on an enemy (docs/scenarios/standalone-scenarios.md, The Stone of Erech): characters attacking it use their Willpower instead of their Attack to determine attack strength (src/rules/families/attack/spectral.ts).
+  // Spectral on an enemy (docs/scenarios/standalone-scenarios/the-stone-of-erech.md, The Stone of Erech): characters attacking it use their Willpower instead of their Attack to determine attack strength (src/rules/families/attack/spectral.ts).
   spectral: z.boolean().optional(),
   // Dire on a quest card (mec113.dire): while the main quest has it, each player's elimination level is 99, non-boon player card effects lower a player's threat by at most 1 each round and Valour triggers at 80 threat (src/rules/families/black-gate/dire.ts).
   dire: z.boolean().optional(),

@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, emce.discover, emce.loot, ltp.scoring, docs/scenarios/standalone-scenarios.md (The Ruins of Belegost) (data/rules/entries.json).
+// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, emce.discover, emce.loot, ltp.scoring, docs/scenarios/standalone-scenarios/the-ruins-of-belegost.md (The Ruins of Belegost) (data/rules/entries.json).
 import { describe, expect } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";

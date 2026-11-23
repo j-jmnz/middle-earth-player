@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town: the Smaug deck and Burn X, from the Quest Companion), rr.reveal, rr.damage, rr.attacks-outside-the-combat-phase (data/rules/entries.json); ledger lines 50201:A:1, 50205:A:2, 50211:A:1, 50202:B:2.
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town: the Smaug deck and Burn X, from the Quest Companion), rr.reveal, rr.damage, rr.attacks-outside-the-combat-phase (data/rules/entries.json); ledger lines 50201:A:1, 50205:A:2, 50211:A:1, 50202:B:2.
 // The verbs and hooks src/catalog/families/smaug.ts adds: the Smaug deck (deck.ts), burn damage (burn.ts), Smaug's attack against Lake-town (attack.ts), stage 2B's heal (stage.ts) and the Dock's split of progress (split.ts). The core calls the hooks (interpret/family-hooks.ts), not this file by name.
 import type { Instruction } from "../../../catalog/boundary.ts";
 

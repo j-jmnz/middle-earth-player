@@ -1,4 +1,4 @@
-// Rules: rr.attachment-cards, rr.cannot, rr.in-play-and-out-of-play (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Ruins of Belegost).
+// Rules: rr.attachment-cards, rr.cannot, rr.in-play-and-out-of-play (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-ruins-of-belegost.md (The Ruins of Belegost).
 // The enemies' attachment bars, which a card-spec row cannot read (ledger data/printed/standalone-scenarios.json): Lurker of the Depths' "Cannot have attachments.", and "Cannot have player card
 // attachments." on Nameless Cave Dweller and Old Stone Troll, on `attachBlocked`, the gate every attach passes. Each table is `tableFromLayout`; `lineSpec` runs the check again
 // without the records of its line, where it must fail. Each test title starts with the line id it tests.

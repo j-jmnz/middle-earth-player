@@ -11,7 +11,7 @@ import { idOf, resolveRecords } from "../../../../test/harness/scene-kit.ts";
 import { progressOf, revealAnswering, riddleTable, stacked } from "./fixture.ts";
 
 describe("Not Fair! Not Fair! (131084:A:1)", () => {
-  // rr.cannot: stage 2B's "cannot be ... removed ... except by answering riddles" is absolute and Not Fair! Not Fair! answers no riddle, so the discards happen and the progress stays (docs/scenarios/the-hobbit.md, Dungeons Deep and Caverns Dim).
+  // rr.cannot: stage 2B's "cannot be ... removed ... except by answering riddles" is absolute and Not Fair! Not Fair! answers no riddle, so the discards happen and the progress stays (docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md, Dungeons Deep and Caverns Dim).
   it("131084:A:1 discards the top 3 encounter cards and takes no progress off stage 2, whose bar holds against it", () => {
     const made = riddleTable({ deck: ["131074", "131079", "f0", "f0", "treachery", "f0", "f0"] });
     const state = updateCard(stacked(made.state, ["f0", "f0", "treachery"]), idOf(made.state, "131030"), { progress: 5 });

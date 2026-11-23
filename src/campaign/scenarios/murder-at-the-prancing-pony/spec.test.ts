@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.travel, rr.search, rr.immune, rr.cannot, rr.engaged, rr.in-play-and-out-of-play, rr.victory, rr.quest-advancement, rr.keywords, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (Murder at the Prancing Pony).
+// Rules: rr.forced, rr.travel, rr.search, rr.immune, rr.cannot, rr.engaged, rr.in-play-and-out-of-play, rr.victory, rr.quest-advancement, rr.keywords, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios/murder-at-the-prancing-pony.md (Murder at the Prancing Pony).
 import { describe, it } from "vitest";
 
 import { announce, answer, attack, cardSpecs, count, damageOn, defend, flag, handCount, quest, resolve, respond, reveal, offers, stat, stagingThreat, threat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";

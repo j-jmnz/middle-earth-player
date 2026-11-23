@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town), rr.travel, rr.active-location; ledger lines 50223:A:2, 50217:A:2.
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town), rr.travel, rr.active-location; ledger lines 50223:A:2, 50217:A:2.
 // Fisherman's Dock: with one active location the players may travel to it as a second active location (the exhaust is its cost); South Pier: while in play the players cannot travel to any other location.
 import { describe, expect, it } from "vitest";
 

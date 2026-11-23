@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.victory (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (Attack on Dol Guldur, The table); ledger lines 50907:A:1, 50931:A:1, 50931:B:1, 50931:B:3.
+// Rules: rr.forced, rr.victory (data/rules/entries.json); docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md (Attack on Dol Guldur, The table); ledger lines 50907:A:1, 50931:A:1, 50931:B:1, 50931:B:3.
 // The top-bar dial of Attack on Dol Guldur: the city strength, with the tally the end of a stage 3 round takes off.
 import { describe, expect, it } from "vitest";
 

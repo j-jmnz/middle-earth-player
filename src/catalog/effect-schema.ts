@@ -327,7 +327,7 @@ export const effectSchema = z.strictObject({
   byEncounterDeck: z.literal(true).optional(),
   // A "revealed" event is not heard when the card was found in the encounter discard pile by a search ("revealed from the encounter deck" counts a search of the deck, 09016:A:3).
   notFromDiscard: z.literal(true).optional(),
-  // This Forced effect resolves before the other Forced effects of the same moment, whatever the age of their cards (the engine resolves the oldest card's first): "after resolving the Forced effect on each stage 3 in play" (50907:A:1; docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 5).
+  // This Forced effect resolves before the other Forced effects of the same moment, whatever the age of their cards (the engine resolves the oldest card's first): "after resolving the Forced effect on each stage 3 in play" (50907:A:1; docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 5).
   early: z.literal(true).optional(),
   cancel: cancelSchema.optional(),
   // While this holds, nothing may cancel the effect ("If The One Ring is exhausted, this effect cannot be canceled").

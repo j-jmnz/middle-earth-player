@@ -73,7 +73,7 @@ export type ZoneName =
   // The Hard/Expert Mode card next to the quest deck, on the side the players chose (dcce.hard-expert): in play all game. A zone of its own, so
   // nothing that reads the Nightmare setup card reads it.
   | "modeCard"
-  // The Night objective beside the current quest (docs/scenarios/standalone-scenarios.md, The Stone of Erech): in play, controlled by nobody, one card at a time (families/erech/).
+  // The Night objective beside the current quest (docs/scenarios/standalone-scenarios/the-stone-of-erech.md, The Stone of Erech): in play, controlled by nobody, one card at a time (families/erech/).
   | "nightObjective"
   // The riddle area (hob.riddle-area, families/riddles/): stage 2 of Dungeons Deep and Caverns Dim and the Gollum enemy lie in it, in play, outside the staging area; the objective Ring is attached to Bilbo Baggins, who stays among his seat's heroes.
   | "riddleArea"

@@ -1,4 +1,4 @@
-// Rules: hob.riddle-area, hob.riddles, hob.riddles-steps-2-and-3 (data/rules/entries.json); ledger lines of the Dungeons Deep and Caverns Dim cards (docs/scenarios/the-hobbit.md, Dungeons Deep and Caverns Dim).
+// Rules: hob.riddle-area, hob.riddles, hob.riddles-steps-2-and-3 (data/rules/entries.json); ledger lines of the Dungeons Deep and Caverns Dim cards (docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md, Dungeons Deep and Caverns Dim).
 // The verbs and hooks src/catalog/families/riddles.ts adds: the riddle area (area.ts), answering a riddle (answer.ts), the riddle cards as they are revealed (reveal.ts), Gollum's attack on Bilbo and who may defend (gollum.ts) and the riddle conditions (conditions.ts).
 import type { Instruction } from "../../../catalog/boundary.ts";
 

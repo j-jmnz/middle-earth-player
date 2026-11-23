@@ -1,6 +1,6 @@
 // Rules: hob.riddle-area, hob.riddles (data/rules/entries.json); docs/scenarios/the-hobbit.md (Dungeons Deep and Caverns Dim); ledger lines 131029:A:1, 131030:A:1, 131030:B:2, 131030:B:3, 131031:B:1.
 //
-// The riddle area of Dungeons Deep and Caverns Dim on the table (docs/scenarios/the-hobbit.md, Dungeons Deep and Caverns Dim): stage 2, Riddles in the Dark, lies in a zone of its own with Gollum, and Bilbo Baggins stays among his seat's heroes with the Ring on him.
+// The riddle area of Dungeons Deep and Caverns Dim on the table (docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md, Dungeons Deep and Caverns Dim): stage 2, Riddles in the Dark, lies in a zone of its own with Gollum, and Bilbo Baggins stays among his seat's heroes with the Ring on him.
 // The stage is a top-bar dial: its progress against the 9 that completes it (the players' way out, so the ring never warms), and a tap shows the stage and Gollum. The seat that controls Bilbo wears a mark while he is in the area. The engine decided each number; nothing here changes one.
 // Empty in any other scenario and once stage 3 has taken stage 2 out of the area.
 import type { ScenarioState } from "../../../rules/core/state.ts";

@@ -3,7 +3,7 @@ import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 
 // Into the Pit Nightmare (deck 9010, data/printed/nightmare.json). The setup card counts the Cave Torch's exhausts and removes the Torch from the game at the 5th; side B is the recipe the build applies (Goblin Patrol leaves the quest deck and
 // Goblin Ambush takes stage 2). Patrol Sentry attacks when the Torch exhausts, Shadow Dweller and Goblin Lurker change what the Torch and the Dark locations do, and Twisting Shadows, Narrow Fissure and Shadow-fall count and make Dark locations.
-// Rules: rr.forced, rr.search, rr.first-player, faq.enemy-attacks-outside-combat, rr.attachment-cards, rr.destroy, dwd.cave-torch-the-long-dark (data/rules/entries.json); the readings are in docs/scenarios/dwarrowdelf.md (Into the Pit).
+// Rules: rr.forced, rr.search, rr.first-player, faq.enemy-attacks-outside-combat, rr.attachment-cards, rr.destroy, dwd.cave-torch-the-long-dark (data/rules/entries.json); the readings are in docs/scenarios/dwarrowdelf/into-the-pit.md (Into the Pit).
 const TORCH = "03041";
 const PATROL_SENTRY = "901003";
 const PATROL_LEADER = "03014";

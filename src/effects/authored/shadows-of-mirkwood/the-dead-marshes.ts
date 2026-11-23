@@ -3,7 +3,7 @@ import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 // Records for The Dead Marshes (Shadows of Mirkwood part 5, standalone, no campaign card). Every line is read from the scan ledger (data/printed/shadows-of-mirkwood.json). Gollum (02107) is an objective in the staging area that collects resource tokens
 // from the Escape cards and from the quest; at 8 he shuffles back into the encounter deck. The players escape by making escape tests (the escape family, src/rules/families/escape/): committed characters against the Escape on the cards dealt from the encounter deck. The last stage
 // holds the win until its own escape test is passed (the flag holdsWin) and resets the quest when it is failed.
-// Rules: sotm.escape-test, sotm.escape-test-example, sotm.reset-the-quest-deck, sotm.setup-the-dead-marshes, rr.then, rr.staging, rr.active-location, rr.first-player, rr.forced, rr.winning-the-game (data/rules/entries.json); the readings are in docs/scenarios/shadows-of-mirkwood.md (The Dead Marshes).
+// Rules: sotm.escape-test, sotm.escape-test-example, sotm.reset-the-quest-deck, sotm.setup-the-dead-marshes, rr.then, rr.staging, rr.active-location, rr.first-player, rr.forced, rr.winning-the-game (data/rules/entries.json); the readings are in docs/scenarios/shadows-of-mirkwood/the-dead-marshes.md (The Dead Marshes).
 const GOLLUM_CODE = "02107";
 const GOLLUM: PickSpec = { type: "objective", control: "any", names: ["Gollum"] };
 const GOLLUM_IN_PLAY: Condition = { kind: "canPick", pick: GOLLUM };
@@ -33,7 +33,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
 
   // 02106 The Capture (stage 2, the final stage). Forced: after it is defeated the first player chooses a player, who makes an escape test dealing 1 card for each resource token on Gollum. Failing resets the quest deck to stage 1B; with Gollum out of play there is nobody
-  // to capture, so the capture fails (docs/scenarios/shadows-of-mirkwood.md, The Dead Marshes). Passing wins the game (02106:B:2): the stage holds the win until then.
+  // to capture, so the capture fails (docs/scenarios/shadows-of-mirkwood/the-dead-marshes.md, The Dead Marshes). Passing wins the game (02106:B:2): the stage holds the win until then.
   {
     id: "02106:forced:1",
     cardCode: "02106",

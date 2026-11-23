@@ -1,4 +1,4 @@
-// Rules: rr.search, rr.reveal, rr.guarded, rr.engaged, rr.quest-advancement, rr.surge, rr.cancel, rr.travel (data/rules/entries.json); ledger lines 51201:B:2, 51201:B:3, 51203:B:1, 51205:B:1, 51211:A:3, 51240:A:1, 51241:A:1 (docs/scenarios/standalone-scenarios.md, The Mines of Moria, readings 7 to 11 and 13).
+// Rules: rr.search, rr.reveal, rr.guarded, rr.engaged, rr.quest-advancement, rr.surge, rr.cancel, rr.travel (data/rules/entries.json); ledger lines 51201:B:2, 51201:B:3, 51203:B:1, 51205:B:1, 51211:A:3, 51240:A:1, 51241:A:1 (docs/scenarios/standalone-scenarios/the-mines-of-moria.md, The Mines of Moria, readings 7 to 11 and 13).
 // The pieces The Mines of Moria adds, on the scenario's own cards: the Watcher's flip and the stage that advances after it, Hidden Threat's facedown card and its reveal, A Presence in the Dark's ranking of the top two cards, Narrow Paths' guarded attachments, Stairs of Náin's surge and the bar to travel to Chamber of Mazarbul.
 import { describe, expect, it } from "vitest";
 
