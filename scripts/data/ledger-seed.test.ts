@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { loadCards } from "./load-cards.ts";
 import { loadLedger, keyOf } from "./printed/ledger.ts";
-import { playerPackCodes } from "./printed/scope.ts";
+import { PLAYER_CODES, playerPackCodes, playerScopeCodes } from "./printed/scope.ts";
 import { indentOf, nightmareDeckCodes, pinnedScans, seedEntries, seedEntry, withSeeded } from "./ledger-seed.ts";
 
 // `pnpm data ledger-seed`: the entries a scenario's cards are missing, from the source text, readBy empty.
@@ -78,6 +78,13 @@ describe("ledger seed", () => {
     const types = new Set(codes.map((code) => cards.find((card) => card.code === code)?.type));
     expect([...types].every((type) => ["hero", "ally", "attachment", "event", "player-side-quest", "contract"].includes(type ?? ""))).toBe(true);
     expect(playerPackCodes(["no-such-pack"], cards)).toEqual([]);
+  });
+
+  it("names single player cards beside packs and refuses another card", () => {
+    expect(playerScopeCodes([], ["06107", "02033"], cards)).toEqual(["02033", "06107"]);
+    expect(playerScopeCodes(["HoN"], ["06107"], cards)).toContain("06107");
+    expect(() => playerScopeCodes([], ["141025"], cards)).toThrow(/Not a deck-legal player card/);
+    expect(PLAYER_CODES.every((code) => playerScopeCodes([], [code], cards).length === 1)).toBe(true);
   });
 
   it("seeds a player card from a pinned scan into a new file with the conventions", () => {

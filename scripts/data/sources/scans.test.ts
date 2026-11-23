@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { mergePins, packsArg } from "./scans.ts";
+import { codesArg, mergePins, packsArg } from "./scans.ts";
 
 // `pnpm data sync scans --pack <id>`: pins one pack's player cards without fetching the other scans again.
 describe("scan sync by pack", () => {
+  it("reads every --codes value, comma separated", () => {
+    expect(codesArg(["scans", "--codes", "06107,02033", "--pack", "HoN", "--codes", "17135"])).toEqual(["06107", "02033", "17135"]);
+    expect(codesArg(["scans", "--codes"])).toEqual([]);
+  });
+
   it("reads every --pack value", () => {
     expect(packsArg(["scans", "--pack", "OHaUH", "--verbose", "--pack", "HoN"])).toEqual(["OHaUH", "HoN"]);
     expect(packsArg(["scans", "--pack"])).toEqual([]);

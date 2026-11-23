@@ -90,12 +90,27 @@ export const PLAYER_REQUESTS = [
 // The packs whose deck-legal player cards the ledger holds (the pilot of reading every player card from its scan). A pack is added here when
 // `pnpm data sync scans --pack <id>` and `pnpm data ledger-seed --pack <id>` have run for it; the ledger file is data/printed/player-cards.json.
 export const PLAYER_PACKS: readonly string[] = ["OHaUH", "HoN"];
+// Single deck-legal player cards the ledger holds beside the packs (`--codes <code,...>` on the same two commands): the cards with errata, where the source text and
+// the printed card most often differ. A code is added here when `pnpm data sync scans --codes` and `pnpm data ledger-seed --codes` have run for it.
+export const PLAYER_CODES: readonly string[] = [
+  ...["02033", "02095", "02116", "03003", "03009", "04036", "04061", "04076", "04079", "04081"],
+  ...["04085", "04109", "04129", "04132", "06036", "06037", "06107", "08006", "08092", "12060"],
+  ...["12066", "12116", "132011", "132017", "17007", "17135", "19145", "19153", "22090"],
+];
 const PLAYER_CARD_TYPES: ReadonlySet<string> = new Set(["hero", "ally", "attachment", "event", "player-side-quest", "contract"]);
 
 /** The deck-legal player cards (hero, ally, attachment, event, player side quest, contract) a pack prints, by code. */
 export function playerPackCodes(packs: readonly string[], cards: readonly Card[] = loadCards()): string[] {
   const wanted = new Set(packs);
   return cards.filter((card) => card.deckLegal && PLAYER_CARD_TYPES.has(card.type) && card.printings.some((printing) => wanted.has(printing.pack))).map((card) => card.code).sort();
+}
+
+/** The deck-legal player cards of `packs` and the single `codes`, sorted and unique. A code that is no deck-legal player card is an error. */
+export function playerScopeCodes(packs: readonly string[], codes: readonly string[], cards: readonly Card[] = loadCards()): string[] {
+  const legal = new Set(playerPackCodes([...new Set(cards.flatMap((card) => card.printings.map((printing) => printing.pack)))], cards));
+  const bad = codes.filter((code) => !legal.has(code));
+  if (bad.length > 0) throw new Error(`Not a deck-legal player card in data/cards: ${bad.join(", ")}`);
+  return [...new Set([...playerPackCodes(packs, cards), ...codes])].sort();
 }
 
 // The codes of both starter lists, from the campaign file (data/starter-decks.json).
@@ -152,7 +167,7 @@ function nightmareDeckCodes(): string[] {
 }
 
 export function scopeCodes(): string[] {
-  return [...new Set<string>([...campaignCards(), ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaigns(), loadScenarios()), ...nightmareDeckCodes(), ...boxCodes(), ...starterCodes(), ...PLAYER_REQUESTS, ...playerPackCodes(PLAYER_PACKS)])].sort();
+  return [...new Set<string>([...campaignCards(), ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaigns(), loadScenarios()), ...nightmareDeckCodes(), ...boxCodes(), ...starterCodes(), ...PLAYER_REQUESTS, ...playerPackCodes(PLAYER_PACKS), ...PLAYER_CODES])].sort();
 }
 
 type HobImages = { CardSet: string; Slug: string; RingsDbCardId: string | null; Front: { ImagePath: string | null }; Back: { ImagePath: string | null } | null };
