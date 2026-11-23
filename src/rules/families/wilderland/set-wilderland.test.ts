@@ -4,7 +4,9 @@ import { describe, expect, it } from "vitest";
 
 import { answer, attack, cardSpecs, committed, defend, reveal, threat, type Row } from "../../../../test/harness/card-spec.ts";
 import { modifiedStat } from "../../core/keywords.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { expireModifiers } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { fightEnemy, first, idOf, legalIntents, revealedTop, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 const table = (layout = {}) => tableFromLayout("the-battle-of-five-armies", layout);
@@ -126,3 +128,42 @@ const ROWS: readonly Row[] = [
   { line: "132038:A:2", name: "a defender the attack destroys makes the defending player raise his threat by 5", layout: { play: ["ally"] }, act: [attack("132055", { shadow: "132038" }), defend("ally")], expect: threat(33) },
 ];
 cardSpecs("the-battle-of-five-armies", ROWS);
+
+// Two staging areas (mec109.multiple-staging-areas; The Breaking of the Fellowship's isolated areas): a seat in each.
+describe("Wilderland on a table with two staging areas (132035, 132038)", () => {
+  const apart = () => {
+    const made = tableFromLayout("the-battle-of-five-armies", { phase: "Quest", deck: ["132038", "f0"], seats: 2 });
+    return { ...made, state: { ...made.state, separate: true as const, isolated: true as const } };
+  };
+
+  it("132038:A:1 revealed to the first seat's staging area, it lowers only that seat's exhausted characters", () => {
+    const made = apart();
+    const heroes = [made.hero, made.seat1Hero!];
+    const read = (state: ScenarioState, id: string) => modifiedStat(state, state.cards[id]!, "willpower", made.ctx.cards);
+    const base = heroes.map((id) => read(made.state, id));
+    const revealed = revealedTop(made, "132038");
+    const exhausted = { ...revealed, cards: { ...revealed.cards, ...Object.fromEntries(heroes.map((id) => [id, { ...revealed.cards[id]!, exhausted: true }])) } };
+    expect(read(exhausted, heroes[0]!)).toBe(base[0]! - 1);
+    expect(read(exhausted, heroes[1]!)).toBe(base[1]);
+  });
+
+  // Bilbo (132001) as the seat's hero holding 2 Baggins resources; the first seat's staging area holds Hidden Path.
+  const withBilboAt = (bilboSeat: 0 | 1) => {
+    const made = tableFromLayout("the-battle-of-five-armies", { phase: "Travel", seats: 2, staging: ["132035"], play: ["132001"] });
+    const bilbo = first(made.state, "132001");
+    const path = first(made.state, "132035");
+    const seats = made.state.seats.map((seat, index) => (index === bilboSeat ? { ...seat, heroes: [...seat.heroes, bilbo] } : seat)) as unknown as typeof made.state.seats;
+    const cards = { ...made.state.cards, [bilbo]: { ...made.state.cards[bilbo]!, zone: "heroes" as const, controller: bilboSeat, resources: 2 } };
+    const apartState: ScenarioState = { ...made.state, seats, cards, separate: true, isolated: true };
+    const placed = moveCard(apartState, path, { zone: "staging", area: 0 });
+    return { made, state: placed, path };
+  };
+  const travels = (state: ScenarioState, ctx: ReturnType<typeof apart>["ctx"], path: string) => legalIntents(state, ctx).some((intent) => intent.type === "Travel");
+
+  it("132035:A:2 Hidden Path in the first seat's area is paid by a Baggins hero of that area, and not by one of the other seat's area", () => {
+    const own = withBilboAt(0);
+    expect(travels(own.state, own.made.ctx, own.path)).toBe(true);
+    const other = withBilboAt(1);
+    expect(travels(other.state, other.made.ctx, other.path)).toBe(false);
+  });
+});

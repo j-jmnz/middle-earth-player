@@ -19,7 +19,8 @@ import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import { printedOf, type Sphere } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { Discount, ScenarioState } from "../../core/state.ts";
-import { livingSeats, updateCard } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { sharing } from "../breaking/areas.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { attachTo } from "../../core/zones.ts";
 import { noteSpent, spentThisRound, spheresOf } from "./pay.ts";
@@ -93,7 +94,8 @@ export function discardResources(state: ScenarioState, instruction: Extract<Inst
 
 // The heroes whose resources can pay `sphere` for the actor, or for any player with `group`, and what they hold in all.
 export function spendablePools(state: ScenarioState, actor: number, spec: { sphere?: Sphere | undefined; group?: boolean | undefined }, ctx: ReduceContext): { pools: string[]; total: number } {
-  const seats = spec.group ? livingSeats(state) : [actor];
+  // `group`: the players who share the actor's staging area, all of them while the area is shared (hob.staging-area-creating: only players that share a staging area can interact).
+  const seats = spec.group ? sharing(state, actor) : [actor];
   const pools = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, spec.sphere ?? null, ctx));
   return { pools, total: pools.reduce((sum, id) => sum + (state.cards[id]?.resources ?? 0), 0) };
 }
