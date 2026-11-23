@@ -229,7 +229,7 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
   132066:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area)): each player raises their threat by 3 from the doomed keyword this card gains (doomedRaised is announced for each)
-    - then, if there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area) (checked when this step runs, after the steps above; not tied to whether they did anything): the first player chooses a quest stage in play other than the current quest stage to be the current quest stage until the end of the round
+    - then, if there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area) (checked when this step runs, after the steps above; not tied to whether they did anything): the first player chooses a quest card other than the current quest (the main quest card, a quest stage in play together, or a side quest in the staging area) to be the current quest until the end of the round
 
 ## 132075 The Gathering of the Clouds
 (the scenario deals it into the quest pile; the piles place it, no record does)

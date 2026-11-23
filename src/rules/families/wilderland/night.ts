@@ -54,11 +54,11 @@ export function askCurrentQuest(state: ScenarioState, ctx: ReduceContext, steps:
 /** The option of the first player's question that leaves the main quest as the quest. */
 export const MAIN_QUEST = "main";
 
-/** MakeCurrentQuest: the side quest is the current quest until the end of the phase; the cards that hear it ("After Draw Her Fire becomes the current quest") are told. */
-export function makeCurrentQuest(state: ScenarioState, instruction: Verb<"MakeCurrentQuest">, ctx: ReduceContext): ScenarioState {
+/** MakeCurrentQuest: the side quest is the current quest until the end of the phase (`until`: the end of the round, for a card that says so, 132066:A:2); the cards that hear it ("After Draw Her Fire becomes the current quest") are told. */
+export function makeCurrentQuest(state: ScenarioState, instruction: Verb<"MakeCurrentQuest">, ctx: ReduceContext, until: "endOfPhase" | "endOfRound" = "endOfPhase"): ScenarioState {
   const card = state.cards[instruction.card];
   if (!card || card.zone !== "staging" || !isSideQuest(state, card.id, ctx)) return state;
-  const marked: ScenarioState = { ...state, modifiers: [...state.modifiers, { instanceId: card.id, sourceId: card.id, stat: "currentQuest", amount: 1, until: "endOfPhase" }] };
+  const marked: ScenarioState = { ...state, modifiers: [...state.modifiers, { instanceId: card.id, sourceId: card.id, stat: "currentQuest", amount: 1, until }] };
   return queueEvent(marked, { trigger: "becameCurrentQuest", seat: null, cardId: card.id, subject: card.id });
 }
 
