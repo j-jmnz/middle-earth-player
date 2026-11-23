@@ -96,6 +96,20 @@ describe("Bilbo Baggins follows the first player token (hob.bilbo-multiplayer-oh
     expect(passed.lost).toBeFalsy();
   });
 
+  it.each([["143001"], ["145001"], ["146002"]])("%s:A:1 a player whose last hero is Aragorn is eliminated when the first player token passes him on (mec113.multiplayer-aragorn, mec112.aragorn)", (code) => {
+    const aragorn = miscCtx([...RECORDS]);
+    const table = seat(2, ["rohan"]);
+    const made = put(table.state, code, "heroes", 0);
+    const lone = table.heroes[0] ?? "";
+    const base = syncConstants(made.state, aragorn);
+    const without = { ...base, seats: [{ ...base.seats[0], heroes: base.seats[0].heroes.filter((id) => id !== lone) }, base.seats[1]] as typeof base.seats, cards: Object.fromEntries(Object.entries(base.cards).filter(([id]) => id !== lone)) };
+    const passed = run({ ...without, firstPlayer: 1 }, aragorn);
+    expect(passed.cards[made.id]?.controller).toBe(1);
+    expect(passed.seats[0]?.eliminated).toBe(true);
+    expect(passed.seats[1]?.eliminated).toBe(false);
+    expect(passed.lost).toBeFalsy();
+  });
+
   it("132001:A:1 a player with another hero is not eliminated when Bilbo passes on", () => {
     const { state } = twoSeats("132001");
     const passed = run({ ...state, firstPlayer: 1 }, ctx);

@@ -17,3 +17,9 @@ export const HOBBIT_TREASURE_ASKS: Readonly<Record<string, Ask>> = {
   // 132022:A:3 (Thrór's Battle Axe): 1 damage to another enemy engaged with the player.
   "132022:response:1 @0 Pick": { owned: true, note: "{card}: choose another enemy engaged with you to take 1 damage.", verb: "Damage" },
 };
+
+// The tables a scenario of the cycle spreads and the card that makes it need one: the hero that is its `sagaStart`, or the treasure in its `treasures` (read by `pnpm scenario new`, scripts/tools/scenario-new-files.ts).
+export const HOBBIT_ASK_TABLES: readonly { name: "HOBBIT_BILBO_ASKS" | "HOBBIT_TREASURE_ASKS"; hero?: string; treasure?: string }[] = [
+  { name: "HOBBIT_BILBO_ASKS", hero: "132001" },
+  { name: "HOBBIT_TREASURE_ASKS", treasure: "132020" },
+];
