@@ -7,7 +7,7 @@ import type { Effect } from "../../src/catalog/boundary.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 
 import { loadRenderEnv } from "../data/effects/render/scenario.ts";
-import { keyOf } from "../data/printed/ledger.ts";
+import { printedLine } from "../data/printed/ledger.ts";
 import { enemyZoneFindings, limitFindings, testTitles, thenFindings, type Finding, type TextOf } from "./record-readings.ts";
 import { LIMIT_TESTS_OPEN } from "./record-readings-limit-open.ts";
 import { ROOT, tracked } from "./tracked.ts";
@@ -71,10 +71,7 @@ const writeLimitOpen = (ids: readonly string[]): void => {
 };
 
 const env = loadRenderEnv();
-const textOf: TextOf = (id) => {
-  const [code = "", side = "", n = "0"] = id.split(":");
-  return env.ledger.byKey.get(keyOf(code, side))?.lines[Number(n) - 1] ?? "";
-};
+const textOf: TextOf = (id) => printedLine(env.ledger, id) ?? "";
 
 type Json = Record<string, unknown>;
 const record = (over: Omit<Partial<Effect>, "instructions"> & { id: string; instructions: unknown[] }): Effect => ({ cardCode: "9", lines: [over.id.replace(/:[a-z]+:\d+$/i, ":A:1")], timing: "action", ...over }) as unknown as Effect;

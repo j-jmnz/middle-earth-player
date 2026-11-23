@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, lstatSync, symlinkSync, unlinkSync } from "node:fs";
+import { existsSync, lstatSync, readlinkSync, symlinkSync, unlinkSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -13,8 +13,8 @@ import { duration, runScript, type Log } from "../log.ts";
 //   pnpm worktree remove <branch> [--force]     removes that folder (git refuses one with changes unless --force); the branch stays
 //
 // What a folder made by hand lacks, and what `add` does about it:
-//   node_modules      `pnpm install --frozen-lockfile --prefer-offline` in the folder: the store is shared, so each package is a hard link and nothing is downloaded. A link to this folder's
-//                     node_modules is not an install: git lists the link as a file (the `node_modules/` ignore line matches folders only), which private-data.test.ts then reads.
+//   node_modules      `pnpm install --frozen-lockfile --prefer-offline` in the folder: the store is shared, so each package is a hard link and nothing is downloaded. The folder holds its own
+//                     install, so a `pnpm install` or a package change in one folder never changes the packages of the other.
 //   docs/INDEX.md     written by the install's prepare script (`pnpm doc index`), and again by the checkout hook.
 //   core.hooksPath    the repository's config is shared by its worktrees and names .githooks, which every checkout holds; `add` sets it when it is missing.
 //   .cache            linked to this folder's .cache (the pinned PDFs and scans `pnpm data sync` fills and `pnpm assets scans` reads; no test reads it). It is ignored by name, never copied, never committed.
@@ -103,14 +103,24 @@ function add({ branch, base }: Args, log: Log): void {
   log.notice(`ready in ${duration(performance.now() - begin)}: cd ${folder}; push with git push -u origin ${branch}; remove with pnpm worktree remove ${branch}`);
 }
 
+/**
+ * Removes the worktree at `folder` of the repository at `repo`. The `.cache` link is taken away first, so no tool follows it into the folder it points to; when git refuses (the folder has
+ * uncommitted work and `force` is not set), the link is made again, so a refused remove leaves the folder as it was.
+ */
+export function removeWorktree(repo: string, folder: string, force: boolean): void {
+  const cache = path.join(folder, ".cache");
+  const target = existsSync(cache) && lstatSync(cache).isSymbolicLink() ? readlinkSync(cache) : null;
+  if (target !== null) unlinkSync(cache);
+  const removed = git(["worktree", "remove", ...(force ? ["--force"] : []), folder], repo);
+  if (removed.ok) return;
+  if (target !== null && existsSync(folder)) symlinkSync(target, cache, "dir");
+  throw new Error(`${removed.err}\n(the folder has changes: commit and push them, or use --force)`);
+}
+
 function remove({ branch, force }: Args, log: Log): void {
   const found = parseWorktrees(mustGit(["worktree", "list", "--porcelain"])).find((one) => one.branch === branch && path.resolve(one.path) !== path.resolve(ROOT));
   if (!found) throw new Error(`no worktree of this repository is on ${branch}`);
-  // A link is removed first, so no tool follows it into the folder it points to.
-  const cache = path.join(found.path, ".cache");
-  if (existsSync(cache) && lstatSync(cache).isSymbolicLink()) unlinkSync(cache);
-  const removed = git(["worktree", "remove", ...(force ? ["--force"] : []), found.path]);
-  if (!removed.ok) throw new Error(`${removed.err}\n(the folder has changes: commit and push them, or use --force)`);
+  removeWorktree(ROOT, found.path, force);
   log.info(`removed ${found.path}; the branch ${branch} stays`);
 }
 

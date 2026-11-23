@@ -7,8 +7,8 @@ import { EFFECTS } from "../../src/effects/index.ts";
 import { parseArgs } from "../cli-args.ts";
 import { loadAnyScenario } from "../data/load-scenarios.ts";
 import { ROOT } from "../data/paths.ts";
-import { keyOf } from "../data/printed/ledger.ts";
-import { loadRenderEnv, type RenderEnv } from "../data/effects/render/scenario.ts";
+import { printedLine } from "../data/printed/ledger.ts";
+import { loadRenderEnv } from "../data/effects/render/scenario.ts";
 import { namedInTests } from "../checks/tracked.ts";
 import { runScript, type Log } from "../log.ts";
 import { scenarioCodes, unnamedOfScenario } from "./test-scenario.ts";
@@ -19,8 +19,9 @@ import { scenarioCodes, unnamedOfScenario } from "./test-scenario.ts";
 //
 // One stub for each record of the scenario's cards that no test names (scripts/checks/line-coverage.ts, unnamedRecords: not by the record's id, not by one of its lines), grouped by
 // card, in src/campaign/scenarios/<id>/spec.test.ts (created when the file is missing, else extended before the end of its ROWS array). Records that share a line share a stub. A stub is a
-// row with a `todo` (test/harness/card-spec.ts, stubProblem): `cardSpecs` fails it, so `pnpm test scenario <id>` fails while one is left, and the stub cannot be committed as a test. It
-// names its line id, so the next run writes nothing for it: a row or test that exists is never replaced.
+// row with a `todo` (test/harness/card-spec.ts, stubProblem): `cardSpecs` fails it, so `pnpm test scenario <id>` fails while one is left. A stub counts as no name: the coverage checks read
+// the tests without their stub rows and the `// <line> printed:` and `// records` comments (scripts/checks/tracked.ts, withoutStubs), so the records stay unnamed until the row is filled and
+// its `todo` deleted. A line that has a row in the file already, stub or not, gets no second stub, so a run twice writes nothing new. The author keeps or deletes the two comments.
 
 export const SCENARIO_TESTS_USAGE = "usage: pnpm scenario tests <scenario-id> [--dry-run]";
 
@@ -44,6 +45,15 @@ export function stubsFor(effects: readonly Effect[], unnamed: readonly string[],
 
 const oneLine = (text: string): string => text.replace(/\s+/g, " ").trim();
 
+/** The first `max` characters of `text` cut at a word (the whole text when it fits, a single long word cut as it stands). */
+export function cutAtWord(text: string, max: number): string {
+  const one = oneLine(text);
+  if (one.length <= max) return one;
+  const cut = one.slice(0, max + 1);
+  const space = cut.lastIndexOf(" ");
+  return (space > 0 ? cut.slice(0, space) : cut.slice(0, max)).replace(/[\s,;:]+$/, "");
+}
+
 /** The text of the stubs, as rows of a ROWS array, a heading comment for each card. */
 export function renderStubs(stubs: readonly Stub[]): string {
   const out: string[] = [];
@@ -58,7 +68,7 @@ export function renderStubs(stubs: readonly Stub[]): string {
     out.push(`  // ${stub.line} printed: ${oneLine(stub.text)}`);
     out.push(`  // records ${stub.records.map((record) => record.id).join(", ")}; timing ${timings}`);
     const todo = `write the row from the printed line (${stub.records.length} record${stub.records.length === 1 ? "" : "s"}, timing ${timings})`;
-    out.push(`  { line: ${JSON.stringify(stub.line)}, name: ${JSON.stringify(oneLine(stub.text).slice(0, 70))}, todo: ${JSON.stringify(todo)}, layout: {}, act: [], expect: [] },`);
+    out.push(`  { line: ${JSON.stringify(stub.line)}, name: ${JSON.stringify(cutAtWord(stub.text, 70))}, todo: ${JSON.stringify(todo)}, layout: {}, act: [], expect: [] },`);
   }
   return out.join("\n");
 }
@@ -98,21 +108,16 @@ else describe("${id} card specs", () => it.todo("a row for each record whose beh
 export type Plan = { file: string; text: string; stubs: Stub[]; created: boolean } | { file: string; stubs: []; problem: string | null };
 
 /** What a run writes: the stubs for the unnamed records, in the spec file `source` holds (null: none yet). */
-export function planTests(id: string, name: string, source: string | null, stubs: readonly Stub[]): Plan {
+export function planTests(id: string, name: string, source: string | null, wanted: readonly Stub[]): Plan {
   const file = `src/campaign/scenarios/${id}/spec.test.ts`;
+  // A line with a row in the file (a stub of an earlier run, or a row the author wrote) gets none.
+  const stubs = wanted.filter((stub) => !(source ?? "").includes(`line: ${JSON.stringify(stub.line)}`));
   if (stubs.length === 0) return { file, stubs: [], problem: null };
   const block = renderStubs(stubs);
   if (source === null) return { file, text: newSpecFile(id, name, block), stubs: [...stubs], created: true };
   const text = extendSpec(source, block);
   if (text === null) return { file, stubs: [], problem: `${file} has no \`const ROWS: readonly Row[] = [\` array to extend: add the rows by hand` };
   return { file, text, stubs: [...stubs], created: false };
-}
-
-function textFrom(env: RenderEnv): (line: string) => string | undefined {
-  return (line) => {
-    const [code = "", side = "", n = ""] = line.split(":");
-    return env.ledger.byKey.get(keyOf(code, side))?.lines[Number(n) - 1];
-  };
 }
 
 function main(log: Log): void {
@@ -127,14 +132,15 @@ function main(log: Log): void {
   const scenario = loadAnyScenario(id);
   const env = loadRenderEnv();
   const unnamed = unnamedOfScenario(scenarioCodes(id), EFFECTS, namedInTests());
-  const stubs = stubsFor(EFFECTS, unnamed, textFrom(env), (code) => env.byCode.get(code)?.name ?? code);
+  const stubs = stubsFor(EFFECTS, unnamed, (line) => printedLine(env.ledger, line), (code) => env.byCode.get(code)?.name ?? code);
   const target = path.join(ROOT, `src/campaign/scenarios/${id}/spec.test.ts`);
   const plan = planTests(id, scenario.name, existsSync(target) ? readFileSync(target, "utf8") : null, stubs);
   if ("problem" in plan) {
     if (plan.problem) {
       log.error(plan.problem);
       process.exitCode = 1;
-    } else log.info(`${id}: every record of the scenario's cards is named by a test; nothing to write`);
+    } else if (unnamed.length > 0) log.info(`${id}: ${unnamed.length} records have only a stub row (or none in this file): fill each stub from its printed line and delete its todo; nothing new to write`);
+    else log.info(`${id}: every record of the scenario's cards is named by a test; nothing to write`);
     return;
   }
   log.info(`${dry ? "would write" : "writing"} ${plan.stubs.length} stubs for ${new Set(plan.stubs.map((stub) => stub.code)).size} cards to ${plan.file}${plan.created ? " (new file)" : ""}:`);

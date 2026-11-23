@@ -1,10 +1,10 @@
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
-import os from "node:os";
+import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { flagValue } from "../../args.ts";
 import { runScript, type Log } from "../../log.ts";
+import { withBaseCheckout } from "../../tools/base-checkout.ts";
 import { ROOT } from "../paths.ts";
 import { formatChanges, reaching, type Dump } from "./reach-diff.ts";
 
@@ -18,12 +18,6 @@ import { formatChanges, reaching, type Dump } from "./reach-diff.ts";
 
 const USAGE = "Usage: effects reach <base-ref> [--out <file>] [--tmp <dir>]";
 
-function git(args: readonly string[], cwd = ROOT): string {
-  const run = spawnSync("git", args, { cwd, encoding: "utf8" });
-  if (run.status !== 0) throw new Error(`git ${args.join(" ")}: ${run.stderr.trim() || `exit ${run.status}`}`);
-  return run.stdout.trim();
-}
-
 function dump(cwd: string, out: string, log: Log): Dump {
   const run = spawnSync(process.execPath, ["scripts/data/effects/reach-dump.ts", out], { cwd, encoding: "utf8", env: { ...process.env, LOG_LEVEL: "warn" } });
   if (run.status !== 0) throw new Error(`The render in ${cwd} failed:\n${run.stderr.trim().split("\n").slice(-12).join("\n")}`);
@@ -36,32 +30,17 @@ async function main(log: Log): Promise<void> {
   const ref = args.find((arg, at) => !arg.startsWith("--") && !["--out", "--tmp"].includes(args[at - 1] ?? ""));
   if (!ref) throw new Error(USAGE);
   const out = flagValue(args, "--out");
-  const resolved = git(["rev-parse", "--verify", `${ref}^{commit}`]);
-  const parent = flagValue(args, "--tmp") ?? os.tmpdir();
-  mkdirSync(parent, { recursive: true });
-  const work = mkdtempSync(path.join(parent, "reach-"));
-  const base = path.join(work, "base");
-  try {
-    git(["worktree", "add", "--detach", base, resolved]);
-    // The base checkout runs on this checkout's installed packages and the render script of this tree.
-    symlinkSync(path.join(ROOT, "node_modules"), path.join(base, "node_modules"), "dir");
-    for (const file of ["scripts/data/effects/reach-dump.ts", "scripts/data/effects/reach-diff.ts"]) {
-      mkdirSync(path.dirname(path.join(base, file)), { recursive: true });
-      if (!existsSync(path.join(ROOT, file))) throw new Error(`${file} is missing`);
-      copyFileSync(path.join(ROOT, file), path.join(base, file));
-    }
-    const before = await log.stepAsync(`rendering ${ref} (${resolved.slice(0, 8)})`, async () => dump(base, path.join(work, "base.json"), log));
-    const after = await log.stepAsync("rendering the working tree", async () => dump(ROOT, path.join(work, "now.json"), log));
-    const report = formatChanges(reaching(before, after), ref);
-    if (out) {
-      writeFileSync(out, report);
-      log.info(`wrote ${out}`);
-    } else process.stdout.write(report);
-  } finally {
-    spawnSync("git", ["worktree", "remove", "--force", base], { cwd: ROOT });
-    spawnSync("git", ["worktree", "prune"], { cwd: ROOT });
-    rmSync(work, { recursive: true, force: true });
-  }
+  // The base checkout runs on this checkout's installed packages and the render scripts of this tree.
+  const copy = ["scripts/data/effects/reach-dump.ts", "scripts/data/effects/reach-diff.ts"];
+  const report = await withBaseCheckout(ref, { prefix: "reach-", parent: flagValue(args, "--tmp"), copy }, async (base) => {
+    const before = await log.stepAsync(`rendering ${ref} (${base.sha.slice(0, 8)})`, async () => dump(base.checkout, path.join(base.work, "base.json"), log));
+    const after = await log.stepAsync("rendering the working tree", async () => dump(ROOT, path.join(base.work, "now.json"), log));
+    return formatChanges(reaching(before, after), ref);
+  });
+  if (out) {
+    writeFileSync(out, report);
+    log.info(`wrote ${out}`);
+  } else process.stdout.write(report);
 }
 
 void runScript("effects:reach", main);

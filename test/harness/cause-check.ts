@@ -4,7 +4,7 @@ import { EFFECTS } from "../../src/effects/index.ts";
 import type { EngineStep } from "../../src/rules/core/intents.ts";
 import { UNATTRIBUTED, type Cause } from "../../src/rules/core/cause.ts";
 
-import { keyOf, loadLedger } from "../../scripts/data/printed/ledger.ts";
+import { loadLedger, printedLine } from "../../scripts/data/printed/ledger.ts";
 
 // Test helper. Every step that changes a number says why: its cause is a rule span in data/rules, or an effect record
 // with one of its printed ledger lines. `causeProblems` lists the steps that fail that, so a card-effect test can call
@@ -23,8 +23,7 @@ export function verified(cause: Cause | undefined): string | null {
   const effect = EFFECTS.find((candidate) => candidate.id === cause.effect);
   if (!effect) return `names ${cause.effect}, which is not an effect record`;
   if (!effect.lines.includes(cause.line)) return `names line ${cause.line}, which ${cause.effect} does not implement`;
-  const [code, side, n] = cause.line.split(":");
-  return ledger.byKey.get(keyOf(code ?? "", side ?? ""))?.lines[Number(n) - 1] ? null : `names line ${cause.line}, which is not in the ledger`;
+  return printedLine(ledger, cause.line) ? null : `names line ${cause.line}, which is not in the ledger`;
 }
 
 export function causeProblems(steps: readonly EngineStep[]): string[] {
