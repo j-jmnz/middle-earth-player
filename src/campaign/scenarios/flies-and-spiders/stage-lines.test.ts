@@ -114,7 +114,7 @@ lineSpec("132069:A:1", "every resource is removed from each hero's pool, Bilbo's
   expect(state.cards[t.seat1Hero ?? ""], "the other player's hero is not touched").toMatchObject({ resources: 2 });
   expect(state.cards[t.seat1Hero ?? ""]?.unconscious).toBeUndefined();
 });
-// FAULT-free reading (docs/scenarios/the-hobbit.md, Flies and Spiders, Stage 3, "Then"): an empty pool is all removed, so the second sentence resolves.
+// FAULT-free reading (docs/scenarios/the-hobbit/flies-and-spiders.md, Flies and Spiders, Stage 3, "Then"): an empty pool is all removed, so the second sentence resolves.
 lineSpec("132069:A:1", "with every resource pool already empty the characters are still made unconscious (Then: removing all of none resolves in full)", (effects) => {
   const { t, state, bilbo } = captured(effects, 0, 1);
   for (const id of [t.hero, t.hero2]) expect(state.cards[id]?.unconscious).toBe(true);

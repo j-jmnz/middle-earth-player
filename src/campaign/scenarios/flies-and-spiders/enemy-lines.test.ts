@@ -40,7 +40,7 @@ lineSpec("132031:A:1", "Venom: a defended attack with no damage gives no poison,
   expect(bare.run.state.cards[bare.made.hero]?.damage).toBe(1);
   expect(poisonOf(bare.run.state, bare.made.hero), "1 damage, 1 poison").toBe(1);
 });
-lineSpec("132028:A:1", "Venom: a character the damage destroys gets no poison (docs/scenarios/the-hobbit.md, Flies and Spiders)", (effects) => {
+lineSpec("132028:A:1", "Venom: a character the damage destroys gets no poison (docs/scenarios/the-hobbit/flies-and-spiders.md, Flies and Spiders)", (effects) => {
   const out = fight(effects, "132028", { undefended: true, damage: 2 });
   expect(out.run.state.cards[out.made.hero]?.zone, "5 damage on 2 damage of 6 hit points destroys it").not.toBe("heroes");
   expect(total(out.run.state)).toBe(0);

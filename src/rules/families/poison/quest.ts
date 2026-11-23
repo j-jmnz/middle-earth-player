@@ -14,7 +14,7 @@ export function removeFromQuest(state: ScenarioState, id: string, ctx: ReduceCon
   return card?.committed ? queueHeard(forgetCommitted(updateCard(state, id, { committed: false }), id), ctx, { trigger: "removedFromQuest", seat: card.controller, subject: id }) : state;
 }
 
-/** Settle sweep: a committed character that cannot quest any more (it is unconscious, or a card bars it, as Forest Stream bars a poisoned one) is removed from the quest and adds no Willpower (agent recommendation, docs/scenarios/the-hobbit.md, Flies and Spiders, Unconscious). */
+/** Settle sweep: a committed character that cannot quest any more (it is unconscious, or a card bars it, as Forest Stream bars a poisoned one) is removed from the quest and adds no Willpower (agent recommendation, docs/scenarios/the-hobbit/flies-and-spiders.md, Flies and Spiders, Unconscious). */
 export function sweepCommitted(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   let next = state;
   for (const card of Object.values(state.cards)) {

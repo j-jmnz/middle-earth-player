@@ -3,7 +3,7 @@ import type { Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts
 import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for Flies and Spiders (The Hobbit: On the Doorstep, deck Q0A.4): the 28 cards of its own set (132025 to 132034) and its four quest stages (132067 to 132070). The Wilderland set (132035 to 132038) belongs to the scenarios
-// that share it. Poison, Venom and the unconscious state are the poison family's (src/rules/families/poison, src/catalog/families/poison.ts); the readings are in docs/scenarios/the-hobbit.md, Flies and Spiders.
+// that share it. Poison, Venom and the unconscious state are the poison family's (src/rules/families/poison, src/catalog/families/poison.ts); the readings are in docs/scenarios/the-hobbit/flies-and-spiders.md, Flies and Spiders.
 // Every "player", "character" and "hero" of an encounter card is one of the players who share its staging area (`atStage`) once the stage splits the players (hob.staging-area-creating).
 // Rules: hob.venom-poison, hob.unconscious-characters, hob.staging-area-creating, hob.staging-area-combining, hob.setup-flies-and-spiders, hob.immune-to-player-card-effects, rr.forced, rr.response, rr.active-location, rr.explored, rr.first-player,
 // rr.defending-player, rr.attachment-cards, rr.reveal, rr.staging, rr.damage, rr.action, rr.cannot, rr.resources, rr.effects, mec109.multiple-staging-areas (data/rules/entries.json).
