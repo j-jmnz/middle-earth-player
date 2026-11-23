@@ -29,7 +29,7 @@ export const RULE_PDFS = [
   { doc: "easy-mode", file: "lotr_easy_mode.pdf", url: `${FFG}/lotr_easy_mode.pdf` },
   // Official decklists: each product's rules insert prints its pre-built or suggested decks. Only the decklist pages are
   // extracted (`only` in data/rules/columns.json). hon and wor are read for their keyword rules (battle, siege,
-  // guarded (X)), not for decklists.
+  // guarded (X)), not for decklists (hon also for its three scenarios' setup pages).
   ...[
     ["mec103", "mec103_rules.pdf"],
     ["mec104", "mec104_rules.pdf"],
@@ -76,6 +76,16 @@ export const RULE_PDFS = [
     ["fos", "13", "mec13_foundations_of_stone_rulesheet.pdf"],
     ["saf", "14", "mec14_shadow_and_flame_rulesheet.pdf"],
   ].map(([doc, number, file]) => ({ doc: doc as string, file: file as string, url: `https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/MEC${number as string}.pdf` })),
+  // Against the Shadow's Adventure Pack rulesheets (MEC18 to MEC23): the scenario's encounter sets, its setup paragraph and the keywords it introduces. A page of two columns each; the FFG PDFs have a text
+  // layer (the Hall of Beorn MEC18 to MEC23 copies are scans with noisy OCR). The Heirs of Númenor insert (`hon`, above) holds the deluxe expansion's three scenarios.
+  ...[
+    ["tsf", "mec18-the-stewards-fear-rulesheet.pdf"],
+    ["tdf", "mec19-the-druadan-forest-rulesheet.pdf"],
+    ["eaad", "rulesheet-encounter-at-amon-din.pdf"],
+    ["aoo", "rulesheet-assault-on-osgiliath.pdf"],
+    ["bog", "rulesheet-the-blood-of-gondor.pdf"],
+    ["tmv", "rulesheet-the-morgul-vale.pdf"],
+  ].map(([doc, file]) => ({ doc: doc as string, file: file as string, url: `${FFG}/${file as string}` })),
 ] as const;
 
 // PDFs stay out of git. They are fetched into .cache/pdf and pinned by sha256 in data/sources.json.

@@ -162,6 +162,10 @@ export type SetupStep =
   | "chooseItemBoons" // "Each player chooses an Item boon (excluding Andúril) from the campaign pool and sets it aside, out of play": `codes` the excluded boon
   // The cycles (scripts/data/normalize/setup-cycles.ts).
   | "createRiddleArea" // The Hobbit, Dungeons Deep and Caverns Dim: "Create a riddle area with stage 2A and follow the setup instructions on that card": hob.riddle-area
+  // Against the Shadow (scripts/data/normalize/setup-against-the-shadow.ts).
+  | "buildUnderworldDeck" // The Steward's Fear, "Create the underworld deck": `codes` the Streets of Gondor and Brigands enemies and the three Clue objectives (ats.setup-the-stewards-fear-underworld-deck)
+  | "hideOneAside" // The Steward's Fear, "Shuffle all Villain cards and randomly set one aside, out of play, without looking at it. Remove the others from the game" (and the Plot cards): `codes` the cards it chooses from, `count` the ones removed
+  | "eachPlayerChoosesEnemyAndLocation" // Assault on Osgiliath, "Each player chooses 1 enemy and 1 unique location and add them to the staging area"
   | "shuffleAsideBack"; // "Then shuffle 1 'Sacked!' card per player back into the encounter deck" (Shadows of Mirkwood), "... 1 copy of A Foe Beyond per player ..." (Dwarrowdelf): `count` cards, `players` for each player
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };

@@ -243,7 +243,10 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       easy = easyDeck ? load(easyDeck) : empty;
       if (!easyDeck) local.push(`${id}: no ${easyKey} Easy deck`);
       for (const key of easy.placements.keys()) {
-        if (!normal.placements.has(key)) local.push(`${id}: Easy deck has ${key.replace("\u0000", " in ")} that Normal does not`);
+        // A card the Setup has each player add to the staging area (Into Ithilien's Southron Company): the Normal deck stages the copies of the most players, the Easy deck stages one and leaves the others in the encounter deck.
+        const [easyCode, easyPile] = key.split("\u0000");
+        const perPlayerStaged = easyPile === "encounter" && clausesOf(quest, "stage").some((clause) => clause.perPlayer != null && clause.codes.includes(easyCode ?? ""));
+        if (!normal.placements.has(key) && !perPlayerStaged) local.push(`${id}: Easy deck has ${key.replace("\u0000", " in ")} that Normal does not`);
       }
       // "Players prepare their fleet" deals all six ship-objectives of The Dream-chaser's Fleet (dcce.prepare-your-fleet), set aside until
       // the players choose; the load list holds the four of the original box, so each ship it lacks (by name) is added, in both decks.

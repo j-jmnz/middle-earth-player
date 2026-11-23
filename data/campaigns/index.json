@@ -110,16 +110,6 @@
     "position": 4
   },
   {
-    "id": "standalone-scenarios",
-    "name": "Standalone scenarios",
-    "scenarioCount": 14,
-    "playable": true,
-    "kind": "cycle",
-    "box": null,
-    "released": "2011-09-21",
-    "position": 2
-  },
-  {
     "id": "against-the-shadow",
     "name": "Against the Shadow",
     "scenarioCount": 9,
@@ -128,6 +118,16 @@
     "box": null,
     "released": "2012-11-26",
     "position": 5
+  },
+  {
+    "id": "standalone-scenarios",
+    "name": "Standalone scenarios",
+    "scenarioCount": 14,
+    "playable": true,
+    "kind": "cycle",
+    "box": null,
+    "released": "2011-09-21",
+    "position": 2
   },
   {
     "id": "the-ring-maker",
