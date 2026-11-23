@@ -16,6 +16,7 @@ import { STAT_TEMPLATES, STAT_UNTIL } from "./stats.ts";
 import { STONE_SAMPLES, STONE_TEMPLATES } from "./families/stone.ts";
 import { SMAUG_SAMPLES, SMAUG_TEMPLATES } from "./families/smaug.ts";
 import { ERECH_SAMPLES, ERECH_TEMPLATES } from "./families/erech.ts";
+import { WESTERN_LANDS_SAMPLES, WESTERN_LANDS_TEMPLATES } from "./families/western-lands.ts";
 import { FOG_SAMPLES, FOG_TEMPLATES } from "./families/fog.ts";
 import { RUINS_SAMPLES, RUINS_TEMPLATES } from "./families/ruins.ts";
 import { SIEGE_SAMPLES, SIEGE_TEMPLATES } from "./families/siege.ts";
@@ -25,7 +26,7 @@ import { INVESTIGATION_SAMPLES, INVESTIGATION_TEMPLATES } from "./families/inves
 import { searchLimits, searchPolicy, WIZARDS_QUEST_SAMPLES, WIZARDS_QUEST_TEMPLATES } from "./families/wizards-quest.ts";
 
 export { ESCAPE_SAMPLES } from "./families/escape.ts";
-export { DREADNAUGHT_SAMPLES, ERECH_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, RUINS_SAMPLES, SIEGE_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES, WIZARDS_QUEST_SAMPLES };
+export { DREADNAUGHT_SAMPLES, ERECH_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, RUINS_SAMPLES, SIEGE_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES, WESTERN_LANDS_SAMPLES, WIZARDS_QUEST_SAMPLES };
 
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
@@ -78,7 +79,7 @@ const FLIP_GOLLUM = {
 export const TEMPLATES: Readonly<Record<string, Template>> = {
   ...FAMILY_TEMPLATES, ...ESCAPE_TEMPLATES, ...AMBUSH_TEMPLATES, ...ANGMAR_TEMPLATES, ...LONG_DARK_TEMPLATES, ...STONE_TEMPLATES,
   ...GUARDIAN_TEMPLATES, ...ATTACH_TEMPLATES, ...STAT_TEMPLATES,
-  ...SMAUG_TEMPLATES, ...ERECH_TEMPLATES, ...FOG_TEMPLATES, ...RUINS_TEMPLATES, ...SIEGE_TEMPLATES, ...GULDUR_TEMPLATES, ...DREADNAUGHT_TEMPLATES, ...INVESTIGATION_TEMPLATES, ...WIZARDS_QUEST_TEMPLATES,
+  ...SMAUG_TEMPLATES, ...ERECH_TEMPLATES, ...FOG_TEMPLATES, ...RUINS_TEMPLATES, ...SIEGE_TEMPLATES, ...GULDUR_TEMPLATES, ...DREADNAUGHT_TEMPLATES, ...INVESTIGATION_TEMPLATES, ...WIZARDS_QUEST_TEMPLATES, ...WESTERN_LANDS_TEMPLATES,
   PlayOnlyIf: (i, ctx) => ({ text: `(constant on a card in hand, read when it would be played) it can only be played while ${renderCondition(i.condition, ctx)}`, read: ["condition"] }),
   Pick: (i, ctx) => ({ text: `choose ${pick(i.pick, ctx)}`, read: ["pick"] }),
   // The mount-doom family (src/catalog/families/mount-doom.ts).
