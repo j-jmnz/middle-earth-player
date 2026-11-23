@@ -9,10 +9,10 @@ export type Finding = { check: "enemyZone" | "thenShort" | "limitTest"; recordId
 /** The printed text of a line id (`<code>:<side>:<n>`), or an empty string. */
 export type TextOf = (lineId: string) => string;
 
-// A Pick or a count of enemies that says where they are in one of these fields reads that zone and no other.
-const ZONE_FIELDS = ["staging", "stagingOnly", "engaged", "engagedWith", "inStormcallerArea", "from", "attackableByPicked", "attacking", "defending", "atStage", "atOtherStage", "hasShadow"] as const;
-// The words a line uses to say where its enemies are: any of them and the line says it.
-const ZONE_WORDS = /engage|staging|attack|defen|victory|discard pile|hand\b|deck|encounter|shadow|\byou\b|\byour\b/i;
+// A Pick, a count or a holder filter of enemies that says where they are in one of these fields reads that zone and no other.
+const ZONE_FIELDS = ["staging", "stagingOnly", "engaged", "engagedWith", "inStormcallerArea", "from", "attackableByPicked", "attacking", "defending", "atStage", "atOtherStage", "hasShadow", "attackingEnemy", "engagedThisRound", "facedownShadow"] as const;
+// The words a printed line uses to say that its enemies are the engaged ones, or the one attacking: the filter then needs no staging area.
+const ENGAGED_WORDS = /engaged with|attacking/i;
 
 type Json = Record<string, unknown>;
 
@@ -34,23 +34,23 @@ function enemyFilters(value: unknown, out: Json[] = []): Json[] {
 const textOfLines = (effect: Effect, textOf: TextOf): string => effect.lines.map(textOf).join(" | ");
 
 /**
- * (a) A line about enemies "in play", or one that names an enemy and no zone, whose record has an enemy filter with no `staging` and no field that fixes the zone. The staging area is in play
- * (rr.in-play-and-out-of-play): such a filter reads only the engaged enemies.
+ * (a) A record with an enemy filter (a pick, a count, a holder, a `names` filter: each is an object of `type: enemy`) that has no `staging`, no `stagingOnly`, no `engaged` and no other field that fixes the zone,
+ * whose printed line does not say "engaged with" or "attacking". The staging area is in play (rr.in-play-and-out-of-play): such a filter reads only the engaged enemies. The check reads the record, not the
+ * word "enemy" in the line: a line that names an enemy card ("Watcher in the Water cannot take damage") is read as well.
  */
 export function enemyZoneFindings(effects: readonly Effect[], textOf: TextOf): Finding[] {
   const found: Finding[] = [];
   for (const effect of effects) {
     const text = textOfLines(effect, textOf);
-    if (!/\benem(?:y|ies)\b/i.test(text)) continue;
-    const inPlay = /\bin play\b/i.test(text);
-    if (!inPlay && ZONE_WORDS.test(text)) continue;
+    if (ENGAGED_WORDS.test(text)) continue;
     const loose = enemyFilters([effect.instructions, (effect as { condition?: unknown }).condition ?? null]).filter((filter) => ZONE_FIELDS.every((field) => filter[field] == null));
     if (loose.length > 0) found.push({ check: "enemyZone", recordId: effect.id, line: effect.lines.join(" "), text });
   }
   return found;
 }
 
-// The instructions that can find fewer cards or tokens than the line asks for: a draw, a discard from the deck or the hand, a discard or a removal of tokens, a spend.
+// The instructions that can find fewer cards or tokens than the line asks for, or have nothing to change: a draw, a discard from the deck or the hand, a discard or a removal of tokens, a spend, a
+// ready or an exhaust of a card that is not exhausted or ready, a heal of a card with no damage.
 const CAN_COME_UP_SHORT: ReadonlySet<string> = new Set([
   "Draw",
   "DiscardTopOfDeck",
@@ -63,24 +63,53 @@ const CAN_COME_UP_SHORT: ReadonlySet<string> = new Set([
   "RemoveQuestProgress",
   "SpendResources",
   "MoveResources",
+  "Ready",
+  "Exhaust",
+  "Heal",
 ]);
 
+// Every instruction list of a record: the record's own, a Repeat's, an Each's, a ForEachPlayer's, a Delay's, an AfterAttack's and a Choose option's, at any depth. A Choose option with `requires` is offered only
+// when it can be taken ("you may spend 1 resource to ..."), so it is not read.
+function instructionLists(value: unknown, out: Json[][] = []): Json[][] {
+  if (Array.isArray(value)) {
+    if (value.length > 0 && value.every((item) => item != null && typeof item === "object" && typeof (item as Json).verb === "string")) out.push(value as Json[]);
+    for (const item of value) instructionLists(item, out);
+    return out;
+  }
+  if (value == null || typeof value !== "object") return out;
+  const object = value as Json;
+  if (object.requires != null && Array.isArray(object.instructions)) return out;
+  for (const item of Object.values(object)) instructionLists(item, out);
+  return out;
+}
+
+// An instruction that can come up short, itself or in a list it holds (a Repeat of discards, a Choose option that draws).
+// An Exhaust that the printed line words as a cost ("Exhaust a hero to claim this objective") is paid or the action is not offered, so it is not read.
+const shortVerb = (step: Json, text: string): boolean => typeof step.verb === "string" && CAN_COME_UP_SHORT.has(step.verb) && !(step.verb === "Exhaust" && /\bexhaust\b[^.]*\bto\b/i.test(text));
+// A list a step holds that is part of the step itself: a Repeat's, an Each's, a ForEachPlayer's. A Choose option is its own part (offered only when it can be taken) and is read as a list of its own.
+const bodyOf = (step: Json): Json[] => (step.verb === "Repeat" || step.verb === "Each" || step.verb === "ForEachPlayer") && Array.isArray(step.instructions) ? (step.instructions as Json[]) : [];
+const canComeUpShort = (step: Json, text: string): boolean => shortVerb(step, text) || bodyOf(step).some((inner) => canComeUpShort(inner, text));
+
+// A Choose whose option holds the condition in `requires` ("you may flip it", offered only when the part before "then" resolved).
+const optionRequires = (step: Json | undefined, kind: string): boolean => Array.isArray(step?.options) && (step.options as Json[]).some((option) => (option.requires as Json | undefined)?.kind === kind);
+
 /**
- * (b) A line with "then" whose record has an instruction that can come up short followed by a last instruction with no condition: the part after "then" resolves only if the part before it did
- * (rr.then), so it carries `thenResolves`, the same condition or sits on a `then` branch. A last instruction with any `when` is read as holding one. The record's own `condition` is not read:
- * it may guard another part.
+ * (b) A line with "then" whose record has, in one instruction list (the record's, or one inside a Repeat, an Each, a Choose option or another list), an instruction that can come up short followed by a last
+ * instruction with no condition: the part after "then" resolves only if the part before it did (rr.then), so it carries `thenResolves`, the same condition or sits on a `then` branch. A last instruction with any
+ * `when` is read as holding one. The record's own `condition` is not read: it may guard another part.
  */
 export function thenFindings(effects: readonly Effect[], textOf: TextOf): Finding[] {
   const found: Finding[] = [];
   for (const effect of effects) {
     const text = textOfLines(effect, textOf);
     if (!/\bthen\b/i.test(text)) continue;
-    const steps = effect.instructions as readonly Json[];
-    const first = steps.findIndex((step) => typeof step.verb === "string" && CAN_COME_UP_SHORT.has(step.verb));
-    if (first < 0) continue;
-    // The part after "then" is the last instruction: it holds a condition on the part before it, or it is not read.
-    const last = steps.length - 1;
-    if (last > first && steps[last]?.when == null) found.push({ check: "thenShort", recordId: effect.id, line: effect.lines.join(" "), text });
+    const short = instructionLists(effect.instructions).some((steps) => {
+      const first = steps.findIndex((step) => canComeUpShort(step, text));
+      // The part after "then" is the last instruction of the list: it holds a condition on the part before it, or it is not read.
+      const last = steps[steps.length - 1];
+      return first >= 0 && steps.length - 1 > first && last?.when == null && !optionRequires(last, "thenResolves");
+    });
+    if (short) found.push({ check: "thenShort", recordId: effect.id, line: effect.lines.join(" "), text });
   }
   return found;
 }
