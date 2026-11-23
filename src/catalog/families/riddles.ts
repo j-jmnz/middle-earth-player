@@ -1,5 +1,5 @@
 // The vocabulary Dungeons Deep and Caverns Dim (The Hobbit, part 3) adds to effect records: the riddle area stage 1A creates, the riddles encounter cards print and the first player answers, and Gollum's attack on Bilbo Baggins. Simple verbs, triggers and stat flags;
-// effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/riddles/ runs them. The rules are the Hobbit rulesheet's (hob.riddle-area, hob.riddles, hob.riddles-steps-2-and-3) and the scenario's section of docs/scenarios/the-hobbit.md.
+// effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/riddles/ runs them. The rules are the Hobbit rulesheet's (hob.riddle-area, hob.riddles, hob.riddles-steps-2-and-3) and the scenario's rulings file, docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md.
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
@@ -30,11 +30,11 @@ const VERBS = [
   z.strictObject({ verb: z.literal("DiscardUntilRiddle"), ...when }),
   // "The first player names a card type" (131084:A:1): the first player names one of these encounter card types (asked in a window) and the effect keeps the name. DiscardEncounterTop then discards the cards RemoveRiddleProgress reads.
   z.strictObject({ verb: z.literal("NameEncounterType"), types: z.array(z.enum(["enemy", "location", "treachery", "objective"])).min(2), ...when }),
-  // "For each of those cards that does not match the named type, remove 1 progress token from stage 2" (131084:A:1): the cards the effect discarded from the top of the encounter deck, those whose type is not the named one, each take 1 progress off stage 2 (never below 0).
+  // "For each of those cards that does not match the named type, remove 1 progress token from stage 2" (131084:A:1): counts the discarded cards that are not of the named type and asks takeProgressOff for that many, which stage 2B's `noProgressRemoved` refuses (rr.cannot; the reading is in docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md, Dungeons Deep and Caverns Dim): the card takes nothing off stage 2.
   z.strictObject({ verb: z.literal("RemoveRiddleProgress"), ...when }),
   // "Gollum attacks Bilbo Baggins. (Do not deal a shadow card for this attack.)" (131074:A:1): Gollum, in the riddle area, makes an attack against the first player outside the combat phase with Bilbo as the only defender; an attack nobody defends deals its damage to Bilbo.
   z.strictObject({ verb: z.literal("GollumAttacksBilbo"), ...when }),
-  // "The first player gains control of Bilbo Baggins" (131031:B:1): stage 2 is removed from the game with the riddle area (hob.riddle-area; the readings are in docs/scenarios/the-hobbit.md). Bilbo stays among the first player's heroes and is no longer limited: his limits are stage 2's constant (131030:B:3),
+  // "The first player gains control of Bilbo Baggins" (131031:B:1): stage 2 is removed from the game with the riddle area (hob.riddle-area; the readings are in docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md, Dungeons Deep and Caverns Dim). Bilbo stays among the first player's heroes and is no longer limited: his limits are stage 2's constant (131030:B:3),
   // and his Magic Ring stays on him. Gollum leaves the area with GollumEngagesFirstPlayer.
   z.strictObject({ verb: z.literal("LeaveRiddleArea"), ...when }),
   // "Gollum engages the first player" (131031:B:2): Gollum, in the riddle area or engaged with another player, engages the first player (rr.first-player); once he is in play he follows the first player token as it passes.
@@ -50,7 +50,7 @@ const TRIGGERS = ["riddleFailed"] as const;
 
 // "Damage from undefended attacks made by Gollum must be placed on Bilbo Baggins" (131031:B:2): set on the table by the stage's constant; the combat hook reads it (families/riddles/gollum.ts).
 // `bilboLimitedToGollum`: on Bilbo Baggins while he is in the riddle area, he takes damage only from Gollum and defends only against Gollum (hob.riddle-area); read by the damage and defense hooks of families/riddles/gollum.ts.
-// `noProgressRemoved`: on a card, no card effect takes progress off it ("no progress can be added to or removed from this quest except by answering riddles", 131030:B:2); the card's own riddles (AnswerRiddle, RemoveRiddleProgress) are not card effects on it. Read by takeProgressOff (rules/core/progress.ts). The other half is `noProgressPlaced`.
+// `noProgressRemoved`: on a card, no card effect takes progress off it ("Progress tokens cannot be added to, or removed from, this quest except by answering riddles", 131030:B:2); answering a riddle (AnswerRiddle) is the one thing that changes its progress; RemoveRiddleProgress goes through the bar and takes nothing off. Read by takeProgressOff (rules/core/progress.ts). The other half is `noProgressPlaced`.
 const FLAGS = ["gollumDamageToBilbo", "noProgressRemoved", "bilboLimitedToGollum"] as const;
 
 export const manifest = { name: "riddles", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

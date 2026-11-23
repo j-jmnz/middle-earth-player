@@ -11,7 +11,7 @@ export function takeProgressOff(state: ScenarioState, cardId: string | null | un
   const card = cardId ? state.cards[cardId] : undefined;
   if (!cardId || !card) return state;
   const removed = Math.min(card.progress, Math.max(0, amount));
-  // "No progress can be ... removed from this quest except by answering riddles" (131030:B:2): a card holding the flag keeps its progress against any card effect.
+  // "Progress tokens cannot be added to, or removed from, this quest except by answering riddles" (131030:B:2): a card holding the flag keeps its progress against any card effect.
   if (removed <= 0 || flagged(state, cardId, "noProgressRemoved")) return state;
   steps.push({ kind: "progress", targetId: cardId, amount: -removed, cause: currentCause(steps, UNATTRIBUTED) });
   return updateCard(state, cardId, { progress: card.progress - removed });

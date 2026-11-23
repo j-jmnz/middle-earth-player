@@ -25,16 +25,21 @@ type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name 
 // The record that offers the choice: its top-level Choose has an option that answers the riddle.
 const offers = (effect: Effect): boolean => effect.instructions.some((instruction) => instruction.verb === "Choose" && instruction.options.some((option) => option.instructions.some((inner) => inner.verb === "AnswerRiddle")));
 
+// The record that offers the riddle among these When Revealed records, when its condition holds for the card being revealed (one reading, for the reveal's records and for the staging event alike).
+function riddleOffer(state: ScenarioState, id: string, seat: number, effects: readonly Effect[], ctx: ReduceContext): Effect | undefined {
+  return effects.find((effect) => offers(effect) && (!effect.condition || holds(state, effect.condition, { actor: seat, sourceId: id, returned: 0 }, ctx)));
+}
+
 /** The When Revealed records the reveal of the card pushes: the riddle offer alone when it holds (the others wait for ResolveNormally), else every record but the offer (a card that is not revealed from the encounter deck, or while riddles are ignored). */
 export function revealedEffects(state: ScenarioState, id: string, seat: number, effects: readonly Effect[], ctx: ReduceContext): readonly Effect[] {
-  const offer = effects.find((effect) => offers(effect) && (!effect.condition || holds(state, effect.condition, { actor: seat, sourceId: id, returned: 0 }, ctx)));
+  const offer = riddleOffer(state, id, seat, effects, ctx);
   return offer ? [offer] : effects.filter((effect) => !offers(effect));
 }
 
 /** Whether the card just revealed offers the first player its riddle: the card is not added to the staging area until he resolves it (an answered riddle card is discarded, never added: hob.riddles). */
 export function offersRiddle(state: ScenarioState, id: string, seat: number, ctx: ReduceContext): boolean {
   const code = state.cards[id]?.code;
-  return effectsOf(ctx, code ?? "").some((effect) => effect.timing === "whenRevealed" && offers(effect) && (!effect.condition || holds(state, effect.condition, { actor: seat, sourceId: id, returned: 0 }, ctx)));
+  return riddleOffer(state, id, seat, effectsOf(ctx, code ?? "").filter((effect) => effect.timing === "whenRevealed"), ctx) !== undefined;
 }
 
 /** ResolveNormally: the card's When Revealed records, but the riddle offer, resolve for the first player as the reveal would have run them. The card is added to the staging area now (the reveal held that back while the riddle was offered). */

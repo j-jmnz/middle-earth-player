@@ -56,7 +56,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "PlaceInRiddleArea", code: "131074" }, { verb: "PlaceInRiddleArea", code: "131079", attachTo: BILBO }, { verb: "ShuffleEncounterDeck" }],
     },
     copyLine("131029:B:1", "131030:B:1"),
-    // No card effect adds progress to or takes it off this stage (noProgressPlaced, noProgressRemoved on the stage only: the active location is not barred). Answering a riddle (AnswerRiddle) adds it and Not Fair! Not Fair!, which names this stage (RemoveRiddleProgress), takes it off, as the reading in docs/scenarios/the-hobbit.md says.
+    // No card effect adds progress to or takes it off this stage (noProgressPlaced, noProgressRemoved on the stage only: the active location is not barred). Answering a riddle (AnswerRiddle) adds it; Not Fair! Not Fair!, which names this stage (RemoveRiddleProgress), takes nothing off it, as the reading in docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md (Dungeons Deep and Caverns Dim) says.
     {
       id: "131030:constant:2",
       cardCode: "131030",
@@ -210,7 +210,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "131083:whenRevealed:1", cardCode: "131083", lines: ["131083:A:1"], timing: "whenRevealed", uncancelable: ALWAYS, instructions: [{ verb: "AnswerRiddle" }] },
     riddle("131083", "131083:A:2", ["sphere", "cost"], 2),
 
-    // 131084 Not Fair! Not Fair! The first player names a card type and the top 3 cards of the encounter deck are discarded; each that is not of that type takes 1 progress off stage 2. No card cancels it.
+    // 131084 Not Fair! Not Fair! The first player names a card type and the top 3 cards of the encounter deck are discarded; each that is not of that type would take 1 progress off stage 2, which 131030:B:2 forbids (rr.cannot), so none comes off. No card cancels it.
     {
       id: "131084:whenRevealed:1",
       cardCode: "131084",

@@ -277,7 +277,7 @@ describe("the riddles the encounter cards print", () => {
       expect(revealed.window?.kind === "choose" ? revealed.window.options : []).toEqual(["leadership", "spirit", "lore", "tactics", "baggins"]);
     }));
 
-  // The removal is barred by 131030:B:2 (rr.cannot, recorded reading in docs/scenarios/the-hobbit.md): what the card still does is name a type and discard 3 cards.
+  // The removal is barred by 131030:B:2 (rr.cannot, recorded reading in docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md, Dungeons Deep and Caverns Dim): what the card still does is name a type and discard 3 cards.
   it("131084:A:1 Not Fair! Not Fair!: the first player names a type and the top 3 encounter cards are discarded; stage 2 keeps its progress", () =>
     proves("131084:A:1", (effects) => {
       const made = riddleTable({ deck: ["131074", "131079", "f0", "f0", "treachery", "f0", "f0"] }, effects);
