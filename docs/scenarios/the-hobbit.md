@@ -1,0 +1,66 @@
+# The Hobbit
+
+The data, rulings and readings of The Hobbit cycle, scenario by scenario. Product rules, the Domain and the Core round are in `docs/brief.md`; the authority order is in `.claude/rules/authority.md`.
+
+The saga cycle of 2012 and 2013: the two saga boxes The Hobbit: Over Hill and Under Hill (`OHaUH`, MEC16: We Must Away, Ere Break of Day; Over the Misty Mountains Grim; Dungeons Deep and Caverns Dim) and The Hobbit: On the Doorstep (`OtD`, MEC24: Flies and Spiders; The Lonely Mountain; The Battle of Five Armies). Like Dwarrowdelf it is `kind: "cycle"` (`data/campaigns/the-hobbit.json`): no campaign card, no booklet, no Campaign Mode, every game standalone on Easy and Normal. It lists under Coming later until one scenario is playable (`src/campaign/playable.ts`). The cycle is data: `scripts/data/cycle-defs.ts` (its six scenarios with the DragnCards decks `Q0A.n` and `E0A.n`), `scripts/data/campaign-defs.ts` (its two products), `scripts/data/normalize/setup-hobbit.ts` (the Setup sentences of the six stage 1A cards), and the folder `the-hobbit` for authored effects and seed finders; `scripts/data/the-hobbit.test.ts` holds its piles, counts and Nightmare decks.
+
+- **Data.** The rules inserts (`ohauh`, `otd`) are pinned as rules docs with `hob.*` spans (`data/rules/index.json`): each scenario's encounter-set paragraph is `hob.setup-<scenario id>`. The scenario files carry no Setup span (`setupSpan`): the sets are Hall of Beorn's list checked against the load list, as in Dwarrowdelf, because an insert's set names hold commas and "and" (We Must Away, Ere Break of Day; Flies and Spiders). The printed ledger is `data/printed/the-hobbit.json`: every side of every card the six scenarios deal, both Bilbo Baggins heroes, the two Baggins-sphere events and the nine treasure cards, read from the scans (`scripts/data/printed/scope.ts`, `hobbitCodes`). The Nightmare block of each scenario is built from decks 9055 to 9060 (`scripts/data/nightmare-defs.ts`); its cards are not read into the ledger and the scenario work leaves Nightmare out.
+- **Rules shared by the scenarios of a box** (each box has its own copy, the words differ): Bilbo Baggins and the Baggins sphere (`hob.bilbo-baggins-ohauh`, `hob.baggins-sphere-ohauh`, `hob.bilbo-multiplayer-ohauh`; `hob.bilbo-baggins-otd`, `hob.baggins-sphere-otd`, `hob.bilbo-multiplayer-otd`), Treasure (`hob.treasure-ohauh`, `hob.treasure-otd`), the saga expansion's player cards (`hob.saga-player-cards-ohauh`, `hob.saga-player-cards-otd`), Immune to player card effects (`hob.immune-to-player-card-effects`) and Indestructible (`hob.indestructible`).
+- **Keyword and effect rules by scenario.** We Must Away: `hob.sack-deck`, `hob.sack-x`, `hob.sack-x-example`. Over the Misty Mountains Grim: `hob.active-and-inactive-encounter-decks`. Dungeons Deep and Caverns Dim: `hob.riddle-area`, `hob.riddles`, `hob.riddles-steps-2-and-3`. Flies and Spiders: `hob.venom-poison`, `hob.unconscious-characters`, `hob.staging-area-creating`, `hob.staging-area-combining`. The Lonely Mountain: `hob.burgle`, `hob.burgle-example`. The Battle of Five Armies: `hob.multiple-stages-in-play`, `hob.current-quest-stage`, `hob.battle`, `hob.siege`. The Easy counts are `easy-mode.the-hobbit`.
+- **Piles.** The piles are the DragnCards load lists' (Q0A.1 to Q0A.6, E0A.1 to E0A.6), checked against the stage 1A card's printed Setup. Bilbo Baggins (player 1's play area in every list) is dealt in no pile: the first player takes control of him at the start of every game. We Must Away sets aside the seven Sack objectives, the three Trolls and Troll Cave (the Sack deck is built from the set-aside Sack cards); Over the Misty Mountains Grim's second encounter deck (Misty Mountain Goblins and The Great Goblin) is the `encounterDeck2` pile; The Lonely Mountain sets aside the five Erebor treasure cards (stacked under The Lonely Mountain at Setup); Flies and Spiders sets aside The Spider's Glade and three copies of the treasure Bilbo's Magic Ring.
+- **Treasure sets.** A treasure card's set icon is the scenario where it is discovered: the troll icon of We Must Away (Sting, Orcrist, Glamdring), the spider web of Flies and Spiders (Bilbo's Magic Ring), the dragon of The Lonely Mountain (the five Erebor treasures). Each insert prints the treasure icons a scenario accepts as pictures only (no text): one icon in Over the Misty Mountains Grim, Dungeons Deep and Caverns Dim and Flies and Spiders, two in The Lonely Mountain, three in The Battle of Five Armies. They are the sets of the earlier scenarios of the cycle that discover treasure (We Must Away; then Flies and Spiders; then The Lonely Mountain).
+- **Readings.** Each scenario below lists what its cards, rulesheet and sources leave open or settle, with sources (`.claude/rules/authority.md`, Open points).
+
+## We Must Away, Ere Break of Day
+
+Pack `OHaUH`, deck Q0A.1 / E0A.1. Encounter sets We Must Away, Ere Break of Day and Western Lands (`hob.setup-we-must-away-ere-break-of-day`). The 1A Setup sets the Sack cards (Sack trait), the three unique Troll enemies and Troll Cave aside; `hob.sack-x` shuffles a Sack card that leaves play back into the sack deck.
+
+- The seven Sack cards are the `setAside` pile (a Sack deck is a Setup record's work, not a pile of its own); DragnCards loads them in its second shared deck (literal).
+- A Sack card's printed text is two paragraphs (the attach rule, then what the attached character cannot do); Hall of Beorn runs them together, so the ledger has two lines (scan).
+
+## Over the Misty Mountains Grim
+
+Deck Q0A.2 / E0A.2. First deck: Over the Misty Mountains Grim and Western Lands; second, inactive deck: Misty Mountain Goblins and The Great Goblin (`hob.setup-over-the-misty-mountains-grim`, `hob.active-and-inactive-encounter-decks`). Hall of Beorn lists the sets of the first deck only, so `encounterSets` names all four (`scripts/data/cycle-defs.ts`).
+
+- Stone-Giant: DragnCards stages one copy; the printed 1B advances at once to stage 2A, whose When Revealed (131027:B:1) finds a copy in the encounter deck. All three copies start in the encounter deck (`data/overrides.json`, scenarioPiles; printed card).
+
+## Dungeons Deep and Caverns Dim
+
+Deck Q0A.3 / E0A.3. Sets Dungeons Deep and Caverns Dim and Misty Mountain Goblins (`hob.setup-dungeons-deep-and-caverns-dim`); the riddle area is `hob.riddle-area`.
+
+- Gollum and Bilbo's Magic Ring: DragnCards stages them; stage 2A's own Setup (131030:A:1) searches the encounter deck for them and places them in the riddle area, so they start in the encounter deck (`data/overrides.json`, scenarioPiles; printed card).
+- The Goblins' Caves in Easy: DragnCards' E0A.3 holds 1, the Easy Mode sheet removes 1 of 3 (Easy 2, Hall of Beorn agrees); the sheet wins (`easy-mode.the-hobbit`, overrides scenarioEasy).
+- Hall of Beorn's pile counts of the Misty Mountain Goblins set needed DragnCards' rows resolved by pack number: DragnCards names the pack "The Hobbit - Over Hill and Under Hill" (`overrides.dragnPackAliases`).
+
+## Flies and Spiders
+
+Pack `OtD`, deck Q0A.4 / E0A.4. Sets Flies and Spiders and Wilderland (`hob.setup-flies-and-spiders`; the insert of The Battle of Five Armies spells it Wilderlands).
+
+- The 1A Setup lets each player shuffle 1 copy of Bilbo's Magic Ring into the deck; the load list sets aside 3 copies of the treasure card, the box holds 1 (Hall of Beorn quantity 1). The data keeps the load list's 3 (recommended; no source found, searches of the FFG FAQ, RulesPal and forum text gave no ruling; the Setup record decides how many copies a table of N players gets). Listed in Readings to confirm.
+
+## The Lonely Mountain
+
+Deck Q0A.5 / E0A.5. Sets The Lonely Mountain and Wilderland (`hob.setup-the-lonely-mountain`).
+
+- Easy counts of Fighting Among Friends (2 removed) and Weighed Down (1 removed): DragnCards' E0A.5 keeps both copies of each; the Easy Mode sheet, Hall of Beorn and the other two Wilderland decks (E0A.4, E0A.6) agree on the removal (overrides scenarioEasy).
+- The treasure stack (`hob.burgle`) is the five set-aside Erebor treasure cards.
+
+## The Battle of Five Armies
+
+Deck Q0A.6 / E0A.6. Sets The Battle of Five Armies and Wilderland (`hob.setup-the-battle-of-five-armies`); stages 2 to 4 are in play together (`hob.multiple-stages-in-play`).
+
+- Hall of Beorn lists stages 2 to 5 and leaves out stage 1A; it is added by `overrides.scenarioStages` and takes its place by stage number. Hall of Beorn and DragnCards' load list disagree on the title: the card prints "The Gathering of the Clouds" (scan 132075.A), and `overrides.cards` names it so and corrects the picture address, which answers 403 under Hall of Beorn's spelling.
+
+## Ledger readings
+
+Where a scan and Hall of Beorn's text differ, the card wins (`.claude/rules/authority.md`); the ledger holds the printed reading. The differences found:
+
+- Paragraphs Hall of Beorn runs together are separate lines (Sack cards, Riddle lines, Burgle lines, Travel and Forced lines of locations); quoted text on a card is written with straight double quotes.
+- Keyword lines missing from the text: Doomed 1 (A Nice Pickle, No Campfire), Surge (Goblin Runners); Dark Bats' Shadow line; Smaug the Golden's "Cannot be engaged."; Ruins of Dale, Ravenhill and The Front Gate print "(1 Baggins instead ...)" with the icon only.
+- Quest card typos in Hall of Beorn's text, written as printed: Lost in the Dark 2B, Captured by Spiders 3B, The Burglar's Turn 2B, The Gathering of the Clouds 1B, The Clouds Burst 5B, "unconscious characters" on the Flies and Spiders stages.
+- Printed misprints, kept under `misprints`: Ravenous Warg prints "Ravenous Wargs attacks" (132059:A:1); A Warm Welcome 1B prints "At the end of round" (132071:B:2).
+- The OHaUH insert says Bilbo "cannot gain resources through player card effects" (`hob.baggins-sphere-ohauh`); the card prints "from player card effects" (131001:A:1). The card wins.
+
+## Readings to confirm
+
+- Flies and Spiders, copies of the treasure Bilbo's Magic Ring: recommended, see Flies and Spiders.
