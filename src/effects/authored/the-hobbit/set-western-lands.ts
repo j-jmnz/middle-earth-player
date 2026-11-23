@@ -11,13 +11,13 @@ const IN_STAGING: Condition = { kind: "sourceIn", zone: "staging" };
 const DEALT_DAMAGE: Condition = { kind: "dealt", min: 1 };
 
 export const WESTERN_LANDS_EFFECTS: readonly Effect[] = withCopies([
-  // 131035 A Suspicious Crow. When Revealed: the top card of the encounter discard pile is revealed in full (the card is found out of the deck, so its keywords and When Revealed resolve) and added to the staging area; with the pile empty nothing happens.
+  // 131035 A Suspicious Crow. When Revealed: the top card of the encounter discard pile, whatever its type, is revealed in full (found out of the deck, so its keywords and When Revealed resolve) and added to the staging area; with the pile empty nothing happens.
   {
     id: "131035:whenRevealed:1",
     cardCode: "131035",
     lines: ["131035:A:1"],
     timing: "whenRevealed",
-    instructions: [{ verb: "PickDiscardTop", types: ["enemy", "location", "treachery"] }, { verb: "ResolveWhenRevealed", card: "picked", reveal: true }],
+    instructions: [{ verb: "ResolveWhenRevealed", card: "discardTop", reveal: true }],
   },
   // Shadow: once the attack has ended and dealt damage, the shadow card goes back into the encounter deck.
   {
