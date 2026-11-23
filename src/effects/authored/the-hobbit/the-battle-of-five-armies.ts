@@ -8,7 +8,7 @@ import { MANY_PLAYERS } from "../conditions.ts";
 import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for The Battle of Five Armies (the-hobbit cycle part 6, no campaign card). Every line is read from the scan ledger (data/printed/the-hobbit.json). The Wilderland set (132035 to 132038) is in set-wilderland.ts. Bilbo is dealt by the loadout.
-// Stages 2, 3 and 4 are in play together (families/armies): `questStage` is the current quest stage, the one the first player chose at the start of the round. The readings are in docs/scenarios/the-hobbit.md (The Battle of Five Armies).
+// Stages 2, 3 and 4 are in play together (families/armies): `questStage` is the current quest stage, the one the first player chose at the start of the round. The readings are in docs/scenarios/the-hobbit/the-battle-of-five-armies.md (The Battle of Five Armies).
 // Rules: hob.multiple-stages-in-play, hob.current-quest-stage, hob.battle, hob.siege, hob.bilbo-multiplayer-otd, hob.baggins-sphere-otd, rr.quest-advancement, faq.progress-without-advancing, rr.engaged, rr.immune, rr.forced, rr.staging, rr.reveal (data/rules/entries.json).
 const STAGE_1 = "132075";
 const STAGE_2 = "132076";
