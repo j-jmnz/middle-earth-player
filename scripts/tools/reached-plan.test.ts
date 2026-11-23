@@ -40,7 +40,7 @@ describe("test reached", () => {
   });
 
   it("asks vitest about every changed file that is not a record, a doc or gone", () => {
-    const changed = ["src/effects/authored/a.ts", "docs/a.md", "src/rules/core/state.ts", "src/rules/gone.ts"];
+    const changed = ["src/effects/authored/a.ts", "docs/brief.md", "src/rules/core/state.ts", "src/rules/gone.ts"];
     expect(relatedSeeds(changed, (file) => file !== "src/rules/gone.ts")).toEqual(["src/rules/core/state.ts"]);
     expect(cardOf("01026:action:1")).toBe("01026");
   });
