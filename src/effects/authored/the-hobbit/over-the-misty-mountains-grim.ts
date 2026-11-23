@@ -9,7 +9,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 // Rules: hob.setup-over-the-misty-mountains-grim, hob.active-and-inactive-encounter-decks, hob.bilbo-baggins-ohauh, hob.baggins-sphere-ohauh, rr.victory, rr.search, rr.reveal, rr.active-location, rr.forced, rr.delayed-effects (data/rules/entries.json).
 const GREAT_GOBLIN = "131063";
 const STONE_GIANT = "131064";
-const BILBO: PickSpec = { type: "hero", control: "any", names: ["Bilbo Baggins"] };
+const BILBO: PickSpec = { type: "card", control: "any", names: ["Bilbo Baggins"] };
 const TREASURE_IN_DECK: PickSpec = { type: "card", control: "you", from: "deck", cardType: "treasure" };
 const GOBLIN_ENEMIES: PickSpec = { type: "enemy", control: "any", trait: "Goblin", staging: true };
 const STONE_GIANT_IN_STAGING: PickSpec = { type: "enemy", control: "any", stagingOnly: true, names: ["Stone-Giant"] };
@@ -118,7 +118,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["131064:A:1"],
       timing: "constant",
       condition: { kind: "sourceIn", zone: "staging" },
-      instructions: [{ verb: "ModifyStat", stat: "gainsSurge", amount: 1, until: "whileSourceInPlay", holders: { type: "treachery", control: "any", names: ["Galloping Boulders"] } }],
+      instructions: [{ verb: "ModifyStat", stat: "gainsSurge", amount: 1, until: "whileSourceInPlay", holders: { type: "card", control: "any", stagingOnly: true, names: ["Galloping Boulders"] } }],
     },
     { id: "131064:forced:1", cardCode: STONE_GIANT, lines: ["131064:A:2"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "Pick", pick: { type: "ally", control: "you" } }, { verb: "DiscardPicked" }] },
 
