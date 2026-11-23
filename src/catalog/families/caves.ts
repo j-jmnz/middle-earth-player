@@ -16,7 +16,8 @@ const VERBS = [
   // The card in play with this code (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its tokens and
   // attachments, and a later AddSetAsideToStaging can bring it back ("Set Goblin Chieftain aside, out of play", 41006:A:1). Nothing happens when
   // no card with the code is in play. `keepDamage` leaves the damage tokens on it ("Set Cold-Drake aside, out of play. (Do not remove damage tokens from it.)", 19024:A:1).
-  z.strictObject({ verb: z.literal("SetAsideInPlay"), code: z.string().min(1), keepDamage: z.boolean().optional(), ...when }),
+  // `byQuest`: a quest card's effect sets it aside, which a card that cannot leave the staging area allows ("Cannot leave the staging area (except by quest effect)", 132041:A:2).
+  z.strictObject({ verb: z.literal("SetAsideInPlay"), code: z.string().min(1), keepDamage: z.boolean().optional(), byQuest: z.literal(true).optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;

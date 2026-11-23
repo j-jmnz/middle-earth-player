@@ -14,8 +14,8 @@ function hostOf(state: ScenarioState, code: string): CardInstance | undefined {
 /** The cards stacked under the card, the top one first. */
 export function stackedUnder(state: ScenarioState, hostId: string): string[] {
   return Object.values(state.cards)
-    .filter((card) => card.zone === "under" && card.host === hostId && card.stackedAt != null)
-    .sort((left, right) => (left.stackedAt ?? 0) - (right.stackedAt ?? 0))
+    .filter((card) => card.zone === "under" && card.host === hostId)
+    .sort((left, right) => (left.stackedAt ?? Number.MAX_SAFE_INTEGER) - (right.stackedAt ?? Number.MAX_SAFE_INTEGER) || left.id.localeCompare(right.id, undefined, { numeric: true }))
     .map((card) => card.id);
 }
 

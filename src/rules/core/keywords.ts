@@ -97,9 +97,7 @@ export function modifiedStat(
   if (stat === "threat") total += threatPerHostWillpower(state, instance, printed, cards);
   const lowered = set ?? total;
   const value = lowered < floor && ((stat === "willpower" && flagged(state, instance.id, "cannotReduceWillpower")) || (stat === "defense" && flagged(state, instance.id, "cannotReduceDefense"))) ? floor : lowered;
-  const read = CARD_STATS.has(stat) ? Math.max(0, value) : value;
-  // "Threat is reduced by half (round up)" (132045:A:1): the additive modifiers come first, then the halving (rr.modifiers; families/burgle).
-  return stat === "threat" && state.modifiers.length > 0 && flagged(state, instance.id, "threatHalved") ? Math.ceil(read / 2) : read;
+  return CARD_STATS.has(stat) ? (stat === "threat" && state.modifiers.length > 0 && flagged(state, instance.id, "threatHalved") ? Math.ceil(Math.max(0, value) / 2) : Math.max(0, value)) : value; // `threatHalved` (132045:A:1, families/burgle): halved after the additive modifiers, rounded up (rr.modifiers).
 }
 
 // The enemy in this attack costs more to engage than the threat of the holder's controller. "Your threat" in "defending

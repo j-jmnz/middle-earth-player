@@ -24,9 +24,8 @@ const DRAGON_IN_STAGING: PickSpec = { type: "enemy", control: "any", stagingOnly
 const READY_HERO: PickSpec = { type: "hero", control: "you", state: "ready", who: "firstPlayer" };
 const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
 const FIRST_PLAYER: Condition = { kind: "firstPlayer" };
-// "Smaug the Golden has 6 progress": the sixth progress sends the quest to stage 4A at once (132040:A:3), so a stage's text that goes on after it is not read (faq.triggering-forced-effects).
-const GOLDEN_FULL: Condition = { kind: "canPick", pick: { ...GOLDEN_PICK, minProgress: 6 } };
-const STAGE_TWO_STILL: Condition = { kind: "not", condition: GOLDEN_FULL };
+// The 6th progress on Smaug the Golden sends the quest to stage 4A at once (132040:A:3), so the rest of stage 2B's line is not read: the stage text is no longer in play (faq.triggering-forced-effects).
+const STAGE_TWO_STILL: Condition = { kind: "onStage", stage: 2 };
 
 // A Burgle line (hob.burgle): the number of cards the first player may discard and what they share with the revealed card.
 const burgleLine = (code: string, line: string, id: number, discard: number, match: ("sphere" | "type" | "cost")[]): Effect => ({
@@ -239,7 +238,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       trigger: id === 1 ? "progressPlaced" : "damaged",
       ...(id === 1 ? { subject: "self" as const } : { subject: { type: "enemy" as const, control: "any" as const, staging: true, names: ["Smaug the Magnificent"] } }),
       condition: { kind: "less", left: { stat: "hitPoints", ofNamed: "Smaug the Magnificent", remaining: true }, right: { stat: "progress", of: "self" } },
-      instructions: [{ verb: "SetAsideInPlay", code: MAGNIFICENT, keepDamage: true }],
+      instructions: [{ verb: "SetAsideInPlay", code: MAGNIFICENT, byQuest: true }],
     })),
     { id: "132073:forced:3", cardCode: STAGE_3, lines: ["132073:B:3"], timing: "forced", trigger: "questCardDefeated", subject: "self", instructions: [{ verb: "WinGame" }] },
 
@@ -256,7 +255,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "stageProgress", min: 7 },
       instructions: [
         { verb: "SetAsideInPlay", code: PATCH },
-        { verb: "SetAsideInPlay", code: MAGNIFICENT },
+        { verb: "SetAsideInPlay", code: MAGNIFICENT, byQuest: true },
         { verb: "AddSetAsideToStaging", code: GOLDEN },
         { verb: "AdvanceToStage", code: STAGE_2, again: true },
       ],
