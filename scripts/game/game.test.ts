@@ -7,7 +7,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 import { firstDifferent, stateDiff } from "./diff.ts";
-import { baseRef, changedScenarios, compareGoldens, renderMoved, type StoredGolden } from "./moved.ts";
+import { compareGoldens, type StoredGolden } from "./compare.ts";
+import { baseRef, changedScenarios, goldenAt, renderMoved } from "./moved.ts";
 import { intentText } from "./names.ts";
 import { layoutOf, sceneSource } from "./scene-source.ts";
 import { loadSource } from "./source.ts";
@@ -92,6 +93,26 @@ describe("pnpm game", () => {
     expect(block).toContain("first differing step: intent #3 (golden.json's numbering, the Keep is #1): Pass");
     expect(block).toContain("records that resolved there: 01012:action:1 (Beravor)");
     expect(block).toContain("... 2 more");
+  });
+
+  it("says when a golden got shorter that the game now ends there, and keys a row without a name by its seed and place", () => {
+    const golden = (over: Partial<StoredGolden> = {}): StoredGolden => ({ name: "solo", outcome: "won", intents: [{ type: "Pass" }, { type: "Keep" }, { type: "Pass" }], checks: [1, 2, 3], state: { round: 3 }, ...over });
+    const [shorter] = compareGoldens([golden()], [golden({ intents: [{ type: "Pass" }, { type: "Keep" }], checks: [1, 2] })]);
+    expect(shorter).toMatchObject({ first: 2, endsNow: true, was: '{"type":"Pass"}', now: "(ended)" });
+    const block = renderMoved("a-scenario", shorter!, { intent: "Commit", effects: [], rules: [], cards: [], steps: [], more: 0 });
+    expect(block).toContain("the game now ends after intent #3");
+    expect(block).toContain("last intent: Commit");
+    expect(block).not.toContain("intent now");
+    const longer = compareGoldens([golden({ intents: [{ type: "Pass" }], checks: [1] })], [golden()])[0];
+    expect(longer).toMatchObject({ first: 1, endsNow: false });
+    const row = (seed: number, round: number): StoredGolden => ({ seed, intents: [{ type: "Pass" }], checks: [1], state: { round } });
+    const moves = compareGoldens([row(1, 2), row(1, 3)], [row(1, 2), row(1, 4)]);
+    expect(moves).toEqual([expect.objectContaining({ name: "seed 1, row 2", number: 2, kind: "moved", fields: ["round: 3 → 4"] })]);
+  });
+
+  it("returns no golden.json only for a file the ref does not hold, and refuses a flag as a ref", () => {
+    expect(goldenAt("HEAD", "no-such-scenario")).toBeNull();
+    expect(() => baseRef("--verbose")).toThrow("not a ref");
   });
 
   it("names the base ref and the scenarios whose golden.json differs from it", () => {

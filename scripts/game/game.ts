@@ -19,7 +19,9 @@ import { reduce, type PlayerIntent } from "../../src/rules/engine/reduce.ts";
 import { firstDifferent, stateDiff } from "./diff.ts";
 import { intentText, stepText } from "./names.ts";
 import { layoutOf, sceneSource } from "./scene-source.ts";
-import { baseRef, changedScenarios, compareGoldens, detailOf, goldenAt, renderMoved, ROOT, type StepDetail, type StoredGolden } from "./moved.ts";
+import { ROOT } from "../data/paths.ts";
+import { compareGoldens, type StoredGolden } from "./compare.ts";
+import { baseRef, changedScenarios, detailOf, goldenAt, renderMoved, type StepDetail } from "./moved.ts";
 import { goldenNames, listSources, loadSource, type GameSource } from "./source.ts";
 import { stateText } from "./state-text.ts";
 import { parseUntil, walk, type Move } from "./walk.ts";
@@ -114,22 +116,37 @@ function diff(source: GameSource): void {
 }
 
 // The blocks of `pnpm game moved`: each moved golden, with the intent where its table first differs replayed for the records and cards that resolved.
+// A scenario that cannot be compared or replayed prints one line that names it and the others go on.
+async function movedBlocks(ref: string, scenarioId: string): Promise<string[]> {
+  const now = JSON.parse(readFileSync(path.join(ROOT, "src", "campaign", "scenarios", scenarioId, "golden.json"), "utf8")) as StoredGolden[];
+  const blocks: string[] = [];
+  for (const move of compareGoldens(goldenAt(ref, scenarioId), now, goldenNames(scenarioId))) {
+    let detail: StepDetail | null = null;
+    let refused: string | undefined;
+    if (move.number !== null && move.first !== null) {
+      try {
+        const source = await loadSource(`${scenarioId}/${move.number}`);
+        const walked = walk(source, { at: move.endsNow ? move.first + 1 : move.first + 2 });
+        const last = walked.moves.at(-1);
+        if (walked.refused) refused = `refused at #${walked.refused.index + 1}: ${walked.refused.reason}`;
+        else if (last) detail = detailOf(last, source.ctx);
+      } catch (error) {
+        refused = `not replayed: ${error instanceof Error ? error.message : String(error)}`;
+      }
+    }
+    blocks.push(renderMoved(scenarioId, move, detail, refused));
+  }
+  return blocks;
+}
+
 async function moved(log: Log, refArg: string | undefined): Promise<void> {
   const ref = baseRef(refArg);
   const blocks: string[] = [];
   for (const scenarioId of changedScenarios(ref)) {
-    const now = JSON.parse(readFileSync(path.join(ROOT, "src", "campaign", "scenarios", scenarioId, "golden.json"), "utf8")) as StoredGolden[];
-    for (const move of compareGoldens(goldenAt(ref, scenarioId), now, goldenNames(scenarioId))) {
-      let detail: StepDetail | null = null;
-      let refused: string | undefined;
-      if (move.number !== null && move.first !== null) {
-        const source = await loadSource(`${scenarioId}/${move.number}`);
-        const walked = walk(source, { at: move.first + 2 });
-        const last = walked.moves.at(-1);
-        if (walked.refused) refused = `refused at #${walked.refused.index + 1}: ${walked.refused.reason}`;
-        else if (last) detail = detailOf(last, source.ctx);
-      }
-      blocks.push(renderMoved(scenarioId, move, detail, refused));
+    try {
+      blocks.push(...(await movedBlocks(ref, scenarioId)));
+    } catch (error) {
+      blocks.push(`${scenarioId}: not compared: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
   process.stdout.write(blocks.length > 0 ? `${blocks.join("\n\n")}\n` : `no golden.json differs from ${ref.slice(0, 10)}\n`);
@@ -142,7 +159,7 @@ async function main(log: Log): Promise<void> {
     process.stdout.write(`${listSources().join("\n")}\n`);
     return;
   }
-  if (command === "moved") return moved(log, name);
+  if (command === "moved") return moved(log, name?.startsWith("--") ? undefined : name);
   if (!["show", "log", "diff", "scene"].includes(command) || !name || name.startsWith("--")) throw new Error(USAGE);
   if (command === "scene") {
     // The layout is the argument after the scenario, when it is not a flag.
