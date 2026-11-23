@@ -38,7 +38,7 @@ The engine or the record does not do what the line prints. The writer does not f
 - The cause of each moved golden is the block `pnpm game moved` prints for it (the first differing intent and the records and cards that resolved there), pasted into the commit body: never a cause written from memory.
 - Before a new flag, verb or filter, search the families for one that does the same.
 - The review reads the fix diff with a fresh context and is told to look for the cards a general change reaches, an offer and a refusal that disagree, an ability now withheld wrongly, and the stated cause of each moved golden, which it checks against `pnpm game moved`. Its findings go to a second fix run.
-- The commit that closes the review carries a line `Reviewed: <who read the diff and what they looked at>`. `pnpm commit:check --range`, which CI runs on a pull request's commits, refuses a branch that changes `src/rules` or `src/effects/authored` with no such line (`scripts/git/range-rules.ts`).
+- The commit that closes the review carries a line `Reviewed: <who read the diff and what they looked at>`. `pnpm commit:check --range`, which CI runs on a pull request's commits, refuses a branch that changes `src/rules` or `src/effects/authored` with no such line (`scripts/git/range-rules.ts`). A branch that changes only comments there says so in the line, with how that was checked.
 
 ## Running it
 
