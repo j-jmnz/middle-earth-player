@@ -2,7 +2,7 @@
 //
 // The locate test: the tester discards 1 card from his hand to discard the top card of the encounter deck, over and over, until a discarded encounter card prints PASS (passed), or he will not discard more or has no card to discard (failed). Each try is a choice of the tester's, asked as a target
 // (askTarget: the verb runs again with the answer), so the test needs no frame of its own: no action window opens between tries (it is not a quest test or a Fortitude test). The cards go to their discard piles one at a time. An empty encounter deck is refilled from the discard pile in the
-// quest phase, the test's own discards included (rr.running-out-of-cards; agent recommendation, docs/scenarios/dwarrowdelf.md, The Long Dark); in any other phase no card can be discarded and the test is failed at once. The result is noted on the running effect for `lastLocateFailed` and `lastLocatePassed`.
+// quest phase, the test's own discards included (rr.running-out-of-cards; agent recommendation, docs/scenarios/dwarrowdelf/the-long-dark.md, The Long Dark); in any other phase no card can be discarded and the test is failed at once. The result is noted on the running effect for `lastLocateFailed` and `lastLocatePassed`.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";

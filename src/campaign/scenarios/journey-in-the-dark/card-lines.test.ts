@@ -15,7 +15,7 @@ const ROWS: readonly Row[] = [
   { line: "142042:B:2", name: "the stage is not defeated while The Great Bridge is in the staging area", layout: { stage: "142042", progress: 14, staging: ["142050"], play: ["ally", "ally", "ally"], committed: ["ally"] }, act: quest("success"), expect: [notWon, zone("142042", "questStage")] },
 
   // 142044 The Balrog A:2: "While in the staging area, The Balrog is considered to be engaged with the first player and only the first player can declare attackers against The Balrog." It adds no Threat there
-  // and no player engages it (docs/scenarios/fellowship-of-the-ring.md, Journey in the Dark, the Doom countdown and the Balrog).
+  // and no player engages it (docs/scenarios/fellowship-of-the-ring/journey-in-the-dark.md, Journey in the Dark, the Doom countdown and the Balrog).
   { line: "142044:A:2", name: "in the staging area the Balrog counts as engaged with the first player and adds no Threat", layout: { staging: ["142044"] }, act: [], expect: [flag("142044", "engagedWithFirst"), stagingThreat(0)] },
   { line: "142044:A:2", name: "an engagement check at a threat of 50 leaves the Balrog in the staging area", layout: { phase: "Encounter", staging: ["142044"], threat: [50, 0] }, act: endPhase, expect: zone("142044", "staging") },
 

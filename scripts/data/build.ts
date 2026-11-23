@@ -6,6 +6,8 @@ import { createLog, runScript, verbose, type Log } from "../log.ts";
 import { DATA_DIR, ROOT } from "./paths.ts";
 import { buildIcons } from "./icons.ts";
 import { buildCards, parseOverrides } from "./normalize/cards.ts";
+import { sourceOriginProblems } from "./sources/origins.ts";
+import type { SourceRecord } from "./sources/fetch.ts";
 import { loadRaw } from "./normalize/load-raw.ts";
 import { asksFileNames, checkAsksNames, renderAsksBarrel } from "./effects/asks-barrel.ts";
 import { authoredFileNames, authoredOrder, renderAuthoredBarrel } from "./effects/barrel.ts";
@@ -64,7 +66,9 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
     for (const [pack, list] of [...byPack].sort(([a], [b]) => a.localeCompare(b))) writeFileSync(path.join(dir, `${pack}.json`), renderCardFile(list));
   });
   // Rule text: re-extracted only when a cached PDF's sha256 differs from the committed markdown.
-  const sources = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Record<string, { files: { path: string; sha256: string }[] }> };
+  const sources = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Record<string, Pick<SourceRecord, "origin" | "publisher" | "licence"> & { files: { path: string; sha256: string }[] }> };
+  const originProblems = sourceOriginProblems(sources.sources);
+  if (originProblems.length > 0) throw new Error(`data/sources.json: ${originProblems.join("; ")}`);
   const pinned = new Map((sources.sources.rules?.files ?? []).map((file) => [file.path, file.sha256]));
   const { entries, steps } = log.step("rules", () => {
     const docs = extractAll(outDir, pinned, parseColumns(readFileSync(path.join(DATA_DIR, "rules", "columns.json"), "utf8")));

@@ -155,6 +155,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 39, scenarios: ["the-uruk-hai", "helms-deep", "the-road-to-isengard", "the-passing-of-the-grey-company", "the-siege-of-gondor", "the-battle-of-the-pelennor-fields", "the-black-gate-opens"], note: "A player whose last hero is Aragorn is eliminated when the first player token passes him on." },
   { version: 39, scenarios: ["journey-up-the-anduin", "lost-in-mirkwood", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"], note: "A treasure in your hand, like Anvil of Gundabad or Axe of the Edain, can be played onto its host like an attachment, and Durin's Dagger can be played from the discard pile." },
   { version: 39, scenarios: "all", note: "Sting's Response is offered only to a hero that exhausted to defend, not to one an effect made a defender while it was already exhausted." },
+  { version: 39, scenarios: "all", note: "Rivendell Skirmishers, Jubayr, Staff of Lebethron, Small Target and Frodo Baggins answer a defense only when the character exhausted to defend, not when an effect made it a defender while it was already exhausted." },
+  { version: 39, scenarios: "all", note: "An Action or Response that adds resources to a hero who cannot gain them from player card effects is not offered: Steward of Gondor and Orcrist on Bilbo Baggins of the Over Hill and Under Hill box, and Bilbo's Magic Ring too." },
+  { version: 39, scenarios: "all", note: "The Arkenstone is not offered with no ally of the attached hero's sphere in your hand, or when X can only be 0 at a threat of 49, and a hero that gained a resource icon is also of that sphere for it and for Good Meal." },
+  { version: 39, scenarios: "all", note: "Sting's Response, and the Fellowship's Sting, are not offered when the encounter deck is empty." },
 ];
 
 export const ENGINE_VERSION = 39;

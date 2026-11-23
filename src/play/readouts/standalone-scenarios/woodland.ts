@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.quest-advancement (data/rules/entries.json); ledger lines 51103:B:2, 51104:B:3, 51105:B:2, 51108:B:3 (docs/scenarios/standalone-scenarios.md, The Woodland Realm, The table and readings 9, 14 and 21; docs/design-system-table.md, Top bar).
+// Rules: rr.forced, rr.quest-advancement (data/rules/entries.json); ledger lines 51103:B:2, 51104:B:3, 51105:B:2, 51108:B:3 (docs/scenarios/standalone-scenarios/the-woodland-realm.md, The Woodland Realm, The table and readings 9, 14 and 21; docs/design-system-table.md, Top bar).
 //
 // The two limits The Woodland Realm's stages set, as top-bar dials. Stage 2 caps the progress placed on it each round (5, or 10 when Mendor was committed: the cap is fixed at the staging step, so the dial appears then): the ring fills toward the cap
 // and says "near" at it, as a plain limit. Stage 3B "To the Elvenking's Halls" counts the progress placed on it in the quest phase against 10, the number that reveals a card after a successful quest: a goal dial, full at 10. The engine

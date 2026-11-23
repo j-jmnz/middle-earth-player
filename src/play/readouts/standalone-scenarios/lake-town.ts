@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town), rr.victory, ltp.scoring (data/rules/entries.json); ledger lines 50201:B:1, 50202:B:1, 50203:B:3, 50207:A:1.
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town), rr.victory, ltp.scoring (data/rules/entries.json); ledger lines 50201:B:1, 50202:B:1, 50203:B:3, 50207:A:1.
 //
 // The pieces The Battle of Lake-town's cards hold on the table, as top-bar dials: the damage on Lake-town against the 50 that loses the game (it warms near the limit), on stage 3 the Victory points in the display against that damage (a goal: more points wins, a tie loses), and the damage on
 // Smaug against the cap the stage gives him (6 or 12) or, on stage 3, against his hit points. The Smaug deck and its discard pile are piles of the table (store/pile-ids.ts). The engine decided every number (the damage tokens, the `damageCeiling` and `loseAtDamage` constants, the points of

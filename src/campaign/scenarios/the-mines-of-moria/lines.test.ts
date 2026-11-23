@@ -1,4 +1,4 @@
-// Rules: rr.travel, rr.forced, rr.shadow-effects, rr.attachment-cards, rr.lasting-effects (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Mines of Moria, readings 8, 9, 22).
+// Rules: rr.travel, rr.forced, rr.shadow-effects, rr.attachment-cards, rr.lasting-effects (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-mines-of-moria.md (The Mines of Moria, readings 8, 9, 22).
 // The lines a card-spec row cannot express (spec.test.ts holds the rest): the order of the top two cards, who may travel to Chamber of Mazarbul, an attacker engaged this round, the attachments the armoured enemies bar.
 import { describe, expect, it } from "vitest";
 

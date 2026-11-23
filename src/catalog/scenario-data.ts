@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioDefinition } from "./boundary.ts";
+import { originSchema } from "./origin.ts";
 
 // A scenario as data/scenarios/<id>.json stores it: which cards go to which pile, in Normal and Easy
 // counts. The sync adapters and the quest cards' Setup text both agree on it before the build writes it.
@@ -19,7 +20,7 @@ import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioD
 // The Two Towers' second encounter decks (mec112.setup-journey-to-the-cross-roads, mec112.setup-shelobs-lair): `haradDeck` (the Men of Harad set, shuffled and
 // placed facedown under The Cross-roads) and `greatSpiderDeck` (The Great Spider set, set aside). Neither is part of the encounter deck.
 // Angmar Awakened's Orc deck (mec108.orc-deck): `angmarOrcDeck`, the Angmar Orcs enemies and Concealed Orc-camp The Weather Hills' Setup takes out of the encounter deck.
-// The Battle of Lake-town's Smaug deck (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town): `smaugDeck`, the nine Smaug cards its Setup shuffles into a separate deck, with a discard pile of its own.
+// The Battle of Lake-town's Smaug deck (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town): `smaugDeck`, the nine Smaug cards its Setup shuffles into a separate deck, with a discard pile of its own.
 export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "smaugDeck"] as const;
 export type Pile = (typeof PILES)[number];
 
@@ -67,6 +68,8 @@ export const scenarioDataSchema = z
   .strictObject({
     id: z.string().min(1),
     name: z.string().min(1),
+    // Absent on an official scenario; a fan-made one names its publisher (src/catalog/origin.ts).
+    origin: originSchema.optional(),
     number: z.number().int().positive(),
     stages: z.array(z.string().min(1)).min(1),
     // The booklet's encounter sets, in booklet order, with the Normal count of cards each contributes.
@@ -99,7 +102,7 @@ export const scenarioDataSchema = z
     // The code of the scenario's own mode card (The Siege of Annúminas' Standard Game Mode): its Setup runs before the quest card's, then it is flipped and kept beside the quest deck all game
     // (`ScenarioDefinition.modeCard`). The Dream-chaser Hard/Expert Mode card is not this: a campaign with XP adds it (MODE_CARD_CODE).
     modeCard: z.string().min(1).optional(),
-    // The mode card the app's Easy difficulty deals in its place (The Hunt for the Dreadnaught's Easy Mode, docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, reading 1): the Setup, the back and the game are as with `modeCard`.
+    // The mode card the app's Easy difficulty deals in its place (The Hunt for the Dreadnaught's Easy Mode, docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, reading 1): the Setup, the back and the game are as with `modeCard`.
     easyModeCard: z.string().min(1).optional(),
   })
   .superRefine((data, context) => {

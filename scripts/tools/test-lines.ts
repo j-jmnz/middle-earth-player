@@ -59,7 +59,7 @@ function dump(cwd: string, out: string): RecordDump {
 }
 
 /** The records of the working tree and of `ref` (a detached checkout in a temporary folder, on this folder's packages, removed after). */
-function dumps(ref: string, log: Log): Promise<{ base: RecordDump; now: RecordDump }> {
+export function dumps(ref: string, log: Log): Promise<{ base: RecordDump; now: RecordDump }> {
   return withBaseCheckout(ref, { prefix: "test-lines-", copy: ["scripts/data/effects/records-dump.ts"] }, (base) => {
     const before = dump(base.checkout, path.join(base.work, "base.json"));
     log.debug(`records of ${ref}: ${Object.keys(before).length}`);

@@ -1,4 +1,4 @@
-// The smaug family (The Battle of Lake-town, docs/scenarios/standalone-scenarios.md, The Battle of Lake-town): the Smaug deck revealed at the beginning of every quest phase, Burn X and "resolve all burn damage", Smaug's attack against Lake-town and the stage that heals Lake-town with progress.
+// The smaug family (The Battle of Lake-town, docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town): the Smaug deck revealed at the beginning of every quest phase, Burn X and "resolve all burn damage", Smaug's attack against Lake-town and the stage that heals Lake-town with progress.
 // Lake-town takes damage tokens (`changeDamageOn` of the moria family), its damage and the Victory points in the display are the amounts `lakeTownDamage` and `victoryDisplay` (effect-schema-amount.ts), and the card refs `smaug` and `lakeTown` name the two cards
 // (MoveDamageTo). src/rules/families/smaug/ runs and reads them.
 import { z } from "zod";

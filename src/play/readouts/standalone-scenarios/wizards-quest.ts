@@ -1,4 +1,4 @@
-// Rules: rr.guarded, rr.in-play-and-out-of-play, rr.reveal (data/rules/entries.json); ledger lines 51004:B:1, 51004:B:2, 51013:A:1, 51205:B:1, 51241:A:1 (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, readings 9 and 3; The Mines of Moria, readings 10 and 11; docs/design-system-table.md, Top bar).
+// Rules: rr.guarded, rr.in-play-and-out-of-play, rr.reveal (data/rules/entries.json); ledger lines 51004:B:1, 51004:B:2, 51013:A:1, 51205:B:1, 51241:A:1 (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, readings 9 and 3; The Mines of Moria, readings 10 and 11; docs/design-system-table.md, Top bar).
 // The player cards a quest card holds faceup under it (an ally under Carried Away, a card of a hand under Necromancer's Pass, an attachment under Narrow Paths) and the cards Hidden Threat lays facedown under the main quest: the host's pill counts them and names each owner, and the held card's preview says where it lies.
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { printedOf } from "../../../rules/core/printed.ts";

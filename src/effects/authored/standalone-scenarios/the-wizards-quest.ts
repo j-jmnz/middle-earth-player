@@ -2,7 +2,7 @@ import type { Amount, Condition, Effect, Instruction, PickSpec } from "../../../
 
 // Records for The Wizard's Quest (standalone-scenarios cycle part 10, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints word for word needs no record here.
 // The scenario is a kit: the quest card 51001's Setup builds the Quick-build game (BuildQuickDeck: 7 of the 14 encounter sets; ChooseQuestStage: the first player's stage 2 and stage 3) and searches for the 0 cost enemy or location of each player. "The opposing team" chooses
-// and searches in the manner that gives the players the greatest challenge: the engine's fixed policy, never a prompt (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, readings 1 and 3: the search fields byChallenge, maxCost, maxCostMulti, types and top; the pick field `challenge`).
+// and searches in the manner that gives the players the greatest challenge: the engine's fixed policy, never a prompt (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, readings 1 and 3: the search fields byChallenge, maxCost, maxCostMulti, types and top; the pick field `challenge`).
 // Rules: rr.search, rr.reveal, rr.cancel, rr.guarded, rr.explored, rr.forced, rr.travel, rr.engaged, rr.staging, rr.first-player, rr.the-word-choose, rr.victory, rr.quest-advancement, rr.in-play-and-out-of-play, rr.attachment-cards, rr.doomed-x, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json).
 const STAGE_1 = "51001";
 const STAGES_2 = ["51003", "51004", "51005"] as const;
@@ -209,7 +209,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "51021:forced:1", cardCode: "51021", lines: ["51021:A:2"], timing: "forced", trigger: "endOfPhase", condition: { kind: "phase", is: "Combat" }, instructions: [damageOneOf(MY_HERO)] },
   { id: "51021:shadow:1", cardCode: "51021", lines: ["51021:A:3"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "defenseIgnored", amount: 1, until: "endOfAttack", target: "attacker" }] },
 
-  // 51022 Pine Slopes: each Pine Slopes gets +2 Threat until the end of the phase. Travel: raise your threat (the first player's: he travels, rr.step-4-2, docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 14) by 1 for each Pine Slopes in the staging area.
+  // 51022 Pine Slopes: each Pine Slopes gets +2 Threat until the end of the phase. Travel: raise your threat (the first player's: he travels, rr.step-4-2, docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, reading 14) by 1 for each Pine Slopes in the staging area.
   { id: "51022:whenRevealed:1", cardCode: "51022", lines: ["51022:A:1"], timing: "whenRevealed", instructions: [{ verb: "ModifyStat", stat: "threat", amount: 2, until: "endOfPhase", holders: { type: "location", control: "any", names: ["Pine Slopes"] } }] },
   { id: "51022:travel:1", cardCode: "51022", lines: ["51022:A:2"], timing: "travel", instructions: [{ verb: "RaiseThreat", amount: { count: { type: "location", control: "any", stagingOnly: true, names: ["Pine Slopes"] } }, who: "firstPlayer" }] },
 
@@ -305,7 +305,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     ],
   },
 
-  // 51037 Hunting Warg: after it engages a player it makes an immediate attack; dealt a shadow card with no effect for that attack it gets +2 Attack for it (ImmediateAttack `blankBonus`, for the attack itself: docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 16).
+  // 51037 Hunting Warg: after it engages a player it makes an immediate attack; dealt a shadow card with no effect for that attack it gets +2 Attack for it (ImmediateAttack `blankBonus`, for the attack itself: docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, reading 16).
   { id: "51037:forced:1", cardCode: "51037", lines: ["51037:A:1"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "ImmediateAttack", blankBonus: 2 }] },
 
   // 51038 Hunter's Lookout: while in the staging area it raises each player's threat at the end of the round for each enemy in the staging area. Travel: the highest Attack enemy in the staging area attacks the first player.

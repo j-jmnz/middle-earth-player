@@ -2,7 +2,7 @@
 
 The data, rulings and readings of The Hobbit cycle, scenario by scenario. Product rules, the Domain and the Core round are in `docs/brief.md`; the authority order is in `.claude/rules/authority.md`.
 
-The saga cycle of 2012 and 2013: the two saga boxes The Hobbit: Over Hill and Under Hill (`OHaUH`, MEC16: We Must Away, Ere Break of Day; Over the Misty Mountains Grim; Dungeons Deep and Caverns Dim) and The Hobbit: On the Doorstep (`OtD`, MEC24: Flies and Spiders; The Lonely Mountain; The Battle of Five Armies). Like Dwarrowdelf it is `kind: "cycle"` (`data/campaigns/the-hobbit.json`): no campaign card, no booklet, no Campaign Mode, every game standalone on Easy and Normal (user decision, 2026-11-23, for the cycle's six scenarios). It lists under Coming later until one scenario is playable (`src/campaign/playable.ts`). The cycle is data: `scripts/data/cycle-defs.ts` (its six scenarios with the DragnCards decks `Q0A.n` and `E0A.n`), `scripts/data/campaign-defs.ts` (its two products), `scripts/data/normalize/setup-hobbit.ts` (the Setup sentences of the six stage 1A cards), and the folder `the-hobbit` for authored effects and seed finders; `scripts/data/the-hobbit.test.ts` holds its piles, counts and Nightmare decks.
+The saga cycle of 2012 and 2013: the two saga boxes The Hobbit: Over Hill and Under Hill (`OHaUH`, MEC16: We Must Away, Ere Break of Day; Over the Misty Mountains Grim; Dungeons Deep and Caverns Dim) and The Hobbit: On the Doorstep (`OtD`, MEC24: Flies and Spiders; The Lonely Mountain; The Battle of Five Armies). Like Dwarrowdelf it is `kind: "cycle"` (`data/campaigns/the-hobbit.json`): no campaign card, no booklet and no Campaign Mode, so every game is standalone; Nightmare is not built (the data names no scenario for the Nightmare decks). It lists under Coming later until one scenario is playable (`src/campaign/playable.ts`). The cycle is data: `scripts/data/cycle-defs.ts` (its six scenarios with the DragnCards decks `Q0A.n` and `E0A.n`), `scripts/data/campaign-defs.ts` (its two products), `scripts/data/normalize/setup-hobbit.ts` (the Setup sentences of the six stage 1A cards), and the folder `the-hobbit` for authored effects and seed finders; `scripts/data/the-hobbit.test.ts` holds its piles, counts and Nightmare decks.
 
 - **Data.** The rules inserts (`ohauh`, `otd`) are pinned as rules docs with `hob.*` spans (`data/rules/index.json`): each scenario's encounter-set paragraph is `hob.setup-<scenario id>`. The scenario files carry no Setup span (`setupSpan`): the sets are Hall of Beorn's list checked against the load list, as in Dwarrowdelf, because an insert's set names hold commas and "and" (We Must Away, Ere Break of Day; Flies and Spiders). The printed ledger is `data/printed/the-hobbit.json`: every side of every card the six scenarios deal, both Bilbo Baggins heroes, the two Baggins-sphere events and the nine treasure cards, read from the scans (`scripts/data/printed/scope.ts`, `hobbitCodes`). Nightmare is out of scope: the decks 9055 to 9060 are built as cards (`scripts/data/nightmare-defs.ts`) but name no scenario, so the scenario files carry no Nightmare block and the ledger no Nightmare lines. Naming a scenario in a row builds the block (the removals resolve), and the Nightmare ledger lines are then read from the proxy pictures.
 - **Rules shared by the scenarios of a box** (each box has its own copy, the words differ): Bilbo Baggins and the Baggins sphere (`hob.bilbo-baggins-ohauh`, `hob.baggins-sphere-ohauh`, `hob.bilbo-multiplayer-ohauh`; `hob.bilbo-baggins-otd`, `hob.baggins-sphere-otd`, `hob.bilbo-multiplayer-otd`), Treasure (`hob.treasure-ohauh`, `hob.treasure-otd`), the saga expansion's player cards (`hob.saga-player-cards-ohauh`, `hob.saga-player-cards-otd`), Immune to player card effects (`hob.immune-to-player-card-effects`) and Indestructible (`hob.indestructible`).
@@ -11,56 +11,6 @@ The saga cycle of 2012 and 2013: the two saga boxes The Hobbit: Over Hill and Un
 - **Piles.** The piles are the DragnCards load lists' (Q0A.1 to Q0A.6, E0A.1 to E0A.6), checked against the stage 1A card's printed Setup. Bilbo Baggins (player 1's play area in every list) is dealt in no pile: the first player takes control of him at the start of every game. We Must Away sets aside the seven Sack objectives, the three Trolls and Troll Cave (the Sack deck is built from the set-aside Sack cards); Over the Misty Mountains Grim's second encounter deck (Misty Mountain Goblins and The Great Goblin) is the `encounterDeck2` pile; The Lonely Mountain sets aside the five Erebor treasure cards (stacked under The Lonely Mountain at Setup); Flies and Spiders sets aside The Spider's Glade and three copies of the treasure Bilbo's Magic Ring.
 - **Treasure sets.** A treasure card's set icon is the scenario where it is discovered: the troll icon of We Must Away (Sting, Orcrist, Glamdring), the spider web of Flies and Spiders (Bilbo's Magic Ring), the dragon of The Lonely Mountain (the five Erebor treasures). Each insert prints the treasure icons a scenario accepts as pictures only (no text): one icon in Over the Misty Mountains Grim, Dungeons Deep and Caverns Dim and Flies and Spiders, two in The Lonely Mountain, three in The Battle of Five Armies. They are the sets of the earlier scenarios of the cycle that discover treasure (We Must Away; then Flies and Spiders; then The Lonely Mountain).
 - **Readings.** Each scenario below lists what its cards, rulesheet and sources leave open or settle, with sources (`.claude/rules/authority.md`, Open points).
-
-## We Must Away, Ere Break of Day
-
-Pack `OHaUH`, deck Q0A.1 / E0A.1. Encounter sets We Must Away, Ere Break of Day and Western Lands (`hob.setup-we-must-away-ere-break-of-day`). The 1A Setup sets the Sack cards (Sack trait), the three unique Troll enemies and Troll Cave aside; `hob.sack-x` shuffles a Sack card that leaves play back into the sack deck.
-
-- The seven Sack cards are the `setAside` pile (a Sack deck is a Setup record's work, not a pile of its own); DragnCards loads them in its second shared deck (literal).
-- A Sack card's printed text is two paragraphs (the attach rule, then what the attached character cannot do); Hall of Beorn runs them together, so the ledger has two lines (scan).
-
-## Over the Misty Mountains Grim
-
-Deck Q0A.2 / E0A.2. First deck: Over the Misty Mountains Grim and Western Lands; second, inactive deck: Misty Mountain Goblins and The Great Goblin (`hob.setup-over-the-misty-mountains-grim`, `hob.active-and-inactive-encounter-decks`). Hall of Beorn lists the sets of the first deck only, so `encounterSets` names all four (`scripts/data/cycle-defs.ts`).
-
-- Stone-Giant: DragnCards stages one copy; the printed 1B advances at once to stage 2A, whose When Revealed (131027:B:1) finds a copy in the encounter deck. All three copies start in the encounter deck (`data/overrides.json`, scenarioPiles; printed card).
-
-- Quest stages (standard sides): 1A is the Setup and 1B advances at once. Stage 2 (16 points) and stage 3 (20 points) arrive on their B face (`arrivalFace`): stage 2's B text (131027:B:1, the Stone-giant search) resolves as it arrives; stage 3 resolves its A text (131028:A:1, the deck swap) and then its B text (131028:B:2) in one frame, and 131028:B:1 and B:3 hold from then on. `literal`.
-- The deck swap (131028:A:1; `hob.active-and-inactive-encounter-decks`; `span-settled`, the card wins where the span differs). The span says the cards in play and in the discard pile are removed from the game; the card says all encounter cards are shuffled back into the first deck and set aside. Both leave the same table: the encounter enemies and locations in play (staging area, engaged enemies, the active location), with the attachments on them, go to the discard pile, the first deck and its discard pile are set aside inactive (`SetAsideEncounterDeck`), the Misty Mountain Goblins and The Great Goblin sets are shuffled in (`ShuffleSetAsideSet` for each), then The Great Goblin is searched and the deck shuffled. The victory display and the quest cards stay. No new verb (as From Sea to Land, `dcce.from-sea-to-land`).
-- Bilbo's reduction (131028:B:2; `recommended`, none settled it). The first player (Bilbo's controller) chooses X from 0 to the resources in Bilbo's pool, spends X (a spend, so an effect that hears resources spent hears them: `SpendResources` with an `X` amount), and the stage reveals 3 per player less X, at least 1. The alternative, a reduction by a player who does not control Bilbo, cannot occur. Sources read: Hall of Beorn page of the card (https://hallofbeorn.com/LotR/Details/Down-Down-to-Goblin-Town-THOHaUH?Lang=EN, no ruling), the FAQ (`faq.*`, none).
-- Guffawing of Giants (131073:A:1; `recommended`). A tie for the highest threat is broken by the first player (`rr.first-player`: the first player makes the choices the players cannot agree on; the FFG forum answer on a tie for the highest threat, found through the search https://ffg-forum-archive.entropicdreams.com/topic/55677-a-journey-to-rhosgobel-card-query; no ruling on this card exists). The delay is to the end of the quest phase (`rr.delayed-effects`; `Delay` with `phase: "Quest"`): revealed in another phase, the Stone-giant waits for the next quest phase to end. A Stone-giant the search finds when none is in the staging area is not "chosen", so it only enters the staging area and does not engage. Alternative: it also engages at the end of the quest phase. Sources read: https://hallofbeorn.com/LotR/Details/Guffawing-of-Giants-THOHaUH (card text only), the FAQ (none).
-- "After The Great Goblin attacks" (131063:A:1; `literal`): after the attack resolves, as the other "After X attacks" Forced effects do (Chieftain Ufthak). Only Goblin enemies among the discarded cards go to the staging area; the others stay in the discard pile.
-- Cave Entrance (131041:A:1; `recommended`): the top X cards of the discard pile (the most recently discarded first) move together to the bottom of the encounter deck, keeping their order. Alternative: reversed order. No source speaks to it.
-- Baggins resources (131057:A:1, 131066:A:2, 131068:A:1; `literal`): the resource tokens in Bilbo's pool; the first player pays them (Bilbo's controller). The Actions of Front Porch and Overhanging Rock belong to the location, so any player may start them (`rr.action`), but a player pays only from his own heroes' pools: a player who does not control Bilbo holds no Baggins resource and is not offered them. Front Porch's line names the first player, so no other player is offered it. The Action of Overhanging Rock is offered only while the paying player's deck holds a card. Dreary Hills and Lone-Lands (131039, 131040): Bilbo's pool is one of the hero pools a player may remove a resource from (`hob.bilbo-baggins-ohauh`), and his gain is an encounter card effect, so his printed limit does not stop it. `literal`.
-- Stone-Giant surge (131064:A:1), Goblin Axeman and Goblin Miners (131058:A:1, 131059:A:1: Cave locations in the staging area and the active location), Goblin Bent-Swords (131062:A:1): conditional values and keywords, `literal`.
-- Chaos in the Cavern (131071:A:1; `recommended`, none settled it). "Then" holds the +1 Threat to each Goblin enemy until the end of the phase behind the return of the engaged enemies (`rr.then`): with no enemy engaged nothing returns, so no Goblin gets the +1. Alternative: the +1 Threat always resolves. Sources read: the FFG FAQ (no entry for this card), Hall of Beorn's card page and a web search of forum text, none of which rules on it.
-
-## Dungeons Deep and Caverns Dim
-
-Deck Q0A.3 / E0A.3. Sets Dungeons Deep and Caverns Dim and Misty Mountain Goblins (`hob.setup-dungeons-deep-and-caverns-dim`); the riddle area is `hob.riddle-area`.
-
-- Gollum and Bilbo's Magic Ring: DragnCards stages them; stage 2A's own Setup (131030:A:1) searches the encounter deck for them and places them in the riddle area, so they start in the encounter deck (`data/overrides.json`, scenarioPiles; printed card).
-- The Goblins' Caves in Easy: DragnCards' E0A.3 holds 1, the Easy Mode sheet removes 1 of 3 (Easy 2, Hall of Beorn agrees); the sheet wins (`easy-mode.the-hobbit`, overrides scenarioEasy).
-- Hall of Beorn's pile counts of the Misty Mountain Goblins set needed DragnCards' rows resolved by pack number: DragnCards names the pack "The Hobbit - Over Hill and Under Hill" (`overrides.dragnPackAliases`).
-
-## Flies and Spiders
-
-Pack `OtD`, deck Q0A.4 / E0A.4. Sets Flies and Spiders and Wilderland (`hob.setup-flies-and-spiders`; the insert of The Battle of Five Armies spells it Wilderlands).
-
-- The 1A Setup lets each player shuffle 1 copy of Bilbo's Magic Ring into the deck; the load list sets aside 3 copies of the treasure card, the box holds 1 (Hall of Beorn quantity 1). The data keeps the load list's 3 (recommended; no source found, searches of the FFG FAQ, RulesPal and forum text gave no ruling; the Setup record decides how many copies a table of N players gets). Listed in Readings to confirm.
-
-## The Lonely Mountain
-
-Deck Q0A.5 / E0A.5. Sets The Lonely Mountain and Wilderland (`hob.setup-the-lonely-mountain`).
-
-- Easy counts of Fighting Among Friends (2 removed) and Weighed Down (1 removed): DragnCards' E0A.5 keeps both copies of each; the Easy Mode sheet, Hall of Beorn and the other two Wilderland decks (E0A.4, E0A.6) agree on the removal (overrides scenarioEasy).
-- The treasure stack (`hob.burgle`) is the five set-aside Erebor treasure cards.
-
-## The Battle of Five Armies
-
-Deck Q0A.6 / E0A.6. Sets The Battle of Five Armies and Wilderland (`hob.setup-the-battle-of-five-armies`); stages 2 to 4 are in play together (`hob.multiple-stages-in-play`).
-
-- Hall of Beorn lists stages 2 to 5 and leaves out stage 1A; it is added by `overrides.scenarioStages` and takes its place by stage number. Hall of Beorn and DragnCards' load list disagree on the title: the card prints "The Gathering of the Clouds" (scan 132075.A), and `overrides.cards` names it so and corrects the picture address, which answers 403 under Hall of Beorn's spelling.
 
 ## The shared rules
 
@@ -85,11 +35,18 @@ Where a scan and Hall of Beorn's text differ, the card wins (`.claude/rules/auth
 - Printed misprints, kept under `misprints`: Ravenous Warg prints "Ravenous Wargs attacks" (132059:A:1); A Warm Welcome 1B prints "At the end of round" (132071:B:2).
 - The OHaUH insert says Bilbo "cannot gain resources through player card effects" (`hob.baggins-sphere-ohauh`); the card prints "from player card effects" (131001:A:1). The card wins.
 
+## Scenario files
+
+- `docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md`: We Must Away, Ere Break of Day
+- `docs/scenarios/the-hobbit/over-the-misty-mountains-grim.md`: Over the Misty Mountains Grim
+- `docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md`: Dungeons Deep and Caverns Dim
+- `docs/scenarios/the-hobbit/flies-and-spiders.md`: Flies and Spiders
+- `docs/scenarios/the-hobbit/the-lonely-mountain.md`: The Lonely Mountain
+- `docs/scenarios/the-hobbit/the-battle-of-five-armies.md`: The Battle of Five Armies
+
 ## Readings to confirm
 
-- Flies and Spiders, copies of the treasure Bilbo's Magic Ring: recommended, see Flies and Spiders.
 - Treasure with no Campaign Log: the discovery condition is waived and the set icon is kept: recommended, see The shared rules.
 - A treasure is played from the hand like an attachment: recommended, see The shared rules.
 - The Baggins sphere cards stay deck-legal outside the Hobbit scenarios: recommended, see The shared rules.
 - The Arkenstone's X is chosen when the action resolves, not paid as a cost: recommended, see The shared rules.
-- Over the Misty Mountains Grim: Bilbo's reduction of the reveals (131028:B:2), the Stone-giant a search finds for Guffawing of Giants (131073:A:1) and the order of the cards Cave Entrance moves (131041:A:1) and the +1 Threat of Chaos in the Cavern with no engaged enemy (131071:A:1): recommended, see Over the Misty Mountains Grim.

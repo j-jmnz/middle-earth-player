@@ -14,6 +14,10 @@ export type SourceRecord = {
   pin: { kind: "sha256" | "git"; value: string };
   fetchedAt: string;
   files: SourceFile[];
+  // Absent on an official source. A fan-made source names its publisher and its licence (scripts/data/sources/origins.ts).
+  origin?: "official" | "fan-made";
+  publisher?: string;
+  licence?: string;
 };
 
 export function sha256(body: string | Uint8Array): string {

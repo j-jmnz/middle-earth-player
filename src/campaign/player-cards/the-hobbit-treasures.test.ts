@@ -177,8 +177,9 @@ describe("131021:A:1 to A:3 Orcrist", () => {
   // Bilbo of the Over Hill and Under Hill box "cannot gain resources from player card effects", and a treasure is a player card: the card wins over the box's wish for his own treasures (hob.baggins-sphere-ohauh).
   it("131021:A:3 adds no resource to Bilbo Baggins of the Over Hill and Under Hill box (131001:A:2)", () => {
     const { t, declared } = attacked(EFFECTS, true);
-    const used = accept(declared, { type: "Trigger", cardId: t.ids[ORCRIST]!, effectId: "131021:response:1" }, t.ctx);
-    expect(used.cards[t.ids.host!]?.resources).toBe(0);
+    // The Response could add him nothing, so it is not offered (rr.triggered-ability) and his pool stays empty.
+    expect(triggers(declared, t.ctx, "131021:response:1")).toEqual([]);
+    expect(declared.cards[t.ids.host!]?.resources).toBe(0);
   });
 });
 

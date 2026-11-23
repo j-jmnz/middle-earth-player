@@ -3,7 +3,7 @@ import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 
 // The Watcher in the Water Nightmare (deck 9015, data/printed/nightmare.json). The setup card's A:1 and its side B are the deck-building text (inert). A:2: while Doors of Durin is in play The Watcher cannot be engaged at all; A:3: a Tentacle enemy destroyed damages The
 // Watcher if it is in play; A:4: the stage cannot be defeated until Doors of Durin and The Watcher are both in the victory display. The Nightmare Watcher takes the standard one's place (the setup card's recipe), takes no damage from player card effects in the staging area, and
-// deals the standard one's end-of-combat damage. The Tentacles and the locations use the discard check, `lookedAtEncounterDeck` and the Tentacle attachments of the box's records. The readings are in docs/scenarios/dwarrowdelf.md (The Watcher in the Water).
+// deals the standard one's end-of-combat damage. The Tentacles and the locations use the discard check, `lookedAtEncounterDeck` and the Tentacle attachments of the box's records. The readings are in docs/scenarios/dwarrowdelf/the-watcher-in-the-water.md (The Watcher in the Water).
 // Rules: dwd.doors-of-durin, rr.cannot, rr.victory, rr.destroy, rr.damage, rr.shadow-effects, rr.search, rr.travel, rr.reveal, rr.first-player, rr.attachment-cards (data/rules/entries.json).
 const DOORS = "04065";
 const WATCHER = "04072";

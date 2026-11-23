@@ -1,4 +1,4 @@
-// Rules: rr.quest-advancement, rr.victory (data/rules/entries.json); ledger lines 147002:B:2, 147003:B:2, 147004:B:2, 147005:B:2, 147006:B:1, 147011:A:2 (docs/scenarios/standalone-scenarios.md, The Old Forest, The table).
+// Rules: rr.quest-advancement, rr.victory (data/rules/entries.json); ledger lines 147002:B:2, 147003:B:2, 147004:B:2, 147005:B:2, 147006:B:1, 147011:A:2 (docs/scenarios/standalone-scenarios/the-old-forest.md, The Old Forest, The table).
 //
 // The piece The Old Forest's stage 2 holds on the table, as a top-bar dial: the Victory points of the locations in the victory display against the players times 5 that send the quest on to stage 3A (a goal dial: more is the way on). It warms when one location (3 points at most) is
 // short, and a tap on it opens the victory display's list. On stage 3B the quest readout says Withywindle holds the win when the progress would fill the stage. The engine decided every number (the points, the players, the records' own X); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
