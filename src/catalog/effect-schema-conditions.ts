@@ -380,6 +380,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The holder is in the staging area of the player `seat` or engaged with a player who shares it (mec108.create-staging-area): an encounter card's lasting effect on "each enemy" reaches the enemies of its own staging area only while the staging areas are separate. Engine use: the stat modifier
   // an encounter card's effect makes carries it; read while a stat is read (src/rules/core/keywords.ts).
   z.strictObject({ kind: z.literal("inArea"), seat: z.number().int().min(0) }),
+  // A stat modifier's: the holder is exhausted now, read each time the stat is read ("exhausted characters get -1 Willpower, -1 Attack, and -1 Defense", 132038:A:1; faq.lasting-effects).
+  z.strictObject({ kind: z.literal("holderExhausted") }),
   // The sole attacker: exactly one character was declared as an attacker in the attack in progress ("declared as the only attacker", 143015:A:3; rr.step-6-8b). Read by the attack family.
   // The encounter deck placed at least 1 progress on the current quest stage itself as the result of questing, in the quest resolution just made (the Defense keyword, mec112.defense):
   // progress the active location took does not count (143074:B:2). False while no quest has resolved under Defense. Read by the fortress family.
@@ -418,8 +420,8 @@ export const conditionSchema = z.discriminatedUnion("kind", [
 
 export type Condition = z.infer<typeof conditionSchema>;
 
-export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" | "versusVictoryTrait" | "inArea" | "defendingAgainst" }> {
-  return condition?.kind === "versusHighEngagement" || condition?.kind === "defendingAgainst" || condition?.kind === "attacking" || condition?.kind === "versusDefender" || condition?.kind === "versusVictoryTrait" || condition?.kind === "inArea";
+export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" | "versusVictoryTrait" | "inArea" | "defendingAgainst" | "holderExhausted" }> {
+  return condition?.kind === "versusHighEngagement" || condition?.kind === "defendingAgainst" || condition?.kind === "attacking" || condition?.kind === "versusDefender" || condition?.kind === "versusVictoryTrait" || condition?.kind === "inArea" || condition?.kind === "holderExhausted";
 }
 
 export const targetSchema = z.discriminatedUnion("kind", [
