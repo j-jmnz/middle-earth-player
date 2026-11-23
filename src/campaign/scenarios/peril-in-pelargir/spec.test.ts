@@ -1,135 +1,54 @@
-// Rules: TODO name the rule ids the rows exercise (data/rules/entries.json).
+// Rules: rr.forced, rr.reveal, rr.shadow-effects, rr.travel, rr.search, rr.engaged, rr.optional-engagement, rr.attachment-cards, rr.running-out-of-cards (data/rules/entries.json). Lines that need Alcaron's Scroll on a hero or a played-out game are tests titled with their line id in lines.test.ts.
 import { describe, it } from "vitest";
 
-import { cardSpecs, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, handCount, resolve, resourcesOn, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Peril in Pelargir (against-the-shadow part 1): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
-// TODO: the rows; the todo below stands in until there is one.
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points;
+// every seat starts at threat 28; a layout's phase is the one the row names. The layout's attachments are plain attachments in play, so the rows that need the Scroll on a hero are in lines.test.ts.
+const THUG = "05020";
+const PICKPOCKET = "05037";
+const ZEALOUS = "05042";
+const BANDIT = "05043";
+const ASSASSIN = "05044";
+
 const ROWS: readonly Row[] = [
-  // 05019 Alcaron's Scroll.
-  // 05019:A:1 printed: If unattached, return Alcaron's Scroll to the staging area and it gains: 'Action: Exhaust a hero to attach Alcaron's Scroll to that hero.'
-  // records 05019:constant:1, 05019:action:1; timing constant, action
-  { line: "05019:A:1", name: "If unattached, return Alcaron's Scroll to the staging area and it", todo: "write the row from the printed line (2 records, timing constant, action)", layout: {}, act: [], expect: [] },
-  // 05019:A:2 printed: Forced: When the hero with Alcaron's Scroll attached is damaged by an enemy attack, attach Alcaron's Scroll to that enemy.
-  // records 05019:forced:1; timing forced
-  { line: "05019:A:2", name: "Forced: When the hero with Alcaron's Scroll attached is damaged by an", todo: "write the row from the printed line (1 record, timing forced)", layout: {}, act: [], expect: [] },
+  { line: "05022:A:1", name: "While Pelargir Docks is the active location, enemies in the staging area and engaged get +1 Attack and +1 Defense", layout: { active: "05022", engaged: [THUG], staging: [ZEALOUS] }, act: [], expect: [stat(THUG, "attack", 4), stat(THUG, "defense", 2), stat(ZEALOUS, "attack", 4), stat(ZEALOUS, "defense", 3)] },
 
-  // 05020 Harbor Thug.
-  // 05020:A:1 printed: Forced: When the player whose hero has Alcaron's Scroll attached raises his threat, Harbor Thug engages that player.
-  // records 05020:forced:1; timing forced
-  { line: "05020:A:1", name: "Forced: When the player whose hero has Alcaron's Scroll attached", todo: "write the row from the printed line (1 record, timing forced)", layout: {}, act: [], expect: [] },
-  // 05020:A:2 printed: Shadow: Any damage dealt by this attack is dealt to the hero with Alcaron's Scroll attached, if able.
-  // records 05020:shadow:1; timing shadow
-  { line: "05020:A:2", name: "Shadow: Any damage dealt by this attack is dealt to the hero with", todo: "write the row from the printed line (1 record, timing shadow)", layout: {}, act: [], expect: [] },
+  { line: "05023:A:1", name: "Each time a location is discarded from the top of the encounter deck, each player raises his threat by 1 (and Collateral Damage's own 2 for that location)", layout: { staging: ["05023"], deck: ["05021", "f0", "f0"] }, act: reveal("05024"), expect: threat(31) },
+  { line: "05023:A:2", name: "Shadow: one additional shadow card for each Thug in play (two in the staging area; the threat 20 keeps them there): 1 shadow card and 2 more leave the deck", layout: { staging: [THUG, THUG], threat: [20, 20] }, act: attack("f3", { shadow: "05023", undefended: true }), expect: deckCount(1) },
 
-  // 05021 The Leaping Fish.
-  // 05021:A:1 printed: If Alcaron's Scroll is attached to a hero, The Leaping Fish gains: 'Forced: At the beginning of the quest phase discard X cards from the top of the encounter deck where X is the number of players in the game. Add each enemy discarded by this effect to the staging area.'
-  // records 05021:forced:1; timing forced
-  { line: "05021:A:1", name: "If Alcaron's Scroll is attached to a hero, The Leaping Fish gains", todo: "write the row from the printed line (1 record, timing forced)", layout: {}, act: [], expect: [] },
+  { line: "05024:A:1", name: "Discard 2, 2 more for each copy in the discard pile, then each player raises his threat by 2 for each location discarded", layout: { deck: ["05021", "f0", "05022", "f0", "f0", "f0"], discard: ["05024"] }, act: reveal("05024"), expect: [threat(32), deckCount(2)] },
+  { line: "05024:A:1", name: "No copy in the discard pile: only 2 are discarded", layout: { deck: ["05021", "05022", "05023", "f0"] }, act: reveal("05024"), expect: [threat(32), deckCount(2)] },
 
-  // 05022 Pelargir Docks.
-  // 05022:A:1 printed: While Pelargir Docks is the active location, enemies get +1 Attack and +1 Defense.
-  // records 05022:constant:1; timing constant
-  { line: "05022:A:1", name: "While Pelargir Docks is the active location, enemies get +1 Attack and", todo: "write the row from the printed line (1 record, timing constant)", layout: {}, act: [], expect: [] },
+  { line: "05037:A:1", name: "Forced when it attacks: the defender discards 1 resource from a hero of his choice and 1 card at random", layout: { heroResources: 2, hand: ["filler", "filler"] }, act: [attack(PICKPOCKET, { undefended: true }), answer("dh1")], expect: [resourcesOn("dh1", 1), resourcesOn("dh2", 2), handCount(1)] },
+  { line: "05037:A:1", name: "No resource anywhere: only the card goes", layout: { hand: ["filler", "filler"] }, act: attack(PICKPOCKET, { undefended: true }), expect: handCount(1) },
+  { line: "05037:A:2", name: "Shadow: discard 1 of his attachments", layout: { attached: [{ code: "attachment", to: "dh1" }, { code: "attachment", to: "dh1" }] }, act: [attack("f3", { shadow: PICKPOCKET }), answer("attachment")], expect: count("attachment", "discard", 1) },
+  { line: "05037:A:2", name: "Shadow, undefended: all of his attachments", layout: { attached: [{ code: "attachment", to: "dh1" }, { code: "attachment", to: "dh1" }] }, act: attack("f3", { shadow: PICKPOCKET, undefended: true }), expect: count("attachment", "discard", 2) },
 
-  // 05023 Harbor Storehouse.
-  // 05023:A:1 printed: Forced: Each time a location is discarded from the top of the encounter deck, raise each player's threat by 1.
-  // records 05023:constant:1, 05023:forced:1; timing constant, forced
-  { line: "05023:A:1", name: "Forced: Each time a location is discarded from the top of the", todo: "write the row from the printed line (2 records, timing constant, forced)", layout: {}, act: [], expect: [] },
-  // 05023:A:2 printed: Shadow: Deal attacking enemy an additional shadow card for each Thug enemy in play.
-  // records 05023:shadow:1; timing shadow
-  { line: "05023:A:2", name: "Shadow: Deal attacking enemy an additional shadow card for each Thug", todo: "write the row from the printed line (1 record, timing shadow)", layout: {}, act: [], expect: [] },
+  { line: "05039:A:2", name: "Travel: each player spends 1 resource from one of his heroes' pools (dh1 paid, so the resource phase that follows leaves it at 1 and dh2 at 2)", layout: { staging: ["05039"], phase: "Travel", heroResources: 1 }, act: [travel("05039"), answer("dh1")], expect: [resourcesOn("dh1", 1), resourcesOn("dh2", 2), zone("05039", "activeLocation")] },
+  { line: "05039:A:3", name: "Shadow: the defending player discards all resources in his heroes' pools", layout: { heroResources: 3 }, act: attack("f3", { shadow: "05039", undefended: true }), expect: [resourcesOn("dh1", 0), resourcesOn("dh2", 0)] },
 
-  // 05037 Pickpocket.
-  // 05037:A:1 printed: Forced: When Pickpocket attacks, the defending player discards 1 resource from one of his heroes' resource pools and 1 card at random from his hand.
-  // records 05037:forced:1; timing forced
-  { line: "05037:A:1", name: "Forced: When Pickpocket attacks, the defending player discards 1", todo: "write the row from the printed line (1 record, timing forced)", layout: {}, act: [], expect: [] },
-  // 05037:A:2 printed: Shadow: Defending player discards 1 of his attachments. (Discard all of his attachments instead if undefended.)
-  // records 05037:shadow:1; timing shadow
-  { line: "05037:A:2", name: "Shadow: Defending player discards 1 of his attachments. (Discard all", todo: "write the row from the printed line (1 record, timing shadow)", layout: {}, act: [], expect: [] },
+  { line: "05040:A:1", name: "When Revealed: each player searches the encounter deck for a City location and adds it to the staging area", layout: { deck: ["05038", "f0", "f0"] }, act: reveal("05040"), expect: zone("05038", "staging") },
+  { line: "05040:A:1", name: "The discard pile is searched too", layout: { deck: ["f0", "f0"], discard: ["05038"] }, act: reveal("05040"), expect: zone("05038", "staging") },
+  { line: "05040:A:2", name: "Shadow: the defending player discards his hand", layout: { hand: ["filler", "filler"] }, act: attack("f3", { shadow: "05040", undefended: true }), expect: handCount(0) },
 
-  // 05038 City Street.
-  // 05038:A:2 printed: While City Street is in the staging area, players cannot travel to a location that does not have the title City Street.
-  // records 05038:constant:1; timing constant
-  { line: "05038:A:2", name: "While City Street is in the staging area, players cannot travel to a", todo: "write the row from the printed line (1 record, timing constant)", layout: {}, act: [], expect: [] },
+  { line: "05041:A:1", name: "When Revealed: attach to a hero (the first player chooses among those tied for the highest threat cost)", layout: { deck: ["f0"] }, act: [reveal("05041"), answer("dh1")], expect: zone("05041", "attached") },
+  { line: "05041:A:1", name: "The hero exhausts: his controller raises his threat by 1", layout: { attached: [{ code: "05041", to: "dh1" }] }, act: announce("exhausted", "dh1"), expect: threat(29) },
+  { line: "05041:A:1", name: "The hero readies: his controller raises his threat by 1", layout: { attached: [{ code: "05041", to: "dh1" }] }, act: announce("readied", "dh1"), expect: threat(29) },
+  { line: "05041:A:1", name: "The hero triggers an ability: his controller raises his threat by 1", layout: { attached: [{ code: "05041", to: "dh1" }] }, act: announce("abilityTriggered", "dh1"), expect: threat(29) },
 
-  // 05039 Market Square.
-  // 05039:A:2 printed: Travel: Each player must spend 1 resource from one of his heroes' resource pools to travel here.
-  // records 05039:travel:1; timing travel
-  { line: "05039:A:2", name: "Travel: Each player must spend 1 resource from one of his heroes'", todo: "write the row from the printed line (1 record, timing travel)", layout: {}, act: [], expect: [] },
-  // 05039:A:3 printed: Shadow: Defending player discards all resources in his heroes' resource pools.
-  // records 05039:shadow:1; timing shadow
-  { line: "05039:A:3", name: "Shadow: Defending player discards all resources in his heroes'", todo: "write the row from the printed line (1 record, timing shadow)", layout: {}, act: [], expect: [] },
+  { line: "05042:A:1", name: "Forced when it engages a player not optionally: 2 damage to each ally he controls", layout: { phase: "Encounter", engaged: [ZEALOUS], play: [{ code: "ally", damage: 0 }] }, act: announce("engaged", ZEALOUS), expect: damageOn("ally", 2) },
+  { line: "05043:A:1", name: "Forced when it engages a player not optionally: 2 resources from each hero", layout: { phase: "Encounter", engaged: [BANDIT], heroResources: 3 }, act: announce("engaged", BANDIT), expect: [resourcesOn("dh1", 1), resourcesOn("dh2", 1)] },
+  { line: "05044:A:2", name: "Forced when it engages a player not optionally: a hero he chooses is discarded", layout: { phase: "Encounter", engaged: [ASSASSIN] }, act: [announce("engaged", ASSASSIN), answer("dh1")], expect: zone("dh1", "discard") },
 
-  // 05040 Lost in the City.
-  // 05040:A:1 printed: When Revealed: Each player must search the encounter deck and discard pile for 1 City location and add it to the staging area, if able. Shuffle the encounter deck. This effect cannot be canceled.
-  // records 05040:whenRevealed:1; timing whenRevealed
-  { line: "05040:A:1", name: "When Revealed: Each player must search the encounter deck and discard", todo: "write the row from the printed line (1 record, timing whenRevealed)", layout: {}, act: [], expect: [] },
-  // 05040:A:2 printed: Shadow: Defending player discards his hand.
-  // records 05040:shadow:1; timing shadow
-  { line: "05040:A:2", name: "Shadow: Defending player discards his hand.", todo: "write the row from the printed line (1 record, timing shadow)", layout: {}, act: [], expect: [] },
+  { line: "05045:A:1", name: "When Revealed: engaged Brigands return to the staging area", layout: { engaged: [PICKPOCKET, ZEALOUS, THUG], deck: ["f0", "f0"] }, act: reveal("05045"), expect: [zone(PICKPOCKET, "staging"), zone(ZEALOUS, "staging"), zone(THUG, "engaged"), deckCount(2)] },
+  { line: "05045:A:1", name: "No Brigand returned: it gains surge", layout: { engaged: [THUG], deck: ["f0", "f0"] }, act: reveal("05045"), expect: deckCount(1) },
+  { line: "05045:A:2", name: "Shadow: return the attacking enemy to the staging area after it attacks", layout: {}, act: attack(PICKPOCKET, { shadow: "05045", undefended: true }), expect: zone(PICKPOCKET, "staging") },
 
-  // 05041 Local Trouble.
-  // 05041:A:1 printed: When Revealed: Attach this card to the hero with the highest threat cost without a copy of Local Trouble attached. (Counts as a Condition attachment with the text: 'When attached hero exhausts, readies, or triggers an ability, raise its controller's threat by 1.')
-  // records 05041:constant:1, 05041:triggered:1, 05041:triggered:2, 05041:triggered:3; timing constant, triggered
-  { line: "05041:A:1", name: "When Revealed: Attach this card to the hero with the highest threat", todo: "write the row from the printed line (4 records, timing constant, triggered)", layout: {}, act: [], expect: [] },
+  { line: "05065:B:2", name: "When Revealed: each player searches the encounter deck for a Harbor Thug and adds it to the staging area", layout: { seats: 2, deck: [THUG, "f0", THUG, "f0"] }, act: resolve("05065", "whenRevealed"), expect: count(THUG, "staging", 2) },
 
-  // 05042 Zealous Traitor.
-  // 05042:A:1 printed: Forced: When Zealous Traitor engages a player, that player must deal 1 damage to each ally he controls. (2 damage instead if Zealous Traitor was not optionally engaged.)
-  // records 05042:forced:1; timing forced
-  { line: "05042:A:1", name: "Forced: When Zealous Traitor engages a player, that player must deal 1", todo: "write the row from the printed line (1 record, timing forced)", layout: {}, act: [], expect: [] },
-
-  // 05043 Lossarnach Bandit.
-  // 05043:A:1 printed: Forced: When Lossarnach Bandit engages a player, that player discards 1 resource from each of his heroes' resource pools. (2 resources instead if Lossarnach Bandit was not optionally engaged.)
-  // records 05043:forced:1; timing forced
-  { line: "05043:A:1", name: "Forced: When Lossarnach Bandit engages a player, that player discards", todo: "write the row from the printed line (1 record, timing forced)", layout: {}, act: [], expect: [] },
-
-  // 05044 Umbar Assassin.
-  // 05044:A:2 printed: Forced: When Umbar Assassin engages a player, that player must deal 3 damage to a hero he controls. (Discard that hero instead if Umbar Assassin was not optionally engaged.)
-  // records 05044:forced:1; timing forced
-  { line: "05044:A:2", name: "Forced: When Umbar Assassin engages a player, that player must deal 3", todo: "write the row from the printed line (1 record, timing forced)", layout: {}, act: [], expect: [] },
-
-  // 05045 Lurking in Shadows.
-  // 05045:A:1 printed: When Revealed: Return all Brigand enemies engaged with players to the staging area. If this effect returned no Brigand enemies to the staging area, Lurking in Shadows gains surge.
-  // records 05045:whenRevealed:1; timing whenRevealed
-  { line: "05045:A:1", name: "When Revealed: Return all Brigand enemies engaged with players to the", todo: "write the row from the printed line (1 record, timing whenRevealed)", layout: {}, act: [], expect: [] },
-  // 05045:A:2 printed: Shadow: Return attacking enemy to the staging area after it attacks.
-  // records 05045:shadow:1; timing shadow
-  { line: "05045:A:2", name: "Shadow: Return attacking enemy to the staging area after it attacks.", todo: "write the row from the printed line (1 record, timing shadow)", layout: {}, act: [], expect: [] },
-
-  // 05065 The Leaping Fish.
-  // 05065:A:1 printed: Setup: Search the encounter deck for The Leaping Fish and Alcaron's Scroll. Make The Leaping Fish the active location and attach Alcaron's Scroll to a hero.
-  // records 05065:setup:1; timing setup
-  { line: "05065:A:1", name: "Setup: Search the encounter deck for The Leaping Fish and Alcaron's", todo: "write the row from the printed line (1 record, timing setup)", layout: {}, act: [], expect: [] },
-  // 05065:B:1 printed: Battle. (Characters use their Attack instead of Willpower when questing.)
-  // records 05065:constant:1; timing constant
-  { line: "05065:B:1", name: "Battle. (Characters use their Attack instead of Willpower when", todo: "write the row from the printed line (1 record, timing constant)", layout: {}, act: [], expect: [] },
-  // 05065:B:2 printed: When Revealed: Each player must search the encounter deck for a copy of Harbor Thug and add it to the staging area. Shuffle the encounter deck.
-  // records 05065:whenRevealed:1; timing whenRevealed
-  { line: "05065:B:2", name: "When Revealed: Each player must search the encounter deck for a copy", todo: "write the row from the printed line (1 record, timing whenRevealed)", layout: {}, act: [], expect: [] },
-
-  // 05066 Fighting in the Streets.
-  // 05066:B:1 printed: Battle. (Characters use their Attack instead of Willpower when questing.)
-  // records 05066:constant:1; timing constant
-  { line: "05066:B:1", name: "Battle. (Characters use their Attack instead of Willpower when", todo: "write the row from the printed line (1 record, timing constant)", layout: {}, act: [], expect: [] },
-  // 05066:B:2 printed: The players cannot advance to the next stage unless Alcaron's Scroll is attached to a hero.
-  // records 05066:constant:2; timing constant
-  { line: "05066:B:2", name: "The players cannot advance to the next stage unless Alcaron's Scroll", todo: "write the row from the printed line (1 record, timing constant)", layout: {}, act: [], expect: [] },
-  // 05066:B:3 printed: When Revealed: Attach Alcaron's Scroll to the highest engagement cost enemy in play, if able. Otherwise, add Alcaron's Scroll to the staging area.
-  // records 05066:whenRevealed:1; timing whenRevealed
-  { line: "05066:B:3", name: "When Revealed: Attach Alcaron's Scroll to the highest engagement cost", todo: "write the row from the printed line (1 record, timing whenRevealed)", layout: {}, act: [], expect: [] },
-
-  // 05067 Escape to the Quays.
-  // 05067:A:1 printed: When Revealed: Each player searches the encounter deck and discard pile for 1 enemy and adds it to the staging area.
-  // records 05067:whenRevealed:1; timing whenRevealed
-  { line: "05067:A:1", name: "When Revealed: Each player searches the encounter deck and discard", todo: "write the row from the printed line (1 record, timing whenRevealed)", layout: {}, act: [], expect: [] },
-  // 05067:B:1 printed: Enemies cannot be optionally engaged.
-  // records 05067:constant:1; timing constant
-  { line: "05067:B:1", name: "Enemies cannot be optionally engaged.", todo: "write the row from the printed line (1 record, timing constant)", layout: {}, act: [], expect: [] },
-  // 05067:B:3 printed: The players cannot defeat this stage unless Alcaron's Scroll is attached to a hero. If the players defeat this stage, they have won the game.
-  // records 05067:constant:2; timing constant
-  { line: "05067:B:3", name: "The players cannot defeat this stage unless Alcaron's Scroll is", todo: "write the row from the printed line (1 record, timing constant)", layout: {}, act: [], expect: [] },
+  { line: "05067:A:1", name: "When Revealed: each player searches the encounter deck and discard pile for an enemy and adds it to the staging area", layout: { deck: [PICKPOCKET, "f0"], discard: [ZEALOUS] }, act: [resolve("05067", "whenRevealed"), answer(ZEALOUS)], expect: [zone(ZEALOUS, "staging"), zone(PICKPOCKET, "encounterDeck")] },
 ];
 
 if (ROWS.length > 0) cardSpecs("peril-in-pelargir", ROWS);
