@@ -1,9 +1,14 @@
 // Rules: rr.then, rr.forced, rr.response, rr.shadow-effects, rr.in-play-and-out-of-play, rr.triggered-ability, rr.reveal, rr.doomed-x, rr.explored, hob.sack-x, hob.bilbo-baggins-ohauh (data/rules/entries.json); ledger lines 131023:A:1, 131024:B:1, 131024:B:2, 131032:A:3, 131033:A:3, 131034:A:3, 131036:A:1, 131036:A:2, 131038:A:1, 131038:A:2, 131041:A:1, 131042:A:1, 131051:A:1, 131051:A:2, 131052:A:2, 131053:A:1, 131054:A:1, 131054:A:2.
 import { expect, it } from "vitest";
 
+import { placeDamage } from "../../../rules/core/keywords.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { updateCard } from "../../../rules/core/state.ts";
-import { idOf, resolveRecords, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
+import type { Effect } from "../../../catalog/boundary.ts";
+import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
+import { play } from "../../../../test/harness/card-spec-play.ts";
+import { lineSpec } from "../../../../test/harness/line-spec.ts";
+import { idOf, legalIntents, resolveRecords, send, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 import { EFFECTS } from "../../../effects/index.ts";
 import { answer, attack, announce, cardSpecs, count, damageOn, deckCount, flag, handCount, offers, progressOn, quest, resolve, respond, reveal, stat, threat, zone, rowProblems, type Row } from "../../../../test/harness/card-spec.ts";
@@ -81,4 +86,39 @@ it("131054:A:1 with two players the first player (the second seat) engages the T
   const troll = done.state.cards[idOf(done.state, "131032")];
   expect(troll?.zone).toBe("engaged");
   expect(troll?.controller).toBe(1);
+});
+
+// 131034:A:1 "Troll enemies can only be attacked by one character at a time": two characters declared against an engaged Troll are refused, one is accepted; an enemy that is not a Troll takes both. 131032:A:1: a Troll in the staging area takes no damage, an engaged one does.
+function toPlayerAttack(effects: readonly Effect[], engaged: string) {
+  const done = play(ID, { line: "131034:A:1", layout: { phase: "Combat", engaged: [engaged], staging: ["131034"] }, act: [], expect: [] }, effects, true);
+  const ctx = done.table.ctx;
+  let run = send(done.run, { type: "Pass" }, ctx);
+  run = send(run, { type: "Undefended", heroId: idOf(run.state, "dh1") }, ctx);
+  for (let guard = 0; guard < 8 && run.state.window?.kind !== "playerAttack"; guard += 1) {
+    const pass = legalIntents(run.state, ctx).find((intent) => intent.type === "Pass");
+    if (!pass) break;
+    run = send(run, pass as PlayerIntent, ctx);
+  }
+  return { run, ctx };
+}
+for (const [troll, other] of [["131032", "f3"]] as const) {
+  lineSpec("131034:A:1", `a Troll enemy (${troll}) engaged with a player is attacked by one character at a time, another enemy by two`, (effects) => {
+    const trollFight = toPlayerAttack(effects, troll);
+    const both = { type: "DeclareAttackers", enemyId: idOf(trollFight.run.state, troll), attackerIds: [idOf(trollFight.run.state, "dh1"), idOf(trollFight.run.state, "dh2")] } as const;
+    expect(() => send(trollFight.run, both as PlayerIntent, trollFight.ctx)).toThrow();
+    const one = { ...both, attackerIds: [idOf(trollFight.run.state, "dh1")] };
+    expect(() => send(trollFight.run, one as PlayerIntent, trollFight.ctx)).not.toThrow();
+    const plain = toPlayerAttack(effects, other);
+    const two = { type: "DeclareAttackers", enemyId: idOf(plain.run.state, other), attackerIds: [idOf(plain.run.state, "dh1"), idOf(plain.run.state, "dh2")] };
+    expect(() => send(plain.run, two as PlayerIntent, plain.ctx)).not.toThrow();
+  });
+}
+
+lineSpec("131032:A:1", "a Troll enemy in the staging area takes no damage, an engaged Troll takes it (one player and two)", (effects) => {
+  for (const seats of [1, 2] as const) {
+    const table = tableFromLayout(ID, { seats, staging: ["131032"], engaged: [{ code: "131033", seat: seats - 1 }] }, { effects });
+    const hit = (code: string): number | undefined => placeDamage(table.state, idOf(table.state, code), 2, table.ctx.cards, [], "player", { rule: "rr.damage" }).cards[idOf(table.state, code)]?.damage;
+    expect(hit("131032")).toBe(0);
+    expect(hit("131033")).toBe(2);
+  }
 });
