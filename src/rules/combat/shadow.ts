@@ -57,7 +57,9 @@ function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number,
   const turned = updateCard(state, shadowId, { face: "up" });
   const effects = ctx.effects.filter((effect) => effect.cardCode === shadow.code && effect.timing === "shadow");
   // An effect that waits for a player runs in a frame settle advances; the attack goes on when it pops (afterShadowFrame).
-  if (runsInFrame(effects) && turned.pendingAttack) {
+  // A Shadow effect the first player may cancel by paying (`cancel`, "The first player may spend 1 Baggins resource to cancel this effect", 131051:A:2) runs in a frame too: the frame offers the cancel as it begins (rr.cancel).
+  const payable = effects.find((effect) => effect.cancel != null)?.cancel;
+  if ((runsInFrame(effects) || payable != null) && turned.pendingAttack) {
     const framed = pushEffectFrame(
       // The defense window is over: the defender is declared.
       { ...turned, window: null, pendingAttack: { ...turned.pendingAttack, shadowFrame: shadowId } },
@@ -69,7 +71,7 @@ function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number,
         effectId: effects[0]?.id ?? `${shadowId}:shadow`,
         instructions: effects.flatMap((effect) => effect.instructions),
         causes: effects.flatMap((effect) => effect.instructions.map(() => effectCause(effect))),
-        cancel: null,
+        cancel: payable ? { amount: payable.cost, sphere: payable.sphere ?? null, unless: payable.unless ?? null } : null,
         blockCancel: null,
       },
       steps,

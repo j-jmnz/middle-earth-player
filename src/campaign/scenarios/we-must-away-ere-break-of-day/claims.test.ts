@@ -10,7 +10,7 @@ import { finish, idOf, legalIntents, send, type Layout } from "../../../../test/
 import type { PlayerIntent } from "../../../rules/core/intents.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 
-// The claims of the Troll Key (131043) and the Troll Purse (131042), Troll Camp's Action (131036:A:2) and Troll Cave's travel cost (131037:A:2), all of which need Bilbo Baggins (`sagaHero`), whom the loadout deals. William (131032, 12 hit points) is the host.
+// The claims of the Troll Key and the Troll Purse, which need Bilbo Baggins (`sagaHero`), whom the loadout deals (Troll Camp's Action and Troll Cave's cost are in bilbo.test.ts). William (12 hit points) is the host.
 const ID = "we-must-away-ere-break-of-day";
 const BILBO = "131001";
 const DEAD_WILLIAM = { code: "131032", damage: 12 } as const;

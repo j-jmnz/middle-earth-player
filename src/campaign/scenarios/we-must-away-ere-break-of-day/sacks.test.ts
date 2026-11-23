@@ -3,9 +3,11 @@ import { describe, expect, it } from "vitest";
 
 import { announce, answer, cardSpecs, flag, zone, type Row } from "../../../../test/harness/card-spec.ts";
 import { EFFECTS } from "../../../effects/index.ts";
-import { moveCard } from "../../../rules/core/zones.ts";
+import { moveCard, spawn } from "../../../rules/core/zones.ts";
+import { updateCard } from "../../../rules/core/state.ts";
 import { play } from "../../../../test/harness/card-spec-play.ts";
-import { idOf } from "../../../../test/harness/scene-kit.ts";
+import { lineSpec } from "../../../../test/harness/line-spec.ts";
+import { attachTargetCodes, engagedHandTable, idOf, resolveRecords, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 // The seven Sack cards (131044 to 131050): the When Sacked attach of each (the character with the highest value, the first player choosing among those tied, none when no one is eligible) and what the attached character cannot do. The stand-in heroes dh1 and dh2 have
 // 2 in every stat and 6 hit points, the stand-in ally 1 cost and 1 in every stat with 2 hit points, Bilbo Baggins (`sagaHero`) 1 in every stat, 3 hit points and the resources his pool holds.
@@ -68,4 +70,20 @@ describe("131044:A:1 with no ally in play the Sack card goes back into the Sack 
     expect(done.run.state.cards[idOf(done.run.state, "131044")]?.zone).toBe("sackDeck");
     expect(done.run.state.cards[idOf(done.run.state, "dh1")]?.attachments).toEqual([]);
   });
+});
+
+// 131033:A:1 "Players cannot play attachment cards on Troll enemies." Forest Snare (01069, "Attach to an enemy engaged with a player") may go on the engaged f0 and not on Bert or William; a card an effect attaches (an objective, an encounter card)
+// is not the play of an attachment card (the Key and the Purse attach to a Troll in the claims tests).
+lineSpec("131033:A:1", "Forest Snare cannot be played on an engaged Troll enemy but can on another enemy", (effects) => {
+  const made = engagedHandTable(ID, "01069", "131033", effects);
+  expect(attachTargetCodes(made, "01069")).toEqual(["f0"]);
+});
+
+// 131050:A:1 "When Sacked: Attach to hero with the most resources without a Sack attached." The line prints no "(excluding Gandalf)" (the six others do) and no span bars Gandalf from every Sack (hob.sack-x), so a hero titled Gandalf with the most resources takes it.
+lineSpec("131050:A:1", "a hero titled Gandalf with the most resources takes A Worn Sack", (effects) => {
+  const table = tableFromLayout(ID, { engaged: ["131033"], piles: { sackDeck: ["131050"] } }, { effects, extra: ["142002"] });
+  const gandalf = spawn(table.state, "142002", { zone: "heroes", seat: 0 });
+  const state = updateCard(gandalf.state, gandalf.id, { resources: 3 });
+  const done = resolveRecords(state, table.ctx, "131033", "forced", idOf(state, "131033"));
+  expect(done.state.cards[gandalf.id]?.attachments).toContain(idOf(done.state, "131050"));
 });

@@ -32,8 +32,9 @@ const ROWS: readonly Row[] = [
 cardSpecs(ID, ROWS);
 
 // The first player's Trigger of a card's Action or Response, paid from Bilbo's pool (a resource cost is paid by the intent): the state after it resolves, with the answers of `after` taken first.
-function used(effects: readonly Effect[], line: string, layout: Layout, act: Parameters<typeof play>[1]["act"], code: string, amount: number): ScenarioState {
-  const done = play(ID, { line, layout, act, expect: [] }, effects, true);
+function used(effects: readonly Effect[], row: { line: string; layout: Layout; act: Parameters<typeof play>[1]["act"]; code: string; amount: number }): ScenarioState {
+  const { code, amount } = row;
+  const done = play(ID, { line: row.line, layout: row.layout, act: row.act, expect: [] }, effects, true);
   const intent = legalIntents(done.run.state, done.table.ctx).find((offered) => offered.type === "Trigger" && offered.cardId === idOf(done.run.state, code));
   if (!intent) return done.run.state;
   const payments = amount > 0 ? [{ heroId: idOf(done.run.state, BILBO), amount }] : [];
@@ -43,14 +44,14 @@ function used(effects: readonly Effect[], line: string, layout: Layout, act: Par
 const CAMP: Layout = { staging: ["131036"], engaged: ["131033"], sagaHero: { resources: 3 } };
 
 lineSpec("131036:A:2", "Action: a Sack card attached to a character, drawn by Bert's Sack 1, is removed and goes back into the Sack deck", (effects) => {
-  const state = used(effects, "131036:A:2", { ...CAMP, piles: { sackDeck: ["131045"] } }, [SACKED, answer("dh1")], "131036", 1);
+  const state = used(effects, { line: "131036:A:2", layout: { ...CAMP, piles: { sackDeck: ["131045"] } }, act: [SACKED, answer("dh1")], code: "131036", amount: 1 });
   expect(state.cards[idOf(state, "131045")]?.zone).toBe("sackDeck");
   expect(state.cards[idOf(state, BILBO)]?.exhausted).toBe(true);
   expect(state.cards[idOf(state, BILBO)]?.resources).toBe(2);
 });
 lineSpec("131036:A:2", "Bilbo may trigger it even with a Sack card attached to him", (effects) => {
   // A Worn Sack goes to the hero with the most resources: Bilbo, holding 3.
-  const state = used(effects, "131036:A:2", { ...CAMP, piles: { sackDeck: ["131050"] } }, [SACKED], "131036", 1);
+  const state = used(effects, { line: "131036:A:2", layout: { ...CAMP, piles: { sackDeck: ["131050"] } }, act: [SACKED], code: "131036", amount: 1 });
   expect(state.cards[idOf(state, "131050")]?.zone).toBe("sackDeck");
   expect(state.cards[idOf(state, BILBO)]?.exhausted).toBe(true);
 });
