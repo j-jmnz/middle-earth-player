@@ -34,6 +34,8 @@ describe("The Lonely Mountain golden", () => {
         expect(cardsOf(state, "132020", "132021", "132022", "132023", "132024").map((card) => card.zone), golden.name).toEqual(Array(5).fill("under"));
         expect(cardsOf(state, "132001").map((card) => [card.zone, card.controller]), golden.name).toEqual([["heroes", 0]]);
         expect(state.seats[0]?.heroes[0], golden.name).toBe(cardsOf(state, "132001")[0]?.id);
+        // Easy deals 2 Fighting Among Friends and 1 Weighed Down fewer (the Easy Mode sheet): 0 and 1 of the 2 and 2 Normal deals.
+        expect(cardsOf(state, "132037", "132038").map((card) => card.code).sort(), golden.name).toEqual(golden.difficulty === "Easy" ? ["132038"] : ["132037", "132037", "132038", "132038"]);
       },
     },
     wins: "ends when stage 3 is defeated after Smaug the Magnificent is set aside, settles at once with a score and earns nothing",

@@ -48,12 +48,11 @@ export type MountainGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-lonely-mountain/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type MountainGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: MountainDecks; outcome: "won" | "lost"; policy?: Partial<MountainPolicy>; lossReason?: string };
 
-// The games to pin (about 300 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and true solo on Easy (each makes stage 2B's burgle attempt, advances to stage 3 and wins by the progress that sets Smaug the Magnificent
+// The games to pin (about 200 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo on Normal and two-handed on Easy (each makes stage 2B's burgle attempt, advances to stage 3 and wins by the progress that sets Smaug the Magnificent
 // aside), and the ways to lose: every player's threat at 50 (heroes too weak to quest; the solo game reaches stage 4A through Pretending to Sleep before it ends) and Bilbo Baggins leaving play (brittle heroes). The scenario has no Nightmare deck in play (out of scope).
 export const MOUNTAIN_GOLDENS: readonly MountainGolden[] = [
   { name: "solo win", seatCount: 1, seed: 9, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "two-handed win", seatCount: 2, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "Easy solo win", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "Easy two-handed win", seatCount: 2, seed: 7, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "solo loss: threat 50", seatCount: 1, seed: 5, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed loss: Bilbo Baggins leaves play", seatCount: 2, seed: 3, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "Bilbo Baggins left play" },
 ];

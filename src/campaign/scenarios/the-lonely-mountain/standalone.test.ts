@@ -31,6 +31,7 @@ describe("The Lonely Mountain in the the-hobbit cycle", () => {
   });
 
   it("pins goldens on Normal and Easy, solo and two-handed, with a win and each loss", () => {
+    expect(MOUNTAIN_GOLDENS.filter((golden) => golden.outcome === "won").map((golden) => [golden.seatCount, golden.difficulty])).toEqual([[1, "Normal"], [2, "Easy"]]);
     expect(new Set(MOUNTAIN_GOLDENS.map((golden) => golden.difficulty))).toEqual(new Set(["Normal", "Easy"]));
     expect(new Set(MOUNTAIN_GOLDENS.map((golden) => golden.seatCount))).toEqual(new Set([1, 2]));
     expect(MOUNTAIN_GOLDENS.filter((golden) => golden.outcome === "lost").map((golden) => golden.lossReason)).toEqual(["No seats remain", "Bilbo Baggins left play"]);
