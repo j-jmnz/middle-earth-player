@@ -40,6 +40,8 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
   };
 
   for (const key of PRINTED_FLAGS) shown(key, kw[key] === true);
+  // Battle or Siege a card effect gives the card (the last stage of Into Ithilien gains Siege, 05071:B:1): drawn like a printed one.
+  for (const key of ["battle", "siege"] as const) if (!found.has(key) && flagged(game, cardId, key)) add(key, false);
   for (const key of PRINTED_VALUES) shown(key, (kw[key] ?? 0) > 0, kw[key] ?? undefined);
   // Uncharted is on the Lost Island side only (dcce.uncharted); the charted side of a double-sided location has none.
   shown("uncharted", isLostIsland(instance, ctx));

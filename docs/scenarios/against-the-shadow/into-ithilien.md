@@ -65,7 +65,7 @@ The readings of Into Ithilien use the statuses defined in the Readings bullet of
 
 ### 05049 Morgul Spider
 
-- `05049:A:1` (researched). Until the end of the round +1 Attack for each character of any player not committed to a quest, counted again as the game changes; exhausted characters in play count, Celador and the Guardians in the staging area do not (they are committed). Not taken: The count is fixed when it is revealed. Basis: faq.lasting-effects; `ats.ally-objectives`. Sources: the FAQ's own example (Poisoned Vapour, "each damaged character") is a condition on the game state that is read again when the state changes, as "currently" is here; no official ruling names Morgul Spider. VOTP (https://visionofthepalantir.com/2018/03/18/into-ithilien/, "at that time"), https://talesfromthecards.wordpress.com/2014/05/06/surviving-into-ithilien/ and the FFG forum archive play-through (https://ffg-forum-archive.entropicdreams.com/topic/308703-preotets-play-throughs/) restate the card and do not say; Hall of Beorn has no ruling. After the quest phase nobody is committed, so in combat the Spider gets +1 for every character in play.
+- `05049:A:1` (recommended). Until the end of the round +1 Attack for each character of any player not committed to a quest, counted again as the game changes; exhausted characters in play count, Celador and the Guardians in the staging area do not (they are committed). Not taken: The count is fixed when it is revealed. Basis: faq.lasting-effects; `ats.ally-objectives`. Sources: the FAQ's own example (Poisoned Vapour, "each damaged character") is a condition on the game state that is read again when the state changes, as "currently" is here; no official ruling names Morgul Spider. VOTP (https://visionofthepalantir.com/2018/03/18/into-ithilien/, "at that time"), https://talesfromthecards.wordpress.com/2014/05/06/surviving-into-ithilien/ and the FFG forum archive play-through (https://ffg-forum-archive.entropicdreams.com/topic/308703-preotets-play-throughs/) restate the card and do not say; Hall of Beorn has no ruling. None of them settles it: the only support is the analogy to the FAQ's own example, so the live count is an agent recommendation. After the quest phase nobody is committed, so in combat the Spider gets +1 for every character in play.
 
 ### 05050 Forest Bat
 
@@ -115,12 +115,14 @@ The readings of Into Ithilien use the statuses defined in the Readings bullet of
 
 ## Table
 
-Words writes the Table step. The lines create no tracker, dial or zone. What the table must show:
+The lines create no tracker, dial or zone. What the table shows for each, checked with `pnpm game scene` and the readout and preview tests (`src/play/cards/ithilien-preview.test.ts`):
 
-- **Committed ally objectives** (`05025:A:1`, `05026:A:1`; `ats.ally-objectives`). The card lies in the staging area and counts in the quest total: Words marks it on the staged card and shows the stat it adds (Willpower, Attack under Battle, Defense under Siege). The commit readout already adds it (`committedWillpower`).
-- **Quest card keywords** (`05068:B:1`, `05069:B:1` to `B:3`, `05071:B:1`): Battle, Siege and Archery X on the stage card, and the siege the last stage gains.
-- **Archery damage** (`05052:A:1`, `05069:B:2`): the assignment lists Celador and the Guardians as targets.
-- **Ally objectives under a player's control** (`05070:B:1`): normal ally rows.
+- **Committed ally objectives** (`05025:A:1`, `05026:A:1`; `ats.ally-objectives`). The card lies in the staging area with its damage and hit points, like any staged card. The quest meter and the dock's quest readout add its stat through `committedWillpower` (Celador and both Guardians with one committed hero: 6 under Battle, 5 under Siege). The card is not lifted, since the commitment is a constant and not the card's `committed` field. Its preview line names the commitment and the stat it adds now (`ithilienDetail` in `cards/dungeon-preview.ts`, Attack under Battle, Defense under Siege); the line is gone once a player controls the card.
+- **Quest card keywords** (`05068:B:1`, `05069:B:1` to `B:3`, `05071:B:1`): the stage card's chips show Battle (05068), Archery 1 and Siege (05069). The Siege that stage 4 gains at threat 37 is a chip too (`cardKeywords` reads the gained flag); below 37 it has none. The meter's caption stays "willpower" under Battle and Siege: the number is the stat the stage counts, named in the preview of each staged ally objective.
+- **Archery damage** (`05052:A:1`, `05069:B:2`): the assignment lists Celador and the Guardians as targets (`archeryRecipients`; tested in `lines.test.ts` through the real archery window).
+- **Ally objectives under a player's control** (`05070:B:1`): normal ally rows, committed as any ally.
+- **Skipped stage** (`05068:B:2`, `05069:B:4`): no widget; the quest card is the one after the skipped stage.
+- **Mûmak's cap** (`05054:A:2`): nothing is drawn; the cap is a hidden count.
 
 ## Engine notes
 
@@ -143,6 +145,7 @@ Where the engine does not read a reading above to the letter, and why. The flags
 - `05046:A:1`: researched (community discussion only). An uncontrolled ally objective cannot pay the exhaust. See Readings.
 - `05046:A:2` and `05047:A:2`: recommended. X is the attacking enemy's current Threat. See Readings.
 - `05048:A:1` (step 2): recommended. Only a player's own committed characters count; Celador and the Guardians stay committed. See Readings.
+- `05049:A:1`: recommended. The Spider's Attack is counted live as the game changes. See Readings.
 - `05050:A:1`: recommended. The chosen character is a questing hero, not an ally. See Readings.
 - `05050:A:2` (shadow): recommended. The defending player is the player attacked. See Readings.
 - `05051:A:1` (raise): recommended. Each player raises by the total of questing characters, ally objectives included. See Readings.
