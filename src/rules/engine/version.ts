@@ -142,9 +142,11 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: "all", note: "Ring of Thrór is not offered while the hero it readies is ready, Gimli (16001) and Legolas (16002) only when another hero is exhausted or the partner they give a bonus is there, and Imladris Stargazer only for a player whose deck holds a card." },
   { version: 38, scenarios: "all", note: "A card that costs nothing still needs a hero with its sphere, even when Treebeard or Radagast holds resources: their pool stands in for a hero only when something is paid from it." },
   { version: 38, scenarios: "all", note: "Wiglaf's Action cannot exhaust an encounter attachment on him, such as a Condition: only an attachment you control pays it." },
+  { version: 39, scenarios: ["the-uruk-hai", "helms-deep", "the-road-to-isengard", "the-passing-of-the-grey-company", "the-siege-of-gondor", "the-battle-of-the-pelennor-fields", "the-black-gate-opens"], note: "A player whose last hero is Aragorn is eliminated when the first player token passes him on." },
+  { version: 39, scenarios: ["journey-up-the-anduin", "lost-in-mirkwood", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"], note: "A treasure in your hand, like Anvil of Gundabad or Axe of the Edain, can be played onto its host like an attachment, and Durin's Dagger can be played from the discard pile." },
 ];
 
-export const ENGINE_VERSION = 38;
+export const ENGINE_VERSION = 39;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {
