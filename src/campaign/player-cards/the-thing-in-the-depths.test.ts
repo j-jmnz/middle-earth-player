@@ -247,6 +247,34 @@ describe("Elevenses (12036:A:1)", () => {
   });
 });
 
+describe("Elevenses (12036:A:2) and Then", () => {
+  // "Ready each chosen character and remove them from the quest. Then, reduce your threat by X.": the threat is reduced only when every chosen character was readied (rr.then, rr.effects): a chosen
+  // character that is ready already (Fast Hitch readied it) is not readied, so the ready is not resolved in full and the threat stays.
+  const elevenses = (readyAlready: boolean) => {
+    const tab = table(EFFECTS, { start: "quest", heroes: [{ code: PAL, seat: 0 }, { code: EOWYN, seat: 0 }], allies: [{ code: TOOK, seat: 0 }], hand: [{ code: ELEVENSES, seat: 0 }], deck: [GLADE, GLADE] });
+    const [took, pal] = [idsOf(tab, TOOK), idsOf(tab, PAL)];
+    let run = staged(tab, [took, pal]);
+    run = { ...run, state: updateCard(run.state, took, { exhausted: !readyAlready }) };
+    const before = run.state.seats[0]?.threat ?? 0;
+    run = play(run, tab, idsOf(tab, ELEVENSES));
+    run = sendUnledgered(run, { type: "Choose", optionId: "x2" }, tab.ctx);
+    while (run.state.window?.kind === "choose" && run.state.window.options.some((option) => option === took || option === pal)) run = sendUnledgered(run, { type: "Choose", optionId: run.state.window.options[0] ?? "" }, tab.ctx);
+    return { run, before, took, pal };
+  };
+
+  it("reduces the threat by X when every chosen character was exhausted", () => {
+    const { run, before, took, pal } = elevenses(false);
+    expect([took, pal].map((id) => run.state.cards[id]?.committed)).toEqual([false, false]);
+    expect(run.state.seats[0]?.threat).toBe(before - 2);
+  });
+
+  it("removes the characters from the quest but keeps the threat when a chosen character was ready already", () => {
+    const { run, before, took, pal } = elevenses(true);
+    expect([took, pal].map((id) => run.state.cards[id]?.committed)).toEqual([false, false]);
+    expect(run.state.seats[0]?.threat).toBe(before);
+  });
+});
+
 describe("Mirkwood Explorer (12037:A:1)", () => {
   // "Response: After Mirkwood Explorer quests successfully, place 1 progress on it.": the Explorer and Denethor quest (Willpower 3) against
   // the Weak (Threat 1); the quest succeeds and the Explorer gets 1 progress.

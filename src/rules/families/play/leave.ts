@@ -56,13 +56,17 @@ export function attachFacedown(state: ScenarioState, instruction: Extract<Instru
   return updateCard(moveCard(state, id, { zone: "under", locationId: host.id }), id, { owner });
 }
 
+/** The card in the staging area, other than `subject`, with the printed title of `subject` (DiscardSameTitle), or null. */
+export function sameTitleInStaging(state: ScenarioState, subject: string | null, ctx: ReduceContext): string | null {
+  const name = subject ? printedOf(ctx.cards, state.cards[subject]?.code ?? "").name : null;
+  return name ? (state.staging.find((id) => id !== subject && printedOf(ctx.cards, state.cards[id]?.code ?? "").name === name) ?? null) : null;
+}
+
 // DiscardSameTitle: a card in the staging area with the title of the answered event's card goes to the encounter discard
 // pile (a discard, not an exploration: no victory display).
 export function discardSameTitle(state: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
-  const subject = namedCard(state, "subject", focus);
-  const name = subject ? printedOf(ctx.cards, state.cards[subject]?.code ?? "").name : null;
-  const match = state.staging.find((id) => id !== subject && printedOf(ctx.cards, state.cards[id]?.code ?? "").name === name);
-  return name && match ? moveCard(state, match, { zone: "encounterDiscard" }) : state;
+  const match = sameTitleInStaging(state, namedCard(state, "subject", focus), ctx);
+  return match ? moveCard(state, match, { zone: "encounterDiscard" }) : state;
 }
 
 // SpendFrom: resources spent from one pool (the last picked card's by default), all of them or none.

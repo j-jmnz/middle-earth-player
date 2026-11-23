@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, damageOn, deckCount, defend, endPhase, exhausted, flag, lost, progressOn, resolve, resourcesOn, respond, reveal, stagingThreat, stat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Road to Rivendell (dwarrowdelf part 5): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). Build wrote the rows for the mechanics it added (Ambush's checks, Goblin Gate's gained ambush, Barren Hills,
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). Build wrote the rows for the mechanics it added (Ambush's checks, Goblin Gate's gained ambush, Barren Hills,
 // Orc Ambush, Goblin Gate's live quest points); Finish writes the rest. The stand-in heroes dh1 and dh2 have 2 Willpower, 2 Attack, 2 Defense; the first player's threat is the layout's first number.
 const ROWS: readonly Row[] = [
   // 04043 Goblin Gate: while it is the active location the round's first enemy revealed from the deck gains ambush, so Crebain (cost 35, no ambush of its own) engages a first player with threat 40.

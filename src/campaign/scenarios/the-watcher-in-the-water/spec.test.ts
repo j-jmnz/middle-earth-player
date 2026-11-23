@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { attack, cardSpecs, damageOn, deckCount, defend, handCount, progressOn, resolve, reveal, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Watcher in the Water (dwarrowdelf part 6): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The rows here are the lines whose records need only a table; the lines with a flow
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The rows here are the lines whose records need only a table; the lines with a flow
 // of several steps (the Tentacle attachments, Doors of Durin's Action, the Nightmare setup card) are tests titled with their line id in verbs.test.ts, tentacles.test.ts and flows.test.ts. The stand-in heroes dh1 and dh2 are the first player's.
 const ROWS: readonly Row[] = [
   // 040076 Wrapped!: the first player attaches it to a hero he controls that has no Wrapped!; with none it is discarded.

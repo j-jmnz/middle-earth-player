@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import { authoredRelOfScenario } from "../data/effects/authored-paths.ts";
 import { loadCampaignsInOrder } from "../data/load-scenarios.ts";
-import { planScenario, type Repo } from "./scenario-new.ts";
+import { planScenario, SCENARIO_NEW_USAGE, scenarioNewArguments, type Repo } from "./scenario-new.ts";
 
 // pnpm scenario new <scenario-id>: it plans from data/scenarios and the registries as they are, edits them only by inserting lines, never
 // overwrites a file, and refuses an id that has no scenario file. Nothing is written here: the plan is read, and the CLI runs with --dry-run.
@@ -231,5 +231,17 @@ describe("pnpm scenario new", () => {
     expect(run.output).toContain(`src/campaign/scenarios/${id}/spec.test.ts`);
     for (const item of plan?.files ?? []) expect(exists(item.file), item.file).toBe(false);
     for (const edit of plan?.edits ?? []) expect(repo.read(edit.file), edit.file).toBe(edit.before);
+  });
+});
+
+describe("scenario new arguments", () => {
+  it("reads the id, --short with its value and --dry-run", () => {
+    expect(scenarioNewArguments(["the-long-dark", "--short", "dark", "--dry-run"])).toEqual({ id: "the-long-dark", short: "dark", dry: true, help: false });
+    expect(scenarioNewArguments(["the-long-dark"])).toEqual({ id: "the-long-dark", short: undefined, dry: false, help: false });
+  });
+
+  it("refuses a misspelt flag, so --dryrun does not write the skeleton files, and answers --help with help", () => {
+    expect(() => scenarioNewArguments(["the-long-dark", "--dryrun"])).toThrow(SCENARIO_NEW_USAGE);
+    expect(scenarioNewArguments(["--help"]).help).toBe(true);
   });
 });

@@ -2,7 +2,7 @@
 // exact name, name prefix, a word of the name, trait / type / sphere, the card text, then a one-letter slip in a name word.
 import { traitTokens } from "../../catalog/deck-save";
 
-import { searchFold } from "../kit/fold";
+import { searchFold, SLIP_MIN, withinOneEdit } from "../kit/fold";
 
 /** What a pool row offers the search; a row without the type, sphere or text names (a test row) matches on what it has. */
 export type SearchRow = {
@@ -50,23 +50,6 @@ export function searchTerms(query: string): string[] {
   return terms;
 }
 
-const FUZZY_MIN = 5;
-
-// Whether a and b differ by at most one insertion, deletion, substitution or swap of two neighbours.
-function withinOneEdit(a: string, b: string): boolean {
-  if (Math.abs(a.length - b.length) > 1) return false;
-  let start = 0;
-  while (start < a.length && start < b.length && a[start] === b[start]) start += 1;
-  if (start === a.length && start === b.length) return true;
-  const restA = a.slice(start + 1);
-  const restB = b.slice(start + 1);
-  if (a.length === b.length) {
-    if (restA === restB) return true;
-    return a[start] === b[start + 1] && a[start + 1] === b[start] && a.slice(start + 2) === b.slice(start + 2);
-  }
-  return a.length > b.length ? restA === b.slice(start) : a.slice(start) === restB;
-}
-
 // Where a field has the term at the start of any of its words (a phrase starts at a word too).
 function atWordStart(field: string, term: string): boolean {
   return field.startsWith(term) || field.includes(` ${term}`);
@@ -84,7 +67,7 @@ function termScore(index: SearchIndex, term: string): number | null {
   if (atWordStart(index.name, term)) return NAME_WORD;
   if (atWordStart(index.tags, term)) return TAG;
   if (index.text.includes(term)) return TEXT;
-  if (term.length >= FUZZY_MIN && !term.includes(" ") && index.nameWords.some((word) => withinOneEdit(term, word))) return FUZZY;
+  if (term.length >= SLIP_MIN && !term.includes(" ") && index.nameWords.some((word) => withinOneEdit(term, word))) return FUZZY;
   return null;
 }
 

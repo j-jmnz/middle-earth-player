@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, attackersOf, cardSpecs, damageOn, defend, endPhase, flag, handCount, notWon, progressOn, quest, resolve, resourcesOn, reveal, stat, threat, travel, zone, exhausted, lost, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Weather Hills (angmar-awakened part 2): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot express (a damaged hero, a tally across rounds, a card field) is a
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). What a row cannot express (a damaged hero, a tally across rounds, a card field) is a
 // test titled with its line id in lines.test.ts. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; every seat starts at threat 28; a layout's current stage is on its B side.
 const CORNERED = "09025";
 const AMON = "09026";

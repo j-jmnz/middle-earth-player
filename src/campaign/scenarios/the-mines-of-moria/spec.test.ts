@@ -2,7 +2,7 @@
 import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, drew, exhausted, flag, handCount, progressOn, quest, resolve, resourcesOn, respond, reveal, stagingThreat, stat, threat, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Mines of Moria (standalone-scenarios part 12): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
 // Each layout holds the quest cards a Quick-build game keeps (1A, one stage 2, one stage 3), so a stage number is the printed one.
 const F0 = ["f0", "f0", "f0", "f0", "f0", "f0"];
 const ADVANCING = { phase: "Quest", deck: ["f0"] } as const;

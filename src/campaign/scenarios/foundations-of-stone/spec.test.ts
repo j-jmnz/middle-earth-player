@@ -26,7 +26,7 @@ import {
 } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Foundations of Stone (dwarrowdelf part 8): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The rows here are the lines a table and one action show; the flows of several steps (Washed Away!, the separate stage 4 areas and their
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The rows here are the lines a table and one action show; the flows of several steps (Washed Away!, the separate stage 4 areas and their
 // join, the Nameless enemies' attachments and Nest of Horrors, Lost and Alone, the Centipede, Chill of the Roots, the Nightmare setup, the commit limit) are tests titled with their line id in lines.test.ts. The stand-in heroes dh1 and dh2 are the first player's, dh3 the second's.
 const ROWS: readonly Row[] = [
   // 04111 The Dripping Walls. Setup: the first player attaches Cave Torch to a hero. B:1: one card per player.

@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, attackersOf, cardSpecs, damageOn, defend, endPhase, exhausted, flag, handCount, heldBy, lost, notWon, progressOn, quest, resolve, resourcesOn, respond, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Intruders in Chetwood (angmar-awakened part 1): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot express (a controller, a tally across rounds, a card held under another)
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). What a row cannot express (a controller, a tally across rounds, a card held under another)
 // is a test titled with its line id in lines.test.ts. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; every seat starts at threat 28; the main quest card is the one quest card in play until a side quest is staged.
 const IARION = "09016";
 const ORC_WAR_PARTY = "09017";

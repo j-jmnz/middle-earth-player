@@ -443,7 +443,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource(s) come off the resource pool of this card (discarded, not spent)
-    - then, if all of: (every draw and every discard of the top of the deck this effect ran so far resolved in full (what follows "then" is attempted only when they did)) and (resources of this card is less than 1) (checked when this step runs, after the steps above; not tied to whether they did anything): the Ring-bearer's life goes down by 3, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
+    - then, if all of: (every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows "then" is attempted only when they all did)) and (resources of this card is less than 1) (checked when this step runs, after the steps above; not tied to whether they did anything): the Ring-bearer's life goes down by 3, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
 
 ## 906307 Ettendales
 

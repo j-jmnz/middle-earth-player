@@ -11,14 +11,14 @@ export function splitRuns<T>(runs: readonly T[], unfinished: (run: T) => boolean
   return { hero: open[0] ?? null, others: open.slice(1) };
 }
 
-/** A scenario that waits under Coming later: its name, and its box with its place in the book ("Coming soon · Revised Core Set · 2"). */
-export type ComingScenario = { id: string; name: string; caption: string };
+/** A scenario that waits under Coming later: its name, its box with its place in the book ("Coming soon · Revised Core Set · 2"), and the box's name as the words a search also finds it by. */
+export type ComingScenario = { id: string; name: string; caption: string; find: string };
 
 /** The scenarios no box can deal yet, in box and book order; a cycle's scenarios not built yet (`later`) follow its built ones. */
 export function comingScenarios(boxes: readonly Box[], isPlayable: (scenarioId: string) => boolean, nameOf: (scenarioId: string) => string): ComingScenario[] {
   return boxes.flatMap((box) => {
-    const built = box.scenarios.flatMap((id, index) => (isPlayable(id) ? [] : [{ id, name: nameOf(id), caption: `Coming soon · ${box.name} · ${index + 1}` }]));
-    const unbuilt = (box.later ?? []).map((name, index) => ({ id: `${box.id}:${name}`, name, caption: `Coming soon · ${box.name} · ${box.scenarios.length + index + 1}` }));
+    const built = box.scenarios.flatMap((id, index) => (isPlayable(id) ? [] : [{ id, name: nameOf(id), caption: `Coming soon · ${box.name} · ${index + 1}`, find: box.name }]));
+    const unbuilt = (box.later ?? []).map((name, index) => ({ id: `${box.id}:${name}`, name, caption: `Coming soon · ${box.name} · ${box.scenarios.length + index + 1}`, find: box.name }));
     return [...built, ...unbuilt];
   });
 }
