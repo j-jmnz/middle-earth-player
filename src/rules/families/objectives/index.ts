@@ -90,7 +90,7 @@ function claimObjective(state: ScenarioState, instruction: Extract<Instruction, 
   const heroId = lastPicked(state);
   const hero = heroId ? state.cards[heroId] : undefined;
   // A claimed objective attached to another hero is claimed from there as well: "A hero can also exhaust to claim Book of Mazarbul even if it is attached to another hero" (dwd.book-of-mazarbul); the claim moves it.
-  const claimable = objective?.zone === "staging" || (objective?.zone === "attached" && objective.claimed === true);
+  const claimable = objective?.zone === "staging" || (objective?.zone === "attached" && (objective.claimed === true || instruction.fromHost === true)) || (instruction.fromHost === true && objective?.zone === "encounterDiscard");
   if (!id || !objective || !claimable || !freeOfEncounters(state, id) || !hero || (hero.zone !== "heroes" && hero.zone !== "play") || hero.controller == null) return state;
   const attached = attachTo(moveCard(state, id, { zone: "attached" }), id, heroId);
   const claimed = updateCard(attached, id, { face: "up", controller: hero.controller, claimed: true });

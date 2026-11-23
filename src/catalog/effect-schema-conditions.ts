@@ -84,7 +84,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2). `hand`: an Action
   // its player uses from the hand ("put Emery into play from your hand", src/rules/families/deck/play.ts). `encounterDeck`: a card that left play
   // for the encounter deck (Gavin's Planning Action shuffles him in; "When Gavin leaves play (other than by his ability)", 11210:A:3). `attached`: the source is attached to a card now (an event that attaches itself, then does more only if it did: 10172:A:1, rr.then).
-  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand", "stormcallerArea", "encounterDeck", "attached"]) }),
+  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand", "stormcallerArea", "encounterDeck", "attached", "encounterDiscard"]) }),
   // The source card shows this side (a contract, flipped by FlipCard; side A at the start).
   z.strictObject({ kind: z.literal("faceUp"), side: z.enum(["A", "B"]) }),
   // The actor's seat (`seat`), the source card (`self`) or the table (`table`, the flags every seat holds: 901201:A:3) holds this flag, a modifier of that stat that is in force now (`is`: false

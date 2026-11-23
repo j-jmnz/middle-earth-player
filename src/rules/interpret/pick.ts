@@ -24,7 +24,7 @@ import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
 import { flaggedByClass } from "../core/holder-classes.ts";
-import { cardTypeOf, isAllyLike, isQuestCardType, isSideQuestType, isPlayerType, printedOf } from "../core/printed.ts";
+import { cardTypeOf, isAllyLike, isCharacterType, isQuestCardType, isSideQuestType, isPlayerType, printedOf } from "../core/printed.ts";
 import { activeFor, headOf, sharedStaging, sharing } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
 import type { ScenarioState } from "../core/state.ts";
@@ -160,6 +160,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     // player claimed: attached to a hero, controlled by that player (families/objectives.ts).
     if (spec.control !== "you" && !spec.controlled) raw.push(...stagingFor(state, spec, asking));
     if (!spec.stagingOnly) raw.push(...Object.values(state.cards).filter((card) => card.claimed === true && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
+    // An objective an encounter card attached to a character (a Sack card) is unclaimed and controlled by no one (131036:A:2).
+    if (spec.onCharacter) raw.push(...Object.values(state.cards).filter((card) => card.zone === "attached" && card.host != null && !raw.includes(card.id) && isCharacterType(printedOf(ctx.cards, state.cards[card.host]?.code ?? ""))).map((card) => card.id));
     // A location with the safe keyword (an objective-location) may be the active location (10075:A:2).
     if (spec.safe && !spec.stagingOnly) raw.push(...activeFor(state, asking, spec.stagingArea === "any"));
     // `controlled` also counts a tower the players control as a group: freed of encounters, in the staging area, claimed with no controller (ControlWhenFree, families/objectives/control.ts).

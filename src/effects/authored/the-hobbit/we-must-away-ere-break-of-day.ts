@@ -11,7 +11,8 @@ const TROLL_IN_STAGING: PickSpec = { type: "enemy", control: "any", trait: "Trol
 const TROLL_IN_STAGING_NOW: Condition = { kind: "count", pick: TROLL_IN_STAGING, min: 1 };
 const NO_TROLL_IN_STAGING: Condition = { kind: "count", pick: TROLL_IN_STAGING, max: 0 };
 const ATTACKER_IS_TROLL: Condition = { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", trait: "Troll", staging: true } };
-const SACK_CARD: PickSpec = { type: "objective", control: "any", trait: "Sack" };
+// A Sack card on a character is an encounter card that nobody controls (`onCharacter`).
+const SACK_CARD: PickSpec = { type: "objective", control: "any", trait: "Sack", onCharacter: true };
 const TRAVEL_PAYABLE: Condition = { kind: "bagginsTravel", amount: 5, reduced: 2, key: "131043", purse: "131042" };
 const SELF_ENGAGED: Condition = { kind: "all", conditions: [{ kind: "phase", is: "Combat" }, { kind: "sourceIn", zone: "engaged" }] };
 
@@ -33,13 +34,13 @@ function sackRecords(code: string, attach: Instruction): Effect[] {
 }
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
-  // 131023 An Unexpected Party. The three Trolls and Troll Cave are set aside by the deal; the Sack cards are set aside too, and the Setup builds the Sack deck from them.
+  // 131023 An Unexpected Party. The three Trolls and Troll Cave are set aside by the deal; the Sack cards are set aside too, and the Setup builds the Sack deck from them. The table notes the cards placed in the encounter discard pile, which the Key and the Purse hear when stage 2B discards them from the deck.
   {
     id: "131023:setup:1",
     cardCode: "131023",
     lines: ["131023:A:1"],
     timing: "setup",
-    instructions: [{ verb: "PrepareSackDeck" }, { verb: "ShuffleEncounterDeck" }, { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "RevealEncounter" }] }],
+    instructions: [{ verb: "PrepareSackDeck" }, { verb: "ModifyStat", stat: "noteEncounterDiscards", amount: 1, until: "endOfGame", target: "table" }, { verb: "ShuffleEncounterDeck" }, { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "RevealEncounter" }] }],
   },
 
   // 131024 Roast Mutton.
@@ -128,15 +129,17 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     condition: { kind: "sourceIn", zone: "staging" },
     instructions: WAIT_FOR_TROLL,
   },
+  // A copy discarded from the encounter deck (stage 2B's discards) or from play goes to the staging area ("If discarded").
+  { id: "131042:forced:4", cardCode: "131042", lines: ["131042:A:1"], timing: "forced", trigger: "encounterDiscarded", subject: "self", condition: { kind: "sourceIn", zone: "encounterDiscard" }, instructions: [{ verb: "MoveEncounterCard", card: "self", to: "staging" }] },
+  // The first player's Response, offered as the host is destroyed (hostDestroyed: before the Forced return of this card to the staging area, rr.timing-of-ability-resolution); the cost is one resource of the Baggins sphere.
   {
     id: "131042:response:1",
     cardCode: "131042",
     lines: ["131042:A:2"],
     timing: "response",
-    trigger: "enemyDestroyed",
-    subject: "host",
+    trigger: "hostDestroyed",
     cost: { kind: "resources", amount: 1, sphere: "baggins" },
-    instructions: [{ verb: "Pick", pick: { type: "hero", control: "any", names: [BILBO] } }, { verb: "ClaimObjective" }],
+    instructions: [{ verb: "Pick", pick: { type: "hero", control: "any", names: [BILBO] } }, { verb: "ClaimObjective", fromHost: true }],
   },
   copyLine("131042:A:1", "131043:A:1"),
   {
@@ -144,10 +147,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     cardCode: "131043",
     lines: ["131043:A:2"],
     timing: "response",
-    trigger: "damagedByAttack",
+    trigger: "enemyDamagedByAttack",
     subject: "host",
     cost: { kind: "exhaustNamed", name: BILBO },
-    instructions: [{ verb: "Pick", pick: { type: "hero", control: "any", names: [BILBO] } }, { verb: "ClaimObjective" }],
+    instructions: [{ verb: "Pick", pick: { type: "hero", control: "any", names: [BILBO] } }, { verb: "ClaimObjective", fromHost: true }],
   },
 
   // 131044 to 131050 the Sack cards: When Sacked is the record answering the Sack X draw (hob.sack-x); the constant holds the attached character. Six lines print "(excluding Gandalf)"; 131050 prints none and no span bars Gandalf from every Sack (hob.sack-x, hob.sack-x-example), so a hero titled Gandalf can take A Worn Sack.

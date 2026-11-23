@@ -451,6 +451,8 @@ export function destroyCard(
   if (isLocationCard(printed)) {
     for (const attachmentId of instance.attachments) next = queueEvent(next, { trigger: "hostLeftPlay", seat: state.firstPlayer, cardId: attachmentId, subject: id, explored });
   }
+  // The cards attached to an enemy that is destroyed hear it (`hostDestroyed`, "After attached Troll enemy is destroyed", 131042:A:2), from where the release puts them.
+  if (printed.type === "enemy") for (const attachmentId of instance.attachments) next = queueEvent(next, { trigger: "hostDestroyed", seat: state.firstPlayer, cardId: attachmentId, subject: id });
   // The active location explored: every card hears it, with the number of attachments it had (10006:A:1, 19026:A:2).
   if (explored && isLocationCard(printed) && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
   // A location explored in the staging area (not the active location, which announced itself above) is heard by "after a location is explored" (Northern Tracker, The Evening Star).

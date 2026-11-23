@@ -11,7 +11,7 @@ const TROLLS = ["131032", "131033", "131034"];
 
 const ROWS: readonly Row[] = [
   // 131023 An Unexpected Party.
-  { line: "131023:A:1", name: "Setup: the set-aside Sack cards make the Sack deck and each player reveals a card", layout: { stage: "131023", side: "A", setAside: SACKS, deck: ["f0", "f0", "f0"] }, act: resolve("131023", "setup"), expect: [...SACKS.map((code) => count(code, "sackDeck", 1)), zone("f0", "staging"), deckCount(2)] },
+  { line: "131023:A:1", name: "Setup: the set-aside Sack cards make the Sack deck and each player reveals a card", layout: { stage: "131023", side: "A", setAside: SACKS, deck: ["f0", "f0", "f0"] }, act: resolve("131023", "setup"), expect: [...SACKS.map((code) => count(code, "sackDeck", 1)), flag("table", "noteEncounterDiscards"), zone("f0", "staging"), deckCount(2)] },
   // 131024 Roast Mutton.
   { line: "131024:A:1", name: "When Revealed: the set-aside Trolls and Troll Cave join the staging area and the discard pile is shuffled into the deck", layout: { ...A, setAside: [...TROLLS, "131037"], discard: ["f0", "f3"] }, act: resolve("131024", "whenRevealed"), expect: [...[...TROLLS, "131037"].map((code) => zone(code, "staging")), count("f0", "encounterDeck", 1), count("f3", "encounterDeck", 1)] },
   { line: "131024:B:1", name: "Forced: the stage advances when the last Troll enemy is destroyed", layout: { ...B, victory: ["131032"], staging: ["f3"], deck: ["f0"] }, act: announce("enemyDestroyed", "131032"), expect: [zone("131025", "questStage")] },
