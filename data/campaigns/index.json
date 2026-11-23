@@ -113,7 +113,7 @@
     "id": "against-the-shadow",
     "name": "Against the Shadow",
     "scenarioCount": 9,
-    "playable": false,
+    "playable": true,
     "kind": "cycle",
     "box": null,
     "released": "2012-11-26",

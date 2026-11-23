@@ -144,6 +144,12 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
   "passage-through-mirkwood": [
     "two-handed, won on Beorn's Path",
   ],
+  "peril-in-pelargir": [
+    "Easy solo win",
+    "Easy two-handed win",
+    "solo win",
+    "two-handed win",
+  ],
   "return-to-mirkwood": [
     "Nightmare two-handed win",
   ],

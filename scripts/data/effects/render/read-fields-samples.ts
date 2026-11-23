@@ -275,6 +275,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
     { verb: "Restrict", what: "travel", location: "18068", guarding: "Tiny" },
     { verb: "Restrict", what: "travel", trait: "West Bank" },
     { verb: "Restrict", what: "travel", exceptSelf: true },
+    { verb: "Restrict", what: "travel", exceptTitle: "City Street" },
     { verb: "Restrict", what: "travel", withResources: true },
     { verb: "Restrict", what: "travel" },
     { verb: "Restrict", what: "defend", anyDefender: true },

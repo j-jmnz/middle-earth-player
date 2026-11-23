@@ -123,6 +123,10 @@ describe("effect coverage", () => {
   // the card came into play, so a constant record owns it: a Forced trigger on one way in (added to the staging area, engaged) would miss the others. Named one by one, with the reason.
   const REPLACEMENT_RECORDS: ReadonlySet<string> = new Set(["11181:constant:2"]);
 
+  // A constant record that is no replacement effect: it raises the table flag that makes the engine announce an event, so the card's own Forced record can hear it. 05023:constant:1 is the other half of Harbor Storehouse's Forced line (05023:A:1):
+  // the flag `noteDeckDiscards` makes the engine announce a card that leaves the top of the encounter deck (families/stormcaller/zone.ts, discardedFromDeck), held while the card is in play.
+  const ANNOUNCEMENT_FLAG_RECORDS: ReadonlySet<string> = new Set(["05023:constant:1"]);
+
   const lineOf = (id: string): string => printedLine(lines, id) ?? "";
 
   it("has a record that names a line of its own card, for every shipped record", () => {
@@ -137,7 +141,7 @@ describe("effect coverage", () => {
         // unlabeled line it carries out with its labeled one (Close Call's "Doomed X." raised by its Response, 08005).
         const timings = lineTimings(line ?? "");
         const alongside = timings.has("constant") && effect.lines.some((other) => other !== id && lineTimings(lineOf(other)).has(effect.timing));
-        if (!alongside && !REPLACEMENT_RECORDS.has(effect.id) && !isCampaignMarker(effect, line ?? "")) expect(timings, `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
+        if (!alongside && !REPLACEMENT_RECORDS.has(effect.id) && !ANNOUNCEMENT_FLAG_RECORDS.has(effect.id) && !isCampaignMarker(effect, line ?? "")) expect(timings, `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
       }
     }
   });

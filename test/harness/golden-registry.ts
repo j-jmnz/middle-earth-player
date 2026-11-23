@@ -64,6 +64,7 @@ import * as water from "../scenarios/the-watcher-in-the-water/game.ts";
 import * as dark from "../scenarios/the-long-dark/game.ts";
 import * as stone from "../scenarios/foundations-of-stone/game.ts";
 import * as flame from "../scenarios/shadow-and-flame/game.ts";
+import * as pelargir from "../scenarios/peril-in-pelargir/game.ts";
 import * as spiders from "../scenarios/flies-and-spiders/game.ts";
 import * as osgiliath from "../scenarios/the-massing-at-osgiliath/game.ts";
 import * as town from "../scenarios/the-battle-of-lake-town/game.ts";
@@ -180,6 +181,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("flies-and-spiders", "Flies and Spiders", spiders.SPIDERS_GOLDENS, spiders.spidersWorld, spiders.playGolden),
   entry("the-lonely-mountain", "The Lonely Mountain", mountain.MOUNTAIN_GOLDENS, mountain.mountainWorld, mountain.playGolden),
   entry("the-battle-of-five-armies", "The Battle of Five Armies", armies.ARMIES_GOLDENS, armies.armiesWorld, armies.playGolden),
+  entry("peril-in-pelargir", "Peril in Pelargir", pelargir.PELARGIR_GOLDENS, pelargir.pelargirWorld, pelargir.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),

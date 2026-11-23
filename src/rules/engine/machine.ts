@@ -55,6 +55,7 @@ import { damageHeld, destroyOverwhelmed } from "../core/keywords.ts";
 import { clearEliminated, eliminateHeroless } from "../core/eliminate.ts";
 import { effectsOf } from "../windows/listen.ts";
 import { engagesAgain, optionallyEngaged } from "../families/quest/engage.ts";
+import { noteOptionalEngage } from "../families/pelargir/optional-engage.ts";
 import { syncThreatSaves } from "../families/quest/threat.ts";
 import { eventWaits } from "../families/defense/listen.ts";
 import { announceShadowsDealt } from "../families/defense/shadow.ts";
@@ -177,7 +178,8 @@ export function applyIntent(
       return declineTravel(state, ctx, steps);
     case "Engage": {
       // "After you optionally engage an enemy", and a seat that may optionally engage an additional enemy (09002:A:2).
-      const engaged = optionallyEngaged(engageEnemy(state, state.activeSeat, intent.enemyId, steps), state.activeSeat, intent.enemyId, ctx);
+      // The engagement is marked optional first (a Forced effect of the enemy asks, 05042:A:1), in a game with a record that reads the mark.
+      const engaged = optionallyEngaged(engageEnemy(noteOptionalEngage(state, intent.enemyId, ctx), state.activeSeat, intent.enemyId, steps), state.activeSeat, intent.enemyId, ctx);
       return engagesAgain(engaged, state.activeSeat, ctx) ? engaged : finishOptional(engaged, state.activeSeat);
     }
     case "DeclineEngage":

@@ -308,6 +308,7 @@ export const simpleVerbs = [
     belowSourceHitPoints: z.boolean().optional(), anyDefender: z.literal(true).optional(), // `anyDefender`: no character can defend against the source ("Players cannot declare defenders against Rock Adder", 51324:A:1).
     // With "travel" on a card that is not the location: the players cannot travel to any location but the source ("players cannot travel to other locations", 50217:A:2).
     exceptSelf: z.boolean().optional(),
+    exceptTitle: z.string().min(1).optional(), // With "travel" on a card that is not the location: no travel to a location whose title is not this one (05038:A:2).
     // With "commit" (a player who does not control a card that matches this cannot commit characters to the quest, 02013:B:1) and "draw" (such a player cannot draw cards through card effects, 900404:A:1: the resource phase's and the round's draws are framework
     // draws, not card effects). The pick is read from each player's side.
     unlessControls: pickSchema.optional(),

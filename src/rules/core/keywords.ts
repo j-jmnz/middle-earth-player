@@ -243,7 +243,7 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
 
 function placeDamageHere(state: ScenarioState, assigned: string, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], source: DamageSource, cause: Cause, sourceId?: string | null): ScenarioState {
   // Damage assigned to a card another takes for it ("attached hero takes all damage assigned to the chosen hero", 02099).
-  const id = damageGoesTo(state, assigned);
+  const id = damageGoesTo(state, assigned, source);
   const instance = state.cards[id];
   // Damage goes only on a card in play (rr.in-play-and-out-of-play): a defender that already left play takes none.
   if (!instance || !inPlay(instance.zone)) return state;
