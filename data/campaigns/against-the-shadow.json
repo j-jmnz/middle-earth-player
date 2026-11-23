@@ -1,0 +1,18 @@
+{
+  "id": "against-the-shadow",
+  "name": "Against the Shadow",
+  "scenarios": [
+    "peril-in-pelargir",
+    "into-ithilien",
+    "the-siege-of-cair-andros",
+    "the-stewards-fear",
+    "the-druadan-forest",
+    "encounter-at-amon-din",
+    "assault-on-osgiliath",
+    "the-blood-of-gondor",
+    "the-morgul-vale"
+  ],
+  "kind": "cycle",
+  "starterDecks": [],
+  "saga": false
+}

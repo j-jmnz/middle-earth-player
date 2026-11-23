@@ -12,7 +12,7 @@ import {
 import { CAMPAIGNS, CAMPAIGN_SUFFIX, productOf, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
 import { PLAYER_TYPES, type Overrides } from "./cards.ts";
 import { clausesOf, codesOf, nameIndex, parseSetup, type ParsedSetup } from "./setup-text.ts";
-import { loggedHarad, pileAccepts, questFacts } from "./scenario-piles.ts";
+import { loggedHarad, pileAccepts, questFacts, stagedPerPlayer } from "./scenario-piles.ts";
 import { bookletSetsOf, setupOf } from "./scenario-text.ts";
 import { burdenSetProblems, crossCheckProblems, easyRemovals, easySheetProblem, plain, PLAYER_GROUP, type Deck } from "./scenario-checks.ts";
 import { pilesFromSetup, type Loaded } from "./setup-piles.ts";
@@ -243,7 +243,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       easy = easyDeck ? load(easyDeck) : empty;
       if (!easyDeck) local.push(`${id}: no ${easyKey} Easy deck`);
       for (const key of easy.placements.keys()) {
-        if (!normal.placements.has(key)) local.push(`${id}: Easy deck has ${key.replace("\u0000", " in ")} that Normal does not`);
+        if (!normal.placements.has(key) && !stagedPerPlayer(quest, key)) local.push(`${id}: Easy deck has ${key.replace("\u0000", " in ")} that Normal does not`);
       }
       // "Players prepare their fleet" deals all six ship-objectives of The Dream-chaser's Fleet (dcce.prepare-your-fleet), set aside until
       // the players choose; the load list holds the four of the original box, so each ship it lacks (by name) is added, in both decks.
