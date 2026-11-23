@@ -1,4 +1,5 @@
 // Test helper for the riddles family's tests: a table of Dungeons Deep and Caverns Dim with Bilbo Baggins and the riddle area its Setup makes, and the answers to the choices a riddle asks.
+import type { Effect } from "../../../catalog/boundary.ts";
 import { settle } from "../../engine/machine.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -9,9 +10,9 @@ export const ID = "dungeons-deep-and-caverns-dim";
 // Player cards with a printed sphere, type and cost: Guard of the Citadel (leadership ally 2), Common Cause (leadership event 0), Grim Resolve (leadership event 5), Citadel Plate (tactics attachment 4), The Galadhrim's Greeting (spirit event 3), Stand and Fight (spirit event X).
 export const PLAYER = ["01013", "01021", "01025", "01040", "01046", "01051"];
 
-/** A table at the start of the quest phase with the scenario's three quest cards, Lake in the Cavern staged, Bilbo Baggins as the first seat's hero, and the riddle area made by the Setup (the round stopped where it is). */
-export function riddleTable(layout: Layout = {}) {
-  const made = tableFromLayout(ID, { stages: ["131029", "131030", "131031"], stage: "131029", deck: ["131074", "131079", "f0", "f0"], staging: ["131078"], ...layout }, { extra: ["131001", ...PLAYER] });
+/** A table at the start of the quest phase (on `effects` when given: a line spec runs it without the records of its line) with the scenario's three quest cards, Lake in the Cavern staged, Bilbo Baggins as the first seat's hero, and the riddle area made by the Setup (the round stopped where it is). */
+export function riddleTable(layout: Layout = {}, effects?: readonly Effect[]) {
+  const made = tableFromLayout(ID, { stages: ["131029", "131030", "131031"], stage: "131029", deck: ["131074", "131079", "f0", "f0"], staging: ["131078"], ...layout }, { extra: ["131001", ...PLAYER], ...(effects ? { effects } : {}) });
   const bilbo = spawn(made.state, "131001", { zone: "heroes", seat: 0 });
   const setup = resolveRecords(bilbo.state, made.ctx, "131029", "setup", idOf(bilbo.state, "131029"));
   return { ...made, state: settle({ ...setup.state, window: null, mode: "stopped" }, made.ctx, []), bilbo: bilbo.id };

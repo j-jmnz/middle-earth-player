@@ -80,9 +80,16 @@ export function gollumEngagesFirstPlayer(state: ScenarioState, steps: EngineStep
   return engageWith(state, state.firstPlayer, gollum.id, steps);
 }
 
-/** The Ring on Bilbo and the Baggins resources in his pool, when both are there to use while answering a riddle (131079:A:2). */
-export function ringReady(state: ScenarioState): { bilbo: CardInstance } | null {
+/** The Action the Ring prints for answering a riddle (131079:A:2): its record, which the riddle step reads for the resources spent and the cards discarded. */
+const ringAction = (ctx: Pick<ReduceContext, "effects">) => ctx.effects.find((effect) => effect.cardCode === RING && effect.timing === "action" && effect.condition?.kind === "riddle");
+
+/** The Ring on Bilbo and the Baggins resources in his pool, when both are there to use while answering a riddle (131079:A:2): Bilbo, what one use spends and how many cards it discards. Null without the Action's record. */
+export function ringReady(state: ScenarioState, ctx: Pick<ReduceContext, "effects">): { bilbo: CardInstance; spend: number; discard: number } | null {
+  const action = ringAction(ctx);
+  const cost = action && !Array.isArray(action.cost) && action.cost?.kind === "resources" ? action.cost : undefined;
+  const discard = action?.instructions.find((instruction) => instruction.verb === "DiscardFromDeck");
+  const amount = discard?.verb === "DiscardFromDeck" && typeof discard.amount === "number" ? discard.amount : undefined;
   const hero = bilbo(state);
   const ring = hero?.attachments.some((id) => state.cards[id]?.code === RING) === true;
-  return hero && ring && hero.resources > 0 ? { bilbo: hero } : null;
+  return hero && ring && cost && amount != null && hero.resources >= cost.amount ? { bilbo: hero, spend: cost.amount, discard: amount } : null;
 }

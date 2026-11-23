@@ -102,12 +102,12 @@ function discardCards(state: ScenarioState, card: string, ctx: ReduceContext, sh
 
 // "Action: When answering a riddle, spend 1 Baggins resource to discard an additional player card from the top of your deck" (131079:A:2): asked while Bilbo holds a resource and the Ring is on him, until the first player stops.
 function ringStep(state: ScenarioState, instruction: Verb<"RiddleStep">, focus: Focus, ctx: ReduceContext, cause: QueueItem["cause"]): ScenarioState {
-  const ready = ringReady(state);
+  const ready = ringReady(state, ctx);
   if (!ready || (state.seats[state.firstPlayer]?.deck.length ?? 0) === 0) return state;
   if (focus.chosen == null) return askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, ...(cause ? { cause } : {}) }, ["ring", "stop"]);
   if (focus.chosen !== "ring") return state;
-  const spent = updateCard(state, ready.bilbo.id, { resources: ready.bilbo.resources - 1 });
-  const more = discardCards(spent, instruction.card, ctx, false, 1);
+  const spent = updateCard(state, ready.bilbo.id, { resources: ready.bilbo.resources - ready.spend });
+  const more = discardCards(spent, instruction.card, ctx, false, ready.discard);
   return queueFront(more, [{ instruction, seat: state.firstPlayer, chosen: null, ...(cause ? { cause } : {}) }]);
 }
 

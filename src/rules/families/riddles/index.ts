@@ -32,7 +32,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ResolveNormally":
       return resolveNormally(state, focus, ctx, steps);
     case "DiscardUntilRiddle":
-      return discardUntilRiddle(state, ctx);
+      return discardUntilRiddle(state, focus, ctx);
     case "NameEncounterType":
       return nameEncounterType(state, instruction, focus, steps);
     case "RemoveRiddleProgress":

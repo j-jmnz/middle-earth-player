@@ -55,8 +55,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "PlaceInRiddleArea", code: "131074" }, { verb: "PlaceInRiddleArea", code: "131079", attachTo: BILBO }, { verb: "ShuffleEncounterDeck" }],
     },
     copyLine("131029:B:1", "131030:B:1"),
-    // Progress goes on this stage only by answering a riddle (AnswerRiddle) and comes off only by Not Fair! Not Fair!: no card effect places or removes it (the current quest is stage 1).
-    { id: "131030:constant:2", cardCode: "131030", lines: ["131030:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noEffectProgress", amount: 1, until: "whileSourceInPlay", target: "self" }] },
+    // No card effect adds progress to or takes it off this stage (noProgressPlaced, noProgressRemoved on the stage only: the active location is not barred). Answering a riddle (AnswerRiddle) adds it and Not Fair! Not Fair!, which names this stage (RemoveRiddleProgress), takes it off, as the reading in docs/scenarios/the-hobbit.md says.
+    {
+      id: "131030:constant:2",
+      cardCode: "131030",
+      lines: ["131030:B:2"],
+      timing: "constant",
+      instructions: [{ verb: "ModifyStat", stat: "noProgressPlaced", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "noProgressRemoved", amount: 1, until: "whileSourceInPlay", target: "self" }],
+    },
     // The riddle area: its cards are immune to player card effects, and Bilbo Baggins (the first player still controls him) cannot quest, attack or take attachments played by the players; he defends only against Gollum (families/riddles/gollum.ts).
     {
       id: "131030:constant:3",
@@ -132,7 +138,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 131078 Lake in the Cavern. X (its Threat) is twice the number of players; the players cannot travel here; Forced: after stage 3 is revealed, remove it from the game.
     copyLine("50306:A:1", "131078:A:1"),
-    { id: "131078:constant:2", cardCode: "131078", lines: ["131078:A:2"], timing: "constant", instructions: [{ verb: "Restrict", what: "travel" }] },
+    { id: "131078:constant:2", cardCode: "131078", lines: ["131078:A:2"], timing: "constant", instructions: [{ verb: "Restrict", what: "travel", location: "131078" }] },
     {
       id: "131078:forced:1",
       cardCode: "131078",
@@ -159,8 +165,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "131079",
       lines: ["131079:A:3"],
       timing: "action",
-      cost: { kind: "exhaustSelf" },
-      instructions: [{ verb: "RaiseThreat", amount: 2, who: "eachSeat" }, { verb: "AddResources", amount: 1, to: "host" }],
+      cost: [{ kind: "exhaustSelf" }, { kind: "raiseThreat", amount: 2, each: true }],
+      instructions: [{ verb: "AddResources", amount: 1, to: "host" }],
     },
 
     // 131080 Come Down Little Bird. Each player in turn (the first player first) searches for a Creature enemy and puts it into play engaged with him; the encounter deck is shuffled.

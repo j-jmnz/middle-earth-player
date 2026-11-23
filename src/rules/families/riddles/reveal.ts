@@ -11,6 +11,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { askTarget } from "../../windows/choices.ts";
+import { queueEvent } from "../../windows/queue.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { effectData, pushPicked, shuffleDiscardIn } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
@@ -28,18 +29,25 @@ export function revealedEffects(state: ScenarioState, id: string, seat: number, 
   return offer ? [offer] : effects.filter((effect) => !offers(effect));
 }
 
-/** ResolveNormally: the card's When Revealed records, but the riddle offer, resolve for the first player as the reveal would have run them. */
+/** Whether the card just revealed offers the first player its riddle: the card is not added to the staging area until he resolves it (an answered riddle card is discarded, never added: hob.riddles). */
+export function offersRiddle(state: ScenarioState, id: string, seat: number, ctx: ReduceContext): boolean {
+  const code = state.cards[id]?.code;
+  return ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "whenRevealed" && offers(effect) && (!effect.condition || holds(state, effect.condition, { actor: seat, sourceId: id, returned: 0 }, ctx)));
+}
+
+/** ResolveNormally: the card's When Revealed records, but the riddle offer, resolve for the first player as the reveal would have run them. The card is added to the staging area now (the reveal held that back while the riddle was offered). */
 export function resolveNormally(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = focus.sourceId;
   const code = id ? state.cards[id]?.code : undefined;
   if (!id || !code) return state;
+  const added = state.cards[id]?.zone === "staging" ? queueEvent(state, { trigger: "addedToStaging", seat: state.firstPlayer, cardId: id }) : state;
   const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed" && !offers(effect));
-  return pushCardEffects(state, "whenRevealed", id, focus.seat, false, effects, ctx, steps);
+  return pushCardEffects(added, "whenRevealed", id, focus.seat, false, effects, ctx, steps);
 }
 
-/** DiscardUntilRiddle: encounter cards go to the discard pile until one that prints a riddle is discarded; it is the picked card (empty when no such card is left in the deck or the discard pile). */
-export function discardUntilRiddle(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  const wanted = (id: string) => riddleOf(ctx, state.cards[id]?.code ?? "") != null;
+/** DiscardUntilRiddle: encounter cards go to the discard pile until another card that prints a riddle is discarded; it is the picked card (empty when no such card is left in the deck or the discard pile). The source card is no "other" card: shuffled back with the discard pile it is not found. */
+export function discardUntilRiddle(state: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
+  const wanted = (id: string) => id !== focus.sourceId && riddleOf(ctx, state.cards[id]?.code ?? "") != null;
   if (![...state.encounterDeck, ...state.encounterDiscard].some(wanted)) return pushPicked(state, null);
   let current = state;
   for (;;) {

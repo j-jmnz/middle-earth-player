@@ -27,7 +27,7 @@ import { skipLoot } from "../families/wilderland/loot.ts";
 import { familyRevealed } from "../interpret/family-hooks.ts";
 import { gainedDoomed } from "../families/deck/gains-doomed.ts";
 import { gameReads } from "../core/game-reads.ts";
-import { revealedEffects } from "../families/riddles/reveal.ts";
+import { offersRiddle, revealedEffects } from "../families/riddles/reveal.ts";
 import { whenRevealedIgnored } from "../families/angmar/safe.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
@@ -159,7 +159,8 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // An enemy with Grapple attaches to a location in the staging area as it is revealed, and is not added to the staging area (dcce.grapple).
       if (grapplesOnReveal(next, id, ctx)) return pushGrapple(patchTop(next, { step: 1 }), id, seat, steps);
       // "After an enemy is added to the staging area" hears the card arrive.
-      if (!engages) next = queueEvent(next, { trigger: "addedToStaging", seat, cardId: id });
+      // A riddle card the first player may answer is added to the staging area only when he resolves it (families/riddles/reveal.ts).
+      if (!engages && !offersRiddle(next, id, seat, ctx)) next = queueEvent(next, { trigger: "addedToStaging", seat, cardId: id });
       next = patchTop(next, { step: 1 });
       // A Forced effect on the reveal of a location (148004:B:1) resolves before the Responses to the reveal are offered; one that cancels the reveal leaves none to offer.
       if (printed.type === "location" && listens(next, ctx, "locationRevealed")) {
