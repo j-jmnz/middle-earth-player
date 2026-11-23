@@ -50,9 +50,9 @@ const PLAYS: Readonly<Record<string, number>> = {
 // The harness's whole-game players: the auto-player's loop, the kit's, the combat policy's, the starter-deck games.
 const PLAYERS = ["playOut", "playToEnd", "playUntil", "playStarter"];
 
-// The files that may import the golden registry: its own test, the reader check and `pnpm game`, which plays the one golden it is asked for. A test that
+// The files that may import the golden registry: its own test, the reader check, `pnpm game` and its base replay (`scripts/game/replay-dump.ts`), which play the one golden they are asked for. A test that
 // loops over the registry plays every scenario's goldens again; a check on golden games goes in test/harness/golden-suite.ts, which runs it on the games it has played.
-const REGISTRY_IMPORTERS = ["test/harness/golden-registry.test.ts", "src/play/reader-play/games.ts", "scripts/game/source.ts"];
+const REGISTRY_IMPORTERS = ["test/harness/golden-registry.test.ts", "src/play/reader-play/games.ts", "scripts/game/source.ts", "scripts/game/replay-dump.ts"];
 
 // A scenario's goldens hold at most MOST_INTENTS intents in all: a few wins and a loss for each way to lose, not every seed and option.
 // The scenarios over it today are listed at their count, with SLACK for an engine change that moves their games; a new golden there
