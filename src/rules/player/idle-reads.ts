@@ -75,6 +75,12 @@ export function amountIdle(state: ScenarioState, amount: Amount | undefined, fra
   });
 }
 
+/** Whether X cannot be chosen: every number of `max` is settled and, for every card the earlier Pick may have chosen, the lowest of them is below `min` (the engine takes no X then, `chooseX`). */
+export function xUnchoosable(state: ScenarioState, max: readonly Amount[], min: number, frame: IdleFrame, ctx: ReduceContext): boolean {
+  if (!max.every(settledAmount)) return false;
+  return (frame.picked ?? [null]).every((id) => Math.min(...max.map((amount) => resolveAmount(state, amount, id == null ? frame.scope : { ...frame.scope, picked: [id] }, ctx))) < min);
+}
+
 /** The scope a condition is read in: the actor, the source and the card the answered event is about. */
 export function conditionScope(frame: IdleFrame, sourceId: string) {
   return { actor: frame.seat, sourceId, returned: 0, ...(frame.scope.subject ? { subject: frame.scope.subject } : {}), ...(frame.scope.other ? { other: frame.scope.other } : {}), ...(frame.eventSeat != null ? { eventSeat: frame.eventSeat } : {}) };

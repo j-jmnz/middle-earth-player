@@ -111,19 +111,28 @@ describe("131001:A:2 and 132001:A:1: the resources Bilbo Baggins gains", () => {
     expect(resourcesOf(collect(ringed, ctx), bilbo)).toBe(2);
   });
 
-  // FAULT: the card prints that Bilbo gains no resource from a player card effect, so the Ring's whole effect (gain 1 Baggins resource) cannot happen and its Action may not be started (rr.triggered-ability, rr.cost); the engine offers it and takes the exhaust and the threat for nothing.
-  it.fails("131001:A:2 the Ring's Action 132019:A:2 is not offered on Bilbo of the Over Hill and Under Hill box, whose pool it cannot fill", () => {
+  it("131001:A:2 the Ring's Action 132019:A:2 is not offered on Bilbo of the Over Hill and Under Hill box, whose pool it cannot fill", () => {
     const ctx = world(EFFECTS);
     const { state, ids } = bilboTable(ctx, BILBO_OHAUH, [RING]);
     expect(ids[RING]).toBeDefined();
     expect(triggers(state, ctx, "132019:action:1")).toEqual([]);
   });
 
-  // FAULT: the card prints that Bilbo gains no resource from a player card effect, so Orcrist's Response (add 1 resource to the attached hero) has no effect on him and may not be started (rr.triggered-ability); the engine offers it.
-  it.fails("131001:A:2 Orcrist's Response 131021:A:3 is not offered when the attached hero is Bilbo of the Over Hill and Under Hill box", () => {
+  it("131001:A:2 Orcrist's Response 131021:A:3 is not offered when the attached hero is Bilbo of the Over Hill and Under Hill box", () => {
     const { t, declared } = orcristAttack(EFFECTS, BILBO_OHAUH);
     expect(declared.cards[t.ids.orcling!]?.zone).toBe("encounterDiscard");
     expect(triggers(declared, t.ctx, "131021:response:1")).toEqual([]);
+  });
+});
+
+describe("131001:A:2 the other player cards that add resources to Bilbo Baggins", () => {
+  it("131001:A:2 the Action of the Steward of Gondor (01026:A:3) is not offered on Bilbo of the Over Hill and Under Hill box, and is offered on another hero", () => {
+    const ctx = world(EFFECTS);
+    const barred = bilboTable(ctx, BILBO_OHAUH, [STEWARD]);
+    expect(triggers(barred.state, ctx, "01026:action:1")).toEqual([]);
+    const other = seat(1, ["rohan"]);
+    const held = put(other.state, STEWARD, "play");
+    expect(triggers(hostOn(held.state, held.id, other.heroes[0] ?? "", ctx), ctx, "01026:action:1")).not.toEqual([]);
   });
 });
 
@@ -190,8 +199,7 @@ describe("132020:A:2 The Arkenstone: the next ally this phase, the lowered cost 
     expect(triggers(some.state, ctx, "132020:action:1")).not.toEqual([]);
   });
 
-  // FAULT: the card lowers only the cost of an ally that matches the attached hero's sphere, so with only an ally of another sphere in hand the effect has nothing to act on (rr.triggered-ability, rr.cost); the engine offers the Action and takes the exhaust and the threat.
-  it.fails("132020:A:2 is not offered when the only ally in hand is of another sphere than the attached hero's", () => {
+  it("132020:A:2 is not offered when the only ally in hand is of another sphere than the attached hero's", () => {
     const ctx = world(EFFECTS);
     const some = stoneTable(ctx, ["plain-ally"]);
     expect(triggers(some.state, ctx, "132020:action:1"), "a Leadership ally with a Leadership hero").not.toEqual([]);
@@ -199,8 +207,7 @@ describe("132020:A:2 The Arkenstone: the next ally this phase, the lowered cost 
     expect(triggers(other.state, ctx, "132020:action:1")).toEqual([]);
   });
 
-  // FAULT: X is 1 to the threat that leaves the player in the game (docs/scenarios/the-hobbit.md, The shared rules), so at threat 49 it can only be 0 and the Action changes nothing (rr.triggered-ability); the engine offers it and uses it for nothing but the exhaust.
-  it.fails("132020:A:2 is not offered when X can only be 0, at a threat of 49", () => {
+  it("132020:A:2 is not offered when X can only be 0, at a threat of 49", () => {
     const ctx = world(EFFECTS);
     const low = stoneTable(ctx, ["plain-ally"], { threat: 48 });
     expect(triggers(low.state, ctx, "132020:action:1"), "at 48, X may be 1").not.toEqual([]);
@@ -217,11 +224,11 @@ describe("132020:A:2 The Arkenstone: the next ally this phase, the lowered cost 
     expect(playFree(used, t.ids[0] ?? "", ctx).ok, "the Leadership ally (cost 2) is free with X = 2").toBe(true);
   });
 
-  // FAULT: Aragorn with Celebrían's Stone has the Spirit icon, so a Spirit ally matches his sphere (docs/brief.md, Three layers); the engine reads the attached hero's printed sphere only (reduceNextCost) and the Spirit ally is no cheaper.
-  it.fails("132020:A:2 a hero that gained a resource icon counts as that sphere: the Spirit ally of Aragorn with Celebrían's Stone costs X less", () => {
+  it("132020:A:2 a hero that gained a resource icon counts as that sphere: the Spirit ally of Aragorn with Celebrían's Stone costs X less", () => {
     const ctx = world(EFFECTS);
     const t = stoneTable(ctx, ["rider"], { hero: "ranger", extra: [CELEBRIANS_STONE] });
-    const plain = stoneTable(ctx, ["rider"], { hero: "ranger" });
+    // The Leadership ally keeps the Action offered without the Stone (an Action with no ally of his sphere in hand is not offered).
+    const plain = stoneTable(ctx, ["rider", "plain-ally"], { hero: "ranger" });
     expect(playFree(useStone(plain.state, plain.stone, 1, ctx), plain.ids[0] ?? "", ctx).ok, "without the Stone he is no Spirit hero").toBe(false);
     expect(playFree(useStone(t.state, t.stone, 1, ctx), t.ids[0] ?? "", ctx).ok).toBe(true);
   });
@@ -247,15 +254,13 @@ const stingScene = (effects: readonly Effect[], sting: string, hostCode: string,
 const responseOffered = (scene: ReturnType<typeof stingScene>): boolean => offered(legalIntents(scene.defended, scene.built.ctx), scene.response);
 
 describe("131020:A:3 and 142011:A:3 Sting: the discard from the encounter deck", () => {
-  // FAULT: the card prints "discard the top card of the encounter deck", so with no card in it nothing is discarded, no damage is dealt and the Response may not be started (rr.triggered-ability, rr.cost); the engine offers it.
-  it.fails("131020:A:3 is not offered with an empty encounter deck", () => {
+  it("131020:A:3 is not offered with an empty encounter deck", () => {
     expect(responseOffered(stingScene(EFFECTS, STING, BILBO_OHAUH, ["mist", "bigfoe"])), "a card to discard").toBe(true);
     expect(responseOffered(stingScene(EFFECTS, STING, BILBO_OHAUH, [])), "no shadow card, no card to discard").toBe(false);
     expect(responseOffered(stingScene(EFFECTS, STING, BILBO_OHAUH, ["mist"])), "the shadow card was the last").toBe(false);
   });
 
-  // FAULT: the card prints "discard the top card of the encounter deck", so with no card in it nothing is discarded, no damage is dealt and the Response may not be started (rr.triggered-ability, rr.cost); the engine offers it.
-  it.fails("142011:A:3 is not offered with an empty encounter deck", () => {
+  it("142011:A:3 is not offered with an empty encounter deck", () => {
     expect(responseOffered(stingScene(EFFECTS, FELLOWSHIP_STING, "hobbit-hero", ["mist", "bigfoe"])), "a card to discard").toBe(true);
     expect(responseOffered(stingScene(EFFECTS, FELLOWSHIP_STING, "hobbit-hero", [])), "no shadow card, no card to discard").toBe(false);
     expect(responseOffered(stingScene(EFFECTS, FELLOWSHIP_STING, "hobbit-hero", ["mist"])), "the shadow card was the last").toBe(false);
