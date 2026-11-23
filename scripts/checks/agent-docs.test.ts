@@ -22,14 +22,8 @@ import {
 // Sections over SECTION_BYTES today, at their size. None may grow; one split or cut below the limit leaves the list and
 // fails here as stale. A new section may not join it: split it under `###` headings (docs-standards.md, The index).
 const LARGE_SECTIONS: Readonly<Record<string, number>> = {
-  "docs/design-system-table.md#Top bar": 27021,
   "docs/design-system-table.md#Cards": 100985,
   "docs/scenarios/dream-chaser.md#Dream-chaser": 64878,
-  "docs/scenarios/ered-mithrin.md#Ered Mithrin": 66826,
-  "docs/scenarios/standalone-scenarios.md#The Ruins of Belegost": 24294,
-  "docs/scenarios/standalone-scenarios.md#Escape from Khazad-dûm": 27444,
-  "docs/scenarios/standalone-scenarios.md#The Hunt for the Dreadnaught": 35431,
-  "docs/scenarios/the-two-towers.md#The Two Towers": 65931,
 };
 
 // Doc paths that may name a file that does not exist: test fixtures of `pnpm move`, and the desktop comment issue #181
@@ -66,7 +60,7 @@ describe("agent context", () => {
     expect(statusProblems()).toEqual([]);
   });
 
-  it("keeps scenario sections out of docs/brief.md (a scenario's rulings are in its box's file in docs/scenarios/)", () => {
+  it("keeps scenario sections out of docs/brief.md (a scenario's rulings are in its own file in docs/scenarios/<box>/)", () => {
     expect(scenarioHeadingsInBrief()).toEqual([]);
   });
 

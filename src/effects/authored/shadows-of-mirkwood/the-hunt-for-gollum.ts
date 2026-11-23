@@ -7,7 +7,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 // Records for The Hunt for Gollum (Shadows of Mirkwood part 1, standalone, no campaign card). Every line is read from the scan ledger (data/printed/shadows-of-mirkwood.json). The Signs of Gollum are the four Clue objectives: revealed
 // Guarded, claimed by a Response to the players questing successfully (the claimed card counts as a Condition attachment on a hero committed to the quest, with the Forced return the card prints in brackets), counted by the Clue traits of
 // the other cards. On the Trail holds the players to a hero with a Clue attached and resets the quest deck to stage 2B when none is left (rules/families/quest/reset.ts).
-// Rules: rr.guarded, rr.objective-cards, rr.attachment-cards, rr.first-player, rr.forced, rr.response, rr.search, sotm.reset-the-quest-deck (data/rules/entries.json); the MEC02 rulesheet for the Signs (docs/scenarios/shadows-of-mirkwood.md, The Hunt for Gollum).
+// Rules: rr.guarded, rr.objective-cards, rr.attachment-cards, rr.first-player, rr.forced, rr.response, rr.search, sotm.reset-the-quest-deck (data/rules/entries.json); the MEC02 rulesheet for the Signs (docs/scenarios/shadows-of-mirkwood/the-hunt-for-gollum.md, The Hunt for Gollum).
 const CLUE: PickSpec = { type: "objective", control: "any", trait: "Clue" };
 const HERO_WITH_CLUE: PickSpec = { type: "hero", control: "any", hasAttachment: { trait: "Clue" } };
 const YOUR_HERO_WITH_CLUE: PickSpec = { type: "hero", control: "you", hasAttachment: { trait: "Clue" } };

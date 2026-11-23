@@ -1,6 +1,6 @@
 import type { Condition, Effect, Instruction, PickSpec } from "../../../../catalog/boundary.ts";
 
-// What the records of The Hunt for the Dreadnaught share: the cards they name, the pick filters and the builders of the lines several cards print alike (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught).
+// What the records of The Hunt for the Dreadnaught share: the cards they name, the pick filters and the builders of the lines several cards print alike (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught).
 export const MODE = "40002";
 export const EASY = "40001";
 export const DREADNAUGHT = "40013";
@@ -117,7 +117,7 @@ export const threatOrBoarding = (code: string, line: string, threat: number): Ef
   ],
 });
 
-// "N PerPlayer" on a global value (the stages, the Dreadnaught): N for each player who started the scenario, an eliminated one included (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, reading 16).
+// "N PerPlayer" on a global value (the stages, the Dreadnaught): N for each player who started the scenario, an eliminated one included (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, reading 16).
 export const STARTED = { startedPlayers: true } as const;
 export const PLAYERS = { players: true } as const;
 

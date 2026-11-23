@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.search, docs/scenarios/standalone-scenarios.md (Escape from Khazad-dûm, readings 2, 3 and 6) (data/rules/entries.json).
+// Rules: rr.setup, rr.search, docs/scenarios/standalone-scenarios/escape-from-khazad-dum.md (Escape from Khazad-dûm, readings 2, 3 and 6) (data/rules/entries.json).
 // What is Escape from Khazad-dûm's own in the standalone game. Its Setup is the golden suite's opening check (golden.test.ts); the cycle checks (a part of its cycle, no campaign card, playable, scored and recorded as a
 // standalone run with nothing earned, the loss reasons) are the golden suite's too (test/harness/golden-suite.ts, standalone: true).
 import { describe, expect, it } from "vitest";

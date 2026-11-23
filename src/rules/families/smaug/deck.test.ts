@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town: the Smaug deck, from the Quest Companion), rr.reveal, rr.first-player; ledger lines 50201:A:1, 50206:A:3.
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town: the Smaug deck, from the Quest Companion), rr.reveal, rr.first-player; ledger lines 50201:A:1, 50206:A:3.
 // The Smaug deck and its discard pile: dealt out of the encounter deck, revealed into the play area or the staging area, handing its damage to the next Smaug as that one is revealed, refilled from its discard pile, asked once at the beginning of the quest phase.
 import { describe, expect, it } from "vitest";
 

@@ -1,4 +1,4 @@
-// Rules: rr.response, rr.forced, rr.immune, rr.lasting-effects, rr.in-play-and-out-of-play, rr.victory (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Siege of Annúminas).
+// Rules: rr.response, rr.forced, rr.immune, rr.lasting-effects, rr.in-play-and-out-of-play, rr.victory (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-siege-of-annuminas.md (The Siege of Annúminas).
 // The lines a card-spec row cannot express (spec.test.ts holds the rest): the Responses at the end of the round, the Response no Standard game can offer, the Epic card Enemy Camp, a table-wide effect, and the immunity of a card whose keywords are printed in a line with X.
 import { describe, expect, it } from "vitest";
 

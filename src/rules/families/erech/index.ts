@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Stone of Erech); ledger lines 50301:A:1, 50302:A:1, 50303:B:2, 50304:A:1, 50308:A:2, 50312:A:2, 50321:A:1, 50324:A:1. The Stone of Erech's mechanics: the Night objectives (night.ts), Derufin attached to the Stone and freed to the first player (derufin.ts),
+// Rules: docs/scenarios/standalone-scenarios/the-stone-of-erech.md (The Stone of Erech); ledger lines 50301:A:1, 50302:A:1, 50303:B:2, 50304:A:1, 50308:A:2, 50312:A:2, 50321:A:1, 50324:A:1. The Stone of Erech's mechanics: the Night objectives (night.ts), Derufin attached to the Stone and freed to the first player (derufin.ts),
 // the hand passed to the left (hand.ts), and the table flags the quest and the encounter cards set. The flags are read where their rule is: skipPlanning (a breaking flag) and noCollect by the round (engine/machine.ts),
 // cannotPlayEvents by the play hook below. (losesIcons, the Haunted Valley flag, is a costs flag: families/costs/pay.ts.)
 import type { Instruction } from "../../../catalog/boundary.ts";

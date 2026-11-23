@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town), rr.step-3-4, rr.quest-advancement, rr.damage; ledger lines 50202:B:2, 50203:B:3.
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town), rr.step-3-4, rr.quest-advancement, rr.damage; ledger lines 50202:B:2, 50203:B:3.
 // Stage 2B: progress questing would place on the quest card may instead be discarded, as many as the first player chooses, to remove that much damage from Lake-town; the rest goes on the quest. Stage 3B's score reads Lake-town's damage and the display's Victory points.
 import { describe, expect, it } from "vitest";
 

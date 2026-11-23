@@ -7,7 +7,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 // Records for A Journey to Rhosgobel (Shadows of Mirkwood part 3, standalone, no campaign card). Every line is read from the scan ledger (data/printed/shadows-of-mirkwood.json). The players carry the wounded Eagle Wilyador, an objective ally the first
 // player controls and the first player token passes on, who suffers 2 damage each round and cannot be healed while Rhosgobel is in the staging area. Athelas (Guarded) is claimed by a hero; stage 3 heals Wilyador 5 for each Athelas the players control
 // and the players win only if he is whole. Wilyador leaving play loses the game, and the Eagle-or-ranged enemies' undefended damage goes onto him.
-// Rules: rr.guarded, rr.objective-cards, rr.attachment-cards, rr.first-player, rr.forced, rr.response, rr.search, rr.damage, rr.ranged, sotm.ally-objective-wilyador, sotm.removed-from-game (data/rules/entries.json); the MEC03 rulesheet for Wilyador (docs/scenarios/shadows-of-mirkwood.md, A Journey to Rhosgobel).
+// Rules: rr.guarded, rr.objective-cards, rr.attachment-cards, rr.first-player, rr.forced, rr.response, rr.search, rr.damage, rr.ranged, sotm.ally-objective-wilyador, sotm.removed-from-game (data/rules/entries.json); the MEC03 rulesheet for Wilyador (docs/scenarios/shadows-of-mirkwood/a-journey-to-rhosgobel.md, A Journey to Rhosgobel).
 const WILYADOR: PickSpec = { type: "character", control: "any", names: ["Wilyador"] };
 // An Athelas objective a hero carries: the players control it (the player attachment Athelas, 09011, is not an objective).
 const ATHELAS_CLAIMED: PickSpec = { type: "objective", control: "any", names: ["Athelas"], controlled: true };

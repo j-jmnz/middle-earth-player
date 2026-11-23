@@ -6,7 +6,7 @@ import { mayBypass, whenDefeated } from "../mount-gundabad.ts";
 import { copyLine, withCopies } from "../reprint.ts";
 import { AUTHORED_EFFECTS as INTO_THE_PIT } from "./into-the-pit.ts";
 
-// Records for Flight from Moria (Dwarrowdelf part 3, no campaign card). Every line is read from the scan ledger (data/printed/dwarrowdelf.json); the Nightmare deck's records are in ../nightmare/flight-from-moria.ts. The readings are in docs/scenarios/dwarrowdelf.md (Flight from Moria).
+// Records for Flight from Moria (Dwarrowdelf part 3, no campaign card). Every line is read from the scan ledger (data/printed/dwarrowdelf.json); the Nightmare deck's records are in ../nightmare/flight-from-moria.ts. The readings are in docs/scenarios/dwarrowdelf/flight-from-moria.md (Flight from Moria).
 // The quest deck is Mount Gundabad's shape (mount-gundabad.ts): the stage 2s are shuffled with side A up beneath stage 1, each is flipped at the beginning of the staging step (FlipCurrentQuest `resolve`, which also marks it a stage of a quest deck and resolves its side B's When Revealed)
 // and may be bypassed at the end of the combat phase (families/wilderland/gundabad.ts, moria.ts). The Great Cave-troll prints the Nazgûl of Dol Guldur's "No attachments can be played" (01102:A:1) and Goblin Spearman's twin lines are Into the Pit's.
 // Rules: dwd.creating-the-quest-deck, dwd.bypassing-a-quest-card, dwd.the-nameless-fear, dwd.immune-to-ranged-damage, dwd.last-player, dwd.encounter-card-actions, rr.reveal, rr.first-player, rr.guarded, rr.blank, rr.attachment-cards, rr.search, rr.cancel (data/rules/entries.json).

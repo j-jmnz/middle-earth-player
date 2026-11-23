@@ -22,7 +22,7 @@ const ENEMY_ZONE: Readonly<Record<string, string>> = {
   "141059:response:1": "The line says \"all engaged enemies\": the discard reads the engaged ones only.",
   "110139:action:1": "The line says \"an engaged non-unique enemy\": only an engaged enemy is a target.",
   "146026:constant:1": "The line adds the Threat of \"each engaged enemy\": the staging area's enemies are not counted.",
-  "50608:forced:1": "Naurlhûg is added from the set-aside pile or returned from an engagement; one already in the staging area has nothing to do (docs/scenarios/standalone-scenarios.md, The Ruins of Belegost, reading 11).",
+  "50608:forced:1": "Naurlhûg is added from the set-aside pile or returned from an engagement; one already in the staging area has nothing to do (docs/scenarios/standalone-scenarios/the-ruins-of-belegost.md, The Ruins of Belegost, reading 11).",
   "51339:forced:1": "The line says \"each engaged enemy\": a shadow card is dealt only to an enemy engaged with a player.",
   "12185:whenRevealed:1": "The enemies counted are the cards this effect discarded from the encounter deck, not cards in play.",
 };
@@ -31,7 +31,7 @@ const ENEMY_ZONE: Readonly<Record<string, string>> = {
 const THEN_SHORT: Readonly<Record<string, string>> = {
   "19101:forced:1": "The Loot step is one verb that does nothing with no Undead enemy found or no Loot objective in the discard pile (the step's own words).",
   "146028:forced:1": "The put into play is inside the ForEachPlayer step, which holds the condition that the picked card is an enemy.",
-  "50608:forced:2": "Discarding all tokens cannot come up short: all of none is none, so it resolves in full and the set aside follows (docs/scenarios/standalone-scenarios.md, The Ruins of Belegost, reading 11, recommended).",
+  "50608:forced:2": "Discarding all tokens cannot come up short: all of none is none, so it resolves in full and the set aside follows (docs/scenarios/standalone-scenarios/the-ruins-of-belegost.md, The Ruins of Belegost, reading 11, recommended).",
   "50911:forced:1": "The second step reads the title of the card the first discarded from the deck: with an empty deck no title was discarded and it matches no card.",
   "40008:forced:1": "The starting hand is drawn from a full deck, so the draw cannot come up short before the shuffle.",
   "11208:response:1": "The record's own condition holds that the card has at least 1 resource, so the move that comes before the heal always resolves.",

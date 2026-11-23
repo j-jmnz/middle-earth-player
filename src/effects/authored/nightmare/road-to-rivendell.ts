@@ -2,7 +2,7 @@ import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 
 
 // Road to Rivendell Nightmare (deck 9014, data/printed/nightmare.json). The setup card's A:1 and its side B are the deck-building text (inert); A:2 gives an engaged ambush enemy's Threat to the staging area during the quest phase. Ambush in the Night takes
-// stage 2's place: it finds Goblin Gate and reveals the enemies it discards, then gives Arwen to the Gate to guard and lets the engaged enemies add quest points to the Gate. The cards put engagement checks and damage on Arwen. The readings are in docs/scenarios/dwarrowdelf.md (Road to Rivendell).
+// stage 2's place: it finds Goblin Gate and reveals the enemies it discards, then gives Arwen to the Gate to guard and lets the engaged enemies add quest points to the Gate. The cards put engagement checks and damage on Arwen. The readings are in docs/scenarios/dwarrowdelf/road-to-rivendell.md (Road to Rivendell).
 // Rules: dwd.ambush, rr.engagement-check, rr.engaged, rr.guarded, rr.explored, rr.reveal, rr.search, rr.running-out-of-cards, rr.damage, rr.defending-player, dwd.ally-objective-arwen-road-to-rivendell (data/rules/entries.json).
 const ARWEN = "04041";
 const GOBLIN_GATE = "04043";

@@ -2,7 +2,7 @@ import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/
 import { EACH_PLAYER } from "../the-ghost-of-framsburg.ts";
 
 // Records for Murder at the Prancing Pony (standalone-scenarios cycle part 7, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints word for word needs no record here.
-// The Investigation deck, Investigate X and the accusation are the investigation family's verbs (src/catalog/families/investigation.ts); the readings are in docs/scenarios/standalone-scenarios.md, Murder at the Prancing Pony, Readings (numbers 1 to 23 below). The Hideouts' victory-display lines are
+// The Investigation deck, Investigate X and the accusation are the investigation family's verbs (src/catalog/families/investigation.ts); the readings are in docs/scenarios/standalone-scenarios/murder-at-the-prancing-pony.md, Murder at the Prancing Pony, Readings (numbers 1 to 23 below). The Hideouts' victory-display lines are
 // constants that hold while the Hideout is in the victory display (`sourceIn victory`, reading 21). The hidden Suspect and Hideout, and the cards of the Investigation deck, are named by no step: the verbs here ask only about names, never about a card.
 // Rules: rr.forced, rr.travel, rr.search, rr.immune, rr.cannot, rr.engaged, rr.attachment-cards, rr.keywords, rr.in-play-and-out-of-play, rr.victory, rr.quest-advancement, faq.additional-attacks (data/rules/entries.json).
 const STAGE_1 = "50701";
