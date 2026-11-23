@@ -19,7 +19,7 @@ import { effectById, effectsOf } from "../../rules/windows/listen.ts";
 
 import { ASKS_BY_SCENARIO } from "./asks/index.ts";
 import type { ChoiceNames, PickWords } from "./choice.ts";
-import { matchOf } from "./record-path.ts";
+import { matchOf, repeatTimesOf } from "./record-path.ts";
 import { askedSeat, seatSays } from "./seat.ts";
 
 /**
@@ -50,8 +50,8 @@ export type Ask = {
   label?: Text;
   labels?: Readonly<Record<string, Text>>;
   bind?: Readonly<Record<string, Amount>>;
-  /** The times the record's Pick repeats (Forest Stream's four discards): `{countdown}` says "n of m", n counting this one and m what the poison under the characters offered can still give, so fewer than the times when fewer remain. */
-  countdown?: number;
+  /** Marks a Pick the record's Repeat runs (Forest Stream's four discards): `{countdown}` says "n of m", m the Repeat's count read from the record, or fewer when the thing counted `against` (the poison under the characters offered) runs out. */
+  countdown?: { against: "poison" };
   named?: Readonly<Record<string, { pick: PickSpec; otherwise: string }>>;
   caution?: { when: Condition; text: Text };
 };
@@ -118,6 +118,8 @@ export function fill(template: string, values: Readonly<Record<string, string | 
 type Values = Record<string, string | number | undefined>;
 type Hit = { entry: Ask; values: Values; scope: ReturnType<typeof frameScope> };
 
+const candidatesOf = (a: AskFacts, id: string | undefined, code: string | undefined) => [id ? effectById(a.ctx, id) : undefined, ...(code ? effectsOf(a.ctx, code) : [])];
+
 /** The table of the game's own scenario (its asks file), or undefined when it has none. `by` is the barrel's `ASKS_BY_SCENARIO`. */
 export const asksOfScenario = (game: ScenarioState, by: Readonly<Record<string, AsksTable>> = ASKS_BY_SCENARIO): AsksTable | undefined => by[game.scenarioId];
 
@@ -135,7 +137,7 @@ export function askAt(a: AskFacts, table?: AsksTable): AskAt | null {
   const id = a.cause && "effect" in a.cause ? a.cause.effect : a.effectId;
   const code = a.source ? (a.game.cards[a.source]?.code ?? a.source) : undefined;
   let best: { id: string; path: string; rank: number } | null = null;
-  for (const record of [id ? effectById(a.ctx, id) : undefined, ...(code ? effectsOf(a.ctx, code) : [])]) {
+  for (const record of candidatesOf(a, id, code)) {
     if (!record || !ids.has(record.id)) continue;
     const match = matchOf(record.instructions, a.instruction);
     if (match && (best === null || match.rank < best.rank)) best = { id: record.id, path: match.path, rank: match.rank };
@@ -159,9 +161,12 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   }
   // "2 of 4": the discards done so far, this one, and the most the poison still on the characters offered lets the repeats reach.
   if (entry.countdown != null && a.again) {
+    const code = a.source ? (a.game.cards[a.source]?.code ?? a.source) : undefined;
+    const id = a.cause && "effect" in a.cause ? a.cause.effect : a.effectId;
+    const times = candidatesOf(a, id, code).reduce<number | null>((found, record) => found ?? (record ? repeatTimesOf(record.instructions, a.instruction) : null), null);
     const left = a.again() + 1;
-    const done = entry.countdown - left;
-    const poison = (a.options ?? []).reduce((sum, id) => sum + poisonOf(a.game, id), 0);
+    const done = (times ?? left) - left;
+    const poison = (a.options ?? []).reduce((sum, option) => sum + poisonOf(a.game, option), 0);
     values.countdown = `${done + 1} of ${done + Math.max(1, Math.min(left, poison))}`;
   }
   values.host = hostId ? a.names.card(hostId) : "Its host";

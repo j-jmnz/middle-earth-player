@@ -5,7 +5,7 @@ import { reshuffleWords } from "./pile-ids.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { discoverLogLine, setAsideLine } from "../words/scenarios/wilderland.ts";
-import { poisonLine, unconsciousLine } from "../words/scenarios/standalone-scenarios/poison.ts";
+import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
 import type { Cause } from "../../rules/core/cause.ts";
 import type { EngineStep } from "../../rules/core/intents.ts";
 

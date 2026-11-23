@@ -58,7 +58,7 @@ export function QuestAdvanceView({
   const s = useUiScale();
   const progress = useSharedValue(scale === 0 ? 1 : 0);
   const wide = screen.width > screen.height;
-  // On a short wide screen (a phone on its side) the question's sentence keeps its first lines and the printed line after it is cut, so every row and the answer fit under it (the reader still hears all of it).
+  // On a short wide screen (a phone on its side) the question's printed line goes below its rows inside the scroll, so every row and the answer show at once and the line is read by scrolling; it is never cut.
   const short = wide && screen.height < SHORT * s;
   const roomW = screen.width - insets.left - insets.right;
   const roomH = screen.height - insets.top - insets.bottom;
@@ -74,6 +74,7 @@ export function QuestAdvanceView({
   const sheet = choice.sheet;
   const tiles = asks ? trayTiles(sheet) : [];
   const marks = new Set(choice.choice.ids);
+  const note = choice.header.note;
   return (
     <View testID="quest-advance" accessibilityViewIsModal onAccessibilityEscape={asks ? undefined : onProgress} style={StyleSheet.absoluteFill}>
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: t.night }, scrimStyle]} />
@@ -110,12 +111,8 @@ export function QuestAdvanceView({
             <View testID="quest-advance-asks" className="mt-3" style={{ flexShrink: 1 }}>
               <Text className="font-display text-eyebrow uppercase text-accent">{choice.header.step}</Text>
               <Text className="mt-1 text-body text-bone">{choice.header.title}</Text>
-              {choice.header.note ? (
-                <Text className="mt-0.5 text-label text-muted" numberOfLines={short ? 3 : undefined}>
-                  {choice.header.note}
-                </Text>
-              ) : null}
-              <ScrollView style={{ flexShrink: 1, marginTop: 8 * s - ringRoom(s), marginHorizontal: ringScroll(s).style.marginHorizontal }} contentContainerStyle={ringScroll(s).content} showsVerticalScrollIndicator={false}>
+              <ScrollView style={{ flexShrink: 1, marginTop: (short || !note ? 8 : 2) * s - ringRoom(s), marginHorizontal: ringScroll(s).style.marginHorizontal }} contentContainerStyle={ringScroll(s).content} showsVerticalScrollIndicator={false}>
+                {note && !short ? <Text className="mb-2 text-label text-muted">{note}</Text> : null}
                 {tiles.map((tile) => {
                   const source = tile.code ? picture(tile.code) : null;
                   const readId = tile.readId;
@@ -134,6 +131,7 @@ export function QuestAdvanceView({
                     />
                   );
                 })}
+                {note && short ? <Text className="mt-1 text-label text-muted">{note}</Text> : null}
               </ScrollView>
               {tiles.some((tile) => tile.readId) ? <Text className="mt-1 text-label text-muted">Hold a card to read it.</Text> : null}
               <View className="mt-2">

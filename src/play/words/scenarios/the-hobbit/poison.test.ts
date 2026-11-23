@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { givePoison } from "../../../../rules/families/poison/poison.ts";
 import { spiderTable } from "../../../../../test/scenarios/flies-and-spiders/scene.ts";
+import { effectById } from "../../../../rules/windows/listen.ts";
 import { askValues, type Ask } from "../../asks.ts";
 import { poisonLine, unconsciousLine } from "./poison.ts";
 
@@ -19,13 +20,16 @@ describe("the poison lines", () => {
 });
 
 describe("Forest Stream's countdown (132027:A:2)", () => {
-  const entry: Ask = { note: "Discard ({countdown}).", countdown: 4 };
+  const entry: Ask = { note: "Discard ({countdown}).", countdown: { against: "poison" } };
   const said = (poison: number, again: number): string => {
     const t = spiderTable({ seats: 1 });
     const game = givePoison(t.state, t.hero, poison, t.ctx, []);
     const names = { card: (id: string) => id, code: (code: string) => code };
-    const instruction = { verb: "Pick" as const, pick: { type: "character" as const, control: "any" as const, poisoned: true } };
-    return String(askValues({ game, ctx: t.ctx, names, instruction, source: null, options: [t.hero], again: () => again }, entry).values.countdown);
+    // The Pick of the record's Repeat, and the 4 read from the record.
+    const repeat = effectById(t.ctx, "132027:response:1")?.instructions.find((step) => step.verb === "Repeat");
+    const instruction = repeat && repeat.verb === "Repeat" ? repeat.instructions[0] : undefined;
+    if (!instruction) throw new Error("Forest Stream's Repeat is missing");
+    return String(askValues({ game, ctx: t.ctx, names, instruction, effectId: "132027:response:1", source: null, options: [t.hero], again: () => again }, entry).values.countdown);
   };
 
   it("counts the discards of the four, this one included", () => {

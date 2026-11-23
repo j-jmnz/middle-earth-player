@@ -22,7 +22,7 @@ import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape
 import { locateResultTitle } from "../words/scenarios/locate.ts";
 import { BACK_TITLE, TRAPPED_TITLE } from "../readouts/standalone-scenarios/barrow-downs-words.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
-import { poisonLine, unconsciousLine } from "../words/scenarios/standalone-scenarios/poison.ts";
+import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
 import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner

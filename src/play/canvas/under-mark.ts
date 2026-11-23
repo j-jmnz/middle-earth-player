@@ -13,7 +13,7 @@ export const STRIP = 15;
 /**
  * `wordWidth` and `countWidth` are the text's width in the badge font ("3 captured" and "3"), `s` the UI scale. A pill that counts captured cards (`counted`) stands one row above the foot row, as the open pick's number does, clear of the engagement cost, the combat number and the
  * quest strip, which the foot of an enemy, a stage and an active location wear. The Havens Burn's and the held-card pills keep the foot row.
- * `atEnd`: the pill of a character turned sideways (a poisoned one) stands at the right end of the card, clear of the name and the stat chip at its left, and keeps to the glyph and count so it stays short.
+ * `atEnd`: the pill of an exhausted character (its sideways footprint) stands at the right end of the card, clear of the name and the stat chip at its left, and keeps to the glyph and count so it stays short.
  */
 export function underMarkBox(rect: Rect, wordWidth: number, countWidth: number, s: number, counted: boolean, atEnd = false): UnderBox {
   const token = TOKEN * s;

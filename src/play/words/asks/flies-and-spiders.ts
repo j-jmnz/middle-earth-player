@@ -15,7 +15,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 132026:A:2 (Response): the first player readies an unconscious character of the players at the stage.
   "132026:response:1 @0 Pick": { note: "{card}: choose 1 unconscious character to ready. It is no longer unconscious.", verb: "Ready" },
   // 132027:A:2 (Response): the first player takes 1 poison, four times, from the poisoned characters of the players at the stage.
-  "132027:response:1 @0.0 Pick": { note: "{card}: choose 1 poisoned character to discard 1 poison from ({countdown}).", verb: "Discard", countdown: 4 },
+  "132027:response:1 @0.0 Pick": { note: "{card}: choose 1 poisoned character to discard 1 poison from ({countdown}).", verb: "Discard", countdown: { against: "poison" } },
   // 132028:A:2 (Forced, end of the round): each player in turn gives 1 poison to a hero he controls.
   "132028:forced:1 @0.0 Pick": { owned: true, note: "{card}: choose 1 hero you control to take 1 poison from the top of your deck. An unconscious hero cannot take it.", verb: "Poison" },
   // 132029:A:2 (When Revealed): the first player chooses among the characters with the most poison; its controller is attacked.
