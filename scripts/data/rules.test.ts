@@ -95,7 +95,7 @@ describe("rules store", () => {
     const found = new Set<string>();
     // Every prefix entries.json holds (rr, ltp, mec109, faq, dcce, ...), so a new document's ids are checked without editing this test.
     const prefixes = [...new Set(entries.map((entry) => entry.id.split(".")[0] ?? ""))].map((prefix) => prefix.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&"));
-    const ids = new RegExp(`\\b((?:${prefixes.join("|")})\\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\\b(?![-<*])`, "g");
+    const ids = new RegExp(`\\b((?:${prefixes.join("|")})\\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\\b(?![-<*]|\\.[a-z0-9])`, "g");
     const scan = (file: string): void => {
       for (const match of readFileSync(file, "utf8").matchAll(ids)) found.add(match[1] ?? "");
     };
