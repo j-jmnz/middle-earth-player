@@ -17,11 +17,12 @@
         "sha256": "f92c012c02a6e2ba110e2da9d7d16f1453afb2954a06b316c13d3b0a02ea7514"
       },
       "lines": [
-        "If unattached, return Alcaron's Scroll to the staging area and it gains: 'Action: Exhaust a hero to attach Alcaron's Scroll to that hero.'Forced: When the hero with Alcaron's Scroll attached is damaged by an enemy attack, attach Alcaron's Scroll to that enemy."
+        "If unattached, return Alcaron's Scroll to the staging area and it gains: 'Action: Exhaust a hero to attach Alcaron's Scroll to that hero.'",
+        "Forced: When the hero with Alcaron's Scroll attached is damaged by an enemy attack, attach Alcaron's Scroll to that enemy."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -38,7 +39,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -54,7 +55,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -70,7 +71,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -87,7 +88,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -104,7 +105,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -121,7 +122,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -135,11 +136,11 @@
       "lines": [
         "Surge.",
         "While City Street is in the staging area, players cannot travel to a location that does not have the title City Street.",
-        "Shadow: attacking enemy gets +2 Attack."
+        "Shadow: Attacking enemy gets +2 Attack."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -157,7 +158,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -174,7 +175,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -190,7 +191,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -206,7 +207,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -222,7 +223,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -239,7 +240,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -256,7 +257,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -272,7 +273,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -284,12 +285,12 @@
         "sha256": "92fb34748ec25064787b59f266bbdbe1d9984f914602767f69631ca3601d4ba0"
       },
       "lines": [
-        "Battle.",
+        "Battle. (Characters use their Attack instead of Willpower when questing.)",
         "When Revealed: Each player must search the encounter deck for a copy of Harbor Thug and add it to the staging area. Shuffle the encounter deck."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -303,7 +304,7 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -315,12 +316,13 @@
         "sha256": "e86c139f8b0c0e6e20d4e40e98032063aa194b53c950789f9d1ff29352f55358"
       },
       "lines": [
-        "Battle.",
+        "Battle. (Characters use their Attack instead of Willpower when questing.)",
+        "The players cannot advance to the next stage unless Alcaron's Scroll is attached to a hero.",
         "When Revealed: Attach Alcaron's Scroll to the highest engagement cost enemy in play, if able. Otherwise, add Alcaron's Scroll to the staging area."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -336,7 +338,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -354,7 +356,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -372,7 +374,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -390,7 +392,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -403,11 +405,11 @@
       },
       "lines": [
         "Southron Company gets +2 Threat and +2 Attack while the current quest card has the battle or siege keyword.",
-        "Shadow: attacking enemy gets +1 Attack. (+2 Attack instead if the current quest card has a keyword.)"
+        "Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if the current quest card has a keyword.)"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -424,7 +426,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -442,7 +444,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -459,7 +461,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -476,7 +478,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -492,7 +494,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -508,7 +510,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -525,7 +527,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -542,7 +544,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -556,11 +558,11 @@
       "lines": [
         "Archery X.",
         "X is the number of players in the game.",
-        "Shadow: attacking enemy gets +1 Attack. (+3 Attack instead if it has the Harad trait.)"
+        "Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if it has the Harad trait.)"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -577,7 +579,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -594,7 +596,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -611,7 +613,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -627,7 +629,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -639,12 +641,12 @@
         "sha256": "4d5e8de1a72671e0449587a1f46c35f2f3c188a77461e87fc69343178f5ec4f1"
       },
       "lines": [
-        "Battle.",
+        "Battle. (Characters use Attack instead of Willpower when questing.)",
         "If the players complete this stage with Celador in the staging area, advance to stage 3A (bypassing stage 2)."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -658,7 +660,7 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -670,13 +672,14 @@
         "sha256": "b76837424e95744f7556ee56dc6452d52ab65c01493a08ee1056df4b3b032558"
       },
       "lines": [
-        "Siege. Archery X.",
+        "Siege. (Characters use Defense instead of Willpower when questing.)",
+        "Archery X.",
         "X is the number of players in the game.",
-        "After this stage is completed advance to stage 4A (bypassing stage 3)."
+        "After this stage is completed, advance to stage 4A (bypassing stage 3)."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -690,7 +693,7 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -702,12 +705,12 @@
         "sha256": "8bbafd9686e78e014a772c6d1df24bce0655306d4a32eda5f3fa1644ea3efdc7"
       },
       "lines": [
-        "When Revealed: The first player takes contorl of all Ranger objectives in the staging area.",
+        "When Revealed: The first player takes control of all Ranger objectives in the staging area.",
         "Enemies do not make engagement checks and cannot be optionally engaged."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -721,7 +724,7 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -733,13 +736,13 @@
         "sha256": "c635ed7bc6f6fa504f61e12f23f9eb098afa1b19da347be8a3ac0d0540480297"
       },
       "lines": [
-        "If any players threat is 37 or higher, Approaching Cair Andros gains Siege.",
+        "If any player's threat is 37 or higher, Approaching Cair Andros gains siege.",
         "Forced: At the end of each round, raise each player's threat by 2.",
         "If the players defeat this stage, they have won the game."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -757,7 +760,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -775,7 +778,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -792,7 +795,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -809,7 +812,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -821,12 +824,12 @@
         "sha256": "ee692e1a99822d5b3485de54d7e2f069c40b023cde79ed8ac268d13fe1de24f3"
       },
       "lines": [
-        "If the Approach has 7 or more damage, remove it from the game (do not collect its victory points).",
+        "If The Approach has 7 or more damage, remove it from the game (do not collect its victory points).",
         "Response: After The Approach leaves play as an explored location, remove stage 3 from the quest deck, if able."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -843,7 +846,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -860,7 +863,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -872,11 +875,12 @@
         "sha256": "6a4d2c4af642d7f9e3f5ef1320f7d6b99c445acfb4cebfc0a4b9630ea1f04438"
       },
       "lines": [
-        "Allies cannot defend against Lieutenant of Mordor.When Revealed: Resolve the 'when revealed' effect on the topmost treachery card in the encounter discard pile, if able. This effect cannot be canceled."
+        "Allies cannot defend against Lieutenant of Mordor.",
+        "When Revealed: Resolve the 'when revealed' effect on the topmost treachery card in the encounter discard pile, if able. This effect cannot be canceled."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -890,11 +894,11 @@
       "lines": [
         "Archery X.",
         "X is the number of different resource icons (Leadership, Tactics, Spirit, or Lore) on heroes in play.",
-        "Shadow: attacking enemy gets +2 Attack."
+        "Shadow: Attacking enemy gets +2 Attack."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -911,7 +915,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -924,11 +928,11 @@
       },
       "lines": [
         "If an Orc enemy is in play, progress tokens cannot be placed on Orc War Camp while it is in the staging area.",
-        "Shadow: attacking enemy gets +1 Attack for each shadow card dealt to it."
+        "Shadow: Attacking enemy gets +1 Attack for each shadow card dealt to it."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -944,7 +948,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -961,7 +965,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -978,7 +982,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -991,11 +995,11 @@
       },
       "lines": [
         "Forced: When Orc Arsonist engages a player, deal 1 shadow card to each enemy engaged with that player.",
-        "Shadow: attacking enemy gets +1 Attack. Deal it another shadow card."
+        "Shadow: Attacking enemy gets +1 Attack. Deal it another shadow card."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1008,11 +1012,11 @@
       },
       "lines": [
         "When Revealed: Each player discards the top card of his deck. Until the end of the phase, raise the total Threat in the staging area by X, where X is the total cost of all cards discarded by this effect.",
-        "Shadow: attacking enemy gets +1 Attack. Deal it another shadow card."
+        "Shadow: Attacking enemy gets +1 Attack. Deal it another shadow card."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1028,7 +1032,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1040,12 +1044,12 @@
         "sha256": "30c05c9a2ff7abcbd12689ce97a3621ab6313cbe7065dafbd85743f0359530d6"
       },
       "lines": [
-        "Siege.",
-        "Players must deal damage from undefended attacks to the lowest Threat Battleground location in play. If there are no Battleground locations in play, immediate advance to the next stage."
+        "Siege. (Characters quest using Defense instead of Willpower.)",
+        "Players must deal damage from undefended attacks to the lowest Threat Battleground location in play. If there are no Battleground locations in play, immediately advance to the next stage."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1059,7 +1063,7 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1075,7 +1079,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1089,7 +1093,7 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1101,12 +1105,12 @@
         "sha256": "e8e11e34d96684eda1eb0e630cf2616d9042d416d71ce627e5a743bca385003a"
       },
       "lines": [
-        "Battle.",
-        "Forced: After the players quest unsuccessfully, instead of raising threat each player must choose and discard 1 character he controls."
+        "Battle. (Characters quest using Attack instead of Willpower.)",
+        "Forced: After the players quest unsuccessfully, instead of raising threat, each player must choose and discard 1 character he controls."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1120,7 +1124,7 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1132,12 +1136,12 @@
         "sha256": "2a9d0a5e0c97bc4577e29b4235308fafa39759edbfd95e796569a79fbb236a58"
       },
       "lines": [
-        "Siege.",
+        "Siege. (Characters quest using Defense instead of Willpower.)",
         "Breakthrough at the Citadel adds 5 Threat to the staging area."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1151,7 +1155,7 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1163,14 +1167,14 @@
         "sha256": "9cc547bb6330b5c429671ea0ce61e2657f5c8d71dfca0805369ed6495e332a5b"
       },
       "lines": [
-        "Siege.",
+        "Siege. (Characters quest using Defense instead of Willpower.)",
         "When Revealed: Reveal 1 card per player from the encounter deck and add it to the staging area.",
-        "If the players have collected 4 or more victory points, The Last Battle gains Battle and loses Siege.",
+        "If the players have collected 4 or more victory points, The Last Battle gains battle and loses siege.",
         "If the players defeat this stage, they have won the game."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1186,7 +1190,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1204,7 +1208,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1220,7 +1224,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1238,7 +1242,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1254,7 +1258,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1271,7 +1275,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1288,7 +1292,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1305,7 +1309,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1322,7 +1326,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1339,7 +1343,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1356,7 +1360,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1373,7 +1377,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1390,7 +1394,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1407,7 +1411,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1425,7 +1429,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1442,7 +1446,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1458,7 +1462,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1475,7 +1479,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1491,7 +1495,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1503,11 +1507,12 @@
         "sha256": "316446e78acd25b6ab2b58b88faf4c49be78995754930c77412fbfb8c52c32e1"
       },
       "lines": [
-        "Action: Exhaust a hero to claim this objective and attach it to that hero.Action: If attached to a hero, add Secret Map to the victory display to place 3 progress tokens on the active location."
+        "Action: Exhaust a hero to claim this objective and attach it to that hero.",
+        "Action: If attached to a hero, add Secret Map to the victory display to place 3 progress tokens on the active location."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1523,7 +1528,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1535,11 +1540,12 @@
         "sha256": "4f23daae2a93f62e32b63a2eae3c715f682d6462b13714eea1af376b2c0bd6a9"
       },
       "lines": [
-        "Reveal 1 additional card from the encounter deck and add it to the staging area during the staging step each round.If a hero is destroyed by an enemy attack, the players have lost the game."
+        "Reveal 1 additional card from the encounter deck and add it to the staging area during the staging step each round.",
+        "If a hero is destroyed by an enemy attack, the players have lost the game."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1551,11 +1557,12 @@
         "sha256": "c6ee46234285b88f8eeab1303d9f4b0a3ed55e1209246666e8980badd7315285"
       },
       "lines": [
-        "Forced: At the end of the round, place 1 resource token on Up in Flames and discard the top X cards of each player's deck. X is the number of resource tokens on Up in Flames.If any player has no cards in his deck, the players have lost the game."
+        "Forced: At the end of the round, place 1 resource token on Up in Flames and discard the top X cards of each player's deck. X is the number of resource tokens on Up in Flames.",
+        "If any player has no cards in his deck, the players have lost the game."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1571,7 +1578,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1587,7 +1594,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1603,7 +1610,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1617,7 +1624,7 @@
       "lines": [],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1633,7 +1640,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1649,7 +1656,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1661,13 +1668,13 @@
         "sha256": "5f8e21768bbcc9572f28e0156ac7c80a25cbadf2b7c1f57180bbe5635bc3650a"
       },
       "lines": [
-        "Siege.",
+        "Siege. (Characters use their Defense instead of Willpower when questing.)",
         "Characters use their Willpower instead of Attack when attacking enemies. If an enemy would be damaged this way, place progress tokens on it instead of damage tokens. When an enemy has progress equal to its hit points, add it to the victory display and place those progress tokens on the quest.",
         "If the players defeat this stage, they have won the game."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1685,7 +1692,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1702,7 +1709,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1720,7 +1727,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1738,7 +1745,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1755,7 +1762,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1772,7 +1779,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1789,7 +1796,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1801,12 +1808,12 @@
         "sha256": "a7824a1a6a8e09d1bb68a338544cc1afb9a2721e6437056022610de37693cce6"
       },
       "lines": [
-        "Each Wose enemy gains Archery 1.",
+        "Each Wose enemy gains archery 1.",
         "X is equal to the total archery value of the highest archery Wose enemy in play."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1823,7 +1830,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1841,7 +1848,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1859,7 +1866,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1871,12 +1878,11 @@
         "sha256": "6df52a5a3e223577250be137a733587d0b8cfb72e0895bb9d9af0c90539a2d9a"
       },
       "lines": [
-        "Villagers 5.",
         "Setup: Set Ghulat aside, out of play. Put Lord Alcaron into play. Make Burning Farmhouse the active location. Add the Rescued Villagers and Dead Villagers objectives to the staging area. Then, shuffle the encounter deck and reveal 1 encounter card per player and add it to the staging area."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1888,12 +1894,13 @@
         "sha256": "cba402a845d21e7cdc8627a8b2505beb6db8f34d3df848d58d7ab9f0d460fcd5"
       },
       "lines": [
+        "Villagers 5.",
         "When progress would be placed on Savagery of the Orcs, move an equal number of villager tokens from this quest onto Rescued Villagers instead.",
         "If there are no villager tokens on Savagery of the Orcs, advance to the next stage."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1909,7 +1916,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1926,7 +1933,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1938,11 +1945,12 @@
         "sha256": "5c31c80c67bdb77c49c0543d4e53706816a53cb05fadaf6631be6ae588434050"
       },
       "lines": [
-        "If a location leaves play as an explored location, move any villager tokens from that location to Rescued Villagers.At the end of the game, if there are more villager tokens here than damage tokens on Dead Vilagers, the players have won."
+        "If a location leaves play as an explored location, move any villager tokens from that location to Rescued Villagers.",
+        "At the end of the game, if there are more villager tokens here than damage tokens on Dead Villagers, the players have won."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1954,11 +1962,12 @@
         "sha256": "5fe41dad8da8e4db9df61dab4fd04415c5eb8a2828bc99de19b4becc74024f24"
       },
       "lines": [
-        "If a villager token is discarded from a location, objective or quest stage, place a damage token on Dead Villagers.At the end of the game, if there are more damage tokens here than villager tokens on Rescued Villagers, the players have lost."
+        "If a villager token is discarded from a location, objective, or quest stage, place a damage token on Dead Villagers.",
+        "At the end of the game, if there are more damage tokens here than villager tokens on Rescued Villagers, the players have lost."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1976,7 +1985,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1994,7 +2003,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2011,7 +2020,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2028,7 +2037,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2044,7 +2053,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2061,7 +2070,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2078,7 +2087,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2095,7 +2104,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2113,7 +2122,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2130,8 +2139,13 @@
         "Shadow: If this attack destroys a character, discard 1 villager token from Rescued Villagers."
       ],
       "inert": [],
-      "misprints": [],
-      "readBy": "",
+      "misprints": [
+        {
+          "line": 2,
+          "printed": "When Revealed: Discard 1 villager token from the active location for each player in the game. If no villager tokens were removed by this effect,Trapped Inside gains surge."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2148,7 +2162,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2164,7 +2178,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2182,7 +2196,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2199,7 +2213,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2216,7 +2230,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2233,7 +2247,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2249,7 +2263,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2266,7 +2280,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2279,11 +2293,11 @@
       },
       "lines": [
         "Travel: Reveal the top card of the encounter deck and add it to the staging area to travel here.",
-        "Forced: After the player who controls the King's Library lets an attack go undefended, return the King's Library to the staging area."
+        "Forced: After the player who controls The King's Library lets an attack go undefended, return The King's Library to the staging area."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2301,7 +2315,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2314,12 +2328,12 @@
       },
       "lines": [
         "The players cannot travel here.",
-        "Planning Action: Spend 2 resources to play 1 progress token on The Old Bridge. (1 resource instead if there is another Osgiliath location in the staging area.)",
+        "Planning Action: Spend 2 resources to place 1 progress token on The Old Bridge. (1 resource instead if there is another Osgiliath location in the staging area.)",
         "Forced: After the player who controls The Old Bridge lets an attack go undefended, return The Old Bridge to the staging area."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2331,12 +2345,12 @@
         "sha256": "2e8ff8050051b5b71ef4f84ccfbb32bf5168e74b0761a492c376d31cbb5f3a5f"
       },
       "lines": [
-        "While West Quarter is the active location, the current quest gains Siege.",
+        "While West Quarter is the active location, the current quest gains siege. (Characters quest using Defense instead of Willpower.)",
         "Shadow: If this attack destroys a character, that character's controller must return a location he controls with the highest Threat to the staging area."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2348,12 +2362,12 @@
         "sha256": "170431fe2bcf032bba50c5cc4140d51caa6cb0680805d183c707af89ad9f4422"
       },
       "lines": [
-        "While East Quarter is the active location, the current quest gains Battle.",
+        "While East Quarter is the active location, the current quest gains battle. (Characters quest using Attack instead of Willpower.)",
         "Shadow: If this attack destroys a character, that character's controller must return a location he controls with the highest Threat to the staging area."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2371,7 +2385,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2388,7 +2402,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2405,7 +2419,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2421,7 +2435,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2438,7 +2452,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2450,11 +2464,11 @@
         "sha256": "5acd7dcf52ae1e2b61e3a6bf4934d11d3caab325200b2433afe508a614d8d316"
       },
       "lines": [
-        "Setup: Add the Crossroads and Black Númenorean to the staging area. Put the Faramir and Lord Alcaron objective allies into play. Shuffle the encounter deck and reveal 1 card from the encounter deck per player and add it to the staging area."
+        "Setup: Add The Crossroads and Black Númenorean to the staging area. Put the Faramir and Lord Alcaron objective allies into play. Shuffle the encounter deck and reveal 1 card from the encounter deck per player and add it to the staging area."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2467,11 +2481,11 @@
       },
       "lines": [
         "At the beginning of the quest phase, each player takes 1 hidden card.",
-        "At the beginning of the combat phase, each player must either turn each of his hidden cards faceup or take 1 hidden card."
+        "At the beginning of the combat phase, each player must either turn each of his hidden cards faceup, or take 1 hidden card."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2483,11 +2497,11 @@
         "sha256": "5cf47d0fda5a73231590a14f2d087f3ea43e153b6df2ee1c31beea6d0a1259c9"
       },
       "lines": [
-        "When Revealed: Place Faramir and Lord Alcaron under Captured! (they are in play but players cannot gain control of them). Each player turns each of his hidden cards faceup."
+        "When Revealed: Place Faramir and Lord Alcaron under Captured! (they are in play but the players cannot gain control of them). Each player turns each of his hidden cards faceup."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2499,14 +2513,14 @@
         "sha256": "d4cef5bf3f5bffc3f530ea2db54ca7d36792a03fb94b305d2d2a49d458b68509"
       },
       "lines": [
-        "Battle.",
+        "Battle. (Characters use their Attack instead of Willpower when questing.)",
         "At the beginning of the quest phase, each player takes 1 hidden card.",
         "If a player has 5 hidden cards, he must turn them faceup.",
         "If the players defeat this stage, they have won the game."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2519,11 +2533,11 @@
       },
       "lines": [
         "X is the total number of hidden cards in the game.",
-        "Forced: At the end of the round, each player must raise his threat by 1 for each hiddien card in his play area."
+        "Forced: At the end of the round, each player must raise his threat by 1 for each hidden card in his play area."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2536,11 +2550,11 @@
       },
       "lines": [
         "Forced: After Orc Ambusher engages you, discard 1 non-objective ally you control, if able.",
-        "Shadow: Attack enemy gets +1 Attack. (+3 Attack instead if undefended.)"
+        "Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if undefended.)"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2552,11 +2566,11 @@
         "sha256": "567dd4ea6cb66cf7c997bdbef26a37c7dd54406fdfe3867102fe677bff511f5e"
       },
       "lines": [
-        "Forced: After Brutual Uruk attacks and destroys a character, that character's controller turns all hidden cards in his play area faceup. Deal a shadow card to each enemy turned faceup by this effect and resolve their attacks as normal."
+        "Forced: After Brutal Uruk attacks and destroys a character, that character's controller turns all hidden cards in his play area faceup. Deal a shadow card to each enemy turned faceup by this effect and resolve their attacks as normal."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2573,7 +2587,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2585,13 +2599,13 @@
         "sha256": "dc81de29668afb6bb63bbbafb02f90683e5fd7837e3fa2afa33f23a84d7b4509"
       },
       "lines": [
-        "The current quest card gains Siege (and loses Battle).",
-        "X is the number of players in the game.",
+        "The current quest card gains siege (and loses battle).",
+        "X is equal to the number of players in the game.",
         "Travel: The first player must take 1 hidden card to travel here."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2607,7 +2621,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2624,7 +2638,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2640,7 +2654,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2652,12 +2666,12 @@
         "sha256": "43c957327a74ea3a118acbe97d15b1714e2017805515c5598704111d6adf2104"
       },
       "lines": [
-        "Easter Road gets +5 quest points while it is in the staging area.",
+        "Eastern Road gets +5 quest points while it is in the staging area.",
         "Travel: The first player must take 2 hidden cards to travel here."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2675,7 +2689,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2687,11 +2701,11 @@
         "sha256": "4e0af1dc1ed9b93a785914c4ebeace7f6a605de8c2fd1b8ec91bb8fbf5c4823d"
       },
       "lines": [
-        "When Revealed: The first player turns each hidden card in his play area faceup. Resolve the 'When Revealed' effects of each encounter cards turned faceup by this effect. If a location is turned faceup, add it to the staging area."
+        "When Revealed: The first player turns each hidden card in his play area faceup. Resolve the \"When Revealed\" effects of each encounter card turned faceup by this effect. If a location is turned faceup, add it to the staging area."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2705,11 +2719,11 @@
       "lines": [
         "Surge.",
         "When Revealed: Each player takes 1 hidden card.",
-        "Shadow: If this attack destoys a characters, that character's controller turns each of his hidden cards faceup."
+        "Shadow: If this attack destroys a character, that character's controller turns each of his hidden cards faceup."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2726,7 +2740,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2739,12 +2753,12 @@
       },
       "lines": [
         "The first player gains control of Faramir.",
-        "Combat Action: Exhaust Faramir to turn 1 hidden card faceup. If that card is an enemy, deal 3 damage to it.",
+        "Combat Action: Exhaust Faramir to turn a hidden card faceup. If that card is an enemy, deal 3 damage to it.",
         "If Faramir leaves play, the players have lost the game."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2762,7 +2776,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2778,7 +2792,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2794,7 +2808,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2810,7 +2824,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2826,7 +2840,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2842,7 +2856,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2860,7 +2874,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2878,7 +2892,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2895,7 +2909,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2912,7 +2926,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2929,7 +2943,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2945,7 +2959,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2962,7 +2976,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2974,12 +2988,12 @@
         "sha256": "7ee32f74e0c8c943bfbf37abe1b6cd6275cc216d75b0695c9d8dcc681dbeb822"
       },
       "lines": [
-        "Cannot have attachments.",
+        "Nazgûl of Minas Morgul cannot have attachments.",
         "Reduce any amount of damage dealt to Nazgûl of Minas Morgul to 1."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2991,12 +3005,12 @@
         "sha256": "907f9bba3741c5e2fe63d526b7d0ba2bd1ecee3494af5f8b9821d3abc029a3b1"
       },
       "lines": [
-        "Response: After Morgul Road leaves play as an explored location, the first player may remove 1 progress token from To the Tower or deal 1 damage to any enemy in play.",
+        "Response: After Morgul Road leaves play as an explored location, the first player may remove 1 progress token from To the Tower or deal 1 damage to an enemy in play.",
         "Shadow: Return attacking enemy to the staging area after this attack."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -3013,7 +3027,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -3029,7 +3043,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -3041,11 +3055,16 @@
         "sha256": "73f5a24714c8425156e8f77ae7b8ee108f5af7990bc65e14e9768ae9a51527d2"
       },
       "lines": [
-        "When Revealed: The first player either places 3 progress tokens on To the Tower or reveals X additional cards from the encounter deck and adds them to the staging area. X is the number of players in the game."
+        "When Revealed: The first player either places 3 progress tokens on To the Tower, or reveals X additional cards from the encounter deck and adds them to the staging area. X is the number of players in the game."
       ],
       "inert": [],
-      "misprints": [],
-      "readBy": "",
+      "misprints": [
+        {
+          "line": 1,
+          "printed": "When Revealed: The first player either places 3 progress tokens on To the Tower or reveals X additional cards from the encounter deck and adds them to the staging area. X is the number of players in the game."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -3058,12 +3077,12 @@
       },
       "lines": [
         "Doomed 2.",
-        "When Revealed: Each player must discard 3 random cards from his hand or place 1 progress token on To the Tower.",
+        "When Revealed: Each player must discard 3 random cards from his hand or place 1 progress token on To The Tower.",
         "Shadow: Return attacking enemy to the staging area after this attack."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -3081,7 +3100,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -3093,12 +3112,12 @@
         "sha256": "62b2aa93f909fdea0b7795a0e142bb90920d8f041f7b97f6def25b480679e05c"
       },
       "lines": [
-        "When Revealed: Raise each players' threat by the number of progress tokens on To the Tower. If there are no progress tokens on To the Tower, The Dead City Looms gains surge.",
+        "When Revealed: Raise each player's threat by the number of progress tokens on To the Tower. If there are no progress tokens on To the Tower, The Dead City Looms gains surge.",
         "Shadow: Attacking enemy gets +1 Attack for each progress token on To the Tower."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     }
   ]

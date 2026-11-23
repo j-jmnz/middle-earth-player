@@ -144,13 +144,13 @@
         "sha256": "b3d126b88420f22a1a8160722f225d6c3ca25dab8cc9ae75e7602e0d5a38694c"
       },
       "lines": [
-        "Restricted.",
-        "Attach to a Tactics character. Limit 1 per character.",
+        "Attach to a Tactics character. Restricted.",
+        "Limit 1 per character.",
         "Response: After attached character is declared as a defender, deal 1 damage to the attacking enemy."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1110,7 +1110,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1126,7 +1126,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1142,7 +1142,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1158,7 +1158,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1176,7 +1176,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1192,7 +1192,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1210,7 +1210,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1226,7 +1226,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1242,7 +1242,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1258,7 +1258,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1274,7 +1274,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1290,7 +1290,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1307,7 +1307,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1319,12 +1319,12 @@
         "sha256": "c01a99d528fa84047d7ce26b3397ce465c4c966ce0c844a456514fbc4a985899"
       },
       "lines": [
-        "Attach to a Tactics hero hero. Limit 1 per hero.",
+        "Attach to a Tactics hero. Limit 1 per hero.",
         "Response: After attached hero attacks and destroys an enemy, deal 1 damage to another enemy that shares a Trait with the enemy just destroyed."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1341,7 +1341,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1357,7 +1357,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1374,7 +1374,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1390,7 +1390,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1406,7 +1406,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1423,7 +1423,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1440,7 +1440,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1458,7 +1458,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1474,7 +1474,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1490,7 +1490,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1506,7 +1506,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1523,7 +1523,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1541,7 +1541,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1554,11 +1554,11 @@
       },
       "lines": [
         "Play only if each of your heroes is a Hobbit.",
-        "Combat Action: Enemies engaged with you do not attack this round. You cannot declare attacks this round."
+        "Combat Action: Enemies engaged with you do not attack this phase. You cannot declare attacks this phase."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1574,8 +1574,13 @@
         "Faramir gets +1 Attack for each enemy in the staging area."
       ],
       "inert": [],
-      "misprints": [],
-      "readBy": "",
+      "misprints": [
+        {
+          "line": 2,
+          "printed": "Faramir gets +1 Attack for each enemy in the staging area.."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1592,7 +1597,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1608,7 +1613,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1620,11 +1625,16 @@
         "sha256": "d41eb96cc57470713fb91541c7600314ddc4733855e73e6385e4a38482c4cd39"
       },
       "lines": [
-        "If each of your heroes has a printed Tactics hero resource icon, Knight of Minas Tirith Tirith gains: \"Response: After Knight of Minas Tirith enters play, choose an enemy in the staging area. Engage that enemy and exhaust Knight of Minas Tirith to declare it as attacker (and resolve its attack) against that enemy.\""
+        "If each of your heroes has a printed Tactics resource icon, Knight of Minas Tirith gains: \"Response: After Knight of Minas Tirith enters play, choose an enemy in the staging area. Engage that enemy and exhaust Knight of Minas Tirith to declare it as attacker (and resolve its attack) against that enemy.\""
       ],
       "inert": [],
-      "misprints": [],
-      "readBy": "",
+      "misprints": [
+        {
+          "line": 1,
+          "printed": "If each of your heroes has a printed Tactics resource icon, Knight of Minas Tirith gains: \"Response: After Knight of Minas Tirith enters play, choose an enemy in the staging area. Engage that enemy and exhaust Knight of Minas Tirith to delcare it as attacker (and resolve its attack) against that enemy.\""
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1641,7 +1651,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1653,11 +1663,11 @@
         "sha256": "e87a80634e828f160b77c719f5bdee16edd83bacd902e91cfc10f23aa768820c"
       },
       "lines": [
-        "Pelargir Shipwright gets +1 Willpower for each hero you control with a printed Spirit hero resource icon."
+        "Pelargir Shipwright gets +1 Willpower for each hero you control with a printed Spirit resource icon."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1675,7 +1685,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1687,13 +1697,12 @@
         "sha256": "748b048413d66507ce4566d692960391dc97b98e25b2ac2474cd6f5ad9bb4b22"
       },
       "lines": [
-        "Restricted.",
-        "Attach to a Ranger character.",
+        "Attach to a Ranger character. Restricted.",
         "Action: Exhaust Ranger Bow and attached character to deal 1 damage to an enemy in the staging area."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1710,7 +1719,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1727,7 +1736,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1743,7 +1752,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1760,8 +1769,17 @@
         "Action: Discard Tome of Atanatar to play any Leadership event card in your discard pile as if it were in your hand. Then, place that event on the bottom of your deck."
       ],
       "inert": [],
-      "misprints": [],
-      "readBy": "",
+      "misprints": [
+        {
+          "line": 2,
+          "printed": "Reduce the cost to play Tome of Atanator by 1 for each hero you control with a printed Leadership resource icon."
+        },
+        {
+          "line": 3,
+          "printed": "Action: Discard Tome of Atanator to play any Leadership event card in your discard pile as if it were in your hand. Then, place that event on the bottom of your deck."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1778,7 +1796,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1794,7 +1812,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1806,11 +1824,16 @@
         "sha256": "9381298e7f8412cd4dae99b315b3b14ff8f26a20962d4c96b2f5e21d60a921de"
       },
       "lines": [
-        "Action: Discard the top 3 card of your deck to put Emery into play from your hand, under any player's control. Then, if any of the discarded cards have the Tactics, Lore or Leadership sphere, discard Emery."
+        "Action: Discard the top 3 cards of your deck to put Emery into play from your hand, under any player's control. Then, if any of the discarded cards have the Tactics, Lore, or Leadership sphere, discard Emery."
       ],
       "inert": [],
-      "misprints": [],
-      "readBy": "",
+      "misprints": [
+        {
+          "line": 1,
+          "printed": "Action: Discard the top 3 cards of your deck to put Emery into play from your hand, under any player's control, Then, if any of the discarded cards have the Tactics, Lore, or Leadership sphere, discard Emery."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1826,7 +1849,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1842,7 +1865,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1855,12 +1878,12 @@
       },
       "lines": [
         "Play Poisoned Stakes into the staging area unattached.",
-        "If unattached, attach Poisoned Stakes to the next eligble enemy that enters the staging area.",
+        "If unattached, attach Poisoned Stakes to the next eligible enemy that enters the staging area.",
         "At the end of each round, deal 2 damage to attached enemy."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1876,7 +1899,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1889,11 +1912,11 @@
       },
       "lines": [
         "Sentinel.",
-        "Each Tactics hero with a printed Tactics resource icon gets +1 Willpower."
+        "Each hero with a printed Tactics resource icon gets +1 Willpower."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1909,7 +1932,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1926,7 +1949,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1938,13 +1961,17 @@
         "sha256": "9a38af9d91f59dcd34ab68479195a23d48c1d86a6c78581345e71ce17c9672e7"
       },
       "lines": [
-        "Restricted.",
-        "Attach to a Rohan character.",
+        "Attach to a Rohan character. Restricted.",
         "Attached character gets +1 Attack (+2 Attack instead if attacking an enemy in the staging area)."
       ],
       "inert": [],
-      "misprints": [],
-      "readBy": "",
+      "misprints": [
+        {
+          "line": 2,
+          "printed": "Attached character gets +1 Attack. (+2 Attack instead if attacking an enemy in the staging area)."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1960,7 +1987,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1973,11 +2000,11 @@
       },
       "lines": [
         "Attach to a Gondor or Rohan hero.",
-        "Response: after attached hero commits to a quest, spend 1 resource from attached hero's resource pool to ready attached hero."
+        "Response: After attached hero commits to a quest, spend 1 resource from attached hero's resource pool to ready attached hero."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -1993,7 +2020,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2009,7 +2036,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2027,7 +2054,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -2044,7 +2071,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     }
   ]

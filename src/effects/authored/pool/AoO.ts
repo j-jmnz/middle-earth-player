@@ -18,7 +18,7 @@ export const RECORDS: readonly Effect[] = [
   // 06087 Map of Earnil
   {"id":"06087:constant:2","cardCode":"06087","lines":["06087:A:2"],"timing":"constant","instructions":[{"verb":"ReduceCost","amount":{"count":{"type":"hero","control":"you","printedIcon":"spirit"}}}]},
   // 06088 Ranger Bow
-  {"id":"06088:action:1","cardCode":"06088","lines":["06088:A:3"],"timing":"action","cost":[{"kind":"exhaustSelf"},{"kind":"exhaustHost"}],"condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true}},"instructions":[{"verb":"Pick","pick":{"type":"enemy","control":"any","stagingOnly":true}},{"verb":"DamageCard","amount":1}]},
+  {"id":"06088:action:1","cardCode":"06088","lines":["06088:A:2"],"timing":"action","cost":[{"kind":"exhaustSelf"},{"kind":"exhaustHost"}],"condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true}},"instructions":[{"verb":"Pick","pick":{"type":"enemy","control":"any","stagingOnly":true}},{"verb":"DamageCard","amount":1}]},
   // 06089 Forest Patrol
   {"id":"06089:constant:1","cardCode":"06089","lines":["06089:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"count","pick":{"type":"character","control":"you","trait":"Ranger"},"min":1}}]},
   {"id":"06089:action:1","cardCode":"06089","lines":["06089:A:2"],"timing":"action","instructions":[{"verb":"Pick","pick":{"type":"enemy","control":"any","staging":true,"hasAttachment":{"trait":"Trap"}}},{"verb":"DamageCard","amount":3}]},
