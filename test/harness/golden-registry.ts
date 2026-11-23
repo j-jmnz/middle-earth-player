@@ -78,6 +78,7 @@ import * as woodland from "../scenarios/the-woodland-realm/game.ts";
 import * as mines from "../scenarios/the-mines-of-moria/game.ts";
 import * as khazad from "../scenarios/escape-from-khazad-dum/game.ts";
 import * as dreadnaught from "../scenarios/the-hunt-for-the-dreadnaught/game.ts";
+// import * as mountain from "../scenarios/the-lonely-mountain/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -182,4 +183,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
   entry("escape-from-khazad-dum", "Escape from Khazad-dûm", khazad.KHAZAD_GOLDENS, khazad.khazadWorld, khazad.playGolden),
   entry("the-hunt-for-the-dreadnaught", "The Hunt for the Dreadnaught", dreadnaught.DREADNAUGHT_GOLDENS, dreadnaught.dreadnaughtWorld, dreadnaught.playGolden),
+  // entry("the-lonely-mountain", "The Lonely Mountain", mountain.MOUNTAIN_GOLDENS, mountain.mountainWorld, mountain.playGolden),
 ];
