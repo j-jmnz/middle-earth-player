@@ -58,9 +58,7 @@ export type Scope = {
   // The event a Forced effect answers was made by a player card's effect (a heal or a ready).
   byPlayerCard?: boolean;
   // The engagement a Forced effect answers was from the staging area (kept only in a game with ships).
-  fromStaging?: boolean;
-  // The declaredDefender event a Response answers: the declaration exhausted the character ("exhausts to defend").
-  exhaustedToDefend?: boolean;
+  fromStaging?: boolean; exhaustedToDefend?: boolean;
   // The seat the event a Response answers happened to.
   eventSeat?: number | null;
   // What the running effect has picked, and the other card the answered event names.
@@ -351,8 +349,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return scope.byPlayerCard === true;
     case "fromStaging":
       return scope.fromStaging === true;
-    case "exhaustedToDefend":
-      return scope.exhaustedToDefend === true;
+    case "exhaustedToDefend": return scope.exhaustedToDefend === true;
     case "excess":
       return (scope.excess ?? 0) >= condition.min;
     case "dealt":

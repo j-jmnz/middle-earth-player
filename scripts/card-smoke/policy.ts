@@ -58,7 +58,7 @@ function paymentsOf(request: PayRequest | null, roll: Dice): Payment[] | null {
   return sharesReady(shares, request.total, true) ? toPayments(shares) : null;
 }
 
-/** The PlayCard the table would send for this card: its first shares and, for an attachment, the first legal host. */
+/** The PlayCard the table would send for this card: its first shares and, for an attachment or treasure, the first legal host. */
 export function playIntent(state: ScenarioState, ctx: ReduceContext, cardId: string, roll: Dice): PlayerIntent | null {
   const instance = state.cards[cardId];
   if (!instance) return null;

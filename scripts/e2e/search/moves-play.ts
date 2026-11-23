@@ -1,6 +1,6 @@
 import { playCost } from "../../../src/rules/player/attach.ts";
 import { heroPays } from "../../../src/rules/player/payments.ts";
-import { printedOf } from "../../../src/rules/core/printed.ts";
+import { playsOntoHost, printedOf } from "../../../src/rules/core/printed.ts";
 import { modifiedStat } from "../../../src/rules/core/keywords.ts";
 import type { LegalIntent, Payment, PlayerIntent } from "../../../src/rules/core/intents.ts";
 import { legalTargets, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
@@ -13,7 +13,7 @@ import { triggerPayments } from "../../../test/harness/auto-player.ts";
 /** The most cards (or Actions) one decision offers. */
 const MOST_CARDS = 5;
 
-const TYPE_RANK: Readonly<Record<string, number>> = { ally: 0, attachment: 1, event: 2 };
+const TYPE_RANK: Readonly<Record<string, number>> = { ally: 0, attachment: 1, treasure: 1, event: 2 };
 
 /** The resources the seat pays for a card, taking from its heroes in `order`, or null when it cannot pay. */
 function payFrom(state: ScenarioState, ctx: ReduceContext, cardId: string, cost: number, order: readonly string[]): Payment[] | null {
@@ -58,7 +58,7 @@ export function playOptions(state: ScenarioState, ctx: ReduceContext, legal: rea
   const out: PlayerIntent[] = [];
   for (const { cardId, printed } of ranked) {
     if (out.length >= MOST_CARDS) break;
-    if (printed.type === "attachment") {
+    if (playsOntoHost(printed)) {
       const hosts = [...legalTargets(state, { type: "PlayCard", cardId }, ctx)].sort((left, right) => hostValue(state, ctx, right) - hostValue(state, ctx, left)).slice(0, 2);
       for (const hostId of hosts) {
         const cost = playCost(state, cardId, seat, ctx, hostId);
