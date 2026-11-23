@@ -2,6 +2,7 @@ import type { Condition, Effect } from "../../../catalog/boundary.ts";
 
 import { RECORDS as MISC } from "../families/misc.ts";
 import { copyLine, withCopies } from "../reprint.ts";
+import { MISTY_MOUNTAIN_GOBLINS_EFFECTS } from "./set-misty-mountain-goblins.ts";
 import { WESTERN_LANDS_EFFECTS } from "./set-western-lands.ts";
 
 // The records the six scenarios of The Hobbit share: the nine treasure cards of its two boxes (the box ledger, data/printed/the-hobbit.json), which a deck adds at a scenario's Setup (the briefing admits them,
@@ -132,6 +133,6 @@ const TREASURE_EFFECTS: readonly Effect[] = withCopies(
 );
 
 // The cycle's own records, then the records of the encounter sets its scenarios share (set-*.ts).
-export const AUTHORED_EFFECTS: readonly Effect[] = [...TREASURE_EFFECTS, ...WESTERN_LANDS_EFFECTS];
+export const AUTHORED_EFFECTS: readonly Effect[] = [...TREASURE_EFFECTS, ...MISTY_MOUNTAIN_GOBLINS_EFFECTS, ...WESTERN_LANDS_EFFECTS];
 
 export const AUTHORED_REPLACES: readonly string[] = [];

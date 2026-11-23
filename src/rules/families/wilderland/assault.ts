@@ -9,6 +9,7 @@ import { takeProgressOff } from "../../core/progress.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
 import { searchable } from "../../interpret/search.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
@@ -24,11 +25,11 @@ export function searchStageCard(state: ScenarioState, instruction: Verb<"SearchS
   return id == null ? state : moveEncounter(state, id, "staging", focus.seat, ctx, steps);
 }
 
-/** StageDiscarded: each card of the type among those the effect's DiscardEncounterTop discarded, still in the encounter discard pile, is added to the staging area in the order discarded. */
+/** StageDiscarded: each card of the type (and the Trait, when the instruction names one) among those the effect's DiscardEncounterTop discarded, still in the encounter discard pile, is added to the staging area in the order discarded. */
 export function stageDiscarded(state: ScenarioState, instruction: Verb<"StageDiscarded">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   for (const id of effectData(state)?.looked ?? []) {
-    if (next.cards[id]?.zone === "encounterDiscard" && printedOf(ctx.cards, next.cards[id]?.code ?? "").type === instruction.type) next = moveEncounter(next, id, "staging", focus.seat, ctx, steps);
+    if (next.cards[id]?.zone === "encounterDiscard" && printedOf(ctx.cards, next.cards[id]?.code ?? "").type === instruction.type && (instruction.trait == null || hasTrait(next, id, instruction.trait, ctx))) next = moveEncounter(next, id, "staging", focus.seat, ctx, steps);
   }
   return next;
 }

@@ -168,6 +168,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 39, scenarios: ["fog-on-the-barrow-downs", "flies-and-spiders"], note: "An encounter card's Forced effect that has no event seat is answered by the first player of the card's own staging area while the players have separate areas (Glade, Old Tomnoddy), not by the player who holds the first player token." },
   { version: 39, scenarios: ["escape-from-mount-gram", "foundations-of-stone", "fog-on-the-barrow-downs", "flies-and-spiders"], note: "While the players have separate staging areas, \"the first player\" of a card is the first player of its own area: the highest-threat Pick of Escape from Mount Gram and the choices that name the first player open for the first player of the area, not for the holder of the token." },
   { version: 39, scenarios: ["escape-from-mount-gram", "foundations-of-stone", "fog-on-the-barrow-downs", "flies-and-spiders"], note: "While the players have separate staging areas, a cost the players pay as a group (Hidden Path, Durin's Axe, a player card that spends together) is paid only from the players of the area." },
+  { version: 39, scenarios: "all", note: "The loot The Burglar's Turn attaches to a location is an attachment on it for every card that counts or asks for one: Forest Road Traveler, Mirkwood Hunter, Haldan, South Away! and the other cards that read a location's attachments." },
 ];
 
 export const ENGINE_VERSION = 39;

@@ -74,6 +74,7 @@ import { woodlandFixtures } from "./standalone-scenarios/the-woodland-realm.ts";
 import { minesFixtures } from "./standalone-scenarios/the-mines-of-moria.ts";
 import { khazadFixtures } from "./standalone-scenarios/escape-from-khazad-dum.ts";
 import { dreadnaughtFixtures } from "./standalone-scenarios/the-hunt-for-the-dreadnaught.ts";
+import { grimFixtures } from "./the-hobbit/over-the-misty-mountains-grim.ts";
 import { spidersFixtures } from "./the-hobbit/flies-and-spiders.ts";
 import { dayFixtures } from "./the-hobbit/we-must-away-ere-break-of-day.ts";
 
@@ -161,6 +162,7 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "the-mines-of-moria": () => minesFixtures(),
   "escape-from-khazad-dum": () => khazadFixtures(),
   "the-hunt-for-the-dreadnaught": () => dreadnaughtFixtures(),
-  "flies-and-spiders": () => spidersFixtures(),
   "we-must-away-ere-break-of-day": () => dayFixtures(),
+  "over-the-misty-mountains-grim": () => grimFixtures(),
+  "flies-and-spiders": () => spidersFixtures(),
 };
