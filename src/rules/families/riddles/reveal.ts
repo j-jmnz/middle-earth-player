@@ -42,6 +42,16 @@ export function offersRiddle(state: ScenarioState, id: string, seat: number, ctx
   return riddleOffer(state, id, seat, effectsOf(ctx, code ?? "").filter((effect) => effect.timing === "whenRevealed"), ctx) !== undefined;
 }
 
+/** The riddle card whose offer the open Choose is: it lies in the staging area, but answering its riddle keeps it out of it (the table's quest figure leaves its threat out). Null when no riddle offer is open. */
+export function offeredRiddleCard(state: ScenarioState, ctx: ReduceContext): string | null {
+  if (state.window?.kind !== "choose") return null;
+  const frame = state.stack.at(-1);
+  const card = frame?.cardId != null ? state.cards[frame.cardId] : undefined;
+  if (!card || card.zone !== "staging" || frame?.data.kind !== "effect") return null;
+  const effectId = frame.data.effectId;
+  return effectsOf(ctx, card.code).some((effect) => effect.id === effectId && offers(effect)) ? card.id : null;
+}
+
 /** ResolveNormally: the card's When Revealed records, but the riddle offer, resolve for the first player as the reveal would have run them. The card is added to the staging area now (the reveal held that back while the riddle was offered). */
 export function resolveNormally(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = focus.sourceId;

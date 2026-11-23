@@ -322,6 +322,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const stopsDefenders = defending && wait?.kind === "target";
       return {
         ...base,
+        ...(asked.title ? { title: asked.title } : {}),
         ...(stopsDefenders ? { alternative: { label: "No more defenders", intent: { type: "Choose" as const, optionId: DONE } } } : {}),
         note: [`${asked.prompt}${asked.owned ? "" : who}`, committedNote(game, ctx, effect, window.seat), line].filter((part) => part != null).join(" "),
         verb: asked.verb,

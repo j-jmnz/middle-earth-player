@@ -6,7 +6,8 @@
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { areaGollum, areaStage, bilbo } from "../../../rules/families/riddles/area.ts";
-import { questPointsOf } from "../../../rules/quest/quest.ts";
+import { offeredRiddleCard } from "../../../rules/families/riddles/reveal.ts";
+import { questPointsOf, stagingThreat } from "../../../rules/quest/quest.ts";
 
 import type { TableDial } from "../dials.ts";
 import type { HandMark } from "../isengard.ts";
@@ -37,9 +38,18 @@ export function riddleDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
   ];
 }
 
-/** The mark of the seat that controls Bilbo Baggins while he is in the riddle area ("Bilbo in the riddle area", "P1 · Bilbo in the riddle area" two-handed). Empty in any other scenario and once stage 2 has left. */
+/** The mark of the seat that controls Bilbo Baggins while he is in the riddle area ("Riddle area", "P1 · Riddle area" two-handed; the note says it is Bilbo). Empty in any other scenario and once stage 2 has left. */
 export function riddleHands(game: ScenarioState): readonly HandMark[] {
   const hero = game.scenarioId === SCENARIO && areaStage(game) ? bilbo(game) : undefined;
   if (!hero || hero.controller == null) return [];
-  return [{ seat: hero.controller, label: game.seatCount > 1 ? `P${hero.controller + 1} · Bilbo in the riddle area` : "Bilbo in the riddle area", note: "Bilbo Baggins is in the riddle area with Bilbo's Magic Ring. He cannot quest, attack or defend, except against Gollum, and takes damage only from Gollum." }];
+  return [{ seat: hero.controller, label: game.seatCount > 1 ? `P${hero.controller + 1} · Riddle area` : "Riddle area", note: "Bilbo Baggins is in the riddle area with Bilbo's Magic Ring. He cannot quest, attack or defend, except against Gollum, and takes damage only from Gollum." }];
+}
+
+/**
+ * The threat in staging as the quest figure reads it. While the first player decides whether to answer a riddle card just revealed, the card lies in the staging
+ * area, but answering keeps it out (hob.riddles), so the figure leaves its threat out; with the choice made, or in any other game, it is the engine's number.
+ */
+export function stagingThreatNow(game: ScenarioState, ctx: ReduceContext, seat?: number): number {
+  const offered = game.scenarioId === SCENARIO ? offeredRiddleCard(game, ctx) : null;
+  return stagingThreat(offered ? { ...game, staging: game.staging.filter((id) => id !== offered) } : game, ctx.cards, seat);
 }

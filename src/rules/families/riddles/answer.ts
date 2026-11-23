@@ -111,10 +111,15 @@ function ringStep(state: ScenarioState, instruction: Verb<"RiddleStep">, focus: 
   return queueFront(more, [{ instruction, seat: state.firstPlayer, chosen: null, ...(cause ? { cause } : {}) }]);
 }
 
+/** The cards the open riddle has discarded so far, each with whether it matches every name, and how many match (the words of the Ring's question read it). Empty when no riddle is open. */
+export function riddleResult(state: ScenarioState, ctx: ReduceContext): { cards: readonly { id: string; match: boolean }[]; hits: number } {
+  const cards = (effectData(state)?.named ?? []).filter((entry) => entry.startsWith(`${KEPT}card:`)).map((entry) => entry.slice(KEPT.length + 5)).map((id) => ({ id, match: matches(state, id, ctx) }));
+  return { cards, hits: cards.filter((card) => card.match).length };
+}
+
 // The matches are counted: each is 1 progress on stage 2, no match fails the riddle, and the source card is discarded unless it lies elsewhere already.
 function finishRiddle(state: ScenarioState, card: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const found = (effectData(state)?.named ?? []).filter((entry) => entry.startsWith(`${KEPT}card:`)).map((entry) => entry.slice(KEPT.length + 5));
-  const hits = found.filter((id) => matches(state, id, ctx)).length;
+  const { hits } = riddleResult(state, ctx);
   const stage = areaStage(state);
   let next = state;
   if (stage && hits > 0) {

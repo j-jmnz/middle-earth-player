@@ -25,6 +25,7 @@ import { companyProgressWords } from "./company.ts";
 import { erechQuestWords } from "./standalone-scenarios/erech.ts";
 import { downsHoldWords, downsQuestWords, downsRaise } from "./standalone-scenarios/barrow-downs.ts";
 import { forestHoldWords } from "./standalone-scenarios/old-forest.ts";
+import { stagingThreatNow } from "./the-hobbit/riddles.ts";
 import { lairProgressWords } from "./lair.ts";
 import { blackGateQuestEnd } from "./black-gate.ts";
 import { fortitudeNumbers } from "./fortitude.ts";
@@ -119,7 +120,9 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const enemy = game.cards[attack.enemyId];
     if (!enemy) return null;
     const strength = modifiedStat(game, enemy, "attack", ctx.cards);
-    const shadowNote = attack.shadowResolved ? "" : ", shadow card next";
+    // A shadow card comes next only when the enemy holds one: Gollum's attack from the riddle area deals none (131074:A:1), nor does an enemy dealt none for want of a card.
+    const shadowNext = !attack.shadowResolved && enemy.shadowId != null;
+    const shadowNote = shadowNext ? ", shadow card next" : "";
     const picked = pickedInAttack(game, sheet, choice);
     // Several defenders (Stand Together, rr.multiple-defenders): their defense is pooled against the attack, and all the
     // damage goes on the one the defending player chooses.
@@ -132,11 +135,14 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const defenderId = attack.undefended ? undefined : (attack.defenderId ?? (picked?.role === "defender" ? picked.id : undefined));
     if (defenderId && game.cards[defenderId]) {
       const defense = defenseAsDefender(game, defenderId, ctx.cards);
-      const destroyed = destroyedWords(game, ctx, defenderId, Math.max(0, strength - defense), cardName, !attack.shadowResolved);
+      const destroyed = destroyedWords(game, ctx, defenderId, Math.max(0, strength - defense), cardName, shadowNext);
       return { kind: "defense", stats: [ATTACK(strength), DEFENSE(defense)], result: `${damageWords(strength, defense)}${shadowNote}${destroyed}` };
     }
     const hit = attack.heroId ?? (picked?.role === "hit" ? picked.id : undefined);
-    if (hit) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${shadowNote}${destroyedWords(game, ctx, hit, strength, cardName, !attack.shadowResolved)}` };
+    if (hit) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${shadowNote}${destroyedWords(game, ctx, hit, strength, cardName, shadowNext)}` };
+    // The one hero the damage may go on (Gollum's attack from the riddle area, a shadow effect that names the hero) is named before it is picked.
+    const only = attack.onlyHeroes?.length === 1 && !attack.undefended ? attack.onlyHeroes[0] : undefined;
+    if (only && game.cards[only]) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended, ${cardName(only)} takes ${strength}${shadowNote}` };
     return { kind: "defense", stats: [ATTACK(strength)], result: attack.undefended ? `Undefended: ${strength} damage${shadowNote}` : `Undefended, a hero takes ${strength}` };
   }
   // The players attack: the attackers picked (or declared) against the enemy's defense.
@@ -186,7 +192,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     // The acting seat quests against its own staging area once stages are separate.
     const seat = questSeat(game);
     const willpower = committedWillpower(game, ctx.cards, seat) + added;
-    const threat = stagingThreat(game, ctx.cards, seat);
+    const threat = stagingThreatNow(game, ctx, seat);
     if (game.mode === "questCommit") return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${commitWords(game, ctx, picked)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
     // A stage with Defense (mec112.defense): the Threat that beats the Willpower is progress the encounter deck places, so no player's threat rises and no elimination is warned of.
     if (stageHasDefense(game)) return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: defenseQuestResult(willpower, threat, defenseOutcome(game, ctx)) };
