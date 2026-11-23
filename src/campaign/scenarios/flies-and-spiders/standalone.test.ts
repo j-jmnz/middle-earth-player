@@ -9,7 +9,7 @@ const spiders = loadAnyScenario("flies-and-spiders");
 // What is Flies and Spiders's own in the standalone game. The cycle checks (a part of its cycle, no campaign card, playable, scored and recorded as a standalone run with nothing earned, the loss reasons) are the golden suite's
 // (test/harness/golden-suite.ts, standalone: true).
 describe("Flies and Spiders in the the-hobbit cycle", () => {
-  it("has no Nightmare deck: the cycle builds none (docs/scenarios/the-hobbit.md, Data), so nothing is dealt on Nightmare", () => {
+  it("has no Nightmare deck: the cycle builds none (docs/scenarios/the-hobbit.md, The Hobbit), so nothing is dealt on Nightmare", () => {
     expect(spiders.nightmare).toBeUndefined();
   });
 

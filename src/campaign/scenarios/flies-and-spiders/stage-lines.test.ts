@@ -49,26 +49,35 @@ lineSpec("132067:A:1", "a player may keep his copy of the Ring out of his deck, 
 
 // ---- 132067:B:1, 132069:B:1, 132070:B:1 the unconscious bars ----
 const barsOf = (state: ScenarioState, id: string) => BARS.filter((bar) => flagged(state, id, bar));
-for (const [line, stage] of [["132067:B:1", STAGE_1], ["132069:B:1", STAGE_3], ["132070:B:1", STAGE_4]] as const) {
-  lineSpec(line, "an unconscious character cannot quest, attack, defend, collect resources, trigger abilities, be poisoned or ready; a conscious one is not barred", (effects) => {
-    const t = on(effects, { seats: 1, stage });
-    const down = makeUnconscious(t.state, t.hero, t.ctx);
-    expect(barsOf(syncOf(t, down), t.hero)).toEqual([...BARS]);
-    expect(barsOf(syncOf(t, down), t.hero2), "a conscious character").toEqual([]);
-    expect(legalTargets({ ...syncOf(t, down), phase: "Quest", mode: "questCommit" }, { type: "Commit" }, t.ctx), "it cannot be committed").not.toContain(t.hero);
-    expect(legalTargets({ ...syncOf(t, down), phase: "Quest", mode: "questCommit" }, { type: "Commit" }, t.ctx), "another character can").toContain(t.hero2);
-    expect(poisonOf(givePoison(syncOf(t, down), t.hero, 1, t.ctx, []), t.hero), "it cannot be poisoned").toBe(0);
-  });
-  lineSpec(line, "the refresh phase does not ready an unconscious character, and the next round does not either", (effects) => {
-    const t = on(effects, { seats: 1, stage, phase: "Refresh" });
-    const down = syncOf(t, makeUnconscious(t.state, t.hero, t.ctx));
-    const tired = syncOf(t, updateCard(down, t.hero2, { exhausted: true }));
-    const out = toNextRound(tired, t.ctx).state;
-    expect(out.round, "a round passed").toBeGreaterThan(tired.round);
-    expect(out.cards[t.hero2]?.exhausted, "an exhausted character is readied").toBe(false);
-    expect(out.cards[t.hero]).toMatchObject({ unconscious: true, exhausted: true });
-  });
-}
+const barsCheck = (stage: string) => (effects: readonly Effect[]) => {
+  const t = on(effects, { seats: 1, stage });
+  const down = makeUnconscious(t.state, t.hero, t.ctx);
+  expect(barsOf(syncOf(t, down), t.hero)).toEqual([...BARS]);
+  expect(barsOf(syncOf(t, down), t.hero2), "a conscious character").toEqual([]);
+  expect(legalTargets({ ...syncOf(t, down), phase: "Quest", mode: "questCommit" }, { type: "Commit" }, t.ctx), "it cannot be committed").not.toContain(t.hero);
+  expect(legalTargets({ ...syncOf(t, down), phase: "Quest", mode: "questCommit" }, { type: "Commit" }, t.ctx), "another character can").toContain(t.hero2);
+  expect(poisonOf(givePoison(syncOf(t, down), t.hero, 1, t.ctx, []), t.hero), "it cannot be poisoned").toBe(0);
+};
+const refreshCheck = (stage: string) => (effects: readonly Effect[]) => {
+  const t = on(effects, { seats: 1, stage, phase: "Refresh" });
+  const down = syncOf(t, makeUnconscious(t.state, t.hero, t.ctx));
+  const tired = syncOf(t, updateCard(down, t.hero2, { exhausted: true }));
+  const out = toNextRound(tired, t.ctx).state;
+  expect(out.round, "a round passed").toBeGreaterThan(tired.round);
+  expect(out.cards[t.hero2]?.exhausted, "an exhausted character is readied").toBe(false);
+  expect(out.cards[t.hero]).toMatchObject({ unconscious: true, exhausted: true });
+  expect(out.cards[t.hero2]?.resources, "a character collects a resource").toBe(1);
+  expect(out.cards[t.hero]?.resources, "an unconscious character collects none").toBe(0);
+};
+const BARS_TITLE = "an unconscious character cannot quest, attack, defend, collect resources, trigger abilities, be poisoned or ready; a conscious one is not barred";
+const REFRESH_TITLE = "the refresh phase does not ready an unconscious character and the next resource phase gives it no resource";
+lineSpec("132067:B:1", BARS_TITLE, barsCheck(STAGE_1));
+lineSpec("132067:B:1", REFRESH_TITLE, refreshCheck(STAGE_1));
+lineSpec("132069:B:1", BARS_TITLE, barsCheck(STAGE_3));
+lineSpec("132069:B:1", REFRESH_TITLE, refreshCheck(STAGE_3));
+lineSpec("132070:B:1", BARS_TITLE, barsCheck(STAGE_4));
+lineSpec("132070:B:1", REFRESH_TITLE, refreshCheck(STAGE_4));
+
 // ---- 132068:B:1 Lost in the Dark ----
 lineSpec("132068:B:1", "with 2 players the first player takes stage 3 in an area of his own, the other advances to stage 4 and keeps the cards of the staging area", (effects) => {
   const { state } = revealed(effects, { staging: ["132032"] });

@@ -20,20 +20,18 @@ const endOfRound = { trigger: "endOfRound", seat: null } as GameEvent;
 
 // ---- Venom ----
 // Attack, defense: 132028 5/2, 132029 3/2, 132030 3/2, 132031 1/1 (+3 with a poisoned character), 132032 4/1 (its Forced effect poisons 1 more at the attack).
-const VENOM: readonly (readonly [string, string, number, number])[] = [
-  ["132028:A:1", "132028", 3, 1],
-  ["132029:A:1", "132029", 1, 1],
-  ["132030:A:1", "132030", 1, 1],
-  ["132032:A:1", "132032", 2, 2],
-];
-for (const [line, enemy, damage, poison] of VENOM) {
-  lineSpec(line, "Venom: the damage the enemy deals to a defending character gives it 1 poison, once, whatever the damage", (effects) => {
-    const out = fight(effects, enemy);
-    expect(out.run.state.cards[out.made.hero]?.damage, "the attack dealt its damage").toBe(damage);
-    expect(poisonOf(out.run.state, out.made.hero), "1 poison for that damage").toBe(poison);
-    expect(poisonOf(out.run.state, out.made.hero2), "another character gets none").toBe(0);
-  });
-}
+const venomCheck = (enemy: string, damage: number, poison: number) => (effects: readonly Effect[]) => {
+  const out = fight(effects, enemy);
+  expect(out.run.state.cards[out.made.hero]?.damage, "the attack dealt its damage").toBe(damage);
+  expect(poisonOf(out.run.state, out.made.hero), "1 poison for that damage").toBe(poison);
+  expect(poisonOf(out.run.state, out.made.hero2), "another character gets none").toBe(0);
+};
+const VENOM_TITLE = "Venom: the damage the enemy deals to a defending character gives it 1 poison, once, whatever the damage";
+lineSpec("132028:A:1", VENOM_TITLE, venomCheck("132028", 3, 1));
+lineSpec("132029:A:1", VENOM_TITLE, venomCheck("132029", 1, 1));
+lineSpec("132030:A:1", VENOM_TITLE, venomCheck("132030", 1, 1));
+// Wicked Spider's own Forced effect (132032:A:2) gives 1 more poison at the attack: 2 in all.
+lineSpec("132032:A:1", VENOM_TITLE, venomCheck("132032", 2, 2));
 lineSpec("132031:A:1", "Venom: a defended attack with no damage gives no poison, an undefended one with damage does", (effects) => {
   const defended = fight(effects, "132031");
   expect(defended.run.state.cards[defended.made.hero]?.damage, "1 Attack against 2 Defense").toBe(0);
@@ -42,7 +40,7 @@ lineSpec("132031:A:1", "Venom: a defended attack with no damage gives no poison,
   expect(bare.run.state.cards[bare.made.hero]?.damage).toBe(1);
   expect(poisonOf(bare.run.state, bare.made.hero), "1 damage, 1 poison").toBe(1);
 });
-lineSpec("132028:A:1", "Venom: a character the damage destroys gets no poison (docs/scenarios/the-hobbit.md, Poison)", (effects) => {
+lineSpec("132028:A:1", "Venom: a character the damage destroys gets no poison (docs/scenarios/the-hobbit.md, Flies and Spiders)", (effects) => {
   const out = fight(effects, "132028", { undefended: true, damage: 2 });
   expect(out.run.state.cards[out.made.hero]?.zone, "5 damage on 2 damage of 6 hit points destroys it").not.toBe("heroes");
   expect(total(out.run.state)).toBe(0);

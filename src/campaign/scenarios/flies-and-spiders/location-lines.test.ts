@@ -1,5 +1,5 @@
 // Rules: hob.venom-poison, hob.unconscious-characters, hob.staging-area-creating, rr.active-location, rr.explored, rr.travel, rr.forced, rr.response, rr.then (data/rules/entries.json). The locations of Flies and Spiders (132025 to 132027), each test from the printed line (data/printed/the-hobbit.json)
-// on a table built from data/ by the layout kit, and run again without the records of its line (`lineSpec`). 132025:A:1 (Immune to player card effects) is a keyword the printed card gives, with no record.
+// on a table built from data/ by the layout kit, and run again without the records of its line (`lineSpec`). Its Immune line is a keyword the printed card gives, with no record.
 import { expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
