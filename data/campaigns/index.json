@@ -103,7 +103,7 @@
     "id": "the-hobbit",
     "name": "The Hobbit",
     "scenarioCount": 6,
-    "playable": false,
+    "playable": true,
     "kind": "cycle",
     "box": null,
     "released": "2012-08-17",
