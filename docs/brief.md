@@ -382,6 +382,7 @@ Readings of player cards that the Rules Reference leaves open. Each says how it 
 - Favor of the Valar (10124) on another player's threat dial is controlled by that player and saves that player: the dial is part of that player's play area (`rr.ownership-and-control`; AEP 1.38, 3.297). Status: recommended (no ruling covers a dial attachment; https://ffg-forum-archive.entropicdreams.com/topic/195523-favor-of-the-valar-limit-1-per-player agrees loosely).
 - A Response to one step of an effect may be used as soon as that step resolves, before the rest of the effect (`rr.response`; AEP 3.296): the Hobbit Pipe (141015) answers Smoke Rings' (141010) threat reduction before the Willpower sentence, and the order changes no outcome. Status: recommended (no ruling names these cards).
 - Wiglaf's Action (19027) exhausts an attachment its controller controls: an encounter attachment on him stays the scenario's and cannot pay the cost (`rr.cost`; AEP 1.06, `rr.ownership-and-control`). Status: researched. Test: `src/campaign/player-cards/roam-across-rhovanion.test.ts` and `player-readings.test.ts`.
+- Thrór's Map (131013:A:2) costs a discard, as its Dwarves of Durin printing reads ("Travel Action: Discard Thrór's Map to choose a location in the staging area"), though `faq.errata.131013` (FAQ 1.9, 10/16/2017, the latest FAQ pinned in `data/sources.json`) says "Exhaust Thrór's Map". FFG changed the card to Discard in later printings of Over Hill and Under Hill and in the Dwarves of Durin starter deck, with no FAQ entry; the exhaust cost is the wording before those printings. The later official printing outranks the older erratum, so the erratum rule (Data sources) does not apply to this card. Status: researched, settled by the reprint and community discussion (https://hallofbeorn.wordpress.com/2019/09/08/alternate-art-errata/: newer printings have the text change, "no corresponding FAQ version currently"; https://alongextendedparty.com/semi-official-errata-faq-1-10/: a "silent erratum" confirmed by the Dwarves of Durin reprint; https://ringsdb.com/card/131013 and https://www.hallofbeorn.com/LotR/Details/Thror's-Map-THOHaUH: Discard as current text). The record's cost is a discard and `src/campaign/player-cards/over-hill-and-under-hill*.test.ts` holds it.
 
 ### Keywords implemented once
 
@@ -581,6 +582,8 @@ A cycle (Shadows of Mirkwood, Dwarrowdelf, the Standalone scenarios) has no book
 
 Sources disagree. The build cross-checks them (Hall of Beorn counts against the DragnCards load lists, piles against the quest card's Setup text) and a scenario that fails a check is not written. Each resolved disagreement is a row in `data/overrides.json` with its reason and source. Do not hand-edit generated data such as `data/scenarios/*.json`: fix the source or add an override with its reason.
 
+An official erratum replaces the printed wording of its card (user decision, 2026-11-23): the FAQ says the errata on a card apply to all its printings. A card's ledger lines (`data/printed/`) hold the corrected wording, and `scripts/data/errata.test.ts` lists each card whose text differs from its erratum, each with its reason (`DIFFERENCES`).
+
 RingsDB states that the texts are copyrighted by Fantasy Flight Games and that the API is for tools that complement the game.
 
 `data/sources.json` records the fetch date; `catalog.db` carries it in a `meta` row.
@@ -684,5 +687,6 @@ Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open point
 - Beechbone 10118:A:2 reads X as 0 when its own cost destroys him (`recommended`, docs/brief.md, Core round).
 - A card played from the hand or the deck "at no cost" (Host of Galadhrim, Send for Help, Scavenge for Supplies) needs no resource match (community-sourced, docs/brief.md, Core round).
 - A resource moved to a hero's pool (Errand-rider) is gained, not added: Heir of Mardil answers it, Harbor Master does not (community-sourced, docs/brief.md, Core round).
+- Thrór's Map 131013:A:2 costs a discard, as its Dwarves of Durin printing reads; FAQ 1.9 still says Exhaust (`researched`, community-settled, docs/brief.md, Player card readings).
 - East Road Ranger 10008:A:1: "committed to a side quest" means committed while a side quest is the current quest (`recommended`).
 - The Messenger of the King heroes keep RingsDB's pictures (about 430×600): no larger source was found (agent recommendation, not user-confirmed).

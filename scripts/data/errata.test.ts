@@ -8,7 +8,7 @@ import type { RuleEntry } from "./rules/spans.ts";
 import { loadCards } from "./load-cards.ts";
 import { DATA_DIR } from "./paths.ts";
 
-// The game follows a card's errata only because the source text has it applied. The FAQ's errata section is in data/rules as one span per card
+// An erratum replaces its card's printed wording (docs/brief.md, Data sources); the game follows it only because the source text has it applied. The FAQ's errata section is in data/rules as one span per card
 // (`faq.errata.<card code>`; the Core Set rulebook's is `faq.errata.core-rulebook-quest-phase`, which names no card). This test reads each erratum's
 // "Should read" wording from the span and finds it in the card's `text` (its other side's and its shadow text too), compared with quotes, tags,
 // dashes and whitespace made alike and icons as words. A difference is a finding for the user, not for this test to fix: it is listed at its
@@ -16,11 +16,11 @@ import { DATA_DIR } from "./paths.ts";
 // (a clarification, "Omit the parenthetical") and a card that is not in data/cards are counted, not compared.
 const DIFFERENCES: Readonly<Record<string, string>> = {
   "03003": "punctuation: the card has no comma before the last icon (\"[tactics] or [spirit]\"); the erratum has one",
-  "131013": "wording: the card says \"Discard Thrór's Map\", the erratum \"Exhaust Thrór's Map\"; the card also keeps the parenthetical about the active location",
-  "132068": "wording: the stage's side B reads \"use that stage\", \"not other players\" and \"the staging area\"; the erratum \"using that stage\", \"no other players\" and \"its staging area\"",
+  "131013": "wording: the card says \"Discard Thrór's Map\", the erratum (FAQ 1.9, 2017) \"Exhaust Thrór's Map\"; the game plays the later official printing (Dwarves of Durin, later Over Hill and Under Hill), which the FAQ never recorded (docs/brief.md, Player card readings)",
+  "132068": "wording: the stage's side B reads \"use that stage\", \"not other players\" and \"the staging area\"; the erratum \"using that stage\", \"no other players\" and \"its staging area\"; the scenario is not playable and the card has no ledger entry, so the erratum is not applied",
   "06117": "punctuation: the card has no comma before \"or take 1 hidden card\"; the erratum has one",
   "06157": "punctuation: the card has no comma before \"or reveals\"; the erratum has one",
-  "144067": "wording: the card (the campaign card, LoS 67) reads \"change hero cards without\"; the erratum \"change hero cards he controls without\"",
+  "144067": "wording: the card (the campaign card, LoS 67) reads \"change hero cards without\"; the erratum \"change hero cards he controls without\"; the ledger was read from the scan, and each player changes only their own heroes in either wording. No later printing was found online",
 };
 
 const entries = JSON.parse(readFileSync(path.join(DATA_DIR, "rules", "entries.json"), "utf8")) as RuleEntry[];
@@ -31,7 +31,7 @@ const cards = new Map(loadCards().map((card) => [card.code, card]));
 const GLYPHS = /[ÌÎÏÊ]/g;
 
 /** The words of a text with quotes, dashes, tags and whitespace made alike; `[icon]` kept as its word, or dropped when `icons` is false. */
-export function normalized(text: string, icons = true): string {
+function normalized(text: string, icons = true): string {
   return text
     .replace(/<[^>]+>/g, " ")
     .replace(/\[([^\]]+)\]/g, icons ? " $1 " : " ")
@@ -46,7 +46,7 @@ export function normalized(text: string, icons = true): string {
 }
 
 /** What an erratum span says the card should read: its quoted wording in pieces (a `...` splits it), and a title when it gives one. */
-export function wording(text: string): { pieces: string[]; hasGlyph: boolean; title: string | null } {
+function wording(text: string): { pieces: string[]; hasGlyph: boolean; title: string | null } {
   const read = /should (?:read|have the text):\s*[“"]([\s\S]*?)[”"](?:\s|$)/i.exec(text.replace(/Title should read:[\s\S]*?\n/i, ""));
   const title = /title should read:\s*[“"]([^”"]*)[”"]/i.exec(text)?.[1] ?? null;
   const raw = read?.[1] ?? "";
@@ -58,7 +58,7 @@ function printed(card: Card): string[] {
 }
 
 /** The pieces of the erratum the card's printed text does not hold, in order. */
-export function missing(card: Card, text: string): string[] {
+function missing(card: Card, text: string): string[] {
   const { pieces, hasGlyph, title } = wording(text);
   const out: string[] = [];
   const icons = !hasGlyph;
