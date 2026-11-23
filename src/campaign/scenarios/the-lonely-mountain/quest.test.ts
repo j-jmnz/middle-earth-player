@@ -115,6 +115,12 @@ describe("132074:B:1 Thieves! Fire! Murder!: the stage resets the quest to 2B an
     expect(current(second.state)).toBe("132074");
     expect([zoneOf(second.state, "132041"), zoneOf(second.state, "132040")]).toEqual(["staging", "setAside"]);
   });
+  lineSpec("132074:B:1", "A Bare Patch attached to Smaug the Magnificent is set aside with him, and one in the staging area too", (effects) => {
+    const attached = make({ stage: "132074", progress: 7, staging: [{ code: "132041", damage: 5 }], attached: [{ code: "132039", to: "132041" }], setAside: ["132040"] }, effects);
+    const run = announceAndDrive(attached, { trigger: "questCardDefeated", cardId: idOf(attached.state, "132074") }, {});
+    expect([zoneOf(run.state, "132039"), zoneOf(run.state, "132041"), zoneOf(run.state, "132040"), current(run.state)]).toEqual(["setAside", "setAside", "staging", "132072"]);
+    expect(Object.values(run.state.cards).find((card) => card.code === "132041")?.damage).toBe(0);
+  });
   lineSpec("132074:B:1", "after the reset the players can advance to stage 3, which brings Smaug the Magnificent and A Bare Patch back", (effects) => {
     const made = prepared(effects);
     const first = announceAndDrive(made, { trigger: "questSucceeded" }, {});
