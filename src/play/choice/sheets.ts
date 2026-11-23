@@ -246,7 +246,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       // A burgle attempt's action window: the card revealed from the first player's deck, what step 3 asks and the Action that takes the card.
       const burgle = frame?.data.kind === "burgle" ? burgleWindowNote(game, ctx, { card: names.card, code: (code) => ctx.cards.get(code)?.name ?? code }) : null;
       const source = frame?.cardId ?? null;
-      // The Read button of a burgle window opens the revealed card: the card the discards must match (the title stays the card that makes the attempt).
+      // The Read button of a burgle window opens the revealed card (the card the discards must match) first, then the card that makes the attempt, which the title names.
       const revealed = frame?.data.kind === "burgle" ? frame.data.revealedId : null;
       return {
         kind: "trigger",
@@ -254,6 +254,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         step: hide ? "Hide test" : fortitude ? "Fortitude test" : escape ? "Escape test" : burgle ? "Burgle attempt" : step(game),
         title: source ? names.card(source) : "Action window",
         sourceId: revealed ?? source,
+        ...(revealed && source ? { about: [revealed, source] } : {}),
         timing: "Action",
         note: hide ? `Hide ${hide.x}: willpower ${hide.willpower} against threat ${hide.threat}.` : (fortitude ?? escape ?? burgle ?? "Actions may be used before this resolves."),
         hide,

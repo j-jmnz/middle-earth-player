@@ -65,7 +65,7 @@ export function dockExtras(a: {
   const extras: DockExtra[] = [];
   // Undo is in the dock, in reach of the thumb; a sheet opened from the table has Cancel instead.
   if (a.undoButton) extras.push(a.undoButton);
-  const about = sheet.kind === "pick" ? (sheet.about ?? []) : sheet.kind === "trigger" && sheet.sourceId ? [sheet.sourceId] : [];
+  const about = sheet.kind === "pick" ? (sheet.about ?? []) : sheet.kind === "trigger" && sheet.sourceId ? (sheet.about ?? [sheet.sourceId]) : [];
   const first = about[0];
   if (first) extras.push({ label: "Read", accessibilityLabel: "Read the card", testID: READ_ID, onPress: () => a.onRead(first, about) });
   if (!a.panel && sheet.kind !== "window" && tappable(sheet).size > 0) extras.push({ label: "List", testID: "sheet-list", onPress: a.onList });

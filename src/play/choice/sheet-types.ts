@@ -132,6 +132,8 @@ export type TriggerSheet = {
   title: string;
   // The card the moment is about, so the sheet can name it and the inspect route can open it.
   sourceId: string | null;
+  // Cards the Read button may open, first one first, where more than the source is the moment's subject (a burgle window: the revealed card, then the card that makes the attempt).
+  about?: readonly string[];
   timing: string;
   note: string | null;
   // What a screen reader hears in place of `note`, where the note names a glow or a drag; read only under useReaderMode (use-table-choice.ts).

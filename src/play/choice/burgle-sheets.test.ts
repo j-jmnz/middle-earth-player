@@ -57,7 +57,7 @@ describe("132072:B:1 and B:2 The Burglar's Turn: the rows say what follows the a
     const sheet = sheetOf(made, choose.state);
     expect(sheet?.kind === "pick" ? sheet.options.map((option) => option.label) : []).toEqual([
       "Discard 1 card that matches the revealed Snowbourn Scout in sphere and card type, then take the top treasure card from under The Lonely Mountain into your hand",
-      "Decline the attempt: the burgle fails and nothing is discarded, then Smaug the Golden attacks the first player",
+      "Decline the attempt: the burgle fails and nothing is discarded, then Smaug the Golden attacks you",
     ]);
   });
 });

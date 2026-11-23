@@ -24,7 +24,7 @@ function progressOn(game: ScenarioState, title: string, names: ChoiceNames): num
 function followWords(game: ScenarioState, names: ChoiceNames, success: boolean): string {
   const maker = nearestBurgle(game)?.frame.cardId;
   const code = maker ? game.cards[maker]?.code : undefined;
-  if (code === "132072") return success ? `take the top treasure card from under ${names.code("132043")} into your hand` : `${names.code("132040")} attacks the first player`;
+  if (code === "132072") return success ? `take the top treasure card from under ${names.code("132043")} into your hand` : `${names.code("132040")} attacks you`;
   if (code === "132039" && success) return `${names.code("132039")} attaches to ${names.code("132041")}`;
   return "";
 }

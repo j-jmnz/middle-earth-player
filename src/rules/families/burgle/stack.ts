@@ -1,5 +1,5 @@
 // Rules: hob.burgle, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 132071:A:1, 132072:B:1. The Erebor treasures stacked facedown under The Lonely Mountain: out of play under it, in the order the Setup shuffled them; the top one goes into the first player's hand.
-import type { Instruction } from "../../../catalog/boundary.ts";
+import type { Instruction, ModifierStat } from "../../../catalog/boundary.ts";
 
 import { shuffleIds } from "../../core/seed.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
@@ -12,7 +12,7 @@ function hostOf(state: ScenarioState, code: string): CardInstance | undefined {
 }
 
 /** The Threat a card has once the flag `threatHalved` (132045:A:1) is on it: halved after the additive modifiers and rounded up (rr.modifiers). Any other stat, and a card with no such flag, keeps `value`. */
-export function halvedThreat(state: ScenarioState, instance: CardInstance, stat: string, value: number): number {
+export function halvedThreat(state: ScenarioState, instance: CardInstance, stat: ModifierStat, value: number): number {
   return stat === "threat" && state.modifiers.length > 0 && flagged(state, instance.id, "threatHalved") ? Math.ceil(value / 2) : value;
 }
 

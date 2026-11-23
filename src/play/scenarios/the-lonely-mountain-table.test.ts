@@ -62,6 +62,10 @@ describe("the action window of a burgle attempt (132043:A:2)", () => {
     // Read opens the revealed card, which the discards must match.
     const burgle = window.state.stack.find((entry) => entry.data.kind === "burgle");
     expect(sheet?.kind === "trigger" ? sheet.sourceId : null).toBe((burgle?.data.kind === "burgle" ? burgle.data.revealedId : null) ?? "none");
+    // Read offers the revealed card first and the card that makes the attempt (A Bare Patch) second.
+    const revealedId = burgle?.data.kind === "burgle" ? burgle.data.revealedId : "none";
+    expect(sheet?.kind === "trigger" ? sheet.about : null).toEqual([revealedId, burgle?.cardId]);
+    expect(window.state.cards[burgle?.cardId ?? ""]?.code).toBe("132039");
     expect(drive(window, made).state.window).toBeNull();
   });
 
