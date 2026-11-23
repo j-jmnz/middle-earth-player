@@ -71,5 +71,5 @@ export function attachLoot(state: ScenarioState, focus: Focus): ScenarioState {
   return { ...moved, lootDecks: (moved.lootDecks ?? []).map((ids, seat) => (seat === focus.seat ? ids.filter((id) => id !== top) : ids)) };
 }
 
-// The loot guarding a card and the attachments on it are read by the core too (the explored event, the pick filters): core/zones.ts.
-export { lootUnder } from "../../core/zones.ts";
+// The loot guarding a card and the attachments on it are read by the core too (the explored event, the pick filters): core/attached.ts.
+export { lootUnder } from "../../core/attached.ts";

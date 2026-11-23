@@ -20,7 +20,7 @@ import { seatThreat } from "../families/play/hooks.ts";
 import { playPickMatches } from "../families/play/pick.ts";
 import { playBlocked } from "../families/sidequests/contract.ts";
 import { sidequestsPickMatches } from "../families/sidequests/pick.ts";
-import { attachmentsOn, lootUnder } from "../core/zones.ts";
+import { attachmentsOn, lootUnder } from "../core/attached.ts";
 import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
@@ -272,7 +272,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.attackingEnemy != null && (state.pendingAttack?.enemyId === id) !== spec.attackingEnemy) return false;
   if (spec.hasAttachment) {
     const want = spec.hasAttachment;
-    // The loot guarding a location is attached to it (core/zones.ts, attachmentsOn).
+    // The loot guarding a location is attached to it (core/attached.ts).
     const found = attachmentsOn(state, id).some((attachmentId) => {
       const attachment = state.cards[attachmentId];
       if (!attachment) return false;
@@ -431,7 +431,7 @@ function attachedPool(state: ScenarioState, where: "source" | "host" | "activeLo
     where === "defender" ? defender : where === "activeLocation" ? (state.activeLocation ? state.cards[state.activeLocation] : undefined) : where === "source" ? source : hostId ? state.cards[hostId] : undefined;
   if (!holder) return [];
   const attached = holder.attachments.filter((id) => state.cards[id] != null && inPlay(state.cards[id]?.zone ?? "removed"));
-  // The loot guarding the active location is on it, out of play as it is (core/zones.ts, attachmentsOn; Mirkwood Hunter, 19087:A:2).
+  // The loot guarding the active location is on it, out of play as it is (core/attached.ts; Mirkwood Hunter, 19087:A:2).
   return where === "activeLocation" ? [...attached, ...lootUnder(state, holder.id)] : attached;
 }
 

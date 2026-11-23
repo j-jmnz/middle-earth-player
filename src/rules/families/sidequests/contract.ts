@@ -10,7 +10,8 @@ import { printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
 import { heldAmount, updateCard } from "../../core/state.ts";
-import { attachmentsOn, moveCard, playerCardsUnder } from "../../core/zones.ts";
+import { attachmentsOn } from "../../core/attached.ts";
+import { moveCard, playerCardsUnder } from "../../core/zones.ts";
 import { familyPlayBarred } from "../../interpret/family-hooks.ts";
 
 // The `faceUp` condition: the card shows this side. A card dealt face up shows its side A.
