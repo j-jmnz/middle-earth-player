@@ -1,7 +1,7 @@
 // The web app's test controls (src/ui/web/render-scale.ts): which drawing scale and whether the frame meter, from the address and the stored choice.
 import { describe, expect, it } from "vitest";
 
-import { chosenScale, meterChosen, meterLine } from "./render-scale.ts";
+import { chosenScale, errorLine, meterChosen, meterLine } from "./render-scale.ts";
 
 describe("the web app's drawing scale", () => {
   it("takes the address's scale before the stored one", () => {
@@ -29,5 +29,13 @@ describe("the web app's drawing scale", () => {
   it("says the frame rate, the worst frame and the scale", () => {
     expect(meterLine([16, 16, 18, 50], 2)).toBe("40 fps  worst 50 ms  x2");
     expect(meterLine([], 1.5)).toBe("-- fps  x1.5");
+  });
+
+  it("says an error's name, message and first frames without the site's address", () => {
+    const error = new Error("The object is in an invalid state.");
+    error.name = "InvalidStateError";
+    error.stack = "f@https://site.example/_expo/static/js/web/entry-abc.js:1:2\ng@https://site.example/_expo/static/js/web/table-def.js:3:4";
+    expect(errorLine(error)).toBe("InvalidStateError: The object is in an invalid state.\nf@entry-abc.js:1:2\ng@table-def.js:3:4");
+    expect(errorLine("plain")).toBe("plain");
   });
 });

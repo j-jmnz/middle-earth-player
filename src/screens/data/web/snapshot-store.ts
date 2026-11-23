@@ -3,14 +3,27 @@
 // because the page waits on that one for every database call, and on Safari a worker growing a file waits on the page.
 import { decodeSnapshot, encodeSnapshot, newestOf, SLOTS, SNAPSHOT_DIRECTORY, type Slot, type Stored } from "./snapshot";
 
+// A file that is busy is asked again this many times, this far apart: a page that reloads opens while the page before it may still hold the file.
+const READ_TRIES = 6;
+const READ_WAIT_MS = 250;
+
+const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+/**
+ * The slot's snapshot; null when the file is not there yet or is not a whole snapshot. A file the browser will not hand over (another handle holds it) is asked
+ * again, and when it stays held the open fails: reading it as no file would open an empty database and write that over the games.
+ */
 async function readSlot(directory: FileSystemDirectoryHandle, slot: Slot): Promise<Stored | null> {
-  try {
-    const file = await (await directory.getFileHandle(slot)).getFile();
-    const snapshot = await decodeSnapshot(new Uint8Array(await file.arrayBuffer()));
-    return snapshot ? { ...snapshot, slot } : null;
-  } catch {
-    // No such file yet, or one that does not read: the other slot answers.
-    return null;
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      const file = await (await directory.getFileHandle(slot)).getFile();
+      const snapshot = await decodeSnapshot(new Uint8Array(await file.arrayBuffer()));
+      return snapshot ? { ...snapshot, slot } : null;
+    } catch (error: unknown) {
+      if (error instanceof DOMException && error.name === "NotFoundError") return null;
+      if (attempt >= READ_TRIES) throw new Error(`The saved games could not be read from storage (${slot}: ${error instanceof Error ? error.message : "unknown error"})`);
+      await wait(READ_WAIT_MS);
+    }
   }
 }
 

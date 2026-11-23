@@ -1,6 +1,6 @@
 // The web app's drawing scale and frame meter (docs/plans/pwa-iphone-ipad.md, Risks only a device can answer): two test controls a player turns on from the address,
 // so a device says what a headless browser cannot. `?scale=1` (or 1.5) makes the table's canvases draw at that many pixels for each CSS pixel in place of the device's
-// (an iPad's 2 is four times the pixels of 1), `?fps=1` shows the frame rate; `?scale=0` and `?fps=0` turn each off. Both are kept in localStorage, since they are read
+// (an iPad's 2 is four times the pixels of 1), `?fps=1` shows the frame rate and the first error the page reports, with where it was thrown; `?scale=0` and `?fps=0` turn each off. Both are kept in localStorage, since they are read
 // before any database opens. Skia's web views read window.devicePixelRatio when they are made, so the scale is set before CanvasKit loads (skia-web-load.ts).
 const SCALE_KEY = "middle-earth-player.render-scale";
 const FPS_KEY = "middle-earth-player.frame-meter";
@@ -45,11 +45,46 @@ export function meterLine(gaps: readonly number[], scale: number): string {
   return `${Math.round((1000 * gaps.length) / total)} fps  worst ${Math.round(Math.max(...gaps))} ms  x${scale}`;
 }
 
+/** An error as the meter's second line: its name and message, then the first frames of its stack, so a photo of the screen says where it was thrown. */
+export function errorLine(error: unknown): string {
+  if (!(error instanceof Error)) return String(error).slice(0, 300);
+  const frames = (error.stack ?? "")
+    .split("\n")
+    .map((frame) => frame.trim().replace(/https?:\/\/[^/]+\/(?:[^/\s]+\/)*/g, ""))
+    .filter((frame) => frame !== "" && !frame.includes(error.message))
+    .slice(0, 5);
+  return [`${error.name}: ${error.message}`, ...frames].join("\n").slice(0, 700);
+}
+
+// The first error the page reports while the meter shows: React logs an error a boundary caught through console.error, and the window hears the rest.
+function watchErrors(show: (text: string) => void): void {
+  let seen = false;
+  const report = (error: unknown) => {
+    if (seen || !(error instanceof Error)) return;
+    seen = true;
+    show(errorLine(error));
+  };
+  const logged = console.error;
+  console.error = (...args: unknown[]) => {
+    report(args.find((arg) => arg instanceof Error));
+    logged(...args);
+  };
+  window.addEventListener("error", (event) => report(event.error));
+  window.addEventListener("unhandledrejection", (event) => report(event.reason));
+}
+
 function startMeter(): void {
   const box = document.createElement("div");
   box.setAttribute("aria-hidden", "true");
-  box.style.cssText = "position:fixed;left:4px;bottom:4px;z-index:2147483647;padding:2px 6px;border-radius:4px;background:#000c;color:#fff;font:12px/16px monospace;pointer-events:none";
+  box.style.cssText = "position:fixed;left:4px;bottom:4px;z-index:2147483647;max-width:90vw;padding:2px 6px;border-radius:4px;background:#000c;color:#fff;font:12px/16px monospace;pointer-events:none;white-space:pre-wrap";
+  const rate = document.createElement("div");
+  const fault = document.createElement("div");
+  fault.style.color = "#ffb4a8";
+  box.append(rate, fault);
   document.body.appendChild(box);
+  watchErrors((text) => {
+    fault.textContent = text;
+  });
   let gaps: number[] = [];
   let last = performance.now();
   let shown = last;
@@ -57,7 +92,7 @@ function startMeter(): void {
     gaps.push(now - last);
     last = now;
     if (now - shown >= 1000) {
-      box.textContent = meterLine(gaps, window.devicePixelRatio);
+      rate.textContent = meterLine(gaps, window.devicePixelRatio);
       gaps = [];
       shown = now;
     }
