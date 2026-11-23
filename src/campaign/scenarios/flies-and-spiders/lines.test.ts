@@ -127,6 +127,13 @@ describe("the enemies", () => {
     expect(stat(t, poisoned(t, 1), id, "attack")).toBe(base + 3);
   });
 
+  it("132031:A:3 Fat Spider's shadow gives the defending character 1 poison, and an undefended attack 2 poison to a character the defending player chooses", () => {
+    const defended = fightEnemy(spiderTable, "132031", "f0", { seats: 1 });
+    expect(poisonOf(defended.run.state, defended.made.hero)).toBe(1);
+    const bare = fightEnemy(spiderTable, "132031", "f0", { seats: 1 }, { undefended: true });
+    expect(total(bare.run.state)).toBe(2);
+  });
+
   it("132032:A:1 Wicked Spider has Venom", () => {
     const t = spiderTable({ seats: 1, engaged: [{ code: "132032", seat: 0 }] });
     expect(flagged(synced(t, t.state), idOf(t.state, "132032"), "venom")).toBe(true);
