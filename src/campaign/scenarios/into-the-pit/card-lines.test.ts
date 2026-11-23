@@ -8,11 +8,11 @@ import { EFFECTS } from "../../../effects/index.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { attachmentHostIds } from "../../../rules/player/attach.ts";
 import { withoutLines } from "../../../../test/harness/card-spec.ts";
-import { fightEnemy, idOf, type Layout, type LayoutTable, legalIntents, resolveRecords, revealedTop, send, statOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
+import { fightEnemy, idOf, type Layout, layoutTableFor, legalIntents, resolveRecords, revealedTop, send, statOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "into-the-pit";
 const TORCH = "03041";
-const make = (layout: Layout, effects: readonly Effect[] = EFFECTS): LayoutTable => tableFromLayout(ID, layout, { effects });
+const make = layoutTableFor(ID);
 
 // The card is revealed from the top of the encounter deck and its choices take their first option.
 

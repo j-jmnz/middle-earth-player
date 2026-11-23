@@ -243,3 +243,8 @@ export function attachTargetCodes(made: LayoutTable, code: string): string[] {
 export function engagedHandTable(scenarioId: string, hand: string, enemy: string, effects: readonly Effect[], extra: readonly string[] = [hand]): LayoutTable {
   return tableFromLayout(scenarioId, { engaged: [enemy, "f0"], hand: [hand] }, { effects, extra });
 }
+
+/** A scenario's `make`: `tableFromLayout` for `scenarioId` on the records it is given (all records by default). Write `const make = layoutTableFor(ID);`. */
+export function layoutTableFor(scenarioId: string): (layout: Layout, effects?: readonly Effect[]) => LayoutTable {
+  return (layout, effects = EFFECTS) => tableFromLayout(scenarioId, layout, { effects });
+}

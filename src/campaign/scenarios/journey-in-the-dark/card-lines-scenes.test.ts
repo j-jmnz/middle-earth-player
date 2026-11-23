@@ -8,10 +8,10 @@ import { EFFECTS } from "../../../effects/index.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { attachBlocked } from "../../../rules/interpret/restrictions.ts";
 import { quest, rowProblems, withoutLines, won, zone } from "../../../../test/harness/card-spec.ts";
-import { first, idOf, resolveRecords, tableFromLayout, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
+import { first, idOf, layoutTableFor, resolveRecords } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "journey-in-the-dark";
-const make = (layout: Layout, effects: readonly Effect[] = EFFECTS): LayoutTable => tableFromLayout(ID, layout, { effects });
+const make = layoutTableFor(ID);
 const zonesOf = (state: ScenarioState, code: string): string[] => Object.values(state.cards).filter((card) => card.code === code).map((card) => card.zone).sort();
 
 describe("142087 Overcome by Grief and 142088 Grievous Wound", () => {

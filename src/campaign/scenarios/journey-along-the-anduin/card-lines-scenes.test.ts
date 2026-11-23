@@ -11,14 +11,14 @@ import { placeDamage } from "../../../rules/core/keywords.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { attachmentHostIds } from "../../../rules/player/attach.ts";
 import { answer, attack, damageOn, deckCount, defend, endPhase, endRound, flag, resolve, reveal, type Row, rowProblems, stat, threat, withoutLines, zone } from "../../../../test/harness/card-spec.ts";
-import { finish, first, idOf, legalIntents, resolveRecords, send, start, tableFromLayout, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
+import { finish, first, idOf, type Layout, layoutTableFor, legalIntents, resolveRecords, send, start } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "journey-along-the-anduin";
 const HILL_TROLL = "01082";
 const MENDOR = "01135";
 const VALOR = "01133";
 const SCARRED = "01138";
-const make = (layout: Layout, effects: readonly Effect[] = EFFECTS): LayoutTable => tableFromLayout(ID, layout, { effects });
+const make = layoutTableFor(ID);
 // What a row says is wrong on these records: nothing when it holds.
 const problems = (row: Row, effects: readonly Effect[] = EFFECTS): string[] => rowProblems(ID, row, effects);
 
