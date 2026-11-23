@@ -2,12 +2,11 @@
 import type { Condition, Instruction } from "../../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { resolveAmount, type AmountScope } from "../../interpret/amounts.ts";
+import { frameScope, resolveAmount, type AmountScope } from "../../interpret/amounts.ts";
 import type { Scope } from "../../interpret/conditions.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
-import { frameScope } from "../../interpret/amounts.ts";
 import { spendablePools } from "../costs/verbs.ts";
 import { noteSpent } from "../costs/pay.ts";
 import type { Focus } from "../index.ts";
