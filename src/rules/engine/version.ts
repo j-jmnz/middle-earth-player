@@ -109,6 +109,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: "all", note: "Steward of Orthanc gives its event a threat raise from the Doomed keyword, so Orthanc Guard, Isengard Messenger and Keys of Orthanc answer it." },
   { version: 38, scenarios: "all", note: "A part of a card after \"Then\" is not attempted when a draw or a discard from the top of the deck before it found too few cards: Daeron's Runes does not ask for a discard after drawing 1 card, and Ered Nimrais Prospector does not shuffle a card back after discarding 2." },
   { version: 38, scenarios: "all", note: "Heed the Dream offers the 3 Leadership resources for the second search only when the first search found a card." },
+  { version: 38, scenarios: ["journey-up-the-anduin", "lost-in-mirkwood", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"], note: "Durin's Dagger, once it left play, is played from its owner's discard pile onto a character in the planning phase, paid for with its cost." },
   { version: 38, scenarios: "all", note: "Responses to a successful quest, like Expert Treasure-hunter, Haleth and Black Key, are offered after the quest resolves, when the character was committed to it." },
   { version: 38, scenarios: "all", note: "A character an effect removes from the quest no longer counts as having quested: a Response to a successful quest, like Haleth's, is not offered for it." },
   { version: 38, scenarios: "all", note: "After Éomer commits to the quest, his Response is offered although committing exhausted him: he attacks an enemy in the staging area and stays exhausted." },
@@ -144,6 +145,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: "all", note: "Wiglaf's Action cannot exhaust an encounter attachment on him, such as a Condition: only an attachment you control pays it." },
   { version: 39, scenarios: ["the-uruk-hai", "helms-deep", "the-road-to-isengard", "the-passing-of-the-grey-company", "the-siege-of-gondor", "the-battle-of-the-pelennor-fields", "the-black-gate-opens"], note: "A player whose last hero is Aragorn is eliminated when the first player token passes him on." },
   { version: 39, scenarios: ["journey-up-the-anduin", "lost-in-mirkwood", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"], note: "A treasure in your hand, like Anvil of Gundabad or Axe of the Edain, can be played onto its host like an attachment, and Durin's Dagger can be played from the discard pile." },
+  { version: 39, scenarios: "all", note: "Sting's Response is offered only to a hero that exhausted to defend, not to one an effect made a defender while it was already exhausted." },
 ];
 
 export const ENGINE_VERSION = 39;
