@@ -10,7 +10,7 @@ export const PLAYER_TYPES: ReadonlySet<string> = new Set(["hero", "ally", "attac
 
 // The treasure cards of The Hobbit saga boxes are added to a deck at the start of a scenario (hob.treasure-ohauh, hob.treasure-otd): player cards no deck list holds, so
 // `deckLegal` is false for them. Stinker (Sméagol's treasure, 21071) is an encounter card and not one of them.
-const HOBBIT_PACKS: ReadonlySet<string> = new Set(["OHaUH", "OtD"]);
+export const HOBBIT_PACKS: ReadonlySet<string> = new Set(["OHaUH", "OtD"]);
 
 export function isPoolCard(card: Card): boolean {
   return (card.deckLegal && PLAYER_TYPES.has(card.type)) || (card.type === "treasure" && card.printings.some((printing) => HOBBIT_PACKS.has(printing.pack)));

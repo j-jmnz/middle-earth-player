@@ -41,7 +41,8 @@ describe("opening the table", () => {
     const save = fixtureSave(name, "s1", CATALOG_VERSION);
     // The save is from before the newest version whose lines include both an "all" line and one scoped to other scenarios.
     const scoped = (change: (typeof ENGINE_CHANGES)[number]) => change.scenarios !== "all" && !change.scenarios.includes("a-shadow-of-the-past");
-    const from = Math.max(...ENGINE_CHANGES.filter(scoped).map((change) => change.version)) - 1;
+    const withBoth = (version: number) => ENGINE_CHANGES.some((change) => change.version === version && change.scenarios === "all") && ENGINE_CHANGES.some((change) => change.version === version && scoped(change));
+    const from = Math.max(...ENGINE_CHANGES.filter((change) => withBoth(change.version)).map((change) => change.version)) - 1;
     const old = { ...save, active: { ...save.active!, engineVersion: from } };
     writeSave(user, old);
     const before = savedAt(user).get("s1");
