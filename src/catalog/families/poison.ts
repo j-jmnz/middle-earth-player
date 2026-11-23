@@ -19,8 +19,6 @@ const VERBS = [
   // "This enemy attacks the character with the most poison attached" (132029:A:2): the source, an enemy in the staging area, attacks the player who controls the last picked character now, with a shadow card, outside the combat phase and with no engagement (rr.attacks-outside-the-combat-phase). The record picks the character first
   // (the pick filter `mostPoison`: the first player chooses among those tied). Nothing happens when nothing was picked.
   z.strictObject({ verb: z.literal("AttackPickedPlayer"), ...when }),
-  // "Each player may shuffle 1 copy of ~ into his deck" (132067:A:1): the set-aside card with the printed code goes into the acting player's deck, and the deck is shuffled. Nothing happens when none is set aside.
-  z.strictObject({ verb: z.literal("ShuffleSetAsideIntoDeck"), code: z.string().min(1), ...when }),
   // Stage 2B (132068:B:1): after the first player took his own stage, every other player advances to the stage with this printed code, and they keep the staging area they share, with the cards in it (hob.staging-area-creating). With no other player the stage they left and each card in its staging area are discarded instead, and the first player stays alone at his stage.
   // Run it after SplitToOwnStage, which leaves the shared stage to the other players.
   z.strictObject({ verb: z.literal("AdvanceOtherPlayers"), code: z.string().min(1), ...when }),

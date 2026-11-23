@@ -16,7 +16,7 @@ export function venomPoison(before: ScenarioState, after: ScenarioState, ctx: Re
   for (const now of Object.values(after.cards)) {
     const was = before.cards[now.id];
     if (!was || !inPlay(now.zone) || now.damage <= was.damage || !(now.zone === "heroes" || isCharacterType(printedOf(ctx.cards, now.code)))) continue;
-    next = givePoison(next, now.id, 1, ctx, []);
+    next = givePoison(next, now.id, 1, ctx);
   }
   return next;
 }

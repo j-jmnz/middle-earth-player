@@ -260,6 +260,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   LimitPlaysPerRound: [{ verb: "LimitPlaysPerRound", max: 1 }],
   QuestProgress: [{ verb: "QuestProgress", amount: 10 }],
   ShuffleDiscardIntoDeck: [{ verb: "ShuffleDiscardIntoDeck" }],
+  ShuffleSetAsideIntoDeck: [{ verb: "ShuffleSetAsideIntoDeck", code: "132019" }],
   RemoveSourceFromGame: [{ verb: "RemoveSourceFromGame" }],
   DamageEach: [{ verb: "DamageEach", amount: 1, pick: HERO }],
   Restrict: [

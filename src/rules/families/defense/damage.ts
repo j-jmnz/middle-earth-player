@@ -1,7 +1,6 @@
 // Rules: rr.damage, rr.cancel, rr.step-6-4-3, rr.step-3-4, rr.active-location, rr.modifiers (data/rules/entries.json).
 // The damage window of the defense family: what follows a cancel, damage moved to another card, damage assigned to another
 // hero, characters an undefended attack may land on, and quest progress assigned as damage.
-import { venomPoison } from "../poison/venom.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
@@ -10,6 +9,7 @@ import { currentCause, effectCause, UNATTRIBUTED, type Cause } from "../../core/
 import { effectsOf } from "../../windows/listen.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
+import { familyAttackDamaged } from "../../interpret/family-hooks.ts";
 import { modifiedStat, placeDamage } from "../../core/keywords.ts";
 import { isCharacterType, printedOf, type PrintedCard } from "../../core/printed.ts";
 import { placeQuestProgress, questPointsOf } from "../../quest/quest.ts";
@@ -127,8 +127,8 @@ export function questDamageCause(state: ScenarioState, ctx: ReduceContext): Ques
 // Each character that took damage from the enemy attack in progress and is still in play hears it ("After attached hero takes
 // damage from an enemy attack"): the characters whose damage went up between the two states; the enemy making the attack is the event's other card.
 export function noteAttackDamage(before: ScenarioState, damaged: ScenarioState, ctx: ReduceContext): ScenarioState {
-  // An enemy with Venom gives each character it damaged 1 poison (hob.venom-poison, families/poison/venom.ts).
-  const after = venomPoison(before, damaged, ctx);
+  // A family may act on the damage (an enemy with Venom gives each character it damaged 1 poison: hob.venom-poison, families/poison/venom.ts).
+  const after = familyAttackDamaged(before, damaged, ctx);
   if (!listened(after, ctx, ["damagedByAttack"])) return after;
   let next = after;
   for (const now of Object.values(after.cards)) {

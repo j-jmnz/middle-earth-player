@@ -56,7 +56,7 @@ const barsCheck = (stage: string) => (effects: readonly Effect[]) => {
   expect(barsOf(syncOf(t, down), t.hero2), "a conscious character").toEqual([]);
   expect(legalTargets({ ...syncOf(t, down), phase: "Quest", mode: "questCommit" }, { type: "Commit" }, t.ctx), "it cannot be committed").not.toContain(t.hero);
   expect(legalTargets({ ...syncOf(t, down), phase: "Quest", mode: "questCommit" }, { type: "Commit" }, t.ctx), "another character can").toContain(t.hero2);
-  expect(poisonOf(givePoison(syncOf(t, down), t.hero, 1, t.ctx, []), t.hero), "it cannot be poisoned").toBe(0);
+  expect(poisonOf(givePoison(syncOf(t, down), t.hero, 1, t.ctx), t.hero), "it cannot be poisoned").toBe(0);
 };
 const refreshCheck = (stage: string) => (effects: readonly Effect[]) => {
   const t = on(effects, { seats: 1, stage, phase: "Refresh" });

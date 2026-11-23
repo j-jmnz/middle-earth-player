@@ -65,11 +65,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 // The verbs that work on the areas themselves, the whole state: all of them but AdvanceToStage, which is the acting seat's stage like the quest's own advance.
 const BREAKING_VERBS: ReadonlySet<string> = new Set(catalog.verbs.map((schema) => schema.shape.verb.value).filter((verb) => verb !== "AdvanceToStage"));
 
-// Whether the verb is one of this family's that works on the whole state, not on one seat's view of it (rules/interpret/interpret.ts runInstruction).
+// Whether the verb is one of this family's that works on the whole state, not on one seat's view of it (rules/interpret/interpret.ts runInstruction). Another family's verb that does declares it in its manifest (`wholeState`).
 export function isBreakingVerb(verb: string): boolean {
-  // Joining another player's staging area changes the areas themselves (families/captured/join.ts).
-  // Flies and Spiders advances the other players, and joins the first player to them, on the areas themselves (families/poison/stages.ts).
-  return BREAKING_VERBS.has(verb) || verb === "JoinAnotherPlayer" || verb === "AdvanceOtherPlayers" || verb === "JoinAtStage";
+  return BREAKING_VERBS.has(verb);
 }
 
 // AdvanceToStage ("advance to stage 4A", 142063:B:2): runs on the acting seat's view, so the stage is that seat's. The stage left is defeated (its attachments are

@@ -306,6 +306,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   EngageLowestThreat: () => ({ text: "every copy of this enemy, in the staging area or engaged with a player, engages the player with the lowest threat (the first player chooses among tied players)", read: [] }),
   QuestProgress: (i, ctx) => ({ text: i.main ? `add ${amount(i.amount, ctx)} progress to the main quest (the main quest card takes it: the active location takes it first only while the main quest is the current quest)` : `place ${amount(i.amount, ctx)} progress on the current quest (the active location takes it first)`, read: ["amount", "main"] }),
   ShuffleDiscardIntoDeck: () => ({ text: "the acting player shuffles their discard pile into their deck", read: [] }),
+  ShuffleSetAsideIntoDeck: (i) => ({ text: `the acting player puts the set-aside card with code ${str(i.code)} into his deck and shuffles the deck (nothing when none is set aside)`, read: ["code"] }),
   RemoveSourceFromGame: () => ({ text: "this card is removed from the game", read: [] }),
   DamageEach: (i, ctx) => ({ text: `deal ${amount(i.amount, ctx)} damage to each ${pick(i.pick, ctx)}`, read: ["amount", "pick"] }),
   PlaceMireToken: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} mire token(s) (resources) on ${cardRef(i.on)}; a location whose mire tokens then reach its Mire X is discarded by the Mire keyword`, read: ["on", "amount"] }),

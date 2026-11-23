@@ -18,7 +18,7 @@ import { guardedSafeLocation } from "../families/angmar/safe.ts";
 import { flightDefenseBarred } from "../families/attack/flight.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
-import { areaHeadOf, firstOfArea, headOf, isolatedAreas } from "../families/breaking/areas.ts";
+import { areaHeadOf, headOf, isolatedAreas, sideOf } from "../families/breaking/areas.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
 // The `exceptTrait` the template "Cannot have non-<X> attachments" reads from the printed phrase "non-objective player card attachments" (51012:A:1): a card kind, not a Trait.
@@ -129,13 +129,13 @@ export function forcedTravel(state: ScenarioState, ctx: ReduceContext): string[]
 // can fail to pay. A Travel cost of cards (discard 2 at random, each player exhausts a hero) needs the cards to pay it.
 export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
   // The players who pay the Travel cost: those of the staging area the location lies in once the areas are isolated (hob.staging-area-creating).
+  const location = state.cards[locationId];
   const home = isolatedAreas(state) ? areaHeadOf(state, locationId) : null;
-  const payer = isolatedAreas(state) ? firstOfArea(state, home ?? state.firstPlayer) : state.firstPlayer;
-  const code = state.cards[locationId]?.code;
+  const payer = location && isolatedAreas(state) ? (sideOf(state, location) ?? state.firstPlayer) : state.firstPlayer;
+  const code = location?.code;
   if (code == null) return false;
   // Only the Travel effect of the side the location shows counts: the Temple of the Deceived side of a map location prints one that its other side does not (12068:B:3).
-  const shown = state.cards[locationId];
-  const instructions = [...(shown ? recordsOfFace(shown, ctx.effects.filter((effect) => effect.cardCode === code)) : []).filter((effect) => effect.timing === "travel").flatMap((effect) => effect.instructions), ...grantedTravel(state, locationId)];
+  const instructions = [...(location ? recordsOfFace(location, ctx.effects.filter((effect) => effect.cardCode === code)) : []).filter((effect) => effect.timing === "travel").flatMap((effect) => effect.instructions), ...grantedTravel(state, locationId)];
   return instructions.some((instruction) => {
       // A cost line that is gated (`when`) is owed only while its condition holds: Fisherman's Dock's exhaust is owed with 1 active location (50223:A:2).
       if ("when" in instruction && instruction.when != null && !holds(state, instruction.when, { actor: payer, sourceId: locationId, returned: 0 }, ctx)) return false;

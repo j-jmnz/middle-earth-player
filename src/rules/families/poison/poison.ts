@@ -2,7 +2,6 @@
 //
 // Poison is the top card of a character's controller's deck, attached to the character facedown (the zone under, hosted by it, `CardInstance.poison`, `owner` the seat whose deck it came from). A character with any poison is poisoned. With poison equal to its printed hit
 // points a character is made unconscious at once and the poison goes to the discard pile of the player who owns it. A poison that leaves for any reason goes to its owner's discard pile, a character that leaves play takes its poison there (families/play/zones.ts leaveWith).
-import type { EngineStep } from "../../core/intents.ts";
 import { isCharacterType, printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, updateCard } from "../../core/state.ts";
@@ -60,7 +59,7 @@ export function readyUnconscious(state: ScenarioState, id: string | null): Scena
 }
 
 /** GivePoison: for each of `amount`, the top card of the controller's deck goes facedown under the character. A deck with no card gives none, a character that cannot be poisoned gets none. With poison equal to the printed hit points the character is made unconscious at once. */
-export function givePoison(state: ScenarioState, id: string | null, amount: number, ctx: ReduceContext, _steps: EngineStep[]): ScenarioState {
+export function givePoison(state: ScenarioState, id: string | null, amount: number, ctx: ReduceContext): ScenarioState {
   let next = state;
   for (let count = 0; count < amount; count += 1) {
     const card = id ? next.cards[id] : undefined;

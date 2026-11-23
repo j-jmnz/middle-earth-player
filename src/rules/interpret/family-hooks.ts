@@ -205,6 +205,18 @@ export function familyOptionalEngageBarred(state: ScenarioState, enemyId: string
   return false;
 }
 
+const wholeStateBy = new WeakMap<readonly RulesFamily[], ReadonlySet<string>>();
+
+/** Whether a family declares the verb works on the whole state, not on one seat's view of it (`RulesFamily.wholeState`). */
+export function familyWholeStateVerb(verb: string, families: readonly RulesFamily[] = active()): boolean {
+  let verbs = wholeStateBy.get(families);
+  if (!verbs) {
+    verbs = new Set(families.flatMap((family) => family.wholeState ?? []));
+    wholeStateBy.set(families, verbs);
+  }
+  return verbs.has(verb);
+}
+
 /** False when a family's pick predicate rejects the card. */
 export function familyPickMatches(state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext, families: readonly RulesFamily[] = active()): boolean {
   for (const family of hooked(families).pick) if (family.pick?.(state, id, spec, at, ctx) === false) return false;
@@ -252,6 +264,13 @@ export function familyDefenseReason(state: ScenarioState, defender: PrintedCard,
     if (reason) return reason;
   }
   return null;
+}
+
+/** The state the families leave once the damage of the enemy attack in progress is dealt: each family's `combat.damaged` reads what changed between `before` and `after` (Venom, `poison`). */
+export function familyAttackDamaged(before: ScenarioState, after: ScenarioState, ctx: ReduceContext, families: readonly RulesFamily[] = active()): ScenarioState {
+  let next = after;
+  for (const family of hooked(families).combat) next = family.combat?.damaged?.(before, next, ctx) ?? next;
+  return next;
 }
 
 /** Why a family bars the attacker from being declared against the enemy, or null (the first family's reason). */

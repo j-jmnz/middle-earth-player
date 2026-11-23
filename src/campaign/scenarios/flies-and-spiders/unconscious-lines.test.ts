@@ -17,7 +17,7 @@ it("132067:B:1 an unconscious character that leaves play (returned to hand) and 
 });
 it("132067:B:1 a character that leaves play gives its poison back to its owner's discard pile, and its unconscious state is gone with the poison", () => {
   const t = spiderTable({ seats: 1 }, { effects: EFFECTS });
-  const sick = givePoison(t.state, t.hero, 2, t.ctx, []);
+  const sick = givePoison(t.state, t.hero, 2, t.ctx);
   expect(poisonOf(sick, t.hero)).toBe(2);
   const away = moveCard(sick, t.hero, { zone: "hand", seat: 0 });
   expect(poisonOf(away, t.hero), "no poison stays on a card that left play").toBe(0);

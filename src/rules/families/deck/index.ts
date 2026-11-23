@@ -5,7 +5,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { actAs, addToX, discardFromDeck, givePicked, moveCardVerb, removeDiscardFromGame, shuffleDiscardIn, shuffleHandIn, swapPicked } from "./moves.ts";
+import { actAs, addToX, discardFromDeck, givePicked, moveCardVerb, removeDiscardFromGame, shuffleDiscardIn, shuffleHandIn, shuffleSetAsideIn, swapPicked } from "./moves.ts";
 import { shuffleHeroIntoDeck, shuffleHighestIntoDeck } from "./hero.ts";
 import { keepOpeningHand, playFrom } from "./play.ts";
 import type { Focus } from "../index.ts";
@@ -25,6 +25,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return swapPicked(state);
     case "ShuffleDiscardIntoDeck":
       return shuffleDiscardIn(state, instruction, focus, ctx);
+    case "ShuffleSetAsideIntoDeck":
+      return shuffleSetAsideIn(state, instruction.code, focus.seat);
     case "ShuffleHandIntoDeck":
       return shuffleHandIn(state, focus, instruction.keepPicked === true);
     case "ShuffleHighestCostIntoDeck":
@@ -54,4 +56,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "deck", verbs: ["MoveCard", "GivePicked", "SwapPicked", "ShuffleDiscardIntoDeck", "ShuffleHandIntoDeck", "ShuffleHighestCostIntoDeck", "ShuffleHeroIntoDeck", "RemoveDiscardFromGame", "DiscardFromDeck", "AddToX", "ActAs", "PlayFrom", "ReduceNextDoomed", "KeepOpeningHand", "ReducePlayCost", "GainsDoomed"], run, settle: { sweep: eliminateEmptyPiles }, amount: (state, found, _scope, ctx) => discardedAmount(state, found, ctx), idle: deckIdle, idleCards: deckIdleCards };
+export const manifest: RulesFamily = { name: "deck", verbs: ["MoveCard", "GivePicked", "SwapPicked", "ShuffleDiscardIntoDeck", "ShuffleSetAsideIntoDeck", "ShuffleHandIntoDeck", "ShuffleHighestCostIntoDeck", "ShuffleHeroIntoDeck", "RemoveDiscardFromGame", "DiscardFromDeck", "AddToX", "ActAs", "PlayFrom", "ReduceNextDoomed", "KeepOpeningHand", "ReducePlayCost", "GainsDoomed"], run, settle: { sweep: eliminateEmptyPiles }, amount: (state, found, _scope, ctx) => discardedAmount(state, found, ctx), idle: deckIdle, idleCards: deckIdleCards };

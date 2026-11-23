@@ -15,7 +15,7 @@ const ids = (table: ReturnType<typeof spiderTable>, state: typeof table.state, s
 describe("the pick filters of poison", () => {
   it("`poisoned` keeps the characters with any poison, `false` those with none", () => {
     const t = spiderTable({ seats: 1 });
-    const state = givePoison(t.state, t.hero, 1, t.ctx, []);
+    const state = givePoison(t.state, t.hero, 1, t.ctx);
     expect(ids(t, state, { ...characters(), poisoned: true })).toEqual([t.hero]);
     expect(ids(t, state, { ...characters(), poisoned: false })).toEqual([t.hero2]);
   });
@@ -30,15 +30,15 @@ describe("the pick filters of poison", () => {
   it("`mostPoison` keeps the characters with the most poison, every character when none is poisoned", () => {
     const t = spiderTable({ seats: 1 });
     expect(ids(t, t.state, { ...characters(), mostPoison: true }).sort()).toEqual([t.hero, t.hero2].sort());
-    const state = givePoison(givePoison(t.state, t.hero, 2, t.ctx, []), t.hero2, 1, t.ctx, []);
+    const state = givePoison(givePoison(t.state, t.hero, 2, t.ctx), t.hero2, 1, t.ctx);
     expect(ids(t, state, { ...characters(), mostPoison: true })).toEqual([t.hero]);
-    const tied = givePoison(state, t.hero2, 1, t.ctx, []);
+    const tied = givePoison(state, t.hero2, 1, t.ctx);
     expect(ids(t, tied, { ...characters(), mostPoison: true }).sort()).toEqual([t.hero, t.hero2].sort());
   });
 
   it("`mostPoison` reads every character of the table, the other player's too", () => {
     const t = spiderTable({ seats: 2 });
-    const state = givePoison(t.state, t.seat1Hero ?? "", 1, t.ctx, []);
+    const state = givePoison(t.state, t.seat1Hero ?? "", 1, t.ctx);
     expect(ids(t, state, { ...characters(), mostPoison: true })).toEqual([t.seat1Hero]);
   });
 
@@ -53,7 +53,7 @@ describe("the pick filters of poison", () => {
 describe("the amount `poison`", () => {
   it("is the poison under the card the reference names", () => {
     const t = spiderTable({ seats: 1 });
-    const state = givePoison(t.state, t.hero, 3, t.ctx, []);
+    const state = givePoison(t.state, t.hero, 3, t.ctx);
     expect(resolveAmount(state, { poison: "picked" }, { actor: 0, sourceId: null, picked: [t.hero] }, t.ctx)).toBe(3);
     expect(resolveAmount(state, { poison: "picked" }, { actor: 0, sourceId: null, picked: [t.hero2] }, t.ctx)).toBe(0);
   });
@@ -63,7 +63,7 @@ describe("Giant Web and Forest Stream (132026:A:1, 132027:A:1)", () => {
   it("Giant Web takes 1 Willpower, Attack and Defense for each poison from the character that has it, and no other", () => {
     const t = spiderTable({ seats: 1, active: "132026" });
     const stat = (state: typeof t.state, id: string, which: "willpower" | "attack" | "defense") => modifiedStat(state, state.cards[id]!, which, t.cards);
-    const poisoned = syncConstants(givePoison(t.state, t.hero, 2, t.ctx, []), t.ctx);
+    const poisoned = syncConstants(givePoison(t.state, t.hero, 2, t.ctx), t.ctx);
     for (const which of ["willpower", "attack", "defense"] as const) {
       expect(stat(poisoned, t.hero, which)).toBe(Math.max(0, stat(t.state, t.hero, which) - 2));
       expect(stat(poisoned, t.hero2, which)).toBe(stat(t.state, t.hero2, which));
@@ -72,7 +72,7 @@ describe("Giant Web and Forest Stream (132026:A:1, 132027:A:1)", () => {
 
   it("Forest Stream bars a poisoned character from the quest, and no other", () => {
     const t = spiderTable({ seats: 1, active: "132027" });
-    const poisoned = syncConstants(givePoison(t.state, t.hero, 1, t.ctx, []), t.ctx);
+    const poisoned = syncConstants(givePoison(t.state, t.hero, 1, t.ctx), t.ctx);
     const barred = (id: string) => poisoned.modifiers.some((modifier) => modifier.instanceId === id && modifier.stat === "cannotQuest" && modifier.amount > 0);
     expect(barred(t.hero)).toBe(true);
     expect(barred(t.hero2)).toBe(false);

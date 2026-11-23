@@ -29,6 +29,7 @@ import { shadowFace } from "../families/defense/shadow.ts";
 import { drawCards } from "../families/dungeon/deck.ts";
 import { withView } from "../families/breaking/areas.ts";
 import { isBreakingVerb } from "../families/breaking/index.ts";
+import { familyWholeStateVerb } from "./family-hooks.ts";
 import { announceDraw } from "../families/dreamchaser/index.ts";
 import { heroDrawn } from "../families/deck/hero.ts";
 import { announceEnteredHand } from "../families/island/hand.ts";
@@ -102,7 +103,7 @@ export function runInstruction(
   // Once stages are separate "the staging area", "this stage" and "the quest" of an instruction are the acting seat's (mec109.multiple-staging-areas): the
   // instruction runs on the state as that seat sees it, with its own staging area and stage in the shared fields (families/breaking/areas.ts). The verbs of the
   // breaking family are about the areas themselves and run on the whole state.
-  if (state.separate && !isBreakingVerb(twin.verb)) return withView(state, focus.seat, (view) => runTwinned(view, twin, focus, ctx, steps));
+  if (state.separate && !isBreakingVerb(twin.verb) && !familyWholeStateVerb(twin.verb)) return withView(state, focus.seat, (view) => runTwinned(view, twin, focus, ctx, steps));
   return runTwinned(state, twin, focus, ctx, steps);
 }
 

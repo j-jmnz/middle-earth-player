@@ -19,7 +19,6 @@ export const POISON_TEMPLATES: Readonly<Record<string, (i: Obj) => Made>> = {
   }),
   ReadyUnconscious: (i) => ({ text: `${cardRef(i.target ?? "picked")}, if it is unconscious, is no longer unconscious and is ready`, read: ["target"] }),
   AttackPickedPlayer: () => ({ text: "this enemy, in the staging area, attacks the player who controls the picked character now, from the staging area, dealt a shadow card", read: [] }),
-  ShuffleSetAsideIntoDeck: (i) => ({ text: `the acting player puts the set-aside card with code ${str(i.code)} into his deck and shuffles the deck (nothing when none is set aside)`, read: ["code"] }),
   AdvanceOtherPlayers: (i) => ({
     text: `every other player advances to the stage with code ${str(i.code)} and keeps the staging area the players shared; with no other player the stage the acting player left and each card in its staging area are discarded instead`,
     read: ["code"],
@@ -43,7 +42,6 @@ export const POISON_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   MakeUnconscious: [{ verb: "MakeUnconscious", target: "defender" }],
   ReadyUnconscious: [{ verb: "ReadyUnconscious", target: "self" }],
   AttackPickedPlayer: [{ verb: "AttackPickedPlayer" }],
-  ShuffleSetAsideIntoDeck: [{ verb: "ShuffleSetAsideIntoDeck", code: "132019" }],
   AdvanceOtherPlayers: [{ verb: "AdvanceOtherPlayers", code: "132070" }],
   JoinAtStage: [{ verb: "JoinAtStage", code: "132070" }],
 };
