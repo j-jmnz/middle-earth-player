@@ -81,9 +81,15 @@ export function reshuffleDiscard(state: ScenarioState, steps: EngineStep[], rule
   return shuffleEncounterDeck(next);
 }
 
+// Whether an empty encounter deck is refilled from its discard pile as soon as a step leaves it empty: only while the Nightmare setup card says so (encounterRefill, 900201:A:3).
+// Otherwise the deck refills at the end of a reveal and in Hide (`resetEncounterDeck`), never in the middle of an effect.
+export function refillsEmptyDeckNow(state: ScenarioState): boolean {
+  return state.encounterDeck.length === 0 && state.encounterDiscard.length > 0 && refillsAnyTime(state);
+}
+
 // The encounter deck emptied while the Nightmare setup card refills it at any time (encounterRefill, 900201:A:3).
 export function refillEncounterDeck(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
-  return state.encounterDeck.length === 0 && state.encounterDiscard.length > 0 && refillsAnyTime(state) ? resetEncounterDeck(state, steps, ctx) : state;
+  return refillsEmptyDeckNow(state) ? resetEncounterDeck(state, steps, ctx) : state;
 }
 
 // A card goes into the encounter deck face down, as every card in a deck is, and the deck is shuffled.
