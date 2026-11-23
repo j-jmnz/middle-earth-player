@@ -92,7 +92,7 @@ export const amountExprSchema = z.strictObject({
   discardedMatching: pickSchema.optional(),
   // The printed cost of the card the source guards: the player cards under it, and the card it is attached to as a guard ("X is that card's cost", 18050:A:1). Read by the wilderland family.
   guardedCost: z.literal(true).optional(),
-  // The Siege values added up for this round (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 4): each destroyed enemy and each explored location adds its printed Siege value (TallySiege), "X is the total siege value of each location explored and each enemy destroyed this round" (50907:A:1). 0 once the round is over. Read by the wilderland family.
+  // The Siege values added up for this round (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 4): each destroyed enemy and each explored location adds its printed Siege value (TallySiege), "X is the total siege value of each location explored and each enemy destroyed this round" (50907:A:1). 0 once the round is over. Read by the wilderland family.
   siegeTally: z.literal(true).optional(),
   // The damage on the card the answered event is about beyond its printed hit points: "for each excess point of damage dealt" (18049:A:2). Read by the wilderland family.
   excessOf: z.literal("subject").optional(),
@@ -141,7 +141,7 @@ export const amountExprSchema = z.strictObject({
   minasTirithLeft: z.literal(true).optional(),
   // A count the earlier Resolution recorded in the Campaign Log's notes ("X is the number recorded in the campaign log", 145078:A:1), 0 when none is recorded or the game has no log. Read by the campaign family.
   recorded: z.enum(RECORDED_COUNTS).optional(),
-  // The Battle of Lake-town (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town), read by the smaug family: the damage on Lake-town ("X is the amount of damage on Lake-town", 50222:A:2), and the Victory points in the victory display (50203:B:3).
+  // The Battle of Lake-town (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town), read by the smaug family: the damage on Lake-town ("X is the amount of damage on Lake-town", 50222:A:2), and the Victory points in the victory display (50203:B:3).
   lakeTownDamage: z.literal(true).optional(),
   victoryDisplay: z.literal(true).optional(),
 });

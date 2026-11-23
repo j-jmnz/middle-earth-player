@@ -18,7 +18,7 @@ Sort a soak's rows before a fix: a refusal of an intent the random player built 
 
 A test writer writes tests only and commits nothing. Its brief gives it the records of its batch, with their line ids and one file name for each pack or scenario, so two writers never write the same file.
 
-- The expected result comes from the printed words and the rule spans (`pnpm data query`), never from the record. `pnpm effects render` shows which record implements a line; it is not the source of what must happen. A ruling in `docs/brief.md` or the box's file in `docs/scenarios/` is the reading to test, not a fault.
+- The expected result comes from the printed words and the rule spans (`pnpm data query`), never from the record. `pnpm effects render` shows which record implements a line; it is not the source of what must happen. A ruling in `docs/brief.md` or the scenario's file in `docs/scenarios/` is the reading to test, not a fault.
 - Each test runs again without its line's records and fails there: a card-spec row (`cardSpecs`, `test/harness/card-spec.ts`), `lineSpec` (`test/harness/line-spec.ts`), or a scene test run again on `withoutLines`. A test that passes without its records tests nothing. For a line that is a card's only ability the second run fails at the first intent, so assert every clause the card prints.
 - The title starts with the line id, written out. A title built in a loop does not name its line for the coverage check: write the ids in the `describe` title.
 - No assertion inside an `if`. The scene fixes how many candidates there are, so the test knows whether a choice opens: a choice with one candidate, or with copies of one card, is taken with no question.
@@ -27,7 +27,7 @@ A test writer writes tests only and commits nothing. Its brief gives it the reco
 
 ## A fault
 
-The engine or the record does not do what the line prints. The writer does not fix it and does not bend the test: the test stays as the card says, as a plain `it.fails` whose title starts with the line id, under a `// FAULT:` comment of one sentence (what the card prints, what the engine does). Before it calls a fault it reads the rule span and the box's rulings again: about half of the first suspected faults of an audit rest on a wrong rule premise. A line whose words allow two readings that no doc settles gets no test and goes to the report as an open point (`.claude/rules/authority.md`, Open points).
+The engine or the record does not do what the line prints. The writer does not fix it and does not bend the test: the test stays as the card says, as a plain `it.fails` whose title starts with the line id, under a `// FAULT:` comment of one sentence (what the card prints, what the engine does). Before it calls a fault it reads the rule span and the scenario's rulings again: about half of the first suspected faults of an audit rest on a wrong rule premise. A line whose words allow two readings that no doc settles gets no test and goes to the report as an open point (`.claude/rules/authority.md`, Open points).
 
 ## Fix and review
 
@@ -38,7 +38,7 @@ The engine or the record does not do what the line prints. The writer does not f
 - The cause of each moved golden is the block `pnpm game moved` prints for it (the first differing intent and the records and cards that resolved there), pasted into the commit body: never a cause written from memory.
 - Before a new flag, verb or filter, search the families for one that does the same.
 - The review reads the fix diff with a fresh context and is told to look for the cards a general change reaches, an offer and a refusal that disagree, an ability now withheld wrongly, and the stated cause of each moved golden, which it checks against `pnpm game moved`. Its findings go to a second fix run.
-- The commit that closes the review carries a line `Reviewed: <who read the diff and what they looked at>`. `pnpm commit:check --range`, which CI runs on a pull request's commits, refuses a branch that changes `src/rules` or `src/effects/authored` with no such line (`scripts/git/range-rules.ts`).
+- The commit that closes the review carries a line `Reviewed: <who read the diff and what they looked at>`. `pnpm commit:check --range`, which CI runs on a pull request's commits, refuses a branch that changes `src/rules` or `src/effects/authored` with no such line (`scripts/git/range-rules.ts`). A branch that changes only comments there says so in the line, with how that was checked.
 
 ## Running it
 

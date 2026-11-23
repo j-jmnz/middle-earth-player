@@ -6,7 +6,7 @@ import { AUTHORED_EFFECTS as OLD_FOREST } from "./the-old-forest.ts";
 
 // Records for Fog on the Barrow-downs (standalone-scenarios cycle part 5, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) needs no record here.
 // Setup: the data's piles set Great Barrow, Standing Stones and Hollow Circle aside (148001:A:1's first sentence); only the shuffle is a record. The campaign card and the boon are Campaign Mode only (every line inert).
-// The partial split of the staging areas (a player who reveals a Great Barrow leaves for a stage 4A of his own while the others stay at 3B, which stays in play) is src/rules/families/breaking/barrow.ts; the readings are in docs/scenarios/standalone-scenarios.md, Fog on the Barrow-downs, Line readings.
+// The partial split of the staging areas (a player who reveals a Great Barrow leaves for a stage 4A of his own while the others stay at 3B, which stays in play) is src/rules/families/breaking/barrow.ts; the readings are in docs/scenarios/standalone-scenarios/fog-on-the-barrow-downs.md, Fog on the Barrow-downs, Line readings.
 // Rules: rr.forced, rr.surge, mec109.peril, rr.immune, rr.doomed-x, rr.engaged, rr.victory, rr.in-play-and-out-of-play, rr.quest-advancement, rr.player-elimination, rr.lasting-effects, rr.cancel, mec108.create-staging-area, mec109.multiple-staging-areas (data/rules/entries.json).
 const STAGE_3 = "148003";
 const STAGE_4 = "148004";
@@ -17,7 +17,7 @@ const WIGHT = "Wight";
 const IN_STAGING = { kind: "sourceIn", zone: "staging" } as const;
 // A Great Barrow in play, in the staging area or active (the stage's own area once the areas are separate).
 const BARROW: PickSpec = { type: "location", control: "any", names: ["Great Barrow"] };
-// Any Great Barrow in play, in any staging area. The player eliminated at stage 4B cannot choose: the first player (a player still in the game) names the Great Barrow that goes to the victory display (agent recommendation, docs/scenarios/standalone-scenarios.md, Fog on the Barrow-downs).
+// Any Great Barrow in play, in any staging area. The player eliminated at stage 4B cannot choose: the first player (a player still in the game) names the Great Barrow that goes to the victory display (agent recommendation, docs/scenarios/standalone-scenarios/fog-on-the-barrow-downs.md, Fog on the Barrow-downs).
 const ANY_BARROW: PickSpec = { type: "location", control: "any", names: ["Great Barrow"], stagingArea: "any", who: "firstPlayer" };
 // The Wights engaged with a player at the source's stage, and the players there.
 const WIGHT_AT_STAGE: PickSpec = { type: "enemy", control: "any", trait: WIGHT, atStage: true };

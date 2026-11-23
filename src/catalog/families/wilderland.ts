@@ -101,18 +101,18 @@ const VERBS = [
   z.strictObject({ verb: z.literal("PutObjectiveLocationAfterDiscard") }),
   // Carried Away (18074:A:1): "Each player chooses a hero he controls, discards each token and attachment from that hero, and places it in the staging area ... attaches that enemy to the hero he owns in the staging area, guarding it." After a Pick of the hero, a DiscardUntil enemy and a
   // MoveEncounterCard of that enemy to the staging area, the hero (the card picked before the last) loses its tokens and attachments and lies facedown under the enemy (the captive zone: in play, controlled by no one), flagged as guarded; the enemy guards it (guardsHero). Nothing happens when no enemy was found.
-  // `keepAttachments` (51008:B:1, "discard all tokens from the chosen hero"): only the hero's tokens are discarded; its attachments stay on it under the enemy (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 10).
+  // `keepAttachments` (51008:B:1, "discard all tokens from the chosen hero"): only the hero's tokens are discarded; its attachments stay on it under the enemy (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, reading 10).
   z.strictObject({ verb: z.literal("CarryAwayHero"), keepAttachments: z.literal(true).optional(), ...when }),
   // Carried Away (18074:B:2): "When an enemy guarding a hero is defeated, return that hero to its owner's control, exhausted." (user ruling, 2026-11-05: when it leaves play in any way) The hero the event's subject (the enemy) guarded comes back among its owner's heroes, faceup and exhausted.
   z.strictObject({ verb: z.literal("ReleaseGuardedHero"), ...when }),
   // Carried Away (18074:B:3): "When the players advance from this stage, discard each guarded hero." Each hero an enemy guards goes to its owner's discard pile; a player left with no hero is eliminated (rr.player-elimination).
   z.strictObject({ verb: z.literal("DiscardGuardedHeroes"), ...when }),
   // Enemy Camp (50815:A:2, "discard 1 random facedown hero from under each stage 3"): of the heroes lying facedown under the current quest stage when it is stage number `stage`, one chosen with the game's seed goes to its owner's discard pile (a player left with no hero is eliminated).
-  // Nothing happens at another stage or with no hero under it (docs/scenarios/standalone-scenarios.md, The Siege of Annúminas, reading 18: Standard Game Mode puts no hero there).
+  // Nothing happens at another stage or with no hero under it (docs/scenarios/standalone-scenarios/the-siege-of-annuminas.md, The Siege of Annúminas, reading 18: Standard Game Mode puts no hero there).
   z.strictObject({ verb: z.literal("DiscardHeldHero"), stage: z.number().int().positive(), ...when }),
   // Enemy Camp (50815:A:2, "return each hero under each stage 3 to its owner's control"): each hero lying facedown under the current quest stage, when it is stage number `stage`, returns among its owner's heroes, faceup and exhausted.
   z.strictObject({ verb: z.literal("ReturnHeldHeroes"), stage: z.number().int().positive(), ...when }),
-  // Attack on Dol Guldur (standalone-scenarios part 9; ledger lines 50907:A:1, 50931:B:2; docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, readings 4 and 6).
+  // Attack on Dol Guldur (standalone-scenarios part 9; ledger lines 50907:A:1, 50931:B:2; docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, readings 4 and 6).
   // On the event of an enemy destroyed or a location explored: the Siege value printed on that card (`siegeValue`, 0 when it prints none) joins the round's tally, which the amount `siegeTally` reads. Dol Guldur's Forced effect empties it by reading it at the end of the round.
   z.strictObject({ verb: z.literal("TallySiege"), ...when }),
   // "randomly select a stage 3 that was not in play this round" (50931:B:2): of the stages in `codes`, those but the current one, the game's seed picks one and the running effect notes its code as an option taken (the condition `optionTaken`), for the penalty records that follow.
@@ -377,7 +377,7 @@ const FLAGS = [
   // On the table: the Refresh Action of Abandoned Tools can be used once each round while Escape from Darkness is the current quest (901201:A:3), and the use made this round (engine use).
   "refreshOnce",
   "refreshUsed",
-  // On an enemy: it has no Indestructible, whatever it prints ("While Dol Guldur's city strength is 0, each Lieutenant enemy loses indestructible", 50931:B:1; docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 18). Its other keywords stay. Read by indestructible (rules/core/keywords.ts).
+  // On an enemy: it has no Indestructible, whatever it prints ("While Dol Guldur's city strength is 0, each Lieutenant enemy loses indestructible", 50931:B:1; docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 18). Its other keywords stay. Read by indestructible (rules/core/keywords.ts).
   "losesIndestructible",
   // On an enemy: no Response cancels a Shadow effect the enemy attacks with ("its shadow cards cannot be canceled", 50916:A:1). Read by cancelBarred (rules/families/encounter/cancel.ts).
   "shadowsUncancelable",

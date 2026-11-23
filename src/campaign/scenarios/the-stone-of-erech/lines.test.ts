@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.keywords, rr.cancel, rr.winning-the-game, rr.active-location, rr.blank (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Stone of Erech); ledger lines 50303:B:3, 50304:A:1, 50322:A:2, 50323:A:3.
+// Rules: rr.forced, rr.keywords, rr.cancel, rr.winning-the-game, rr.active-location, rr.blank (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-stone-of-erech.md (The Stone of Erech); ledger lines 50303:B:3, 50304:A:1, 50322:A:2, 50323:A:3.
 import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";

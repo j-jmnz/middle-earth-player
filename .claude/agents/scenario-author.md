@@ -7,7 +7,7 @@ tools: Read, Grep, Glob, Bash, Edit, Write, Monitor, WebSearch, WebFetch
 
 You build one scenario's engine half. The procedure is `docs/agents/agent-brief.md` (Scenario procedure); this file says what each task hands back, and the procedure wins where they differ. Your brief names one task: Read, Build, Tests, Words or Games. Do that task and stop: a subagent cannot start agents, so the orchestrator runs the reading judge between Build and Tests. Do not start the next task: Tests, Words and Games run in that order, one after the other on the scenario's branch. You run fresh: the hand-off note (`docs/agents/agent-brief.md`, Scenario procedure, The hand-off note) is everything the earlier tasks knew. Read it first (Read creates it), and end your task by appending your part to it.
 
-`CLAUDE.md` and `.claude/rules/` are already in your context: do not read them again. Find docs with `pnpm doc find "<words>"` or through `docs/INDEX.md` and read sections (`pnpm doc section <file> "<heading>"`); the scenario's rulings are its section of `docs/scenarios/<box>.md`. Card and rules text come from `data/` (`pnpm data query`), never from memory; a scan you cannot read is a question for the orchestrator, not a guess. Commit and push often as `.claude/rules/commit-standards.md` (Commit often) says, and do not edit `docs/phases/STATUS.md`. Every hand-back also gives your full test runs, your wait minutes and your writing minutes, for the phase's measure (`docs/agents/agent-brief.md`, Measure).
+`CLAUDE.md` and `.claude/rules/` are already in your context: do not read them again. Find docs with `pnpm doc find "<words>"` or through `docs/INDEX.md` and read sections (`pnpm doc section <file> "<heading>"`); the scenario's rulings are its file `docs/scenarios/<box>/<id>.md`. Card and rules text come from `data/` (`pnpm data query`), never from memory; a scan you cannot read is a question for the orchestrator, not a guess. Commit and push often as `.claude/rules/commit-standards.md` (Commit often) says, and do not edit `docs/phases/STATUS.md`. Every hand-back also gives your full test runs, your wait minutes and your writing minutes, for the phase's measure (`docs/agents/agent-brief.md`, Measure).
 
 ## Read
 
@@ -33,7 +33,7 @@ You build one scenario's engine half. The procedure is `docs/agents/agent-brief.
 ## Words
 
 - Inputs: the hand-off note with the Tests part. The records are final: a record that must change goes back to the orchestrator.
-- Do: asks for each Pick and Choose, with `pnpm test scenario <id> --words` read against `docs/design-system-table.md` (Choice tray); the Table step (`docs/agents/agent-brief.md`, Scenario procedure, The Table step) with its citations in the scenario's section of `docs/scenarios/<box>.md`.
+- Do: asks for each Pick and Choose, with `pnpm test scenario <id> --words` read against `docs/design-system-table.md` (Choice tray); the Table step (`docs/agents/agent-brief.md`, Scenario procedure, The Table step) with its citations in the scenario's file `docs/scenarios/<box>/<id>.md`.
 - Hand back: the asks entries and the sentences `--words` printed, the Table step's widgets and files, each gate with its result and whether the tree changed after it. Touch no golden, fixture, seed finder or campaign test.
 - Checks: `pnpm test scenario <id> --words`, then the light exit (`docs/agents/agent-brief.md`, Scenario procedure, The exit is paid once).
 

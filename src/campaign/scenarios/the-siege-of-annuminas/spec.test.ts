@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.response, rr.then, rr.travel, rr.first-player, rr.player-elimination, rr.victory, rr.immune, rr.engaged, rr.in-play-and-out-of-play, rr.shadow-effects, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Siege of Annúminas).
+// Rules: rr.forced, rr.response, rr.then, rr.travel, rr.first-player, rr.player-elimination, rr.victory, rr.immune, rr.engaged, rr.in-play-and-out-of-play, rr.shadow-effects, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-siege-of-annuminas.md (The Siege of Annúminas).
 import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, defend, endRound, exhausted, flag, lost, progressOn, quest, resolve, resourcesOn, reveal, stat, threat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Siege of Annúminas (standalone-scenarios part 8): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).

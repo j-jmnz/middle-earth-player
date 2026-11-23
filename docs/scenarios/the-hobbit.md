@@ -12,62 +12,6 @@ The saga cycle of 2012 and 2013: the two saga boxes The Hobbit: Over Hill and Un
 - **Treasure sets.** A treasure card's set icon is the scenario where it is discovered: the troll icon of We Must Away (Sting, Orcrist, Glamdring), the spider web of Flies and Spiders (Bilbo's Magic Ring), the dragon of The Lonely Mountain (the five Erebor treasures). Each insert prints the treasure icons a scenario accepts as pictures only (no text): one icon in Over the Misty Mountains Grim, Dungeons Deep and Caverns Dim and Flies and Spiders, two in The Lonely Mountain, three in The Battle of Five Armies. They are the sets of the earlier scenarios of the cycle that discover treasure (We Must Away; then Flies and Spiders; then The Lonely Mountain).
 - **Readings.** Each scenario below lists what its cards, rulesheet and sources leave open or settle, with sources (`.claude/rules/authority.md`, Open points).
 
-## We Must Away, Ere Break of Day
-
-Pack `OHaUH`, deck Q0A.1 / E0A.1. Encounter sets We Must Away, Ere Break of Day and Western Lands (`hob.setup-we-must-away-ere-break-of-day`). The 1A Setup sets the Sack cards (Sack trait), the three unique Troll enemies and Troll Cave aside; `hob.sack-x` shuffles a Sack card that leaves play back into the sack deck.
-
-- The seven Sack cards are the `setAside` pile (a Sack deck is a Setup record's work, not a pile of its own); DragnCards loads them in its second shared deck (literal).
-- A Sack card's printed text is two paragraphs (the attach rule, then what the attached character cannot do); Hall of Beorn runs them together, so the ledger has two lines (scan).
-
-## Over the Misty Mountains Grim
-
-Deck Q0A.2 / E0A.2. First deck: Over the Misty Mountains Grim and Western Lands; second, inactive deck: Misty Mountain Goblins and The Great Goblin (`hob.setup-over-the-misty-mountains-grim`, `hob.active-and-inactive-encounter-decks`). Hall of Beorn lists the sets of the first deck only, so `encounterSets` names all four (`scripts/data/cycle-defs.ts`).
-
-- Stone-Giant: DragnCards stages one copy; the printed 1B advances at once to stage 2A, whose When Revealed (131027:B:1) finds a copy in the encounter deck. All three copies start in the encounter deck (`data/overrides.json`, scenarioPiles; printed card).
-
-## Dungeons Deep and Caverns Dim
-
-Deck Q0A.3 / E0A.3. Sets Dungeons Deep and Caverns Dim and Misty Mountain Goblins (`hob.setup-dungeons-deep-and-caverns-dim`); the riddle area is `hob.riddle-area`.
-
-- Gollum and Bilbo's Magic Ring: DragnCards stages them; stage 2A's own Setup (131030:A:1) searches the encounter deck for them and places them in the riddle area, so they start in the encounter deck (`data/overrides.json`, scenarioPiles; printed card).
-- The Goblins' Caves in Easy: DragnCards' E0A.3 holds 1, the Easy Mode sheet removes 1 of 3 (Easy 2, Hall of Beorn agrees); the sheet wins (`easy-mode.the-hobbit`, overrides scenarioEasy).
-- Hall of Beorn's pile counts of the Misty Mountain Goblins set needed DragnCards' rows resolved by pack number: DragnCards names the pack "The Hobbit - Over Hill and Under Hill" (`overrides.dragnPackAliases`).
-
-## Flies and Spiders
-
-Pack `OtD`, deck Q0A.4 / E0A.4. Sets Flies and Spiders and Wilderland (`hob.setup-flies-and-spiders`; the insert of The Battle of Five Armies spells it Wilderlands).
-
-- The 1A Setup lets each player shuffle 1 copy of Bilbo's Magic Ring into the deck; the load list sets aside 3 copies of the treasure card, the box holds 1 (Hall of Beorn quantity 1). The data keeps the load list's 3 (recommended; no source found, searches of the FFG FAQ, RulesPal and forum text gave no ruling; the Setup record decides how many copies a table of N players gets). Listed in Readings to confirm.
-
-## The Lonely Mountain
-
-Deck Q0A.5 / E0A.5. Sets The Lonely Mountain and Wilderland (`hob.setup-the-lonely-mountain`).
-
-- Easy counts of Fighting Among Friends (2 removed) and Weighed Down (1 removed): DragnCards' E0A.5 keeps both copies of each; the Easy Mode sheet, Hall of Beorn and the other two Wilderland decks (E0A.4, E0A.6) agree on the removal (overrides scenarioEasy).
-- The treasure stack (`hob.burgle`) is the five set-aside Erebor treasure cards.
-
-## The Battle of Five Armies
-
-Deck Q0A.6 / E0A.6. Sets The Battle of Five Armies and Wilderland (`hob.setup-the-battle-of-five-armies`); stages 2 to 4 are in play together (`hob.multiple-stages-in-play`).
-
-- Hall of Beorn lists stages 2 to 5 and leaves out stage 1A; it is added by `overrides.scenarioStages` and takes its place by stage number. Hall of Beorn and DragnCards' load list disagree on the title: the card prints "The Gathering of the Clouds" (scan 132075.A), and `overrides.cards` names it so and corrects the picture address, which answers 403 under Hall of Beorn's spelling.
-- **Stage 1** (132075; `recommended`, no source settles it). The scan prints a dash in the quest points of both sides, so Hall of Beorn has none. The Setup (add Bolg, shuffle, reveal 1 encounter card for each player) runs, then stage 1 shows side B and its When Revealed runs after the reveals (`families/quest/setup.ts`, as for every stage 1 with a Setup); `PutStagesIntoPlay` puts stages 2 to 4 into play and sets stage 1 aside, so stage 1 never advances. Alternative: it never advances (a stage with no points). While the Setup reveals, stage 1 is the only stage in play. Searched the FFG forum archive and a playthrough log: none says.
-- **Bolg** (132053:A:1; `literal`). He starts in the staging area, as DragnCards stages him: the data build reads the Setup's "add it to the staging area" as a pile placement and refuses an `overrides.scenarioPiles` entry that moves him to the encounter deck, so the Setup record only shuffles and reveals. "X is the number of players" is his Threat. A card revealed during the Setup resolves its When Revealed, and "until the end of the round" lasts to the end of round 1, so the first Goblin the Setup reveals gains Surge and none later in round 1 (`researched`, a forum thread quoting FAQ 1.19: https://ffg-forum-archive.entropicdreams.com/topic/175562-battle-of-five-armies-2-questions; the FAQ PDF is not pinned, and its URL answers 404).
-- **Stages 2, 3 and 4 in play together** (132075:B:1; `span-settled`, `hob.multiple-stages-in-play`; `faq.side-quest-current-quest-text` says the text of each quest card in play is active). Each stage's text is active while it is in play. Stage 1 leaves play. The stages are three quest cards at once, each with its own progress.
-- **Current quest stage** (`span-settled`, `hob.current-quest-stage`). The first player chooses it at the beginning of each round, before resources are collected: the same choice the encounter side quests ask for (`currentQuestId`). Progress goes only on it (the active location first, `rr.active-location`); "the current quest" in every effect is that stage; Battle (stage 3) and Siege (stage 4) work as for a side quest (`hon.battle`, `hon.siege`, built). The Setup round has no choice (stage 1 is the only stage); round 1's choice is the first one.
-- **Complete** (132076:B:1, 132077:B:1, 132078:B:1; `span-settled`, `faq.progress-without-advancing`, `rr.quest-advancement`). A stage is complete when its progress equals or exceeds its 8 quest points; it stays in play and may take more progress, but it does not advance alone. When stages 2, 3 and 4 are all complete the players advance to stage 5 at once. A progress removal that leaves a stage under 8 makes it incomplete again (Gundabad Climber, Ruins of Dale and the like). The community reads it the same way (https://ffg-forum-archive.entropicdreams.com/topic/79753-question-about-the-battle-of-five-armies-quest: "you cannot progress to 5a until 2b, 3b, and 4b all have 8 or more tokens on that all at the same time"; no official answer found). Status: `researched`, community only; listed under Readings to confirm.
-- **Quest stage in play with no progress** (132054:A:2, 132055:A:2, 132057:A:1, 132058:A:2, 132059:A:2; `literal`). The count is the stages in play with no progress token on them, read when the effect resolves: 0 to 3 while stages 2 to 4 are in play. Stage 1 counts during the Setup and stage 5 once it is in play (`recommended`: the cards say "each quest stage in play"; alternative: only stages 2 to 4 count).
-- **No progress at the end of the round** (132076:B:2, 132077:B:3, 132078:B:3; `literal`). A Forced effect at the end of the round, only while the stage is in play with 0 progress. Siege's discard takes every resource from every hero's pool, Bilbo's too.
-- **Travel costs of Ruins of Dale, Ravenhill and The Front Gate** (132061:A:3, 132062:A:3, 132063:A:3; `literal`). The cost is 1 Baggins resource when the named stage is the current quest, 3 otherwise; a player who does not control Bilbo spends from the Baggins resources of his pool (`hob.bilbo-multiplayer-otd`). Their Forced removes 2 progress from the named stage at the end of each round, if there is progress to remove.
-- **Heedless of Order** (132066:A:2; `researched`, https://ffg-forum-archive.entropicdreams.com/topic/175562-battle-of-five-armies-2-questions, community): the first player chooses a stage other than the current one to be current until the end of the round; with no other stage the card gains Doomed 3. Revealed during the Setup it gains Doomed 3 (stage 1 is the only quest; "TwiceBorn: Correct").
-- **Stage 5** (132079:B:1 to B:3; `literal`). Bolg is in the staging area, and while he is, he is engaged with the first player (he attacks in the combat phase, and he is not optionally engageable). He is Immune, and cannot take damage while a Bodyguard of Bolg is in play (132054:A:1, a Bodyguard in the staging area or engaged); stage 5 is the last stage and the players win when Bolg is destroyed. Before stage 5 he can be attacked in the staging area only if the engine offers it; the engine follows the cards (Immune stops card effects, an attack is no effect; forum, no official ruling: https://ffg-forum-archive.entropicdreams.com/topic/79707-battle-of-the-five-armies-questions). Progress cannot be placed on stage 5, so questing no longer moves the quest. `recommended` for the engagement timing (before stage 5 he stays in the staging area and engages only by the stage 5 text). Threat while engaged (`researched`): he stays in the staging area, so he still adds his Threat there; the nearest official text, the Dwarrowdelf rulesheet span `dwd.durins-bane` ("considered to be engaged ... allowing it to both add its threat to the staging area and attack"), says the same of an enemy considered engaged while it stays in the staging area, and stage 5 says nothing on Threat. The Fellowship's Balrog record adds no Threat, which the Balrog's own scenario owns. The forum thread (https://ffg-forum-archive.entropicdreams.com/topic/79707-battle-of-the-five-armies-questions) and the Hall of Beorn page (https://hallofbeorn.com/LotR/Details/The-Battle-of-the-Five-Armies-TH) do not address Threat.
-- **The table** (`hob.multiple-stages-in-play`, `hob.current-quest-stage`; ledger lines 132076:B:2, 132077:B:2, 132077:B:3, 132078:B:2, 132078:B:3, 132079:B:2; `docs/design-system-table.md`, Top bar): the three stages in play together are three dials after the seat dials (`readouts/the-hobbit/armies.ts`), each with its progress against its 8 quest points, the current stage marked, the Battle or Siege it prints, and a warning while it holds no progress, since its Forced effect at the end of the round then applies. The first player's choice of the current stage at the start of each round is a choice sheet with a row for each stage and its progress (`words/scenarios/the-hobbit/armies.ts`). Stage 5 shows no dial: no progress can be placed on it and Bolg, in the staging area, is the card that matters. All three stage cards are in the quest area at once.
-- **Wilderland set** (132035 to 132038, records in `src/effects/authored/the-hobbit/set-wilderland.ts`, shared with Flies and Spiders and The Lonely Mountain).
-  - Fighting Among Friends (132037:A:1; `span-settled`, `rr.neutral-cards`): the first player names one of Leadership, Lore, Spirit and Tactics; a neutral non-Baggins character belongs to none of them, so it is removed from the quest too.
-  - Weighed Down (132038:A:1; `span-settled`, `rr.lasting-effects`, `faq.lasting-effects`): each player of the staging area it is revealed to holds the lasting effect on the characters he controls, now and entering play later; the penalty is read each time the stat is read, so a character exhausted or readied later in the round gains or loses it (stat condition `holderExhausted`). A:2 (`literal`): only a defended attack that destroys its defender raises the threat; an undefended attack that destroys a hero does not.
-  - Dark Bats (132036; `recommended`): it attaches to the damaged or defending character and counts as a Condition attachment while attached (`CountsAs`, `AttachSelf` to `subject` or `defender`); a character it destroys is out of play, so the card stays an enemy; an undefended attack has no defending character, so the Shadow card is not attached.
-  - Hidden Path (132035:A:2; `span-settled`, `hob.staging-area-creating`): the 2 Baggins resources are paid from the heroes of the Baggins sphere (`SpendResources` with `sphere: baggins`, `group`); once the staging areas are separate only the players who share the location's staging area may pay, from the heroes they control (`spendablePools`, `src/rules/families/costs/verbs.ts`, reads the actor's area). This replaces the earlier recommended reading that Bilbo's pool pays in every area.
-
 ## The shared rules
 
 Built once for the six scenarios: Bilbo Baggins and the Baggins sphere, Treasure, the saga player cards, Immune to player card effects and Indestructible. Each reading says its status (`.claude/rules/authority.md`, Open points): `literal` (the printed line), `span-settled` (a `hob.*` span), `researched` (an online source settles it) or `recommended` (no source settles it).
@@ -91,12 +35,18 @@ Where a scan and Hall of Beorn's text differ, the card wins (`.claude/rules/auth
 - Printed misprints, kept under `misprints`: Ravenous Warg prints "Ravenous Wargs attacks" (132059:A:1); A Warm Welcome 1B prints "At the end of round" (132071:B:2).
 - The OHaUH insert says Bilbo "cannot gain resources through player card effects" (`hob.baggins-sphere-ohauh`); the card prints "from player card effects" (131001:A:1). The card wins.
 
+## Scenario files
+
+- `docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md`: We Must Away, Ere Break of Day
+- `docs/scenarios/the-hobbit/over-the-misty-mountains-grim.md`: Over the Misty Mountains Grim
+- `docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md`: Dungeons Deep and Caverns Dim
+- `docs/scenarios/the-hobbit/flies-and-spiders.md`: Flies and Spiders
+- `docs/scenarios/the-hobbit/the-lonely-mountain.md`: The Lonely Mountain
+- `docs/scenarios/the-hobbit/the-battle-of-five-armies.md`: The Battle of Five Armies
+
 ## Readings to confirm
 
-- Flies and Spiders, copies of the treasure Bilbo's Magic Ring: recommended, see Flies and Spiders.
 - Treasure with no Campaign Log: the discovery condition is waived and the set icon is kept: recommended, see The shared rules.
 - A treasure is played from the hand like an attachment: recommended, see The shared rules.
 - The Baggins sphere cards stay deck-legal outside the Hobbit scenarios: recommended, see The shared rules.
 - The Arkenstone's X is chosen when the action resolves, not paid as a cost: recommended, see The shared rules.
-- The Battle of Five Armies, stage 1 advances at once after the Setup (the scan prints a dash for quest points): recommended, see The Battle of Five Armies.
-- The Battle of Five Armies, a stage is complete at 8 or more progress and stages 2 to 4 advance together to stage 5; the count of "quest stage in play with no progress" includes stage 1 and stage 5: community and recommended, see The Battle of Five Armies.

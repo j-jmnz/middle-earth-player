@@ -18,6 +18,9 @@ const scaffolded = (id: string): boolean => exists(`src/effects/authored/${autho
 // The next scenario the scaffold has not been run for: its previous part has its files (the planner refuses a part whose earlier part has none).
 const NEW = loadCampaignsInOrder().flatMap((campaign) => campaign.scenarios.filter((id, at) => SCENARIOS.includes(id) && !scaffolded(id) && (at === 0 || scaffolded(campaign.scenarios[at - 1] as string))))[0];
 
+// A scenario's rulings file, joined so the doc-path check (scripts/checks/agent-docs.test.ts) does not read it as a doc that must exist.
+const docFile = (box: string, id: string): string => ["docs", "scenarios", box, `${id}.md`].join("/");
+
 // A view of the repo as if `ids` had none of their lines in the registries and none of their files: the planner is tested on explicit ids,
 // whether or not the real repo has scaffolded them yet. (Every registry line that names a scenario carries its id.)
 function without(...ids: string[]): { repo: Repo; exists: (file: string) => boolean } {
@@ -170,6 +173,7 @@ describe("pnpm scenario new", () => {
       `scripts/e2e/${id}.ts`,
       `src/effects/authored/${id}.ts`,
       `src/campaign/fixtures/${id}.json`,
+      docFile("dream-chaser", id),
     ]);
     expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/writers.ts", "test/harness/golden-registry.ts"]);
     // An edit only inserts lines, and the golden registry's are comments (its test fails on an entry with no golden.json).
@@ -192,6 +196,23 @@ describe("pnpm scenario new", () => {
 
     for (const item of plan?.files ?? []) expect(view.exists(item.file), item.file).toBe(false);
     for (const edit of plan?.edits ?? []) expect(view.repo.read(edit.file), edit.file).toBe(edit.before);
+  });
+
+  // A scenario's rulings go in its own file under its box's folder in docs/scenarios/ (.claude/rules/docs-standards.md, Agent context).
+  it.each([
+    ["the-drowned-ruins", "dream-chaser", "The Drowned Ruins"],
+    ["the-wastes-of-eriador", "angmar-awakened", "The Wastes of Eriador"],
+    ["the-hunt-for-gollum", "shadows-of-mirkwood", "The Hunt for Gollum"],
+  ])("writes the rulings file of %s, a title only, in its box's folder", (id, box, title) => {
+    const file = docFile(box, id);
+    const view = without(id);
+    const { plan, problems } = planScenario(id, {}, view.repo, view.exists);
+    expect(problems).toEqual([]);
+    expect(plan?.files.find((item) => item.file === file)?.text).toBe(`# ${title}\n`);
+    // A rulings file that exists already is kept, and does not stop the scaffold.
+    const kept = planScenario(id, {}, view.repo, (name) => name === file || view.exists(name));
+    expect(kept.problems).toEqual([]);
+    expect(kept.plan?.files.map((item) => item.file)).not.toContain(file);
   });
 
   it("puts a campaign folder's seed finder in its folder, with imports one level deeper, and builds its log on the previous part's finder", () => {
