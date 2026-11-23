@@ -1,4 +1,4 @@
-// Rules: rr.in-play-and-out-of-play, rr.active-location, rr.defending-player, rr.engaged, rr.first-player, rr.damage, rr.shadow-effects, rr.additional-attacks, rr.discard-pile-and-victory-display (data/rules/entries.json); docs/scenarios/the-hobbit.md (Over the Misty Mountains Grim).
+// Rules: rr.in-play-and-out-of-play, rr.active-location, rr.defending-player, rr.engaged, rr.first-player, rr.damage, rr.shadow-effects, faq.additional-attacks, rr.discard-pile-and-victory-display (data/rules/entries.json); docs/scenarios/the-hobbit.md (Over the Misty Mountains Grim).
 // Card specs for the Misty Mountain Goblins set (131058 to 131061, 131065, 131070: 131058:A:1, 131058:A:2, 131059:A:1, 131059:A:2, 131060:A:2, 131061:A:1, 131061:A:2, 131065:A:1, 131065:A:2, 131070:A:1, 131070:A:2), which Over the Misty Mountains Grim and
 // Dungeons Deep and Caverns Dim both deal. They run on this scenario's table, as any scenario that deals the set could run them.
 import { expect } from "vitest";
