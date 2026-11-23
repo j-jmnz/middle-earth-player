@@ -43,6 +43,8 @@ import { unreachedReport } from "./unreached.ts";
 //   unreached  not a part: after a run that played the scenario's goldens, the records of its own cards that no golden resolves, with whether a test of the scenario names each
 //              (test/harness/reached.ts writes the list, scripts/tools/unreached.ts prints it); each one needs a card test or a golden that reaches it, and the list never fails the run
 //   budget     the tests part's time, held to the scenario's budget on a full run (Test budget, below)
+// After the parts, a warning (never a failure) lists the render snapshots of other scenarios that differ from the merge base with origin/main (scripts/data/effects/render/snapshots): the
+// task's report must explain each, since a change to a shared record or template moved another scenario's render.
 // `--list` prints the files and codes without running anything. A file runs once, in the first part that names it.
 
 // Test budget: the scenario's own tests (the tests part) take at most TEST_BUDGET_SECONDS of test time in all, summed over their files as
@@ -201,6 +203,13 @@ export function playerCodes(id: string, recorded: readonly string[]): string[] {
   return [...new Set(dealt)].filter((code) => withRecords.has(code));
 }
 
+const SNAPSHOT_DIR = "scripts/data/effects/render/snapshots/";
+
+/** The scenarios other than `id` whose render snapshot is among the changed files, by id. */
+export function otherSnapshots(changed: readonly string[], id: string): string[] {
+  return changed.filter((file) => file.startsWith(SNAPSHOT_DIR) && file.endsWith(".txt")).map((file) => file.slice(SNAPSHOT_DIR.length, -".txt".length)).filter((name) => name !== id).sort();
+}
+
 const SMOKE_NODE = ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON"];
 
 /** The card smokes of the scenario: the player cards' (skipped when it deals none), and the encounter smoke, which every scenario has. */
@@ -322,6 +331,12 @@ async function main(log: Log): Promise<void> {
     for (const line of unreachedReport(rows, texts)) log.info(line);
   }
   for (const result of results) (result.ok ? log.info : log.error)(`${result.name.padEnd(9)} ${result.ok ? "passed" : "FAILED"}  ${result.detail}${result.ms > 0 ? `  (${duration(result.ms)})` : ""}`);
+  // A warning, not a failure: another scenario's render moved with this change.
+  const moved = otherSnapshots(changed, id);
+  if (moved.length > 0) {
+    log.warn(`the render snapshot of ${moved.length} other scenario${moved.length === 1 ? "" : "s"} differs from the merge base with origin/main; the task's report must explain each:`);
+    for (const name of moved) log.warn(`  ${name}`);
+  }
   const failed = results.filter((result) => !result.ok);
   if (failed.length > 0) throw new Error(`failed: ${failed.map((result) => result.name).join(", ")}`);
 }

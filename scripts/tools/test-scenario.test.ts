@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { BUDGET_SLACK, budgetProblem, changedFamilyTests, hasReaderGames, OVER_BUDGET, quickParts, registryTitle, scenarioTests, selectTests, smokeRuns, TEST_BUDGET_SECONDS } from "./test-scenario.ts";
+import { BUDGET_SLACK, budgetProblem, changedFamilyTests, hasReaderGames, otherSnapshots, OVER_BUDGET, quickParts, registryTitle, scenarioTests, selectTests, smokeRuns, TEST_BUDGET_SECONDS } from "./test-scenario.ts";
 
 // pnpm test scenario <id>: the selection is a pure function of the id, the changed paths and the tree of test files.
 const TREE = [
@@ -204,5 +204,19 @@ describe("the test budget (budgetProblem)", () => {
 
   it("lists only scenarios over the default budget", () => {
     expect(Object.entries(OVER_BUDGET).filter(([, listed]) => listed <= TEST_BUDGET_SECONDS)).toEqual([]);
+  });
+});
+
+describe("the render snapshots of other scenarios (otherSnapshots)", () => {
+  const snapshot = (name: string) => `scripts/data/effects/render/snapshots/${name}.txt`;
+
+  it("names the other scenarios whose snapshot changed, sorted, and leaves out the scenario's own and every other file", () => {
+    const changed = [snapshot("the-oath"), snapshot("a-knife-in-the-dark"), snapshot("lost-in-mirkwood"), "scripts/data/effects/render/kit.ts", "docs/brief.md"];
+    expect(otherSnapshots(changed, "the-oath")).toEqual(["a-knife-in-the-dark", "lost-in-mirkwood"]);
+  });
+
+  it("names nothing when only the scenario's own snapshot changed, or none did", () => {
+    expect(otherSnapshots([snapshot("the-oath")], "the-oath")).toEqual([]);
+    expect(otherSnapshots([], "the-oath")).toEqual([]);
   });
 });
