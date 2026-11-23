@@ -47,13 +47,28 @@ export function noteBelowThreat(state: ScenarioState): ScenarioState {
 }
 
 // An enemy in the staging area that attacks, in the combat phase, each player who has an enemy engaged that relays its attack (`attacksViaRelay` on the Thing in the Depths, `relaysAttack` on Eye of the
-// Beast, 12050:A:3): it attacks from the staging area, once for each such player, and is dealt a shadow card for each attack.
+// Beast, 12050:A:3): it attacks from the staging area, once for each such enemy engaged with the player, and is dealt a shadow card for each attack.
 export function viaRelay(state: ScenarioState, id: string): boolean {
   return state.cards[id]?.zone === "staging" && flagged(state, id, "attacksViaRelay");
 }
 
+// How many enemies engaged with the seat relay an attack: each is a separate instance of the constant ability (rr.constant-ability), so each gives one attack.
+function relays(state: ScenarioState, seat: number): number {
+  return (state.seats[seat]?.engaged ?? []).filter((enemy) => flagged(state, enemy, "relaysAttack")).length;
+}
+
 function relayedTo(state: ScenarioState, seat: number): boolean {
-  return (state.seats[seat]?.engaged ?? []).some((enemy) => flagged(state, enemy, "relaysAttack"));
+  return relays(state, seat) > 0;
+}
+
+// The attacks the enemy in the staging area makes against the seat in a combat phase: one for each relaying enemy engaged with the seat (12050:A:3), one otherwise.
+function attacksOwed(state: ScenarioState, id: string, seat: number): number {
+  return viaRelay(state, id) ? Math.max(1, relays(state, seat)) : 1;
+}
+
+/** Whether the attack the enemy makes on the seat now is counted as made this combat phase: it is for every enemy but one that attacks once for each relaying enemy, which is counted each time. */
+export function countsEachAttack(state: ScenarioState, id: string): boolean {
+  return viaRelay(state, id);
 }
 
 // Whether the enemy in the staging area is considered engaged with this seat: every seat for the Watcher, the first player for the Balrog, the seats with a relaying enemy engaged for the Thing.
@@ -78,7 +93,7 @@ export function attackKey(state: ScenarioState, enemyId: string, seat: number): 
 
 // The enemies in the staging area that still attack this seat in this combat phase.
 export function stagingAttackers(state: ScenarioState, seat: number): string[] {
-  return state.staging.filter((id) => engagedWithSeat(state, id, seat) && !state.resolvedAttacks.includes(`${id}@${seat}`) && !attackBarred(state, id, seat));
+  return state.staging.filter((id) => engagedWithSeat(state, id, seat) && state.resolvedAttacks.filter((key) => key === `${id}@${seat}`).length < attacksOwed(state, id, seat) && !attackBarred(state, id, seat));
 }
 
 // An enemy that is not engaged is dealt a shadow card of its own when it attacks; one dealt for an earlier attack is discarded first.

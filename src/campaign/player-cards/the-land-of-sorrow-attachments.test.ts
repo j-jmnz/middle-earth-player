@@ -10,13 +10,12 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, hosts, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { choices, hosts, play, playerTableFor, printed, questUntil, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const BOOK = "22110";
 const HEALING = "22112";
@@ -38,7 +37,7 @@ const DEAR = "dear";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -49,14 +48,6 @@ beforeAll(async () => {
 });
 
 // Commits `commit` and passes until `stop` holds, the game asks a question, or the quest is over.
-function quested(tab: Table, commit: readonly string[], stop: (run: Run) => boolean): Run {
-  let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: commit }, tab.ctx);
-  for (let guard = 0; guard < 20 && !stop(run) && run.state.window?.kind !== "choose" && run.state.mode !== "travel" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) {
-    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
-  }
-  return run;
-}
-
 describe("Red Book of Westmarch (22110:A:1, A:2, A:3)", () => {
   // "Attach to a Hobbit hero. Restricted.": the Pal (a Hobbit hero) is offered; Aragorn (not a Hobbit) and the Wandering Took (a Hobbit
   // ally) are not. Played on the Pal, it is attached to him.
@@ -103,7 +94,7 @@ describe("Red Book of Westmarch (22110:A:1, A:2, A:3)", () => {
   lineSpec("22110:A:3", "after you quest successfully, exhaust it to add 1 resource to the attached hero", (effects) => {
     const tab = table(effects, { start: "quest", heroes: [{ code: PAL, seat: 0 }], attached: [{ code: BOOK, host: PAL }], deck: ["f0"] });
     const [pal, book] = [idsOf(tab, PAL), idsOf(tab, BOOK)];
-    let run = quested(tab, [pal], (next) => triggers(next.state, tab).includes("22110:response:1"));
+    let run = questUntil(tab, [pal], (next) => triggers(next.state, tab).includes("22110:response:1"));
     expect(triggers(run.state, tab)).toContain("22110:response:1");
     const before = run.state.cards[pal]?.resources ?? 0;
     run = sendUnledgered(run, { type: "Trigger", cardId: book, effectId: "22110:response:1" }, tab.ctx);
@@ -114,7 +105,7 @@ describe("Red Book of Westmarch (22110:A:1, A:2, A:3)", () => {
   // A failed quest (the Pal's 2 against the staging area's 3): no Response.
   it("22110:A:3 is not offered when the quest fails", () => {
     const tab = table(EFFECTS, { start: "quest", heroes: [{ code: PAL, seat: 0 }], attached: [{ code: BOOK, host: PAL }], staging: ["f3"], deck: ["f0"] });
-    const run = quested(tab, [idsOf(tab, PAL)], (next) => triggers(next.state, tab).includes("22110:response:1"));
+    const run = questUntil(tab, [idsOf(tab, PAL)], (next) => triggers(next.state, tab).includes("22110:response:1"));
     expect(run.state.quested?.succeeded ?? []).not.toContain(0);
     expect(triggers(run.state, tab)).not.toContain("22110:response:1");
   });

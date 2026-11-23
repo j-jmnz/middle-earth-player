@@ -4,14 +4,13 @@
 // 10007:A:1. The allies, events and side quest are in the-wastes-of-eriador.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { chooseIfAsked, combat, hosts, passAll, play, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { atDefense, chooseIfAsked, hosts, passAll, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const HELM = "10005";
 const PONY = "10007";
@@ -33,7 +32,7 @@ const GEAR = "gear";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -52,8 +51,7 @@ beforeAll(async () => {
 // The combat phase on `tab`: its windows passed to the first defense, `defender` declared, and the run back at the Response window that
 // follows the damage.
 function defended(tab: Table, defender: string): Run {
-  const run = passAll(combat(tab.state, tab), tab.ctx);
-  expect(run.state.window?.kind).toBe("defense");
+  const run = atDefense(tab);
   return passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx);
 }
 

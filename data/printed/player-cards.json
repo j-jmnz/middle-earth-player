@@ -1,0 +1,1100 @@
+{
+  "campaign": "player-cards",
+  "conventions": [
+    "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
+    "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Hide 2.) stay.",
+    "Icons are written as the words Hall of Beorn uses (Willpower, Attack, Defense, Threat, Lore, Fellowship). Apostrophes are straight.",
+    "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
+    "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword."
+  ],
+  "entries": [
+    {
+      "code": "05001",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Beregond.jpg",
+        "sha256": "23137859ab54655ea1c476008869b3bfad77f2812cd37ad80b45656f1e997442"
+      },
+      "lines": [
+        "Sentinel.",
+        "Lower the cost to play Weapon and Armor attachments on Beregond by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05002",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Boromir.jpg",
+        "sha256": "2e8d2afeef3865bbd5146f86f8a27d202f28bd76c95752479496141640583861"
+      },
+      "lines": [
+        "While Boromir has at least 1 resource in his resource pool, Gondor allies get +1 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05003",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Errand-rider.jpg",
+        "sha256": "1403e81436fe1854839e9d53e88234d8de283282eea24eb879ce4f78c1a3f454"
+      },
+      "lines": [
+        "Action: Exhaust Errand-rider to move 1 resource from the resource pool of a hero you control to another hero's resource pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05004",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Citadel-Custodian.jpg",
+        "sha256": "95e32c56f879f04abd33ddcb0d07721dba7e03e971c5c2a52566d663d9894c8c"
+      },
+      "lines": [
+        "Lower the cost to play Citadel Custodian by 1 for each Gondor ally in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05005",
+      "side": "A",
+      "printing": "Heirs of Númenor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Mutual-Accord.jpg",
+        "sha256": "b0c8cb03ceda8bb80d51467bc9aa8663508247b415d2a17cbb1b2f13ec9dd290"
+      },
+      "lines": [
+        "Action: Until the end of the phase, each Gondor card in play gains the Rohan trait, and each Rohan card in play gains the Gondor trait."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05006",
+      "side": "A",
+      "printing": "Heirs of Númenor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Wealth-of-Gondor.jpg",
+        "sha256": "4a7d627fabfac68638a526450873181549dd6c545b583f134c7448da4d210073"
+      },
+      "lines": [
+        "Action: Choose a Gondor hero. Add 1 resource to that hero's resource pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05007",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Defender-of-Rammas.jpg",
+        "sha256": "b12ea938cdf897ea4bb1125dfe9b572d042f75021d27cbaee79fd102e3ba0c79"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05008",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Behind-Strong-Walls.jpg",
+        "sha256": "0c2138e19ee9581e8faea1d485566bb86dce63f940e3e2342c992d7a99cab481"
+      },
+      "lines": [
+        "Action: Ready a defending Gondor character. That character gets +1 Defense until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05009",
+      "side": "A",
+      "printing": "Heirs of Númenor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Spear-of-the-Citadel.jpg",
+        "sha256": "b3d126b88420f22a1a8160722f225d6c3ca25dab8cc9ae75e7602e0d5a38694c"
+      },
+      "lines": [
+        "Restricted.",
+        "Attach to a Tactics character. Limit 1 per character.",
+        "Response: After attached character is declared as a defender, deal 1 damage to the attacking enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "05010",
+      "side": "A",
+      "printing": "Heirs of Númenor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Damrod.jpg",
+        "sha256": "e8be43060b13ad61205408a771ef296b2804e8b61b925dbcef68e5dd0dc48020"
+      },
+      "lines": [
+        "Action: Discard Damrod from play to lower your threat by 1 for each enemy in the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05011",
+      "side": "A",
+      "printing": "Heirs of Númenor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Light-the-Beacons.jpg",
+        "sha256": "8fed9af40baa86c711dbbad096bdfe1d15c63e90f89abdf70340c4e8d5a65d17"
+      },
+      "lines": [
+        "Action: All characters get +2 Defense and do not exhaust to defend until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05012",
+      "side": "A",
+      "printing": "Heirs of Númenor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/A-Watchful-Peace.jpg",
+        "sha256": "756142f3d8c16de2f6e6512ef8083db3830044b386e0c64e0582663569caf585"
+      },
+      "lines": [
+        "Response: After a location worth no victory points leaves play as an explored location, return it to the top of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05013",
+      "side": "A",
+      "printing": "Heirs of Númenor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Blood-of-Númenor.jpg",
+        "sha256": "64a37f4fdba1cfa01060a5f650d136d70090a46a83058e35e2f4299abe919084"
+      },
+      "lines": [
+        "Attach to a Gondor or Dúnedain hero.",
+        "Action: Spend 1 resource from attached hero's resource pool to give attached hero +1 Defense for each resource in its resource pool until the end of the phase. (Limit once per phase.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05014",
+      "side": "A",
+      "printing": "Heirs of Númenor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Hunter-of-Lamedon.jpg",
+        "sha256": "a7ce6e923cbd3d2797fac460bd261add04c3a9df7a5be36f94932c58b0186be2"
+      },
+      "lines": [
+        "Response: After you play Hunter of Lamedon from your hand, reveal the top card of your deck. If it is an Outlands card, add it to your hand. Otherwise, discard it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05015",
+      "side": "A",
+      "printing": "Heirs of Númenor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Ithilien-Tracker.jpg",
+        "sha256": "a3b335811e3ee2be45f399304ca611cfa66800e456a3c56639a7667b613e413c"
+      },
+      "lines": [
+        "Action: Exhaust Ithilien Tracker to lower the Threat of the next enemy added to the staging area to 0 until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05016",
+      "side": "A",
+      "printing": "Heirs of Númenor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Master-of-Lore.jpg",
+        "sha256": "1aa53eec8d230e9c2531db65a9558e23d1684dbee643b57fc9c21d77a3b40fca"
+      },
+      "lines": [
+        "Action: Exhaust Master of Lore to name a card type. Lower the cost for you to play the next Lore card of that type by 1 until the end of the phase (to a minimum of 1)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05017",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Ranger-Spikes.jpg",
+        "sha256": "5b18f86cdf4c23b914e9a56e400827c5c5f2d771cf64ca73de5647aa034bf261"
+      },
+      "lines": [
+        "Play Ranger Spikes into the staging area unattached.",
+        "If unattached, attach Ranger Spikes to the next eligible enemy that enters the staging area.",
+        "Players do not make engagement checks against attached enemy. Attached enemy gets -2 Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "05018",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Envoy-of-Pelargir.jpg",
+        "sha256": "d067023aa5b98f93186fd637b4a0314642f1ed9caeacde88c9fa559218728322"
+      },
+      "lines": [
+        "Response: After Envoy of Pelargir enters play, add 1 resource to a Gondor or Noble hero's resource pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131001",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Bilbo-Baggins.jpg",
+        "sha256": "af64331f038db74561a487f636061c0b13bf4a2c40fca9b25d3def969542062f"
+      },
+      "lines": [
+        "The first player gains control of Bilbo Baggins.",
+        "Bilbo Baggins cannot gain resources from player card effects.",
+        "If Bilbo Baggins leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131002",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Thorin-Oakenshield.jpg",
+        "sha256": "8d14d5ffd90ce0e6452ffb16b47f7702bb66167a86ebe12090b6d7e7b48f4754"
+      },
+      "lines": [
+        "If you control at least 5 Dwarf characters, add 1 additional resource to Thorin Oakenshield's pool when you collect resources during the resource phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131003",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Nori.jpg",
+        "sha256": "87d102424d447ea21ae4b2ae8012d58918aa9c2856d40405f93a4927396d17d0"
+      },
+      "lines": [
+        "Response: After you play a Dwarf character from your hand, reduce your threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131004",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Ori.jpg",
+        "sha256": "13600ef7460b775266ac7b8e64e17794e7358461cb265c76266b032cf34e6faa"
+      },
+      "lines": [
+        "If you control at least 5 Dwarf characters, draw 1 additional card at the beginning of the resource phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131005",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Beorn.jpg",
+        "sha256": "4b223d803ee71d4d8427f09a17acce34d83312287dfe8857dfab17c99eeea1a4"
+      },
+      "lines": [
+        "Sentinel. Cannot have attachments.",
+        "Immune to player card effects.",
+        "Beorn does not exhaust to defend."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131006",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Fili.jpg",
+        "sha256": "3f6fb5a3614fc581e6866320bc2fd1935cbc6f2bbe0ae7122c4b6260fea261c0"
+      },
+      "lines": [
+        "Response: After you play Fili from your hand during the planning phase, search your deck for Kili and put him into play under your control. Then, shuffle your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131007",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Kili.jpg",
+        "sha256": "bd186b46a1e09ad5c069034681237de1d2b7978563cd4a6c40657afc5631f724"
+      },
+      "lines": [
+        "Response: After you play Kili from your hand during the planning phase, search your deck for Fili and put him into play under your control. Then, shuffle your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131008",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Bofur.jpg",
+        "sha256": "219c7bc0a8d58163b45bf7932417ac3dca2d83b9d08740b2744d89c07e00359f"
+      },
+      "lines": [
+        "Action: Exhaust Bofur to search the top 5 cards of your deck for 1 Weapon attachment. Add that card to your hand and shuffle the other cards back into your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131009",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Dori.jpg",
+        "sha256": "bd519c2ce5ab4cb227dad7181376521682a4f4f4143d3b5d29da70c158091221"
+      },
+      "lines": [
+        "Response: After a hero is assigned any amount of damage, exhaust Dori to place that damage on Dori instead."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131010",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Gandalf.jpg",
+        "sha256": "88c413b012d44b25c86d91fa3c4f18a0e03d39fef3f9010ed5be1efb0aaed638"
+      },
+      "lines": [
+        "Gandalf does not exhaust to commit to a quest.",
+        "Forced: At the end of the refresh phase, discard Gandalf from play. You may raise your threat by 2 to cancel this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131011",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Cram.jpg",
+        "sha256": "b8aaff035db94154a095a84d1926f57a208c8a2458e28ca10e892eb7e5fa01e2"
+      },
+      "lines": [
+        "Attach to a hero.",
+        "Action: Discard Cram to ready attached hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131012",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Spare-Hood-and-Cloak.jpg",
+        "sha256": "96b3a88481d4dabc8bdecbe6c0c296b473510bbd15b65c4163cfbb703fe54eaf"
+      },
+      "lines": [
+        "Attach to a character.",
+        "Action: Exhaust Spare Hood and Cloak and exhaust attached character to ready another character. Then, attach Spare Hood and Cloak to that character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131013",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Thrór's-Map.jpg",
+        "sha256": "fbef49a77bef90153f845737b7c2d23eec89c85ac254715b325560535dd9540f"
+      },
+      "lines": [
+        "Attach to a hero.",
+        "Travel Action: Discard Thrór's Map to choose a location in the staging area. Make that location the active location. (If there is another active location, return it to the staging area.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131014",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/A-Very-Good-Tale.jpg",
+        "sha256": "0a352dd93c76bccaa98a779dfa4c2ae71eedef582a89433dded12d05b31cdef8"
+      },
+      "lines": [
+        "Action: Exhaust 2 allies you control to shuffle your deck and discard the top 5 cards. Put up to 2 allies discarded by this effect into play under your control. The total cost of the allies put into play cannot exceed the total cost of the allies exhausted to pay for this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131015",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Foe-hammer.jpg",
+        "sha256": "2092142201d95d8147e28635ff539be2315564982deeb1277e4a8988f215c8cc"
+      },
+      "lines": [
+        "Response: After a hero you control attacks and destroys an enemy, exhaust a Weapon card attached to that hero to draw 3 cards."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131016",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Goblin-cleaver.jpg",
+        "sha256": "f3bc055f9a2c9124d2f727d91c3fc84d3c83bc269ea16b729b76d7784dc91878"
+      },
+      "lines": [
+        "Combat Action: Exhaust a Weapon card attached to a hero you control to choose an enemy engaged with you. Deal 2 damage to that enemy. (Deal 3 damage instead if the enemy is an Orc.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131017",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Late-Adventurer.jpg",
+        "sha256": "94ab7106d8ee8899f1e682aeb00d1822ca9b727c5effa92f9b63f1ba9028036f"
+      },
+      "lines": [
+        "Quest Action: Exhaust a character you control that is not committed to the quest to commit that character to the quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131018",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Expecting-Mischief.jpg",
+        "sha256": "285c4b09624bf294968f5c747dd818927d6ee70f271f15b80db6cf5e5d5facfb"
+      },
+      "lines": [
+        "Play during the quest phase, before the staging step.",
+        "Action: Deal 2 damage to the first enemy revealed from the encounter deck this phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131019",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Burglar-Baggins.jpg",
+        "sha256": "dfedc1f2d9ec893020c5da2c74fdcc674c3e59d680aa3a39a42c0ae4b5edca66"
+      },
+      "lines": [
+        "Action: Bilbo Baggins gets +2 Willpower, +2 Attack, and +2 Defense until the end of the phase. (You may spend a Baggins resource from Bilbo Baggins' resource pool to play this card even if you do not control Bilbo Baggins.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "02033",
+      "side": "A",
+      "printing": "Conflict at the Carrock",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/A-Burning-Brand.jpg",
+        "sha256": "20f231e5af86aec4d1029a38e3ee4761910779fde302511ff93664418001b155"
+      },
+      "lines": [
+        "Attach to a Lore character. Restricted.",
+        "Response: Exhaust A Burning Brand to cancel a shadow effect just triggered during an attack that attached character is defending."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "02095",
+      "side": "A",
+      "printing": "The Dead Marshes",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Boromir.jpg",
+        "sha256": "9d07d32629b6fb57b6bf23ee89d1418aa2d311295eb3e7594bf0759d3736c4fd"
+      },
+      "lines": [
+        "Action: Raise your threat by 1 to ready Boromir. (Limit once per phase.)",
+        "Action: Discard Boromir to deal 2 damage to each enemy engaged with a single player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "02116",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Dáin-Ironfoot.jpg",
+        "sha256": "0838fa282691884a784064653e3568f81f36024108811c94ef0047817880f776"
+      },
+      "lines": [
+        "While Dáin Ironfoot is ready, Dwarf characters get +1 Attack and +1 Willpower."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03003",
+      "side": "A",
+      "printing": "Khazad-dûm",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Narvi's-Belt.jpg",
+        "sha256": "2413f725d389009b7bef7b6bc541a318ae3442d2ccfca98d0dac23d47faaa660"
+      },
+      "lines": [
+        "Attach to a Dwarf hero.",
+        "Action: Exhaust Narvi's Belt to give attached hero a Leadership, Lore, Tactics, or Spirit icon until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "03009",
+      "side": "A",
+      "printing": "Khazad-dûm",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Zigil-Miner.jpg",
+        "sha256": "78da1ac1b1298a951632361db28671a062abc7ed7423323e8fa968a74489c3d9"
+      },
+      "lines": [
+        "Action: Exhaust Zigil Miner and name a number to discard the top 2 cards of your deck. If at least one of those cards has a cost equal to the named number, choose a hero you control. For each card that matches the named number, add 1 resource to that hero's resource pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04036",
+      "side": "A",
+      "printing": "Road to Rivendell",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Out-of-the-Wild.jpg",
+        "sha256": "0d9b918b95198b0197c95fb069c1bf2a5cdd6520c3250e83affd856d05d01499"
+      },
+      "lines": [
+        "Secrecy 2.",
+        "Action: Search the top 5 cards of the encounter deck for any 1 non-objective card worth no victory points and add it to your victory display. Shuffle the encounter deck. Add Out of the Wild to the victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "04061",
+      "side": "A",
+      "printing": "The Watcher in the Water",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Legacy-of-Durin.jpg",
+        "sha256": "5e762b63801036fc6c914f0eaf22badd87677b37e80885049ba39955c7574033"
+      },
+      "lines": [
+        "Attach to a Dwarf hero.",
+        "Response: After you play a Dwarf character from your hand, exhaust Legacy of Durin to draw 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04076",
+      "side": "A",
+      "printing": "The Long Dark",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Háma.jpg",
+        "sha256": "72de7d19abd2b9625b77a7fdbe2816e249c153ab0fe958db1c63ca02d74ebacd"
+      },
+      "lines": [
+        "Response: After Háma is declared as an attacker, return a Tactics event from your discard pile to your hand. Then, choose and discard 1 card from your hand. (Limit 3 times per game for the group.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04079",
+      "side": "A",
+      "printing": "The Long Dark",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Erebor-Battle-Master.jpg",
+        "sha256": "ef64d0f3e6091dae76641e27c67d636f9233bca7d870899d9a95f1ce13fec34a"
+      },
+      "lines": [
+        "Erebor Battle Master gets +1 Attack for each other Dwarf ally you control. (Limit +4 Attack.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04081",
+      "side": "A",
+      "printing": "The Long Dark",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Out-of-Sight.jpg",
+        "sha256": "2c3c0a91818bd8f9196d8dbd0110088df278df1c7c739762fdd54ce5cb3f6436"
+      },
+      "lines": [
+        "Secrecy 3.",
+        "Action: Enemies engaged with you cannot attack you this phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04085",
+      "side": "A",
+      "printing": "The Long Dark",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Love-of-Tales.jpg",
+        "sha256": "8b46c61f8a44b15ce7f2b1191d51b7f68b2c5f904e88fef1a10612586d5e92b5"
+      },
+      "lines": [
+        "Attach to a Lore hero. Limit 1 per hero.",
+        "Response: After a Song card is played, exhaust Love of Tales to add 1 resource to attached hero's resource pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04109",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Healing-Herbs.jpg",
+        "sha256": "666bc8149aee1e8fa3512756e475363f8208fd7c529adfb1646f4ed6a717daaf"
+      },
+      "lines": [
+        "Attach to a Lore hero.",
+        "Action: Discard Healing Herbs and exhaust attached hero to heal all damage on 1 character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04129",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/We-Are-Not-Idle.jpg",
+        "sha256": "8ab2c62153de600fbcaf293aaa31b029730e9647ef62fb1d58775b0dfab18728"
+      },
+      "lines": [
+        "Action: Exhaust X Dwarf heroes to add X resources to a hero's resource pool and draw 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "04132",
+      "side": "A",
+      "printing": "Shadow and Flame",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/A-Elbereth-Gilthoniel.jpg",
+        "sha256": "9935653817c7d0d10fb9c545eec88e362ca3e1b6d25b24bf32b6b1a3bd711b87"
+      },
+      "lines": [
+        "Secrecy 4.",
+        "Response: After a non-unique enemy attacks you, put that enemy on the bottom of the encounter deck. If your threat is lower than that enemy's engagement cost, set your threat equal to the engagement cost of that enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "06036",
+      "side": "A",
+      "printing": "The Drúadan Forest",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Druadan-Forest/Trained-for-War.jpg",
+        "sha256": "1e68e2ad4cbf1c1eb34a9f5021f606a2154c7ef0697e6a9fca89fe73618a643e"
+      },
+      "lines": [
+        "Play only if each hero you control has the printed Tactics resource icon.",
+        "Action: Until the end of the phase, if the current quest does not have siege, it gains battle. (Characters quest using Attack instead of Willpower.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "06037",
+      "side": "A",
+      "printing": "Elves of Lórien",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Silvan-Refugee.jpg",
+        "sha256": "07eaebb3b73b95782f4c1f26e7ef3405e01ad85b070373b224c3391fc881f27e"
+      },
+      "lines": [
+        "Forced: After a character leaves play, discard Silvan Refugee from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "06107",
+      "side": "A",
+      "printing": "The Blood of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Blood-of-Gondor/Caldara.jpg",
+        "sha256": "8e4b4700685cd5e4635319cd43efef1e05db0c7a6c0e162ea4e6e0ace9274ad9"
+      },
+      "lines": [
+        "Action: Discard Caldara to put 1 Spirit ally from your discard pile into play for each other hero you control with a printed Spirit resource icon. (Limit once per game.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08006",
+      "side": "A",
+      "printing": "Two-Player Limited Edition Starter",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Two-Player-Limited-Edition-Starter/Blue-Mountain-Trader.jpg",
+        "sha256": "d0090e93d3e8af35275c3b55ab61c2ff64aab50a0cde156c1251c6117f6186d8"
+      },
+      "lines": [
+        "Action: Choose another player. That player gains control of Blue Mountain Trader. Then, that player moves 1 resource from the resource pool of a hero he controls to the resource pool of a hero you control, or Blue Mountain Trader is discarded. (Limit once per round.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08092",
+      "side": "A",
+      "printing": "The Nîn-in-Eilph",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Wingfoot.jpg",
+        "sha256": "6e053a138830db779fa7f5d70b79bba55bd026929bc6bd9001d6ac20a2e8b945"
+      },
+      "lines": [
+        "Attach to a Ranger hero.",
+        "Response: After attached hero commits to a quest, name enemy, location, or treachery. If a card of the named type is revealed during this quest phase, exhaust Wingfoot to ready attached hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "12060",
+      "side": "A",
+      "printing": "Temple of the Deceived",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Déorwine.jpg",
+        "sha256": "4341462e40328282632e37a2a6bf08ee1377c93396d8a72f6fb5ca3c8a0d7728"
+      },
+      "lines": [
+        "Sentinel.",
+        "While Déorwine is defending, he gains: \"Response: Spend 1 Leadership resource to cancel a shadow effect just triggered. Any player may trigger this response.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "12066",
+      "side": "A",
+      "printing": "Temple of the Deceived",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/c2c8d69a-6639-49af-89ed-86f2ffc8c096.jpg",
+        "sha256": "1405588f73156b07c33926f6e909b72170842b863bb0ca2701fb3543f11d6db3"
+      },
+      "lines": [
+        "Response: After Ered Luin Miner is discarded from your deck, put it into play under your control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "12116",
+      "side": "A",
+      "printing": "A Storm on Cobas Haven",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Windfola.jpg",
+        "sha256": "4dc95ad724df3f7887ab88a36ad2158b697be12383aa3c83ce442c34b3366d87"
+      },
+      "lines": [
+        "Attach to a Spirit hero, or to Éowyn. Restricted.",
+        "Attached character gets +1 Willpower.",
+        "Response: After attached character is removed from the quest, exhaust Windfola to commit that character to the quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "132011",
+      "side": "A",
+      "printing": "The Hobbit: On the Doorstep",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Ravens-of-the-Mountain.jpg",
+        "sha256": "198c2a57ca6fefb64c4c6ce5afef57e1ab96918c5b98fd0c6b34ef4040753103"
+      },
+      "lines": [
+        "Action: Exhaust a hero you control to shuffle the encounter deck and look at its top card. Place progress tokens on the current quest equal to the Threat of the card you looked at. Then, put that card back on top of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132017",
+      "side": "A",
+      "printing": "The Hobbit: On the Doorstep",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Expert-Treasure-hunter.jpg",
+        "sha256": "bea628b4e803e8edb49a713f7f24ca71090bb70f76371e02d3d7307d08c6b59f"
+      },
+      "lines": [
+        "Attach to a hero. Limit 1 per hero.",
+        "Response: After attached hero quests successfully, name a card type and discard the top card of your deck. If the discarded card is the named type, take it into your hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17007",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Dwarf-Pipe.jpg",
+        "sha256": "1af20856d82e6114f8f10e3e3898949840a104b3e20c615c5414e43d4c0171ce"
+      },
+      "lines": [
+        "Attach to a Dwarf character. Limit 1 per character.",
+        "Response: After a card is discarded from your deck, exhaust Dwarf Pipe to place that card on the bottom of your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17135",
+      "side": "A",
+      "printing": "The Crossings of Poros",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/b62716d9-5e70-4ec1-bcb7-852f67299e82.jpg",
+        "sha256": "6e385ad0dc0df1fce41cdfb0a50d4a974f25997fab2962b75055f6048e130876"
+      },
+      "lines": [
+        "Cannot have restricted attachments.",
+        "Action: Deal 2 damage to Quickbeam to ready him. (Limit once per phase.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "19145",
+      "side": "A",
+      "printing": "The Fate of Wilderland",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fate-of-Wilderland/Radagast.jpg",
+        "sha256": "f2acfff6554d1be91aebeaa12bac540177e0c18ccf0fcc46e5ae4548ff2e5b86"
+      },
+      "lines": [
+        "While playing a Creature ally, Radagast gains the printed Leadership, Spirit, and Tactics icons.",
+        "Response: After you play a Creature card, Radagast does not exhaust to quest this round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "19153",
+      "side": "A",
+      "printing": "The Fate of Wilderland",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fate-of-Wilderland/Reforged.jpg",
+        "sha256": "104f76a56ef9be50ea070359315d4f8cd2dbae21b0750e5d25e922459729f1e2"
+      },
+      "lines": [
+        "Action: Choose an Item attachment with a printed cost of X in any player's discard pile and play that attachment for no cost. (The chosen attachment can belong to any sphere of influence.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "22090",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Helm-of-Secrecy.jpg",
+        "sha256": "6b62d424073989db6156ff0e7d6b6dd6180a1fd2b029d7ba14afdf2257caf88f"
+      },
+      "lines": [
+        "Limit 1 per deck.",
+        "Action: Choose a hero you control and discard all tokens from it. Select a different non-Fellowship, non-Baggins hero from your collection with a threat cost less than or equal to the chosen hero. Swap those heroes, moving all eligible attachments to the hero from your collection."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    }
+  ]
+}

@@ -123,6 +123,12 @@ const ROWS: readonly Row[] = [
 
   // 901308 Caradhras the Cruel.
   { line: "901308:A:1", name: "every Snow card in the discard pile goes on top of the deck and the top card is revealed", layout: { discard: ["04027", "f0"], deck: ["f3"] }, act: reveal("901308"), expect: [zone("04027", "staging"), zone("f0", "encounterDiscard")] },
+
+  // 04025:A:2 and 04026:A:2 "Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if the active location is a Mountain.)" f0 (1 Attack) undefended: 2 with The Dimrill Stair (a Stair) active, 3 with Rocky Crags (a Mountain) active.
+  { line: "04025:A:2", name: "Shadow: +1 Attack while the active location is no Mountain", layout: { active: "04018" }, act: attack("f0", { shadow: "04025", undefended: true }), expect: damageOn("dh1", 2) },
+  { line: "04025:A:2", name: "Shadow: +2 Attack instead while the active location is a Mountain", layout: { active: "04019" }, act: attack("f0", { shadow: "04025", undefended: true }), expect: damageOn("dh1", 3) },
+  { line: "04026:A:2", name: "Shadow: +1 Attack with no active location", layout: {}, act: attack("f0", { shadow: "04026", undefended: true }), expect: damageOn("dh1", 2) },
+  { line: "04026:A:2", name: "Shadow: +2 Attack instead while the active location is a Mountain", layout: { active: "04019" }, act: attack("f0", { shadow: "04026", undefended: true }), expect: damageOn("dh1", 3) },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-redhorn-gate", ROWS);

@@ -131,6 +131,9 @@ const ROWS: readonly Row[] = [
   { line: "51253:A:1", name: "When Revealed: with no engaged enemy no attack is made and it gains surge", layout: { deck: F0 }, act: reveal("51253"), expect: [count("f0", "staging", 1)] },
   { line: "51253:A:1", name: "an engaged enemy attacks and it gains none", layout: { engaged: ["f0"], deck: ["f0", "f3"] }, act: resolve("51253", "whenRevealed"), expect: [window("defense"), zone("f3", "encounterDeck")] },
   { line: "51253:A:2", name: "Shadow: each enemy engaged with you gets +1 Attack until the end of the phase", layout: { engaged: ["f3", "f0"], deck: F0 }, act: attack("f3", { shadow: "51253", undefended: true }), expect: [damageOn("dh1", 4)] },
+
+  // 51248:A:2 "Shadow: Attacking enemy gets +1 Attack." f3 (1 Attack) undefended deals 2.
+  { line: "51248:A:2", name: "Shadow: the attacking enemy gets +1 Attack", layout: { engaged: ["f3"], deck: F0 }, act: attack("f3", { shadow: "51248", undefended: true }), expect: damageOn("dh1", 2) },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-mines-of-moria", ROWS.map(withStages));

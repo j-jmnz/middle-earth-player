@@ -417,7 +417,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 906305:A:1 (front): X is 1 plus the number of Nazgûl enemies in play.
   906305:constant:1: Constant
-    - this card: stat threat the number of Nazgûl enemy (any player controls) + 1, while this card is in play
+    - this card: stat threat the number of Nazgûl enemy (any player controls) or in the staging area + 1, while this card is in play
 
 906305:A:2 (front): While Great East Road is in the staging area, each Nazgûl enemy gets -5 engagement cost.
   906305:constant:2: Constant
@@ -443,7 +443,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource(s) come off the resource pool of this card (discarded, not spent)
-    - then, if not (this card is a location (any player controls) with resources on it) (checked when this step runs, after the steps above; not tied to whether they did anything): the Ring-bearer's life goes down by 3, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
+    - then, if all of: (every draw and every discard of the top of the deck this effect ran so far resolved in full (what follows "then" is attempted only when they did)) and (resources of this card is less than 1) (checked when this step runs, after the steps above; not tied to whether they did anything): the Ring-bearer's life goes down by 3, to a minimum of 0, and the step names its cause (healing never raises it; at 0 the players lose the game; nothing in a game with no life number)
 
 ## 906307 Ettendales
 
@@ -488,7 +488,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 906309:A:2 (front): When Revealed: Attach to the Ring-bearer. Limit 1 per hero. (Counts as a Condition attachment with the text: "Forced: At the beginning of the planning phase, either exhaust The One Ring, or reduce the Ring-bearer's life by 1.")
   906309:whenRevealed:1: When revealed
-    - if the number of card (any player controls) or in the staging area or the active location, named "The Twilight World", attached to a hero (any player controls) is at most 0: this treachery is attached to the Ring-bearer, the hero with the Ring-bearer trait (it stays in the encounter discard pile when there is no Ring-bearer in play)
+    - if the number of attachment (any player controls) named "The Twilight World", attached to a hero (any player controls) is at most 0: this treachery is attached to the Ring-bearer, the hero with the Ring-bearer trait (it stays in the encounter discard pile when there is no Ring-bearer in play)
   906309:forced:1: Forced when a phase begins
     only if it is the Planning phase
     who acts: the acting player is the first player (a phase has no player of its own)
@@ -500,4 +500,4 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   906309:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 235 by template, 0 as JSON)
+(rendered pieces: 236 by template, 0 as JSON)

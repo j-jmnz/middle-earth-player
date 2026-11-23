@@ -5,15 +5,13 @@
 // Deep Knowledge 07012:A:2, The Wizards's Voice 07013:A:2, Power of Orthanc 07014:A:2, The Seeing-stone 07015:A:2.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { Effect } from "../../catalog/boundary.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { EFFECTS } from "../../effects/index.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, fillers, passAll, play, playerTable, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { begin, idsOf } from "../../../test/harness/scene.ts";
+import { atDefense, canPlay, choices, combat, fillers, passAll, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
 
 const LEGACY = "07011";
 const DEEP = "07012";
@@ -35,7 +33,7 @@ const PLAIN = "plain";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -46,7 +44,6 @@ beforeAll(async () => {
 });
 
 // Whether the engine offers to play `cardId` from the hand.
-const playable = (tab: Table, cardId: string) => legalIntents(tab.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === cardId);
 
 describe("Legacy of Númenor (07011:A:2)", () => {
   // "Action: Add 1 resource to each hero's resource pool.": Aragorn pays 0; each hero of both players gets 1 (Doomed 4 raises each threat).
@@ -71,7 +68,7 @@ describe("Deep Knowledge (07012:A:2)", () => {
   // Both decks empty: no player can draw, so the Action can change nothing and the card is not played (rr.triggered-ability).
   it("07012:A:2 Deep Knowledge: not played when every deck is empty", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: DENETHOR, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: DEEP, seat: 0 }] });
-    expect(playable(tab, idsOf(tab, DEEP))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, DEEP))).toBe(false);
   });
 });
 
@@ -92,7 +89,7 @@ describe("The Wizards's Voice (07013:A:2)", () => {
   // No enemy engaged with any player: nothing to choose, so the card is not played.
   it("07013:A:2 The Wizards's Voice: not played with no enemy engaged", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: VOICE, seat: 0 }], staging: [BRUTE] });
-    expect(playable(tab, idsOf(tab, VOICE))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, VOICE))).toBe(false);
   });
 
   // "Until the end of the phase": played in the planning phase, the Brute cannot attack the player for that phase; the effect is over
@@ -102,8 +99,7 @@ describe("The Wizards's Voice (07013:A:2)", () => {
     const played = play(begin(tab.state), tab, idsOf(tab, VOICE));
     expect(played.state.cards[idsOf(tab, VOICE)]?.zone).toBe("discard");
     expect(played.state.modifiers).toContainEqual(expect.objectContaining({ instanceId: idsOf(tab, BRUTE), stat: "cannotAttack", until: "endOfPhase", seat: 0 }));
-    const run = passAll(combat(played.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    atDefense(tab, played.state);
   });
 });
 
@@ -131,7 +127,7 @@ describe("Power of Orthanc (07014:A:2)", () => {
   // No Condition attachment in play: each player can only skip, so the card can change nothing and is not played.
   it("07014:A:2 Power of Orthanc: not played with no Condition attachment in play", () => {
     const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], attached: [{ code: STONE_ITEM, host: EOWYN }], hand: [{ code: POWER, seat: 0 }] });
-    expect(playable(tab, idsOf(tab, POWER))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, POWER))).toBe(false);
   });
 });
 

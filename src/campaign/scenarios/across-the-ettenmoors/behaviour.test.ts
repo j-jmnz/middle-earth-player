@@ -14,7 +14,6 @@ import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { pickCandidates } from "../../../rules/interpret/pick.ts";
 import { guardWith } from "../../../rules/families/objectives/guard.ts";
 import { setCurrentQuest } from "../../../rules/families/angmar/quest.ts";
-import { startReveal } from "../../../rules/windows/frames.ts";
 import { queueEvent } from "../../../rules/windows/queue.ts";
 import { begin } from "../../../../test/harness/scene.ts";
 import { fightEnemy, finish, idOf, legalIntents, legalTargets, resolveRecords, revealFromTop, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
@@ -108,19 +107,15 @@ describe("10068:A:1 is Guarded and Safe", () => {
     expect(targets(free)).toContain("10068");
   });
 
-  it("10068:A:1 skips a safe location that would be the guard: it is revealed in its own turn and takes the card after it as its guard (rr.guarded)", () => {
+  it("10068:A:1 a second safe location that is next in the deck is revealed after the card behind it has guarded the first, and takes the card after that as its guard (rr.guarded)", () => {
     const t = at({ deck: ["10069", "f0", "f3", "f0"] });
-    const first = finish({ state: revealFromTop(t.state, t.ctx, "10068", []).state, steps: [] }, t.ctx).state;
-    // The first safe location takes the first card that is not an objective; the second one stays on the deck, on top.
-    expect(first.cards[idOf(first, "f0")]?.guard).toBe(true);
-    expect(first.cards[idOf(first, "f0")]?.host).toBe(idOf(first, "10068"));
-    expect(first.encounterDeck.map((id) => first.cards[id]?.code)).toEqual(["10069", "f3", "f0"]);
-    // Its own turn: revealed from the top, it takes the next card.
-    const top = first.encounterDeck[0] ?? "";
-    const second = finish({ state: settle(startReveal({ ...first, window: null, mode: "stopped" }, 0, t.ctx, [], top), t.ctx, []), steps: [] }, t.ctx).state;
-    expect(second.cards[idOf(second, "10069")]?.zone).toBe("staging");
-    expect(second.cards[idOf(second, "f3")]?.guard).toBe(true);
-    expect(second.cards[idOf(second, "f3")]?.host).toBe(idOf(second, "10069"));
+    const done = finish({ state: revealFromTop(t.state, t.ctx, "10068", []).state, steps: [] }, t.ctx).state;
+    expect(done.cards[idOf(done, "f0")]?.guard).toBe(true);
+    expect(done.cards[idOf(done, "f0")]?.host).toBe(idOf(done, "10068"));
+    expect(done.cards[idOf(done, "10069")]?.zone).toBe("staging");
+    expect(done.cards[idOf(done, "f3")]?.guard).toBe(true);
+    expect(done.cards[idOf(done, "f3")]?.host).toBe(idOf(done, "10069"));
+    expect(done.encounterDeck.map((id) => done.cards[id]?.code)).toEqual(["f0"]);
   });
 });
 

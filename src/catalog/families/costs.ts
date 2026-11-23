@@ -98,7 +98,7 @@ const TRIGGERS = ["attached", "resourcesSpent"] as const;
 // hero a Leadership icon until the end of the phase". `collectsResources`: a card that is not a hero collects this many
 // resources each resource phase (rr.step-1-2) into its own pool. `engagementCheckCost`: an enemy gets this much more
 // engagement cost while it makes an engagement check with the player who controls the modifier's source (Orc Disguise). `losesIcons`: on a hero, it has none of its Lore, Leadership, Spirit and
-// Tactics icons, printed or gained ("all ready heroes lose all Lore, Leadership, Spirit and Tactics icons", 50321:A:1); read by iconLost (rules/families/costs/pay.ts).
-const FLAGS = ["leadershipIcon", "loreIcon", "tacticsIcon", "spiritIcon", "collectsResources", "engagementCheckCost", "losesIcons"] as const;
+// Tactics icons, printed or gained ("all ready heroes lose all Lore, Leadership, Spirit and Tactics icons", 50321:A:1); read by iconLost (rules/families/costs/pay.ts). `paysAsLeadership`: on a hero, its resources may be spent as Leadership resources (Oak-wood Grove, 02046:A:1); a payment allowance, not an icon, so it is no sphere in a filter (heroPays, rules/player/payments.ts).
+const FLAGS = ["leadershipIcon", "loreIcon", "tacticsIcon", "spiritIcon", "collectsResources", "engagementCheckCost", "losesIcons", "paysAsLeadership"] as const;
 
 export const manifest = { name: "costs", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

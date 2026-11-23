@@ -9,16 +9,13 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
-import { ruleCause } from "../../rules/core/cause.ts";
-import { placeDamage } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard, withThreat } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, discarded, endRound, enter, hosts, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { canPlay, choices, destroyed, discarded, endRound, enter, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const LORIEN = "08058";
 const GWAIHIR = "08059";
@@ -46,7 +43,7 @@ const SPIRIT = "spirit";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -60,8 +57,6 @@ beforeAll(async () => {
 });
 
 // The card `id` is destroyed (9 damage), and a Pass lets the game resolve what that set off.
-const destroyed = (state: Run["state"], tab: Table, id: string): Run => sendUnledgered(begin(placeDamage(state, id, 9, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
-const playable = (state: Run["state"], tab: Table, id: string) => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
 
 describe("O Lórien! (08058:A:1)", () => {
   // "Attach to a hero.": the Pal and the other player's Spirit hero are offered, the ally is not.
@@ -188,9 +183,9 @@ describe("Lembas (08064:A:1 to A:3)", () => {
   // Guide (a Silvan ally) and the other player's Legolas (a Silvan hero), it is not.
   lineSpec("08064:A:1", "is played only while you control a Noldor or Silvan hero", (effects) => {
     const without = table(effects, { seats: 2, heroes: [{ code: DENETHOR, seat: 0 }, { code: LEGOLAS, seat: 1 }], allies: [{ code: GUIDE, seat: 0 }], hand: [{ code: LEMBAS, seat: 0 }] });
-    expect(playable(without.state, without, idsOf(without, LEMBAS))).toBe(false);
+    expect(canPlay(without.state, without, idsOf(without, LEMBAS))).toBe(false);
     const tab = table(effects, { heroes: [{ code: DENETHOR, seat: 0 }, { code: GLORFINDEL, seat: 0 }], hand: [{ code: LEMBAS, seat: 0 }] });
-    expect(playable(tab.state, tab, idsOf(tab, LEMBAS))).toBe(true);
+    expect(canPlay(tab.state, tab, idsOf(tab, LEMBAS))).toBe(true);
     expect(play(begin(tab.state), tab, idsOf(tab, LEMBAS), idsOf(tab, DENETHOR)).state.cards[idsOf(tab, LEMBAS)]?.host).toBe(idsOf(tab, DENETHOR));
   });
 

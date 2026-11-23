@@ -109,6 +109,9 @@ const ROWS: readonly Row[] = [
   { line: "50832:A:1", name: "When Revealed: each player deals 1 damage to a hero he controls; a questing hero is removed from the quest", layout: { stage: "50805", committed: ["dh1"], deck: ["f0"] }, act: reveal(WEARY), expect: [damageOn("dh1", 1), exhausted("dh1", false)] },
   { line: "50832:A:2", name: "Shadow: the attacker gets +1 Attack", layout: { engaged: ["f3"] }, act: attack("f3", { shadow: WEARY, undefended: true }), expect: [damageOn("dh1", 2)] },
   { line: "50832:A:2", name: "+2 Attack instead if the defender is damaged", layout: { engaged: ["f3"], play: [{ code: "ally", damage: 1 }] }, act: [attack("f3", { shadow: WEARY }), defend("ally")], expect: [damageOn("ally", 3)] },
+
+  // 50820:A:3 "Travel: Reveal the top card of the encounter deck to travel here." One card, not one for each player: with two players one card of three leaves the deck.
+  { line: "50820:A:3", name: "Travel: the top card of the encounter deck is revealed", layout: { stage: "50805", seats: 2, phase: "Travel", staging: ["50820"], deck: ["place", "f0", "f0"] }, act: travel("50820"), expect: [zone("place", "staging"), zone("50820", "activeLocation"), deckCount(2)] },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-siege-of-annuminas", ROWS);

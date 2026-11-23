@@ -22,6 +22,7 @@ import type { ScenarioState } from "../core/state.ts";
 import { heldAmount, livingSeats, updateCard } from "../core/state.ts";
 import { attachTo, moveCard } from "../core/zones.ts";
 import { matchesPick, pickCandidates } from "../interpret/pick.ts";
+import { spheresOf } from "../families/costs/pay.ts";
 
 type AttachRule = Extract<Instruction, { verb: "AttachesTo" }>;
 
@@ -69,7 +70,7 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
     if (named.kind === "ringBearer" && !hasTrait(state, id, "Ring-bearer", ctx)) return false;
     if (named.trait && !hasTrait(state, id, named.trait, ctx)) return false;
     if (named.name && printedOf(ctx.cards, host.code).name !== named.name) return false;
-    if (named.sphere && printedOf(ctx.cards, host.code).sphere !== named.sphere) return false;
+    if (named.sphere && !spheresOf(state, id, printedOf(ctx.cards, host.code).sphere, ctx).includes(named.sphere)) return false;
     return true;
   });
 }

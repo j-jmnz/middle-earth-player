@@ -7,7 +7,8 @@
 //   Action must not be idle (`idleEventReason`).
 // - `noChangeReason` reads only the first instruction of an Action or a Response on a card in play (usage.ts), except for an effect whose every instruction is idle: a later
 //   instruction can depend on it ("Then", rr.then) or be a choice made as the effect resolves, and an ability that does something else after its first instruction has the
-//   potential to change the game state.
+//   potential to change the game state. The steps that act on the card a cost discarded (a Pick of the top of the discard pile after a `discardDeckTop` cost, Ring of Thrór) are not read: the potential is
+//   assessed without the consequences of the cost payment.
 // An instruction is idle when the table shows it cannot change the game, by its kind and what it acts on (idle.ts; a mechanic family's verb is read by the family's `idle`
 // hook, `RulesFamily` in interpret/family-manifest.ts). The kinds, in the order idle.ts reads them:
 // - a stat or an amount: a Draw from an empty deck (rr.running-out-of-cards) or of 0 cards, a gain of 0 resources or none for a hero that cannot gain, a stat change of 0,
@@ -22,6 +23,7 @@
 // `when: thenResolves` after a Draw or a discard that found too few cards is not attempted (rr.then).
 import type { Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
 
+import { costsOf } from "../../catalog/costs.ts";
 import { isPlayerCardEffect } from "../core/keywords.ts";
 import type { GameEvent, ScenarioState } from "../core/state.ts";
 import { targetCandidates } from "../interpret/effect-verbs.ts";
@@ -87,23 +89,32 @@ function pickedStepsIdle(state: ScenarioState, instructions: readonly Instructio
   return false;
 }
 
+// The instructions whose potential counts: the steps from a Pick of the top of the discard pile on act on the card the cost discarded (Ring of Thrór: "discard the top card of your deck
+// to ready attached hero. If the discarded card is an attachment, put it into play"), and the potential is read without the consequences of the cost payment (rr.triggered-ability).
+function counted(effect: Effect): readonly Instruction[] {
+  if (!costsOf(effect).some((cost) => cost.kind === "discardDeckTop")) return effect.instructions;
+  const from = effect.instructions.findIndex((step) => step.verb === "Pick" && step.pick.from === "discard" && step.pick.topmost === true);
+  return from < 0 ? effect.instructions : effect.instructions.slice(0, from);
+}
+
 /** Why a Trigger of a player card's Action or Response cannot change the game state, or null. `event` is the one a Response answers. */
 export function noChangeReason(state: ScenarioState, effect: Effect, sourceId: string, seat: number, ctx: ReduceContext, event?: GameEvent): string | null {
   if (effect.timing !== "action" && effect.timing !== "response") return null;
   // An encounter card's ability is the game's, not a player card effect (rr.triggered-ability speaks of player cards).
   if (!isPlayerCardEffect(state, ctx.cards, sourceId)) return null;
-  const first = effect.instructions[0];
+  const steps = counted(effect);
+  const first = steps[0];
   const source = state.cards[sourceId];
   if (!first || !source || ("when" in first && first.when != null)) return null;
   const about = event ? aboutCard(event) : undefined;
   const scope: AmountScope = { actor: seat, sourceId, subject: about ?? null, other: event?.other ?? null, ...(event?.participants ? { participants: event.participants } : {}) };
-  if (first.verb !== "Pick") return allIdle(state, effect.instructions, sourceId, seat, ctx, scope, { eventSeat: event?.seat ?? undefined }) ? IDLE : null;
+  if (first.verb !== "Pick") return allIdle(state, steps, sourceId, seat, ctx, scope, { eventSeat: event?.seat ?? undefined }) ? IDLE : null;
   const pick = first.pick;
   // A search of a deck with no card in it finds nothing and shuffles nothing; with cards in it, it may find none and still shuffle (rr.search).
   if (pick.from === "deck" && !pick.looked) return seatsOf(state, pick, seat).every((index) => deckPool(state, index, pick).length === 0) ? NO_TARGET : null;
   if (searchOrLaterPick(pick, first.when)) return null;
   const found = pickCandidates(state, pick, seat, [], sourceId, ctx, event?.amount, event?.participants, false, event ? { subject: about ?? null, other: event.other ?? null } : undefined);
   if (found.length === 0) return NO_TARGET;
-  const idle = pickedStepsIdle(state, effect.instructions, found, sourceId, seat, ctx) || allIdle(state, effect.instructions, sourceId, seat, ctx, scope, { eventSeat: event?.seat ?? undefined });
+  const idle = pickedStepsIdle(state, steps, found, sourceId, seat, ctx) || allIdle(state, steps, sourceId, seat, ctx, scope, { eventSeat: event?.seat ?? undefined });
   return idle ? IDLE : null;
 }

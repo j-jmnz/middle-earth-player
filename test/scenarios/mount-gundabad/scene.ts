@@ -1,3 +1,4 @@
+import type { Effect } from "../../../src/catalog/boundary.ts";
 import { campaignScenario, scenarioDefinition, type CampaignData, type ScenarioData } from "../../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../../src/effects/index.ts";
 import { definePrinted, type PrintedCard } from "../../../src/rules/core/printed.ts";
@@ -67,7 +68,8 @@ export const CODES = {
 export { HERO, HERO2, HERO3 };
 export type { Entry };
 
-const SCENE_EFFECTS = sceneEffects("c0");
+// The records every table runs on: the authored and generated ones and the stand-ins' do-nothing Actions.
+export const SCENE_EFFECTS = sceneEffects("c0");
 
 export type GundabadWorld = { definition: ReturnType<typeof scenarioDefinition>; cards: Map<string, PrintedCard> };
 
@@ -113,6 +115,8 @@ export type GundabadLayout = {
   threat?: readonly [number, number];
   // The campaign card is on the table (a campaign game), as the Campaign Setup leaves it.
   campaign?: boolean;
+  // The records the table runs on: the scene's by default; a test passes them less a line to show that the line's records make the difference.
+  effects?: readonly Effect[];
 };
 
 export type GundabadTable = { state: ScenarioState; ctx: ReduceContext; hero: string; hero2: string; seat1Hero: string | null };
@@ -120,7 +124,7 @@ export type GundabadTable = { state: ScenarioState; ctx: ReduceContext; hero: st
 export function gundabadTable(world: GundabadWorld, layout: GundabadLayout = {}): GundabadTable {
   const seats = layout.seats ?? 1;
   const stage = layout.stage ?? STAGES[0];
-  const ctx: ReduceContext = { effects: SCENE_EFFECTS, cards: world.cards };
+  const ctx: ReduceContext = { effects: layout.effects ?? SCENE_EFFECTS, cards: world.cards };
   let state = blankScenario({ seatCount: seats, seed: layout.seed ?? 3, definition: world.definition });
   const deckOrder = layout.questDeck ?? STAGE_TWOS.filter((code) => code !== stage);
   for (const code of STAGES) {

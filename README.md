@@ -434,7 +434,7 @@ From the campaign path, between scenarios, tap Spend XP. Nothing is spent until 
 <details>
 <summary>How do I back up my saves?</summary>
 
-On a computer, Settings, Back up saves writes one file. Restore from a backup replaces every campaign, game, deck and setting with the file's. A phone uses its own system backup.
+In Settings, Back up saves writes one file, on a phone, a tablet or a computer. Restore from a backup replaces every campaign, game, deck and setting with the file's, and a file from one device restores on another. A phone's saves are also in its own system backup.
 
 </details>
 <details>

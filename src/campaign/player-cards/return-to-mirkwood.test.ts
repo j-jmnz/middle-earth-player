@@ -14,8 +14,8 @@ import { legalIntents } from "../../rules/engine/reduce.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, hosts, passAll, play, playCode, playerTable, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { choices, combat, hosts, passAll, passWhile, play, playCode, playerTableFor, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const DAIN = "02116";
 const SIGNAL = "02117";
@@ -50,7 +50,7 @@ const padAction: Effect = { id: "pad:action:1", cardCode: PAD, lines: ["fixture:
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -158,7 +158,7 @@ describe("Dawn Take You All (02118:A:1, A:2)", () => {
     expect(run.state.window).toMatchObject({ kind: "defense", seat: 0 });
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, ARAGORN) }, tab.ctx);
     const struck = (next: Run): boolean => next.steps.some((step) => step.kind === "strike" && step.side === "enemy");
-    for (let guard = 0; guard < 8 && !struck(run) && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => !struck(run) && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"), 8);
     // The first attack has struck, the second has not: the combat action window is open (the Pad is legal in it) and Dawn is not offered in it.
     expect(struck(run)).toBe(true);
     expect(run.state.phase).toBe("Combat");

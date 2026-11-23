@@ -390,7 +390,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
   900105:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose ready character (you control)
+    - choose character (you control)
     - exhaust the picked card
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
 

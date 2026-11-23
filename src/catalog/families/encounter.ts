@@ -90,7 +90,7 @@ const VERBS = [
 
   // The encounter discard pile is shuffled into the encounter deck; with `trait`, only the cards of that printed or gained Trait go back and the deck is shuffled ("Shuffle all Hazard cards in the encounter discard pile back into the encounter deck", 900708:A:2).
   // With `type`, only the cards of that printed type go back ("Shuffle all locations in the encounter discard pile back into the encounter deck", 03039:A:2). With `name`, only the cards with that title go back ("shuffle all copies of Balin's Doom in the encounter discard pile back into the encounter deck", 901101:A:3). With `alsoVictory` the matching cards in the victory display go back too ("Reshuffle all locations in the discard pile and victory display back into the encounter deck", 04018:A:1); the cards that went, from both places, are the effect's `returned` count (`returnedBelow`).
-  z.strictObject({ verb: z.literal("ShuffleEncounterDiscard"), trait: z.string().min(1).optional(), type: z.enum(["location", "enemy", "treachery"]).optional(), name: z.string().min(1).optional(), alsoVictory: z.literal(true).optional(), ...when }),
+  z.strictObject({ verb: z.literal("ShuffleEncounterDiscard"), trait: z.string().min(1).optional(), type: z.enum(["location", "enemy", "treachery"]).optional(), name: z.string().min(1).optional(), alsoVictory: z.literal(true).optional(), exceptSource: z.literal(true).optional(), ...when }),
 
   // Every location in the victory display goes back into the encounter deck, which is then shuffled ("Shuffle all locations in the victory display into the encounter deck", 144066:A:1). They lose nothing they had: a card in the display has no tokens.
   z.strictObject({ verb: z.literal("ShuffleVictoryIntoEncounterDeck"), ...when }),

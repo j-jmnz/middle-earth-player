@@ -9,6 +9,7 @@ import { hostOf } from "./amounts.ts";
 import { countsAsAttachment, hasTrait } from "./conditions.ts";
 import { attachmentsPickMatches } from "../families/attachments/pick.ts";
 import { costsPickMatches, highestCost } from "../families/costs/pick.ts";
+import { spheresOf } from "../families/costs/pay.ts";
 import { attackPickMatches } from "../families/attack/pick.ts";
 import { miscPickMatches } from "../families/misc/pick.ts";
 import { questCardPool } from "../families/quest/quest-card.ts";
@@ -209,11 +210,12 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.traits && !spec.traits.some((trait) => hasTrait(state, id, trait, ctx))) return false;
   if (spec.notTraits && spec.notTraits.some((trait) => hasTrait(state, id, trait, ctx))) return false;
   if (spec.names && !spec.names.includes(printed.name)) return false;
-  if (spec.sphere && printed.sphere !== spec.sphere) return false;
-  if (spec.spheres && (printed.sphere == null || !spec.spheres.includes(printed.sphere))) return false;
+  const spheres = spec.sphere || spec.spheres || spec.nonNeutral || spec.exceptSphere ? spheresOf(state, id, printed.sphere, ctx) : [];
+  if (spec.sphere && !spheres.includes(spec.sphere)) return false;
+  if (spec.spheres && !spheres.some((sphere) => spec.spheres?.includes(sphere))) return false;
   if (spec.printedIcon && !(printed.type === "hero" && printed.sphere === spec.printedIcon)) return false;
-  if (spec.nonNeutral && (printed.sphere == null || printed.sphere === "neutral")) return false;
-  if (spec.exceptSphere && printed.sphere === spec.exceptSphere) return false;
+  if (spec.nonNeutral && !spheres.some((sphere) => sphere !== "neutral")) return false;
+  if (spec.exceptSphere && spheres.some((sphere) => [spec.exceptSphere].flat().includes(sphere))) return false;
   if (spec.cardType && printed.type !== spec.cardType) return false;
   if (spec.enemyOrLocation && printed.type !== "enemy" && printed.type !== "location") return false;
   if (spec.questCardType && !isQuestCardType(printed.type)) return false;
@@ -238,7 +240,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.isHost && (at.sourceId == null || hostOf(state, at.sourceId) !== id)) return false;
   if (spec.active && !activeFor(state, asking, spec.stagingArea === "any").includes(id)) return false;
   // The attachments family's filters: attached or not, Guarded, progress tokens (families/attachments/pick.ts).
-  if (!attachmentsPickMatches(state, id, spec, ctx)) return false;
+  if (!attachmentsPickMatches(state, id, spec, ctx, at.sourceId)) return false;
   // The uncharted family's filters: a Lost Island, progress enough (families/uncharted/pick.ts).
   if (!unchartedPickMatches(state, id, spec, ctx) || !aflamePickMatches(state, id, spec, ctx) || !sidePickMatches(state, id, spec)) return false;
   if (spec.attachable != null && !attachmentHostIds(state, asking, spec.attachable, ctx).includes(id)) return false;
@@ -383,6 +385,8 @@ function candidatesOf(
   const found = raw.filter((id) => {
     const instance = state.cards[id];
     if (!instance) return false;
+    // `controlled` on the attachments of a card leaves out an encounter attachment, which no player controls (Wiglaf, 19027:A:2: "exhaust an attachment", a cost, rr.cost).
+    if (spec.attachedTo && spec.controlled && instance.controller == null) return false;
     // Only an attachment a player may discard is offered for one (141071:A:2): a Permanent card on a hero is not.
     if (spec.type === "attachment" && !counting && printedOf(ctx.cards, instance.code).keywords.permanent && (state.cards[instance.host ?? ""]?.zone === "heroes" || state.cards[instance.host ?? ""]?.captive === true)) return false;
     if (playerEffect && !playerCardEffectCanChoose(printedOf(ctx.cards, instance.code), state, id, sourcePrinted(state, ctx.cards, sourceId))) return false;

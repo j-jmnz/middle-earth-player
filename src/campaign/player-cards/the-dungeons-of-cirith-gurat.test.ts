@@ -9,14 +9,14 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard, withThreat } from "../../rules/core/state.ts";
+import { updateCard } from "../../rules/core/state.ts";
 import { threatCostCut, threatCostOf } from "../../rules/families/costs/stats.ts";
 import { hasTrait } from "../../rules/interpret/conditions.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, fillers, hosts, passAll, play, playCode, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
+import { attacking, fillers, hosts, passAll, play, playCode, playerTableFor, sendUnledgered, stat, threatened, triggers } from "../../../test/harness/player-table.ts";
 
 const FOLCO = "17109";
 const DALE = "17110";
@@ -44,7 +44,7 @@ const CARD = "card";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -55,7 +55,6 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-const threatened = (tab: Table, threat: number, seat = 0): Table => ({ ...tab, state: withThreat(tab.state, seat, threat) });
 
 describe("Folco Boffin (17109:A:1, A:2)", () => {
   // "Folco Boffin gets -1 threat cost for each Hobbit hero you control.": with the Pal (a Hobbit hero) beside him, Folco (a Hobbit hero

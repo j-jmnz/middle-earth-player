@@ -183,6 +183,29 @@ export function depthsTable(world: DepthsWorld, layout: DepthsLayout = {}): Dept
 export { send, start, answer, codesIn, finish, idOf, idsOf, legalIntents, legalTargets, resolveRecords };
 export type { Run, PlayerIntent };
 
+/**
+ * Plays the round on from where the table stands until `until` holds: every attack is undefended (its damage on the first hero of the seat attacked), a choice takes the answer `pick` gives (the first option by
+ * default), travel, engagement and attacks are declined. `defenses` are the attacks in the order they were made: the attacker's code and the seat attacked.
+ */
+export function depthsDrive(run: Run, ctx: ReduceContext, until: (state: ScenarioState) => boolean, pick: (state: ScenarioState) => string = (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "")): { run: Run; defenses: { enemy: string; seat: number }[] } {
+  const defenses: { enemy: string; seat: number }[] = [];
+  let current = run;
+  for (let guard = 0; guard < 200 && !until(current.state) && !current.state.lost; guard += 1) {
+    const state = current.state;
+    if (state.window?.kind === "defense") {
+      defenses.push({ enemy: state.cards[state.window.enemyId ?? ""]?.code ?? "", seat: state.window.seat });
+      current = send(current, { type: "Undefended", heroId: state.seats[state.window.seat]?.heroes[0] ?? "" }, ctx);
+    } else if (state.window?.kind === "choose") current = send(current, { type: "Choose", optionId: pick(state) }, ctx);
+    else if (state.window?.kind === "look") current = send(current, { type: "Pass" }, ctx);
+    else {
+      const next = legalIntents(state, ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineTravel" || intent.type === "DeclineEngage" || intent.type === "DeclineAttack");
+      if (!next) break;
+      current = send(current, next as PlayerIntent, ctx);
+    }
+  }
+  return { run: current, defenses };
+}
+
 /** An enemy engaged with the first seat attacks in the combat phase with `shadow` dealt to it, the first hero defending (or nobody). The state at the end of the attack. */
 export function depthsFight(world: DepthsWorld, shadow: string, enemy: string, layout: DepthsLayout = {}, options: FightOptions<DepthsTable> = {}): Fight<DepthsTable> {
   return fightEnemy((made: DepthsLayout) => depthsTable(world, made), shadow, enemy, layout, options);

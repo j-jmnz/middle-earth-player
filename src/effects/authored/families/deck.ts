@@ -61,7 +61,7 @@ export const RECORDS: readonly Effect[] = [
   // 04002 Taking Initiative: the discarded card is picked only when its printed cost is high enough.
   {"id":"04002:action:1","cardCode":"04002","lines":["04002:A:1"],"timing":"action","instructions":[{"verb":"DiscardFromDeck","amount":1,"count":{"type":"card","control":"any"},"costAtLeast":{"count":{"type":"character","control":"you"}}},{"verb":"Draw","amount":2,"when":{"kind":"matches","card":"picked"}},{"verb":"Pick","pick":{"type":"enemy","control":"any","staging":true},"when":{"kind":"matches","card":"picked"}},{"verb":"DamageCard","amount":2,"when":{"kind":"matches","card":"picked"}}]},
   // 04106 Imladris Stargazer: the chosen player looks and arranges.
-  {"id":"04106:action:1","cardCode":"04106","lines":["04106:A:1"],"timing":"action","cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"Pick","pick":{"type":"player","control":"any"}},{"verb":"ActAs","who":"pickedPlayer"},{"verb":"LookAtTop","count":5,"deck":"own"},{"verb":"ArrangeTop"}]},
+  {"id":"04106:action:1","cardCode":"04106","lines":["04106:A:1"],"timing":"action","cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"Pick","pick":{"type":"player","control":"any","deckHasCards":true}},{"verb":"ActAs","who":"pickedPlayer"},{"verb":"LookAtTop","count":5,"deck":"own"},{"verb":"ArrangeTop"}]},
   // 06059 Book of Eldacar, 06087 Map of Earnil, 06109 Tome of Atanatar, 06142 Scroll of Isildur.
   playFromDiscard("06059", "tactics"),
   playFromDiscard("06087", "spirit"),

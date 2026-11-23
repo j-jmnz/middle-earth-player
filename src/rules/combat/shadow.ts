@@ -31,7 +31,7 @@ import { announceShadowsResolved } from "../families/angmar/reanimate/shadows.ts
 import { announceShadowWizardry } from "../families/wizardry/shadow.ts";
 import { announceDestroyed, charactersDestroyed, destroyedByAttack } from "../families/burden/attack.ts";
 import { printedOf } from "../core/printed.ts";
-import { attackHere, attackKey, locationDamage } from "../families/south/watcher.ts";
+import { attackHere, attackKey, countsEachAttack, locationDamage } from "../families/south/watcher.ts";
 import { pillageAfter } from "../families/sea/pillage.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
@@ -313,7 +313,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const sendsExcess = flagged(state, attack.enemyId, "excessToShip");
   const done = expireModifiers(state, ["endOfAttack"]);
   const resolvedAttacks =
-    attack.immediate || done.resolvedAttacks.includes(attackKey(done, attack.enemyId, attack.seat)) ? done.resolvedAttacks : [...done.resolvedAttacks, attackKey(done, attack.enemyId, attack.seat)];
+    attack.immediate || (done.resolvedAttacks.includes(attackKey(done, attack.enemyId, attack.seat)) && !countsEachAttack(done, attack.enemyId)) ? done.resolvedAttacks : [...done.resolvedAttacks, attackKey(done, attack.enemyId, attack.seat)];
   // The shadow cards an attack outside the combat phase was dealt are discarded once it resolves
   // (faq.enemy-attacks-outside-combat).
   // The events it announces answer after the shadow card is gone, so they carry whether it had no effect (18022:A:1).

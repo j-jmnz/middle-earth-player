@@ -11,7 +11,7 @@ import { attachmentHostIds, playCost } from "../../player/attach.ts";
 import { effectCause, ruleCause } from "../../core/cause.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { holds } from "../../interpret/conditions.ts";
-import { discountFor, fewestHeroesReason } from "../../player/cost-rules.ts";
+import { discountFor, fewestHeroesReason, SINGLE_HERO_REASON } from "../../player/cost-rules.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { EngineStep, Payment, PlayerIntent } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -23,7 +23,7 @@ import { heroPays, hasResourceMatch } from "../../player/payments.ts";
 import { matchesPick, pickCandidates } from "../../interpret/pick.ts";
 import { playCard } from "../../player/planning.ts";
 import { pickedList } from "../../interpret/player-verbs.ts";
-import { printedOf } from "../../core/printed.ts";
+import { playsOntoHost, printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats } from "../../core/state.ts";
@@ -49,12 +49,15 @@ export function extraCostReason(state: ScenarioState, cardId: string, seat: numb
   const others = (state.seats[seat]?.hand ?? []).filter((id) => id !== cardId).length;
   for (const rule of cardRules(state, cardId, "PlayCost", ctx)) if (others < rule.discard) return "That card's additional cost cannot be paid";
   // "You must use resources from 3 different heroes' pools": fewer pools that could pay for it than that.
-  const need = distinctRule(state, cardId, ctx)?.min;
-  if (need != null) {
-    const sphere = printedOf(ctx.cards, state.cards[cardId]?.code ?? "").sphere;
-    const pools = [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, cardId, ctx)].filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, sphere, ctx, cardId));
-    if (pools.length < need) return fewestHeroesReason(need);
-  }
+  const distinct = distinctRule(state, cardId, ctx);
+  if (distinct?.min == null && distinct?.max !== 1) return null;
+  const sphere = printedOf(ctx.cards, state.cards[cardId]?.code ?? "").sphere;
+  const pools = [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, cardId, ctx)].filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, sphere, ctx, cardId));
+  if (distinct.min != null && pools.length < distinct.min) return fewestHeroesReason(distinct.min);
+  // "Paid from a single hero's resource pool": one pool that holds the whole cost, or no payment is legal (families/costs/pay.ts, distinctRule).
+  const cost = playCost(state, cardId, seat, ctx) ?? 0;
+  const held = pools.map((id) => state.cards[id]?.resources ?? 0);
+  if (distinct.max === 1 && cost > 0 && held.reduce((sum, amount) => sum + amount, 0) >= cost && !held.some((amount) => amount >= cost)) return SINGLE_HERO_REASON;
   return null;
 }
 
@@ -116,7 +119,7 @@ export function afterPlay(before: ScenarioState, state: ScenarioState, intent: P
   if (discount?.doomed) for (const index of livingSeats(next)) next = raiseThreat(next, index, discount.doomed, steps, ruleCause("rr.doomed-x"));
   // "Those allies cannot quest this round."
   if (discount?.cannotQuest && printed.type !== "event") next = addModifier(next, intent.cardId, discount.sourceId || intent.cardId, "cannotQuest", 1, "endOfRound");
-  if (printed.type === "attachment" && intent.hostId) next = queueEvent(next, { trigger: "attached", seat, subject: intent.cardId, other: intent.hostId });
+  if (playsOntoHost(printed) && intent.hostId) next = queueEvent(next, { trigger: "attached", seat, subject: intent.cardId, other: intent.hostId });
   // Characters exhausted for the cost not paid in resources (ExhaustToReduce).
   const rule = cardRules(before, intent.cardId, "ExhaustToReduce", ctx)[0];
   const owed = rule ? (playCost(before, intent.cardId, seat, ctx, intent.hostId ?? null) ?? 0) - paid.reduce((sum, payment) => sum + payment.amount, 0) : 0;
@@ -199,17 +202,27 @@ function queueFront(state: ScenarioState, seat: number, instructions: readonly I
   return patchTop(state, { data: { ...data, queue: [...instructions.map((instruction) => ({ instruction, seat, chosen: null })), ...data.queue] } });
 }
 
+// Whether the card in a hand fits the pick of a PlayFromHand.
+function fitsPick(state: ScenarioState, id: string, instruction: PlayFromHand, seat: number, sourceId: string | null, ctx: ReduceContext): boolean {
+  return matchesPick(state, id, { ...instruction.pick, from: "hand" }, { seat, sourceId, counting: true }, ctx);
+}
+
+// The cards in the actor's hand that a PlayFromHand with no picked cards could play under its terms.
+export function playOptions(state: ScenarioState, instruction: PlayFromHand, seat: number, sourceId: string | null, ctx: ReduceContext): string[] {
+  const terms = termsOf(instruction);
+  return (state.seats[seat]?.hand ?? []).filter((id) => fitsPick(state, id, instruction, seat, sourceId, ctx) && playableNow(state, seat, id, terms, sourceId, ctx));
+}
+
 // PlayFromHand: the actor chooses a card in their hand that can be played under the terms (or plays each picked card), and
 // pays for it with PayToPlay.
 export function playFromHand(state: ScenarioState, instruction: PlayFromHand, seat: number, sourceId: string | null, chosen: string | undefined, ctx: ReduceContext): ScenarioState {
   const terms = termsOf(instruction);
-  const fitsPick = (id: string): boolean => matchesPick(state, id, { ...instruction.pick, from: "hand" }, { seat, sourceId, counting: true }, ctx);
   if (instruction.picked) {
-    const ids = pickedList(state).filter((id, at, all) => id !== "" && all.indexOf(id) === at && fitsPick(id) && playableNow(state, state.cards[id]?.controller ?? seat, id, terms, sourceId, ctx));
+    const ids = pickedList(state).filter((id, at, all) => id !== "" && all.indexOf(id) === at && fitsPick(state, id, instruction, seat, sourceId, ctx) && playableNow(state, state.cards[id]?.controller ?? seat, id, terms, sourceId, ctx));
     return queueFront(state, seat, ids.map((id): PayToPlay => ({ verb: "PayToPlay", card: id, ...terms, paid: [] })));
   }
   if (chosen) return queueFront(state, seat, [{ verb: "PayToPlay", card: chosen, ...terms, paid: [] }]);
-  const options = (state.seats[seat]?.hand ?? []).filter((id) => fitsPick(id) && playableNow(state, seat, id, terms, sourceId, ctx));
+  const options = playOptions(state, instruction, seat, sourceId, ctx);
   if (options.length === 0) return state;
   if (options.length === 1 && options[0]) return queueFront(state, seat, [{ verb: "PayToPlay", card: options[0], ...terms, paid: [] }]);
   return askTarget(state, { instruction, seat, chosen: null }, options);

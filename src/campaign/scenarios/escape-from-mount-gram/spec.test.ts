@@ -29,6 +29,9 @@ const ROWS: readonly Row[] = [
   { line: "10042:A:3", name: "Forced when it becomes the active location: each player with less than 35 threat raises it to 35", layout: { seats: 2, threat: [28, 40], staging: [SOUTHERN_GATE] }, act: announce("becameActive", SOUTHERN_GATE), expect: [threat(35, 0), threat(40, 1)] },
 
   { line: "10047:A:2", name: "Travel: each player raises their threat by 3 to travel here", layout: { phase: "Travel", staging: [PATROL_ROOM] }, act: travel(PATROL_ROOM), expect: threat(32) },
+  // "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player's threat is 20 or higher)." A 1-Attack enemy's undefended attack.
+  { line: "10047:A:3", name: "Shadow: the attacking enemy gets +2 Attack with the defending player's threat at 20 or higher", layout: { engaged: [{ code: "f3", seat: 0 }], threat: [20, 20] }, act: attack("f3", { shadow: PATROL_ROOM, undefended: true }), expect: damageOn("dh1", 3) },
+  { line: "10047:A:3", name: "Shadow: +1 Attack only with the defending player's threat below 20", layout: { engaged: [{ code: "f3", seat: 0 }], threat: [19, 19] }, act: attack("f3", { shadow: PATROL_ROOM, undefended: true }), expect: damageOn("dh1", 2) },
   { line: "10045:A:3", name: "Shadow: +2 Attack when the attacking enemy has no captured cards underneath it", layout: { engaged: [{ code: "f3", seat: 0 }] }, act: attack("f3", { shadow: TORMENTOR, undefended: true }), expect: damageOn("dh1", 3) },
 
   { line: "10049:A:2", name: "When Revealed: each enemy in the staging area gets -10 engagement cost and +1 Attack until the end of the round", layout: { staging: ["f3"], deck: DECK }, act: reveal(SOUND_THE_ALARM), expect: [stat("f3", "engagementCost", 40), stat("f3", "attack", 2)] },

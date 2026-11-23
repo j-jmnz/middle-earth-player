@@ -15,7 +15,7 @@ import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-pas
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, hosts, passAll, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, attacking, choices, combat, hosts, passAll, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const AXE = "22006";
 const CIRCLET = "22008";
@@ -190,8 +190,7 @@ describe("Inner Strength (22009:A:1, A:2)", () => {
   // Boost as its shadow card. `defender` is declared.
   function defended(effects: readonly Effect[], defender: string): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: BEARER, seat: 0 }, { code: EOWYN, seat: 0 }], attached: [{ code: ONE_RING, host: BEARER }, { code: INNER, host: BEARER }], engaged: [{ code: BRUTE, seat: 0 }], deck: [BOOST] });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx);
     return { tab, run };
   }

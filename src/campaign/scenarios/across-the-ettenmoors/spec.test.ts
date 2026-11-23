@@ -1,7 +1,7 @@
 // Rules: mec108.safe, mec108.objective-locations, mec108.side-quests-in-play, rr.guarded, rr.travel, rr.reveal, rr.forced, rr.response, rr.running-out-of-cards, mec108.objective-allies, mec108.immune (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { cardSpecs, drew, endPhase, resolve, resourcesOn, respond, reveal, revealedBy, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { attack, cardSpecs, damageOn, defend, drew, endPhase, lost, resolve, resourcesOn, respond, reveal, revealedBy, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Across the Ettenmoors (angmar-awakened part 6): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot express (the Setup pair, a safe location over a whole round, a damage rule over several steps, a pool) is a test
@@ -21,6 +21,12 @@ const ROWS: readonly Row[] = [
   { line: "10071:A:3", name: "Response after you travel to it: each player adds 1 resource to each of their heroes", layout: { phase: "Travel", staging: [PATCH_OF_WOODS], heroResources: 0 }, act: resolve(PATCH_OF_WOODS, "response"), expect: resourcesOn("dh1", 1) },
   { line: "10071:A:1", name: "Guarded: when it is revealed the next card of the encounter deck is revealed and attached to it as its guard", layout: { deck: ["f3", "f0"] }, act: reveal(PATCH_OF_WOODS), expect: revealedBy("f3", 0) },
   { line: "10071:A:1", name: "Safe: while it is the active location enemies make no engagement checks", layout: { phase: "Encounter", active: PATCH_OF_WOODS, staging: ["10076"], deck: DECK }, act: endPhase, expect: zone("10076", "staging") },
+
+  // 10076:A:2 "Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if this attack is undefended)." Undefended, f0 (1 Attack) deals 4, not 5; defended by dh1 (2 Defense), Savage Trollspawn (2 Attack with no damaged character) deals 1.
+  { line: "10076:A:2", name: "Shadow: an undefended attack gets +3 Attack instead of +1", layout: {}, act: attack("f0", { shadow: "10076", undefended: true }), expect: damageOn("dh1", 4) },
+  { line: "10076:A:2", name: "Shadow: a defended attack gets +1 Attack", layout: {}, act: [attack("10072", { shadow: "10076" }), defend("dh1")], expect: damageOn("dh1", 1) },
+  // 10067:A:2 "If Amarthiúl leaves play, the players lose the game." Ruthless Hill-troll (4 Attack) attacks; Amarthiúl (3 Defense, 3 hit points, 2 damage) defends and is destroyed.
+  { line: "10067:A:2", name: "Amarthiúl destroyed defending an attack loses the game", layout: { play: [{ code: "10067", damage: 2 }] }, act: [attack("10075"), defend("10067")], expect: [zone("10067", "encounterDiscard"), lost] },
 ];
 
 if (ROWS.length > 0) cardSpecs("across-the-ettenmoors", ROWS);

@@ -365,8 +365,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["50726:A:2"],
     timing: "whenRevealed",
     instructions: [
-      { verb: "Pick", pick: { type: "enemy", control: "any", trait: "Brigand", staging: true, hasAttachment: { names: ["Hired Muscle"], none: true } } },
-      { verb: "AttachSelfToPicked", when: { kind: "canPick", pick: { type: "enemy", control: "any", trait: "Brigand", staging: true, hasAttachment: { names: ["Hired Muscle"], none: true } } } },
+      { verb: "Pick", pick: { type: "enemy", control: "any", trait: "Brigand", staging: true, takesSource: true, hasAttachment: { names: ["Hired Muscle"], none: true } } },
+      { verb: "AttachSelfToPicked", when: { kind: "canPick", pick: { type: "enemy", control: "any", trait: "Brigand", staging: true, takesSource: true, hasAttachment: { names: ["Hired Muscle"], none: true } } } },
       { verb: "ReturnToStaging", target: { kind: "picked" }, when: { kind: "canPick", pick: { type: "enemy", control: "any", trait: "Brigand", staging: true, hasAttachment: { names: ["Hired Muscle"] } } } },
     ],
   },

@@ -32,34 +32,34 @@ describe("the campaign card's XP list (11191:B:2 to 11191:B:9)", () => {
     expect(xpOf({ seats: 2 }, out)).toBe(1);
   });
 
-  it("gains 1 XP if the players ended the game on-course, the Sun setting only (B:3)", () => {
+  it("11191:B:3 gains 1 XP if the players ended the game on-course, the Sun setting only (B:3)", () => {
     expect(xpOf({ heading: "Sun" })).toBe(2);
     expect(xpOf({ heading: "Cloud" })).toBe(1);
     expect(xpOf({ heading: "Storm" })).toBe(1);
   });
 
-  it("gains 1 XP if the players ended the game on stage 2B (B:4)", () => {
+  it("11191:B:4 gains 1 XP if the players ended the game on stage 2B (B:4)", () => {
     expect(xpOf({ stage: "12013" })).toBe(2);
     expect(xpOf({ stage: "12012" })).toBe(1);
     expect(xpOf({ stage: "12015" })).toBe(1);
   });
 
-  it("gains 2 XP if the Stormcaller is in the victory display, whichever side it shows (B:5)", () => {
+  it("11191:B:5 gains 2 XP if the Stormcaller is in the victory display, whichever side it shows (B:5)", () => {
     expect(xpOf({ victory: [CODES.stormcaller] })).toBe(3);
     expect(xpOf({ victory: [CODES.stormcaller, CODES.stormcaller] })).toBe(3);
   });
 
-  it("gains 1 XP if Crowley is in the victory display, not for more than one (B:6)", () => {
+  it("11191:B:6 gains 1 XP if Crowley is in the victory display, not for more than one (B:6)", () => {
     expect(xpOf({ victory: [CODES.crowley] })).toBe(2);
     expect(xpOf({ victory: [CODES.crowley, CODES.crowley] })).toBe(2);
   });
 
-  it("gains 2 XP if Thunderstruck is in the victory display (B:7)", () => {
+  it("11191:B:7 gains 2 XP if Thunderstruck is in the victory display (B:7)", () => {
     expect(xpOf({ victory: [CODES.thunderstruck] })).toBe(3);
     expect(xpOf({ victory: [CODES.thunderstruck, CODES.crowley] })).toBe(4);
   });
 
-  it("gains 1 XP if each hero has no damage on it (B:8)", () => {
+  it("11191:B:8 gains 1 XP if each hero has no damage on it (B:8)", () => {
     expect(xpOf({ heroDamage: 0 })).toBe(2);
     expect(xpOf({ heroDamage: 2 })).toBe(1);
   });

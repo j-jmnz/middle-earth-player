@@ -17,8 +17,8 @@ import { updateCard, withThreat } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, deckSaveFacts, enter, fillers, hosts, packRow, passAll, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { atDefense, choices, deckSaveFacts, enter, fillers, hosts, packRow, passAll, passWhile, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const VETERAN = "10029";
 const DESCENDANTS = "10030";
@@ -47,7 +47,7 @@ const TOWER = "tower";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -130,8 +130,7 @@ describe("Derndingle Warrior (10031:A:2 to A:4)", () => {
   // The Warrior in play, the Weak enemy engaged; the combat phase is at the first attack's defense step.
   function defending(effects: readonly Effect[]): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: SPIRIT, seat: 0 }], allies: [{ code: DERNDINGLE, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] });
-    const run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    const run = atDefense(tab);
     return { tab, run };
   }
 
@@ -211,7 +210,7 @@ describe("Leave No Trace (10035:A:2)", () => {
     const tab = { ...scene, state: updateCard(scene.state, id, { progress: 2 }) };
     if (!explored) return { tab, run: sendUnledgered(begin(destroyCard(tab.state, id, tab.ctx.cards, [])), { type: "Pass" }, tab.ctx) };
     let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, PAL)] }, tab.ctx);
-    for (let guard = 0; guard < 10 && run.state.cards[id]?.zone === "activeLocation"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.cards[id]?.zone === "activeLocation", 10);
     return { tab, run };
   }
 

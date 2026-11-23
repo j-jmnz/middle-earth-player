@@ -61,6 +61,9 @@ export const ROWS: readonly Row[] = [
   { line: "144068:A:1", name: "Setup: each player but the first searches the encounter deck for a different non-unique location and adds it to the staging area", layout: { ...TWO, deck: ["f0", "place"] }, act: resolve("144068", "setup"), expect: zone("place", "staging") },
   { line: "144068:B:1", name: "at the beginning of the quest phase the top Harad deck card is revealed and added to the staging area", layout: { phase: "Planning", piles: { haradDeck: ["144057", "144058"] } }, act: endPhase, expect: [zone("144057", "staging"), zone("144058", "haradDeck")] },
   { line: "144068:B:2", name: "when The Cross-roads is explored the players win the game", layout: { active: "144030" }, act: announce("locationExplored", "144030"), expect: won },
+
+  // 144056:A:3 "Shadow: Attacking enemy gets +3 Attack." f0 (1 Attack) undefended deals 4.
+  { line: "144056:A:3", name: "Shadow: the attacking enemy gets +3 Attack", layout: {}, act: attack("f0", { shadow: "144056", undefended: true }), expect: damageOn("dh1", 4) },
 ];
 
 if (ROWS.length > 0) cardSpecs("journey-to-the-cross-roads", ROWS);

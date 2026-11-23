@@ -4,11 +4,11 @@
 import { beforeAll, describe, expect } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
-import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, playerTable, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { choices, playerTableFor, playRefusal, sendUnledgered } from "../../../test/harness/player-table.ts";
 
 const HEED = "12009";
 const VANISH = "12011";
@@ -24,7 +24,7 @@ const MARK = "ally";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -32,18 +32,13 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-function playable(tab: Table, code: string): string | null {
-  const card = idsOf(tab, code);
-  return refusal(tab.state, { type: "PlayCard", cardId: card, payments: payFor(tab.state, tab.ctx, card) }, tab.ctx);
-}
-
 describe("Vanish from Sight (12011:A:1)", () => {
   // "Play only if you control 2 or fewer heroes."
   lineSpec("12011:A:1", "is played with 2 heroes and not with 3", (effects) => {
     const two = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: GLOIN, seat: 0 }], hand: [{ code: VANISH, seat: 0 }] });
-    expect(playable(two, VANISH)).toBeNull();
+    expect(playRefusal(two.state, two, VANISH)).toBeNull();
     const three = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: GLOIN, seat: 0 }, { code: ARAGORN, seat: 0 }], hand: [{ code: VANISH, seat: 0 }] });
-    expect(playable(three, VANISH)).not.toBeNull();
+    expect(playRefusal(three.state, three, VANISH)).not.toBeNull();
   });
 });
 

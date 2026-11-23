@@ -69,6 +69,11 @@ const ROWS: readonly Row[] = [
   { line: "145071:A:1", name: "Forced at the beginning of the staging step: it gets 1 resource, then a player who assigns X damage among their characters assigns that 1", layout: { staging: [FLEET] }, act: [announce("stagingStepBegins"), answer("damage"), answer("dh1")], expect: [resourcesOn(FLEET, 1), damageOn("dh1", 1)] },
   { line: "145071:A:1", name: "or reveals an encounter card instead", layout: { staging: [{ code: FLEET, resources: 4 }], deck: ["f3"] }, act: [announce("stagingStepBegins"), answer("reveal")], expect: [resourcesOn(FLEET, 5), zone("f3", "staging"), revealedBy("f3", 0), damageOn("dh1", 0)] },
   { line: "145071:A:1", name: "each player in turn chooses: the first reveals, the second assigns", layout: { seats: 2, staging: [FLEET], deck: ["f3"] }, act: [announce("stagingStepBegins"), answer("reveal"), answer("damage")], expect: [revealedBy("f3", 0), damageOn("dh3", 1)] },
+
+  // 145036:A:2 "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location is a Ship)." f0 (1 Attack) undefended: 2 with no active location or a City one (Port of Pelargir), 3 with Umbar War Galley (a Ship) active.
+  { line: "145036:A:2", name: "Shadow: +1 Attack with no active location", layout: {}, act: attack("f0", { shadow: "145036", undefended: true }), expect: damageOn("dh1", 2) },
+  { line: "145036:A:2", name: "Shadow: +1 Attack only while the active location is no Ship", layout: { active: "145033" }, act: attack("f0", { shadow: "145036", undefended: true }), expect: damageOn("dh1", 2) },
+  { line: "145036:A:2", name: "Shadow: +2 Attack instead while the active location is a Ship", layout: { active: "145031" }, act: attack("f0", { shadow: "145036", undefended: true }), expect: damageOn("dh1", 3) },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-siege-of-gondor", ROWS);

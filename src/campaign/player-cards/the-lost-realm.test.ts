@@ -11,11 +11,11 @@ import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { attachTo, spawn } from "../../rules/core/zones.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
-import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, chooseIfAsked, combat, fillers, playCode, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, choices, chooseIfAsked, combat, fillers, passWhile, playCode, playerTableFor, playRefusal, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 
 const ARAGORN = "09001";
@@ -46,7 +46,7 @@ const CARD = "card";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -57,15 +57,10 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-function playable(state: ScenarioState, tab: Table, code: string): string | null {
-  const card = idsOf(tab, code);
-  return refusal(state, { type: "PlayCard", cardId: card, payments: payFor(state, tab.ctx, card) }, tab.ctx);
-}
-
 // Passes the action windows until a Response is offered or the game asks for something else.
 function passTo(run: Run, tab: Table, effectId: string): Run {
   let next = run;
-  for (let guard = 0; guard < 10 && !triggers(next.state, tab).includes(effectId) && (next.state.window?.kind === "frameAction" || next.state.window?.kind === "response"); guard += 1) next = sendUnledgered(next, { type: "Pass" }, tab.ctx);
+  next = passWhile(next, tab, (run) => !triggers(run.state, tab).includes(effectId) && (run.state.window?.kind === "frameAction" || run.state.window?.kind === "response"), 10);
   return next;
 }
 
@@ -192,9 +187,9 @@ describe("Ranger Summons (09007:A:1)", () => {
       return { tab, state: updateCard(tab.state, idsOf(tab, RANGER_OF_THE_NORTH), { owner: 0 }) };
     };
     const dunedain = ready([CORE_ARAGORN, GLOIN]);
-    expect(playable(dunedain.state, dunedain.tab, SUMMONS)).toBeNull();
+    expect(playRefusal(dunedain.state, dunedain.tab, SUMMONS)).toBeNull();
     const none = ready([GLOIN, THEODRED]);
-    expect(playable(none.state, none.tab, SUMMONS)).not.toBeNull();
+    expect(playRefusal(none.state, none.tab, SUMMONS)).not.toBeNull();
   });
 });
 
@@ -205,12 +200,12 @@ describe("Tireless Hunters (09008:A:1, A:2)", () => {
     const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }], hand: [{ code: HUNTERS, seat: 0 }], staging: [F3], engaged: [{ code: WEAK, seat: 0 }] });
     const before = combat(tab.state, tab);
     expect(before.state.window?.kind).toBe("frameAction");
-    expect(playable(before.state, tab, HUNTERS)).toBeNull();
+    expect(playRefusal(before.state, tab, HUNTERS)).toBeNull();
     // Legolas attacks once the enemy attacks are resolved. An action window opens in his attack only for a card that can be played, and
     // the Hunters are not: the attack resolves and no window holds it.
     const after = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WEAK), attackerIds: [idsOf(tab, LEGOLAS)] }, tab.ctx);
     expect(after.state.cards[idsOf(tab, WEAK)]?.damage).toBe(1);
-    expect(playable(after.state, tab, HUNTERS)).not.toBeNull();
+    expect(playRefusal(after.state, tab, HUNTERS)).not.toBeNull();
   });
 
   // "Combat Action: Choose an enemy not engaged with you. Engage that enemy. Then, discard a shadow card from that enemy, if able."
