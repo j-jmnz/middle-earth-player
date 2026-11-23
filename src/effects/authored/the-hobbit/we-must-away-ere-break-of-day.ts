@@ -50,7 +50,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     timing: "whenRevealed",
     instructions: [{ verb: "AddSetAsideToStaging", trait: "Troll", all: true }, { verb: "AddSetAsideToStaging", code: "131037" }, { verb: "ShuffleEncounterDiscard" }],
   },
-  // Forced: the stage advances when no Troll enemy is left in play (checked as one is destroyed) or when the encounter deck is empty (checked as the staging step and each phase end). One line, three events that can make it true.
+  // Forced: the stage advances when no Troll enemy is left in play (checked as one is destroyed) or the moment the encounter deck has no card (the event `encounterDeckEmpty`, announced before any reset of the deck: recorded reading, rr.forced, rr.running-out-of-cards). One line, two events that can make it true.
   {
     id: "131024:forced:1",
     cardCode: "131024",
@@ -61,8 +61,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     condition: { kind: "enemyInPlay", trait: "Troll", is: false },
     instructions: [{ verb: "AdvanceStage" }],
   },
-  { id: "131024:forced:2", cardCode: "131024", lines: ["131024:B:1"], timing: "forced", trigger: "stagingStepEnds", condition: { kind: "encounterDeckEmpty" }, instructions: [{ verb: "AdvanceStage" }] },
-  { id: "131024:forced:3", cardCode: "131024", lines: ["131024:B:1"], timing: "forced", trigger: "endOfPhase", condition: { kind: "encounterDeckEmpty" }, instructions: [{ verb: "AdvanceStage" }] },
+  { id: "131024:forced:2", cardCode: "131024", lines: ["131024:B:1"], timing: "forced", trigger: "encounterDeckEmpty", condition: { kind: "encounterDeckEmpty" }, instructions: [{ verb: "AdvanceStage" }] },
   { id: "131024:constant:1", cardCode: "131024", lines: ["131024:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "progressDiscards", amount: 1, until: "whileSourceInPlay" }] },
 
   // 131025 Dawn Take You All. Nothing is stored for the discovered treasure: the cycle has no log.
@@ -79,7 +78,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   },
   { id: "131032:forced:1", cardCode: "131032", lines: ["131032:A:2"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "Sack", amount: 2 }] },
   { id: "131032:forced:2", cardCode: "131032", lines: ["131032:A:3"], timing: "forced", trigger: "endOfPhase", condition: SELF_ENGAGED, instructions: RETURN_UNLESS_RAISED },
-  { id: "131033:constant:1", cardCode: "131033", lines: ["131033:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noPlayerAttachments", amount: 1, until: "whileSourceInPlay", holders: TROLL }] },
+  { id: "131033:constant:1", cardCode: "131033", lines: ["131033:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noAttachmentPlays", amount: 1, until: "whileSourceInPlay", holders: TROLL }] },
   { id: "131033:forced:1", cardCode: "131033", lines: ["131033:A:2"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "Sack", amount: 1 }] },
   copyLine("131032:A:3", "131033:A:3"),
   { id: "131034:constant:1", cardCode: "131034", lines: ["131034:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "singleAttacker", amount: 1, until: "whileSourceInPlay", holders: TROLL }] },
@@ -135,7 +134,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     timing: "response",
     trigger: "enemyDestroyed",
     subject: "host",
-    anyPlayer: true,
     cost: { kind: "resources", amount: 1, sphere: "baggins" },
     instructions: [{ verb: "Pick", pick: { type: "hero", control: "any", names: [BILBO] } }, { verb: "ClaimObjective" }],
   },
@@ -147,12 +145,11 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     timing: "response",
     trigger: "damagedByAttack",
     subject: "host",
-    anyPlayer: true,
     cost: { kind: "exhaustNamed", name: BILBO },
     instructions: [{ verb: "Pick", pick: { type: "hero", control: "any", names: [BILBO] } }, { verb: "ClaimObjective" }],
   },
 
-  // 131044 to 131050 the Sack cards: When Sacked is the record answering the Sack X draw (hob.sack-x); the constant holds the attached character.
+  // 131044 to 131050 the Sack cards: When Sacked is the record answering the Sack X draw (hob.sack-x); the constant holds the attached character. Six lines print "(excluding Gandalf)"; 131050 prints none and no span bars Gandalf from every Sack (hob.sack-x, hob.sack-x-example), so a hero titled Gandalf can take A Worn Sack.
   ...sackRecords("131044", { verb: "AttachSacked", to: "ally", by: "cost" }),
   {
     id: "131044:constant:1",
@@ -172,7 +169,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   ...sackRecords("131047", { verb: "AttachSacked", to: "character", by: "hitPoints" }),
   ...sackRecords("131048", { verb: "AttachSacked", to: "character", by: "willpower" }),
   ...sackRecords("131049", { verb: "AttachSacked", to: "character", by: "attachments" }),
-  ...sackRecords("131050", { verb: "AttachSacked", to: "hero", by: "resources" }),
+  ...sackRecords("131050", { verb: "AttachSacked", to: "hero", by: "resources", anyTitle: true }),
   copyLine("131044:A:2", "131045:A:2"),
   copyLine("131044:A:2", "131046:A:2"),
   copyLine("131044:A:2", "131047:A:2"),
@@ -208,7 +205,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     timing: "whenRevealed",
     instructions: [{ verb: "DamageEach", amount: 2, pick: { type: "ally", control: "any" }, when: TROLL_IN_STAGING_NOW }, { verb: "DamageEach", amount: 1, pick: { type: "ally", control: "any" }, when: NO_TROLL_IN_STAGING }],
   },
-  { id: "131053:shadow:1", cardCode: "131053", lines: ["131053:A:2"], timing: "shadow", instructions: [{ verb: "SearchToStaging", code: "131036" }, { verb: "ShuffleEncounterDeck" }] },
+  { id: "131053:shadow:1", cardCode: "131053", lines: ["131053:A:2"], timing: "shadow", instructions: [{ verb: "SearchToStaging", code: "131036", deckOnly: true }, { verb: "ShuffleEncounterDeck" }] },
 
   // 131054 Hungry Troll.
   {

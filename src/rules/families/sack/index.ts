@@ -9,6 +9,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { attachSacked } from "./attach.ts";
 import { prepareSackDeck, sack } from "./deck.ts";
+import { announceEmptyDeck } from "./empty-deck.ts";
 import { removeTraitFromGame } from "./remove.ts";
 import { canPayTravel, spendBaggins } from "./travel.ts";
 
@@ -33,6 +34,7 @@ export const manifest: RulesFamily = {
   name: "sack",
   verbs: ["PrepareSackDeck", "Sack", "AttachSacked", "RemoveTraitFromGame", "SpendBagginsToTravel"],
   run,
+  settle: { before: announceEmptyDeck },
   condition: (state, condition, _scope, ctx) => {
     if (condition.kind === "encounterDeckEmpty") return state.encounterDeck.length === 0;
     return condition.kind === "bagginsTravel" ? canPayTravel(state, condition, ctx) : null;

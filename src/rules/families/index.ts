@@ -75,7 +75,7 @@ export function rulesFamilies(): readonly RulesFamily[] {
 // Every family with a hook for the phase is listed (settleHooks throws on one that is not). The order is the one the core's chain had when it called the families by name, and it is not the list's.
 // `before`: after the constant win check, before the core refills the encounter deck. `after`: right after that refill. `sweep`: after the core's own sweeps.
 export const SETTLE_ORDER: Readonly<Record<"before" | "after" | "sweep", readonly string[]>> = {
-  before: ["burden", "island", "south", "quest"],
+  before: ["burden", "island", "south", "quest", "sack"],
   after: ["sea", "stormcaller", "island", "wilderland", "captives"],
   sweep: ["aflame", "objectives", "sea", "wilderland", "south", "deck", "angmar", "quest", "escape", "nameless", "encounter", "erech", "wizards-quest"],
 };

@@ -379,7 +379,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   DiscardPicked: () => ({ text: "discard the picked card", read: [] }),
   Engage: (i) => ({ text: `engage ${cardRef(i.target ?? "picked")}`, read: ["target"] }),
   PlaceDamageOn: (i) => ({ text: `place ${str(i.amount)} damage token(s) on the card in play with code ${str(i.code)} (placed, not dealt: nothing cancels or reduces them)`, read: ["code", "amount"] }),
-  SearchToStaging: (i) => ({ text: `search the encounter deck, discard pile and victory display for the card with code ${str(i.code)} and add it to the staging area (not revealed; nothing when none is found)`, read: ["code"] }),
+  SearchToStaging: (i) => ({ text: `search the encounter ${i.deckOnly === true ? "deck only" : "deck, discard pile and victory display"} for the card with code ${str(i.code)} and add it to the staging area (not revealed; nothing when none is found)`, read: ["code", "deckOnly"] }),
   EngageSeatWith: (i, ctx) => ({ text: `this enemy engages ${i.controls === true ? "the player who controls" : "a player engaged with"} a ${pick(i.pick, ctx)} (the first player chooses among several; nothing when it is already engaged with that player${i.controls === true ? "; an enemy engaged with another player leaves that player" : ""})`, read: ["pick", "controls"] }),
   GrantSurgeToSubject: () => ({ text: "the card just revealed gains surge", read: [] }),
   PlaceDamage: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} damage token(s) on ${cardRef(i.card ?? "self")} (placed, not dealt: nothing cancels or reduces them)`, read: ["amount", "card"] }),

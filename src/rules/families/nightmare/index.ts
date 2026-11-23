@@ -49,7 +49,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "DamageOncePerRound":
       return damageOncePerRound(state, instruction, focus, ctx, steps);
     case "SearchToStaging":
-      return searchToStaging(state, instruction.code, ctx);
+      return searchToStaging(state, instruction.code, ctx, instruction.deckOnly === true);
     case "AttackActor":
       return attackActor(state, focus, ctx, steps);
     case "AttachToDamagedDefender":
@@ -118,9 +118,9 @@ function attachToQuest(state: ScenarioState, focus: Focus, main: boolean): Scena
 
 // The first copy of the card's title found in the encounter deck, its discard pile or the victory display, in that order (rr.search),
 // joins the staging area faceup, not revealed.
-function searchToStaging(state: ScenarioState, code: string, ctx: ReduceContext): ScenarioState {
+function searchToStaging(state: ScenarioState, code: string, ctx: ReduceContext, deckOnly: boolean): ScenarioState {
   const title = printedOf(ctx.cards, code).name;
-  const found = [...state.encounterDeck, ...state.encounterDiscard, ...state.victory].find((id) => {
+  const found = (deckOnly ? state.encounterDeck : [...state.encounterDeck, ...state.encounterDiscard, ...state.victory]).find((id) => {
     const instance = state.cards[id];
     return instance != null && printedOf(ctx.cards, instance.code).name === title;
   });

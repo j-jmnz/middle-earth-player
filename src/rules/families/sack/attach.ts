@@ -35,7 +35,7 @@ function valueOf(state: ScenarioState, card: CardInstance, by: Verb["by"], ctx: 
   }
 }
 
-/** The characters a Sack card may attach to: in play, not titled Gandalf, with no Sack attached and able to have the attachment. */
+/** The characters a Sack card may attach to: in play, not titled Gandalf (unless the line prints no exclusion: `anyTitle`), with no Sack attached and able to have the attachment. */
 function eligible(state: ScenarioState, instruction: Verb, sackCode: string, ctx: ReduceContext): string[] {
   const heroes = new Set(livingSeats(state).flatMap((seat) => state.seats[seat]?.heroes ?? []));
   return livingSeats(state)
@@ -43,7 +43,7 @@ function eligible(state: ScenarioState, instruction: Verb, sackCode: string, ctx
     .filter((id) => (instruction.to === "hero" ? heroes.has(id) : instruction.to === "ally" ? !heroes.has(id) : true))
     .filter((id) => {
       const card = state.cards[id];
-      return card != null && printedOf(ctx.cards, card.code).name !== "Gandalf" && !card.attachments.some((other) => hasTrait(state, other, "Sack", ctx)) && !attachBlocked(state, ctx, id, sackCode);
+      return card != null && (instruction.anyTitle === true || printedOf(ctx.cards, card.code).name !== "Gandalf") && !card.attachments.some((other) => hasTrait(state, other, "Sack", ctx)) && !attachBlocked(state, ctx, id, sackCode);
     });
 }
 

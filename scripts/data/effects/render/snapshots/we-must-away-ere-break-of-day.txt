@@ -26,13 +26,9 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
     only if there is no Troll enemy in play (in the staging area or engaged)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - advance to the next quest stage
-  131024:forced:2: Forced on the event stagingStepEnds
+  131024:forced:2: Forced on the event encounterDeckEmpty
     only if the encounter deck holds no card
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - advance to the next quest stage
-  131024:forced:3: Forced at the end of the phase
-    only if the encounter deck holds no card
-    who acts: the acting player is the first player (a phase has no player of its own)
     - advance to the next quest stage
 
 131024:B:2 (back): Any time players would place progress tokens on this quest, discard an equal number of cards from the encounter deck instead. (Progress is placed on the active location before triggering this effect.)
@@ -78,7 +74,7 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
 
 131033:A:1 (front): Players cannot play attachment cards on Troll enemies.
   131033:constant:1: Constant
-    - each Troll enemy (any player controls) or in the staging area: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
+    - each Troll enemy (any player controls) or in the staging area: stat noAttachmentPlays (no player plays an attachment card onto it) 1, while this card is in play
 
 131033:A:2 (front): Forced: After Bert engages a player, sack 1.
   131033:forced:1: Forced after an enemy engages a player (heard about this card)
@@ -184,7 +180,7 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
     - this card attaches to the picked card (any number of copies may be attached to one card)
 
 131042:A:2 (front): Response: After attached Troll enemy is destroyed, the first player may spend 1 Baggins resource to claim this objective and attach it to Bilbo Baggins.
-  131042:response:1: Response after an enemy is destroyed (heard about the host; cost: pay 1 baggins resource(s); any player may use it)
+  131042:response:1: Response after an enemy is destroyed (heard about the host; cost: pay 1 baggins resource(s))
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (any player controls) named "Bilbo Baggins"
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -212,7 +208,7 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
     - this card attaches to the picked card (any number of copies may be attached to one card)
 
 131043:A:2 (front): Response: After attached Troll enemy takes damage as the result of an attack, the first player may exhaust Bilbo Baggins to claim this objective and attach it to him.
-  131043:response:1: Response on the event damagedByAttack (heard about the host; cost: exhaust the card titled Bilbo Baggins in play that the acting player controls; any player may use it)
+  131043:response:1: Response on the event damagedByAttack (heard about the host; cost: exhaust the card titled Bilbo Baggins in play that the acting player controls)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (any player controls) named "Bilbo Baggins"
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
@@ -325,7 +321,7 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
 131050:A:1 (front): When Sacked: Attach to hero with the most resources without a Sack attached.
   131050:triggered:1: Triggered (mandatory, not printed as Forced) on the event sacked
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - (When Sacked) this Sack card attaches to the hero in play, never one titled Gandalf, with a Sack attached or unable to have attachments, with the highest resources in its pool (the first player chooses among those tied); with none it is shuffled into the Sack deck
+    - (When Sacked) this Sack card attaches to the hero in play, of any title (the line has no Gandalf exclusion), with a Sack attached or unable to have attachments, with the highest resources in its pool (the first player chooses among those tied); with none it is shuffled into the Sack deck
 
 131050:A:2 (front): Attached character cannot ready, attack, defend, commit to quests, or trigger effects. If this Sack card is removed, shuffle it into the sack deck.
   131050:constant:1: Constant
@@ -379,7 +375,7 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
   131053:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - search the encounter deck, discard pile and victory display for the card with code 131036 and add it to the staging area (not revealed; nothing when none is found)
+    - search the encounter deck only for the card with code 131036 and add it to the staging area (not revealed; nothing when none is found)
     - shuffle the encounter deck
 
 ## 131054 Hungry Troll
@@ -397,4 +393,4 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
     who acts: the acting player is the defending player (the player the attack is against)
     - deal 4 damage to each character (any player controls) with a Sack card attached
 
-(rendered pieces: 228 by template, 0 as JSON)
+(rendered pieces: 225 by template, 0 as JSON)

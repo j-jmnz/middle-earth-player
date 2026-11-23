@@ -14,8 +14,8 @@ const VERBS = [
   verbFlags(z.strictObject({ verb: z.literal("Sack"), amount: positiveAmountSchema, ...when }), { runsInFrame: true }),
   // The When Sacked effect of a Sack card (131044:A:1 to 131050:A:1; hob.sack-x-example): the source Sack card attaches to the eligible character with the highest `by` and no Sack card attached, never a card titled Gandalf and never a character that cannot have attachments; the first player chooses
   // among characters tied. `to`: `ally` (allies only), `character` (heroes and allies), `hero` (heroes only). `by`: the printed `cost`, `attack`, `defense`, `willpower` or `hitPoints` (a missing value counts 0), the number of `attachments` on the character, or the `resources` in its pool.
-  // With no eligible character the card is shuffled into the Sack deck.
-  z.strictObject({ verb: z.literal("AttachSacked"), to: z.enum(["ally", "character", "hero"]), by: z.enum(["cost", "attack", "defense", "willpower", "hitPoints", "attachments", "resources"]), ...when }),
+  // With no eligible character the card is shuffled into the Sack deck. `anyTitle`: the printed line has no "(excluding Gandalf)", so a card titled Gandalf is eligible too (A Worn Sack, 131050:A:1: "Attach to hero with the most resources without a Sack attached").
+  z.strictObject({ verb: z.literal("AttachSacked"), to: z.enum(["ally", "character", "hero"]), by: z.enum(["cost", "attack", "defense", "willpower", "hitPoints", "attachments", "resources"]), anyTitle: z.literal(true).optional(), ...when }),
   // "Remove all Troll enemies and Sack cards from the game" (131025:B:1): every card with one of these traits leaves the game wherever it lies (in play, set aside, in a deck or discard pile, in the victory display); its attachments leave play with it.
   z.strictObject({ verb: z.literal("RemoveTraitFromGame"), traits: z.array(z.string().min(1)).min(1), ...when }),
   // The Travel cost of Troll Cave (131037:A:2): the first player spends `amount` resources from Bilbo Baggins' pool (`reduced` while Bilbo has the card with code `purse` attached), and the players can pay it only while Bilbo has the card with code `key` attached
@@ -23,5 +23,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("SpendBagginsToTravel"), amount: z.number().int().positive(), reduced: z.number().int().positive(), key: z.string().min(1), purse: z.string().min(1), ...when }),
 ] as const;
 
+// "noAttachmentPlays": no player's attachment card (type attachment) is played onto the card ("Players cannot play attachment cards on Troll enemies", 131033:A:1); a card put on it by an effect, an objective or an encounter card still attaches.
+const FLAGS = ["noAttachmentPlays"] as const;
+
+// "encounterDeckEmpty": about no card, announced as soon as the encounter deck has no card and no effect is resolving, before the quest phase reset of the deck (131024:B:1; src/rules/families/sack/empty-deck.ts); only a game with a card that hears it announces it.
 // "sacked": the event a Sack card's When Sacked record answers (src/rules/families/sack/deck.ts reads the record when the card is drawn; no card listens for it).
-export const manifest = { name: "sack", verbs: VERBS, triggers: ["sacked"], flags: [] } as const satisfies CatalogFamily;
+export const manifest = { name: "sack", verbs: VERBS, triggers: ["sacked", "encounterDeckEmpty"], flags: FLAGS } as const satisfies CatalogFamily;

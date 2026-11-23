@@ -9,7 +9,7 @@ const TO: Readonly<Record<string, string>> = { ally: "ally", character: "charact
 export const SACK_TEMPLATES: Readonly<Record<string, (i: Obj) => Made>> = {
   PrepareSackDeck: () => ({ text: "the set-aside Sack cards are shuffled facedown into the Sack deck, a deck of its own beside the encounter deck", read: [] }),
   Sack: (i) => ({ text: `Sack ${str(i.amount)}: the first player draws the top ${str(i.amount)} card(s) of the Sack deck one at a time and resolves each card's When Sacked effect before the next (an empty Sack deck ignores it)`, read: ["amount"] }),
-  AttachSacked: (i) => ({ text: `(When Sacked) this Sack card attaches to the ${TO[String(i.to)] ?? str(i.to)} in play, never one titled Gandalf, with a Sack attached or unable to have attachments, with the highest ${BY[String(i.by)] ?? str(i.by)} (the first player chooses among those tied); with none it is shuffled into the Sack deck`, read: ["to", "by"] }),
+  AttachSacked: (i) => ({ text: `(When Sacked) this Sack card attaches to the ${TO[String(i.to)] ?? str(i.to)} in play, ${i.anyTitle === true ? "of any title (the line has no Gandalf exclusion)" : "never one titled Gandalf"}, with a Sack attached or unable to have attachments, with the highest ${BY[String(i.by)] ?? str(i.by)} (the first player chooses among those tied); with none it is shuffled into the Sack deck`, read: ["to", "by", "anyTitle"] }),
   RemoveTraitFromGame: (i) => ({ text: `every card with the trait ${(Array.isArray(i.traits) ? i.traits : []).map((trait) => str(trait)).join(" or ")} leaves the game wherever it lies, its attachments with it`, read: ["traits"] }),
   SpendBagginsToTravel: (i) => ({ text: `the first player spends ${str(i.amount)} resources from Bilbo Baggins' pool (${str(i.reduced)} while the card with code ${str(i.purse)} is attached to him; he holds the card with code ${str(i.key)})`, read: ["amount", "reduced", "key", "purse"] }),
 };
@@ -22,7 +22,7 @@ export const SACK_CONDITIONS: Readonly<Record<string, (c: Obj, ctx: Ctx) => Made
 export const SACK_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   PrepareSackDeck: [{ verb: "PrepareSackDeck" }],
   Sack: [{ verb: "Sack", amount: 2 }],
-  AttachSacked: [{ verb: "AttachSacked", to: "ally", by: "cost" }, { verb: "AttachSacked", to: "hero", by: "resources" }],
+  AttachSacked: [{ verb: "AttachSacked", to: "ally", by: "cost" }, { verb: "AttachSacked", to: "hero", by: "resources", anyTitle: true }],
   RemoveTraitFromGame: [{ verb: "RemoveTraitFromGame", traits: ["Troll", "Sack"] }],
   SpendBagginsToTravel: [{ verb: "SpendBagginsToTravel", amount: 5, reduced: 2, key: "131043", purse: "131042" }],
 };

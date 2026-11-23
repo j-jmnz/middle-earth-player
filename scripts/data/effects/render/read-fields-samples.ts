@@ -75,7 +75,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   EngageSeatWith: [{ verb: "EngageSeatWith", pick: HERO, controls: true }, { verb: "EngageSeatWith", pick: HERO }],
   GrantSurgeToSubject: [{ verb: "GrantSurgeToSubject" }],
   PlaceDamageOn: [{ verb: "PlaceDamageOn", code: "02064", amount: 2 }],
-  SearchToStaging: [{ verb: "SearchToStaging", code: "900602" }],
+  SearchToStaging: [{ verb: "SearchToStaging", code: "900602" }, { verb: "SearchToStaging", code: "131036", deckOnly: true }],
   PlaceDamage: [{ verb: "PlaceDamage", amount: 2, card: "picked" }, { verb: "PlaceDamage", amount: { players: true } }],
   LookAtTop: [{ verb: "LookAtTop", count: 3, deck: "own" }],
   DiscardOtherLooked: [{ verb: "DiscardOtherLooked" }],
