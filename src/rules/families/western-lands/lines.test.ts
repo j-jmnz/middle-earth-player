@@ -1,5 +1,5 @@
 // Rules: rr.reveal, rr.forced, rr.response, rr.shadow-effects, rr.explored, rr.doomed-x, rr.the-word-choose, hob.bilbo-baggins-ohauh (data/rules/entries.json); ledger lines 131035:A:1, 131035:A:2, 131039:A:1, 131039:A:2, 131040:A:1, 131040:A:2, 131041:A:1, 131055:A:2, 131055:A:3, 131056:A:1, 131056:A:2, 131057:A:1, 131057:A:2.
-import { expect } from "vitest";
+import { expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
@@ -8,7 +8,8 @@ import { spawn } from "../../core/zones.ts";
 import type { PlayerIntent } from "../../engine/reduce.ts";
 import { settle } from "../../engine/machine.ts";
 import { placeProgress } from "../../interpret/effect-verbs.ts";
-import { announce, answer, attack, cardSpecs, count, deckCount, resolve, resourcesOn, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, count, deckCount, resolve, resourcesOn, rowProblems, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { EFFECTS } from "../../../effects/index.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import { fightEnemy, finish, idOf, legalIntents, resolveRecords, send, tableFromLayout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
 
@@ -34,10 +35,21 @@ const ROWS: readonly Row[] = [
   { line: "131055:A:3", name: "Shadow: the defending player raises his threat by 2", layout: { threat: [30, 30] }, act: attack("f3", { shadow: "131055", undefended: true }), expect: [threat(32)] },
   // 131056 Wind-whipped Rain.
   { line: "131056:A:1", name: "When Revealed: every attachment in play is discarded", layout: { attached: [{ code: "attachment", to: "dh1" }] }, act: resolve("131056", "whenRevealed"), expect: [zone("attachment", "encounterDiscard")] },
+  // The second pass: two players, the false case and what the line leaves out.
+  { line: "131041:A:1", name: "with two players two cards go from the discard pile to the bottom of the deck", layout: { staging: ["131041"], seats: 2, discard: ["f0", "f3", "f3"], deck: ["f0"] }, act: announce("endOfRound"), expect: [deckCount(3), count("f3", "encounterDiscard", 0), count("f0", "encounterDiscard", 1)] },
+  { line: "131055:A:2", name: "with two players each player chooses: the first raises his threat by 4, the second reveals a card", layout: { seats: 2, threat: [30, 30], deck: ["f0", "f0"] }, act: [resolve("131055", "whenRevealed"), answer("threat"), answer("reveal")], expect: [threat(34, 0), threat(30, 1), deckCount(1)] },
+  { line: "131056:A:1", name: "an attached objective (the Troll Key) stays while an attachment is discarded", layout: { attached: [{ code: "attachment", to: "dh1" }, { code: "131043", to: "dh1", encounter: true }] }, act: resolve("131056", "whenRevealed"), expect: [zone("attachment", "encounterDiscard"), zone("131043", "attached")] },
   // 131057 More Like a Grocer.
 ];
 
 cardSpecs(ID, ROWS);
+
+// What these lines leave alone: a table without their records leaves it alone too, so these run on every record only.
+const FALSE: readonly Row[] = [
+  { line: "131035:A:1", name: "When Revealed: with the discard pile empty nothing joins the staging area", layout: { discard: [], deck: ["f0"] }, act: resolve("131035", "whenRevealed"), expect: [deckCount(1), count("f0", "staging", 0)] },
+  { line: "131041:A:1", name: "Cave Entrance as the active location moves no card at the end of the round", layout: { active: "131041", discard: ["f3", "f0"], deck: ["f0"] }, act: announce("endOfRound"), expect: [deckCount(1)] },
+];
+for (const row of FALSE) it(`${row.line} ${row.name}`, () => expect(rowProblems(ID, row, EFFECTS), row.name).toEqual([]));
 
 // Bilbo Baggins is the saga hero the loadout deals, which a layout does not place: these lines take a table with him in the heroes of the first seat and `resources` Baggins resources in his pool.
 function withBilbo(effects: readonly Effect[], layout: Parameters<typeof tableFromLayout>[1], resources: number): LayoutTable {
@@ -60,6 +72,25 @@ for (const code of ["131039", "131040"]) {
     expect(trigger, `a Response of ${code} is offered`).toBeDefined();
     const done = finish(send(run, trigger as PlayerIntent, table.ctx), table.ctx);
     expect(resourcesOfBilbo(done.state)).toBe(1);
+  });
+}
+
+// The Response of 131039 and 131040 is not offered when the location has not left play explored (progress short of its quest points), nor when Bilbo is not in play (it would change nothing, rr.triggered-ability).
+for (const code of ["131039", "131040"]) {
+  it(`${code}:A:2 Response is not offered while the location stays in play`, () => {
+    const table = withBilbo(EFFECTS, { active: code }, 0);
+    const location = idOf(table.state, code);
+    const steps: EngineStep[] = [];
+    const partly = settle({ ...placeProgress({ ...table.state, activeLocation: location }, location, 1, table.ctx, steps), window: null, mode: "stopped" }, table.ctx, steps);
+    expect(legalIntents(partly, table.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === location)).toBe(false);
+  });
+  // FAULT: the card gives Bilbo a resource, and with Bilbo out of play the Response can change nothing, yet the engine offers it as the location leaves play explored.
+  it.fails(`${code}:A:2 Response is not offered without Bilbo Baggins in play`, () => {
+    const alone = tableFromLayout(ID, { active: code }, { effects: EFFECTS });
+    const there = idOf(alone.state, code);
+    const more: EngineStep[] = [];
+    const explored = settle({ ...placeProgress({ ...alone.state, activeLocation: there }, there, 5, alone.ctx, more), window: null, mode: "stopped" }, alone.ctx, more);
+    expect(legalIntents(explored, alone.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === there)).toBe(false);
   });
 }
 
