@@ -178,7 +178,10 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
           goBack(router, nav.back);
           return;
         case "log":
-          setReading({ kind: "log" });
+        case "setAside":
+        case "settings":
+          // The reading panel of the row's own name (src/play/chrome/reading.ts).
+          setReading({ kind: id });
           return;
         case "rules":
           router.push("/glossary");
@@ -189,9 +192,6 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
         case "setup":
           setPreview(null);
           setSetupShown(true);
-          return;
-        case "settings":
-          setReading({ kind: "settings" });
           return;
         case "resign":
           // Asked first: a resigned scenario is lost and its outcome opens.
@@ -492,7 +492,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
         />
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
-      <UpdateTableMenu open={menuOpen} nav={nav} without={menuWithout} state={{ store, nameOf, intents }} top={barBottom} right={insets.right + 8 * s} bottom={insets.bottom + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
+      <UpdateTableMenu open={menuOpen} nav={nav} without={menuWithout} ctx={ctx} state={{ store, nameOf, intents }} top={barBottom} right={insets.right + 8 * s} bottom={insets.bottom + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
       <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.lead + choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable, result: choice.readout?.result, refusal }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );
