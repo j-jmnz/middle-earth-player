@@ -21,7 +21,7 @@ You build one scenario's engine half. The procedure is `docs/agents/agent-brief.
 - Inputs: the hand-off note and the Readings, researched or recommended (apply them as given; a reading that conflicts with a line goes back, it is not worked around).
 - Do: the new verbs with their engine and tests (search the families first for a verb, flag or filter that already does it), then the records in the authored file `pnpm scenario new` wrote (`docs/architecture.md`, Effects), `pnpm effects open`, the scenario in `src/campaign/playable.ts` once none of its lines is open, then `pnpm effects render <id> --out .agent/render/<id>.md` and the scenario's render snapshot (`pnpm effects render --all --out scripts/data/effects/render/snapshots`).
 - Hand back: the render's path, the verbs and families added with the engine files touched, the lines still open with the reason. Do not judge your own render.
-- Checks: `pnpm lint`, `pnpm typecheck`, `pnpm test scenario <id> --quick` (its `records` part fails until Tests names each record; every other part passes), `pnpm test smoke <codes>` for the player cards you wrote records for, and the soak of `.claude/agents/orchestrator.md` (Implementer tasks) when you changed `src/rules`.
+- Checks: `pnpm lint`, `pnpm typecheck`, `pnpm test scenario <id> --quick --no-records` (Tests names the records), `pnpm test smoke <codes>` for the player cards you wrote records for, and the soak of `.claude/agents/orchestrator.md` (Implementer tasks) when you changed `src/rules`.
 
 ## Tests
 
