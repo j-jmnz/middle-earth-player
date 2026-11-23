@@ -2,6 +2,7 @@ import type { Condition, Effect } from "../../../catalog/boundary.ts";
 
 import { RECORDS as MISC } from "../families/misc.ts";
 import { copyLine, withCopies } from "../reprint.ts";
+import { WESTERN_LANDS_EFFECTS } from "./set-western-lands.ts";
 
 // The records the six scenarios of The Hobbit share: the nine treasure cards of its two boxes (the box ledger, data/printed/the-hobbit.json), which a deck adds at a scenario's Setup (the briefing admits them,
 // src/campaign/loadout.ts) and which are drawn and played like attachments (playsOntoHost, src/rules/core/printed.ts). Bilbo Baggins' own lines and the two Baggins events are records of the misc family
@@ -12,7 +13,7 @@ const BILBO = "Bilbo Baggins";
 /** "After Bilbo Baggins exhausts to defend": the defender is exhausted once declared, so the host being exhausted says it did. */
 const HOST_EXHAUSTED: Condition = { kind: "matches", card: "host", pick: { type: "hero", control: "any", state: "exhausted" } };
 
-export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
+const TREASURE_EFFECTS: readonly Effect[] = withCopies(
   [
     // 131020 Sting. A:2 and A:3 read as the Fellowship's Sting (142011), which also names the hero that exhausts to defend.
     { id: "131020:constant:1", cardCode: "131020", lines: ["131020:A:1"], timing: "constant", instructions: [{ verb: "AttachesTo", host: { kind: "hero", name: BILBO } }] },
@@ -129,5 +130,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   ],
   { pool: MISC },
 );
+
+// The cycle's own records, then the records of the encounter sets its scenarios share (set-*.ts).
+export const AUTHORED_EFFECTS: readonly Effect[] = [...TREASURE_EFFECTS, ...WESTERN_LANDS_EFFECTS];
 
 export const AUTHORED_REPLACES: readonly string[] = [];
