@@ -11,8 +11,8 @@ You build one scenario's engine half. The procedure is `docs/agents/agent-brief.
 
 ## Read
 
-- Inputs: the scenario id and the base commit.
-- Do: `pnpm scenario new <id>` (`--dry-run` first), `pnpm data build`, `pnpm scenario pack <id>`; read `.agent/pack/<id>.md`; group the drafted lines by mechanic; do the readings pass, each line's `faq.*` spans included; research every reading the spans leave open online, in the order `.claude/rules/authority.md` (Open points) gives.
+- Inputs: the scenario id, the base commit and, when the orchestrator started a `researcher` beside you, `.agent/handoff/<id>.research.md` (its rows are your readings; research only what it lacks, and wait for it once your own pass is done).
+- Do: `pnpm scenario new <id>` (`--dry-run` first), `pnpm data build`, `pnpm scenario pack <id>`; read `.agent/pack/<id>.md`; group the drafted lines by mechanic; do the readings pass, each line's `faq.*` spans included; research every reading the spans and the research file leave open online, in the order `.claude/rules/authority.md` (Open points) gives.
 - Hand back: the Readings list (`.claude/agents/orchestrator.md`, Implementer tasks): every line read more than one way, with the reading taken, the alternative, the citation and its status `literal`, `span-settled`, `researched` or `recommended`, with the URLs read; the mechanics that need a new verb, trigger or flag and the family each belongs to; the pack's size. Write no engine code and no records.
 - Checks: `pnpm lint` and `pnpm typecheck` stay green on the scaffold; `pnpm test scenario <id> --quick --list` names the scenario's files.
 

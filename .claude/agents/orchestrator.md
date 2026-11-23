@@ -13,8 +13,8 @@ Read the plan in full first, then the parts of `docs/architecture.md`, `docs/bri
 
 - Every agent that writes code is an `implementer`, a `scenario-author`, a `designer` (or `general-purpose`) run with the Sonnet model. No exceptions.
 - Every review agent (`reviewer`, `ux`, `reading-judge`) runs with the Opus model.
-- Any other helper (`Explore`, a search, a timing run) runs with the Sonnet model.
-- Name the model on every Agent call (`model: "sonnet"` for `implementer`, `scenario-author`, `designer`, `general-purpose` and `Explore`, `model: "opus"` for `reviewer`, `ux` and `reading-judge`). Do not rely on the agent file's default.
+- Any other helper (`researcher`, `Explore`, a search, a timing run) runs with the Sonnet model.
+- Name the model on every Agent call (`model: "sonnet"` for `implementer`, `scenario-author`, `designer`, `general-purpose`, `researcher` and `Explore`, `model: "opus"` for `reviewer`, `ux` and `reading-judge`). Do not rely on the agent file's default.
 
 ## Implementer tasks
 
@@ -31,7 +31,7 @@ Each brief stands on its own, because the agent knows only what you give it:
 - The exit of a writing task (implementer, scenario-author, effect-author) is `pnpm test fast`, `pnpm test scenario <id>` when a scenario is in play, `pnpm data check`, `pnpm lint` and `pnpm typecheck`, plus the task's own checks, each result reported with whether the tree changed after it. It does not run the full `pnpm test`: the fix task after the review round runs the one full run (One review round). A run that can pass Bash's ten-minute limit goes to the background with its output in a file and is polled, never waited on in the foreground.
 - Commit and push often as `.claude/rules/commit-standards.md` (Commit often) says; do not edit `docs/phases/STATUS.md`. Report changes by file, each deviation from the plan and why, and the command results.
 - A task that writes records ends its report with a Readings list: for each line read in more than one way, the line, the reading taken, the alternative, a citation (a ledger line or a rule span) and a status: `literal`, `span-settled`, `researched` (with the URLs) or `recommended` (`.claude/rules/authority.md`, Open points). Every brief that can meet an open point, a data or shell task's included, names that section; apply each reading as researched or recommended without waiting on the user, and file it where that section says.
-- A scenario is the tasks of `docs/agents/agent-brief.md` (Scenario procedure), in its order, each a fresh agent handed the hand-off note and the previous report: `scenario-author` Read, which researches every open reading; Build with the readings as researched or recommended; `reading-judge` on the render; Tests with the judge's rows; Words and Games (side by side in two worktrees, or Words first: the procedure says why); the review round; the fix task with the one full `pnpm test`. The note and the `render-gap` rows are in the procedure.
+- A scenario is the tasks of `docs/agents/agent-brief.md` (Scenario procedure), in its order, each a fresh agent handed the hand-off note and the previous report: `scenario-author` Read beside a read-only `researcher` on the printed lines (the procedure says how it starts); Build with the readings as researched or recommended; `reading-judge` on the render; Tests with the judge's rows; Words and Games (side by side in two worktrees, or Words first: the procedure says why); the review round; the fix task with the one full `pnpm test`. The note and the `render-gap` rows are in the procedure.
 - The Words task runs `pnpm test scenario <id> --words` and checks each sentence against `docs/design-system-table.md`, Choice tray, before it hands back.
 
 ## After each task
