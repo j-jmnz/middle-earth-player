@@ -1,6 +1,7 @@
 import { eliminationLevel } from "../../src/rules/core/eliminate.ts";
-import { modifiedStat } from "../../src/rules/core/keywords.ts";
-import { flagged, inPlay } from "../../src/rules/core/state.ts";
+import { indestructible, modifiedStat } from "../../src/rules/core/keywords.ts";
+import { printedOf } from "../../src/rules/core/printed.ts";
+import { inPlay } from "../../src/rules/core/state.ts";
 import type { CardInstance, ZoneName } from "../../src/rules/core/state-types.ts";
 import type { ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
 
@@ -63,7 +64,7 @@ function cardFaults(state: ScenarioState, card: CardInstance, lists: Lists, ctx:
   const live = (card.zone === "heroes" || card.zone === "play" || card.zone === "engaged" || card.zone === "staging") && card.face !== "down" && !card.prisoner && !card.captive && !card.guardedHero;
   if (!live) return;
   const points = hitPoints(state, card, ctx);
-  if (points > 0 && card.damage >= points && !flagged(state, card.id, "indestructible")) faults.push(`Card ${card.code} is in play (${card.zone}) with ${card.damage} damage of ${points} hit points while nothing resolves`);
+  if (points > 0 && card.damage >= points && !indestructible(state, card.id, printedOf(ctx.cards, card.code))) faults.push(`Card ${card.code} is in play (${card.zone}) with ${card.damage} damage of ${points} hit points while nothing resolves`);
 }
 
 /** The faults of the table, each a sentence; none on a sound table. */
