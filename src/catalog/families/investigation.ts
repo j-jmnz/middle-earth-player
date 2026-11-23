@@ -45,4 +45,7 @@ const FLAGS = [
   "investigateLooked",
 ] as const;
 
-export const manifest = { name: "investigation", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;
+// The Suspect and the Hideout the Setup hides stay set aside facedown until the accusation (50701:A:1, 50702:B:2): any of the ten codes is facedown while set aside.
+const ASIDE_SECRETS = [{ verb: "HideSuspectAndHideout", codes: ["suspects", "hideouts"] }] as const;
+
+export const manifest = { name: "investigation", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS, asideSecrets: ASIDE_SECRETS } as const satisfies CatalogFamily;

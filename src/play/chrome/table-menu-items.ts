@@ -2,12 +2,13 @@
 // reads the order and the words. The testIDs are the ones the controls had in the bar, so a test taps `table-menu`
 // and then the same id.
 import type { IconName } from "../../ui/icon-map.ts";
+import { setAsideLabel, setAsideSaid } from "../words/list.ts";
 import { OFFER_LINK_HINT, offerLinkLabel, offerTitle } from "../../ui/update/offer.ts";
 
 /** What the menu needs of the table's navigation: the word the table's back control names the screen it leads to. */
 export type MenuNav = { backLabel: string; backAccessibilityLabel: string };
 
-export type MenuItemId = "update" | "leave" | "log" | "rules" | "booklet" | "setup" | "settings" | "debug" | "resign";
+export type MenuItemId = "update" | "leave" | "log" | "setAside" | "rules" | "booklet" | "setup" | "settings" | "debug" | "resign";
 
 export type MenuItem = {
   id: MenuItemId;
@@ -24,12 +25,12 @@ export type MenuItem = {
 };
 
 /**
- * The menu's rows in order: what opens over the table (Log, Rules, Booklet, the scenario's Setup card, Table settings), Copy game state, Resign, then, apart at the foot, Leave the table
+ * The menu's rows in order: what opens over the table (Log, Set aside with the number of cards its list holds, Rules, Booklet, the scenario's Setup card, Table settings), Copy game state, Resign, then, apart at the foot, Leave the table
  * with its door mark and no more words (user request, 2026-10-27); a screen reader still hears where it goes and that the game is saved.
- * `without` leaves out the rows a game has nothing behind: Booklet for a cycle's scenario, the Setup card where there is none, Copy game state while Debug tools is off. `update` is the version
+ * `without` leaves out the rows a game has nothing behind: Set aside while its list holds no card (`setAside` 0, src/play/store/set-aside.ts), Booklet for a cycle's scenario, the Setup card where there is none, Copy game state while Debug tools is off. `update` is the version
  * on offer (src/ui/update/offer.ts): its row heads the menu, since the table shows no update ribbon (docs/design-system-table.md, Table menu).
  */
-export function menuItems(nav: MenuNav, without?: readonly MenuItemId[], update?: string | null): readonly MenuItem[] {
+export function menuItems(nav: MenuNav, without?: readonly MenuItemId[], update?: string | null, setAside = 0): readonly MenuItem[] {
   const offer: MenuItem[] = update
     ? [
         {
@@ -46,6 +47,8 @@ export function menuItems(nav: MenuNav, without?: readonly MenuItemId[], update?
   const rows: MenuItem[] = [
     ...offer,
     { id: "log", testID: "log-open", label: "Log", accessibilityLabel: "This round's log", icon: null },
+    // The set-aside cards the players may read, and how many lie facedown (reading-panels.tsx, SetAsideList). The count is the list's, so a hidden card adds one and no name.
+    { id: "setAside", testID: "set-aside-open", label: setAsideLabel(setAside), accessibilityLabel: setAsideSaid(setAside), accessibilityHint: "Lists the cards that are set aside", icon: null },
     { id: "rules", testID: "rules-open", label: "Rules", accessibilityLabel: "Look up a rule", icon: null },
     { id: "booklet", testID: "booklet-open", label: "Booklet", accessibilityLabel: "Open the booklet", icon: null },
     // The scenario's campaign card, its Setup side, shown large (user request, 2026-11-01).
@@ -66,5 +69,6 @@ export function menuItems(nav: MenuNav, without?: readonly MenuItemId[], update?
       tone: "danger",
     },
   ];
-  return without ? rows.filter((row) => !without.includes(row.id)) : rows;
+  const left = setAside > 0 ? rows : rows.filter((row) => row.id !== "setAside");
+  return without ? left.filter((row) => !without.includes(row.id)) : left;
 }

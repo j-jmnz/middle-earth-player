@@ -24,6 +24,7 @@ import { inspectTargets } from "../store/selectors.ts";
 import { whyNotPlayable } from "../choice/why.ts";
 import { previewKeywords } from "./preview-keywords.ts";
 import { contractSides } from "./contract-sides.ts";
+import { LOOT_ROLE } from "../words/loot.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 
 // A card code as the preview draws it: its name, its picture (or null) by picture key (picture-key.ts: side B of a revealed quest
@@ -103,7 +104,9 @@ export function previewCards(
     const card = game.cards[id];
     if (!card) return [];
     if (earlier.includes(id)) return [earlierStage(game, ctx, card.code, describe)];
-    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : card.host ? "Attachment" : null;
+    // The loot a location guards is under it, out of play, and still its player's (22024:B:2).
+    const loot = game.lootDecks != null && card.zone === "under" && card.controller != null;
+    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : loot ? LOOT_ROLE : card.host ? "Attachment" : null;
     // The effects on it, then what a delayed effect will do to it (Sneak Attack's return); for the pressed hand card, why it
     // does not glow.
     const effects = [...effectLines(game, ctx, id, cardName), ...delayedLines(game, id, cardName)];

@@ -254,3 +254,7 @@ export function parseRingsDbCards(payload: unknown, packCode: string): RingsDbCa
   }
   return payload.map((raw) => parseRingsDbCard(raw));
 }
+
+// What the families declare of the set-aside cards (family-manifest.ts): the verbs that hide one, and those that park cards the game does not use. The table's Set aside list reads them.
+export { ASIDE_SECRETS, ASIDE_UNUSED } from "./families/index.ts";
+export type { AsideSecret, AsideUnused } from "./family-manifest.ts";

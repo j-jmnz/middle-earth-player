@@ -198,4 +198,12 @@ const FLAGS = [
   "attackableEngagedWithAll",
 ] as const;
 
-export const manifest = { name: "sea", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;
+// The set-aside cards the players must not see (family-manifest.ts, AsideSecret). "Set aside each Send for Help facedown" (dcce.campaign-setup-a-storm-on-cobas-haven, dcce.campaign-setup-the-city-of-corsairs):
+// Gavin shuffles a random one into the encounter deck, and the ones left would tell which. The first encounter deck of The City of Corsairs lies set aside facedown once the second takes its place
+// (12148:B:1); the second deck's set waits set aside before that, named by the Setup.
+const ASIDE_SECRETS = [
+  { verb: "ShuffleRandomSetAside", names: ["name"] },
+  { verb: "SetAsideEncounterDeck", deck: true, openSets: { verb: "ShuffleSetAsideSet", field: "set" } },
+] as const;
+
+export const manifest = { name: "sea", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS, asideSecrets: ASIDE_SECRETS } as const satisfies CatalogFamily;
