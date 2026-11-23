@@ -8,7 +8,7 @@ import { defendingAgainst } from "../families/angmar/combat.ts";
 import type { EngineStep } from "./intents.ts";
 import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "../windows/queue.ts";
-import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
+import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, isExhausted, modifierActive, updateCard, withThreat } from "./state.ts";
 import { claimedDestination, discardedDetached, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
@@ -26,8 +26,9 @@ import { perDamage, threatPerHostWillpower } from "../families/cirith-ungol/valu
 import { perShadow } from "../families/wizards-quest/khazad.ts";
 import { questProgressBonus } from "../families/wilderland/dolguldur.ts";
 import { printedStat, victoryOf } from "./printed-stat.ts";
+import { halvedThreat } from "../families/burgle/stack.ts";
 import { wallRoom } from "../families/pelennor/wall.ts";
-import { heldBy, type TraitCheck } from "./holder-classes.ts";
+import { fromPlayerCard, heldBy, type TraitCheck } from "./holder-classes.ts";
 import { hasTrait } from "../interpret/conditions.ts";
 import { inAreaOf } from "../families/breaking/areas.ts";
 import { versusVictoryTrait } from "../families/captured/values.ts";
@@ -42,12 +43,6 @@ export { printedStat };
 
 // The stats of a card. A value below 0 is treated as 0 (rr.modifiers).
 const CARD_STATS: ReadonlySet<ModifierStat> = new Set(["willpower", "attack", "defense", "threat", "questPoints", "engagementCost", "hitPoints"]);
-
-// A modifier a player card gives: its source is a player card (an attachment's bonus, a hero's ability, an event).
-function fromPlayerCard(state: ScenarioState, modifier: Modifier, cards: ReadonlyMap<string, PrintedCard>): boolean {
-  const source = state.cards[modifier.sourceId];
-  return source != null && isPlayerType(printedOf(cards, source.code));
-}
 
 // `against` is the enemy the instance is attacking, for a modifier that only holds against some enemies.
 // A set modifier overrides every other one, the most recent set winning (rr.modifiers).
@@ -99,7 +94,7 @@ export function modifiedStat(
   if (stat === "threat") total += threatPerHostWillpower(state, instance, printed, cards);
   const lowered = set ?? total;
   const value = lowered < floor && ((stat === "willpower" && flagged(state, instance.id, "cannotReduceWillpower")) || (stat === "defense" && flagged(state, instance.id, "cannotReduceDefense"))) ? floor : lowered;
-  return CARD_STATS.has(stat) ? Math.max(0, value) : value;
+  return CARD_STATS.has(stat) ? halvedThreat(state, instance, stat, Math.max(0, value)) : value;
 }
 
 // The enemy in this attack costs more to engage than the threat of the holder's controller. "Your threat" in "defending

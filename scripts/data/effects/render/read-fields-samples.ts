@@ -1,6 +1,6 @@
 import { FAMILY_SAMPLES } from "./families.ts";
 import type { Obj } from "./kit.ts";
-import { DREADNAUGHT_SAMPLES, ERECH_SAMPLES, ESCAPE_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, POISON_SAMPLES, RUINS_SAMPLES, SIEGE_SAMPLES, SMAUG_SAMPLES, SACK_SAMPLES, STONE_SAMPLES, WESTERN_LANDS_SAMPLES, WIZARDS_QUEST_SAMPLES } from "./verbs.ts";
+import { BURGLE_SAMPLES, DREADNAUGHT_SAMPLES, ERECH_SAMPLES, ESCAPE_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, POISON_SAMPLES, RUINS_SAMPLES, SIEGE_SAMPLES, SMAUG_SAMPLES, SACK_SAMPLES, STONE_SAMPLES, WESTERN_LANDS_SAMPLES, WIZARDS_QUEST_SAMPLES } from "./verbs.ts";
 
 // A field is never hidden (kit.ts): a template that names a key in `read` must say it in its text, or the key would be dropped from the reader's view with no `[also ...]` to show it. For each verb, samples that set
 // every field the template reads; removing a field must change the text. A new template needs a sample here.
@@ -8,6 +8,7 @@ export const HERO = { type: "hero", control: "you" };
 export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ...FAMILY_SAMPLES,
   ...ESCAPE_SAMPLES,
+  ...BURGLE_SAMPLES,
   ...LONG_DARK_SAMPLES,
   ...STONE_SAMPLES,
   ...GUARDIAN_SAMPLES,
@@ -78,6 +79,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   PlaceDamageOn: [{ verb: "PlaceDamageOn", code: "02064", amount: 2 }],
   SearchToStaging: [{ verb: "SearchToStaging", code: "900602" }, { verb: "SearchToStaging", code: "131036", deckOnly: true }],
   PlaceDamage: [{ verb: "PlaceDamage", amount: 2, card: "picked" }, { verb: "PlaceDamage", amount: { players: true } }],
+  LookAtEncounterTop: [{ verb: "LookAtEncounterTop" }],
   LookAtTop: [{ verb: "LookAtTop", count: 3, deck: "own" }],
   DiscardOtherLooked: [{ verb: "DiscardOtherLooked" }],
   SetX: [{ verb: "SetX", value: 2 }],

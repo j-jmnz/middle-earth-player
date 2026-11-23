@@ -8,6 +8,7 @@ import { compact, done, isObj, jsonOf, joinAnd, joinOr, quoted, str, withArticle
 import { renderPick } from "./picks.ts";
 import { ANGMAR_TEMPLATES } from "./families/angmar.ts";
 import { ESCAPE_TEMPLATES } from "./families/escape.ts";
+import { BURGLE_TEMPLATES } from "./families/burgle.ts";
 import { ATTACH_TEMPLATES } from "./attach.ts";
 import { GUARDIAN_SAMPLES, GUARDIAN_TEMPLATES } from "./families/guardian.ts";
 import { AMBUSH_TEMPLATES } from "./families/ambush.ts";
@@ -28,6 +29,7 @@ import { POISON_SAMPLES, POISON_TEMPLATES } from "./families/poison.ts";
 import { searchLimits, searchPolicy, WIZARDS_QUEST_SAMPLES, WIZARDS_QUEST_TEMPLATES } from "./families/wizards-quest.ts";
 
 export { ESCAPE_SAMPLES } from "./families/escape.ts";
+export { BURGLE_SAMPLES } from "./families/burgle.ts";
 export { DREADNAUGHT_SAMPLES, ERECH_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, POISON_SAMPLES, RUINS_SAMPLES, SIEGE_SAMPLES, SMAUG_SAMPLES, SACK_SAMPLES, STONE_SAMPLES, WESTERN_LANDS_SAMPLES, WIZARDS_QUEST_SAMPLES };
 
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
@@ -79,7 +81,7 @@ const FLIP_GOLLUM = {
 } as const;
 
 export const TEMPLATES: Readonly<Record<string, Template>> = {
-  ...FAMILY_TEMPLATES, ...ESCAPE_TEMPLATES, ...AMBUSH_TEMPLATES, ...ANGMAR_TEMPLATES, ...LONG_DARK_TEMPLATES, ...STONE_TEMPLATES,
+  ...FAMILY_TEMPLATES, ...ESCAPE_TEMPLATES, ...BURGLE_TEMPLATES, ...AMBUSH_TEMPLATES, ...ANGMAR_TEMPLATES, ...LONG_DARK_TEMPLATES, ...STONE_TEMPLATES,
   ...GUARDIAN_TEMPLATES, ...ATTACH_TEMPLATES, ...STAT_TEMPLATES,
   ...SMAUG_TEMPLATES, ...ERECH_TEMPLATES, ...FOG_TEMPLATES, ...RUINS_TEMPLATES, ...SIEGE_TEMPLATES, ...GULDUR_TEMPLATES, ...DREADNAUGHT_TEMPLATES, ...INVESTIGATION_TEMPLATES, ...WIZARDS_QUEST_TEMPLATES, ...POISON_TEMPLATES, ...WESTERN_LANDS_TEMPLATES, ...SACK_TEMPLATES,
   PlayOnlyIf: (i, ctx) => ({ text: `(constant on a card in hand, read when it would be played) it can only be played while ${renderCondition(i.condition, ctx)}`, read: ["condition"] }),
@@ -219,6 +221,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   RemoveProgressEach: (i, ctx) => ({ text: `remove up to ${amount(i.amount, ctx)} progress from each ${pick(i.pick, ctx)} (the number of tokens removed in all is the effect's X)`, read: ["amount", "pick"] }),
   RemoveAllProgress: (i, ctx) => ({ text: `remove all the progress from ${i.pick !== undefined ? `each ${pick(i.pick, ctx)}` : cardRef(i.target ?? "picked")}`, read: ["target", "pick"] }),
   UndefendedDamageTo: (i, ctx) => ({ text: `the damage of this attack, if undefended, must go on a ${pick(i.pick, ctx)}${i.character === true ? " in play, whoever controls it" : " the defending player controls"}, if able (${i.character === true ? "" : "the player names the hero among them; "}a defended attack still damages its defender)`, read: ["pick", "character"] }),
+  LookAtEncounterTop: () => ({ text: "the acting player looks at the top card of the encounter deck in a look window (it is not revealed and stays on the deck)", read: [] }),
   LookAtTop: (i, ctx) => ({ text: `${who("actor")} looks at the top ${i.count === undefined ? "1" : amount(i.count, ctx)} card(s) of ${i.deck === "own" ? "their own deck" : i.deck === "picked" ? "the picked player's deck" : "the encounter deck"} (a card with a Forced effect for being looked at acts at once and is not one of them)`, read: ["count", "deck"] }),
   DiscardOtherLooked: () => ({ text: "the cards looked at, but the picked one, go to the encounter discard pile faceup; the picked card is then the top card of the encounter deck", read: [] }),
   RaiseStagingThreat: (i, ctx) => ({ text: i.live === "scoutEnemiesInPlay" ? `the total Threat in the staging area is raised, live, by 1 for each Scout enemy in play ${STAT_UNTIL[str(i.until)] ?? ""}` : i.live === "alliesInDiscard" ? `the total Threat in the staging area is raised, live, by the allies in a discard pile ${STAT_UNTIL[str(i.until)] ?? ""}` : `the total Threat in the staging area is ${amount(i.amount, ctx)} higher ${STAT_UNTIL[str(i.until)] ?? str(i.until)}`, read: ["amount", "until", "live"] }),

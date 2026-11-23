@@ -62,6 +62,7 @@ const TRIGGER: Readonly<Record<string, string>> = {
   progressPlacedOnSelf: "after progress is placed on this card, the placement that explores it included (X is the amount placed; the card may have left play)",
   questProgressPlacedOnStage: "once, after a quest that succeeded has placed progress on the stage itself",
   escapeFailed: "after an escape test that this card's own effect made is failed (no other card hears it; the event happened to the player who made the test)",
+  burgleFailed: "after the first player's burgle attempt fails (every card in play hears it)",
   escapePassed: "after an escape test that this card's own effect made is passed (no other card hears it; the event happened to the player who made the test)",
   questProgressPlaced: "once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)",
 };
