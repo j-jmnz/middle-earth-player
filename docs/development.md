@@ -134,7 +134,7 @@ Scripts are grouped as `pnpm <group> <command> [args]`, and running `pnpm <group
 | `pnpm release plan --dry-run` | Prints the next tag and its release notes without changing anything. Run `git fetch --tags` first. |
 | `pnpm release source --tag <tag> --ipa <file> --notes <file> --out <file>` | Writes a release's SideStore and AltStore source. The release workflow runs it. |
 | `pnpm release installs --releases <file> --out <file>` | Writes the README's installs badge from a `gh api --paginate --slurp` dump of the releases. The release workflow runs it. |
-| `pnpm commit:check "<subject>"` | Checks commit subjects against `.claude/rules/commit-standards.md`, or a whole range with `--range <base>..<head>`. It is installed as the `commit-msg` hook. |
+| `pnpm commit:check "<subject>"` | Checks commit subjects against `.claude/rules/commit-standards.md`, or a whole range with `--range <base>..<head>`. A range is also held as a whole: a `Reviewed:` line when `src/rules` or `src/effects/authored` changed, and a `Pipeline measure:` line when a scenario became playable (`scripts/git/range-rules.ts`). It is installed as the `commit-msg` hook. |
 | `pnpm move <old> <new>` | Moves files and rewrites every reference to them. Try `--dry-run` first. |
 
 Scripts log to stderr. Pass `--verbose` or `--quiet`, or set `LOG_LEVEL` to `debug`, `info`, `warn`, `error` or `silent`.
