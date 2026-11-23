@@ -9,8 +9,8 @@ You research the open points of one scenario. The procedure is `docs/agents/agen
 
 ## Inputs
 
-- The scenario id, and `.agent/handoff/<id>.lines.txt`: every dealt card's printed ledger lines, from `pnpm effects render <id> --all-dealt`. A line marked `NO RECORD NAMES THIS LINE` is yours; a line that shows a record was read in an earlier scenario.
-- The user rulings the scenario's cards touch, from `pnpm doc rulings "<card name or words>"`. A ruling is settled: a source that says otherwise is a `conflict` row, not a change.
+- The scenario id, and `.agent/handoff/<id>.lines.txt`: every dealt card's printed ledger lines, from `pnpm effects render <id> --all-dealt --out <file>`. A line marked `NO RECORD NAMES THIS LINE` is yours; a line that shows a record was read in an earlier scenario.
+- The user rulings the scenario's cards touch, from `pnpm doc rulings "<card name or words>"`. A ruling is settled: a source that says otherwise is a `conflict` row, not a change. A `conflict` row is a reading that a user ruling, or a reading recorded in the box's file in `docs/scenarios/`, already settles differently from what the sources say: the row gives the settled reading and the source that disagrees, and the Read task applies the settled one.
 
 ## Do
 

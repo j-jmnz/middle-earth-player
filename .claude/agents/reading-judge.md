@@ -31,10 +31,10 @@ Exactly this, nothing before or after:
 ```
 <line id> | ok|wrong|ambiguous|render-gap | <clause, or why>
 <line id>#<tag> | ok | -
-<line id>#<tag> | <what is wrong>
+<line id>#<tag> | wrong | <what is wrong>
 ```
 
-one row per ledger line in the render's order, each followed by one `#<tag>` row for every CHECK printed under it (`ok`, or what is wrong: a fault there makes the line `wrong`, or `ambiguous` when it is a real choice). A CHECK with no row is a defect of your output. Then:
+one row per ledger line in the render's order, each followed by one `#<tag>` row for every CHECK printed under it (`ok`, or `wrong` with what is wrong: a `wrong` tag row makes its line `wrong`, or `ambiguous` when it is a real choice). Every row has three fields. A CHECK with no row is a defect of your output. Then:
 
 ```
 Needs ruling
