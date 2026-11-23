@@ -120,6 +120,16 @@ export function soakStart(from: number | undefined, random: () => number = Math.
   return from ?? GAMES + Math.floor(random() * 1_000_000);
 }
 
+/** The command that plays a soak's games of one scenario again: the same first number and as many games as the soak played (`--games-only` leaves out the card probes). */
+export function replayCommand(scenario: string, from: number, games: number): string {
+  return `pnpm test encounter ${scenario} --from=${from} --games=${games} --games-only`;
+}
+
+/** The line a soak adds after a scenario's summary: how to replay it, and that KNOWN (keyed by game number) is not matched, so a known failure shows as a problem here. */
+export function soakNote(scenario: string, from: number, games: number): string {
+  return `  replay: ${replayCommand(scenario, from, games)} (a soak does not match KNOWN: a known failure shows as a problem; compare its message with the KNOWN entries)`;
+}
+
 /** When the next scenario of a soak must stop: its share of the time left, `remaining` scenarios including it. */
 export function soakDeadline(now: number, end: number, remaining: number): number {
   return now + Math.max(0, end - now) / Math.max(1, remaining);
@@ -141,7 +151,7 @@ async function main(log: Log): Promise<void> {
   if (minutes !== undefined && (args.includes("--cards-only") || games !== undefined)) throw new Error("--minutes plays games only, as many as fit: it takes neither --cards-only nor --games");
   const from = minutes === undefined ? number("from") : soakStart(number("from"));
   const end = minutes === undefined ? 0 : performance.now() + minutes * 60_000;
-  if (minutes !== undefined) log.info(`soak: ${minutes} min over ${ids.length} scenarios, games from number ${from} (--from=${from} plays them again)`);
+  if (minutes !== undefined) log.info(`soak: ${minutes} min over ${ids.length} scenarios, games from number ${from}; each scenario's summary is followed by the command that plays its games again`);
   let failed = 0;
   for (const [at, id] of ids.entries()) {
     try {
@@ -149,6 +159,7 @@ async function main(log: Log): Promise<void> {
       const summary = await smokeScenario(id, { ...(games == null ? {} : { games }), ...(from == null ? {} : { from }), ...soak, cards: minutes === undefined && !args.includes("--games-only") });
       if (problemsOf(summary).length > 0) failed += 1;
       (problemsOf(summary).length > 0 ? log.error : log.info)(formatSummary(summary));
+      if (minutes !== undefined && from !== undefined) log.info(soakNote(id, from, summary.games.length));
     } catch (error) {
       failed += 1;
       log.error(`${id}: ${describeError(error)}`);

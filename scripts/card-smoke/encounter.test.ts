@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect, Instruction } from "../../src/catalog/boundary.ts";
 import type { ReduceContext } from "../../src/rules/engine/reduce.ts";
 
-import { countOf, KNOWN, knownOf, probeTable, problemsOf, smokeScenario, soakDeadline, soakStart, type EncounterSummary, type KnownFailure } from "./encounter.ts";
+import { countOf, KNOWN, knownOf, probeTable, problemsOf, replayCommand, smokeScenario, soakNote, soakDeadline, soakStart, type EncounterSummary, type KnownFailure } from "./encounter.ts";
 import { encounterCards, probeCard, type Probe } from "./encounter-cards.ts";
 import { playGame, type GameSummary } from "./encounter-games.ts";
 import type { EncounterWorld } from "./encounter-world.ts";
@@ -109,6 +109,12 @@ describe("known failures and flags", () => {
     expect(problemsOf({ ...summary([game()]), scenario: "the-oath" }, listed)).toHaveLength(1);
     expect(problemsOf(summary([game({ intent: { type: "Pass" } })]), listed)).toHaveLength(1);
     expect(problemsOf(summary([game()]), KNOWN)).toHaveLength(1);
+  });
+
+  it("prints the command that plays a soak's games again, and says KNOWN is not matched in a soak", () => {
+    expect(replayCommand("the-oath", 123456, 40)).toBe("pnpm test encounter the-oath --from=123456 --games=40 --games-only");
+    expect(soakNote("the-oath", 123456, 40)).toContain("--from=123456 --games=40 --games-only");
+    expect(soakNote("the-oath", 123456, 40)).toContain("does not match KNOWN");
   });
 
   it("rejects a count that is not a whole number", () => {
