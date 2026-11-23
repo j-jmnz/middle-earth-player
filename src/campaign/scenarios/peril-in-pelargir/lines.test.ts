@@ -14,9 +14,12 @@ import { settle } from "../../../rules/engine/machine.ts";
 import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
+import { holds } from "../../../rules/interpret/conditions.ts";
+import { questStatOf } from "../../../rules/quest/quest.ts";
+import { topFrame } from "../../../rules/windows/windows.ts";
 import { pushCardEffects } from "../../../rules/interpret/effect-frames.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
-import { fightEnemy, finish, first, idOf, idsOf, revealFromTop, send, start, tableFromLayout, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
+import { fightEnemy, finish, first, idOf, idsOf, resolveRecords, revealFromTop, send, start, tableFromLayout, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
 import { pelargirStart, pelargirWorld } from "../../../../test/scenarios/peril-in-pelargir/game.ts";
 
 const SCENARIO = "peril-in-pelargir";
@@ -187,7 +190,7 @@ describe("05037 Pickpocket, 05038 City Street and 05039 Market Square", () => {
   it("05038:A:2 the players can travel to City Street and to another copy of it, and to no location with another title", () => {
     const table = tableFromLayout(SCENARIO, { staging: ["05038", "05021", "05038"], phase: "Travel" });
     const run = start(table.state);
-    const targets = legalTargets(run.state, { type: "Travel" } as PlayerIntent, table.ctx);
+    const targets = legalTargets(run.state, { type: "Travel" } as never, table.ctx);
     expect(targets).toEqual(idsOf(table.state, "05038").filter((id) => targets.includes(id)));
     expect(targets.length).toBe(2);
     expect(targets).not.toContain(idOf(table.state, "05021"));
@@ -195,7 +198,7 @@ describe("05037 Pickpocket, 05038 City Street and 05039 Market Square", () => {
 
   it("05038:A:2 with no City Street in the staging area the players travel anywhere", () => {
     const table = tableFromLayout(SCENARIO, { staging: ["05021", "05022"], phase: "Travel" });
-    expect(legalTargets(start(table.state).state, { type: "Travel" } as PlayerIntent, table.ctx)).toHaveLength(2);
+    expect(legalTargets(start(table.state).state, { type: "Travel" } as never, table.ctx)).toHaveLength(2);
   });
 
   // The travel intent and the payments it asks for. The players' answers are the first option of each Choose window; the game goes on into the resource phase, where every hero gains 1, so a hero that paid holds what it had, one that did not holds 1 more.
@@ -225,5 +228,117 @@ describe("05037 Pickpocket, 05038 City Street and 05039 Market Square", () => {
   it("05039:A:2 the cost is paid from the pool of any hero the player chooses, whatever its sphere: no hero is barred", () => {
     const state = traveled({ heroResources: 1 }, (open) => (open.window?.kind === "choose" ? (open.window.options.find((id) => open.cards[id]?.code === "dh2") ?? "") : ""));
     expect([resourcesOf(state, "dh1"), resourcesOf(state, "dh2")]).toEqual([2, 1]);
+  });
+});
+
+describe("05040 Lost in the City", () => {
+  // The bar of the When Revealed frame, read as the engine reads it while the effect resolves: the card is revealed, so it lies in no staging area, and in the discard pile once it has resolved.
+  const barHolds = (code: string, zone: "encounterDeck" | "discard"): boolean | undefined => {
+    const table = tableFromLayout(SCENARIO, { staging: [code] });
+    const source = idOf(table.state, code);
+    const records = EFFECTS.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
+    const pushed = pushCardEffects({ ...table.state, window: null }, "whenRevealed", source, 0, false, records, table.ctx, []);
+    const bar = topFrame(pushed)?.data;
+    if (bar?.kind !== "effect" || bar.blockCancel == null) return undefined;
+    const away = { ...pushed, cards: { ...pushed.cards, [source]: { ...pushed.cards[source]!, zone: zone === "discard" ? ("encounterDiscard" as const) : ("encounterDeck" as const) } } };
+    return holds(away, bar.blockCancel, { actor: 0, sourceId: source, returned: 0 }, table.ctx);
+  };
+
+  it("05040:A:1 #uncancelable: this effect cannot be canceled, whatever zone the card lies in (a revealed treachery is never in the staging area); another treachery's When Revealed has no bar", () => {
+    expect(barHolds("05040", "encounterDeck")).toBe(true);
+    expect(barHolds("05040", "discard")).toBe(true);
+    expect(barHolds("05041", "discard")).toBeUndefined();
+  });
+});
+
+describe("05042, 05043 and 05044: optional engagement and the engagement check", () => {
+  // The player chooses the engagement in the optional engagement step, or declines it and the engagement check engages the enemy (the engagement costs are at most 40 and the stand-in threat is 28 or more for the first two).
+  function engagedBy(code: string, optional: boolean, layout: Layout): ScenarioState {
+    const table = tableFromLayout(SCENARIO, { phase: "Encounter", staging: [code], threat: [45, 45], ...layout });
+    const enemy = idOf(table.state, code);
+    const run = send(start(table.state), optional ? { type: "Engage", enemyId: enemy } : { type: "DeclineEngage" }, table.ctx);
+    return finish(run, table.ctx, (state) => (state.window?.kind === "choose" ? (state.window.options.find((id) => state.cards[id]?.code === "dh1") ?? state.window.options[0] ?? "") : "")).state;
+  }
+  const ally = (state: ScenarioState): { damage: number; zone: string } => ({ damage: state.cards[idOf(state, "ally")]?.damage ?? 0, zone: state.cards[idOf(state, "ally")]?.zone ?? "" });
+
+  it("05042:A:1 optionally engaged: 1 damage to each ally he controls; engaged by the engagement check: 2 damage", () => {
+    expect(ally(engagedBy(ZEALOUS, true, { play: ["ally"] }))).toEqual({ damage: 1, zone: "play" });
+    expect(ally(engagedBy(ZEALOUS, false, { play: ["ally"] })).zone).toBe("discard");
+  });
+
+  it("05043:A:1 optionally engaged: 1 resource from each hero; engaged by the engagement check: 2 resources", () => {
+    const resources = (state: ScenarioState): number[] => ["dh1", "dh2"].map((code) => state.cards[idOf(state, code)]?.resources ?? 0);
+    expect(resources(engagedBy(BANDIT, true, { heroResources: 3 }))).toEqual([2, 2]);
+    expect(resources(engagedBy(BANDIT, false, { heroResources: 3 }))).toEqual([1, 1]);
+  });
+
+  it("05044:A:2 optionally engaged: 3 damage to a hero he chooses; engaged by the engagement check: that hero is discarded", () => {
+    const optional = engagedBy(ASSASSIN, true, {});
+    expect(optional.cards[idOf(optional, "dh1")]).toMatchObject({ damage: 3, zone: "heroes" });
+    const forced = engagedBy(ASSASSIN, false, {});
+    expect(forced.cards[idOf(forced, "dh1")]?.zone).not.toBe("heroes");
+  });
+
+  it("05067:B:1 enemies cannot be optionally engaged: no enemy is offered for it, the player may only decline", () => {
+    const table = tableFromLayout(SCENARIO, { stage: "05067", phase: "Encounter", staging: [ZEALOUS], threat: [45, 45] });
+    const run = start(table.state);
+    expect(legalIntents(run.state, table.ctx).map((intent) => intent.type)).toEqual(["DeclineEngage"]);
+    const plain = tableFromLayout(SCENARIO, { phase: "Encounter", staging: [ZEALOUS], threat: [45, 45] });
+    expect(legalIntents(start(plain.state).state, plain.ctx).map((intent) => intent.type)).toContain("Engage");
+  });
+});
+
+describe("05065, 05066 and 05067: the quest stages", () => {
+  it.each([["05065:B:1", "05065"], ["05066:B:1", "05066"]])("%s Battle: the characters use their Attack instead of Willpower when questing", (_line, stage) => {
+    const table = tableFromLayout(SCENARIO, { stage });
+    expect(questStatOf(table.state, table.hero, table.ctx.cards)).toBe("attack");
+    expect(questStatOf(tableFromLayout(SCENARIO, { stage: "05067" }).state, table.hero, table.ctx.cards)).toBe("willpower");
+  });
+
+  // A stage whose quest points are reached while the Scroll is on no hero keeps its progress and does not advance; it advances once the Scroll is attached to a hero.
+  const settled = (table: LayoutTable): ScenarioState => settle({ ...table.state, window: null }, table.ctx, []);
+
+  it("05066:B:2 the players cannot advance to the next stage unless the Scroll is attached to a hero: the stage holds its progress and advances when it is", () => {
+    const layout: Layout = { stage: "05066", progress: 13 };
+    const held = settled(tableFromLayout(SCENARIO, { ...layout, staging: [SCROLL] }));
+    expect(held.cards[idOf(held, "05066")]?.zone).toBe("questStage");
+    expect(held.cards[idOf(held, "05066")]?.progress).toBe(13);
+    const free = settled(scrollTable(layout));
+    expect(free.cards[idOf(free, "05067")]?.zone).toBe("questStage");
+  });
+
+  it("05067:B:3 the players cannot defeat this stage unless the Scroll is attached to a hero; defeating the last stage wins the game", () => {
+    const layout: Layout = { stage: "05067", progress: 15 };
+    const held = settled(tableFromLayout(SCENARIO, { ...layout, staging: [SCROLL] }));
+    expect(held.stageCleared ?? false).toBe(false);
+    expect(held.cards[idOf(held, "05067")]?.progress).toBe(15);
+    const free = settled(scrollTable(layout));
+    expect(free.stageCleared).toBe(true);
+  });
+
+  it("05066:B:3 When Revealed: the Scroll, from a hero, goes to the highest engagement cost enemy in play, the staging area included", () => {
+    const table = scrollTable({ stage: "05066", engaged: [THUG], staging: [ASSASSIN, ZEALOUS] });
+    const made = resolveRecords(table.state, table.ctx, "05066", "whenRevealed", first(table.state, "05066"));
+    const done = finish(made, table.ctx);
+    expect(done.state.cards[idOf(done.state, SCROLL)]?.host).toBe(idOf(done.state, ASSASSIN));
+    expect(done.state.cards[idOf(done.state, SCROLL)]?.controller ?? null).toBeNull();
+  });
+
+  it("05066:B:3 with no enemy in play the Scroll is added to the staging area", () => {
+    const table = scrollTable({ stage: "05066" });
+    const done = finish(resolveRecords(table.state, table.ctx, "05066", "whenRevealed", first(table.state, "05066")), table.ctx);
+    expect(done.state.cards[idOf(done.state, SCROLL)]?.zone).toBe("staging");
+  });
+
+  it("05067:B:2 the first enemy the encounter deck reveals each round attacks the player whose hero has the Scroll from the staging area; no later enemy does", () => {
+    const table = scrollTable({ stage: "05067", seats: 2, deck: ["f0", "f0", "f0"] });
+    const steps: EngineStep[] = [];
+    const one = revealFromTop(table.state, table.ctx, THUG, steps);
+    expect(one.state.pendingAttack).toMatchObject({ enemyId: idOf(one.state, THUG), seat: 0, fromStaging: true });
+    expect(one.state.cards[idOf(one.state, THUG)]?.zone).toBe("staging");
+    const attacked = finish({ state: one.state, steps }, table.ctx, (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "")).state;
+    const two = revealFromTop({ ...attacked, pendingAttack: null }, table.ctx, ZEALOUS, steps);
+    expect(two.state.pendingAttack ?? null).toBeNull();
+    expect(flagged(two.state, idOf(two.state, ZEALOUS), "firstEnemy")).toBe(false);
   });
 });
