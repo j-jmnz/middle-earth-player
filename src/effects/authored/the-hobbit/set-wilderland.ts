@@ -3,7 +3,8 @@ import type { Condition, Effect, Instruction } from "../../../catalog/boundary.t
 // Records for the Wilderland encounter set (132035 to 132038), which Flies and Spiders, The Lonely Mountain and The Battle of Five Armies all deal. Every line is read from the scan ledger (data/printed/the-hobbit.json). The readings are in docs/scenarios/the-hobbit.md (The Battle of Five Armies).
 // Rules: rr.active-location, rr.travel, rr.attachment-cards, rr.forced, rr.neutral-cards, faq.lasting-effects, hob.baggins-sphere-otd, hob.bilbo-multiplayer-otd, rr.damage, rr.destroy (data/rules/entries.json).
 const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
-const ATTACHED: Condition = { kind: "sourceIn", zone: "attached" };
+// "Attached character gets ...": the penalty holds only while the host is a character (a host can change type).
+const ATTACHED: Condition = { kind: "all", conditions: [{ kind: "sourceIn", zone: "attached" }, { kind: "matches", card: "host", pick: { type: "character", control: "any" } }] };
 const SPHERES = ["leadership", "lore", "spirit", "tactics"] as const;
 
 // "The first player names a sphere. Then, all non-Baggins characters who do not belong to the named sphere are removed from the quest." One of the four spheres is named (a neutral or Baggins sphere cannot be); a neutral character belongs to none, so it is removed (rr.neutral-cards).
