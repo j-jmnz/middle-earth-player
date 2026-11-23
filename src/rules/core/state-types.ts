@@ -165,7 +165,7 @@ export type CardInstance = {
   carried?: true;
   // The named deck the card was dealt into, when that deck has a discard pile of its own (core/piles.ts): the card goes back to that discard pile, not the encounter discard pile, when it
   // leaves play (emce.evil-creatures-deck). Absent on every other card.
-  deck?: "evilCreatures" | "balrog" | "smaug";
+  deck?: "evilCreatures" | "balrog" | "smaug" | "sack";
 };
 
 export type Seat = {

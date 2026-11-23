@@ -86,6 +86,8 @@ export function struck(
   // The damage the attack dealt is the event's amount, and so the Response's X ("a Dwarf deals X damage", 04105:A:1).
   const dealt = destroyed ? placedAmount(before, enemyId, printedOf(ctx.cards, was.code), raw) : (now?.damage ?? 0) - was.damage;
   if (hurt && heard(next, ctx, "attackDamaged")) for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDamaged", cardId: attackerId, amount: dealt, ...about });
+  // The enemy hears that a player attack damaged it, as the card attached to it does (`subject: "host"`, 131043:A:2).
+  if (hurt && heard(next, ctx, "enemyDamagedByAttack")) next = queueEvent(next, { trigger: "enemyDamagedByAttack", seat, cardId: enemyId, subject: enemyId, amount: dealt, participants: attackerIds });
   if (!destroyed) return next;
   for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, other: enemyId, participants: attackerIds });
   const engaged = was.zone === "engaged" ? was.controller : null;

@@ -83,6 +83,7 @@ import minesFixtures from "./fixtures/the-mines-of-moria.json";
 import khazadFixtures from "./fixtures/escape-from-khazad-dum.json";
 import dreadnaughtFixtures from "./fixtures/the-hunt-for-the-dreadnaught.json";
 import spidersFixtures from "./fixtures/flies-and-spiders.json";
+import dayFixtures from "./fixtures/we-must-away-ere-break-of-day.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -184,6 +185,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "escape-from-khazad-dum": khazadFixtures,
   "the-hunt-for-the-dreadnaught": dreadnaughtFixtures,
   "flies-and-spiders": spidersFixtures,
+  "we-must-away-ere-break-of-day": dayFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

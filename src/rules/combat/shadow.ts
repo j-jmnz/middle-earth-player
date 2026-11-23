@@ -45,7 +45,7 @@ function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx:
 // instruction ("Deal X shadow cards to this attacker", 01112:A:2) or resolves another card's When Revealed effects ("Resolve the
 // \"When Revealed\" effect of Iron Shackles", 01105:A:2), assigns damage a point at a time ("Assign X damage among characters you control", 142057:A:2),
 // runs on each card that matches ("exhaust all characters you control", 900103:A:2), or
-// reveals an encounter card ("Reveal an encounter card", 11176:A:4), or discards the bottom card of a deck and reads its printed cost (11032:A:2), or grapples (the first player chooses among tied locations, 12053:A:3, 12054:A:3), or searches for an enemy and adds it to the staging area (the first player chooses among the kinds found, 12106:A:2), runs in a frame: only a frame expands a Repeat or an Each or waits for the effects it pushes. A verb says so in its schema entry (`runsInFrame`, src/catalog/verb-flags.ts); this lists none.
+// reveals an encounter card ("Reveal an encounter card", 11176:A:4), or discards the bottom card of a deck and reads its printed cost (11032:A:2), or grapples (the first player chooses among tied locations, 12053:A:3, 12054:A:3), or searches for an enemy and adds it to the staging area (the first player chooses among the kinds found, 12106:A:2), or searches the encounter deck for a card and then shuffles it (the "Then" step reads the frame, 131053:A:2), runs in a frame: only a frame expands a Repeat or an Each or waits for the effects it pushes. A verb says so in its schema entry (`runsInFrame`, src/catalog/verb-flags.ts); this lists none.
 export function runsInFrame(effects: readonly Effect[]): boolean {
   const framed = verbsRunningInFrame();
   return effects.some((effect) => effect.instructions.some((instruction) => framed.has(instruction.verb)));
@@ -57,7 +57,9 @@ function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number,
   const turned = updateCard(state, shadowId, { face: "up" });
   const effects = ctx.effects.filter((effect) => effect.cardCode === shadow.code && effect.timing === "shadow");
   // An effect that waits for a player runs in a frame settle advances; the attack goes on when it pops (afterShadowFrame).
-  if (runsInFrame(effects) && turned.pendingAttack) {
+  // A Shadow effect the first player may cancel by paying (`cancel`, "The first player may spend 1 Baggins resource to cancel this effect", 131051:A:2) runs in a frame too: the frame offers the cancel as it begins (rr.cancel).
+  const payable = effects.find((effect) => effect.cancel != null)?.cancel;
+  if ((runsInFrame(effects) || payable != null) && turned.pendingAttack) {
     const framed = pushEffectFrame(
       // The defense window is over: the defender is declared.
       { ...turned, window: null, pendingAttack: { ...turned.pendingAttack, shadowFrame: shadowId } },
@@ -69,7 +71,7 @@ function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number,
         effectId: effects[0]?.id ?? `${shadowId}:shadow`,
         instructions: effects.flatMap((effect) => effect.instructions),
         causes: effects.flatMap((effect) => effect.instructions.map(() => effectCause(effect))),
-        cancel: null,
+        cancel: payable ? { amount: payable.cost, sphere: payable.sphere ?? null, unless: payable.unless ?? null } : null,
         blockCancel: null,
       },
       steps,

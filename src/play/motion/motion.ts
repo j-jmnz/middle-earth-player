@@ -30,7 +30,7 @@ export type Motion = {
 };
 
 // The decks of the second slot a card is revealed from, and the decks that are refilled from a discard pile of their own.
-const SECOND_DECK_PILES: Readonly<Record<string, true>> = { corsairDeck: true, evilCreaturesDeck: true, balrogDeck: true, cavesDeck: true, haradDeck: true, angmarOrcDeck: true, investigationDeck: true, smaugDeck: true };
+const SECOND_DECK_PILES: Readonly<Record<string, true>> = { corsairDeck: true, evilCreaturesDeck: true, balrogDeck: true, cavesDeck: true, haradDeck: true, angmarOrcDeck: true, investigationDeck: true, smaugDeck: true, sackDeck: true };
 const REFILLED = [["corsairDeck", "corsairDiscard"], ["evilCreaturesDeck", "evilCreaturesDiscard"], ["balrogDeck", "balrogDiscard"], ["smaugDeck", "smaugDiscard"]] as const;
 
 // How a card that left the table goes: "shake" (destroyed or discarded from play: it shakes, then shrinks and fades to its

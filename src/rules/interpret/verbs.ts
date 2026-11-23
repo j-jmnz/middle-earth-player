@@ -27,6 +27,7 @@ import { mayGainResources } from "../families/misc/guards.ts";
 import { queueHeard } from "../families/quest/events.ts";
 import { countDiscarded } from "../families/south/damage.ts";
 import { refillsAnyTime } from "../families/nightmare/guards.ts";
+import { hearsEmptyDeck } from "../families/sack/empty-deck.ts";
 import { returnUndeadBeforeReset } from "../families/angmar/run-out.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
@@ -61,6 +62,8 @@ export function shuffleEncounterDeck(state: ScenarioState): ScenarioState {
 export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   // In any phase while the Nightmare setup card says so (encounterRefill, 900201:A:3).
   if (state.phase !== "Quest" && !refillsAnyTime(state)) return state;
+  // A card in play that advances the stage on an empty deck hears it first (131024:B:1, families/sack/empty-deck.ts).
+  if (hearsEmptyDeck(state, ctx)) return state;
   return reshuffleDiscard(returnUndeadBeforeReset(state, ctx, steps), steps, "rr.running-out-of-cards");
 }
 

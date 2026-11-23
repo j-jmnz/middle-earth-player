@@ -139,6 +139,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "escape-from-khazad-dum": UNDERGROUND,
   "the-hunt-for-the-dreadnaught": SEA,
   "flies-and-spiders": FOREST,
+  "we-must-away-ere-break-of-day": { calm: "shire", combat: "chase" },
 };
 
 /** The loop a table plays: its scenario's combat loop during the Combat phase, its calm loop otherwise, and the menu's for a scenario with no pair. */
