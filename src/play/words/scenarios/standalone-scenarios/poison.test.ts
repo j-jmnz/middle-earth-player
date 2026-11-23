@@ -1,9 +1,9 @@
 // Rules: hob.venom-poison, hob.unconscious-characters (data/rules/entries.json).
 import { describe, expect, it } from "vitest";
 
-import { givePoison } from "../../../rules/families/poison/poison.ts";
-import { spiderTable } from "../../../../test/scenarios/flies-and-spiders/scene.ts";
-import { askValues, type Ask } from "../asks.ts";
+import { givePoison } from "../../../../rules/families/poison/poison.ts";
+import { spiderTable } from "../../../../../test/scenarios/flies-and-spiders/scene.ts";
+import { askValues, type Ask } from "../../asks.ts";
 import { poisonLine, unconsciousLine } from "./poison.ts";
 
 describe("the poison lines", () => {
