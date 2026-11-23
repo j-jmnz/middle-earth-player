@@ -50,6 +50,11 @@ export function firstOfArea(state: ScenarioState, seat: number): number {
   return [...mine].sort((left, right) => ((left - state.firstPlayer + count) % count) - ((right - state.firstPlayer + count) % count))[0] ?? state.firstPlayer;
 }
 
+// The first player an effect read by `actor` means: the first player of the actor's area while the areas are isolated ("the resolution of each phase occurs as if only the player or players that share any given staging area are currently present in the game", hob.staging-area-creating), else the first player.
+export function firstPlayerFor(state: ScenarioState, actor: number): number {
+  return isolatedAreas(state) ? firstOfArea(state, actor) : state.firstPlayer;
+}
+
 // The seat that heads the area the card is in: its staging area, its active location or the engagement of a player of the area; null for a card in no area (or while stages are not separate).
 export function areaHeadOf(state: ScenarioState, id: string): number | null {
   if (!state.separate) return null;

@@ -25,7 +25,7 @@ import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
 import { flaggedByClass } from "../core/holder-classes.ts";
 import { cardTypeOf, isAllyLike, isQuestCardType, isSideQuestType, isPlayerType, printedOf } from "../core/printed.ts";
-import { activeFor, headOf, sharedStaging, sharing } from "../families/breaking/areas.ts";
+import { activeFor, firstPlayerFor, headOf, sharedStaging, sharing } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { flagged, heldAmount, inPlay, livingSeats } from "../core/state.ts";
@@ -191,7 +191,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   const instance = state.cards[id];
   if (!instance) return false;
   const printed = printedOf(ctx.cards, instance.code);
-  const asking = spec.who === "firstPlayer" ? state.firstPlayer : at.seat;
+  const asking = spec.who === "firstPlayer" ? firstPlayerFor(state, at.seat) : at.seat;
   const picked = at.picked ?? [];
   const from = spec.from ?? "play";
   if ((id === at.sourceId && (from !== "play" || spec.other)) || (spec.different && picked.includes(id))) return false;
@@ -369,7 +369,7 @@ function candidatesOf(
   // The answered event's subject and other card, for a condition read about it (families/attack/pick.ts).
   event?: { subject?: string | null; other?: string | null; discards?: boolean },
 ): string[] {
-  const asking = spec.who === "firstPlayer" ? state.firstPlayer : seat;
+  const asking = spec.who === "firstPlayer" ? firstPlayerFor(state, seat) : seat;
   if (spec.type === "player") return seatsOf(state, spec, asking).filter((index) => !state.seats[index]?.eliminated && seatPickMatches(state, index, spec, ctx)).map((index) => `seat:${index}`);
   if (spec.hostForPicked) {
     const card = state.cards[picked.at(-1) ?? ""];

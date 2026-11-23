@@ -18,6 +18,7 @@ import { guardedSafeLocation } from "../families/angmar/safe.ts";
 import { flightDefenseBarred } from "../families/attack/flight.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
+import { areaHeadOf, firstOfArea, isolatedAreas } from "../families/breaking/areas.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
 // The `exceptTrait` the template "Cannot have non-<X> attachments" reads from the printed phrase "non-objective player card attachments" (51012:A:1): a card kind, not a Trait.
@@ -127,6 +128,8 @@ export function forcedTravel(state: ScenarioState, ctx: ReduceContext): string[]
 // two-handed play that is not the Ring-bearer's seat every round. A Hide test on a Travel line is not a cost the players
 // can fail to pay. A Travel cost of cards (discard 2 at random, each player exhausts a hero) needs the cards to pay it.
 export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
+  // The players who pay the Travel cost: those of the staging area the location lies in once the areas are isolated (hob.staging-area-creating).
+  const payer = isolatedAreas(state) ? firstOfArea(state, areaHeadOf(state, locationId) ?? state.firstPlayer) : state.firstPlayer;
   const code = state.cards[locationId]?.code;
   if (code == null) return false;
   // Only the Travel effect of the side the location shows counts: the Temple of the Deceived side of a map location prints one that its other side does not (12068:B:3).
@@ -134,7 +137,7 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
   const instructions = [...(shown ? recordsOfFace(shown, ctx.effects.filter((effect) => effect.cardCode === code)) : []).filter((effect) => effect.timing === "travel").flatMap((effect) => effect.instructions), ...grantedTravel(state, locationId)];
   return instructions.some((instruction) => {
       // A cost line that is gated (`when`) is owed only while its condition holds: Fisherman's Dock's exhaust is owed with 1 active location (50223:A:2).
-      if ("when" in instruction && instruction.when != null && !holds(state, instruction.when, { actor: state.firstPlayer, sourceId: locationId, returned: 0 }, ctx)) return false;
+      if ("when" in instruction && instruction.when != null && !holds(state, instruction.when, { actor: payer, sourceId: locationId, returned: 0 }, ctx)) return false;
       // "A player at this staging area must engage an enemy in any staging area to travel here" (142079:A:1): an enemy to engage must be in some staging area.
       // "Place 1 resource on Shelob to travel here" (144045:A:3): the card the resources go on is picked and must be in play.
       if ((instruction.verb === "Engage" && instruction.target === "picked") || (instruction.verb === "PlaceResourceTokens" && instruction.on === "picked")) {
@@ -142,9 +145,9 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
         return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length === 0;
       }
       // "Spend 1 Fellowship resource to travel here" (144020:A:3): a hero of the players must hold the resources, the record says whose (`group`: any player's).
-      if (instruction.verb === "SpendResources") return spendablePools(state, state.firstPlayer, instruction, ctx).total < instruction.amount;
+      if (instruction.verb === "SpendResources") return spendablePools(state, payer, instruction, ctx).total < instruction.amount;
       // "Either exhaust Sméagol, or discard 1 random card from each player's hand" (144044:A:2): a cost of a choice is payable when some option can be taken (rr.effects, rr.cost).
-      if (instruction.verb === "Choose") return !instruction.options.some((option) => option.requires == null || holds(state, option.requires, { actor: state.firstPlayer, sourceId: locationId, returned: 0 }, ctx));
+      if (instruction.verb === "Choose") return !instruction.options.some((option) => option.requires == null || holds(state, option.requires, { actor: payer, sourceId: locationId, returned: 0 }, ctx));
       // "Reveal the top card of the burden deck to travel here" (141058:A:3): an empty burden deck has none to reveal.
       if (instruction.verb === "RevealBurden") return (state.burdenDeck?.length ?? 0) === 0;
       // A family's own Travel cost the players cannot pay (the Corsair deck of Southern Belfalas is empty, 12154:A:1, families/sea/index.ts).

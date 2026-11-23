@@ -17,7 +17,7 @@ import { seatThreat } from "../families/play/hooks.ts";
 import { distinctTraitCount, flaggedTrait, lostTrait } from "../families/misc/traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "../families/quest/conditions.ts";
-import { headOf, inAreaOf, isolatedAreas } from "../families/breaking/areas.ts";
+import { firstPlayerFor, headOf, inAreaOf, isolatedAreas } from "../families/breaking/areas.ts";
 import { victoryPointsOf } from "../core/printed-stat.ts";
 import { modifiedStat, versusDefender, versusHighEngagement } from "../core/keywords.ts";
 import { defendingAgainst } from "../families/angmar/combat.ts";
@@ -156,7 +156,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
         (id) => id != null && id !== scope.sourceId && printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location",
       );
     case "firstPlayer":
-      return scope.actor === state.firstPlayer;
+      return scope.actor === firstPlayerFor(state, scope.actor);
     case "tokens":
       return tokensOn(state, condition.code) >= condition.min * (condition.perPlayer ? livingSeats(state).length : 1);
     case "stagingThreat":

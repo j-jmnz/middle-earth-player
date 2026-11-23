@@ -1,4 +1,5 @@
 import type { LegalIntent, PlayerIntent } from "../core/intents.ts";
+import { firstPlayerFor } from "../families/breaking/areas.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { holds } from "../interpret/conditions.ts";
 import { guardianSeat } from "../families/guardian/seats.ts";
@@ -26,7 +27,7 @@ export function openBranch(state: ScenarioState, item: QueueItem, returned: numb
   const instruction = item.instruction;
   if (instruction.verb !== "Choose") return state;
   // `guardian`: the player guarding Gollum chooses (02134:A:1, 900904:A:1); the actor when nobody does.
-  const seat = instruction.who === "firstPlayer" ? state.firstPlayer : instruction.who === "guardian" ? (guardianSeat(state) ?? item.seat) : item.seat;
+  const seat = instruction.who === "firstPlayer" ? firstPlayerFor(state, item.seat) : instruction.who === "guardian" ? (guardianSeat(state) ?? item.seat) : item.seat;
   const data = effectData(state);
   // An option may require something of the cards the effect picked or the event it answers ("If it is an enemy, you may
   // discard it").
