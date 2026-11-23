@@ -28,6 +28,8 @@ const STARGAZER = "04106";
 const SOLDIER = "19085";
 const TREEBEARD = "08146";
 const ENTMOOT = "143011";
+const ELROND_HERO = "04128";
+const GALION = "19063";
 const BOOMING = "08141";
 const PIT = "06064";
 const DENETHOR = "01010";
@@ -58,7 +60,7 @@ const playable = (tab: Table, state = tab.state): string[] => legalIntents(state
 
 beforeAll(async () => {
   const starter = await starterBase();
-  base = { ...starter, cards: new Map([...starter.cards, ...(await loadPrinted([RING, GIMLI_CORE, BERAVOR, PLATE, GIMLI, LEGOLAS, ARAGORN, STARGAZER, SOLDIER, TREEBEARD, ENTMOOT, BOOMING, PIT, DENETHOR, SWORD, ELROND, FAVOR, WIGLAF, MINSTREL, DESCENDANTS, SMOKE_RINGS, PIPE, FATTY, SAM]))]) };
+  base = { ...starter, cards: new Map([...starter.cards, ...(await loadPrinted([ELROND_HERO, GALION, RING, GIMLI_CORE, BERAVOR, PLATE, GIMLI, LEGOLAS, ARAGORN, STARGAZER, SOLDIER, TREEBEARD, ENTMOOT, BOOMING, PIT, DENETHOR, SWORD, ELROND, FAVOR, WIGLAF, MINSTREL, DESCENDANTS, SMOKE_RINGS, PIPE, FATTY, SAM]))]) };
   base.cards.set(NOBLE, definePrinted({ code: NOBLE, name: "Noble", type: "hero", sphere: "leadership", threat: 9, willpower: 1, attack: 1, defense: 1, health: 3, traits: ["Noble"] }));
   base.cards.set(SOFT, definePrinted({ code: SOFT, name: "Soft", type: "enemy", threat: 1, engagementCost: 50, attack: 1, defense: 0, health: 9 }));
 });
@@ -82,8 +84,7 @@ describe("Ring of Thrór 19093:A:3 on a ready hero", () => {
 describe("Gimli 16001:A:2 and Legolas 16002:A:2 with every other hero ready", () => {
   // Gimli defends (so he is exhausted); the other heroes are ready.
   function defended(heroes: readonly string[]): { tab: Table; offered: boolean } {
-    const scene = table({ heroes: heroes.map((code) => ({ code, seat: 0 })), engaged: [{ code: WEAK, seat: 0 }] });
-    const tab = scene;
+    const tab = table({ heroes: heroes.map((code) => ({ code, seat: 0 })), engaged: [{ code: WEAK, seat: 0 }] });
     const run = passAll(combat(tab.state, tab), tab.ctx);
     const declared = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, GIMLI) }, tab.ctx);
     return { tab, offered: triggers(declared.state, tab).includes("16001:response:1") };
@@ -147,7 +148,7 @@ describe("Soldier of Erebor 19085:A:1 with fewer than 3 cards in the deck", () =
 });
 
 describe("Treebeard 08146: his resources and the resource match", () => {
-  // Aragorn (Leadership) is the only hero. Treebeard holds resources; Booming Ent (Tactics, cost 4 in the hand: too dear) and Entmoot (Lore,
+  // Aragorn (Leadership) is the only hero. Treebeard holds resources; Booming Ent (Tactics, cost 4, paid from Treebeard's 4 resources) and Entmoot (Lore,
   // cost 0) are in the hand. His pool pays for an Ent of any sphere with no resource match (AEP 2.26); a 0-cost Ent has nothing for his pool to pay,
   // so it still needs a hero with its sphere (AEP 2.61).
   function ents(resources: number): Table {
@@ -168,6 +169,17 @@ describe("Treebeard 08146: his resources and the resource match", () => {
   it("a Tactics Ent that costs resources is offered with no Tactics hero, to be paid from his pool", () => {
     const tab = ents(4);
     expect(playable(tab)).toContain(idsOf(tab, BOOMING));
+  });
+});
+
+// A hero whose own pool pays by its text (Elrond 04128: "pay for [spirit], [leadership], and [tactics] allies") gives the resource match for an ally that
+// costs nothing: Galion (Spirit, cost 0) is offered with no Spirit hero (docs/brief.md, Player card readings; `recommended`).
+describe("Elrond 04128:A:1 and a 0-cost ally of another sphere", () => {
+  it("offers Galion with Elrond and a Leadership hero, and not with the Leadership hero alone", () => {
+    const withElrond = table({ heroes: [{ code: ELROND_HERO, seat: 0 }, { code: ARAGORN, seat: 0 }], hand: [{ code: GALION, seat: 0 }] }, 3);
+    expect(playable(withElrond)).toContain(idsOf(withElrond, GALION));
+    const alone = table({ heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: GALION, seat: 0 }] }, 3);
+    expect(playable(alone)).not.toContain(idsOf(alone, GALION));
   });
 });
 

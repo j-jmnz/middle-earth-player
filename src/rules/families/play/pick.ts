@@ -12,7 +12,7 @@ import { printedOf } from "../../core/printed.ts";
 import { spheresOf } from "../costs/pay.ts";
 import type { ScenarioState } from "../../core/state.ts";
 
-// `heroSphere`: the card's printed sphere is one of the spheres of the heroes (a gained icon included) `seat` controls; a neutral card and a Fellowship hero match none.
+// `heroSphere`: the card's printed sphere is one of the spheres of the heroes (a gained icon included) `seat` controls; a neutral card matches none, and a Fellowship hero matches none unless it gained an icon (Song of Wisdom).
 function matchesHeroSphere(state: ScenarioState, id: string, seat: number, ctx: ReduceContext): boolean {
   const sphere = printedOf(ctx.cards, state.cards[id]?.code ?? "").sphere;
   if (sphere == null || sphere === "neutral" || sphere === "fellowship") return false;
