@@ -119,7 +119,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
 
   // 10172 Determination (event, Action). Attach it to a unique character in play (any controller's hero or unique ally; any number of copies may be attached to one card), where it stays as a Condition attachment; then ready each character with a Determination attached and each character the Campaign Log marks "determined".
   // The Forced "if you win this scenario, mark ... determined" is read by the Resolution (RecordDetermined, run by the campaign card's record in angmar-awakened.ts) for a Determination still attached to a character in play.
-  { id: "10172:action:1", cardCode: DETERMINATION, lines: ["10172:A:1"], timing: "action", instructions: [
+  // The Action is the play of the event, from the hand or from the top of the deck (Gandalf, 142002:A:1): once it is attached it is in play as a Condition attachment, and its Action is not used again from the character
+  // (the event's cost would discard it).
+  { id: "10172:action:1", cardCode: DETERMINATION, lines: ["10172:A:1"], timing: "action", condition: { kind: "not", condition: { kind: "sourceIn", zone: "play" } }, instructions: [
     { verb: "Pick", pick: UNIQUE_CHARACTER },
     { verb: "AttachSelfToPicked", unlimited: true },
     // "Then, ready ...": only when the attach happened (rr.then), so with no unique character to attach to nothing is readied.

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { EFFECTS } from "../../src/effects/index.ts";
 
 import { loadCards } from "../data/load-cards.ts";
+import { EXEMPT, unnamedRecords } from "./line-coverage.ts";
 import { namedInTests } from "./tracked.ts";
 
 // Every effect record is named by a test: its id, or one of the printed lines it implements, stands in a test file. That holds for the deck-legal player cards and for every other card (encounter cards,
@@ -12,16 +13,13 @@ import { namedInTests } from "./tracked.ts";
 // title built in a loop does not name its line: write the line ids in the describe title. A record no test can show is listed in EXEMPT with its reason; the list is empty and stays empty unless a reason
 // is written beside the entry.
 
-/** Record ids with no test, each with the reason no test can show it. */
-const EXEMPT: Readonly<Record<string, string>> = {};
-
 // The card types a player builds a deck from.
 const PLAYER_TYPES = new Set(["hero", "ally", "attachment", "event", "player-side-quest", "contract"]);
 
 describe("line coverage", () => {
   const playerCodes = new Set(loadCards().filter((card) => PLAYER_TYPES.has(card.type) && card.deckLegal).map((card) => card.code));
   const named = namedInTests();
-  const unnamed = [...new Set(EFFECTS.filter((effect) => !named.has(effect.id) && !effect.lines.some((line) => named.has(line))).map((effect) => effect.id))];
+  const unnamed = unnamedRecords(EFFECTS, named);
   const open = unnamed.filter((id) => !(id in EXEMPT)).sort();
   const ofPlayer = (id: string) => playerCodes.has(id.slice(0, id.indexOf(":")));
 

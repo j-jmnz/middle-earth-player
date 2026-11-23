@@ -3,7 +3,8 @@
 // intent whose table differs, and the effect records, rules and cards that resolved at that intent. This file compares the two stored files and prints a
 // block; scripts/game/game.ts replays the golden for the step detail. The comparison itself is scripts/game/compare.ts.
 //
-// golden.json stores, for each golden, its intents (after the opening Keep), `checks` (a digest of the table after each intent) and the final `state`.
+// golden.json stores, for each golden, its intents (after the opening Keep), `checks` (a digest of the table after each intent) and `end` (the result,
+// the last round and a hash of the final state; scripts/game/golden-file.ts). It stores the final `state` only for the goldens a test reads.
 // The first intent whose check differs is the first move whose table is not the one the base pinned, whether or not the intents themselves changed.
 import { execFileSync } from "node:child_process";
 
@@ -64,10 +65,11 @@ export function detailOf(move: Move, ctx: ReduceContext): StepDetail {
 export function renderMoved(scenarioId: string, move: GoldenMove, detail: StepDetail | null, refused?: string): string {
   const head = move.number === null ? `${scenarioId} "${move.name}" (no longer in golden.json)` : `${scenarioId} golden ${move.number} "${move.name}"${move.kind === "new" ? " (new)" : ""}`;
   const out = [head, `  result: ${move.before} → ${move.after}`];
-  if (move.kind === "moved") out.push(`  intents: ${move.intents === "same" ? "unchanged, only the stored table and state moved" : "changed"}`);
+  if (move.storage) out.push("  storage format changed, same intents and digests: no intent, per-intent digest or final state moved");
+  else if (move.kind === "moved") out.push(`  intents: ${move.intents === "same" ? "unchanged, only the stored table and state moved" : "changed"}`);
   if (move.first !== null && move.endsNow) out.push(`  first difference: the game now ends after intent #${move.first + 1} (golden.json's numbering, the Keep is #1)${detail ? `; last intent: ${detail.intent}` : ""}`);
   else if (move.first !== null) out.push(`  first differing step: intent #${move.first + 2} (golden.json's numbering, the Keep is #1)${detail ? `: ${detail.intent}` : ""}`);
-  else if (move.kind === "moved") out.push("  first differing step: none, no intent's table differs; only the final state does");
+  else if (move.kind === "moved" && !move.storage) out.push("  first differing step: none, no intent's table differs; only the final state does");
   if (move.was !== undefined && move.endsNow) out.push(`  intent in the base after it: ${move.was}`);
   else if (move.was !== undefined) out.push(`  intent in the base: ${move.was}`, `  intent now: ${move.now}`);
   if (refused) out.push(`  replay now: ${refused}`);

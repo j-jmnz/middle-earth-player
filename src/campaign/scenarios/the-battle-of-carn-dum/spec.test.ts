@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, attack, cardSpecs, damageOn, deckCount, endPhase, flag, handCount, reveal, resolve, stat, threat, won, zone, attackersOf, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Battle of Carn Dûm (angmar-awakened part 8): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot express (a count over several steps, a state built from shadow cards, a choice by several seats, a pool entry)
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). What a row cannot express (a count over several steps, a state built from shadow cards, a choice by several seats, a pool entry)
 // is a test titled with its line id in lines.test.ts, rulings.test.ts and boons.test.ts. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; every seat starts at threat 28; a layout's current stage is on its B side; the filler enemy f3 has 1 Attack and an engagement cost of 50.
 const STAGE1 = "10125";
 const STAGE2 = "10126";

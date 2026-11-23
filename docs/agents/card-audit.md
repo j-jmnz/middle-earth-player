@@ -4,9 +4,11 @@ The standing procedure to prove that the cards in play do what they print, and t
 
 ## What finds what
 
-Three checks find different faults. None replaces another.
+Five checks find different faults. None replaces another.
 
-- **A soak** finds a throw, a stall, a broken table and an offer the engine then refuses. It plays random games with the pre-built decks and the stand-in heroes on Normal, Easy and Nightmare, with new seeds each run, checks every table (`scripts/card-smoke/invariants.ts`) and tries every offered intent on a share of the tables. `pnpm test encounter --all` is the committed form; a longer run is a scratch script on `scripts/card-smoke/encounter-games.ts`, never committed. It cannot see a card that does the wrong thing on a sound table.
+- **A soak** finds a throw, a stall, a broken table and an offer the engine then refuses. It plays random games of a scenario dealt as a standalone game to stand-in heroes with a deck of free events (no pre-built deck), on Normal, Easy and Nightmare, with new seeds each run, checks every table (`scripts/card-smoke/invariants.ts`) and tries every offered intent on a share of the tables. `pnpm test encounter --all` is the committed form; a longer run is a scratch script on `scripts/card-smoke/encounter-games.ts`, never committed. It cannot see a card that does the wrong thing on a sound table.
+- **The idle check** (`scripts/card-smoke/idle.ts`) runs in the card smoke (`pnpm test smoke --all`), which plays each player card in the starter game with the starter decks, and so reaches a card on a table those decks make. The soak's games run it too, but their seats are stand-in heroes with free events, so it reaches no player card there. It finds an Action, a Response or an event that was offered, used and changed nothing (`rr.triggered-ability`, `rr.cost`): a hit is read against the printed line, then fixed through `src/rules/player/potential.ts`, a family `idle` hook or a `canPick` condition on the record, or listed with its reason in `scripts/card-smoke/idle-known.ts`.
+- **The line checks** (`scripts/checks/record-readings.test.ts`) find a line about enemies "in play" whose record reads only the engaged ones and a "Then" after a part that can come up short with no condition on it, and read the "Limit" and duration lines that no test title tests twice or to the end. The first two list today's findings with their reasons, and a new one fails; the third lists the records of the day it was added (`scripts/checks/record-readings-limit-open.ts`), which only shrinks.
 - **A test from the printed line** finds a record that says less, more or other than its card. `scripts/checks/line-coverage.test.ts` fails on a record no test names, so the list of untested records is its failure output.
 - **A review** finds a fix that passes its own tests and is wrong for other cards. Every fix run of an audit is reviewed (Fix and review).
 
@@ -31,10 +33,12 @@ The engine or the record does not do what the line prints. The writer does not f
 
 - One fix run takes all the faults of a round. It fixes the general cause where one cause explains several faults, then turns each `it.fails` into a plain test and deletes its comment.
 - For each kind of fault it searches every record for the same mistake and reads the printed line of each hit. The report lists the hits and what was done with each.
+- `pnpm effects reach <base-ref>` prints every card whose record or render the fix changed, by card with its printed line: read each before the review. It does not see a change in engine code that no record shows, so for a shared reader search the records for the verb or field it reads.
 - A change to a reader many cards share (a pick filter, a sphere or trait reader, a cost or payment helper, `moveCard`) lists the other cards whose behaviour it changes, by code, each checked against its printed text, with a test for a card of each kind. A check keyed on an unrelated fact, added so that no golden moves, is not a fix: apply the rule in general and regenerate the goldens it moves.
 - The cause of each moved golden is the block `pnpm game moved` prints for it (the first differing intent and the records and cards that resolved there), pasted into the commit body: never a cause written from memory.
 - Before a new flag, verb or filter, search the families for one that does the same.
 - The review reads the fix diff with a fresh context and is told to look for the cards a general change reaches, an offer and a refusal that disagree, an ability now withheld wrongly, and the stated cause of each moved golden, which it checks against `pnpm game moved`. Its findings go to a second fix run.
+- The commit that closes the review carries a line `Reviewed: <who read the diff and what they looked at>`. `pnpm commit:check --range`, which CI runs on a pull request's commits, refuses a branch that changes `src/rules` or `src/effects/authored` with no such line (`scripts/git/range-rules.ts`).
 
 ## Running it
 

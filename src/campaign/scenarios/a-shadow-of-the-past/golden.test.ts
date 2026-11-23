@@ -8,6 +8,7 @@ import { playOut } from "../../../../test/harness/auto-player.ts";
 import { pastContext } from "../../../../test/scenarios/a-shadow-of-the-past/play.ts";
 import { campaign, loadWorld, scenario } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
 
+import { endOf, goldenText } from "../../../../scripts/game/golden-file.ts";
 import { buildStart } from "../../start.ts";
 
 // A permanent golden: the intents and the final state of A Shadow of the Past on seeds 1, 2 and 9. It pins the
@@ -23,13 +24,13 @@ describe("golden: a whole game of A Shadow of the Past", () => {
     const world = await loadWorld();
     const ctx = pastContext(world);
     const loadout = { heroes: [RING_BEARER, "scout", "q1", "q2"], deck: Array.from({ length: 30 }, () => "filler") };
-    const out: unknown[] = [];
+    const out: Record<string, unknown>[] = [];
     for (const seed of [1, 2, 9]) {
       const start = buildStart({ campaign, scenario, seatCount: 1, seed, threatModifier: 0, seats: [loadout], effects: EFFECTS });
       const kept = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx)).state;
       const run = playOut(kept, ctx, { scout: "scout", prefer: "141035", protect: RING_BEARER });
-      out.push({ seed, intents: run.intents, state: run.state, checks: checksOf({ kept, intents: run.intents }, ctx) });
+      out.push({ seed, intents: run.intents, checks: checksOf({ kept, intents: run.intents }, ctx), end: endOf(run.state) });
     }
-    await expect(JSON.stringify(out)).toMatchFileSnapshot(file);
+    await expect(goldenText(out)).toMatchFileSnapshot(file);
   }, 240_000);
 });

@@ -2,7 +2,7 @@
 import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, defend, endRound, exhausted, flag, handCount, offers, progressOn, quest, resolve, resourcesOn, respond, reveal, stat, threat, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Attack on Dol Guldur (standalone-scenarios part 9): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The lines a row cannot express (the Setup piles and the Keyword lines) are tests in lines.test.ts, each titled with its line id.
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The lines a row cannot express (the Setup piles and the Keyword lines) are tests in lines.test.ts, each titled with its line id.
 // A deck of locations: a card revealed in the staging step adds no enemy.
 const PLACES = ["place", "place", "place", "place", "place", "place"];
 const DG = (resources: number) => ({ code: "50907", resources });

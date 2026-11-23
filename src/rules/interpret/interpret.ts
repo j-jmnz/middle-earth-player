@@ -11,7 +11,7 @@ import { namedTargetImmune } from "./immune-targets.ts";
 import { collectAllyResources } from "../families/costs/pay.ts";
 import { runFamilyVerb } from "../families/index.ts";
 import { commitCard } from "../families/attack/index.ts";
-import { exhaustCard, placePlayerDamage, readyCard, runPlayerVerb } from "./player-verbs.ts";
+import { exhaustCard, placePlayerDamage, readyWithThen, runPlayerVerb } from "./player-verbs.ts";
 import { drawVerb } from "./effect-verbs.ts";
 import { revealNow } from "../windows/frames.ts";
 import { runSetupVerb } from "../setup/verbs.ts";
@@ -160,7 +160,7 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
       return id ? exhaustCard(state, id) : state;
     }
     case "Ready":
-      return focus.sourceId ? readyCard(state, focus.sourceId, playerSource(state, focus.sourceId, ctx), ctx.cards) : state;
+      return focus.sourceId ? readyWithThen(state, focus.sourceId, ctx, playerSource(state, focus.sourceId, ctx)) : state;
     case "Commit":
       // A card the effect names commits as it is, and is announced (families/attack.ts).
       if (instruction.target) return commitCard(state, instruction.target, focus);

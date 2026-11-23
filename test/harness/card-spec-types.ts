@@ -59,7 +59,8 @@ export type Expect =
   | { expect: "window"; kind: string; value: boolean }
   | { expect: "offers"; intent: PlayerIntent["type"]; code?: string; value?: boolean };
 
-export type Row = { line: string; layout?: Layout; act: Act | readonly Act[]; expect: Expect | readonly Expect[]; name?: string };
+/** `todo` marks a stub that `pnpm scenario tests` wrote: the row is not a test yet, and `cardSpecs` fails it until the layout, action and expectation are written and `todo` is deleted. */
+export type Row = { line: string; layout?: Layout; act: Act | readonly Act[]; expect: Expect | readonly Expect[]; name?: string; todo?: string };
 
 /** What the actions of a row left: the run, the table, and the state of the attack while it was still in progress (an `attack` action). */
 export type Done = { run: Run; table: LayoutTable; during?: ScenarioState };

@@ -42,6 +42,10 @@ The Ered Mithrin campaign is nine scenarios played in order: The Wilds of Rhovan
 - **A treasure that leaves play goes to its owner's discard pile**, where Durin's Dagger may be played from (`recommended`, https://hallofbeorn.com/LotR/Details/Durin's-Dagger-EMC). The owner is the seat that claimed or played it: `AttachPicked` puts the claimed treasure in the claiming seat's play area, and `hostTakesControl` (`src/rules/player/attach.ts`) gives control to the host's controller and keeps the claiming seat as owner. A Dagger that player 1 claims onto player 2's character goes to player 1's discard pile, and player 1 plays it from there.
 - **A treasure in play, claimed or played, is not an attachment for card effects** (`recommended`). A pick of attachments ("discard an attachment", "an Item attachment") never takes it; a Response to "after you play an attachment" does not hear it; an attachment cost reduction does not reduce it; Anvil of Gundabad's own PlayFromHand of an Item attachment does not offer an Item treasure. `hasAttachment.treasure` keeps it separate. Reason: `emce.treasure` calls it "a new type of player card", its card type is Treasure, and the game prints the exceptions where it means one ("Counts as an attachment" on the Dol Guldur objectives, 01108 to 01110). No ruling found: read `emce.treasure`, `rr.attachment-cards`, Hall of Beorn's treasure pages (e.g. https://hallofbeorn.com/LotR/Details/Durin's-Dagger-EMC, no rulings) and a web search of the Ered Mithrin rules text; the FAQ has no entry.
 
+## Abilities of a claimed objective
+
+The players use a claimed objective's Action or Response themselves, so it is not offered when its effect cannot change the game (`rr.cost`, "An ability's cost cannot be paid if the resolution of its effect does not have the potential to change the game state"): Durin's Key (19036:A:2) is not offered with no location in play.
+
 ## Readings to confirm
 
 Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.

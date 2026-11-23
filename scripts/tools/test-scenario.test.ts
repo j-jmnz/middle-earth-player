@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { BUDGET_SLACK, budgetProblem, changedFamilyTests, hasReaderGames, OVER_BUDGET, quickParts, registryTitle, scenarioTests, selectTests, smokeRuns, TEST_BUDGET_SECONDS } from "./test-scenario.ts";
+import type { Effect } from "../../src/catalog/boundary.ts";
+import { BUDGET_SLACK, budgetProblem, changedFamilyTests, hasReaderGames, otherSnapshots, OVER_BUDGET, quickParts, registryTitle, scenarioCodes, scenarioTests, selectTests, smokeRuns, TEST_BUDGET_SECONDS, unnamedOfScenario } from "./test-scenario.ts";
 
 // pnpm test scenario <id>: the selection is a pure function of the id, the changed paths and the tree of test files.
 const TREE = [
@@ -204,5 +205,35 @@ describe("the test budget (budgetProblem)", () => {
 
   it("lists only scenarios over the default budget", () => {
     expect(Object.entries(OVER_BUDGET).filter(([, listed]) => listed <= TEST_BUDGET_SECONDS)).toEqual([]);
+  });
+});
+
+describe("the render snapshots of other scenarios (otherSnapshots)", () => {
+  const snapshot = (name: string) => `scripts/data/effects/render/snapshots/${name}.txt`;
+
+  it("names the other scenarios whose snapshot changed, sorted, and leaves out the scenario's own and every other file", () => {
+    const changed = [snapshot("the-oath"), snapshot("a-knife-in-the-dark"), snapshot("lost-in-mirkwood"), "scripts/data/effects/render/kit.ts", "docs/brief.md"];
+    expect(otherSnapshots(changed, "the-oath")).toEqual(["a-knife-in-the-dark", "lost-in-mirkwood"]);
+  });
+
+  it("names nothing when only the scenario's own snapshot changed, or none did", () => {
+    expect(otherSnapshots([snapshot("the-oath")], "the-oath")).toEqual([]);
+    expect(otherSnapshots([], "the-oath")).toEqual([]);
+  });
+});
+
+describe("the records of a scenario's cards that no test names (unnamedOfScenario)", () => {
+  const record = (id: string, cardCode: string, lines: string[]): Effect => ({ id, cardCode, lines, timing: "action", instructions: [] }) as unknown as Effect;
+  const effects = [record("1:action:1", "1", ["1:A:1"]), record("1:response:1", "1", ["1:A:2"]), record("2:action:1", "2", ["2:A:1"])];
+
+  it("lists a record of the scenario's cards named by neither its id nor its line, and no record of another card", () => {
+    expect(unnamedOfScenario(new Set(["1"]), effects, new Set(["1:action:1"]))).toEqual(["1:response:1"]);
+    expect(unnamedOfScenario(new Set(["1"]), effects, new Set(["1:A:1", "1:A:2"]))).toEqual([]);
+    expect(unnamedOfScenario(new Set(["1"]), effects, new Set())).toEqual(["1:action:1", "1:response:1"]);
+  });
+
+  it("reads the cards a real scenario deals, the starter decks of the first scenario of its campaign included", () => {
+    expect(scenarioCodes("a-shadow-of-the-past").size).toBeGreaterThan(20);
+    expect([...scenarioCodes("a-shadow-of-the-past")]).toEqual(expect.arrayContaining(["141085", "01025"]));
   });
 });

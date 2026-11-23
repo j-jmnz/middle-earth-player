@@ -125,6 +125,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["aboveThreat"], pick.aboveThreat === true ? "with an engagement cost higher than the chooser's threat" : null);
   note(["on"], onWords(pick.on));
   note(["other"], pick.other === true ? "other than this card" : null);
+  note(["takesSource"], pick.takesSource === true ? "that this card can be attached to (one that cannot have attachments is left out)" : null);
   note(["different"], pick.different === true ? "other than the cards this effect already picked" : null);
   note(["guardsObjectiveLocation"], pick.guardsObjectiveLocation === true ? "attached to an objective-location as its guard" : null);
   note(["copyInDiscard"], pick.copyInDiscard === true ? "with a copy of it (the same title) in its controller's discard pile" : pick.copyInDiscard === "owner" ? "with a card of its title in its owner's discard pile" : null);
