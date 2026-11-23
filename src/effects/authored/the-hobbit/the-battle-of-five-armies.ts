@@ -175,7 +175,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "Each", pick: { type: "hero", control: "any" }, instructions: [{ verb: "DiscardResources", all: true, target: "picked" }] }],
     },
 
-    // 132079 stage 5. When Revealed: each player searches the encounter deck and discard pile for a Bodyguard of Bolg and adds it to the staging area; shuffle. Progress cannot be placed on it; while Bolg is in the staging area he is engaged with the first player. When Bolg is destroyed the players win.
+    // 132079 stage 5. When Revealed: each player searches the encounter deck and discard pile for a Bodyguard of Bolg and adds it to the staging area; shuffle. Progress cannot be placed on it; while Bolg is in the staging area he is engaged with the first player and still adds his Threat to it (dwd.durins-bane). When Bolg is destroyed the players win.
     {
       id: "132079:whenRevealed:1",
       cardCode: STAGE_5,
@@ -192,7 +192,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "ModifyStat", stat: "noProgressPlaced", amount: 1, until: "whileSourceInPlay", target: "self" },
         { verb: "ModifyStat", stat: "engagedWithFirst", amount: 1, until: "whileSourceInPlay", holders: { ...BOLG, stagingOnly: true } },
         { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", holders: { ...BOLG, stagingOnly: true } },
-        { verb: "ModifyStat", stat: "noThreatContribution", amount: 1, until: "whileSourceInPlay", holders: { ...BOLG, stagingOnly: true } },
       ],
     },
     { id: "132079:triggered:1", cardCode: STAGE_5, lines: ["132079:B:3"], timing: "triggered", trigger: "enemyDestroyed", subject: BOLG, instructions: [{ verb: "WinGame" }] },
