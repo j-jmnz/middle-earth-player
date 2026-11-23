@@ -348,9 +348,10 @@ function defenderReason(
   return null;
 }
 
-// The attack must be defended while a character can defend it (Ravenous Warg, 132059:A:1).
+// The attack must be defended while a character can defend it (Ravenous Warg, 132059:A:1). An attack already considered undefended (its defender left play, rr.step-6-4-3) has no defender to force. The offer and the refusal both read this.
 function mustDefend(state: ScenarioState, ctx: ReduceContext): boolean {
-  return state.pendingAttack?.mustDefend === true && defenderIds(state, state.pendingAttack.seat, ctx.cards).length > 0;
+  const attack = state.pendingAttack;
+  return attack?.mustDefend === true && attack.undefended !== true && defenderIds(state, attack.seat, ctx.cards).length > 0;
 }
 
 function undefendedReason(state: ScenarioState, intent: Extract<PlayerIntent, { type: "Undefended" }>, ctx: ReduceContext): string | null {

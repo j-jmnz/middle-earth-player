@@ -7,7 +7,7 @@ import { expireModifiers, flagged, type ScenarioState } from "../../../rules/cor
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
-import { answer, fightEnemy, first, resolveRecords, revealedTop, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { answer, fightEnemy, first, legalIntents, legalTargets, resolveRecords, revealedTop, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { askCurrentStage, stagesInPlay } from "../../../rules/families/armies/stages.ts";
 
 const [S1, S2, S3, S4, S5] = ["132075", "132076", "132077", "132078", "132079"] as const;
@@ -150,6 +150,53 @@ describe("the character with the most damage defends (132059:A:1)", () => {
 
   it("132059:A:1 the attack cannot be left undefended while a character can defend it", () => {
     expect(() => fightEnemy(tableOf, "f0", "132059", {}, { tweak: damaged(false), undefended: true })).toThrow("Undefended refused: The defending player must declare the character with the most damage");
+  });
+});
+
+describe("an attack that is already undefended is not forced onto a defender (132059:A:1, rr.step-6-4-3)", () => {
+  // Ravenous Warg attacks seat 0 and the table is at its defense window; `tweak` changes the table before the attack starts.
+  function atDefense(seats: 1 | 2, tweak: (state: ScenarioState, ids: { hero: string; hero2: string }) => ScenarioState) {
+    const made = tableFromLayout("the-battle-of-five-armies", { stage: S2, seats, phase: "Encounter", engaged: [{ code: "132059", seat: 0 }], deck: ["f0", "f0", "f0"] });
+    const state = syncConstants(tweak(made.state, made), made.ctx);
+    let run = send(start(state), { type: "DeclineEngage" }, made.ctx);
+    for (let guard = 0; guard < 40 && run.state.window?.kind !== "defense"; guard += 1) {
+      const pass = legalIntents(run.state, made.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack" || intent.type === "DeclineEngage");
+      if (!pass) break;
+      run = send(run, pass, made.ctx);
+    }
+    expect(run.state.window?.kind).toBe("defense");
+    return { made, run };
+  }
+  const exhaust = (...ids: string[]) => (state: ScenarioState): ScenarioState => ({ ...state, cards: Object.fromEntries(Object.entries(state.cards).map(([id, card]) => [id, ids.includes(id) ? { ...card, exhausted: true } : card])) });
+  // What a defender destroyed by the shadow card leaves behind (shadow.ts, resolveAttack): the attack is undefended and the hero is named next.
+  const undefendedNow = (state: ScenarioState): ScenarioState => ({ ...state, pendingAttack: state.pendingAttack ? { ...state.pendingAttack, undefended: true } : null });
+
+  for (const seats of [1, 2] as const) {
+    it(`132059:A:1 the attack left undefended after its defender is gone offers only Undefended and takes it (${seats} seat${seats === 1 ? "" : "s"})`, () => {
+      const { made, run } = atDefense(seats, (state, ids) => exhaust(ids.hero, ids.hero2)(state));
+      // Before the defender goes, the Warg forces one: only a declaration is offered.
+      expect(legalIntents(run.state, made.ctx).map((intent) => intent.type)).toEqual(["DeclareDefender"]);
+      const after = { ...run, state: undefendedNow(run.state) };
+      const offered = legalIntents(after.state, made.ctx);
+      expect(offered.map((intent) => intent.type)).toEqual(["Undefended"]);
+      const [hero] = legalTargets(after.state, { type: "Undefended" }, made.ctx);
+      expect(hero).toBeDefined();
+      expect(() => send(after, { type: "Undefended", heroId: hero }, made.ctx)).not.toThrow();
+    });
+  }
+
+  it("132059:A:1 with no character that can be declared, Undefended is offered and accepted", () => {
+    const stopped = (state: ScenarioState, ids: { hero: string; hero2: string }): ScenarioState => ({
+      ...state,
+      modifiers: [...state.modifiers, ...[ids.hero, ids.hero2].map((id) => ({ instanceId: id, sourceId: id, stat: "cannotDefend" as const, amount: 1, until: "endOfGame" as const }))],
+    });
+    const { made, run } = atDefense(1, stopped);
+    expect(legalTargets(run.state, { type: "DeclareDefender" }, made.ctx)).toEqual([]);
+    const offered = legalIntents(run.state, made.ctx);
+    expect(offered.map((intent) => intent.type)).toContain("Undefended");
+    const [hero] = legalTargets(run.state, { type: "Undefended" }, made.ctx);
+    expect(hero).toBeDefined();
+    expect(() => send(run, { type: "Undefended", heroId: hero }, made.ctx)).not.toThrow();
   });
 });
 
