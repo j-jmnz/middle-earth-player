@@ -4,7 +4,7 @@ import { ALWAYS } from "../conditions.ts";
 
 // Shadow and Flame Nightmare (deck 9018, data/printed/nightmare.json). The setup card's A:1 and its side B are the deck-building text (inert: the build removes and shuffles in the cards of the recipe). A:2 to A:4: the encounter cards with the Attack trait are Durin's Bane's shadow cards and lie in
 // a Balrog deck of their own, with a Balrog discard pile that is shuffled back in at the beginning of each combat phase and whenever the deck is empty (src/rules/families/flame/balrog.ts). The ten Attack cards have only a Shadow effect and are never revealed. The new cards use the vocabulary of
-// ../dwarrowdelf/shadow-and-flame.ts. The readings are in docs/scenarios/dwarrowdelf.md (Shadow and Flame).
+// ../dwarrowdelf/shadow-and-flame.ts. The readings are in docs/scenarios/dwarrowdelf/shadow-and-flame.md (Shadow and Flame).
 // Rules: dwd.durins-bane, rr.forced, rr.shadow-effects, rr.search, rr.travel, rr.damage, rr.hit-points, rr.modifiers, rr.cancel, rr.attachment-cards, faq.additional-attacks (data/rules/entries.json).
 const BANE = "Durin's Bane";
 const DURINS_BANE: PickSpec = { type: "enemy", control: "any", staging: true, names: [BANE] };

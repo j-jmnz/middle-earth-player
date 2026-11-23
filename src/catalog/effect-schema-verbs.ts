@@ -76,7 +76,7 @@ export const simpleVerbs = [
   // `eventSeat` is the player the answered event happened to.
   z.strictObject({ verb: z.literal("LowerThreat"), amount: positiveAmountSchema, who: z.enum(["actor", "picked", "eachSeat", "eventSeat"]), ...when }),
   // Places damage on the picked card (or `target`) as a player card effect (toughness and immunity apply).
-  // `uncancelable`: the damage cannot be canceled by an ability that cancels damage, though one that moves it to another card still can ("This effect cannot be canceled", 03028:A:1; docs/scenarios/dwarrowdelf.md, Flight from Moria).
+  // `uncancelable`: the damage cannot be canceled by an ability that cancels damage, though one that moves it to another card still can ("This effect cannot be canceled", 03028:A:1; docs/scenarios/dwarrowdelf/flight-from-moria.md, Flight from Moria).
   z.strictObject({ verb: z.literal("DamageCard"), amount: positiveAmountSchema, target: cardRefSchema.optional(), uncancelable: z.literal(true).optional(), ...when }),
   // Places progress tokens on the picked location, on every location in the staging area, on the source or the active
   // location. A full location is explored. `host`: the location the source is attached to.

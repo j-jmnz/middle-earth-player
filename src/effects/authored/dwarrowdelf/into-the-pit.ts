@@ -11,7 +11,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 // are in ../nightmare/into-the-pit.ts. East-gate is the active location and First Hall and Bridge of Khazad-dûm are set aside by the scenario data (dwd.setup-into-the-pit-set-aside); the Goblin Patrol stage's three lines
 // are a Forced effect (the enemies it discards), a flag the quest stage reads at each settle (advance with no enemy in play) and the search of its When Revealed.
 // Rules: rr.cancel, rr.replacement-effects, rr.search, rr.first-player, rr.travel, rr.immune, rr.optional-engagement, rr.engagement-check, rr.active-location, rr.explored, dwd.immune-to-card-effects, dwd.last-player,
-// dwd.cave-torch-the-long-dark, dwd.encounter-card-actions, dwd.revealing-enemies, faq.lasting-effects (data/rules/entries.json); the readings are in docs/scenarios/dwarrowdelf.md (Into the Pit).
+// dwd.cave-torch-the-long-dark, dwd.encounter-card-actions, dwd.revealing-enemies, faq.lasting-effects (data/rules/entries.json); the readings are in docs/scenarios/dwarrowdelf/into-the-pit.md (Into the Pit).
 const TORCH = "03041";
 const BRIDGE = "03018";
 const FIRST_HALL = "03017";

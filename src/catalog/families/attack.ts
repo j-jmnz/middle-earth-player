@@ -57,7 +57,7 @@ const FLAGS = [
   "attacksStaging",
   "attacksStagingAlone",
   // On an enemy in the staging area: characters with the ranged keyword, of any player, may be declared as attackers against it during the player attacks of the combat phase, together with
-  // each other, one attack per seat (Goblin Archer, 03032:A:2; rr.ranged, agent recommendation in docs/scenarios/dwarrowdelf.md, The Seventh Level). Characters without ranged cannot (rules/combat/combat.ts canAttack).
+  // each other, one attack per seat (Goblin Archer, 03032:A:2; rr.ranged, agent recommendation in docs/scenarios/dwarrowdelf/the-seventh-level.md, The Seventh Level). Characters without ranged cannot (rules/combat/combat.ts canAttack).
   "attackableByRanged",
   // On an attacking character: the enemy it attacks does not count its Defense against this attack ("While ~ is attacking alone,
   // the defending enemy does not count its Defense").

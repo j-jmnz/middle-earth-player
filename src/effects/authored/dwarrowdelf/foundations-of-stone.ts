@@ -5,7 +5,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for Foundations of Stone (Dwarrowdelf part 8, no campaign card). Every line is read from the scan ledger (data/printed/dwarrowdelf.json). The Surge, Doomed, Restricted and Victory lines are keywords. The "Place the Foundations of Stone encounter set aside" sentence of the Setup is the
 // `encounterDeck2` pile's SetAside instructions (data/scenarios), as Journey in the Dark's. The Twists and Turns, Deeps of Moria and Goblins of the Deep cards and Cave Torch have their records elsewhere. The Nightmare deck's records are in ../nightmare/foundations-of-stone.ts. The readings are in
-// docs/scenarios/dwarrowdelf.md (Foundations of Stone).
+// docs/scenarios/dwarrowdelf/foundations-of-stone.md (Foundations of Stone).
 // Rules: dwd.setup-foundations-of-stone, dwd.setup-foundations-of-stone-cave-torch, dwd.cave-torch, dwd.creating-a-staging-area, dwd.joining-another-player, mec109.multiple-staging-areas, mec108.create-staging-area, mec108.joining-another-player, rr.first-player, rr.forced, rr.reveal,
 // rr.staging-area, rr.attachment-cards, rr.objective-cards, rr.explored, rr.active-location, rr.hit-points, rr.discard-pile-and-victory-display, rr.removed-from-game, rr.ranged, rr.shadow-effects, rr.winning-the-game, rr.travel (data/rules/entries.json).
 const TORCH = "03041";
