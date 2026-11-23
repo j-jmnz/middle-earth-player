@@ -40,18 +40,18 @@ describe("the web app's drawing scale", () => {
   });
 
   it("keeps a second as its rate, its longest frame and its slow frames", () => {
-    expect(secondOf([16, 16, 18, 50])).toEqual({ fps: 40, worst: 50, slow: 1 });
-    expect(secondOf([])).toEqual({ fps: 0, worst: 0, slow: 0 });
+    expect(secondOf([16, 16, 18, 50], 12.4)).toEqual({ fps: 40, worst: 50, slow: 1, late: 35, raf: 12 });
+    expect(secondOf([])).toEqual({ fps: 0, worst: 0, slow: 0, late: 0, raf: 0 });
   });
 
   it("sums the log up by its slowest second, and lists it to send", () => {
     const log = [
-      { fps: 60, worst: 18, slow: 0 },
-      { fps: 24, worst: 90, slow: 7 },
-      { fps: 48, worst: 40, slow: 2 },
+      { fps: 60, worst: 18, slow: 0, late: 2, raf: 40 },
+      { fps: 24, worst: 90, slow: 7, late: 610, raf: 300 },
+      { fps: 48, worst: 40, slow: 2, late: 200, raf: 120 },
     ];
     expect(summaryLine(log)).toBe("last 3 s: lowest 24 fps  mean 44  worst 90 ms  slow frames 9");
     expect(summaryLine([])).toBe("no log yet");
-    expect(logText(log, 1.5).split("\n")).toEqual(["x1.5  last 3 s: lowest 24 fps  mean 44  worst 90 ms  slow frames 9", " 1  60 fps  worst 18 ms", " 2  24 fps  worst 90 ms", " 3  48 fps  worst 40 ms"]);
+    expect(logText(log, 1.5).split("\n")).toEqual(["x1.5  last 3 s: lowest 24 fps  mean 44  worst 90 ms  slow frames 9", " 1  60 fps  worst 18 ms  late 2  raf 40", " 2  24 fps  worst 90 ms  late 610  raf 300", " 3  48 fps  worst 40 ms  late 200  raf 120"]);
   });
 });

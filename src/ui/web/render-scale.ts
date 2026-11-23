@@ -73,18 +73,30 @@ function watchErrors(show: (text: string) => void): void {
   window.addEventListener("unhandledrejection", (event) => report(event.reason));
 }
 
-/** One second of the meter: its frame rate, its longest frame and how many of its frames took over two frames' time. */
-export type Second = { fps: number; worst: number; slow: number };
+/**
+ * One second of the meter: its frame rate, its longest frame, how many of its frames took over two frames' time, how long its frames ran late in all (`late`: what
+ * each took beyond a sixtieth of a second), and how long the animation frame callbacks ran (`raf`: the animations and the canvases' drawing). A second whose `late`
+ * is far over its `raf` lost its time outside the drawing: React's work, the engine, a save, or the browser's own layout, painting and graphics.
+ */
+export type Second = { fps: number; worst: number; slow: number; late: number; raf: number };
 
 // A frame over this is one the eye sees as a stutter at 60 frames a second.
 const SLOW_MS = 34;
+// A frame at 60 frames a second.
+const FRAME_MS = 1000 / 60;
 // How many seconds the log keeps.
 export const LOG_SECONDS = 60;
 
 /** A second's frames as its log entry. */
-export function secondOf(gaps: readonly number[]): Second {
+export function secondOf(gaps: readonly number[], raf: number = 0): Second {
   const total = gaps.reduce((sum, gap) => sum + gap, 0);
-  return { fps: total > 0 ? Math.round((1000 * gaps.length) / total) : 0, worst: Math.round(Math.max(0, ...gaps)), slow: gaps.filter((gap) => gap > SLOW_MS).length };
+  return {
+    fps: total > 0 ? Math.round((1000 * gaps.length) / total) : 0,
+    worst: Math.round(Math.max(0, ...gaps)),
+    slow: gaps.filter((gap) => gap > SLOW_MS).length,
+    late: Math.round(gaps.reduce((sum, gap) => sum + Math.max(0, gap - FRAME_MS), 0)),
+    raf: Math.round(raf),
+  };
 }
 
 /** The log in one line: the slowest second, the mean, the longest frame and the slow frames of the seconds kept. */
@@ -97,10 +109,27 @@ export function summaryLine(log: readonly Second[]): string {
 
 /** The log as text to send: the summary, then each second's frame rate and longest frame, oldest first. */
 export function logText(log: readonly Second[], scale: number): string {
-  return [`x${scale}  ${summaryLine(log)}`, ...log.map((second, index) => `${String(index + 1).padStart(2)}  ${second.fps} fps  worst ${second.worst} ms`)].join("\n");
+  return [`x${scale}  ${summaryLine(log)}`, ...log.map((second, index) => `${String(index + 1).padStart(2)}  ${second.fps} fps  worst ${second.worst} ms  late ${second.late}  raf ${second.raf}`)].join("\n");
+}
+
+// How long the animation frame callbacks ran since the meter last read it. Every caller asks the window for a frame at call time, so wrapping it here times them all.
+let rafBusy = 0;
+
+function watchFrames(): void {
+  const frame = window.requestAnimationFrame.bind(window);
+  window.requestAnimationFrame = (callback) =>
+    frame((now) => {
+      const started = performance.now();
+      try {
+        callback(now);
+      } finally {
+        rafBusy += performance.now() - started;
+      }
+    });
 }
 
 function startMeter(): void {
+  watchFrames();
   const box = document.createElement("div");
   box.setAttribute("aria-hidden", "true");
   box.style.cssText = "position:fixed;left:4px;bottom:4px;z-index:2147483647;max-width:90vw;max-height:80vh;overflow:auto;padding:2px 6px;border-radius:4px;background:#000c;color:#fff;font:12px/16px monospace;pointer-events:none;white-space:pre-wrap";
@@ -142,7 +171,8 @@ function startMeter(): void {
     if (!paused) {
       gaps.push(now - last);
       if (now - shown >= 1000) {
-        log = [...log, secondOf(gaps)].slice(-LOG_SECONDS);
+        log = [...log, secondOf(gaps, rafBusy)].slice(-LOG_SECONDS);
+        rafBusy = 0;
         rate.textContent = `${meterLine(gaps, window.devicePixelRatio)}  (tap to stop)`;
         summary.textContent = summaryLine(log);
         gaps = [];
