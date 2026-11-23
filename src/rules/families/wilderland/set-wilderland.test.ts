@@ -2,6 +2,7 @@
 // The Wilderland set's records on a table of The Battle of Five Armies (the set is dealt by Flies and Spiders and The Lonely Mountain too).
 import { describe, expect, it } from "vitest";
 
+import { answer, attack, cardSpecs, committed, defend, reveal, threat, type Row } from "../../../../test/harness/card-spec.ts";
 import { modifiedStat } from "../../core/keywords.ts";
 import { fightEnemy, first, idOf, legalIntents, revealedTop, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
@@ -18,6 +19,18 @@ describe("Wilderland (132035 to 132038)", () => {
     expect(modifiedStat(state, state.cards[hero]!, "willpower", made.ctx.cards)).toBe(base - 1);
     state = { ...state, cards: { ...state.cards, [hero]: { ...state.cards[hero]!, exhausted: false } } };
     expect(modifiedStat(state, state.cards[hero]!, "willpower", made.ctx.cards)).toBe(base);
+  });
+
+  it("132038:A:1 a character that enters play after the card was revealed, exhausted, gets -1 Willpower until the end of the round", () => {
+    const made = table({ phase: "Quest", deck: ["132038", "f0"], hand: ["ally"] });
+    const ally = first(made.state, "ally");
+    const base = modifiedStat(made.state, { ...made.state.cards[ally]!, zone: "play", controller: 0, exhausted: true }, "willpower", made.ctx.cards);
+    let state = revealedTop(made, "132038");
+    const entered = (exhausted: boolean) => ({ ...state, cards: { ...state.cards, [ally]: { ...state.cards[ally]!, zone: "play" as const, controller: 0, exhausted } } });
+    state = entered(true);
+    expect(modifiedStat(state, state.cards[ally]!, "willpower", made.ctx.cards)).toBe(Math.max(0, base - 1));
+    state = entered(false);
+    expect(modifiedStat(state, state.cards[ally]!, "willpower", made.ctx.cards)).toBe(base);
   });
 
   it("132035:A:1 while it is the active location, a location in the staging area gets -1 Threat", () => {
@@ -65,10 +78,30 @@ describe("Shadow cards of the set (132037:A:2, 132038:A:2)", () => {
       modifiers: [...state.modifiers, { instanceId: made.hero, sourceId: made.hero, stat: "defense" as const, amount: -9, until: "endOfRound" as const }],
       cards: { ...state.cards, [made.hero]: { ...state.cards[made.hero]!, damage: modifiedStat(state, state.cards[made.hero]!, "hitPoints", made.ctx.cards) - 1 } },
     });
-    const raised = (shadow: string) => {
-      const fought = fightEnemy(table, shadow, "f3", {}, { tweak: nearDeath });
+    const raised = (shadow: string, undefended = false) => {
+      const fought = fightEnemy(table, shadow, "f3", {}, { tweak: nearDeath, undefended });
       return fought.run.state.seats[0]!.threat - fought.start.seats[0]!.threat;
     };
     expect(raised("132038") - raised("f0")).toBe(5);
   });
+
+  it("132038:A:2 an undefended attack that destroys a hero raises no threat: no defending character is destroyed", () => {
+    const nearDeath = (state: Parameters<NonNullable<Parameters<typeof fightEnemy>[4]>["tweak"] & {}>[0], made: { hero: string; ctx: { cards: Parameters<typeof modifiedStat>[3] } }) => ({
+      ...state,
+      cards: { ...state.cards, [made.hero]: { ...state.cards[made.hero]!, damage: modifiedStat(state, state.cards[made.hero]!, "hitPoints", made.ctx.cards) - 1 } },
+    });
+    const raised = (shadow: string) => {
+      const fought = fightEnemy(table, shadow, "f3", {}, { tweak: nearDeath, undefended: true });
+      expect(fought.run.state.cards[fought.made.hero]?.zone).not.toBe("heroes");
+      return fought.run.state.seats[0]!.threat - fought.start.seats[0]!.threat;
+    };
+    expect(raised("132038") - raised("f0")).toBe(0);
+  });
 });
+
+// The set's spec rows. Gundabad Wolf Rider (Attack 3) against the stand-in ally (Defense 1, 2 hit points) destroys it.
+const ROWS: readonly Row[] = [
+  { line: "132037:A:1", name: "naming Leadership removes the committed characters of other spheres from the quest", layout: { phase: "Quest", committed: ["dh1"] }, act: [reveal("132037"), answer("leadership")], expect: committed("dh1", false) },
+  { line: "132038:A:2", name: "a defender the attack destroys makes the defending player raise his threat by 5", layout: { play: ["ally"] }, act: [attack("132055", { shadow: "132038" }), defend("ally")], expect: threat(33) },
+];
+cardSpecs("the-battle-of-five-armies", ROWS);
