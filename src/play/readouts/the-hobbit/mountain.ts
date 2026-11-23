@@ -5,9 +5,10 @@
 // Empty in any other scenario. Pure, so a test reads it.
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
+import { stackedUnder } from "../../../rules/families/burgle/stack.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 
-import { goldenLimitWords, goldenNearWords, goldenWords, stackWords } from "../../words/scenarios/the-hobbit/mountain-table.ts";
+import { goldenLimitWords, goldenNearWords, stackLimitWords, stackWords } from "../../words/scenarios/the-hobbit/mountain-table.ts";
 import { cardsOf, type TableDial } from "../dials.ts";
 
 const SCENARIO = "the-lonely-mountain";
@@ -27,15 +28,15 @@ export function mountainDials(game: ScenarioState, ctx: ReduceContext, nameOf: (
   const dials: TableDial[] = [];
   const mountain = cardsOf(game, MOUNTAIN)[0];
   if (mountain) {
-    const under = Object.values(game.cards).filter((card) => card.zone === "under" && card.host === mountain.id).length;
+    const under = stackedUnder(game, mountain.id).length;
     const threat = modifiedStat(game, mountain, "threat", ctx.cards);
-    dials.push({ id: "stack", testID: "mountain-stack", label: "Stack", name: `Treasure cards under ${nameOf(MOUNTAIN)}`, value: under, limit: STACKED, note: stackWords(nameOf(MOUNTAIN), under, STACKED, threat, ctx.cards.get(MOUNTAIN)?.threat ?? 0) });
+    dials.push({ id: "stack", testID: "mountain-stack", label: "Stack", name: `Treasure cards under ${nameOf(MOUNTAIN)}`, value: under, limit: STACKED, limitWords: stackLimitWords(STACKED), cardId: mountain.id, note: stackWords(nameOf(MOUNTAIN), under, STACKED, threat, ctx.cards.get(MOUNTAIN)?.threat ?? 0) });
   }
   const golden = cardsOf(game, GOLDEN)[0];
   if (golden) {
     const left = Math.max(0, SIXTH - golden.progress);
     const level = left <= CRITICAL ? ("critical" as const) : left <= NEAR ? ("near" as const) : null;
-    dials.push({ id: "golden", testID: "mountain-golden", label: "Golden", name: `Progress on ${nameOf(GOLDEN)}`, value: golden.progress, limit: SIXTH, warms: true, ...(level ? { warn: { level, words: goldenNearWords(left) } } : {}), limitWords: goldenLimitWords(SIXTH), note: goldenWords(nameOf(GOLDEN), golden.progress, SIXTH) });
+    dials.push({ id: "golden", testID: "mountain-golden", label: "Golden", name: `Progress on ${nameOf(GOLDEN)}`, value: golden.progress, limit: SIXTH, warms: true, ...(level ? { warn: { level, words: goldenNearWords(left) } } : {}), limitWords: goldenLimitWords(SIXTH), cardId: golden.id });
   }
   return dials;
 }

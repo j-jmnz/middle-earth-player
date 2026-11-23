@@ -6,6 +6,7 @@ import type { ReduceContext } from "../../../../rules/interpret/interpret.ts";
 import type { ScenarioState } from "../../../../rules/core/state.ts";
 import { inPlay } from "../../../../rules/core/state.ts";
 import { burgleEffectOf, nearestBurgle } from "../../../../rules/families/burgle/match.ts";
+import { spendablePools } from "../../../../rules/families/costs/verbs.ts";
 
 import { article } from "../../instruction.ts";
 import type { ChoiceNames } from "../../choice.ts";
@@ -19,14 +20,25 @@ function progressOn(game: ScenarioState, title: string, names: ChoiceNames): num
   return card ? card.progress : null;
 }
 
+/** What follows the attempt, by the card that makes it: The Burglar's Turn gives the top treasure card on a success and has Smaug the Golden attack the first player on a failure (132072:B:1, 132072:B:2); A Bare Patch attaches itself to Smaug the Magnificent on a success (132039:A:2). Empty when nothing follows. */
+function followWords(game: ScenarioState, names: ChoiceNames, success: boolean): string {
+  const maker = nearestBurgle(game)?.frame.cardId;
+  const code = maker ? game.cards[maker]?.code : undefined;
+  if (code === "132072") return success ? `take the top treasure card from under ${names.code("132043")} into your hand` : `${names.code("132040")} attacks the first player`;
+  if (code === "132039" && success) return `${names.code("132039")} attaches to ${names.code("132041")}`;
+  return "";
+}
+
+const then = (words: string): string => (words ? `, then ${words}` : "");
+
 /** A branch of a burgle family card's choice in words, or null for any other branch. */
 export function burgleBranchWords(choose: ChooseInstruction, optionId: string, game: ScenarioState, names: ChoiceNames, ctx?: ReduceContext): string | null {
   const option = choose.options.find((entry) => entry.id === optionId);
   // Step 3 of an attempt: discard the matching cards or decline (families/burgle/attempt.ts).
   if (choose.options.some((entry) => entry.id === "discard") && choose.options.some((entry) => entry.id === "decline")) {
     const facts = ctx ? attemptFacts(game, ctx, names) : null;
-    if (optionId === "decline") return "Decline the attempt: the burgle fails and nothing is discarded";
-    if (optionId === "discard" && facts) return `Discard ${cards(facts.need)} that ${facts.need === 1 ? "matches" : "match"} the revealed ${facts.revealed} in ${facts.shared}`;
+    if (optionId === "decline") return `Decline the attempt: the burgle fails and nothing is discarded${then(followWords(game, names, false))}`;
+    if (optionId === "discard" && facts) return `Discard ${cards(facts.need)} that ${facts.need === 1 ? "matches" : "match"} the revealed ${facts.revealed} in ${facts.shared}${then(followWords(game, names, true))}`;
   }
   const [first, second] = option?.instructions ?? [];
   // Secret Entrance (132045:A:2): each branch names a card type, travels, looks at the top card and sends the location back unless it is that type.
@@ -85,13 +97,23 @@ const SPHERES: Readonly<Record<string, string>> = { leadership: "leadership", lo
 function revealedWords(game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, revealedId: string | null): string {
   const code = revealedId ? game.cards[revealedId]?.code : undefined;
   const printed = code ? ctx.cards.get(code) : undefined;
-  if (!code || !printed) return "no card (his deck is empty)";
+  if (!code || !printed) return "no card (the deck is empty)";
   const sphere = printed.sphere ? `${SPHERES[printed.sphere] ?? printed.sphere} ` : "";
   const cost = printed.costX ? ", cost X" : printed.cost != null ? `, cost ${printed.cost}` : "";
   return `${names.code(code)} (${article(`${sphere}${printed.type}`)}${cost})`;
 }
 
-/** The note of the action window of a burgle attempt (after step 2): the card the attempt stopped at, the revealed card that stays on the deck, what step 3 asks and The Lonely Mountain's Action. Null with no attempt at the window. */
+/** Why The Lonely Mountain's Action cannot be used now, or null when it can: the first player pays 2 Baggins resources, and a revealed card must still lie on his deck (132043:A:2). */
+function actionBarred(game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, revealedId: string | null): string | null {
+  if (revealedId == null || game.cards[revealedId]?.zone !== "deck") return "no revealed card is left on the deck to take";
+  const have = spendablePools(game, game.firstPlayer, { sphere: "baggins" }, ctx).total;
+  if (have >= 2) return null;
+  const hero = (game.seats[game.firstPlayer]?.heroes ?? []).find((id) => ctx.cards.get(game.cards[id]?.code ?? "")?.sphere === "baggins");
+  const name = hero ? names.code(game.cards[hero]?.code ?? "") : "The first player's heroes";
+  return `${name} ${hero ? "has" : "have"} ${have === 0 ? "no" : have} Baggins resource${have === 1 ? "" : "s"}`;
+}
+
+/** The note of the action window of a burgle attempt (after step 2): the card the attempt stopped at, the revealed card that stays on the deck, what step 3 asks and The Lonely Mountain's Action, with the reason when it cannot be used. The first player is named when two play. Null with no attempt at the window. */
 export function burgleWindowNote(game: ScenarioState, ctx: ReduceContext, names: ChoiceNames): string | null {
   const found = nearestBurgle(game);
   const data = found?.frame.data;
@@ -100,6 +122,9 @@ export function burgleWindowNote(game: ScenarioState, ctx: ReduceContext, names:
   if (!data || !effectCode || !effect) return null;
   const shared = effect.match.map((trait) => TRAIT_WORDS[trait] ?? trait).join(" and ");
   const mountain = Object.values(game.cards).some((card) => card.code === "132043" && inPlay(card.zone));
-  const action = mountain ? ` ${names.code("132043")}: Action, spend 2 Baggins resources to take the revealed card into hand and reveal the next card.` : "";
-  return `Burgle attempt, step 2: the first player's deck is shuffled and ${revealedWords(game, ctx, names, data.revealedId)} is revealed; it stays on the deck. ${names.code(effectCode)} asks for ${cards(effect.discard)} from his hand that ${effect.discard === 1 ? "matches" : "match"} its ${shared}.${action}`;
+  // Two-handed, the player whose deck and hand the attempt uses is named.
+  const his = game.seatCount > 1 ? `Player ${game.firstPlayer + 1}'s` : "the first player's";
+  const barred = mountain ? actionBarred(game, ctx, names, data.revealedId) : null;
+  const action = mountain ? ` ${names.code("132043")}: Action, spend 2 Baggins resources to take the revealed card into hand and reveal the next card.${barred ? ` Not available now: ${barred}.` : ""}` : "";
+  return `Burgle attempt, step 2: ${his} deck is shuffled and ${revealedWords(game, ctx, names, data.revealedId)} is revealed; it stays on the deck. ${names.code(effectCode)} asks for ${cards(effect.discard)} from ${his} hand that ${effect.discard === 1 ? "matches" : "match"} its ${shared}.${action}`;
 }

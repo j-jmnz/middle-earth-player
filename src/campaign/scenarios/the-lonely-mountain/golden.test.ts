@@ -45,8 +45,9 @@ describe("The Lonely Mountain golden", () => {
       expect(state.seats.slice(0, golden.seatCount).some((seat) => !seat.eliminated), golden.name).toBe(true);
     },
     lost(state, golden) {
-      if (golden.lossReason === "Bilbo Baggins left play") expect(cardsOf(state, "132001").every((card) => card.zone !== "heroes"), golden.name).toBe(true);
-      else expect(state.seats.slice(0, golden.seatCount).every((seat) => seat.eliminated && seat.threat >= 50), golden.name).toBe(true);
+      const bilboGone = cardsOf(state, "132001").every((card) => card.zone !== "heroes");
+      const allOut = state.seats.slice(0, golden.seatCount).every((seat) => seat.eliminated && seat.threat >= 50);
+      expect(golden.lossReason === "Bilbo Baggins left play" ? bilboGone : allOut, golden.name).toBe(true);
     },
     checks(suite) {
       // Stage 2B's burgle attempt is made in each win, and it discards at least the encounter card with the burgle effect (nothing is revealed, so the staging area holds no card an attempt dealt).

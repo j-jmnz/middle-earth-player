@@ -42,6 +42,9 @@ export function askWords(a: {
 }): AskedWords {
   const { game, ctx, names, instruction, queue, options, source, picked, amountNow, effectId, cause } = a;
   const asked = a.origin?.verb === "DiscardFromHand" ? a.origin : instruction;
+  // The hand card step 3 of a burgle attempt makes the first player discard: before the asks, since the burgle's effect frame stands on the card that has the burgle effect and its records may ask too.
+  const burgling = burglePickWords(game, ctx, names, effectId, game.window?.kind === "choose" ? game.window.seat : game.firstPlayer);
+  if (burgling) return burgling;
   const written = asksPick({ game, ctx, names, instruction: asked, source, amountNow, options, ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });
   if (written) return a.place ? withPlace(written, a.place) : written;
   const traded = instruction.verb === "TradeDamageForThreat" && instruction.character ? game.cards[instruction.character] : undefined;
@@ -51,8 +54,6 @@ export function askWords(a: {
   }
   // The Burglar's Turn's Setup with more candidates than the loot deck takes (22024:A:2).
   if (instruction.verb === "BuildLootDeck") return lootLeaveOutWords(options.length, instruction.size);
-  const burgling = burglePickWords(game, ctx, names, effectId, game.window?.kind === "choose" ? game.window.seat : game.firstPlayer);
-  if (burgling) return burgling;
   const words = (
     grappleAsk(instruction, source, names, grappleFactsOf(game, ctx, instruction, picked)) ??
     wilderlandAsk(instruction, source, names, queue[0], picked, { game, ctx, options }) ??

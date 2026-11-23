@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { legalIntents } from "../../rules/engine/legal.ts";
 import { send } from "../../../test/harness/scene-kit.ts";
-import { bilbo, drive, make, resolveAndDrive } from "../../../test/scenarios/the-lonely-mountain/moments.ts";
+import { announceAndDrive, bilbo, drive, make, resolveAndDrive } from "../../../test/scenarios/the-lonely-mountain/moments.ts";
 
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { sheetFor } from "./sheets.ts";
@@ -27,7 +27,7 @@ describe("132044:A:2 Great Hall burgle: the words of step 3", () => {
     const { made, choose } = attempt("132044", 1);
     const sheet = sheetOf(made, choose.state);
     expect(sheet?.kind === "pick" ? sheet.note : "").toBe("Great Hall: burgle attempt. The revealed card is Snowbourn Scout. As the first player, discard 3 cards from your hand that match its card type, or decline and the attempt fails.");
-    expect(sheet?.kind === "pick" ? sheet.options.map((option) => option.label) : []).toEqual(["Discard 3 cards that match the revealed Snowbourn Scout in card type", "Decline the attempt: the burgle fails and nothing is discarded"]);
+    expect(sheet?.kind === "pick" ? sheet.options.map((option) => option.label) : []).toEqual(["Discard 3 cards that match the revealed Snowbourn Scout in card type, then A Bare Patch attaches to Smaug the Magnificent", "Decline the attempt: the burgle fails and nothing is discarded"]);
   });
 
   it("the Pick says which card of how many, solo and two-handed", () => {
@@ -46,5 +46,18 @@ describe("132042:A:3 Croaking Crows burgle: the words say the traits it names", 
     const { made, choose } = attempt("132042", 1);
     const sheet = sheetOf(made, choose.state);
     expect(sheet?.kind === "pick" ? sheet.note : "").toBe("Croaking Crows: burgle attempt. The revealed card is Snowbourn Scout. As the first player, discard 1 card from your hand that matches its sphere and card type, or decline and the attempt fails.");
+  });
+});
+
+describe("132072:B:1 and B:2 The Burglar's Turn: the rows say what follows the attempt", () => {
+  it("a success takes the top treasure card, a refusal has Smaug the Golden attack the first player", () => {
+    const treasures = ["132020", "132021", "132022", "132023", "132024"].map((code) => ({ code, to: "132043" }));
+    const made = make({ stage: "132072", staging: [{ code: "132040" }, "132043"], setAside: ["132041", "132039"], under: treasures, deck: ["132042", "f0", "f0"], deckOf: ["01016", "01016", "01016"], hand: ["01016"], heroes: [bilbo(0)] });
+    const choose = announceAndDrive(made, { trigger: "questSucceeded" }, {}, ["choose"]);
+    const sheet = sheetOf(made, choose.state);
+    expect(sheet?.kind === "pick" ? sheet.options.map((option) => option.label) : []).toEqual([
+      "Discard 1 card that matches the revealed Snowbourn Scout in sphere and card type, then take the top treasure card from under The Lonely Mountain into your hand",
+      "Decline the attempt: the burgle fails and nothing is discarded, then Smaug the Golden attacks the first player",
+    ]);
   });
 });

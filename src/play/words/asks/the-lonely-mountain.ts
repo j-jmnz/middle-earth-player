@@ -14,15 +14,27 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "132045:travel:1 @0 Pick": { owned: true, note: "{card}: as the first player, choose 1 ready hero you control to exhaust to travel here. Bilbo Baggins may be the hero.", verb: "Exhaust" },
   "132045:travel:1 @2 Choose": { owned: true, note: "{card}: as the first player, name a card type. The players travel here and the top card of the encounter deck is looked at. If it is not the named type, this location goes back to the staging area." },
 
+  // The progress Smaug the Golden receives (Croaking Crows, Great Hall, Pretending to Sleep, The Burglar's Turn): the pick has one card in a game that has him in play.
+  "132042:forced:1 @0 Pick": { note: "{card}: choose Smaug the Golden to place 1 progress on.", verb: "Place" },
+  "132044:forced:1 @0 Pick": { note: "{card}: choose Smaug the Golden to place 1 progress on.", verb: "Place" },
+  "132048:whenRevealed:1 @0 Pick": { note: "{card}: choose Smaug the Golden to place 1 progress on.", verb: "Place" },
+  "132072:forced:1 @0 Pick": { note: "{card}: choose Smaug the Golden to place 1 progress on.", verb: "Place" },
+
   // 132047:A:1 (Western Slopes, leaving play explored): the first player draws 2 cards or removes 1 progress from Smaug the Golden.
   "132047:response:1 @0 Choose": { owned: true, note: "{card}: it left play explored. As the first player, draw 2 cards or remove 1 progress from Smaug the Golden." },
   "132047:response:1 @0.remove.0 Pick": { owned: true, note: "{card}: choose Smaug the Golden to take 1 progress off.", verb: "Remove" },
 
   // 132048:A:2 (Pretending to Sleep, When Revealed): the first player spends X Baggins resources or advances to stage 4A.
-  "132048:whenRevealed:1 @2 Choose": { owned: true, note: "{card}: as the first player, spend as many Baggins resources as Smaug the Golden has progress, or advance to stage 4A." },
+  "132048:whenRevealed:1 @2 Choose": { owned: true, note: "{card}: as the first player, spend {x} Baggins resources (the progress on Smaug the Golden) or advance to stage 4A.", bind: { x: { stat: "progress", ofNamed: "Smaug the Golden" } } },
+  "132048:whenRevealed:1 @2 advance": { label: "Advance to stage 4A, Thieves! Fire! Murder!" },
 
   // 132072:B:1 (The Burglar's Turn): after the burgle attempt the players may advance to stage 3.
   "132072:forced:1 @4 Choose": { owned: true, note: "{card}: the burgle attempt is made. As the first player, advance to stage 3, or stay on this stage." },
+  "132072:forced:1 @4 advance": { label: "Advance to stage 3, Inside Information" },
+  "132072:forced:1 @4 stay": { label: "Stay on stage 2, The Burglar's Turn" },
+
+  // 132072:B:2 (The Burglar's Turn): after the first player's failed burgle attempt Smaug the Golden attacks him; the pick names the attacker, no player chooses it.
+  "132072:forced:2 @0 Pick": { note: "{card}: the burgle attempt failed, so Smaug the Golden attacks the first player from the staging area. Choose him to start the attack.", verb: "Attack" },
 
   // 132051:A:1 (Dragon-Spell, When Revealed): it goes to the hero with the most resources that has no Dragon-Spell; a tie is the first player's choice.
   "132051:whenRevealed:1 @0 Pick": { owned: true, note: "{card}: choose the hero it attaches to, among the heroes with the most resources and no Dragon-Spell. That hero gets -1 Willpower for each resource in its pool and takes damage for each resource it spends.", verb: "Attach" },

@@ -4,11 +4,13 @@ const cards = (count: number): string => `${count} treasure card${count === 1 ? 
 
 /** The stack under The Lonely Mountain: how many of the five treasure cards remain, and what that does to its Threat. */
 export function stackWords(name: string, under: number, all: number, threat: number, printed: number): string {
-  if (under === 0) return `No treasure card lies under ${name}: its Threat is ${threat} (${printed} printed) and a player card can affect it.`;
-  return `${cards(under)} of the ${all} lie facedown under ${name}. Each lowers its Threat by 2: it is ${threat} now (${printed} printed). A successful burgle attempt takes the top one into the first player's hand.`;
+  if (under === 0) return `No treasure card lies under ${name}: its Threat is ${threat} (${printed} printed) and a player card can affect it`;
+  return `${cards(under)} of the ${all} lie facedown under ${name}. Each lowers its Threat by 2: it is ${threat} now (${printed} printed). The top one is the prize of a successful burgle attempt at The Burglar's Turn`;
 }
 
-/** The progress on Smaug the Golden against the 6th. */
-export const goldenWords = (name: string, progress: number, limit: number): string => `${name} holds ${progress} of ${limit} progress. The ${limit}th sends the players to stage 4A at once.`;
+/** What a screen reader hears of the stack's 5: the number the Setup stacks, not a loss. */
+export const stackLimitWords = (all: number): string => `The Setup stacks ${all} treasure cards`;
+
+/** The progress on Smaug the Golden against the 6th: the limit's words say what the 6th does, so the dial has no note. */
 export const goldenLimitWords = (limit: number): string => `At ${limit} progress the players advance to stage 4A`;
 export const goldenNearWords = (left: number): string => (left === 1 ? "1 more progress advances the players to stage 4A" : `${left} more progress advance the players to stage 4A`);
