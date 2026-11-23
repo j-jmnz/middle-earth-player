@@ -8,6 +8,8 @@ import { checksOf, expectReplays, ownCauses } from "../../../../test/harness/gol
 
 import { validateLoadout } from "../../loadout.ts";
 import { applyResolution, emptyLog } from "../../log.ts";
+import { GOLDEN_PINS } from "../../../../test/harness/golden-pins.ts";
+import { endOf, goldenText } from "../../../../scripts/game/golden-file.ts";
 import { campaignPath } from "../../path.ts";
 import { loadCampaign } from "../../../../scripts/data/load-scenarios.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
@@ -35,11 +37,12 @@ describe("golden: a whole game of A Knife in the Dark", () => {
   });
 
   it("plays the same intents to the same state on fixed seeds", async () => {
+    const pins = GOLDEN_PINS["a-knife-in-the-dark"] ?? [];
     const out = KNIFE_GOLDENS.map((golden) => {
       const game = games.get(golden.name);
-      return { ...golden, intents: game?.intents, state: game?.state, checks: game ? checksOf(game, ctx) : undefined };
+      return { ...golden, intents: game?.intents, checks: game ? checksOf(game, ctx) : undefined, end: game ? endOf(game.state) : undefined, state: game && pins.includes(golden.name) ? game.state : undefined };
     });
-    await expect(JSON.stringify(out)).toMatchFileSnapshot(file);
+    await expect(goldenText(out)).toMatchFileSnapshot(file);
   });
 
   it("names a cause for every number a step changes, the scenario's own records among them", () => {

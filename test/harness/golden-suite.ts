@@ -21,6 +21,8 @@ import { causeProblems, NUMBER_STEPS } from "./cause-check.ts";
 import { ownCodes, unreachedRecords, whileRecording, writeUnreached } from "./reached.ts";
 import type { CampaignGoldenBase, PlayedGame } from "./game-kit.ts";
 import { goldensMovedHint } from "./golden-moved.ts";
+import { GOLDEN_PINS } from "./golden-pins.ts";
+import { endOf, goldenText } from "../../scripts/game/golden-file.ts";
 import { nextPartId, nextPartStatus, nextStepKind } from "./next-part.ts";
 import { NO_COPY_LIMITS } from "../../src/campaign/wilderland.ts";
 
@@ -167,13 +169,22 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
     }
 
     it("plays the same intents to the same state on fixed seeds", async () => {
+      const pins = GOLDEN_PINS[spec.scenario.id] ?? [];
+      expect(pins.filter((name) => !spec.goldens.some((golden) => golden.name === name)), "names in test/harness/golden-pins.ts that are no golden of this scenario").toEqual([]);
       const out = spec.goldens.map((golden) => {
         const played = games.get(golden.name);
         // The checks are the digest of the table after each intent (src/campaign/digest.ts): they move only when a change reaches this scenario's games.
-        return { ...golden, intents: played?.intents, state: played?.state, checks: played ? checksOf(played, worlds.get(golden.decks)!.ctx) : undefined };
+        // `end` holds the result and a hash of the whole final state; the state itself is stored for the goldens a test reads (golden-pins.ts).
+        return {
+          ...golden,
+          intents: played?.intents,
+          checks: played ? checksOf(played, worlds.get(golden.decks)!.ctx) : undefined,
+          end: played ? endOf(played.state) : undefined,
+          state: played && pins.includes(golden.name) ? played.state : undefined,
+        };
       });
-      await expect(JSON.stringify(out)).toMatchFileSnapshot(spec.file, goldensMovedHint(spec.file, spec.scenario.id, out));
-      // A later part reads these states back from golden.json in place of playing the games again (test/harness/golden-state.ts).
+      await expect(goldenText(out)).toMatchFileSnapshot(spec.file, goldensMovedHint(spec.file, spec.scenario.id, out));
+      // A later part reads the pinned states back from golden.json in place of playing the games again (test/harness/golden-state.ts).
       for (const golden of spec.goldens) expect(JSON.parse(JSON.stringify(game(golden).state)), golden.name).toEqual(game(golden).state);
     });
 

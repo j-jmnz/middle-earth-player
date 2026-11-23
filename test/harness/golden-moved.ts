@@ -18,6 +18,7 @@ export function goldensMovedHint(file: string, scenarioId: string, out: readonly
     if (move.kind === "removed") return [];
     if (move.kind === "new") return [`${label} is new`];
     if (move.intents === "changed") return [`${label} plays other intents`];
+    if (move.storage) return [`${label} is stored in another format`];
     return [move.fields.length > 0 ? `${label} ends on another state` : `${label} stores other tables`];
   });
   if (moved.length === 0) return undefined;

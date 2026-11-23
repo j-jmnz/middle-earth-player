@@ -1,16 +1,29 @@
 // Two golden.json files compared row by row: the one comparison behind `pnpm game moved` (scripts/game/moved.ts) and the hint a failed golden snapshot
 // prints (test/harness/golden-moved.ts). It reads no game and loads no engine, so a test helper can import it.
 import { firstDifferent, stateDiff } from "./diff.ts";
+import { endOf, type GoldenEnd } from "./golden-file.ts";
 
-/** The parts of a golden.json row this reads. A row of an older scenario has no `name`; it is keyed by its seed and its place. */
+/** The parts of a golden.json row this reads. A row of an older scenario has no `name`; it is keyed by its seed and its place. `state` is stored only for the goldens a test reads (golden-file.ts); a file written before `end` existed has `state` and no `end`. */
 export type StoredGolden = {
   name?: string;
   seed?: number;
   outcome?: string;
   intents?: unknown[];
   checks?: unknown[];
+  end?: GoldenEnd;
   state?: { round?: number; lost?: boolean; stageCleared?: boolean; lossReason?: string | null };
 };
+
+/** The end of a row: the stored `end`, or the one its stored state gives (a file in the earlier format). */
+function endOfRow(golden: StoredGolden): GoldenEnd | undefined {
+  return golden.end ?? (golden.state ? endOf({ round: golden.state.round ?? 0, lost: golden.state.lost ?? false, stageCleared: golden.state.stageCleared ?? false, lossReason: golden.state.lossReason }, golden.state) : undefined);
+}
+
+/** The row with the fields that hold the game left out: what is left is what the scenario's spec says (name, seed, loadout, options). */
+function specOf(golden: StoredGolden): string {
+  const { intents: _intents, checks: _checks, end: _end, state: _state, ...spec } = golden;
+  return JSON.stringify(spec);
+}
 
 export type GoldenMove = {
   /** 1-based, as `pnpm game show <scenario-id>/<n>` numbers it; null for a golden the file no longer holds. */
@@ -27,15 +40,17 @@ export type GoldenMove = {
   /** The intent at `first` as the base and the golden now hold it, when the two differ (JSON). */
   was?: string;
   now?: string;
-  /** The paths at which the final states differ (a few). */
+  /** The paths at which the final states differ (a few); one line naming the two hashes when a state is not stored in both files. */
   fields: string[];
+  /** True when the two files hold the same spec, intents, per-intent digests and final state hash and differ only in how they store them. */
+  storage?: true;
 };
 
 function resultOf(golden: StoredGolden | undefined): string {
   if (!golden) return "none";
-  const state = golden.state;
-  const outcome = golden.outcome ?? (state?.lost ? "lost" : state?.stageCleared ? "won" : "unfinished");
-  return `${outcome}${state?.lost && state.lossReason ? ` (${state.lossReason})` : ""}, last round ${state?.round ?? "?"}`;
+  const end = endOfRow(golden);
+  const outcome = golden.outcome ?? (end?.lost ? "lost" : end?.cleared ? "won" : "unfinished");
+  return `${outcome}${end?.lost && end.lossReason ? ` (${end.lossReason})` : ""}, last round ${end?.round ?? "?"}`;
 }
 
 /** A row's key: its name, or its seed and its 1-based place when it has none. */
@@ -57,10 +72,13 @@ export function compareGoldens(base: readonly StoredGolden[] | null, now: readon
       return;
     }
     if (JSON.stringify(was) === JSON.stringify(golden)) return;
+    const wasEnd = endOfRow(was);
+    const nowEnd = endOfRow(golden);
     const sameIntents = JSON.stringify(was.intents) === JSON.stringify(golden.intents);
     const parts = [firstDifferent(golden.intents ?? [], was.intents ?? []), firstDifferent(golden.checks ?? [], was.checks ?? [])].filter((index): index is number => index !== null);
     const first = parts.length > 0 ? Math.min(...parts) : null;
     const intentAt = (list: readonly unknown[] | undefined): string | undefined => (first !== null && list && first < list.length ? JSON.stringify(list[first]) : undefined);
+    const storage = sameIntents && first === null && specOf(was) === specOf(golden) && wasEnd?.hash === nowEnd?.hash;
     const differs = !sameIntents && first !== null && intentAt(was.intents) !== intentAt(golden.intents);
     moves.push({
       number: numberOf(name, at),
@@ -72,7 +90,8 @@ export function compareGoldens(base: readonly StoredGolden[] | null, now: readon
       first,
       endsNow: first !== null && first >= (golden.intents ?? []).length,
       ...(differs ? { was: intentAt(was.intents) ?? "(ended)", now: intentAt(golden.intents) ?? "(ended)" } : {}),
-      fields: stateDiff(was.state, golden.state, 5),
+      fields: was.state && golden.state ? stateDiff(was.state, golden.state, 5) : wasEnd?.hash === nowEnd?.hash ? [] : [`state hash ${wasEnd?.hash ?? "none"} → ${nowEnd?.hash ?? "none"} (\`pnpm game diff\` replays the game and names the fields)`],
+      ...(storage ? { storage: true as const } : {}),
     });
   });
   base?.forEach((was, at) => {

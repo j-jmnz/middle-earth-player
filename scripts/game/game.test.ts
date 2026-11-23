@@ -8,6 +8,7 @@ import path from "node:path";
 
 import { firstDifferent, stateDiff } from "./diff.ts";
 import { compareGoldens, type StoredGolden } from "./compare.ts";
+import { endOf, goldenText } from "./golden-file.ts";
 import { baseRef, changedScenarios, goldenAt, renderMoved } from "./moved.ts";
 import { intentText } from "./names.ts";
 import { layoutOf, sceneSource } from "./scene-source.ts";
@@ -108,6 +109,18 @@ describe("pnpm game", () => {
     const row = (seed: number, round: number): StoredGolden => ({ seed, intents: [{ type: "Pass" }], checks: [1], state: { round } });
     const moves = compareGoldens([row(1, 2), row(1, 3)], [row(1, 2), row(1, 4)]);
     expect(moves).toEqual([expect.objectContaining({ name: "seed 1, row 2", number: 2, kind: "moved", fields: ["round: 3 → 4"] })]);
+  });
+
+  it("reads a row in the end format, and reads a change of format alone as one", () => {
+    const state = { round: 3, lost: false, stageCleared: true, extra: 1 };
+    const old: StoredGolden = { name: "solo", outcome: "won", intents: [{ type: "Pass" }], checks: [1], state };
+    const now: StoredGolden = { name: "solo", outcome: "won", intents: [{ type: "Pass" }], checks: [1], end: endOf(state) };
+    expect(compareGoldens([old], [now])).toEqual([expect.objectContaining({ kind: "moved", storage: true, intents: "same", first: null, fields: [], before: "won, last round 3", after: "won, last round 3" })]);
+    expect(renderMoved("a-scenario", compareGoldens([old], [now])[0]!, null)).toContain("storage format changed, same intents and digests");
+    const [moved] = compareGoldens([now], [{ ...now, end: endOf(state, { ...state, extra: 2 }) }]);
+    expect(moved?.storage).toBeUndefined();
+    expect(moved?.fields[0]).toContain("state hash");
+    expect(goldenText([{ name: "a", intents: [1], checks: [2], end: endOf(state), state: undefined }])).toBe(`[\n{\n"name":"a",\n"intents":[1],\n"checks":[2],\n"end":${JSON.stringify(endOf(state))}\n}\n]\n`);
   });
 
   it("returns no golden.json only for a file the ref does not hold, and refuses a flag as a ref", () => {

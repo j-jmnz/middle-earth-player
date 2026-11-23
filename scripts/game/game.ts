@@ -17,6 +17,7 @@ import { runScript, type Log } from "../log.ts";
 import { reduce, type PlayerIntent } from "../../src/rules/engine/reduce.ts";
 
 import { firstDifferent, stateDiff } from "./diff.ts";
+import { stateHash } from "./golden-file.ts";
 import { intentText, stepText } from "./names.ts";
 import { layoutOf, sceneSource } from "./scene-source.ts";
 import { ROOT } from "../data/paths.ts";
@@ -101,8 +102,16 @@ function diff(source: GameSource): void {
   const at = firstDifferent(played, pinned);
   const out = [`${source.label}: played now ${played.length} intents, golden.json ${pinned.length}`];
   if (at === null) {
-    const fields = stateDiff(source.pinned, source.played.state);
-    out.push(fields.length === 0 ? "same intents and same final state: the golden holds" : "same intents, different final state (golden.json → played now):", ...fields.map((line) => `  ${line}`));
+    // golden.json stores a final state only for the goldens a test reads (golden-pins.ts); the others store its hash.
+    const nowHash = stateHash(source.played.state);
+    if (source.pinned.state) {
+      const fields = stateDiff(source.pinned.state, source.played.state);
+      out.push(fields.length === 0 ? "same intents and same final state: the golden holds" : "same intents, different final state (golden.json → played now):", ...fields.map((line) => `  ${line}`));
+    } else if (source.pinned.hash === nowHash) {
+      out.push("same intents and same final state hash: the golden holds");
+    } else {
+      out.push(`same intents, different final state: golden.json stores its hash only (${source.pinned.hash ?? "none"}), the game played now ends on ${nowHash}.`, "  Its fields are not stored: add the golden to GOLDEN_PINS (test/harness/golden-pins.ts) and update the golden test to see them.");
+    }
   } else {
     // The state both games share: the pinned game up to the move before they part (+1 for the opening Keep).
     const walked = walk(source, { at: at + 1 });
