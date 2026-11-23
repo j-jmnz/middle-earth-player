@@ -11,6 +11,7 @@ import { DATA_DIR } from "./paths.ts";
 import { keyOf, ledgerSchema, loadLedger, type Ledger, type LedgerEntry } from "./printed/ledger.ts";
 import { playerScopeCodes, scanTargets, type ScanTarget } from "./printed/scope.ts";
 import { codesArg, packsArg } from "./sources/scans.ts";
+import { parseArgs } from "../cli-args.ts";
 
 // `pnpm data ledger-seed <scenario-id>`: writes the ledger entries a scenario's cards are missing, from the source text (Hall of Beorn's, through data/cards),
 // with `readBy` empty and the pinned scan named (data/sources.json). Every seeded line is still read against its scan before the scenario is playable: the
@@ -94,14 +95,25 @@ export function withSeeded(file: unknown | null, campaign: string, seeded: reado
 
 export const PLAYER_LEDGER_ID = "player-cards";
 
+export const LEDGER_SEED_USAGE = "Usage: pnpm data ledger-seed <scenario-id> [--nightmare] | --pack <pack>... | --codes <code,code,...>";
+
+/** The arguments of a run: a misspelt flag (`--nightmar` would seed the campaign's ledger) throws, and `--help` asks for the usage. */
+export function ledgerSeedArguments(args: readonly string[]): { id: string | undefined; nightmare: boolean; help: boolean } {
+  const parsed = parseArgs(args, LEDGER_SEED_USAGE, { flags: ["nightmare"], spaced: ["pack", "codes"] });
+  return { id: parsed.positional[0], nightmare: parsed.flags.has("nightmare"), help: parsed.help };
+}
+
 function main(log: Log): void {
   const args = process.argv.slice(2);
+  const { id, nightmare, help } = ledgerSeedArguments(args);
+  if (help) {
+    log.info(LEDGER_SEED_USAGE);
+    return;
+  }
   const packs = packsArg(args);
   const listed = codesArg(args);
   const player = packs.length > 0 || listed.length > 0;
-  const id = args.find((arg, at) => !arg.startsWith("--") && args[at - 1] !== "--pack" && args[at - 1] !== "--codes");
-  const nightmare = args.includes("--nightmare");
-  if (!id && !player) throw new Error("Usage: pnpm data ledger-seed <scenario-id> [--nightmare] | --pack <pack>... | --codes <code,code,...>");
+  if (!id && !player) throw new Error(LEDGER_SEED_USAGE);
   const cards = loadCards();
   const campaign = id ? loadCampaigns().find((one) => one.scenarios.includes(id)) : undefined;
   if (!player && !campaign && !nightmare) throw new Error(`No built campaign or cycle holds the scenario ${id}`);
