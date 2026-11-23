@@ -260,6 +260,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   RemoveFromCampaignPool: () => ({ text: "this card is removed from the Campaign Pool", read: [] }),
   CancelDamage: (i, ctx) => ({ text: i.all === true ? "cancel all of the damage just dealt" : `cancel up to ${i.amount === undefined ? "1" : amount(i.amount, ctx)} point(s) of the damage just dealt${i.target === undefined ? "" : ` to ${cardRef(i.target)}`}`, read: ["amount", "all", "target"] }),
   ChooseX: (i, ctx) => ({ text: `the acting player chooses X, from ${i.min === undefined ? "1" : str(i.min)} to ${chooseXMost(i.max, ctx)}`, read: ["min", "max"] }),
+  PayFromHero: (i) => ({ text: `a resource from the pool of the hero named ${str(i.name)} may pay for this card, even when its player does not control that hero`, read: ["name"] }),
   MoveDamage: (i, ctx) => ({ text: `move ${i.all === true ? "all" : amount(i.amount, ctx)} damage from the card picked before the last to the last picked card`, read: ["amount", "all"] }),
   TakeLoggedCaptives: (i) => ({ text: `each seat the Campaign Log names a Captive for has that hero lie faceup under the card with code ${str(i.under)}`, read: ["under"] }),
   MakeCaptive: (i) => ({ text: `the picked hero becomes a Captive: it lies faceup under the card with code ${str(i.under)}, in play and controlled by no one`, read: ["under"] }),

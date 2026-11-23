@@ -251,7 +251,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: {
         kind: "all",
         conditions: [
-          { kind: "matches", card: "self", pick: { type: "character", control: "any", state: "exhausted" } },
+          { kind: "exhaustedToDefend" },
           { kind: "matches", card: "other", pick: { type: "enemy", control: "any", nonUnique: true, hasShadow: true } },
         ],
       },
