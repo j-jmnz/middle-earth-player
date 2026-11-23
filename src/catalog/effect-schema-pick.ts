@@ -26,6 +26,8 @@ export const pickSchema = z.strictObject({
   onCharacter: z.literal(true).optional(),
   // An enemy in the Stormcaller's area counts too: it is in play, though not in the staging area while the players are at another stage ("if Captain Sahír is in play", 11192:A:3; dcce.stormcallers-area). Read by src/rules/interpret/pick.ts.
   inStormcallerArea: z.literal(true).optional(),
+  // With `type: card`: only the cards of the riddle area (Dungeons Deep and Caverns Dim, hob.riddle-area): stage 2, Gollum, Bilbo Baggins and the Ring attached to him while they are in it. Read by src/rules/interpret/pick.ts through the riddles family's pool.
+  riddleArea: z.literal(true).optional(),
   // Which staging area the staging cards of the filter are in once stages are separate (Breaking of the Fellowship, mec109.multiple-staging-areas):
   // the chooser's own (`own`, the default: "the staging area", "this stage"), the shared area stage 2B deals out (`shared`), or any seat's (`any`:
   // "in any staging area"). Read by src/rules/interpret/pick.ts; a game with one staging area ignores it.

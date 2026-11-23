@@ -70,7 +70,7 @@ const EMPTY: readonly CardInstance[] = [];
  */
 export function combatPairs(game: ScenarioState, seat: number): ReadonlyMap<string, { ids: readonly string[]; kind: FightKind }> {
   const pairs = new Map<string, { ids: readonly string[]; kind: FightKind }>();
-  const engaged = game.seats[seat]?.engaged ?? NONE;
+  const engaged = engagedOf(game, seat);
   const attack = game.pendingAttack;
   if (attack && engaged.includes(attack.enemyId)) {
     const defended = attack.defenderId != null && !attack.undefended;
@@ -84,6 +84,16 @@ export function combatPairs(game: ScenarioState, seat: number): ReadonlyMap<stri
     if (attackers.length > 0) pairs.set(strike.enemyId, { ids: attackers, kind: "attack" });
   }
   return pairs;
+}
+
+/**
+ * The enemies the engagement area draws for the seat: those engaged with it, and Gollum while he attacks from the riddle area (131074:A:1), so the attack has an
+ * attacker on the table and the hero it hits is drawn beside him. He lies in no seat's engaged list, so no other card or game reads this beyond the table.
+ */
+function engagedOf(game: ScenarioState, seat: number): readonly string[] {
+  const own = game.seats[seat]?.engaged ?? NONE;
+  const attack = game.pendingAttack;
+  return attack != null && attack.seat === seat && game.cards[attack.enemyId]?.zone === "riddleArea" && !own.includes(attack.enemyId) ? [...own, attack.enemyId] : own;
 }
 
 function fightingIds(game: ScenarioState, seat: number): ReadonlySet<string> {
@@ -112,7 +122,7 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number, facts?:
     case "secondActiveLocation":
       return !isSeparate(game) && game.widgets.secondActiveLocation && game.secondActiveLocation ? [game.secondActiveLocation] : NONE;
     case "engaged":
-      return owner?.engaged ?? NONE;
+      return engagedOf(game, seat);
     case "play": {
       if (!owner) return NONE;
       // An attachment is in its controller's play list and on its host; the table draws it on the host only. A character in

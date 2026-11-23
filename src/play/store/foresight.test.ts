@@ -117,7 +117,8 @@ describe("several defenders (Stand Together, 01038:A:1)", () => {
     // Gimli is declared; picking Thalin as well pools 2 + 2 Defense against the attack of 6.
     const readout = readoutFor(run.state, tab.ctx, sheet, { key: sheet.key, ids: [thalin ?? ""], shares: [] }, (id) => id);
     expect(readout?.stats.map((stat) => stat.value)).toEqual([6, 4]);
-    expect(readout?.result).toBe("2 damage on one defender you choose, shadow card next");
+    // The scene's encounter deck is empty, so no shadow card was dealt to the attacker and none is announced.
+    expect(readout?.result).toBe("2 damage on one defender you choose");
     // The pick's mark is the pooled damage; nothing is destroyed by declaring, since who takes it is chosen after.
     expect(sheet.options.find((item) => item.id === thalin)?.mark).toEqual({ icon: "damage", value: 2, danger: false });
     // Thalin joins, and the declarations end.

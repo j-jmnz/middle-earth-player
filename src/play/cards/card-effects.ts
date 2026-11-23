@@ -44,7 +44,7 @@ export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "thre
 // round), so the pill shows it will go (rr.lasting-effects).
 export type StatBadge = { stat: BadgeStat; icon: IconName; word: string; value: number; delta: number; lasting: boolean };
 
-export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit" | "cancelsDamage" | "mustCommit";
+export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit" | "cancelsDamage" | "mustCommit" | "cannotQuest" | "noPlayerAttachments" | "bilboLimitedToGollum";
 
 // The short word on the pill of a card that must commit to the quest (A Fell Dread, 101163:A:1): a "must", not a "cannot", so it is drawn as the Willpower icon and this word on an accent pill, never struck through.
 export const MUST_COMMIT_WORD = "Quest";
@@ -76,6 +76,10 @@ const STAT_WORD: Readonly<Record<BadgeStat, string>> = {
 
 const FLAGS: readonly { flag: FlagStat; icon: IconName; word: string }[] = [
   { flag: "cannotAttack", icon: "attack", word: "Cannot attack" },
+  // Bilbo Baggins in the riddle area (131030:B:3, hob.riddle-area): the stage's other limits on him, as the preview lists them.
+  { flag: "cannotQuest", icon: "willpower", word: "Cannot quest" },
+  { flag: "noPlayerAttachments", icon: "attachment", word: "Takes no attachments from players" },
+  { flag: "bilboLimitedToGollum", icon: "defense", word: "Defends against and takes damage from Gollum only" },
   { flag: "cannotTakeDamage", icon: "hitPoints", word: "Takes no damage" },
   { flag: "cannotTakeNonCombatDamage", icon: "hitPoints", word: "Takes only combat damage" },
   { flag: "cannotBeEngaged", icon: "engagementCost", word: "Cannot be engaged" },

@@ -102,6 +102,9 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   // The captured cards a pick starts from (families/captured/values.ts).
   const captured = spec.captured ? familyPool(state, spec, asking, sourceId, ctx) : null;
   if (captured) return captured;
+  // The cards of the riddle area (families/riddles/area.ts).
+  const riddleArea = spec.riddleArea ? familyPool(state, spec, asking, sourceId, ctx) : null;
+  if (riddleArea) return riddleArea;
   // Every card in play of any kind (families/angmar/reanimate/pick.ts).
   const everything = spec.allInPlay ? familyPool(state, spec, asking, sourceId, ctx) : null;
   if (everything) return everything;

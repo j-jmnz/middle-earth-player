@@ -1,6 +1,7 @@
 // The stat templates: ModifyStat (who holds the stat, what a flag means, how long it lasts) and Restrict (a prohibition read from the record's own fields), with the glosses they share. Beside the other verb modules (verbs.ts).
 import { cardRef, renderAmount } from "./amounts.ts";
 import { ERECH_STAT_NOTES } from "./families/erech.ts";
+import { RIDDLES_STAT_NOTES } from "./families/riddles.ts";
 import { ESCAPE_STAT_NOTES } from "./families/escape.ts";
 import { FOG_STAT_NOTES } from "./families/fog.ts";
 import { FLAG_NOTES } from "./stat-notes.ts";
@@ -48,6 +49,7 @@ const STAT_NOTE: Readonly<Record<string, string>> = {
   ...ESCAPE_STAT_NOTES,
   ...SMAUG_STAT_NOTES,
   ...ERECH_STAT_NOTES,
+  ...RIDDLES_STAT_NOTES,
   ...FOG_STAT_NOTES,
   ...RUINS_STAT_NOTES,
   ...INVESTIGATION_STAT_NOTES,
