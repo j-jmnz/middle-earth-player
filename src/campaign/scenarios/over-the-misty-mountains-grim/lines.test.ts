@@ -1,7 +1,7 @@
 // Rules: hob.bilbo-baggins-ohauh, hob.baggins-sphere-ohauh, hob.bilbo-multiplayer-ohauh, rr.search, rr.cost, rr.action, rr.travel, rr.delayed-effects, rr.victory (data/rules/entries.json); docs/scenarios/the-hobbit.md (Over the Misty Mountains Grim).
 // The lines a card-spec row cannot say (spec.test.ts holds the rest): a shuffle and the order of a deck, a cost paid from Bilbo's pool and who may pay it, the travel the players are left, an effect that waits for the next quest phase. 131026:A:1, 131026:B:1,
 // 131028:B:2, 131028:B:3, 131066:A:2, 131067:A:2, 131068:A:1, 131073:A:1.
-import { expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { answer, endPhase, endRound, resolve } from "../../../../test/harness/card-spec.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
@@ -105,31 +105,35 @@ const blanked = (state: { modifiers: readonly { stat: string; instanceId: string
 
 const threatOf = (done: ReturnType<typeof playedLayout>, code: string): number => modifiedStat(done.run.state, done.run.state.cards[idOf(done.run.state, code)]!, "threat", done.table.cards);
 
-lineSpec("131071:A:1", "the +1 Threat holds only after enemies returned (rr.then), lasts to the end of the phase and is not given again by a second reveal with none engaged", (effects) => {
-  const layout = { stage: "131027", phase: "Quest", staging: ["131058"], engaged: ["f3"] } satisfies Layout;
-  const once = playedLayout(ID, layout, resolve("131071", "whenRevealed"), effects, true);
-  expect(threatOf(once, "131058")).toBe(3);
-  // With no enemy engaged the part before "then" resolves nothing: no Goblin gets +1 Threat.
-  const none = playedLayout(ID, { ...layout, engaged: [] }, [resolve("131071", "whenRevealed")], effects, true);
-  expect(threatOf(none, "131058")).toBe(2);
-  // A second reveal in the phase finds no engaged enemy left: the first +1 stays and no second one is added.
-  expect(threatOf(playedLayout(ID, layout, [resolve("131071", "whenRevealed"), resolve("131071", "whenRevealed")], effects, true), "131058")).toBe(3);
-  // The end of the phase ends the +1 Threat.
-  expect(threatOf(playedLayout(ID, layout, [resolve("131071", "whenRevealed"), endPhase], effects, true), "131058")).toBe(2);
+describe("131071:A:1 the +1 Threat ends at the end of the phase and a second reveal does not add it again", () => {
+  lineSpec("131071:A:1", "the +1 Threat holds only after enemies returned (rr.then), lasts to the end of the phase and is not given again by a second reveal with none engaged", (effects) => {
+    const layout = { stage: "131027", phase: "Quest", staging: ["131058"], engaged: ["f3"] } satisfies Layout;
+    const once = playedLayout(ID, layout, resolve("131071", "whenRevealed"), effects, true);
+    expect(threatOf(once, "131058")).toBe(3);
+    // With no enemy engaged the part before "then" resolves nothing: no Goblin gets +1 Threat.
+    const none = playedLayout(ID, { ...layout, engaged: [] }, [resolve("131071", "whenRevealed")], effects, true);
+    expect(threatOf(none, "131058")).toBe(2);
+    // A second reveal in the phase finds no engaged enemy left: the first +1 stays and no second one is added.
+    expect(threatOf(playedLayout(ID, layout, [resolve("131071", "whenRevealed"), resolve("131071", "whenRevealed")], effects, true), "131058")).toBe(3);
+    // The end of the phase ends the +1 Threat.
+    expect(threatOf(playedLayout(ID, layout, [resolve("131071", "whenRevealed"), endPhase], effects, true), "131058")).toBe(2);
+  });
 });
 
-lineSpec("131066:A:2", "the text is blank until the end of the round, so the Action is not offered a second time in the round and is offered again in the next round", (effects) => {
-  const layout = { active: "131066", phase: "Quest" } satisfies Layout;
-  const made = withBilbo(table(layout, effects), 4);
-  const porch = idOf(made.state, "131066");
-  const first = finish(send(start(made.state), paying(offered(made, "131066"), idOf(made.state, BILBO), 2), made.ctx), made.ctx);
-  expect(blanked(first.state, porch)).toBe(true);
-  // Blank, the card has no Action: with 2 Baggins resources left it is not offered again this round.
-  expect(offered({ ...made, state: first.state }, "131066")).toBeUndefined();
-  // The end of the round ends the blank.
-  const done = playedLayout(ID, layout, [resolve("131066", "action"), ...Array.from({ length: 7 }, () => endPhase)], effects, true);
-  expect(blanked(done.run.state, idOf(done.run.state, "131066"))).toBe(false);
-  expect(blanked(playedLayout(ID, layout, [resolve("131066", "action")], effects, true).run.state, porch)).toBe(true);
+describe("131066:A:2 the blank ends at the end of the round and the Action is not offered a second time before it", () => {
+  lineSpec("131066:A:2", "the text is blank until the end of the round, so the Action is not offered a second time in the round and is offered again in the next round", (effects) => {
+    const layout = { active: "131066", phase: "Quest" } satisfies Layout;
+    const made = withBilbo(table(layout, effects), 4);
+    const porch = idOf(made.state, "131066");
+    const first = finish(send(start(made.state), paying(offered(made, "131066"), idOf(made.state, BILBO), 2), made.ctx), made.ctx);
+    expect(blanked(first.state, porch)).toBe(true);
+    // Blank, the card has no Action: with 2 Baggins resources left it is not offered again this round.
+    expect(offered({ ...made, state: first.state }, "131066")).toBeUndefined();
+    // The end of the round ends the blank.
+    const done = playedLayout(ID, layout, [resolve("131066", "action"), ...Array.from({ length: 7 }, () => endPhase)], effects, true);
+    expect(blanked(done.run.state, idOf(done.run.state, "131066"))).toBe(false);
+    expect(blanked(playedLayout(ID, layout, [resolve("131066", "action")], effects, true).run.state, porch)).toBe(true);
+  });
 });
 
 lineSpec("131066:A:2", "the first player pays 2 Baggins resources from Bilbo's pool, and no other player may", (effects) => {
