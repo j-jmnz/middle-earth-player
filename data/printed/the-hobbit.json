@@ -7,5 +7,2581 @@
     "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
     "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword."
   ],
-  "entries": []
+  "entries": [
+    {
+      "code": "131023",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/An-Unexpected-Party-1A.jpg",
+        "sha256": "0a82467202bf70d26472fa29fffd53f1512149ed3d0c51fb01b0497af0713bc9"
+      },
+      "lines": [
+        "Setup: Remove and shuffle the 7 Sack cards into a Sack deck and set it aside face down. Remove the 3 Troll enemies and the Troll Cave from the encounter deck and set them aside out of play. Then, shuffle the encounter deck. Each player reveals 1 card from the top of the encounter deck and adds it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131023",
+      "side": "B",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/An-Unexpected-Party-1B.jpg",
+        "sha256": "3e38f4b3d6eba9d52a6467670e1c50c3e34a54182d48421c240e920850a6df44"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131024",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Roast-Mutton-2A.jpg",
+        "sha256": "132420a5675153bbe0a314e9139c3eba3ca0c143dd8f105d8ee68d8bdf54312f"
+      },
+      "lines": [
+        "When Revealed: Add the set-aside Troll enemies and the Troll Cave to the staging area. Shuffle the encounter discard pile back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131024",
+      "side": "B",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Roast-Mutton-2B.jpg",
+        "sha256": "9b9c3c22f829a02bbb85e6369b1064e31d79b45952b78a936b56329704e3daf3"
+      },
+      "lines": [
+        "Forced: If there are no Troll enemies left in play, or if there are no cards left in the encounter deck, advance it to the next stage.",
+        "Any time players would place progress tokens on this quest, discard an equal number of cards from the encounter deck instead. (Progress is placed on the active location before triggering this effect.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131025",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Dawn-Take-You-All-3A.jpg",
+        "sha256": "1e31c128e96d1f71f1e8f840e87a75dca891b4de69a19ee3864c754602d32845"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131025",
+      "side": "B",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Dawn-Take-You-All-3B.jpg",
+        "sha256": "f66918625f06dee7825d7c07775e83d7f8407d8887ba7c0536045df83caef0ad"
+      },
+      "lines": [
+        "When Revealed: Remove all Troll enemies and Sack cards from the game. If Troll Cave is in the victory display, the players have discovered the treasure cards Sting, Glamdring, and Orcrist.",
+        "The players have won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131032",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/William.jpg",
+        "sha256": "b6b7e1463ee8e74644e60c484f4e9dbb357351f6c51a824a3a659bedcef62cba"
+      },
+      "lines": [
+        "Troll enemies not engaged with a player cannot take damage.",
+        "Forced: After William engages a player, sack 2.",
+        "Forced: Return William to the staging area at the end of the combat phase. The engaged player may raise his threat by 1 to cancel this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131033",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Bert.jpg",
+        "sha256": "afc455b40a34eaab075d61fc08021e0d3efa1bc590f8d1ebcb490fd415fd6668"
+      },
+      "lines": [
+        "Players cannot play attachment cards on Troll enemies.",
+        "Forced: After Bert engages a player, sack 1.",
+        "Forced: Return Bert to the staging area at the end of the combat phase. The engaged player may raise his threat by 1 to cancel this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131034",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Tom.jpg",
+        "sha256": "01f1011d9dc153b4bc86f4d81aa0cd83c651a190eb8e0e7a2b72d0f6ca196e96"
+      },
+      "lines": [
+        "Troll enemies can only be attacked by one character at a time.",
+        "Forced: After Tom engages a player, sack 1.",
+        "Forced: Return Tom to the staging area at the end of the combat phase. The engaged player may raise his threat by 1 to cancel this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131035",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/A-Suspicious-Crow.jpg",
+        "sha256": "10c9971925e6336c71ad91423ad4d338b44d6da3a5368d3c389aa4f359691d14"
+      },
+      "lines": [
+        "When Revealed: Reveal the top card of the encounter discard pile and add it to the staging area, if able.",
+        "Shadow: If this attack deals at least 1 damage, shuffle this card back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131036",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Troll-Camp.jpg",
+        "sha256": "959dc7799d69d3351275964670c42027aabce37d0374632b0dbb08726a29bfa9"
+      },
+      "lines": [
+        "While Troll Camp is in the staging area, Troll enemies get +1 Threat for each player in the game.",
+        "While Troll Camp is in play, Bilbo Baggins gains: \"Action: Exhaust Bilbo Baggins and spend 1 Baggins resource to remove 1 Sack card from a character. Bilbo Baggins may trigger this effect even with a Sack card attached to him.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131037",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Troll-Cave.jpg",
+        "sha256": "db1a7ea3b859e116b12a3a3ad39edae4d8155d18e12cc1ce4908ea63ac6df9d3"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Players cannot travel to Troll Cave unless Bilbo Baggins has the Troll Key attached and the first player spends 5 Baggins resources. (2 Baggins resources instead if Bilbo Baggins has the Troll Purse attached.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131038",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Hobbit-lands.jpg",
+        "sha256": "a5f667c9f944e767029b1cc8ca216b482d3132578f4e6fec8bd8408a51c22255"
+      },
+      "lines": [
+        "Response: After placing 1 or more progress tokens on Hobbit-lands, the first player draws 1 card.",
+        "Shadow: Defending player must put the top card of the encounter deck discard pile on top of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131039",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Dreary-Hills.jpg",
+        "sha256": "a467c9b6aa4504049617ec2e3836928556b951e3e4ab331906c6d9d099988440"
+      },
+      "lines": [
+        "Forced: After placing 1 or more progress tokens on Dreary Hills, each player must discard 1 card at random from his hand.",
+        "Response: After Dreary Hills leaves play as an explored location, Bilbo Baggins gains 1 resource."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131040",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Lone-Lands.jpg",
+        "sha256": "7b988cbe03a41aef6a3b96d7ed03a3c0d3d11681e1ce9c040537048223f97a40"
+      },
+      "lines": [
+        "Forced: After placing 1 or more progress tokens on Lone-Lands, each player removes 1 resource from one of his hero's resource pools, if able.",
+        "Response: After Lone-Lands leaves play as an explored location, Bilbo Baggins gains 1 resource."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131041",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Cave-Entrance.jpg",
+        "sha256": "8f4bbf2803615db97ff44e1cbea63a43ab518804e3b745203b4d96bb804a0cf0"
+      },
+      "lines": [
+        "While Cave Entrance is in the staging area, it gains: \"Forced: At the end of the round, place the top X cards of the encounter discard pile on the bottom of the encounter deck. X is the number of players in the game.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131042",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Troll-Purse.jpg",
+        "sha256": "7798cb6ce5fe61abb8957e4f58c3ddc849c4174a6b959a343046108ff685b82e"
+      },
+      "lines": [
+        "If Troll Purse is discarded, add it to the staging area. If Troll Purse is unattached and in the staging area, attach it to a Troll enemy, if able.",
+        "Response: After attached Troll enemy is destroyed, the first player may spend 1 Baggins resource to claim this objective and attach it to Bilbo Baggins."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131043",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Troll-Key.jpg",
+        "sha256": "0c2ea554bf0c84bd2dbf52f07fa09e8179ee76490382795be28a0ca56246c6cd"
+      },
+      "lines": [
+        "If Troll Key is discarded, add it to the staging area. If Troll Key is unattached and in the staging area, attach it to a Troll enemy, if able.",
+        "Response: After attached Troll enemy takes damage as the result of an attack, the first player may exhaust Bilbo Baggins to claim this objective and attach it to him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131044",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/A-Smelly-Sack.jpg",
+        "sha256": "d87aae557efc1b6e7e05072283e8fe814ef590943a93bc40bf96cb53c01b6e6d"
+      },
+      "lines": [
+        "When Sacked: Attach to the ally (excluding Gandalf) with the highest printed cost without a Sack attached.",
+        "Attached character cannot ready, attack, defend, commit to quests, or trigger effects. If this Sack card is removed, shuffle it into the sack deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131045",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/A-Strong-Sack.jpg",
+        "sha256": "083f6a2a73098a043e12890b6c9ad06c6e77d99a11e7d0c616c5e0aac2d95036"
+      },
+      "lines": [
+        "When Sacked: Attach to the character (excluding Gandalf) with the highest printed Attack without a Sack attached.",
+        "Attached character cannot ready, attack, defend, commit to quests, or trigger effects. If this Sack card is removed, shuffle it into the sack deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131046",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/A-Tough-Sack.jpg",
+        "sha256": "5b8b87112e225f43622c766f5009fa2a3474edeb3dca1b8886182224bd7fa456"
+      },
+      "lines": [
+        "When Sacked: Attach to the character (excluding Gandalf) with the highest printed Defense without a Sack attached.",
+        "Attached character cannot ready, attack, defend, commit to quests, or trigger effects. If this Sack card is removed, shuffle it into the sack deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131047",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/A-Large-Sack.jpg",
+        "sha256": "d4bc622ca5ba7b76839b9ff56c92d98d274901ef7a5ec9e831e354214777c829"
+      },
+      "lines": [
+        "When Sacked: Attach to the character (excluding Gandalf) with the highest printed hit points without a Sack attached.",
+        "Attached character cannot ready, attack, defend, commit to quests, or trigger effects. If this Sack card is removed, shuffle it into the sack deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131048",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/A-Deep-Sack.jpg",
+        "sha256": "5f1954b7443d57eb87adeab2d3645375b1c73037d7cc2cf2f1483ca6eefd6c59"
+      },
+      "lines": [
+        "When Sacked: Attach to the character (excluding Gandalf) with the highest printed Willpower without a Sack attached.",
+        "Attached character cannot ready, attack, defend, commit to quests, or trigger effects. If this Sack card is removed, shuffle it into the sack deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131049",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/A-Foul-Sack.jpg",
+        "sha256": "8dfeeca0a79010cf4baddc83faf407b2bbbb5be5287f4fda78359f509d35eb10"
+      },
+      "lines": [
+        "When Sacked: Attach to the character (excluding Gandalf) with the most attachments without a Sack attached.",
+        "Attached character cannot ready, attack, defend, commit to quests, or trigger effects. If this Sack card is removed, shuffle it into the sack deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131050",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/A-Worn-Sack.jpg",
+        "sha256": "504e6d4223d119c4a77f6cbca0856a3d7e0561b89356de47543e7e4aabadc5d6"
+      },
+      "lines": [
+        "When Sacked: Attach to hero with the most resources without a Sack attached.",
+        "Attached character cannot ready, attack, defend, commit to quests, or trigger effects. If this Sack card is removed, shuffle it into the sack deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131051",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Lots-or-None-at-All.jpg",
+        "sha256": "058765871374e6c296ea24742883810d468953570f21d5a862c415397aa3bb07"
+      },
+      "lines": [
+        "When Revealed: If there is a Troll enemy in the staging area, Sack 1. If there are no Troll enemies in the staging area, this card gains Doomed 2.",
+        "Shadow: If the attacking enemy is a Troll, Sack 1. (The first player may spend 1 Baggins resource to cancel this effect.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131052",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/A-Nice-Pickle.jpg",
+        "sha256": "17b9a97a2f8ee32ce1cdebd340d5d343b685d91af3f5b75cff1f058cf62a6483"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Place the top X cards of the encounter discard pile on the bottom of the encounter deck. X is equal to twice the number of players in the game.",
+        "Shadow: Shuffle this card into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131053",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Roast-'Em-or-Boil-'Em.jpg",
+        "sha256": "3594e045bfcc32618d6152e9e8444d2503e43caf7b749cba8eb46d17c8eeb240"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each ally. (2 damage instead if there is a Troll enemy in the staging area.)",
+        "Shadow: Search the encounter deck for Troll Camp and add it to the staging area. Then, shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131054",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Hungry-Troll.jpg",
+        "sha256": "21e00208933c7c8fc34e8aeb1e41219e53dabc7221e53b94d8969df31ea1259d"
+      },
+      "lines": [
+        "When Revealed: The first player chooses a Troll enemy in the staging area and engages that enemy. If there are no Troll enemies in the staging area, this card gains Surge.",
+        "Shadow: Deal 4 damage to each character with a Sack card attached. (The first player may spend 2 Baggins resources to cancel this effect.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131055",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/No-Campfire.jpg",
+        "sha256": "5fede4f460c06e4d7ecbe358666b14655f58bff6b8f02619a78b51e957f29732"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Each player must choose one: increase his threat by 4, or reveal an additional encounter card from the encounter deck and add it to the staging area.",
+        "Shadow: The defending player raises his threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131056",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Wind-whipped-Rain.jpg",
+        "sha256": "d798a19badee3dc445c269392b99aba92f061597c7d14288382a02bd92ebf563"
+      },
+      "lines": [
+        "When Revealed: Discard all non-treasure, non-objective attachments in play.",
+        "Shadow: The defending character gets -1 Defense."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131057",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/More-Like-a-Grocer.jpg",
+        "sha256": "b576c2954f945944f574c9d65691ea7236c35b66394799e0968cc43334e6cf9b"
+      },
+      "lines": [
+        "When Revealed: Discard all Baggins resources.",
+        "Shadow: Resolve this card's \"When Revealed\" effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131026",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/A-Short-Rest-1A.jpg",
+        "sha256": "e2c46284e1c30f0126fbff0b8e4ca5d21be1222c61d2a6b54e9d41b5333164cd"
+      },
+      "lines": [
+        "Setup: Shuffle the Over the Misty Mountains Grim and Western Lands encounter sets into one encounter deck and make it the active encounter deck. Then, shuffle the The Great Goblin and Misty Mountain Goblins encounter sets into a second encounter deck and set it aside, inactive."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131026",
+      "side": "B",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/A-Short-Rest-1B.jpg",
+        "sha256": "bf1631e215f962cd5c03312c51bb88a61b7dc55a53f67471dfca944e0e9e992f"
+      },
+      "lines": [
+        "When Revealed: Each player may search his deck for 1 treasure card and add it to his hand, then shuffle his deck. Advance to stage 2A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131027",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/The-Mountain-Pass-2A.jpg",
+        "sha256": "01afe1313319dd8a76a4ab77d63b0933ad46cce0918d171cf6cc7644deca34c3"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131027",
+      "side": "B",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/The-Mountain-Pass-2B.jpg",
+        "sha256": "f984825188e29e5aaefccf77f1bbdd931a595fe037e81cc6842f0c5a02bacbbb"
+      },
+      "lines": [
+        "When Revealed: Search the encounter deck for 1 copy of Stone-giant and add it to the staging area. Then, shuffle the encounter deck. Reveal 1 card per player from the encounter deck and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131028",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Down-Down-to-Goblin-Town-3A.jpg",
+        "sha256": "2df0b6c57eec116c6bbf91969b3134efc424500fdd145ec30eeb339bb228a136"
+      },
+      "lines": [
+        "When Revealed: Shuffle all encounter cards back into the encounter deck and set it aside, inactive. The second encounter deck becomes the active encounter deck. Search the encounter deck for The Great Goblin and add it to the staging area. Then, shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131028",
+      "side": "B",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Down-Down-to-Goblin-Town-3B.jpg",
+        "sha256": "fd3d21904fba77096512aec8eaf8598dbd0a3efbcabec6a69326eb49c073b88a"
+      },
+      "lines": [
+        "Players cannot defeat this stage unless The Great Goblin is in the victory display.",
+        "When Revealed: Reveal 3 encounter cards per player, Bilbo Baggins may spend X resources to reduce the total number of encounter cards revealed by X. (To a minimum of 1.)",
+        "If the players defeat this stage, they have won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131058",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Goblin-Axeman.jpg",
+        "sha256": "8d7df1ad38bc330137e77d35dab609dbd2b244bad3baea9777286f5f48cbfe28"
+      },
+      "lines": [
+        "Goblin Axeman gets +1 Attack for each Cave location in play.",
+        "Shadow: Defending character gets -1 Defense."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131059",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Goblin-Miners.jpg",
+        "sha256": "692d02609c28cc9ae9097d3b7b43d83c31567c5541b2b546ed25059249ea8986"
+      },
+      "lines": [
+        "Goblin Miners gets +1 Defense for each Cave location in play.",
+        "Shadow: Attacking enemy gets +1 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131060",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Goblin-Runners.jpg",
+        "sha256": "d49730f04fd94e83ad66dba5b2d7a831e7a1aac5f83449f1ba86683a1ac6122a"
+      },
+      "lines": [
+        "Surge.",
+        "Shadow: Attacking enemy makes an additional attack immediately after this one. (Deal a new shadow card for that attack.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131061",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Goblin-Driver.jpg",
+        "sha256": "b18bf3d56d908005d49ccc50532f026b66728858abe6872ee889dc93fd4b25f9"
+      },
+      "lines": [
+        "When Revealed: The first player exhausts 1 character he controls.",
+        "Shadow: Defending player exhausts 1 character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131062",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Goblin-Bent-Swords.jpg",
+        "sha256": "a50ae3a31a15ce84134a66aba1fa55305b2a2ed547ffce3cf0fcc2c1094df08d"
+      },
+      "lines": [
+        "If The Great Goblin is in the victory display, this card gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if The Great Goblin is in the victory display.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131063",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/The-Great-Goblin-Enemy.jpg",
+        "sha256": "63ef664a0f37dfc140dea79efcb23bf34641e3da5a62aae6d79d0ff4faf14447"
+      },
+      "lines": [
+        "Forced: After The Great Goblin attacks, discard X cards from the encounter deck where X is the number of players in the game. Add each Goblin enemy discarded by this effect to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131064",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Stone-Giant.jpg",
+        "sha256": "2874095af8baab8e0d649a9f15cf42c5bedf54dc04255408d15ddee891145636"
+      },
+      "lines": [
+        "While at least one Stone-Giant is in the staging area, the Galloping Boulders card gains surge.",
+        "Forced: After Stone-Giant engages a player, that player chooses and discards 1 ally he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131065",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/The-Goblins'-Caves.jpg",
+        "sha256": "7231e925b2ceae3f940da9b97f17f15235c20e9e34d1ee6a6d50831b6901aad5"
+      },
+      "lines": [
+        "While The Goblins' Caves is the active location, Goblin enemies get +1 Threat.",
+        "Shadow: Defending player raises his threat by X. X is the number of Goblin enemies engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131066",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Front-Porch.jpg",
+        "sha256": "4cef6c84589891bcc7f8d7a4603d593bd84ba279126d68c508ccb7907fc4982d"
+      },
+      "lines": [
+        "While Front Porch is the active location, players cannot attack Goblin enemies.",
+        "Action: The first player may spend 2 Baggins resources to treat Front Porch's printed text box as if it were blank until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131067",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Great-Cavern-Room.jpg",
+        "sha256": "ad964db51569f307b9c8224440da73ba1f75306e0ef416adc204539c9f44beac"
+      },
+      "lines": [
+        "While Great Cavern Room is the active location, it gains: \"Forced: After a player engages a Goblin enemy, he must deal 1 damage to a character he controls.\"",
+        "Forced: When faced with the option to travel, if The Great Goblin is in the victory display the players must travel to Great Cavern Room if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131068",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Overhanging-Rock.jpg",
+        "sha256": "e5fa81b6de64d8e31b07b19644e9e308a780b137652ae6343ecd87c94f09bf4d"
+      },
+      "lines": [
+        "While Overhanging Rock is the active location, it gains: \"Action: Spend 1 Baggins resource to look at the top 2 cards of your deck. Add 1 of those to your hand and discard the other.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131069",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/The-High-Pass.jpg",
+        "sha256": "02a8f94e82030f1bf17a262140ecf76f00fc431c1056eda89f058e344943d158"
+      },
+      "lines": [
+        "X is the number of players in the game.",
+        "Forced: At the end of the round, remove X progress tokens from the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131070",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Grip-Grab-Pinch-Nab.jpg",
+        "sha256": "d2e1d5977881b2e5a48f4da95478c09ca9c8c80f9e4c8588580001fc8b1c6623"
+      },
+      "lines": [
+        "When Revealed: Starting with the first player, each player must choose 1 Goblin enemy from the discard pile and add it to the staging area.",
+        "Shadow: Defending player deals damage among characters he controls equal to the number of Goblin enemies engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131071",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Chaos-in-the-Cavern.jpg",
+        "sha256": "9ee710aec9b0c4b745536f79ae6352ccfe53f450ecbb78f7c67296fcb8cb697f"
+      },
+      "lines": [
+        "When Revealed: All engaged enemies return to the staging area. Then, each Goblin enemy gets +1 Threat until the end of the phase.",
+        "Shadow: Attacking enemy is returned to the staging area after its attack resolves."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131072",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Galloping-Boulders.jpg",
+        "sha256": "0c7973fad214bed84202881891f606fc9c32d36cc0dc705ff5d612f21ef8e195"
+      },
+      "lines": [
+        "When Revealed: The first player chooses a questing character. That character takes 3 damage and is removed from the quest.",
+        "Shadow: Put this card on top of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131073",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Guffawing-of-Giants.jpg",
+        "sha256": "586f8be48c249d948b653920d30ecc54326b926e96953625d38f213b1c08c2ab"
+      },
+      "lines": [
+        "When Revealed: The first player chooses 1 Stone-giant in the staging area. At the end of the quest phase, that Stone-giant engages the player with the highest threat. If there are no Stone-giant cards in the staging area, search the encounter deck for 1 Stone-giant and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131029",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Out-of-the-Frying-Pan-1A.jpg",
+        "sha256": "cf9d5572acf4a247880b609121f6ecf6caa20aac231b4d1ecc9e8bbb8996e556"
+      },
+      "lines": [
+        "Setup: Add Lake in the Cavern to the staging area. Create a riddle area with stage 2A and follow the setup instructions on that card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131029",
+      "side": "B",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Out-of-the-Frying-Pan-1B.jpg",
+        "sha256": "d81f659adbc332b67c0667ffee04c8e6d228fe0800fd2f73c3b2f301bc655c9c"
+      },
+      "lines": [
+        "Players cannot advance to stage 3A unless both 1B and 2B are complete.",
+        "Forced: Reveal 1 additional encounter card per player during the staging step."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131030",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Riddles-in-the-Dark-2A.jpg",
+        "sha256": "cecafab183c215cb95b271828ed5bcf84d27f4c640a81cc5e4b1bd81ad013452"
+      },
+      "lines": [
+        "Setup: Search the encounter deck for Gollum and Bilbo's Magic Ring. Place Gollum and Bilbo Baggins in the riddle area and attach Bilbo's Magic Ring to Bilbo Baggins. Then, shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131030",
+      "side": "B",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Riddles-in-the-Dark-2B.jpg",
+        "sha256": "b2b5486143cf61bfdc4cc4f8101b36fda005fbefd0566a9be927ccab826f54b5"
+      },
+      "lines": [
+        "Players cannot advance to stage 3A unless both 1B and 2B are complete.",
+        "Progress tokens cannot be added to, or removed from, this quest except by answering riddles.",
+        "Cards in the riddle area are immune to player card effects and cannot leave the riddle area except by quest effects."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131031",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Into-the-Fire-3A.jpg",
+        "sha256": "1d80b3188902d5bb8c8d7620c9750b9c46a642e1b8cbe1190d57b4890650b9ea"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131031",
+      "side": "B",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Into-the-Fire-3B.jpg",
+        "sha256": "18f3ca44bf29e49d332bfcac1800cdd86e54eb9bb3fced91579b01b186e110ac"
+      },
+      "lines": [
+        "When Revealed: The first player gains control of Bilbo Baggins. Reveal 1 encounter card per player and add it to the staging area.",
+        "Gollum engages the first player. Damage from undefended attacks made by Gollum must be placed on Bilbo Baggins.",
+        "All riddle effects are ignored. Treachery cards gain surge.",
+        "If players defeat this stage, they have won the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131074",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Gollum.jpg",
+        "sha256": "1c6b111685f51fac371112b6452e30cb5483b06db3f826a011137e64db3d35b3"
+      },
+      "lines": [
+        "Forced: After the first player answers a riddle and fails to find at least 1 match, Gollum attacks Bilbo Baggins. (Do not deal a shadow card for this attack.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131075",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Great-Gray-Wolf.jpg",
+        "sha256": "81d40399ffdbab72fdaa1cffabed0aac1f866897f30af277ec068d1333a480ff"
+      },
+      "lines": [
+        "Forced: If Great Gray Wolf is dealt a shadow card with a riddle, return all Creature enemies to the staging area at the end of the combat phase.",
+        "Riddle: The first player names a card type, sphere and cost, shuffles his deck, then discards the top 3 cards. For each of those cards that matches all three items, place 1 progress token on stage 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131076",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Wild-Wargs.jpg",
+        "sha256": "fe4bd9d29bec9d7b31f77bf6aa39dffb84f6387531ac48a5c6e22aab6263eb71"
+      },
+      "lines": [
+        "Forced: If Wild Wargs is dealt a shadow card with a riddle, it gets +2 Attack.",
+        "Riddle: The first player names a card type, shuffles his deck, and discards the top 2 cards. For each of those cards that matches, place 1 progress token on stage 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131077",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/The-Wargs'-Glade.jpg",
+        "sha256": "ab23bdbafa40b411aa4bfaea8a8da5b485aae8b8fe8e7bc72ccf89022b181630"
+      },
+      "lines": [
+        "Forced: After a character takes damage from an attack made by a Creature enemy, remove 1 progress from the current quest.",
+        "Riddle: The first player names a sphere, shuffles his deck, and discards the top card. For each of those cards that matches, place 1 progress token on stage 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131078",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Lake-in-the-Cavern.jpg",
+        "sha256": "502877321ec944722eff878b299d54a5caed7826003f6c6a9cb644af1a7f6e35"
+      },
+      "lines": [
+        "X is twice the number of players in the game.",
+        "Players cannot travel here.",
+        "Immune to player card effects.",
+        "Forced: After players advance to stage 3, remove Lake in the Cavern from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131079",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Bilbo's-Magic-Ring.jpg",
+        "sha256": "89ae71798e820d6c24ce5d487db6e8d46c41e88093e95b663157e23deeac5bd9"
+      },
+      "lines": [
+        "Attach to Bilbo Baggins.",
+        "Action: When answering a riddle, spend 1 Baggins resource to discard an additional player card from the top of your deck.",
+        "Action: Exhaust Bilbo's Magic Ring and raise each player's threat by 2 to add 1 Baggins resource to Bilbo Baggins' resource pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131080",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Come-Down-Little-Bird.jpg",
+        "sha256": "72a806d790ccfa2fcf82d7a9330bea012ea9a739862921f0e631fc74577cd283"
+      },
+      "lines": [
+        "When Revealed: Starting with the first player, each player must search the encounter deck and encounter discard pile for 1 Creature enemy and put it into play engaged with him. Then, shuffle the encounter deck.",
+        "Riddle: The first player names a card type and cost, shuffles his deck, then discards the top 3 cards. For each of those cards that matches both items, place 1 progress token on stage 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131081",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/It-Likes-Riddles.jpg",
+        "sha256": "bb1040ff83b56b0aa68207c6e952f8d73b2564ad60f99e6bf178903e0b497af2"
+      },
+      "lines": [
+        "When Revealed: The first player must choose to answer the riddle on this card. If he finds at least 1 match, discard cards from the encounter deck until another card with a riddle is discarded. Then, answer that riddle.",
+        "Riddle: The first player names a cost, shuffles his deck, then discards the top 2 cards. For each of those cards that matches, place 1 progress token on stage 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131082",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Hiding-in-the-Trees.jpg",
+        "sha256": "4f05ec9654b1586dedda6a4784ecd0788dba73b12eb336e40d5ad4e0218fbd20"
+      },
+      "lines": [
+        "When Revealed: Characters get -1 Willpower and cannot attack until the end of the round.",
+        "Riddle: The first player names a card type and sphere, shuffles his deck, then discards the top 3 cards. For each of those cards that matches both items, place 1 progress token on stage 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131083",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/What's-In-My-Pocket.jpg",
+        "sha256": "5733f77e56f1b9e5faa1a00db52a585f1d98608d8343f19320578ca3bce62a1a"
+      },
+      "lines": [
+        "When Revealed: The first player must choose to answer the riddle on this card. This effect cannot be canceled.",
+        "Riddle: The first player names a sphere and cost, shuffles his deck, then discards the top 2 cards. For each of those cards that matches both items, place 1 progress token on stage 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131084",
+      "side": "A",
+      "printing": "OHaUH",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Not-Fair-Not-Fair.jpg",
+        "sha256": "44cbc9ff0f75be51badfaa775778793a4aeb30f9ba8862c5737850df7d730378"
+      },
+      "lines": [
+        "When Revealed: The first player names a card type and then discards the top 3 cards of the encounter deck. For each of those cards that does not match the named type, remove 1 progress token from stage 2. This effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132019",
+      "side": "A",
+      "printing": "The Hobbit: On the Doorstep",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Bilbo's-Magic-Ring.jpg",
+        "sha256": "acdc6c7cfac03edbc8d48d0fb436d445da5694fb3201df9e6eb4c47a3e01751f"
+      },
+      "lines": [
+        "Attach to Bilbo Baggins.",
+        "Action: Exhaust Bilbo's Magic Ring and raise your threat by 1 to gain 1 Baggins resource. (Limit once per round.)",
+        "Response: After Bilbo Baggins exhausts to defend an attack, exhaust Bilbo's Magic Ring and raise your threat by 3 to cancel all damage from this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132025",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Spider's-Glade.jpg",
+        "sha256": "8ab8ed1ad21d5513fb7422b77310baeadbc6df5c9d02debd7099134e4fc960f0"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Travel: Exhaust Bilbo Baggins to travel here.",
+        "Forced: At the start of each quest phase, search the encounter deck for 1 Spider enemy and add it to the staging area. (2 Spider enemies instead if 3 or more players are at this stage.) Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132026",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Giant-Web.jpg",
+        "sha256": "a5333cc724eb030193713eacc5042818d90f51b3f116f58a2abd7ea85539e7a0"
+      },
+      "lines": [
+        "While Giant Web is the active location, each character gets -1 Willpower, -1 Attack, and -1 Defense for each poison it has.",
+        "Response: After Giant Web leaves play as an explored location, ready an unconscious character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132027",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Forest-Stream.jpg",
+        "sha256": "95f3aad17242f73e6176fe2f800d0b63414a9bbf880d6353bed1f507c1a5027d"
+      },
+      "lines": [
+        "While Forest Stream is the active location, poisoned characters cannot quest.",
+        "Response: After Forest Stream leaves play as an explored location, discard 4 poison."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132028",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Old-Tomnoddy.jpg",
+        "sha256": "8f5365be6a758068c219530c7c490c6ca10aa9ba3bf1a6b44391fdb5fb1b9319"
+      },
+      "lines": [
+        "Venom.",
+        "Forced: At the end of each round, each player must give a hero he controls 1 poison."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132029",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Crazy-Cob.jpg",
+        "sha256": "4657121068047a6f36c075c80ad3f1cb0262fa511cf052856291e0a21a5a4771"
+      },
+      "lines": [
+        "Venom.",
+        "When Revealed: This enemy attacks the character with the most poison attached.",
+        "Shadow: Defending character gets 1 poison."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132030",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Lazy-Lob.jpg",
+        "sha256": "310e6597b0d294ff5f491d08bb3ff12a0b217017440b47e0b2b5d300119dedc8"
+      },
+      "lines": [
+        "Venom.",
+        "When Revealed: Each character committed to the quest gets 1 poison.",
+        "Shadow: If defending character is poisoned, make that character unconscious."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132031",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Fat-Spider.jpg",
+        "sha256": "e25472538910390c50d2e418b8aa3c383a02ef3ee08e44420a89192df11a9075"
+      },
+      "lines": [
+        "Venom.",
+        "This enemy gets +3 Attack while engaged with a player who controls at least 1 poisoned character.",
+        "Shadow: Defending character gets 1 poison. (Give 2 poison to a character you control if undefended.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132032",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Wicked-Spider.jpg",
+        "sha256": "87d7c89e0f7de72109e34c9da1680a0d7d0df4c76583770990eb2ef7bc101f43"
+      },
+      "lines": [
+        "Venom.",
+        "Forced: When this enemy attacks, defending player must attach 1 poison to a character he controls.",
+        "Shadow: Defending character gets 2 poison."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132033",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Caught-in-Webs.jpg",
+        "sha256": "1e30b852aab54b2993d0c077db90dfbd921ea6d694aba707b094e7459dc23448"
+      },
+      "lines": [
+        "When Revealed: Choose a hero to be removed from the quest and make that hero unconscious. If no hero was removed from the quest by this effect, this card gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132034",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Poisoned-by-Spiders.jpg",
+        "sha256": "761ab2a6f8b646ae24e580b4bf7b0f55644bdb606220792850aacec50528258a"
+      },
+      "lines": [
+        "When Revealed: Each character takes damage equal to the number of poison it has. If no characters were damaged by this effect, this card gains surge.",
+        "Shadow: Discard an unconscious character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132035",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Hidden-Path.jpg",
+        "sha256": "34560c7e422bf5fe7debbf20d741e6836bff342b770a49b7b1165df7b9a01dfd"
+      },
+      "lines": [
+        "While Hidden Path is the active location, locations in the staging area get -1 Threat.",
+        "Travel: Spend 2 Baggins resources to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132036",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Dark-Bats.jpg",
+        "sha256": "486c684400799fe90d1b11c59cf23a3151015ed524aae11dad2fc9f2170e14da"
+      },
+      "lines": [
+        "Forced: After Dark Bats damages a character, attach it to that character. (While attached, counts as a Condition attachment with the text: \"Attached character gets -1 Willpower, -1 Attack, and -1 Defense.\")",
+        "Shadow: Attach this card to the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132037",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Fighting-Among-Friends.jpg",
+        "sha256": "ba6d474cd70d18c7455bd37730221780985ef5f678eb2a8dd813a5de1e9f7c6b"
+      },
+      "lines": [
+        "When Revealed: The first player names a sphere. Then, all non-Baggins characters who do not belong to the named sphere are removed from the quest.",
+        "Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if undefended.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132038",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Weighed-Down.jpg",
+        "sha256": "e5ce0d89c048ade15d48d784701c62f59360388809c252d5c55e7723fbde14b9"
+      },
+      "lines": [
+        "When Revealed: Until the end of the round, exhausted characters get -1 Willpower, -1 Attack, and -1 Defense.",
+        "Shadow: If the defending character is destroyed by this attack, its controller must raise his threat by 5."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132067",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Into-Mirkwood-1A.jpg",
+        "sha256": "3af9daace97b8aca188fb6c54997b4ba19e9d30dfa09bd08eaa091a8f2f0d5f3"
+      },
+      "lines": [
+        "Setup: Each player may shuffle 1 copy Bilbo's Magic Ring into his deck. Search the encounter deck for The Spider's Glade and set it aside, out of play. Then, shuffle the encounter deck and reveal 1 encounter card per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132067",
+      "side": "B",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Into-Mirkwood-1B.jpg",
+        "sha256": "ae02ef56d0299bae46532ca635b6b5a2138968e4f0880d9ba8c194d9d6f60e02"
+      },
+      "lines": [
+        "Unconscious characters cannot quest, attack, defend, collect resources, trigger abilities, be poisoned, or ready (except by effects that target unconscious characters)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132068",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Lost-in-the-Dark-2A.jpg",
+        "sha256": "7a761ae47fac72f66bbaf2d2911c28fe5d8055d63512c88285a91c274bbc99fe"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132068",
+      "side": "B",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Lost-in-the-Dark-2B.jpg",
+        "sha256": "11b15ad7ca52644eed4c2a62d545856a93b4241be378974ae11a2cd5ed8ebd03"
+      },
+      "lines": [
+        "When Revealed: Reveal stage 3 and create a separate staging area for the first player using that stage. If there are no other players in the game, discard this stage and each card in its staging area. All other players advance to stage 4."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132069",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Captured-by-Spiders-3A.jpg",
+        "sha256": "2af293225b46dc7d9eb681171a2d031db6564d848d3405efbd58a89993594eed"
+      },
+      "lines": [
+        "When Revealed: Remove all resources from each hero's resource pool. Then, make each character you control (except Bilbo Baggins) unconscious."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132069",
+      "side": "B",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Captured-by-Spiders-3B.jpg",
+        "sha256": "0e9e62f7dcd5f5648c426cade7f8f99f7569526ff62c6f0c2338c5e4ba4e63cc"
+      },
+      "lines": [
+        "Unconscious characters cannot quest, attack, defend, collect resources, trigger abilities, be poisoned, or ready (except by effects that target unconscious characters).",
+        "Do not pass the first player token. When this stage is complete, do not advance to stage 4 until the end of the quest phase. (Combine staging areas if necessary.)",
+        "Action: Spend 2 Baggins resources to ready an unconscious character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132070",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Battle-with-the-Spiders-4A.jpg",
+        "sha256": "fc2e48ba93bcd06f24b822629d12f654b7d500762abb3999a03fcf2c0c1cc1d7"
+      },
+      "lines": [
+        "When Revealed: Add The Spider's Glade to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132070",
+      "side": "B",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Battle-with-the-Spiders-4B.jpg",
+        "sha256": "46eedb16d354b160e76904c618aa7fef93c35c225b209e2451400645b9cfeafa"
+      },
+      "lines": [
+        "Unconscious characters cannot quest, attack, defend, collect resources, trigger abilities, be poisoned, or ready (except by effects that target unconscious characters).",
+        "Progress cannot be placed on this stage while The Spider's Glade is in play.",
+        "Action: Spend 2 Baggins resources to ready an unconscious character you control.",
+        "If the players defeat this stage, they have won the game and discovered the treasure card Bilbo's Magic Ring."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132020",
+      "side": "A",
+      "printing": "The Hobbit: On the Doorstep",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Arkenstone.jpg",
+        "sha256": "3918fdade8a2f981b5af7fcc9b338d7eac61c8df61b7e1935a00b522ab39c70b"
+      },
+      "lines": [
+        "Attach to a hero.",
+        "Action: Exhaust The Arkenstone and raise your threat by X to lower by X the cost of the next ally you play this phase that matches the attached hero's sphere."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132021",
+      "side": "A",
+      "printing": "The Hobbit: On the Doorstep",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Mithril-Shirt.jpg",
+        "sha256": "f1adb8ef482c0ae580d65315c03eb4fab831ec07e1af76006d1ca02b4e4ef47c"
+      },
+      "lines": [
+        "Attach to Bilbo Baggins.",
+        "Attached hero gets +1 Defense and +1 hit point."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132022",
+      "side": "A",
+      "printing": "The Hobbit: On the Doorstep",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Thrór's-Battle-Axe.jpg",
+        "sha256": "25fdd3fe0e935bf8b880605bdb2f140ffadc33b206acfc46c90d39cda101623c"
+      },
+      "lines": [
+        "Attach to a hero. Restricted.",
+        "Attached hero gets +2 Attack.",
+        "Response: After attached hero attacks and destroys an enemy, deal 1 damage to another enemy engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132023",
+      "side": "A",
+      "printing": "The Hobbit: On the Doorstep",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Thrór's-Hunting-Bow.jpg",
+        "sha256": "3d0e9f927f3245024736f40ecadb69691db1849bcfb12cecf3646320fcf006a9"
+      },
+      "lines": [
+        "Attach to a hero. Restricted.",
+        "Attached hero gains Ranged.",
+        "When making a ranged attack, attached hero gets +2 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132024",
+      "side": "A",
+      "printing": "The Hobbit: On the Doorstep",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Thrór's-Golden-Cup.jpg",
+        "sha256": "35b621ac14ccd0ff7c817789260d2648453210fbfe8d30602c5205d24922fdce"
+      },
+      "lines": [
+        "Attach to a hero.",
+        "Action: Add Thrór's Golden Cup to the victory display to draw 3 cards."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132039",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/A-Bare-Patch.jpg",
+        "sha256": "e36318574b3d4779c729c80aef5df6c9e74c41283094d86073fd32bec0059569"
+      },
+      "lines": [
+        "While attached, Smaug the Magnificent gets -3 Defense.",
+        "Response: After the players quest successfully, the first player makes a burgle attempt. If successful, attach A Bare Patch to Smaug the Magnificent."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132040",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Smaug-the-Golden.jpg",
+        "sha256": "6a12b5114e6cc49932b2bdd5a0ffa0860dfd712b87347b54b2bb7f25f6fd1605"
+      },
+      "lines": [
+        "Indestructible. Immune to player card effects. Cannot be engaged.",
+        "X is the number of non-Burglar characters committed to the quest.",
+        "Forced: After the 6th progress token is placed here, the players advance to stage 4A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132041",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Smaug-the-Magnificent.jpg",
+        "sha256": "606bd34494da578d9805e169e285ef27d35a6e32c7304c4c908391f790a28cfd"
+      },
+      "lines": [
+        "Indestructible. Immune to player card effects.",
+        "Cannot leave the staging area (except by quest effect) but is considered to be engaged with the first player.",
+        "Forced: If Smaug the Magnificent is dealt a shadow card with a burgle effect, he makes an additional attack immediately after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132042",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Croaking-Crows.jpg",
+        "sha256": "a25d9d19b33f14d274db9d330489c8501287aa437ab10ff207be7d60cd567cda"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: When a location is revealed from the encounter deck, put 1 progress on Smaug the Golden.",
+        "Burgle: The first player shuffles his deck and reveals the top card. He may discard 1 card from his hand that matches the revealed card's sphere and type."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132043",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Lonely-Mountain-Location.jpg",
+        "sha256": "55d32eac73cdef86a81934176fa7837053b24c80b76ab1331e2e17325d33d35f"
+      },
+      "lines": [
+        "While at least 1 card is stacked underneath, The Lonely Mountain is immune to player card effects, cannot leave the staging area, and gets -2 Threat for each card stacked under it.",
+        "Action: While making a burgle attempt, the first player may spend 2 Baggins resources to take the revealed card into hand and reveal the next card of his deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132044",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Great-Hall.jpg",
+        "sha256": "53838f342a64d9e5f761e1028f8b327d5f683d9f5a9015f16189bc495749784f"
+      },
+      "lines": [
+        "While Great Hall is the active location, it gains: \"Forced: Put 1 progress on Smaug the Golden at the end of each round.\"",
+        "Burgle: The first player shuffles his deck and reveals the top card. He may discard 3 cards from his hand that match the revealed card's type."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132045",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Secret-Entrance.jpg",
+        "sha256": "3816bc1fc36ce16321e4b9b65e6fa08c48ecb0fd2729f57a14ddc1305ec7fa48"
+      },
+      "lines": [
+        "While Secret Entrance is the active location, The Lonely Mountain's Threat is reduced by half (round up).",
+        "Travel: The first player must exhaust a hero and name a card type to travel here. Then, look at the top card of the encounter deck. If the looked at card is not the named type, return Secret Entrance to the staging area. (The players cannot travel again this round.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132046",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Desolation-of-Smaug.jpg",
+        "sha256": "a5f07f06c3ce6e6a10f63dd719ef22efeedde14f54f3a4c5916e04299e692aef"
+      },
+      "lines": [
+        "While Desolation of Smaug is the active location, the first treachery card revealed each round gains surge.",
+        "Burgle: The first player shuffles his deck and reveals the top card. He may discard 2 cards from his hand that match the revealed card's cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132047",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Western-Slopes.jpg",
+        "sha256": "b7e69825521fa9563bce596d80882b25dd8156ea4b06d881ce33765f2553b21b"
+      },
+      "lines": [
+        "Response: When Western Slopes leaves play as an explored location (choose one): the first player draws 2 cards, or remove 1 progress token from Smaug the Golden.",
+        "Burgle: The first player shuffles his deck and reveals the top card. He may discard 2 cards from his hand that match the revealed card's sphere."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132048",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Pretending-to-Sleep.jpg",
+        "sha256": "7a1e4a1db6513cd8da4175724bdeb13a9655f32f8f013da2c6efd7437027580d"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Put 1 progress token on Smaug the Golden. Then, spend X Baggins resources or advance to stage 4A. X is the number of progress tokens on Smaug the Golden.",
+        "Burgle: The first player shuffles his deck and reveals the top card. He may discard 2 cards from his hand that match the revealed card's type."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132049",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Known-to-an-Ounce.jpg",
+        "sha256": "a1e5d54c899b4caa9885e56c483d00617c5143efb56fc04cde2aad62234f3cd1"
+      },
+      "lines": [
+        "When Revealed: Each player discards 2 random cards from hand. Until the end of the phase, each Dragon enemy in play gets +1 Threat for each event discarded by this effect.",
+        "Burgle: The first player shuffles his deck and reveals the top card. He may discard 1 card from his hand that matches the revealed card's sphere and cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132050",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Belching-Fire.jpg",
+        "sha256": "620823b1cea4a74d5352829342db662758b6cf1b0ad06de6ac4f837f35570059"
+      },
+      "lines": [
+        "When Revealed: Each Dragon enemy in the staging area makes an immediate attack against the player with the highest total Willpower committed to the quest. (Do not deal a shadow card for this attack.)",
+        "Burgle: The first player shuffles his deck and reveals the top card. He may discard 1 card from his hand that matches the revealed card's type and cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132051",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Dragon-Spell.jpg",
+        "sha256": "48ac92db3e16c11ba94e04c1a03fe95fb25ff7fe3b3ed6198a47aef225cfe6ed"
+      },
+      "lines": [
+        "When Revealed: Attach to the hero with the most resources without Dragon-Spell attached. (Counts as a Condition attachment with the text: \"Attached hero gets -1 Willpower for each resource in its resource pool. Forced: When attached hero spends resources, attached hero takes X damage. X is equal to the number of resources spent.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132071",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/A-Warm-Welcome-1A.jpg",
+        "sha256": "f21fd7f19f3817124d6494b49af17e8c6918f7b26220bfd52c976a898ae4f594"
+      },
+      "lines": [
+        "Setup: Search the encounter deck for Smaug the Golden, Smaug the Magnificent, The Lonely Mountain, and A Bare Patch. Set Smaug the Magnificent and A Bare Patch aside, out of play. Add Smaug the Golden and The Lonely Mountain to the staging area. Shuffle the five Erebor treasure cards and stack them facedown under The Lonely Mountain."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132071",
+      "side": "B",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/A-Warm-Welcome-1B.jpg",
+        "sha256": "af7a1194348db7b8da9b4a8b21ea464766e1e1b45b1a171e9f198937ac12c064"
+      },
+      "lines": [
+        "Skip the Quest phase.",
+        "Forced: At the end of the round, advance to stage 2."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 2,
+          "printed": "Forced: At the end of round, advance to stage 2."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132072",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Burglar's-Turn-2A.jpg",
+        "sha256": "3b385b9f8050c9a7d6394a1dd3f5464380aef1e2f9aa039c8797d9ab59126050"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132072",
+      "side": "B",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Burglar's-Turn-2B.jpg",
+        "sha256": "ab4e4664d6b5c3118a57e8100ff3b7f886d8541cd32708045d475269f0076b59"
+      },
+      "lines": [
+        "Forced: After questing successfully, place 1 progress on Smaug the Golden. Then, the first player makes a burgle attempt. If successful, the first player takes the top treasure card from under The Lonely Mountain into his hand. Then, the players may advance to stage 3.",
+        "Forced: After the first player makes an unsuccessful burgle attempt, Smaug the Golden attacks the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132073",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Inside-Information-3A.jpg",
+        "sha256": "a72b38e218ae2d37c8734de44c62328c13759fd5a241a3a770c48b88732cd3ea"
+      },
+      "lines": [
+        "When Revealed: Set Smaug the Golden aside, out of play. Add Smaug the Magnificent and A Bare Patch to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132073",
+      "side": "B",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Inside-Information-3B.jpg",
+        "sha256": "91c8cd64b1239eb5b7edc39919677e87f0627f0294a482c805d12a1630a147bd"
+      },
+      "lines": [
+        "Players cannot defeat this stage while Smaug the Magnificent is in play.",
+        "Forced: If the total number of progress on this stage is greater than the total remaining hit points on Smaug the Magnificent, remove Smaug the Magnificent from play.",
+        "If the players defeat this stage, they have won the game and discovered any treasure successfully burgled from The Lonely Mountain."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132074",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Thieves-Fire-Murder-4A.jpg",
+        "sha256": "e133523c9babae28abf5fdf92d64ecd7cd009a9debd0fcd8f997ffda2bf45227"
+      },
+      "lines": [
+        "When Revealed: Remove all progress from Smaug the Golden and set him aside, out of play. Then, add Smaug the Magnificent to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132074",
+      "side": "B",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Thieves-Fire-Murder-4B.jpg",
+        "sha256": "2eb6727d866b7e160ec0d4dc85ee082363cc844d8049e95657eb246a40388d5c"
+      },
+      "lines": [
+        "Forced: After placing the 7th progress token on this stage, remove all damage from Smaug the Magnificent and set him aside, out of play. Then, add Smaug the Golden to the staging area and reset the quest deck to stage 2B."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132052",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Misty-Mountain-Eagle.jpg",
+        "sha256": "7551eb90da05536432b6ecc78c7526e8d99b5ceee445f8538e996f8d99dd5171"
+      },
+      "lines": [
+        "Action: The first player may spend 2 Baggins resources to (choose one): take control of Misty Mountain Eagle, or discard this ally to discard a non-unique enemy in the staging area.",
+        "Shadow: Deal 3 damage to attacking enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132053",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Bolg.jpg",
+        "sha256": "90d06b1e9eedf74b3ffda53e011fe706944c94cb5b1a6b574653062b0247b9d1"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "X is the number of players in the game.",
+        "Cannot leave the staging area.",
+        "The first Goblin revealed each round gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132054",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Bodyguard-of-Bolg.jpg",
+        "sha256": "a6c555b04fdfc0e14c4078715452551454fda8b88a8f08d08c2e8552ef6f0346"
+      },
+      "lines": [
+        "Bolg cannot take damage.",
+        "Forced: When this enemy attacks, deal it an additional shadow card for each quest stage in play with no progress tokens on it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132055",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Gundabad-Wolf-Rider.jpg",
+        "sha256": "481edc63c17dd1a0c5787304ec589971c1665b5c050a41629dd80db71aa36ed2"
+      },
+      "lines": [
+        "Forced: When this enemy attacks, remove 1 progress from the current quest.",
+        "Shadow: Attacking enemy gets +1 Attack for each quest stage in play with no progress on it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132056",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Gundabad-Climber.jpg",
+        "sha256": "0013dd5d93b9173371409995b15ab791725820007b916ec5edf9fcb205165bed"
+      },
+      "lines": [
+        "When Revealed: Remove 1 progress from every quest stage in play. (2 progress instead if 3 or more players in the game.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132057",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Vanguard-of-Bolg.jpg",
+        "sha256": "bc5db5055dcea720e2f951cf32bad1c528c1b7363125a3d176d93bdef688e515"
+      },
+      "lines": [
+        "This enemy gets +1 Threat, +1 Attack, and +1 Defense for each quest stage in play with no progress on it.",
+        "Shadow: If this attack destroys a character, remove all progress from the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132058",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Gundabad-Archer.jpg",
+        "sha256": "dee55cdba06e3f177ff5c714199285a3def2b779e3121d56cf5df75b0469c005"
+      },
+      "lines": [
+        "When Revealed: Each player must deal 2 damage to a character he controls.",
+        "Shadow: Deal 1 damage to defending character for each quest stage in play with no progress on it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132059",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Ravenous-Warg.jpg",
+        "sha256": "d4cd89af0567773961ffc035af71a56f6b848adba3069c74cfdce71efea4eb09"
+      },
+      "lines": [
+        "Forced: When Ravenous Warg attacks, the defending player must declare the character he controls with the most damage as the defender. (Even if exhausted.)",
+        "Shadow: Defending character gets -1 Defense for each quest stage in play with no progress on it."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 1,
+          "printed": "Forced: When Ravenous Wargs attacks, the defending player must declare the character he controls with the most damage as the defender. (Even if exhausted.)"
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132060",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Northern-Slopes.jpg",
+        "sha256": "708987ca4dc35113c871653dddedb6cc7e043dfcad7b141cf2703491d17c4128"
+      },
+      "lines": [
+        "While Northern Slopes is in the staging area, each Goblin enemy gets +1 Attack and +1 Defense.",
+        "While Northern Slopes is the active location, it gains: \"Forced: When a character leaves play, remove 1 progress from the current quest, if able.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132061",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Ruins-of-Dale.jpg",
+        "sha256": "207bc381c444030004857d7d6fba76ed148a3c48114ae9507e65ae679338808d"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Forced: Remove 2 progress from stage 3B at the end of each round, if able.",
+        "Travel: Spend 3 Baggins resources to travel here. (1 Baggins instead if stage 3B is the current quest.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132062",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Ravenhill.jpg",
+        "sha256": "71509d7214ced68d07205708364cc9e15b93ffea884d98d8aafcc2c035b55bfc"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Forced: Remove 2 progress from stage 4B at the end of each round, if able.",
+        "Travel: Spend 3 Baggins resources to travel here. (1 Baggins instead if stage 4B is the current quest.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132063",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Front-Gate.jpg",
+        "sha256": "5a4abfe96407d281bcec5aa3490f9b9177a1bf010bd02a758b010efc66e941bf"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Forced: Remove 2 progress from stage 2B at the end of each round, if able.",
+        "Travel: Spend 3 Baggins resources to travel here. (1 Baggins instead if stage 2B is the current quest.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132064",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Hatred-Rekindled.jpg",
+        "sha256": "d003aa17afb7a216b521e0273a089f799e85de0265379b1e7b0b9df7dab035c7"
+      },
+      "lines": [
+        "When Revealed: Each enemy engaged with a player makes an immediate attack. Do not deal shadow cards for attacks made by this effect. If no attacks were made by this effect, this card gains surge.",
+        "Shadow: Attacking enemy makes an additional attack immediately after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132065",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Goblins-are-Upon-You.jpg",
+        "sha256": "840545bbbc9995e3655866e1156b32499d781fc97124a87d8f75843fa8cd17ec"
+      },
+      "lines": [
+        "When Revealed: Each player must search the encounter deck and discard pile for a Goblin enemy and put it into play, engaged with him. Then, shuffle the encounter deck. (This effect cannot be canceled.)",
+        "Shadow: Attacking enemy gets +1 Attack for each Goblin enemy engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132066",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Heedless-of-Order.jpg",
+        "sha256": "23b69f6d4cba77d570ca2470f18747c846f1994d89c7d8c41581c5da8f5aeb29"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Choose a different quest to be the current quest until the end of the round, if able. If the current quest did not change as a result of this effect, this card gains Doomed 3."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132075",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Gathering-of-the-Clouds-1A.jpg",
+        "sha256": "009fa1a8a00b67d868b12f6eeabeb54e0f6e6a81cf1e8c5a3e12f33a6ab01c77"
+      },
+      "lines": [
+        "Setup: Search the encounter deck for Bolg and add it to the staging area. Then, shuffle the encounter deck and reveal 1 encounter card per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132075",
+      "side": "B",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Gathering-of-the-Clouds-1B.jpg",
+        "sha256": "ea935b156a745813d8668495b17870292de6a631294ac1ce603037f54fed45e3"
+      },
+      "lines": [
+        "When Revealed: Put stage 2, stage 3, and stage 4 into play at the same time. Then, remove this stage from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132076",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Eastern-Spur-2A.jpg",
+        "sha256": "3e69f0b342289691daff33fe2638138dddb0e9397f76df6c19891e9b70240664"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132076",
+      "side": "B",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Eastern-Spur-2B.jpg",
+        "sha256": "1df71244ebcbd2b1c1f4f41cde0198766e22e5c4f6c8089f9d81094640e4b90c"
+      },
+      "lines": [
+        "Players cannot advance from this stage unless stage 3 and stage 4 are complete.",
+        "Forced: If there is no progress on this stage at the end of the round, each player must discard 1 random card from his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132077",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Battle-in-the-Dale-3A.jpg",
+        "sha256": "073ea18f0833556285f7ca98853c5ce45abbdfd6595e3c8c02fb77eb3ddfa6c4"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132077",
+      "side": "B",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Battle-in-the-Dale-3B.jpg",
+        "sha256": "5b4bf8495089d005b70dad4e13f42391a50ee72e2041cca8981ef1cd0c1e3a73"
+      },
+      "lines": [
+        "Players cannot advance from this stage unless stage 2 and stage 4 are complete.",
+        "Battle. (Characters use Attack instead of Willpower when questing here.)",
+        "Forced: If there is no progress on this stage at the end of the round, the first player adds the topmost enemy in the discard pile to the staging area, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132078",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Defense-of-Ravenhill-4A.jpg",
+        "sha256": "7a4e385f6ec7d94de2abcb6c5cbaad78874cfd9dde8b9655ebc5a4368c45866d"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132078",
+      "side": "B",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Defense-of-Ravenhill-4B.jpg",
+        "sha256": "a0ad5963025af9a6682afab922a8dea8f89fbc365f65c09c403124b30f32c2de"
+      },
+      "lines": [
+        "Players cannot advance from this stage unless stage 2 and stage 3 are complete.",
+        "Siege. (Characters use Defense instead of Willpower when questing here.)",
+        "Forced: If there is no progress on this stage at the end of the round, each player must discard all resources from each hero's resource pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132079",
+      "side": "A",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Clouds-Burst-5A.jpg",
+        "sha256": "223a3e71892c35cc9d734d3f2acb946b7f415ad8b2728742ebd9e6fa362b3b9a"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132079",
+      "side": "B",
+      "printing": "OtD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Clouds-Burst-5B.jpg",
+        "sha256": "d2c42ec3bf47cd18c07ba49e18cc2364d7861d3f56b3c774d726c49ff3b9db7d"
+      },
+      "lines": [
+        "When Revealed: Each player must search the encounter deck and discard pile for a copy of Bodyguard of Bolg and add it to the staging area, if able. Shuffle the encounter deck.",
+        "Progress cannot be placed on this stage. While Bolg is in the staging area, it is considered to be engaged with the first player.",
+        "If Bolg is destroyed, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131001",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Bilbo-Baggins.jpg",
+        "sha256": "af64331f038db74561a487f636061c0b13bf4a2c40fca9b25d3def969542062f"
+      },
+      "lines": [
+        "The first player gains control of Bilbo Baggins.",
+        "Bilbo Baggins cannot gain resources from player card effects.",
+        "If Bilbo Baggins leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131019",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Burglar-Baggins.jpg",
+        "sha256": "dfedc1f2d9ec893020c5da2c74fdcc674c3e59d680aa3a39a42c0ae4b5edca66"
+      },
+      "lines": [
+        "Action: Bilbo Baggins gets +2 Willpower, +2 Attack, and +2 Defense until the end of the phase. (You may spend a Baggins resource from Bilbo Baggins' resource pool to play this card even if you do not control Bilbo Baggins.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131020",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Sting.jpg",
+        "sha256": "a4f3f25b8c843563166a9fdca4f435fc8cdedd5750ba1e9ee78849c29ab81348"
+      },
+      "lines": [
+        "Attach to Bilbo Baggins. Restricted.",
+        "Bilbo Baggins gets +1 Willpower, +1 Attack, and +1 Defense.",
+        "Response: After Bilbo Baggins exhausts to defend, discard the top card of the encounter deck. Deal damage to the attacking enemy equal to the discarded card's Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131021",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Orcrist.jpg",
+        "sha256": "5a64de640c23d730615cf71aacaae5a0c23d530f65ff53d3a3cd75d794b61ccc"
+      },
+      "lines": [
+        "Attach to a hero. Restricted.",
+        "Attached character gets +2 Attack.",
+        "Response: After attached hero destroys an Orc enemy, add 1 resource to that hero's resource pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "131022",
+      "side": "A",
+      "printing": "The Hobbit: Over Hill and Under Hill",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Glamdring.jpg",
+        "sha256": "ee265b1222cf07f77be423c199161d3889a6dcdfeaf88d55e018dcfa3a484f31"
+      },
+      "lines": [
+        "Attach to a hero or Gandalf. Restricted.",
+        "Attached character gets +2 Attack.",
+        "Response: After attached character destroys an Orc enemy, draw 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132001",
+      "side": "A",
+      "printing": "The Hobbit: On the Doorstep",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Bilbo-Baggins.jpg",
+        "sha256": "fed2177e64a1f65249d5a4351c77e257f5577214cef59f335ede3c51428496ff"
+      },
+      "lines": [
+        "Bilbo Baggins does not count against the hero limit and cannot gain resources from non-treasure cards. The first player gains control of Bilbo Baggins.",
+        "Action: Spend 1 Baggins resource to search your deck for a treasure card and add it to your hand.",
+        "If Bilbo Baggins leaves play, the players have lost the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "132013",
+      "side": "A",
+      "printing": "The Hobbit: On the Doorstep",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Lucky-Number.jpg",
+        "sha256": "99af279c3b2ae904cc57f618659a7a3f00c5c0edc50621a7730572778062ed99"
+      },
+      "lines": [
+        "Action: Choose a character in play (other than Bilbo Baggins). Add Bilbo Baggins' total Willpower, Attack, and Defense to that character's Willpower, Attack, and Defense respectively until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    }
+  ]
 }
