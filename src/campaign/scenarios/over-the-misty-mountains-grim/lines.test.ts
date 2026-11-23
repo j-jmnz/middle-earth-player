@@ -140,3 +140,14 @@ it("131073:A:1 revealed outside the quest phase, the Stone-Giant engages at the 
   expect(next.run.state.cards[idOf(next.run.state, "131064")]?.zone).toBe("engaged");
 }));
 
+
+// 131056:A:1 Wind-whipped Rain (Western Lands, shared with We Must Away): "Discard all non-treasure, non-objective attachments in play." Sting (a treasure) and an objective attached to a hero stay, an ordinary attachment goes.
+it("131056:A:1 a treasure stays in play, an ordinary attachment is discarded", () =>
+  holdsOnlyWith("131056:A:1", (effects) => {
+    const made = table({ attached: [{ code: "attachment", to: "dh1" }, { code: "131020", to: "dh1" }] }, effects);
+    const run = resolveRecords(made.state, made.ctx, "131056", "whenRevealed");
+    const sting = run.state.cards[idOf(run.state, "131020")];
+    expect(run.state.cards[idOf(run.state, "attachment")]?.zone).toBe("encounterDiscard");
+    expect(sting?.zone).toBe("play");
+    expect(sting?.host).toBe(idOf(run.state, "dh1"));
+  }));
