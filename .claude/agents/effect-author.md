@@ -36,7 +36,7 @@ template under `scripts/data/effects/`, not in the authored files. Both follow `
 and copied lines: a template writes the records the played cards already have, and `scripts/checks/effect-migration.test.ts`
 must stay green.
 
-Before you report, read each new record against the card bugs reviews find (`docs/agents/effect-authoring.md`, Readings the review catches).
+Before you report, read each new record against the card bugs reviews find (`docs/agents/effect-authoring.md`, Readings the review catches). Every record you write gets a test from its printed line that fails without the line's records (`docs/agents/card-audit.md`, Tests from the printed line): `scripts/checks/line-coverage.test.ts` fails on a record no test names.
 Lines of your batch that read the same are written once and copied.
 
 Your exit is the one in `.claude/agents/orchestrator.md` (Implementer tasks).
