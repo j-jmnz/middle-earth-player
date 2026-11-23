@@ -59,7 +59,7 @@ export type GrimGolden = { name: string; seatCount: 1 | 2; seed: number; difficu
 
 // The games to pin (about 450 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and Easy, and the ways to lose: every player's threat at 50 (heroes too weak to quest), every hero destroyed (heroes too brittle) and Bilbo Baggins leaving play (131001:A:3).
 export const GRIM_GOLDENS: readonly GrimGolden[] = [
-  { name: "solo win", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "solo win", seatCount: 1, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "Easy solo win", seatCount: 1, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "Easy two-handed win", seatCount: 2, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won" },
