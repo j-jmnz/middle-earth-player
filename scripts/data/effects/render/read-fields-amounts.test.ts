@@ -27,6 +27,7 @@ describe("effects render read fields, amounts", () => {
     { lakeTownDamage: true },
     { victoryDisplay: true },
     { questCards: true },
+    { stagesNoProgress: true },
     { shadowCardsInPlay: true },
     { discardPileMaxCost: true },
     { investigateValue: true },

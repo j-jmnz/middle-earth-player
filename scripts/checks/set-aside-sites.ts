@@ -21,6 +21,8 @@ export const ASIDE_SITES: Readonly<Record<string, AsideSite>> = {
   "families/angmar/set-aside.ts": { functions: ["takeOrSpawnSetAside"], group: "public", why: "A named copy from the supply, faceup." },
   "families/angmar/burdens.ts": { functions: ["attachRandomBurden"], group: "public", why: "AttachRandomBurden attaches one of the named burdens faceup; the players see which, so the rest are known." },
   "families/angmar/ettenmoors.ts": { functions: ["stageRandomGuardedPair"], group: "public", why: "StageRandomGuardedPair reveals its pair; the safe locations and side quests left were named by the Setup." },
+  "families/armies/advance.ts": { functions: ["jointAdvance"], group: "notListed", why: "The other stages played together are set aside when the quest advances; quest stages are never listed." },
+  "families/armies/stages.ts": { functions: ["putStagesIntoPlay"], group: "notListed", why: "The Battle of Five Armies' stage that puts the others into play is set aside; quest stages are never listed." },
   "families/attachments/dial.ts": { functions: ["detachFromDial"], group: "public", why: "DetachFromDial: a named card comes back from a threat dial." },
   "families/attachments/play.ts": { functions: ["startGuard"], group: "public", why: "A guarded player card waits faceup while its guard is searched." },
   "families/black-gate/embassy.ts": { functions: ["layFaceup"], group: "public", why: "The embassy's row is laid faceup." },

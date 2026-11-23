@@ -88,6 +88,7 @@ import spidersFixtures from "./fixtures/flies-and-spiders.json";
 import dayFixtures from "./fixtures/we-must-away-ere-break-of-day.json";
 import dimFixtures from "./fixtures/dungeons-deep-and-caverns-dim.json";
 import mountainFixtures from "./fixtures/the-lonely-mountain.json";
+import armiesFixtures from "./fixtures/the-battle-of-five-armies.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -194,6 +195,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "dungeons-deep-and-caverns-dim": dimFixtures,
   "flies-and-spiders": spidersFixtures,
   "the-lonely-mountain": mountainFixtures,
+  "the-battle-of-five-armies": armiesFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

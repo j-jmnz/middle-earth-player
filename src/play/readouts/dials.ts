@@ -20,6 +20,8 @@ export type TableDial = {
   warms?: true;
   warn?: { level: "near" | "critical"; words: string };
   limitWords?: string;
+  // The stage the quest is at among several in play together: the dial wears an accent ring (the note says it in words).
+  current?: true;
   note?: string;
   // The disc says this word in place of the number (the Day and Night dial: "Day"); the number only tells the dial that it changed.
   word?: string;
@@ -53,6 +55,7 @@ export function dialProps(dial: TableDial) {
     limitWords: dial.limitWords,
     goal: dial.goal,
     warn: dial.warn,
+    current: dial.current,
     note: dial.note,
     word: dial.word,
     hint: dial.cardId ? (dial.extra && dial.extra.length > 0 ? "Shows the stage and its cards" : "Shows the card") : dial.pile ? "Shows the cards" : undefined,

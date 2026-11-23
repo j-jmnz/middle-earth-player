@@ -100,6 +100,15 @@ describe("the current quest", () => {
     expect(holds(back, { kind: "currentQuest", is: "side" }, scope, t.ctx)).toBe(false);
   });
 
+  it("132066:A:2 a side quest chosen with `until: endOfRound` keeps the current-quest mark to the end of the round, not the phase", () => {
+    const t = built({ staging: [REARGUARD] });
+    const rearguard = idOf(t.state, REARGUARD);
+    const round = chooseCurrentQuest(t.state, { verb: "ChooseCurrentQuest", until: "endOfRound" }, { seat: 0, sourceId: null }, t.ctx, []);
+    expect(round.modifiers.find((m) => m.stat === "currentQuest" && m.instanceId === rearguard)?.until).toBe("endOfRound");
+    const phase = chooseCurrentQuest(t.state, { verb: "ChooseCurrentQuest" }, { seat: 0, sourceId: null }, t.ctx, []);
+    expect(phase.modifiers.find((m) => m.stat === "currentQuest" && m.instanceId === rearguard)?.until).toBe("endOfPhase");
+  });
+
   it("09049:A:2 lets the first player choose a quest card other than the current quest, the main quest card included, and the one card left is taken without asking", () => {
     const t = built({ staging: [REARGUARD, "09046"] });
     const rearguard = idOf(t.state, REARGUARD);

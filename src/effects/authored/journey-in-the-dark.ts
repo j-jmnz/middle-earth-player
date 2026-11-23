@@ -123,8 +123,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"142085:whenRevealed:1","cardCode":"142085","lines":["142085:A:2"],"timing":"whenRevealed","instructions":[{"verb":"ModifyStat","stat":"blankText","amount":1,"until":"endOfRound","holders":{"type":"character","control":"any"}}]},
   {"id":"142085:shadow:1","cardCode":"142085","lines":["142085:A:3"],"timing":"shadow","instructions":[{"verb":"ModifyStat","stat":"defense","amount":{"stat":"defense","of":"defender","negative":true},"until":"endOfAttack","target":"defender"}]},
 
-  // 142086 Pursued by the Enemy (Doomed 1 and Surge are keywords): each enemy engaged with a player attacks (the Balrog, in the staging area, does not).
-  {"id":"142086:whenRevealed:1","cardCode":"142086","lines":["142086:A:2"],"timing":"whenRevealed","instructions":[{"verb":"ImmediateAttackEach"}]},
+  // 142086 Pursued by the Enemy (Doomed 1 and Surge are keywords): each enemy engaged with a player, and not in the staging area, attacks (`notStaging`: the Balrog, considered engaged with the first player, does not).
+  {"id":"142086:whenRevealed:1","cardCode":"142086","lines":["142086:A:2"],"timing":"whenRevealed","instructions":[{"verb":"ImmediateAttackEach","notStaging":true}]},
 
   // 142087 Overcome by Grief, a burden objective dealt to the staging area. After a character is destroyed it attaches to a hero (the first player chooses); attached
   // it counts as a Condition attachment, and after a character its hero's player controls is destroyed it exhausts the hero, which cannot ready that round.

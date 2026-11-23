@@ -17,15 +17,16 @@ import { putOnStage, questPointsOf } from "../../quest/quest.ts";
 import { currentSideQuest, isSideQuest } from "../wilderland/night-quest.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 import { stageOf, stagingOf } from "../breaking/areas.ts";
+import { stagesInPlay } from "../armies/stages.ts";
 import { rescueRandom } from "../captured/rescue.ts";
 import { placeOnSideQuest } from "../sidequests/quest.ts";
 import type { Focus } from "../index.ts";
 
-// The quest cards in play the asking player can name.
+// The quest cards in play the asking player can name: the stage of his area (every stage in play together in The Battle of Five Armies, hob.multiple-stages-in-play) and the side quests of his staging area.
 export function questCardPool(state: ScenarioState, asking: number, ctx: ReduceContext): string[] {
   const stage = stageOf(state, asking);
   const staged = stagingOf(state, asking).filter((id) => isSideQuest(state, id, ctx));
-  return [...(stage ? [stage] : []), ...staged];
+  return [...(state.armies ? stagesInPlay(state) : stage ? [stage] : []), ...staged];
 }
 
 // PlaceProgressOnQuestCard: see the schema entry.
