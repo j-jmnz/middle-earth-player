@@ -417,8 +417,7 @@ describe("10192:A:1 Rivendell Skirmishers: after it exhausts to defend", () => {
     expect(shadowCards(used.cards[orc])).toHaveLength(0);
   });
 
-  // FAULT: the card prints "after Rivendell Skirmishers exhausts to defend", so an already exhausted Skirmishers that an effect declares a defender did not exhaust to defend and the Response is not offered (the same reading as Sting's 131020:A:3); the engine reads "is exhausted" and offers it.
-  it.fails("10192:A:1 is not offered when an already exhausted Rivendell Skirmishers is declared a defender by an effect", () => {
+  it("10192:A:1 is not offered when an already exhausted Rivendell Skirmishers is declared a defender by an effect", () => {
     const { built, defending, skirmishers } = skirmish(EFFECTS);
     const tired = defend({ ...defending, cards: { ...defending.cards, [skirmishers]: { ...defending.cards[skirmishers]!, exhausted: true } } }, { type: "DeclareDefender", defenderId: built.ids.guard! }, built.ctx);
     expect(responseOffered(legalIntents(tired, built.ctx), "test:add-exhausted-ally")).toBe(true);

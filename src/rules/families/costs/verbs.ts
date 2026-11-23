@@ -23,7 +23,7 @@ import { livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { attachTo } from "../../core/zones.ts";
 import { isolatedAreas, sharing } from "../breaking/areas.ts";
-import { noteSpent, spentThisRound } from "./pay.ts";
+import { noteSpent, spentThisRound, spheresOf } from "./pay.ts";
 
 type Focus = { seat: number; sourceId: string | null; chosen?: string };
 
@@ -35,12 +35,11 @@ export function reduceNextCost(state: ScenarioState, instruction: Extract<Instru
   const amount = resolveAmount(state, instruction.amount, scope, ctx);
   const rider = instruction.doomed != null || instruction.noMatch === true || instruction.cannotQuest === true;
   if (seat == null || (amount <= 0 && !rider)) return state;
-  // "that matches attached hero's sphere": the host's printed sphere, read now.
+  // "that matches attached hero's sphere": the host's spheres, read now (`hostSpheres`).
   const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
-  const read = instruction.hostSphere ? printedOf(ctx.cards, state.cards[source?.host ?? ""]?.code ?? "").sphere : null;
-  const hostSphere = read === "fellowship" || read === "baggins" ? null : read;
-  if (instruction.hostSphere && hostSphere == null) return state;
-  const pick = hostSphere ? { ...instruction.pick, sphere: hostSphere } : instruction.pick;
+  const spheres = instruction.hostSphere ? hostSpheres(state, source?.host ?? "", ctx) : null;
+  if (spheres != null && spheres.length === 0) return state;
+  const pick = spheres ? { ...instruction.pick, spheres } : instruction.pick;
   const discount: Discount = {
     seat,
     sourceId: focus.sourceId ?? "",
@@ -54,6 +53,14 @@ export function reduceNextCost(state: ScenarioState, instruction: Extract<Instru
     ...(instruction.cannotQuest ? { cannotQuest: true as const } : {}),
   };
   return { ...state, discounts: [...(state.discounts ?? []), discount] };
+}
+
+// The spheres of influence of the hero a card is attached to: its printed sphere and every resource icon it gained (docs/brief.md, Three layers). A Fellowship or Baggins hero without
+// a gained icon has none (rr.neutral-cards).
+export function hostSpheres(state: ScenarioState, hostId: string, ctx: ReduceContext): Sphere[] {
+  const host = state.cards[hostId];
+  if (!host) return [];
+  return spheresOf(state, hostId, printedOf(ctx.cards, host.code).sphere, ctx).filter((sphere) => sphere !== "fellowship" && sphere !== "baggins" && sphere !== "neutral");
 }
 
 // ChooseX: the actor picks X among the numbers that can be chosen (a branch per number); one number is taken without asking.

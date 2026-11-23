@@ -318,7 +318,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10192:A:1 (front): Response: After Rivendell Skirmishers exhausts to defend an attack from non-unique enemy, discard each shadow card from that enemy.
   10192:response:1: Response after a character is declared as a defender (heard about this card)
-    only if all of: (this card is a exhausted character (any player controls)) and (the event's other card is a non-unique enemy (any player controls) with a shadow card)
+    only if all of: (the declaration of the defender the Response answers exhausted it (it did not stay ready, and was not exhausted already)) and (the event's other card is a non-unique enemy (any player controls) with a shadow card)
     - discard each shadow card dealt to the event's other card
 
-(rendered pieces: 202 by template, 0 as JSON)
+(rendered pieces: 201 by template, 0 as JSON)
