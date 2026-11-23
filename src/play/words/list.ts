@@ -43,3 +43,29 @@ export function threatSourceWords(kind: string | null, threat: number, from: key
 export function threatSourceSaid(kind: string | null, threat: number, from: keyof typeof FROM_WORDS, area?: number): string {
   return [kind, whereWords(from, area)?.toLowerCase(), `${threat} threat`].filter(Boolean).join(", ");
 }
+
+/** The Set aside list (docs/design-system-table.md, Reading panels): its title, the menu row's words, and the lines that are not a card. */
+export const SET_ASIDE_TITLE = "Set aside";
+
+/** The menu row: "Set aside (5)". */
+export function setAsideLabel(count: number): string {
+  return `${SET_ASIDE_TITLE} (${count})`;
+}
+
+/** What a screen reader hears of the menu row: "Set aside cards, 5". */
+export function setAsideSaid(count: number): string {
+  return `Set aside cards, ${count}`;
+}
+
+/** The cards the scenario hides: "1 card is facedown", "2 cards are facedown". Shown and heard the same; it names nothing. */
+export function facedownWords(count: number): string {
+  return count === 1 ? "1 card is facedown" : `${count} cards are facedown`;
+}
+
+/** The list's foot (rr.in-play-and-out-of-play: cards set aside are out of play). */
+export const SET_ASIDE_FOOT = "These cards are out of play.";
+
+/** A set-aside card's line: its type, then what the table knows of it ("Enemy · Set aside with 3 damage, which it keeps when it returns."). */
+export function setAsideWords(kind: string | null, kept: string | null): string | null {
+  return [kind, kept].filter(Boolean).join(" · ") || null;
+}

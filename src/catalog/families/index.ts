@@ -1,4 +1,4 @@
-import { collect } from "../family-manifest.ts";
+import { collect, type AsideSecret, type AsideUnused, type CatalogFamily } from "../family-manifest.ts";
 import { manifest as attack } from "./attack.ts";
 import { manifest as defense } from "./defense.ts";
 import { manifest as encounter } from "./encounter.ts";
@@ -58,5 +58,9 @@ export const CATALOG_FAMILIES = [
 ] as const;
 
 export const FAMILY_VERBS = collect(CATALOG_FAMILIES, "verbs");
+/** Every family's verbs that hide a set-aside card (family-manifest.ts, AsideSecret), with the family that declares each. */
+export const ASIDE_SECRETS: readonly (AsideSecret & { readonly family: string })[] = CATALOG_FAMILIES.flatMap((family: CatalogFamily) => (family.asideSecrets ?? []).map((secret) => ({ ...secret, family: family.name })));
+/** Every family's verbs that park unused cards in the set-aside zone (family-manifest.ts, AsideUnused). */
+export const ASIDE_UNUSED: readonly (AsideUnused & { readonly family: string })[] = CATALOG_FAMILIES.flatMap((family: CatalogFamily) => (family.asideUnused ?? []).map((unused) => ({ ...unused, family: family.name })));
 export const FAMILY_TRIGGERS = collect(CATALOG_FAMILIES, "triggers");
 export const FAMILY_FLAGS = collect(CATALOG_FAMILIES, "flags");

@@ -254,3 +254,5 @@ export function parseRingsDbCards(payload: unknown, packCode: string): RingsDbCa
   }
   return payload.map((raw) => parseRingsDbCard(raw));
 }
+export { ASIDE_SECRETS, ASIDE_UNUSED } from "./families/index.ts";
+export type { AsideSecret, AsideUnused } from "./family-manifest.ts";

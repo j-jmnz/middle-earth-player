@@ -1,5 +1,5 @@
 // The reading panels (docs/design-system-table.md, Reading panels; phase 21): a discard pile's cards or the victory display's, a row's
-// folded cards, the cards that make up the staging threat from the quest meter, this round's log, the threat panel from a dial and the table settings from the menu. They open in one place, the same tray
+// folded cards, the set-aside cards from the menu, the cards that make up the staging threat from the quest meter, this round's log, the threat panel from a dial and the table settings from the menu. They open in one place, the same tray
 // frame (tray-frame.tsx), one at a time: a new one replaces the last (reading.ts). Each has a round ✕ labelled "Close" at its top right and
 // closes on a tap outside. The card lists stand on night, each card as the table draws it; the log and the threat panel stay on paper:
 // they are what gets read and recorded; the settings panel is on night like the Settings tab. Nothing here sends an intent but a playable
@@ -176,6 +176,49 @@ export function RowList({ title, cards, onRead, onClose }: { title: string; card
           <CardRow key={card.id} card={card} playable={false} testID={`row-card-${card.id}`} onPress={() => onRead(card.id)} />
         ))}
       </ScrollView>
+    </View>
+  );
+}
+
+/**
+ * The set-aside cards, from the menu's row (store/set-aside.ts), on the frame of a discard pile's list: each card the players may read, by name; a row shows the card
+ * large and sends nothing. The head counts every card of the list, the facedown ones too, as the menu's row does. The cards the scenario hides are one line that is no button, "2 cards are facedown": no name, picture or type. The foot says the cards are out of play.
+ */
+export function SetAsideList({ title, count, cards, facedown, foot, onRead, onClose }: { title: string; count: number; cards: readonly ListCard[]; facedown: string | null; foot: string; onRead: (cardId: string) => void; onClose: () => void }) {
+  const total = count;
+  return (
+    <View testID="set-aside-list" collapsable={false} style={{ flexShrink: 1 }}>
+      <ListHead count={`${total} ${total === 1 ? "card" : "cards"}`} title={title} />
+      <PanelClose testID="set-aside-list-close" onPress={onClose} paper={false} />
+      <ScrollView className="mt-3" style={{ flexShrink: 1 }}>
+        {total === 0 ? <Text className="text-center text-body text-muted">No card is set aside.</Text> : null}
+        {cards.map((card) => (
+          <CardRow key={card.id} card={card} playable={false} testID={`set-aside-card-${card.id}`} onPress={() => onRead(card.id)} />
+        ))}
+        {facedown ? <FacedownRow words={facedown} /> : null}
+        {total > 0 ? (
+          <Text testID="set-aside-foot" className="mt-1 text-center text-label text-muted">
+            {foot}
+          </Text>
+        ) : null}
+      </ScrollView>
+    </View>
+  );
+}
+
+// The facedown cards of the Set aside list: a card back's plate where a row has its picture, and the count in words. Text, not a button: there is nothing to open.
+function FacedownRow({ words }: { words: string }) {
+  const t = useTableTokens();
+  const s = useUiScale();
+  const box = smallPictures(useWindowDimensions().height, s) ? LIST_PICTURE_SMALL : LIST_PICTURE;
+  const w = box.w * s;
+  const h = box.h * s;
+  return (
+    <View testID="set-aside-facedown" accessible accessibilityRole="text" accessibilityLabel={words} className="mb-1 flex-row items-center rounded-item px-1.5 py-1" style={{ gap: 12 * s, minHeight: touch(s, 48) }}>
+      <View style={{ width: w, height: h, borderRadius: cardCorner(w, h), backgroundColor: t.raised, boxShadow: dropShadowOf(t, 3, 8, 0.8) }} />
+      <Text className="min-w-0 flex-1 font-display text-body" style={{ color: t.bone }}>
+        {words}
+      </Text>
     </View>
   );
 }

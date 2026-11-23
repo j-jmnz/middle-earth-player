@@ -1,4 +1,4 @@
-// The table menu (docs/design-system-table.md, Top bar): the update offer when there is one, Log, Rules, Booklet, Table settings and, apart, Leave the table, in a
+// The table menu (docs/design-system-table.md, Top bar): the update offer when there is one, Log, Set aside while a card is set aside, Rules, Booklet, Table settings and, apart, Leave the table, in a
 // popover under the menu button at the top right. React Native views over the canvas, never on the canvas. The frame, the scrim
 // and the motion are the shared popover frame (popover-frame.tsx). A row closes the menu and then acts (the caller's onSelect).
 // Android Back closes it first (back.ts).
@@ -34,7 +34,7 @@ export function MenuButton({ open, onPress }: { open: boolean; onPress: () => vo
  * place it under the menu button, inside the safe-area insets; `bottom` is the room kept under it. A menu taller than the window
  * between them scrolls inside its frame (a landscape phone with the update offer and Debug tools), so every row stays in reach.
  */
-export function TableMenu({ open, nav, without, update, top, right, bottom, onClose, onSelect }: { open: boolean; nav: MenuNav; without?: readonly MenuItemId[]; update?: string | null; top: number; right: number; bottom: number; onClose: () => void; onSelect: (id: MenuItemId) => void }) {
+export function TableMenu({ open, nav, without, update, setAside, top, right, bottom, onClose, onSelect }: { open: boolean; nav: MenuNav; without?: readonly MenuItemId[]; update?: string | null; setAside?: number; top: number; right: number; bottom: number; onClose: () => void; onSelect: (id: MenuItemId) => void }) {
   // Focus moves to the first row when the menu opens, so a screen reader starts inside it.
   const first = useRef<PressableRef>(null);
   const s = useUiScale();
@@ -52,7 +52,7 @@ export function TableMenu({ open, nav, without, update, top, right, bottom, onCl
       maxHeight={height - top - bottom}
       onClose={onClose}
     >
-      {menuItems(nav, without, update).map((item, index) => (
+      {menuItems(nav, without, update, setAside ?? 0).map((item, index) => (
         // Leaving stands apart from the rows that open something over the table: 8 pt of space, and its word in danger.
         <View key={item.id} style={item.id === "leave" ? { marginTop: 8 * s } : undefined}>
           <PopoverRow item={item} rowRef={index === 0 ? first : undefined} onPress={() => onSelect(item.id)} />
