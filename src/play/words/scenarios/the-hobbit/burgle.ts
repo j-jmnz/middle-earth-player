@@ -25,7 +25,7 @@ export function burgleBranchWords(choose: ChooseInstruction, optionId: string, g
   // Step 3 of an attempt: discard the matching cards or decline (families/burgle/attempt.ts).
   if (choose.options.some((entry) => entry.id === "discard") && choose.options.some((entry) => entry.id === "decline")) {
     const facts = ctx ? attemptFacts(game, ctx, names) : null;
-    if (optionId === "decline") return "Decline: the burgle attempt fails and nothing is discarded";
+    if (optionId === "decline") return "Decline the attempt: the burgle fails and nothing is discarded";
     if (optionId === "discard" && facts) return `Discard ${cards(facts.need)} that ${facts.need === 1 ? "matches" : "match"} the revealed ${facts.revealed} in ${facts.shared}`;
   }
   const [first, second] = option?.instructions ?? [];

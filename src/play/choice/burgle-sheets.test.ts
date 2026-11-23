@@ -27,7 +27,7 @@ describe("132044:A:2 Great Hall burgle: the words of step 3", () => {
     const { made, choose } = attempt("132044", 1);
     const sheet = sheetOf(made, choose.state);
     expect(sheet?.kind === "pick" ? sheet.note : "").toBe("Great Hall: burgle attempt. The revealed card is Snowbourn Scout. As the first player, discard 3 cards from your hand that match its card type, or decline and the attempt fails.");
-    expect(sheet?.kind === "pick" ? sheet.options.map((option) => option.label) : []).toEqual(["Discard 3 cards that match the revealed Snowbourn Scout in card type", "Decline: the burgle attempt fails and nothing is discarded"]);
+    expect(sheet?.kind === "pick" ? sheet.options.map((option) => option.label) : []).toEqual(["Discard 3 cards that match the revealed Snowbourn Scout in card type", "Decline the attempt: the burgle fails and nothing is discarded"]);
   });
 
   it("the Pick says which card of how many, solo and two-handed", () => {
