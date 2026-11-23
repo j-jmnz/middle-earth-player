@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { runScript, type Log } from "../log.ts";
+import { rangeProblems } from "./range-rules.ts";
 
 // Checks commit subjects against .claude/rules/commit-standards.md (Subject line): "<type>: <summary>", one of the
 // types below, at most 72 characters, no closing period, the summary an action (its first word an imperative verb). A message file and a range also have their bodies checked for a
@@ -150,11 +151,28 @@ function messages(args: string[]): { subjects: string[]; bodies: string[] } {
   return { subjects: given, bodies: [] };
 }
 
+/** What the commits of a range lack as a whole (scripts/git/range-rules.ts), read from the merge base of the range's two ends. */
+function branchProblems(range: string, bodies: readonly string[]): string[] {
+  const [from, to] = range.split("..");
+  if (!from || !to) return [];
+  const base = git(["merge-base", from, to]);
+  const shown = (ref: string) => {
+    try {
+      return git(["show", `${ref}:src/campaign/playable.ts`]);
+    } catch {
+      return "";
+    }
+  };
+  const changed = git(["diff", "--name-only", base, to]).split("\n").filter((file) => file !== "");
+  return rangeProblems({ changed, bodies, playable: { base: shown(base), head: shown(to) } });
+}
+
 function main(log: Log): void {
   const args = process.argv.slice(2);
   if (args.includes("--install")) return install(log);
   const { subjects, bodies } = messages(args);
-  const problems = [...subjects.map(subjectProblem), ...bodies.map(bodyProblem)].filter((problem) => problem !== undefined);
+  const range = args.includes("--range") ? flag(args, "--range") : undefined;
+  const problems = [...subjects.map(subjectProblem), ...bodies.map(bodyProblem), ...(range ? branchProblems(range, bodies) : [])].filter((problem) => problem !== undefined);
   if (problems.length === 0) return log.debug(`${subjects.length} commits follow .claude/rules/commit-standards.md`);
   for (const problem of problems) log.error(problem);
   throw new Error(`${problems.length} problems in ${subjects.length} commits break .claude/rules/commit-standards.md (Subject line, Body)`);
