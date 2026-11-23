@@ -6,7 +6,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
-import { discardEncounterTopMore } from "./discard.ts";
+import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
 import { noteFirstEnemy, pelargirCondition } from "./first-enemy.ts";
 import { attachToHighestThreatCost } from "./host.ts";
 import { attachObjectiveTo, attackScrollHolder } from "./scroll.ts";
@@ -22,6 +22,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return attackScrollHolder(state, instruction, focus, ctx, steps);
     case "DiscardEncounterTopMore":
       return discardEncounterTopMore(state, instruction, focus, ctx, steps);
+    case "RaiseThreatPerDiscarded":
+      return raiseThreatPerDiscarded(state, instruction, focus, ctx, steps);
     default:
       return null;
   }
@@ -29,7 +31,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelargir",
-  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore"],
+  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded"],
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,

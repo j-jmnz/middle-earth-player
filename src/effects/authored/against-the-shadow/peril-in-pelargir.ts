@@ -1,6 +1,7 @@
 import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
 import { AUTHORED_EFFECTS as ROAD_TO_RIVENDELL } from "../dwarrowdelf/road-to-rivendell.ts";
+import { ALWAYS } from "../conditions.ts";
 import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for Peril in Pelargir (Against the Shadow part 1, no campaign card). Every line is read from the scan ledger (data/printed/against-the-shadow.json). Keywords (Surge, Immune, Archery, Battle) are the cards' own; the Battle stages
@@ -101,7 +102,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         { verb: "DiscardEncounterTop", count: 2, reset: true },
         { verb: "DiscardEncounterTopMore", count: { count: { type: "treachery", control: "any", from: "encounterDiscard", names: ["Collateral Damage"] }, times: 2 }, reset: true },
-        { verb: "RaiseThreat", amount: { discardedMatching: LOCATION, times: 2 }, who: "eachSeat" },
+        { verb: "RaiseThreatPerDiscarded", type: "location", amount: 2 },
       ],
     },
 
@@ -141,7 +142,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "05040",
       lines: ["05040:A:1"],
       timing: "whenRevealed",
-      uncancelable: { kind: "sourceIn", zone: "staging" },
+      uncancelable: ALWAYS,
       instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "SearchMove", type: "location", trait: "City", to: "staging" }] }, { verb: "ShuffleEncounterDeck" }],
     },
     { id: "05040:shadow:1", cardCode: "05040", lines: ["05040:A:2"], timing: "shadow", instructions: [{ verb: "DiscardHand" }] },

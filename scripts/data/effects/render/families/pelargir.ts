@@ -14,8 +14,12 @@ export const PELARGIR_TEMPLATES: Templates = {
     read: ["code"],
   }),
   DiscardEncounterTopMore: (i, ctx) => ({
-    text: `discard ${amt(i.count, ctx)} card(s) from the top of the encounter deck${i.reset === true ? " (a deck that runs out is reset from the discard pile and the discard goes on)" : ""}; they join the cards this effect discarded before, so a later amount "discarded by this effect" counts them all`,
+    text: `discard ${amt(i.count, ctx)} card(s) from the top of the encounter deck${i.reset === true ? " (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)" : ""}; they join the cards this effect discarded before, so a later amount "discarded by this effect" counts them all`,
     read: ["count", "reset"],
+  }),
+  RaiseThreatPerDiscarded: (i) => ({
+    text: `raise each player's threat by ${String(i.amount)} for each ${str(i.type)} card this effect discarded from the top of the encounter deck, in any of its discard steps, even one a reset of the deck put back in it`,
+    read: ["type", "amount"],
   }),
 };
 
@@ -24,6 +28,7 @@ export const PELARGIR_SAMPLES: Samples = {
   AttachToHighestThreatCost: [{ verb: "AttachToHighestThreatCost" }],
   AttackScrollHolder: [{ verb: "AttackScrollHolder", code: "05019" }],
   DiscardEncounterTopMore: [{ verb: "DiscardEncounterTopMore", count: 2, reset: true }],
+  RaiseThreatPerDiscarded: [{ verb: "RaiseThreatPerDiscarded", type: "location", amount: 2 }],
 };
 
 export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {

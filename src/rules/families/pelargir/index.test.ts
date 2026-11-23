@@ -254,3 +254,20 @@ describe("DiscardEncounterTopMore", () => {
     expect(threatAfter("DiscardEncounterTop")).toBe(0);
   });
 });
+
+describe("RaiseThreatPerDiscarded", () => {
+  // Collateral Damage's two discard steps with the deck reset between them (quest phase): the locations discarded before the reset still count.
+  const threatAfter = (instructions: Effect["instructions"]): number => {
+    const table = tableFromLayout(SCENARIO, { staging: ["05024"], deck: ["05021", "05022"], threat: [20, 20] });
+    const source = idOf(table.state, "05024");
+    const record: Effect = { id: "05024:test:1", cardCode: "05024", lines: ["05024:A:1"], timing: "whenRevealed", instructions };
+    const steps: EngineStep[] = [];
+    const done = settle(pushCardEffects({ ...table.state, window: null }, "whenRevealed", source, 0, false, [record], table.ctx, steps), table.ctx, steps);
+    return (done.seats[0]?.threat ?? 0) - 20;
+  };
+
+  it("counts each location the effect discarded once, one the deck reset in the middle of the effect put back in the deck as well", () => {
+    const steps: Effect["instructions"] = [{ verb: "DiscardEncounterTop", count: 2 }, { verb: "DiscardEncounterTopMore", count: 1, reset: true }];
+    expect(threatAfter([...steps, { verb: "RaiseThreatPerDiscarded", type: "location", amount: 2 }])).toBe(4);
+  });
+});
