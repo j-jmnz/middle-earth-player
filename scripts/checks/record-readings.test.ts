@@ -38,6 +38,7 @@ const THEN_SHORT: Readonly<Record<string, string>> = {
   "11002:response:1": "A discard of any number may be 0, and the draw is for that many: nothing is short of 0.",
   "10136:whenRevealed:1": "The \"then\" only orders the two sentences: a player with an empty hand discarded no card, and the search for other copies of it finds none.",
   "00015:whenRevealed:1": "The Exhaust is the \"exhausted\" of the same sentence, done to the card just taken: it cannot come up short.",
+  "132069:whenRevealed:1": "Removing all resources from empty pools resolves in full, so the characters are always made unconscious (docs/scenarios/the-hobbit/flies-and-spiders.md, Flies and Spiders, Stage 3, \"Then\", recommended).",
   "50931:forced:2": "The discards belong to the Forced effect of the stage 3 the first step selected, which resolves as a whole; the part after \"Then\" holds the stage's own conditions.",
   "900106:whenRevealed:1": "The exhaust reads the ready heroes: a hero already exhausted is in the state the line asks for, so the line is resolved in full.",
   "11195:action:1": "The \"then\" adds the event to the victory display after the number of characters is set; the later \"Until the end of the round\" sentences are the Heal and the bonuses.",
