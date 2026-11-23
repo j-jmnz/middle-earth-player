@@ -109,7 +109,7 @@ export function endsInDefeat(state: ScenarioState): boolean {
   return heldAmount(state, "table", "endsInDefeat") > 0;
 }
 
-/** What a run list and the end screens say of that end: the scenario was cleared by its last player's elimination and not by a win (mec113.dire, docs/scenarios/the-return-of-the-king.md, The Black Gate Opens). */
+/** What a run list and the end screens say of that end: the scenario was cleared by its last player's elimination and not by a win (mec113.dire, docs/scenarios/the-return-of-the-king/the-black-gate-opens.md, The Black Gate Opens). */
 export const ENDED_BY_DEFEAT = "Every player fell";
 
 /** The scenario ended on its last player's elimination, which is its Resolution (`endsInDefeat`), not on a win: every other end of every other scenario is false here. */
