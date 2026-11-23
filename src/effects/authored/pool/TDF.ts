@@ -10,8 +10,7 @@ export const RECORDS: readonly Effect[] = [
   // 06034 Strength of Arms
   {"id":"06034:constant:1","cardCode":"06034","lines":["06034:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"allMatch","of":{"type":"hero","control":"you"},"match":{"type":"hero","control":"you","printedIcon":"leadership"}}}]},
   {"id":"06034:action:1","cardCode":"06034","lines":["06034:A:2"],"timing":"action","instructions":[{"verb":"Each","pick":{"type":"ally","control":"any"},"instructions":[{"verb":"Ready","target":"picked"}]}]},
-  // 06035 Mighty Prowess ("a Tactics hero hero" is printed so). Line 2 needs "shares a Trait with": open.
-  {"id":"06035:constant:1","cardCode":"06035","lines":["06035:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero","sphere":"tactics"},"limitPerHost":true}]},
+  // 06035 Mighty Prowess: line 1 is the generated 06035:constant:1. Line 2 needs "shares a Trait with": open.
   // 06036 Trained for War.
   {"id":"06036:constant:1","cardCode":"06036","lines":["06036:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"allMatch","of":{"type":"hero","control":"you"},"match":{"type":"hero","control":"you","printedIcon":"tactics"}}}]},
   // 06037 Silvan Refugee: another character (its own leaving play leaves nothing to discard).

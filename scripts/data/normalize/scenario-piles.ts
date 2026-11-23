@@ -28,6 +28,13 @@ export function questFacts(args: { quest: ParsedSetup; code: string; printed: Ca
   };
 }
 
+// A card the Setup has each player add to the staging area (Into Ithilien's Southron Company) that a load list's `key` (code and pile) names in its encounter pile: the Normal deck stages the copies of the
+// most players, the Easy deck stages one and leaves the others in the encounter deck, so the Easy deck's encounter copy needs no Normal one.
+export function stagedPerPlayer(quest: ParsedSetup, key: string): boolean {
+  const [code = "", pile = ""] = key.split("\u0000");
+  return pile === "encounter" && clausesOf(quest, "stage").some((clause) => clause.perPlayer != null && clause.codes.includes(code));
+}
+
 // A Harad enemy the campaign log records: a Setup that sets "each Harad enemy recorded in the campaign log" aside deals the card, whatever its own pile (Journey to the Cross-roads and The Battle of the Pelennor Fields).
 export function loggedHarad(setup: ParsedSetup, printed: Card | undefined): boolean {
   return clausesOf(setup, "step").some((clause) => clause.step === "asideLogged") && printed?.traits.includes("Harad") === true;
@@ -45,7 +52,7 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
   const fleet = stepExists("prepareFleet") && (/Fleet/.test(printed?.encounterSet ?? "") || printed?.type === "ship-objective");
   switch (pile) {
     case "setAside":
-      return said(["aside", "putIntoPlay"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial", "secrets", "shuffleIntoDecks") || setAsideBySet || loggedHarad(quest, printed) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective") || steps("hideLoot", "hideSuspectAndHideout", "buildInvestigationDeck");
+      return said(["aside", "putIntoPlay"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial", "secrets", "shuffleIntoDecks", "buildUnderworldDeck", "hideOneAside") || setAsideBySet || loggedHarad(quest, printed) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective") || steps("hideLoot", "hideSuspectAndHideout", "buildInvestigationDeck");
     case "activeLocation":
       return said(["active"]);
     case "attachedChosen":
