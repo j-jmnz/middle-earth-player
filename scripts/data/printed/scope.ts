@@ -254,6 +254,16 @@ function nightmarePictures(cards: readonly Card[], scope: ReadonlySet<string>): 
   return out;
 }
 
+// Cards whose pinned picture is of an earlier printing than the pack its URL belongs to (Hall of Beorn files one picture under the reprint's pack). The ledger names
+// the printing the scan shows, read from the scan's copyright line and set number.
+export const SCAN_PRINTINGS: Readonly<Record<string, string>> = {
+  "03003": "Khazad-dûm",
+  "03009": "Khazad-dûm",
+  "04061": "The Watcher in the Water",
+  "08092": "The Nîn-in-Eilph",
+  "12066": "Temple of the Deceived",
+};
+
 // Hall of Beorn's scan of the saga box's reprint first (MEC109, MEC112: its TFotR or TTwT printing), then the other printings, DragnCards last. A card the box
 // does not reprint (the core-set cards of the starter lists) takes the Revised Core Set scan. A Nightmare card takes its proxy picture.
 export function scanTargets(codes: readonly string[] = scopeCodes()): ScanTarget[] {
@@ -307,8 +317,8 @@ export function scanTargets(codes: readonly string[] = scopeCodes()): ScanTarget
     if (!front) throw new Error(`No scan for ${code}`);
     const guid = card.printings.map((printing) => printing.octgnGuid).find((value) => value !== undefined);
     const fromDragn = guid ? dragn.get(guid) : undefined;
-    out.push({ code, side: "A", printing: first.printing, urls: [...(SCAN_URL_FIXES[code] ?? []), front, ...sources.slice(1).flatMap((source) => source.urls.slice(0, 1)), ...(fromDragn ? [fromDragn] : []), ...(dragnByNumber(card, "A") ? [dragnByNumber(card, "A") as string] : [])] });
-    if (back) out.push({ code, side: "B", printing: first.printing, urls: [...(SCAN_URL_FIXES[`${code}.B`] ?? []), back, ...(dragnByNumber(card, "B") ? [dragnByNumber(card, "B") as string] : [])] });
+    out.push({ code, side: "A", printing: SCAN_PRINTINGS[code] ?? first.printing, urls: [...(SCAN_URL_FIXES[code] ?? []), front, ...sources.slice(1).flatMap((source) => source.urls.slice(0, 1)), ...(fromDragn ? [fromDragn] : []), ...(dragnByNumber(card, "A") ? [dragnByNumber(card, "A") as string] : [])] });
+    if (back) out.push({ code, side: "B", printing: SCAN_PRINTINGS[code] ?? first.printing, urls: [...(SCAN_URL_FIXES[`${code}.B`] ?? []), back, ...(dragnByNumber(card, "B") ? [dragnByNumber(card, "B") as string] : [])] });
   }
   return out;
 }

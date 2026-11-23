@@ -1905,7 +1905,7 @@
    "basis": [
     "Scan: the Black Riders printing (c) 2013, which Hall of Beorn also serves as its MEC109 #46 image (byte-identical sha256) and DragnCards serves as an independent file; all three read 'Each player draws 1 less card in his starting hand.'",
     "Hall of Beorn MEC109 #46 and DragnCards cardDb text agree with the scan.",
-    "RingsDB (has_errata) prints 'Skip the draw cards step during the first round of the game.' No FAQ, rulebook or Learn to Play text in data/rules mentions Gandalf's Delay, so nothing official supports the RingsDB wording.",
+    "RingsDB (has_errata) prints 'Skip the draw cards step during the first round of the game.' No FAQ, rulebook or Learn to Play text in data/rules mentions Gandalf's Delay. Along Extended Party's Semi-official Errata & FAQ 1.10 (https://alongextendedparty.com/semi-official-errata-faq-1-10/), Official Reprints section, lists it under The Black Riders as a reprint in The Fellowship of the Ring saga expansion with functional changes, and gives the RingsDB wording ('Each player draws 1 less card in his starting hand. Skip the draw cards step during the first round of the game.').",
     "Decision: the printed text. Matches the earlier user decision recorded in docs/brief.md (the MEC109 printing wins)."
    ]
   },

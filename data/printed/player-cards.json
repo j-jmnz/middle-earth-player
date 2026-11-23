@@ -666,34 +666,34 @@
     {
       "code": "03003",
       "side": "A",
-      "printing": "Dwarves of Durin",
+      "printing": "Khazad-dûm",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Narvi's-Belt.jpg",
         "sha256": "2413f725d389009b7bef7b6bc541a318ae3442d2ccfca98d0dac23d47faaa660"
       },
       "lines": [
         "Attach to a Dwarf hero.",
-        "Action: Exhaust Narvi's Belt to give attached hero a Leadership, Lore, Tactics or Spirit icon until the end of the phase."
+        "Action: Exhaust Narvi's Belt to give attached hero a Leadership, Lore, Tactics, or Spirit icon until the end of the phase."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
       "code": "03009",
       "side": "A",
-      "printing": "Dwarves of Durin",
+      "printing": "Khazad-dûm",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Zigil-Miner.jpg",
         "sha256": "78da1ac1b1298a951632361db28671a062abc7ed7423323e8fa968a74489c3d9"
       },
       "lines": [
-        "Action: Exhaust Zigil Miner and name a number to discard the top 2 cards of your deck. If at least one of those cards has cost equal to the named number, choose a hero you control. For each card that matches the named number, add 1 resource to that hero's resource pool."
+        "Action: Exhaust Zigil Miner and name a number to discard the top 2 cards of your deck. If at least one of those cards has a cost equal to the named number, choose a hero you control. For each card that matches the named number, add 1 resource to that hero's resource pool."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -716,7 +716,7 @@
     {
       "code": "04061",
       "side": "A",
-      "printing": "Dwarves of Durin",
+      "printing": "The Watcher in the Water",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Legacy-of-Durin.jpg",
         "sha256": "5e762b63801036fc6c914f0eaf22badd87677b37e80885049ba39955c7574033"
@@ -856,11 +856,11 @@
       },
       "lines": [
         "Play only if each hero you control has the printed Tactics resource icon.",
-        "Action: Until the end of the phase, if the current quest does not have Siege, it gains Battle."
+        "Action: Until the end of the phase, if the current quest does not have siege, it gains battle. (Characters quest using Attack instead of Willpower.)"
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -914,18 +914,18 @@
     {
       "code": "08092",
       "side": "A",
-      "printing": "Elves of Lórien",
+      "printing": "The Nîn-in-Eilph",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Wingfoot.jpg",
         "sha256": "6e053a138830db779fa7f5d70b79bba55bd026929bc6bd9001d6ac20a2e8b945"
       },
       "lines": [
         "Attach to a Ranger hero.",
-        "Response: After attached hero commits to a quest. name enemy, location or treachery. If a card of the named type is revealed during this quest phase, exhaust Wingfoot to ready attached hero."
+        "Response: After attached hero commits to a quest, name enemy, location, or treachery. If a card of the named type is revealed during this quest phase, exhaust Wingfoot to ready attached hero."
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -948,7 +948,7 @@
     {
       "code": "12066",
       "side": "A",
-      "printing": "Dwarves of Durin",
+      "printing": "Temple of the Deceived",
       "scan": {
         "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/c2c8d69a-6639-49af-89ed-86f2ffc8c096.jpg",
         "sha256": "1405588f73156b07c33926f6e909b72170842b863bb0ca2701fb3543f11d6db3"

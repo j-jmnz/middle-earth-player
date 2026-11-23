@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { loadCards } from "./load-cards.ts";
 import { loadLedger, keyOf } from "./printed/ledger.ts";
-import { PLAYER_CODES, playerPackCodes, playerScopeCodes } from "./printed/scope.ts";
+import { PLAYER_CODES, playerPackCodes, playerScopeCodes, scanTargets, SCAN_PRINTINGS } from "./printed/scope.ts";
 import { indentOf, nightmareDeckCodes, pinnedScans, seedEntries, seedEntry, withSeeded } from "./ledger-seed.ts";
 
 // `pnpm data ledger-seed`: the entries a scenario's cards are missing, from the source text, readBy empty.
@@ -26,6 +26,11 @@ describe("ledger seed", () => {
     expect(held).toBeDefined();
     const { entries } = seedEntries(new Set(["01013"]), ledger, cards, pins);
     expect(entries).toEqual([]);
+  });
+
+  it("names the printing a scan shows when its picture is filed under a reprint's pack", () => {
+    const targets = scanTargets(Object.keys(SCAN_PRINTINGS));
+    expect(targets.map((target) => [target.code, target.printing])).toEqual(Object.entries(SCAN_PRINTINGS));
   });
 
   it("splits text into one line per ability with straight apostrophes", () => {
