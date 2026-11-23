@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.shuffle (data/rules/entries.json); ledger line 132067:A:1. ShuffleSetAsideIntoDeck (deck family): the set-aside card with the printed code goes into the acting player's deck, which is shuffled; nothing happens when none is set aside.
+// Rules: rr.setup (data/rules/entries.json); ledger line 132067:A:1. ShuffleSetAsideIntoDeck (deck family): the set-aside card with the printed code goes into the acting player's deck, which is shuffled; nothing happens when none is set aside.
 import { describe, expect, it } from "vitest";
 
 import { runInstruction } from "../../interpret/interpret.ts";
