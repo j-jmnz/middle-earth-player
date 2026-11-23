@@ -1,6 +1,14 @@
 // Test helper. The goldens whose final state golden.json stores (scripts/game/golden-file.ts): the ones a test reads with `goldenState` instead of playing
 // the game again. Every other golden stores the hash of its final state. A test that needs one more adds its name here; the scenario's golden test
 // then writes the state, and fails while a name here is no golden of the scenario.
+//
+// The readers (`pnpm test pins` runs them and lists a pin none of them reads, which is then removed here):
+//   - tests that call `goldenState`: a later part's campaign test and world (src/campaign/scenarios/*/campaign.test.ts, test/scenarios/*/game.ts) read the earlier
+//     parts' golden states, and a standalone test reads its own (`goldenState`, `goldenResolved`, test/harness/campaign-kit.ts);
+//   - the seed finders and fixture writers under scripts/e2e, which `pnpm scenario fixtures` runs and the suite does not: a `wonLog` call that names a
+//     `scenarioId` reads that golden (`seedFinderReads`, test/harness/golden-readers.ts; scripts/checks/golden-pins.test.ts holds each to a pin).
+// Pinning a golden means writing its scenario's golden.json again; `pnpm game moved` must then report only a storage change for that file, so a move
+// nobody looked at is never accepted with it (the golden suite refuses the write otherwise, test/harness/golden-suite.ts, `goldenRows`).
 export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
   "a-journey-to-rhosgobel": [
     "Nightmare two-handed win",
@@ -304,6 +312,7 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
     "true solo, lost, every hero destroyed",
     "true solo, lost, threat reaches 50",
     "true solo, won, Normal",
+    "two-handed, won, Normal",
   ],
   "the-withered-heath": [
     "true solo, Easy, won, Melanwar's and Isolde's lines, The Steadfast, no Song, 4 Dragon Signs",

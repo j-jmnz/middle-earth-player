@@ -34,7 +34,8 @@
 // (141078) and Gildor Inglorion (141077), as the scenario-1 tests answer it. Each seat plays its list with
 // a hero of the same sphere in place of each hero that fell in that game (REPLACEMENT), and the briefing's threat
 // penalty when one did. Two-handed, Easy, the auto-player's answers, every intent up to the loss.
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
@@ -334,14 +335,24 @@ void runScript("e2e-fixtures", async () => {
   if (only === null && searchFlags() !== null) throw new Error("--search takes one scenario id: a search of every scenario would run for hours");
   const dir = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "..", "src", "campaign", "fixtures");
   if (only !== null && !isChained(only) && searchFlags() !== null) throw new Error(`${only} has its own search for its won game: pass --won`);
-  if (only === null || !isChained(only)) writeScenarioOne(dir, searching);
-  if (only === null || isChained(only)) await writeChained(dir, only, searchFlags()?.out ?? null);
+  // --dry-run writes the files into a temporary folder and says which differ from the committed ones, so a seed finder can be run with nothing rewritten.
+  const scratch = process.argv.includes("--dry-run") ? mkdtempSync(path.join(os.tmpdir(), "fixtures-dry-")) : null;
+  if (only === null || !isChained(only)) writeScenarioOne(scratch ?? dir, searching);
+  if (only === null || isChained(only)) await writeChained(dir, only, scratch ?? searchFlags()?.out ?? null);
+  if (scratch !== null) {
+    for (const name of readdirSync(scratch)) {
+      const committed = path.join(dir, name);
+      const same = existsSync(committed) && readFileSync(committed, "utf8") === readFileSync(path.join(scratch, name), "utf8");
+      say.notice(`${name}: ${same ? "the same as the committed file" : "DIFFERS from the committed file"}`);
+    }
+    rmSync(scratch, { recursive: true, force: true });
+  }
 });
 
 // The scenario id named on the command line, or null for every scenario. It must be in the fixture registry.
 function scenarioArgument(): FixtureScenarioId | null {
   const named = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
-  if (named.length > 1) throw new Error("Usage: scripts/e2e/fixtures.ts [<scenario-id>] [--won] [--search ...]");
+  if (named.length > 1) throw new Error("Usage: scripts/e2e/fixtures.ts [<scenario-id>] [--won] [--search ...] [--dry-run]");
   const id = named[0];
   if (id === undefined) return null;
   const entry = FIXTURE_REGISTRY.find((one) => one.scenarioId === id);

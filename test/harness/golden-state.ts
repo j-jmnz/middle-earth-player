@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { appendFileSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import type { ScenarioState } from "../../src/rules/engine/reduce.ts";
@@ -26,10 +26,14 @@ function pinned(scenarioId: string): readonly Pinned[] {
   return goldens;
 }
 
+// `pnpm test pins` sets GOLDEN_READS_FILE: each read is appended there, one JSON pair a line, so the readers in every worker are collected.
+const READS_FILE = process.env.GOLDEN_READS_FILE;
+
 /** The final state of the golden named `name` of `scenarioId`, as its golden.json pins it (only the goldens in GOLDEN_PINS store one). A fresh copy: the caller may keep it. */
 export function goldenState(scenarioId: string, name: string): ScenarioState {
+  if (READS_FILE) appendFileSync(READS_FILE, `${JSON.stringify([scenarioId, name])}\n`);
   const golden = pinned(scenarioId).find((item) => item.name === name);
   if (!golden) throw new Error(`${scenarioId}/golden.json has no golden named ${name}`);
-  if (!golden.state) throw new Error(`${scenarioId}/golden.json stores no final state for ${name}: add it to GOLDEN_PINS (test/harness/golden-pins.ts), then run the scenario's golden test with -u`);
+  if (!golden.state) throw new Error(`${scenarioId}/golden.json stores no final state for ${name}: add it to GOLDEN_PINS (test/harness/golden-pins.ts), then write the scenario's golden.json again (\`pnpm vitest run src/campaign/scenarios/${scenarioId}/golden.test.ts -u\`) with no engine move pending: \`pnpm game moved\` must then report only a storage change for that file`);
   return structuredClone(golden.state);
 }

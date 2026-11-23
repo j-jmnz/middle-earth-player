@@ -4,12 +4,11 @@ import type { PrintedCard } from "../../../rules/core/printed.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { KNIFE_GOLDENS, knife, knifeLoadout, knifeWorld, playGolden, type KnifeGame } from "../../../../test/scenarios/a-knife-in-the-dark/game.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
-import { checksOf, expectReplays, ownCauses } from "../../../../test/harness/golden-suite.ts";
+import { expectReplays, goldenRows, ownCauses } from "../../../../test/harness/golden-suite.ts";
 
 import { validateLoadout } from "../../loadout.ts";
 import { applyResolution, emptyLog } from "../../log.ts";
-import { GOLDEN_PINS } from "../../../../test/harness/golden-pins.ts";
-import { endOf, goldenText } from "../../../../scripts/game/golden-file.ts";
+import { goldenText } from "../../../../scripts/game/golden-file.ts";
 import { campaignPath } from "../../path.ts";
 import { loadCampaign } from "../../../../scripts/data/load-scenarios.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
@@ -37,11 +36,7 @@ describe("golden: a whole game of A Knife in the Dark", () => {
   });
 
   it("plays the same intents to the same state on fixed seeds", async () => {
-    const pins = GOLDEN_PINS["a-knife-in-the-dark"] ?? [];
-    const out = KNIFE_GOLDENS.map((golden) => {
-      const game = games.get(golden.name);
-      return { ...golden, intents: game?.intents, checks: game ? checksOf(game, ctx) : undefined, end: game ? endOf(game.state) : undefined, state: game && pins.includes(golden.name) ? game.state : undefined };
-    });
+    const out = goldenRows({ scenarioId: "a-knife-in-the-dark", file, goldens: KNIFE_GOLDENS, played: (golden) => games.get(golden.name), ctx: () => ctx });
     await expect(goldenText(out)).toMatchFileSnapshot(file);
   });
 
