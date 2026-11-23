@@ -7,7 +7,7 @@ import { KEYWORD_RULES, pickRule, TIMING_RULES, timingOf } from "./keyword-rules
 
 describe("keyword rules", () => {
   it("name an existing span for every candidate", () => {
-    // Burn X is defined by the Quest Companion, which data/rules holds no span of (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town): its chip says its own definition.
+    // Burn X is defined by the Quest Companion, which data/rules holds no span of (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town): its chip says its own definition.
     for (const word of [...Object.values(KEYWORD_RULES), ...Object.values(TIMING_RULES)]) {
       if (word.text == null) expect(word.rules.length, word.word).toBeGreaterThan(0);
       else expect(word.text.paragraphs.length, word.word).toBeGreaterThan(0);

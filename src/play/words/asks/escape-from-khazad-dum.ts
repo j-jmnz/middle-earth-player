@@ -2,7 +2,7 @@ import type { Ask } from "../asks.ts";
 
 // The choice words of Escape from Khazad-dûm (standalone-scenarios part 13), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario escape-from-khazad-dum --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=escape-from-khazad-dum` prints each sentence.
-// The opposing team's choices (docs/scenarios/standalone-scenarios.md, Escape from Khazad-dûm, reading 3) are the engine's, so a sheet opens only for a choice a player makes or a tie the first player settles. The entries below word those sheets.
+// The opposing team's choices (docs/scenarios/standalone-scenarios/escape-from-khazad-dum.md, Escape from Khazad-dûm, reading 3) are the engine's, so a sheet opens only for a choice a player makes or a tie the first player settles. The entries below word those sheets.
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 51304:B:1 (A Wrong Turn): each player keeps one card of his hand and shuffles the rest into his deck (reading 9).
   "51304:whenRevealed:2 @0.0 Pick": { note: "A Wrong Turn: choose the card of your hand you keep. You shuffle the rest of your hand into your deck.", verb: "Keep", owned: true },

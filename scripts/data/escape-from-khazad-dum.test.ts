@@ -1,4 +1,4 @@
-// Rules: none (Escape from Khazad-dûm has no rulesheet; its rules are the quest cards' and the kit's Quick-build rules, docs/scenarios/standalone-scenarios.md, Escape from Khazad-dûm).
+// Rules: none (Escape from Khazad-dûm has no rulesheet; its rules are the quest cards' and the kit's Quick-build rules, docs/scenarios/standalone-scenarios/escape-from-khazad-dum.md, Escape from Khazad-dûm).
 // Escape from Khazad-dûm, the thirteenth scenario of the Standalone scenarios cycle (its own file: standalone-scenarios.test.ts is at the file-size limit): its codes, its piles and the printed-text
 // ledger read from the scans.
 import { describe, expect, it } from "vitest";

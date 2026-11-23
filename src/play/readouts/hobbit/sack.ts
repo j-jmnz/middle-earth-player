@@ -1,4 +1,4 @@
-// Rules: hob.sack-deck, hob.sack-x (data/rules/entries.json); ledger lines 131023:A:1, 131032:A:2, 131044:A:1 (docs/scenarios/the-hobbit.md, We Must Away, Ere Break of Day, The table).
+// Rules: hob.sack-deck, hob.sack-x (data/rules/entries.json); ledger lines 131023:A:1, 131032:A:2, 131044:A:1 (docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md, We Must Away, Ere Break of Day, The table).
 //
 // The Sack deck as a top-bar dial: how many of the 7 Sack cards the deck still holds, and how many are attached to characters. The deck itself is a pile that shows its count and a back only (the cards are facedown and the players never look at them);
 // a Sack card lies under the character it is attached to, like any attachment. The dial's limit is the 7 the Setup builds the deck from, and it warns when the deck is empty, since an empty Sack deck ignores Sack X (hob.sack-x). The engine decided every card's place;

@@ -2,7 +2,7 @@ import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/
 
 import { copyLine, withCopies } from "../reprint.ts";
 
-// Records for We Must Away, Ere Break of Day (the-hobbit cycle part 1, no campaign card). Every line is read from the scan ledger (data/printed/); the Western Lands set's records are set-western-lands.ts. The readings are in docs/scenarios/the-hobbit.md (We Must Away, Ere Break of Day).
+// Records for We Must Away, Ere Break of Day (the-hobbit cycle part 1, no campaign card). Every line is read from the scan ledger (data/printed/); the Western Lands set's records are set-western-lands.ts. The readings are in docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md (We Must Away, Ere Break of Day).
 // Bilbo Baggins is dealt by the loadout, never by a Setup record, and the cycle has no log: the "discovered" treasure line stores nothing.
 // Rules: hob.setup-we-must-away-ere-break-of-day, hob.sack-deck, hob.sack-x, hob.sack-x-example, rr.attachment-cards, rr.forced, rr.response, rr.travel, rr.victory, rr.doomed-x, rr.engaged, rr.objective-cards (data/rules/entries.json).
 const BILBO = "Bilbo Baggins";

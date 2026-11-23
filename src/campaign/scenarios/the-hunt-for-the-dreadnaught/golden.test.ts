@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, dcce.prepare-your-fleet, dcce.ship-objectives, dcce.ship-enemies, ltp.scoring, docs/scenarios/standalone-scenarios.md (The Hunt for the Dreadnaught) (data/rules/entries.json).
+// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, dcce.prepare-your-fleet, dcce.ship-objectives, dcce.ship-enemies, ltp.scoring, docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md (The Hunt for the Dreadnaught) (data/rules/entries.json).
 import { describe, expect } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";

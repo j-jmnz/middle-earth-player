@@ -15,10 +15,11 @@ import type { ReduceContext } from "../interpret/interpret.ts";
 import { pickCandidates, seatsOf } from "../interpret/pick.ts";
 import { targetCandidates } from "../interpret/effect-verbs.ts";
 import { touchableStagingLocations } from "../interpret/immune-targets.ts";
+import { mayGainResources } from "../families/misc/guards.ts";
 import { characters } from "../combat/combat.ts";
 import type { AmountScope } from "../interpret/amounts.ts";
 import { deckPool } from "../families/uncharted/pick.ts";
-import { amountIdle, candidatesOf, conditionScope, namedCards, readCandidates, readsTable, seatsOfWho } from "./idle-reads.ts";
+import { amountIdle, candidatesOf, conditionScope, namedCards, readCandidates, readsTable, seatsOfWho, xUnchoosable } from "./idle-reads.ts";
 
 // The stats of a card that a lasting effect changes by a number, or by the flag "does not exhaust to commit": a modifier of one of them with no card in play to hold it changes nothing (rr.lasting-effects).
 // Another flag may be a rule of the table the effect sets ("enemies do not make engagement checks", 06040:A:2), which holds for the cards that arrive later too.
@@ -92,7 +93,12 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
     }
     case "SetThreat":
       return state.seats[frame.seat]?.threat === instruction.value;
-    case "AddResources":
+    case "AddResources": {
+      // A hero that cannot gain resources from this card's effect (Bilbo of the Over Hill and Under Hill box, "from player card effects"): every hero it may add them to is barred (rr.triggered-ability).
+      const heroes = namedCards(state, instruction.to ?? "host", source, "picked", frame, mark);
+      if (heroes != null && heroes.length > 0 && heroes.every((hero) => hero != null && !mayGainResources(state, hero.id, sourceId, ctx))) return true;
+      return amountIdle(state, instruction.amount, frame, ctx);
+    }
     case "DamageCard":
       return amountIdle(state, instruction.amount, frame, ctx) || answeredCardLeftPlay(state, instruction, frame);
     case "ModifyStat":
@@ -181,6 +187,9 @@ function searchesEmptyDeck(state: ScenarioState, instruction: Instruction, at: I
   return seatsOf(state, pick, at.seat).every((index) => deckPool(state, index, pick).length === 0);
 }
 
+// Whether the amount of the step is the effect's X.
+const readsX = (instruction: Instruction): boolean => "amount" in instruction && typeof instruction.amount === "object" && "x" in instruction.amount && instruction.amount.x === true;
+
 /**
  * Whether every instruction of the list is idle, in order: the first alone, and each later one idle or a "Then" part that the first one's empty Draw keeps from resolving. A Pick or a PlayFrom
  * makes the cards the later steps read: they are idle when they are for every candidate. A second choice makes what follows depend on two choices, which the table does not settle.
@@ -189,6 +198,8 @@ function searchesEmptyDeck(state: ScenarioState, instruction: Instruction, at: I
 export function idleList(state: ScenarioState, instructions: readonly Instruction[], sourceId: string, frame: IdleFrame, ctx: ReduceContext, mark: IdleMark): boolean {
   let at = frame;
   let idleSteps = 0;
+  // After a ChooseX that finds no number, a step whose amount is X changes nothing.
+  let noX = false;
   const rest = instructions.filter((step) => !paysForRest(step));
   for (const instruction of rest.length > 0 ? rest : instructions) {
     const stays = pickedAttachmentStays(state, instruction, sourceId, at, ctx);
@@ -212,6 +223,18 @@ export function idleList(state: ScenarioState, instructions: readonly Instructio
     if (made != null) {
       if (at.picked != null || made.length > 0) return false;
       at = { ...at, picked: made };
+      continue;
+    }
+    // A ChooseX only sets X: it changes nothing itself, and with no number to choose the steps that read X change nothing either.
+    if (instruction.verb === "ChooseX" && instruction.when == null) {
+      if (xUnchoosable(state, instruction.max, instruction.min ?? 1, at, ctx)) {
+        noX = true;
+        idleSteps += 1;
+      }
+      continue;
+    }
+    if (noX && readsX(instruction)) {
+      idleSteps += 1;
       continue;
     }
     if (!idleStep(state, instruction, sourceId, at, ctx, mark)) return false;

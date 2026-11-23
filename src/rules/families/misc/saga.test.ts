@@ -28,8 +28,10 @@ describe("Bilbo Baggins gains no resources from some cards", () => {
     const bilbo = table.heroes[0] ?? "";
     const card = put(table.state, "gift", "hand");
     const state = syncConstants(table.state, ctx);
-    const played = run(play({ ...card.state, modifiers: state.modifiers }, card.id, ctx), ctx);
-    expect(played.cards[bilbo]?.resources).toBe(5);
+    // The event could add him nothing, so it is not offered (rr.triggered-ability) and his pool stays as it was.
+    const held = run({ ...card.state, modifiers: state.modifiers }, ctx);
+    expect(reduce(held, { type: "PlayCard", cardId: card.id, payments: [] }, ctx).ok).toBe(false);
+    expect(held.cards[bilbo]?.resources).toBe(5);
   });
 
   it("132001: none from cards that are not treasures; a treasure's effect adds them", () => {
@@ -37,7 +39,8 @@ describe("Bilbo Baggins gains no resources from some cards", () => {
     const bilbo = table.heroes[0] ?? "";
     const card = put(table.state, "gift", "hand");
     const synced = syncConstants(table.state, ctx);
-    const played = run(play({ ...card.state, modifiers: synced.modifiers }, card.id, ctx), ctx);
+    const played = run({ ...card.state, modifiers: synced.modifiers }, ctx);
+    expect(reduce(played, { type: "PlayCard", cardId: card.id, payments: [] }, ctx).ok).toBe(false);
     expect(played.cards[bilbo]?.resources).toBe(5);
     const treasureCtx = miscCtx([...RECORDS, gift("trove")]);
     // The same effect on a treasure card: Bilbo gains.

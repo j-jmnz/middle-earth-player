@@ -1,4 +1,4 @@
-// Rules: hob.setup-we-must-away-ere-break-of-day, hob.sack-deck, hob.sack-x, rr.forced, rr.response, rr.reveal, rr.shadow-effects, rr.quest-advancement, rr.doomed-x, rr.surge, rr.engaged, rr.attachment-cards (data/rules/entries.json); docs/scenarios/the-hobbit.md (We Must Away, Ere Break of Day).
+// Rules: hob.setup-we-must-away-ere-break-of-day, hob.sack-deck, hob.sack-x, rr.forced, rr.response, rr.reveal, rr.shadow-effects, rr.quest-advancement, rr.doomed-x, rr.surge, rr.engaged, rr.attachment-cards (data/rules/entries.json); docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md (We Must Away, Ere Break of Day).
 import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, flag, handCount, progressOn, quest, resolve, reveal, respond, stat, threat, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for We Must Away, Ere Break of Day (the-hobbit part 1): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).

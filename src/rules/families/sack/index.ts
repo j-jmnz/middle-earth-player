@@ -1,4 +1,4 @@
-// Rules: hob.sack-deck, hob.sack-x, hob.sack-x-example, rr.travel (data/rules/entries.json); docs/scenarios/the-hobbit.md, We Must Away, Ere Break of Day. The sack family: the Sack deck and Sack X (deck.ts), the When Sacked attach (attach.ts), the removal of the Trolls and Sack cards (remove.ts)
+// Rules: hob.sack-deck, hob.sack-x, hob.sack-x-example, rr.travel (data/rules/entries.json); docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md, We Must Away, Ere Break of Day. The sack family: the Sack deck and Sack X (deck.ts), the When Sacked attach (attach.ts), the removal of the Trolls and Sack cards (remove.ts)
 // and Troll Cave's Baggins travel cost (travel.ts).
 import type { Instruction } from "../../../catalog/boundary.ts";
 

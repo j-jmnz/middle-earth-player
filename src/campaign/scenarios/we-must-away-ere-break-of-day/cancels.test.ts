@@ -1,4 +1,4 @@
-// Rules: rr.cancel, rr.shadow-effects, rr.resources, hob.baggins-sphere-ohauh, hob.sack-x (data/rules/entries.json); docs/scenarios/the-hobbit.md (We Must Away, Ere Break of Day, Troll Camp and the Baggins cost).
+// Rules: rr.cancel, rr.shadow-effects, rr.resources, hob.baggins-sphere-ohauh, hob.sack-x (data/rules/entries.json); docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md (We Must Away, Ere Break of Day, Troll Camp and the Baggins cost).
 import { expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";

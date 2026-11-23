@@ -65,8 +65,9 @@ describe("Bilbo Baggins (131001:A:1, A:2)", () => {
   // "Bilbo Baggins cannot gain resources from player card effects."
   lineSpec("131001:A:2", "gains no resource from a player card effect", (effects) => {
     const tab = table(effects, { heroes: [{ code: BILBO, seat: 0 }, { code: THORIN, seat: 0 }], attached: [{ code: STEWARD, host: BILBO }] }, 0);
-    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, STEWARD), effectId: "01026:action:1" }, tab.ctx);
-    expect(run.state.cards[idsOf(tab, STEWARD)]?.exhausted).toBe(true);
+    // The Action could add him nothing, so it is not offered (rr.triggered-ability) and its cost is not paid.
+    const run = begin(tab.state);
+    expect(triggers(run.state, tab)).not.toContain("01026:action:1");
     expect(run.state.cards[idsOf(tab, BILBO)]?.resources).toBe(0);
   });
 

@@ -1,4 +1,4 @@
-// The western-lands family (the Western Lands encounter set of The Hobbit, docs/scenarios/the-hobbit.md, We Must Away, Ere Break of Day): the small verbs the set's cards need that no other family has. src/rules/families/western-lands/ runs them.
+// The western-lands family (the Western Lands encounter set of The Hobbit, docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md, We Must Away, Ere Break of Day): the small verbs the set's cards need that no other family has. src/rules/families/western-lands/ runs them.
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";

@@ -193,6 +193,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   RemoveFromCampaignPool: [{ verb: "RemoveFromCampaignPool" }],
   CancelDamage: [{ verb: "CancelDamage", amount: 2, target: "host" }, { verb: "CancelDamage", all: true }],
   ChooseX: [{ verb: "ChooseX", min: 2, max: [{ stat: "damage", of: "picked" }] }, { verb: "ChooseX", max: [3, { stat: "resources", of: "picked" }] }],
+  PayFromHero: [{ verb: "PayFromHero", name: "Bilbo Baggins" }],
   MoveDamage: [{ verb: "MoveDamage", amount: 2 }, { verb: "MoveDamage", all: true }],
   TakeLoggedCaptives: [{ verb: "TakeLoggedCaptives", under: "143022" }],
   FreeRingBearer: [{ verb: "FreeRingBearer" }],

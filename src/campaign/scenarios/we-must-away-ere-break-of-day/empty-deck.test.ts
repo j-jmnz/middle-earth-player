@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.running-out-of-cards, rr.step-3-3, rr.quest-advancement, faq.last-encounter-card, rr.shadow-effects (data/rules/entries.json); docs/scenarios/the-hobbit.md (We Must Away, Ere Break of Day, Stage 2B).
+// Rules: rr.forced, rr.running-out-of-cards, rr.step-3-3, rr.quest-advancement, faq.last-encounter-card, rr.shadow-effects (data/rules/entries.json); docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md (We Must Away, Ere Break of Day, Stage 2B).
 import { expect } from "vitest";
 
 import { cardSpecs, count, deckCount, endPhase, quest, zone, type Row } from "../../../../test/harness/card-spec.ts";

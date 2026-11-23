@@ -95,7 +95,7 @@ for (const code of ["131039", "131040"]) {
 }
 
 // 131039 Dreary Hills (2 quest points) and 131040 Lone-Lands (3): "Forced: After placing 1 or more progress tokens on this location, ..." The Forced hears every placement on the card, the one that explores it too (`progressPlacedOnSelf`, the reading of
-// 131038:A:1 Hobbit-lands and of Bottomless Chasm 901606:A:1; docs/scenarios/the-hobbit.md, We Must Away, Ere Break of Day).
+// 131038:A:1 Hobbit-lands and of Bottomless Chasm 901606:A:1; docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md, We Must Away, Ere Break of Day).
 function placeOnActive(effects: readonly Effect[], code: string, layout: Parameters<typeof tableFromLayout>[1], progress: number): ScenarioState {
   const table = tableFromLayout(ID, { active: code, ...layout }, { effects });
   const location = idOf(table.state, code);

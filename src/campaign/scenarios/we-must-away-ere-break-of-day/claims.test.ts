@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.response, rr.timing-of-ability-resolution, rr.attachment-cards, rr.travel, rr.objective-cards, rr.discard-pile-and-victory-display, hob.bilbo-baggins-ohauh, hob.baggins-sphere-ohauh (data/rules/entries.json); docs/scenarios/the-hobbit.md (We Must Away, Ere Break of Day, Troll Key and Troll Purse, Troll Cave, Troll Camp).
+// Rules: rr.forced, rr.response, rr.timing-of-ability-resolution, rr.attachment-cards, rr.travel, rr.objective-cards, rr.discard-pile-and-victory-display, hob.bilbo-baggins-ohauh, hob.baggins-sphere-ohauh (data/rules/entries.json); docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md (We Must Away, Ere Break of Day, Troll Key and Troll Purse, Troll Cave, Troll Camp).
 import { expect } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";

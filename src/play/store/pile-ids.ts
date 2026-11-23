@@ -2,7 +2,7 @@
 // the four every table shows, the second slot's, and the victory display. Which of the second slot's piles a game has is decided here from the state, once. Pure.
 import type { ScenarioState } from "../../rules/core/state.ts";
 
-// The four piles every table shows, and the second slot's: the Corsair deck and its discard pile while the scenario has a Corsair deck (dcce.corsair-deck), the Smaug deck and its discard pile in The Battle of Lake-town (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town), the Evil Creatures deck and its
+// The four piles every table shows, and the second slot's: the Corsair deck and its discard pile while the scenario has a Corsair deck (dcce.corsair-deck), the Smaug deck and its discard pile in The Battle of Lake-town (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town), the Evil Creatures deck and its
 // discard pile while it deals that (emce.evil-creatures-deck), or one deck alone: the Uncharted deck (dcce.uncharted-deck), the Grotto deck (dcce.grotto-deck) or the Caves deck
 // (emce.caves-deck), the Balrog deck and its discard pile in Shadow and Flame Nightmare (the setup card's lines 901801:A:2 to A:4), or the Harad deck lying under The Cross-roads (mec112.setup-journey-to-the-cross-roads). The victory display is a pile too, at staging's right end, only while a card is in it (ltp.victory-display). Only the discard piles and the victory display open a list.
 export type BasePileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";

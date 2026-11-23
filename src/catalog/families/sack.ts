@@ -1,4 +1,4 @@
-// The sack family (We Must Away, Ere Break of Day, docs/scenarios/the-hobbit.md, We Must Away, Ere Break of Day; hob.sack-deck, hob.sack-x): the Sack deck, the Sack X keyword and its When Sacked effects, the Troll Cave's Baggins travel cost and the small verbs and
+// The sack family (We Must Away, Ere Break of Day, docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md, We Must Away, Ere Break of Day; hob.sack-deck, hob.sack-x): the Sack deck, the Sack X keyword and its When Sacked effects, the Troll Cave's Baggins travel cost and the small verbs and
 // condition the Troll lines need. src/rules/families/sack/ runs and reads them. A card with the Sack trait lies in the Sack deck (the zone `sackDeck`, out of play, facedown) until a Sack X draws it; it is shuffled back into the deck whenever it leaves play.
 import { z } from "zod";
 

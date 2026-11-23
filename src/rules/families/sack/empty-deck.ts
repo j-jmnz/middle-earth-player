@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.running-out-of-cards (data/rules/entries.json); ledger line 131024:B:1 ("Forced: If there are no cards left in the encounter deck, advance"). The recorded reading (docs/scenarios/the-hobbit.md, We Must Away, Ere Break of Day):
+// Rules: rr.forced, rr.running-out-of-cards (data/rules/entries.json); ledger line 131024:B:1 ("Forced: If there are no cards left in the encounter deck, advance"). The recorded reading (docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md, We Must Away, Ere Break of Day):
 // an empty encounter deck advances the stage the moment it is empty, before any reset of the deck. A record with the trigger `encounterDeckEmpty` hears the event this settle hook queues whenever the deck is empty and no effect is resolving (the
 // event waits for the open frames, windows.ts canAnnounce); resetEncounterDeck holds back the quest phase reset while such a card is in play, so the Forced effect runs first.
 import type { Effect } from "../../../catalog/boundary.ts";

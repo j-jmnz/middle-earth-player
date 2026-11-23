@@ -5,7 +5,7 @@ import { definePrinted } from "../../core/printed.ts";
 import { spawn } from "../../core/zones.ts";
 import { enemy, hero, table } from "../defense/table.ts";
 
-// Rules: rr.encounter-deck, rr.search (data/rules/entries.json); ledger line 03039:A:2 (docs/scenarios/dwarrowdelf.md, Into the Pit). ShuffleEncounterDiscard with `type`: only the cards of that printed type go back into the deck.
+// Rules: rr.encounter-deck, rr.search (data/rules/entries.json); ledger line 03039:A:2 (docs/scenarios/dwarrowdelf/into-the-pit.md, Into the Pit). ShuffleEncounterDiscard with `type`: only the cards of that printed type go back into the deck.
 
 const place = definePrinted({ code: "place", name: "Place", type: "location", threat: 1 });
 

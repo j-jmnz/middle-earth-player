@@ -27,7 +27,7 @@ What agents read is held small, single and current (user instruction, 2026-11-22
 - An agent file holds only that agent's inputs, steps, hand-back and report. It cites a rule by file and section, never restates it, and never tells the agent to read `CLAUDE.md` or `.claude/rules/` again. A read instruction names sections, not whole files.
 - Say each rule once, in the doc that owns it (`.claude/rules/authority.md` gives the owners). Before writing an instruction, search for the rule (`pnpm doc find`, grep): if another file says it, point there; if two files disagree, fix the owner and delete the copy.
 - Each heading's text is unique in its doc. A doc merge conflict becomes one section, never both sides.
-- A scenario's rulings go in its box's file in `docs/scenarios/`, never in `docs/brief.md`.
+- A scenario's rulings go in its file in `docs/scenarios/<box>/`, never in `docs/brief.md`.
 - Move or delete a doc with `pnpm move`, so no path names a missing doc.
 
 ## `docs/phases/STATUS.md`

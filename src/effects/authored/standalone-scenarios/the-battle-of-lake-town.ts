@@ -2,8 +2,8 @@ import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/
 import { ALWAYS } from "../conditions.ts";
 
 // Records for The Battle of Lake-town (standalone-scenarios cycle part 2, no campaign card). Every line is read from the scan ledger (data/printed/); the Burn X lines are read by the keyword (pnpm data build) and "Immune to player card effects" by its template.
-// The Smaug deck, Burn X and the way a Smaug enters play are not printed on the cards: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town) holds them with their sources (the Quest Companion), and src/catalog/families/smaug.ts the vocabulary.
-// Rules: none printed outside the cards (no rulesheet): docs/scenarios/standalone-scenarios.md (The Battle of Lake-town).
+// The Smaug deck, Burn X and the way a Smaug enters play are not printed on the cards: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town) holds them with their sources (the Quest Companion), and src/catalog/families/smaug.ts the vocabulary.
+// Rules: none printed outside the cards (no rulesheet): docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town).
 
 const LAKE_TOWN = "50207";
 // Smaug is a Dragon, the only one in the scenario: the three Smaug cards in the staging area or engaged.

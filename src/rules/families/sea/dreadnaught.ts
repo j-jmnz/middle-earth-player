@@ -1,4 +1,4 @@
-// Rules: rr.player-elimination, rr.first-player, rr.engaged, rr.ownership-and-control, dcce.ship-objectives (data/rules/entries.json); docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, readings 12, 13, 14, 19, 25 and 7. The pieces of the box that
+// Rules: rr.player-elimination, rr.first-player, rr.engaged, rr.ownership-and-control, dcce.ship-objectives (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, readings 12, 13, 14, 19, 25 and 7. The pieces of the box that
 // no earlier sea card needed: the ship-objective that is flipped to its Upgraded side, the elimination of a player with no ship-objective, the Corsair that comes into play at random, the Ship with the fewest hit points left and the hero that
 // gains the Traits of another.
 import type { Instruction } from "../../../catalog/boundary.ts";

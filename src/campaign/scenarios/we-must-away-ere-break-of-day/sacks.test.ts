@@ -1,4 +1,4 @@
-// Rules: hob.sack-deck, hob.sack-x, hob.sack-x-example, rr.attachment-cards, rr.constant-ability, rr.in-play-and-out-of-play (data/rules/entries.json); docs/scenarios/the-hobbit.md (We Must Away, Ere Break of Day, When Sacked targets).
+// Rules: hob.sack-deck, hob.sack-x, hob.sack-x-example, rr.attachment-cards, rr.constant-ability, rr.in-play-and-out-of-play (data/rules/entries.json); docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md (We Must Away, Ere Break of Day, When Sacked targets).
 import { describe, expect, it } from "vitest";
 
 import { announce, answer, cardSpecs, flag, zone, type Row } from "../../../../test/harness/card-spec.ts";

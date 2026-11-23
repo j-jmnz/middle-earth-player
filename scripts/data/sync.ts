@@ -13,6 +13,7 @@ import { syncNightmare } from "./sources/nightmare.ts";
 import { syncPictures } from "./sources/pictures.ts";
 import { syncRingsDb } from "./sources/ringsdb.ts";
 import { syncRules } from "./sources/rules.ts";
+import { declaredOrigin } from "./sources/origins.ts";
 import { syncScans } from "./sources/scans.ts";
 
 // The only network command. Refreshes data/raw and .cache/pdf, then records every pin in data/sources.json.
@@ -66,7 +67,7 @@ void runScript("data:sync", async (log) => {
     const begin = performance.now();
     sourceLog.info("start");
     try {
-      records[id] = await adapter(sourceLog);
+      records[id] = { ...(await adapter(sourceLog)), ...declaredOrigin(id) };
     } catch (error) {
       // The raw files of the sources that finished are on disk, but their pins are not: say so before the error ends the run.
       if (done.length > 0) log.warn(`data/raw was refreshed for ${done.join(", ")}, but sources.json is not written: rerun those sources or restore data/raw with git`);
