@@ -14,7 +14,7 @@ const SACKS = ["131044", "131045", "131046", "131047", "131048", "131049", "1310
 const TROLLS = ["131032", "131033", "131034"];
 
 // A permanent golden: whole standalone games of We Must Away, Ere Break of Day played by the auto-player (test/scenarios/we-must-away-ere-break-of-day/game.ts) on fixed seeds, through two wins and each way to lose. A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned.
-// The wins are true solo on Easy and two-handed on Normal: the players fight the Trolls, draw and attach their Sack cards, and the quest's progress discards run the encounter deck out (stage 2B advances the moment the deck is empty). The losses are every player's threat at 50
+// The wins are true solo on Easy and two-handed on Normal: the Trolls engage and attack, the players draw and attach their Sack cards, and the quest's progress discards run the encounter deck out (stage 2B advances the moment the deck is empty). The losses are every player's threat at 50
 // and Bilbo Baggins destroyed (131001:A:3). The opening, the causes, a replay and the scoring are checked for each. Update the snapshot only when the change is meant.
 describe("We Must Away, Ere Break of Day golden", () => {
   goldenSuite<DayGolden, DayDecks>({

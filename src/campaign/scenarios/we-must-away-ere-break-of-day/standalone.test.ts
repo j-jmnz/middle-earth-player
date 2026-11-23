@@ -11,7 +11,7 @@ const day = loadAnyScenario("we-must-away-ere-break-of-day");
 describe("We Must Away, Ere Break of Day in the the-hobbit cycle", () => {
   it("has no Nightmare deck, and a win ends at Dawn Take You All with Bilbo Baggins still a hero of the first seat", () => {
     expect(day.nightmare).toBeUndefined();
-    const state = goldenState(day.id, "two-handed win, the Trolls are fought and the Sack cards are drawn");
+    const state = goldenState(day.id, "two-handed win, the Sack cards are drawn and the encounter deck runs out");
     expect(state.cards[state.questStage ?? ""]?.code).toBe("131025");
     const bilbo = Object.values(state.cards).filter((card) => card.code === "131001");
     expect(bilbo.map((card) => [card.zone, card.controller])).toEqual([["heroes", state.firstPlayer]]);
