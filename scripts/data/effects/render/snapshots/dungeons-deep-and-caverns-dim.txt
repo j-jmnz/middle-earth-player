@@ -1,0 +1,261 @@
+Scenario piles that place cards with no record (quest: 131029 Out of the Frying Pan; quest: 131030 Riddles in the Dark; quest: 131031 Into the Fire; staging: 131078 Lake in the Cavern)
+
+## 131029 Out of the Frying Pan
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+131029:A:1 (front): Setup: Add Lake in the Cavern to the staging area. Create a riddle area with stage 2A and follow the setup instructions on that card.
+  131029:setup:1: Setup
+    - create the riddle area: the quest deck's card with code 131030 lies in it, side B up, beside the current quest, and its Setup resolves; the quest advances from the first stage past it
+
+131029:B:1 (back): Players cannot advance to stage 3A unless both 1B and 2B are complete.
+  131029:constant:1: Constant
+    only if not (the current quest stage and stage 2 both hold their quest points (with stage 2 gone, the current stage alone))
+    - the players cannot defeat this stage while this holds
+
+131029:B:2 (back): Forced: Reveal 1 additional encounter card per player during the staging step.
+  131029:forced:1: Forced when the staging step begins, before the first card is revealed
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - reveal 1 additional encounter card(s) for each player in the staging step this phase (the extra reveals go to the players in turn after the one each player makes, so the first player makes the first of them; while the stages are separate, to the player whose stage holds the effect)
+
+## 131030 Riddles in the Dark
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+131030:A:1 (front): Setup: Search the encounter deck for Gollum and Bilbo's Magic Ring. Place Gollum and Bilbo Baggins in the riddle area and attach Bilbo's Magic Ring to Bilbo Baggins. Then, shuffle the encounter deck.
+  131030:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - find the card with code 131074 in the encounter deck or its discard pile and put it into the riddle area (nothing when none is left)
+    - find the card with code 131079 in the encounter deck or its discard pile and attach it to Bilbo Baggins (nothing when none is left)
+    - shuffle the encounter deck
+
+131030:B:1 (back): Players cannot advance to stage 3A unless both 1B and 2B are complete.
+  131030:constant:1: Constant
+    only if not (the current quest stage and stage 2 both hold their quest points (with stage 2 gone, the current stage alone))
+    - the players cannot defeat this stage while this holds
+
+131030:B:2 (back): Progress tokens cannot be added to, or removed from, this quest except by answering riddles.
+  131030:constant:2: Constant
+    - this card: stat noEffectProgress (card effects cannot place progress on this stage or on an active location; the progress a successful quest places is not an effect) 1, while this card is in play
+
+131030:B:3 (back): Cards in the riddle area are immune to player card effects and cannot leave the riddle area except by quest effects.
+  131030:constant:3: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each card (any player controls) or in the staging area or the active location, in the riddle area: stage 2, Gollum, Bilbo Baggins and the Ring on him (while stage 2 is there): stat immuneToPlayerCards 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, in the riddle area: stage 2, Gollum, Bilbo Baggins and the Ring on him (while stage 2 is there), of card type hero: stat cannotQuest 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, in the riddle area: stage 2, Gollum, Bilbo Baggins and the Ring on him (while stage 2 is there), of card type hero: stat cannotAttack 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, in the riddle area: stage 2, Gollum, Bilbo Baggins and the Ring on him (while stage 2 is there), of card type hero: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
+
+## 131031 Into the Fire
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+131031:B:1 (back): When Revealed: The first player gains control of Bilbo Baggins. Reveal 1 encounter card per player and add it to the staging area.
+  131031:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - stage 2 is removed from the game with the riddle area; Bilbo Baggins stays with the first player and is no longer limited
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+131031:B:2 (back): Gollum engages the first player. Damage from undefended attacks made by Gollum must be placed on Bilbo Baggins.
+  131031:whenRevealed:2: When revealed
+    - Gollum, in the riddle area or engaged with another player, engages the first player (once stage 2 has left)
+  131031:triggered:1: Triggered (mandatory, not printed as Forced) on the event firstPlayerTokenPassed
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - Gollum, in the riddle area or engaged with another player, engages the first player (once stage 2 has left)
+  131031:constant:1: Constant
+    - the table: stat gollumDamageToBilbo (damage from the undefended attacks of Gollum goes on Bilbo Baggins) 1, while this card is in play
+
+131031:B:3 (back): All riddle effects are ignored. Treachery cards gain surge.
+  131031:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - while this card is in play every riddle effect is ignored (a marker)
+    - while this card is in play each treachery card revealed from the encounter deck gains surge (a marker)
+
+131031:B:4 (back): If players defeat this stage, they have won the game.
+  131031:constant:3: Constant
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
+
+## 131074 Gollum
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131074:A:1 (front): Forced: After the first player answers a riddle and fails to find at least 1 match, Gollum attacks Bilbo Baggins. (Do not deal a shadow card for this attack.)
+  131074:forced:1: Forced on the event riddleFailed
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - Gollum, in the riddle area, attacks Bilbo Baggins' player: no shadow card is dealt, only Bilbo can defend, and damage nobody defends goes on Bilbo
+
+## 131075 Great Gray Wolf
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131075:A:1 (front): Forced: If Great Gray Wolf is dealt a shadow card with a riddle, return all Creature enemies to the staging area at the end of the combat phase.
+  131075:forced:1: Forced on the event shadowDealtTo (heard about this card)
+    only if this enemy was dealt a shadow card that prints a riddle
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - later, at the end of this phase:
+      - return every enemy with the trait Creature engaged with a player to the staging area
+
+131075:A:2 (front): Riddle: The first player names a card type, sphere and cost, shuffles his deck, then discards the top 3 cards. For each of those cards that matches all three items, place 1 progress token on stage 2.
+  131075:constant:1: Constant
+    - a riddle: the first player names a card type (ally, event, attachment or treasure), a sphere (leadership, spirit, lore, tactics or Baggins), a cost (0 to 6), shuffles his deck and discards its top 3 card(s); each discarded card that matches every named item puts 1 progress on stage 2 (a marker, read when the riddle is answered)
+  131075:whenRevealed:1: When revealed
+    only if this card is being revealed from the encounter deck and no card ignores riddles: the first player may answer its riddle
+    - the first player chooses one of:
+      * option "answer":
+        - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
+      * option "resolve":
+        - resolve this card's other When Revealed effects for the first player, as the reveal would have, leaving its riddle out
+
+## 131076 Wild Wargs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131076:A:1 (front): Forced: If Wild Wargs is dealt a shadow card with a riddle, it gets +2 Attack.
+  131076:forced:1: Forced on the event shadowDealtTo (heard about this card)
+    only if this enemy was dealt a shadow card that prints a riddle
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card: stat attack 2, until the end of the attack
+
+131076:A:2 (front): Riddle: The first player names a card type, shuffles his deck, and discards the top 2 cards. For each of those cards that matches, place 1 progress token on stage 2.
+  131076:constant:1: Constant
+    - a riddle: the first player names a card type (ally, event, attachment or treasure), shuffles his deck and discards its top 2 card(s); each discarded card that matches every named item puts 1 progress on stage 2 (a marker, read when the riddle is answered)
+  131076:whenRevealed:1: When revealed
+    only if this card is being revealed from the encounter deck and no card ignores riddles: the first player may answer its riddle
+    - the first player chooses one of:
+      * option "answer":
+        - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
+      * option "resolve":
+        - resolve this card's other When Revealed effects for the first player, as the reveal would have, leaving its riddle out
+
+## 131077 The Wargs' Glade
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131077:A:1 (front): Forced: After a character takes damage from an attack made by a Creature enemy, remove 1 progress from the current quest.
+  131077:forced:1: Forced on the event damagedByAttack (heard about character (any player controls))
+    only if the attacking enemy is a Creature enemy (any player controls)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - remove 1 progress from the current quest card (all of it when it holds less)
+
+131077:A:2 (front): Riddle: The first player names a sphere, shuffles his deck, and discards the top card. For each of those cards that matches, place 1 progress token on stage 2.
+  131077:constant:1: Constant
+    - a riddle: the first player names a sphere (leadership, spirit, lore, tactics or Baggins), shuffles his deck and discards its top 1 card(s); each discarded card that matches every named item puts 1 progress on stage 2 (a marker, read when the riddle is answered)
+  131077:whenRevealed:1: When revealed
+    only if this card is being revealed from the encounter deck and no card ignores riddles: the first player may answer its riddle
+    - the first player chooses one of:
+      * option "answer":
+        - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
+      * option "resolve":
+        - resolve this card's other When Revealed effects for the first player, as the reveal would have, leaving its riddle out
+
+## 131078 Lake in the Cavern
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+131078:A:1 (front): X is twice the number of players in the game.
+  131078:constant:1: Constant
+    - this card: stat threat the number of players x 2, while this card is in play
+
+131078:A:2 (front): Players cannot travel here.
+  131078:constant:2: Constant
+    - the players cannot travel to this location while this holds
+
+131078:A:3: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+131078:A:4 (front): Forced: After players advance to stage 3, remove Lake in the Cavern from the game.
+  131078:forced:1: Forced on the event afterStageRevealed
+    only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Into the Fire"
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card is removed from the game
+
+## 131079 Bilbo's Magic Ring
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131079:A:1 (front): Attach to Bilbo Baggins.
+  131079:constant:1: Constant
+    - this attachment may be attached to a hero named "Bilbo Baggins"
+
+131079:A:2 (front): Action: When answering a riddle, spend 1 Baggins resource to discard an additional player card from the top of your deck.
+  131079:action:1: Action (cost: pay 1 baggins resource(s) from the host's pool)
+    only if a riddle is being answered in the running effect
+    who acts: any player may trigger it; the acting player is the one who does
+    - the top 1 card(s) of the acting player's deck go to their discard pile
+
+131079:A:3 (front): Action: Exhaust Bilbo's Magic Ring and raise each player's threat by 2 to add 1 Baggins resource to Bilbo Baggins' resource pool.
+  131079:action:2: Action (cost: exhaust this card)
+    who acts: any player may trigger it; the acting player is the one who does
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by 2 (each player)
+    - add 1 resources to its host
+
+## 131080 Come Down Little Bird
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131080:A:1 (front): When Revealed: Starting with the first player, each player must search the encounter deck and encounter discard pile for 1 Creature enemy and put it into play engaged with him. Then, shuffle the encounter deck.
+  131080:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Creature enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
+    - shuffle the encounter deck
+
+131080:A:2 (front): Riddle: The first player names a card type and cost, shuffles his deck, then discards the top 3 cards. For each of those cards that matches both items, place 1 progress token on stage 2.
+  131080:constant:1: Constant
+    - a riddle: the first player names a card type (ally, event, attachment or treasure), a cost (0 to 6), shuffles his deck and discards its top 3 card(s); each discarded card that matches every named item puts 1 progress on stage 2 (a marker, read when the riddle is answered)
+  131080:whenRevealed:2: When revealed
+    only if this card is being revealed from the encounter deck and no card ignores riddles: the first player may answer its riddle
+    - the first player chooses one of:
+      * option "answer":
+        - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
+      * option "resolve":
+        - resolve this card's other When Revealed effects for the first player, as the reveal would have, leaving its riddle out
+
+## 131081 It Likes Riddles?
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131081:A:1 (front): When Revealed: The first player must choose to answer the riddle on this card. If he finds at least 1 match, discard cards from the encounter deck until another card with a riddle is discarded. Then, answer that riddle.
+  131081:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
+    - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): discard cards from the top of the encounter deck until a card with a riddle is discarded, and pick it (the discard pile is shuffled into the deck when it runs out; nothing is picked when no such card is left)
+    - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the first player answers the riddle of the picked card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
+
+131081:A:2 (front): Riddle: The first player names a cost, shuffles his deck, then discards the top 2 cards. For each of those cards that matches, place 1 progress token on stage 2.
+  131081:constant:1: Constant
+    - a riddle: the first player names a cost (0 to 6), shuffles his deck and discards its top 2 card(s); each discarded card that matches every named item puts 1 progress on stage 2 (a marker, read when the riddle is answered)
+
+## 131082 Hiding in the Trees
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131082:A:1 (front): When Revealed: Characters get -1 Willpower and cannot attack until the end of the round.
+  131082:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every character in play, now and entering later: stat willpower -1, until the end of the round
+    - every character in play, now and entering later: stat cannotAttack 1, until the end of the round
+
+131082:A:2 (front): Riddle: The first player names a card type and sphere, shuffles his deck, then discards the top 3 cards. For each of those cards that matches both items, place 1 progress token on stage 2.
+  131082:constant:1: Constant
+    - a riddle: the first player names a card type (ally, event, attachment or treasure), a sphere (leadership, spirit, lore, tactics or Baggins), shuffles his deck and discards its top 3 card(s); each discarded card that matches every named item puts 1 progress on stage 2 (a marker, read when the riddle is answered)
+  131082:whenRevealed:2: When revealed
+    only if this card is being revealed from the encounter deck and no card ignores riddles: the first player may answer its riddle
+    - the first player chooses one of:
+      * option "answer":
+        - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
+      * option "resolve":
+        - resolve this card's other When Revealed effects for the first player, as the reveal would have, leaving its riddle out
+
+## 131083 What's In My Pocket?
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131083:A:1 (front): When Revealed: The first player must choose to answer the riddle on this card. This effect cannot be canceled.
+  131083:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+    - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
+
+131083:A:2 (front): Riddle: The first player names a sphere and cost, shuffles his deck, then discards the top 2 cards. For each of those cards that matches both items, place 1 progress token on stage 2.
+  131083:constant:1: Constant
+    - a riddle: the first player names a sphere (leadership, spirit, lore, tactics or Baggins), a cost (0 to 6), shuffles his deck and discards its top 2 card(s); each discarded card that matches every named item puts 1 progress on stage 2 (a marker, read when the riddle is answered)
+
+## 131084 Not Fair! Not Fair!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131084:A:1 (front): When Revealed: The first player names a card type and then discards the top 3 cards of the encounter deck. For each of those cards that does not match the named type, remove 1 progress token from stage 2. This effect cannot be canceled.
+  131084:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player names a card type: enemy, location, treachery, objective
+    - discard 3 card(s) from the top of the encounter deck
+    - for each card this effect discarded from the top of the encounter deck that is not of the named type, remove 1 progress from stage 2
+
+(rendered pieces: 144 by template, 0 as JSON)

@@ -94,6 +94,7 @@ describe("effects render read fields, picks", () => {
     controlledBy: "attackers",
     sideQuest: true,
     stagingArea: "any",
+    riddleArea: true,
     engagedWith: "picked",
     engageable: true,
     highestThreat: true,
