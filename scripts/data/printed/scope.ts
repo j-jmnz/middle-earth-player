@@ -89,7 +89,7 @@ export const PLAYER_REQUESTS = [
 
 // The packs whose deck-legal player cards the ledger holds (the pilot of reading every player card from its scan). A pack is added here when
 // `pnpm data sync scans --pack <id>` and `pnpm data ledger-seed --pack <id>` have run for it; the ledger file is data/printed/player-cards.json.
-export const PLAYER_PACKS: readonly string[] = [];
+export const PLAYER_PACKS: readonly string[] = ["OHaUH", "HoN"];
 const PLAYER_CARD_TYPES: ReadonlySet<string> = new Set(["hero", "ally", "attachment", "event", "player-side-quest", "contract"]);
 
 /** The deck-legal player cards (hero, ally, attachment, event, player side quest, contract) a pack prints, by code. */

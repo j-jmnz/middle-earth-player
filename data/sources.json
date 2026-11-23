@@ -30429,9 +30429,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "c38656877dfa45077f002ceb4cc4c29d9b758be4798ffcdb2d7601a1f8012f16"
+        "value": "aa4a0974eb64f56fc999e720f747b5b9b5e738efec1e8bf7fa7f2b8425dd1f17"
       },
-      "fetchedAt": "2026-11-20T16:31:05.546Z",
+      "fetchedAt": "2026-11-23T07:35:25.722Z",
       "files": [
         {
           "path": "scans/00001.A.jpg",
@@ -33186,6 +33186,114 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/Many-Thonged-Whip.jpg",
           "sha256": "1e85ffcfd135cda77070af7138e8bf31d94cd398d833507d14024531ff66b703",
           "bytes": 169296
+        },
+        {
+          "path": "scans/05001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Beregond.jpg",
+          "sha256": "23137859ab54655ea1c476008869b3bfad77f2812cd37ad80b45656f1e997442",
+          "bytes": 140786
+        },
+        {
+          "path": "scans/05002.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Boromir.jpg",
+          "sha256": "2e8d2afeef3865bbd5146f86f8a27d202f28bd76c95752479496141640583861",
+          "bytes": 53503
+        },
+        {
+          "path": "scans/05003.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Errand-rider.jpg",
+          "sha256": "1403e81436fe1854839e9d53e88234d8de283282eea24eb879ce4f78c1a3f454",
+          "bytes": 139950
+        },
+        {
+          "path": "scans/05004.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Citadel-Custodian.jpg",
+          "sha256": "95e32c56f879f04abd33ddcb0d07721dba7e03e971c5c2a52566d663d9894c8c",
+          "bytes": 143790
+        },
+        {
+          "path": "scans/05005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Mutual-Accord.jpg",
+          "sha256": "b0c8cb03ceda8bb80d51467bc9aa8663508247b415d2a17cbb1b2f13ec9dd290",
+          "bytes": 134881
+        },
+        {
+          "path": "scans/05006.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Wealth-of-Gondor.jpg",
+          "sha256": "4a7d627fabfac68638a526450873181549dd6c545b583f134c7448da4d210073",
+          "bytes": 152644
+        },
+        {
+          "path": "scans/05007.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Defender-of-Rammas.jpg",
+          "sha256": "b12ea938cdf897ea4bb1125dfe9b572d042f75021d27cbaee79fd102e3ba0c79",
+          "bytes": 144269
+        },
+        {
+          "path": "scans/05008.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Behind-Strong-Walls.jpg",
+          "sha256": "0c2138e19ee9581e8faea1d485566bb86dce63f940e3e2342c992d7a99cab481",
+          "bytes": 131149
+        },
+        {
+          "path": "scans/05009.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Spear-of-the-Citadel.jpg",
+          "sha256": "b3d126b88420f22a1a8160722f225d6c3ca25dab8cc9ae75e7602e0d5a38694c",
+          "bytes": 128169
+        },
+        {
+          "path": "scans/05010.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Damrod.jpg",
+          "sha256": "e8be43060b13ad61205408a771ef296b2804e8b61b925dbcef68e5dd0dc48020",
+          "bytes": 133973
+        },
+        {
+          "path": "scans/05011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Light-the-Beacons.jpg",
+          "sha256": "8fed9af40baa86c711dbbad096bdfe1d15c63e90f89abdf70340c4e8d5a65d17",
+          "bytes": 124673
+        },
+        {
+          "path": "scans/05012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/A-Watchful-Peace.jpg",
+          "sha256": "756142f3d8c16de2f6e6512ef8083db3830044b386e0c64e0582663569caf585",
+          "bytes": 900066
+        },
+        {
+          "path": "scans/05013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Blood-of-Númenor.jpg",
+          "sha256": "64a37f4fdba1cfa01060a5f650d136d70090a46a83058e35e2f4299abe919084",
+          "bytes": 146388
+        },
+        {
+          "path": "scans/05014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Hunter-of-Lamedon.jpg",
+          "sha256": "a7ce6e923cbd3d2797fac460bd261add04c3a9df7a5be36f94932c58b0186be2",
+          "bytes": 141862
+        },
+        {
+          "path": "scans/05015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Ithilien-Tracker.jpg",
+          "sha256": "a3b335811e3ee2be45f399304ca611cfa66800e456a3c56639a7667b613e413c",
+          "bytes": 137145
+        },
+        {
+          "path": "scans/05016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Heirs-of-Numenor/Master-of-Lore.jpg",
+          "sha256": "1aa53eec8d230e9c2531db65a9558e23d1684dbee643b57fc9c21d77a3b40fca",
+          "bytes": 914540
+        },
+        {
+          "path": "scans/05017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Ranger-Spikes.jpg",
+          "sha256": "5b18f86cdf4c23b914e9a56e400827c5c5f2d771cf64ca73de5647aa034bf261",
+          "bytes": 140811
+        },
+        {
+          "path": "scans/05018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Envoy-of-Pelargir.jpg",
+          "sha256": "d067023aa5b98f93186fd637b4a0314642f1ed9caeacde88c9fa559218728322",
+          "bytes": 134305
         },
         {
           "path": "scans/09016.A.jpg",
@@ -36738,6 +36846,120 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Ered-Mithrin-Campaign-Expansion/Masterwork-Bow.jpg",
           "sha256": "1558e89ead2cc399b30b1861497d12c6034e2c6680729a025bd9a65c99421612",
           "bytes": 310672
+        },
+        {
+          "path": "scans/131001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Bilbo-Baggins.jpg",
+          "sha256": "af64331f038db74561a487f636061c0b13bf4a2c40fca9b25d3def969542062f",
+          "bytes": 158958
+        },
+        {
+          "path": "scans/131002.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Thorin-Oakenshield.jpg",
+          "sha256": "8d14d5ffd90ce0e6452ffb16b47f7702bb66167a86ebe12090b6d7e7b48f4754",
+          "bytes": 145229
+        },
+        {
+          "path": "scans/131003.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Nori.jpg",
+          "sha256": "87d102424d447ea21ae4b2ae8012d58918aa9c2856d40405f93a4927396d17d0",
+          "bytes": 855422
+        },
+        {
+          "path": "scans/131004.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Ori.jpg",
+          "sha256": "13600ef7460b775266ac7b8e64e17794e7358461cb265c76266b032cf34e6faa",
+          "bytes": 47999
+        },
+        {
+          "path": "scans/131005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Beorn.jpg",
+          "sha256": "4b223d803ee71d4d8427f09a17acce34d83312287dfe8857dfab17c99eeea1a4",
+          "bytes": 144516
+        },
+        {
+          "path": "scans/131006.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Fili.jpg",
+          "sha256": "3f6fb5a3614fc581e6866320bc2fd1935cbc6f2bbe0ae7122c4b6260fea261c0",
+          "bytes": 143788
+        },
+        {
+          "path": "scans/131007.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Kili.jpg",
+          "sha256": "bd186b46a1e09ad5c069034681237de1d2b7978563cd4a6c40657afc5631f724",
+          "bytes": 145247
+        },
+        {
+          "path": "scans/131008.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Bofur.jpg",
+          "sha256": "219c7bc0a8d58163b45bf7932417ac3dca2d83b9d08740b2744d89c07e00359f",
+          "bytes": 147717
+        },
+        {
+          "path": "scans/131009.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Dori.jpg",
+          "sha256": "bd519c2ce5ab4cb227dad7181376521682a4f4f4143d3b5d29da70c158091221",
+          "bytes": 135397
+        },
+        {
+          "path": "scans/131010.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Gandalf.jpg",
+          "sha256": "88c413b012d44b25c86d91fa3c4f18a0e03d39fef3f9010ed5be1efb0aaed638",
+          "bytes": 146678
+        },
+        {
+          "path": "scans/131011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Cram.jpg",
+          "sha256": "b8aaff035db94154a095a84d1926f57a208c8a2458e28ca10e892eb7e5fa01e2",
+          "bytes": 141486
+        },
+        {
+          "path": "scans/131012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Spare-Hood-and-Cloak.jpg",
+          "sha256": "96b3a88481d4dabc8bdecbe6c0c296b473510bbd15b65c4163cfbb703fe54eaf",
+          "bytes": 141043
+        },
+        {
+          "path": "scans/131013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Thrór's-Map.jpg",
+          "sha256": "fbef49a77bef90153f845737b7c2d23eec89c85ac254715b325560535dd9540f",
+          "bytes": 41462
+        },
+        {
+          "path": "scans/131014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/A-Very-Good-Tale.jpg",
+          "sha256": "0a352dd93c76bccaa98a779dfa4c2ae71eedef582a89433dded12d05b31cdef8",
+          "bytes": 144469
+        },
+        {
+          "path": "scans/131015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Foe-hammer.jpg",
+          "sha256": "2092142201d95d8147e28635ff539be2315564982deeb1277e4a8988f215c8cc",
+          "bytes": 140431
+        },
+        {
+          "path": "scans/131016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Goblin-cleaver.jpg",
+          "sha256": "f3bc055f9a2c9124d2f727d91c3fc84d3c83bc269ea16b729b76d7784dc91878",
+          "bytes": 138202
+        },
+        {
+          "path": "scans/131017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Late-Adventurer.jpg",
+          "sha256": "94ab7106d8ee8899f1e682aeb00d1822ca9b727c5effa92f9b63f1ba9028036f",
+          "bytes": 142016
+        },
+        {
+          "path": "scans/131018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Expecting-Mischief.jpg",
+          "sha256": "285c4b09624bf294968f5c747dd818927d6ee70f271f15b80db6cf5e5d5facfb",
+          "bytes": 127726
+        },
+        {
+          "path": "scans/131019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Burglar-Baggins.jpg",
+          "sha256": "dfedc1f2d9ec893020c5da2c74fdcc674c3e59d680aa3a39a42c0ae4b5edca66",
+          "bytes": 140428
         },
         {
           "path": "scans/141001.A.jpg",
