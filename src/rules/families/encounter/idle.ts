@@ -7,8 +7,8 @@ import { refillsEmptyDeckNow } from "../../interpret/verbs.ts";
 export const encounterIdle: IdleHook = (state, instruction) => {
   if (instruction.verb !== "MoveEncounterCard") return null;
   if (instruction.card === "discardTop") return state.encounterDiscard.length === 0;
-  // The move reads the deck as it stands: the refill from the discard pile comes at the end of a reveal and in Hide (rr.running-out-of-cards), not in the move, so an empty deck has no card
-  // to move in any phase unless the Nightmare refill at any time puts the discard pile back first (`refillsEmptyDeckNow`).
+  // The move reads the deck as it stands. The engine resets the deck from the discard pile at the end of a reveal and in Hide (rr.running-out-of-cards), not in the move, so an empty deck has
+  // no card to move in any phase unless the Nightmare refill at any time puts the discard pile back first (`refillsEmptyDeckNow`). The quest-phase table of the test is what the engine holds today.
   if (instruction.card === "deckTop") return state.encounterDeck.length === 0 && !refillsEmptyDeckNow(state);
   return false;
 };
