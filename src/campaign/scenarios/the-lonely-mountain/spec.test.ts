@@ -49,6 +49,7 @@ const ROWS: readonly Row[] = [
   { line: "132049:A:1", name: "with two players each discards 2 cards at random and all the events count", layout: { stages: STAGES, seats: 2, staging: ["132041"], hand: ["c1", "c1"] }, act: resolve("132049", "whenRevealed"), expect: [handCount(0), stat("132041", "threat", 10)] },
   // 132050 Belching Fire.
   { line: "132050:A:1", name: "When Revealed: each Dragon in the staging area attacks the player with the highest total Willpower committed", layout: { stages: STAGES, staging: ["132041"], committed: ["dh1"] }, act: resolve("132050", "whenRevealed"), expect: [window("defense")] },
+  { line: "132050:A:1", name: "the attack deals no shadow card", layout: { stages: STAGES, staging: ["132041"], committed: ["dh1"], deck: ["f0", "f0"] }, act: resolve("132050", "whenRevealed"), expect: [window("defense"), deckCount(2)] },
   // 132051 Dragon-Spell.
   { line: "132051:A:1", name: "When Revealed: it attaches to the hero with the most resources, a tie to the first player's choice, and takes 1 Willpower for each resource", layout: { stages: STAGES, heroResources: 2 }, act: [reveal("132051"), answer("dh2")], expect: [stat("dh2", "willpower", 0), stat("dh1", "willpower", 2)] },
   { line: "132051:A:1", name: "When Revealed: a hero that has a Dragon-Spell is passed over", layout: { stages: STAGES, heroResources: 2, attached: [{ code: "132051", to: "dh1" }] }, act: reveal("132051"), expect: [stat("dh2", "willpower", 0), stat("dh1", "willpower", 0)] },
