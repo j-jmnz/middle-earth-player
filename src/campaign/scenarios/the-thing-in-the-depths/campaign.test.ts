@@ -8,7 +8,7 @@ import { campaignScenario } from "../../../catalog/scenario-data.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import type { PrintedCard } from "../../../rules/core/printed.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
+import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { UPGRADED_CODES, afterFlight, depthsLoadout, depthsPlan, depthsStart, depthsWorld } from "../../../../test/scenarios/the-thing-in-the-depths/game.ts";
@@ -111,11 +111,13 @@ describe("The Thing in the Depths in the Dream-chaser campaign", () => {
     }
   });
 
-  it("places no progress on Helm of the Stormcaller in the staging area with Northern Tracker: Helm is immune to player card effects (12042:A:1, rr.immune)", () => {
+  it("places no progress on Helm of the Stormcaller in the staging area, and does not offer Northern Tracker's Response for it: Helm is immune to player card effects (12042:A:1, rr.immune)", () => {
     const made = depthsTable(scene, { campaign: true, stage: "12039", progress: 1, staging: [CODES.helm], play: [CODES.northernTracker], setAside: [CODES.sahir, CODES.naasiyah, CODES.blackKey, CODES.blackKeyBurden, CODES.comeTogether, CODES.seaSerpent, CODES.thing] });
     const tracker = idOf(made.state, CODES.northernTracker);
     let run = send(start(made.state), { type: "Commit", cardIds: [made.hero, tracker] }, made.ctx);
-    run = finish(send(run, { type: "Trigger", cardId: tracker, effectId: "01045:response:1" }, made.ctx), made.ctx);
+    // The only location in the staging area is Helm, which player card effects cannot touch: the Response would change nothing, so it is not offered (rr.triggered-ability).
+    expect(legalIntents(run.state, made.ctx).some((intent) => intent.type === "Trigger" && intent.effectId === "01045:response:1")).toBe(false);
+    run = finish(run, made.ctx);
     const helm = where(run.state, CODES.helm)[0];
     expect(helm?.zone).toBe("staging");
     expect(helm?.progress).toBe(0);

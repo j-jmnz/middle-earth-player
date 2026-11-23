@@ -200,8 +200,8 @@ export type EscapeData = {
 // `leftPlayWithAttachments` event is about (families/play/zones.ts).
 // `occurrence`: events one game occurrence created share it (each character of one commit), and are announced together in
 // a single response window (rr.triggering-condition). `fromDeck`: a "revealed" card the encounter deck itself revealed. `fromStaging`: an
-// "engaged" enemy that came from the staging area, kept only in a game with ships (Boarding, families/sea/boarding.ts).
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; byPlayerCard?: true; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean; fromDiscard?: true; fromStaging?: boolean; shadowBlank?: true; uncancelable?: true; at?: number };
+// "engaged" enemy that came from the staging area, kept only in a game with ships (Boarding, families/sea/boarding.ts). `exhaustedToDefend`: a "declaredDefender" character the declaration exhausted (not one that stayed ready or was exhausted already).
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; byPlayerCard?: true; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean; fromDiscard?: true; fromStaging?: boolean; exhaustedToDefend?: true; shadowBlank?: true; uncancelable?: true; at?: number };
 
 // A Response a player may use after an event. It is offered once and may be passed. `event` is the one it answers, when a
 // window answers several events of one occurrence.

@@ -16,6 +16,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import { exhaustAnnounced } from "../../windows/exhaust.ts";
 import type { GameEvent, PendingAttack, ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, livingSeats, modifierActive } from "../../core/state.ts";
+import { gameReads } from "../../core/game-reads.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
 import { groupResources } from "./conditions.ts";
 import { noteAttackDamage } from "./damage.ts";
@@ -82,6 +83,12 @@ export function markDefender(state: ScenarioState, id: string, ctx: ReduceContex
   return { ...state, pendingAttack: withDefense(attack, { marks: { ...attack.defense?.marks, [id]: card.damage } }) };
 }
 
+// The declaredDefender event's flag for "exhausts to defend" (131020:A:3, 142011:A:3): the declaration exhausted the character, which was ready.
+// It is stamped only in a game with a record that reads it, so every other game's queued events stay as they were.
+export function exhaustedToDefend(before: ScenarioState, after: ScenarioState, id: string, ctx: ReduceContext): { exhaustedToDefend?: true } {
+  return after.cards[id]?.exhausted && !before.cards[id]?.exhausted && gameReads(before, ctx, '"exhaustedToDefend"') ? { exhaustedToDefend: true } : {};
+}
+
 // AddDefender: the card joins the defenders of the attack in progress. It exhausts unless it is exhausted already or does not
 // exhaust to defend, and its declaration is announced.
 export function addDefender(state: ScenarioState, id: string, ctx: ReduceContext): ScenarioState {
@@ -91,7 +98,7 @@ export function addDefender(state: ScenarioState, id: string, ctx: ReduceContext
   const exhausted = card.exhausted || staysReadyToDefend(state, id, ctx) ? state : exhaustAnnounced(state, id, ctx);
   const current = exhausted.pendingAttack ?? attack;
   const joined: PendingAttack = current.defenderId ? withDefense(current, { extra: [...(current.defense?.extra ?? []), id] }) : { ...current, defenderId: id };
-  const declared = queueEvent({ ...exhausted, pendingAttack: joined }, { trigger: "declaredDefender", seat: attack.seat, cardId: id, other: attack.enemyId });
+  const declared = queueEvent({ ...exhausted, pendingAttack: joined }, { trigger: "declaredDefender", seat: attack.seat, cardId: id, other: attack.enemyId, ...exhaustedToDefend(state, exhausted, id, ctx) });
   return markDefender(declared, id, ctx);
 }
 

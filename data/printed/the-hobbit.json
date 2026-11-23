@@ -2462,40 +2462,6 @@
       "confirmedBy": null
     },
     {
-      "code": "131001",
-      "side": "A",
-      "printing": "The Hobbit: Over Hill and Under Hill",
-      "scan": {
-        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Bilbo-Baggins.jpg",
-        "sha256": "af64331f038db74561a487f636061c0b13bf4a2c40fca9b25d3def969542062f"
-      },
-      "lines": [
-        "The first player gains control of Bilbo Baggins.",
-        "Bilbo Baggins cannot gain resources from player card effects.",
-        "If Bilbo Baggins leaves play, the players lose the game."
-      ],
-      "inert": [],
-      "misprints": [],
-      "readBy": "Claude Code, read from the scan image",
-      "confirmedBy": null
-    },
-    {
-      "code": "131019",
-      "side": "A",
-      "printing": "The Hobbit: Over Hill and Under Hill",
-      "scan": {
-        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-Over-Hill-and-Under-Hill/Burglar-Baggins.jpg",
-        "sha256": "dfedc1f2d9ec893020c5da2c74fdcc674c3e59d680aa3a39a42c0ae4b5edca66"
-      },
-      "lines": [
-        "Action: Bilbo Baggins gets +2 Willpower, +2 Attack, and +2 Defense until the end of the phase. (You may spend a Baggins resource from Bilbo Baggins' resource pool to play this card even if you do not control Bilbo Baggins.)"
-      ],
-      "inert": [],
-      "misprints": [],
-      "readBy": "Claude Code, read from the scan image",
-      "confirmedBy": null
-    },
-    {
       "code": "131020",
       "side": "A",
       "printing": "The Hobbit: Over Hill and Under Hill",

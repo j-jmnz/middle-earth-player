@@ -9,11 +9,15 @@ import { isNightmareCard, nightmareDeckOf, nightmareDeckOfCode } from "./nightma
 import { dealtCodes, loadAnyScenario, loadCampaigns } from "./load-scenarios.ts";
 import { DATA_DIR } from "./paths.ts";
 import { keyOf, ledgerSchema, loadLedger, type Ledger, type LedgerEntry } from "./printed/ledger.ts";
-import { scanTargets, type ScanTarget } from "./printed/scope.ts";
+import { playerScopeCodes, scanTargets, type ScanTarget } from "./printed/scope.ts";
+import { codesArg, packsArg } from "./sources/scans.ts";
+import { parseArgs } from "../cli-args.ts";
 
 // `pnpm data ledger-seed <scenario-id>`: writes the ledger entries a scenario's cards are missing, from the source text (Hall of Beorn's, through data/cards),
 // with `readBy` empty and the pinned scan named (data/sources.json). Every seeded line is still read against its scan before the scenario is playable: the
 // effect coverage test refuses a playable scenario's card whose entry has no `readBy`. Run `pnpm data sync scans` first when the scenario's scans are not pinned.
+// `--pack <id>` (repeatable) seeds the deck-legal player cards of those packs into data/printed/player-cards.json instead (`pnpm data sync scans --pack <id>` pins their scans first).
+// `--codes <code,code,...>` does the same for single player cards (PLAYER_CODES in printed/scope.ts).
 // `--nightmare` seeds the scenario's Nightmare deck instead (data/printed/nightmare.json): a Nightmare card's scan is its proxy picture, pinned under `pictures/`
 // by `pnpm data sync nightmare`, which is read when `scans/` does not hold it yet.
 
@@ -25,11 +29,14 @@ export const SEED_CONVENTIONS = [
   "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword.",
 ];
 
+// RingsDB's player card text marks bold and italic with tags and icons with [sphere]: the ledger writes plain words (Response:, Willpower, Tactics).
+const plainOf = (line: string): string => line.replace(/<\/?[a-z]+>/g, "").replace(/\[([a-z]+)\]/g, (_, word: string) => word.charAt(0).toUpperCase() + word.slice(1));
+
 // Source text to ledger lines: one per source line, straight apostrophes and quotes. Hall of Beorn runs a printed Escape value (The Dead Marshes) into the sentence above it.
 function linesOf(...texts: (string | null | undefined)[]): string[] {
   return texts
     .flatMap((text) => (text ?? "").replace(/([.)])(Escape: \d+)$/, "$1\n$2").split("\n"))
-    .map((line) => line.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').trim())
+    .map((line) => plainOf(line).replace(/[‘’]/g, "'").replace(/[“”]/g, '"').trim())
     .filter((line) => line !== "");
 }
 
@@ -86,23 +93,41 @@ export function withSeeded(file: unknown | null, campaign: string, seeded: reado
   return { campaign: current.campaign, conventions: [...current.conventions], entries };
 }
 
+export const PLAYER_LEDGER_ID = "player-cards";
+
+export const LEDGER_SEED_USAGE = "Usage: pnpm data ledger-seed <scenario-id> [--nightmare] | --pack <pack>... | --codes <code,code,...>";
+
+/** The arguments of a run: a misspelt flag (`--nightmar` would seed the campaign's ledger) throws, and `--help` asks for the usage. */
+export function ledgerSeedArguments(args: readonly string[]): { id: string | undefined; nightmare: boolean; help: boolean } {
+  const parsed = parseArgs(args, LEDGER_SEED_USAGE, { flags: ["nightmare"], spaced: ["pack", "codes"] });
+  return { id: parsed.positional[0], nightmare: parsed.flags.has("nightmare"), help: parsed.help };
+}
+
 function main(log: Log): void {
-  const id = process.argv.slice(2).find((arg) => !arg.startsWith("--"));
-  const nightmare = process.argv.includes("--nightmare");
-  if (!id) throw new Error("Usage: pnpm data ledger-seed <scenario-id> [--nightmare]");
-  const campaign = loadCampaigns().find((one) => one.scenarios.includes(id));
-  if (!campaign && !nightmare) throw new Error(`No built campaign or cycle holds the scenario ${id}`);
+  const args = process.argv.slice(2);
+  const { id, nightmare, help } = ledgerSeedArguments(args);
+  if (help) {
+    log.info(LEDGER_SEED_USAGE);
+    return;
+  }
+  const packs = packsArg(args);
+  const listed = codesArg(args);
+  const player = packs.length > 0 || listed.length > 0;
+  if (!id && !player) throw new Error(LEDGER_SEED_USAGE);
   const cards = loadCards();
-  const ledgerId = nightmare ? "nightmare" : (campaign?.id ?? id);
+  const campaign = id ? loadCampaigns().find((one) => one.scenarios.includes(id)) : undefined;
+  if (!player && !campaign && !nightmare) throw new Error(`No built campaign or cycle holds the scenario ${id}`);
+  const ledgerId = player ? PLAYER_LEDGER_ID : nightmare ? "nightmare" : (campaign?.id ?? (id as string));
+  const label = player ? [...(packs.length > 0 ? [`packs ${packs.join(", ")}`] : []), ...(listed.length > 0 ? [`codes ${listed.join(", ")}`] : [])].join(" and ") : `${id}${nightmare ? " (Nightmare)" : ""}`;
   const file = path.join(DATA_DIR, "printed", `${ledgerId}.json`);
   const raw = existsSync(file) ? readFileSync(file, "utf8") : null;
   const existing = raw === null ? null : (JSON.parse(raw) as unknown);
-  const codes = nightmare ? nightmareDeckCodes(id, cards) : dealtCodes(campaign as NonNullable<typeof campaign>, [loadAnyScenario(id)], { nightmare: false });
+  const codes = player ? new Set(playerScopeCodes(packs, listed, cards)) : nightmare ? nightmareDeckCodes(id as string, cards) : dealtCodes(campaign as NonNullable<typeof campaign>, [loadAnyScenario(id as string)], { nightmare: false });
   const { entries, unpinned } = seedEntries(codes, loadLedger(), cards, pinnedScans(undefined, { nightmare }));
-  for (const key of unpinned) log.warn(`${key} has no pinned scan: run pnpm data sync ${nightmare ? "nightmare" : "scans"}`);
+  for (const key of unpinned) log.warn(`${key} has no pinned scan: run pnpm data sync ${nightmare ? "nightmare" : player ? `scans${packs.map((pack) => ` --pack ${pack}`).join("")}${listed.length > 0 ? ` --codes ${listed.join(",")}` : ""}` : "scans"}`);
   const next = withSeeded(existing, ledgerId, entries);
   writeFileSync(file, `${JSON.stringify(next, null, indentOf(raw))}\n`);
-  log.info(`${id}${nightmare ? " (Nightmare)" : ""}: ${entries.length} sides seeded into ${path.relative(process.cwd(), file)} (${next.entries.length} in all), readBy empty`);
+  log.info(`${label}: ${entries.length} sides seeded into ${path.relative(process.cwd(), file)} (${next.entries.length} in all), readBy empty`);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) void runScript("data:ledger-seed", main);

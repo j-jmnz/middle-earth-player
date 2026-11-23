@@ -2,10 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { RECORDS } from "../../../effects/authored/families/defense.ts";
+import { EFFECTS } from "../../../effects/index.ts";
 
 import { attackBarred } from "../../interpret/constants.ts";
 import { definePrinted } from "../../core/printed.ts";
-import { legalIntents } from "../../engine/reduce.ts";
+import { legalIntents, type LegalIntent } from "../../engine/reduce.ts";
 import { flagged, type ScenarioState } from "../../core/state.ts";
 import { ally, enemy, hero, offered, recordsOf, send, table, treachery, until, type TableSpec } from "./table.ts";
 
@@ -76,6 +77,26 @@ describe("after an attack the attached hero defended", () => {
     expect(readied.cards[ids.aragorn!]?.exhausted).toBe(false);
     // The second player's enemy is another enemy, but not one engaged with the defending player: its shadow card stays.
     expect(readied.cards[ids["deck:shade"]!]?.zone).toBe("shadow");
+  });
+
+  it("does not offer Armored Destrier to a hero that readied himself already (Elrohir): the ready changes nothing and the shadow card stays (rr.then)", () => {
+    const mount = definePrinted({ code: "12059", name: "Armored Destrier", type: "attachment", sphere: "leadership", cost: 2 });
+    const effects = [...recordsOf(RECORDS, "12059"), ...EFFECTS.filter((effect) => effect.cardCode === "04001")];
+    const { state, ids, ctx } = toCombat(
+      stopped({ cards: [hero("04001", { defense: 3 }), mount, enemy("orc", { attack: 2, engagementCost: 40 }), enemy("goblin", { attack: 2, engagementCost: 10 }), shade], effects, heroes: [{ code: "04001" }], attachments: [{ code: "12059", host: "04001" }], enemies: [{ code: "orc" }, { code: "goblin" }], encounter: ["shade", "shade"] }),
+      (current) => current.window?.kind === "chooseEnemy",
+    );
+    const defended = send(until(send(state, { type: "ChooseEnemy", enemyId: ids.orc! }, ctx), ctx, defenseWindow), { type: "DeclareDefender", defenderId: ids["04001"]! }, ctx);
+    const stop = (current: ScenarioState, legal: readonly LegalIntent[]) => offered(legal, "12059:response:1") || (current.window?.kind === "defense" && current !== defended);
+    // Exhausted from defending, the hero is readied by the Destrier once the attack is over.
+    const after = until(defended, ctx, stop);
+    expect(offered(legalIntents(after, ctx), "12059:response:1")).toBe(true);
+    // Readied by Elrohir after he is declared as a defender, he stays ready: the Destrier's ready would change nothing, so it is not offered and the shadow card is not discarded.
+    const readied = send(defended, { type: "Trigger", cardId: ids["04001"]!, effectId: "04001:response:1", payments: [{ heroId: ids["04001"]!, amount: 1 }] }, ctx);
+    expect(readied.cards[ids["04001"]!]?.exhausted).toBe(false);
+    const done = until(readied, ctx, stop);
+    expect(offered(legalIntents(done, ctx), "12059:response:1")).toBe(false);
+    expect(done.cards[ids["deck:shade"]!]?.zone).toBe("shadow");
   });
 
   it("gives The Day's Rising's hero a resource when it defends and takes no damage", () => {

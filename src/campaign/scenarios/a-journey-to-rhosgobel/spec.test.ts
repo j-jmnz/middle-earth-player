@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, attack, cardSpecs, damageOn, deckCount, defend, endPhase, endRound, exhausted, flag, lost, quest, resolve, respond, reveal, stat, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for A Journey to Rhosgobel (shadows-of-mirkwood part 3): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). A constant resolved by itself (`resolve`) is applied twice (once by the action, once by the table), so a
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). A constant resolved by itself (`resolve`) is applied twice (once by the action, once by the table), so a
 // stat row reads a number off an unrelated announcement instead.
 const ROWS: readonly Row[] = [
   { line: "02060:A:1", name: "Setup places 2 damage tokens on Wilyador", layout: { staging: ["02064"] }, act: resolve("02060", "setup"), expect: [damageOn("02064", 2)] },

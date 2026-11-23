@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, damageOn, deckCount, drew, exhausted, handCount, progressOn, quest, resolve, reveal, stagingThreat, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Long Dark (dwarrowdelf part 7): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The rows here are the lines a table and one action show; the flows of several steps (the locate test and its
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The rows here are the lines a table and one action show; the flows of several steps (the locate test and its
 // results, the Lost choices, Twisting Passage, Eastern Mines, Gathering Ground, the Shadows that need an attack with a second seat) are tests titled with their line id in lines.test.ts. The stand-in heroes dh1 and dh2 are the first player's; PASS is printed on the box's locations 04089, 04090, 04091 and 04092.
 const ROWS: readonly Row[] = [
   // 04086 Journey in the Black Pit. Setup: the first player attaches Cave Torch to a hero. B:1: cards are discarded until X locations lie in the discard pile; they go to the staging area and the other cards go back. B:2: +1 Threat for each location.

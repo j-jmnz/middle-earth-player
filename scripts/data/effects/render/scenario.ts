@@ -65,7 +65,7 @@ function finalStageCodes(): ReadonlySet<string> {
 
 // `piles`: where the scenario deals each code, so a card the piles place says so.
 // `nightmare`: the scenario's Nightmare deck cards, printed after the others under their own heading.
-export function renderCodes(env: RenderEnv, codes: readonly string[], piles: ReadonlyMap<string, string> = new Map(), nightmare: readonly string[] = []): Rendered {
+export function renderCodes(env: RenderEnv, codes: readonly string[], piles: ReadonlyMap<string, string> = new Map(), nightmare: readonly string[] = [], checks = false): Rendered {
   const sections: string[] = [];
   // The cards the scenario's piles place with no record (the staging and quest piles), so a Setup line that says "Add X to the staging area" is seen to be done by the piles.
   const placed = [...piles].filter(([, pile]) => pile !== "encounter").map(([code, pile]) => `${pile}: ${code} ${env.byCode.get(code)?.name ?? ""}`);
@@ -77,7 +77,7 @@ export function renderCodes(env: RenderEnv, codes: readonly string[], piles: Rea
     const card = env.byCode.get(code);
     if (!card) continue;
     const rawLines = (["A", "B"] as const).flatMap((side) => (env.ledger.byKey.get(keyOf(code, side))?.lines ?? []).map((line, at) => ({ lineId: lineId(code, side, at + 1), line })));
-    const rendered = renderCard(card, segmentsOf(card, env.ledger), EFFECTS, env.inertIds, { ...(rawLines.length > 0 ? { rawLines } : {}), ...(piles.has(code) ? { pile: piles.get(code) } : {}), ...(finalStageCodes().has(code) ? { finalStage: true } : {}) });
+    const rendered = renderCard(card, segmentsOf(card, env.ledger), EFFECTS, env.inertIds, { ...(rawLines.length > 0 ? { rawLines } : {}), ...(piles.has(code) ? { pile: piles.get(code) } : {}), ...(finalStageCodes().has(code) ? { finalStage: true } : {}), ...(checks ? { checks: true } : {}) });
     total.template += rendered.tally.template;
     total.json += rendered.tally.json;
     sections.push(rendered.text);
@@ -86,7 +86,7 @@ export function renderCodes(env: RenderEnv, codes: readonly string[], piles: Rea
 }
 
 // A scenario's cards: the ones its authored file has records for (every dealt card with `allDealt`, or when it has no authored file).
-export async function renderScenario(env: RenderEnv, scenarioId: string, allDealt: boolean, log: Log): Promise<Rendered> {
+export async function renderScenario(env: RenderEnv, scenarioId: string, allDealt: boolean, log: Log, checks = false): Promise<Rendered> {
   const scenario = loadAnyScenario(scenarioId);
   const dealt = [...dealtCodes(loadCampaigns(), [scenario])];
   const owned = allDealt ? null : await authoredCodes(scenario.id, log);
@@ -95,5 +95,5 @@ export async function renderScenario(env: RenderEnv, scenarioId: string, allDeal
   const codes = dealt.filter((code) => (owned === null ? !deck.has(code) : owned.has(code) && !deck.has(code))).sort();
   const deckCodes = [...deck].filter((code) => (ownedDeck === null || ownedDeck.has(code)) && dealt.includes(code)).sort();
   log.info(`scenario ${scenario.id}: ${codes.length + deckCodes.length} cards`);
-  return renderCodes(env, codes, new Map(scenario.cards.map((card) => [card.code, card.pile])), deckCodes);
+  return renderCodes(env, codes, new Map(scenario.cards.map((card) => [card.code, card.pile])), deckCodes, checks);
 }
