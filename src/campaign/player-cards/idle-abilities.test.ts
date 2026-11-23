@@ -44,6 +44,7 @@ const BERAVOR = "01012";
 const ELEANOR = "01008";
 const DUNHERE = "01009";
 const NOBLE = "noble";
+const CONDITION = "condition";
 const PAL = "pal";
 const RIDER = "141039";
 const FORD = "141072";
@@ -57,6 +58,7 @@ const offeredPlay = (tab: Table, code: string): boolean => playableCards(tab.sta
 beforeAll(async () => {
   const starter = await starterBase();
   base = { ...starter, cards: new Map([...starter.cards, ...(await loadPrinted([STALLION, BILL, RALLYING_CRY, KNIFE_WORK, ELROND, ATHELAS, SHADOW, GIMLI, GRIM_RESOLVE, NORTHERN_TRACKER, WE_DO_NOT_SLEEP, CAPTAINS, MEN_OF_THE_WEST, HUNTER, EXPLORER, WARDEN, CEORL, MENDOR, OUTMATCHED, SWIFT_AND_SILENT, DETERMINATION, ARAGORN_LORE, ARAGORN, BERAVOR, ELEANOR, DUNHERE]))]) };
+  base.cards.set(CONDITION, definePrinted({ code: CONDITION, name: "Condition", type: "attachment", sphere: "neutral", cost: 0, traits: ["Condition"] }));
   base.cards.set(NOBLE, definePrinted({ code: NOBLE, name: "Noble", type: "hero", sphere: "leadership", threat: 9, willpower: 1, attack: 1, defense: 1, health: 3, traits: ["Noble"] }));
 });
 
@@ -219,6 +221,14 @@ describe("Athelas 09011:A:2 with nothing to heal or discard", () => {
 
   it("is offered once a character has damage", () => {
     expect(triggers(athelas(2).state, athelas(2))).toContain("09011:action:1");
+  });
+
+  it("is offered for a character with no damage that carries a Condition attachment it may discard", () => {
+    const tab = table({ heroes: [{ code: BERAVOR, seat: 0 }], attached: [{ code: ATHELAS, host: BERAVOR }, { code: CONDITION, host: BERAVOR }] });
+    expect(triggers(tab.state, tab)).toContain("09011:action:1");
+    // The same table with the attachment of another trait is refused again.
+    const plain = table({ heroes: [{ code: BERAVOR, seat: 0 }], attached: [{ code: ATHELAS, host: BERAVOR }] });
+    expect(triggers(plain.state, plain)).not.toContain("09011:action:1");
   });
 });
 
