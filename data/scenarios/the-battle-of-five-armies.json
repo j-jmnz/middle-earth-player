@@ -166,6 +166,20 @@
     }
   ],
   "campaignPlaced": [],
+  "sagaStart": {
+    "hero": "132001"
+  },
+  "treasures": [
+    "131020",
+    "131021",
+    "131022",
+    "132019",
+    "132020",
+    "132021",
+    "132022",
+    "132023",
+    "132024"
+  ],
   "widgets": {
     "hide": false,
     "secondActiveLocation": false,

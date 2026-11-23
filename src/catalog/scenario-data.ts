@@ -87,6 +87,8 @@ export const scenarioDataSchema = z
     // first player picks, with `attached` (The One Ring) attached to him (scenarios 10 to 12). Absent for the Fellowship box, whose six scenarios
     // all start with a Ring-bearer and its attachments in the campaign's `prelude`.
     sagaStart: z.union([z.strictObject({ hero: z.string().min(1) }), z.strictObject({ ringBearer: z.literal(true), attached: z.array(z.string().min(1)).min(1) })]).optional(),
+    // The Hobbit: the treasure cards a deck may add at this scenario's Setup (hob.treasure-ohauh, hob.treasure-otd), the treasures of the earlier scenarios the Setup lists by icon. Absent where none is listed.
+    treasures: z.array(z.string().min(1)).min(1).optional(),
     // Table pieces the cards call for, read from their printed text by the build.
     widgets: z.strictObject({ hide: z.boolean(), secondActiveLocation: z.boolean(), perSeatStaging: z.boolean() }),
     // The DragnCards decks the Fellowship box is loaded from (null where the box has none: Hall of Beorn's counts and the printed

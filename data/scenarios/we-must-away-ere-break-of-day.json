@@ -194,6 +194,9 @@
     }
   ],
   "campaignPlaced": [],
+  "sagaStart": {
+    "hero": "131001"
+  },
   "widgets": {
     "hide": false,
     "secondActiveLocation": false,

@@ -11,7 +11,7 @@ import { legalIntents, reduce, startScenario } from "../../engine/reduce.ts";
 import { updateCard } from "../../core/state.ts";
 import { attachTo } from "../../core/zones.ts";
 import { MISC_CARDS, miscCtx } from "./fixture.ts";
-import { play, put, run, seat, send, trigger } from "../play/fixture.ts";
+import { play, put, run, seat, trigger } from "../play/fixture.ts";
 
 const gift = (code: string): Effect => ({
   id: `${code}:action:1`,
@@ -61,20 +61,20 @@ describe("Bilbo Baggins gains no resources from some cards", () => {
 
 describe("Burglar Baggins and The Lucky Number", () => {
   it("Burglar Baggins gives Bilbo +2 Willpower, Attack and Defense, and may be paid from his pool by a player who does not control him (131019:A:1)", () => {
-    const table = seat(2, ["131001"]);
-    const [bilbo0, bilbo1] = table.heroes;
-    const burglar = put(table.state, "131019", "hand", 1);
-    const synced = syncConstants(run(burglar.state, ctx), ctx);
-    // The first player controls every Bilbo Baggins.
-    expect(synced.cards[bilbo1 ?? ""]?.controller).toBe(0);
+    // One Bilbo, controlled by the first player (seat 0); seat 1 holds the card.
+    const table = seat(2, ["rohan"]);
+    const placed = put(table.state, "131001", "heroes", 0);
+    const bilbo = placed.id;
+    const burglar = put(placed.state, "131019", "hand", 1);
+    const synced = syncConstants(run(updateCard(burglar.state, bilbo, { resources: 5 }), ctx), ctx);
+    expect(synced.cards[bilbo]?.controller).toBe(0);
     const state: typeof synced = { ...synced, activeSeat: 1, window: { kind: "pass" }, planningSeat: 1 };
-    let played = play(state, burglar.id, ctx, [{ heroId: bilbo1 ?? "", amount: 1 }]);
-    expect(played.cards[bilbo1 ?? ""]?.resources).toBe(4);
-    // Two Bilbos are in play in this test (one for each seat): the player chooses.
-    expect(played.window).toMatchObject({ kind: "choose" });
-    played = send(played, { type: "Choose", optionId: bilbo0 ?? "" }, ctx);
-    const synced2 = syncConstants(run(played, ctx), ctx);
-    expect(modifiedStat(synced2, synced2.cards[bilbo0 ?? ""]!, "willpower", ctx.cards)).toBeGreaterThanOrEqual(2 + 2);
+    const played = play(state, burglar.id, ctx, [{ heroId: bilbo, amount: 1 }]);
+    expect(played.cards[bilbo]?.resources).toBe(4);
+    const after = syncConstants(run(played, ctx), ctx);
+    expect(modifiedStat(after, after.cards[bilbo]!, "willpower", ctx.cards)).toBe(2 + 2);
+    expect(modifiedStat(after, after.cards[bilbo]!, "attack", ctx.cards)).toBe(2 + 2);
+    expect(modifiedStat(after, after.cards[bilbo]!, "defense", ctx.cards)).toBe(2 + 2);
   });
 
   it("The Lucky Number adds Bilbo's total Willpower, Attack and Defense to another character (132013:A:1)", () => {

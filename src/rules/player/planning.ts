@@ -30,7 +30,7 @@ import { queueEvent } from "../windows/queue.ts";
 import { playerCardEffectCanChoose, raiseThreat, uniqueBlocked } from "../core/keywords.ts";
 import { planningTurn } from "../windows/pass.ts";
 import { hasResourceMatch, heroPays } from "./payments.ts";
-import { printedOf, type PrintedCard } from "../core/printed.ts";
+import { playsOntoHost, printedOf, type PrintedCard } from "../core/printed.ts";
 import { attachBlocked } from "../interpret/restrictions.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats, updateCard } from "../core/state.ts";
@@ -83,11 +83,11 @@ export function playCard(
   // A player side quest is placed in the staging area (families/sidequests/play.ts).
   if (printed.type === "player-side-quest") return enterStaging(next, intent.cardId, seat, steps);
   // An attachment played unattached, onto a threat dial, or guarded (families/attachments/play.ts).
-  const elsewhere = printed.type === "attachment" ? playElsewhere(next, intent.cardId, intent.hostId, seat, ctx, steps) : null;
+  const elsewhere = playsOntoHost(printed) ? playElsewhere(next, intent.cardId, intent.hostId, seat, ctx, steps) : null;
   if (elsewhere) return elsewhere;
   next = moveCard(next, intent.cardId, { zone: "play", seat });
   next = updateCard(next, intent.cardId, { exhausted: entersExhausted(ctx, instance.code) });
-  if (printed.type === "attachment" && intent.hostId) {
+  if (playsOntoHost(printed) && intent.hostId) {
     // Played on another player's character, it is that player's to control (rr.attachment-cards).
     next = hostTakesControl(attachTo(next, intent.cardId, intent.hostId), intent.cardId, ctx);
     next = queueEvent(next, { trigger: "played", seat, cardId: intent.cardId });
@@ -211,7 +211,7 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
     if (instruction.verb === "PlayOnlyIf" && !holds(state, instruction.condition, scope, ctx)) return "That card's play restriction is not met";
   }
   const printed = printedOf(ctx.cards, instance.code);
-  if (printed.type !== "ally" && printed.type !== "attachment" && printed.type !== "event" && printed.type !== "player-side-quest") return "That card cannot be played";
+  if (printed.type !== "ally" && !playsOntoHost(printed) && printed.type !== "event" && printed.type !== "player-side-quest") return "That card cannot be played";
   // A card with no printed cost (an ally with the Encounter keyword) is never played from the hand (rr.cost).
   if (printed.cost == null && !printed.costX) return "That card cannot be played";
   // Events are Actions: any action window. Allies and attachments are played in the planning phase only, by the
@@ -247,7 +247,7 @@ export function playReason(
   const instance = state.cards[intent.cardId];
   if (!instance) return "That card is not in hand";
   const printed = printedOf(ctx.cards, instance.code);
-  if (printed.type === "attachment") {
+  if (playsOntoHost(printed)) {
     if (!intent.hostId) return "Choose a host";
     const host = state.cards[intent.hostId];
     if (!playHosts(state, instance, ctx).includes(intent.hostId)) {
@@ -276,7 +276,7 @@ function playHosts(state: ScenarioState, instance: { code: string; zone: string 
 
 export function attachmentTargets(state: ScenarioState, cardId: string | undefined, ctx: ReduceContext): readonly string[] {
   const instance = cardId ? state.cards[cardId] : undefined;
-  if (!instance || ctx.cards.get(instance.code)?.type !== "attachment") return [];
+  if (!instance || !playsOntoHost(printedOf(ctx.cards, instance.code))) return [];
   return playHosts(state, instance, ctx);
 }
 

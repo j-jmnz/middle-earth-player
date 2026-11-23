@@ -1,4 +1,4 @@
-// Rules: rr.card-types, rr.ownership-and-control, rr.constant-ability (data/rules/entries.json).
+// Rules: rr.card-types, rr.ownership-and-control, rr.constant-ability, rr.player-elimination, hob.bilbo-multiplayer-ohauh, hob.bilbo-multiplayer-otd (data/rules/entries.json).
 //
 // Rules the play family's constants keep true at all times, checked by settle (machine.ts) with the other sweeps: an ally that
 // gained the hero card type sits among its controller's heroes and functions as a hero ("Attached character loses the ally card
@@ -136,7 +136,11 @@ export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: Engin
       // An objective ally in the staging area joins the first player's play area, faceup and ready, and stays with that player when the first player token moves on: "joins the first player" is one change of
       // control, not a rule that follows the token (Grimbeorn the Old, 02037:A:2; docs/scenarios/shadows-of-mirkwood.md, Conflict at the Carrock).
       } else if (id && held?.zone === "staging" && instruction.intoPlay === true) next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up", exhausted: false });
-      else if (id && (instruction.intoPlay !== true || instruction.follows === true) && held?.controller !== holder) next = giveControl(next, id, holder, ctx.cards);
+      else if (id && (instruction.intoPlay !== true || instruction.follows === true) && held?.controller !== holder) {
+        next = giveControl(next, id, holder, ctx.cards);
+        // "If Bilbo Baggins is the last hero under a player's control, and he then leaves that player's control, that player is immediately eliminated" (hob.bilbo-multiplayer-ohauh, hob.bilbo-multiplayer-otd; rr.player-elimination).
+        if (held?.zone === "heroes") next = eliminateEmpties(next, steps);
+      }
     } else if (instruction.verb === "DiscardWhen" && modifiedStat(next, source, instruction.stat, ctx.cards) <= instruction.max) {
       next = destroyCard(next, source.id, ctx.cards, steps);
     }

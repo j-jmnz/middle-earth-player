@@ -484,6 +484,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         ...(Object.keys(reprints).length > 0 ? { reprints } : {}),
         ...(life != null ? { life } : {}),
         ...(sagaStart ? { sagaStart } : {}),
+        ...(def.treasures ? { treasures: [...def.treasures] } : {}),
         widgets,
         source: { dragnNormal: normalKey, dragnEasy: easyDeck ? easyKey : null, hobSlug: hob.Slug },
         ...(nightmare.data ? { nightmare: nightmare.data } : {}),

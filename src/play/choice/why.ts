@@ -7,7 +7,7 @@ import { attachmentTargets, playWindowReason } from "../../rules/player/planning
 import { fewestHeroesIn } from "../../rules/player/cost-rules.ts";
 import { exhaustSlack } from "../../rules/families/costs/play.ts";
 import { payingSlack } from "../../rules/families/deck/play.ts";
-import { printedOf } from "../../rules/core/printed.ts";
+import { playsOntoHost, printedOf } from "../../rules/core/printed.ts";
 import { reduce, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { playRequest } from "./pay.ts";
@@ -33,7 +33,7 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
     }
     switch (refused) {
       case "That intent is not legal in this window":
-        if (printed.type === "ally" || printed.type === "attachment") return `${printed.type === "ally" ? "Allies" : "Attachments"} are played in the planning phase.`;
+        if (printed.type === "ally" || playsOntoHost(printed)) return `${printed.type === "ally" ? "Allies" : printed.type === "treasure" ? "Treasures" : "Attachments"} are played in the planning phase.`;
         return game.window ? "Nothing can be played at this point." : "Nothing can be played right now.";
       case "Only the active player plays allies and attachments now":
         return "Allies and attachments are played in your own planning turn.";
@@ -55,7 +55,7 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
         return `${refused}.`;
     }
   }
-  if (printed.type === "attachment" && attachmentTargets(game, cardId, ctx).length === 0) return "No card can take it now.";
+  if (playsOntoHost(printed) && attachmentTargets(game, cardId, ctx).length === 0) return "No card can take it now.";
   const request = playRequest(game, ctx, cardId);
   return request ? shortWords(request.total, request.pools.reduce((sum, pool) => sum + pool.max, 0), playSlack(game, ctx, cardId), printed.sphere) : null;
 }
