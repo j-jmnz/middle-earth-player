@@ -1,8 +1,8 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-import { SCAN_CACHE_DIR } from "../paths.ts";
-import { scanTargets } from "../printed/scope.ts";
+import { DATA_DIR, SCAN_CACHE_DIR } from "../paths.ts";
+import { playerScopeCodes, scanTargets } from "../printed/scope.ts";
 import { bytes, createLog, type Log } from "../../log.ts";
 import { combinedPin, fetchBytes, sha256, type SourceFile, type SourceRecord } from "./fetch.ts";
 
@@ -33,12 +33,37 @@ const MIN_WIDTH = 400;
 // image of at least this width; every side that already had a MIN_WIDTH image keeps it.
 const FALLBACK_WIDTH = 300;
 
+// `--pack <id>` (repeatable) fetches only the deck-legal player cards of those packs and merges their pins into the ones data/sources.json already holds,
+// so a new pack is pinned without fetching every scan again. `--codes` does the same for single cards.
+export function packsArg(argv: readonly string[]): string[] {
+  return argv.flatMap((arg, at) => (arg === "--pack" && argv[at + 1] ? [argv[at + 1] as string] : []));
+}
+
+// `--codes <code,code,...>` (repeatable) names single deck-legal player cards beside the packs.
+export function codesArg(argv: readonly string[]): string[] {
+  return argv.flatMap((arg, at) => (arg === "--codes" && argv[at + 1] ? (argv[at + 1] as string).split(",").map((code) => code.trim()).filter((code) => code !== "") : []));
+}
+
+/** `previous` pins with `fresh` ones written over the same path, in path order. */
+export function mergePins(previous: readonly SourceFile[], fresh: readonly SourceFile[]): SourceFile[] {
+  const byPath = new Map([...previous, ...fresh].map((file) => [file.path, file] as const));
+  return [...byPath.values()].sort((a, b) => a.path.localeCompare(b.path));
+}
+
+function pinnedFiles(): SourceFile[] {
+  const sources = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Record<string, SourceRecord> };
+  return sources.sources.scans?.files ?? [];
+}
+
 // Card scans stay out of git. They are fetched into .cache/scans/<code>.<side>.<jpg|png> and pinned by sha256 in
 // data/sources.json, which is what the printed-text ledger names.
 export async function syncScans(log: Log = createLog("scans")): Promise<SourceRecord> {
   mkdirSync(SCAN_CACHE_DIR, { recursive: true });
   const files: SourceFile[] = [];
-  const targets = scanTargets();
+  const packs = packsArg(process.argv.slice(2));
+  const codes = codesArg(process.argv.slice(2));
+  const partial = packs.length > 0 || codes.length > 0;
+  const targets = partial ? scanTargets(playerScopeCodes(packs, codes)) : scanTargets();
   log.info(`${targets.length} card sides to fetch into ${SCAN_CACHE_DIR}`);
   const tick = log.progress(targets.length, "scan");
   let fallbacks = 0;
@@ -74,5 +99,6 @@ export async function syncScans(log: Log = createLog("scans")): Promise<SourceRe
     tick(`${target.code}.${target.side} ${widthOf(fetched.bytes)} px, ${bytes(fetched.bytes.length)}${failures.length > 0 ? ` (after ${failures.length} unusable URL${failures.length === 1 ? "" : "s"})` : ""}`);
   }
   if (fallbacks > 0) log.info(`${fallbacks} side${fallbacks === 1 ? "" : "s"} came from a fallback URL (--verbose lists the skipped ones)`);
-  return { id: "scans", site: "https://hallofbeorn.com", pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
+  const all = partial ? mergePins(pinnedFiles(), files) : files;
+  return { id: "scans", site: "https://hallofbeorn.com", pin: { kind: "sha256", value: combinedPin(all) }, fetchedAt: new Date().toISOString(), files: all };
 }

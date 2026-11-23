@@ -91,11 +91,20 @@ describe("rules store", () => {
     expect(steps.find((step) => step.id === "6.E")?.entries).toEqual(["rr.step-6-3", "rr.step-6-4-1", "rr.step-6-4-2", "rr.step-6-4-3", "rr.step-6-4-4", "rr.step-6-4a", "rr.step-6-4b", "rr.step-6-5", "rr.step-6-6"]);
   });
 
+  // Every prefix entries.json holds (rr, ltp, mec109, faq, dcce, ...), so a new document's ids are checked without editing this test.
+  const ruleIds = (prefixes: readonly string[]): RegExp => {
+    const escaped = prefixes.map((prefix) => prefix.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&"));
+    return new RegExp(`\\b((?:${escaped.join("|")})(?:\\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+)\\b(?![-<*])`, "g");
+  };
+
+  it("reads an id with dots whole, so a mistyped one is checked", () => {
+    const text = "faq.errata.99999, rr.stagng.x and rr.travel. also faq.errata.131013 and mec109.setup-* and dcce.setup-<id>";
+    expect([...text.matchAll(ruleIds(["rr", "faq", "mec109", "dcce"]))].map((match) => match[1])).toEqual(["faq.errata.99999", "rr.stagng.x", "rr.travel", "faq.errata.131013"]);
+  });
+
   it("knows every rule id that src, docs and the tests name", () => {
     const found = new Set<string>();
-    // Every prefix entries.json holds (rr, ltp, mec109, faq, dcce, ...), so a new document's ids are checked without editing this test.
-    const prefixes = [...new Set(entries.map((entry) => entry.id.split(".")[0] ?? ""))].map((prefix) => prefix.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&"));
-    const ids = new RegExp(`\\b((?:${prefixes.join("|")})\\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\\b(?![-<*])`, "g");
+    const ids = ruleIds([...new Set(entries.map((entry) => entry.id.split(".")[0] ?? ""))]);
     const scan = (file: string): void => {
       for (const match of readFileSync(file, "utf8").matchAll(ids)) found.add(match[1] ?? "");
     };
@@ -103,7 +112,8 @@ describe("rules store", () => {
     // The plan and the 8c phase file name the old wrong ids on purpose, as findings.
     for (const file of listFiles(path.join(ROOT, "docs"), ".md")) if (!/plans|phase-08c/.test(file)) scan(file);
     const unresolved = [...found].filter((id) => !byId.has(id)).sort();
-    // A wildcard in prose ("mec109.setup-*", "dcce.setup-<id>") names a family of ids: the pattern above skips an id followed by -, < or *.
+    // A wildcard in prose ("mec109.setup-*", "dcce.setup-<id>") names a family of ids: the pattern above skips an id followed by -, < or *. An id with a dot in it
+    // (`faq.errata.<card code>`) is read whole, so a mistyped one is reported.
     expect(unresolved).toEqual([]);
     expect(found.size).toBeGreaterThan(15);
   });

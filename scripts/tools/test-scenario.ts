@@ -3,8 +3,12 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
+import type { Effect } from "../../src/catalog/boundary.ts";
+import { EFFECTS } from "../../src/effects/index.ts";
+import { EXEMPT, unnamedRecords } from "../checks/line-coverage.ts";
+import { namedInTests } from "../checks/tracked.ts";
 import { loadCards } from "../data/load-cards.ts";
-import { loadCampaignsInOrder, loadAnyScenario } from "../data/load-scenarios.ts";
+import { dealtCodes, loadCampaigns, loadCampaignsInOrder, loadAnyScenario } from "../data/load-scenarios.ts";
 import { DATA_DIR, ROOT } from "../data/paths.ts";
 import { duration, runScript, type Log } from "../log.ts";
 import { smokeCodes } from "../card-smoke/world.ts";
@@ -19,6 +23,7 @@ import { unreachedReport } from "./unreached.ts";
 //   pnpm test scenario <scenario-id> --quick      the loop while authoring: skips the goldens (the registry-wide golden tests and the scenario's own golden.test.ts) and the reader
 //                                                 check; the full run, once before the hand-back, runs them (docs/agents/agent-brief.md, Scenario procedure)
 //   pnpm test scenario <scenario-id> --words      only src/play/words/scenario-words.test.ts for the scenario, and src/play/words/asks.test.ts when it has an asks file
+//   pnpm test scenario <scenario-id> --no-records   with any of the above: the records part reports the records no test names and does not fail (the Build task, before Tests)
 //                                                 (src/play/words/asks/<id>.ts), with WORDS_DUMP=<id>: it prints every sentence the scenario's choices say (the
 //                                                 check for a bare "Choose a player." or a fallback sentence, and for a scenario with an asks file every asks entry rendered)
 //
@@ -43,6 +48,10 @@ import { unreachedReport } from "./unreached.ts";
 //   unreached  not a part: after a run that played the scenario's goldens, the records of its own cards that no golden resolves, with whether a test of the scenario names each
 //              (test/harness/reached.ts writes the list, scripts/tools/unreached.ts prints it); each one needs a card test or a golden that reaches it, and the list never fails the run
 //   budget     the tests part's time, held to the scenario's budget on a full run (Test budget, below)
+//   records    not a vitest run: every effect record of the cards the scenario deals (and of its campaign's starter decks, when it opens the campaign) is named by a test, as
+//              scripts/checks/line-coverage.test.ts holds for every card; a record no test names fails the run, with its id
+// After the parts, a warning (never a failure) lists the render snapshots of other scenarios that differ from the merge base with origin/main (scripts/data/effects/render/snapshots): the
+// task's report must explain each, since a change to a shared record or template moved another scenario's render.
 // `--list` prints the files and codes without running anything. A file runs once, in the first part that names it.
 
 // Test budget: the scenario's own tests (the tests part) take at most TEST_BUDGET_SECONDS of test time in all, summed over their files as
@@ -201,6 +210,26 @@ export function playerCodes(id: string, recorded: readonly string[]): string[] {
   return [...new Set(dealt)].filter((code) => withRecords.has(code));
 }
 
+/** The player cards and encounter cards of the scenario whose records a test must name: every card it deals, and the starter decks of the campaign it opens. */
+export function scenarioCodes(id: string): Set<string> {
+  const codes = dealtCodes(loadCampaigns(), [loadAnyScenario(id)]);
+  const campaign = loadCampaignsInOrder().find((one) => one.scenarios.includes(id));
+  if (campaign?.scenarios[0] === id) for (const deck of campaign.starterDecks ?? []) for (const row of deck.rows) codes.add(row.code);
+  return codes;
+}
+
+/** The ids of the records of the scenario's cards that no test names, from the effect list and the names the tests hold (EXEMPT, with its reason, is left out). */
+export function unnamedOfScenario(codes: ReadonlySet<string>, effects: readonly Effect[], named: ReadonlySet<string>): string[] {
+  return unnamedRecords(effects.filter((effect) => codes.has(effect.cardCode)), named).filter((recordId) => !(recordId in EXEMPT)).sort();
+}
+
+const SNAPSHOT_DIR = "scripts/data/effects/render/snapshots/";
+
+/** The scenarios other than `id` whose render snapshot is among the changed files, by id. */
+export function otherSnapshots(changed: readonly string[], id: string): string[] {
+  return changed.filter((file) => file.startsWith(SNAPSHOT_DIR) && file.endsWith(".txt")).map((file) => file.slice(SNAPSHOT_DIR.length, -".txt".length)).filter((name) => name !== id).sort();
+}
+
 const SMOKE_NODE = ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON"];
 
 /** The card smokes of the scenario: the player cards' (skipped when it deals none), and the encounter smoke, which every scenario has. */
@@ -240,8 +269,10 @@ async function main(log: Log): Promise<void> {
   const listOnly = process.argv.includes("--list");
   const wordsOnly = process.argv.includes("--words");
   const quick = process.argv.includes("--quick");
+  // The Build task writes the records before the Tests task names them: it runs with --no-records, which reports the count and does not fail on it.
+  const noRecords = process.argv.includes("--no-records");
   const id = args[0];
-  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test scenario <scenario-id> [--list | --quick | --words]");
+  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test scenario <scenario-id> [--list | --quick | --words] [--no-records]");
   if (!existsSync(path.join(DATA_DIR, "scenarios", `${id}.json`))) throw new Error(`${id} is not a scenario in data/scenarios`);
 
   if (wordsOnly) {
@@ -315,6 +346,10 @@ async function main(log: Log): Promise<void> {
     results.push({ name: smoked.name, ok: outcome.ok, ms: outcome.ms, detail: smoked.detail });
   }
 
+  // Every record of the scenario's cards is named by a test.
+  const unnamed = unnamedOfScenario(scenarioCodes(id), EFFECTS, namedInTests());
+  results.push({ name: "records", ok: unnamed.length === 0 || noRecords, ms: 0, detail: unnamed.length === 0 ? "every record of the scenario's cards is named by a test" : noRecords ? `${unnamed.length} records wait for a test (--no-records: the Tests task names them)` : `${unnamed.length} records no test names (docs/agents/card-audit.md, Tests from the printed line): ${unnamed.slice(0, 20).join(" ")}${unnamed.length > 20 ? " ..." : ""}` });
+
   // The records no golden resolves (the golden suite ran: a full run, or one that named the scenario's golden test).
   if (existsSync(unreachedPath)) {
     const rows = (JSON.parse(readFileSync(unreachedPath, "utf8")) as { unreached: Unreached[] }).unreached;
@@ -322,6 +357,12 @@ async function main(log: Log): Promise<void> {
     for (const line of unreachedReport(rows, texts)) log.info(line);
   }
   for (const result of results) (result.ok ? log.info : log.error)(`${result.name.padEnd(9)} ${result.ok ? "passed" : "FAILED"}  ${result.detail}${result.ms > 0 ? `  (${duration(result.ms)})` : ""}`);
+  // A warning, not a failure: another scenario's render moved with this change.
+  const moved = otherSnapshots(changed, id);
+  if (moved.length > 0) {
+    log.warn(`the render snapshot of ${moved.length} other scenario${moved.length === 1 ? "" : "s"} differs from the merge base with origin/main; the task's report must explain each:`);
+    for (const name of moved) log.warn(`  ${name}`);
+  }
   const failed = results.filter((result) => !result.ok);
   if (failed.length > 0) throw new Error(`failed: ${failed.map((result) => result.name).join(", ")}`);
 }

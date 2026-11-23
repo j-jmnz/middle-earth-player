@@ -555,7 +555,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource(s) come off the resource pool of this card (discarded, not spent)
-    - then, if all of: (every draw and every discard of the top of the deck this effect ran so far resolved in full (what follows "then" is attempted only when they did)) and (resources of this card is less than 1) (checked when this step runs, after the steps above; not tied to whether they did anything): one out-of-play copy of the card with code 141069 (set aside, in the encounter discard pile, in the victory display or under a card) joins the encounter deck, which is shuffled (when copies are out of play in more than one zone the first player chooses which; nothing with no copy left)
+    - then, if all of: (every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows "then" is attempted only when they all did)) and (resources of this card is less than 1) (checked when this step runs, after the steps above; not tied to whether they did anything): one out-of-play copy of the card with code 141069 (set aside, in the encounter discard pile, in the victory display or under a card) joins the encounter deck, which is shuffled (when copies are out of play in more than one zone the first player chooses which; nothing with no copy left)
 
 ## 906207 Forsaken Inn
 

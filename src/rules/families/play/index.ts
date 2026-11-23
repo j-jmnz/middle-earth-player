@@ -7,6 +7,7 @@ import type { Focus } from "../index.ts";
 import { changeControl, doomed, switchActor, takeFirstPlayer } from "./control.ts";
 import { placeTokens, putFromHand, putIntoPlay } from "./enter.ts";
 import { attachFacedown, discardSameTitle, returnAttachments, spendFrom, takeIntoHand } from "./leave.ts";
+import { playIdle } from "./idle.ts";
 
 // The verbs src/catalog/families/play.ts adds, for putting cards into play, leaving play, delayed returns, control changes and card type changes. Null when the verb is not one of them.
 // The constants (ControlledBy, DiscardWhen) are kept by the settle sweep (families/play/sweep.ts): they do nothing when run.
@@ -44,4 +45,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "play", verbs: ["PutIntoPlay", "PutIntoPlayFromHand", "ChangeControl", "TakeFirstPlayer", "Doomed", "TakeIntoHand", "ReturnAttachments", "AttachFacedown", "SwitchActor", "PlaceDamage", "SpendFrom", "DiscardSameTitle", "ControlledBy", "DiscardWhen"], run };
+export const manifest: RulesFamily = { name: "play", verbs: ["PutIntoPlay", "PutIntoPlayFromHand", "ChangeControl", "TakeFirstPlayer", "Doomed", "TakeIntoHand", "ReturnAttachments", "AttachFacedown", "SwitchActor", "PlaceDamage", "SpendFrom", "DiscardSameTitle", "ControlledBy", "DiscardWhen"], run, idle: playIdle };

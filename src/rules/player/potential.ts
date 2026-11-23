@@ -25,7 +25,8 @@ import type { Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { costsOf } from "../../catalog/costs.ts";
 import { isPlayerCardEffect } from "../core/keywords.ts";
-import type { GameEvent, ScenarioState } from "../core/state.ts";
+import { inPlay, type GameEvent, type ScenarioState } from "../core/state.ts";
+import { printedOf } from "../core/printed.ts";
 import { targetCandidates } from "../interpret/effect-verbs.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import type { AmountScope } from "../interpret/amounts.ts";
@@ -97,11 +98,17 @@ function counted(effect: Effect): readonly Instruction[] {
   return from < 0 ? effect.instructions : effect.instructions.slice(0, from);
 }
 
+// An objective in play that a player controls: the players use its Action or Response themselves.
+function playerObjective(state: ScenarioState, sourceId: string, ctx: ReduceContext): boolean {
+  const source = state.cards[sourceId];
+  return source != null && source.controller != null && inPlay(source.zone) && printedOf(ctx.cards, source.code).type === "objective";
+}
+
 /** Why a Trigger of a player card's Action or Response cannot change the game state, or null. `event` is the one a Response answers. */
 export function noChangeReason(state: ScenarioState, effect: Effect, sourceId: string, seat: number, ctx: ReduceContext, event?: GameEvent): string | null {
   if (effect.timing !== "action" && effect.timing !== "response") return null;
-  // An encounter card's ability is the game's, not a player card effect (rr.triggered-ability speaks of player cards).
-  if (!isPlayerCardEffect(state, ctx.cards, sourceId)) return null;
+  // An encounter card's ability is the game's, not a player card effect (rr.triggered-ability speaks of player cards). An objective a player controls is read like a player card: the players use its Action or Response themselves, and its cost cannot be paid when its effect cannot change the game (rr.cost; Durin's Key 19036:A:2 with no location in play, Mendor 01135:A:3 while he is ready).
+  if (!isPlayerCardEffect(state, ctx.cards, sourceId) && !playerObjective(state, sourceId, ctx)) return null;
   const steps = counted(effect);
   const first = steps[0];
   const source = state.cards[sourceId];

@@ -60,7 +60,15 @@ export function drawVerb(
   const gained = (state.seats[target]?.deck.length ?? 0) - (drawn.seats[target]?.deck.length ?? 0);
   if (data?.kind !== "effect" || !readsThen(ctx)) return drawn;
   // A draw that found fewer cards than it named is not resolved in full, so what follows "then" is not attempted (the `thenResolves` condition).
-  return gained > 0 || count > gained ? patchTop(drawn, { data: { ...data, ...(gained > 0 ? { drew: true } : {}), ...(count > gained ? { short: true } : {}) } }) : drawn;
+  const noted = gained > 0 ? patchTop(drawn, { data: { ...data, drew: true } }) : drawn;
+  return count > gained ? markShort(noted, ctx) : noted;
+}
+
+// The running effect did not resolve in full (a draw, a discard or a ready that fell short), so what follows "then" is not attempted (the `thenResolves` condition, rr.then). Only a game whose records
+// read it keeps the mark.
+export function markShort(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  const data = topFrame(state)?.data;
+  return data?.kind === "effect" && readsThen(ctx) ? patchTop(state, { data: { ...data, short: true } }) : state;
 }
 
 const READS_THEN = new WeakMap<readonly Effect[], boolean>();

@@ -10,8 +10,8 @@ import { WESTERN_LANDS_EFFECTS } from "./set-western-lands.ts";
 // Rules: hob.treasure-ohauh, hob.treasure-otd, hob.saga-player-cards-ohauh, hob.saga-player-cards-otd, hob.bilbo-baggins-ohauh, hob.bilbo-baggins-otd, hob.baggins-sphere-ohauh, hob.baggins-sphere-otd,
 // rr.attachment-cards, rr.restricted, rr.ranged, rr.defending-player, rr.cancel, rr.victory, rr.cost (data/rules/entries.json).
 const BILBO = "Bilbo Baggins";
-/** "After Bilbo Baggins exhausts to defend": the defender is exhausted once declared, so the host being exhausted says it did. */
-const HOST_EXHAUSTED: Condition = { kind: "matches", card: "host", pick: { type: "hero", control: "any", state: "exhausted" } };
+/** "After Bilbo Baggins exhausts to defend": the declaration exhausted the host (an already exhausted Bilbo, made to defend by an effect, did not exhaust to defend). */
+const HOST_EXHAUSTED: Condition = { kind: "exhaustedToDefend" };
 
 const TREASURE_EFFECTS: readonly Effect[] = withCopies(
   [

@@ -31,6 +31,7 @@ describe("effects render read fields, picks", () => {
     playerCard: false,
     highestThreatPlusRemaining: true,
     attachable: "03041",
+    takesSource: true,
     engaged: "other",
     names: ["Urdug"],
     exceptNames: ["Ufthak"],
