@@ -82,6 +82,7 @@ import woodlandFixtures from "./fixtures/the-woodland-realm.json";
 import minesFixtures from "./fixtures/the-mines-of-moria.json";
 import khazadFixtures from "./fixtures/escape-from-khazad-dum.json";
 import dreadnaughtFixtures from "./fixtures/the-hunt-for-the-dreadnaught.json";
+import grimFixtures from "./fixtures/over-the-misty-mountains-grim.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -182,6 +183,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-mines-of-moria": minesFixtures,
   "escape-from-khazad-dum": khazadFixtures,
   "the-hunt-for-the-dreadnaught": dreadnaughtFixtures,
+  "over-the-misty-mountains-grim": grimFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
