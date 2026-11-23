@@ -5,6 +5,7 @@ import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { CardRef, Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard } from "../../interpret/amounts.ts";
+import { markShort } from "../../interpret/effect-verbs.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { beginEnemyAttack, characters } from "../../combat/combat.ts";
@@ -124,7 +125,8 @@ function searchToStaging(state: ScenarioState, code: string, ctx: ReduceContext,
     const instance = state.cards[id];
     return instance != null && printedOf(ctx.cards, instance.code).name === title;
   });
-  if (!found) return state;
+  // Nothing found: the search did not resolve, so a "Then" step after it is not attempted (rr.then).
+  if (!found) return markShort(state, ctx);
   return updateCard(moveCard(state, found, { zone: "staging" }), found, { face: "up", controller: null, damage: 0, progress: 0, resources: 0 });
 }
 
