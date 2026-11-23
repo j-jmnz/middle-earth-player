@@ -31,7 +31,7 @@ function engagedEnemies(state: ScenarioState, seat: number): string[] {
 // ImmediateAttackEach. The first time it runs it queues an attack for each engaged enemy ahead of the rest of the effect; each
 // queued attack runs when the one before it is resolved. Outside an effect nobody can wait for the attacks, so none is made.
 export function immediateAttackEach(state: ScenarioState, instruction: Each, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (instruction.enemy != null) return attackWith(state, instruction.enemy, ctx, steps);
+  if (instruction.enemy != null) return attackWith(state, instruction.enemy, ctx, steps, undefined, 0, false, instruction.shadow !== false);
   const data = effectData(state);
   if (!data) return state;
   // `trait`: only the engaged enemies with it ("All engaged Troll enemies attack", 900208:A:1).

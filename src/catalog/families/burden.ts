@@ -32,7 +32,7 @@ const VERBS = [
   // enemy attacked. `enemy` is engine use: the enemy whose attack is next.
   // `own`: only the enemies engaged with the actor ("Each Undead enemy engaged with you makes an immediate attack", 144026:A:2).
   // `trait`: only the engaged enemies with this trait ("All engaged Troll enemies attack", 900208:A:1); `notTrait`: only those without it ("Each engaged non-Ship enemy makes an immediate attack", 11067:A:1).
-  z.strictObject({ verb: z.literal("ImmediateAttackEach"), enemy: z.string().min(1).optional(), trait: z.string().min(1).optional(), notTrait: z.string().min(1).optional(), own: z.literal(true).optional(), ...when }),
+  z.strictObject({ verb: z.literal("ImmediateAttackEach"), enemy: z.string().min(1).optional(), shadow: z.literal(false).optional(), trait: z.string().min(1).optional(), notTrait: z.string().min(1).optional(), own: z.literal(true).optional(), ...when }),
   // Setup: one copy of the card goes into each player's deck, which is shuffled ("each player shuffles 1 copy of Poisoned Counsels into his deck", 143072:A:1; a burden that functions like a
   // player card, mec112.poisoned-counsels-searching-eye). The Setup runs once the starting hands are drawn, so the copy is never in an opening hand. Inside a Choose of the quest card's Setup it makes the record run. A Campaign Setup shuffles a copy in with `ShuffleIntoEachDeck` (campaign family) instead; this one is for a scenario's own Setup.
   verbFlags(z.strictObject({ verb: z.literal("ShuffleCopyIntoEachDeck"), code: z.string().min(1), ...when }), { setupRuns: "inChoose" }),

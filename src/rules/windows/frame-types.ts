@@ -264,6 +264,8 @@ export type PendingAttack = {
   immediate?: boolean;
   // The attack is a shadow card's own (Wolf Rider, 01081:A:2), made once the attack it was dealt to ended.
   shadowAttack?: boolean;
+  // The defending player must declare the character with the most damage, an exhausted one too, and cannot leave the attack undefended while one can defend (Ravenous Warg, 132059:A:1; families/armies/defender.ts).
+  mustDefend?: true;
   defenderId?: string;
   // The hero an undefended attack lands on.
   heroId?: string;

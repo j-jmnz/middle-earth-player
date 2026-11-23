@@ -26,7 +26,7 @@ export function questCardsInPlay(state: ScenarioState, seat: number, ctx: Reduce
 
 /** The cards that may be the current quest: the main quest card (not in the quest phase while it cannot be chosen, 10094:B:3) and the side quests, encounter and player, in the staging area. */
 function choosable(state: ScenarioState, ctx: ReduceContext): string[] {
-  return [...(state.questStage && !mainQuestBarred(state) ? [state.questStage] : []), ...stagedSideQuests(state, ctx)];
+  return [...(state.questStage && !mainQuestBarred(state) ? [state.questStage] : []), ...(state.armies?.stages.filter((id) => id !== state.questStage && state.cards[id] != null) ?? []), ...stagedSideQuests(state, ctx)];
 }
 
 /** The quest card that is the current quest now: the side quest chosen until the end of the phase, else the main quest card; none in the quest phase while the main quest card cannot be chosen and no side quest was. */
@@ -37,6 +37,8 @@ function currentQuestCard(state: ScenarioState): string | null {
 /** The current quest is the card (`id`): the mark of the side quest that held it ends, and a side quest takes it until the end of the phase; the main quest card takes it by holding no mark. */
 export function setCurrentQuest(state: ScenarioState, id: string, ctx: ReduceContext): ScenarioState {
   const cleared: ScenarioState = state.modifiers.some((modifier) => modifier.stat === "currentQuest") ? { ...state, modifiers: state.modifiers.filter((modifier) => modifier.stat !== "currentQuest") } : state;
+  // One of the stages in play together (The Battle of Five Armies) is the current quest stage by being the stage the quest is at (hob.current-quest-stage).
+  if (cleared.armies?.stages.includes(id)) return { ...cleared, questStage: id };
   return id === cleared.questStage ? cleared : makeCurrentQuest(cleared, { verb: "MakeCurrentQuest", card: id }, ctx);
 }
 

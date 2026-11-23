@@ -35,6 +35,7 @@ import { islandTravelTo } from "../families/island/travel.ts";
 import { reduceQuestProgress } from "../families/angmar/progress.ts";
 import { currentSideQuest, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
 import { replaceStageProgress } from "./progress-replaced.ts";
+import { jointAdvance } from "../families/armies/advance.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -275,6 +276,9 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     if (next.stageChoice === "due" || next.stageHeld === currentId) return next;
     // Defeating a stage when the Stormcaller is at its stage means the players have caught up to it and win (families/stormcaller/values.ts, 12013:B:3).
     if (caughtUp(next, current.code)) return clearStage(next);
+    // Stages 2 to 4 of The Battle of Five Armies advance together to the stage after them (families/armies/advance.ts).
+    const joint = jointAdvance(next, currentId, cards);
+    if (joint) next = joint.state;
     const index = next.stages.findIndex((stage) => stage.code === current.code);
     // A quest that is ordered by its quest deck (ShuffleStages, LookAtStages, families/quest/order.ts) goes to the top stage of the deck, or asks.
     const ordered = orderedNext(next, current.code);
@@ -289,7 +293,7 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     // A stage that names AdvanceIfAttached (50601:B:3) proceeds to the stage its Loot condition names.
     const attached = ordered || branched || rolled ? null : attachedStageFrom(next, current.code, cards);
     if (attached) next = attached.state;
-    const nextId = ordered ? ordered.id : rolled ? rolled.id : attached ? attached.id : (() => {
+    const nextId = joint ? joint.id : ordered ? ordered.id : rolled ? rolled.id : attached ? attached.id : (() => {
       const nextCode = branched ? branched.code : index < 0 || flagged(next, currentId, "holdsWin") ? undefined : next.stages[index + 1]?.code;
       return nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
     })();

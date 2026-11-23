@@ -27,6 +27,7 @@ import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/at
 import { flightAttackBarred } from "../families/attack/flight.ts";
 import { countsDefense, rangedAttack, struck } from "../families/attack/strike.ts";
 import { attackStatAgainst } from "../families/attack/spectral.ts";
+import { mustBeDeclared } from "../families/armies/defender.ts";
 import { attackHere, dealForAttack, engagedWithAll, engagedWithThreatening, noteBelowThreat, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
 import { barredFromDreadnaught } from "../families/sea/dreadnaught.ts";
@@ -183,7 +184,7 @@ export function defenderIds(state: ScenarioState, attackedSeat: number, cards: C
 
 export function canDefend(state: ScenarioState, attackedSeat: number, defenderId: string, cards: Cards): boolean {
   const instance = state.cards[defenderId];
-  if (!instance || instance.exhausted) return false;
+  if (!instance || (instance.exhausted && !mustBeDeclared(state, defenderId, cards))) return false;
   if (instance.zone !== "heroes" && instance.zone !== "play") return false;
   const printed = printedOf(cards, instance.code);
   if (!isCharacterType(printed) || instance.host != null) return false;

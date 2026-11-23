@@ -128,6 +128,8 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   if (instruction.verb === "ClaimRandomTreasure") return { verb: "Choose", prompt: `Choose 1 of ${drawn} random undiscovered treasures to attach to a character.` };
   // The Shadow card of Frenzied Creature goes on the attacking enemy, whom nobody chooses (18018:A:2).
   if (instruction.verb === "AttachSelf" && instruction.to.kind === "attackingEnemy") return { verb: "Attach", prompt: `Attach ${source ? names.card(source) : "this card"} to the attacking enemy.` };
+  // Dark Bats goes on the character it damaged or on the defending character, whom nobody chooses (132036:A:1, 132036:A:2).
+  if (instruction.verb === "AttachSelf" && (instruction.to.kind === "subject" || instruction.to.kind === "defender")) return { verb: "Attach", prompt: `Attach ${source ? names.card(source) : "this card"} to ${instruction.to.kind === "subject" ? "the character it damaged" : "the defending character"}.` };
   // Players tied for the most cards in hand: the first player names who takes the card (18026:A:1).
   if (instruction.verb === "AddSourceToHandOfMost") {
     const card = source ? names.card(source) : "this card";

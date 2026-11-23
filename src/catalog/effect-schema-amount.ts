@@ -111,6 +111,8 @@ export const amountExprSchema = z.strictObject({
   destroyedWillpower: z.literal(true).optional(),
   // The number of quest cards in play: the main quest card, the side quests in the staging area, encounter and player, at least 1 ("X is the number of quest cards in play", 09016:A:1; mec108.side-quests-in-play). Read by the angmar family.
   questCards: z.literal(true).optional(),
+  // The quest stages in play with no progress token on them: stages 2 to 4 in play together, the only stage before them and stage 5 after them ("for each quest stage in play with no progress on it", 132054:A:2; 132057:A:1). Read by the armies family.
+  stagesNoProgress: z.literal(true).optional(),
   // Every shadow card dealt to an enemy in play, the staging area's and the engaged ones, added up ("where X is the number of shadow cards in play", 10126:A:1). Read by the angmar family.
   shadowCardsInPlay: z.literal(true).optional(),
   // The highest printed cost among the cards in the actor's discard pile, 0 for an empty pile, a card with a printed X cost or no cost (a hero) counting 0 ("the printed cost of the highest cost card in that player's discard pile", 10137:A:1). Read by the angmar family.
