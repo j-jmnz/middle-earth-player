@@ -80,8 +80,8 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
   05024:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard 2 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
-    - discard the number of treachery (any player controls) encounterDiscard, named "Collateral Damage" x 2 card(s) from the top of the encounter deck (a deck that runs out is reset from the discard pile and the discard goes on); they join the cards this effect discarded before, so a later amount "discarded by this effect" counts them all
-    - raise threat by the number of cards this effect discarded from the top of the encounter deck, still in the discard pile, that are location (any player controls) x 2 (each player)
+    - discard the number of treachery (any player controls) encounterDiscard, named "Collateral Damage" x 2 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on); they join the cards this effect discarded before, so a later amount "discarded by this effect" counts them all
+    - raise each player's threat by 2 for each location card this effect discarded from the top of the encounter deck, in any of its discard steps, even one a reset of the deck put back in it
 
 05024:A:2 (shadow): Shadow: Any damage dealt by this attack is dealt to the hero with Alcaron's Scroll attached, if able.
   05024:shadow:1: Shadow
@@ -146,7 +146,7 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 05040:A:1 (front): When Revealed: Each player must search the encounter deck and discard pile for 1 City location and add it to the staging area, if able. Shuffle the encounter deck. This effect cannot be canceled.
-  05040:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+  05040:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player finds one City location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
@@ -295,4 +295,4 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
     only if the card with code 05019 is not attached to a hero (it is in the staging area, on an enemy or out of play)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 166 by template, 1 as JSON)
+(rendered pieces: 165 by template, 1 as JSON)
