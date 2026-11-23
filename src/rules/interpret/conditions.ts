@@ -229,11 +229,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && inAreaOf(state, holder, condition.seat);
     }
-    // Answered by the captured family's condition hook above (families/captured/values.ts).
-    case "versusVictoryTrait":
-      return false;
-    // holderExhausted is a stat condition, read where the stat is (core/keywords.ts).
-    case "holderExhausted":
+    // Answered by the captured family's condition hook above (families/captured/values.ts); holderExhausted is a stat condition, read where the stat is (core/keywords.ts).
+    case "versusVictoryTrait": case "holderExhausted":
       return false;
     case "versusHighEngagement": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
