@@ -28,7 +28,7 @@ export const BURGLE_CONDITIONS: Readonly<Record<string, (c: Obj, ctx: Ctx) => Ma
   burgleFailed: () => ({ text: "the last burgle attempt the running effect made failed (false before it has made one)", read: [] }),
   burgling: () => ({ text: "a burgle attempt is in its action window (after its second step, before its third) and the actor is the first player", read: [] }),
   burgleCanDiscard: () => ({ text: "the first player's hand holds as many cards matching the revealed card as the burgle effect asks", read: [] }),
-  shadowBurgle: () => ({ text: "the shadow card just dealt has a burgle effect", read: [] }),
+  shadowBurgle: () => ({ text: "a shadow card this enemy holds for the attack has a burgle effect", read: [] }),
   bagginsAtLeast: (c, ctx) => ({ text: `the acting player's heroes with a Baggins icon hold at least ${amount(c.amount, ctx)} resources in all`, read: ["amount"] }),
   encounterTop: (c) => ({ text: `the top card of the encounter deck is ${c.cardType === "enemy" ? "an" : "a"} ${str(c.cardType)} (false with an empty deck)`, read: ["cardType"] }),
 };

@@ -47,9 +47,9 @@ Scenario piles that place cards with no record (quest: 132071 A Warm Welcome; qu
     - this card: stat engagedWithFirst 1, while this card is in play
 
 132041:A:3 (front): Forced: If Smaug the Magnificent is dealt a shadow card with a burgle effect, he makes an additional attack immediately after this one.
-  132041:forced:1: Forced on the event shadowDealtTo (heard about this card)
-    only if the shadow card just dealt has a burgle effect
-    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+  132041:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    only if a shadow card this enemy holds for the attack has a burgle effect
+    who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 132042 Croaking Crows
