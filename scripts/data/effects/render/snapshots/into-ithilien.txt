@@ -1,0 +1,298 @@
+Scenario piles that place cards with no record (activeLocation: 05028 Ithilien Road; quest: 05068 Ambush in Ithilien; quest: 05069 Southron Counter-attack; quest: 05070 The Hidden Way; quest: 05071 Approaching Cair Andros; staging: 05025 Celador; staging: 05027 Southron Company)
+
+## 05025 Celador
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+05025:A:1 (front): While Celador is in the staging area, he is committed to the current quest.
+  05025:constant:1: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat committedInStaging (an ally objective in the staging area: it counts in the quest total with the stat the quest uses, is a character committed to the quest for every effect that picks or counts one, and takes archery damage) 1, while this card is in play
+    - this card: stat guardedAlly 1, while this card is in play
+
+05025:A:2 (front): Forced: After players quest unsuccessfully or a character leaves play, deal 1 damage to Celador.
+  05025:forced:1: Forced after the players quest unsuccessfully
+    only if the actor holds the first player token
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - deal 1 damage to this card
+  05025:forced:2: Forced after a card leaves play (heard about character (any player controls) other than this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - deal 1 damage to this card
+  05025:forced:3: Forced after a card leaves play (heard about Ranger objective (any player controls) other than this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - deal 1 damage to this card
+
+05025:A:3 (front): If Celador leaves play, remove him from the game.
+  05025:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card is removed from the game
+
+## 05026 Ithilien Guardian
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05026:A:1 (front): While Ithilien Guardian is in the staging area, he is committed to the current quest.
+  05026:constant:1: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat committedInStaging (an ally objective in the staging area: it counts in the quest total with the stat the quest uses, is a character committed to the quest for every effect that picks or counts one, and takes archery damage) 1, while this card is in play
+    - this card: stat guardedAlly 1, while this card is in play
+
+05026:A:2 (front): When Revealed: Add Ithilien Guardian to the staging area and Ithilien Guardian gains surge.
+  05026:whenRevealed:1: When revealed
+    - this card gains surge (one more encounter card is revealed when it has been resolved)
+
+05026:A:3 (shadow): Shadow: Deal 2 damage to the attacking enemy.
+  05026:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - deal 2 damage to the attacking enemy
+
+## 05027 Southron Company
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+05027:A:1 (front): Southron Company gets +2 Threat and +2 Attack while the current quest card has the battle or siege keyword.
+  05027:constant:1: Constant
+    only if any of: (the current quest card has the battle keyword, printed or gained) or (the current quest card has the siege keyword, printed or gained)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat 2, while this card is in play
+    - this card: stat attack 2, while this card is in play
+
+05027:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if the current quest card has a keyword.)
+  05027:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if all of: (the current quest card prints no keyword) and (the current quest card does not have the battle keyword, printed or gained) and (the current quest card does not have the siege keyword, printed or gained): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if any of: (the current quest card prints a keyword (Battle, Siege, Archery X...), a gained one not counted) or (the current quest card has the battle keyword, printed or gained) or (the current quest card has the siege keyword, printed or gained) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 05028 Ithilien Road
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+05028:A:1 (front): While Ithilien Road is the active location, the engagement cost of each enemy in the staging area is 0.
+  05028:constant:1: Constant
+    only if this card is the active location
+    - each enemy (any player controls) in the staging area only: stat engagementCost -99, while this card is in play
+
+05028:A:2 (shadow): Shadow: Return attacking enemy to the staging area after it attacks.
+  05028:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 05029 Blocking Wargs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05029:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+05029:A:2 (front): When Revealed: Deal 1 damage to each character committed to the quest.
+  05029:whenRevealed:1: When revealed
+    - deal 1 damage to each character (any player controls) committed to the quest
+
+05029:A:3 (shadow): Shadow: Deal 1 damage to the defending character.
+  05029:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - deal 1 damage to the defender
+
+## 05046 Overgrown Trail
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05046:A:1 (front): Action: Exhaust a Ranger character to place 3 progress tokens on Overgrown Trail.
+  05046:action:1: Action
+    only if there is a ready Ranger character (you control) to choose
+    who acts: any player may trigger it; the acting player is the one who does
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready Ranger character (you control)
+    - exhaust the picked card
+    - place 3 progress on this card
+
+05046:A:2 (shadow): Shadow: Remove X progress tokens from the current quest, where X is the attacking enemy's Threat.
+  05046:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - remove threat of the attacking enemy progress from the current quest card (all of it when it holds less)
+
+## 05047 Secluded Glade
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05047:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+05047:A:2 (shadow): Shadow: Remove X progress tokens from the current quest, where X is the attacking enemy's Threat.
+  05047:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - remove threat of the attacking enemy progress from the current quest card (all of it when it holds less)
+
+## 05048 Lost Companion
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05048:A:1 (front): When Revealed: Each player removes 1 character he controls from the quest, if able. Then, if any player has no characters committed to the quest, remove all characters from the quest.
+  05048:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - choose character (you control) committed to the quest
+      - the last picked character is removed from the quest (it stays exhausted)
+    - for each player, first player first:
+      - if not (there is a character (you control) committed to the quest to choose): for each character (any player controls) committed to the quest:
+        - the last picked character is removed from the quest (it stays exhausted)
+
+## 05049 Morgul Spider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05049:A:1 (front): When Revealed: Until the end of the round, Morgul Spider gets +1 Attack for each character not currently committed to a quest.
+  05049:whenRevealed:1: When revealed
+    - this card: stat attackForUncommitted (marker: the constant that gives the Attack for each character not committed to a quest holds while this flag does) 1, until the end of the round
+  05049:constant:1: Constant
+    only if this card holds the flag attackForUncommitted
+    - this card: stat attack the number of character (any player controls) not committed to the quest, while this card is in play
+
+## 05050 Forest Bat
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05050:A:1 (front): When Revealed: The first player deals 2 damage to a questing hero and removes that hero from the quest.
+  05050:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (any player controls) committed to the quest, chosen by the first player
+    - deal 2 damage to the picked card
+    - the last picked character is removed from the quest (it stays exhausted)
+
+05050:A:2 (shadow): Shadow: Defending player raises his threat by X where X is the attacking enemy's Threat.
+  05050:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - raise threat by threat of the attacking enemy (the acting player)
+
+## 05051 Watcher in the Wood
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05051:A:1 (front): When Revealed: Raise each player's threat by the number of questing characters. (If the current quest has the battle or siege keyword, Watcher in the Wood gains surge.)
+  05051:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by the number of character (any player controls) committed to the quest (each player)
+    - then, if any of: (the current quest card has the battle keyword, printed or gained) or (the current quest card has the siege keyword, printed or gained) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+05051:A:2 (shadow): Shadow: Each player raises his threat by the number of enemies engaged with him.
+  05051:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - for each player, first player first:
+      - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
+
+## 05052 Southron Mercenaries
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05052:A:1 (front): Archery X.
+  05052:constant:1: Constant (record also names 05052:A:2)
+    - this card: stat archeryPlayers 1, while this card is in play
+
+05052:A:2 (front): X is the number of players in the game.
+  05052:constant:1: Constant (record also names 05052:A:1)
+    - this card: stat archeryPlayers 1, while this card is in play
+
+05052:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if it has the Harad trait.)
+  05052:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a Harad enemy (any player controls) or in the staging area): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a Harad enemy (any player controls) or in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 05053 Haradrim Elite
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05053:A:1 (front): Forced: When Haradrim Elite enters play, it makes an immediate attack from the staging area against the first player.
+  05053:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card attacks the first player now, from the staging area, dealt a shadow card
+
+05053:A:2 (shadow): Shadow: This enemy attacks again after this attack resolves. (Deal a new shadow card for that attack.)
+  05053:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 05054 Mûmak
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05054:A:1 (front): No attachments can be attached to Mûmak.
+  05054:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+05054:A:2 (front): Mûmak cannot take more than 3 damage each round.
+  05054:constant:2: Constant
+    - this card: stat damageCap (it takes no more than this much damage each round; damage past it is not placed) 3, while this card is in play
+
+## 05055 Southron Support
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05055:A:1: Doomed 3.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+05055:A:2 (front): When Revealed: Each player must search the encounter deck and discard pile for 1 Harad enemy and add it to the staging area, if able. Shuffle the encounter deck.
+  05055:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Harad enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 05068 Ambush in Ithilien
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+05068:A:1 (front): Setup: Add Celador to the staging area. Search the encounter deck for a copy of Ithilien Road and make it the active location. Each player must search the encounter deck for a copy of Southron Company and add it to the staging area. Shuffle the encounter deck.
+  05068:setup:1: Setup
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+05068:B:1 (back): Battle. (Characters use Attack instead of Willpower when questing.)
+  (the keyword part is owned by the card's keywords; the records cover: (Characters use Attack instead of Willpower when questing.))
+  05068:constant:1: Constant
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+05068:B:2 (back): If the players complete this stage with Celador in the staging area, advance to stage 3A (bypassing stage 2).
+  05068:constant:2: Constant
+    only if there is a objective (any player controls) in the staging area only, named "Celador" to choose
+    - this card: stat skipsNextStage (held by a quest stage: once it is completed the quest goes to the stage after the next one, which is bypassed) 1, while this card is in play
+
+## 05069 Southron Counter-attack
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+05069:B:1 (back): Siege. (Characters use Defense instead of Willpower when questing.)
+  (the keyword part is owned by the card's keywords; the records cover: (Characters use Defense instead of Willpower when questing.))
+  05069:constant:1: Constant
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+05069:B:2 (back): Archery X.
+  05069:constant:2: Constant (record also names 05069:B:3)
+    - this card: stat archeryPlayers 1, while this card is in play
+
+05069:B:3 (back): X is the number of players in the game.
+  05069:constant:2: Constant (record also names 05069:B:2)
+    - this card: stat archeryPlayers 1, while this card is in play
+
+05069:B:4 (back): After this stage is completed, advance to stage 4A (bypassing stage 3).
+  05069:constant:3: Constant
+    - this card: stat skipsNextStage (held by a quest stage: once it is completed the quest goes to the stage after the next one, which is bypassed) 1, while this card is in play
+
+## 05070 The Hidden Way
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+05070:B:1 (back): When Revealed: The first player takes control of all Ranger objectives in the staging area.
+  05070:whenRevealed:1: When revealed
+    - the first player takes control of each Ranger objective in the staging area: it comes into his play area, faceup and ready, and is no longer committed by its own text; with none there nothing happens
+
+05070:B:2 (back): Enemies do not make engagement checks and cannot be optionally engaged.
+  05070:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat noEngagementChecks (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing) 1, while this card is in play
+    - the table: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+## 05071 Approaching Cair Andros
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+05071:B:1 (back): If any player's threat is 37 or higher, Approaching Cair Andros gains siege.
+  05071:constant:1: Constant
+    only if 36 is less than the highest threat among the living players
+    - this card: stat siege 1, while this card is in play
+
+05071:B:2 (back): Forced: At the end of each round, raise each player's threat by 2.
+  05071:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - raise threat by 2 (each player)
+
+05071:B:3 (back): If the players defeat this stage, they have won the game.
+  05071:constant:2: Constant
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
+
+(rendered pieces: 154 by template, 0 as JSON)

@@ -127,6 +127,10 @@ describe("effect coverage", () => {
   // the flag `noteDeckDiscards` makes the engine announce a card that leaves the top of the encounter deck (families/stormcaller/zone.ts, discardedFromDeck), held while the card is in play.
   const ANNOUNCEMENT_FLAG_RECORDS: ReadonlySet<string> = new Set(["05023:constant:1"]);
 
+  // A constant record that is the other half of a When Revealed line whose lasting effect is recalculated as the game changes (faq.lasting-effects): 05049:whenRevealed:1 sets the flag `attackForUncommitted` until the end of the round and 05049:constant:1 counts
+  // "+1 Attack for each character not currently committed" while the flag holds, because a modifier made by the When Revealed effect fixes its amount when it resolves.
+  const LASTING_CONSTANT_RECORDS: ReadonlySet<string> = new Set(["05049:constant:1"]);
+
   const lineOf = (id: string): string => printedLine(lines, id) ?? "";
 
   it("has a record that names a line of its own card, for every shipped record", () => {
@@ -141,7 +145,7 @@ describe("effect coverage", () => {
         // unlabeled line it carries out with its labeled one (Close Call's "Doomed X." raised by its Response, 08005).
         const timings = lineTimings(line ?? "");
         const alongside = timings.has("constant") && effect.lines.some((other) => other !== id && lineTimings(lineOf(other)).has(effect.timing));
-        if (!alongside && !REPLACEMENT_RECORDS.has(effect.id) && !ANNOUNCEMENT_FLAG_RECORDS.has(effect.id) && !isCampaignMarker(effect, line ?? "")) expect(timings, `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
+        if (!alongside && !REPLACEMENT_RECORDS.has(effect.id) && !ANNOUNCEMENT_FLAG_RECORDS.has(effect.id) && !LASTING_CONSTANT_RECORDS.has(effect.id) && !isCampaignMarker(effect, line ?? "")) expect(timings, `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
       }
     }
   });

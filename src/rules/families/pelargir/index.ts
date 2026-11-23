@@ -1,4 +1,4 @@
-// Rules: rr.attachment-cards, rr.objective-cards, rr.first-player, rr.damage, rr.reveal, rr.optional-engagement, rr.running-out-of-cards (data/rules/entries.json); the cards of Peril in Pelargir (05019 to 05024, 05037 to 05045, 05065 to 05067).
+// Rules: rr.attachment-cards, rr.objective-cards, rr.first-player, rr.damage, rr.reveal, rr.optional-engagement, rr.running-out-of-cards, rr.quest-advancement, ats.ally-objectives (data/rules/entries.json); the cards of Peril in Pelargir (05019 to 05024, 05037 to 05045, 05065 to 05067) and Into Ithilien (05025 to 05029, 05046 to 05055, 05068 to 05071; committed.ts, stage-skip.ts and control.ts).
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 
@@ -6,6 +6,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
+import { takeControlOfStagedObjectives } from "./control.ts";
 import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
 import { noteFirstEnemy, pelargirCondition } from "./first-enemy.ts";
 import { attachToHighestThreatCost } from "./host.ts";
@@ -24,6 +25,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return discardEncounterTopMore(state, instruction, focus, ctx, steps);
     case "RaiseThreatPerDiscarded":
       return raiseThreatPerDiscarded(state, instruction, focus, ctx, steps);
+    case "TakeControlOfStagedObjectives":
+      return takeControlOfStagedObjectives(state, instruction, ctx);
     default:
       return null;
   }
@@ -31,7 +34,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelargir",
-  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded"],
+  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives"],
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,

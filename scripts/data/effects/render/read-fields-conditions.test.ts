@@ -59,6 +59,8 @@ describe("effects render read fields, conditions", () => {
     victoryPoints: [{ kind: "victoryPoints", min: 20 }],
     firstTreachery: [{ kind: "firstTreachery" }],
     firstEnemy: [{ kind: "firstEnemy" }],
+    questKeyword: [{ kind: "questKeyword", keyword: "battle", is: true }, { kind: "questKeyword", keyword: "siege", is: false }],
+    questKeywords: [{ kind: "questKeywords", is: true }, { kind: "questKeywords", is: false }],
     attachedToHero: [{ kind: "attachedToHero", code: "05019", is: true }, { kind: "attachedToHero", code: "05019", is: false }],
     hitPointsLeft: [{ kind: "hitPointsLeft", code: "09033" }],
     committedThisRound: [{ kind: "committedThisRound" }],

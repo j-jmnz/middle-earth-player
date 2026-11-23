@@ -45,6 +45,7 @@ import { highestThreatPlusRemaining } from "../families/long-dark/pick.ts";
 import { fortitudePool } from "../families/mount-doom/pick.ts";
 import { seatPickMatches } from "../families/wilderland/seat-pick.ts";
 import { mostResources } from "../families/burgle/pick.ts";
+import { committedInStaging } from "../families/pelargir/committed.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
 // characters of the attack a Response answers. `counting` reads every card that matches, immune ones too: a count or a
@@ -207,7 +208,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
     // An ally attached to another card (Wild Stallion) is an attachment while it is.
     const base = printed.type === "ally" && instance.host != null && instance.zone !== "heroes" ? "attachment" : cardTypeOf(instance, printed);
     // An objective ally with printed combat stats (Mendor, 01135) a player controls is an ally in play (isAllyLike), and still an objective card.
-    const type = base === "objective" && instance.zone === "play" && instance.host == null && isAllyLike(printed) ? "ally" : base;
+    const type = base === "objective" && instance.zone === "play" && instance.host == null && isAllyLike(printed) ? "ally" : base === "objective" && isAllyLike(printed) && committedInStaging(state, id) ? "ally" : base;
     // An Objective-Location counts as a location as the active location, travelled to, explored or in the victory display, and stays an objective in the staging area (docs/scenarios/ered-mithrin/lost-in-mirkwood.md, Lost in Mirkwood): revealing one is no "revealed location".
     const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type || (spec.type === "location" && printed.objectiveLocation && type === "objective" && instance.zone !== "staging") || (spec.type === "objective" && printed.type === "objective") || (spec.type === "attachment" && countsAsAttachment(state, id, ctx));
     if (!typed) return false;
@@ -228,7 +229,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.questCardType && !isQuestCardType(printed.type)) return false;
   if (spec.sideQuest && !isSideQuestType(printed.type)) return false;
   if (spec.notCardType && printed.type === spec.notCardType) return false;
-  if (spec.committed != null && instance.committed !== spec.committed) return false;
+  if (spec.committed != null && (committedInStaging(state, id) || instance.committed) !== spec.committed) return false;
   if (spec.canQuest != null && flaggedByClass(state, instance, printed, "cannotQuest", (trait) => hasTrait(state, id, trait, ctx)) === spec.canQuest) return false;
   if (spec.participating && !(at.participants ?? []).includes(id)) return false;
   // No card is at another stage in a game with one stage (50805:B:2).

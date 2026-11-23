@@ -18,6 +18,7 @@ import { engagementCostOf } from "../quest/quest.ts";
 import { enemyAttackWindow, playerAttackWindow } from "../engine/step-window.ts";
 import { inPlay } from "../core/zones.ts";
 import { titleBarred } from "../families/nightmare/guards.ts";
+import { stagedCommitted } from "../families/pelargir/committed.ts";
 import { ruleCause } from "../core/cause.ts";
 import { fireForced } from "../windows/triggers.ts";
 import { damageBarred, undefendedExtras } from "../families/defense/damage.ts";
@@ -72,6 +73,8 @@ export function archeryRecipients(state: ScenarioState, cards: Cards, seat?: num
     if (!owner || owner.eliminated || (seat != null && state.separate && index !== seat)) continue;
     ids.push(...characters(state, index, cards));
   }
+  // An ally objective committed from the staging area is a character in play too (05052:A:1, families/pelargir/committed.ts).
+  ids.push(...stagedCommitted(state, seat));
   // "Archery damage must be assigned to allies, if able" (143058:A:2).
   if (state.modifiers.length > 0 && flagged(state, "table", "archeryToAllies")) {
     const allies = ids.filter((id) => {
