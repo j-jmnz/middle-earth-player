@@ -2,7 +2,7 @@
 // rr.enters-play, rr.staging-area, rr.combat-phase, rr.quest-phase, rr.ready, rr.move (data/rules/entries.json).
 // The Morgul Vale player cards, written from their card text (data/cards/TMV.json; data/printed holds no ledger for this pack, so every
 // intent goes through sendUnledgered): Théoden 06134:A:2, Pelargir Ship Captain 06135:A:1, Visionary Leadership 06136:A:1 and A:2,
-// Spear of the Mark 06137:A:2 and A:3, Forth Eorlingas! 06138:A:1, Steed of the Mark 06139:A:1 and A:2, Lay of Nimrodel 06140:A:1, Ered
+// Spear of the Mark 06137:A:1 and A:2, Forth Eorlingas! 06138:A:1, Steed of the Mark 06139:A:1 and A:2, Lay of Nimrodel 06140:A:1, Ered
 // Nimrais Prospector 06141:A:1, Scroll of Isildur 06142:A:1 to A:3.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -143,9 +143,9 @@ describe("Visionary Leadership (06136:A:1, A:2)", () => {
   });
 });
 
-describe("Spear of the Mark and Forth Eorlingas! (06137:A:2, A:3, 06138:A:1)", () => {
+describe("Spear of the Mark and Forth Eorlingas! (06137:A:1, A:2, 06138:A:1)", () => {
   // "Attach to a Rohan character.": Théodred, Éowyn and the Snowbourn Scout (a Rohan ally); not Legolas nor the Guard of the Citadel.
-  lineSpec("06137:A:2", "Spear of the Mark: Attach to a Rohan character", (effects) => {
+  lineSpec("06137:A:1", "Spear of the Mark: Attach to a Rohan character", (effects) => {
     const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }, { code: THEODRED, seat: 0 }, { code: EOWYN, seat: 0 }], allies: [{ code: SNOWBOURN, seat: 0 }, { code: GUARD, seat: 0 }], hand: [{ code: SPEAR, seat: 0 }] });
     const spear = idsOf(tab, SPEAR);
     expect(hosts(tab, spear)).toEqual([idsOf(tab, THEODRED), idsOf(tab, EOWYN), idsOf(tab, SNOWBOURN)].sort());
@@ -163,7 +163,7 @@ describe("Spear of the Mark and Forth Eorlingas! (06137:A:2, A:3, 06138:A:1)", (
 
   // "Attached character gets +1 Attack (+2 Attack instead if attacking an enemy in the staging area).": Théodred attacks the engaged enemy
   // with 2 + 1.
-  lineSpec("06137:A:3", "Spear of the Mark: +1 Attack against an engaged enemy", (effects) => {
+  lineSpec("06137:A:2", "Spear of the Mark: +1 Attack against an engaged enemy", (effects) => {
     const { tab, engaged } = scene(effects);
     expect(stat(tab.state, tab, idsOf(tab, THEODRED), "attack")).toBe(printed(tab, THEODRED, "attack") + 1);
     const run = passAll(sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: engaged, attackerIds: [idsOf(tab, THEODRED)] }, tab.ctx), tab.ctx);
@@ -172,7 +172,7 @@ describe("Spear of the Mark and Forth Eorlingas! (06137:A:2, A:3, 06138:A:1)", (
 
   // "Combat Action: Each Rohan hero can be declared as an attacker against enemies in the staging area this phase.": played in the combat
   // phase's action window, Théodred and Éowyn may attack the staged enemy; Legolas (not Rohan) and the Snowbourn Scout (a Rohan ally) may
-  // not. Théodred's Spear makes his attack 2 + 2 (06137:A:3). In the next phase the permission is gone.
+  // not. Théodred's Spear makes his attack 2 + 2 (06137:A:2). In the next phase the permission is gone.
   lineSpec("06138:A:1", "Forth Eorlingas!: each Rohan hero may attack the staging area this phase", (effects) => {
     const { tab, staged: enemyId } = scene(effects);
     expect(refusal(attacking(tab.state), { type: "DeclareAttackers", enemyId, attackerIds: [idsOf(tab, EOWYN)] }, tab.ctx)).not.toBeNull();

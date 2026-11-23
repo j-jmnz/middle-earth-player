@@ -4353,6 +4353,27 @@
       "pile": "encounter",
       "reason": "DragnCards loads Bilbo's Magic Ring in the staging area (Q0A.3). Stage 2A's Setup (131030) searches the encounter deck for it and attaches it to Bilbo Baggins in the riddle area, so it starts in the encounter deck, as Hall of Beorn's count of 1 says.",
       "source": "cards 131029 and 131030 (data/printed/the-hobbit.json); hob.riddle-area; dragncards preBuiltDecks.json (Q0A.3)"
+    },
+    {
+      "scenario": "peril-in-pelargir",
+      "code": "05019",
+      "pile": "attachedChosen",
+      "reason": "DragnCards loads Alcaron's Scroll in the staging area (Q03.1, E03.1). The quest card The Leaping Fish (05065) prints \"Setup: ... Make The Leaping Fish the active location and attach Alcaron's Scroll to a hero.\", so it is attached to a hero at Setup, not staged.",
+      "source": "scan 05065.A (hallofbeorn-resources Images/Cards/Heirs-of-Numenor/The-Leaping-Fish-Quest-1A.jpg); dragncards preBuiltDecks.json (Q03.1, E03.1); Heirs of Númenor rules insert p3 (ats.setup-peril-in-pelargir)"
+    },
+    {
+      "scenario": "peril-in-pelargir",
+      "code": "05020",
+      "pile": "encounter",
+      "reason": "DragnCards loads 4 of the 5 Harbor Thug in the staging area (Q03.1; its Easy deck E03.1 stages none). The quest card The Leaping Fish (05065) prints no Setup line that adds an enemy to the staging area, so all 5 copies are in the encounter deck at the start. The When Revealed of stage 1B (scan 05065.B: \"Each player must search the encounter deck for a copy of Harbor Thug and add it to the staging area.\") is what puts the Harbor Thugs in staging.",
+      "source": "scans 05065.A and 05065.B (hallofbeorn-resources Images/Cards/Heirs-of-Numenor/The-Leaping-Fish-Quest-1A.jpg and -1B.jpg); dragncards preBuiltDecks.json (Q03.1, E03.1); hallofbeorn.com/Export/Scenarios/Peril-in-Pelargir (5 Normal, 5 Easy)"
+    },
+    {
+      "scenario": "the-stewards-fear",
+      "code": "06022",
+      "pile": "encounter",
+      "reason": "DragnCards loads The Fourth Star set aside (Q03.4). The quest card Conspiracy (06011) sets aside only Roots of Mindolluin, the Villain cards and the Plot cards, and the Steward's Fear rulesheet's Setup paragraph names no other card, so The Fourth Star is in the encounter deck at the start.",
+      "source": "scan 06011.B (\"When Revealed: Search the encounter deck for The Fourth Star and make it the active location. Shuffle the encounter deck.\"); Steward's Fear rulesheet MEC18 (ats.setup-the-stewards-fear-underworld-deck); dragncards preBuiltDecks.json (Q03.4)"
     }
   ],
   "scenarioRemovals": [
@@ -4680,26 +4701,18 @@
       "easy": 3,
       "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 2 of Great Barrow's 5 copies (Easy 3); all copies are set aside by stage 1A's Setup, so the setAside pile loses them; the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
       "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "into-ithilien",
+      "code": "05027",
+      "pile": "staging",
+      "normal": 4,
+      "easy": 4,
+      "reason": "The Setup (05068:A) has each player search the encounter deck for a copy of Southron Company and add it to the staging area. The set holds 4 copies; DragnCards' Q03.2 stages all 4 and E03.2 stages 1 and leaves 3 in the encounter deck, though the Easy Mode sheet changes no Setup. The staging pile holds the 4 copies (one for each of up to 4 players), so the encounter pile's copies are dropped.",
+      "source": "scan 05068.A (hallofbeorn-resources Images/Cards/Heirs-of-Numenor/Ambush-in-Ithilien-1A.jpg); dragncards preBuiltDecks.json (Q03.2, E03.2); hallofbeorn.com/Export/Scenarios/Into-Ithilien (Southron Company 4 Normal, 4 Easy)"
     }
   ],
   "campaigns": [
-    {
-      "id": "against-the-shadow",
-      "name": "Against the Shadow",
-      "kind": "cycle",
-      "products": [
-        "Heirs of Númenor",
-        "The Steward's Fear",
-        "The Drúadan Forest",
-        "Encounter at Amon Dîn",
-        "Assault on Osgiliath",
-        "The Blood of Gondor",
-        "The Morgul Vale"
-      ],
-      "released": "2012-11-26",
-      "reason": "No source names a cycle. Hall of Beorn lists the scenarios of Heirs of Númenor and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 13 and 14. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 13 and 14; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
     {
       "id": "the-ring-maker",
       "name": "The Ring-maker",
@@ -4933,6 +4946,18 @@
       "pack": "OtD",
       "reason": "DragnCards names the pack \"The Hobbit - On the Doorstep\" (a hyphen) where Hall of Beorn's product is \"The Hobbit: On the Doorstep\". Its collector numbers and names are Hall of Beorn's own, so the row's number and name find the card in OtD (the rows Hall of Beorn gives no OCTGN guid: The Spider's Glade, The Lonely Mountain).",
       "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); DragnCards preBuiltDecks.json (Q0A.4 to Q0A.6)"
+    },
+    {
+      "dragncards": "Heirs of Numenor",
+      "pack": "HoN",
+      "reason": "DragnCards spells the pack's name without the accent (\"Heirs of Numenor\") where Hall of Beorn's product is \"Heirs of Númenor\", so the row's pack does not name the product. Its collector numbers and names are Hall of Beorn's own, so the row's number and name find the card in HoN (the rows Hall of Beorn gives no OCTGN guid: both The Leaping Fish cards).",
+      "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); DragnCards preBuiltDecks.json (Q03.1 to Q03.3)"
+    },
+    {
+      "dragncards": "The Druadan Forest",
+      "pack": "TDF",
+      "reason": "DragnCards spells the pack's name without the accent (\"The Druadan Forest\") where Hall of Beorn's product is \"The Drúadan Forest\", so the row's pack does not name the product. Its collector numbers (45 to 49) and names are Hall of Beorn's own, so the row's number and name find the card in TDF (the rows Hall of Beorn gives no OCTGN guid: Drû-buri-Drû, Drúadan Drummer, Elite, Hunter and Thief).",
+      "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); DragnCards preBuiltDecks.json (Q03.5)"
     }
   ],
   "dragnCardCodes": [
