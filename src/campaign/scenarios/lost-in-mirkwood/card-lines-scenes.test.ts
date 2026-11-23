@@ -12,11 +12,10 @@ import type { EngineStep } from "../../../rules/core/intents.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { whenRevealedUncancelable } from "../../../rules/families/wilderland/heath.ts";
 import { play } from "../../../../test/harness/card-spec-play.ts";
-import { attack, defend, endPhase, endRound, quest, reveal, travel, withoutLine, type Act, type Row } from "../../../../test/harness/card-spec.ts";
+import { type Act, attack, defend, endPhase, endRound, quest, reveal, type Row, travel, withoutLine } from "../../../../test/harness/card-spec.ts";
 import { finish, idOf, legalIntents, legalTargets, revealFromTop, send, start, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "lost-in-mirkwood";
-const without = (line: string): readonly Effect[] => withoutLine(EFFECTS, line);
 const played = (layout: Layout, act: Act | readonly Act[], effects: readonly Effect[] = EFFECTS): ScenarioState => play(SCENARIO, { line: "", layout, act, expect: [] } satisfies Row, effects, false).run.state;
 const card = (state: ScenarioState, code: string) => state.cards[idOf(state, code)];
 const threatOf = (state: ScenarioState, code: string, cards: LayoutTable["cards"]): number => modifiedStat(state, card(state, code)!, "threat", cards);
@@ -30,7 +29,7 @@ describe("18029 to 18032 Guarded (location) and Guarded (enemy)", () => {
     const layout: Layout = { deck };
     const state = played(layout, reveal(objective));
     expect(card(state, found)).toMatchObject({ zone: "staging", host: idOf(state, objective), guard: true });
-    expect(card(played(layout, reveal(objective), without(line)), found)?.guard).not.toBe(true);
+    expect(card(played(layout, reveal(objective), withoutLine(EFFECTS, line)), found)?.guard).not.toBe(true);
   });
 });
 
@@ -52,7 +51,7 @@ describe("18033 Twilight Hall", () => {
   it("18033:A:3 with no resource on it the players cannot travel there; with 1 they can", () => {
     expect(travelOffered(0, EFFECTS)).toBe(false);
     expect(travelOffered(1, EFFECTS)).toBe(true);
-    expect(travelOffered(0, without("18033:A:1"))).toBe(true);
+    expect(travelOffered(0, withoutLine(EFFECTS, "18033:A:1"))).toBe(true);
   });
 
   it("18033:A:1 with no resource it keeps its printed Threat 2", () => {
@@ -77,7 +76,7 @@ describe("18034 Mirkwood Patrol", () => {
     const state = patrolled({ staging: ["18034", "18029"] });
     expect(state.phase).not.toBe("Encounter");
     expect(card(state, "18034")).toMatchObject({ zone: "staging", host: idOf(state, "18029"), guard: true });
-    expect(card(patrolled({ staging: ["18034", "18029"] }, without("18034:A:1")), "18034")?.guard).not.toBe(true);
+    expect(card(patrolled({ staging: ["18034", "18029"] }, withoutLine(EFFECTS, "18034:A:1")), "18034")?.guard).not.toBe(true);
   });
 
   it("18034:A:1 an objective-location another card already guards is left as it is", () => {
@@ -219,7 +218,7 @@ describe("18041 Swarm of Bats", () => {
     expect(state.seats[0]?.threat).toBe(30);
     expect(state.seats[1]?.threat).toBe(28);
     expect(state.encounterDeck).toHaveLength(2);
-    expect(revealed(without("18041:A:1")).seats[0]?.threat).toBe(28);
+    expect(revealed(withoutLine(EFFECTS, "18041:A:1")).seats[0]?.threat).toBe(28);
   });
 });
 
@@ -243,7 +242,7 @@ describe("18071 Ambushed at Night", () => {
 
   it("18071:B:1 a player card does not reduce a player's threat", () => {
     expect(greeted("18071", EFFECTS)).toBe(28);
-    expect(greeted("18071", without("18071:B:1"))).toBe(22);
+    expect(greeted("18071", withoutLine(EFFECTS, "18071:B:1"))).toBe(22);
   });
 });
 

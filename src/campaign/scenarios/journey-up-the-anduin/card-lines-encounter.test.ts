@@ -5,12 +5,11 @@
 import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
-import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { attachBlocked } from "../../../rules/interpret/restrictions.ts";
 import { play } from "../../../../test/harness/card-spec-play.ts";
 import { answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, exhausted, flag, offers, respond, reveal, stat, threat, zone, type Act, type Row } from "../../../../test/harness/card-spec.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
-import { finish, idOf, legalIntents, resolveRecords, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
+import { finish, idOf, type Layout, legalIntents, resolveRecords, type Run, send, start, statOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "journey-up-the-anduin";
 // Codes read from data/scenarios/journey-up-the-anduin.json and data/cards.
@@ -82,7 +81,6 @@ const ROWS: readonly Row[] = [
 cardSpecs(SCENARIO, ROWS);
 
 const played = (layout: Layout, act: Act | readonly Act[]) => play(SCENARIO, { line: "", layout, act, expect: [] } satisfies Row, EFFECTS, false);
-const statOf = (run: Run, ctx: ReturnType<typeof tableFromLayout>["ctx"], code: string, name: Parameters<typeof modifiedStat>[2]) => modifiedStat(run.state, run.state.cards[idOf(run.state, code)]!, name, ctx.cards);
 
 describe("Journey Up the Anduin encounter lines that need more than one row", () => {
   it("18017:A:1 engages the enemy with the first player, not the player the event names", () => {
@@ -133,7 +131,7 @@ describe("Journey Up the Anduin encounter lines that need more than one row", ()
 
   it("18020:A:2 gives nothing to a non-Goblin, to itself, from the staging area, or to a Goblin engaged with the other player", () => {
     const made = tableFromLayout(SCENARIO, { engaged: [GOBLIN_TROOP, HILL_TROLL] });
-    const at = (table: typeof made, code: string, name: "attack" | "defense") => statOf({ state: table.state, steps: [] }, table.ctx, code, name);
+    const at = (table: typeof made, code: string, name: "attack" | "defense") => statOf({ state: table.state, steps: [] }.state, table.ctx.cards, code, name);
     expect([at(made, HILL_TROLL, "attack"), at(made, HILL_TROLL, "defense")]).toEqual([6, 3]);
     expect([at(made, GOBLIN_TROOP, "attack"), at(made, GOBLIN_TROOP, "defense")]).toEqual([5, 4]);
     const staged = tableFromLayout(SCENARIO, { staging: [GOBLIN_TROOP], engaged: [SNIPER] });
@@ -159,7 +157,7 @@ describe("Journey Up the Anduin encounter lines that need more than one row", ()
   it("18023:A:2 ends its -1 Threat at the end of the phase", () => {
     const done = played({ phase: "Quest", staging: [HILLS], deck: ["f0"] }, [respond(HILLS), answer("dh2"), { act: "endPhase" }]);
     expect(done.run.state.phase).not.toBe("Quest");
-    expect(statOf(done.run, done.table.ctx, HILLS, "threat")).toBe(2);
+    expect(statOf(done.run.state, done.table.ctx.cards, HILLS, "threat")).toBe(2);
   });
 
   it("18023:A:2 is offered to the first player only, and only in the quest phase", () => {
@@ -180,7 +178,7 @@ describe("Journey Up the Anduin encounter lines that need more than one row", ()
     const run = finish(send(start(made.state), { ...intent!, payments: [] } as PlayerIntent, made.ctx), made.ctx);
     const filler = run.state.cards[idOf(run.state, "filler")];
     expect(filler).toMatchObject({ zone: "under", host: lands, face: "down" });
-    expect(statOf(run, made.ctx, LONELY_LANDS, "threat")).toBe(4);
+    expect(statOf(run.state, made.ctx.cards, LONELY_LANDS, "threat")).toBe(4);
   });
 
   it("18024:A:2 does not take an event played while it is the active location", () => {

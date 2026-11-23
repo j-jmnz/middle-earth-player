@@ -9,15 +9,13 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
-import { ruleCause } from "../../rules/core/cause.ts";
-import { placeDamage } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard, withThreat } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { canPlay, choices, discarded, endRound, enter, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { canPlay, choices, destroyed, discarded, endRound, enter, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const LORIEN = "08058";
 const GWAIHIR = "08059";
@@ -59,7 +57,6 @@ beforeAll(async () => {
 });
 
 // The card `id` is destroyed (9 damage), and a Pass lets the game resolve what that set off.
-const destroyed = (state: Run["state"], tab: Table, id: string): Run => sendUnledgered(begin(placeDamage(state, id, 9, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
 
 describe("O Lórien! (08058:A:1)", () => {
   // "Attach to a hero.": the Pal and the other player's Spirit hero are offered, the ally is not.

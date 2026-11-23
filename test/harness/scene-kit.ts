@@ -3,6 +3,7 @@ import { EFFECTS } from "../../src/effects/index.ts";
 import type { EngineStep } from "../../src/rules/core/intents.ts";
 import { definePrinted, type PrintedCard } from "../../src/rules/core/printed.ts";
 import { byCode } from "../../src/rules/core/test-fixture.ts";
+import { modifiedStat } from "../../src/rules/core/keywords.ts";
 import { spawn } from "../../src/rules/core/zones.ts";
 import { startReveal } from "../../src/rules/windows/frames.ts";
 import { settle } from "../../src/rules/engine/machine.ts";
@@ -36,6 +37,16 @@ export function first(state: ScenarioState, code: string): string {
 /** The ids of the cards of a code, in id order. */
 export function idsOf(state: ScenarioState, code: string): string[] {
   return Object.values(state.cards).filter((card) => card.code === code).map((card) => card.id);
+}
+
+/** The zone of the first card of a code in `state` (undefined when no card has it). */
+export function zoneOf(state: ScenarioState, code: string): string | undefined {
+  return state.cards[idOf(state, code)]?.zone;
+}
+
+/** A stat of the first card of a code in `state`, modifiers included (`cards` is the table's printed cards: `made.cards` or `ctx.cards`). */
+export function statOf(state: ScenarioState, cards: ReduceContext["cards"], code: string, which: Parameters<typeof modifiedStat>[2]): number {
+  return modifiedStat(state, state.cards[idOf(state, code)]!, which, cards);
 }
 
 /** The codes of the cards in a zone, sorted. */
@@ -254,5 +265,5 @@ export function fightEnemy<T extends FightTable, L>(table: (layout: L) => T, sha
 }
 
 // The table built from a layout is test/harness/layout.ts; it lives there so this file keeps to the scene's helpers.
-export { printedIn, tableFromLayout } from "./layout.ts";
+export { attachTargetCodes, engagedHandTable, printedIn, tableFromLayout } from "./layout.ts";
 export type { Layout, LayoutTable, Placed, PileZone } from "./layout.ts";

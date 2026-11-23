@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
 import { ruleCause } from "../../../rules/core/cause.ts";
-import { modifiedStat, placeDamage } from "../../../rules/core/keywords.ts";
+import { placeDamage } from "../../../rules/core/keywords.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { spawn } from "../../../rules/core/zones.ts";
 import { settle } from "../../../rules/engine/machine.ts";
@@ -16,12 +16,11 @@ import { runInstruction } from "../../../rules/interpret/interpret.ts";
 import { attachmentTargets } from "../../../rules/player/planning.ts";
 import { play } from "../../../../test/harness/card-spec-play.ts";
 import { attack, defend, endPhase, endRound, quest, reveal, announce, type Act } from "../../../../test/harness/card-spec.ts";
-import { finish, idOf, idsOf, legalIntents, send, start, tableFromLayout, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
+import { finish, idOf, idsOf, type Layout, type LayoutTable, legalIntents, send, start, statOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "the-ring-goes-south";
 const played = (layout: Layout, act: Act | readonly Act[]) => play(SCENARIO, { line: "", layout, act, expect: [] }, EFFECTS, false).run.state;
 const zonesOf = (state: ScenarioState, code: string) => idsOf(state, code).map((id) => state.cards[id]?.zone);
-const statOf = (table: { cards: LayoutTable["cards"] }, state: ScenarioState, code: string, name: Parameters<typeof modifiedStat>[2]) => modifiedStat(state, state.cards[idOf(state, code)]!, name, table.cards);
 
 // A table with these player cards among its cards, `heroes` among the first seat's heroes (after the stand-ins).
 function withHeroes(layout: Layout, heroes: readonly string[], extra: readonly string[] = []): LayoutTable {
@@ -104,13 +103,13 @@ describe("the false cases and durations of the encounter cards", () => {
   // 142031 Tree-crowned Hill: "While Tree-crowned Hill is the active location": in the staging area it gives no -1 Threat.
   it("142031:A:1 gives no enemy -1 Threat while it is in the staging area", () => {
     const made = tableFromLayout(SCENARIO, { staging: ["142031", "f3"] });
-    expect(statOf(made, made.state, "f3", "threat")).toBe(3);
+    expect(statOf(made.state, made.cards, "f3", "threat")).toBe(3);
   });
 
   // 142032 Hills of Hollin: "While Hills of Hollin is the active location": in the staging area it gives no +5 engagement cost.
   it("142032:A:1 gives no enemy +5 engagement cost while it is in the staging area", () => {
     const made = tableFromLayout(SCENARIO, { staging: ["142032", "f0"] });
-    expect(statOf(made, made.state, "f0", "engagementCost")).toBe(50);
+    expect(statOf(made.state, made.cards, "f0", "engagementCost")).toBe(50);
   });
 
   // 142033 Redhorn Foothills: "-5 engagement cost until the end of the round", and only while it is the active location.
@@ -119,9 +118,9 @@ describe("the false cases and durations of the encounter cards", () => {
     const round = play(SCENARIO, { line: "", layout: { active: "142033", deck: ["f0", "f0", "f0"] }, act: [reveal("f3"), endPhase, endRound], expect: [] }, EFFECTS, false).run.state;
     expect(round.round).toBe(made.state.round + 1);
     expect(zonesOf(round, "f3")).toEqual(["staging"]);
-    expect(statOf(made, round, "f3", "engagementCost")).toBe(50);
+    expect(statOf(round, made.cards, "f3", "engagementCost")).toBe(50);
     const staged = played({ staging: ["142033"], deck: ["f0"] }, reveal("f3"));
-    expect(statOf(made, staged, "f3", "engagementCost")).toBe(50);
+    expect(statOf(staged, made.cards, "f3", "engagementCost")).toBe(50);
   });
 
   // 142036 Snowdrifts: "No more than 3 progress can be placed on attached location each round": the next round takes 3 more.
@@ -206,12 +205,12 @@ describe("Hunting Hawk (906403:A:2)", () => {
 describe("Expanse of Hollin (906405)", () => {
   it("906405:A:1 counts the enemies in the staging area as well as the engaged ones", () => {
     const made = tableFromLayout(SCENARIO, { staging: ["906405", "f0"], engaged: ["f3"] });
-    expect(statOf(made, made.state, "906405", "threat")).toBe(3);
+    expect(statOf(made.state, made.cards, "906405", "threat")).toBe(3);
   });
 
   it("906405:A:1 counts an enemy engaged with a player", () => {
     const made = tableFromLayout(SCENARIO, { staging: ["906405"], engaged: ["f3", "f0"] });
-    expect(statOf(made, made.state, "906405", "threat")).toBe(3);
+    expect(statOf(made.state, made.cards, "906405", "threat")).toBe(3);
   });
 
   // "Forced: When Expanse of Hollin is explored, shuffle the encounter discard pile into the encounter deck. Then, discard the top card of the encounter deck for each damage here. Add each enemy discarded by this effect to the staging area."

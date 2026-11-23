@@ -17,14 +17,13 @@ import { attachBlocked } from "../../../rules/interpret/restrictions.ts";
 import { openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
-import { withoutLine } from "../../../../test/harness/card-spec.ts";
+import { withoutLines } from "../../../../test/harness/card-spec.ts";
 import { addStandIns, finish, first, idOf, resolveRecords, revealFromTop, sceneEffects, send, type Run } from "../../../../test/harness/scene-kit.ts";
 import { BURDENS, FELL_RIDER, fordTable, loadFordWorld, WITCH_KING, type FordLayout, type FordWorld } from "../../../../test/scenarios/flight-to-the-ford/scene.ts";
 
 const NIGHTMARE = ["906302", "906303", "906304", "906305", "906306", "906307", "906308", "906309"];
 const BLACK_STEED = "141074"; // a Morgul treachery that attaches to a Nazgûl
 const ALL = sceneEffects();
-const without = (...lines: string[]) => lines.reduce(withoutLine, ALL);
 
 let world: FordWorld;
 beforeAll(async () => {
@@ -70,7 +69,7 @@ describe("Fell Rider (141063, 906302)", () => {
       const rider = idOf(made.state, code);
       expect(attachBlocked(made.state, made.ctx, rider, "attachment")).toBe(true);
       expect(attachBlocked(made.state, made.ctx, rider, BLACK_STEED)).toBe(false);
-      const bare = make({ staging: [code], effects: without(line) });
+      const bare = make({ staging: [code], effects: withoutLines(ALL, line) });
       expect(attachBlocked(bare.state, bare.ctx, idOf(bare.state, code), "attachment")).toBe(false);
     });
   }
@@ -86,7 +85,7 @@ describe("the Nightmare locations' Travel costs (906303, 906304)", () => {
     expect(engaged(0)).toHaveLength(1);
     expect(engaged(1)).toHaveLength(1);
     expect([...engaged(0), ...engaged(1)].sort()).toEqual([FELL_RIDER, WITCH_KING].sort());
-    const bare = make({ ...layout, effects: without("906303:A:2") });
+    const bare = make({ ...layout, effects: withoutLines(ALL, "906303:A:2") });
     const after = resolveRecords(bare.state, bare.ctx, "906303", "travel", idOf(bare.state, "906303")).state;
     expect(after.seats[0].engaged).toEqual([]);
   });
@@ -95,7 +94,7 @@ describe("the Nightmare locations' Travel costs (906303, 906304)", () => {
   it("906304:A:2 traveling to Trollshaw Forest reduces the Ring-bearer's life by 1", () => {
     const made = make({ staging: ["906304"] });
     expect(resolveRecords(made.state, made.ctx, "906304", "travel", idOf(made.state, "906304")).state.life).toBe(14);
-    const bare = make({ staging: ["906304"], effects: without("906304:A:2") });
+    const bare = make({ staging: ["906304"], effects: withoutLines(ALL, "906304:A:2") });
     expect(resolveRecords(bare.state, bare.ctx, "906304", "travel", idOf(bare.state, "906304")).state.life).toBe(15);
   });
 });
@@ -111,7 +110,7 @@ describe("Great East Road (906305)", () => {
   it("906305:A:1 its Threat is 1 plus the Nazgûl engaged with the players", () => {
     expect(threat({ staging: ["906305"] })).toBe(1);
     expect(threat({ staging: ["906305"], engaged: [{ code: FELL_RIDER, seat: 0 }] })).toBe(2);
-    expect(threat({ staging: ["906305"], engaged: [{ code: FELL_RIDER, seat: 0 }], effects: without("906305:A:1") })).not.toBe(2);
+    expect(threat({ staging: ["906305"], engaged: [{ code: FELL_RIDER, seat: 0 }], effects: withoutLines(ALL, "906305:A:1") })).not.toBe(2);
   });
 
   it("906305:A:1 a Nazgûl in the staging area is in play and counts for X", () => {
@@ -128,7 +127,7 @@ describe("Great East Road (906305)", () => {
     };
     expect(cost({ staging: ["906305", FELL_RIDER] })).toBe(25);
     expect(cost({ staging: [FELL_RIDER], active: "906305" })).toBe(30);
-    expect(cost({ staging: ["906305", FELL_RIDER], effects: without("906305:A:2") })).toBe(30);
+    expect(cost({ staging: ["906305", FELL_RIDER], effects: withoutLines(ALL, "906305:A:2") })).toBe(30);
   });
 });
 
@@ -138,7 +137,7 @@ describe("Pathless Wilderness (906306)", () => {
     const made = make({ deck: ["f0"] });
     const shown = reveal(made.state, made.ctx, "906306");
     expect(shown.state.cards[shown.id]?.resources).toBe(3);
-    const bare = make({ deck: ["f0"], effects: without("906306:A:1") });
+    const bare = make({ deck: ["f0"], effects: withoutLines(ALL, "906306:A:1") });
     const plain = reveal(bare.state, bare.ctx, "906306");
     expect(plain.state.cards[plain.id]?.resources ?? 0).toBe(0);
   });
@@ -154,7 +153,7 @@ describe("Pathless Wilderness (906306)", () => {
 
   it("906306:A:2 one token comes off at the end of the round, and with tokens left the life is not reduced", () => {
     expect(endOfRound(2)).toMatchObject({ resources: 1, lost: 0 });
-    expect(endOfRound(2, without("906306:A:2"))).toMatchObject({ resources: 2, lost: 0 });
+    expect(endOfRound(2, withoutLines(ALL, "906306:A:2"))).toMatchObject({ resources: 2, lost: 0 });
   });
 
   it("906306:A:2 the last token taken off reduces the Ring-bearer's life by 3", () => {
@@ -178,7 +177,7 @@ describe("Ettendales (906307)", () => {
 
   it("906307:A:1 explored, it shuffles the top card of the burden deck into the encounter deck", () => {
     expect(explore(3)).toBe("encounterDeck");
-    expect(explore(3, without("906307:A:1"))).toBe("burdenDeck");
+    expect(explore(3, withoutLines(ALL, "906307:A:1"))).toBe("burdenDeck");
   });
 
   it("906307:A:1 progress that does not explore it moves no burden", () => {
@@ -193,7 +192,7 @@ describe("Come Back! (906308)", () => {
     const { state } = reveal(made.state, made.ctx, "906308");
     expect(state.life).toBe(14);
     expect(state.cards[state.questStage ?? ""]?.progress).toBe(0);
-    const bare = make({ progress: 5, deck: ["f0"], effects: without("906308:A:2") });
+    const bare = make({ progress: 5, deck: ["f0"], effects: withoutLines(ALL, "906308:A:2") });
     const plain = reveal(bare.state, bare.ctx, "906308").state;
     expect(plain.life).toBe(15);
     expect(plain.cards[plain.questStage ?? ""]?.progress).toBe(5);
@@ -209,7 +208,7 @@ describe("The Twilight World (906309)", () => {
     const made = make({ deck: ["f0"] });
     const once = reveal(made.state, made.ctx, "906309");
     expect(once.state.cards[once.id]).toMatchObject({ zone: "attached", host: made.frodo });
-    const bare = make({ deck: ["f0"], effects: without("906309:A:2") });
+    const bare = make({ deck: ["f0"], effects: withoutLines(ALL, "906309:A:2") });
     const plain = reveal(bare.state, bare.ctx, "906309");
     expect(plain.state.cards[plain.id]?.zone).not.toBe("attached");
   });
@@ -227,7 +226,7 @@ describe("The Twilight World (906309)", () => {
     const { state, id } = reveal(made.state, made.ctx, "906309");
     expect(countsAsAttachment(state, id, made.ctx)).toBe(true);
     expect(hasTrait(state, id, "Condition", made.ctx)).toBe(true);
-    expect(countsAsAttachment(state, id, { ...made.ctx, effects: without("906309:A:2") })).toBe(false);
+    expect(countsAsAttachment(state, id, { ...made.ctx, effects: withoutLines(ALL, "906309:A:2") })).toBe(false);
   });
 
   it("906309:A:2 at the beginning of the planning phase the first player exhausts The One Ring or reduces the life by 1", () => {
@@ -244,7 +243,7 @@ describe("The Twilight World (906309)", () => {
     // With The One Ring already exhausted only the life can be paid.
     const spent = { ...planning, cards: { ...planning.cards, [ring]: { ...planning.cards[ring]!, exhausted: true } } };
     expect(announce(spent, PLANNING, made.ctx).state.life).toBe(14);
-    expect(announce(planning, PLANNING, { ...made.ctx, effects: without("906309:A:2") }).state.life).toBe(15);
+    expect(announce(planning, PLANNING, { ...made.ctx, effects: withoutLines(ALL, "906309:A:2") }).state.life).toBe(15);
   });
 });
 
@@ -258,6 +257,6 @@ describe("Flight to the Ford's Resolution (141056:B:1)", () => {
       return (resolutionResult(openResolution(won, made.ctx))?.earned ?? []).map((item) => item.code).sort();
     };
     expect(earned()).toEqual([weight, fear, eaten].sort());
-    expect(earned(without("141056:B:1"))).toEqual([]);
+    expect(earned(withoutLines(ALL, "141056:B:1"))).toEqual([]);
   });
 });

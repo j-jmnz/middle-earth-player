@@ -7,11 +7,10 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { attachBlocked } from "../../../rules/interpret/restrictions.ts";
-import { quest, rowProblems, withoutLine, won, zone } from "../../../../test/harness/card-spec.ts";
+import { quest, rowProblems, withoutLines, won, zone } from "../../../../test/harness/card-spec.ts";
 import { first, idOf, resolveRecords, tableFromLayout, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "journey-in-the-dark";
-const without = (...lines: string[]): readonly Effect[] => lines.reduce(withoutLine, EFFECTS);
 const make = (layout: Layout, effects: readonly Effect[] = EFFECTS): LayoutTable => tableFromLayout(ID, layout, { effects });
 const zonesOf = (state: ScenarioState, code: string): string[] => Object.values(state.cards).filter((card) => card.code === code).map((card) => card.zone).sort();
 
@@ -25,7 +24,7 @@ describe("142087 Overcome by Grief and 142088 Grievous Wound", () => {
         return zonesOf(resolveRecords(made.state, made.ctx, code, "setup", idOf(made.state, code)).state, code);
       };
       expect(setUp(EFFECTS)).toEqual(["staging"]);
-      expect(setUp(without(line))).toEqual(["setAside"]);
+      expect(setUp(withoutLines(EFFECTS, line))).toEqual(["setAside"]);
     });
   }
 });
@@ -40,7 +39,7 @@ describe("142039 Journey in the Dark (campaign card)", () => {
       return ["142086", "142085", "142088", "142087"].map((code) => zonesOf(state, code));
     };
     expect(setUp(EFFECTS)).toEqual([["encounterDeck"], ["encounterDeck"], ["staging"], ["staging"]]);
-    expect(setUp(without("142039:A:2"))).toEqual([[], [], [], []]);
+    expect(setUp(withoutLines(EFFECTS, "142039:A:2"))).toEqual([[], [], [], []]);
   });
 });
 
@@ -58,7 +57,7 @@ describe("906502 Slab-bearer", () => {
   it("906502:A:1 an attachment cannot be attached to it", () => {
     const made = make({ staging: ["906502"] });
     expect(attachBlocked(made.state, made.ctx, idOf(made.state, "906502"), "attachment")).toBe(true);
-    const bare = make({ staging: ["906502"] }, without("906502:A:1"));
+    const bare = make({ staging: ["906502"] }, withoutLines(EFFECTS, "906502:A:1"));
     expect(attachBlocked(bare.state, bare.ctx, idOf(bare.state, "906502"), "attachment")).toBe(false);
   });
 });

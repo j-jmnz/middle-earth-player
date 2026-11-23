@@ -8,12 +8,11 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { withThreat } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { canPlay, choices, combat, playCode, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { canPlay, choices, combat, playCode, playerTableFor, sendUnledgered, threatened } from "../../../test/harness/player-table.ts";
 
 const FIERCE = "17113";
 const HEIRS = "17115";
@@ -51,7 +50,6 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-const threatened = (tab: Table, threat: number): Table => ({ ...tab, state: withThreat(tab.state, 0, threat) });
 
 describe("Fierce Defense (17113:A:1, A:2)", () => {
   // Legolas (Tactics) pays 3. The Weak, the Grunt and the unique Boss are engaged with the first player (only the Boss when `bossOnly`), a

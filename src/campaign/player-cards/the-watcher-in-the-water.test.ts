@@ -8,15 +8,14 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
-import { ruleCause } from "../../rules/core/cause.ts";
-import { hasKeyword, placeDamage } from "../../rules/core/keywords.ts";
+import { hasKeyword } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, endRound, enter, fillers, passAll, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { choices, combat, destroyed, endRound, enter, fillers, passAll, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const CAIRN = "04054";
 const WATCHER = "04056";
@@ -47,7 +46,6 @@ beforeAll(async () => {
 });
 
 // The card `id` is destroyed (9 damage), and a Pass lets the game resolve what that set off.
-const destroyed = (tab: Table, id: string): Run => sendUnledgered(begin(placeDamage(tab.state, id, 9, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
 
 describe("Grave Cairn (04054:A:1)", () => {
   // The Pal pays; the Brute (Attack 3), an ally and the other player's Spirit hero are in play; Grave Cairn is in hand; the Weak enemy is
@@ -60,7 +58,7 @@ describe("Grave Cairn (04054:A:1)", () => {
   lineSpec("04054:A:1", "after a character leaves play, its Attack goes to another character until the end of the round", (effects) => {
     const tab = scene(effects);
     const [brute, ally, cairn] = [idsOf(tab, BRUTE), idsOf(tab, ALLY), idsOf(tab, CAIRN)];
-    let run = destroyed(tab, brute);
+    let run = destroyed(tab.state, tab, brute);
     expect(run.state.cards[brute]?.zone).toBe("discard");
     expect(triggers(run.state, tab)).toContain("04054:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: cairn, effectId: "04054:response:1", payments: [{ heroId: idsOf(tab, PAL), amount: 1 }] }, tab.ctx);
@@ -77,14 +75,14 @@ describe("Grave Cairn (04054:A:1)", () => {
   // An enemy that leaves play is not a character.
   it("04054:A:1 is not offered when an enemy leaves play", () => {
     const tab = table(EFFECTS, { heroes: [{ code: PAL, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }], hand: [{ code: CAIRN, seat: 0 }] });
-    const run = destroyed(tab, idsOf(tab, WEAK));
+    const run = destroyed(tab.state, tab, idsOf(tab, WEAK));
     expect(run.state.cards[idsOf(tab, WEAK)]?.zone).toBe("encounterDiscard");
     expect(triggers(run.state, tab)).not.toContain("04054:response:1");
   });
 
   it("04054:A:1 is not offered when the character that leaves play has Attack 0", () => {
     const tab = scene(EFFECTS, [NOUGHT, ALLY]);
-    const run = destroyed(tab, idsOf(tab, NOUGHT));
+    const run = destroyed(tab.state, tab, idsOf(tab, NOUGHT));
     expect(run.state.cards[idsOf(tab, NOUGHT)]?.zone).toBe("discard");
     expect(triggers(run.state, tab)).not.toContain("04054:response:1");
   });

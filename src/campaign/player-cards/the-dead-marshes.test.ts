@@ -14,7 +14,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, enter, hosts, passAll, playCode, playerTable, questing, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, choices, combat, enter, exhausted, hosts, passAll, playCode, playerTable, questing, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const BOROMIR = "02095";
 const WATCHER = "02096";
@@ -52,7 +52,6 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-const exhausted = (tab: Table, ...ids: string[]): Table => ({ ...tab, state: ids.reduce((state, id) => updateCard(state, id, { exhausted: true }), tab.state) });
 
 describe("Boromir (02095:A:1, A:2)", () => {
   // "Action: Raise your threat by 1 to ready Boromir. (Limit once per phase.)": exhausted, he readies for 1 threat (8 to 9). Exhausted

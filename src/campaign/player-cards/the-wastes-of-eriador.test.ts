@@ -10,12 +10,11 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { deckSaveRefusal } from "../../catalog/deck-save.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { withThreat } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { canPlay, choices, combat, deckSaveFacts, enter, packRow, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { canPlay, choices, combat, deckSaveFacts, enter, packRow, passAll, play, playerTableFor, sendUnledgered, stat, threatened, triggers } from "../../../test/harness/player-table.ts";
 
 const INGOLD = "10002";
 const RALLYING = "10003";
@@ -49,7 +48,6 @@ const STRIDER = "strider";
 let base: Awaited<ReturnType<typeof starterBase>>;
 
 const table = playerTableFor(() => base);
-const threatened = (tab: Table, threat: number, seat = 0): Table => ({ ...tab, state: withThreat(tab.state, seat, threat) });
 
 beforeAll(async () => {
   const starter = await starterBase();

@@ -7,16 +7,14 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
-import { ruleCause } from "../../rules/core/cause.ts";
-import { placeDamage } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, enter, fillers, hosts, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
+import { attach, choices, destroyed, enter, fillers, hosts, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const IMRAHIL = "02050";
 const QUEST = "02051";
@@ -58,7 +56,6 @@ beforeAll(async () => {
 });
 
 // The card `id` is destroyed (9 damage), and a Pass lets the game resolve what that set off.
-const destroyed = (state: Table["state"], tab: Table, id: string): Run => sendUnledgered(begin(placeDamage(state, id, 9, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
 
 describe("Prince Imrahil (02050:A:1)", () => {
   // Imrahil exhausted, two allies of the player and one of the other player's, and a Weak enemy engaged.

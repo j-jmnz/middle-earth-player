@@ -18,13 +18,12 @@ import { runInstruction } from "../../../rules/interpret/interpret.ts";
 import { attachBlocked } from "../../../rules/interpret/restrictions.ts";
 import { startReveal } from "../../../rules/windows/frames.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
-import { withoutLine } from "../../../../test/harness/card-spec.ts";
+import { withoutLines } from "../../../../test/harness/card-spec.ts";
 import { fightEnemy, finish, idOf, revealFromTop, tableFromLayout, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "the-city-of-corsairs";
 const SAHIR = "12158";
 const SWORD = "11216";
-const without = (...lines: string[]): readonly Effect[] => lines.reduce(withoutLine, EFFECTS);
 
 // The table of a layout on these records, with the Heading card set to `heading` (dcce.heading; none: no Heading card in the game). `extra` places a card the campaign deal leaves out (the standalone Shattered Monument).
 function make(layout: Layout, options: { effects?: readonly Effect[]; heading?: Heading; extra?: readonly string[] } = {}): LayoutTable {
@@ -53,7 +52,7 @@ describe("12151 Stormcaller and 12152 Slave Ship", () => {
     it(`${line} an attachment cannot be attached to it`, () => {
       const made = make({ staging: [code] });
       expect(attachBlocked(made.state, made.ctx, idOf(made.state, code), "attachment")).toBe(true);
-      const bare = make({ staging: [code] }, { effects: without(line) });
+      const bare = make({ staging: [code] }, { effects: withoutLines(EFFECTS, line) });
       expect(attachBlocked(bare.state, bare.ctx, idOf(bare.state, code), "attachment")).toBe(false);
     });
   }
@@ -69,14 +68,14 @@ describe("12155 Corsair Waters", () => {
     const run = fought("heading").run.state;
     expect(run.sea?.heading).toBe("Cloud");
     expect(heroDamage(run)).toBe(1);
-    expect(fought("heading", without("12155:A:2")).run.state.sea?.heading).toBe("Sun");
+    expect(fought("heading", withoutLines(EFFECTS, "12155:A:2")).run.state.sea?.heading).toBe("Sun");
   });
 
   it("12155:A:2 or the attack is treated as undefended: its whole 3 Attack lands on a hero, the Defense ignored", () => {
     const run = fought("undefended").run.state;
     expect(heroDamage(run)).toBe(3);
     expect(run.sea?.heading).toBe("Sun");
-    expect(heroDamage(fought("undefended", without("12155:A:2")).run.state)).toBe(1);
+    expect(heroDamage(fought("undefended", withoutLines(EFFECTS, "12155:A:2")).run.state)).toBe(1);
   });
 });
 
@@ -86,7 +85,7 @@ describe("12156 Watch Tower", () => {
     expect(resources(revealed(make({ staging: ["12156"], deck: ["f0"] }), "11064"), "11064")).toBe(1);
     expect(resources(revealed(make({ active: "12156", deck: ["f0"] }), "11064"), "11064")).toBe(0);
     expect(resources(revealed(make({ staging: ["12156"], deck: ["f0"] }), "f3"), "f3")).toBe(0);
-    expect(resources(revealed(make({ staging: ["12156"], deck: ["f0"] }, { effects: without("12156:A:1") }), "11064"), "11064")).toBe(0);
+    expect(resources(revealed(make({ staging: ["12156"], deck: ["f0"] }, { effects: withoutLines(EFFECTS, "12156:A:1") }), "11064"), "11064")).toBe(0);
   });
 });
 
@@ -104,7 +103,7 @@ describe("12157 Serpent's Tail", () => {
     expect(shadowOf(state, "11057")).not.toBeNull();
     expect(shadowOf(state, "12152")).toBeNull();
     expect(shadowOf(state, "11064")).toBeNull();
-    const bare = make(layout, { heading: "Sun", effects: without("12157:A:1") });
+    const bare = make(layout, { heading: "Sun", effects: withoutLines(EFFECTS, "12157:A:1") });
     expect(shadowOf(revealed(bare, "12157"), "11057")).toBeNull();
   });
 
@@ -125,7 +124,7 @@ describe("12157 Serpent's Tail", () => {
     expect(cost(off, offState, "11064")).toBe(24);
     const on = make(layout, { heading: "Sun" });
     expect(cost(on, revealed(on, "12157"), "12152")).toBe(32);
-    const bare = make(layout, { heading: "Rain", effects: without("12157:A:1") });
+    const bare = make(layout, { heading: "Rain", effects: withoutLines(EFFECTS, "12157:A:1") });
     expect(cost(bare, revealed(bare, "12157"), "12152")).toBe(32);
   });
 });
@@ -141,7 +140,7 @@ describe("12158 Captain Sahír", () => {
       return finish({ state: settle(startReveal(top, 0, made.ctx, steps), made.ctx, steps), steps }, made.ctx).state.cards[spawned.id];
     };
     expect(run()).toMatchObject({ zone: "engaged", controller: 1 });
-    expect(run(without("12158:A:1"))?.zone).toBe("staging");
+    expect(run(withoutLines(EFFECTS, "12158:A:1"))?.zone).toBe("staging");
   });
 
   // "For each point of damage Captain Sahír would take, discard 1 resource from him and cancel that damage."
@@ -156,7 +155,7 @@ describe("12158 Captain Sahír", () => {
     expect(hurt(2, 3)).toEqual({ damage: 0, resources: 1 });
     expect(hurt(5, 3)).toEqual({ damage: 2, resources: 0 });
     expect(hurt(2, 0)).toEqual({ damage: 2, resources: 0 });
-    expect(hurt(2, 3, without("12158:A:2"))).toEqual({ damage: 2, resources: 3 });
+    expect(hurt(2, 3, withoutLines(EFFECTS, "12158:A:2"))).toEqual({ damage: 2, resources: 3 });
   });
 });
 
@@ -177,7 +176,7 @@ describe("12159, 110129 The Shattered Monument", () => {
       expect([resources(state, "11064"), resources(state, "11065"), resources(state, "11066")]).toEqual([1, 1, 0]);
       const planning = begun(monument, EFFECTS, "Planning");
       expect(resources(planning, "11064")).toBe(0);
-      const bare = begun(monument, without(line));
+      const bare = begun(monument, withoutLines(EFFECTS, line));
       expect(resources(bare, "11064")).toBe(0);
     });
   }
@@ -192,7 +191,7 @@ describe("12162 Umbar Harbor", () => {
     };
     expect(defense({ staging: ["12162", "11064"] })).toBe(2);
     expect(defense({ active: "12162", staging: ["11064"] })).toBe(4);
-    expect(defense({ active: "12162", staging: ["11064"] }, without("12162:A:1"))).toBe(2);
+    expect(defense({ active: "12162", staging: ["11064"] }, withoutLines(EFFECTS, "12162:A:1"))).toBe(2);
   });
 });
 
@@ -211,11 +210,11 @@ describe("11216 The Black Sword, side B", () => {
 
   it("11216:B:2 enters play attached to Sahír with 2 resources on it", () => {
     expect(armed().sword).toMatchObject({ face: "B", host: idOf(armed().state, SAHIR), resources: 2 });
-    expect(armed(without("11216:B:2")).sword?.resources).toBe(0);
+    expect(armed(withoutLines(EFFECTS, "11216:B:2")).sword?.resources).toBe(0);
   });
 
   it("11216:B:3 gives Sahír indestructible and leaves his printed 6 Attack", () => {
     expect(armed()).toMatchObject({ indestructible: true, attack: 6 });
-    expect(armed(without("11216:B:3")).indestructible).toBe(false);
+    expect(armed(withoutLines(EFFECTS, "11216:B:3")).indestructible).toBe(false);
   });
 });

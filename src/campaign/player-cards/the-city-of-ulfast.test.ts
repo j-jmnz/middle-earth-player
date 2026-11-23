@@ -15,7 +15,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, deckSaveFacts, discarded, packRow, playCode, playerTableFor, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { choices, combat, deckSaveFacts, discarded, packRow, playCode, playerTableFor, questing, sendUnledgered, stat, threatened, triggers } from "../../../test/harness/player-table.ts";
 
 const ANGBOR = "22028";
 const NEED = "22029";
@@ -45,11 +45,10 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-const threatened = (tab: Table, seat: number, threat: number): Table => ({ ...tab, state: withThreat(tab.state, seat, threat) });
 
 describe("Angbor the Fearless (22028:A:1)", () => {
   // Aragorn pays for Angbor in hand; the player's threat is `threat`.
-  const angbor = (effects: readonly Effect[], threat: number): Table => threatened(table(effects, { heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: ANGBOR, seat: 0 }], deck: ["f0", "f0"] }), 0, threat);
+  const angbor = (effects: readonly Effect[], threat: number): Table => threatened(table(effects, { heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: ANGBOR, seat: 0 }], deck: ["f0", "f0"] }), threat, 0);
 
   // "While your threat is 40 or higher, Angbor the Fearless gets +2 Attack and does not exhaust to quest.": played at threat 40 he has
   // Attack 1 + 2, and he commits to the quest without exhausting.
@@ -73,7 +72,7 @@ describe("Angbor the Fearless (22028:A:1)", () => {
 
   // "your threat": the other player at 45 does not count.
   it("22028:A:1 Angbor the Fearless: another player's threat does not count", () => {
-    const tab = threatened(angbor(EFFECTS, 30), 1, 45);
+    const tab = threatened(angbor(EFFECTS, 30), 45, 1);
     expect(stat(playCode(tab, ANGBOR).state, tab, idsOf(tab, ANGBOR), "attack")).toBe(1);
   });
 });

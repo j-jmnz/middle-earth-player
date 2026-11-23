@@ -9,7 +9,7 @@ import { attachTo, moveCard, spawn } from "../../../rules/core/zones.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
-import { finish, idOf, legalIntents, send, start, tableFromLayout, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
+import { finish, idOf, type LayoutTable, legalIntents, type Run, send, start, tableFromLayout, zoneOf } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "roam-across-rhovanion";
 const STAGE_TWOS = ["19048", "19049", "19050"];
@@ -45,7 +45,6 @@ function quested(made: LayoutTable, state: ScenarioState): ScenarioState {
 }
 
 const stageOf = (state: ScenarioState): string | undefined => state.cards[state.questStage ?? ""]?.code;
-const zoneOf = (state: ScenarioState, code: string): string | undefined => state.cards[idOf(state, code)]?.zone;
 
 // "Forced: When the players defeat this stage, remove it from the game. Advance to a random stage 2A, if able. Otherwise, advance to stage 3A."
 describe.each([

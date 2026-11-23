@@ -5,6 +5,7 @@ import { isCharacterType, printedFromCard, type PrintedCard } from "../../src/ru
 import { blankScenario, updateCard, withThreat } from "../../src/rules/core/state.ts";
 import { attachTo, spawn, type Destination } from "../../src/rules/core/zones.ts";
 import type { ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
+import { attachmentTargets } from "../../src/rules/player/planning.ts";
 import { holdCaptive } from "../../src/rules/families/captives/index.ts";
 import { syncConstants } from "../../src/rules/interpret/constants.ts";
 import { markSideQuests } from "../../src/rules/families/wilderland/night-quest.ts";
@@ -228,4 +229,17 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   state = markSeatedRows(state, ctx);
   state = { ...state, ...opening(layout.phase ?? "Quest"), ...(layout.firstPlayer != null ? { firstPlayer: layout.firstPlayer } : {}) };
   return { state: syncConstants(state, ctx), ctx, hero: first.id, hero2: secondHero.id, seat1Hero, definition, cards };
+}
+
+/** The codes (sorted) of the cards that the first card of `code` in `made` can be attached to, with the first seat acting. */
+export function attachTargetCodes(made: LayoutTable, code: string): string[] {
+  return attachmentTargets({ ...made.state, activeSeat: 0 }, idOf(made.state, code), made.ctx).map((id) => made.state.cards[id]?.code ?? "").sort();
+}
+
+/**
+ * A table with `enemy` and the filler enemy f0 engaged and the card `hand` in hand (a card outside the scenario: it joins `extra`, which takes
+ * the cards of other codes too). It is the moment an attachment card is tried on the engaged enemies.
+ */
+export function engagedHandTable(scenarioId: string, hand: string, enemy: string, effects: readonly Effect[], extra: readonly string[] = [hand]): LayoutTable {
+  return tableFromLayout(scenarioId, { engaged: [enemy, "f0"], hand: [hand] }, { effects, extra });
 }

@@ -2,8 +2,9 @@ import { readFileSync } from "node:fs";
 
 import type { Effect, ModifierStat } from "../../src/catalog/boundary.ts";
 import type { DeckSaveCard } from "../../src/catalog/deck-save.ts";
-import { modifiedStat } from "../../src/rules/core/keywords.ts";
-import { withMode, type ScenarioState } from "../../src/rules/core/state.ts";
+import { modifiedStat, placeDamage } from "../../src/rules/core/keywords.ts";
+import { updateCard, withMode, withThreat, type ScenarioState } from "../../src/rules/core/state.ts";
+import { ruleCause } from "../../src/rules/core/cause.ts";
 import { attachTo, spawn } from "../../src/rules/core/zones.ts";
 import { settle } from "../../src/rules/engine/machine.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext } from "../../src/rules/engine/reduce.ts";
@@ -67,6 +68,21 @@ export function stat(state: ScenarioState, tab: Table, id: string, which: Extrac
   const card = state.cards[id];
   if (!card) throw new Error(`no card ${id}`);
   return modifiedStat(state, card, which, tab.ctx.cards);
+}
+
+/** The table with the threat of `seat`'s player set to `threat`. */
+export function threatened(tab: Table, threat: number, seat = 0): Table {
+  return { ...tab, state: withThreat(tab.state, seat, threat) };
+}
+
+/** The table with the cards `ids` exhausted. */
+export function exhausted(tab: Table, ...ids: readonly string[]): Table {
+  return { ...tab, state: ids.reduce((state, id) => updateCard(state, id, { exhausted: true }), tab.state) };
+}
+
+/** Puts 9 damage on `id` in `state` (a card with that much health is destroyed) and passes the window that opens, through sendUnledgered. */
+export function destroyed(state: ScenarioState, tab: Table, id: string): Run {
+  return sendUnledgered(begin(placeDamage(state, id, 9, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
 }
 
 /** The combat phase begins with the enemies engaged: its action window (6.2) is open. */
