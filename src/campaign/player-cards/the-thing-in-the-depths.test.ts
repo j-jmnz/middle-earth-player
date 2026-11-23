@@ -16,7 +16,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { choices, chooseIfAsked, discarded, enter, hosts, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { choices, chooseIfAsked, discarded, enter, hosts, passWhile, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const LANWYN = "12030";
 const WISDOM = "12032";
@@ -254,7 +254,7 @@ describe("Mirkwood Explorer (12037:A:1)", () => {
     const tab = table(effects, { start: "quest", heroes: [{ code: DENETHOR, seat: 0 }], allies: [{ code: EXPLORER, seat: 0 }], deck: [WEAK, WEAK] });
     const explorer = idsOf(tab, EXPLORER);
     let run = staged(tab, [explorer, idsOf(tab, DENETHOR)]);
-    for (let guard = 0; guard < 6 && !triggers(run.state, tab).includes("12037:response:1") && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => !triggers(run.state, tab).includes("12037:response:1") && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"), 6);
     expect(triggers(run.state, tab)).toContain("12037:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: explorer, effectId: "12037:response:1" }, tab.ctx);
     expect(run.state.cards[explorer]?.progress).toBe(1);

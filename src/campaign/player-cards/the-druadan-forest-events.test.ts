@@ -14,7 +14,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf } from "../../../test/harness/scene.ts";
-import { canPlay, combat, enter, passAll, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { canPlay, combat, enter, passAll, passWhile, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
 
 const STRENGTH = "06034";
 const TRAINED = "06036";
@@ -105,7 +105,7 @@ describe("Trained for War (06036:A:1, A:2)", () => {
     const stage = tab.state.questStage ?? "";
     let run = play(begin(tab.state), tab, idsOf(tab, TRAINED));
     run = sendUnledgered(run, { type: "Commit", cardIds: [idsOf(tab, LEGOLAS), idsOf(tab, GIMLI)] }, tab.ctx);
-    for (let guard = 0; guard < 5 && run.state.mode === "questCommit"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.mode === "questCommit", 5);
     run = passAll(run, tab.ctx, { responses: true });
     expect(run.state.mode).toBe("travel");
     expect(run.state.cards[stage]?.progress).toBe(3 + 2);
@@ -115,7 +115,7 @@ describe("Trained for War (06036:A:1, A:2)", () => {
   it("06036:A:2 Trained for War: without it the heroes quest with their Willpower", () => {
     const tab = table(EFFECTS, { start: "quest", heroes: [{ code: LEGOLAS, seat: 0 }, { code: GIMLI, seat: 0 }], deck: ["f0", "f0"] });
     let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, LEGOLAS), idsOf(tab, GIMLI)] }, tab.ctx);
-    for (let guard = 0; guard < 5 && run.state.mode === "questCommit"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.mode === "questCommit", 5);
     run = passAll(run, tab.ctx, { responses: true });
     expect(run.state.cards[tab.state.questStage ?? ""]?.progress).toBe(1 + 2);
   });

@@ -14,7 +14,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { canPlay, choices, combat, deckSaveFacts, enter, packRow, passAll, play, playerTableFor, sendUnledgered, stat, threatened, triggers } from "../../../test/harness/player-table.ts";
+import { canPlay, choices, combat, deckSaveFacts, enter, packRow, passAll, passWhile, play, playerTableFor, sendUnledgered, stat, threatened, triggers } from "../../../test/harness/player-table.ts";
 
 const INGOLD = "10002";
 const RALLYING = "10003";
@@ -115,7 +115,7 @@ describe("Rallying Cry (10003:A:1, A:2)", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: ARAGORN, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: ALLY, seat: 1 }], hand: [{ code: RALLYING, seat: 0 }], engaged: [{ code: BRUTE, seat: 1 }] });
     const [ally, cry] = [idsOf(tab, ALLY), idsOf(tab, RALLYING)];
     let run = defended(tab, ALLY);
-    for (let guard = 0; guard < 3 && !triggers(run.state, tab).includes("10003:response:1"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => !triggers(run.state, tab).includes("10003:response:1"), 3);
     expect(triggers(run.state, tab)).toContain("10003:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: cry, effectId: "10003:response:1", payments: [{ heroId: idsOf(tab, ARAGORN), amount: 2 }] }, tab.ctx);
     expect(run.state.seats[1]?.hand).toEqual([ally]);
@@ -221,7 +221,7 @@ describe("Scout Ahead (10009:A:2)", () => {
     run = sendUnledgered(run, { type: "Choose", optionId: scout }, tab.ctx);
     run = sendUnledgered(run, { type: "Commit", cardIds: [idsOf(tab, STRIDER)] }, tab.ctx);
     // The commit passes on to each other player, then the staging step reveals and the quest resolves.
-    for (let guard = 0; guard < 4 && run.state.mode === "questCommit"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.mode === "questCommit", 4);
     run = passAll(run, tab.ctx);
     return { tab, run, scout };
   }

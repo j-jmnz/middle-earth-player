@@ -16,7 +16,7 @@ import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-pa
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, enter, hosts, play, playerTableFor, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, choices, combat, enter, hosts, passWhile, play, playerTableFor, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const GIMLI = "01004";
@@ -99,7 +99,7 @@ describe("Messenger Raven (19146)", () => {
     expect(refusal(attack, { type: "DeclareAttackers", enemyId: brute, attackerIds: [raven] }, tab.ctx)).not.toBeNull();
     expect(refusal(attack, { type: "DeclareAttackers", enemyId: brute, attackerIds: [ally] }, tab.ctx)).toBeNull();
     let run = combat(tab.state, tab);
-    for (let guard = 0; guard < 10 && run.state.window?.kind !== "defense"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.window?.kind !== "defense", 10);
     expect(refusal(run.state, { type: "DeclareDefender", defenderId: raven }, tab.ctx)).not.toBeNull();
     expect(refusal(run.state, { type: "DeclareDefender", defenderId: ally }, tab.ctx)).toBeNull();
   });
@@ -215,7 +215,7 @@ describe("Mithril Shirt (19152)", () => {
     const tab = table(effects, { heroes: [{ code: GIMLI, seat: 0 }], attached: [{ code: SHIRT, host: GIMLI }], engaged: [{ code: BRUTE, seat: 0 }] });
     const gimli = idsOf(tab, GIMLI);
     let run = combat(tab.state, tab);
-    for (let guard = 0; guard < 10 && run.state.window?.kind !== "defense"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.window?.kind !== "defense", 10);
     run = sendUnledgered(run, { type: "Undefended", heroId: gimli }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("19152:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, SHIRT), effectId: "19152:response:1" }, tab.ctx);
@@ -226,7 +226,7 @@ describe("Mithril Shirt (19152)", () => {
   it("19152:A:3 Mithril Shirt: no Response for damage to another hero", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }, { code: EOWYN, seat: 0 }], attached: [{ code: SHIRT, host: GIMLI }], engaged: [{ code: BRUTE, seat: 0 }] });
     let run = combat(tab.state, tab);
-    for (let guard = 0; guard < 10 && run.state.window?.kind !== "defense"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.window?.kind !== "defense", 10);
     run = sendUnledgered(run, { type: "Undefended", heroId: idsOf(tab, EOWYN) }, tab.ctx);
     expect(triggers(run.state, tab)).not.toContain("19152:response:1");
   });

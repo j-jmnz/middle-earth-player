@@ -12,7 +12,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, FRODO, idsOf, RING, type Table } from "../../../test/harness/scene.ts";
-import { choices, enter, fillers, hosts, passAll, play, playerTableFor, printed, questing, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { choices, enter, fillers, hosts, passAll, passWhile, play, playerTableFor, printed, questing, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
 
 const SWORD = "22083";
 const STONE = "22084";
@@ -84,7 +84,7 @@ describe("Stone of Elostirion (22084:A:1, A:2)", () => {
     run = sendUnledgered(run, { type: "Travel", locationId: place }, tab.ctx);
     expect(run.state.activeLocation).toBe(place);
     run = sendUnledgered(begin(questing(run.state)), { type: "Commit", cardIds: [strider] }, tab.ctx);
-    for (let guard = 0; guard < 4 && run.state.mode === "questCommit"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.mode === "questCommit", 4);
     run = passAll(run, tab.ctx, { responses: true });
     expect(run.state.cards[place]?.zone).toBe("encounterDiscard");
     expect(choices(run.state, tab).sort()).toEqual([strider, idsOf(tab, BERAVOR)].sort());

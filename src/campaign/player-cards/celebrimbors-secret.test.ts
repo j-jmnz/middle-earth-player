@@ -16,7 +16,7 @@ import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-pa
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf } from "../../../test/harness/scene.ts";
-import { attach, attacking, choices, combat, discarded, hosts, play, playerTableFor, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attach, attacking, choices, combat, discarded, hosts, passWhile, play, playerTableFor, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const THEODRED = "01002";
@@ -64,7 +64,7 @@ describe("Galadriel (08112:A:1)", () => {
     expect(refusal(attack, { type: "DeclareAttackers", enemyId: brute, attackerIds: [galadriel] }, tab.ctx)).not.toBeNull();
     expect(refusal(attack, { type: "DeclareAttackers", enemyId: brute, attackerIds: [eowyn] }, tab.ctx)).toBeNull();
     let run = combat(tab.state, tab);
-    for (let guard = 0; guard < 10 && run.state.window?.kind !== "defense"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.window?.kind !== "defense", 10);
     expect(run.state.window?.kind).toBe("defense");
     expect(refusal(run.state, { type: "DeclareDefender", defenderId: galadriel }, tab.ctx)).not.toBeNull();
     expect(refusal(run.state, { type: "DeclareDefender", defenderId: eowyn }, tab.ctx)).toBeNull();

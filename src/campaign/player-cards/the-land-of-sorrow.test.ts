@@ -17,7 +17,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attach, attacking, choices, enter, hosts, passAll, playCode, playerTableFor, printed, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { attach, attacking, choices, enter, hosts, passAll, playCode, playerTableFor, printed, questUntil, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
 
 const GWAIHIR = "22108";
 const ARCHER = "22109";
@@ -57,14 +57,6 @@ beforeAll(async () => {
 });
 
 // Commits `commit` and passes until `stop` holds, the game asks a question, or the quest is over.
-function quested(tab: Table, commit: readonly string[], stop: (run: Run) => boolean): Run {
-  let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: commit }, tab.ctx);
-  for (let guard = 0; guard < 20 && !stop(run) && run.state.window?.kind !== "choose" && run.state.mode !== "travel" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) {
-    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
-  }
-  return run;
-}
-
 describe("Gwaihir (22108:A:2)", () => {
   // "Cannot have restricted attachments.": Citadel Plate (restricted, "Attach to a hero.") may go on Legolas, not on Gwaihir.
   // "Gwaihir does not ready during the refresh phase.": both exhausted, the refresh phase readies Legolas and leaves Gwaihir exhausted.
@@ -119,7 +111,7 @@ describe("Eagle Emissary (22113:A:2)", () => {
   // The Emissary quests alone against an empty staging area, with Legolas (Tactics) or Aragorn (no Tactics icon) as the hero.
   function emissary(effects: readonly Effect[], hero: string): { tab: Table; run: Run } {
     const tab = table(effects, { start: "quest", heroes: [{ code: hero, seat: 0 }], allies: [{ code: EMISSARY, seat: 0 }], deck: ["f0"] }, 2);
-    return { tab, run: quested(tab, [idsOf(tab, EMISSARY)], () => false) };
+    return { tab, run: questUntil(tab, [idsOf(tab, EMISSARY)]) };
   }
 
   // "Forced: After Eagle Emissary quests successfully, pay 1 Tactics resource or discard it from play.": Legolas holds Tactics
@@ -152,7 +144,7 @@ describe("Eagle Emissary (22113:A:2)", () => {
   // Aragorn quests and the Emissary does not: it stays.
   it("22113:A:2 nothing happens when the Emissary did not quest", () => {
     const tab = table(EFFECTS, { start: "quest", heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: EMISSARY, seat: 0 }], deck: ["f0"] }, 2);
-    const run = quested(tab, [idsOf(tab, ARAGORN)], () => false);
+    const run = questUntil(tab, [idsOf(tab, ARAGORN)]);
     // The quest was won: Aragorn's 2 Willpower against the staging area's 0 is 2 progress on the stage.
     expect(run.state.mode).toBe("travel");
     expect(Object.values(run.state.cards).find((card) => card.zone === "questStage")?.progress).toBe(2);

@@ -15,7 +15,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { combat, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { combat, hosts, passWhile, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const FARAMIR = "144002";
 const STAFF = "144008";
@@ -109,7 +109,7 @@ describe("Snowmane (144010:A:1, A:3)", () => {
     const tab = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: DENETHOR, seat: 0 }], attached: [{ code: SNOWMANE, host: EOWYN }], deck: ["f0", "f0"] });
     const eowyn = idsOf(tab, EOWYN);
     let run = quest(tab, [eowyn]);
-    for (let guard = 0; guard < 10 && !triggers(run.state, tab).includes("144010:response:1") && run.state.phase === "Quest"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => !triggers(run.state, tab).includes("144010:response:1") && run.state.phase === "Quest", 10);
     expect(run.state.cards[eowyn]?.exhausted).toBe(true);
     expect(triggers(run.state, tab)).toContain("144010:response:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, SNOWMANE), effectId: "144010:response:1" }, tab.ctx);

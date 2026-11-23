@@ -165,6 +165,22 @@ export function passAll(run: Run, ctx: ReduceContext, windows: { responses?: boo
   return next;
 }
 
+/** Sends Pass (sendUnledgered) while `keepGoing(run)` holds, at most `max` times. A Pass nobody offers throws IntentRefused, as one Pass does. */
+export function passWhile(run: Run, tab: Table, keepGoing: (run: Run) => boolean, max = 10): Run {
+  let next = run;
+  for (let guard = 0; guard < max && keepGoing(next); guard += 1) next = sendUnledgered(next, { type: "Pass" }, tab.ctx);
+  return next;
+}
+
+/**
+ * The quest phase from its commit step: `commit` (card ids) is committed, then Pass is sent until `stop(run)` holds, a question is asked, the
+ * travel step comes or no Pass is offered (at most 20 times), so a Response window of the quest, a staging step or a choice can be read.
+ */
+export function questUntil(tab: Table, commit: readonly string[], stop: (run: Run) => boolean = () => false): Run {
+  const committed = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [...commit] }, tab.ctx);
+  return passWhile(committed, tab, (run) => !stop(run) && run.state.window?.kind !== "choose" && run.state.mode !== "travel" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"), 20);
+}
+
 /** The engine moves on to `mode` (its phase begins) and runs to its next window. */
 export function enter(state: ScenarioState, tab: Table, mode: Parameters<typeof withMode>[1]): Run {
   return begin(settle({ ...withMode(state, mode), window: null }, tab.ctx, []));

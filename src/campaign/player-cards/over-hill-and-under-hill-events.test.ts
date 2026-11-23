@@ -13,7 +13,7 @@ import { fund, payFor, starterBase } from "../../../test/scenarios/a-shadow-of-t
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, buildTable, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, playerTableFor, playRefusal, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, choices, combat, passWhile, playerTableFor, playRefusal, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const THORIN = "131002";
 const ORI = "131004";
@@ -185,7 +185,7 @@ describe("Expecting Mischief (131018:A:1)", () => {
     expect(playRefusal(planning.state, planning, MISCHIEF)).not.toBeNull();
     // The heroes commit and the staging step reveals: the window after staging (3.3) is too late.
     let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, THORIN)] }, tab.ctx);
-    for (let guard = 0; guard < 5 && run.state.window?.kind !== "frameAction" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.window?.kind !== "frameAction" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"), 5);
     expect(run.state.mode).not.toBe("questCommit");
     expect(playRefusal(run.state, tab, MISCHIEF)).not.toBeNull();
   });

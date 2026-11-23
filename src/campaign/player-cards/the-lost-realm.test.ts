@@ -15,7 +15,7 @@ import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-pas
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, chooseIfAsked, combat, fillers, playCode, playerTableFor, playRefusal, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, choices, chooseIfAsked, combat, fillers, passWhile, playCode, playerTableFor, playRefusal, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 
 const ARAGORN = "09001";
@@ -60,7 +60,7 @@ beforeAll(async () => {
 // Passes the action windows until a Response is offered or the game asks for something else.
 function passTo(run: Run, tab: Table, effectId: string): Run {
   let next = run;
-  for (let guard = 0; guard < 10 && !triggers(next.state, tab).includes(effectId) && (next.state.window?.kind === "frameAction" || next.state.window?.kind === "response"); guard += 1) next = sendUnledgered(next, { type: "Pass" }, tab.ctx);
+  next = passWhile(next, tab, (run) => !triggers(run.state, tab).includes(effectId) && (run.state.window?.kind === "frameAction" || run.state.window?.kind === "response"), 10);
   return next;
 }
 

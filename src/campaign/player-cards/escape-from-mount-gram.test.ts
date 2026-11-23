@@ -18,7 +18,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, deckSaveFacts, enter, fillers, hosts, packRow, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { choices, combat, deckSaveFacts, enter, fillers, hosts, packRow, passAll, passWhile, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const VETERAN = "10029";
 const DESCENDANTS = "10030";
@@ -211,7 +211,7 @@ describe("Leave No Trace (10035:A:2)", () => {
     const tab = { ...scene, state: updateCard(scene.state, id, { progress: 2 }) };
     if (!explored) return { tab, run: sendUnledgered(begin(destroyCard(tab.state, id, tab.ctx.cards, [])), { type: "Pass" }, tab.ctx) };
     let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, PAL)] }, tab.ctx);
-    for (let guard = 0; guard < 10 && run.state.cards[id]?.zone === "activeLocation"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.cards[id]?.zone === "activeLocation", 10);
     return { tab, run };
   }
 
