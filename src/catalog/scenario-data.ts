@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioDefinition } from "./boundary.ts";
+import { originSchema } from "./origin.ts";
 
 // A scenario as data/scenarios/<id>.json stores it: which cards go to which pile, in Normal and Easy
 // counts. The sync adapters and the quest cards' Setup text both agree on it before the build writes it.
@@ -67,6 +68,8 @@ export const scenarioDataSchema = z
   .strictObject({
     id: z.string().min(1),
     name: z.string().min(1),
+    // Absent on an official scenario; a fan-made one names its publisher (src/catalog/origin.ts).
+    origin: originSchema.optional(),
     number: z.number().int().positive(),
     stages: z.array(z.string().min(1)).min(1),
     // The booklet's encounter sets, in booklet order, with the Normal count of cards each contributes.

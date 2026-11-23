@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { DATA_DIR, SCAN_CACHE_DIR } from "../paths.ts";
 import { sha256 } from "../sources/fetch.ts";
+import { FAN_MADE_PUBLISHERS } from "../sources/origins.ts";
 
 // The printed-text ledger: what is printed on a card, read from its scan by an agent. data/printed/<campaign>.json.
 // A line has the id "<code>:<side>:<n>", n counting from 1 in the entry's `lines`.
@@ -13,6 +14,10 @@ export const ledgerEntrySchema = z.strictObject({
   side: z.enum(["A", "B"]),
   // The pack whose printing the scan shows.
   printing: z.string().min(1),
+  // A fan-made card only (absent on an official one): the id of its publisher (FAN_MADE_PUBLISHERS) and the version of the set whose picture is the scan.
+  // A new version of the set is seeded and read again (docs/brief.md, Data sources, Fan-made content).
+  publisher: z.string().min(1).optional(),
+  version: z.string().min(1).optional(),
   scan: z.strictObject({ url: z.string().url(), sha256: z.string().regex(/^[0-9a-f]{64}$/) }),
   lines: z.array(z.string().min(1)),
   // Lines that need no effect record.
@@ -56,6 +61,8 @@ export function parseLedger(raw: unknown): Ledger {
     for (const mark of [...entry.inert, ...entry.misprints]) {
       if (mark.line > entry.lines.length) throw new Error(`Ledger ${key}: line ${mark.line} does not exist`);
     }
+    if (entry.publisher !== undefined && !(entry.publisher in FAN_MADE_PUBLISHERS)) throw new Error(`Ledger ${key}: the publisher ${entry.publisher} is not declared in scripts/data/sources/origins.ts`);
+    if ((entry.publisher === undefined) !== (entry.version === undefined)) throw new Error(`Ledger ${key}: a fan-made entry names both its publisher and its version of the set, an official one neither`);
     if (entry.confirmedBy === "sources" && (entry.basis?.length ?? 0) === 0) throw new Error(`Ledger ${key}: confirmed by sources without a basis`);
     byKey.set(key, entry);
   }

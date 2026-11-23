@@ -590,6 +590,15 @@ RingsDB states that the texts are copyrighted by Fantasy Flight Games and that t
 
 Snapshot the card codes a scenario actually dealt into the save at scenario start, so a later catalog rebuild cannot rewrite a game in progress.
 
+### Fan-made content
+
+The repository holds fan-made scenarios beside the official ones. Every source, card and scenario has an origin: official, or fan-made with the publisher's name (user decision, 2026-11-23). `data/sources.json` gives a source no origin field when it is official. A fan-made source records `origin`, `publisher` and `licence`, copied from `scripts/data/sources/origins.ts` by `pnpm data sync`, and the data build fails on a fan-made source with no licence. A card or scenario of a fan-made set carries `origin` (`src/catalog/origin.ts`), which the screens read to show that a scenario is fan-made; official data carries none. Whether the app may ship a publisher's pictures and text is the user's to decide for each publisher, and no fan-made content is added without it (user decision, 2026-11-23). A Long-extended Party (ALeP) is the first publisher with that permission: written, for this app, no commercial use (user statement, 2026-11-23). No ALeP content is in the repository yet.
+
+- **Printed text.** A fan-made card's printed text is the card picture its publisher released, in a named version. Its ledger entry names the publisher and the version of the set, the pinned picture with its sha256 is the scan, and a new version is seeded and read again (user decision, 2026-11-23).
+- **Authority.** The publisher's own documents (rules sheet, quest and campaign cards) win on that set's rules. The official Learn to Play, Rules Reference and FAQ win on the ordinary round and the definitions. A reading they leave open is researched in the publisher's own FAQ and its designers' answers first, then in community discussion, then as the agent's recommendation. A fan-made card wins over a rule as any card does. A publisher's ruling never changes an official card or scenario (user decision, 2026-11-23).
+- **Errata.** An official erratum of the publisher replaces the card's wording, as the erratum rule above says. The publisher's errata document is a pinned source, imported as rule spans (`<publisher id>.errata.<card code>`), and `scripts/data/errata.test.ts` covers it (user decision, 2026-11-23).
+- **Rulings read online.** A page where official rulings were read, such as ALeP's Semi-official Errata & FAQ cited in `data/printed/`, is a reference, not a content source, and has no origin.
+
 ## Card images
 
 The app needs no network: every card's picture is bundled in the binary (user decisions, 2026-10-29). `pnpm data sync pictures` pins one picture per card (`.cache/pictures`, source `pictures` in `data/sources.json`; `scripts/data/sources/pictures.ts`), from the first source that has it, in the user's order of preference (2026-10-29):

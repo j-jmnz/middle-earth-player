@@ -7,7 +7,7 @@ import { runScript, type Log } from "../log.ts";
 import { headingsOf, ROOT } from "./index.ts";
 
 // The register of user rulings: every place docs/brief.md and docs/scenarios/*.md stamp a reading or a choice as the user's ("user ruling, 2026-11-05", "user decision",
-// "user instruction", "user request", "user-accepted", "user-confirmed", "Rulings (user, 2026-11-06):", "the user asked for this reading", "the user named"), with or
+// "user instruction", "user request", "user statement", "user-accepted", "user-confirmed", "Rulings (user, 2026-11-06):", "the user asked for this reading", "the user named"), with or
 // without a date. It is settled until the user changes it, so a brief for a fix agent names the ones its task touches. A stamp that heads a list ("Rulings (user, ...):"
 // followed by sub-bullets, or by "(1) ... (7) ...") covers the whole list; a sentence already inside a listed bullet or list is not listed again. Each entry is a
 // card or rule reading (it names a card code, a printed line id or a rule id, or sits in docs/scenarios/ or in a rules section of the brief) or a product decision
@@ -37,7 +37,7 @@ export type Ruling = {
   bullet?: string;
 };
 
-export const STAMP = /(?<!\bnot )\buser(?:[- ](?:rulings?|decisions?|instructions?|requests?|accepted|confirmed)\b|,(?=\s*\d{4}-)|\s+(?:asked|named)\b)[^)\n]{0,60}/gi;
+export const STAMP = /(?<!\bnot )\buser(?:[- ](?:rulings?|decisions?|instructions?|requests?|statements?|accepted|confirmed)\b|,(?=\s*\d{4}-)|\s+(?:asked|named)\b)[^)\n]{0,60}/gi;
 const DATE = /\d{4}-\d{2}-\d{2}/g;
 export const LINE_ID = /(?<![\w:])(\d{2,6}):[A-Za-z]+:\d+(?![\w])/g;
 export const CODE = /(?<![\w:./-])\d{5,6}(?![\w/])/g;
