@@ -183,7 +183,8 @@ export { attachmentsOn } from "./attached.ts";
 
 // The facedown player cards under a location (Truly Lost, 18075:A:1): the cards under it that a player owns, in instance id order.
 export function playerCardsUnder(state: ScenarioState, locationId: string): string[] {
-  return cardsUnder(state, locationId).filter((id) => state.cards[id]?.owner != null);
+  // Poison under a character is a facedown player card too, but not one a card of the scenario holds under a location (families/poison).
+  return cardsUnder(state, locationId).filter((id) => state.cards[id]?.owner != null && state.cards[id]?.poison !== true);
 }
 
 // Every shadow card dealt to the enemy, the first one first.

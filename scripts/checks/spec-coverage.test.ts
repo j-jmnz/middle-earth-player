@@ -56,9 +56,9 @@ const specScenarios = readdirSync(SCENARIOS).filter((id) => existsSync(path.join
 
 describe("spec coverage", () => {
   it("reads a header below the imports as well as above them, and stops at the first line of code", () => {
-    const skeleton = ['// Rules: rr.forced.', 'import { it } from "vitest";', "", "// Card specs: 111111:A:1 and 111111:A:2 are held.", "const ROWS = [", '  { line: "111111:A:1", act: [], expect: [] },', "];", "// 111111:A:3 in the body is not a claim."].join("\n");
+    const skeleton = ['// Rules: rr.forced.', 'import { it } from "vitest";', "", "// Card specs: 111111:A:1 and 111111:A:2 are held.", "const ROWS = [", '  { line: "111111:A:1", act: [], expect: [] },', "];", "// 111111:A:3 in the body is not a claim.", 'lineSpec("111111:A:4", "x", check);'].join("\n");
     expect(claimedByHeader(skeleton)).toEqual(["111111:A:1", "111111:A:2"]);
-    expect([...coveredIn(skeleton)]).toEqual(["111111:A:1"]);
+    expect([...coveredIn(skeleton)]).toEqual(["111111:A:1", "111111:A:4"]);
     expect(claimedByHeader(skeleton).filter((line) => !coveredIn(skeleton).has(line))).toEqual(["111111:A:2"]);
   });
 

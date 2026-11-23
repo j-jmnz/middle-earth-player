@@ -77,7 +77,7 @@ function drawOverlay(p: PieceProps) {
         {info?.determined ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s)} fonts={fonts} t={t} s={s} /> : null}
         {info?.loss ? <ShipLossView rect={rect} mark={info.loss} fonts={fonts} t={t} s={s} /> : null}
         {info?.place ? <PlaceMarkView rect={rect} mark={info.place} t={t} s={s} /> : null}
-        {info?.under ? <UnderMarkView rect={rect} mark={info.under} fonts={fonts} t={t} s={s} /> : null}
+        {info?.under ? <UnderMarkView rect={rect} mark={info.under} sideways={slot.exhausted} fonts={fonts} t={t} s={s} /> : null}
         {info?.delayed ? <DelayedMark rect={rect} t={t} s={s} /> : null}
         {p.stageMarks ? <StageMarks rect={rect} pill={p.stageMarks.pill} apart={p.stageMarks.apart} fonts={fonts} t={t} s={s} /> : null}
         <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(p.sphere, t) : null} contrast={contrast} />

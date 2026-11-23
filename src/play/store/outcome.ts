@@ -22,6 +22,7 @@ import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape
 import { locateResultTitle } from "../words/scenarios/locate.ts";
 import { BACK_TITLE, TRAPPED_TITLE } from "../readouts/standalone-scenarios/barrow-downs-words.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
+import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
 import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
@@ -293,6 +294,13 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
         line(`${names.card(step.sourceId)} sets ${names.card(step.cardId)} aside`, null, [step.cardId]);
         line(POOL_COPY);
+        return;
+      // Poison and unconscious (hob.venom-poison, hob.unconscious-characters): the character's table pill and its turn follow each line.
+      case "poison":
+        line(poisonLine(names.card(step.targetId), step.count, step.of), null, [step.targetId]);
+        return;
+      case "unconscious":
+        line(unconsciousLine(names.card(step.targetId), step.ready === true), null, [step.targetId]);
         return;
       case "resetEncounterDeck":
         line("The encounter discard pile is shuffled into the encounter deck");

@@ -149,6 +149,10 @@ export type CardInstance = {
   asAttachment?: true | "discard";
   // A player card lying faceup on an enemy as an attachment with no title and no game text, taken from the top of a deck (Nameless Thing, families/nameless): its printed cost is its only active part. Set only by AttachDeckTop, and cleared once the card has left the enemy.
   nameless?: true;
+  // A character made unconscious (Flies and Spiders, hob.unconscious-characters, families/poison): rotated 180 degrees on the table. It is also exhausted, which replaces ready and exhausted: it is neither for a filter (`state`), and only ReadyUnconscious readies it.
+  unconscious?: true;
+  // A card of a player deck attached facedown to a character as poison (hob.venom-poison, families/poison): out of play, zone under, hosted by the character, `owner` the seat whose deck it came from.
+  poison?: true;
   // The enemy Lost in Mirkwood's stage 4A named the nemesis, until it leaves play (18076:A:1, families/wilderland/nemesis.ts).
   nemesis?: true;
   // An objective a player claimed and attached to a hero: when it leaves that hero it returns to the staging area, uncontrolled

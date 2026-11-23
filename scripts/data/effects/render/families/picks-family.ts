@@ -44,6 +44,10 @@ export function familyPickNotes(pick: Obj, note: Note): void {
   note(["nemesis"], pick.nemesis === true ? "that is the nemesis (the enemy the stage named, until it leaves play)" : null);
   note(["sameTitleAs"], pick.sameTitleAs === "activeLocation" ? "with the same title as the active location" : pick.sameTitleAs === "picked" ? "with the same title as the last card picked, never that card itself" : null);
   note(["guardsHero"], pick.guardsHero === true ? "that guards a hero, in play or not" : null);
+  note(["poisoned"], pick.poisoned === true ? "with any poison attached (poisoned)" : pick.poisoned === false ? "with no poison attached" : null);
+  note(["unconscious"], pick.unconscious === true ? "that is unconscious" : pick.unconscious === false ? "that is not unconscious" : null);
+  note(["mostPoison"], pick.mostPoison === true ? "with as much poison as any character at the asking player's staging area (every such character when none is poisoned, and then the chooser decides)" : null);
+  note(["poison"], pick.poison === true ? "(the cards counted are the poison under the holder)" : null);
   note(["hasFacedownUnder"], pick.hasFacedownUnder === true ? "with a facedown player card under it, wherever the card is now" : null);
   note(["facedownUnder"], pick.facedownUnder === true ? "(the cards counted are the facedown player cards under the holder, not its attachments)" : null);
   note(["guardsCard"], pick.guardsCard === true ? "that guards a card, as the guard of an objective or as the keeper of a player card held under it" : null);

@@ -1,5 +1,6 @@
 // Effect items that act on a picked or found card: ReturnToStaging, AttachSelf, the searches, ShuffleIntoDeck, DiscardRestricted, ReadyHero,
 // BarAttack, PlaceProgressOnLocation. The candidates are found, one is chosen (copies out of play are one choice, distinctChoices), and the verb applies.
+import { eventCharacterHost } from "../families/wilderland/attach-event.ts";
 import { announceLooked } from "../families/encounter/looked.ts";
 import type { Instruction } from "../../catalog/boundary.ts";
 import { characters } from "../combat/combat.ts";
@@ -65,6 +66,8 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       const code = sourceId ? state.cards[sourceId]?.code : undefined;
       const unlimited = (instruction.to.kind === "character" || instruction.to.kind === "hero") && instruction.to.unlimited === true;
       const free = (id: string): boolean => (unlimited || !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code)) && (code == null || !attachBlocked(state, ctx, id, code));
+      // The character the event is about, or the defender: one host, nobody asked (families/wilderland/attach-event.ts).
+      if (instruction.to.kind === "subject" || instruction.to.kind === "defender") return [eventCharacterHost(state, instruction.to.kind, sourceId ?? null, ctx)].filter((id): id is string => id != null);
       if (instruction.to.kind === "character") {
         const { trait, name } = instruction.to;
         const hosts = livingSeats(state).flatMap((seat) => characters(state, seat, ctx.cards)).filter((id) => (trait == null || hasTrait(state, id, trait, ctx)) && (name == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").name === name) && free(id));

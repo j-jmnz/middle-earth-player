@@ -158,6 +158,7 @@ const SLOT_FIELDS = Object.keys({
   zone: true,
   kind: true,
   exhausted: true,
+  unconscious: true,
   faceDown: true,
   landscape: true,
   resources: true,

@@ -37,6 +37,8 @@ const VERBS = [
   // Every card in the discard pile of the actor (or of the last picked player) goes into that player's deck, which is then
   // shuffled.
   z.strictObject({ verb: z.literal("ShuffleDiscardIntoDeck"), who: z.enum(["actor", "picked"]).optional(), ...when }),
+  // "Each player may shuffle 1 copy of ~ into his deck" (132067:A:1): the set-aside card with the printed code goes into the acting player's deck, and the deck is shuffled. Nothing happens when none is set aside.
+  z.strictObject({ verb: z.literal("ShuffleSetAsideIntoDeck"), code: z.string().min(1), ...when }),
   // The actor's hand (but the source card) is shuffled into their deck. The effect's X becomes how many cards that was ("Count
   // the number of cards in your hand and shuffle your hand into your deck. Then, draw an equal number of cards").
   // `keepPicked`: the picked card stays in the hand and the rest is shuffled in ("Each player chooses 1 card in his hand and shuffles the rest into his deck", 51304:B:1); with no picked card in the hand, all of it goes.

@@ -55,7 +55,11 @@ export type EngineStep =
   // Discover X resolved for the active location: the cards looked at (top of the encounter deck first), the Loot objective attached to it as a guarded objective and the Hazard card revealed, if any (emce.discover). The rest went to the encounter discard pile.
   | { kind: "discover"; locationId: string; looked: readonly string[]; loot?: string; hazard?: string; cause: Cause }
   // A card from the encounter discard pile was set aside for the Resolution to add a copy of to the campaign pool (A Growing Threat, 12167:A:2; emce.campaign-pool-encounter): the card that did it and the card set aside.
-  | { kind: "setAsideForPool"; sourceId: string; cardId: string; cause: Cause };
+  | { kind: "setAsideForPool"; sourceId: string; cardId: string; cause: Cause }
+  // A character was given poison (hob.venom-poison): `count` is the poison it has now, `of` its printed hit points; one more at `of` makes it unconscious.
+  | { kind: "poison"; targetId: string; count: number; of: number; cause: Cause }
+  // A character was made unconscious (hob.unconscious-characters), or, with `ready`, readied from it.
+  | { kind: "unconscious"; targetId: string; ready?: true; cause: Cause };
 
 export type Payment = { heroId: string; amount: number };
 

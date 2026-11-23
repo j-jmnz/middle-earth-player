@@ -36,6 +36,8 @@ export type CardSlot = Rect & {
   zone: SlotZone;
   kind: SlotKind;
   exhausted: boolean;
+  // An unconscious character (hob.unconscious-characters): turned 180 degrees, upright in its footprint, and no sideways exhausted card.
+  unconscious?: true;
   faceDown: boolean;
   // Quest cards are printed sideways.
   landscape: boolean;

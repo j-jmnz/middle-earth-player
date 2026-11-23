@@ -20,7 +20,7 @@ import { feedsDiscard, pickCandidates } from "./pick.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "../core/state.ts";
 import { distinctChoices, livingSeats, withSeat } from "../core/state.ts";
-import { isolatedAreas, sharing } from "../families/breaking/areas.ts";
+import { firstPlayerFor, isolatedAreas, sharing } from "../families/breaking/areas.ts";
 import { guardianSeats, otherThanGuardian } from "../families/guardian/seats.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { holdsNow } from "./verbs.ts";
@@ -379,7 +379,7 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
   const data = topFrame(state)?.data;
   if (instruction.verb !== "Pick" || data?.kind !== "effect") return state;
   // The actor chooses, unless the card says the first player does.
-  const chooser = instruction.pick.who === "firstPlayer" ? state.firstPlayer : item.seat;
+  const chooser = instruction.pick.who === "firstPlayer" ? firstPlayerFor(state, item.seat) : item.seat;
   const found = pickCandidates(state, instruction.pick, chooser, data.picked ?? [], frame.cardId, ctx, data.x, data.participants, false, { discards: data.queue[0]?.instruction.verb === "DiscardPicked" });
   const options = (instruction.pick.from ?? "play") === "play" ? found : distinctChoices(state, found);
   // The further defenders of Stand Together (families/defense/defenders.ts): the pick may be stopped, and then no more are declared.

@@ -42,7 +42,9 @@ export function askWords(a: {
 }): AskedWords {
   const { game, ctx, names, instruction, queue, options, source, picked, amountNow, effectId, cause } = a;
   const asked = a.origin?.verb === "DiscardFromHand" ? a.origin : instruction;
-  const written = asksPick({ game, ctx, names, instruction: asked, source, amountNow, options, ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });
+  // The same Pick queued again (a Repeat's later rounds), counted when an entry has a `countdown`.
+  const again = instruction.verb === "Pick" ? () => queue.filter((later) => JSON.stringify(later) === JSON.stringify(instruction)).length : undefined;
+  const written = asksPick({ game, ctx, names, instruction: asked, source, amountNow, options, ...(again ? { again } : {}), ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });
   if (written) return a.place ? withPlace(written, a.place) : written;
   const traded = instruction.verb === "TradeDamageForThreat" && instruction.character ? game.cards[instruction.character] : undefined;
   if (instruction.verb === "TradeDamageForThreat" && traded) {

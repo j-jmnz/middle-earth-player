@@ -249,6 +249,9 @@ export const simpleVerbs = [
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1), challenge: z.literal(true).optional() }),
       // The enemy making the attack in progress ("Shadow: Attach this card to attacking enemy", 18018:A:2).
       z.strictObject({ kind: z.literal("attackingEnemy") }),
+      // The character the answered event is about ("Forced: After Dark Bats damages a character, attach it to that character", 132036:A:1), or (`defender`) the defending character of the attack in progress ("Shadow: Attach this card to the defending character", 132036:A:2). Nobody chooses; an undefended attack has no defender and the card is not attached.
+      z.strictObject({ kind: z.literal("subject") }),
+      z.strictObject({ kind: z.literal("defender") }),
       // A Ship objective the players control, chosen by the first player ("Attach to a Ship objective.", 12132:A:1), or (`defender`) the Ship objective defending the attack in progress
       // ("If defending character is a Ship, attach ~ to it.", 12132:A:2).
       z.strictObject({ kind: z.literal("ship"), defender: z.literal(true).optional() }),

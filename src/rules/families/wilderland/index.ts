@@ -8,6 +8,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { addFromNamed, pileTravelUnpayable, refillEvilCreatures, shuffleIntoNamed, shuffleNamed, shuffleNamedIntoEncounter } from "./decks.ts";
 import { attachSelf } from "../../interpret/effect-targeted.ts";
+import { attachToEventCharacter } from "./attach-event.ts";
 import { replaceFromCaves, resolveDeep } from "./deep.ts";
 import { addToStagingWithResources, arrangeCaves, attachSearched, attachSelfToPicked, cancelStrike, guardPickedAttachment, guardWithDeckTop, putOnPileBottom, returnHeld } from "./kings.ts";
 import { attachLootFromDiscard, discover, discoverUnavailable, resolveDiscover } from "./discover.ts";
@@ -54,6 +55,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return addSourceToHandOfMost(state, instruction, focus, ctx, steps);
     // A Shadow card's "attach this card to attacking enemy" (18018:A:2) needs no question, so it runs inline; every other AttachSelf is the effect frame's.
     case "AttachSelf": {
+      if (instruction.to.kind === "subject" || instruction.to.kind === "defender") return attachToEventCharacter(state, instruction.to.kind, focus, ctx);
       if (instruction.to.kind !== "attackingEnemy") return null;
       const attacker = state.pendingAttack?.enemyId;
       return attacker && focus.sourceId && state.cards[attacker] ? attachSelf(state, focus.sourceId, attacker, ctx) : state;

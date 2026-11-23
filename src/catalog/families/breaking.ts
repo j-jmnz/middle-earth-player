@@ -66,7 +66,8 @@ const VERBS = [
   // The acting seat leaves the stage the players share (stage 3B) for a stage and a staging area of its own: the quest deck's card with this printed code (stage 4A, one copy for each player) becomes its stage, side B up, and its When Revealed effects resolve for
   // the seat ("remove each character you control from the quest and create your own staging area. Then advance to a separate stage 4A by yourself", 148007:A:2; mec108.create-staging-area). The other players keep the shared stage and its staging area, the source card
   // with them; from here each area resolves as if only its players were in the game (`ScenarioState.isolated`), and a stage no player is at stays in play, parked. Nothing happens when the seat is not at the shared stage or no copy is left in the quest deck.
-  z.strictObject({ verb: z.literal("SplitToOwnStage"), code: z.string().min(1), ...when }),
+  // `keepActive`: a seat alone at the shared stage keeps its active location as its own (it is not in the staging area, ltp.traveling-to-locations), where the Fog on the Barrow-downs parks it in the staging area with the stage (Lost in the Dark, 132068:B:1).
+  z.strictObject({ verb: z.literal("SplitToOwnStage"), code: z.string().min(1), keepActive: z.literal(true).optional(), ...when }),
   // The acting seat's own stage (stage 4B) goes back to the quest deck with no progress and the seat is at the stage with this printed code again (3B): its enemies, locations and active location join that stage's staging area (engaged enemies stay engaged), and the seat joins the players there or
   // takes the stage when none is ("advance to stage 3B at the beginning of the travel phase (combining staging areas with stage 3B)", 148004:B:2). Once every living player shares one area the areas are the shared one again.
   z.strictObject({ verb: z.literal("ReturnToSharedStage"), code: z.string().min(1), ...when }),

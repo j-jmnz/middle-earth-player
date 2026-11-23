@@ -7,7 +7,7 @@
 import type { PrintedCard } from "../../rules/core/printed.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
-import { type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
+import { isExhausted, type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
 import { shadowCards } from "../../rules/core/zones.ts";
 import { stagingThreat } from "../../rules/quest/quest.ts";
 
@@ -148,7 +148,7 @@ function labelOf(game: ScenarioState, seat: number, card: CardInstance, deps: Ca
     parts.push(`controlled by player ${card.controller + 1}`);
   }
   if (card.zone === "attached" && card.host && game.cards[card.host]) parts.push(`attached to ${nameOfCard(game.cards, card.host, deps.nameOf)}`);
-  if (card.exhausted) parts.push("exhausted");
+  if (isExhausted(card)) parts.push("exhausted");
   if (card.committed) parts.push(info.willpower != null ? `committed to the quest, ${info.willpower} willpower` : "committed to the quest");
 
   const damage = damageWords(game, card, printed, deps, info);

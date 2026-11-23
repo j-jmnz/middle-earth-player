@@ -56,6 +56,8 @@ export const manifest: RulesFamily = {
   name: "captured",
   verbs: ["Capture", "InEveryArea", "PrepareCapturedDeck", "SetAsideCapturedBoons", "CaptureFromDeck", "CapturePicked", "CaptureAttachments", "CaptureInsteadOfDamage", "PutCapturedIntoPlay", "DiscardCapturedUnder", "DiscardCapturedTop", "EngageSelfWithPicked", "JoinAnotherPlayer", "AttachHeroBoons", "RecordStolenCards", "ChooseBoonToHand"],
   run,
+  // Joining another player's staging area changes the areas themselves (join.ts).
+  wholeState: ["JoinAnotherPlayer"],
   pool: (state, spec, asking, sourceId, ctx) => capturedPool(state, spec, asking, sourceId, ctx),
   condition: (state, condition, scope, ctx) => capturedHolds(state, condition, scope, ctx),
   amount: (state, found, scope, ctx) => capturedAmount(state, found, scope, ctx),

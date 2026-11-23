@@ -9,7 +9,7 @@ import type { EngineStep } from "./intents.ts";
 import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "../windows/queue.ts";
 import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
-import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
+import { flagged, heldAmount, isExhausted, modifierActive, updateCard, withThreat } from "./state.ts";
 import { claimedDestination, discardedDetached, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
 import { attachmentsOn, inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
@@ -79,6 +79,8 @@ export function modifiedStat(
     if (modifier.when?.kind === "defendingAgainst" && !defendingAgainst(state, instance, modifier.when.trait, { effects: [], cards })) continue;
     if (modifier.when?.kind === "versusVictoryTrait" && !versusVictoryTrait(state, instance, cards, against)) continue;
     if (modifier.when?.kind === "inArea" && !inAreaOf(state, instance, modifier.when.seat)) continue;
+    // "While the character is exhausted" (Weighed Down, 132038:A:1); an unconscious character is not exhausted (hob.unconscious-characters).
+    if (modifier.when?.kind === "holderExhausted" && !isExhausted(instance)) continue;
     // "+2 Attack while attacking that enemy": only while the holder attacks it.
     if (modifier.against != null && modifier.against !== against) continue;
     // "+1 Attack when attacking an Orc" (families/attack/strike.ts).

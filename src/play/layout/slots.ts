@@ -1,7 +1,7 @@
 // The pieces the table's layout places cards with (layout.ts, play-area.ts): a card's slot, its footprint in a row, a row's left
 // edges, and the cards peeking out under a host. Pure.
 import { isReanimatedCode } from "../../rules/core/printed.ts";
-import type { CardInstance } from "../../rules/core/state.ts";
+import { isExhausted, type CardInstance } from "../../rules/core/state.ts";
 
 import type { CardSlot, Rect, SlotKind, SlotZone } from "./layout.ts";
 import type { ZoneEntry, ZoneId } from "../store/selectors.ts";
@@ -27,7 +27,8 @@ export function slotOf(card: CardInstance, zone: SlotZone, kind: SlotKind, rect:
     ...(card.face === "B" ? { picture: pictureKey(card) } : {}),
     zone,
     kind,
-    exhausted: card.exhausted,
+    exhausted: isExhausted(card),
+    ...(card.unconscious === true ? { unconscious: true as const } : {}),
     faceDown: card.face === "down",
     landscape,
     resources: card.resources,
@@ -43,7 +44,7 @@ export function slotOf(card: CardInstance, zone: SlotZone, kind: SlotKind, rect:
 
 // The width a card takes in a row: an exhausted card is turned sideways.
 export function footprint(card: CardInstance, size: { w: number; h: number }): number {
-  return card.exhausted ? size.h : size.w;
+  return isExhausted(card) ? size.h : size.w;
 }
 
 // Left edges for items of these widths across a row from `x` to `x + width`: spaced by one gap, squeezed (overlapping) when
@@ -63,7 +64,7 @@ export function rowXs(widths: readonly number[], x: number, width: number, gap: 
 
 // A card at the left edge `x` of its footprint: an exhausted card is drawn centered in its sideways footprint.
 export function cardRect(card: CardInstance, x: number, y: number, size: { w: number; h: number }): Rect {
-  const offset = card.exhausted ? (size.h - size.w) / 2 : 0;
+  const offset = isExhausted(card) ? (size.h - size.w) / 2 : 0;
   return { x: x + offset, y, w: size.w, h: size.h };
 }
 

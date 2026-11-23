@@ -159,7 +159,7 @@ export function specialStrike(state: ScenarioState, ctx: ReduceContext, steps: E
   const defense = pooledDefense(pooled, standing, ctx.cards);
   steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: chosen, attack: strength, defense, undefended: false, cause: ruleCause("rr.step-6-4-3") });
   const damaged = combatDamage(pooled, attack.enemyId, chosen, Math.max(0, strength - defense), ctx, steps);
-  return { state: noteAttackDamage(pooled, damaged, ctx), wait: false };
+  return { state: noteAttackDamage(pooled, damaged, ctx, steps), wait: false };
 }
 
 // The defender took no damage from the attack: its damage is no higher than when it was declared.

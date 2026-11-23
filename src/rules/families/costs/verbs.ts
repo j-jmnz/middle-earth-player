@@ -22,6 +22,7 @@ import type { Discount, ScenarioState } from "../../core/state.ts";
 import { livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { attachTo } from "../../core/zones.ts";
+import { isolatedAreas, sharing } from "../breaking/areas.ts";
 import { noteSpent, spentThisRound, spheresOf } from "./pay.ts";
 
 type Focus = { seat: number; sourceId: string | null; chosen?: string };
@@ -93,7 +94,8 @@ export function discardResources(state: ScenarioState, instruction: Extract<Inst
 
 // The heroes whose resources can pay `sphere` for the actor, or for any player with `group`, and what they hold in all.
 export function spendablePools(state: ScenarioState, actor: number, spec: { sphere?: Sphere | undefined; group?: boolean | undefined }, ctx: ReduceContext): { pools: string[]; total: number } {
-  const seats = spec.group ? livingSeats(state) : [actor];
+  // The players as a group are the players of the actor's area once the areas are isolated: they cannot spend what a player of another area holds (Hidden Path, 132035:A:2; hob.staging-area-creating).
+  const seats = spec.group ? (isolatedAreas(state) ? sharing(state, actor) : livingSeats(state)) : [actor];
   const pools = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, spec.sphere ?? null, ctx));
   return { pools, total: pools.reduce((sum, id) => sum + (state.cards[id]?.resources ?? 0), 0) };
 }

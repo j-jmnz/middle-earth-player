@@ -77,6 +77,8 @@ describe("cardSpeech label", () => {
     const printed = printedOf(ctx.cards, state.cards[hero]?.code ?? "");
     expect(label).toContain(`${printed.name}, hero`);
     expect(label).toContain("exhausted");
+    // An unconscious character is exhausted in the state but neither ready nor exhausted (hob.unconscious-characters); its pill says "Unconscious".
+    expect(cardSpeech(updateCard(state, hero, { unconscious: true }), 0, hero, depsOf({ ...moment, state: updateCard(state, hero, { unconscious: true }) })).label).not.toContain("exhausted");
     expect(label).toContain(`2 damage of ${printed.health} hit points`);
     expect(label).toContain("3 resources");
     expect(label).toContain(`${printed.willpower} willpower`);

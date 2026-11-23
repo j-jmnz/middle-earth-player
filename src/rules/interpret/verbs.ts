@@ -1,4 +1,5 @@
 // Rules: rr.in-play-and-out-of-play, rr.attachment-cards, rr.active-location, rr.quest-advancement, rr.effects (data/rules/entries.json).
+import { firstPlayerFor } from "../families/breaking/areas.ts";
 import { isStatCondition, type Instruction } from "../../catalog/boundary.ts";
 
 import { frameScope, hostOf, refCard, resolveAmount } from "./amounts.ts";
@@ -47,7 +48,7 @@ export function seatFor(state: ScenarioState, who: "actor" | "firstPlayer" | "ot
   if (who === "otherPlayer") return otherSeat(state, actor) ?? actor;
   // "guardian": the player guarding Gollum (sotm.guarding-gollum), the actor when nobody does.
   if (who === "guardian") return guardianSeat(state) ?? actor;
-  return who === "firstPlayer" ? state.firstPlayer : actor;
+  return who === "firstPlayer" ? firstPlayerFor(state, actor) : actor;
 }
 
 export function shuffleEncounterDeck(state: ScenarioState): ScenarioState {
