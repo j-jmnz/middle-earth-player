@@ -24,7 +24,7 @@ function inPlayWith(state: ScenarioState, code: string): string | undefined {
 
 // The hero the card with this code is attached to, when it is attached to a hero in play (the hero "with Alcaron's Scroll attached").
 function holderOf(state: ScenarioState, code: string): string | null {
-  const objective = Object.values(state.cards).find((card) => card.code === code && card.zone === "attached");
+  const objective = Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone) && card.host != null);
   const host = objective?.host ? state.cards[objective.host] : undefined;
   return host?.zone === "heroes" ? host.id : null;
 }
@@ -69,7 +69,7 @@ export function scrollDamageTarget(state: ScenarioState, assigned: string): stri
   const attack = state.pendingAttack;
   if (!attack || state.modifiers.length === 0 || !flagged(state, attack.enemyId, "damageToScroll")) return null;
   if (state.cards[assigned]?.controller !== attack.seat) return null;
-  const objective = Object.values(state.cards).find((card) => card.zone === "attached" && flagged(state, card.id, "takesAttackDamage"));
+  const objective = Object.values(state.cards).find((card) => card.host != null && flagged(state, card.id, "takesAttackDamage"));
   const host = objective?.host ? state.cards[objective.host] : undefined;
   return host?.zone === "heroes" && inPlay(host.zone) ? host.id : null;
 }

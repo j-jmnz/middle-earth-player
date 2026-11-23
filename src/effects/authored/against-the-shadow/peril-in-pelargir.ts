@@ -21,7 +21,7 @@ const DAMAGE_TO_SCROLL: Instruction = { verb: "ModifyStat", stat: "damageToScrol
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
     // 05019 Alcaron's Scroll. A:1: if unattached it returns to the staging area (a claimed objective that returns: the flag) and there gains the Action that any player's ready hero exhausts for to attach it (claim, as the Gate Key's, 12071:A:1). The second
-    // flag marks the card that 05020:A:2 and 05024:A:2 look for ("the hero with Alcaron's Scroll attached", read by families/pelargir/scroll.ts). A:2: the Forced effect attaches the Scroll to the enemy whose attack damaged the hero (AttachObjectiveTo keeps it a claimed objective).
+    // flag marks the card that 05020:A:2 and 05024:A:2 look for ("the hero with Alcaron's Scroll attached", read by families/pelargir/scroll.ts). The Scroll on a hero is an attachment he controls, so Pickpocket's Shadow may discard it (reading of 05037:A:2, recommended). A:2: the Forced effect attaches the Scroll to the enemy whose attack damaged the hero (AttachObjectiveTo keeps it a claimed objective).
     {
       id: "05019:constant:1",
       cardCode: SCROLL,
@@ -30,6 +30,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         { verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" },
         { verb: "ModifyStat", stat: "takesAttackDamage", amount: 1, until: "whileSourceInPlay", target: "self" },
+        { verb: "CountsAs", cardType: "attachment" },
       ],
     },
     {

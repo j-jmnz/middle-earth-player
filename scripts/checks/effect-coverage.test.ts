@@ -121,7 +121,8 @@ describe("effect coverage", () => {
 
   // A printed "Forced:" line that is a replacement effect ("When 3 or more damage would be placed on Revenant, place 2 damage instead") holds for as long as its card is in play, however
   // the card came into play, so a constant record owns it: a Forced trigger on one way in (added to the staging area, engaged) would miss the others. Named one by one, with the reason.
-  const REPLACEMENT_RECORDS: ReadonlySet<string> = new Set(["11181:constant:2"]);
+  // 05023:constant:1 is the other half of Harbor Storehouse's Forced line: the table flag that makes the engine announce a card that leaves the top of the encounter deck (families/stormcaller/zone.ts), held while the card is in play.
+  const REPLACEMENT_RECORDS: ReadonlySet<string> = new Set(["11181:constant:2", "05023:constant:1"]);
 
   const lineOf = (id: string): string => printedLine(lines, id) ?? "";
 
