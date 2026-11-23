@@ -4,6 +4,6 @@ import type { Ask } from "./asks.ts";
 
 export const MISTY_MOUNTAIN_GOBLINS_ASKS: Readonly<Record<string, Ask>> = {
   // 131061 Goblin Driver. When Revealed: the first player exhausts a character he controls. Shadow: the defending player does.
-  "131061:whenRevealed:1 @0 Pick": { owned: true, note: "{card}: choose a character you control to exhaust.", verb: "Exhaust" },
-  "131061:shadow:1 @0 Pick": { owned: true, note: "{card}: choose a character you control to exhaust.", verb: "Exhaust" },
+  "131061:whenRevealed:1 @0 Pick": { owned: true, why: "when revealed,", note: "choose a character you control to exhaust.", verb: "Exhaust" },
+  "131061:shadow:1 @0 Pick": { owned: true, why: "as its Shadow effect,", note: "choose a character you control to exhaust.", verb: "Exhaust" },
 };
