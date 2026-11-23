@@ -11,8 +11,22 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "131026:whenRevealed:1 @0.0.search.0 Pick": { owned: true, note: "A Short Rest: choose 1 treasure card from your deck to add to your hand. Your deck is shuffled after.", verb: "Add" },
 
   // 131028:B:2 (Down, Down to Goblin Town): Bilbo Baggins may spend X resources from his pool to reduce the encounter cards revealed by X, to a minimum of 1. The first player (Bilbo's controller) chooses X and pays.
-  "131028:whenRevealed:2 @0 ChooseX": { owned: true, note: "Down, Down to Goblin Town: choose X, from 0 to the resources in Bilbo Baggins' pool. Bilbo spends X resources, and the players reveal X fewer encounter cards (3 for each player, at least 1 in all)." },
+  "131028:whenRevealed:2 @0 ChooseX": {
+    owned: true,
+    bind: { pool: { stat: "resources", ofNamed: "Bilbo Baggins" }, cards: { players: true, times: 3 } },
+    note: "Down, Down to Goblin Town: choose X, from 0 to {pool}, the resources in Bilbo Baggins' pool. Bilbo spends X resources, and the players reveal {cards} encounter cards less X, and at least 1.",
+    xRows: { label: "Spend {x}: reveal {reveals}", less: { name: "reveals", of: { players: true, times: 3 }, min: 1, unit: "card" } },
+  },
   "131028:whenRevealed:2 @1 Pick": { owned: true, note: "Down, Down to Goblin Town: Bilbo Baggins' pool pays the X resources.", verb: "Pay" },
+
+  // 131064:A:2 (Stone-Giant): after it engages a player, that player chooses and discards an ally he controls.
+  "131064:forced:1 @0 Pick": { owned: true, why: "it engaged you.", note: "Choose an ally you control to discard.", verb: "Discard" },
+
+  // 131067:A:1 (Great Cavern Room): while active, after a player engages a Goblin enemy, he deals 1 damage to a character he controls.
+  "131067:forced:1 @0 Pick": { owned: true, why: "you engaged a Goblin enemy.", note: "Choose a character you control to take 1 damage.", verb: "Damage" },
+
+  // 131072:A:1 (Galloping Boulders): the first player chooses a character committed to a quest; it takes 3 damage and is removed from the quest.
+  "131072:whenRevealed:1 @0 Pick": { owned: true, note: "{card}: choose a character committed to the quest. It takes 3 damage and is removed from the quest.", verb: "Choose" },
 
   // 131070:A:1 (Grip, Grab! Pinch, Nab!): starting with the first player, each player chooses 1 Goblin enemy from the encounter discard pile and adds it to the staging area.
   "131070:whenRevealed:1 @0.0 Pick": { owned: true, note: "Grip, Grab! Pinch, Nab!: choose a Goblin enemy from the encounter discard pile to add to the staging area.", verb: "Add" },
