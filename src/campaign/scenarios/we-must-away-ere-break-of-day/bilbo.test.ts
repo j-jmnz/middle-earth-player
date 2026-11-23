@@ -55,3 +55,21 @@ lineSpec("131036:A:2", "Bilbo may trigger it even with a Sack card attached to h
   expect(state.cards[idOf(state, "131050")]?.zone).toBe("sackDeck");
   expect(state.cards[idOf(state, BILBO)]?.exhausted).toBe(true);
 });
+
+// 131036:A:2 costs "Exhaust Bilbo Baggins": once used, Bilbo is exhausted and the Action is not offered again in the round, though Sack cards remain and he holds resources; when he is ready again it is offered.
+lineSpec("131036:A:2", "a second use in the same round is not offered while Bilbo stays exhausted", (effects) => {
+  const attached = [{ code: "131045", to: "dh1", encounter: true }, { code: "131046", to: "dh2", encounter: true }];
+  const done = play(ID, { line: "131036:A:2", layout: { ...CAMP, attached }, act: [], expect: [] }, effects, true);
+  const camp = idOf(done.run.state, "131036");
+  const offered = (state: ScenarioState) => legalIntents(state, done.table.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === camp);
+  const first = legalIntents(done.run.state, done.table.ctx).find((intent) => intent.type === "Trigger" && intent.cardId === camp);
+  expect(first, "the first use is offered").toBeDefined();
+  const bilbo = idOf(done.run.state, BILBO);
+  const after = finish(send(done.run, { ...first, payments: [{ heroId: bilbo, amount: 1 }] } as PlayerIntent, done.table.ctx), done.table.ctx, (state) => idOf(state, "131045")).state;
+  expect(after.cards[bilbo]?.resources).toBe(2);
+  expect(after.cards[idOf(after, "131045")]?.zone, "the Sack card chosen is removed").not.toBe("attached");
+  expect(after.cards[idOf(after, "131046")]?.zone, "the other Sack card stays, so a second use has a target").toBe("attached");
+  expect(offered(after), "the second use").toBe(false);
+  const ready = { ...after, cards: { ...after.cards, [bilbo]: { ...after.cards[bilbo]!, exhausted: false } } };
+  expect(offered(ready), "after Bilbo readies").toBe(true);
+});

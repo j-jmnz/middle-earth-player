@@ -87,3 +87,17 @@ lineSpec("131050:A:1", "a hero titled Gandalf with the most resources takes A Wo
   const done = resolveRecords(state, table.ctx, "131033", "forced", idOf(state, "131033"));
   expect(done.state.cards[gandalf.id]?.attachments).toContain(idOf(done.state, "131050"));
 });
+
+// 131044 to 131048 print "(excluding Gandalf)": when the only character without a Sack attached is Gandalf, the Sack card goes back into the Sack deck (hob.sack-x). The stand-in heroes already hold a Sack card each, and Gandalf (the hero 142002, or the ally 01073 for A Smelly Sack)
+// has the highest value of the stat in every case but hit points, where nobody else is eligible anyway.
+for (const [code, ally] of [["131044", true], ["131045", false], ["131046", false], ["131047", false], ["131048", false]] as const) {
+  lineSpec(`${code}:A:1`, "a character titled Gandalf, the only one without a Sack card, does not take it: it goes back into the Sack deck", (effects) => {
+    const held = ["dh1", "dh2"].map((to) => ({ code: "131050", to }));
+    const table = tableFromLayout(ID, { engaged: ["131033"], piles: { sackDeck: [code] }, attached: held }, { effects, extra: ["142002", "01073"] });
+    const gandalf = spawn(table.state, ally ? "01073" : "142002", ally ? { zone: "play", seat: 0 } : { zone: "heroes", seat: 0 });
+    const done = resolveRecords(gandalf.state, table.ctx, "131033", "forced", idOf(gandalf.state, "131033"));
+    expect(done.state.cards[idOf(done.state, code)]?.zone).toBe("sackDeck");
+    expect(done.state.cards[gandalf.id]?.attachments).toEqual([]);
+    expect(done.steps.some((step) => step.kind === "push" && step.cardId === idOf(done.state, code)), "the Sack card was drawn and its When Sacked record ran").toBe(true);
+  });
+}
