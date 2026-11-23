@@ -1,18 +1,16 @@
 // Test helper. Tables of Flies and Spiders built from data/ by the layout kit, for the poison family's tests (src/rules/families/poison) and the scenario's card tests (src/campaign/scenarios/flies-and-spiders). The heroes are the layout's stand-ins
 // (6 hit points); a player deck of filler events gives the poison cards.
-import type { ScenarioState } from "../../../src/rules/core/state.ts";
+import type { GameEvent, ScenarioState } from "../../../src/rules/core/state.ts";
 import { runInstruction } from "../../../src/rules/interpret/interpret.ts";
-import type { Instruction } from "../../../src/catalog/boundary.ts";
 import { syncConstants } from "../../../src/rules/interpret/constants.ts";
 import { spawn } from "../../../src/rules/core/zones.ts";
 import { stagingDest } from "../../../src/rules/families/breaking/areas.ts";
 import { startReveal } from "../../../src/rules/windows/frames.ts";
 import { fireForced } from "../../../src/rules/windows/triggers.ts";
-import type { GameEvent } from "../../../src/rules/core/state.ts";
-import type { Effect } from "../../../src/catalog/boundary.ts";
-import { finish, legalIntents, resolveRecords, send, tableFromLayout, type Run } from "../../harness/scene-kit.ts";
-import { settle } from "../../../src/rules/engine/machine.ts";
+import type { Effect, Instruction } from "../../../src/catalog/boundary.ts";
 import type { EngineStep } from "../../../src/rules/core/intents.ts";
+import { finish, legalIntents, resolveRecords, send, start, tableFromLayout, type Run } from "../../harness/scene-kit.ts";
+import { settle } from "../../../src/rules/engine/machine.ts";
 import type { PlayerIntent, ReduceContext } from "../../../src/rules/engine/reduce.ts";
 
 export const SCENARIO = "flies-and-spiders";
@@ -74,4 +72,21 @@ export function revealTo(ctx: ReduceContext, state: ScenarioState, code: string,
   const spawned = spawn({ ...state, window: null, mode: "stopped" }, code, { zone: "encounterDeck" }, "down");
   const top = { ...spawned.state, encounterDeck: [spawned.id, ...spawned.state.encounterDeck.filter((id) => id !== spawned.id)] };
   return finish({ state: settle(startReveal(top, seat, ctx, steps), ctx, steps), steps }, ctx).state;
+}
+
+/** The encounter phase of a table is played on until the defense window of the first attack opens (no defender declared yet); the state there. */
+export function atDefense(table: { state: ScenarioState; ctx: ReduceContext }): ScenarioState {
+  let run = send(start(table.state), { type: "DeclineEngage" }, table.ctx);
+  for (let guard = 0; guard < 60 && run.state.window?.kind !== "defense"; guard += 1) {
+    const window = run.state.window;
+    if (window?.kind === "chooseEnemy") run = send(run, { type: "ChooseEnemy", enemyId: window.options[0] ?? "" }, table.ctx);
+    else if (window?.kind === "choose") run = send(run, { type: "Choose", optionId: window.options[0] ?? "" }, table.ctx);
+    else {
+      const pass = legalIntents(run.state, table.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack" || intent.type === "DeclineEngage");
+      if (!pass) break;
+      run = send(run, pass as PlayerIntent, table.ctx);
+    }
+  }
+  if (run.state.window?.kind !== "defense") throw new Error(`no defense window: ${JSON.stringify(run.state.window)}`);
+  return run.state;
 }
