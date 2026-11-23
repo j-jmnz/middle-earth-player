@@ -2,7 +2,7 @@
 import type { ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
-import { isGuarded, noteHostDefeated, releaseGuarded, textBlank } from "../families/attachments/hold.ts";
+import { announceHostLeaving, isGuarded, noteHostDefeated, releaseGuarded, textBlank } from "../families/attachments/hold.ts";
 import { keywordsKept } from "../families/angmar/blank.ts";
 import { defendingAgainst } from "../families/angmar/combat.ts";
 import type { EngineStep } from "./intents.ts";
@@ -12,7 +12,7 @@ import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
 import { claimedDestination, discardedDetached, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
-import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
+import { attachmentsOn, inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
 import { attackingHolds } from "../families/attack/strike.ts";
 import { resourceCancel, resourceShield } from "../families/aflame/attack.ts";
@@ -445,16 +445,12 @@ export function destroyCard(
   if (!instance) return state;
   const printed = printedOf(cards, instance.code);
   if (printed.keywords.permanent && heroHostInPlay(state, instance)) return state;
-  // The cards attached to a location that leaves play hear about it (Elf-stone). Whether the location was explored is
-  // decided here, while the attachments still count (rr.explored): an Elf-stone's extra quest point is gone once it is discarded.
-  let next = state;
-  if (isLocationCard(printed)) {
-    for (const attachmentId of instance.attachments) next = queueEvent(next, { trigger: "hostLeftPlay", seat: state.firstPlayer, cardId: attachmentId, subject: id, explored });
-  }
+  // The cards attached to a leaving location or destroyed enemy hear about it, with whether the location was explored decided here (announceHostLeaving).
+  let next = announceHostLeaving(state, id, cards, explored);
   // The active location explored: every card hears it, with the number of attachments it had (10006:A:1, 19026:A:2).
-  if (explored && isLocationCard(printed) && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
+  if (explored && isLocationCard(printed) && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: attachmentsOn(state, id).length });
   // A location explored in the staging area (not the active location, which announced itself above) is heard by "after a location is explored" (Northern Tracker, The Evening Star).
-  if (explored && isLocationCard(printed) && instance.zone === "staging") next = queueEvent(next, { trigger: "locationExplored", seat: null, subject: id, amount: instance.attachments.length });
+  if (explored && isLocationCard(printed) && instance.zone === "staging") next = queueEvent(next, { trigger: "locationExplored", seat: null, subject: id, amount: attachmentsOn(state, id).length });
   // A location in the staging area that is explored detaches the enemies grappled with it (dcce.grapple).
   if (explored && isLocationCard(printed) && instance.zone === "staging") next = releaseGrappled(next, id);
   next = releaseAttachments(next, id, cards, steps);

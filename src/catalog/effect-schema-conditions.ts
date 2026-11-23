@@ -84,7 +84,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2). `hand`: an Action
   // its player uses from the hand ("put Emery into play from your hand", src/rules/families/deck/play.ts). `encounterDeck`: a card that left play
   // for the encounter deck (Gavin's Planning Action shuffles him in; "When Gavin leaves play (other than by his ability)", 11210:A:3). `attached`: the source is attached to a card now (an event that attaches itself, then does more only if it did: 10172:A:1, rr.then).
-  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand", "stormcallerArea", "encounterDeck", "attached"]) }),
+  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand", "stormcallerArea", "encounterDeck", "attached", "encounterDiscard"]) }),
   // The source card shows this side (a contract, flipped by FlipCard; side A at the start).
   z.strictObject({ kind: z.literal("faceUp"), side: z.enum(["A", "B"]) }),
   // The actor's seat (`seat`), the source card (`self`) or the table (`table`, the flags every seat holds: 901201:A:3) holds this flag, a modifier of that stat that is in force now (`is`: false
@@ -341,6 +341,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The encounter discard pile (`discard`), or the encounter deck and its discard pile (`deckAndDiscard`), holds a card of this printed type and/or with the Aflame keyword: the either/or of a search
   // that has something to find ("search ... for the Aflame location", 11040:A:1; `code`: a copy of the card with this code, "While there is a copy of Eastern Crows in the discard pile", 51031:A:1; "the topmost enemy in the encounter discard pile", 11044:A:2; rr.effects). Read by the aflame family.
   z.strictObject({ kind: z.literal("encounterHas"), piles: z.enum(["discard", "deckAndDiscard"]), cardType: z.enum(["enemy", "location", "treachery"]).optional(), aflame: z.literal(true).optional(), trait: z.string().min(1).optional(), code: z.string().min(1).optional() }),
+  // The encounter deck holds no card ("if there are no cards left in the encounter deck", 131024:B:1). Read by the sack family (src/rules/families/sack/).
+  z.strictObject({ kind: z.literal("encounterDeckEmpty") }),
+  // Bilbo Baggins has the card with code `key` attached and his pool holds the Baggins resources the travel costs: `amount`, or `reduced` while the card with code `purse` is attached too ("Players cannot travel to Troll Cave unless Bilbo Baggins has the Troll Key attached and the first player spends 5 Baggins resources", 131037:A:2). Read by the sack family.
+  z.strictObject({ kind: z.literal("bagginsTravel"), amount: z.number().int().positive(), reduced: z.number().int().positive(), key: z.string().min(1), purse: z.string().min(1) }),
   // A location in play with this trait has a total Threat of at least `min`, its grappled enemies' Threat included ("if the total Threat of any one Ship location is 9 or higher", 12041:B:2;
   // src/rules/families/grapple/values.ts).
   z.strictObject({ kind: z.literal("locationThreat"), trait: z.string().min(1), min: z.number().int().min(0) }),
