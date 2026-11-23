@@ -35,6 +35,8 @@ const NO_ALLIES_OR_ATTACHMENTS: Instruction[] = [
 const END_OF_QUEST_ACTIVE = { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, ACTIVE] } as const satisfies Condition;
 // "Then, you may flip X to its Grotto side": the first player decides.
 const MAY_FLIP_BACK: Instruction = { verb: "Choose", who: "firstPlayer", options: [{ id: "flip", instructions: [{ verb: "FlipDoubleSided" }] }, { id: "stay", instructions: [] }] };
+// The flip after a discard of tokens or cards that must be resolved in full first ("Then, you may flip", rr.then): offered only when no pool or deck came up short.
+const MAY_FLIP_AFTER_FULL: Instruction = { verb: "Choose", who: "firstPlayer", options: [{ id: "flip", requires: { kind: "thenResolves" }, instructions: [{ verb: "FlipDoubleSided" }] }, { id: "stay", instructions: [] }] };
 // The scenario's objective allies, in play under the first and the last player (they count as allies in play, not as objectives).
 const OBJECTIVE_ALLY: PickSpec = { type: "ally", control: "any", names: ["Captain Sahír", "Na'asiyah"] };
 // "Choose a card type and discard each card in your hand that is not of the chosen type": one option for each card type a player's hand can hold (a hero never is).
@@ -198,7 +200,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         { verb: "Each", pick: OBJECTIVE_ALLY, instructions: [{ verb: "DiscardResources", amount: 1, target: "picked" }] },
         { verb: "Each", pick: { type: "hero", control: "any" }, instructions: [{ verb: "DiscardResources", amount: 1, target: "picked" }] },
-        MAY_FLIP_BACK,
+        MAY_FLIP_AFTER_FULL,
       ],
     },
 
@@ -272,7 +274,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, ACTIVE] },
       instructions: [
         { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "DiscardFromDeck", amount: 10 }] },
-        { verb: "Choose", who: "firstPlayer", options: [{ id: "return", instructions: [{ verb: "ReturnToStaging", target: { kind: "self" } }] }, { id: "stay", instructions: [] }] },
+        { verb: "Choose", who: "firstPlayer", options: [{ id: "return", requires: { kind: "thenResolves" }, instructions: [{ verb: "ReturnToStaging", target: { kind: "self" } }] }, { id: "stay", instructions: [] }] },
       ],
     },
 

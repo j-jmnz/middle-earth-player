@@ -9,6 +9,8 @@ import { expectOk } from "../../src/rules/core/test-fixture.ts";
 import { DATA_DIR } from "../data/paths.ts";
 import { describeError, duration, runScript, type Log } from "../log.ts";
 import { encounterCards, probeCard, probesOf, type CardResult } from "./encounter-cards.ts";
+import { formatIdle } from "./idle.ts";
+import { unknownIdle } from "./idle-known.ts";
 import { GAMES, playGame, type GameSummary } from "./encounter-games.ts";
 import { encounterStart, encounterWorld, kept, type EncounterWorld } from "./encounter-world.ts";
 
@@ -70,7 +72,9 @@ const gameLine = (scenario: string, game: GameSummary, problem: NonNullable<Game
 export function problemsOf(summary: EncounterSummary, known: readonly KnownFailure[] = KNOWN): string[] {
   const cards = summary.cards.flatMap((result) => (result.problem ? [`${summary.scenario} card ${result.code} ${result.probe}: ${result.problem}`] : []));
   const games = summary.games.flatMap((game) => (game.problem && !knownFailure(summary.scenario, game, known) ? [gameLine(summary.scenario, game, game.problem)] : []));
-  return [...cards, ...games];
+  // An ability a player used that changed nothing (scripts/card-smoke/idle.ts).
+  const idle = summary.games.flatMap((game) => unknownIdle(game.idle).map((hit) => `${summary.scenario} game ${game.game}: ${formatIdle(hit)}`));
+  return [...cards, ...games, ...idle];
 }
 
 /** The known failure a game's problem is, or undefined (a different message, intent, game or seed is not it). */

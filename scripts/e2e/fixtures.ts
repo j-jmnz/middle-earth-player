@@ -34,8 +34,7 @@
 // (141078) and Gildor Inglorion (141077), as the scenario-1 tests answer it. Each seat plays its list with
 // a hero of the same sphere in place of each hero that fell in that game (REPLACEMENT), and the briefing's threat
 // penalty when one did. Two-handed, Easy, the auto-player's answers, every intent up to the loss.
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import os from "node:os";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
@@ -54,6 +53,7 @@ import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceConte
 import { nextIntent } from "../../test/harness/auto-player.ts";
 import { loadAnyScenario, loadCampaign, loadCampaignsInOrder, loadScenario, scenarioOrder } from "../data/load-scenarios.ts";
 import { FIXTURE_DECKS, SOLO_FIXTURE_DECK, prebuiltDeck } from "./seed-kit.ts";
+import { fixtureArguments, FIXTURE_USAGE } from "./fixture-args.ts";
 import { searchFlags } from "./search/options.ts";
 import { WRITERS, isChained, type Chained, type Written } from "./writers.ts";
 import { pastShowcase } from "./showcase-past.ts";
@@ -330,30 +330,22 @@ function position(order: readonly string[], id: string): number {
 // No legal win of the two starter decks has been found on this engine, so the search runs only when the user asks for it,
 // and `won` and `knife-lost` are written only when it finds one.
 void runScript("e2e-fixtures", async () => {
-  const searching = process.argv.includes("--won");
-  const only = scenarioArgument();
+  const parsed = fixtureArguments();
+  if (parsed.help) {
+    say.info(FIXTURE_USAGE);
+    return;
+  }
+  const searching = parsed.flags.has("won");
+  const only = scenarioArgument(parsed.positional[0]);
   if (only === null && searchFlags() !== null) throw new Error("--search takes one scenario id: a search of every scenario would run for hours");
   const dir = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "..", "src", "campaign", "fixtures");
   if (only !== null && !isChained(only) && searchFlags() !== null) throw new Error(`${only} has its own search for its won game: pass --won`);
-  // --dry-run writes the files into a temporary folder and says which differ from the committed ones, so a seed finder can be run with nothing rewritten.
-  const scratch = process.argv.includes("--dry-run") ? mkdtempSync(path.join(os.tmpdir(), "fixtures-dry-")) : null;
-  if (only === null || !isChained(only)) writeScenarioOne(scratch ?? dir, searching);
-  if (only === null || isChained(only)) await writeChained(dir, only, scratch ?? searchFlags()?.out ?? null);
-  if (scratch !== null) {
-    for (const name of readdirSync(scratch)) {
-      const committed = path.join(dir, name);
-      const same = existsSync(committed) && readFileSync(committed, "utf8") === readFileSync(path.join(scratch, name), "utf8");
-      say.notice(`${name}: ${same ? "the same as the committed file" : "DIFFERS from the committed file"}`);
-    }
-    rmSync(scratch, { recursive: true, force: true });
-  }
+  if (only === null || !isChained(only)) writeScenarioOne(dir, searching);
+  if (only === null || isChained(only)) await writeChained(dir, only, searchFlags()?.out ?? null);
 });
 
 // The scenario id named on the command line, or null for every scenario. It must be in the fixture registry.
-function scenarioArgument(): FixtureScenarioId | null {
-  const named = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
-  if (named.length > 1) throw new Error("Usage: scripts/e2e/fixtures.ts [<scenario-id>] [--won] [--search ...] [--dry-run]");
-  const id = named[0];
+function scenarioArgument(id: string | undefined): FixtureScenarioId | null {
   if (id === undefined) return null;
   const entry = FIXTURE_REGISTRY.find((one) => one.scenarioId === id);
   if (!entry) throw new Error(`${id} has no fixtures in src/campaign/fixtures/registry.ts`);

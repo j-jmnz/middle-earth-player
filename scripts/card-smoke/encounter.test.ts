@@ -91,6 +91,7 @@ describe("known failures and flags", () => {
     steps: 0,
     rounds: 0,
     ended: "problem",
+    idle: [],
     problem: { game: over.game ?? 5, seed: over.seed ?? 6, profile: "strong", seats: 2, step: 80, round: 3, window: "response", intent: { type: "Trigger", cardId: "i3", effectId: "141024:response:1" }, message: "The reducer refused an offered intent: Travel was refused", ...over },
   });
   const summary = (games: GameSummary[]): EncounterSummary => ({ scenario: "a-shadow-of-the-past", cards: [], games, ms: 0 });

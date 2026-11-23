@@ -43,6 +43,7 @@ export function readsTable(condition: Condition): boolean {
   switch (condition.kind) {
     case "threat":
     case "phase":
+    case "resources":
       return true;
     // A pick that reads the running effect is not settled before the effect runs.
     case "count":
@@ -113,5 +114,7 @@ export function namedCards(state: ScenarioState, target: string | undefined, sou
   if (named === "picked") return frame.picked?.map((id) => state.cards[id] ?? null);
   if (mark.event) return undefined;
   if (named === "host") return [source.host ? (state.cards[source.host] ?? null) : null];
+  // The other card of the event the Response answers (the defending character of an attack that resolved): an undefended attack has none, and the step reads no card.
+  if (named === "other") return frame.scope.other == null ? [] : [state.cards[frame.scope.other] ?? null];
   return named === "self" ? [source] : undefined;
 }

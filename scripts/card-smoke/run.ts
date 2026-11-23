@@ -6,6 +6,8 @@ import { legalIntents, reduce, type EngineStep, type PlayerIntent, type Scenario
 import { spawn } from "../../src/rules/core/zones.ts";
 
 import { nextIntent } from "../../test/harness/auto-player.ts";
+import { formatIdle, idleWatcher, type IdleHit } from "./idle.ts";
+import { unknownIdle } from "./idle-known.ts";
 import { dice, seedOf, smokeIntent, type Preference, type Smoked } from "./policy.ts";
 import { handCopy, POLICY, SMOKE_SEED, smokeCodes, smokeWorld, type SmokeWorld } from "./world.ts";
 import { splitCodes } from "../codes.ts";
@@ -64,6 +66,8 @@ export type SmokeSummary = {
   frames: number;
   records: RecordTally[];
   problems: SmokeProblem[];
+  // Abilities offered and accepted whose resolution changed nothing (scripts/card-smoke/idle.ts), the card's own and any the game's other cards used.
+  idle: IdleHit[];
 };
 
 function inHandOrPlay(state: ScenarioState, id: string): boolean {
@@ -104,7 +108,8 @@ export function smokeCard(code: string, options: SmokeOptions): SmokeSummary {
   const ids = new Set<string>();
   const smoked: Smoked = { ids, records: new Set(records.keys()), played: printed.type === "hero" };
   const preference: Preference = { prefer: options.prefer ?? 0.8, dice: dice(seedOf(code, options.seed ?? SMOKE_SEED)), uses: new Map() };
-  const summary: SmokeSummary = { code, type: printed.type, placed: "hand", added: [], plays: 0, copies: 0, steps: 0, rounds: 0, ended: "steps", frames: 0, records: [...records.values()], problems: [] };
+  const summary: SmokeSummary = { code, type: printed.type, placed: "hand", added: [], plays: 0, copies: 0, steps: 0, rounds: 0, ended: "steps", frames: 0, records: [...records.values()], problems: [], idle: [] };
+  const watcher = idleWatcher(ctx);
   const deal = (from: ScenarioState): ScenarioState => {
     const copy = handCopy(world, from, code, summary.added);
     ids.add(copy.id);
@@ -156,6 +161,7 @@ export function smokeCard(code: string, options: SmokeOptions): SmokeSummary {
       if (!result.ok) throw new Error(`The reducer refused an offered intent: ${result.reason}`);
       if (result.state.failure) throw new Error(`state.failure: ${result.state.failure}`);
       tally(summary, records, smoked, state, intent, result.steps);
+      watcher.observe(state, intent, result.state, result.steps);
       state = result.state;
       for (const record of records.values()) if (state.modifiers.some((modifier) => modifier.origin === record.id)) record.active += 1;
       if (printed.type !== "hero" && summary.copies < (options.copies ?? 3) && ![...ids].some((id) => inHandOrPlay(state, id))) state = deal(state);
@@ -168,6 +174,7 @@ export function smokeCard(code: string, options: SmokeOptions): SmokeSummary {
     }
   }
   summary.rounds = state.round;
+  summary.idle = [...watcher.hits];
   return summary;
 }
 
@@ -185,7 +192,7 @@ export function formatSummary(summary: SmokeSummary): string {
   const added = summary.added.length > 0 ? `, added ${summary.added.join(" ")}` : "";
   const head = `${summary.code} ${summary.type} (${summary.placed}${added}): played ${summary.plays} of ${summary.copies} copies, ${summary.frames} effect frames, ${summary.steps} steps to round ${summary.rounds}, ended ${summary.ended}`;
   const lines = summary.records.map((record) => `  ${record.id.padEnd(22)} offered ${record.offered}, used ${record.used}, caused ${record.caused} steps, modifiers on ${record.active} steps`);
-  return [head, ...lines, ...summary.problems.map((problem) => `  problem: ${formatProblem(summary.code, problem)}`)].join("\n");
+  return [head, ...lines, ...summary.idle.map((hit) => `  idle: ${formatIdle(hit)}`), ...summary.problems.map((problem) => `  problem: ${formatProblem(summary.code, problem)}`)].join("\n");
 }
 
 async function main(log: Log): Promise<void> {
@@ -200,9 +207,10 @@ async function main(log: Log): Promise<void> {
   let failed = 0;
   for (const code of codes) {
     const summary = smokeCard(code, { world, seed: number("seed"), steps: number("steps") });
-    if (summary.problems.length > 0) failed += 1;
-    (summary.problems.length > 0 ? log.error : log.info)(formatSummary(summary));
-    if (summary.problems.length > 0) log.error(`  open it: pnpm game show ${smokeSource(code, number("seed"), number("deal"))} --legal`);
+    const bad = summary.problems.length > 0 || unknownIdle(summary.idle).length > 0;
+    if (bad) failed += 1;
+    (bad ? log.error : log.info)(formatSummary(summary));
+    if (bad) log.error(`  open it: pnpm game show ${smokeSource(code, number("seed"), number("deal"))} --legal`);
   }
   if (failed > 0) throw new Error(`${failed} of ${codes.length} cards had problems`);
 }
