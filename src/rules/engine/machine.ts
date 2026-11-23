@@ -5,7 +5,6 @@ import {
   applyDefense,
   applyPlayerAttack,
   applyUndefended,
-  archeryRecipients,
   archeryTotal,
   assignArchery,
   beginEnemyAttack,
@@ -16,6 +15,7 @@ import {
   nextEnemyGroup,
   openDefense,
 } from "../combat/combat.ts";
+import { archeryTargets } from "../combat/archery-targets.ts";
 import { applyChoice } from "../windows/choices.ts";
 import { ruleCause } from "../core/cause.ts";
 import { canAnnounce, drainEvents } from "../windows/events.ts";
@@ -334,7 +334,7 @@ function startCombat(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   if (state.separate) return startSeparateCombat(state, ctx);
   const total = archeryTotal(state, ctx.cards);
   const next = { ...withMode(state, "combatShadows"), resolvedAttacks: [], declaredAttacks: [], pendingAttack: null };
-  if (total > 0 && archeryRecipients(next, ctx.cards).length > 0) {
+  if (total > 0 && archeryTargets(next, ctx.cards).length > 0) {
     return { ...next, window: { kind: "archery", total }, activeSeat: livingSeats(next)[0] ?? next.firstPlayer };
   }
   return next;
@@ -347,7 +347,7 @@ function startSeparateCombat(state: ScenarioState, ctx: ReduceContext): Scenario
   for (const seat of livingSeats(state)) {
     if (done.includes(seat)) continue;
     const total = archeryTotal(state, ctx.cards, seat);
-    if (total <= 0 || archeryRecipients(state, ctx.cards, seat).length === 0) continue;
+    if (total <= 0 || archeryTargets(state, ctx.cards, seat).length === 0) continue;
     return { ...state, archeryDone: [...done, seat], window: { kind: "archery", total, seat }, activeSeat: seat };
   }
   const { archeryDone: _done, ...rest } = state;

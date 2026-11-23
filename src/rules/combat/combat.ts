@@ -20,7 +20,7 @@ import { inPlay } from "../core/zones.ts";
 import { titleBarred } from "../families/nightmare/guards.ts";
 import { ruleCause } from "../core/cause.ts";
 import { fireForced } from "../windows/triggers.ts";
-import { undefendedExtras } from "../families/defense/damage.ts";
+import { damageBarred, undefendedExtras } from "../families/defense/damage.ts";
 import { exhaustedToDefend, markDefender, moreDefenders, staysReadyToDefend } from "../families/defense/defenders.ts";
 import { holdAttack, queueHeard } from "../families/defense/listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/attack/flow.ts";
@@ -448,7 +448,8 @@ export function undefendedTargets(state: ScenarioState, seat: number, cards: Car
   const heroes = heroIds(state, seat);
   const own = [...heroes, ...characters(state, seat, cards).filter((id) => !heroes.includes(id) && flagged(state, id, "takesUndefendedDamage"))];
   // A character another card lets take it for this player (08093), whoever controls that character.
-  const all = [...own, ...undefendedExtras(state, seat, cards).filter((id) => !own.includes(id))];
+  // A hero that cannot take this attack's damage is not offered for it (Bilbo Baggins in the riddle area against an attacker other than Gollum, hob.riddle-area; rr.cannot).
+  const all = [...own, ...undefendedExtras(state, seat, cards).filter((id) => !own.includes(id))].filter((id) => !damageBarred(state, id, "combat", null));
   // A shadow effect says the damage must go on one of these heroes (families/south/watcher.ts, 900408:A:3).
   // A character of another player named by the shadow effect (Wilyador, 02070:A:2) is among them though the seat does not control it.
   const only = state.pendingAttack?.onlyHeroes;

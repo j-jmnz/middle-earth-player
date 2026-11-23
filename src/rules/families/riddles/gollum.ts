@@ -34,6 +34,7 @@ export function bilboDamageBarred(state: ScenarioState, id: string, source: stri
 /** The `combat.undefended` hook: damage from the undefended attack of Gollum goes on Bilbo Baggins while the table holds `gollumDamageToBilbo` (stage 3B, 131031:B:2). */
 export function undefendedTargets(state: ScenarioState): readonly string[] {
   const attacker = state.pendingAttack ? state.cards[state.pendingAttack.enemyId] : undefined;
+  if (attacker?.code !== GOLLUM) return [];
   const hero = bilbo(state);
-  return attacker?.code === GOLLUM && hero && flagged(state, "table", "gollumDamageToBilbo") ? [hero.id] : [];
+  return hero && flagged(state, "table", "gollumDamageToBilbo") ? [hero.id] : [];
 }

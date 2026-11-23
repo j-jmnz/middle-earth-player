@@ -1,6 +1,5 @@
 import { triggerIntents, triggerReason } from "../player/actions.ts";
 import {
-  archeryRecipients,
   attackDeclared,
   canAttack,
   canDefend,
@@ -10,6 +9,7 @@ import {
   hasLegalAttack,
   undefendedTargets,
 } from "../combat/combat.ts";
+import { archeryTargets } from "../combat/archery-targets.ts";
 import { optionIntents, optionReason } from "../windows/choices.ts";
 import { mulliganTriggers } from "../families/deck/play.ts";
 import { hideCommitReason, hideCommitters } from "../quest/hide.ts";
@@ -116,7 +116,7 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
     case "DeclareAttackers":
       return declarableEnemies(state, state.activeSeat, selection.cardId, ctx.cards);
     case "Distribute":
-      return archeryRecipients(state, ctx.cards, state.window?.kind === "archery" ? state.window.seat : undefined);
+      return archeryTargets(state, ctx.cards, state.window?.kind === "archery" ? state.window.seat : undefined);
   }
 }
 
@@ -395,7 +395,7 @@ function distributeReason(
   ctx: ReduceContext,
 ): string | null {
   if (state.window?.kind !== "archery") return "That intent is not legal in this window";
-  const legal = new Set(archeryRecipients(state, ctx.cards, state.window.seat));
+  const legal = new Set(archeryTargets(state, ctx.cards, state.window.seat));
   const seen = new Set<string>();
   let sum = 0;
   for (const assignment of intent.assignments) {
