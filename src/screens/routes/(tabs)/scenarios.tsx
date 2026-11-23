@@ -1,5 +1,6 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useDeferredValue, useState } from "react";
+import type { FlashListRef } from "@shopify/flash-list";
+import { useCallback, useDeferredValue, useEffect, useEffectEvent, useRef, useState } from "react";
 import { View } from "react-native";
 
 import { isPlayable } from "../../../campaign/playable";
@@ -20,8 +21,10 @@ import { comingLater, splitRuns } from "../../campaign/hub-runs";
 import { usePalette } from "../../kit/palette-hook";
 import { seatWord } from "../../data/seats";
 import { gameCaption, statusWord } from "../../history/standalone-words";
+import { plural } from "../../history/words";
 import { listStandalone } from "../../data/standalone-store";
 import { STALE_STEP } from "../../session/stale-words";
+import { announce } from "../../../ui/announce";
 import { useUiScale } from "../../../ui/ui-scale";
 import { useSizeClass } from "../../../ui/use-size-class";
 
@@ -115,7 +118,19 @@ export default function Scenarios() {
   const waiting = comingLater(BOXES, campaignListQueries(catalog).campaigns.all(), isPlayable, scenarioName);
   // What the search keeps of them. While it narrows the list every fold is open, and a tap on a fold header changes no stored fold.
   const found = searchHub(boxes, waiting, query, scenarioName);
-  const listFold = (id: string) => (found.searching ? { folded: false, onFold: () => undefined } : fold(id));
+  // Such a header is a plain heading with its count of matches (FoldHeader with no `onFold`).
+  const listFold = (id: string) => (found.searching ? { folded: false } : fold(id));
+  // A screen reader hears what each search kept, once the list has caught up with the field.
+  const sayFound = useEffectEvent(() => {
+    if (!found.searching) return;
+    const kept = found.boxes.reduce((sum, { playable }) => sum + playable.length, 0);
+    const parts = [kept > 0 ? plural(kept, "scenario") : null, found.waiting.length > 0 ? `${found.waiting.length} coming later` : null].filter((part) => part != null);
+    announce(parts.length > 0 ? parts.join(", ") : "No scenario matches");
+  });
+  useEffect(() => sayFound(), [query]);
+  // On focus the field goes to the top of the list, over what it finds: under a game in progress it sits low on the first screen.
+  const list = useRef<FlashListRef<HubItem>>(null);
+  const toSearch = () => void list.current?.scrollToIndex({ index: 0, animated: true, viewOffset: -8 * s });
   // The catalog is the list's items (hub-items.ts): a folded box mounts its header alone.
   const items = hubItems({ boxes: found.boxes, waiting: found.waiting.length, posters, folded: (id) => folds.folded(id, false), searching: found.searching });
   // The scenarios list's folds, each box and Coming later: Collapse all folds every one while any is open, else Expand all opens them.
@@ -135,8 +150,9 @@ export default function Scenarios() {
     switch (item.type) {
       case "search":
         return (
-          <View className="flex-row" style={lead ? undefined : section}>
-            <SearchField testID="scenarios-search" value={search} onChangeText={setSearch} placeholder="Search scenario or box" accessibilityLabel="Search scenarios" accessibilityHint="Searches scenario and box names" />
+          // On a tablet the field keeps the hero's measure.
+          <View className="flex-row" style={{ ...(lead ? undefined : section), ...(size === "expanded" ? { maxWidth: 620 * s } : undefined) }}>
+            <SearchField testID="scenarios-search" value={search} onChangeText={setSearch} onFocus={toSearch} placeholder="Search scenario or box" accessibilityLabel="Search scenarios" accessibilityHint="Searches scenario and box names" />
           </View>
         );
       case "empty":
@@ -189,6 +205,8 @@ export default function Scenarios() {
     <HubListPage
       testID="scenarios"
       listTestID="standalone-scenarios"
+      listRef={list}
+      fill={found.searching}
       title="Scenarios"
       actions={<PillButton label="History" testID="history-open" accessibilityLabel="History: games in progress, finished and archived" onPress={() => router.push({ pathname: "/history", params: { kind: "standalone" } })} />}
       hero={heroBlock}

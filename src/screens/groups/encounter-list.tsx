@@ -60,7 +60,7 @@ export function EncounterList({
           const id = productFoldId(product.id);
           const folded = searching ? false : folds.folded(id, true);
           return (
-            <FoldSection key={product.id} id={id} title={product.title} summary={product.summary} folded={folded} onFold={(next) => (searching ? undefined : folds.setFolded(id, next, true))}>
+            <FoldSection key={product.id} id={id} title={product.title} summary={product.summary} folded={folded} onFold={searching ? undefined : (next) => folds.setFolded(id, next, true)}>
               {folded
                 ? null
                 : product.items.map((item) =>
