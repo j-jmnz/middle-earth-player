@@ -1,6 +1,6 @@
 // The web app's drawing scale and frame meter (docs/plans/pwa-iphone-ipad.md, Risks only a device can answer): two test controls a player turns on from the address,
 // so a device says what a headless browser cannot. `?scale=1` (or 1.5) makes the table's canvases draw at that many pixels for each CSS pixel in place of the device's
-// (an iPad's 2 is four times the pixels of 1), `?fps=1` shows the frame rate and the first error the page reports, with where it was thrown; `?scale=0` and `?fps=0` turn each off. Both are kept in localStorage, since they are read
+// (an iPad's 2 is four times the pixels of 1), `?fps=1` shows the frame rate, a log of the last minute (a tap on the meter stops it and copies the log) and the first error the page reports, with where it was thrown; `?scale=0` and `?fps=0` turn each off. Both are kept in localStorage, since they are read
 // before any database opens. Skia's web views read window.devicePixelRatio when they are made, so the scale is set before CanvasKit loads (skia-web-load.ts).
 const SCALE_KEY = "middle-earth-player.render-scale";
 const FPS_KEY = "middle-earth-player.frame-meter";
@@ -73,10 +73,37 @@ function watchErrors(show: (text: string) => void): void {
   window.addEventListener("unhandledrejection", (event) => report(event.reason));
 }
 
+/** One second of the meter: its frame rate, its longest frame and how many of its frames took over two frames' time. */
+export type Second = { fps: number; worst: number; slow: number };
+
+// A frame over this is one the eye sees as a stutter at 60 frames a second.
+const SLOW_MS = 34;
+// How many seconds the log keeps.
+export const LOG_SECONDS = 60;
+
+/** A second's frames as its log entry. */
+export function secondOf(gaps: readonly number[]): Second {
+  const total = gaps.reduce((sum, gap) => sum + gap, 0);
+  return { fps: total > 0 ? Math.round((1000 * gaps.length) / total) : 0, worst: Math.round(Math.max(0, ...gaps)), slow: gaps.filter((gap) => gap > SLOW_MS).length };
+}
+
+/** The log in one line: the slowest second, the mean, the longest frame and the slow frames of the seconds kept. */
+export function summaryLine(log: readonly Second[]): string {
+  if (log.length === 0) return "no log yet";
+  const mean = Math.round(log.reduce((sum, second) => sum + second.fps, 0) / log.length);
+  const slow = log.reduce((sum, second) => sum + second.slow, 0);
+  return `last ${log.length} s: lowest ${Math.min(...log.map((second) => second.fps))} fps  mean ${mean}  worst ${Math.max(...log.map((second) => second.worst))} ms  slow frames ${slow}`;
+}
+
+/** The log as text to send: the summary, then each second's frame rate and longest frame, oldest first. */
+export function logText(log: readonly Second[], scale: number): string {
+  return [`x${scale}  ${summaryLine(log)}`, ...log.map((second, index) => `${String(index + 1).padStart(2)}  ${second.fps} fps  worst ${second.worst} ms`)].join("\n");
+}
+
 function startMeter(): void {
   const box = document.createElement("div");
   box.setAttribute("aria-hidden", "true");
-  box.style.cssText = "position:fixed;left:4px;bottom:4px;z-index:2147483647;max-width:90vw;padding:2px 6px;border-radius:4px;background:#000c;color:#fff;font:12px/16px monospace;pointer-events:none;white-space:pre-wrap";
+  box.style.cssText = "position:fixed;left:4px;bottom:4px;z-index:2147483647;max-width:90vw;max-height:80vh;overflow:auto;padding:2px 6px;border-radius:4px;background:#000c;color:#fff;font:12px/16px monospace;pointer-events:none;white-space:pre-wrap";
   const rate = document.createElement("div");
   const fault = document.createElement("div");
   fault.style.color = "#ffb4a8";
@@ -85,17 +112,44 @@ function startMeter(): void {
   watchErrors((text) => {
     fault.textContent = text;
   });
+  const summary = document.createElement("div");
+  box.insertBefore(summary, fault);
+  // A tap stops the meter where it stands, so its numbers can be read or photographed, and copies the log; a second tap clears the log and goes on.
+  box.style.pointerEvents = "auto";
+  box.style.cursor = "pointer";
   let gaps: number[] = [];
+  let log: Second[] = [];
+  let paused = false;
   let last = performance.now();
   let shown = last;
-  const frame = (now: number) => {
-    gaps.push(now - last);
-    last = now;
-    if (now - shown >= 1000) {
-      rate.textContent = meterLine(gaps, window.devicePixelRatio);
+  box.addEventListener("click", (event) => {
+    event.stopPropagation();
+    paused = !paused;
+    if (paused) {
+      const text = logText(log, window.devicePixelRatio);
+      rate.textContent = "STOPPED. Tap to clear and go on.";
+      summary.textContent = text;
+      void navigator.clipboard?.writeText(text).catch(() => undefined);
+    } else {
+      log = [];
       gaps = [];
-      shown = now;
+      last = performance.now();
+      shown = last;
+      summary.textContent = summaryLine(log);
     }
+  });
+  const frame = (now: number) => {
+    if (!paused) {
+      gaps.push(now - last);
+      if (now - shown >= 1000) {
+        log = [...log, secondOf(gaps)].slice(-LOG_SECONDS);
+        rate.textContent = `${meterLine(gaps, window.devicePixelRatio)}  (tap to stop)`;
+        summary.textContent = summaryLine(log);
+        gaps = [];
+        shown = now;
+      }
+    }
+    last = now;
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
