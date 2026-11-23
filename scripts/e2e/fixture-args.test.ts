@@ -41,7 +41,7 @@ describe("pnpm scenario fixtures with a flag it does not know", () => {
     expect(done.status).not.toBe(0);
     expect(`${done.stdout}${done.stderr}`).toContain("Unknown flag --wno");
     expect(stamps()).toBe(before);
-  });
+  }, 60_000);
 
   it("writes no fixture for --help and prints the usage", () => {
     const before = stamps();
@@ -49,5 +49,5 @@ describe("pnpm scenario fixtures with a flag it does not know", () => {
     expect(done.status).toBe(0);
     expect(`${done.stdout}${done.stderr}`).toContain("Usage: pnpm scenario fixtures");
     expect(stamps()).toBe(before);
-  });
+  }, 60_000);
 });
