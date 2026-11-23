@@ -13,7 +13,7 @@ const cardsOf = (state: ScenarioState, code: string) => Object.values(state.card
 
 // A permanent golden: whole standalone games of The Battle of Five Armies played by the auto-player (test/scenarios/the-battle-of-five-armies/game.ts) on fixed seeds. A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned.
 // The wins are two-handed on Normal and Easy: the first player chooses each round the stage with room left, the three stages are complete together and the players advance to stage 5, where Bolg is engaged with the first player, a Bodyguard of Bolg is
-// destroyed first and then Bolg himself. The losses are the two ways to lose, true solo or two-handed: every player's threat at 50 and Bilbo Baggins leaving play. No true solo win: no seed in 8 gets past the staging area of stage 5. The opening, the causes, a replay and
+// destroyed first and then Bolg himself. The losses are the two ways to lose, true solo or two-handed: every player's threat at 50 and Bilbo Baggins leaving play. No true solo win: no seed in 16 (1 to 8, Normal and Easy) gets past the staging area of stage 5. The opening, the causes, a replay and
 // the scoring are checked for each. Update the snapshot only when the change is meant.
 describe("The Battle of Five Armies golden", () => {
   goldenSuite<ArmiesGolden, ArmiesDecks>({

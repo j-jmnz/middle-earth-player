@@ -95,7 +95,7 @@ export type ArmiesGame = PlayedGame;
 export type ArmiesGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: ArmiesDecks; outcome: "won" | "lost"; policy?: Partial<ArmiesPolicy>; lossReason?: string };
 
 // The games to pin (about 1,600 intents in all, .claude/rules/code-standards.md, Test cost): two-handed wins on Normal and Easy that reach stage 5 and destroy Bolg, and the two ways to lose, each true solo or two-handed: every player's threat at 50 and
-// Bilbo Baggins leaving play. No true solo win: the one player controls Bilbo Baggins (Willpower 1) and two heroes, and no seed in 8 on either difficulty gets past the staging area of stage 5 (each is lost with Bilbo Baggins gone).
+// Bilbo Baggins leaving play. No true solo win: the one player controls Bilbo Baggins (Willpower 1) and two heroes, and no seed in 16 (1 to 8, Normal and Easy) gets past the staging area of stage 5 (each is lost with Bilbo Baggins gone).
 export const ARMIES_GOLDENS: readonly ArmiesGolden[] = [
   { name: "two-handed win", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "Easy two-handed win", seatCount: 2, seed: 8, difficulty: "Easy", decks: "strong", outcome: "won" },
