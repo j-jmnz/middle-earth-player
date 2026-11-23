@@ -1,4 +1,4 @@
-// Rules: hob.unconscious-characters, rr.commit-to-quest (data/rules/entries.json).
+// Rules: hob.unconscious-characters, ltp.commit-characters (data/rules/entries.json).
 import { forgetCommitted } from "../costs/pay.ts";
 import { flaggedByClass } from "../../core/holder-classes.ts";
 import { printedOf } from "../../core/printed.ts";
