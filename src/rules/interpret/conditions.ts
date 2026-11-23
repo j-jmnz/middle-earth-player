@@ -231,7 +231,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     // Answered by the captured family's condition hook above (families/captured/values.ts).
     case "versusVictoryTrait": return false;
-    case "holderExhausted": return state.cards[scope.holderId ?? scope.sourceId ?? ""]?.exhausted === true;
+    // An unconscious character is neither ready nor exhausted (hob.unconscious-characters): Weighed Down's penalty does not reach it.
+    case "holderExhausted": return state.cards[scope.holderId ?? scope.sourceId ?? ""]?.exhausted === true && state.cards[scope.holderId ?? scope.sourceId ?? ""]?.unconscious !== true;
     case "versusHighEngagement": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && versusHighEngagement(state, condition.role, holder, ctx.cards, scope.against);
