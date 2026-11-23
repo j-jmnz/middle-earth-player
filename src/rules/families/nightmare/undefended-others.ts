@@ -46,6 +46,6 @@ export function strikeUndefended(state: ScenarioState, amount: number, focus: Fo
   if (!enemyId || !enemy || !state.cards[heroId]) return state;
   steps.push({ kind: "strike", side: "enemy", enemyId, targetId: heroId, attack: amount, defense: 0, undefended: true, cause: ruleCause("rr.step-6-4-3") });
   const raw = flagged(state, enemyId, "dealsNoDamage") ? 0 : amount;
-  const hit = noteAttackDamage(state, combatDamage(state, enemyId, heroId, raw, ctx, steps), ctx);
+  const hit = noteAttackDamage(state, combatDamage(state, enemyId, heroId, raw, ctx, steps), ctx, steps);
   return announceDestroyed(hit, { enemyId, seat: focus.seat, heroId }, ctx);
 }

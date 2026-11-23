@@ -64,6 +64,7 @@ import * as water from "../scenarios/the-watcher-in-the-water/game.ts";
 import * as dark from "../scenarios/the-long-dark/game.ts";
 import * as stone from "../scenarios/foundations-of-stone/game.ts";
 import * as flame from "../scenarios/shadow-and-flame/game.ts";
+import * as spiders from "../scenarios/flies-and-spiders/game.ts";
 import * as osgiliath from "../scenarios/the-massing-at-osgiliath/game.ts";
 import * as town from "../scenarios/the-battle-of-lake-town/game.ts";
 import * as erech from "../scenarios/the-stone-of-erech/game.ts";
@@ -78,6 +79,9 @@ import * as woodland from "../scenarios/the-woodland-realm/game.ts";
 import * as mines from "../scenarios/the-mines-of-moria/game.ts";
 import * as khazad from "../scenarios/escape-from-khazad-dum/game.ts";
 import * as dreadnaught from "../scenarios/the-hunt-for-the-dreadnaught/game.ts";
+import * as grim from "../scenarios/over-the-misty-mountains-grim/game.ts";
+import * as day from "../scenarios/we-must-away-ere-break-of-day/game.ts";
+import * as dim from "../scenarios/dungeons-deep-and-caverns-dim/game.ts";
 import * as mountain from "../scenarios/the-lonely-mountain/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
@@ -169,6 +173,10 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-long-dark", "The Long Dark", dark.DARK_GOLDENS, dark.darkWorld, dark.playGolden),
   entry("foundations-of-stone", "Foundations of Stone", stone.STONE_GOLDENS, stone.stoneWorld, stone.playGolden),
   entry("shadow-and-flame", "Shadow and Flame", flame.FLAME_GOLDENS, flame.flameWorld, flame.playGolden),
+  entry("we-must-away-ere-break-of-day", "We Must Away, Ere Break of Day", day.DAY_GOLDENS, day.dayWorld, day.playGolden),
+  entry("over-the-misty-mountains-grim", "Over the Misty Mountains Grim", grim.GRIM_GOLDENS, grim.grimWorld, grim.playGolden),
+  entry("dungeons-deep-and-caverns-dim", "Dungeons Deep and Caverns Dim", dim.DIM_GOLDENS, dim.dimWorld, dim.playGolden),
+  entry("flies-and-spiders", "Flies and Spiders", spiders.SPIDERS_GOLDENS, spiders.spidersWorld, spiders.playGolden),
   entry("the-lonely-mountain", "The Lonely Mountain", mountain.MOUNTAIN_GOLDENS, mountain.mountainWorld, mountain.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),

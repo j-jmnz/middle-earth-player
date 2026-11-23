@@ -212,6 +212,11 @@ export function markReached(state: ScenarioState, step: string): ScenarioState {
   return { ...state, stepWindows: [...state.stepWindows.filter((key) => key.startsWith(`${state.round}:`)), at] };
 }
 
+/** Exhausted as a filter, a stat modifier and the table read it: an unconscious character is exhausted but neither ready nor exhausted (hob.unconscious-characters), so "exhausted" does not reach it. */
+export function isExhausted(card: Pick<CardInstance, "exhausted" | "unconscious">): boolean {
+  return card.exhausted && card.unconscious !== true;
+}
+
 /** A hero an enemy holds, in play and in nobody's hands: a Captive of The Uruk-hai or a hero an enemy guards (Carried Away). It lies in the captive zone. */
 export function heldHero(card: CardInstance): boolean {
   return (card.guardedHero === true || card.captive === true) && card.zone === "captive";
@@ -247,6 +252,7 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "nightmare" ||
     zone === "modeCard" ||
     zone === "nightObjective" ||
+    zone === "riddleArea" ||
     zone === "captive" || zone === "grappled"
   );
 }

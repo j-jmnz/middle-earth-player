@@ -13,8 +13,9 @@ export const STRIP = 15;
 /**
  * `wordWidth` and `countWidth` are the text's width in the badge font ("3 captured" and "3"), `s` the UI scale. A pill that counts captured cards (`counted`) stands one row above the foot row, as the open pick's number does, clear of the engagement cost, the combat number and the
  * quest strip, which the foot of an enemy, a stage and an active location wear. The Havens Burn's and the held-card pills keep the foot row.
+ * `atEnd`: the pill of an exhausted character (its sideways footprint) stands at the right end of the card, clear of the name and the stat chip at its left, and keeps to the glyph and count so it stays short.
  */
-export function underMarkBox(rect: Rect, wordWidth: number, countWidth: number, s: number, counted: boolean): UnderBox {
+export function underMarkBox(rect: Rect, wordWidth: number, countWidth: number, s: number, counted: boolean, atEnd = false): UnderBox {
   const token = TOKEN * s;
   const room = rect.w - 4 * s;
   const top = rect.y + rect.h - token - FOOT_ROW * s - (counted ? token + 2 * s : 0);
@@ -25,7 +26,7 @@ export function underMarkBox(rect: Rect, wordWidth: number, countWidth: number, 
     const width = Math.min(room, words);
     return { kind: "words", x: rect.x + (rect.w - width) / 2, y: top, width, height: token };
   }
-  const kind = words <= room ? "words" : glyph <= room ? "count" : "number";
+  const kind = !atEnd && words <= room ? "words" : glyph <= room ? "count" : "number";
   const width = kind === "words" ? words : kind === "count" ? glyph : Math.min(room, countWidth + 10 * s);
-  return { kind, x: rect.x + (rect.w - width) / 2, y: top, width, height: token };
+  return { kind, x: atEnd ? rect.x + rect.w - width - 2 * s : rect.x + (rect.w - width) / 2, y: top, width, height: token };
 }

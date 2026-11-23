@@ -16,3 +16,6 @@ export function lootLeaveOutWords(options: number, size: number): { verb: string
 export function lootDeckWords(left: number): { text: string; loses: boolean; speech: string } {
   return { text: `${left} left`, loses: false, speech: `${left === 0 ? "No cards" : left === 1 ? "1 card" : `${left} cards`} left in the loot deck` };
 }
+
+/** The label of a loot card in its location's preview, where an attachment says "Attachment". */
+export const LOOT_ROLE = "Guarded loot";

@@ -112,7 +112,8 @@ export function branchThreat(choose: ChooseInstruction, optionId: string): numbe
   return null;
 }
 
-export type PickWords = { verb: string; prompt: string; owned?: true };
+// `title`: the sheet's title when it is not the card that opened the window (the Ring's question, which a riddle card opened).
+export type PickWords = { verb: string; prompt: string; owned?: true; title?: string };
 
 /** What a Pick asks for, from the instruction that uses the picked card: the verb for the button and a prompt sentence. */
 export function pickWords(pick: Instruction, next: Instruction | undefined, names: ChoiceNames, sourceId: string | null, restricted = 2, game?: ScenarioState, amountNow?: number, after?: readonly Instruction[]): PickWords {

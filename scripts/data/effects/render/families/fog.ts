@@ -5,8 +5,8 @@ type Made = { text: string; read: readonly string[] };
 
 export const FOG_TEMPLATES: Readonly<Record<string, (i: Obj) => Made>> = {
   SplitToOwnStage: (i) => ({
-    text: `the acting player leaves the stage the players share for a stage and a staging area of his own: the quest deck's card with code ${str(i.code)} becomes his stage, side B up, and its When Revealed effects resolve for him; the others keep the shared stage and its staging area, this card with them; from then on each area resolves as if only its players were in the game, and a stage no player is at stays in play (nothing when the player is not at the shared stage or no copy is left)`,
-    read: ["code"],
+    text: `the acting player leaves the stage the players share for a stage and a staging area of his own: the quest deck's card with code ${str(i.code)} becomes his stage, side B up, and its When Revealed effects resolve for him; the others keep the shared stage and its staging area, this card with them; from then on each area resolves as if only its players were in the game, and a stage no player is at stays in play${i.keepActive === true ? "; a player alone at the shared stage keeps his active location, which is not in the staging area" : ""} (nothing when the player is not at the shared stage or no copy is left)`,
+    read: ["code", "keepActive"],
   }),
   ReturnToSharedStage: (i) => ({
     text: `the acting player's own stage goes back to the quest deck with no progress and he is at the stage with code ${str(i.code)} again: the enemies, locations and active location of his area join its staging area (engaged enemies stay engaged), and he joins the players there or takes the stage when none is; once every player shares one area the areas are the shared one again (nothing when he is not at another stage)`,
@@ -31,7 +31,7 @@ export const FOG_CONDITIONS: Readonly<Record<string, (c: Obj, ctx: Ctx) => Made>
 };
 
 export const FOG_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
-  SplitToOwnStage: [{ verb: "SplitToOwnStage", code: "148004" }],
+  SplitToOwnStage: [{ verb: "SplitToOwnStage", code: "148004" }, { verb: "SplitToOwnStage", code: "132069", keepActive: true }],
   ReturnToSharedStage: [{ verb: "ReturnToSharedStage", code: "148003" }],
   CancelRevealed: [{ verb: "CancelRevealed" }],
   AdvanceToStage: [{ verb: "AdvanceToStage", code: "142067" }, { verb: "AdvanceToStage", code: "50903", again: true }],

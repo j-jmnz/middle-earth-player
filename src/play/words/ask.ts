@@ -15,6 +15,7 @@ import { tradeWords } from "./scenarios/uncharted.ts";
 import { wilderlandAsk } from "./scenarios/wilderland.ts";
 import { lootLeaveOutWords } from "./loot.ts";
 import { burglePickWords } from "./scenarios/the-hobbit/burgle.ts";
+import { riddleAsk } from "./scenarios/the-hobbit/riddles.ts";
 
 /** What the instruction a player is asked about says to ask. `queue` is the instructions after the asked one (`queue[0]` is the next instruction), `picked` the card the effect last picked. */
 /** Which of an expanded discard's picks this is, "Card 2 of 4."; none for a discard of one. */
@@ -45,7 +46,9 @@ export function askWords(a: {
   // The hand card step 3 of a burgle attempt makes the first player discard: before the asks, since the burgle's effect frame stands on the card that has the burgle effect and its records may ask too.
   const burgling = burglePickWords(game, ctx, names, effectId, game.window?.kind === "choose" ? game.window.seat : game.firstPlayer);
   if (burgling) return burgling;
-  const written = asksPick({ game, ctx, names, instruction: asked, source, amountNow, options, ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });
+  // The same Pick queued again (a Repeat's later rounds), counted when an entry has a `countdown`.
+  const again = instruction.verb === "Pick" ? () => queue.filter((later) => JSON.stringify(later) === JSON.stringify(instruction)).length : undefined;
+  const written = asksPick({ game, ctx, names, instruction: asked, source, amountNow, options, ...(again ? { again } : {}), ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });
   if (written) return a.place ? withPlace(written, a.place) : written;
   const traded = instruction.verb === "TradeDamageForThreat" && instruction.character ? game.cards[instruction.character] : undefined;
   if (instruction.verb === "TradeDamageForThreat" && traded) {
@@ -54,6 +57,8 @@ export function askWords(a: {
   }
   // The Burglar's Turn's Setup with more candidates than the loot deck takes (22024:A:2).
   if (instruction.verb === "BuildLootDeck") return lootLeaveOutWords(options.length, instruction.size);
+  const riddle = riddleAsk(instruction, queue, game, ctx, names);
+  if (riddle) return riddle;
   const words = (
     grappleAsk(instruction, source, names, grappleFactsOf(game, ctx, instruction, picked)) ??
     wilderlandAsk(instruction, source, names, queue[0], picked, { game, ctx, options }) ??

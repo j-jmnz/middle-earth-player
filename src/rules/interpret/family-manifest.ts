@@ -71,11 +71,13 @@ export type AttachedHook = (state: ScenarioState, id: string, host: string, ctx:
 
 /** Who may attack and defend, and where an undefended attack's damage goes, for the families that change it (src/rules/combat/combat.ts, src/rules/engine/legal.ts).
  * `defense` and `attack` return why the character may not, or null; the first family with a reason wins. `undefended` returns the characters an undefended attack's
- * damage may go to instead of the heroes, or an empty list; `candidates` is the player's characters, read only when asked. The first non-empty answer wins. */
+ * damage may go to instead of the heroes, or an empty list; `candidates` is the player's characters, read only when asked. The first non-empty answer wins.
+ * `damaged` is told what the damage of the enemy attack in progress did (`before` and `after` the damage) and returns the state it leaves (Venom, `poison`); every family's runs, in list order. */
 export type CombatHooks = {
   readonly defense?: (state: ScenarioState, defender: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, defenderId: string) => string | null;
   readonly attack?: (state: ScenarioState, enemyId: string, attacker: PrintedCard, target: PrintedCard, attackerId: string) => string | null;
   readonly undefended?: (state: ScenarioState, candidates: () => readonly string[], cards: ReadonlyMap<string, PrintedCard>) => readonly string[];
+  readonly damaged?: (before: ScenarioState, after: ScenarioState, ctx: ReduceContext, steps: EngineStep[]) => ScenarioState;
 };
 
 /** Whether a family bars a seat from optionally engaging an enemy in the staging area (rr.optional-engagement): true bars it. Asked after the core's own bars, with the cards the game plays. */
@@ -106,6 +108,8 @@ export type RulesFamily = {
   /** Every verb `run` answers, so a test can check them against the verbs the catalog side declares. */
   readonly verbs: readonly Instruction["verb"][];
   readonly run: Runner;
+  /** The verbs of `verbs` that act on the areas themselves, so they run on the whole state, not on the acting seat's view of it (runInstruction in interpret.ts). */
+  readonly wholeState?: readonly Instruction["verb"][];
   /** Optional hooks into the core; each is called through rulesFamilies() (src/rules/interpret/family-hooks.ts), in list order unless the hook says otherwise. */
   readonly settle?: SettleHooks;
   readonly travel?: TravelHooks;

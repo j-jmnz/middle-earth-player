@@ -17,7 +17,6 @@ import { DATA_DIR } from "./paths.ts";
 const DIFFERENCES: Readonly<Record<string, string>> = {
   "03003": "punctuation: the card has no comma before the last icon (\"[tactics] or [spirit]\"); the erratum has one",
   "131013": "wording: the card says \"Discard Thrór's Map\", the erratum (FAQ 1.9, 2017) \"Exhaust Thrór's Map\"; the game plays the later official printing (Dwarves of Durin, later Over Hill and Under Hill), which the FAQ never recorded (docs/brief.md, Player card readings)",
-  "06117": "punctuation: the card has no comma before \"or take 1 hidden card\"; the erratum has one",
   "06157": "punctuation: the card has no comma before \"or reveals\"; the erratum has one",
   "144067": "wording: the card (the campaign card, LoS 67) reads \"change hero cards without\"; the erratum \"change hero cards he controls without\"; the ledger was read from the scan, and each player changes only their own heroes in either wording. No later printing was found online",
 };

@@ -21,7 +21,7 @@ describe("132037:A:1 Fighting Among Friends (the Wilderland set's words): each r
   it("counts the committed non-Baggins characters outside the named sphere", () => {
     const made = make({ phase: "Quest", deck: ["132037", "f0", "f0"], heroes: [bilbo(0), "01001", "01004", "01007"], committed: ["132001", "01001", "01004", "01007"] });
     const sheet = sheetOf(made, revealFromTop(made.state, made.ctx, "132037", []).state);
-    expect(sheet?.kind === "pick" ? sheet.note : "").toBe("Fighting Among Friends: as the first player, name a sphere. Each committed non-Baggins character outside it is removed from the quest.");
+    expect(sheet?.kind === "pick" ? sheet.note : "").toBe("Fighting Among Friends: name a sphere. Each committed non-Baggins character outside it is removed from the quest.");
     expect(sheet?.kind === "pick" ? sheet.options.map((option) => option.label) : []).toEqual([
       "Name Leadership: 2 characters leave the quest",
       "Name Lore: 3 characters leave the quest",

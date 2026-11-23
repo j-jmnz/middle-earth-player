@@ -10,6 +10,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import { embassyPairNow } from "../readouts/black-gate.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { ringBearerId } from "../../rules/families/burden/deck.ts";
+import { poisonOf } from "../../rules/families/poison/poison.ts";
 import { frameScope, hostOf, resolveAmount } from "../../rules/interpret/amounts.ts";
 import { holds } from "../../rules/interpret/conditions.ts";
 import { pickCandidates } from "../../rules/interpret/pick.ts";
@@ -18,7 +19,7 @@ import { effectById, effectsOf } from "../../rules/windows/listen.ts";
 
 import { ASKS_BY_SCENARIO } from "./asks/index.ts";
 import type { ChoiceNames, PickWords } from "./choice.ts";
-import { matchOf } from "./record-path.ts";
+import { matchOf, repeatTimesOf, walk, type PathMatch } from "./record-path.ts";
 import { askedSeat, seatSays } from "./seat.ts";
 
 /**
@@ -29,7 +30,7 @@ export type Text = string | readonly { when?: Condition; text: string }[];
 
 /**
  * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{picked}` (the card an Each or an earlier Pick of the record chose, in a note too; in a caution, the card of the row it is about), `{host}` (the card the record's card lies on), `{subject}` (the card that triggered the record: the ally that entered play), `{pair}` (the Embassy's pair being decided: the player card with its owner and the encounter card it is paired with) and `{ringBearer}` (the hero with the Ring-bearer trait), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
- * has none), `{left}` (the damage an AssignDamage still has to place, counting the step asked: its note only), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
+ * has none), `{left}` (the damage an AssignDamage still has to place, counting the step asked: its note only), `{countdown}` (an entry with `countdown`: "2 of 4"), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
  * - `note`: the sentence over a Pick or a Choose (the entry keyed with the instruction's verb).
  * - `why`: the reason the window opened. It is said after the card's title and before the note, "Card: why note" ("Player 1, Card: why note" when owned and two-handed).
  * - `owned`: one player's own choice. Two-handed the sentence leads with the player and the sheet adds no "Player N chooses."; solo it has no lead, and a note with no `why` is capitalised.
@@ -37,6 +38,8 @@ export type Text = string | readonly { when?: Condition; text: string }[];
  * - `labels`: the rows of a Pick that are no card, by option id ("skip", "done"). A key that names a card is refused.
  * - `label`: the row of one branch of a Choose (the entry keyed with the option id).
  * - `bind`: a name for each number a template says, as the `Amount` the engine reads.
+ * - `xRows`: the rows of a ChooseX (the entry keyed with the verb `ChooseX`), one for each number X the player may take: `label` says `{x}` and each `bind` name, and `less` names `{<name>}`, the amount `of` less X and at
+ *   least `min`, with its `unit` ("4 cards"), so "Spend {x}: reveal {reveals}" says what each number buys.
  * - `named`: a name for each card a template says, as the `PickSpec` that finds it for the seat asked: the card's name when exactly one card matches, else the words `otherwise` ("your highest-cost ally"), so a row names the card it takes when there is no second step to choose; `{<name>Cost}` says that card's printed cost.
  * - `caution`: the two-tap warning, said as "Tap again: ..." when `when` holds. It belongs to a row: on a Pick `when` is read once for each row with `picked` set to that row's id, so the confirm arms only on the row that loses
  *   the game, and on a Choose it is read for the branch the entry is keyed with. A warning that holds whatever is picked is a `when` that does not read `picked`; there is no sheet-wide caution.
@@ -49,6 +52,9 @@ export type Ask = {
   label?: Text;
   labels?: Readonly<Record<string, Text>>;
   bind?: Readonly<Record<string, Amount>>;
+  /** Marks a Pick the record's Repeat runs (Forest Stream's four discards): `{countdown}` says "n of m", m the Repeat's count read from the record, or fewer when the thing counted `against` (the poison under the characters offered) runs out. */
+  countdown?: { against: "poison" };
+  xRows?: { label: Text; less?: { name: string; of: Amount; min: number; unit: string } };
   named?: Readonly<Record<string, { pick: PickSpec; otherwise: string }>>;
   caution?: { when: Condition; text: Text };
 };
@@ -71,6 +77,8 @@ export type AskFacts = {
   cause?: Cause;
   source: string | null;
   amountNow?: number;
+  // How many times the same Pick is queued again after the one asked (a Repeat expanded in the queue), read only for an entry with `countdown`.
+  again?: () => number;
   options?: readonly string[];
   at?: AskAt | null;
 };
@@ -95,7 +103,7 @@ export function templatesOf(entry: Ask): string[] {
 
 /** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `subject`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` and `named` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", "picked", "host", "subject", "ringBearer", "pair", "left", "dealt", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...Object.keys(entry.named ?? {}), ...Object.keys(entry.named ?? {}).map((name) => `${name}Cost`)]);
+  const known = new Set(["card", "owner", "x", "picked", "host", "subject", "ringBearer", "pair", "left", "dealt", "pursuitLimit", ...(entry.countdown != null ? ["countdown"] : []), ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...(entry.xRows?.less ? [entry.xRows.less.name] : []), ...Object.keys(entry.named ?? {}), ...Object.keys(entry.named ?? {}).map((name) => `${name}Cost`)]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -113,6 +121,8 @@ export function fill(template: string, values: Readonly<Record<string, string | 
 type Values = Record<string, string | number | undefined>;
 type Hit = { entry: Ask; values: Values; scope: ReturnType<typeof frameScope> };
 
+const candidatesOf = (a: AskFacts, id: string | undefined, code: string | undefined) => [id ? effectById(a.ctx, id) : undefined, ...(code ? effectsOf(a.ctx, code) : [])];
+
 /** The table of the game's own scenario (its asks file), or undefined when it has none. `by` is the barrel's `ASKS_BY_SCENARIO`. */
 export const asksOfScenario = (game: ScenarioState, by: Readonly<Record<string, AsksTable>> = ASKS_BY_SCENARIO): AsksTable | undefined => by[game.scenarioId];
 
@@ -123,6 +133,11 @@ const tableOf = (a: AskFacts, table?: AsksTable): AsksTable | undefined => table
  * instruction's cause first, then the frame's effect, then the records of the card). A record that holds the very instruction, or an equal copy, beats one that fits only as a copy the engine filled in.
  */
 export function askAt(a: AskFacts, table?: AsksTable): AskAt | null {
+  return askAtBy(a, table, (instructions) => matchOf(instructions, a.instruction));
+}
+
+// askAt with the way the record's instruction is found: askAt looks for the instruction asked, the ChooseX words for the record's one ChooseX (the Choose it opens is the engine's, no record holds it).
+function askAtBy(a: AskFacts, table: AsksTable | undefined, find: (instructions: readonly Instruction[]) => PathMatch | null): AskAt | null {
   const entries = tableOf(a, table);
   if (!entries) return null;
   const ids = new Set(Object.keys(entries).map((key) => key.slice(0, key.indexOf(" "))));
@@ -130,9 +145,9 @@ export function askAt(a: AskFacts, table?: AsksTable): AskAt | null {
   const id = a.cause && "effect" in a.cause ? a.cause.effect : a.effectId;
   const code = a.source ? (a.game.cards[a.source]?.code ?? a.source) : undefined;
   let best: { id: string; path: string; rank: number } | null = null;
-  for (const record of [id ? effectById(a.ctx, id) : undefined, ...(code ? effectsOf(a.ctx, code) : [])]) {
+  for (const record of candidatesOf(a, id, code)) {
     if (!record || !ids.has(record.id)) continue;
-    const match = matchOf(record.instructions, a.instruction);
+    const match = find(record.instructions);
     if (match && (best === null || match.rank < best.rank)) best = { id: record.id, path: match.path, rank: match.rank };
   }
   return best ? { id: best.id, path: best.path, table: entries } : null;
@@ -151,6 +166,16 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   if (a.instruction.verb === "LocateTest" && templatesOf(entry).some((template) => placeholdersOf(template).includes("dealt"))) {
     const dealt = (a.instruction.dealtIds ?? []).map((id) => `${a.names.card(id)}${printedOf(a.ctx.cards, a.game.cards[id]?.code ?? "").keywords.pass === true ? " (PASS)" : " (no PASS)"}`);
     values.dealt = dealt.length > 0 ? dealt.join(", ") : "none yet";
+  }
+  // "2 of 4": the discards done so far, this one, and the most the poison still on the characters offered lets the repeats reach.
+  if (entry.countdown != null && a.again) {
+    const code = a.source ? (a.game.cards[a.source]?.code ?? a.source) : undefined;
+    const id = a.cause && "effect" in a.cause ? a.cause.effect : a.effectId;
+    const times = candidatesOf(a, id, code).reduce<number | null>((found, record) => found ?? (record ? repeatTimesOf(record.instructions, a.instruction) : null), null);
+    const left = a.again() + 1;
+    const done = (times ?? left) - left;
+    const poison = (a.options ?? []).reduce((sum, option) => sum + poisonOf(a.game, option), 0);
+    values.countdown = `${done + 1} of ${done + Math.max(1, Math.min(left, poison))}`;
   }
   values.host = hostId ? a.names.card(hostId) : "Its host";
   // The card an Each or an earlier Pick of the record chose, for the question it opens ("Fanuidhol: spend 1 resource from {picked}'s pool", 04016:A:1).
@@ -186,10 +211,10 @@ function found(a: AskFacts, tail: string | undefined, table?: AsksTable): Hit | 
 const scopeOf = (a: AskFacts, hit: Hit, picked?: string) => ({ actor: hit.scope.actor, sourceId: a.source, returned: 0, ...(hit.scope.subject ? { subject: hit.scope.subject } : {}), ...(picked ? { picked: [picked] } : hit.scope.picked ? { picked: hit.scope.picked } : {}) });
 
 // A `Text` as it reads now: the first variant whose condition holds, filled. `picked` is the row a caution is about. Null when no variant holds or a placeholder has no value.
-function said(a: AskFacts, hit: Hit, text: Text, picked?: string): string | null {
+function said(a: AskFacts, hit: Hit, text: Text, picked?: string, more?: Values): string | null {
   const scope = scopeOf(a, hit, picked);
   const chosen = typeof text === "string" ? text : text.find((variant) => variant.when === undefined || holds(a.game, variant.when, scope, a.ctx))?.text;
-  return chosen === undefined ? null : fill(chosen, picked ? { ...hit.values, picked: a.names.card(picked) } : hit.values);
+  return chosen === undefined ? null : fill(chosen, { ...hit.values, ...(picked ? { picked: a.names.card(picked) } : {}), ...more });
 }
 
 // The warning of one row: its text when the entry's condition holds with that row picked.
@@ -249,4 +274,38 @@ export function asksOption(a: AskFacts, optionId: string, table?: AsksTable): { 
   const label = hit.entry.label == null ? undefined : (said(a, hit, hit.entry.label) ?? undefined);
   const caution = cautionOf(a, hit);
   return label === undefined && caution === undefined ? undefined : { ...(label !== undefined ? { label } : {}), ...(caution !== undefined ? { caution } : {}) };
+}
+
+/** The Choose a ChooseX opens: one branch for each number, `x<n>`, each setting X. */
+export const isXChoice = (choose: Extract<Instruction, { verb: "Choose" }>): boolean =>
+  choose.options.length > 0 && choose.options.every((option) => /^x\d+$/.test(option.id) && option.instructions.length === 1 && option.instructions[0]?.verb === "SetX");
+
+const onlyChooseX = (instructions: readonly Instruction[]): PathMatch | null => {
+  const paths: string[] = [];
+  walk(instructions, (instruction, _next, _after, path) => {
+    if (instruction.verb === "ChooseX") paths.push(path);
+  });
+  return paths.length === 1 && paths[0] !== undefined ? { rank: 2, path: paths[0] } : null;
+};
+
+/**
+ * The words over the Choose that a ChooseX opens, from the entry keyed with the record's `ChooseX`: its sentence, and the row of each number from `xRows`. The record's ChooseX is the only one in its record (a record with
+ * two is not worded, the chain of word families runs), found by the record the queued instruction came from.
+ */
+export function asksChooseX(a: AskFacts, table?: AsksTable): { note: string; owned: boolean; effectId: string; row: (optionId: string) => string | undefined } | undefined {
+  const at = askAtBy(a, table, onlyChooseX);
+  const hit = found({ ...a, at }, "ChooseX", table);
+  const note = hit ? sentence(a, hit) : null;
+  if (!hit || !at || note === null) return undefined;
+  const rows = hit.entry.xRows;
+  const row = (optionId: string): string | undefined => {
+    const x = /^x(\d+)$/.exec(optionId)?.[1];
+    if (!rows || x === undefined) return undefined;
+    const less = rows.less;
+    const base = less ? resolveAmount(a.game, less.of, hit.scope, a.ctx) : 0;
+    const left = less ? Math.max(less.min, base - Number(x)) : 0;
+    const more: Values = { x: Number(x), ...(less ? { [less.name]: `${left} ${less.unit}${left === 1 ? "" : "s"}` } : {}) };
+    return said(a, hit, rows.label, undefined, more) ?? undefined;
+  };
+  return { note, owned: hit.entry.owned === true && a.game.seatCount > 1, effectId: at.id, row };
 }

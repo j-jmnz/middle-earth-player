@@ -3,7 +3,7 @@ import { campaignScenario, scenarioDefinition, stageOf, type AnyScenarioData, ty
 import { EFFECTS } from "../../src/effects/index.ts";
 import { isCharacterType, printedFromCard, type PrintedCard } from "../../src/rules/core/printed.ts";
 import { blankScenario, updateCard, withThreat } from "../../src/rules/core/state.ts";
-import { attachTo, spawn, type Destination } from "../../src/rules/core/zones.ts";
+import { attachTo, moveCard, spawn, type Destination } from "../../src/rules/core/zones.ts";
 import type { ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { attachmentTargets } from "../../src/rules/player/planning.ts";
 import { holdCaptive } from "../../src/rules/families/captives/index.ts";
@@ -73,7 +73,8 @@ export type Layout = {
   // `"easy"`: the scenario's Easy Mode card instead (The Hunt for the Dreadnaught, 40001:B:1).
   modeCard?: true | "easy";
   // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached).
-  attached?: readonly { code: string; to: string }[];
+  // `encounter`: an encounter card attached the way its own effect attaches it (zone attached, controlled by no one, not claimed): the Sack cards, the Troll Key and the Troll Purse.
+  attached?: readonly { code: string; to: string; encounter?: true }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
   committed?: readonly string[];
   // The pursuit value of The Uruk-hai, as its quest card's Setup set it (mec112.pursuit); absent: no tracker.
@@ -84,6 +85,10 @@ export type Layout = {
   under?: readonly { code: string; to: string }[];
   // The Night objective in play beside the current quest (The Stone of Erech, 50301:A:1): a code, or a code with its progress.
   night?: Entry;
+  // The scenario's saga hero (Bilbo Baggins in The Hobbit, the loadout deals him) is a hero of the first seat, with this many resources in his pool.
+  sagaHero?: { resources?: number };
+  // The table notes the cards placed in the encounter discard pile, as a Setup that sets `noteEncounterDiscards` leaves it (We Must Away, Ere Break of Day: the Key and the Purse hear their own discard).
+  noteEncounterDiscards?: true;
   // Other zones that hold a list of cards (a second deck, a named pile).
   piles?: Partial<Record<PileZone, readonly Entry[]>>;
 };
@@ -116,7 +121,7 @@ function loadedWorld(scenarioId: string): Loaded {
   const campaign = loadCampaigns().find((one) => one.scenarios.includes(scenarioId));
   if (!campaign) throw new Error(`no campaign plays ${scenarioId}`);
   const dealt = campaignScenario(data);
-  const codes = new Set([...dealt.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])), ...dealt.campaignPlaced, ...(dealt.campaignCard !== undefined ? [dealt.campaignCard] : []), ...dealt.stages, ...gameCodes(campaign, data), ...sagaStartCodes(data), ...(data.nightmare ? [data.nightmare.setupCard, ...data.nightmare.cards.map((card) => card.code), ...(data.nightmare.questCards ?? [])] : [])]);
+  const codes = new Set([...dealt.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])), ...dealt.campaignPlaced, ...(dealt.campaignCard !== undefined ? [dealt.campaignCard] : []), ...dealt.stages, ...gameCodes(campaign, data), ...sagaStartCodes(data), ...(data.treasures ?? []), ...(data.nightmare ? [data.nightmare.setupCard, ...data.nightmare.cards.map((card) => card.code), ...(data.nightmare.questCards ?? [])] : [])]);
   const cards = new Map<string, PrintedCard>();
   for (const code of codes) {
     const card = cardsByCode().get(code);
@@ -181,6 +186,11 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     for (const item of layout.deckOf ?? []) if (dealtTo(item, seat)) state = spawn(state, dealtCode(item), { zone: "deck", seat }, "down").state;
   }
   if (layout.heroResources) for (const id of Object.keys(state.cards)) if (state.cards[id]?.zone === "heroes") state = updateCard(state, id, { resources: layout.heroResources });
+  if (layout.noteEncounterDiscards) state = { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "noteEncounterDiscards", amount: 1, until: "endOfGame" }] };
+  if (layout.sagaHero && "hero" in (world.data.sagaStart ?? {})) {
+    const saga = spawn(state, (world.data.sagaStart as { hero: string }).hero, { zone: "heroes", seat: 0 });
+    state = updateCard(saga.state, saga.id, { resources: layout.sagaHero.resources ?? 0 });
+  }
   const put = (code: string, dest: Destination, tokens: Entry = code, face?: "up" | "down"): void => {
     const row = entry(tokens);
     const spawned = spawn(state, code, dest, face);
@@ -206,6 +216,12 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item);
   for (const attachment of layout.attached ?? []) {
     const host = idOf(state, attachment.to);
+    if (attachment.encounter) {
+      const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
+      state = attachTo(moveCard(spawned.state, spawned.id, { zone: "attached" }), spawned.id, host);
+      state = updateCard(state, spawned.id, { controller: null });
+      continue;
+    }
     const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
     state = attachTo(spawned.state, spawned.id, host);
     // An objective attached to a character a player controls is a claimed one, controlled by that player (The Treachery of Rhudaur's Clues); one on an enemy or a location (Saruman's Staff, Thaurdir's burdens) is not.

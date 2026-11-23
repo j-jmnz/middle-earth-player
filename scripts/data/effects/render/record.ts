@@ -82,7 +82,7 @@ const COSTS: Readonly<Record<string, (c: Obj) => string | null>> = {
   exhaustSelf: () => "exhaust this card",
   discardSelf: () => "discard this card",
   exhaustHost: () => "exhaust the attached card",
-  raiseThreat: (c) => `raise your threat by ${str(c.amount)}`,
+  raiseThreat: (c) => (c.each === true ? `raise each player's threat by ${str(c.amount)}` : `raise your threat by ${str(c.amount)}`),
   damageSelf: (c) => `deal ${str(c.amount)} damage to this card`,
   returnSelfToHand: () => "return this card to hand",
   resources: (c) => `pay ${str(c.amount)} ${typeof c.sphere === "string" ? `${c.sphere} ` : ""}resource(s)${c.from === "self" ? " from this card's pool" : c.from === "host" ? " from the host's pool" : ""}`,
@@ -97,7 +97,7 @@ export function renderCost(value: unknown, ctx: Ctx): string {
   if (Array.isArray(value)) return value.map((one) => renderCost(one, ctx)).join(" and ");
   if (!isObj(value) || typeof value.kind !== "string") return jsonOf(ctx, "cost", value);
   const said = COSTS[value.kind]?.(value);
-  return said ? done(ctx, said, value, ["kind", "amount", "sphere", "from", "code", "name"]) : jsonOf(ctx, "cost", value);
+  return said ? done(ctx, said, value, ["kind", "amount", "sphere", "from", "code", "name", "each"]) : jsonOf(ctx, "cost", value);
 }
 
 function renderSubject(value: unknown, ctx: Ctx): string {

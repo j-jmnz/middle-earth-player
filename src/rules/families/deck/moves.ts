@@ -136,6 +136,12 @@ export function shuffleDiscardIn(state: ScenarioState, instruction: Verb<"Shuffl
   return shuffleSeatDeck(next, seat);
 }
 
+// ShuffleSetAsideIntoDeck: a set-aside card with the printed code goes into the acting player's deck, shuffled in. Nothing happens when none is set aside.
+export function shuffleSetAsideIn(state: ScenarioState, code: string, seat: number): ScenarioState {
+  const id = state.setAside.find((other) => state.cards[other]?.code === code);
+  return id && state.seats[seat] ? shuffleSeatDeck(moveCard(state, id, { zone: "deck", seat }), seat) : state;
+}
+
 // RemoveDiscardFromGame: every card in the actor's discard pile is removed from the game (900908:A:1), in discard order.
 export function removeDiscardFromGame(state: ScenarioState, focus: Focus): ScenarioState {
   let next = state;

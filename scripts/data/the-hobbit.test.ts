@@ -71,7 +71,7 @@ describe("The Hobbit cycle", () => {
     // The Sack cards, the three Trolls and Troll Cave, the Erebor treasure cards and the treasure Bilbo's Magic Ring are set aside, the second encounter deck of the Misty Mountains is its own pile.
     expect(loadAnyScenario("we-must-away-ere-break-of-day").cards.filter((card) => card.pile === "setAside" && byCode.get(card.code)?.traits.includes("Sack"))).toHaveLength(7);
     expect(loadAnyScenario("the-lonely-mountain").cards.filter((card) => card.pile === "setAside" && byCode.get(card.code)?.type === "treasure")).toHaveLength(5);
-    expect(loadAnyScenario("flies-and-spiders").cards.find((card) => card.code === "132019")).toMatchObject({ pile: "setAside", normal: 3, easy: 3 });
+    expect(loadAnyScenario("flies-and-spiders").cards.find((card) => card.code === "132019")).toMatchObject({ pile: "setAside", normal: 4, easy: 4 });
     expect(loadAnyScenario("over-the-misty-mountains-grim").cards.filter((card) => card.pile === "encounterDeck2").reduce((sum, card) => sum + card.normal, 0)).toBe(30);
   });
 

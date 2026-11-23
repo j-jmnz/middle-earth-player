@@ -76,6 +76,8 @@ export type ZoneName =
   | "modeCard"
   // The Night objective beside the current quest (docs/scenarios/standalone-scenarios/the-stone-of-erech.md, The Stone of Erech): in play, controlled by nobody, one card at a time (families/erech/).
   | "nightObjective"
+  // The riddle area (hob.riddle-area, families/riddles/): stage 2 of Dungeons Deep and Caverns Dim and the Gollum enemy lie in it, in play, outside the staging area; the objective Ring is attached to Bilbo Baggins, who stays among his seat's heroes.
+  | "riddleArea"
   // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by nobody; the host is the Watcher.
   | "captive"
   // Out of play, facedown, under no player's control, still owned (`CardInstance.owner`): a card captured underneath another card (the host), or in a player's captured deck (no host, listed in `Seat.captured`; mec108.captured-cards, mec108.captured-deck).
@@ -150,6 +152,10 @@ export type CardInstance = {
   asAttachment?: true | "discard";
   // A player card lying faceup on an enemy as an attachment with no title and no game text, taken from the top of a deck (Nameless Thing, families/nameless): its printed cost is its only active part. Set only by AttachDeckTop, and cleared once the card has left the enemy.
   nameless?: true;
+  // A character made unconscious (Flies and Spiders, hob.unconscious-characters, families/poison): rotated 180 degrees on the table. It is also exhausted, which replaces ready and exhausted: it is neither for a filter (`state`), and only ReadyUnconscious readies it.
+  unconscious?: true;
+  // A card of a player deck attached facedown to a character as poison (hob.venom-poison, families/poison): out of play, zone under, hosted by the character, `owner` the seat whose deck it came from.
+  poison?: true;
   // The enemy Lost in Mirkwood's stage 4A named the nemesis, until it leaves play (18076:A:1, families/wilderland/nemesis.ts).
   nemesis?: true;
   // An objective a player claimed and attached to a hero: when it leaves that hero it returns to the staging area, uncontrolled
@@ -164,7 +170,7 @@ export type CardInstance = {
   carried?: true;
   // The named deck the card was dealt into, when that deck has a discard pile of its own (core/piles.ts): the card goes back to that discard pile, not the encounter discard pile, when it
   // leaves play (emce.evil-creatures-deck). Absent on every other card.
-  deck?: "evilCreatures" | "balrog" | "smaug";
+  deck?: "evilCreatures" | "balrog" | "smaug" | "sack";
 };
 
 export type Seat = {

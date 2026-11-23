@@ -1,5 +1,5 @@
 // Rules: rr.the-word-choose, rr.first-player, rr.neutral-cards (data/rules/entries.json); ledger line 132037:A:1. The choice words of the Wilderland set (the cards of the Wilderland encounter deck, 132035-132038) that more than one scenario deals.
-// A game reads only its own scenario's asks file, so each scenario that deals the set spreads this table into its own (`...WILDERLAND_ASKS`); only The Lonely Mountain does on this tree, and Flies and Spiders and The Battle of Five Armies, which deal 132037, will spread it when they land. An entry keys a record of a card the set holds.
+// A game reads only its own scenario's asks file, so each scenario that deals the set (Flies and Spiders, The Lonely Mountain, The Battle of Five Armies) spreads this table into its own (`...WILDERLAND_ASKS`), as the Goblins set's is (src/play/words/misty-mountain-goblins-asks.ts); an entry keys a record of a card the set holds.
 import type { PickSpec } from "../../catalog/boundary.ts";
 import { AUTHORED_EFFECTS } from "../../effects/authored/the-hobbit/set-wilderland.ts";
 
@@ -35,6 +35,6 @@ const rows = Object.fromEntries(
 
 export const WILDERLAND_ASKS: Readonly<Record<string, Ask>> = {
   // 132037 Fighting Among Friends. When Revealed: the first player names a sphere; each committed character outside it, a Baggins one excepted, is removed from the quest.
-  "132037:whenRevealed:1 @0 Choose": { owned: true, note: "{card}: as the first player, name a sphere. Each committed non-Baggins character outside it is removed from the quest." },
+  "132037:whenRevealed:1 @0 Choose": { owned: true, note: "{card}: name a sphere. Each committed non-Baggins character outside it is removed from the quest." },
   ...rows,
 };

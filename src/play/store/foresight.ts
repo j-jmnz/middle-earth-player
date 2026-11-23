@@ -12,6 +12,7 @@ import { destroyCard, modifiedStat, placeDamage } from "../../rules/core/keyword
 import { engagementCostOf, engagementForecast } from "../../rules/quest/quest.ts";
 import type { EngineStep, ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { flagged, inPlay, livingSeats } from "../../rules/core/state.ts";
+import { effectsOf } from "../../rules/windows/listen.ts";
 
 export type DamageOutcome = {
   damage: number;
@@ -31,10 +32,27 @@ function place(game: ScenarioState, ctx: ReduceContext, cardId: string, amount: 
   return placeDamage(game, cardId, amount, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-4"));
 }
 
-/** Whether discarding a card from play would lose the game now (a hero who carries Wormsbane, the One Ring's bearer): the reason, or null. */
+// "If X leaves play, the players lose the game" printed as a Forced-style line of its own (Bilbo Baggins, "If Bilbo Baggins leaves play, the players lose the game", 131001:A:3 and 132001:A:3): a record that hears the card leave play and loses the game. The engine applies
+// it when the record resolves, after the destruction, so a copy of the state that only destroys the card does not show it. A card in play whose record names the leaving card (Mendor's) counts too.
+function leavesPlayLoss(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
+  const leaving = game.cards[cardId];
+  const name = leaving ? ctx.cards.get(leaving.code)?.name : undefined;
+  if (!leaving || name == null || !inPlay(leaving.zone)) return null;
+  const loses = Object.values(game.cards).some((card) => inPlay(card.zone) && effectsOf(ctx, card.code).some((effect) => {
+    if (effect.timing !== "triggered" || effect.trigger !== "leftPlay" || effect.condition != null || !effect.instructions.some((instruction) => instruction.verb === "LoseGame")) return false;
+    const subject = effect.subject;
+    return subject === "self" ? card.id === cardId : typeof subject === "object" && subject.names?.includes(name) === true;
+  }));
+  return loses ? `${name} left play` : null;
+}
+
+/** Whether discarding a card from play would lose the game now (a hero who carries Wormsbane, the One Ring's bearer, Bilbo Baggins): the reason, or null. */
 export function discardLoss(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
   const after = destroyCard(game, cardId, ctx.cards, []);
-  return after.lost && !game.lost ? (after.lossReason ?? "The game is lost") : null;
+  if (after.lost && !game.lost) return after.lossReason ?? "The game is lost";
+  // A card that stayed in play (a destruction that something replaced) leaves no record to hear.
+  const left = after.cards[cardId];
+  return left == null || !inPlay(left.zone) ? leavesPlayLoss(game, ctx, cardId) : null;
 }
 
 /** What placing `damage` combat damage on a card would do now. */
@@ -54,7 +72,8 @@ export function damageOutcome(game: ScenarioState, ctx: ReduceContext, cardId: s
       }
     }
   }
-  return { damage, destroyed, loss: after.lost && !game.lost ? (after.lossReason ?? "The game is lost") : null, eliminated, spare };
+  const loss = after.lost && !game.lost ? (after.lossReason ?? "The game is lost") : destroyed ? leavesPlayLoss(game, ctx, cardId) : null;
+  return { damage, destroyed, loss, eliminated, spare };
 }
 
 /** The damage an enemy's attack would place on a defender now, before the shadow card (rr.step-6-4-4); with others declared, the pooled damage. */

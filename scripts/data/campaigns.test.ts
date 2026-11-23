@@ -28,7 +28,7 @@ describe("data/campaigns/index.json", () => {
       ["Haradrim", "cycle", 9],
       ["Vengeance of Mordor", "cycle", 9],
     ]);
-    // The Shadows of Mirkwood cycle is playable from its first scenario (The Hunt for Gollum), Dwarrowdelf from its first (Into the Pit) and The Hobbit from its first built scenario (The Lonely Mountain) and the Standalone scenarios cycle from The Massing at Osgiliath; the other cycles are locked.
+    // The Shadows of Mirkwood cycle is playable from its first scenario (The Hunt for Gollum), Dwarrowdelf from its first (Into the Pit), The Hobbit from a playable scenario and the Standalone scenarios cycle from The Massing at Osgiliath; the other cycles are locked.
     expect(index.filter((entry) => entry.playable && entry.kind !== "campaign").map((entry) => entry.id)).toEqual(["shadows-of-mirkwood", "dwarrowdelf", "the-hobbit", "standalone-scenarios"]);
     expect(index.filter((entry) => entry.kind === "cycle").every((entry) => entry.box === null)).toBe(true);
     // Every campaign is built, so none is locked.

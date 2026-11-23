@@ -5,7 +5,7 @@
 // The Assault on Osgiliath player cards, written from their card text (data/cards/AoO.json; data/printed holds no ledger for this pack, so
 // every intent goes through sendUnledgered): Faramir 06081:A:2, Sword of Morthond 06082:A:1 and A:2, Men of the West 06083:A:1, Knight of
 // Minas Tirith 06084:A:1, Gondorian Fire 06085:A:1 and A:2, Pelargir Shipwright 06086:A:1, Map of Earnil 06087:A:1 to A:3, Ranger Bow
-// 06088:A:2 and A:3, Forest Patrol 06089:A:1 and A:2, Palantir 06090:A:1.
+// 06088:A:1 and A:2, Forest Patrol 06089:A:1 and A:2, Palantir 06090:A:1.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
@@ -283,9 +283,9 @@ describe("Map of Earnil (06087:A:1, A:2, A:3)", () => {
   });
 });
 
-describe("Ranger Bow (06088:A:2, A:3)", () => {
+describe("Ranger Bow (06088:A:1, A:2)", () => {
   // "Attach to a Ranger character.": Beravor and Faramir (Ranger heroes) and the Ranger ally are offered; Éowyn and a plain ally are not.
-  lineSpec("06088:A:2", "Ranger Bow: Attach to a Ranger character", (effects) => {
+  lineSpec("06088:A:1", "Ranger Bow: Attach to a Ranger character", (effects) => {
     const tab = table(effects, { heroes: [{ code: BERAVOR, seat: 0 }, { code: FARAMIR, seat: 0 }, { code: EOWYN, seat: 0 }], allies: [{ code: RANGER, seat: 0 }, { code: ALLY, seat: 0 }], hand: [{ code: BOW, seat: 0 }] });
     const card = idsOf(tab, BOW);
     expect(hosts(tab, card)).toEqual([idsOf(tab, BERAVOR), idsOf(tab, FARAMIR), idsOf(tab, RANGER)].sort());
@@ -298,7 +298,7 @@ describe("Ranger Bow (06088:A:2, A:3)", () => {
 
   // "Action: Exhaust Ranger Bow and attached character to deal 1 damage to an enemy in the staging area.": the two Walls in the staging
   // area are offered, the engaged Target is not; the chosen Wall takes 1 damage, the Bow and Beravor are exhausted.
-  lineSpec("06088:A:3", "Ranger Bow: exhaust it and the character to deal 1 damage to an enemy in the staging area", (effects) => {
+  lineSpec("06088:A:2", "Ranger Bow: exhaust it and the character to deal 1 damage to an enemy in the staging area", (effects) => {
     const tab = bow(effects, [WALL, WALL]);
     const [first = "", second = ""] = tab.ids[WALL] ?? [];
     let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, BOW), effectId: "06088:action:1" }, tab.ctx);
@@ -310,7 +310,7 @@ describe("Ranger Bow (06088:A:2, A:3)", () => {
   });
 
   // No enemy in the staging area, or Beravor exhausted: not offered.
-  it("06088:A:3 Ranger Bow: not offered with no enemy in the staging area or with the character exhausted", () => {
+  it("06088:A:2 Ranger Bow: not offered with no enemy in the staging area or with the character exhausted", () => {
     expect(triggers(bow(EFFECTS, []).state, bow(EFFECTS, []))).not.toContain("06088:action:1");
     const tab = bow(EFFECTS, [WALL]);
     expect(triggers(updateCard(tab.state, idsOf(tab, BERAVOR), { exhausted: true }), tab)).not.toContain("06088:action:1");

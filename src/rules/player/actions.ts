@@ -14,6 +14,7 @@ import { printedOf } from "../core/printed.ts";
 import { flagged, inPlay, type ScenarioState } from "../core/state.ts";
 import { hostLostToCost, payUsage, usable, usageReason } from "./usage.ts";
 import { announcePlayerAbility } from "../families/deck/pressure.ts";
+import { areaHeadOf, headOf, isolatedAreas, stageSeat } from "../families/breaking/areas.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 
@@ -44,6 +45,9 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
   // An encounter card attached to a hero belongs to no player: the hero's controller uses its Action (41043:A:2, Guilty Conscience).
   const holder = instance.controller ?? (instance.zone === "attached" && instance.host ? (state.cards[instance.host]?.controller ?? null) : null);
   if (!effect || (holder !== state.activeSeat && !shared && effect.limit !== "oncePerRoundEachPlayer" && !effect.anyPlayer)) return undefined;
+  // Only players that share a staging area interact (hob.staging-area-creating, mec108.create-staging-area): the Action of a card in another area is out of reach, a quest stage, a location or an enemy of that area, and a player card its controller's area holds.
+  const home = isolatedAreas(state) ? (stageSeat(state, cardId) ?? areaHeadOf(state, cardId) ?? holder) : null;
+  if (home != null && headOf(state, home) !== headOf(state, state.activeSeat)) return undefined;
   const scope = { actor: state.activeSeat, sourceId: cardId, returned: 0 };
   return !effect.condition || holds(state, effect.condition, scope, ctx) ? effect : undefined;
 }

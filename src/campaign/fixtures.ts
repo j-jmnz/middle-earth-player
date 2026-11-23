@@ -82,6 +82,10 @@ import woodlandFixtures from "./fixtures/the-woodland-realm.json";
 import minesFixtures from "./fixtures/the-mines-of-moria.json";
 import khazadFixtures from "./fixtures/escape-from-khazad-dum.json";
 import dreadnaughtFixtures from "./fixtures/the-hunt-for-the-dreadnaught.json";
+import grimFixtures from "./fixtures/over-the-misty-mountains-grim.json";
+import spidersFixtures from "./fixtures/flies-and-spiders.json";
+import dayFixtures from "./fixtures/we-must-away-ere-break-of-day.json";
+import dimFixtures from "./fixtures/dungeons-deep-and-caverns-dim.json";
 import mountainFixtures from "./fixtures/the-lonely-mountain.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
@@ -183,6 +187,10 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-mines-of-moria": minesFixtures,
   "escape-from-khazad-dum": khazadFixtures,
   "the-hunt-for-the-dreadnaught": dreadnaughtFixtures,
+  "we-must-away-ere-break-of-day": dayFixtures,
+  "over-the-misty-mountains-grim": grimFixtures,
+  "dungeons-deep-and-caverns-dim": dimFixtures,
+  "flies-and-spiders": spidersFixtures,
   "the-lonely-mountain": mountainFixtures,
 };
 

@@ -12,7 +12,7 @@ import { attachmentLeaves } from "../families/angmar/reanimate/attached.ts";
 import { areaHeadOf } from "../families/breaking/areas.ts";
 import { discardedFromDeck, joinStormcallerArea } from "../families/stormcaller/zone.ts";
 import { joinUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
-import { deckRoute, isDeckZone, joinPile, leavePile, type PileZone } from "./piles.ts";
+import { deckRoute, isDeckZone, joinPile, leavePile, shufflePile, type PileZone } from "./piles.ts";
 import { isReanimatedCode, ORC_GUARD_CODE, reanimatedBase } from "./printed.ts";
 import { flagged, heldHero, inPlay, updateCard, updateCards, withSeat } from "./state.ts";
 
@@ -30,6 +30,7 @@ export type Destination =
   | { zone: "nightmare" }
   | { zone: "modeCard" }
   | { zone: "nightObjective" }
+  | { zone: "riddleArea" }
   | { zone: "under"; locationId: string }
   // `hostId` null: a prisoner hero, held under no card (families/prisoner.ts).
   | { zone: "captive"; hostId: string | null }
@@ -177,9 +178,13 @@ export function cardsUnder(state: ScenarioState, locationId: string): string[] {
     .map((card) => card.id);
 }
 
+// The attachments on a card with the loot guarding it, for the readers of this file's zones (attached.ts).
+export { attachmentsOn } from "./attached.ts";
+
 // The facedown player cards under a location (Truly Lost, 18075:A:1): the cards under it that a player owns, in instance id order.
 export function playerCardsUnder(state: ScenarioState, locationId: string): string[] {
-  return cardsUnder(state, locationId).filter((id) => state.cards[id]?.owner != null);
+  // Poison under a character is a facedown player card too, but not one a card of the scenario holds under a location (families/poison).
+  return cardsUnder(state, locationId).filter((id) => state.cards[id]?.owner != null && state.cards[id]?.poison !== true);
 }
 
 // Every shadow card dealt to the enemy, the first one first.
@@ -377,6 +382,8 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   if (current.zone === "encounterDeck" && dest.zone === "encounterDiscard") moved = discardedFromDeck(moved, id);
   // A card shuffled back into the Uncharted deck is shuffled into it (families/uncharted/zone.ts).
   if (dest.zone === "unchartedDeck") moved = shuffleUnchartedDeck(moved);
+  // A card that goes back into the Sack deck shuffles it (hob.sack-deck, families/sack/).
+  if (dest.zone === "sackDeck" && current.zone !== "sackDeck") moved = shufflePile(moved, "sackDeck");
   // The enemies grappled with a location that leaves the staging area: detached as it becomes the active location, discarded with it on every other exit (an explored location released them first, destroyCard).
   if (current.zone === "staging" && dest.zone !== "staging") moved = dest.zone === "activeLocation" || dest.zone === "secondActiveLocation" ? releaseGrappled(moved, id) : discardGrappled(moved, id);
   // Its attachments leave play with it, however it left (rr.attachment-cards, families/play/zones.ts).

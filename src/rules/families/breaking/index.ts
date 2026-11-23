@@ -48,7 +48,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "AdvanceToStage":
       return advanceToStage(state, instruction.code, ctx, steps, instruction.again === true);
     case "SplitToOwnStage":
-      return splitToOwnStage(state, instruction.code, focus.seat, ctx, steps);
+      return splitToOwnStage(state, instruction.code, focus.seat, ctx, steps, instruction.keepActive === true);
     case "ReturnToSharedStage":
       return returnToSharedStage(state, instruction.code, stageController(state, focus));
     case "DealOutStaging":
@@ -62,14 +62,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-// The verbs that work on the areas themselves, the whole state: all of them but AdvanceToStage, which is the acting seat's stage like the quest's own advance.
-const BREAKING_VERBS: ReadonlySet<string> = new Set(catalog.verbs.map((schema) => schema.shape.verb.value).filter((verb) => verb !== "AdvanceToStage"));
-
-// Whether the verb is one of this family's that works on the whole state, not on one seat's view of it (rules/interpret/interpret.ts runInstruction).
-export function isBreakingVerb(verb: string): boolean {
-  // Joining another player's staging area changes the areas themselves (families/captured/join.ts).
-  return BREAKING_VERBS.has(verb) || verb === "JoinAnotherPlayer";
-}
+// The verbs that work on the areas themselves, the whole state (`wholeState` below, read by rules/interpret/interpret.ts runInstruction): all of them but AdvanceToStage, which is the acting seat's stage like the quest's own advance.
+const WHOLE_STATE_VERBS = catalog.verbs.map((schema) => schema.shape.verb.value).filter((verb) => verb !== "AdvanceToStage");
 
 // AdvanceToStage ("advance to stage 4A", 142063:B:2): runs on the acting seat's view, so the stage is that seat's. The stage left is defeated (its attachments are
 // released, rr.attachment-cards) and set aside, the new stage is side B up with no progress, and its When Revealed effects are pushed as frames for the seat.
@@ -101,8 +95,8 @@ function stageController(state: ScenarioState, focus: Focus): number {
 }
 
 // SplitToOwnStage (148007:A:2): families/breaking/barrow.ts leaves the shared stage; the stage 4A copy is revealed for the seat as an advanced stage is.
-function splitToOwnStage(state: ScenarioState, code: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const split = splitOff(state, code, seat);
+function splitToOwnStage(state: ScenarioState, code: string, seat: number, ctx: ReduceContext, steps: EngineStep[], keepActive: boolean): ScenarioState {
+  const split = splitOff(state, code, seat, keepActive);
   if (!split) return state;
   const before = steps.length;
   steps.push({ kind: "advance", cardId: split.stageId });
@@ -199,4 +193,4 @@ function discardSharedStage(state: ScenarioState): ScenarioState {
   return next;
 }
 
-export const manifest: RulesFamily = { name: "breaking", amount: (state, amount, scope) => (amount.playersAtStage ? sharing(state, scope.actor).length : null), condition: (state, found, scope) => allAtStageHolds(state, found, scope.sourceId), play: (state, cardId, ctx, how) => how.putting !== true && eventFrozen(state, cardId, how.seat, ctx.cards), playReason: (state, cardId, ctx) => (eventFrozen(state, cardId, undefined, ctx.cards) ? "Players cannot trigger Action or Response effects until the end of the round" : null), verbs: ["SplitToOwnStage", "ReturnToSharedStage", "CancelRevealed", "RemoveRingBearer", "SkipTravelPhase", "ZeroEngagementCosts", "ShuffleSetAsideIntoDiscard", "PlaceDiscardUnderDeck", "StartSeparateStage", "StartRandomSeparateStage", "RemoveUnusedStages", "MoveToOtherPlayerArea", "AdvanceToStage", "DealOutStaging", "MovePickedToOwnStaging", "DiscardSharedStage", "RevealIfDiscarded", "RaiseThreatAtStage", "MoveToLeftArea", "MoveToFirstStaging", "FallIntoEvil", "ReturnFallenHero", "RemoveFromGame", "LockFirstPlayer", "TakeRingBearer"], run };
+export const manifest: RulesFamily = { name: "breaking", amount: (state, amount, scope) => (amount.playersAtStage ? sharing(state, scope.actor).length : null), condition: (state, found, scope) => allAtStageHolds(state, found, scope.sourceId), play: (state, cardId, ctx, how) => how.putting !== true && eventFrozen(state, cardId, how.seat, ctx.cards), playReason: (state, cardId, ctx) => (eventFrozen(state, cardId, undefined, ctx.cards) ? "Players cannot trigger Action or Response effects until the end of the round" : null), verbs: ["SplitToOwnStage", "ReturnToSharedStage", "CancelRevealed", "RemoveRingBearer", "SkipTravelPhase", "ZeroEngagementCosts", "ShuffleSetAsideIntoDiscard", "PlaceDiscardUnderDeck", "StartSeparateStage", "StartRandomSeparateStage", "RemoveUnusedStages", "MoveToOtherPlayerArea", "AdvanceToStage", "DealOutStaging", "MovePickedToOwnStaging", "DiscardSharedStage", "RevealIfDiscarded", "RaiseThreatAtStage", "MoveToLeftArea", "MoveToFirstStaging", "FallIntoEvil", "ReturnFallenHero", "RemoveFromGame", "LockFirstPlayer", "TakeRingBearer"], wholeState: WHOLE_STATE_VERBS, run };
