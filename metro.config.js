@@ -41,11 +41,17 @@ const canvaskitOf = (filePath) => {
 // a copy of its WorkerChannel.ts (src/screens/data/web/worker-channel.ts, held to the original by scripts/checks/web-copies.test.ts) replaces it for every importer on the web.
 const webWorkerChannel = path.join(__dirname, "src/screens/data/web/worker-channel.ts");
 const sqliteWorkerChannel = /[\\/]expo-sqlite[\\/]web[\\/]WorkerChannel\.ts$/;
+// The web app's build keeps its databases in memory, so expo-sqlite's worker gets a memory file system in place of the one that holds files in the origin's
+// private file storage (src/screens/data/web/memory-vfs.js says why). The variable is the one `pnpm webapp build` sets; every other build keeps expo-sqlite's.
+const webAppMemoryVfs = path.join(__dirname, "src/screens/data/web/memory-vfs.js");
+const sqliteAccessHandlePool = /[\\/]expo-sqlite[\\/]web[\\/]wa-sqlite[\\/]AccessHandlePoolVFS\.js$/;
+const webAppBuild = process.env.EXPO_PUBLIC_WEBAPP === "1";
 const resolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (platform === "web" && moduleName === "booklet-pdf") return { type: "sourceFile", filePath: webBookletPdf };
   const resolved = (resolveRequest ?? context.resolveRequest)(context, moduleName, platform);
   if (platform === "web" && resolved.type === "sourceFile" && sqliteWorkerChannel.test(resolved.filePath)) return { type: "sourceFile", filePath: webWorkerChannel };
+  if (webAppBuild && platform === "web" && resolved.type === "sourceFile" && sqliteAccessHandlePool.test(resolved.filePath)) return { type: "sourceFile", filePath: webAppMemoryVfs };
   if (platform === "web" && resolved.type === "sourceFile") {
     const web = canvaskitOf(resolved.filePath);
     if (web && web !== context.originModulePath) return { type: "sourceFile", filePath: web };

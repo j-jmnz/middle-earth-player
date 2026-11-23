@@ -29,8 +29,11 @@ export default {
       throw error;
     }
     const page = matchRoute(url.pathname, list);
-    const answer = await env.ASSETS.fetch(new Request(new URL(assetPath(page ?? "+not-found.html"), url.origin), { method: request.method, headers: request.headers }));
-    // The page's own headers (the isolation pair and the CSP of `_headers`) go with it; only the status says whether the route exists.
-    return new Response(answer.body, { status: page && answer.ok ? 200 : 404, headers: answer.headers });
+    // A route's page is answered as the asset server answers it, headers and status: the isolation pair and the CSP of `_headers`, and a 304 when the browser
+    // already holds the page (a reload asks with If-None-Match).
+    if (page) return env.ASSETS.fetch(new Request(new URL(assetPath(page), url.origin), { method: request.method, headers: request.headers }));
+    // The not-found page is asked for whole, with none of the request's conditions, so its body always goes with the 404.
+    const missing = await env.ASSETS.fetch(new Request(new URL(assetPath("+not-found.html"), url.origin), { method: request.method }));
+    return new Response(missing.body, { status: 404, headers: missing.headers });
   },
 };

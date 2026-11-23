@@ -3,7 +3,7 @@
 // because the page waits on that one for every database call, and on Safari a worker growing a file waits on the page.
 import { decodeSnapshot, encodeSnapshot, newestOf, SLOTS, SNAPSHOT_DIRECTORY, type Slot, type Stored } from "./snapshot";
 
-// A file that is busy is asked again this many times, this far apart: a page that reloads opens while the page before it may still hold the file.
+// A file or a lock that is busy is asked again this many times, this far apart: a page that reloads opens while the page before it may still hold the file.
 const READ_TRIES = 6;
 const READ_WAIT_MS = 250;
 
@@ -86,12 +86,8 @@ export function snapshotWriter(): SnapshotWriter {
 
 const LOCK = "middle-earth-player.user-db";
 
-/**
- * Whether this page is the only one of the origin with the saves open, and from now on it is: it holds a lock until it closes. Two pages would each keep their own
- * copy in memory and write over the other's file. A browser with no Web Locks is let through.
- */
-export function holdOnlyPage(): Promise<boolean> {
-  if (typeof navigator === "undefined" || !navigator.locks) return Promise.resolve(true);
+// One try for the lock: true when this page now holds it.
+function tryLock(): Promise<boolean> {
   return new Promise((resolve) => {
     void navigator.locks.request(LOCK, { ifAvailable: true }, (lock) => {
       resolve(lock !== null);
@@ -99,4 +95,18 @@ export function holdOnlyPage(): Promise<boolean> {
       return lock ? new Promise<void>(() => undefined) : undefined;
     });
   });
+}
+
+/**
+ * Whether this page is the only one of the origin with the saves open, and from now on it is: it holds a lock until it closes. Two pages would each keep their own
+ * copy in memory and write over the other's file. The lock is asked for a few times, since a page that reloads opens while the page before it still lets go of
+ * its own. A browser with no Web Locks is let through.
+ */
+export async function holdOnlyPage(): Promise<boolean> {
+  if (typeof navigator === "undefined" || !navigator.locks) return true;
+  for (let attempt = 1; attempt <= READ_TRIES; attempt += 1) {
+    if (await tryLock()) return true;
+    if (attempt < READ_TRIES) await wait(READ_WAIT_MS);
+  }
+  return false;
 }
