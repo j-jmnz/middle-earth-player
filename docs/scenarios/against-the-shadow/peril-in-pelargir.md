@@ -3,7 +3,7 @@
 Against the Shadow part 1 (pack `HoN`, Heirs of Númenor), standalone only, on Easy and Normal (DragnCards decks Q03.1 and E03.1). Encounter sets Peril in Pelargir, Streets of Gondor and Brigands (`ats.setup-peril-in-pelargir`). Streets of Gondor and Brigands are shared with The Steward's Fear (`docs/scenarios/against-the-shadow/the-stewards-fear.md`). The quest cards carry the Battle keyword (`hon.battle`); Umbar Assassin (05044) has Archery 2 (`hon.archery`).
 
 - **Piles.** Stage 1A's Setup searches the encounter deck for The Leaping Fish and Alcaron's Scroll, makes the Fish the active location and attaches the Scroll to a hero (the normalizer reads it in `scripts/data/normalize/setup-against-the-shadow.ts`). Overrides in `data/overrides.json`: Alcaron's Scroll (05019) is `attachedChosen` and not staged as DragnCards loads it; the five Harbor Thug (05020) are in the encounter deck, since the Setup stages no enemy (DragnCards stages 4 on Normal and none on Easy). The Fish (05021) is the `activeLocation` pile. Sources: the Hall of Beorn scenario export and the DragnCards lists Q03.1 and E03.1, as the override reasons say.
-- **Errata.** None for a card of this scenario (no `faq.errata.*` span names one).
+- **Errata.** None for a card of this scenario (no FAQ errata span names one).
 
 ## Readings
 
