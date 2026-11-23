@@ -2,8 +2,7 @@
 // same frame over everything (black, the ring 120 pt wide in the middle, as app.json's expo-splash-screen entry sets it); once its ring
 // has drawn, the root layout hides the native one under it, which no one can see. A blurred copy of the ring behind it breathes while
 // `loading`; when loading ends the halo flares, the black fades over the first screen, and `onDone` unmounts it. The breath runs on
-// Reanimated's UI thread, so it keeps its pace while the JavaScript thread opens the databases and mounts the hubs; a page has one thread,
-// so the web and the desktop draw the same splash with CSS animations (splash-glow.canvaskit.tsx).
+// Reanimated's UI thread, so it keeps its pace while the JavaScript thread opens the databases and mounts the hubs.
 import { useEffect, useEffectEvent } from "react";
 import { Image, StyleSheet, View } from "react-native";
 import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
