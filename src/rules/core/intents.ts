@@ -25,6 +25,8 @@ export type EngineStep =
   | { kind: "escapeTest"; seat: number | null; dealtIds: readonly string[]; committed: number; escape: number; success: boolean; stat?: "attack" | "defense" }
   // The locate test (dwd.locate-test): `handIds` the cards the tester discarded from his hand, `dealtIds` the encounter cards each discarded, in order; the last one passed it when `success`.
   | { kind: "locateTest"; seat: number; handIds: readonly string[]; dealtIds: readonly string[]; success: boolean }
+  // A burgle attempt (hob.burgle): `dealtIds` the encounter cards step 1 discarded, the last one the card with the burgle effect; `revealedId` the card step 2 revealed (null with an empty deck); `discardedIds` the hand cards step 3 discarded; the attempt succeeded when `success`.
+  | { kind: "burgle"; seat: number; dealtIds: readonly string[]; revealedId: string | null; discardedIds: readonly string[]; success: boolean }
   | { kind: "fortitudeTest"; seat: number; discardedIds: readonly string[]; willpower: number; eyes: number; success: boolean }
   | { kind: "hideTest"; cardId: string; discardedIds: readonly string[]; willpower: number; threat: number; success: boolean }
   // `stormcaller`: the Stormcaller's quest stage advanced (dcce.stormcallers-area-stages), not the players' quest.

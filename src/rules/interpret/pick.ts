@@ -43,6 +43,7 @@ import { embassyPool, highestThreatOf } from "../families/black-gate/pick.ts";
 import { highestThreatPlusRemaining } from "../families/long-dark/pick.ts";
 import { fortitudePool } from "../families/mount-doom/pick.ts";
 import { seatPickMatches } from "../families/wilderland/seat-pick.ts";
+import { mostCommitted, mostResources } from "../families/burgle/pick.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
 // characters of the attack a Response answers. `counting` reads every card that matches, immune ones too: a count or a
@@ -399,6 +400,9 @@ function candidatesOf(
     const most = Math.max(0, ...found.map((id) => state.cards[id]?.damage ?? 0));
     return found.filter((id) => (state.cards[id]?.damage ?? 0) === most);
   }
+  // "The hero with the most resources", "the player with the highest total Willpower committed" (families/burgle/pick.ts).
+  if (spec.mostResources) return mostResources(state, found);
+  if (spec.mostCommittedWillpower) return mostCommitted(state, found, ctx);
   // "The Aflame location in play with the lowest Aflame value" (families/aflame/pick.ts).
   if (spec.lowestAflame) return lowestAflame(state, found, ctx);
   // "The Harad enemy engaged with you with the lowest Attack" (families/harad/pick.ts).

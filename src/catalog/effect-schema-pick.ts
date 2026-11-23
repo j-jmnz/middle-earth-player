@@ -364,6 +364,11 @@ export const pickSchema = z.strictObject({
   // Of the cards that match, only those with the highest printed cost, a card with no printed cost counting as 0 ("discard the highest cost attachment you control", 145041:A:1); every one of them when tied, and then the
   // chooser decides. Read by the costs family (src/rules/families/costs/pick.ts).
   highestCost: z.literal(true).optional(),
+  // The burgle family's filters (src/rules/families/burgle/match.ts, hob.burgle). `burgleMatch`: with `from: hand`, a card of the hand that matches the revealed card of the burgle attempt in progress in what its burgle effect names (sphere, type, cost). `mostResources`: of the cards that matched (heroes),
+  // only those holding the most resources in their pool, every one when tied and then the chooser decides ("the hero with the most resources", 132051:A:1). `mostCommittedWillpower` (with `type: player`): of the players, only those with the highest total Willpower committed to the quest, every one when tied ("the player with the highest total Willpower committed", 132050:A:1).
+  burgleMatch: z.literal(true).optional(),
+  mostResources: z.literal(true).optional(),
+  mostCommittedWillpower: z.literal(true).optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

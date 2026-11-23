@@ -41,6 +41,7 @@ export type FrameName =
   | "hide"
   | "fortitude"
   | "escape"
+  | "burgle"
   | "whenRevealed"
   | "forced"
   | "shadow"
@@ -145,6 +146,8 @@ export type EffectData = {
   escape?: "failed" | "passed";
   // The last locate test this effect made (LocateTest; the `lastLocateFailed` and `lastLocatePassed` conditions, families/long-dark/conditions.ts).
   locate?: "failed" | "passed";
+  // The last burgle attempt this effect made (BurgleAttempt; the `burgleSucceeded` and `burgleFailed` conditions, families/burgle/results.ts).
+  burgle?: "failed" | "succeeded";
   // A Draw this effect ran drew a card (the `drew` condition: the text after "then" resolves only when the draw did, rr.then).
   drew?: boolean;
   // A Draw, a DiscardTopOfDeck or a DiscardResources this effect ran found too few cards or tokens (the `thenResolves` condition: the text after "then" is not attempted, rr.then).
@@ -192,6 +195,19 @@ export type EscapeData = {
   result: EscapeResult | null;
 };
 
+// A burgle attempt under way (families/burgle/attempt.ts, hob.burgle). `seat`: the first player who makes it. `effectCardId`: the encounter card step 1 stopped at, whose burgle effect step 3 reads. `revealedId`: the card of the seat's deck step 2 revealed, which stays on the deck (null with
+// no card to reveal). `matching`: the cards of the hand step 3 offered, and `need` how many it asks, read when the effect frame is pushed. `result`: whether the attempt succeeded, once step 3 is read.
+export type BurgleData = {
+  kind: "burgle";
+  seat: number;
+  effectCardId: string | null;
+  dealtIds: readonly string[];
+  revealedId: string | null;
+  matching: readonly string[];
+  need: number;
+  result: boolean | null;
+};
+
 // An event the engine announces. `seat` is the player it happened to. `phase` is the phase that just ended.
 // `cardId` limits the event to one card: only that card's effects hear it.
 // `subject` is the card the event is about; every card in play hears it. `participants` are the characters in an attack.
@@ -219,6 +235,7 @@ export type FrameData =
   | HideData
   | FortitudeData
   | EscapeData
+  | BurgleData
   | EffectData;
 
 export type Frame = {

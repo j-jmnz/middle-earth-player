@@ -57,6 +57,13 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The escape family's conditions (src/rules/families/escape/conditions.ts): the last escape test the running effect made was failed, or passed ("If this test is failed", 02109:A:1; "If this final Escape test is passed", 02106:B:2). False before the effect has made one.
   z.strictObject({ kind: z.literal("lastEscapeFailed") }),
   z.strictObject({ kind: z.literal("lastEscapePassed") }),
+  // The burgle family's conditions (src/rules/families/burgle/results.ts, hob.burgle): the last burgle attempt the running effect made succeeded ("If successful", 132039:A:2) or failed; false before it made one. `burgling`: a burgle attempt is in its action window (after step 2, before step 3), and the actor
+  // holds the first player token ("While making a burgle attempt, the first player may", 132043:A:2). `burgleCanDiscard`: the hand holds as many cards matching the revealed card as the burgle effect asks (step 3). `shadowBurgle`: the shadow card the answered event dealt has a burgle effect (132041:A:3).
+  z.strictObject({ kind: z.literal("burgleSucceeded") }),
+  z.strictObject({ kind: z.literal("burgleFailed") }),
+  z.strictObject({ kind: z.literal("burgling") }),
+  z.strictObject({ kind: z.literal("burgleCanDiscard") }),
+  z.strictObject({ kind: z.literal("shadowBurgle") }),
   // The long-dark family's conditions (src/rules/families/long-dark/conditions.ts): the last locate test the running effect made was failed, or passed ("If this test is failed", 04087:B:1); false before the effect has made one. `hasPass`: the card the condition names (the other card of the event, the last picked card
   // or the card the event is about) prints PASS in its text box ("dealt a shadow card with PASS printed in its text box", 901602:A:2).
   z.strictObject({ kind: z.literal("lastLocateFailed") }),
