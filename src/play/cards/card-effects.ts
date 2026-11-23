@@ -34,6 +34,7 @@ import type { IconName } from "../../ui/icon-map.ts";
 import { stagePoints } from "../readouts/objective.ts";
 import { stageDefeatLoses } from "../readouts/fortress.ts";
 import { determinedMark, type DeterminedMark } from "./determined-mark.ts";
+import { poisonMark } from "../readouts/poison.ts";
 import { deadSpeech } from "./realm-preview.ts";
 import { sideQuestMark, stagedSideQuest, type SideQuestMark } from "./side-quest-mark.ts";
 
@@ -279,7 +280,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     engagement: cost != null ? { cost, engages: engagesAt(game, ctx).get(cardId) === seat } : null,
     delayed: game.delayed.some((entry) => actsOn(entry, cardId)),
     // The cards underneath The Havens Burn against the number that loses (11038:A:2); `loses` when one more card does.
-    under: card != null && inPlay(card.zone) ? (underMark(burnTally(game, cardId, ctx)) ?? heldMark(game, ctx, cardId) ?? lootMark(game, ctx, cardId)) : null,
+    under: card != null && inPlay(card.zone) ? (underMark(burnTally(game, cardId, ctx)) ?? heldMark(game, ctx, cardId) ?? lootMark(game, ctx, cardId) ?? poisonMark(game, ctx, cardId)) : null,
     // An Aflame location in play: its damage against the value that destroys it.
     fire: card != null && inPlay(card.zone) ? fireMark(aflameTally(game, cardId, ctx)) : null,
     // A Ship location while the stage that loses at a total Threat of 9 is in play: its Threat against that total (12041:B:2).

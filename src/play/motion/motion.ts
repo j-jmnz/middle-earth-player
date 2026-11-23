@@ -50,9 +50,10 @@ export type MotionOptions = {
   grappledFrom?: (cardId: string) => string | null;
 };
 
-/** The turn a slot is drawn at: an exhausted card lies sideways, a hand card keeps its slight fan. */
+/** The turn a slot is drawn at: an exhausted card lies sideways, an unconscious character is upside down, a hand card keeps its slight fan. */
 export function slotRotation(slot: CardSlot): number {
   "worklet";
+  if (slot.unconscious === true) return Math.PI;
   return slot.exhausted ? Math.PI / 2 : slot.tilt;
 }
 

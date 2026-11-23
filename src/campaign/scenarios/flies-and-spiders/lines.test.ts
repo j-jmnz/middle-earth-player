@@ -3,11 +3,10 @@ import { describe, expect, it } from "vitest";
 
 import { settle } from "../../../rules/engine/machine.ts";
 import { offerResponses } from "../../../rules/windows/responses.ts";
+import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
-import type { GameEvent } from "../../../rules/core/state.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
-import { flagged } from "../../../rules/core/state.ts";
-import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { flagged, type GameEvent, type ScenarioState } from "../../../rules/core/state.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { givePoison, makeUnconscious, poisonOf } from "../../../rules/families/poison/poison.ts";
 import { stageOf } from "../../../rules/families/breaking/areas.ts";
@@ -26,7 +25,7 @@ const respondTo = (t: Table, state: ScenarioState, code: string): ScenarioState 
   const offered = settle(offerResponses({ ...state, window: null, mode: "stopped" }, { trigger: "leftPlay", seat: 0, cardId: id, explored: true } as GameEvent, t.ctx, steps), t.ctx, steps);
   const intent = legalIntents(offered, t.ctx).find((one) => one.type === "Trigger" && one.cardId === id);
   if (!intent) throw new Error(`no Response of ${code} is offered`);
-  return finish(send({ state: offered, steps }, intent, t.ctx), t.ctx).state;
+  return finish(send({ state: offered, steps }, intent as PlayerIntent, t.ctx), t.ctx).state;
 };
 const total = (state: ScenarioState) => state.seats.reduce((sum, seat) => sum + seat.heroes.reduce((inner, id) => inner + poisonOf(state, id), 0), 0);
 

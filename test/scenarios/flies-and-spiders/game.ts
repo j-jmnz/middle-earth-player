@@ -3,7 +3,7 @@ import { legalIntents, type PlayerIntent, type ReduceContext, type ScenarioState
 
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { engageOneEach, fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
+import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
 
 const cycle = loadCampaign("the-hobbit");
 const spiders = loadAnyScenario("flies-and-spiders");
