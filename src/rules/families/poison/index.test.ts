@@ -6,7 +6,7 @@ import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { fightEnemy, idOf } from "../../../../test/harness/scene-kit.ts";
 import { codeOf, run, spiderTable, STAGE_1 } from "../../../../test/scenarios/flies-and-spiders/scene.ts";
 import { venomPoison } from "./venom.ts";
-import { discardPoison, givePoison, makeUnconscious, poisonOf } from "./poison.ts";
+import { givePoison, makeUnconscious, poisonOf } from "./poison.ts";
 
 describe("giving poison (hob.venom-poison)", () => {
   it("attaches the top card of the controller's deck facedown to the character, out of play, owned by the deck's seat", () => {

@@ -19,6 +19,8 @@ function attachHost(to: unknown): string {
   if (!isObj(to)) return str(to);
   if (to.kind === "ship") return to.defender === true ? "the Ship objective defending the attack in progress (nothing happens if the defender is not a Ship)" : "a Ship objective the players control, chosen by the first player";
   if (to.kind === "attackingEnemy") return "the enemy making the attack in progress";
+  if (to.kind === "subject") return "the character the event is about (nobody is asked)";
+  if (to.kind === "defender") return "the defending character of the attack in progress (nothing happens when the attack is undefended)";
   if (to.kind === "enemy") return `${to.challenge === true ? "the enemy with the most hit points left, by the opposing team, nobody being asked," : "an enemy"} with the trait ${str(to.trait)}`;
   if (to.kind === "character") return `a character (hero or ally, an objective ally included) of any player, chosen by the first player${typeof to.trait === "string" ? `, one that has the trait ${to.trait} now` : ""}${typeof to.name === "string" ? `, the character titled "${to.name}"` : ""}${to.control === "mostAttachments" ? ", among those holding the most attachments (the first player chooses among those tied)" : ""}${to.unlimited === true ? "; a character that carries a copy is offered too" : "; a character that carries a copy is not offered"} (the card is discarded when none can host it)`;
   const hero: Readonly<Record<string, string>> = { you: "a hero the revealing player controls", any: "any player's hero, chosen by the first player", highestThreat: "a hero of the player with the highest threat, who chooses it (the first player chooses among the players tied)", highestThreatCost: "the hero with the highest printed threat cost among every hero in play (the first player chooses among those tied)", picked: "a hero of the player the effect picked, who chooses it", mostAttachments: "the hero with the most attachments among those the card is not on yet (the first player chooses among those tied)", firstPlayer: "a hero the first player controls, chosen by the first player" };
@@ -131,6 +133,8 @@ export const CORE_SAMPLES: Samples = {
     { verb: "AttachSelf", to: { kind: "hero", control: "highestThreat", exceptSphere: "fellowship", trait: "Warrior", minWillpower: 1, unlimited: true } },
     { verb: "AttachSelf", to: { kind: "enemy", trait: "Orc", challenge: true } },
     { verb: "AttachSelf", to: { kind: "attackingEnemy" } },
+    { verb: "AttachSelf", to: { kind: "subject" } },
+    { verb: "AttachSelf", to: { kind: "defender" } },
     { verb: "AttachSelf", to: { kind: "character", trait: "Eagle", name: "Wilyador", unlimited: true, control: "mostAttachments" } },
   ],
   ReduceCostOf: [{ verb: "ReduceCostOf", pick: { type: "card", control: "you", cardType: "ally" }, amount: 1, firstEachRound: true, anyPlayer: true, min: 1, onHost: "host" }, { verb: "ReduceCostOf", pick: { type: "card", control: "you" }, amount: 1, onHost: "self" }],
