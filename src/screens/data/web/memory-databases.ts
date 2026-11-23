@@ -6,7 +6,7 @@
 // and nothing else. catalog.db is read from the bundle at each launch, so it is always this build's.
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { migrate } from "drizzle-orm/expo-sqlite/migrator";
-import { deserializeDatabaseAsync, openDatabaseAsync } from "expo-sqlite";
+import { backupDatabaseAsync, deserializeDatabaseAsync, openDatabaseAsync, type SQLiteDatabase } from "expo-sqlite";
 
 import migrations from "../../../../drizzle/migrations";
 import { CATALOG_VERSION } from "../../../catalog/version";
@@ -34,11 +34,31 @@ async function catalogBytes(): Promise<Uint8Array> {
   return new Uint8Array(await response.arrayBuffer());
 }
 
+// A new connection each time: expo-sqlite hands out one shared connection for a path, and ":memory:" is the path of every database here.
+function openEmpty(): Promise<SQLiteDatabase> {
+  return openDatabaseAsync(":memory:", { useNewConnection: true });
+}
+
+/**
+ * An ordinary in-memory database with the rows of a serialized one. The bytes are not opened in place and written to: a database SQLite deserialized
+ * keeps its pages in one block it must grow on a write, and writing a game into one ended in a WebAssembly memory fault (Chromium's page crashed, Safari said
+ * "Out of bounds memory access"). So the bytes are opened only to be copied, page by page, into a database SQLite made itself, and closed.
+ */
+async function openFromBytes(bytes: Uint8Array): Promise<SQLiteDatabase> {
+  const source = await deserializeDatabaseAsync(bytes);
+  try {
+    const database = await openEmpty();
+    await backupDatabaseAsync({ sourceDatabase: source, destDatabase: database });
+    return database;
+  } finally {
+    await source.closeAsync();
+  }
+}
+
 export async function openInMemory(): Promise<AppDatabases> {
   if (!(await holdOnlyPage())) throw new Error(OPEN_ELSEWHERE);
   const stored = await readNewest();
-  // A new connection each time: expo-sqlite hands out one shared connection for a path, and ":memory:" is the path of every database here.
-  const userSqlite = stored ? await deserializeDatabaseAsync(stored.data) : await openDatabaseAsync(":memory:", { useNewConnection: true });
+  const userSqlite = stored ? await openFromBytes(stored.data) : await openEmpty();
   const flusher = createFlusher({
     changes: async () => (await userSqlite.getFirstAsync<{ n: number }>("SELECT total_changes() AS n"))?.n ?? 0,
     serialize: () => userSqlite.serializeAsync(),
@@ -57,7 +77,7 @@ export async function openInMemory(): Promise<AppDatabases> {
     console.warn(`Run history was not back-filled (${error instanceof Error ? error.message : "unknown error"}); it is tried again at the next launch`);
   }
 
-  const catalogSqlite = await deserializeDatabaseAsync(await catalogBytes());
+  const catalogSqlite = await openFromBytes(await catalogBytes());
   await catalogSqlite.execAsync("PRAGMA query_only = ON");
   const applied = user.select({ appliedCatalogVersion: meta.appliedCatalogVersion }).from(meta).get()?.appliedCatalogVersion ?? null;
   if (applied !== CATALOG_VERSION) {
