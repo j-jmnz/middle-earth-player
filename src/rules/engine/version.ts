@@ -149,6 +149,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: "all", note: "Swift and Silent is not offered when every hero is ready, and returns to your hand only when the ready happened: not when the hero chosen was ready already or cannot ready." },
   { version: 38, scenarios: "all", note: "Outmatched is not offered when the defending character is ready or the attack had no defender." },
   { version: 38, scenarios: "all", note: "Determination's Action is the play of the event from your hand: once it is attached to a character it is not offered again from there." },
+  { version: 38, scenarios: ["roam-across-rhovanion"], note: "Durin's Key's Action is not offered with no location in play: its cost cannot be paid for nothing." },
   { version: 38, scenarios: ["escape-from-dol-guldur", "journey-along-the-anduin", "passage-through-mirkwood"], note: "Mendor's Response is not offered while he is ready or cannot ready, because the part after \"Then\" waits for the ready." },
   { version: 38, scenarios: "all", note: "Ceorl's Action is not offered while he is ready or cannot ready, because the part after \"Then\" waits for the ready, and Elevenses and Armored Destrier do the same: the threat is reduced and the shadow card discarded only when the ready happened." },
 ];
