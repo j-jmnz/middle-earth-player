@@ -294,7 +294,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.cost != null && (from === "play" || printed.cost !== spec.cost)) return false;
   if (spec.noVictory !== undefined && (printed.victory ?? 0) > 0 === spec.noVictory) return false;
   if (spec.state === "ready" && instance.exhausted) return false;
-  if (spec.state === "exhausted" && !instance.exhausted) return false;
+  // An unconscious character is neither ready nor exhausted (hob.unconscious-characters): the Weighed Down penalty and the "exhausted" filters do not reach it.
+  if (spec.state === "exhausted" && (!instance.exhausted || instance.unconscious === true)) return false;
   if (spec.canAttack && !legalAttackEnemies(state, instance.controller ?? asking, id, ctx.cards, true).length) return false;
   if (spec.attackableByPicked) {
     const attacker = picked.at(-1);

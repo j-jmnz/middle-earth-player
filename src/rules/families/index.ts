@@ -55,6 +55,7 @@ import { manifest as smaug } from "./smaug/index.ts";
 import { manifest as erech } from "./erech/index.ts";
 import { manifest as investigation } from "./investigation/index.ts";
 import { manifest as wizardsQuest } from "./wizards-quest/index.ts";
+import { manifest as poison } from "./poison/index.ts";
 import { registerFamilies } from "../interpret/family-hooks.ts";
 
 export type { Focus };
@@ -65,7 +66,7 @@ let listed: readonly RulesFamily[] | null = null;
 // Built on first use, not when this module runs: a family reached first (a test that imports one) pulls in the core, which pulls in this file while that family is still loading, and a list built here would hold its manifest as undefined.
 export function rulesFamilies(): readonly RulesFamily[] {
   return (listed ??= [
-    attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress, wizardry, mire, gollum, harad, greyCompany, pelennor, cirithUngol, blackGate, mountDoom, angmar, captured, escape, guardian, longDark, nameless, flame, smaug, erech, investigation, wizardsQuest,
+    attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress, wizardry, mire, gollum, harad, greyCompany, pelennor, cirithUngol, blackGate, mountDoom, angmar, captured, escape, guardian, longDark, nameless, flame, smaug, erech, investigation, wizardsQuest, poison,
   ]);
 }
 
@@ -75,7 +76,7 @@ export function rulesFamilies(): readonly RulesFamily[] {
 export const SETTLE_ORDER: Readonly<Record<"before" | "after" | "sweep", readonly string[]>> = {
   before: ["burden", "island", "south", "quest"],
   after: ["sea", "stormcaller", "island", "wilderland", "captives"],
-  sweep: ["aflame", "objectives", "sea", "wilderland", "south", "deck", "angmar", "quest", "escape", "nameless", "encounter", "erech", "wizards-quest"],
+  sweep: ["aflame", "objectives", "sea", "wilderland", "south", "deck", "angmar", "quest", "escape", "nameless", "encounter", "erech", "wizards-quest", "poison"],
 };
 
 /** Runs a verb a mechanic family adds (src/catalog/families), or returns null when no family owns it. */

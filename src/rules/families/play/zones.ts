@@ -36,7 +36,7 @@ export function leaveWith(state: ScenarioState, card: CardInstance, released: re
     for (const id of cardsUnder(next, card.id)) {
       const owner = next.cards[id]?.owner;
       if (owner == null) continue;
-      next = updateCard(moveCard(next, id, { zone: "discard", seat: owner }), id, { face: "up", owner: undefined });
+      next = updateCard(moveCard(next, id, { zone: "discard", seat: owner }), id, { face: "up", owner: undefined, poison: undefined });
     }
   }
   // A lost game is over: nothing answers any more (rr.player-elimination).

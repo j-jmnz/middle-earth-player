@@ -293,6 +293,12 @@ export const pickSchema = z.strictObject({
   hasFacedownUnder: z.literal(true).optional(),
   facedownUnder: z.literal(true).optional(),
   nemesis: z.literal(true).optional(),
+  // Flies and Spiders (read by the poison family, src/rules/families/poison/pick.ts; hob.venom-poison, hob.unconscious-characters). `poisoned`: a character with any poison under it (`false`: one with none). `unconscious`: an unconscious character (`false`: a conscious one).
+  // `mostPoison`: a character of those the chooser's area holds with as much poison as any of them (all of them when none is poisoned). `poison`, in an `eachAttached`: the cards counted are the poison under the holder.
+  poisoned: z.boolean().optional(),
+  unconscious: z.boolean().optional(),
+  mostPoison: z.literal(true).optional(),
+  poison: z.literal(true).optional(),
   // The Ghost of Framsburg (ledger lines 19097:A:2, 19098:A:2, 19109:B:1, 12191:A:1; emce.loot). `lootKeyword`: an objective that prints the Loot keyword (its record has the constant verb Loot), "the Loot objectives the players control" with `controlled`.
   // `engagedWithUnique` (with `type: player`): a player who has a unique enemy engaged with them ("Choose a player that is engaged with a unique enemy", 12191:A:1). Read by the wilderland family (src/rules/families/wilderland/pick.ts).
   lootKeyword: z.literal(true).optional(),
