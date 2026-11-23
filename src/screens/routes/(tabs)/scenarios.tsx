@@ -9,6 +9,7 @@ import { campaignListQueries } from "../../campaign/list";
 import { PillButton, PrimaryButton, TextButton } from "../../kit/chrome";
 import { deckFaces } from "../../deck/store";
 import { useDatabases } from "../../data/databases";
+import { keepSame } from "../../data/keep-same";
 import { FoldHeader, useFolds } from "../../kit/fold-section";
 import { foldAllOffer } from "../../kit/fold-state";
 import { heroFace } from "../../art/hero-tile";
@@ -41,7 +42,8 @@ export default function Scenarios() {
 
   useFocusEffect(
     useCallback(() => {
-      setGames(listStandalone(user));
+      const listed = listStandalone(user);
+      setGames((held) => keepSame(held, listed));
     }, [user]),
   );
 

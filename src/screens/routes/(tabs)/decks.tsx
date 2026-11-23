@@ -8,6 +8,7 @@ import { editSavedDeck, startNewDeck } from "../../deck/draft";
 import { copyDeckName, deckCountLine, deckReadiness, deckShortLine, newDeckName, notAppliedLine } from "../../deck/status";
 import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, notAppliedIn, resetStarterDeck, writeDeckOrder, type SavedDeck } from "../../deck/store";
 import { useDatabases } from "../../data/databases";
+import { keepSame } from "../../data/keep-same";
 import { COVER_GAP, deckListFiltered, deckListLayout, deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "../../deck/list";
 import { DeckListBar } from "../../deck/list-bar";
 import { moveChoices, moveItem } from "../../deck/order";
@@ -130,7 +131,8 @@ export default function Decks() {
   const { columns, inset } = deckListLayout(listWidth, size, view, s);
 
   const refresh = useCallback(() => {
-    setSaved(seed === "pending" ? [] : listDecks(user));
+    const listed = seed === "pending" ? [] : listDecks(user);
+    setSaved((held) => keepSame(held, listed));
     setAsking(null);
   }, [seed, user]);
 

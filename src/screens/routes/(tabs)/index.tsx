@@ -9,6 +9,7 @@ import { deckFaces } from "../../deck/store";
 import { campaignListQueries, lockedCampaignTiles, scenarioWords, startableRows } from "../../campaign/list";
 import { campaignOf } from "../../data/campaign-data";
 import { listSaves, type ListedSave } from "../../data/campaign-store";
+import { keepSame } from "../../data/keep-same";
 import { useDatabases } from "../../data/databases";
 import { usePalette } from "../../kit/palette-hook";
 import { describe, nextSummary, partyCodes, partySeats, saveLine, type SaveLine } from "../../history/save-line";
@@ -53,7 +54,8 @@ export default function CampaignList() {
 
   useFocusEffect(
     useCallback(() => {
-      setSaves(listSaves(user));
+      const listed = listSaves(user);
+      setSaves((held) => keepSame(held, listed));
       if (startParam === "1") {
         scrollPending.current = true;
         if (startAt.current > 0) scrollToNew();
