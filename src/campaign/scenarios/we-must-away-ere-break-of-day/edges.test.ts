@@ -1,4 +1,4 @@
-// Rules: rr.then, rr.forced, rr.response, rr.shadow-effects, rr.in-play-and-out-of-play, rr.triggered-ability, rr.reveal, rr.doomed-x, rr.explored, hob.sack-x, hob.bilbo-baggins-ohauh (data/rules/entries.json); ledger lines 131023:A:1, 131024:B:1, 131024:B:2, 131032:A:3, 131033:A:3, 131034:A:3, 131036:A:1, 131036:A:2, 131038:A:1, 131038:A:2, 131041:A:1, 131042:A:1, 131051:A:1, 131051:A:2, 131052:A:2, 131053:A:1, 131054:A:1, 131054:A:2.
+// Rules: rr.then, rr.forced, rr.response, rr.shadow-effects, rr.in-play-and-out-of-play, rr.triggered-ability, rr.reveal, rr.doomed-x, rr.explored, hob.sack-x, hob.bilbo-baggins-ohauh (data/rules/entries.json); ledger lines 131023:A:1, 131024:B:1, 131024:B:2, 131032:A:3, 131033:A:3, 131034:A:3, 131036:A:1, 131036:A:2, 131038:A:1, 131038:A:2, 131042:A:1, 131051:A:1, 131051:A:2, 131052:A:2, 131053:A:1, 131054:A:1, 131054:A:2.
 import { expect, it } from "vitest";
 
 import { placeDamage } from "../../../rules/core/keywords.ts";
