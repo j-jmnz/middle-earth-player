@@ -82,6 +82,8 @@ export type Layout = {
   under?: readonly { code: string; to: string }[];
   // The Night objective in play beside the current quest (The Stone of Erech, 50301:A:1): a code, or a code with its progress.
   night?: Entry;
+  // The scenario's saga hero (Bilbo Baggins in The Hobbit, the loadout deals him) is a hero of the first seat, with this many resources in his pool.
+  sagaHero?: { resources?: number };
   // Other zones that hold a list of cards (a second deck, a named pile).
   piles?: Partial<Record<PileZone, readonly Entry[]>>;
 };
@@ -179,6 +181,10 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     for (const item of layout.deckOf ?? []) if (dealtTo(item, seat)) state = spawn(state, dealtCode(item), { zone: "deck", seat }, "down").state;
   }
   if (layout.heroResources) for (const id of Object.keys(state.cards)) if (state.cards[id]?.zone === "heroes") state = updateCard(state, id, { resources: layout.heroResources });
+  if (layout.sagaHero && "hero" in (world.data.sagaStart ?? {})) {
+    const saga = spawn(state, (world.data.sagaStart as { hero: string }).hero, { zone: "heroes", seat: 0 });
+    state = updateCard(saga.state, saga.id, { resources: layout.sagaHero.resources ?? 0 });
+  }
   const put = (code: string, dest: Destination, tokens: Entry = code, face?: "up" | "down"): void => {
     const row = entry(tokens);
     const spawned = spawn(state, code, dest, face);

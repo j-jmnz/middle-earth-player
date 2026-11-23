@@ -149,7 +149,8 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 131038:A:1 (front): Response: After placing 1 or more progress tokens on Hobbit-lands, the first player draws 1 card.
-  131038:response:1: Response on the event progressPlaced (heard about this card)
+  131038:response:1: Response after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
     - the first player draws 1 card(s)
 
 131038:A:2 (shadow): Shadow: Defending player must put the top card of the encounter deck discard pile on top of the encounter deck.
@@ -393,4 +394,4 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
     who acts: the acting player is the defending player (the player the attack is against)
     - deal 4 damage to each character (any player controls) with a Sack card attached
 
-(rendered pieces: 225 by template, 0 as JSON)
+(rendered pieces: 226 by template, 0 as JSON)
