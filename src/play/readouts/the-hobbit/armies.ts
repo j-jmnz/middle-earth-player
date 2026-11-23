@@ -3,11 +3,11 @@
 // The three stages of The Battle of Five Armies that are in play at once (docs/design-system-table.md, Cards, The Battle of Five Armies) as top-bar dials, one for each stage: its progress against its quest points, the current stage marked, the Battle or Siege it brings,
 // and a warning while it holds no progress (its Forced effect at the end of the round, 132076:B:2, 132077:B:3, 132078:B:3). A tap on a dial shows the stage card. The engine decided every number (`armies`, the progress on each card); nothing here changes one. Empty in
 // any other scenario and once stage 5 is reached. Pure, so a test reads it.
-import { modifiedStat } from "../../rules/core/keywords.ts";
-import type { ScenarioState } from "../../rules/core/state.ts";
-import type { ReduceContext } from "../../rules/engine/reduce.ts";
+import { modifiedStat } from "../../../rules/core/keywords.ts";
+import type { ScenarioState } from "../../../rules/core/state.ts";
+import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 
-import type { TableDial } from "./dials.ts";
+import type { TableDial } from "../dials.ts";
 
 // What each stage does at the end of a round with no progress on it, and the keyword it prints.
 const STAGES: Readonly<Record<string, { stage: number; keyword?: "Battle" | "Siege"; empty: string }>> = {

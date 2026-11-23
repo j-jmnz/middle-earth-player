@@ -2,9 +2,9 @@
 // The stage dials of The Battle of Five Armies: one for each stage in play together, with its progress, the current mark and the warning for a stage with no progress.
 import { describe, expect, it } from "vitest";
 
-import { first, resolveRecords, tableFromLayout } from "../../../test/harness/scene-kit.ts";
+import { first, resolveRecords, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 import { armiesDials } from "./armies.ts";
-import { scenarioDials } from "./scenario-dials.ts";
+import { scenarioDials } from "../scenario-dials.ts";
 
 const nameOf = (code: string): string => code;
 function inPlay() {

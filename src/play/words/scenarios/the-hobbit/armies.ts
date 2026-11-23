@@ -1,13 +1,13 @@
 // Rules: hob.current-quest-stage, hob.multiple-stages-in-play, rr.first-player (data/rules/entries.json).
 // The first player's choice of the current quest stage at the start of each round of The Battle of Five Armies, on the live sheet (docs/design-system-table.md, Choice tray): the question says what the choice changes, and each row names a stage with the
 // progress it holds now, the Battle or Siege it has and whether it is the current stage. One player's choice leads with "Player N:" two-handed. Pure.
-import type { Instruction } from "../../../catalog/boundary.ts";
-import { modifiedStat } from "../../../rules/core/keywords.ts";
-import type { ScenarioState } from "../../../rules/core/state.ts";
-import type { ReduceContext } from "../../../rules/interpret/interpret.ts";
+import type { Instruction } from "../../../../catalog/boundary.ts";
+import { modifiedStat } from "../../../../rules/core/keywords.ts";
+import type { ScenarioState } from "../../../../rules/core/state.ts";
+import type { ReduceContext } from "../../../../rules/interpret/interpret.ts";
 
-import type { ChoiceNames } from "../choice.ts";
-import { seatSays } from "../seat.ts";
+import type { ChoiceNames } from "../../choice.ts";
+import { seatSays } from "../../seat.ts";
 
 type Choose = Extract<Instruction, { verb: "Choose" }>;
 
@@ -18,7 +18,7 @@ const isStageChoice = (choose: Choose): boolean => choose.options.length >= 2 &&
 export function armiesChooseNote(choose: Choose, game: ScenarioState): string | null {
   if (!isStageChoice(choose)) return null;
   const { say } = seatSays(game);
-  return say("choose the current quest stage for this round? Progress goes on that stage only, and a card effect that affects the current quest affects that stage only.");
+  return say("choose the current quest stage for this round. Progress goes on that stage only, and a card effect that affects the current quest affects that stage only.");
 }
 
 /** What each stage of the choice holds now: "3 of 8 progress, Battle, the current stage". Empty for any other Choose. */

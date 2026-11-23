@@ -19,7 +19,7 @@ import { framsburgAsk, framsburgBranchNow, framsburgBranchWords, framsburgChoose
 import { fateAsk, fateBranchRows, fateBranchWords, fateChooseNote } from "./fate.ts";
 import { boonHeroAsk } from "./angmar/angmar-table.ts";
 import { dragonSicknessAsk, gundabadAsk, gundabadBranchWords, gundabadChooseNote } from "./gundabad.ts";
-import { armiesBranchRows, armiesBranchWords, armiesChooseNote } from "./armies.ts";
+import { armiesBranchRows, armiesBranchWords, armiesChooseNote } from "./the-hobbit/armies.ts";
 import { nightAsk, nightBranchWords, nightChooseNote, nightMainNow, nightQuestsNow } from "./night.ts";
 import { rhovanionAsk, rhovanionBranchWords, rhovanionChooseNote } from "./rhovanion.ts";
 import { askedSeat, seatSays } from "../seat.ts";

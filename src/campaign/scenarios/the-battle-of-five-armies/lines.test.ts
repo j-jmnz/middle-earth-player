@@ -246,25 +246,38 @@ describe("Northern Slopes (132060:A:1, 132060:A:2)", () => {
 });
 
 describe("The stage locations (132061 to 132063: A:2, A:3)", () => {
-  const LOCATIONS = [
-    ["132061", S3],
-    ["132062", S4],
-    ["132063", S2],
-  ] as const;
-  it.each(LOCATIONS)("%s:A:2 at the end of the round 2 progress leave its stage", (location, stage) => {
+  // At the end of the round 2 progress leave the location's stage.
+  const endOfRound = (location: string, stage: string): number => {
     const made = atStage(stage, { staging: [location] });
-    const after = announced(made, withProgress(made.state, stage, 5), { trigger: "endOfRound", seat: null });
-    expect(progressOn(after, stage)).toBe(3);
-  });
-
-  const travels = (location: string, stage: string, current: string, resources: number): boolean => {
+    return progressOn(announced(made, withProgress(made.state, stage, 5), { trigger: "endOfRound", seat: null }), stage);
+  };
+  // Whether the players may travel to the location with `resources` Baggins resources while `current` is the current stage.
+  const travels = (location: string, current: string, resources: number): boolean => {
     const made = withBilbo(atStage(current, { phase: "Travel", staging: [location], play: ["132001"] }), resources);
     return legalIntents(made.state, made.ctx).some((intent) => intent.type === "Travel");
   };
-  it.each(LOCATIONS)("%s:A:3 travelling costs 1 Baggins resource while its stage is the current quest, and 3 otherwise", (location, stage) => {
+  // The cost is 1 while the location's own stage is current and 3 otherwise.
+  const costs = (location: string, stage: string): unknown => {
     const other = stage === S2 ? S3 : S2;
-    expect([travels(location, stage, stage, 0), travels(location, stage, stage, 1)]).toEqual([false, true]);
-    expect([travels(location, stage, other, 2), travels(location, stage, other, 3)]).toEqual([false, true]);
+    return [[travels(location, stage, 0), travels(location, stage, 1)], [travels(location, other, 2), travels(location, other, 3)]];
+  };
+  const COSTS = [[false, true], [false, true]];
+
+  it("132061:A:2 Ruins of Dale: at the end of the round 2 progress leave stage 3", () => expect(endOfRound("132061", S3)).toBe(3));
+  it("132062:A:2 Ravenhill: at the end of the round 2 progress leave stage 4", () => expect(endOfRound("132062", S4)).toBe(3));
+  it("132063:A:2 The Front Gate: at the end of the round 2 progress leave stage 2", () => expect(endOfRound("132063", S2)).toBe(3));
+  it("132061:A:3 Ruins of Dale: travelling costs 1 Baggins resource while stage 3 is the current quest, and 3 otherwise", () => expect(costs("132061", S3)).toEqual(COSTS));
+  it("132062:A:3 Ravenhill: travelling costs 1 Baggins resource while stage 4 is the current quest, and 3 otherwise", () => expect(costs("132062", S4)).toEqual(COSTS));
+  it("132063:A:3 The Front Gate: travelling costs 1 Baggins resource while stage 2 is the current quest, and 3 otherwise", () => expect(costs("132063", S2)).toEqual(COSTS));
+});
+
+describe("Misty Mountain Eagle's Shadow (132052:A:2)", () => {
+  it("132052:A:2 Shadow: the attacking enemy takes 3 damage", () => {
+    const damage = (shadow: string) => {
+      const fought = fightEnemy(table, shadow, "132057", {});
+      return fought.run.state.cards[idOf(fought.run.state, "132057")]?.damage ?? 0;
+    };
+    expect(damage("132052") - damage("f0")).toBe(3);
   });
 });
 

@@ -2,10 +2,10 @@
 // The words of the first player's choice of the current stage in The Battle of Five Armies: the sentence over the Choose and the row of each stage.
 import { describe, expect, it } from "vitest";
 
-import type { Instruction } from "../../../catalog/boundary.ts";
-import type { ScenarioState } from "../../../rules/core/state.ts";
-import { resolveRecords, first, tableFromLayout, idOf } from "../../../../test/harness/scene-kit.ts";
-import type { ChoiceNames } from "../choice.ts";
+import type { Instruction } from "../../../../catalog/boundary.ts";
+import type { ScenarioState } from "../../../../rules/core/state.ts";
+import { resolveRecords, first, tableFromLayout, idOf } from "../../../../../test/harness/scene-kit.ts";
+import type { ChoiceNames } from "../../choice.ts";
 import { armiesBranchRows, armiesBranchWords, armiesChooseNote } from "./armies.ts";
 
 type Choose = Extract<Instruction, { verb: "Choose" }>;
@@ -23,7 +23,7 @@ function stagesTable() {
 describe("the words of the current stage choice", () => {
   it("132076:B:1 the sentence says what the choice changes, and another Choose has none of it", () => {
     const { game, choose } = stagesTable();
-    expect(armiesChooseNote(choose, game)).toMatch(/^Choose the current quest stage for this round\? Progress goes on that stage only/);
+    expect(armiesChooseNote(choose, game)).toMatch(/^Choose the current quest stage for this round\. Progress goes on that stage only/);
     expect(armiesChooseNote({ verb: "Choose", who: "firstPlayer", options: [{ id: "a", instructions: [] }, { id: "b", instructions: [] }] }, game)).toBeNull();
   });
 
