@@ -87,6 +87,17 @@ export const PLAYER_REQUESTS = [
   "01030",
 ];
 
+// The packs whose deck-legal player cards the ledger holds (the pilot of reading every player card from its scan). A pack is added here when
+// `pnpm data sync scans --pack <id>` and `pnpm data ledger-seed --pack <id>` have run for it; the ledger file is data/printed/player-cards.json.
+export const PLAYER_PACKS: readonly string[] = [];
+const PLAYER_CARD_TYPES: ReadonlySet<string> = new Set(["hero", "ally", "attachment", "event", "player-side-quest", "contract"]);
+
+/** The deck-legal player cards (hero, ally, attachment, event, player side quest, contract) a pack prints, by code. */
+export function playerPackCodes(packs: readonly string[], cards: readonly Card[] = loadCards()): string[] {
+  const wanted = new Set(packs);
+  return cards.filter((card) => card.deckLegal && PLAYER_CARD_TYPES.has(card.type) && card.printings.some((printing) => wanted.has(printing.pack))).map((card) => card.code).sort();
+}
+
 // The codes of both starter lists, from the campaign file (data/starter-decks.json).
 export function starterCodes(): string[] {
   return [...new Set(loadCampaign().starterDecks.flatMap((deck) => deck.rows.map((row) => row.code)))].sort();
@@ -141,7 +152,7 @@ function nightmareDeckCodes(): string[] {
 }
 
 export function scopeCodes(): string[] {
-  return [...new Set<string>([...campaignCards(), ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaigns(), loadScenarios()), ...nightmareDeckCodes(), ...boxCodes(), ...starterCodes(), ...PLAYER_REQUESTS])].sort();
+  return [...new Set<string>([...campaignCards(), ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaigns(), loadScenarios()), ...nightmareDeckCodes(), ...boxCodes(), ...starterCodes(), ...PLAYER_REQUESTS, ...playerPackCodes(PLAYER_PACKS)])].sort();
 }
 
 type HobImages = { CardSet: string; Slug: string; RingsDbCardId: string | null; Front: { ImagePath: string | null }; Back: { ImagePath: string | null } | null };

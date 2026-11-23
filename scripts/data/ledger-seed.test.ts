@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { loadCards } from "./load-cards.ts";
 import { loadLedger, keyOf } from "./printed/ledger.ts";
+import { playerPackCodes } from "./printed/scope.ts";
 import { indentOf, nightmareDeckCodes, pinnedScans, seedEntries, seedEntry, withSeeded } from "./ledger-seed.ts";
 
 // `pnpm data ledger-seed`: the entries a scenario's cards are missing, from the source text, readBy empty.
@@ -62,6 +63,24 @@ describe("ledger seed", () => {
 
   it("refuses a scenario with no Nightmare deck", () => {
     expect(() => nightmareDeckCodes("the-oath", cards)).toThrow(/no Nightmare deck/);
+  });
+
+  it("names a pack's deck-legal player cards", () => {
+    const codes = playerPackCodes(["OHaUH", "HoN"], cards);
+    expect(codes).toHaveLength(37);
+    const types = new Set(codes.map((code) => cards.find((card) => card.code === code)?.type));
+    expect([...types].every((type) => ["hero", "ally", "attachment", "event", "player-side-quest", "contract"].includes(type ?? ""))).toBe(true);
+    expect(playerPackCodes(["no-such-pack"], cards)).toEqual([]);
+  });
+
+  it("seeds a player card from a pinned scan into a new file with the conventions", () => {
+    const fake = new Map([["05001.A", { url: "https://x.test/a.jpg", sha256: "0".repeat(64) }]]);
+    const { entries, unpinned } = seedEntries(new Set(["05001", "05002"]), { campaign: "none", entries: [], byKey: new Map() }, cards, fake);
+    expect(entries.map((entry) => keyOf(entry.code, entry.side))).toEqual(["05001.A"]);
+    expect(unpinned).toEqual(["05002.A"]);
+    expect(entries[0]?.lines[0]).toBe("Sentinel.");
+    expect(entries[0]?.readBy).toBe("");
+    expect(withSeeded(null, "player-cards", entries).campaign).toBe("player-cards");
   });
 
   it("writes a file with the indent it already has", () => {
