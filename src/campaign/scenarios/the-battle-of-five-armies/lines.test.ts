@@ -1,6 +1,6 @@
 // Rules: hob.multiple-stages-in-play, hob.current-quest-stage, hob.baggins-sphere-otd, hob.bilbo-multiplayer-otd, rr.immune, rr.cancel, rr.forced, rr.reveal, rr.engaged (data/rules/entries.json); ledger lines 132052:A:1, 132053:A:2, 132053:A:3, 132054:A:1, 132054:A:2, 132055:A:1, 132060:A:1, 132060:A:2, 132061:A:2, 132061:A:3, 132062:A:3, 132063:A:3, 132065:A:1, 132076:B:2, 132078:B:3, 132079:B:2, 132079:B:3, 132066:A:2, 132001:A:1.
 // What a spec row cannot express: a Baggins payment, several stages in play together, a stage that is not the current one, a cancel that is not offered and the stage 5 fight. Each test starts its title with the line id.
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
@@ -13,6 +13,7 @@ import { settle } from "../../../rules/engine/machine.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
+import { loadPrinted } from "../../../../test/harness/catalog.ts";
 import { finish, fightEnemy, first, revealedTop, idOf, legalIntents, legalTargets, opening, resolveRecords, revealFromTop, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "the-battle-of-five-armies";
@@ -422,5 +423,40 @@ describe("Stage 5 (132079:B:1, 132079:B:2, 132079:B:3)", () => {
     const event = (code: string) => ({ trigger: "enemyDestroyed" as const, seat: 0, cardId: idOf(made.state, code), subject: idOf(made.state, code) });
     expect(announced(made, syncConstants(made.state, made.ctx), event("132053")).stageCleared).toBe(true);
     expect(announced(made, syncConstants(made.state, made.ctx), event("f3")).stageCleared).toBeFalsy();
+  });
+});
+
+describe("Ravenous Warg forcing an exhausted Bilbo to defend (132059:A:1)", () => {
+  // The treasures are not dealt by the table's layout: the Ring's printed card joins the table's own copy of the cards.
+  let printedRing: Awaited<ReturnType<typeof loadPrinted>>;
+  beforeAll(async () => {
+    printedRing = await loadPrinted(["132019"]);
+  });
+  // Bilbo (132001) holds Bilbo's Magic Ring (132019), is damaged and exhausted, and Ravenous Warg attacks: the Warg's Forced effect makes Bilbo the defender. Returns what the first player may trigger once he is declared.
+  function offeredRing(exhausted: boolean): boolean {
+    const base = table({ phase: "Encounter", engaged: [{ code: "132059", seat: 0 }], play: ["132001"], deck: ["f0", "f0"] });
+    for (const [code, card] of printedRing) (base.ctx.cards as Map<string, typeof card>).set(code, card);
+    const spawned = spawn(base.state, "132019", { zone: "play", seat: 0 });
+    const made = withBilbo({ ...base, state: attachTo(spawned.state, spawned.id, first(base.state, "132001")) }, 5);
+    const cards = { ...made.state.cards, [made.bilbo]: { ...made.state.cards[made.bilbo]!, damage: 1, exhausted } };
+    const state = syncConstants({ ...made.state, cards: { ...cards, [made.hero]: { ...cards[made.hero]!, exhausted: true } } }, made.ctx);
+    let run = send({ state, steps: [] }, { type: "DeclineEngage" }, made.ctx);
+    for (let guard = 0; guard < 40 && run.state.window?.kind !== "defense"; guard += 1) {
+      const pass = legalIntents(run.state, made.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack" || intent.type === "DeclineEngage");
+      if (!pass) break;
+      run = send(run, pass, made.ctx);
+    }
+    run = send(run, { type: "DeclareDefender", defenderId: made.bilbo }, made.ctx);
+    const ring = first(run.state, "132019");
+    return legalIntents(run.state, made.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === ring);
+  }
+
+  // The base branch fixes the Ring, Sting and Glamdring ("After Bilbo exhausts to defend"); until it is merged here the Ring is offered for a defender that was exhausted already.
+  it.fails("132059:A:1 Bilbo already exhausted, forced to defend, does not trigger the Ring's After Bilbo exhausts to defend", () => {
+    expect(offeredRing(true)).toBe(false);
+  });
+
+  it("132059:A:1 Bilbo ready, forced to defend by the Warg, exhausts to defend and the Ring is offered", () => {
+    expect(offeredRing(false)).toBe(true);
   });
 });
