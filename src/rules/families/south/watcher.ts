@@ -30,6 +30,20 @@ export function engagedWithAll(state: ScenarioState, id: string): boolean {
   return state.cards[id]?.zone === "staging" && (flagged(state, id, "engagedWithAll") || flagged(state, id, "engagedWithFirst") || flagged(state, id, "engagedWithThreatening"));
 }
 
+// The seats a staging enemy is considered engaged with, as the immediate attacks of an encounter card read them ("each enemy engaged with a player", 132064:A:1; rr.engaged): every seat for the Watcher, the first player for the Balrog and Bolg, the seats with a threat of 1 or more for Durin's Bane. An enemy that only attacks through a relay (viaRelay) is not engaged with anyone.
+export function consideredEngagedSeats(state: ScenarioState, id: string, among: number[]): number[] {
+  if (state.cards[id]?.zone !== "staging") return [];
+  return among.filter((seat) => flagged(state, id, "engagedWithAll") || (flagged(state, id, "engagedWithFirst") && seat === state.firstPlayer) || engagedWithThreatening(state, id, seat));
+}
+
+// An enemy engaged with the seat (`you`) or with another player (`other`): one in an engagement area, or one in the staging area that is considered engaged with that player (rr.engaged; a pick's and a condition's `engaged`).
+export function engagedAs(state: ScenarioState, id: string, engaged: "you" | "other", seat: number): boolean {
+  const card = state.cards[id];
+  if (!card) return false;
+  if (card.zone === "engaged") return engaged === "you" ? card.controller === seat : card.controller !== seat;
+  return consideredEngagedSeats(state, id, engaged === "you" ? [seat] : livingSeats(state).filter((other) => other !== seat)).length > 0;
+}
+
 // Durin's Bane: considered engaged with a seat while its threat is 1 or greater, read live (04150:A:2, dwd.durins-bane).
 export function engagedWithThreatening(state: ScenarioState, id: string, seat: number): boolean {
   return state.cards[id]?.zone === "staging" && flagged(state, id, "engagedWithThreatening") && (state.seats[seat]?.threat ?? 0) >= 1 && state.seats[seat]?.eliminated !== true;

@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { modifiedStat } from "../../../rules/core/keywords.ts";
-import type { ScenarioState } from "../../../rules/core/state.ts";
+import { expireModifiers, flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
@@ -92,13 +92,16 @@ describe("stages with no progress (132057:A:1)", () => {
     expect(none - some).toBe(1);
   });
 
-  it("132056:A:1 each stage in play loses 1 progress, 2 with three players or more", () => {
-    const made = inPlay({ staging: ["132056"] });
-    const ready = withProgress(withProgress(made.state, S2, 3), S3, 1);
-    const run = resolveRecords(ready, made.ctx, "132056", "whenRevealed", idOf(ready, "132056"));
-    expect(progressOn(run.state, S2)).toBe(2);
-    expect(progressOn(run.state, S3)).toBe(0);
+  it("132056:A:1 each stage in play loses 1 progress, with one player and with two", () => {
+    for (const seats of [1, 2] as const) {
+      const made = inPlay({ staging: ["132056"], seats });
+      const ready = withProgress(withProgress(made.state, S2, 3), S3, 1);
+      const run = resolveRecords(ready, made.ctx, "132056", "whenRevealed", idOf(ready, "132056"));
+      expect(progressOn(run.state, S2)).toBe(2);
+      expect(progressOn(run.state, S3)).toBe(0);
+    }
   });
+  // The engine plays one or two players (ScenarioState.seatCount), so the "3 or more players" half of 132056:A:1 never applies and has no test.
 });
 
 describe("the first Goblin revealed each round (132053:A:4)", () => {
@@ -108,6 +111,20 @@ describe("the first Goblin revealed each round (132053:A:4)", () => {
     // The first Goblin surged and revealed the next card of the deck, a second copy; that one did not surge, so the deck keeps the cards after it.
     expect(state.staging.filter((id) => state.cards[id]?.code === "132055")).toHaveLength(2);
     expect(state.encounterDeck.some((id) => state.cards[id]?.code === "132055")).toBe(true);
+  });
+
+  it("132053:A:4 in the next round the first Goblin revealed surges again", () => {
+    const made = inPlay({ staging: ["132053"], deck: ["132055", "132055", "132055", "132058", "f0", "f0"] });
+    const round1 = revealedTop(made, "132055");
+    expect(round1.staging.filter((id) => round1.cards[id]?.code === "132055")).toHaveLength(2);
+    // The round ends: "until the end of the round" is over, and the next Goblin is the first of round 2.
+    const round2 = expireModifiers(round1, ["endOfPhase", "endOfRound"]);
+    expect(flagged(round2, "table", "firstRevealedSeen")).toBe(false);
+    const again = revealedTop({ ...made, state: round2 }, "132055");
+    // The second round's first Goblin surged as the first round's did: two more cards revealed. Without the end of the round the second Goblin of round 1 does not surge.
+    const same = revealedTop({ ...made, state: round1 }, "132055");
+    expect(same.staging.filter((id) => same.cards[id]?.code === "132055")).toHaveLength(3);
+    expect(again.staging.filter((id) => again.cards[id]?.code === "132055")).toHaveLength(4);
   });
 
   it("132053:A:4 without Bolg in play nothing surges", () => {
@@ -122,7 +139,7 @@ describe("the character with the most damage defends (132059:A:1)", () => {
   const tableOf = (layout: Layout) => table({ ...layout, stage: S2 });
 
   it("132059:A:1 a character with less damage cannot be declared as the defender", () => {
-    expect(() => fightEnemy(tableOf, "f0", "132059", {}, { tweak: damaged(false) })).toThrow();
+    expect(() => fightEnemy(tableOf, "f0", "132059", {}, { tweak: damaged(false) })).toThrow("DeclareDefender refused: The defending player must declare the character with the most damage");
   });
 
   it("132059:A:1 the character with the most damage defends even when it is exhausted", () => {
@@ -132,7 +149,7 @@ describe("the character with the most damage defends (132059:A:1)", () => {
   });
 
   it("132059:A:1 the attack cannot be left undefended while a character can defend it", () => {
-    expect(() => fightEnemy(tableOf, "f0", "132059", {}, { tweak: damaged(false), undefended: true })).toThrow();
+    expect(() => fightEnemy(tableOf, "f0", "132059", {}, { tweak: damaged(false), undefended: true })).toThrow("Undefended refused: The defending player must declare the character with the most damage");
   });
 });
 

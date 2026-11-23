@@ -10,6 +10,7 @@ import type { Condition } from "../../catalog/boundary.ts";
 import { hostOf, resolveAmount, type AmountScope } from "./amounts.ts";
 import { questSucceeded } from "../families/costs/pay.ts";
 import { discardedCost } from "../families/uncharted/cards.ts";
+import { engagedAs } from "../families/south/watcher.ts";
 import { spendablePools } from "../families/costs/verbs.ts";
 import { engagedThisRound } from "../families/attack/events.ts";
 import { attackingHolds } from "../families/attack/strike.ts";
@@ -58,7 +59,8 @@ export type Scope = {
   // The event a Forced effect answers was made by a player card's effect (a heal or a ready).
   byPlayerCard?: boolean;
   // The engagement a Forced effect answers was from the staging area (kept only in a game with ships).
-  fromStaging?: boolean; exhaustedToDefend?: boolean;
+  fromStaging?: boolean;
+  exhaustedToDefend?: boolean;
   // The seat the event a Response answers happened to.
   eventSeat?: number | null;
   // What the running effect has picked, and the other card the answered event names.
@@ -230,8 +232,11 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return holder != null && inAreaOf(state, holder, condition.seat);
     }
     // Answered by the captured family's condition hook above (families/captured/values.ts).
-    case "versusVictoryTrait": case "stagesComplete": case "stageIsCurrent": case "stageNoProgress": return false; // answered by the captured and armies families' condition hooks above
-    case "holderExhausted": return state.cards[scope.holderId ?? scope.sourceId ?? ""]?.exhausted === true;
+    case "versusVictoryTrait":
+      return false;
+    // Answered by the armies family's hook above (stagesComplete, stageIsCurrent, stageNoProgress); holderExhausted is a stat condition, read where the stat is (core/keywords.ts).
+    case "stagesComplete": case "stageIsCurrent": case "stageNoProgress": case "holderExhausted":
+      return false;
     case "versusHighEngagement": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && versusHighEngagement(state, condition.role, holder, ctx.cards, scope.against);
@@ -299,7 +304,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       if (condition.inPlay != null && inPlay(card.zone) !== condition.inPlay) return false;
       if (condition.inStaging != null && (card.zone === "staging") !== condition.inStaging) return false;
       // "While attached enemy is engaged with you": an enemy filter's `engaged` is read against the actor here too.
-      if (condition.pick?.type === "enemy" && condition.pick.engaged && !engagedAs(card, condition.pick.engaged, scope.actor)) return false;
+      if (condition.pick?.type === "enemy" && condition.pick.engaged && !engagedAs(state, id, condition.pick.engaged, scope.actor)) return false;
       // `isSource` (the fortress family's pick hook, 143036:A:2) reads the scope's source; every other filter reads none.
       const sourceId = condition.pick?.isSource ? scope.sourceId : null;
       return condition.pick == null || matchesPick(state, id, condition.pick, { seat: scope.actor, sourceId, counting: true }, ctx);
@@ -349,7 +354,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return scope.byPlayerCard === true;
     case "fromStaging":
       return scope.fromStaging === true;
-    case "exhaustedToDefend": return scope.exhaustedToDefend === true;
+    case "exhaustedToDefend":
+      return scope.exhaustedToDefend === true;
     case "excess":
       return (scope.excess ?? 0) >= condition.min;
     case "dealt":
@@ -416,12 +422,6 @@ export function shadowBlankOf(state: ScenarioState, enemyId: string | null, ctx:
     const code = state.cards[id]?.code;
     return code != null && !ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "shadow");
   });
-}
-
-// An enemy engaged with the seat (`you`) or with another player (`other`).
-function engagedAs(card: { zone: string; controller: number | null }, engaged: "you" | "other", seat: number): boolean {
-  if (card.zone !== "engaged") return false;
-  return engaged === "you" ? card.controller === seat : card.controller !== seat;
 }
 
 function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory" | "hand" | "stormcallerArea" | "encounterDeck" | "attached"): boolean {

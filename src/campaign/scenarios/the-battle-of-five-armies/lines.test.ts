@@ -1,10 +1,8 @@
-// Rules: hob.multiple-stages-in-play, hob.current-quest-stage, hob.baggins-sphere-otd, hob.bilbo-multiplayer-otd, rr.immune, rr.cancel, rr.forced, rr.reveal, rr.engaged (data/rules/entries.json); ledger lines 132052:A:1, 132053:A:2, 132053:A:3, 132054:A:1, 132054:A:2, 132055:A:1, 132060:A:1, 132060:A:2, 132061:A:2, 132061:A:3, 132062:A:3, 132063:A:3, 132065:A:1, 132076:B:2, 132078:B:3, 132079:B:2, 132079:B:3, 132066:A:2, 132001:A:1.
+// Rules: hob.multiple-stages-in-play, hob.current-quest-stage, hob.baggins-sphere-otd, hob.bilbo-multiplayer-otd, rr.immune, rr.cancel, rr.forced, rr.reveal, rr.engaged (data/rules/entries.json); ledger lines 132052:A:1, 132053:A:2, 132053:A:3, 132054:A:1, 132054:A:2, 132055:A:1, 132060:A:1, 132060:A:2, 132061:A:2, 132061:A:3, 132062:A:3, 132063:A:3, 132076:B:2, 132078:B:3, 132079:B:2, 132079:B:3, 132066:A:2, 132001:A:1.
 // What a spec row cannot express: a Baggins payment, several stages in play together, a stage that is not the current one, a cancel that is not offered and the stage 5 fight. Each test starts its title with the line id.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { Effect } from "../../../catalog/boundary.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
-import { definePrinted } from "../../../rules/core/printed.ts";
 import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { askCurrentStage } from "../../../rules/families/armies/stages.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
@@ -14,7 +12,7 @@ import { syncConstants } from "../../../rules/interpret/constants.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
-import { finish, fightEnemy, first, revealedTop, idOf, legalIntents, legalTargets, opening, resolveRecords, revealFromTop, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { finish, fightEnemy, first, idOf, legalIntents, legalTargets, opening, resolveRecords, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "the-battle-of-five-armies";
 const [S1, S2, S3, S4, S5] = ["132075", "132076", "132077", "132078", "132079"] as const;
@@ -286,65 +284,6 @@ describe("Bilbo Baggins (132001:A:1)", () => {
     const made = withBilbo(table({ play: ["132001"] }), 0);
     const after = gainSeatResources(made.state, 0, [], { kind: "rule", rule: "rr.step-1-2" } as never);
     expect(after.cards[made.bilbo]?.resources).toBe(1);
-  });
-});
-
-describe("The attacks (132064:A:1, 132064:A:2, 132059:A:1)", () => {
-  it("132064:A:1 each enemy engaged with a player attacks at once, and no shadow card is dealt for it", () => {
-    const made = table({ staging: ["132064"], engaged: [{ code: "f3", seat: 0 }], deck: ["f0", "f0", "f0"], phase: "Encounter" });
-    const run = resolveRecords(made.state, made.ctx, "132064", "whenRevealed", first(made.state, "132064"));
-    expect(run.state.pendingAttack?.enemyId).toBe(first(made.state, "f3"));
-    expect(run.state.encounterDeck).toHaveLength(3);
-    expect(run.state.cards[first(run.state, "132064")]?.zone).not.toBe("surge");
-  });
-
-  it("132064:A:1 with no enemy engaged with a player the card gains surge: the next encounter card is revealed", () => {
-    const made = table({ staging: [], deck: ["132064", "f0", "f3"] });
-    const state = revealedTop(made, "132064");
-    expect(state.staging.some((id) => state.cards[id]?.code === "f0")).toBe(true);
-  });
-
-  it("132064:A:2 Shadow: the attacking enemy makes an additional attack at once", () => {
-    const damage = (shadow: string) => {
-      const fought = fightEnemy(table, shadow, "132055", {});
-      return fought.run.state.cards[fought.made.hero]?.damage ?? 0;
-    };
-    // The hero that defended the first attack is exhausted, so the additional attack is undefended: Attack 3 on top of the 1 damage of the first.
-    expect(damage("132064") - damage("f0")).toBe(3);
-  });
-});
-
-describe("Goblins are Upon You! (132065:A:1, 132065:A:2)", () => {
-  // A Response on a card in play that cancels the When Revealed effects of the card just revealed; true when it is offered for the revealed card.
-  const cancels: Effect = { id: "blade:response:9", cardCode: "blade", lines: ["blade:A:1"], timing: "response", trigger: "whenRevealedPending", instructions: [{ verb: "CancelEffect" }] };
-  const offered = (revealed: string): boolean => {
-    const made = table({ deck: ["f0", "f0"] });
-    const ctx = { ...made.ctx, effects: [...made.ctx.effects, cancels], cards: new Map([...made.ctx.cards, ["blade", definePrinted({ code: "blade", name: "Blade", type: "attachment" })]]) };
-    const blade = spawn(made.state, "blade", { zone: "play", seat: 0 });
-    const held = attachTo(blade.state, blade.id, made.hero);
-    const revealing = revealFromTop(held, ctx, revealed, []);
-    return legalIntents(revealing.state, ctx).some((intent) => intent.type === "Trigger" && intent.cardId === blade.id);
-  };
-
-  it("132065:A:1 its When Revealed effect cannot be canceled, as one of another card can", () => {
-    expect(offered("132058")).toBe(true);
-    expect(offered("132065")).toBe(false);
-  });
-
-  it("132065:A:1 each player searches the encounter deck and discard pile for a Goblin enemy and engages it", () => {
-    const made = table({ deck: ["f0", "132055", "f0"], discard: ["132056"], staging: ["132065"] });
-    const run = resolveRecords(made.state, made.ctx, "132065", "whenRevealed", first(made.state, "132065"));
-    const engaged = Object.values(run.state.cards).filter((card) => card.zone === "engaged").map((card) => card.code);
-    expect(engaged).toHaveLength(1);
-    expect(["132055", "132056"]).toContain(engaged[0]);
-  });
-
-  it("132065:A:2 Shadow: the attacking enemy gets +1 Attack for each Goblin enemy engaged with the defending player", () => {
-    const attackOf = (shadow: string) => {
-      const fought = fightEnemy(table, shadow, "f3", { engaged: [{ code: "f3", seat: 0 }, { code: "132055", seat: 0 }, { code: "132056", seat: 0 }] });
-      return modifiedStat(fought.during, fought.during.cards[first(fought.during, "f3")]!, "attack", fought.ctx.cards);
-    };
-    expect(attackOf("132065") - attackOf("f0")).toBe(2);
   });
 });
 

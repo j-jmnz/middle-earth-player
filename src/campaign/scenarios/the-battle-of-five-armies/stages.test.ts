@@ -186,14 +186,14 @@ describe("stage 5 takes no progress (132079:B:2)", () => {
     }
   });
 
-  // Bolg is considered engaged but stays in the staging area, so he keeps adding his Threat to it, as Durin's Bane does (dwd.durins-bane; the card says nothing against it).
-  it("132079:B:2 Bolg, engaged with the first player in the staging area, still adds his Threat to the staging area", () => {
+  // Bolg is considered engaged with the first player, and an engaged enemy adds no Threat to the staging area (rr.engaged), as the Balrog and Dagnir do; he adds it again before stage 5, when he is not engaged.
+  it("132079:B:2 Bolg, engaged with the first player in the staging area, adds no Threat to the staging area, and adds it before stage 5", () => {
     for (const seats of [1, 2] as const) {
       const five = table({ seats, stage: S5, staging: ["132053"] });
       const synced = syncConstants(five.state, five.ctx);
       expect(flagged(synced, idOf(synced, "132053"), "engagedWithFirst")).toBe(true);
-      expect(flagged(synced, idOf(synced, "132053"), "noThreatContribution")).toBe(false);
-      expect(stagingThreat(synced, five.ctx.cards)).toBe(seats);
+      expect(flagged(synced, idOf(synced, "132053"), "noThreatContribution")).toBe(true);
+      expect(stagingThreat(synced, five.ctx.cards)).toBe(0);
       const before = table({ seats, stage: S1, staging: ["132053"] });
       expect(stagingThreat(syncConstants(before.state, before.ctx), before.ctx.cards)).toBe(seats);
     }

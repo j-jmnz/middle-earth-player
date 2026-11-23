@@ -20,25 +20,35 @@ import { damageGoesTo } from "../defense/damage.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import { attackWith } from "../attack/immediate.ts";
 import { effectData } from "../encounter/moves.ts";
+import { consideredEngagedSeats } from "../south/watcher.ts";
 
 type Each = Extract<Instruction, { verb: "ImmediateAttackEach" }>;
 
-// The enemies engaged with a player now, in player order and the order they engaged in; while the areas are isolated, only those engaged with the players sharing the acting seat's area ("each Wight enemy engaged with a player", 148014:A:1: at the revealer's stage).
-function engagedEnemies(state: ScenarioState, seat: number): string[] {
-  return (isolatedAreas(state) ? sharing(state, seat) : livingSeats(state)).flatMap((index) => state.seats[index]?.engaged ?? []);
+// One enemy to attack and the seat it attacks: the player an engaged enemy is engaged with, or a player a staging enemy is considered engaged with (the Watcher in the Water, the Balrog, Bolg at stage 5: rr.engaged).
+type Attacker = { enemy: string; against: number | undefined };
+
+// The enemies engaged with a player now, in player order and the order they engaged in, then those in the staging area that are considered engaged with a player; while the areas are isolated, only those engaged with the players sharing the acting seat's area ("each Wight enemy engaged with a player", 148014:A:1: at the revealer's stage).
+function engagedEnemies(state: ScenarioState, seat: number): Attacker[] {
+  const seats = isolatedAreas(state) ? sharing(state, seat) : livingSeats(state);
+  const engaged = seats.flatMap((index) => (state.seats[index]?.engaged ?? []).map((enemy): Attacker => ({ enemy, against: undefined })));
+  const considered = state.staging.flatMap((enemy) => consideredEngagedSeats(state, enemy, seats).map((against): Attacker => ({ enemy, against })));
+  return [...engaged, ...considered];
 }
 
 // ImmediateAttackEach. The first time it runs it queues an attack for each engaged enemy ahead of the rest of the effect; each
 // queued attack runs when the one before it is resolved. Outside an effect nobody can wait for the attacks, so none is made.
 export function immediateAttackEach(state: ScenarioState, instruction: Each, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (instruction.enemy != null) return attackWith(state, instruction.enemy, ctx, steps, undefined, 0, false, instruction.shadow !== false);
+  // An enemy queued from the staging area attacks the seat it was queued for (`focus.seat`) and is counted as one that attacked.
+  if (instruction.enemy != null) return state.cards[instruction.enemy]?.zone === "staging" ? attackWith(state, instruction.enemy, ctx, steps, focus.seat, 0, true, instruction.shadow !== false) : attackWith(state, instruction.enemy, ctx, steps, undefined, 0, false, instruction.shadow !== false);
   const data = effectData(state);
   if (!data) return state;
   // `trait`: only the engaged enemies with it ("All engaged Troll enemies attack", 900208:A:1).
   const trait = instruction.trait;
-  const queued = (instruction.own ? (state.seats[focus.seat]?.engaged ?? []) : engagedEnemies(state, focus.seat))
-    .filter((enemy) => (trait == null || hasTrait(state, enemy, trait, ctx)) && (instruction.notTrait == null || !hasTrait(state, enemy, instruction.notTrait, ctx)))
-    .map((enemy): QueueItem => ({ instruction: { ...instruction, enemy }, seat: focus.seat, chosen: null }));
+  const own = state.seats[focus.seat]?.engaged ?? [];
+  const attackers = instruction.own ? [...own.map((enemy): Attacker => ({ enemy, against: undefined })), ...state.staging.filter((enemy) => consideredEngagedSeats(state, enemy, [focus.seat]).length > 0).map((enemy): Attacker => ({ enemy, against: focus.seat }))] : engagedEnemies(state, focus.seat);
+  const queued = attackers
+    .filter(({ enemy }) => (trait == null || hasTrait(state, enemy, trait, ctx)) && (instruction.notTrait == null || !hasTrait(state, enemy, instruction.notTrait, ctx)))
+    .map(({ enemy, against }): QueueItem => ({ instruction: { ...instruction, enemy }, seat: against ?? focus.seat, chosen: null }));
   return patchTop(state, { data: { ...data, queue: [...queued, ...data.queue] } });
 }
 
