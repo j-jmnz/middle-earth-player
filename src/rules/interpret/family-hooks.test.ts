@@ -130,9 +130,9 @@ describe("combat damage hooks", () => {
   it("run in list order, each on the state the one before left", () => {
     const seen: string[] = [];
     const list = [family("a", { combat: { damaged: (_before, after) => { seen.push("a"); return { ...after, round: after.round + 1 }; } } }), family("b"), family("c", { combat: { damaged: (_before, after) => { seen.push("c"); return { ...after, round: after.round * 10 }; } } })];
-    expect(familyAttackDamaged(state, state, ctx, list).round).toBe((state.round + 1) * 10);
+    expect(familyAttackDamaged(state, state, ctx, [], list).round).toBe((state.round + 1) * 10);
     expect(seen).toEqual(["a", "c"]);
-    expect(familyAttackDamaged(state, state, ctx, [family("b")])).toBe(state);
+    expect(familyAttackDamaged(state, state, ctx, [], [family("b")])).toBe(state);
   });
 });
 

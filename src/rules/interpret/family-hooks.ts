@@ -267,9 +267,9 @@ export function familyDefenseReason(state: ScenarioState, defender: PrintedCard,
 }
 
 /** The state the families leave once the damage of the enemy attack in progress is dealt: each family's `combat.damaged` reads what changed between `before` and `after` (Venom, `poison`). */
-export function familyAttackDamaged(before: ScenarioState, after: ScenarioState, ctx: ReduceContext, families: readonly RulesFamily[] = active()): ScenarioState {
+export function familyAttackDamaged(before: ScenarioState, after: ScenarioState, ctx: ReduceContext, steps: EngineStep[], families: readonly RulesFamily[] = active()): ScenarioState {
   let next = after;
-  for (const family of hooked(families).combat) next = family.combat?.damaged?.(before, next, ctx) ?? next;
+  for (const family of hooked(families).combat) next = family.combat?.damaged?.(before, next, ctx, steps) ?? next;
   return next;
 }
 

@@ -77,7 +77,7 @@ export type CombatHooks = {
   readonly defense?: (state: ScenarioState, defender: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, defenderId: string) => string | null;
   readonly attack?: (state: ScenarioState, enemyId: string, attacker: PrintedCard, target: PrintedCard, attackerId: string) => string | null;
   readonly undefended?: (state: ScenarioState, candidates: () => readonly string[], cards: ReadonlyMap<string, PrintedCard>) => readonly string[];
-  readonly damaged?: (before: ScenarioState, after: ScenarioState, ctx: ReduceContext) => ScenarioState;
+  readonly damaged?: (before: ScenarioState, after: ScenarioState, ctx: ReduceContext, steps: EngineStep[]) => ScenarioState;
 };
 
 /** Whether a family bars a seat from optionally engaging an enemy in the staging area (rr.optional-engagement): true bars it. Asked after the core's own bars, with the cards the game plays. */

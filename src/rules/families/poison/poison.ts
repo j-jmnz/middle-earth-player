@@ -2,6 +2,8 @@
 //
 // Poison is the top card of a character's controller's deck, attached to the character facedown (the zone under, hosted by it, `CardInstance.poison`, `owner` the seat whose deck it came from). A character with any poison is poisoned. With poison equal to its printed hit
 // points a character is made unconscious at once and the poison goes to the discard pile of the player who owns it. A poison that leaves for any reason goes to its owner's discard pile, a character that leaves play takes its poison there (families/play/zones.ts leaveWith).
+import { currentCause, ruleCause } from "../../core/cause.ts";
+import type { EngineStep } from "../../core/intents.ts";
 import { isCharacterType, printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, updateCard } from "../../core/state.ts";
@@ -44,22 +46,24 @@ export function discardPoison(state: ScenarioState, hostId: string | null, amoun
 }
 
 /** MakeUnconscious: the character is rotated, leaves the quest and its poison is discarded (hob.unconscious-characters). A character already unconscious, or not in play, is left as it is. */
-export function makeUnconscious(state: ScenarioState, id: string | null, ctx: ReduceContext): ScenarioState {
+export function makeUnconscious(state: ScenarioState, id: string | null, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || card.unconscious === true || !isCharacterInPlay(state, id, ctx)) return state;
   const unpoisoned = discardPoison(state, id, "all");
+  steps.push({ kind: "unconscious", targetId: id, cause: currentCause(steps, ruleCause("hob.unconscious-characters")) });
   return removeFromQuest(updateCard(unpoisoned, id, { unconscious: true, exhausted: true }), id, ctx);
 }
 
 /** ReadyUnconscious: the character is no longer unconscious and is ready. */
-export function readyUnconscious(state: ScenarioState, id: string | null): ScenarioState {
+export function readyUnconscious(state: ScenarioState, id: string | null, steps: EngineStep[]): ScenarioState {
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || card.unconscious !== true) return state;
+  steps.push({ kind: "unconscious", targetId: id, ready: true, cause: currentCause(steps, ruleCause("hob.unconscious-characters")) });
   return updateCard(state, id, { unconscious: undefined, exhausted: false });
 }
 
 /** GivePoison: for each of `amount`, the top card of the controller's deck goes facedown under the character. A deck with no card gives none, a character that cannot be poisoned gets none. With poison equal to the printed hit points the character is made unconscious at once. */
-export function givePoison(state: ScenarioState, id: string | null, amount: number, ctx: ReduceContext): ScenarioState {
+export function givePoison(state: ScenarioState, id: string | null, amount: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   for (let count = 0; count < amount; count += 1) {
     const card = id ? next.cards[id] : undefined;
@@ -68,7 +72,8 @@ export function givePoison(state: ScenarioState, id: string | null, amount: numb
     if (!top) return next;
     next = updateCard(moveCard(next, top, { zone: "under", locationId: id }), top, { owner: card.controller, poison: true });
     const hitPoints = printedOf(ctx.cards, card.code).health;
-    if (hitPoints != null && hitPoints > 0 && poisonOf(next, id) >= hitPoints) return makeUnconscious(next, id, ctx);
+    steps.push({ kind: "poison", targetId: id, count: poisonOf(next, id), of: hitPoints ?? 0, cause: currentCause(steps, ruleCause("hob.venom-poison")) });
+    if (hitPoints != null && hitPoints > 0 && poisonOf(next, id) >= hitPoints) return makeUnconscious(next, id, ctx, steps);
   }
   return next;
 }

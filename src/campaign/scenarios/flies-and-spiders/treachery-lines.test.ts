@@ -40,7 +40,7 @@ lineSpec("132033:A:1", "with heroes of 2 players committed exactly one hero is m
 
 lineSpec("132034:A:1", "Poisoned by Spiders deals each character damage equal to its poison, together, and gains no surge", (effects) => {
   const t = on(effects, { seats: 2, deck: ["f0", "f0"], play: [{ code: "ally", seat: 0 }] });
-  const state = givePoison(givePoison(t.state, t.hero, 2, t.ctx), t.seat1Hero, 1, t.ctx);
+  const state = givePoison(givePoison(t.state, t.hero, 2, t.ctx, []), t.seat1Hero, 1, t.ctx, []);
   const out = revealedTop({ state, ctx: t.ctx }, "132034");
   expect(out.cards[t.hero]?.damage).toBe(2);
   expect(out.cards[t.seat1Hero ?? ""]?.damage, "the other player's character").toBe(1);
@@ -55,13 +55,13 @@ lineSpec("132034:A:1", "when no character is poisoned no damage is dealt and the
 });
 lineSpec("132034:A:1", "once the players are split only the characters of the area the card is revealed to take damage", (effects) => {
   const { t, state } = splitTable(effects);
-  const sick = givePoison(givePoison(state, state.seats[0]?.heroes[0] ?? "", 1, t.ctx), t.seat1Hero, 1, t.ctx);
+  const sick = givePoison(givePoison(state, state.seats[0]?.heroes[0] ?? "", 1, t.ctx, []), t.seat1Hero, 1, t.ctx, []);
   const out = revealTo(t.ctx, sick, "132034", 1);
   expect(out.cards[t.seat1Hero ?? ""]?.damage, "the area of the card").toBe(1);
   expect(out.cards[state.seats[0]?.heroes[0] ?? ""]?.damage, "the first player's area").toBe(0);
 });
 lineSpec("132034:A:2", "Shadow: the defending player discards an unconscious character he controls, and nothing is discarded when none is unconscious", (effects) => {
-  const down = fightEnemy((layout) => on(effects, layout), "132034", "f0", { seats: 1 as const }, { tweak: (state, made) => makeUnconscious(state, made.hero2, made.ctx) });
+  const down = fightEnemy((layout) => on(effects, layout), "132034", "f0", { seats: 1 as const }, { tweak: (state, made) => makeUnconscious(state, made.hero2, made.ctx, []) });
   expect(down.run.state.cards[down.made.hero2]?.zone, "the unconscious character is discarded").toBe("discard");
   expect(down.run.state.cards[down.made.hero]?.zone, "the defender stays").toBe("heroes");
   const clean = fightEnemy((layout) => on(effects, layout), "132034", "f0", { seats: 1 as const });

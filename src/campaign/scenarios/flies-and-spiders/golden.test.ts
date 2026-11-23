@@ -45,8 +45,9 @@ describe("Flies and Spiders golden", () => {
     },
     lost(state, golden) {
       const seats = state.seats.slice(0, golden.seatCount);
-      if (golden.lossReason === "Bilbo Baggins left play") return expect(cardsOf(state, BILBO).every((card) => card.zone !== "heroes"), golden.name).toBe(true);
-      expect(seats.every((seat) => seat.eliminated && seat.threat >= 50), golden.name).toBe(true);
+      // Bilbo Baggins out of the heroes, or every seat eliminated at threat 50: one assertion either way.
+      const byBilbo = golden.lossReason === "Bilbo Baggins left play";
+      expect(byBilbo ? cardsOf(state, BILBO).every((card) => card.zone !== "heroes") : seats.every((seat) => seat.eliminated && seat.threat >= 50), golden.name).toBe(true);
     },
   });
 });

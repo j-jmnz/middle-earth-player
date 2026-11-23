@@ -10,6 +10,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import { embassyPairNow } from "../readouts/black-gate.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { ringBearerId } from "../../rules/families/burden/deck.ts";
+import { poisonOf } from "../../rules/families/poison/poison.ts";
 import { frameScope, hostOf, resolveAmount } from "../../rules/interpret/amounts.ts";
 import { holds } from "../../rules/interpret/conditions.ts";
 import { pickCandidates } from "../../rules/interpret/pick.ts";
@@ -29,7 +30,7 @@ export type Text = string | readonly { when?: Condition; text: string }[];
 
 /**
  * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{picked}` (the card an Each or an earlier Pick of the record chose, in a note too; in a caution, the card of the row it is about), `{host}` (the card the record's card lies on), `{subject}` (the card that triggered the record: the ally that entered play), `{pair}` (the Embassy's pair being decided: the player card with its owner and the encounter card it is paired with) and `{ringBearer}` (the hero with the Ring-bearer trait), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
- * has none), `{left}` (the damage an AssignDamage still has to place, counting the step asked: its note only), `{again}` (the times the same Pick comes again in the queue, after this one), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
+ * has none), `{left}` (the damage an AssignDamage still has to place, counting the step asked: its note only), `{countdown}` (an entry with `countdown`: "2 of 4"), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
  * - `note`: the sentence over a Pick or a Choose (the entry keyed with the instruction's verb).
  * - `why`: the reason the window opened. It is said after the card's title and before the note, "Card: why note" ("Player 1, Card: why note" when owned and two-handed).
  * - `owned`: one player's own choice. Two-handed the sentence leads with the player and the sheet adds no "Player N chooses."; solo it has no lead, and a note with no `why` is capitalised.
@@ -49,6 +50,8 @@ export type Ask = {
   label?: Text;
   labels?: Readonly<Record<string, Text>>;
   bind?: Readonly<Record<string, Amount>>;
+  /** The times the record's Pick repeats (Forest Stream's four discards): `{countdown}` says "n of m", n counting this one and m what the poison under the characters offered can still give, so fewer than the times when fewer remain. */
+  countdown?: number;
   named?: Readonly<Record<string, { pick: PickSpec; otherwise: string }>>;
   caution?: { when: Condition; text: Text };
 };
@@ -71,8 +74,8 @@ export type AskFacts = {
   cause?: Cause;
   source: string | null;
   amountNow?: number;
-  // How many times the same Pick is queued again after the one asked (a Repeat expanded in the queue): `{again}`, the countdown of Forest Stream's four discards.
-  again?: number;
+  // How many times the same Pick is queued again after the one asked (a Repeat expanded in the queue), read only for an entry with `countdown`.
+  again?: () => number;
   options?: readonly string[];
   at?: AskAt | null;
 };
@@ -97,7 +100,7 @@ export function templatesOf(entry: Ask): string[] {
 
 /** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `subject`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` and `named` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", "picked", "host", "subject", "ringBearer", "pair", "left", "dealt", "again", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...Object.keys(entry.named ?? {}), ...Object.keys(entry.named ?? {}).map((name) => `${name}Cost`)]);
+  const known = new Set(["card", "owner", "picked", "host", "subject", "ringBearer", "pair", "left", "dealt", "pursuitLimit", ...(entry.countdown != null ? ["countdown"] : []), ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...Object.keys(entry.named ?? {}), ...Object.keys(entry.named ?? {}).map((name) => `${name}Cost`)]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -154,7 +157,13 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
     const dealt = (a.instruction.dealtIds ?? []).map((id) => `${a.names.card(id)}${printedOf(a.ctx.cards, a.game.cards[id]?.code ?? "").keywords.pass === true ? " (PASS)" : " (no PASS)"}`);
     values.dealt = dealt.length > 0 ? dealt.join(", ") : "none yet";
   }
-  if (a.again != null) values.again = a.again;
+  // "2 of 4": the discards done so far, this one, and the most the poison still on the characters offered lets the repeats reach.
+  if (entry.countdown != null && a.again) {
+    const left = a.again() + 1;
+    const done = entry.countdown - left;
+    const poison = (a.options ?? []).reduce((sum, id) => sum + poisonOf(a.game, id), 0);
+    values.countdown = `${done + 1} of ${done + Math.max(1, Math.min(left, poison))}`;
+  }
   values.host = hostId ? a.names.card(hostId) : "Its host";
   // The card an Each or an earlier Pick of the record chose, for the question it opens ("Fanuidhol: spend 1 resource from {picked}'s pool", 04016:A:1).
   const chosen = scope.picked?.findLast((id) => a.game.cards[id] != null);

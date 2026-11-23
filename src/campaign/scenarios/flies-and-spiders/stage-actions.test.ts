@@ -18,7 +18,7 @@ const split = (effects: readonly Effect[], resources = 2) => {
   const t = spiderTable({ stage: STAGE_2, setAside: [GLADE], seats: 2 }, { effects });
   const bilbo = withBilbo(t.state, 0);
   let state = resolveRecords(bilbo.state, t.ctx, STAGE_2, "whenRevealed", bilbo.state.questStage ?? "").state;
-  state = makeUnconscious(state, t.seat1Hero, t.ctx);
+  state = makeUnconscious(state, t.seat1Hero, t.ctx, []);
   state = syncConstants(updateCard(state, bilbo.id, { resources }), t.ctx);
   const down = (state.seats[0]?.heroes ?? []).filter((id) => state.cards[id]?.unconscious === true);
   return { t, state, bilbo: bilbo.id, stage3: stageOf(state, 0) ?? "", stage4: stageOf(state, 1) ?? "", down };
@@ -27,7 +27,7 @@ const split = (effects: readonly Effect[], resources = 2) => {
 const alone = (effects: readonly Effect[], resources = 2) => {
   const t = spiderTable({ stage: STAGE_4, seats: 1 }, { effects });
   const bilbo = withBilbo(t.state, 0);
-  const state = syncConstants(updateCard(makeUnconscious(bilbo.state, t.hero, t.ctx), bilbo.id, { resources }), t.ctx);
+  const state = syncConstants(updateCard(makeUnconscious(bilbo.state, t.hero, t.ctx, []), bilbo.id, { resources }), t.ctx);
   return { t, state, bilbo: bilbo.id, stage: state.questStage ?? "", hero: t.hero };
 };
 const offered = (t: { ctx: Parameters<typeof legalIntents>[1] }, state: ScenarioState, seat: number, stage: string) =>

@@ -60,11 +60,11 @@ lineSpec("132028:A:2", "with 2 players each gives 1 poison to a hero he controls
   const both = fire(t.ctx, t.state, endOfRound);
   expect(poisonOf(both, t.seat1Hero ?? ""), "the other player's hero").toBe(1);
   expect(poisonOf(both, t.hero) + poisonOf(both, t.hero2), "the first player's heroes").toBe(1);
-  const one = makeUnconscious(t.state, t.hero, t.ctx);
+  const one = makeUnconscious(t.state, t.hero, t.ctx, []);
   const out = fire(t.ctx, one, endOfRound);
   expect(poisonOf(out, t.hero), "an unconscious hero cannot take it").toBe(0);
   expect(poisonOf(out, t.hero2), "the other hero takes it").toBe(1);
-  const all = makeUnconscious(one, t.hero2, t.ctx);
+  const all = makeUnconscious(one, t.hero2, t.ctx, []);
   expect(poisonOf(fire(t.ctx, all, endOfRound), t.seat1Hero ?? ""), "the second player's still does").toBe(1);
   expect(total(fire(t.ctx, all, endOfRound)), "none of the first player's heroes can").toBe(1);
 });
@@ -78,7 +78,7 @@ lineSpec("132028:A:2", "once the players are split only the players of the area 
 // ---- 132029 Crazy Cob ----
 const cob = (effects: readonly Effect[], poison: readonly [number, number], seats: 1 | 2 = 2) => {
   const t = on(effects, { seats });
-  const state = givePoison(givePoison(t.state, t.hero, poison[0], t.ctx), t.seat1Hero, poison[1], t.ctx);
+  const state = givePoison(givePoison(t.state, t.hero, poison[0], t.ctx, []), t.seat1Hero, poison[1], t.ctx, []);
   const run = resolveRecords(state, t.ctx, "132029", "whenRevealed");
   return { t, run, state: run.state };
 };
@@ -126,12 +126,12 @@ lineSpec("132030:A:2", "once the players are split only the committed characters
   expect(poisonOf(out, t.seat1Hero ?? ""), "the area of the card").toBe(1);
 });
 lineSpec("132030:A:3", "Shadow: a poisoned defending character is made unconscious, a clean one is not, and an undefended attack has no defending character", (effects) => {
-  const poisoned = fightEnemy((layout) => on(effects, layout), "132030", "f0", { seats: 1 as const }, { tweak: (state, made) => syncConstants(givePoison(state, made.hero, 1, made.ctx), made.ctx) });
+  const poisoned = fightEnemy((layout) => on(effects, layout), "132030", "f0", { seats: 1 as const }, { tweak: (state, made) => syncConstants(givePoison(state, made.hero, 1, made.ctx, []), made.ctx) });
   expect(poisoned.run.state.cards[poisoned.made.hero]?.unconscious, "poisoned").toBe(true);
   const clean = fightEnemy((layout) => on(effects, layout), "132030", "f0", { seats: 1 as const });
   expect(clean.run.state.cards[clean.made.hero]?.unconscious, "not poisoned").toBeUndefined();
   expect(clean.run.state.cards[clean.made.hero]?.zone).toBe("heroes");
-  const bare = fightEnemy((layout) => on(effects, layout), "132030", "f0", { seats: 1 as const }, { undefended: true, tweak: (state, made) => syncConstants(givePoison(state, made.hero, 1, made.ctx), made.ctx) });
+  const bare = fightEnemy((layout) => on(effects, layout), "132030", "f0", { seats: 1 as const }, { undefended: true, tweak: (state, made) => syncConstants(givePoison(state, made.hero, 1, made.ctx, []), made.ctx) });
   expect(bare.run.state.cards[bare.made.hero]?.unconscious, "undefended").toBeUndefined();
   expect(poisoned.run.state.cards[poisoned.made.hero]?.exhausted, "the Shadow ran on a table that can tell").toBe(true);
 });
@@ -144,10 +144,10 @@ lineSpec("132031:A:2", "it gets +3 Attack while engaged with a player who contro
   const staged = spiders.find((card) => card.zone === "staging")?.id;
   const attack = (state: ScenarioState, id: string) => modifiedStat(state, state.cards[id]!, "attack", t.ctx.cards);
   const base = attack(t.state, engaged ?? "");
-  const sick = syncConstants(givePoison(t.state, t.hero, 1, t.ctx), t.ctx);
+  const sick = syncConstants(givePoison(t.state, t.hero, 1, t.ctx, []), t.ctx);
   expect(attack(sick, engaged ?? ""), "engaged with the poisoned character's player").toBe(base + 3);
   expect(attack(sick, staged ?? ""), "not engaged").toBe(base);
-  const other = syncConstants(givePoison(t.state, t.seat1Hero, 1, t.ctx), t.ctx);
+  const other = syncConstants(givePoison(t.state, t.seat1Hero, 1, t.ctx, []), t.ctx);
   expect(attack(other, engaged ?? ""), "the poisoned character is the other player's").toBe(base);
 });
 lineSpec("132031:A:3", "Shadow: the defending character gets 1 poison; an undefended attack gives 2 poison to one character the defending player controls", (effects) => {

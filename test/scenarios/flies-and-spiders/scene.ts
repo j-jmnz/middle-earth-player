@@ -53,8 +53,8 @@ export function toNextRound(first: ScenarioState, ctx: ReduceContext, guard = 80
 }
 
 /** The table after stage 2B is revealed with two players: seat 0 alone at stage 3, seat 1 at stage 4 in the original area, which the Glade joined (the layout may add to it). */
-export function splitTable(effects: readonly Effect[], layout: SpiderLayout = {}) {
-  const t = spiderTable({ stage: STAGE_2, setAside: [GLADE], seats: 2, ...layout }, { effects });
+export function splitTable(effects: readonly Effect[] | undefined, layout: SpiderLayout = {}, extra: readonly string[] = []) {
+  const t = spiderTable({ stage: STAGE_2, setAside: [GLADE], seats: 2, ...layout }, { ...(effects ? { effects } : {}), extra: [...extra] });
   return { t, state: resolveRecords(t.state, t.ctx, STAGE_2, "whenRevealed", t.state.questStage ?? "").state };
 }
 /** A card of `code` is put in the staging area of the area `seat` heads. */

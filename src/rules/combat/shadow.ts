@@ -237,19 +237,19 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     if (defender) steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.defenderId, attack: strength, defense, undefended: false, cause: ruleCause("rr.step-6-4-3") });
     // "This attack deals no damage" (a flag the enemy holds, families/misc.ts).
     const raw = defender && !flagged(next, enemy.id, "dealsNoDamage") ? Math.max(0, strength - defense) : 0;
-    const damaged = noteAttackDamage(next, defender ? combatDamage(noteStruck(next, strength, ctx), attack.enemyId, attack.defenderId, raw, ctx, steps) : next, ctx);
+    const damaged = noteAttackDamage(next, defender ? combatDamage(noteStruck(next, strength, ctx), attack.enemyId, attack.defenderId, raw, ctx, steps) : next, ctx, steps);
     return damaged.lost ? damaged : afterDamage(damaged, ctx, steps);
   }
   // A shadow effect sent the damage to an active location (families/south/watcher.ts).
   const located = attack.toLocation || undefendedToCity(next, attack.enemyId) ? locationDamage(next, attack, ctx, steps) : null;
-  if (located) return located.lost || located.window ? located : afterDamage(noteAttackDamage(next, located, ctx), ctx, steps);
+  if (located) return located.lost || located.window ? located : afterDamage(noteAttackDamage(next, located, ctx, steps), ctx, steps);
   // A shadow effect made a defended attack undefended: the player still names the hero who takes it.
   if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
   // No hero is left to take the attack (every hero of the seat is held, 18074): it deals no damage.
   if (!next.cards[attack.heroId]) return afterDamage(next, ctx, steps);
   const strength = modifiedStat(next, enemy, "attack", ctx.cards);
   steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.heroId, attack: strength, defense: 0, undefended: true, cause: ruleCause("rr.step-6-4-3") });
-  const hit = noteAttackDamage(next, combatDamage(noteStruck(next, strength, ctx), attack.enemyId, attack.heroId, flagged(next, enemy.id, "dealsNoDamage") ? 0 : strength, ctx, steps), ctx);
+  const hit = noteAttackDamage(next, combatDamage(noteStruck(next, strength, ctx), attack.enemyId, attack.heroId, flagged(next, enemy.id, "dealsNoDamage") ? 0 : strength, ctx, steps), ctx, steps);
   return hit.lost ? hit : afterDamage(hit, ctx, steps);
 }
 

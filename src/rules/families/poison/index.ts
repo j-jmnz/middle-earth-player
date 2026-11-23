@@ -26,13 +26,13 @@ function targetOf(state: ScenarioState, ref: Extract<Instruction, { verb: "GiveP
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "GivePoison":
-      return givePoison(state, targetOf(state, instruction.target, focus), instruction.amount ?? 1, ctx);
+      return givePoison(state, targetOf(state, instruction.target, focus), instruction.amount ?? 1, ctx, steps);
     case "DiscardPoison":
       return discardPoison(state, targetOf(state, instruction.target, focus), instruction.all === true ? "all" : (instruction.amount ?? 1));
     case "MakeUnconscious":
-      return makeUnconscious(state, targetOf(state, instruction.target, focus), ctx);
+      return makeUnconscious(state, targetOf(state, instruction.target, focus), ctx, steps);
     case "ReadyUnconscious":
-      return readyUnconscious(state, targetOf(state, instruction.target, focus));
+      return readyUnconscious(state, targetOf(state, instruction.target, focus), steps);
     case "AttackPickedPlayer": {
       const target = state.cards[lastPicked(state)];
       return target?.controller != null && focus.sourceId ? attackNowFromStaging(state, focus.sourceId, target.controller, ctx, steps, { shadow: true }) : state;

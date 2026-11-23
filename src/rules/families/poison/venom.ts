@@ -5,18 +5,19 @@
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay } from "../../core/state.ts";
 import { isCharacterType, printedOf } from "../../core/printed.ts";
+import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { givePoison } from "./poison.ts";
 
 /** The characters the attack in progress damaged between `before` and `after` each get 1 poison when its enemy has Venom. Called where the attack's damage is noted (families/defense/damage.ts noteAttackDamage). */
-export function venomPoison(before: ScenarioState, after: ScenarioState, ctx: ReduceContext): ScenarioState {
+export function venomPoison(before: ScenarioState, after: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const enemyId = after.pendingAttack?.enemyId ?? before.pendingAttack?.enemyId;
   if (!enemyId || after.modifiers.length === 0 || !flagged(after, enemyId, "venom")) return after;
   let next = after;
   for (const now of Object.values(after.cards)) {
     const was = before.cards[now.id];
     if (!was || !inPlay(now.zone) || now.damage <= was.damage || !(now.zone === "heroes" || isCharacterType(printedOf(ctx.cards, now.code)))) continue;
-    next = givePoison(next, now.id, 1, ctx);
+    next = givePoison(next, now.id, 1, ctx, steps);
   }
   return next;
 }

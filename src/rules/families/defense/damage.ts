@@ -126,9 +126,9 @@ export function questDamageCause(state: ScenarioState, ctx: ReduceContext): Ques
 
 // Each character that took damage from the enemy attack in progress and is still in play hears it ("After attached hero takes
 // damage from an enemy attack"): the characters whose damage went up between the two states; the enemy making the attack is the event's other card.
-export function noteAttackDamage(before: ScenarioState, damaged: ScenarioState, ctx: ReduceContext): ScenarioState {
+export function noteAttackDamage(before: ScenarioState, damaged: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   // A family may act on the damage (an enemy with Venom gives each character it damaged 1 poison: hob.venom-poison, families/poison/venom.ts).
-  const after = familyAttackDamaged(before, damaged, ctx);
+  const after = familyAttackDamaged(before, damaged, ctx, steps);
   if (!listened(after, ctx, ["damagedByAttack"])) return after;
   let next = after;
   for (const now of Object.values(after.cards)) {

@@ -21,7 +21,7 @@ const on = (effects: readonly Effect[], layout: Parameters<typeof spiderTable>[0
 type Table = ReturnType<typeof on>;
 const synced = (t: Table, state: ScenarioState) => syncConstants(state, t.ctx);
 const stat = (t: Table, state: ScenarioState, id: string, which: Parameters<typeof modifiedStat>[2]) => modifiedStat(state, state.cards[id]!, which, t.ctx.cards);
-const poisoned = (t: Table, n: number, id = t.hero) => synced(t, givePoison(t.state, id, n, t.ctx));
+const poisoned = (t: Table, n: number, id = t.hero) => synced(t, givePoison(t.state, id, n, t.ctx, []));
 const total = (state: ScenarioState) => state.seats.reduce((sum, seat) => sum + seat.heroes.reduce((inner, id) => inner + poisonOf(state, id), 0), 0);
 // The location leaves play (`explored`: as an explored location, or discarded) and the Trigger the engine offers for its Response, if any, is used with every choice answered by its first option.
 const afterLeaving = (t: Table, state: ScenarioState, code: string, explored: boolean): { offered: boolean; state: ScenarioState } => {
@@ -114,13 +114,13 @@ lineSpec("132026:A:1", "Giant Web in the staging area changes nothing, and with 
   const base = stat(staged, staged.state, staged.hero, "willpower");
   expect(stat(staged, poisoned(staged, 1), staged.hero, "willpower"), "not the active location").toBe(base);
   const t = on(effects, { seats: 2, active: "132026" });
-  const sick = synced(t, givePoison(givePoison(t.state, t.hero, 1, t.ctx), t.seat1Hero, 1, t.ctx));
+  const sick = synced(t, givePoison(givePoison(t.state, t.hero, 1, t.ctx, []), t.seat1Hero, 1, t.ctx, []));
   expect(stat(t, sick, t.seat1Hero ?? "", "attack"), "the other player's poisoned hero").toBe(stat(t, t.state, t.seat1Hero ?? "", "attack") - 1);
   expect(stat(t, sick, t.hero, "attack")).toBe(stat(t, t.state, t.hero, "attack") - 1);
 });
 lineSpec("132026:A:2", "after Giant Web leaves play as an explored location it readies an unconscious character, chosen by the first player: one of two is readied", (effects) => {
   const t = on(effects, { seats: 1, active: "132026" });
-  const down = makeUnconscious(makeUnconscious(t.state, t.hero, t.ctx), t.hero2, t.ctx);
+  const down = makeUnconscious(makeUnconscious(t.state, t.hero, t.ctx, []), t.hero2, t.ctx, []);
   const out = afterLeaving(t, down, "132026", true);
   expect(out.offered).toBe(true);
   const awake = [t.hero, t.hero2].filter((id) => out.state.cards[id]?.unconscious !== true);
@@ -129,7 +129,7 @@ lineSpec("132026:A:2", "after Giant Web leaves play as an explored location it r
 });
 lineSpec("132026:A:2", "is not offered when Giant Web leaves play unexplored, or when no character is unconscious", (effects) => {
   const t = on(effects, { seats: 1, active: "132026" });
-  const down = makeUnconscious(t.state, t.hero, t.ctx);
+  const down = makeUnconscious(t.state, t.hero, t.ctx, []);
   expect(afterLeaving(t, down, "132026", true).offered, "explored, one unconscious").toBe(true);
   expect(afterLeaving(t, down, "132026", false).offered, "discarded unexplored").toBe(false);
   expect(afterLeaving(t, t.state, "132026", true).offered, "nothing to ready").toBe(false);
@@ -145,19 +145,19 @@ lineSpec("132027:A:1", "while Forest Stream is the active location a poisoned ch
   expect(legalTargets(at, { type: "Commit" }, t.ctx)).not.toContain(t.hero);
   expect(legalTargets(at, { type: "Commit" }, t.ctx)).toContain(t.hero2);
   const staged = on(effects, { seats: 1, staging: ["132027"], active: "132026" });
-  expect(flagged(synced(staged, givePoison(staged.state, staged.hero, 1, staged.ctx)), staged.hero, "cannotQuest"), "not while it is in the staging area").toBe(false);
+  expect(flagged(synced(staged, givePoison(staged.state, staged.hero, 1, staged.ctx, [])), staged.hero, "cannotQuest"), "not while it is in the staging area").toBe(false);
 });
 lineSpec("132027:A:2", "after Forest Stream leaves play as an explored location 4 poison are discarded from the characters, all of it when fewer than 4 are there", (effects) => {
   const t = on(effects, { seats: 1, active: "132027" });
-  const six = givePoison(givePoison(t.state, t.hero, 3, t.ctx), t.hero2, 3, t.ctx);
+  const six = givePoison(givePoison(t.state, t.hero, 3, t.ctx, []), t.hero2, 3, t.ctx, []);
   expect(total(afterLeaving(t, six, "132027", true).state), "6 poison, 4 discarded").toBe(2);
-  const two = givePoison(t.state, t.hero2, 2, t.ctx);
+  const two = givePoison(t.state, t.hero2, 2, t.ctx, []);
   expect(total(afterLeaving(t, two, "132027", true).state), "2 poison, all discarded").toBe(0);
-  expect(total(afterLeaving(t, givePoison(t.state, t.hero, 4, t.ctx), "132027", true).state), "exactly 4").toBe(0);
+  expect(total(afterLeaving(t, givePoison(t.state, t.hero, 4, t.ctx, []), "132027", true).state), "exactly 4").toBe(0);
 });
 lineSpec("132027:A:2", "is not offered when Forest Stream leaves play unexplored or when no character is poisoned, and discards from the other player's characters too", (effects) => {
   const t = on(effects, { seats: 2, active: "132027" });
-  const sick = givePoison(givePoison(t.state, t.hero, 1, t.ctx), t.seat1Hero, 2, t.ctx);
+  const sick = givePoison(givePoison(t.state, t.hero, 1, t.ctx, []), t.seat1Hero, 2, t.ctx, []);
   const explored = afterLeaving(t, sick, "132027", true);
   expect(explored.offered).toBe(true);
   expect(total(explored.state), "the poison of both players is discarded").toBe(0);

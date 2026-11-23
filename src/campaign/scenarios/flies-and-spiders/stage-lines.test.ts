@@ -51,16 +51,16 @@ lineSpec("132067:A:1", "a player may keep his copy of the Ring out of his deck, 
 const barsOf = (state: ScenarioState, id: string) => BARS.filter((bar) => flagged(state, id, bar));
 const barsCheck = (stage: string) => (effects: readonly Effect[]) => {
   const t = on(effects, { seats: 1, stage });
-  const down = makeUnconscious(t.state, t.hero, t.ctx);
+  const down = makeUnconscious(t.state, t.hero, t.ctx, []);
   expect(barsOf(syncOf(t, down), t.hero)).toEqual([...BARS]);
   expect(barsOf(syncOf(t, down), t.hero2), "a conscious character").toEqual([]);
   expect(legalTargets({ ...syncOf(t, down), phase: "Quest", mode: "questCommit" }, { type: "Commit" }, t.ctx), "it cannot be committed").not.toContain(t.hero);
   expect(legalTargets({ ...syncOf(t, down), phase: "Quest", mode: "questCommit" }, { type: "Commit" }, t.ctx), "another character can").toContain(t.hero2);
-  expect(poisonOf(givePoison(syncOf(t, down), t.hero, 1, t.ctx), t.hero), "it cannot be poisoned").toBe(0);
+  expect(poisonOf(givePoison(syncOf(t, down), t.hero, 1, t.ctx, []), t.hero), "it cannot be poisoned").toBe(0);
 };
 const refreshCheck = (stage: string) => (effects: readonly Effect[]) => {
   const t = on(effects, { seats: 1, stage, phase: "Refresh" });
-  const down = syncOf(t, makeUnconscious(t.state, t.hero, t.ctx));
+  const down = syncOf(t, makeUnconscious(t.state, t.hero, t.ctx, []));
   const tired = syncOf(t, updateCard(down, t.hero2, { exhausted: true }));
   const out = toNextRound(tired, t.ctx).state;
   expect(out.round, "a round passed").toBeGreaterThan(tired.round);

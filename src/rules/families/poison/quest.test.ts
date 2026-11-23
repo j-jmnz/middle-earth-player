@@ -18,14 +18,14 @@ describe("the committed characters that cannot quest any more (hob.unconscious-c
 
   it("removes an unconscious character from the quest", () => {
     const { t, state } = committed();
-    const out = settle(makeUnconscious(state, t.hero, t.ctx), t.ctx, []);
+    const out = settle(makeUnconscious(state, t.hero, t.ctx, []), t.ctx, []);
     expect(out.cards[t.hero]?.committed).toBe(false);
     expect(out.cards[t.hero2]?.committed).toBe(true);
   });
 
   it("removes a poisoned character that Forest Stream bars, and leaves a committed one with no poison", () => {
     const { t, state } = committed("132027");
-    const out = settle(syncConstants(givePoison(state, t.hero, 1, t.ctx), t.ctx), t.ctx, []);
+    const out = settle(syncConstants(givePoison(state, t.hero, 1, t.ctx, []), t.ctx), t.ctx, []);
     expect(out.cards[t.hero]?.committed, "poisoned under Forest Stream").toBe(false);
     expect(out.cards[t.hero2]?.committed, "no poison").toBe(true);
   });
