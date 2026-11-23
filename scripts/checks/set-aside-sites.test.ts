@@ -1,5 +1,5 @@
-// Rules: rr.in-play-and-out-of-play (data/rules/entries.json). Every engine file that sets a card aside, or draws at random among the set-aside cards, is sorted in ASIDE_SITES, and every one that
-// hides a card names verbs with a declaration in their family, so the table's Set aside list (src/play/store/set-aside.ts) cannot name a hidden card of a later scenario without this failing first.
+// Rules: rr.in-play-and-out-of-play (data/rules/entries.json). Every engine function that sets a card aside, or draws with the game's seed in a file that reads the set-aside cards, is listed
+// in ASIDE_SITES under its file, and every file that hides a card names verbs with a declaration in their family. What this holds and what it cannot is in set-aside-sites.ts.
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -11,7 +11,7 @@ import { ASIDE_SITES } from "./set-aside-sites.ts";
 
 const RULES = path.resolve(import.meta.dirname, "..", "..", "src", "rules");
 
-// A destination in the set-aside zone (`{ zone: "setAside" }`, a ternary that ends there, `leaves: "setAside"`); and a draw with the game's seed in a file that reads the set-aside cards.
+// A destination in the set-aside zone written on one line (`{ zone: "setAside" }`, a ternary that ends there, `leaves: "setAside"`); and a draw with the game's seed in a file that reads the set-aside cards.
 const WRITES = /zone:[^,}\n]*"setAside"|leaves\??:\s*"setAside"/;
 const DRAWS = /\b(shuffleIds|nextUint)\(/;
 // The zone's own definition and its bookkeeping: no verb.
@@ -25,19 +25,35 @@ function sourceFiles(dir: string): string[] {
   });
 }
 
-const sites = sourceFiles(RULES)
-  .filter((file) => {
-    const text = readFileSync(file, "utf8");
-    return WRITES.test(text) || (text.includes("setAside") && DRAWS.test(text));
-  })
-  .map((file) => path.relative(RULES, file).split(path.sep).join("/"))
-  .filter((file) => !ENGINE.has(file))
-  .sort();
+const FUNCTION = /^(?:export )?(?:async )?function (\w+)/;
+
+// The top-level functions of a file that hold a site, by the function a line stands in; "(module)" before the first one.
+function functionsWithSite(text: string): string[] {
+  const reads = text.includes("setAside");
+  const found = new Set<string>();
+  let current = "(module)";
+  for (const line of text.split("\n")) {
+    current = FUNCTION.exec(line)?.[1] ?? current;
+    if (WRITES.test(line) || (reads && DRAWS.test(line))) found.add(current);
+  }
+  return [...found].sort();
+}
+
+const found = new Map(
+  sourceFiles(RULES)
+    .map((file) => [path.relative(RULES, file).split(path.sep).join("/"), functionsWithSite(readFileSync(file, "utf8"))] as const)
+    .filter(([file, functions]) => functions.length > 0 && !ENGINE.has(file)),
+);
+const sites = [...found.keys()].sort();
 
 describe("the engine's set-aside sites", () => {
   it("are each sorted into public, secret or not listed, and no entry names a file without one", () => {
     expect(sites.filter((file) => !(file in ASIDE_SITES)), "sort each new file in scripts/checks/set-aside-sites.ts: does it leave a card set aside that the players must not see?").toEqual([]);
     expect(Object.keys(ASIDE_SITES).filter((file) => !sites.includes(file)), "stale entries").toEqual([]);
+  });
+
+  it("list, for each file, exactly the functions that hold a site, so a new one is read before it passes", () => {
+    for (const file of sites) expect(ASIDE_SITES[file]?.functions, `${file}: sort the new function in scripts/checks/set-aside-sites.ts (does it leave a card set aside that the players must not see?)`).toEqual(found.get(file));
   });
 
   it("name, for each file that hides a card, verbs that declare it in their family", () => {

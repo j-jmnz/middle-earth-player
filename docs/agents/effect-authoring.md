@@ -251,8 +251,10 @@ family owns files that are composed by the `index.ts` next to them, so families 
   new pick filter, condition kind or amount field goes in the shared `effect-schema-*.ts` file, with a comment naming the family file that reads it.
 - A verb that leaves a set-aside card the players must not see (a random pick left facedown, a facedown deck) is declared in its catalog manifest's
   `asideSecrets` (`AsideSecret`, `src/catalog/family-manifest.ts`: the instruction's fields that name the cards), so the table's Set aside list counts
-  the card and never names it; `asideUnused` names the sets a verb parks there that are no part of the game. A new engine file that sets a card aside,
-  or draws at random among the set-aside cards, is sorted in `scripts/checks/set-aside-sites.ts`, whose test fails until it is.
+  the card and never names it; `asideUnused` names the sets a verb parks there that are no part of the game. `scripts/checks/set-aside-sites.test.ts`
+  fails while a function of `src/rules` that writes a set-aside destination, or draws with the seed in a file that reads the set-aside cards, is not
+  listed in `scripts/checks/set-aside-sites.ts`. It reads source text: it does not see a destination in a variable, a call to a listed function from
+  another file, a change inside a listed function, or a verb that hides a card where it lies with no draw. Check those by hand for a new verb.
 - `src/rules/families/<family>/index.ts` exports one `manifest` (`src/rules/interpret/family-manifest.ts`): its `name`, the `verbs` its `run`
   answers and `run`, which resolves them and returns `null` for any other. `src/rules/families/index.ts` lists the manifests in
   `rulesFamilies()`, in play order (where two runners could answer, the first does); `interpret.ts` asks the families before the player verbs and

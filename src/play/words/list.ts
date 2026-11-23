@@ -62,10 +62,27 @@ export function facedownWords(count: number): string {
   return count === 1 ? "1 card is facedown" : `${count} cards are facedown`;
 }
 
-/** The list's foot (rr.in-play-and-out-of-play: cards set aside are out of play). */
-export const SET_ASIDE_FOOT = "These cards are out of play.";
+/** The count over the list's title, with where the cards are (rr.in-play-and-out-of-play: cards set aside are out of play): "21 cards · out of play". */
+export function setAsideHead(count: number): string {
+  return `${plural(count, "card")} · out of play`;
+}
 
-/** A set-aside card's line: its type, then what the table knows of it ("Enemy · Set aside with 3 damage, which it keeps when it returns."). */
+/** A row that stands for several copies of one card: "Deep Deep Dark ×4"; the name alone for one. */
+export function copiesLabel(name: string, count: number): string {
+  return count > 1 ? `${name} ×${count}` : name;
+}
+
+/** What a screen reader hears of that name: "Deep Deep Dark, 4 copies". */
+export function copiesSaid(name: string, count: number): string {
+  return count > 1 ? `${name}, ${count} copies` : name;
+}
+
+/** The damage a set-aside card keeps (19024:A:1), short enough for a row at any text size; its preview says the whole rule. Null for none. */
+export function keptWords(damage: number): string | null {
+  return damage > 0 ? `Keeps ${damage} damage` : null;
+}
+
+/** A set-aside card's line: its type, then the damage it keeps ("Enemy · Keeps 15 damage"). */
 export function setAsideWords(kind: string | null, kept: string | null): string | null {
   return [kind, kept].filter(Boolean).join(" · ") || null;
 }

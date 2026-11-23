@@ -60,10 +60,10 @@ const FLAGS = [
 ] as const;
 
 // The cards Hidden Threat hid facedown under the quest (51241:A:1) are set aside once the players quest successfully and revealed one at a time: the ones that wait their turn are still facedown.
-// In a kit they are cards of the Quick-build's sets, which the list leaves out whole (ASIDE_UNUSED); the declaration covers the verb in any other game.
 const ASIDE_SECRETS = [{ verb: "HideUnderQuest", deck: true }] as const;
 
-// The Quick-build keeps 7 of the kit's encounter sets (51001:A:1): the cards of the others are no part of the game, and the engine parks them in the set-aside zone.
+// The Quick-build keeps 7 of the kit's encounter sets (51001:A:1): the cards of the others are no part of the game, and the engine parks them in the set-aside zone. `sets` names all 14;
+// the ones left out are those with every card still set aside.
 const ASIDE_UNUSED = [{ verb: "BuildQuickDeck", sets: ["sets"] }] as const;
 
 export const manifest = { name: "wizards-quest", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS, asideSecrets: ASIDE_SECRETS, asideUnused: ASIDE_UNUSED } as const satisfies CatalogFamily;

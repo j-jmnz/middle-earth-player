@@ -157,8 +157,7 @@ function heathDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioStat
   if (card.zone === "setAside") {
     // 19024:B:2: "At the end of the round, remove 3 damage tokens from the set-aside Cold-Drake."
     const heal = ctx.effects.find((effect) => effect.id === "19024:forced:2")?.instructions.find((step) => step.verb === "RemoveSetAsideDamage");
-    const kept = keptDamageWords(card);
-    return kept ? `${kept}${heal?.verb === "RemoveSetAsideDamage" ? ` ${heal.amount} damage come off it at the end of each round.` : ""}` : null;
+    return card.keepsDamage === true && card.damage > 0 ? `Set aside with ${card.damage} damage, which it keeps when it returns.${heal?.verb === "RemoveSetAsideDamage" ? ` ${heal.amount} damage come off it at the end of each round.` : ""}` : null;
   }
   if (card.zone !== "staging" && card.zone !== "engaged") return null;
   const lines: string[] = [];
@@ -172,11 +171,6 @@ function heathDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioStat
   const ceiling = heldAmount(game, card.id, "damageCeiling");
   if (ceiling > 0) lines.push(`Never has more than ${ceiling} damage${flagged(game, card.id, "indestructible") ? ", and stays in play even then" : ""}`);
   return lines.length > 0 ? `${lines.join(". ")}.` : null;
-}
-
-/** A card set aside with the damage it keeps (SetAsideInPlay `keepDamage`, 19024:A:1): what its preview and the Set aside list say of it. Null for any other card. */
-export function keptDamageWords(card: Pick<ScenarioState["cards"][string], "zone" | "keepsDamage" | "damage"> | undefined): string | null {
-  return card?.zone === "setAside" && card.keepsDamage === true && card.damage > 0 ? `Set aside with ${card.damage} damage, which it keeps when it returns.` : null;
 }
 
 // A card held engaged with each player (Cold-Drake under a Withered Heath stage, Old Man Willow, the Carn Dûm, Cirith Ungol and Fate of Wilderland cards): the words that say what the flag does.

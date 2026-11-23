@@ -24,9 +24,8 @@ import { carouselHeight } from "../phases/carousel-size.ts";
 import { PhaseCarousel } from "../phases/phase-carousel.tsx";
 import { PhaseSweep } from "../phases/phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
-import { facedownWords, kindWords, SET_ASIDE_FOOT, SET_ASIDE_TITLE, setAsideWords, threatSourceSaid, threatSourceWords, victorySaid, victoryWords } from "../words/list.ts";
-import { setAsideList } from "../store/set-aside.ts";
-import { keptDamageWords } from "../cards/dungeon-preview.ts";
+import { copiesLabel, copiesSaid, facedownWords, keptWords, kindWords, SET_ASIDE_TITLE, setAsideHead, setAsideWords, threatSourceSaid, threatSourceWords, victorySaid, victoryWords } from "../words/list.ts";
+import { setAsideFromKey, setAsideKey } from "../store/set-aside.ts";
 import { adjustWords, threatSourcesOf } from "../readouts/threat-sources.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { seatDialLimit } from "../readouts/threat-level.ts";
@@ -118,25 +117,16 @@ function RowReading({ store, ctx, row, names, picture, onRead, onClose }: { stor
   return <RowList title={areaOnly ? AREA_LIST_TITLE : foldTitle(row)} cards={cards} onRead={onRead} onClose={onClose} />;
 }
 
-// The set-aside cards the players may read and the count of the facedown ones (store/set-aside.ts): the list is the same object for the same game, and the panel
-// subscribes to what it draws of the named cards as one key each (code, picture key, the damage a card keeps), so a state that changes none of that does not render it.
-// Nothing of a facedown card but the count reaches this component.
+// The set-aside cards the players may read, the copies of one card as one row, and the count of the facedown ones (store/set-aside.ts). The panel subscribes to the list as one string,
+// so a state that changes nothing it draws does not render it. Nothing of a facedown card but the count reaches this component.
 function SetAsideReading({ store, ctx, names, picture, onRead, onClose }: { store: TableStore; ctx: ReduceContext; names: SheetNames; picture: Pictures; onRead: (cardId: string) => void; onClose: () => void }) {
-  const list = useStore(store, (state) => setAsideList(state.game, ctx));
-  const rowsKey = useStore(store, (state) =>
-    setAsideList(state.game, ctx)
-      .cards.map((id) => {
-        const card = state.game.cards[id];
-        return [card?.code ?? "", card ? pictureKey(card) : "", keptDamageWords(card) ?? ""].join("\t");
-      })
-      .join("\n"),
-  );
-  const rows = rowsKey.split("\n");
-  const cards = list.cards.map((id, at) => {
-    const [code = "", key = "", kept = ""] = (rows[at] ?? "").split("\t");
-    return listCard(id, code, key || code, names, picture, ctx.cards, setAsideWords(kindWords(ctx.cards.get(code)), kept || null));
+  const key = useStore(store, (state) => setAsideKey(state.game, ctx));
+  const list = setAsideFromKey(key);
+  const cards = list.rows.map((row) => {
+    const made = listCard(row.id, row.code, row.picture, names, picture, ctx.cards, setAsideWords(kindWords(ctx.cards.get(row.code)), keptWords(row.kept)));
+    return { ...made, label: copiesLabel(made.label, row.count), spoken: copiesSaid(made.label, row.count) };
   });
-  return <SetAsideList title={SET_ASIDE_TITLE} count={list.cards.length + list.facedown} cards={cards} facedown={list.facedown > 0 ? facedownWords(list.facedown) : null} foot={SET_ASIDE_FOOT} onRead={onRead} onClose={onClose} />;
+  return <SetAsideList title={SET_ASIDE_TITLE} head={setAsideHead(list.total)} cards={cards} facedown={list.facedown > 0 ? facedownWords(list.facedown) : null} onRead={onRead} onClose={onClose} />;
 }
 
 // The cards that make up the staging threat the quest meter draws (threat-sources.ts), each with the Threat it adds. A card the table hides
