@@ -2,7 +2,7 @@
 // Whether the instructions of an ability can change the game state as the table stands (src/rules/player/potential.ts has the rules and the header): the list is idle
 // when every step of it is, in order, with the cards a Pick chose read for each candidate. Each step is read by its kind and what it acts on (`idleStep`); the verbs a
 // mechanic family owns are read by that family's `idle` hook (docs/architecture.md, Mechanic families), the rest here.
-import type { Instruction } from "../../catalog/boundary.ts";
+import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { inPlay, livingSeats } from "../core/state.ts";
 import type { ScenarioState } from "../core/state.ts";
@@ -112,6 +112,8 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
       return (instruction.target === "eachStagingLocation" && stagingLocations(state, ctx.cards).filter((id) => !immuneTo(state, id, sourceId, ctx)).length === 0) || amountIdle(state, instruction.amount, frame, ctx);
     case "Each": {
       // "Heal 1 damage on up to 2 damaged characters" with no damaged character: an upTo that finds no card does nothing.
+      // A pick from a deck with cards in it reads cards the player cannot see (rr.search): the deck's contents are not read, so the effect is not told idle.
+      if (readsHiddenDeck(state, instruction.pick, frame)) return false;
       if (instruction.upTo != null) return frame.picked == null && pickCandidates(state, instruction.pick, frame.seat, [], sourceId, ctx, frame.scope.x, frame.scope.participants, false, { subject: frame.scope.subject ?? null, other: frame.scope.other ?? null }).length === 0;
       // The cards the Each reads may depend on the card an earlier Pick chose ("each hero the chosen player controls"): read for each candidate of that choice.
       return (frame.picked ?? [null]).every((from) => {
@@ -150,6 +152,11 @@ function pickedAttachmentStays(state: ScenarioState, instruction: Instruction, s
   if (instruction.verb !== "Pick" || instruction.when != null || instruction.pick.hostForPicked !== true || at.picked == null || at.picked.length === 0) return null;
   const pick = instruction.pick;
   return !at.picked.some((from) => pickCandidates(state, pick, at.seat, [from], sourceId, ctx).length > 0);
+}
+
+// Whether a Pick reads a deck that holds cards: its contents are hidden, so which cards match is not read (rr.search). A deck with no card is public: nothing is in it.
+function readsHiddenDeck(state: ScenarioState, pick: PickSpec, frame: IdleFrame): boolean {
+  return pick.from === "deck" && !pick.looked && seatsOf(state, pick, frame.seat).some((index) => deckPool(state, index, pick).length > 0);
 }
 
 // A search of the actor's own deck with no card in it finds nothing, whatever the choices before it.
