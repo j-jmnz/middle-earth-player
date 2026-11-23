@@ -14,7 +14,7 @@ import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-o
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { answerFirst, attacking, choices, chooseIfAsked, fillers, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { answerFirst, attacking, choices, chooseIfAsked, fillers, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const DENETHOR = "12001";
 const AZAIN = "12004";
@@ -36,7 +36,7 @@ const CARD = "card";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

@@ -13,8 +13,8 @@ import { shadowCards } from "../../rules/core/zones.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, attacking, choices, combat, passAll, playerTable, stat, triggers, type PlayerBase } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Run, type Table } from "../../../test/harness/scene.ts";
+import { attach, attacking, choices, combat, passAll, type PlayerBase, playerTableFor, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ANVIL = "12196";
 const CROWN = "12199";
@@ -50,7 +50,7 @@ const FRAIL = "frail";
 
 let base: PlayerBase;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 const trigger = (run: Run, tab: Table, code: string, effectId: string): Run => send(run, { type: "Trigger", cardId: idsOf(tab, code), effectId }, tab.ctx);
 const resourcesOf = (run: Run, tab: Table, codes: readonly string[]) => codes.map((code) => run.state.cards[idsOf(tab, code)]?.resources ?? 0);
 

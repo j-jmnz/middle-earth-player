@@ -6,7 +6,6 @@
 // attachments are in celebrimbors-secret-attachments.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { hasKeyword } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
@@ -16,8 +15,8 @@ import { syncConstants } from "../../rules/interpret/constants.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, attacking, choices, combat, discarded, hosts, play, playerTable, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf } from "../../../test/harness/scene.ts";
+import { attach, attacking, choices, combat, discarded, hosts, play, playerTableFor, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const THEODRED = "01002";
@@ -41,7 +40,7 @@ const PLAIN = "plain";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

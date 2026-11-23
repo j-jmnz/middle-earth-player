@@ -16,8 +16,8 @@ import { stagingThreat } from "../../rules/quest/quest.ts";
 import { DEAR, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, IntentRefused, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, endRound, enter, hosts, passAll, play, playCode, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, IntentRefused, type Table } from "../../../test/harness/scene.ts";
+import { attacking, choices, combat, endRound, enter, hosts, passAll, play, playCode, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const MABLUNG = "08084";
 const BELTS = "08086";
@@ -53,7 +53,7 @@ const BRUTE = "brute";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

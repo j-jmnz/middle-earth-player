@@ -13,8 +13,8 @@ import { updateCard } from "../../rules/core/state.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { answerFirst, choices, combat, enter, fillers, hosts, passAll, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf } from "../../../test/harness/scene.ts";
+import { answerFirst, choices, combat, enter, fillers, hosts, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const BILBO = "02001";
 const MARK = "02002";
@@ -44,7 +44,7 @@ const WEAK = "weak";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 const hero = (code: string, sphere: "leadership" | "tactics" | "lore" | "spirit") => definePrinted({ code, name: code, type: "hero", sphere, threat: 8, willpower: 1, attack: 1, defense: 1, health: 5 });
 
 beforeAll(async () => {

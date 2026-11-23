@@ -4,7 +4,6 @@
 // Herugrim 143010:A:1 to A:3, Shadowfax 143014:A:1 to A:3.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { hasKeyword, modifiedStat } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
@@ -14,8 +13,8 @@ import { playCost } from "../../rules/player/attach.ts";
 import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, playerTable, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Run, type Table } from "../../../test/harness/scene.ts";
+import { attacking, choices, playerTableFor, triggers } from "../../../test/harness/player-table.ts";
 
 const THEODEN = "143002";
 const TREEBEARD = "143003";
@@ -40,7 +39,7 @@ const LOCATION = "141034";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

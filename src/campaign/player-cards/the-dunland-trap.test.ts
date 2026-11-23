@@ -13,8 +13,8 @@ import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, deckSaveFacts, discarded, endRound, fillers, hosts, packRow, play, playerTable, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
+import { attach, choices, deckSaveFacts, discarded, endRound, fillers, hosts, packRow, play, playerTableFor, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const CELEBORN = "08001";
 const NAITH = "08002";
@@ -42,7 +42,7 @@ const CARD = "card";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

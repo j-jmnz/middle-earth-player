@@ -15,8 +15,8 @@ import { withThreat } from "../../rules/core/state.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { answerFirst, attach, attacking, choices, combat, deckSaveFacts, discarded, enter, fillers, packRow, playCode, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
+import { answerFirst, attach, attacking, choices, combat, deckSaveFacts, discarded, enter, fillers, packRow, playCode, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ERESTOR = "10084";
 const REINFORCEMENTS = "10085";
@@ -37,7 +37,7 @@ const CARD = "card";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

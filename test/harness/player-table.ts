@@ -28,6 +28,14 @@ export function playerTable(base: PlayerBase, effects: readonly Effect[], scene:
   return { ...tab, state: syncConstants(state, tab.ctx) };
 }
 
+/**
+ * A file's `table`: `playerTable` on the records it is given, over the printed cards the file loads (`base` is read when the table is built, so a
+ * `let base` that a `beforeAll` fills works). Write `const table = playerTableFor(() => base);`.
+ */
+export function playerTableFor(base: () => PlayerBase): (effects: readonly Effect[], scene?: Scene, resources?: number) => Table {
+  return (effects, scene = {}, resources = 6) => playerTable(base(), effects, scene, resources);
+}
+
 /** The effect ids of the Trigger intents the engine offers. */
 export function triggers(state: ScenarioState, tab: Table): string[] {
   return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Trigger" ? [intent.effectId] : []));

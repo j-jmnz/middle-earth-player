@@ -17,8 +17,8 @@ import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, discarded, endRound, enter, hosts, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { choices, discarded, endRound, enter, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const LORIEN = "08058";
 const GWAIHIR = "08059";
@@ -46,7 +46,7 @@ const SPIRIT = "spirit";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

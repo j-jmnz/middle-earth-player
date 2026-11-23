@@ -13,8 +13,8 @@ import { updateCard } from "../../rules/core/state.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { combat, hosts, passAll, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { combat, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const WARNING = "02026";
 const ALOFT = "02029";
@@ -36,7 +36,7 @@ const LORE_ALLY = "lore-ally";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

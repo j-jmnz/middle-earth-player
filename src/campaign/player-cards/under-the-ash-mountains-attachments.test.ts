@@ -11,8 +11,8 @@ import { withThreat } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, FRODO, idsOf, RING, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, enter, fillers, hosts, passAll, play, playerTable, printed, questing, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { begin, FRODO, idsOf, RING, type Table } from "../../../test/harness/scene.ts";
+import { choices, enter, fillers, hosts, passAll, play, playerTableFor, printed, questing, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
 
 const SWORD = "22083";
 const STONE = "22084";
@@ -33,7 +33,7 @@ const PLACE = "place";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

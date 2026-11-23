@@ -16,7 +16,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, fillers, passAll, play, playerTable, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { choices, combat, fillers, passAll, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
 
 const QUICKBEAM = "17135";
 const HALFAST = "17136";
@@ -43,7 +43,7 @@ const WALL = "wall";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 const playable = (tab: Table, cardId: string, state = tab.state) => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === cardId);
 
 beforeAll(async () => {

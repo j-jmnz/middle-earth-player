@@ -8,7 +8,6 @@
 // the steps go through sendUnledgered. The events are in the-mountain-of-fire-events.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
@@ -16,8 +15,8 @@ import { legalIntents, legalTargets } from "../../rules/engine/reduce.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, FRODO, idsOf, SAM, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, endRound, enter, hosts, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, FRODO, idsOf, SAM, type Table } from "../../../test/harness/scene.ts";
+import { choices, endRound, enter, hosts, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN_CORE = "01001";
 const THEODRED = "01002";
@@ -45,7 +44,7 @@ const PAL = "pal";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

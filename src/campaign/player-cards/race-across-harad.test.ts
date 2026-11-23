@@ -17,7 +17,7 @@ import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-pas
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, endRound, fillers, hosts, passAll, play, playCode, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, choices, endRound, fillers, hosts, passAll, play, playCode, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const THURINDIR = "17028";
 const TRIBESMAN = "17029";
@@ -62,7 +62,7 @@ const MARK = "mark";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

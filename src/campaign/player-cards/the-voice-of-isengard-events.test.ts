@@ -5,15 +5,14 @@
 // Deep Knowledge 07012:A:2, The Wizards's Voice 07013:A:2, Power of Orthanc 07014:A:2, The Seeing-stone 07015:A:2.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { Effect } from "../../catalog/boundary.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, fillers, passAll, play, playerTable, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
+import { choices, combat, fillers, passAll, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
 
 const LEGACY = "07011";
 const DEEP = "07012";
@@ -35,7 +34,7 @@ const PLAIN = "plain";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

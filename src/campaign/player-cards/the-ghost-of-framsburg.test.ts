@@ -16,8 +16,8 @@ import { playCost } from "../../rules/player/attach.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { combat, endRound, enter, fillers, passAll, play, playCode, playerTable, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { combat, endRound, enter, fillers, passAll, play, playCode, playerTableFor, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const DAIN = "19084";
 const SOLDIER = "19085";
@@ -41,7 +41,7 @@ const CHARM = "charm";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

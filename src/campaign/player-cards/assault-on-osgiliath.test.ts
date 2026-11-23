@@ -18,8 +18,8 @@ import { playCost } from "../../rules/player/attach.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, discarded, hosts, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
+import { attach, choices, discarded, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const FARAMIR = "06081";
 const SWORD = "06082";
@@ -59,7 +59,7 @@ const TARGET = "target";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 const playable = (tab: Table, cardId: string, state = tab.state) => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === cardId);
 
 beforeAll(async () => {

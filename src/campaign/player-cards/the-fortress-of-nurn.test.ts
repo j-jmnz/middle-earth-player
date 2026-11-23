@@ -19,8 +19,8 @@ import { syncConstants } from "../../rules/interpret/constants.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, enter, hosts, packRow, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
+import { attach, choices, enter, hosts, packRow, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const SHIELD = "22138";
 const KNOWLEDGE = "22139";
@@ -58,7 +58,7 @@ const CARD = "card";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 type Sphere = "leadership" | "tactics" | "lore" | "spirit";
 const hero = (code: string, sphere: Sphere, traits: string[] = []) => definePrinted({ code, name: code, type: "hero", sphere, threat: 8, willpower: 1, attack: 1, defense: 1, health: 5, traits });
 const ally = (code: string, sphere: Sphere, traits: string[]) => definePrinted({ code, name: code, type: "ally", sphere, cost: 1, willpower: 1, attack: 1, defense: 1, health: 2, traits });

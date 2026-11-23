@@ -3,15 +3,14 @@
 // Elven Spear 10087:A:1 and A:2, Silver Harp 10090:A:2 and A:3, Elf-friend 10093:A:1 and A:2.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { hasTrait } from "../../rules/interpret/conditions.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { answerFirst, attach, enter, fillers, hosts, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf } from "../../../test/harness/scene.ts";
+import { answerFirst, attach, enter, fillers, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ERESTOR = "10084";
 const SPEAR = "10087";
@@ -28,7 +27,7 @@ const CARD = "card";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

@@ -12,8 +12,8 @@ import { syncConstants } from "../../rules/interpret/constants.ts";
 import { fund, payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, buildTable, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { begin, buildTable, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { attacking, choices, combat, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const THORIN = "131002";
 const ORI = "131004";
@@ -36,7 +36,7 @@ const ORC = "orc";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
