@@ -152,9 +152,18 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: ["roam-across-rhovanion"], note: "Durin's Key's Action is not offered with no location in play: its cost cannot be paid for nothing." },
   { version: 38, scenarios: ["escape-from-dol-guldur", "journey-along-the-anduin", "passage-through-mirkwood"], note: "Mendor's Response is not offered while he is ready or cannot ready, because the part after \"Then\" waits for the ready." },
   { version: 38, scenarios: "all", note: "Ceorl's Action is not offered while he is ready or cannot ready, because the part after \"Then\" waits for the ready, and Elevenses and Armored Destrier do the same: the threat is reduced and the shadow card discarded only when the ready happened." },
+  { version: 39, scenarios: ["the-uruk-hai", "helms-deep", "the-road-to-isengard", "the-passing-of-the-grey-company", "the-siege-of-gondor", "the-battle-of-the-pelennor-fields", "the-black-gate-opens"], note: "A player whose last hero is Aragorn is eliminated when the first player token passes him on." },
+  { version: 39, scenarios: ["journey-up-the-anduin", "lost-in-mirkwood", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"], note: "A treasure in your hand, like Anvil of Gundabad or Axe of the Edain, can be played onto its host like an attachment, and Durin's Dagger can be played from the discard pile." },
+  { version: 39, scenarios: "all", note: "Sting's Response is offered only to a hero that exhausted to defend, not to one an effect made a defender while it was already exhausted." },
+  { version: 39, scenarios: "all", note: "Rivendell Skirmishers, Jubayr, Staff of Lebethron, Small Target and Frodo Baggins answer a defense only when the character exhausted to defend, not when an effect made it a defender while it was already exhausted." },
+  { version: 39, scenarios: "all", note: "An Action or Response that adds resources only to heroes who cannot gain them from player card effects is not offered: Steward of Gondor, Orcrist, Bilbo's Magic Ring and Proud Hunters on Bilbo Baggins of the Over Hill and Under Hill box, Rune-master for him, and Steward of Gondor on Bilbo Baggins of the On the Doorstep box (non-treasure cards)." },
+  { version: 39, scenarios: "all", note: "The Arkenstone is not offered with no ally of the attached hero's sphere in your hand, or when X can only be 0 at a threat of 49. Good Meal is not offered with no event of the attached hero's sphere in hand, and discounts an event of a Baggins or Fellowship hero's sphere. A hero that gained a resource icon is also of that sphere for both." },
+  { version: 39, scenarios: "all", note: "An ability that chooses X is not offered when no X can be chosen: To the Sea, to the Sea! and The Old Thrush with an empty hand, Radagast with an empty pool, Elevenses with no questing Hobbit." },
+  { version: 39, scenarios: "all", note: "Miruvor and Good Meal read a discard of the card itself that ends their steps as the price of the steps before it, so they are not offered when the other steps change nothing. Silvan Tracker and Elrond are not offered when the character the event names has no damage to heal." },
+  { version: 39, scenarios: "all", note: "Sting's Response, and the Fellowship's Sting, are not offered when the encounter deck is empty, in any phase: the move of the top encounter card does not refill the deck." },
 ];
 
-export const ENGINE_VERSION = 38;
+export const ENGINE_VERSION = 39;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

@@ -65,7 +65,7 @@ export function notAppliedCodes(texts: Iterable<readonly [string, string | null]
  */
 export function playCaution(code: string, type: string, text: string | null, cost: number, against: TextCheck = shippedCheck()): { words: string; armed: string | null } | null {
   const lines = unappliedLines(code, text, against);
-  if (type === "attachment" && !against.recorded.has(code) && lines.length > 0) {
+  if ((type === "attachment" || type === "treasure") && !against.recorded.has(code) && lines.length > 0) {
     return cost > 0
       ? { words: `Its text is not applied: you pay ${cost} for no effect`, armed: `Tap again: pay ${cost} for no effect` }
       : { words: "Its text is not applied: it has no effect", armed: "Tap again: play it for no effect" };

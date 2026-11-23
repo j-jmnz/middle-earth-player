@@ -41,6 +41,7 @@ export function done(ctx: Ctx, text: string, obj: Obj, read: readonly string[]):
 export const isObj = (value: unknown): value is Obj => typeof value === "object" && value !== null && !Array.isArray(value);
 export const str = (value: unknown): string => (typeof value === "string" ? value : compact(value));
 export const quoted = (names: readonly unknown[]): string => names.map((name) => `"${str(name)}"`).join(" or ");
+export const joinOr = (parts: readonly string[]): string => (parts.length <= 1 ? (parts[0] ?? "") : `${parts.slice(0, -1).join(", ")} or ${parts[parts.length - 1]}`);
 export const joinAnd = (parts: readonly string[]): string => (parts.length <= 1 ? (parts[0] ?? "") : `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`);
 
 // "PlaceProgressOn" -> "place progress on".

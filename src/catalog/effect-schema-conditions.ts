@@ -142,6 +142,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("byPlayerCard") }),
   // The engagement the Forced effect answers was from the staging area ("When Corsair Skiff engages you from the staging area", 12022:A:3): known only in a game with ships (dcce.boarding).
   z.strictObject({ kind: z.literal("fromStaging") }),
+  // The declaredDefender event the Response answers exhausted its character: "After ~ exhausts to defend" (131020:A:3), not a defender that stayed ready or was exhausted already.
+  z.strictObject({ kind: z.literal("exhaustedToDefend") }),
   z.strictObject({ kind: z.literal("excess"), min: z.number().int().positive() }),
   z.strictObject({ kind: z.literal("dealt"), min: z.number().int().positive().optional() }),
   // The Heading card's setting (dcce.heading): on-course (Sun, the only on-course setting), off-course (Cloud, Rain or Storm), or at the worst

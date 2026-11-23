@@ -43,6 +43,9 @@ export type ScenarioDef = {
   // The load list sets the saga start aside instead of putting it in player 1's play area (Mount Doom: the Ring-bearer Frodo Baggins and The One Ring in the set-aside group): they are
   // `ScenarioData.sagaStart`, as in the scenarios whose load list names them in play (mec113.setting-up-the-game).
   sagaStartAside?: boolean;
+  // The treasure cards a deck may add at this scenario's Setup (The Hobbit: the sets of the earlier scenarios that discover treasure, hob.treasure-ohauh, hob.treasure-otd),
+  // recorded as ScenarioData.treasures. The insert prints the sets as icons; each is the treasure of one scenario of the cycle (src/campaign/loadout.ts, `treasures`).
+  treasures?: readonly string[];
 };
 
 // A saga box's reprint of RingsDB's adventure packs (MEC109, MEC112, MEC113): Hall of Beorn's card set of it, the catalog pack code its printings carry
@@ -131,6 +134,9 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "The Long Dark", packs: ["TLD"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
   { name: "Foundations of Stone", packs: ["FoS"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
   { name: "Shadow and Flame", packs: ["SaF"], home: "dwarrowdelf", load: "dragncards", easySheet: false, twinPack: null },
+  // The Hobbit: the two saga boxes (RingsDB's cycle 40), three scenarios each. Hall of Beorn names the products "The Hobbit: ..."; the packs are RingsDB's OHaUH and OtD, which carry the player cards, and the encounter and quest cards are Hall of Beorn's.
+  { name: "The Hobbit: Over Hill and Under Hill", packs: ["OHaUH"], home: "the-hobbit", load: "dragncards", easySheet: false, twinPack: null, sagaStart: true },
+  { name: "The Hobbit: On the Doorstep", packs: ["OtD"], home: "the-hobbit", load: "dragncards", easySheet: false, twinPack: null, sagaStart: true },
   // Standalone scenarios: each official scenario printed on its own, Hall of Beorn's cards of it alone. Hall of Beorn lists the event scenarios of 2011 to 2017 under the year (`scenarioProduct`).
   { name: "The Massing at Osgiliath", packs: ["TMaO"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2011" },
   { name: "The Battle of Lake-town", packs: ["TBoLT"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2012" },

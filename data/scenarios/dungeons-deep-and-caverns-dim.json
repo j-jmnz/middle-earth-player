@@ -1,0 +1,161 @@
+{
+  "id": "dungeons-deep-and-caverns-dim",
+  "name": "Dungeons Deep and Caverns Dim",
+  "number": 3,
+  "stages": [
+    "131029",
+    "131030",
+    "131031"
+  ],
+  "encounterSets": [
+    {
+      "name": "Dungeons Deep and Caverns Dim",
+      "count": 20
+    },
+    {
+      "name": "Misty Mountain Goblins",
+      "count": 18
+    }
+  ],
+  "cards": [
+    {
+      "code": "131074",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131075",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "131076",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "131077",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "131079",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131080",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131081",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "131082",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131083",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "131084",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131058",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "131059",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "131060",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131061",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "131065",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "131070",
+      "normal": 3,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "131029",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "131030",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "131031",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "131078",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    }
+  ],
+  "campaignPlaced": [],
+  "sagaStart": {
+    "hero": "131001"
+  },
+  "treasures": [
+    "131020",
+    "131021",
+    "131022"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q0A.3",
+    "dragnEasy": "E0A.3",
+    "hobSlug": "Dungeons-Deep-and-Caverns-Dim"
+  }
+}

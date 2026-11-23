@@ -1,4 +1,4 @@
-// Rules: rr.attachment-cards, rr.surge, rr.doomed-x, rr.immune, mec109.immune-to-player-card-effects, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible, mec109.toughness, rr.victory, ltp.victory-x, rr.modifiers, rr.lasting-effects, rr.damage (data/rules/entries.json).
+// Rules: rr.attachment-cards, rr.surge, rr.doomed-x, rr.immune, mec109.immune-to-player-card-effects, hob.immune-to-player-card-effects, rr.ranged, rr.sentinel, mec109.peril, mec109.indestructible, hob.indestructible, mec109.toughness, rr.victory, ltp.victory-x, rr.modifiers, rr.lasting-effects, rr.damage (data/rules/entries.json).
 import type { ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";

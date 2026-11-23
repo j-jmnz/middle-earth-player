@@ -21,7 +21,7 @@ import { titleBarred } from "../families/nightmare/guards.ts";
 import { ruleCause } from "../core/cause.ts";
 import { fireForced } from "../windows/triggers.ts";
 import { undefendedExtras } from "../families/defense/damage.ts";
-import { markDefender, moreDefenders, staysReadyToDefend } from "../families/defense/defenders.ts";
+import { exhaustedToDefend, markDefender, moreDefenders, staysReadyToDefend } from "../families/defense/defenders.ts";
 import { holdAttack, queueHeard } from "../families/defense/listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/attack/flow.ts";
 import { flightAttackBarred } from "../families/attack/flight.ts";
@@ -211,7 +211,7 @@ export function applyDefense(
   const declaredState = ready ? state : exhaustAnnounced(state, defenderId, ctx);
   const exhausted: ScenarioState = markDefender(
     {
-      ...queueEvent(declaredState, { trigger: "declaredDefender", seat: attack.seat, cardId: defenderId, other: attack.enemyId }),
+      ...queueEvent(declaredState, { trigger: "declaredDefender", seat: attack.seat, cardId: defenderId, other: attack.enemyId, ...exhaustedToDefend(state, declaredState, defenderId, ctx) }),
       pendingAttack: { ...attack, defenderId },
       window: null,
     },

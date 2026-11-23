@@ -1,4 +1,4 @@
-// Rules: rr.immune, rr.resources, rr.ownership-and-control, rr.effects, mec109.setup, rr.lasting-effects (data/rules/entries.json).
+// Rules: rr.immune, rr.resources, rr.ownership-and-control, rr.effects, mec109.setup, rr.lasting-effects, rr.player-elimination, hob.bilbo-multiplayer-ohauh, hob.bilbo-multiplayer-otd (data/rules/entries.json).
 // The Bilbo, Sméagol and Ring-bearer cards of the misc family, and The One Ring's immunity, run through its real records.
 import { describe, expect, it } from "vitest";
 
@@ -11,7 +11,7 @@ import { legalIntents, reduce, startScenario } from "../../engine/reduce.ts";
 import { updateCard } from "../../core/state.ts";
 import { attachTo } from "../../core/zones.ts";
 import { MISC_CARDS, miscCtx } from "./fixture.ts";
-import { play, put, run, seat, send, trigger } from "../play/fixture.ts";
+import { play, put, run, seat, trigger } from "../play/fixture.ts";
 
 const gift = (code: string): Effect => ({
   id: `${code}:action:1`,
@@ -28,8 +28,10 @@ describe("Bilbo Baggins gains no resources from some cards", () => {
     const bilbo = table.heroes[0] ?? "";
     const card = put(table.state, "gift", "hand");
     const state = syncConstants(table.state, ctx);
-    const played = run(play({ ...card.state, modifiers: state.modifiers }, card.id, ctx), ctx);
-    expect(played.cards[bilbo]?.resources).toBe(5);
+    // The event could add him nothing, so it is not offered (rr.triggered-ability) and his pool stays as it was.
+    const held = run({ ...card.state, modifiers: state.modifiers }, ctx);
+    expect(reduce(held, { type: "PlayCard", cardId: card.id, payments: [] }, ctx).ok).toBe(false);
+    expect(held.cards[bilbo]?.resources).toBe(5);
   });
 
   it("132001: none from cards that are not treasures; a treasure's effect adds them", () => {
@@ -37,7 +39,8 @@ describe("Bilbo Baggins gains no resources from some cards", () => {
     const bilbo = table.heroes[0] ?? "";
     const card = put(table.state, "gift", "hand");
     const synced = syncConstants(table.state, ctx);
-    const played = run(play({ ...card.state, modifiers: synced.modifiers }, card.id, ctx), ctx);
+    const played = run({ ...card.state, modifiers: synced.modifiers }, ctx);
+    expect(reduce(played, { type: "PlayCard", cardId: card.id, payments: [] }, ctx).ok).toBe(false);
     expect(played.cards[bilbo]?.resources).toBe(5);
     const treasureCtx = miscCtx([...RECORDS, gift("trove")]);
     // The same effect on a treasure card: Bilbo gains.
@@ -59,22 +62,81 @@ describe("Bilbo Baggins gains no resources from some cards", () => {
   });
 });
 
+describe("Bilbo Baggins follows the first player token (hob.bilbo-multiplayer-ohauh, hob.bilbo-multiplayer-otd)", () => {
+  // Two players with a hero each; Bilbo is the first player's, carries a Short Sword and holds 3 resources.
+  const twoSeats = (bilbo: string) => {
+    const table = seat(2, ["rohan"]);
+    const made = put(table.state, bilbo, "heroes", 0);
+    const sword = put(made.state, "sword", "play", 0);
+    const held = updateCard(attachTo(sword.state, sword.id, made.id), made.id, { resources: 3 });
+    return { state: run(syncConstants(held, ctx), ctx), bilbo: made.id, sword: sword.id, table };
+  };
+
+  it.each([["131001"], ["132001"]])("%s:A:1 the new first player gains control of Bilbo Baggins, the resources in his pool and the cards attached to him", (code) => {
+    const { state, bilbo, sword } = twoSeats(code);
+    expect(state.cards[bilbo]?.controller).toBe(0);
+    const passed = run({ ...state, firstPlayer: 1 }, ctx);
+    expect(passed.cards[bilbo]?.controller).toBe(1);
+    expect(passed.cards[bilbo]?.resources).toBe(3);
+    expect(passed.cards[sword]?.controller).toBe(1);
+    expect(passed.cards[sword]?.host).toBe(bilbo);
+    // He is still seat 0's card: it takes him back when the token comes round again.
+    expect(passed.cards[bilbo]?.owner).toBe(0);
+    const back = run({ ...passed, firstPlayer: 0 }, ctx);
+    expect(back.cards[bilbo]?.controller).toBe(0);
+    expect(back.cards[sword]?.controller).toBe(0);
+    expect(passed.seats.map((one) => one.eliminated)).toEqual([false, false]);
+  });
+
+  it("131001:A:1 a player whose only other hero is gone is eliminated when Bilbo passes to the new first player", () => {
+    const { state, bilbo, table } = twoSeats("131001");
+    const lone = table.heroes[0] ?? "";
+    const without = { ...state, seats: [{ ...state.seats[0], heroes: state.seats[0].heroes.filter((id) => id !== lone) }, state.seats[1]] as typeof state.seats, cards: Object.fromEntries(Object.entries(state.cards).filter(([id]) => id !== lone)) };
+    const passed = run({ ...without, firstPlayer: 1 }, ctx);
+    expect(passed.cards[bilbo]?.controller).toBe(1);
+    expect(passed.seats[0]?.eliminated).toBe(true);
+    expect(passed.seats[1]?.eliminated).toBe(false);
+    expect(passed.lost).toBeFalsy();
+  });
+
+  it.each([["143001"], ["145001"], ["146002"]])("%s:A:1 a player whose last hero is Aragorn is eliminated when the first player token passes him on (mec113.multiplayer-aragorn, mec112.aragorn)", (code) => {
+    const aragorn = miscCtx([...RECORDS]);
+    const table = seat(2, ["rohan"]);
+    const made = put(table.state, code, "heroes", 0);
+    const lone = table.heroes[0] ?? "";
+    const base = syncConstants(made.state, aragorn);
+    const without = { ...base, seats: [{ ...base.seats[0], heroes: base.seats[0].heroes.filter((id) => id !== lone) }, base.seats[1]] as typeof base.seats, cards: Object.fromEntries(Object.entries(base.cards).filter(([id]) => id !== lone)) };
+    const passed = run({ ...without, firstPlayer: 1 }, aragorn);
+    expect(passed.cards[made.id]?.controller).toBe(1);
+    expect(passed.seats[0]?.eliminated).toBe(true);
+    expect(passed.seats[1]?.eliminated).toBe(false);
+    expect(passed.lost).toBeFalsy();
+  });
+
+  it("132001:A:1 a player with another hero is not eliminated when Bilbo passes on", () => {
+    const { state } = twoSeats("132001");
+    const passed = run({ ...state, firstPlayer: 1 }, ctx);
+    expect(passed.seats[0]?.eliminated).toBe(false);
+    expect(passed.seats[0]?.heroes).toHaveLength(1);
+  });
+});
+
 describe("Burglar Baggins and The Lucky Number", () => {
   it("Burglar Baggins gives Bilbo +2 Willpower, Attack and Defense, and may be paid from his pool by a player who does not control him (131019:A:1)", () => {
-    const table = seat(2, ["131001"]);
-    const [bilbo0, bilbo1] = table.heroes;
-    const burglar = put(table.state, "131019", "hand", 1);
-    const synced = syncConstants(run(burglar.state, ctx), ctx);
-    // The first player controls every Bilbo Baggins.
-    expect(synced.cards[bilbo1 ?? ""]?.controller).toBe(0);
+    // One Bilbo, controlled by the first player (seat 0); seat 1 holds the card.
+    const table = seat(2, ["rohan"]);
+    const placed = put(table.state, "131001", "heroes", 0);
+    const bilbo = placed.id;
+    const burglar = put(placed.state, "131019", "hand", 1);
+    const synced = syncConstants(run(updateCard(burglar.state, bilbo, { resources: 5 }), ctx), ctx);
+    expect(synced.cards[bilbo]?.controller).toBe(0);
     const state: typeof synced = { ...synced, activeSeat: 1, window: { kind: "pass" }, planningSeat: 1 };
-    let played = play(state, burglar.id, ctx, [{ heroId: bilbo1 ?? "", amount: 1 }]);
-    expect(played.cards[bilbo1 ?? ""]?.resources).toBe(4);
-    // Two Bilbos are in play in this test (one for each seat): the player chooses.
-    expect(played.window).toMatchObject({ kind: "choose" });
-    played = send(played, { type: "Choose", optionId: bilbo0 ?? "" }, ctx);
-    const synced2 = syncConstants(run(played, ctx), ctx);
-    expect(modifiedStat(synced2, synced2.cards[bilbo0 ?? ""]!, "willpower", ctx.cards)).toBeGreaterThanOrEqual(2 + 2);
+    const played = play(state, burglar.id, ctx, [{ heroId: bilbo, amount: 1 }]);
+    expect(played.cards[bilbo]?.resources).toBe(4);
+    const after = syncConstants(run(played, ctx), ctx);
+    expect(modifiedStat(after, after.cards[bilbo]!, "willpower", ctx.cards)).toBe(2 + 2);
+    expect(modifiedStat(after, after.cards[bilbo]!, "attack", ctx.cards)).toBe(2 + 2);
+    expect(modifiedStat(after, after.cards[bilbo]!, "defense", ctx.cards)).toBe(2 + 2);
   });
 
   it("The Lucky Number adds Bilbo's total Willpower, Attack and Defense to another character (132013:A:1)", () => {

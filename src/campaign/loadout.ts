@@ -51,11 +51,14 @@ export type LoadoutRule =
   | "stolenCard"
   | "secondVersion"
   | "undiscoveredTreasure"
-  | "treasureCopies";
+  | "treasureCopies"
+  | "bagginsOutsideHobbit"
+  | "treasureSet";
 
 // What a scenario's saga start adds to the loadout rules: the ☺ hero it grants the first player in place of a Ring-bearer from their own heroes
 // (mec112.setting-up-the-game; ☺ Aragorn in scenarios 7 to 9), and the titles the players cannot use (src/campaign/saga.ts).
-export type SagaRules = { hero?: string | undefined; titleBans?: readonly TitleBan[] | undefined };
+// `treasures`: the treasure cards a scenario of The Hobbit lets a deck hold at its Setup (hob.treasure-ohauh, hob.treasure-otd), a cycle with no Campaign Log: a treasure of the listed sets is admitted with no record of its discovery.
+export type SagaRules = { hero?: string | undefined; titleBans?: readonly TitleBan[] | undefined; treasures?: readonly string[] | undefined };
 
 export type LoadoutError = { rule: LoadoutRule; code: string; card: string; message: string };
 
@@ -69,6 +72,14 @@ function nextHero(limit: number): string {
 function isFellowship(card: PrintedCard): boolean {
   return card.type === "hero" && card.sphere === "fellowship";
 }
+
+// The Baggins sphere (hob.bilbo-baggins-ohauh, hob.bilbo-baggins-otd): Bilbo Baggins, the hero of The Hobbit's two boxes.
+function isBagginsHero(card: PrintedCard): boolean {
+  return card.type === "hero" && card.sphere === "baggins";
+}
+
+// "☺ Aragorn" for a Fellowship-sphere hero, the plain name for any other the scenario grants (Bilbo Baggins).
+const grantedName = (card: PrintedCard | undefined): string => (card?.sphere === "fellowship" ? `☺ ${card.name}` : (card?.name ?? "the granted hero"));
 
 function isRingBearer(card: PrintedCard): boolean {
   return isFellowship(card) && card.traits.includes("Ring-bearer");
@@ -90,12 +101,12 @@ function grantedHeroErrors(heroCards: Cards, deckCards: Cards, cards: ReadonlyMa
   }
   for (const card of [...heroes, ...inDecks]) {
     if (card == null || card.code === hero) continue;
-    if (granted && card.name === granted.name) fail("secondVersion", card, `another ${granted.name} cannot be a starting hero or in the deck while the ☺ ${granted.name} is in the game`);
+    if (granted && card.name === granted.name) fail("secondVersion", card, `another ${granted.name} cannot be a starting hero or in the deck while ${grantedName(granted)} is in the game`);
     if (card.leavesPlayLoses) fail("ringInDeck", card, "this card is granted by setup and cannot be in a deck");
   }
   heroCards.forEach((seat, index) => {
     const limit = limits[index] ?? MOST_HEROES;
-    for (const card of seat.filter((item): item is PrintedCard => item != null && item.code !== hero).slice(limit)) fail("tooManyHeroes", card, `${nextHero(limit)} is legal only when the extra hero is ☺ Aragorn`);
+    for (const card of seat.filter((item): item is PrintedCard => item != null && item.code !== hero).slice(limit)) fail("tooManyHeroes", card, `${nextHero(limit)} is legal only when the extra hero is ${grantedName(granted)}`);
   });
   const names = new Set<string>();
   for (const card of heroes) {
@@ -156,13 +167,25 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
   }
 
   // A treasure is a deck card only once the log records it (emce.treasure): "if that treasure card is marked in the campaign log". No more than 1 copy of a title.
+  // The Hobbit's boxes have no log (the cycle is standalone only): a treasure whose set the scenario lists is admitted (`rules.treasures`, hob.treasure-ohauh, hob.treasure-otd), any other is refused.
   for (const deck of deckCards) {
     const seen = new Set<string>();
     for (const card of deck) {
-      if (card == null || card.campaignKind !== "treasure") continue;
-      if (!discovered.includes(card.code)) fail("undiscoveredTreasure", card, "a treasure can be added to a deck only once the players have discovered it and it is marked in the campaign log (emce.treasure)");
-      else if (seen.has(card.name)) fail("treasureCopies", card, "no more than 1 copy of a treasure, by title, can be added to a player's deck (emce.treasure)");
+      if (card == null || card.type !== "treasure") continue;
+      if (card.campaignKind === "treasure") {
+        if (!discovered.includes(card.code)) fail("undiscoveredTreasure", card, "a treasure can be added to a deck only once the players have discovered it and it is marked in the campaign log (emce.treasure)");
+        else if (seen.has(card.name)) fail("treasureCopies", card, "no more than 1 copy of a treasure, by title, can be added to a player's deck (emce.treasure)");
+      } else if (!(rules.treasures ?? []).includes(card.code)) fail("treasureSet", card, "this treasure belongs to a set the scenario does not list in its setup, so it cannot be added to a deck (hob.treasure-ohauh, hob.treasure-otd)");
+      else if (seen.has(card.name)) fail("treasureCopies", card, "no more than 1 copy of a treasure, by title, can be added to a player's deck (hob.treasure-ohauh, hob.treasure-otd)");
       seen.add(card.name);
+    }
+  }
+
+  // Bilbo Baggins "cannot be used as a hero when playing any scenario from a product other than" his box (hob.bilbo-baggins-ohauh, hob.bilbo-baggins-otd): only a scenario that grants a Baggins hero deals him.
+  const grantsBaggins = rules.hero != null && cards.get(rules.hero)?.sphere === "baggins";
+  if (!grantsBaggins) {
+    for (const card of heroCards.flat()) {
+      if (card != null && isBagginsHero(card)) fail("bagginsOutsideHobbit", card, "the Baggins sphere hero can only be used when playing the scenarios of his Hobbit box (hob.bilbo-baggins-ohauh, hob.bilbo-baggins-otd)");
     }
   }
 
@@ -170,6 +193,8 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
     for (const card of heroCards.flat()) {
       if (card != null && isFellowship(card)) fail("fellowshipOutsideSaga", card, "a Fellowship-sphere hero can only be used when playing the scenarios in the saga expansions (mec109.the-fellowship-sphere)");
     }
+    // A scenario that grants a hero outside a saga (The Hobbit's Bilbo Baggins): no other version of him, no fourth hero besides him, and the heroes are unique. A Fellowship hero is already refused above.
+    if (rules.hero != null) return [...errors, ...grantedHeroErrors(heroCards, deckCards, cards, rules.hero, limits).filter((error) => error.rule !== "twoFellowshipHeroes")];
     // The same hero twice is still refused (rr.unique-cards).
     refuseSameHero(heroCards.flat(), null);
     return errors;

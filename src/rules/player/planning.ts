@@ -83,7 +83,7 @@ export function playCard(
   // A player side quest is placed in the staging area (families/sidequests/play.ts).
   if (printed.type === "player-side-quest") return enterStaging(next, intent.cardId, seat, steps);
   // An attachment played unattached, onto a threat dial, or guarded (families/attachments/play.ts).
-  const elsewhere = printed.type === "attachment" ? playElsewhere(next, intent.cardId, intent.hostId, seat, ctx, steps) : null;
+  const elsewhere = playsOntoHost(printed) ? playElsewhere(next, intent.cardId, intent.hostId, seat, ctx, steps) : null;
   if (elsewhere) return elsewhere;
   next = moveCard(next, intent.cardId, { zone: "play", seat });
   next = updateCard(next, intent.cardId, { exhausted: entersExhausted(ctx, instance.code) });

@@ -73,7 +73,6 @@ export const POOL_GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"12113:constant:1","cardCode":"12113","lines":["12113:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character","trait":"Warrior"},"limitPerHost":true}]},
   {"id":"12116:constant:1","cardCode":"12116","lines":["12116:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"whileSourceInPlay","target":"host"}]},
   {"id":"12145:constant:1","cardCode":"12145","lines":["12145:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character","trait":"Ranger"}}]},
-  {"id":"131001:triggered:1","cardCode":"131001","lines":["131001:A:3"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
   {"id":"131005:constant:1","cardCode":"131005","lines":["131005:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveAttachments","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"131011:constant:1","cardCode":"131011","lines":["131011:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero"}}]},
   {"id":"131012:constant:1","cardCode":"131012","lines":["131012:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"}}]},

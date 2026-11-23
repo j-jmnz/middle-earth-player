@@ -4,7 +4,7 @@ import { cardRef, renderAmount } from "./amounts.ts";
 import { renderCondition } from "./conditions.ts";
 import { who } from "./family-kit.ts";
 import { FAMILY_TEMPLATES } from "./families.ts";
-import { compact, done, isObj, jsonOf, joinAnd, quoted, str, withArticle, type Ctx, type Obj } from "./kit.ts";
+import { compact, done, isObj, jsonOf, joinAnd, joinOr, quoted, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 import { ANGMAR_TEMPLATES } from "./families/angmar.ts";
 import { ESCAPE_TEMPLATES } from "./families/escape.ts";
@@ -167,7 +167,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     const host = isObj(i.host) ? i.host : null;
     const kinds: Readonly<Record<string, string>> = { hero: "hero", character: "character", activeLocation: "active location", ringBearer: "Ring-bearer", quest: "quest card in play" };
     const named = host ? `${typeof host.sphere === "string" ? `${host.sphere} ` : ""}${typeof host.trait === "string" ? `${host.trait} ` : ""}${kinds[str(host.kind)] ?? str(host.kind)}${typeof host.name === "string" ? ` named "${host.name}"` : ""}` : null;
-    const where = Array.isArray(i.hosts) ? `a card that is ${joinAnd(i.hosts.map((one) => `a ${pick(one, ctx)}`))}` : named ? `a ${named}` : "any character";
+    const where = Array.isArray(i.hosts) ? `a card that is ${joinOr(i.hosts.map((one) => `a ${pick(one, ctx)}`))}` : named ? `a ${named}` : "any character";
     return { text: `this attachment may be attached to ${where}${i.limitPerHost === true ? " (limit 1 of it per host)" : ""}`, read: ["host", "hosts", "limitPerHost"] };
   },
   Safe: () => ({ text: "(rule marker) this card has the Safe keyword: when the players travel to it all engaged enemies return to the staging area, and while it is the active location treacheries' When Revealed effects are ignored, encounter side quests' text boxes are blank and enemies make no engagement checks (its other lines say each)", read: [] }),
@@ -260,6 +260,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   RemoveFromCampaignPool: () => ({ text: "this card is removed from the Campaign Pool", read: [] }),
   CancelDamage: (i, ctx) => ({ text: i.all === true ? "cancel all of the damage just dealt" : `cancel up to ${i.amount === undefined ? "1" : amount(i.amount, ctx)} point(s) of the damage just dealt${i.target === undefined ? "" : ` to ${cardRef(i.target)}`}`, read: ["amount", "all", "target"] }),
   ChooseX: (i, ctx) => ({ text: `the acting player chooses X, from ${i.min === undefined ? "1" : str(i.min)} to ${chooseXMost(i.max, ctx)}`, read: ["min", "max"] }),
+  PayFromHero: (i) => ({ text: `a resource from the pool of the hero named ${str(i.name)} may pay for this card, even when its player does not control that hero`, read: ["name"] }),
   MoveDamage: (i, ctx) => ({ text: `move ${i.all === true ? "all" : amount(i.amount, ctx)} damage from the card picked before the last to the last picked card`, read: ["amount", "all"] }),
   TakeLoggedCaptives: (i) => ({ text: `each seat the Campaign Log names a Captive for has that hero lie faceup under the card with code ${str(i.under)}`, read: ["under"] }),
   MakeCaptive: (i) => ({ text: `the picked hero becomes a Captive: it lies faceup under the card with code ${str(i.under)}, in play and controlled by no one`, read: ["under"] }),
