@@ -12,10 +12,10 @@ An open point is a reading of a card, a rule or an effect that `data/` and the o
 2. **Community discussion**: BoardGameGeek, the lotrlcg subreddit, and the FFG and Hall of Beorn forums. It settles the point only when its answer is clear and agreed.
 3. **The agent's recommendation**, when neither settles it, with the reason.
 
-A reading is marked `researched` (with the URLs read) or `recommended` (with the URLs read and why none settled it). It goes to its scenario's section in `docs/scenarios/<box>.md` (or to `docs/brief.md` for the core round and the player cards), with its source URL or "agent recommendation"; a `recommended` reading, or one settled only by community discussion, also gets a line in that file's section Readings to confirm, until the user confirms it. A scan that cannot be read is the one question for the user: the printed card cannot be taken from a discussion.
+A reading is marked `researched` (with the URLs read) or `recommended` (with the URLs read and why none settled it). It goes to its scenario's file `docs/scenarios/<box>/<id>.md` (`<box>.md` for what its scenarios share, `docs/brief.md` for the core round and the player cards), with its source URL or "agent recommendation"; a `recommended` reading, or one settled only by community discussion, also gets a line in that file's Readings to confirm until the user confirms it. A scan that cannot be read is the one question for the user: the printed card cannot be taken from a discussion.
 
 ## Changes
 
-A rule change updates `docs/brief.md`, or the box's file in `docs/scenarios/`, in the same change. Do not commit `catalog.db`, card scans or PDFs. Card text and rules text live in `data/` on purpose.
+A rule change updates `docs/brief.md` or the scenario's file in the same change. Do not commit `catalog.db`, card scans or PDFs. Card text and rules text live in `data/` on purpose.
 
 Code changes follow `.claude/rules/code-standards.md`. Doc changes, `docs/phases/STATUS.md` included, follow `.claude/rules/docs-standards.md`. Commits and merges follow `.claude/rules/commit-standards.md`. Branches, versions, tags and releases follow `docs/agents/release-standards.md`. Running a plan with several sections is `/orchestrator`. Implementing a phase is `/implementer`. Reviewing a diff is `/reviewer`. Reviewing screens is `/ux`; changing the design system is `designer`. Writing effect records for lines no template reads is `effect-author`. Phase status is `docs/phases/STATUS.md`.

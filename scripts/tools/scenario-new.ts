@@ -63,6 +63,14 @@ function keyFor(name: string, code: string, used: Set<string>): string {
 // A scenario whose last word another scenario already uses (The Dread Realm owns "realm", Flight from Moria "moria", The Caves of Nibin-Dûm and The Battle of Carn Dûm "dum") starts from another word.
 const SHORT_OF: Readonly<Record<string, string>> = { "the-woodland-realm": "woodland", "the-mines-of-moria": "mines", "escape-from-khazad-dum": "khazad" };
 
+// The box file of docs/scenarios/ a campaign's scenarios belong to, where the campaign's id is not the box file's name.
+const DOC_BOX: Readonly<Record<string, string>> = { "the-dark-of-mirkwood": "mirkwood-paths" };
+
+/** The scenario's own rulings file (docs/scenarios/<box>/<scenario-id>.md): what the box file keeps is what its scenarios share. */
+export function scenarioDocFile(campaignId: string, id: string): string {
+  return `docs/scenarios/${DOC_BOX[campaignId] ?? campaignId}/${id}.md`;
+}
+
 function defaultShort(id: string): string {
   return SHORT_OF[id] ?? id.split("-").at(-1) ?? id;
 }
@@ -194,6 +202,9 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
   ];
   const present = files.filter((item) => exists(item.file)).map((item) => item.file);
   if (present.length > 0) return { plan: null, problems: [`${id} already has: ${present.join(", ")}`] };
+  // The scenario's rulings file is a title only; a file already written for it stays as it is and does not stop the scaffold.
+  const docFile = scenarioDocFile(facts.campaignId, id);
+  if (!exists(docFile)) files.push({ file: docFile, text: `# ${facts.name.replace(/ \(Campaign\)$/, "")}\n` });
 
   // The registries, each read as it is and edited in memory.
   const c = camel(short);
@@ -279,6 +290,7 @@ function addedLines(before: readonly string[], after: readonly string[]): string
 function nextSteps(facts: Facts, log: Log): void {
   log.info("next (docs/agents/agent-brief.md, Scenario procedure):");
   log.info("  pnpm data build                   rewrites the barrels of authored effect files (src/effects/generated/authored.ts) and of asks files (src/play/words/asks/index.ts)");
+  log.info(`  ${scenarioDocFile(facts.campaignId, facts.id)}   the scenario's own rulings file (title only): its mechanics, readings and table pieces go here, not in the box file`);
   log.info(`  pnpm scenario pack ${facts.id}   runs effects draft and writes .agent/pack/${facts.id}.md: the vocabulary, the families' manifests the drafts need, the cookbook sections and the drafts`);
   log.info(`  pnpm scenario tests ${facts.id}      after Build: a failing row stub in spec.test.ts for each record no test names`);
   log.info("  pnpm effects open                 after the records, then add the scenario to src/campaign/playable.ts when none of its lines is open");

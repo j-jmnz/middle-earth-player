@@ -60,7 +60,7 @@ describe("agent context", () => {
     expect(statusProblems()).toEqual([]);
   });
 
-  it("keeps scenario sections out of docs/brief.md (a scenario's rulings are in its box's file in docs/scenarios/)", () => {
+  it("keeps scenario sections out of docs/brief.md (a scenario's rulings are in its own file in docs/scenarios/<box>/)", () => {
     expect(scenarioHeadingsInBrief()).toEqual([]);
   });
 
