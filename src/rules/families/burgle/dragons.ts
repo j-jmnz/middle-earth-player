@@ -3,19 +3,19 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
-import { hasTrait } from "../../interpret/conditions.ts";
+import { addClassModifier, traitedEnemies } from "../../core/holder-classes.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { discardRandom } from "../../interpret/verbs.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats } from "../../core/state.ts";
+import { livingSeats } from "../../core/state.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { committedWillpower } from "../../quest/quest.ts";
 import type { Focus } from "../index.ts";
 import { lastPickedCard } from "../play/refs.ts";
 import { attackNowFromStaging } from "../south/watcher.ts";
 
-/** DiscardRandomRaiseThreat: each living player, the first player first, discards `amount` cards at random from his hand; each enemy in play with the Trait gets +1 Threat until the end of the phase for each card of the type discarded, by all players together. */
+/** DiscardRandomRaiseThreat: each living player, the first player first, discards `amount` cards at random from his hand; each enemy in play with the Trait, and each that enters play later in the phase, gets +1 Threat until the end of the phase for each card of the type discarded, by all players together. */
 export function discardRandomRaiseThreat(state: ScenarioState, instruction: Extract<Instruction, { verb: "DiscardRandomRaiseThreat" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
   const living = livingSeats(state);
   const at = Math.max(0, living.indexOf(state.firstPlayer));
@@ -28,8 +28,8 @@ export function discardRandomRaiseThreat(state: ScenarioState, instruction: Extr
     discarded += (next.seats[seat]?.discard ?? []).slice(before).filter((id) => printedOf(ctx.cards, next.cards[id]?.code ?? "").type === instruction.cardType).length;
   }
   if (discarded === 0) return next;
-  const raised = Object.values(next.cards).filter((card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).type === "enemy" && hasTrait(next, card.id, instruction.trait, ctx));
-  return { ...next, modifiers: [...next.modifiers, ...raised.map((card) => ({ instanceId: card.id, sourceId: focus.sourceId ?? card.id, stat: "threat" as const, amount: discarded, until: "endOfPhase" as const }))] };
+  // The class of the enemies with the Trait, so that a Dragon that enters play later in the phase has the Threat too (faq.lasting-effects).
+  return addClassModifier(next, traitedEnemies(instruction.trait), focus.sourceId ?? "table", "threat", discarded, "endOfPhase");
 }
 
 /** The seats whose committed characters have the highest total Willpower, among the living. */

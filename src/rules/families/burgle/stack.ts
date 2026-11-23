@@ -3,12 +3,17 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { shuffleIds } from "../../core/seed.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
-import { inPlay, updateCard } from "../../core/state.ts";
+import { flagged, inPlay, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 
 function hostOf(state: ScenarioState, code: string): CardInstance | undefined {
   return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone));
+}
+
+/** The Threat a card has once the flag `threatHalved` (132045:A:1) is on it: halved after the additive modifiers and rounded up (rr.modifiers). Any other stat, and a card with no such flag, keeps `value`. */
+export function halvedThreat(state: ScenarioState, instance: CardInstance, stat: string, value: number): number {
+  return stat === "threat" && state.modifiers.length > 0 && flagged(state, instance.id, "threatHalved") ? Math.ceil(value / 2) : value;
 }
 
 /** The cards stacked under the card, the top one first. */

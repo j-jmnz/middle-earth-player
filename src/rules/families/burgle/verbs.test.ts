@@ -4,7 +4,8 @@ import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import { settle } from "../../engine/machine.ts";
 import { definePrinted } from "../../core/printed.ts";
-import type { ScenarioState } from "../../core/state.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { startReveal } from "../../windows/frames.ts";
 import { ally, enemy, hero, send, table, treachery, type TableSpec } from "../defense/table.ts";
@@ -26,21 +27,28 @@ function begin(options: Options) {
   return { ...base, state: settle(pushed, base.ctx, []) };
 }
 
-const threatMods = (state: ScenarioState) => state.modifiers.filter((modifier) => modifier.stat === "threat").map((modifier) => [state.cards[modifier.instanceId]?.code, modifier.amount, modifier.until]);
+const threatMods = (state: ScenarioState) => state.modifiers.filter((modifier) => modifier.stat === "threat").map((modifier) => [state.cards[modifier.instanceId]?.code ?? modifier.instanceId, modifier.amount, modifier.until]);
 
 describe("DiscardRandomRaiseThreat (132049:A:1)", () => {
   const verb: Instruction = { verb: "DiscardRandomRaiseThreat", amount: 2, cardType: "event", trait: "Dragon" };
+
+  // The Threat each card reads now: the bonus is a class modifier, so it counts for a Dragon that enters play later too.
+  const threatOf = (run: ReturnType<typeof begin>, key: string) => modifiedStat(run.state, run.state.cards[run.ids[key] ?? ""] as CardInstance, "threat", run.ctx.cards);
+  const without = (state: ScenarioState): ScenarioState => ({ ...state, modifiers: [] });
 
   it("gives each Dragon in play +1 Threat until the end of the phase for each event discarded", () => {
     const run = begin({ instructions: [verb], hand: [{ code: "ev" }, { code: "ev" }, { code: "x" }], staging: [{ code: "d1" }, { code: "orc" }], enemies: [{ code: "d2" }] });
     expect(run.state.seats[0]?.discard.length).toBe(2);
     const events = run.state.seats[0]?.discard.filter((id) => run.state.cards[id]?.code === "ev").length ?? 0;
-    expect(threatMods(run.state).sort()).toEqual(events > 0 ? [["d1", events, "endOfPhase"], ["d2", events, "endOfPhase"]] : []);
+    expect(threatMods(run.state)).toEqual([["enemies:Dragon", events, "endOfPhase"]]);
+    const plain = { ...run, state: without(run.state) };
+    expect([threatOf(run, "d1") - threatOf(plain, "d1"), threatOf(run, "d2") - threatOf(plain, "d2"), threatOf(run, "orc") - threatOf(plain, "orc")]).toEqual([events, events, 0]);
   });
 
   it("counts the events of every player together", () => {
     const run = begin({ seatCount: 2, heroes: [{ code: "a" }, { code: "b", seat: 1 }], instructions: [verb], hand: [{ code: "ev" }, { code: "ev" }, { code: "ev", seat: 1 }, { code: "ev", seat: 1 }], staging: [{ code: "d1" }] });
-    expect(threatMods(run.state)).toEqual([["d1", 4, "endOfPhase"]]);
+    expect(threatMods(run.state)).toEqual([["enemies:Dragon", 4, "endOfPhase"]]);
+    expect(threatOf(run, "d1") - threatOf({ ...run, state: without(run.state) }, "d1")).toBe(4);
   });
 
   it("raises nothing when no event is discarded, and discards fewer cards from a smaller hand", () => {

@@ -22,6 +22,13 @@ export function burgleActionWindow(state: ScenarioState): boolean {
   return top?.data.kind === "burgle" && top.step === 2 && state.window?.kind === "frameAction";
 }
 
+/** Whether the Mountain's Action (132043:A:2) has a revealed card to take: the window is open and the revealed card is still on the first player's deck. With none left it is not offered, and costs nothing. */
+function actionHasCard(state: ScenarioState): boolean {
+  const top = topFrame(state);
+  const revealed = top?.data.kind === "burgle" ? top.data.revealedId : null;
+  return burgleActionWindow(state) && revealed != null && state.cards[revealed]?.zone === "deck";
+}
+
 /** The burgle family's conditions, or null for any other. */
 export function burgleCondition(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean | null {
   switch (condition.kind) {
@@ -31,7 +38,7 @@ export function burgleCondition(state: ScenarioState, condition: Condition, scop
       return data?.kind === "effect" && data.burgle === (condition.kind === "burgleSucceeded" ? "succeeded" : "failed");
     }
     case "burgling":
-      return burgleActionWindow(state) && scope.actor === state.firstPlayer;
+      return actionHasCard(state) && scope.actor === state.firstPlayer;
     case "burgleCanDiscard": {
       const found = nearestBurgle(state);
       return found != null && found.frame.data.need > 0 && found.frame.data.matching.length >= found.frame.data.need;

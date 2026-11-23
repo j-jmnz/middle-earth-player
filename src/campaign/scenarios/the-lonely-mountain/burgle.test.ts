@@ -6,7 +6,8 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { bilbo, drive, make, resolveAndDrive, type Plan } from "../../../../test/scenarios/the-lonely-mountain/moments.ts";
-import { codesIn, idOf, legalIntents, zoneOf } from "../../../../test/harness/scene-kit.ts";
+import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
+import { codesIn, idOf, legalIntents, send, zoneOf } from "../../../../test/harness/scene-kit.ts";
 
 // The burgle effects of The Lonely Mountain's encounter cards and A Bare Patch's Response, played through the attempt: the first player discards the cards that match, or the attempt fails. Each moment is an attempt that A Bare Patch makes (132039:A:2), the
 // encounter deck holding the card with the burgle effect on top. The player deck holds the cards of one code, so the shuffle cannot change the revealed card. Written from the printed lines, with the hand and the revealed card named as cards of the game:
@@ -161,5 +162,16 @@ describe("132043:A:2 The Lonely Mountain Action: while a burgle attempt is made,
     expect(taken.state.seats[0]?.hand.length).toBe(2);
     expect(zoneOf(taken.state, "132039")).toBe("staging");
     expect(codesIn(taken.state, "encounterDiscard")).toContain("132042");
+  });
+  lineSpec("132043:A:2", "with no revealed card left on the deck the Action is not offered again and the resources stay", (effects) => {
+    const { made, run } = begin(effects, 4, ["01016"]);
+    const offer = (state: ScenarioState) => legalIntents(state, made.ctx).find((intent) => intent.type === "Trigger" && state.cards[intent.cardId]?.code === "132043");
+    const first = offer(run.state);
+    expect(first).toBeDefined();
+    const taken = send(run, { ...(first as PlayerIntent), payments: [{ heroId: idOf(run.state, "132001"), amount: 2 }] } as PlayerIntent, made.ctx);
+    expect(taken.state.window?.kind).toBe("frameAction");
+    expect(revealed(taken.state)).toBeNull();
+    expect(bilboPool(taken.state)).toBe(2);
+    expect(offer(taken.state)).toBeUndefined();
   });
 });
