@@ -17,7 +17,7 @@ const NAME_A_SPHERE: Instruction = {
 };
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
-  // 132035 Hidden Path. While it is the active location, locations in the staging area get -1 Threat. Travel: spend 2 Baggins resources (a hero of the Baggins sphere pays them, as Bilbo's pool does in every staging area he is in).
+  // 132035 Hidden Path. While it is the active location, locations in the staging area get -1 Threat. Travel: spend 2 Baggins resources (the heroes of the Baggins sphere pay them; only players who share the location's staging area may pay, from the heroes they control, hob.staging-area-creating).
   { id: "132035:constant:1", cardCode: "132035", lines: ["132035:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "threat", amount: -1, until: "whileSourceInPlay", holders: { type: "location", control: "any", stagingOnly: true, atStage: true } }] },
   { id: "132035:travel:1", cardCode: "132035", lines: ["132035:A:2"], timing: "travel", instructions: [{ verb: "SpendResources", amount: 2, sphere: "baggins", group: true }] },
 
@@ -61,15 +61,16 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     ],
   },
 
-  // 132038 Weighed Down. When Revealed: until the end of the round exhausted characters get -1 Willpower, Attack and Defense, read as the characters exhaust and ready (faq.lasting-effects). Shadow: a defender this attack destroys makes its controller raise his threat by 5.
+  // 132038 Weighed Down. When Revealed: until the end of the round exhausted characters get -1 Willpower, Attack and Defense. Each player of the staging area it is revealed to holds a lasting effect on the characters he controls, now and entering play later (rr.lasting-effects), read as they exhaust and ready (faq.lasting-effects).
+  // Shadow: when the attack is defended and destroys its defender, the defending player raises his threat by 5; an undefended attack has no defending character.
   {
     id: "132038:whenRevealed:1",
     cardCode: "132038",
     lines: ["132038:A:1"],
     timing: "whenRevealed",
-    instructions: (["willpower", "attack", "defense"] as const).map((stat) => ({ verb: "ModifyStat" as const, stat, amount: -1, until: "endOfRound" as const, holders: { type: "character" as const, control: "any" as const, atStage: true as const }, when: { kind: "holderExhausted" as const } })),
+    instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: (["willpower", "attack", "defense"] as const).map((stat) => ({ verb: "ModifyStat" as const, stat, amount: -1, until: "endOfRound" as const, target: "ownCharacters" as const, when: { kind: "holderExhausted" as const } })) }],
   },
-  { id: "132038:shadow:1", cardCode: "132038", lines: ["132038:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "RaiseThreat", amount: 5, when: { kind: "x", min: 1 } }] }] },
+  { id: "132038:shadow:1", cardCode: "132038", lines: ["132038:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", when: { kind: "undefended", is: false }, instructions: [{ verb: "RaiseThreat", amount: 5, when: { kind: "x", min: 1 } }] }] },
 ];
 
 export const AUTHORED_REPLACES: readonly string[] = [];
