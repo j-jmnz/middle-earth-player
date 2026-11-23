@@ -107,8 +107,8 @@ const VERBS = [
   // ("That player reveals 1 fewer encounter card this phase (to a minimum of 0)", 143020:A:2): the reveals the players make in turn skip that player's, and nothing else is shortened. A player's own reveal is one card, so `min: 1` leaves it as it is.
   z.strictObject({ verb: z.literal("RevealFewer"), amount: z.number().int().positive(), min: z.union([z.literal(0), z.literal(1)]), who: z.literal("picked").optional(), ...when }),
   // The staging step of this phase reveals `amount` more cards (rr.step-3-3): "reveal an additional encounter card this phase"
-  // (141080:A:2). The extra cards are revealed by the players in turn, from the first player on.
-  z.strictObject({ verb: z.literal("RevealMore"), amount: z.number().int().positive(), ...when }),
+  // (141080:A:2). The extra cards are revealed by the players in turn, from the first player on. `perPlayer`: `amount` more for each player in the game ("reveal 1 additional encounter card per player", 131029:B:2).
+  z.strictObject({ verb: z.literal("RevealMore"), amount: z.number().int().positive(), perPlayer: z.literal(true).optional(), ...when }),
   // A lasting effect on the encounter cards revealed from now until `until`, for those of `type` (any type without it):
   // `threatZero`, the next such card added to the staging area has Threat 0 until the end of the phase; `damage`, the first
   // such card revealed takes `amount` damage from the source; `discard`, the next card revealed is discarded without

@@ -83,7 +83,10 @@ export function attackHere(state: ScenarioState, enemyId: string): boolean {
   const enemy = state.cards[enemyId];
   if (!enemy) return false;
   if (enemy.zone === "engaged") return true;
-  return enemy.zone === "staging" && (engagedWithAll(state, enemyId) || viaRelay(state, enemyId) || (state.pendingAttack?.enemyId === enemyId && state.pendingAttack.fromStaging === true));
+  const making = state.pendingAttack?.enemyId === enemyId && state.pendingAttack.fromStaging === true;
+  // Gollum attacks Bilbo from the riddle area (families/riddles/gollum.ts).
+  if (enemy.zone === "riddleArea") return making;
+  return enemy.zone === "staging" && (engagedWithAll(state, enemyId) || viaRelay(state, enemyId) || making);
 }
 
 // The key under which an attack is counted as made this combat phase: one per player for an enemy engaged with all of them.

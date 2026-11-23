@@ -27,6 +27,7 @@ import { skipLoot } from "../families/wilderland/loot.ts";
 import { familyRevealed } from "../interpret/family-hooks.ts";
 import { gainedDoomed } from "../families/deck/gains-doomed.ts";
 import { gameReads } from "../core/game-reads.ts";
+import { revealedEffects } from "../families/riddles/reveal.ts";
 import { whenRevealedIgnored } from "../families/angmar/safe.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
@@ -259,6 +260,7 @@ function runRevealed(
   const code = state.cards[id]?.code;
   if (!code) return state;
   // A safe location that is active makes the players ignore the "when revealed" effects of every treachery (mec108.safe).
-  const effects = whenRevealedIgnored(state, id, ctx) ? [] : ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
+  // A card that prints a riddle offers the first player the choice between answering it and resolving the card (families/riddles/reveal.ts).
+  const effects = whenRevealedIgnored(state, id, ctx) ? [] : revealedEffects(state, id, seat, ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed"), ctx);
   return pushCardEffects(state, "whenRevealed", id, seat, peril, effects, ctx, steps);
 }

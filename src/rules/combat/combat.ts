@@ -138,7 +138,7 @@ export function beginEnemyAttack(
   // `fromStaging`: an effect made an enemy in the staging area attack (families/south/watcher.ts). `shadow: false`: no shadow card is dealt for the attack, though the enemy is considered engaged with each player ("Do not deal a shadow card for this attack", 19083:B:1).
   const { fromStaging = false, shadow = true } = options;
   const attacker = state.cards[enemyId];
-  const here = attacker != null && (attacker.zone === "engaged" || engagedWithAll(state, enemyId) || viaRelay(state, enemyId) || (fromStaging && attacker.zone === "staging"));
+  const here = attacker != null && (attacker.zone === "engaged" || engagedWithAll(state, enemyId) || viaRelay(state, enemyId) || (fromStaging && (attacker.zone === "staging" || attacker.zone === "riddleArea")));
   if (!attacker || !here || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
   // An attack an effect makes from the staging area was dealt its shadow card by the effect (attackNowFromStaging, immediateAttack): one deal per attack.
