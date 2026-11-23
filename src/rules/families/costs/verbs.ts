@@ -156,7 +156,7 @@ export function reattach(state: ScenarioState, instruction: Extract<Instruction,
   const movedId = instruction.card === "picked" ? lastPicked(state) : focus.sourceId;
   const source = movedId ? state.cards[movedId] : undefined;
   if (!source?.host) return state;
-  const options = attachmentHostIds(state, focus.seat, source.code, ctx).filter((id) => id !== source.host);
+  const options = attachmentHostIds(state, focus.seat, source.code, ctx, { byEffect: true }).filter((id) => id !== source.host);
   const target = focus.chosen && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
   if (!target) return options.length > 1 ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, options) : state;
   const old = state.cards[source.host];

@@ -38,6 +38,7 @@ const ROWS: readonly Row[] = [
   // The second pass: two players, the false case and what the line leaves out.
   { line: "131041:A:1", name: "with two players two cards go from the discard pile to the bottom of the deck", layout: { staging: ["131041"], seats: 2, discard: ["f0", "f3", "f3"], deck: ["f0"] }, act: announce("endOfRound"), expect: [deckCount(3), count("f3", "encounterDiscard", 0), count("f0", "encounterDiscard", 1)] },
   { line: "131055:A:2", name: "with two players each player chooses: the first raises his threat by 4, the second reveals a card", layout: { seats: 2, threat: [30, 30], deck: ["f0", "f0"] }, act: [resolve("131055", "whenRevealed"), answer("threat"), answer("reveal")], expect: [threat(34, 0), threat(30, 1), deckCount(1)] },
+  { line: "131056:A:1", name: "an attached objective (the Troll Key) stays while an attachment is discarded", layout: { attached: [{ code: "attachment", to: "dh1" }, { code: "131043", to: "dh1", encounter: true }] }, act: resolve("131056", "whenRevealed"), expect: [zone("attachment", "encounterDiscard"), zone("131043", "attached")] },
   // 131057 More Like a Grocer.
 ];
 

@@ -50,6 +50,7 @@ import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
 import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
 import { captiveLabel, cardLabel, copyLabel, has, option, seatedLabel, stagedAllyLabel, statOf, step, tiedLabel } from "./sheet-parts.ts";
+import { sackStat } from "./sack-rows.ts";
 import { nightActionNote } from "../words/scenarios/night.ts";
 import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/framsburg.ts";
 import { fatePassCaution } from "../words/scenarios/fate.ts";
@@ -338,6 +339,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const willpower = wait?.kind === "target" && wait.item.instruction.verb === "RemoveWillpowerFromQuest" ? statOf(game, ctx, id, "willpower") : [];
           // Gollum's pick of the card whose Sauron's Eye icons are not counted: each row shows the icons it adds.
           const eyes = data?.queue[0]?.instruction.verb === "IgnoreFortitudeEyes" ? [eyesStat(game, ctx, id)] : [];
+          // A Sack card's tie: the number the characters tie on (131044:A:1 to 131050:A:1).
+          const tied = wait?.kind === "target" ? sackStat(wait.item.instruction, id, game, ctx) : [];
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
           const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words, ctx.cards) ?? gundabadOptionLabel(wait.item.instruction, id, game, ctx, words) ?? (isBoonCode(wait.item.instruction, id) ? words.code(id) : null)) : null;
           // Copies of one card in different zones are told apart by where each one is.
@@ -353,7 +356,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : plainLabel);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...(willpower.length > 0 || eyes.length > 0 ? { stats: [...willpower, ...eyes] } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...(willpower.length > 0 || eyes.length > 0 || tied.length > 0 ? { stats: [...willpower, ...eyes, ...tied] } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }

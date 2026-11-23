@@ -15,6 +15,7 @@ const dwarrowdelf = (n: number, id: string, product: string, extra: Partial<Scen
 const TROLL_TREASURE = ["131020", "131021", "131022"];
 const WEB_TREASURE = ["132019"];
 const DRAGON_TREASURE = ["132020", "132021", "132022", "132023", "132024"];
+const againstTheShadow = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("03", n, id, product, extra);
 const hobbit = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("0A", n, id, product, extra);
 
 export const CYCLE_DEFS: readonly CampaignDef[] = [
@@ -77,6 +78,29 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
     ],
     saga: false,
     ledger: "the-hobbit",
+  },
+  {
+    id: "against-the-shadow",
+    name: "Against the Shadow",
+    kind: "cycle",
+    released: "2012-11-26",
+    products: ["Heirs of Númenor", "The Steward's Fear", "The Drúadan Forest", "Encounter at Amon Dîn", "Assault on Osgiliath", "The Blood of Gondor", "The Morgul Vale"],
+    scenarios: [
+      againstTheShadow(1, "peril-in-pelargir", "Heirs of Númenor", { setupSpan: "ats.setup-peril-in-pelargir", deck: { normal: "Q03.1", easy: "E03.1", label: "Peril In Pelargir" } }),
+      againstTheShadow(2, "into-ithilien", "Heirs of Númenor", { setupSpan: "ats.setup-into-ithilien" }),
+      againstTheShadow(3, "the-siege-of-cair-andros", "Heirs of Númenor", { setupSpan: "ats.setup-the-siege-of-cair-andros" }),
+      // DragnCards loads the underworld deck (the Streets of Gondor and Brigands enemies and the three Clue objectives) as the second shared deck; the Setup builds it from the encounter deck's sets (ats.setup-the-stewards-fear-underworld-deck).
+      againstTheShadow(4, "the-stewards-fear", "The Steward's Fear", { setupSpan: "ats.setup-the-stewards-fear", groups: { sharedEncounterDeck2: "setAside" } }),
+      againstTheShadow(5, "the-druadan-forest", "The Drúadan Forest", { setupSpan: "ats.setup-the-druadan-forest" }),
+      // DragnCards loads the objective ally Lord Alcaron in player 1's play area; the printed Setup puts him into play.
+      againstTheShadow(6, "encounter-at-amon-din", "Encounter at Amon Dîn", { setupSpan: "ats.setup-encounter-at-amon-din", groups: { player1Play1: "setAside" } }),
+      againstTheShadow(7, "assault-on-osgiliath", "Assault on Osgiliath", { setupSpan: "ats.setup-assault-on-osgiliath" }),
+      // DragnCards loads the objective allies Faramir and Lord Alcaron in player 1's play area; the printed Setup puts them into play.
+      againstTheShadow(8, "the-blood-of-gondor", "The Blood of Gondor", { setupSpan: "ats.setup-the-blood-of-gondor", groups: { player1Play1: "setAside" } }),
+      againstTheShadow(9, "the-morgul-vale", "The Morgul Vale", { setupSpan: "ats.setup-the-morgul-vale" }),
+    ],
+    saga: false,
+    ledger: "against-the-shadow",
   },
   {
     // The scenarios printed on their own (RingsDB's cycle 50 packs that are not A Long-extended Party's): one product line each as it is built. The index counts the built ones.

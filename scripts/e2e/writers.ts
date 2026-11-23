@@ -75,6 +75,7 @@ import { minesFixtures } from "./standalone-scenarios/the-mines-of-moria.ts";
 import { khazadFixtures } from "./standalone-scenarios/escape-from-khazad-dum.ts";
 import { dreadnaughtFixtures } from "./standalone-scenarios/the-hunt-for-the-dreadnaught.ts";
 import { grimFixtures } from "./the-hobbit/over-the-misty-mountains-grim.ts";
+import { dayFixtures } from "./the-hobbit/we-must-away-ere-break-of-day.ts";
 
 // The scenarios scenario 1's block writes by hand (`won` is the one fixture not committed that the registry names, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -161,4 +162,5 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "escape-from-khazad-dum": () => khazadFixtures(),
   "the-hunt-for-the-dreadnaught": () => dreadnaughtFixtures(),
   "over-the-misty-mountains-grim": () => grimFixtures(),
+  "we-must-away-ere-break-of-day": () => dayFixtures(),
 };
