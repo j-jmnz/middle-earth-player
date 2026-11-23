@@ -76,6 +76,11 @@ export async function loadSource(name: string): Promise<GameSource> {
   throw new Error(`${name} is not a fixture, <scenario-id>/<golden>, encounter:<scenario-id>:<game> or smoke:<code>; \`pnpm game list\` lists the fixtures and goldens`);
 }
 
+/** A scenario's golden names in registry order, which numbers them for `pnpm game show <scenario-id>/<n>`; empty for a scenario with none. */
+export function goldenNames(scenarioId: string): string[] {
+  return GOLDEN_REGISTRY.find((item) => item.scenarioId === scenarioId)?.goldens.map((golden) => golden.name) ?? [];
+}
+
 /** Every source `loadSource` reads, one per line: the committed fixtures, then each scenario's goldens by number and name. */
 export function listSources(): string[] {
   const fixtures = FIXTURE_NAMES.filter(hasFixture).map((name) => `${name}  (fixture, ${fixtureKindOf(name)})`);

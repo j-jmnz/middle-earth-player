@@ -32,8 +32,9 @@ The engine or the record does not do what the line prints. The writer does not f
 - One fix run takes all the faults of a round. It fixes the general cause where one cause explains several faults, then turns each `it.fails` into a plain test and deletes its comment.
 - For each kind of fault it searches every record for the same mistake and reads the printed line of each hit. The report lists the hits and what was done with each.
 - A change to a reader many cards share (a pick filter, a sphere or trait reader, a cost or payment helper, `moveCard`) lists the other cards whose behaviour it changes, by code, each checked against its printed text, with a test for a card of each kind. A check keyed on an unrelated fact, added so that no golden moves, is not a fix: apply the rule in general and regenerate the goldens it moves.
+- The cause of each moved golden is the block `pnpm game moved` prints for it (the first differing intent and the records and cards that resolved there), pasted into the commit body: never a cause written from memory.
 - Before a new flag, verb or filter, search the families for one that does the same.
-- The review reads the fix diff with a fresh context and is told to look for the cards a general change reaches, an offer and a refusal that disagree, an ability now withheld wrongly, and the stated cause of each moved golden. Its findings go to a second fix run.
+- The review reads the fix diff with a fresh context and is told to look for the cards a general change reaches, an offer and a refusal that disagree, an ability now withheld wrongly, and the stated cause of each moved golden, which it checks against `pnpm game moved`. Its findings go to a second fix run.
 
 ## Running it
 

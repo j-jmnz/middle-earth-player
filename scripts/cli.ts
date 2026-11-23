@@ -89,6 +89,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     log: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["log"], env: QUIET }], about: "a fixture's or golden's intents, one line each, with their engine steps (<source> --from, --to, --until, --steps, --grep)" },
     scene: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["scene"], env: QUIET }], about: "a table built from a test layout, read as show reads a game (<scenario-id> '<layout json>' | @<file>, then show's flags)" },
     diff: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["diff"], env: QUIET }], about: "where a golden played now leaves its golden.json, with the table both reached (<scenario-id>/<golden>)" },
+    moved: { steps: [{ script: "game/game.ts", node: GAME_NODE, args: ["moved"], env: QUIET }], about: "each golden whose golden.json differs from a base: result and last round before and after, first differing step, the records and cards that resolved there ([<base-ref>], default the merge base with origin/main)" },
   },
   doc: {
     index: { steps: [{ script: "docs/index.ts" }], about: "regenerates docs/INDEX.md" },
