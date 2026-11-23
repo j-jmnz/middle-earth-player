@@ -2,7 +2,7 @@
 // exact name, name prefix, a word of the name, trait / type / sphere, the card text, then a one-letter slip in a name word.
 import { traitTokens } from "../../catalog/deck-save";
 
-import { searchFold, withinOneEdit } from "../kit/fold";
+import { searchFold, SLIP_MIN, withinOneEdit } from "../kit/fold";
 
 /** What a pool row offers the search; a row without the type, sphere or text names (a test row) matches on what it has. */
 export type SearchRow = {
@@ -50,8 +50,6 @@ export function searchTerms(query: string): string[] {
   return terms;
 }
 
-const FUZZY_MIN = 5;
-
 // Where a field has the term at the start of any of its words (a phrase starts at a word too).
 function atWordStart(field: string, term: string): boolean {
   return field.startsWith(term) || field.includes(` ${term}`);
@@ -69,7 +67,7 @@ function termScore(index: SearchIndex, term: string): number | null {
   if (atWordStart(index.name, term)) return NAME_WORD;
   if (atWordStart(index.tags, term)) return TAG;
   if (index.text.includes(term)) return TEXT;
-  if (term.length >= FUZZY_MIN && !term.includes(" ") && index.nameWords.some((word) => withinOneEdit(term, word))) return FUZZY;
+  if (term.length >= SLIP_MIN && !term.includes(" ") && index.nameWords.some((word) => withinOneEdit(term, word))) return FUZZY;
   return null;
 }
 

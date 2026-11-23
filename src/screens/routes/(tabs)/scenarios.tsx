@@ -128,13 +128,14 @@ export default function Scenarios() {
       <CatalogTile key={id} testID={`standalone-${id}`} sceneId={id} number={number} name={scenarioName(id)} line={line} tone={tone} accessibilityLabel={[`Scenario ${number}`, scenarioName(id), line].filter(Boolean).join(", ")} accessibilityHint="Opens its briefing" posters={posters} listed onPress={() => brief(id)} />
     );
   };
-  // Each item's space above it is the gap the folds had in one column: 18 between sections, 8 between a phone's rows and 12 between posters.
-  const section = (lead: boolean) => (lead ? undefined : { paddingTop: 18 * s });
+  // Each item's space above it: 18 between sections, 8 between a phone's rows and 12 between posters. The search is the list's first
+  // item (`lead`), which HubListPage sets under the hero or the other runs.
+  const section = { paddingTop: 18 * s };
   const renderItem = (item: HubItem, lead: boolean) => {
     switch (item.type) {
       case "search":
         return (
-          <View className="flex-row" style={section(lead)}>
+          <View className="flex-row" style={lead ? undefined : section}>
             <SearchField testID="scenarios-search" value={search} onChangeText={setSearch} placeholder="Search scenario or box" accessibilityLabel="Search scenarios" accessibilityHint="Searches scenario and box names" />
           </View>
         );
@@ -146,7 +147,7 @@ export default function Scenarios() {
         );
       case "fold-all":
         return (
-          <View className="-mx-3 flex-row justify-end" style={section(lead)}>
+          <View className="-mx-3 flex-row justify-end" style={section}>
             <TextButton
               label={offer.label}
               tone="accent"
@@ -159,7 +160,7 @@ export default function Scenarios() {
         );
       case "box":
         return (
-          <View testID={item.id} style={section(lead)}>
+          <View testID={item.id} style={section}>
             <FoldHeader id={item.id} title={item.name} count={item.count} unit="scenario" {...listFold(item.id)} />
           </View>
         );
@@ -175,7 +176,7 @@ export default function Scenarios() {
       }
       case "coming":
         return (
-          <View style={section(lead)}>
+          <View style={section}>
             <FoldHeader id="scenarios-coming" title="Coming later" count={item.count} {...listFold("scenarios-coming")} />
           </View>
         );

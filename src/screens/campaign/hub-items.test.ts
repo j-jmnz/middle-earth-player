@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { hubItems, looselyHolds, searchHub, type HubItemsInput } from "./hub-items";
+import { hubItems, searchHub, type HubItemsInput } from "./hub-items";
 
 const entries = (ids: string[]) => ids.map((id, index) => ({ id, number: index + 1 }));
 const input = (over: Partial<HubItemsInput> = {}): HubItemsInput => ({
@@ -48,7 +48,7 @@ describe("hubItems", () => {
 describe("searchHub", () => {
   const names: Record<string, string> = { a: "Passage Through Mirkwood", b: "Journey Along the Anduin", c: "Escape from Dol Guldur", d: "The Fate of Númenor", e: "The Hunt for Gollum" };
   const tiles = [
-    { id: "x", name: "The Old Forest", caption: "Coming soon · Cycle · 3" },
+    { id: "x", name: "The Old Forest", caption: "Coming soon · Standalone scenarios · 3", find: "Standalone scenarios" },
     { id: "y", name: "Dream-chaser", caption: "Cycle · 9 scenarios · Coming soon" },
   ];
   const search = (text: string) => searchHub(input().boxes, tiles, text, (id) => names[id] ?? id);
@@ -80,22 +80,31 @@ describe("searchHub", () => {
 
   it("finds a word typed from its middle, and one typed without its apostrophe", () => {
     expect(kept("wood")).toEqual(["core:a"]);
-    expect(looselyHolds("Helm\u2019s Deep", ["helms"])).toBe(true);
-    expect(looselyHolds("Helm's Deep", ["helm", "deep"])).toBe(true);
+    const helm = (text: string) => searchHub([], [{ name: "Helm\u2019s Deep" }], text, (id) => id).waiting.length;
+    expect([helm("helms"), helm("helm deep"), helm("helms dep")]).toEqual([1, 1, 0]);
   });
 
   it("keeps every scenario of a box whose name holds the words", () => {
     expect(kept("core")).toEqual(["core:abc"]);
   });
 
-  it("keeps the locked tiles whose name or caption holds the words", () => {
-    expect(search("forest").waiting.map((tile) => tile.id)).toEqual(["x"]);
-    expect(search("cycle").waiting.map((tile) => tile.id)).toEqual(["x", "y"]);
+  it("keeps a scenario by a word of its box and a word of its name together", () => {
+    expect(kept("core mirkwood")).toEqual(["core:a"]);
+    expect(kept("cycle mirkwood")).toEqual([]);
+  });
+
+  it("keeps the locked tiles whose name or box holds the words, never by the caption's fixed words", () => {
+    const waiting = (text: string) => search(text).waiting.map((tile) => tile.id);
+    expect(waiting("forest")).toEqual(["x"]);
+    expect(waiting("standalone")).toEqual(["x"]);
+    expect(waiting("dream")).toEqual(["y"]);
+    expect([waiting("min"), waiting("soon"), waiting("coming"), waiting("scenarios 9")]).toEqual([[], [], [], []]);
   });
 
   it("opens every fold, leaves Collapse all out and says when nothing matches", () => {
     const found = search("gollum");
     expect(shape(hubItems(input({ boxes: found.boxes, waiting: found.waiting.length, searching: true, folded: () => true })))).toEqual(["search", "box", "tiles:e"]);
     expect(shape(hubItems(input({ boxes: [], waiting: 0, searching: true })))).toEqual(["search", "empty"]);
+    expect(shape(hubItems(input({ boxes: [], waiting: 0 })))).toEqual(["search"]);
   });
 });

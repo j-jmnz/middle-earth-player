@@ -32,3 +32,39 @@ export function withinOneEdit(a: string, b: string): boolean {
   }
   return a.length > b.length ? restA === b.slice(start) : a.slice(start) === restB;
 }
+
+/** The words a search compares: lower case, accents and punctuation dropped ("Númenor" is "numenor"). */
+export function searchWords(text: string): string[] {
+  return searchFold(text)
+    .split(" ")
+    .filter((word) => word.length > 0);
+}
+
+/** A typed word this long is forgiven a one-letter slip (`withinOneEdit`): a shorter word has too many neighbours, "ring" and "king". */
+export const SLIP_MIN = 5;
+
+/** How a word of a text answers a typed word. */
+export type WordTest = (word: string, typed: string) => boolean;
+
+/** The plain test: the word starts with the typed word. */
+export const startsWith: WordTest = (word, typed) => word.startsWith(typed);
+
+// A typed word this long is found anywhere in a word ("wood" in Mirkwood).
+const INSIDE_MIN = 3;
+
+/**
+ * The forgiving test: the word starts with the typed word, holds it, or is one slip from it; the slip is also forgiven in the word's
+ * start, so a name half typed with a slip still stays ("mirkwod", "golum").
+ */
+export const looselyAnswers: WordTest = (word, typed) => {
+  if (word.startsWith(typed)) return true;
+  if (typed.length >= INSIDE_MIN && word.includes(typed)) return true;
+  if (typed.length < SLIP_MIN) return false;
+  return [typed.length - 1, typed.length, typed.length + 1].some((length) => withinOneEdit(typed, word.slice(0, length)));
+};
+
+/** Whether the text holds every word typed (`searchWords`), each answered by one of its words; its words also count with their apostrophes dropped, so "helms" finds Helm's Deep. */
+export function holdsWords(text: string, typed: readonly string[], answers: WordTest = startsWith): boolean {
+  const words = [...searchWords(text), ...searchWords(text.replace(/['\u2018\u2019]/g, ""))];
+  return typed.every((term) => words.some((word) => answers(word, term)));
+}
