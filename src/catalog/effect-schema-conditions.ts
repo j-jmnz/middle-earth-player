@@ -64,6 +64,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("burgling") }),
   z.strictObject({ kind: z.literal("burgleCanDiscard") }),
   z.strictObject({ kind: z.literal("shadowBurgle") }),
+  // The actor's heroes with a Baggins icon hold at least this many resources in all ("spend X Baggins resources", 132048:A:2). `encounterTop`: the top card of the encounter deck has this card type (false with an empty deck: "If the looked at card is not the named type", 132045:A:2).
+  z.strictObject({ kind: z.literal("bagginsAtLeast"), amount: amountSchema }),
+  z.strictObject({ kind: z.literal("encounterTop"), cardType: z.enum(["enemy", "location", "treachery", "objective"]) }),
   // The long-dark family's conditions (src/rules/families/long-dark/conditions.ts): the last locate test the running effect made was failed, or passed ("If this test is failed", 04087:B:1); false before the effect has made one. `hasPass`: the card the condition names (the other card of the event, the last picked card
   // or the card the event is about) prints PASS in its text box ("dealt a shadow card with PASS printed in its text box", 901602:A:2).
   z.strictObject({ kind: z.literal("lastLocateFailed") }),

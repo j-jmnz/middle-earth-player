@@ -5,6 +5,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { Scope } from "../../interpret/conditions.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
+import { bagginsCondition } from "./baggins.ts";
 import { burgleEffectOf, nearestBurgle } from "./match.ts";
 
 /** The attempt just finished is noted on the effect that made it. */
@@ -39,6 +40,6 @@ export function burgleCondition(state: ScenarioState, condition: Condition, scop
       return code != null && burgleEffectOf(ctx, code) != null;
     }
     default:
-      return null;
+      return bagginsCondition(state, condition, scope, ctx);
   }
 }

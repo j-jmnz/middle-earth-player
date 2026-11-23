@@ -365,7 +365,7 @@ function damageAllies(
 }
 
 // The seat discards cards from its hand chosen by the seed, one roll each.
-function discardRandom(state: ScenarioState, seat: number, amount: number, sourceId: string | null, ctx: ReduceContext): ScenarioState {
+export function discardRandom(state: ScenarioState, seat: number, amount: number, sourceId: string | null, ctx: ReduceContext): ScenarioState {
   let next = state;
   for (let count = 0; count < amount; count += 1) {
     // A card a player card cannot discard (Lost in the Wild, 18026:A:1) is not among the cards drawn at random.
