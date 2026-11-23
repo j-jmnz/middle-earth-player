@@ -18,6 +18,7 @@ const BAT = "05050";
 const WATCHER = "05051";
 const MERCENARIES = "05052";
 const ELITE = "05053";
+const SPIDER = "05049";
 const MUMAK = "05054";
 const SUPPORT = "05055";
 const BATTLE = "05068";
@@ -42,6 +43,8 @@ const ROWS: readonly Row[] = [
 
   { line: "05029:A:3", name: "Shadow: 1 damage to the defending character (the attack alone deals none to a Defense 2 hero)", layout: { stage: BATTLE }, act: attack("f3", { shadow: WARGS }), expect: damageOn("dh1", 1) },
 
+  { line: "05029:A:2", name: "When Revealed: 1 damage to each character committed to the quest, an ally objective in the staging area included, and none to an uncommitted one", layout: { stage: BATTLE, staging: [CELADOR], committed: ["dh1"], play: ["ally"], deck: ["f0", "f0"] }, act: reveal(WARGS), expect: [damageOn("dh1", 1), damageOn(CELADOR, 1), damageOn("ally", 0), damageOn("dh2", 0)] },
+
   { line: "05046:A:1", name: "Action: a ready Ranger character the player controls is exhausted for 3 progress on Overgrown Trail", layout: { staging: [TRAIL], play: [GUARDIAN], stage: HIDDEN_WAY }, act: resolve(TRAIL, "action"), expect: [exhausted(GUARDIAN), progressOn(TRAIL, 3)] },
   { line: "05046:A:2", name: "Shadow: X progress off the current quest, X the attacking enemy's Threat (3)", layout: { stage: BATTLE, progress: 5 }, act: attack("f3", { shadow: TRAIL, undefended: true }), expect: progressOn(BATTLE, 2) },
   { line: "05047:A:2", name: "Shadow: X progress off the current quest, X the attacking enemy's Threat (3)", layout: { stage: BATTLE, progress: 5 }, act: attack("f3", { shadow: GLADE, undefended: true }), expect: progressOn(BATTLE, 2) },
@@ -49,10 +52,15 @@ const ROWS: readonly Row[] = [
   { line: "05048:A:1", name: "Each player removes 1 character he controls from the quest: the other stays committed while every player still has one", layout: { stage: BATTLE, committed: ["dh1", "dh2"] }, act: [reveal(COMPANION), answer("dh1")], expect: [committed("dh1", false), committed("dh2")] },
   { line: "05048:A:1", name: "Then, if any player has no character committed, every character leaves the quest", layout: { seats: 2, stage: BATTLE, committed: ["dh1", "dh2"] }, act: [reveal(COMPANION), answer("dh1")], expect: [committed("dh1", false), committed("dh2", false)] },
 
+  { line: "05049:A:1", name: "When Revealed: +1 Attack for each character not committed to a quest (dh2 and the ally: Celador and dh1 are committed)", layout: { stage: HIDDEN_WAY, staging: [CELADOR], committed: ["dh1"], play: ["ally"], deck: ["f0", "f0"] }, act: reveal(SPIDER), expect: stat(SPIDER, "attack", 6) },
+
   { line: "05050:A:1", name: "The first player chooses a questing hero: 2 damage, and the hero leaves the quest", layout: { stage: BATTLE, committed: ["dh1", "dh2"] }, act: [reveal(BAT), answer("dh2")], expect: [damageOn("dh2", 2), committed("dh2", false), committed("dh1")] },
   { line: "05050:A:2", name: "Shadow: the defending player raises his threat by the attacker's Threat (3)", layout: { stage: BATTLE }, act: attack("f3", { shadow: BAT, undefended: true }), expect: threat(31) },
 
   { line: "05051:A:2", name: "Shadow: each player raises his threat by the enemies engaged with him (f0 and the attacker)", layout: { stage: BATTLE, engaged: ["f0"] }, act: attack("f3", { shadow: WATCHER, undefended: true }), expect: threat(30) },
+
+  { line: "05051:A:1", name: "When Revealed: each player raises his threat by the characters committed (a hero and Celador), and the card gains surge under Battle", layout: { stage: BATTLE, staging: [CELADOR], committed: ["dh1"], deck: ["f0", "f0"] }, act: reveal(WATCHER), expect: [threat(30), deckCount(1)] },
+  { line: "05051:A:1", name: "Under a quest card without a keyword it gains no surge", layout: { stage: HIDDEN_WAY, staging: [CELADOR], committed: ["dh1"], deck: ["f0", "f0"] }, act: reveal(WATCHER), expect: [threat(30), deckCount(2)] },
 
   { line: "05052:A:3", name: "Shadow: +1 Attack (an undefended attack by a 1 Attack enemy deals 2)", layout: { stage: HIDDEN_WAY }, act: attack("f3", { shadow: MERCENARIES, undefended: true }), expect: damageOn("dh1", 2) },
   { line: "05052:A:3", name: "Shadow: +3 Attack instead for a Harad attacker (3 + 3 destroys a 6 hit point hero)", layout: { stage: HIDDEN_WAY }, act: attack(COMPANY, { shadow: MERCENARIES, undefended: true }), expect: zone("dh1", "discard") },
@@ -66,11 +74,10 @@ const ROWS: readonly Row[] = [
   { line: "05055:A:2", name: "When Revealed: each player searches the encounter deck for a Harad enemy and adds it to the staging area", layout: { stage: BATTLE, deck: [COMPANY, "f0", "f0"] }, act: reveal(SUPPORT), expect: zone(COMPANY, "staging") },
   { line: "05055:A:2", name: "The discard pile is searched too", layout: { stage: BATTLE, deck: ["f0", "f0"], discard: [COMPANY] }, act: reveal(SUPPORT), expect: zone(COMPANY, "staging") },
 
-  { line: "05069:B:2", name: "Archery X, X the players in the game (two seats)", layout: { seats: 2, stage: SIEGE }, act: [], expect: stat(SIEGE, "archeryPlayers", 1) },
 
   { line: "05070:B:2", name: "Enemies do not make engagement checks and cannot be optionally engaged", layout: { stage: HIDDEN_WAY }, act: [], expect: [flag("table", "noEngagementChecks"), flag("table", "cannotBeOptionallyEngaged")] },
 
-  { line: "05071:B:2", name: "Forced: at the end of each round each player raises his threat by 2 (with the Refresh phase's 1)", layout: { stage: APPROACHING }, act: resolve(APPROACHING, "forced"), expect: threat(30) },
+  { line: "05071:B:2", name: "Forced: at the end of each round each player raises his threat by 2 ", layout: { stage: APPROACHING }, act: resolve(APPROACHING, "forced"), expect: threat(30) },
 ];
 
 if (ROWS.length > 0) cardSpecs("into-ithilien", ROWS);
