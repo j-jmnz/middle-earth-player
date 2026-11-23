@@ -154,49 +154,46 @@ describe("the character with the most damage defends (132059:A:1)", () => {
 });
 
 describe("an attack that is already undefended is not forced onto a defender (132059:A:1, rr.step-6-4-3)", () => {
-  // Ravenous Warg attacks seat 0 and the table is at its defense window; `tweak` changes the table before the attack starts.
-  function atDefense(seats: 1 | 2, tweak: (state: ScenarioState, ids: { hero: string; hero2: string }) => ScenarioState) {
-    const made = tableFromLayout("the-battle-of-five-armies", { stage: S2, seats, phase: "Encounter", engaged: [{ code: "132059", seat: 0 }], deck: ["f0", "f0", "f0"] });
-    const state = syncConstants(tweak(made.state, made), made.ctx);
-    let run = send(start(state), { type: "DeclineEngage" }, made.ctx);
-    for (let guard = 0; guard < 40 && run.state.window?.kind !== "defense"; guard += 1) {
-      const pass = legalIntents(run.state, made.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack" || intent.type === "DeclineEngage");
-      if (!pass) break;
-      run = send(run, pass, made.ctx);
-    }
-    expect(run.state.window?.kind).toBe("defense");
-    return { made, run };
-  }
-  const exhaust = (...ids: string[]) => (state: ScenarioState): ScenarioState => ({ ...state, cards: Object.fromEntries(Object.entries(state.cards).map(([id, card]) => [id, ids.includes(id) ? { ...card, exhausted: true } : card])) });
-  // What a defender destroyed by the shadow card leaves behind (shadow.ts, resolveAttack): the attack is undefended and the hero is named next.
-  const undefendedNow = (state: ScenarioState): ScenarioState => ({ ...state, pendingAttack: state.pendingAttack ? { ...state.pendingAttack, undefended: true } : null });
-
+  // The first hero has the most damage, so the Warg forces him; Gundabad Archer's shadow (132058:A:2) deals damage to him and destroys him, the attack is then undefended and the second hero is named to take it.
+  const tableOf = (layout: Layout) => table({ ...layout, stage: S2 });
+  const doomed = (state: ScenarioState, made: { hero: string }): ScenarioState => ({ ...state, cards: { ...state.cards, [made.hero]: { ...state.cards[made.hero]!, damage: 5 } } });
   for (const seats of [1, 2] as const) {
-    it(`132059:A:1 the attack left undefended after its defender is gone offers only Undefended and takes it (${seats} seat${seats === 1 ? "" : "s"})`, () => {
-      const { made, run } = atDefense(seats, (state, ids) => exhaust(ids.hero, ids.hero2)(state));
-      // Before the defender goes, the Warg forces one: only a declaration is offered.
-      expect(legalIntents(run.state, made.ctx).map((intent) => intent.type)).toEqual(["DeclareDefender"]);
-      const after = { ...run, state: undefendedNow(run.state) };
-      const offered = legalIntents(after.state, made.ctx);
-      expect(offered.map((intent) => intent.type)).toEqual(["Undefended"]);
-      const [hero] = legalTargets(after.state, { type: "Undefended" }, made.ctx);
-      expect(hero).toBeDefined();
-      expect(() => send(after, { type: "Undefended", heroId: hero }, made.ctx)).not.toThrow();
+    it(`132059:A:1 a defender destroyed by the shadow card leaves the attack undefended: Undefended is offered, taken, and the damage lands on the named hero (${seats} seat${seats === 1 ? "" : "s"})`, () => {
+      const fought = fightEnemy((layout: Layout) => table({ ...layout, stage: S2, seats }), "132058", "132059", {}, { tweak: doomed });
+      const { made, run } = fought;
+      expect(run.state.cards[made.hero]?.zone).not.toBe("heroes");
+      expect(run.state.cards[made.hero2]?.damage).toBe(3);
+      expect(run.state.pendingAttack).toBeNull();
     });
   }
 
   it("132059:A:1 with no character that can be declared, Undefended is offered and accepted", () => {
-    const stopped = (state: ScenarioState, ids: { hero: string; hero2: string }): ScenarioState => ({
+    const stopped = (state: ScenarioState, made: { hero: string; hero2: string }): ScenarioState => ({
       ...state,
-      modifiers: [...state.modifiers, ...[ids.hero, ids.hero2].map((id) => ({ instanceId: id, sourceId: id, stat: "cannotDefend" as const, amount: 1, until: "endOfGame" as const }))],
+      modifiers: [...state.modifiers, ...[made.hero, made.hero2].map((id) => ({ instanceId: id, sourceId: id, stat: "cannotDefend" as const, amount: 1, until: "endOfGame" as const }))],
     });
-    const { made, run } = atDefense(1, stopped);
-    expect(legalTargets(run.state, { type: "DeclareDefender" }, made.ctx)).toEqual([]);
-    const offered = legalIntents(run.state, made.ctx);
-    expect(offered.map((intent) => intent.type)).toContain("Undefended");
-    const [hero] = legalTargets(run.state, { type: "Undefended" }, made.ctx);
-    expect(hero).toBeDefined();
-    expect(() => send(run, { type: "Undefended", heroId: hero }, made.ctx)).not.toThrow();
+    const fought = fightEnemy(tableOf, "f0", "132059", {}, { tweak: stopped, undefended: true, lands: { "132059": "dh2" } });
+    expect(fought.run.state.pendingAttack).toBeNull();
+    expect(fought.run.state.cards[fought.made.hero2]?.damage).toBe(3);
+  });
+
+  it("132059:A:1 when the only most damaged character is barred from this attack, nothing is forced: Undefended is offered and accepted", () => {
+    const made = tableOf({ phase: "Encounter", engaged: [{ code: "132059", seat: 0 }], deck: ["f0", "f0", "f0"] });
+    const damaged = { ...made.state, cards: { ...made.state.cards, [made.hero]: { ...made.state.cards[made.hero]!, damage: 1 } } };
+    let run = send(start(syncConstants(damaged, made.ctx)), { type: "DeclineEngage" }, made.ctx);
+    for (let guard = 0; guard < 40 && run.state.window?.kind !== "defense"; guard += 1) {
+      const pass = legalIntents(run.state, made.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack" || intent.type === "DeclineEngage" || intent.type === "ChooseEnemy");
+      if (!pass) break;
+      run = send(run, pass.type === "ChooseEnemy" ? { type: "ChooseEnemy", enemyId: run.state.window?.kind === "chooseEnemy" ? (run.state.window.options[0] ?? "") : "" } : pass, made.ctx);
+    }
+    expect(run.state.window?.kind).toBe("defense");
+    // The defender is barred from this attack (an effect removed him from it, 51335:A:2), so no declaration can name the most damaged character.
+    const attack = run.state.pendingAttack!;
+    const barred = { ...run, state: { ...run.state, pendingAttack: { ...attack, removedDefenders: [made.hero] } } };
+    expect(legalTargets(barred.state, { type: "DeclareDefender" }, made.ctx)).toEqual([]);
+    expect(legalIntents(barred.state, made.ctx).map((intent) => intent.type)).toContain("Undefended");
+    const after = send(barred, { type: "Undefended", heroId: made.hero }, made.ctx);
+    expect(after.state.cards[made.hero]?.damage).toBe(4);
   });
 });
 

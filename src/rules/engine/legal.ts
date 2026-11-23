@@ -107,9 +107,8 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
     case "ChooseEnemy":
       return state.window?.kind === "chooseEnemy" ? state.window.options : [];
     case "DeclareDefender": {
-      const seat = state.pendingAttack?.seat ?? state.activeSeat;
       if (state.pendingAttack?.undefended) return [];
-      return defenderIds(state, seat, ctx.cards).filter((id) => !defenseBlocked(state, ctx, id));
+      return declarableDefenders(state, ctx);
     }
     case "Undefended":
       return undefendedTargets(state, state.pendingAttack?.seat ?? state.activeSeat, ctx.cards);
@@ -348,10 +347,16 @@ function defenderReason(
   return null;
 }
 
+// The characters DeclareDefender may name now: the one list the offer, the targets and mustDefend all read.
+function declarableDefenders(state: ScenarioState, ctx: ReduceContext): string[] {
+  const seat = state.pendingAttack?.seat ?? state.activeSeat;
+  return defenderIds(state, seat, ctx.cards).filter((id) => !defenseBlocked(state, ctx, id));
+}
+
 // The attack must be defended while a character can defend it (Ravenous Warg, 132059:A:1). An attack already considered undefended (its defender left play, rr.step-6-4-3) has no defender to force. The offer and the refusal both read this.
 function mustDefend(state: ScenarioState, ctx: ReduceContext): boolean {
   const attack = state.pendingAttack;
-  return attack?.mustDefend === true && attack.undefended !== true && defenderIds(state, attack.seat, ctx.cards).length > 0;
+  return attack?.mustDefend === true && attack.undefended !== true && declarableDefenders(state, ctx).length > 0;
 }
 
 function undefendedReason(state: ScenarioState, intent: Extract<PlayerIntent, { type: "Undefended" }>, ctx: ReduceContext): string | null {
