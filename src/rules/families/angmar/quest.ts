@@ -12,6 +12,7 @@ import { flagged, inPlay, type CardInstance, type ScenarioState } from "../../co
 import { committedWillpower, stagingThreat } from "../../quest/quest.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { effectData } from "../encounter/moves.ts";
+import { stagesInPlay } from "../armies/stages.ts";
 import { questCardPool } from "../quest/quest-card.ts";
 import { makeCurrentQuest } from "../wilderland/night.ts";
 import { currentQuestId, currentSideQuest, mainQuestBarred, stagedSideQuests } from "../wilderland/night-quest.ts";
@@ -26,7 +27,7 @@ export function questCardsInPlay(state: ScenarioState, seat: number, ctx: Reduce
 
 /** The cards that may be the current quest: the main quest card (not in the quest phase while it cannot be chosen, 10094:B:3) and the side quests, encounter and player, in the staging area. */
 function choosable(state: ScenarioState, ctx: ReduceContext): string[] {
-  return [...(state.questStage && !mainQuestBarred(state) ? [state.questStage] : []), ...(state.armies?.stages.filter((id) => id !== state.questStage && state.cards[id] != null) ?? []), ...stagedSideQuests(state, ctx)];
+  return [...(state.questStage && !mainQuestBarred(state) ? [state.questStage] : []), ...stagesInPlay(state).filter((id) => id !== state.questStage), ...stagedSideQuests(state, ctx)];
 }
 
 /** The quest card that is the current quest now: the side quest chosen until the end of the phase, else the main quest card; none in the quest phase while the main quest card cannot be chosen and no side quest was. */
