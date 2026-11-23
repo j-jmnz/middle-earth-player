@@ -215,7 +215,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.spheres && !spheres.some((sphere) => spec.spheres?.includes(sphere))) return false;
   if (spec.printedIcon && !(printed.type === "hero" && printed.sphere === spec.printedIcon)) return false;
   if (spec.nonNeutral && !spheres.some((sphere) => sphere !== "neutral")) return false;
-  if (spec.exceptSphere && spheres.includes(spec.exceptSphere)) return false;
+  if (spec.exceptSphere && spheres.some((sphere) => [spec.exceptSphere].flat().includes(sphere))) return false;
   if (spec.cardType && printed.type !== spec.cardType) return false;
   if (spec.enemyOrLocation && printed.type !== "enemy" && printed.type !== "location") return false;
   if (spec.questCardType && !isQuestCardType(printed.type)) return false;

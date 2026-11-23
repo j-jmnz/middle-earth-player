@@ -72,7 +72,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["affectable"], pick.affectable === true ? "that a card effect can affect (not one immune to card effects)" : null);
   note(["progress"], pick.progress === true ? "with progress on it" : pick.progress === false ? "with no progress on it" : null);
   note(["captive"], typeof pick.captive === "string" ? (pick.captive === "only" ? "that is a Captive (held by an enemy or lying free)" : pick.captive === "free" ? "that is a Captive that no enemy holds" : "(Captives included)") : null);
-  note(["exceptSphere"], typeof pick.exceptSphere === "string" ? `that is not a ${pick.exceptSphere} card` : null);
+  note(["exceptSphere"], typeof pick.exceptSphere === "string" || Array.isArray(pick.exceptSphere) ? `that is not a ${[pick.exceptSphere].flat().join(" or ")} card` : null);
   note(["maxWillpower"], typeof pick.maxWillpower === "number" ? `with a current Willpower of ${pick.maxWillpower} or less` : null);
   note(["highestWillpower"], pick.highestWillpower === true ? "with the highest current Willpower of those (ties: the chooser decides)" : null);
   note(["enemyOrLocation"], pick.enemyOrLocation === true ? "that is an enemy or a location" : null);

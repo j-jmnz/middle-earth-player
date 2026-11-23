@@ -32,11 +32,12 @@ export function flagIcons(state: ScenarioState, id: string): Sphere[] {
   return ICON_FLAGS.filter(([flag]) => heldAmount(state, id, flag) > 0).map(([, sphere]) => sphere);
 }
 
-// The spheres a card belongs to: its printed one and every resource icon it gained, from an attachment or a flag. A character with a gained icon
-// belongs to that sphere as well, for the filters that read a sphere as for paying (docs/brief.md, Core round; Song of Wisdom, Narya).
+// The spheres a card belongs to: its printed one and every resource icon it gained, from an attachment or a flag, less the Lore, Leadership, Spirit and
+// Tactics icons a hero lost (iconLost). A character with a gained icon belongs to that sphere as well, for the filters that read a sphere as for paying
+// (docs/brief.md, Three layers; Song of Wisdom, Narya). A payment allowance (`paysAsLeadership`) is no icon and adds none.
 export function spheresOf(state: ScenarioState, id: string, printed: Sphere | null, ctx: ReduceContext): Sphere[] {
   const gained = state.cards[id] && inPlay(state.cards[id].zone) ? [...grantedIcons(state, id, ctx), ...flagIcons(state, id)] : [];
-  return printed == null ? gained : [printed, ...gained];
+  return (printed == null ? gained : [printed, ...gained]).filter((sphere) => !iconLost(state, id, sphere));
 }
 
 const LOSABLE: ReadonlySet<Sphere> = new Set(["leadership", "lore", "spirit", "tactics"]);

@@ -165,7 +165,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 02046:A:1 (front): While Oak-wood Grove is the active location, resource tokens from any sphere may be spent as Leadership resource tokens.
   02046:constant:1: Constant
     only if this card is the active location
-    - each hero (any player controls): stat leadershipIcon 1, while this card is in play
+    - each hero (any player controls): stat paysAsLeadership 1, while this card is in play
 
 ## 02047 A Frightened Beast
 (the scenario deals it into the encounter pile; the piles place it, no record does)

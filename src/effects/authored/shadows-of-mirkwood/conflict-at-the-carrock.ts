@@ -85,8 +85,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "02044:constant:1", cardCode: "02044", lines: ["02044:A:1"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "threat", amount: { count: TROLL }, until: "whileSourceInPlay", target: "self" }] },
   // 02045 Bee Pastures. Response: after the players travel there, Grimbeorn the Old is fetched from the encounter deck or discard pile into the staging area, and the deck is shuffled.
   { id: "02045:response:1", cardCode: "02045", lines: ["02045:A:1"], timing: "response", trigger: "traveled", instructions: [{ verb: "SearchMove", code: "02037", to: "staging" }, { verb: "ShuffleEncounterDeck" }] },
-  // 02046 Oak-wood Grove. While it is the active location every hero's resources count as Leadership resources: they pay Leadership costs (Grimbeorn's Action and Leadership cards).
-  { id: "02046:constant:1", cardCode: "02046", lines: ["02046:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "leadershipIcon", amount: 1, until: "whileSourceInPlay", holders: { type: "hero", control: "any" } }] },
+  // 02046 Oak-wood Grove. While it is the active location every hero's resources may be spent as Leadership resources (a payment allowance, no icon): they pay Leadership costs (Grimbeorn's Action and Leadership cards).
+  { id: "02046:constant:1", cardCode: "02046", lines: ["02046:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "paysAsLeadership", amount: 1, until: "whileSourceInPlay", holders: { type: "hero", control: "any" } }] },
   // 02047 A Frightened Beast. Each player in turn from the first player may discard a Creature ally he controls to cancel the effect; otherwise every player raises his threat by the total Threat in the staging area.
   {
     id: "02047:whenRevealed:1",

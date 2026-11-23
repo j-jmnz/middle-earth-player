@@ -1,14 +1,13 @@
 // Rules: rr.resource-match, rr.resources (data/rules/entries.json).
-import { grantedIcons } from "../interpret/conditions.ts";
 import { playCost } from "./attach.ts";
 import { heroPaysFor } from "./cost-rules.ts";
 import { deckPlayIcons } from "./deck-play.ts";
-import { allyPools, cannotPay, flagIcons, iconLost, payerOk, payingIcons } from "../families/costs/pay.ts";
+import { allyPools, cannotPay, iconLost, payerOk, payingIcons, spheresOf } from "../families/costs/pay.ts";
 import { openPools } from "../families/misc/guards.ts";
 import type { Payment } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { printedOf, spherePays, type Sphere } from "../core/printed.ts";
-import type { ScenarioState } from "../core/state.ts";
+import { heldAmount, type ScenarioState } from "../core/state.ts";
 
 // A hero pays a sphere with its own icon or one an attachment gives it (Celebrían's Stone gives Aragorn a Spirit icon).
 // `forCard` is the card being played: the top card of a deck is paid for by the hero that lets it be played (Gandalf).
@@ -18,9 +17,11 @@ export function heroPays(state: ScenarioState, heroId: string, sphere: Sphere | 
   // Icons held as flags, icons a hero has while paying for some cards, pools that cannot pay for some (families/costs/pay.ts).
   if (forCard != null && cannotPay(state, heroId, forCard, ctx)) return false;
   if (iconLost(state, heroId, sphere)) return false;
-  if (spherePays(printedOf(ctx.cards, hero.code).sphere, sphere)) return true;
-  if (grantedIcons(state, heroId, ctx).some((icon) => spherePays(icon, sphere))) return true;
-  if (flagIcons(state, heroId).some((icon) => spherePays(icon, sphere))) return true;
+  // A neutral cost needs no icon, so a hero that lost its icons still pays it with its resources (Haunted Valley).
+  if ((sphere == null || sphere === "neutral") && spherePays(printedOf(ctx.cards, hero.code).sphere, sphere)) return true;
+  if (spheresOf(state, heroId, printedOf(ctx.cards, hero.code).sphere, ctx).some((icon) => spherePays(icon, sphere))) return true;
+  // Oak-wood Grove: the hero's resources may be spent as Leadership resources, with no icon.
+  if (sphere === "leadership" && heldAmount(state, heroId, "paysAsLeadership") > 0) return true;
   if (forCard != null && payingIcons(state, heroId, forCard, ctx).some((icon) => spherePays(icon, sphere))) return true;
   if (forCard != null && heroPaysFor(state, heroId, forCard, ctx)) return true;
   return forCard != null && deckPlayIcons(state, heroId, forCard, ctx).some((icon) => spherePays(icon, sphere));

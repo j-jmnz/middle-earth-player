@@ -87,7 +87,7 @@ export const STAGE_RECORDS: readonly Effect[] = [
     { id: "145075:constant:3", cardCode: "145075", lines: ["145075:B:3"], timing: "constant", instructions: [{ verb: "Restrict", what: "travel", trait: "Pelennor" }] },
     { id: "145075:forced:1", cardCode: "145075", lines: ["145075:B:4"], timing: "forced", trigger: "enemyDestroyed", instructions: [{ verb: "PlaceProgressActiveFirst", amount: { x: true } }] },
 
-    // 145076 Rohan has Come! (stage 4). When Revealed: The Witch-king is set aside, out of play, wherever he is in play; each player searches the top 10 cards of their deck for an ally matching the sphere of a hero they control (a neutral ally or a Fellowship hero matches none) and puts it into
+    // 145076 Rohan has Come! (stage 4). When Revealed: The Witch-king is set aside, out of play, wherever he is in play; each player searches the top 10 cards of their deck for an ally matching the sphere of a hero they control (a neutral ally matches none, nor does a Fellowship hero unless it gained an icon) and puts it into
     // play under their control, then shuffles. Side B: progress that questing successfully would place on this stage (the active location took its share) is assigned as damage among the enemies in play, the first player assigning. Forced: at the end of the quest phase the players advance to stage 5A.
     {
       id: "145076:whenRevealed:1",
