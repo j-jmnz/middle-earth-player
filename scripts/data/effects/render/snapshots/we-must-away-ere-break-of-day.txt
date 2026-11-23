@@ -386,7 +386,7 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - search the encounter deck only for the card with code 131036 and add it to the staging area (not revealed; nothing when none is found)
-    - shuffle the encounter deck
+    - then, if every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows "then" is attempted only when they all did) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter deck
 
 ## 131054 Hungry Troll
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -394,13 +394,13 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
 131054:A:1 (front): When Revealed: The first player chooses a Troll enemy in the staging area and engages that enemy. If there are no Troll enemies in the staging area, this card gains Surge.
   131054:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of Troll enemy (any player controls) in the staging area only is at most 0: this card gains surge (one more encounter card is revealed when it has been resolved)
     - choose Troll enemy (any player controls) in the staging area only, chosen by the first player
     - the picked enemy, in the staging area, engages the first player
-    - then, if the number of Troll enemy (any player controls) in the staging area only is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 131054:A:2 (shadow): Shadow: Deal 4 damage to each character with a Sack card attached. (The first player may spend 2 Baggins resources to cancel this effect.)
   131054:shadow:1: Shadow (may be canceled by paying 2)
     who acts: the acting player is the defending player (the player the attack is against)
     - deal 4 damage to each character (any player controls) with a Sack card attached
 
-(rendered pieces: 233 by template, 0 as JSON)
+(rendered pieces: 234 by template, 0 as JSON)
