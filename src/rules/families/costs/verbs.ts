@@ -100,20 +100,24 @@ export function spendablePools(state: ScenarioState, actor: number, spec: { sphe
 
 // SpendResources: a hero for each resource, chosen by the actor unless every resource left must pay.
 export function spendResources(state: ScenarioState, instruction: Extract<Instruction, { verb: "SpendResources" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
+  // The amount is a number or an expression ("spend X resources", 131028:B:2), read once here.
+  const scope = frameScope(state, focus.seat, focus.sourceId);
+  const amount = resolveAmount(state, instruction.amount, scope, ctx);
+  if (amount <= 0) return state;
   if (instruction.target) {
     // From one card's own pool: nobody chooses, and a pool that cannot pay spends nothing.
-    const id = refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) ?? "";
-    if ((state.cards[id]?.resources ?? 0) < instruction.amount) return state;
-    return noteSpent(updateCard(state, id, { resources: (state.cards[id]?.resources ?? 0) - instruction.amount }), [{ heroId: id, amount: instruction.amount }], ctx);
+    const id = refCard(state, instruction.target, scope) ?? "";
+    if ((state.cards[id]?.resources ?? 0) < amount) return state;
+    return noteSpent(updateCard(state, id, { resources: (state.cards[id]?.resources ?? 0) - amount }), [{ heroId: id, amount }], ctx);
   }
   let paid = [...(instruction.paid ?? []), ...(focus.chosen ? [focus.chosen] : [])];
   const left = (id: string): number => (state.cards[id]?.resources ?? 0) - paid.filter((entry) => entry === id).length;
   const { pools } = spendablePools(state, focus.seat, instruction, ctx);
-  if (paid.length === 0 && pools.reduce((sum, id) => sum + left(id), 0) < instruction.amount) return state;
-  while (paid.length < instruction.amount) {
+  if (paid.length === 0 && pools.reduce((sum, id) => sum + left(id), 0) < amount) return state;
+  while (paid.length < amount) {
     const open = pools.filter((id) => left(id) > 0);
     if (open.length === 0) return state;
-    if (open.length === 1 || open.reduce((sum, id) => sum + left(id), 0) <= instruction.amount - paid.length) {
+    if (open.length === 1 || open.reduce((sum, id) => sum + left(id), 0) <= amount - paid.length) {
       paid = [...paid, open[0] ?? ""];
       continue;
     }
@@ -152,7 +156,7 @@ export function reattach(state: ScenarioState, instruction: Extract<Instruction,
   const movedId = instruction.card === "picked" ? lastPicked(state) : focus.sourceId;
   const source = movedId ? state.cards[movedId] : undefined;
   if (!source?.host) return state;
-  const options = attachmentHostIds(state, focus.seat, source.code, ctx).filter((id) => id !== source.host);
+  const options = attachmentHostIds(state, focus.seat, source.code, ctx, { byEffect: true }).filter((id) => id !== source.host);
   const target = focus.chosen && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
   if (!target) return options.length > 1 ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, options) : state;
   const old = state.cards[source.host];

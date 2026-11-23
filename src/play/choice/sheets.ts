@@ -15,7 +15,7 @@ import { topFrame } from "../../rules/windows/windows.ts";
 import { asksPlayers } from "../../rules/setup/resolution.ts";
 
 import { askWords } from "../words/ask.ts";
-import { askAt, asksChoose, asksOption, type AskedWords } from "../words/asks.ts";
+import { askAt, asksChoose, asksChooseX, asksOption, isXChoice, type AskedWords } from "../words/asks.ts";
 import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../words/choice.ts";
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/scenarios/island.ts";
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/scenarios/grapple.ts";
@@ -50,6 +50,7 @@ import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
 import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
 import { captiveLabel, cardLabel, copyLabel, has, option, seatedLabel, stagedAllyLabel, statOf, step, tiedLabel } from "./sheet-parts.ts";
+import { sackStat } from "./sack-rows.ts";
 import { nightActionNote } from "../words/scenarios/night.ts";
 import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/framsburg.ts";
 import { fatePassCaution } from "../words/scenarios/fate.ts";
@@ -290,10 +291,15 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         // The record's asks entries (words/asks.ts) come before the families' words.
         const asked = { game, ctx, names: words, instruction: choose, ...(data?.effectId ? { effectId: data.effectId } : {}), ...(wait.item.cause ? { cause: wait.item.cause } : {}), source };
         const written = { ...asked, at: askAt(asked) };
-        const ask = asksChoose(written)?.note ?? torch?.note ?? smaugChooseNote(choose, game, ctx, words, window.seat) ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
+        // The Choose a ChooseX opens is the engine's: the record's ChooseX entry words it, a row for each number.
+        const xAsk = isXChoice(choose) ? asksChooseX(asked) : undefined;
+        // The line printed is the one of the record the entry words: one frame can resolve two records of a card (a stage's two When Revealed).
+        const askerId = xAsk?.effectId ?? written.at?.id;
+        const asker = askerId ? effectById(ctx, askerId) : undefined;
+        const ask = asksChoose(written)?.note ?? torch?.note ?? xAsk?.note ?? smaugChooseNote(choose, game, ctx, words, window.seat) ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
         return {
           ...base,
-          note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, line].filter((part) => part != null).join(" "),
+          note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, lineOf(asker ?? effect, names)].filter((part) => part != null).join(" "),
           verb: "Choose",
           confirm: "Confirm",
           // The Embassy's pair: the Read button opens the player card and the encounter card it is paired with.
@@ -306,7 +312,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
             // A branch that deals damage to each of the player's allies warns when it destroys one.
             const said = asksOption(written, id);
             const caution = said?.caution ?? branchCaution(game, ctx, choose, id, window.seat, source, names.card, data?.picked?.at(-1) ?? null);
-            return { id, label: said?.label ?? (torch ? torch.label(id) : branchWords(choose, id, game, words, source, now, ctx)), code: null, ...(stats.length > 0 ? { stats } : {}), ...(caution ? { caution } : {}), intent: { type: "Choose", optionId: id } };
+            return { id, label: said?.label ?? (torch ? torch.label(id) : (xAsk?.row(id) ?? branchWords(choose, id, game, words, source, now, ctx))), code: null, ...(stats.length > 0 ? { stats } : {}), ...(caution ? { caution } : {}), intent: { type: "Choose", optionId: id } };
           }),
         };
       }
@@ -333,6 +339,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const willpower = wait?.kind === "target" && wait.item.instruction.verb === "RemoveWillpowerFromQuest" ? statOf(game, ctx, id, "willpower") : [];
           // Gollum's pick of the card whose Sauron's Eye icons are not counted: each row shows the icons it adds.
           const eyes = data?.queue[0]?.instruction.verb === "IgnoreFortitudeEyes" ? [eyesStat(game, ctx, id)] : [];
+          // A Sack card's tie: the number the characters tie on (131044:A:1 to 131050:A:1).
+          const tied = wait?.kind === "target" ? sackStat(wait.item.instruction, id, game, ctx) : [];
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
           const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words, ctx.cards) ?? gundabadOptionLabel(wait.item.instruction, id, game, ctx, words) ?? (isBoonCode(wait.item.instruction, id) ? words.code(id) : null)) : null;
           // Copies of one card in different zones are told apart by where each one is.
@@ -348,7 +356,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : plainLabel);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...(willpower.length > 0 || eyes.length > 0 ? { stats: [...willpower, ...eyes] } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...(willpower.length > 0 || eyes.length > 0 || tied.length > 0 ? { stats: [...willpower, ...eyes, ...tied] } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }

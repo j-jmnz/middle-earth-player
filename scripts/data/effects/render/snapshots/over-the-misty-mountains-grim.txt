@@ -1,0 +1,205 @@
+Scenario piles that place cards with no record (quest: 131026 A Short Rest; quest: 131027 The Mountain Pass; quest: 131028 Down, Down to Goblin Town; encounterDeck2: 131058 Goblin Axeman; encounterDeck2: 131059 Goblin Miners; encounterDeck2: 131060 Goblin Runners; encounterDeck2: 131061 Goblin Driver; encounterDeck2: 131065 The Goblins' Caves; encounterDeck2: 131070 Grip, Grab! Pinch, Nab!; encounterDeck2: 131062 Goblin Bent-Swords; encounterDeck2: 131063 The Great Goblin; encounterDeck2: 131066 Front Porch; encounterDeck2: 131067 Great Cavern Room; encounterDeck2: 131071 Chaos in the Cavern)
+
+## 131026 A Short Rest
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+131026:A:1 (front): Setup: Shuffle the Over the Misty Mountains Grim and Western Lands encounter sets into one encounter deck and make it the active encounter deck. Then, shuffle the The Great Goblin and Misty Mountain Goblins encounter sets into a second encounter deck and set it aside, inactive.
+  131026:setup:1: Setup
+    - shuffle the encounter deck
+
+131026:B:1 (back): When Revealed: Each player may search his deck for 1 treasure card and add it to his hand, then shuffle his deck. Advance to stage 2A.
+  131026:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "search" (only if there is a card (you control) in the deck, of card type treasure to choose):
+          - choose card (you control) in the deck, of card type treasure
+          - move the picked card to hand
+          - shuffle the acting player's deck
+        * option "decline":
+    - advance to the next quest stage
+
+## 131027 The Mountain Pass
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+131027:B:1 (back): When Revealed: Search the encounter deck for 1 copy of Stone-giant and add it to the staging area. Then, shuffle the encounter deck. Reveal 1 card per player from the encounter deck and add it to the staging area.
+  131027:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one enemy with code 131064 in the encounter deck and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+## 131028 Down, Down to Goblin Town
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+131028:A:1 (front): When Revealed: Shuffle all encounter cards back into the encounter deck and set it aside, inactive. The second encounter deck becomes the active encounter deck. Search the encounter deck for The Great Goblin and add it to the staging area. Then, shuffle the encounter deck.
+  131028:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard every card in play that matches enemy (any player controls) or in the staging area (not destroyed: no Victory, no "when destroyed"), its attachments with it; an encounter card goes to the encounter discard pile, a player's card to its owner's
+    - discard every card in play that matches location (any player controls) or in the staging area (not destroyed: no Victory, no "when destroyed"), its attachments with it; an encounter card goes to the encounter discard pile, a player's card to its owner's
+    - every card of the encounter deck and its discard pile goes to the set-aside zone (the Corsair piles are left alone; copies in play stay in play)
+    - every set-aside card of the encounter set "Misty Mountain Goblins" joins the encounter deck (the deck is shuffled by the step after)
+    - every set-aside card of the encounter set "The Great Goblin" joins the encounter deck (the deck is shuffled by the step after)
+    - the acting player finds one enemy with code 131063 in the encounter deck and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+131028:B:1 (back): Players cannot defeat this stage unless The Great Goblin is in the victory display.
+  131028:constant:1: Constant
+    only if the card with code 131063 is not in the victory display
+    - the players cannot defeat this stage while this holds
+
+131028:B:2 (back): When Revealed: Reveal 3 encounter cards per player, Bilbo Baggins may spend X resources to reduce the total number of encounter cards revealed by X. (To a minimum of 1.)
+  131028:whenRevealed:2: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player chooses X, from 0 to resources of "Bilbo Baggins"
+    - then, if there is a card (any player controls) or in the staging area or the active location, named "Bilbo Baggins" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, named "Bilbo Baggins"
+    - then, if there is a card (any player controls) or in the staging area or the active location, named "Bilbo Baggins" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): X resource(s) are spent from the resource pool of the picked card (nothing is spent when the pool holds fewer)
+    - the acting player reveals the number of players x 3 less the effect's X (at least 1) encounter cards, one after the other, each in a staging of its own
+
+131028:B:3 (back): If the players defeat this stage, they have won the game.
+  131028:constant:2: Constant
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
+
+## 131062 Goblin Bent-Swords
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+131062:A:1 (front): If The Great Goblin is in the victory display, this card gains surge.
+  131062:constant:1: Constant
+    only if the card with code 131063 is in the victory display
+    - this card: stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play
+
+131062:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if The Great Goblin is in the victory display.)
+  131062:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the card with code 131063 is in the victory display): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the card with code 131063 is in the victory display (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 131063 The Great Goblin
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+131063:A:1 (front): Forced: After The Great Goblin attacks, discard X cards from the encounter deck where X is the number of players in the game. Add each Goblin enemy discarded by this effect to the staging area.
+  131063:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard the number of players card(s) from the top of the encounter deck
+    - add the discarded Goblin enemies to the staging area
+
+## 131064 Stone-Giant
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131064:A:1 (front): While at least one Stone-Giant is in the staging area, the Galloping Boulders card gains surge.
+  131064:constant:1: Constant
+    only if this card is in the staging area
+    - each card (any player controls) in the staging area only, named "Galloping Boulders": stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play (does not stack: only the oldest copy of this card in play gives it)
+
+131064:A:2 (front): Forced: After Stone-Giant engages a player, that player chooses and discards 1 ally he controls.
+  131064:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ally (you control)
+    - discard the picked card
+
+## 131066 Front Porch
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+131066:A:1 (front): While Front Porch is the active location, players cannot attack Goblin enemies.
+  131066:constant:1: Constant
+    only if this card is the active location
+    - each Goblin enemy (any player controls) or in the staging area: stat cannotBeAttacked 1, while this card is in play
+
+131066:A:2 (front): Action: The first player may spend 2 Baggins resources to treat Front Porch's printed text box as if it were blank until the end of the round.
+  131066:action:1: Action (cost: pay 2 baggins resource(s))
+    only if the actor holds the first player token
+    who acts: any player may trigger it; the acting player is the one who does
+    - this card: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
+
+## 131067 Great Cavern Room
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+131067:A:1 (front): While Great Cavern Room is the active location, it gains: "Forced: After a player engages a Goblin enemy, he must deal 1 damage to a character he controls."
+  131067:forced:1: Forced after an enemy engages a player (heard about Goblin enemy (any player controls))
+    only if this card is the active location
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control)
+    - deal 1 damage to the picked card
+
+131067:A:2 (front): Forced: When faced with the option to travel, if The Great Goblin is in the victory display the players must travel to Great Cavern Room if able.
+  131067:constant:1: Constant
+    only if all of: (this card is in the staging area) and (the card with code 131063 is in the victory display)
+    - while no location is the active location and the players can travel to this location, they must travel to it: the travel step offers no way to decline it or to go elsewhere
+
+## 131068 Overhanging Rock
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131068:A:1 (front): While Overhanging Rock is the active location, it gains: "Action: Spend 1 Baggins resource to look at the top 2 cards of your deck. Add 1 of those to your hand and discard the other."
+  131068:action:1: Action (cost: pay 1 baggins resource(s))
+    only if all of: (this card is the active location) and (there is a card (you control) in the deck to choose)
+    who acts: any player may trigger it; the acting player is the one who does
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (you control) in the deck, among the top 2
+    - move the picked card to hand
+    - choose card (you control) in the deck, among the top 1
+    - discard the picked card
+
+## 131069 The High Pass
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131069:A:1 (front): X is the number of players in the game.
+  131069:constant:1: Constant
+    - this card: stat threat the number of players, while this card is in play
+
+131069:A:2 (front): Forced: At the end of the round, remove X progress tokens from the current quest.
+  131069:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - remove the number of players progress from the current quest card (all of it when it holds less)
+
+## 131071 Chaos in the Cavern
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+131071:A:1 (front): When Revealed: All engaged enemies return to the staging area. Then, each Goblin enemy gets +1 Threat until the end of the phase.
+  131071:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose): each Goblin enemy (any player controls) or in the staging area (only the cards that match now: one that arrives later does not get it): stat threat 1, until the end of the phase
+    - for each player, first player first:
+      - for each enemy (any player controls) engaged with you:
+        - return the picked card to the staging area
+
+131071:A:2 (shadow): Shadow: Attacking enemy is returned to the staging area after its attack resolves.
+  131071:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 131072 Galloping Boulders
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131072:A:1 (front): When Revealed: The first player chooses a questing character. That character takes 3 damage and is removed from the quest.
+  131072:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (any player controls) committed to the quest, chosen by the first player
+    - deal 3 damage to the picked card
+    - the last picked character is removed from the quest (it stays exhausted)
+
+131072:A:2 (shadow): Shadow: Put this card on top of the encounter deck.
+  131072:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - this card goes on top of the encounter deck
+
+## 131073 Guffawing of Giants
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+131073:A:1 (front): When Revealed: The first player chooses 1 Stone-giant in the staging area. At the end of the quest phase, that Stone-giant engages the player with the highest threat. If there are no Stone-giant cards in the staging area, search the encounter deck for 1 Stone-giant and add it to the staging area.
+  131073:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a enemy (any player controls) in the staging area only, named "Stone-Giant" to choose: choose enemy (any player controls) in the staging area only, named "Stone-Giant", chosen by the first player
+    - then, if there is a enemy (any player controls) in the staging area only, named "Stone-Giant" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): later, at the end of the quest phase (the next one, when this is not the quest phase), acting on the card last picked:
+      - if the picked card is in the staging area: choose player (any player controls) with the highest threat among the players still in the game (ties: the chooser decides), chosen by the first player
+      - then, if the card picked before is in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): the effect goes on with the picked player as the acting player
+      - then, if the card picked before is in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): engage the card picked before
+    - then, if not (there is a enemy (any player controls) in the staging area only, named "Stone-Giant" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter deck
+    - then, if not (there is a enemy (any player controls) in the staging area only, named "Stone-Giant" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one enemy with code 131064 in the encounter deck and adds it to the staging area (it is not revealed)
+
+(rendered pieces: 149 by template, 0 as JSON)

@@ -47,6 +47,8 @@ export function lineTimings(line: string): Set<string> {
   }
   // "Forced: While Durin's Bane has no damage, Servant of Flame gets +2 Attack" (901807:A:1) is a constant effect that happens to carry the Forced label: it has no event to answer.
   if (/^Forced:\s+While\b/i.test(line.trim())) allowed.add("constant");
+  // "Forced: When faced with the option to travel, if The Great Goblin is in the victory display the players must travel to Great Cavern Room if able." (131067:A:2) binds the travel step while the card is in the staging area: a constant Restrict, which has no event to answer.
+  if (/^Forced:\s+When faced with the option to travel\b/i.test(line.trim())) allowed.add("constant");
   // A "(Counts as a ... attachment with the text: ...)" line also grants the attachment's own constant text, and so does an enemy that attaches itself "as a Tentacle attachment with the text: ..." (04073:A:1).
   if (/\bas an? (?:\w+ )?attachment/i.test(line)) allowed.add("constant");
   // A claimed objective's "(If detached, return Book of Mazarbul to the staging area.)" (03024:A:2) is a constant rule of its own beside the Action that claims it: the flag `returnsToStagingArea` (families/objectives/claimed.ts).

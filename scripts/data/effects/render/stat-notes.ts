@@ -44,6 +44,7 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   returnsToEncounterDeck: " (a claimed objective: when its hero leaves play it goes to the top of the encounter deck instead of the staging area)",
   returnsWithoutActive: " (while no location is the active location an engaged holder goes back to the staging area at once, whatever engaged it)",
   noPlayerAttachments: " (no player card can be attached to it)",
+  noAttachmentPlays: " (no player plays an attachment card onto it)",
   // Rules the player's table obeys.
   cannotTriggerEffects: " (the holder cannot start its own Action or Response abilities; held by a player, he triggers no Action or Response and plays no event; Constant and Forced effects still work)",
   mustTravel: " (in the travel phase the players cannot decline to travel while a location in the staging area could be traveled to and an active location slot is free)",

@@ -5,7 +5,7 @@
 // card whose text box is blank. Kept free of engine imports beyond the state, so those modules can call it.
 import { queueEvent } from "../../windows/queue.ts";
 import { CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, heldBy } from "../../core/holder-classes.ts";
-import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { isLocationCard, printedOf, type PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { heldAmount, inPlay, modifierActive, updateCard } from "../../core/state.ts";
 
@@ -98,4 +98,23 @@ function liveAllyRaise(state: ScenarioState, cards: ReadonlyMap<string, PrintedC
     }
   }
   return total;
+}
+
+// The cards attached to a host that leaves play hear about it, before the host's attachments are released: those attached to a location hear
+// `hostLeftPlay` (Elf-stone), and the objectives attached to a destroyed enemy hear `hostDestroyed` ("After attached Troll enemy is destroyed",
+// 131042:A:2). Whether a location was explored is decided by the caller, while the attachments still count (rr.explored).
+export function announceHostLeaving(state: ScenarioState, hostId: string, cards: ReadonlyMap<string, PrintedCard>, explored: boolean): ScenarioState {
+  const host = state.cards[hostId];
+  if (!host) return state;
+  const printed = printedOf(cards, host.code);
+  const isLocation = isLocationCard(printed);
+  if (!isLocation && printed.type !== "enemy") return state;
+  const trigger = isLocation ? "hostLeftPlay" : "hostDestroyed";
+  let next = state;
+  for (const attachmentId of host.attachments) {
+    const attached = state.cards[attachmentId];
+    if (!isLocation && printedOf(cards, attached?.code ?? "").type !== "objective") continue;
+    next = queueEvent(next, { trigger, seat: state.firstPlayer, cardId: attachmentId, subject: hostId, explored });
+  }
+  return next;
 }

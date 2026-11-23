@@ -78,6 +78,8 @@ import * as woodland from "../scenarios/the-woodland-realm/game.ts";
 import * as mines from "../scenarios/the-mines-of-moria/game.ts";
 import * as khazad from "../scenarios/escape-from-khazad-dum/game.ts";
 import * as dreadnaught from "../scenarios/the-hunt-for-the-dreadnaught/game.ts";
+import * as grim from "../scenarios/over-the-misty-mountains-grim/game.ts";
+import * as day from "../scenarios/we-must-away-ere-break-of-day/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -168,6 +170,8 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-long-dark", "The Long Dark", dark.DARK_GOLDENS, dark.darkWorld, dark.playGolden),
   entry("foundations-of-stone", "Foundations of Stone", stone.STONE_GOLDENS, stone.stoneWorld, stone.playGolden),
   entry("shadow-and-flame", "Shadow and Flame", flame.FLAME_GOLDENS, flame.flameWorld, flame.playGolden),
+  entry("we-must-away-ere-break-of-day", "We Must Away, Ere Break of Day", day.DAY_GOLDENS, day.dayWorld, day.playGolden),
+  entry("over-the-misty-mountains-grim", "Over the Misty Mountains Grim", grim.GRIM_GOLDENS, grim.grimWorld, grim.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),
