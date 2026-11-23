@@ -1,4 +1,5 @@
 import type { Effect } from "../../src/catalog/boundary.ts";
+import { EFFECTS } from "../../src/effects/index.ts";
 import type { GameEvent, ScenarioState } from "../../src/rules/core/state.ts";
 import { settle } from "../../src/rules/engine/machine.ts";
 import { fireForced } from "../../src/rules/windows/triggers.ts";
@@ -204,4 +205,12 @@ export function play(scenarioId: string, row: Row, effects: readonly Effect[], l
     if (picks.length > 0 && !lenient) throw new Error(`answer(${picks.join(", ")}) was never asked for`);
   }
   return done;
+}
+
+/**
+ * The actions `act` played on a table built from `layout` for `scenarioId`, as a row with no expectations (an `it` test that reads the state itself).
+ * `effects` are the records the table runs on; `lenient` is as in `play`.
+ */
+export function playedLayout(scenarioId: string, layout: Layout, act: Act | readonly Act[], effects: readonly Effect[] = EFFECTS, lenient = false): Done {
+  return play(scenarioId, { line: "", layout, act, expect: [] } satisfies Row, effects, lenient);
 }

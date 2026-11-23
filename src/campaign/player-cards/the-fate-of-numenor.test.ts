@@ -10,7 +10,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { choices, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { choices, playerTable, questUntil, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const HALETH = "22140";
 // Unexpected Courage and Steward of Gondor, attachments; the filler cards are not.
@@ -31,13 +31,7 @@ beforeAll(async () => {
 });
 
 // Passes until the Response window of the quest opens or the quest is over.
-function quested(tab: Table, commit: readonly string[]) {
-  let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: commit.map((code) => idsOf(tab, code)) }, tab.ctx);
-  for (let guard = 0; guard < 20 && !triggers(run.state, tab).includes("22140:response:1") && run.state.mode !== "travel" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) {
-    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
-  }
-  return run;
-}
+const quested = (tab: Table, commit: readonly string[]) => questUntil(tab, commit.map((code) => idsOf(tab, code)), (run) => triggers(run.state, tab).includes("22140:response:1"));
 
 describe("Haleth (22140:A:1)", () => {
   const trigger = (tab: Table, run: ReturnType<typeof quested>) => sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, HALETH), effectId: "22140:response:1" }, tab.ctx);

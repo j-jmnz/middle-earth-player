@@ -11,7 +11,7 @@ import { settle } from "../../../rules/engine/machine.ts";
 import { attachBlocked, heroLimitExempt } from "../../../rules/interpret/restrictions.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { EFFECTS } from "../../../effects/index.ts";
-import { endRound, withoutLine } from "../../../../test/harness/card-spec.ts";
+import { endRound, withoutLines } from "../../../../test/harness/card-spec.ts";
 import { play } from "../../../../test/harness/card-spec-play.ts";
 import { finish, idOf, resolveRecords, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
@@ -20,7 +20,6 @@ const GORBAG = "146021";
 const RING = "146065";
 const FRODO = "141001"; // a Ring-bearer hero
 const STAGE2 = { stage: "146067" };
-const without = (...lines: string[]) => lines.reduce(withoutLine, EFFECTS);
 
 // "Cannot have attachments." A player attachment is barred from Gorbag and not from another enemy.
 describe("Gorbag", () => {
@@ -30,7 +29,7 @@ describe("Gorbag", () => {
   };
   it("146021:A:1 cannot have an attachment, and another enemy can", () => {
     expect(blocked(EFFECTS)).toEqual([true, false]);
-    expect(blocked(without("146021:A:1"))).toEqual([false, false]);
+    expect(blocked(withoutLines(EFFECTS, "146021:A:1"))).toEqual([false, false]);
   });
 });
 
@@ -46,7 +45,7 @@ describe("The One Ring", () => {
     const { state, frodo } = setUp(EFFECTS);
     const ring = state.cards[idOf(state, RING)];
     expect([ring?.host, ring?.controller]).toEqual([frodo, 0]);
-    const bare = setUp(without("146065:A:1"));
+    const bare = setUp(withoutLines(EFFECTS, "146065:A:1"));
     expect(bare.state.cards[idOf(bare.state, RING)]?.host ?? null).toBeNull();
   });
 
@@ -57,7 +56,7 @@ describe("The One Ring", () => {
       return [heroLimitExempt(t.state, t.ctx, t.hero), heroLimitExempt(t.state, t.ctx, t.hero2)];
     };
     expect(exempt(EFFECTS)).toEqual([true, false]);
-    expect(exempt(without("146065:A:2"))).toEqual([false, false]);
+    expect(exempt(withoutLines(EFFECTS, "146065:A:2"))).toEqual([false, false]);
   });
 
   // "The first player gains control of attached hero." Two-handed, the first player token passes from seat 0 to seat 1 at the end of the round: seat 1 takes the hero, its resources and its attachments
@@ -71,7 +70,7 @@ describe("The One Ring", () => {
     expect([state.cards[idOf(state, RING)]?.controller, state.cards[idOf(state, "attachment")]?.controller]).toEqual([1, 1]);
     // 2 resources kept, and 1 more from the resource phase of the new round.
     expect(state.cards[hero]?.resources).toBe(3);
-    const bare = passed(without("146065:A:2"));
+    const bare = passed(withoutLines(EFFECTS, "146065:A:2"));
     expect(bare.cards[idOf(bare, "dh1")]?.controller).toBe(0);
   });
 
@@ -86,6 +85,6 @@ describe("The One Ring", () => {
     const state = destroyed(EFFECTS);
     expect(state.cards[idOf(state, RING)]?.zone).not.toBe("play");
     expect(state.lost).toBeTruthy();
-    expect(destroyed(without("146065:A:3")).lost).toBeFalsy();
+    expect(destroyed(withoutLines(EFFECTS, "146065:A:3")).lost).toBeFalsy();
   });
 });

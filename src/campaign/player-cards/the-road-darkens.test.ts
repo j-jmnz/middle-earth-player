@@ -12,8 +12,8 @@ import { definePrinted } from "../../rules/core/printed.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { FRODO, SAM, begin, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, endRound, hosts, playerTable } from "../../../test/harness/player-table.ts";
+import { FRODO, SAM, begin, idsOf, send, type Run, type Table } from "../../../test/harness/scene.ts";
+import { attach, endRound, hosts, playerTableFor } from "../../../test/harness/player-table.ts";
 
 const GALADRIEL = "142003";
 const ELROND = "142005";
@@ -28,7 +28,7 @@ const PAL = "pal";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();

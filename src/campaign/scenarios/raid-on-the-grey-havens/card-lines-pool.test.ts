@@ -5,13 +5,12 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { EFFECTS } from "../../../effects/index.ts";
-import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { legalIntents, reduce, type PlayerIntent, type ReduceContext } from "../../../rules/engine/reduce.ts";
 import { attack, cardSpecs, defend, withoutLine, zone, type Row } from "../../../../test/harness/card-spec.ts";
-import { fightEnemy, finish, idOf, send, start, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
+import { fightEnemy, finish, idOf, type Layout, type LayoutTable, type Run, send, start, statOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "raid-on-the-grey-havens";
 
@@ -26,7 +25,6 @@ const table = (layout: Layout, effects: readonly Effect[]) => tableFromLayout(SC
 const withoutLines = (...lines: string[]): readonly Effect[] => lines.reduce<readonly Effect[]>((effects, line) => withoutLine(effects, line), EFFECTS);
 // The card turned to its Upgraded side (B), the constants read again.
 const upgraded = (made: LayoutTable, code: string): ScenarioState => syncConstants(updateCard(made.state, idOf(made.state, code), { face: "B" }), made.ctx);
-const statOf = (state: ScenarioState, cards: LayoutTable["cards"], code: string, which: "willpower" | "attack" | "defense") => modifiedStat(state, state.cards[idOf(state, code)]!, which, cards);
 
 describe("11183 Black Key, Upgraded", () => {
   const worn = (effects: readonly Effect[]) => {

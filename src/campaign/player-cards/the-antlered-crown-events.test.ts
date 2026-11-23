@@ -10,12 +10,11 @@ import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { spawn } from "../../rules/core/zones.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, play, playCode, playerTable, printed, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { choices, play, playableCards, playCode, playerTableFor, printed, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const RIDE = "08142";
 const SHADOWS = "08143";
@@ -40,7 +39,7 @@ const BOOST = "boost";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -55,7 +54,6 @@ beforeAll(async () => {
 });
 
 // The ids of the PlayCard intents the engine offers.
-const playable = (tab: Table, state = tab.state): string[] => legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
 
 describe("Ride Them Down (08142:A:1)", () => {
   // Éowyn (Willpower 4) commits; the Ram (non-unique, threat 0) and the Chief (unique) are in the staging area, the Loc (2 quest points) is
@@ -105,7 +103,7 @@ describe("Ride Them Down (08142:A:1)", () => {
   // "Quest Action": in the planning phase it is not played.
   it("08142:A:1 Ride Them Down: not played outside the quest phase", () => {
     const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], hand: [{ code: RIDE, seat: 0 }], staging: [RAM] });
-    expect(playable(tab)).not.toContain(idsOf(tab, RIDE));
+    expect(playableCards(tab.state, tab)).not.toContain(idsOf(tab, RIDE));
   });
 });
 
@@ -150,7 +148,7 @@ describe("Shadows Give Way (08143:A:1, A:2)", () => {
   // With no shadow card on any enemy, its effect can change nothing: it is not played (rr.triggered-ability).
   it("08143:A:2 Shadows Give Way: not played when no enemy has a shadow card", () => {
     const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }, { code: DUNHERE, seat: 0 }, { code: SPRITE, seat: 0 }], hand: [{ code: SHADOWS, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }] });
-    expect(playable(tab)).not.toContain(idsOf(tab, SHADOWS));
+    expect(playableCards(tab.state, tab)).not.toContain(idsOf(tab, SHADOWS));
   });
 });
 
@@ -209,6 +207,6 @@ describe("Waters of Nimrodel (08145:A:2)", () => {
   // No character is damaged: its effect can change nothing, so it is not played (rr.triggered-ability).
   it("08145:A:2 Waters of Nimrodel: not played when no character is damaged", () => {
     const tab = table(EFFECTS, { heroes: [{ code: BERAVOR, seat: 0 }], hand: [{ code: WATERS, seat: 0 }] });
-    expect(playable(tab)).not.toContain(idsOf(tab, WATERS));
+    expect(playableCards(tab.state, tab)).not.toContain(idsOf(tab, WATERS));
   });
 });

@@ -16,8 +16,8 @@ import { syncConstants } from "../../rules/interpret/constants.ts";
 import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, hosts, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { attacking, choices, hosts, passWhile, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARMOR = "19028";
 const GLAMDRING = "19029";
@@ -40,7 +40,7 @@ const ALLY = "ally";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -146,7 +146,7 @@ describe("Glamdring (19029)", () => {
     expect(run.state.seats[0]?.hand.length).toBe(hand + 1);
     let other = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: weak, attackerIds: [idsOf(tab, EOWYN)] }, tab.ctx);
     // Éowyn's own Action opens a framework action window first.
-    for (let guard = 0; guard < 10 && other.state.window?.kind === "frameAction"; guard += 1) other = sendUnledgered(other, { type: "Pass" }, tab.ctx);
+    other = passWhile(other, tab, (run) => run.state.window?.kind === "frameAction", 10);
     expect(other.state.cards[weak]?.zone).toBe("encounterDiscard");
     expect(triggers(other.state, tab)).not.toContain("19029:response:1");
   });
@@ -160,7 +160,7 @@ describe("Glamdring (19029:A:4), an attack together", () => {
     const weak = idsOf(tab, WEAK);
     let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: weak, attackerIds: [idsOf(tab, DENETHOR), idsOf(tab, EOWYN)] }, tab.ctx);
     // Éowyn's own Action opens a framework action window first.
-    for (let guard = 0; guard < 10 && run.state.window?.kind === "frameAction" && !triggers(run.state, tab).includes("19029:response:1"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.window?.kind === "frameAction" && !triggers(run.state, tab).includes("19029:response:1"), 10);
     expect(run.state.cards[weak]?.zone).toBe("encounterDiscard");
     expect(triggers(run.state, tab)).toContain("19029:response:1");
   });

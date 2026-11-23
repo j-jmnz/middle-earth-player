@@ -17,7 +17,7 @@ import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-pas
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, endRound, fillers, hosts, passAll, play, playCode, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, canPlay, choices, endRound, fillers, hosts, passAll, play, playCode, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const THURINDIR = "17028";
 const TRIBESMAN = "17029";
@@ -62,7 +62,7 @@ const MARK = "mark";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -80,8 +80,6 @@ beforeAll(async () => {
   cards.set(MARK, definePrinted({ code: MARK, name: "Mark", type: "location", threat: 2, questPoints: 9 }));
   base = { ...starter, cards };
 });
-
-const playable = (state: ScenarioState, tab: Table, id: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
 
 describe("Thurindir (17028:A:1)", () => {
   // "Thurindir gets +1 Willpower for each side quest in the victory display.": Delay the Enemy and Keep Watch are there, and the Loc (a
@@ -259,9 +257,9 @@ describe("Backtrack (17034:A:1)", () => {
   // the Battle keyword it may not.
   lineSpec("17034:A:1", "Backtrack: played only if the main quest has no keywords", (effects) => {
     const plain = back(effects, false);
-    expect(playable(plain.state, plain, idsOf(plain, BACKTRACK))).toBe(true);
+    expect(canPlay(plain.state, plain, idsOf(plain, BACKTRACK))).toBe(true);
     const keyworded = back(effects, true);
-    expect(playable(keyworded.state, keyworded, idsOf(keyworded, BACKTRACK))).toBe(false);
+    expect(canPlay(keyworded.state, keyworded, idsOf(keyworded, BACKTRACK))).toBe(false);
   });
 });
 

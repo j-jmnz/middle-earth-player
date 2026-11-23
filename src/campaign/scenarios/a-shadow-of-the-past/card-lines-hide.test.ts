@@ -9,13 +9,12 @@ import { settle } from "../../../rules/engine/machine.ts";
 import { startReveal } from "../../../rules/windows/frames.ts";
 import { topFrame } from "../../../rules/windows/windows.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
-import { finish, idOf, idsOf, resolveRecords, revealFromTop, send, start, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
+import { finish, idOf, idsOf, type Layout, type LayoutTable, resolveRecords, revealFromTop, type Run, send, start, tableFromLayout, zoneOf } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "a-shadow-of-the-past";
 const RING = "141085";
 const FRODO = "141001";
 const table = (layout: Layout): LayoutTable => tableFromLayout(SCENARIO, layout, { extra: [RING, FRODO] });
-const zoneOf = (state: ScenarioState, code: string) => state.cards[idOf(state, code)]?.zone;
 
 // The card is put on top of the encounter deck and revealed by `seat` (the first player by default), as saga staging has each player reveal in turn (mec109.saga-staging-rules). A choice it opens is left open.
 function revealBy(made: LayoutTable, code: string, seat?: number): Run {

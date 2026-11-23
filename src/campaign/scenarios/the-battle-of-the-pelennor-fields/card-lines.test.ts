@@ -8,7 +8,7 @@ import { hasTrait } from "../../../rules/interpret/conditions.ts";
 import { attachBlocked } from "../../../rules/interpret/restrictions.ts";
 import type { ScenarioState } from "../../../rules/engine/reduce.ts";
 import { EFFECTS } from "../../../effects/index.ts";
-import { withoutLine } from "../../../../test/harness/card-spec.ts";
+import { withoutLines } from "../../../../test/harness/card-spec.ts";
 import { idOf, resolveRecords, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "the-battle-of-the-pelennor-fields";
@@ -16,7 +16,6 @@ const ROHAN = "145014"; // Esquire of Rohan
 const GONDOR = "145015"; // Esquire of Gondor
 const WRAITH = "145062";
 const FELL_BEAST = "145057"; // a Morgul treachery
-const without = (...lines: string[]) => lines.reduce(withoutLine, EFFECTS);
 
 // "Setup: Attach to a hero." The set-aside Esquire's Setup runs and the first player chooses the second hero.
 function setUp(code: string, effects: readonly Effect[]) {
@@ -30,14 +29,14 @@ describe("the Esquires", () => {
   it("145014:A:3 Setup: Esquire of Rohan is attached to the hero chosen", () => {
     const made = setUp(ROHAN, EFFECTS);
     expect(made.state.cards[idOf(made.state, ROHAN)]?.host).toBe(made.t.hero2);
-    const bare = setUp(ROHAN, without("145014:A:3"));
+    const bare = setUp(ROHAN, withoutLines(EFFECTS, "145014:A:3"));
     expect(bare.state.cards[idOf(bare.state, ROHAN)]?.host ?? null).toBeNull();
   });
 
   it("145015:A:2 Setup: Esquire of Gondor is attached to the hero chosen", () => {
     const made = setUp(GONDOR, EFFECTS);
     expect(made.state.cards[idOf(made.state, GONDOR)]?.host).toBe(made.t.hero2);
-    const bare = setUp(GONDOR, without("145015:A:2"));
+    const bare = setUp(GONDOR, withoutLines(EFFECTS, "145015:A:2"));
     expect(bare.state.cards[idOf(bare.state, GONDOR)]?.host ?? null).toBeNull();
   });
 
@@ -48,11 +47,11 @@ describe("the Esquires", () => {
   };
   it("145014:A:4 the attached hero gains the Rohan trait, and the other hero does not", () => {
     expect(traits(ROHAN, "Rohan", EFFECTS)).toEqual([true, false]);
-    expect(traits(ROHAN, "Rohan", without("145014:A:4"))).toEqual([false, false]);
+    expect(traits(ROHAN, "Rohan", withoutLines(EFFECTS, "145014:A:4"))).toEqual([false, false]);
   });
   it("145015:A:3 the attached hero gains the Gondor trait, and the other hero does not", () => {
     expect(traits(GONDOR, "Gondor", EFFECTS)).toEqual([true, false]);
-    expect(traits(GONDOR, "Gondor", without("145015:A:3"))).toEqual([false, false]);
+    expect(traits(GONDOR, "Gondor", withoutLines(EFFECTS, "145015:A:3"))).toEqual([false, false]);
   });
 });
 
@@ -65,6 +64,6 @@ describe("Wraith on Wings", () => {
   };
   it("145062:A:2 cannot have a non-Morgul attachment, and can have a Morgul one", () => {
     expect(blocked(EFFECTS)).toEqual([true, false, false]);
-    expect(blocked(without("145062:A:2"))).toEqual([false, false, false]);
+    expect(blocked(withoutLines(EFFECTS, "145062:A:2"))).toEqual([false, false, false]);
   });
 });

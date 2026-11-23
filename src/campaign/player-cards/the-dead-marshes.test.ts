@@ -14,7 +14,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, enter, hosts, passAll, playCode, playerTable, questing, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, attacking, choices, combat, enter, exhausted, hosts, passAll, playCode, playerTable, questing, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const BOROMIR = "02095";
 const WATCHER = "02096";
@@ -52,7 +52,6 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-const exhausted = (tab: Table, ...ids: string[]): Table => ({ ...tab, state: ids.reduce((state, id) => updateCard(state, id, { exhausted: true }), tab.state) });
 
 describe("Boromir (02095:A:1, A:2)", () => {
   // "Action: Raise your threat by 1 to ready Boromir. (Limit once per phase.)": exhausted, he readies for 1 threat (8 to 9). Exhausted
@@ -102,8 +101,7 @@ describe("Dúnedain Watcher (02096:A:1)", () => {
   // Aragorn (Defense 2) defends the Brute's attack (2), whose shadow card is the Boost (+3 Attack); the Watcher is in play.
   function defended(effects: readonly Effect[]): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: WATCHER, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }], deck: [BOOST] });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, ARAGORN) }, tab.ctx), tab.ctx);
     return { tab, run };
   }

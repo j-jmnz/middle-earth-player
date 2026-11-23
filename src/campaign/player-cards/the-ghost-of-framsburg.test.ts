@@ -11,13 +11,12 @@ import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { attachTo, spawn } from "../../rules/core/zones.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { playCost } from "../../rules/player/attach.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { combat, endRound, enter, fillers, passAll, play, playCode, playerTable, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { atDefense, combat, endRound, enter, fillers, passAll, play, playableCards, playCode, playerTableFor, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const DAIN = "19084";
 const SOLDIER = "19085";
@@ -41,7 +40,7 @@ const CHARM = "charm";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -53,14 +52,12 @@ beforeAll(async () => {
 });
 
 // The ids of the PlayCard intents the engine offers.
-const playable = (tab: Table, state = tab.state): string[] => legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
 
 describe("Dáin Ironfoot (19084:A:1)", () => {
   // Dáin and the Pal, a deck of `cards` cards; the Brute is engaged and attacks in the combat phase.
   function attacked(effects: readonly Effect[], cards: number): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: DAIN, seat: 0 }, { code: PAL, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }], playerDeck: fillers(CARD, cards) });
-    const run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    const run = atDefense(tab);
     return { tab, run };
   }
 
@@ -143,12 +140,12 @@ describe("Man the Walls (19086:A:1, A:2)", () => {
   lineSpec("19086:A:1", "Man the Walls: only one copy is played each round", (effects) => {
     const tab = walls(effects);
     const [first = "", second = ""] = tab.ids[WALLS] ?? [];
-    expect(playable(tab)).toContain(second);
+    expect(playableCards(tab.state, tab)).toContain(second);
     const run = play(begin(tab.state), tab, first);
     expect(run.state.cards[first]?.zone).toBe("discard");
-    expect(playable(tab, run.state)).not.toContain(second);
+    expect(playableCards(run.state, tab)).not.toContain(second);
     const next = endRound(run.state, tab);
-    expect(playable(tab, { ...next.state, phase: "Planning", boundaryPhase: "Planning", mode: "planning", window: { kind: "pass" }, activeSeat: 0 })).toContain(second);
+    expect(playableCards({ ...next.state, phase: "Planning", boundaryPhase: "Planning", mode: "planning", window: { kind: "pass" }, activeSeat: 0 }, tab)).toContain(second);
   });
 
   // "Planning Action: Reduce the cost of the next ally played by each player this phase by 1. Those allies cannot quest this round.": the
@@ -172,7 +169,7 @@ describe("Man the Walls (19086:A:1, A:2)", () => {
   // "Planning Action": in the quest phase it is not played.
   it("19086:A:2 Man the Walls: not played outside the planning phase", () => {
     const tab = walls(EFFECTS);
-    expect(playable(tab, questing(tab.state))).not.toContain(tab.ids[WALLS]?.[0]);
+    expect(playableCards(questing(tab.state), tab)).not.toContain(tab.ids[WALLS]?.[0]);
   });
 });
 
@@ -238,7 +235,7 @@ describe("Familiar Lands (19088:A:1)", () => {
   // No location has an attachment: its effect can change nothing, so it is not played (rr.triggered-ability).
   it("19088:A:1 Familiar Lands: not played when no location has an attachment", () => {
     const { tab } = lands(EFFECTS, false);
-    expect(playable(tab)).not.toContain(idsOf(tab, LANDS));
+    expect(playableCards(tab.state, tab)).not.toContain(idsOf(tab, LANDS));
   });
 });
 

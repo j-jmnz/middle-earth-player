@@ -1,17 +1,20 @@
 import { readFileSync } from "node:fs";
 
+import { expect } from "vitest";
+
 import type { Effect, ModifierStat } from "../../src/catalog/boundary.ts";
 import type { DeckSaveCard } from "../../src/catalog/deck-save.ts";
-import { modifiedStat } from "../../src/rules/core/keywords.ts";
-import { withMode, type ScenarioState } from "../../src/rules/core/state.ts";
+import { modifiedStat, placeDamage } from "../../src/rules/core/keywords.ts";
+import { updateCard, withMode, withThreat, type ScenarioState } from "../../src/rules/core/state.ts";
+import { ruleCause } from "../../src/rules/core/cause.ts";
 import { attachTo, spawn } from "../../src/rules/core/zones.ts";
 import { settle } from "../../src/rules/engine/machine.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext } from "../../src/rules/engine/reduce.ts";
 import { syncConstants } from "../../src/rules/interpret/constants.ts";
-import { fund, payFor, starterBase } from "../scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { fund, payFor, refusal, starterBase } from "../scenarios/a-shadow-of-the-past/starter-scene.ts";
 
 import { causeProblems } from "./cause-check.ts";
-import { accepted, begin, buildTable, type Run, type Scene, type Table } from "./scene.ts";
+import { accepted, begin, buildTable, idsOf, type Run, type Scene, type Table } from "./scene.ts";
 
 // Test helper. The table and the readers that the player-card tests (src/campaign/player-cards) share: a table on the records under test with every
 // seat's heroes funded and the constants brought up to date as the reducer does after an intent, the intents the engine offers, a stat as the
@@ -28,6 +31,14 @@ export function playerTable(base: PlayerBase, effects: readonly Effect[], scene:
   return { ...tab, state: syncConstants(state, tab.ctx) };
 }
 
+/**
+ * A file's `table`: `playerTable` on the records it is given, over the printed cards the file loads (`base` is read when the table is built, so a
+ * `let base` that a `beforeAll` fills works). Write `const table = playerTableFor(() => base);`.
+ */
+export function playerTableFor(base: () => PlayerBase): (effects: readonly Effect[], scene?: Scene, resources?: number) => Table {
+  return (effects, scene = {}, resources = 6) => playerTable(base(), effects, scene, resources);
+}
+
 /** The effect ids of the Trigger intents the engine offers. */
 export function triggers(state: ScenarioState, tab: Table): string[] {
   return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Trigger" ? [intent.effectId] : []));
@@ -38,6 +49,22 @@ export function choices(state: ScenarioState, tab: Table): string[] {
   return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Choose" ? [intent.optionId] : []));
 }
 
+/** Whether the engine offers a PlayCard of the card `cardId` in `state` (the table's `ctx`). */
+export function canPlay(state: ScenarioState, tab: Table, cardId: string): boolean {
+  return legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === cardId);
+}
+
+/** The ids of the cards the engine offers a PlayCard for in `state`, in the order it offers them. */
+export function playableCards(state: ScenarioState, tab: Table): string[] {
+  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
+}
+
+/** The engine's refusal (a reason, or null when it would play) of a PlayCard of the first card of `code`, paid as `payFor` pays it. */
+export function playRefusal(state: ScenarioState, tab: Table, code: string): string | null {
+  const card = idsOf(tab, code);
+  return refusal(state, { type: "PlayCard", cardId: card, payments: payFor(state, tab.ctx, card) }, tab.ctx);
+}
+
 /** A stat as the game reads it, modifiers included. */
 export function stat(state: ScenarioState, tab: Table, id: string, which: Extract<ModifierStat, "attack" | "defense" | "hitPoints" | "willpower" | "threat" | "questPoints" | "engagementCost">): number {
   const card = state.cards[id];
@@ -45,9 +72,31 @@ export function stat(state: ScenarioState, tab: Table, id: string, which: Extrac
   return modifiedStat(state, card, which, tab.ctx.cards);
 }
 
+/** The table with the threat of `seat`'s player set to `threat`. */
+export function threatened(tab: Table, threat: number, seat = 0): Table {
+  return { ...tab, state: withThreat(tab.state, seat, threat) };
+}
+
+/** The table with the cards `ids` exhausted. */
+export function exhausted(tab: Table, ...ids: readonly string[]): Table {
+  return { ...tab, state: ids.reduce((state, id) => updateCard(state, id, { exhausted: true }), tab.state) };
+}
+
+/** Puts 9 damage on `id` in `state` (a card with that much health is destroyed) and passes the window that opens, through sendUnledgered. */
+export function destroyed(state: ScenarioState, tab: Table, id: string): Run {
+  return sendUnledgered(begin(placeDamage(state, id, 9, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
+}
+
 /** The combat phase begins with the enemies engaged: its action window (6.2) is open. */
 export function combat(state: ScenarioState, tab: Table): Run {
   return begin(settle({ ...withMode(state, "combatStart"), window: null }, tab.ctx, []));
+}
+
+/** The combat phase on `state` (the table's by default) up to the first enemy attack: the defense window is open, as it must be (an expectation). */
+export function atDefense(tab: Table, state: ScenarioState = tab.state): Run {
+  const run = passAll(combat(state, tab), tab.ctx);
+  expect(run.state.window?.kind).toBe("defense");
+  return run;
 }
 
 /** The combat phase with no enemy attacking: the player attack window, the first seat to declare. */
@@ -123,6 +172,22 @@ export function passAll(run: Run, ctx: ReduceContext, windows: { responses?: boo
     }
   }
   return next;
+}
+
+/** Sends Pass (sendUnledgered) while `keepGoing(run)` holds, at most `max` times. A Pass nobody offers throws IntentRefused, as one Pass does. */
+export function passWhile(run: Run, tab: Table, keepGoing: (run: Run) => boolean, max = 10): Run {
+  let next = run;
+  for (let guard = 0; guard < max && keepGoing(next); guard += 1) next = sendUnledgered(next, { type: "Pass" }, tab.ctx);
+  return next;
+}
+
+/**
+ * The quest phase from its commit step: `commit` (card ids) is committed, then Pass is sent until `stop(run)` holds, a question is asked, the
+ * travel step comes or no Pass is offered (at most 20 times), so a Response window of the quest, a staging step or a choice can be read.
+ */
+export function questUntil(tab: Table, commit: readonly string[], stop: (run: Run) => boolean = () => false): Run {
+  const committed = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [...commit] }, tab.ctx);
+  return passWhile(committed, tab, (run) => !stop(run) && run.state.window?.kind !== "choose" && run.state.mode !== "travel" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"), 20);
 }
 
 /** The engine moves on to `mode` (its phase begins) and runs to its next window. */

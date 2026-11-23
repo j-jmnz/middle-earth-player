@@ -14,7 +14,7 @@ import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-o
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { answerFirst, attacking, choices, chooseIfAsked, fillers, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { answerFirst, attacking, choices, chooseIfAsked, fillers, passWhile, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const DENETHOR = "12001";
 const AZAIN = "12004";
@@ -36,7 +36,7 @@ const CARD = "card";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -79,7 +79,7 @@ describe("Azain Silverbeard (12004:A:1)", () => {
   function destroys(effects: readonly Effect[], scene: Scene): { tab: Table; run: Run } {
     const tab = table(effects, scene, 1);
     let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, FRAIL_ORC), attackerIds: [idsOf(tab, AZAIN)] }, tab.ctx);
-    for (let guard = 0; guard < 6 && !triggers(run.state, tab).includes("12004:response:1") && run.state.window?.kind === "frameAction"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => !triggers(run.state, tab).includes("12004:response:1") && run.state.window?.kind === "frameAction", 6);
     return { tab, run };
   }
 

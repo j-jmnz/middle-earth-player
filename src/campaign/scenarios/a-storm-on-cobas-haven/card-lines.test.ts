@@ -27,7 +27,6 @@ const ID = "a-storm-on-cobas-haven";
 const TOWERS = { seaWard: "12134", gull: "12135", beacon: "12136", heron: "12137" } as const;
 const FLAGSHIP = "12124";
 const SHIP = "110138"; // Duskbringer, a ship-objective
-const without = (line: string): readonly Effect[] => withoutLine(EFFECTS, line);
 
 // The table of the layout, with the Heading card showing `heading` (none: the game has no Heading card).
 function table(layout: Layout = {}, effects: readonly Effect[] = EFFECTS, heading?: Heading): LayoutTable {
@@ -64,7 +63,7 @@ describe("the ships that cannot have attachments (12126, 12127)", () => {
       const ship = idOf(made.state, code);
       expect(attachBlocked(made.state, made.ctx, ship, "attachment")).toBe(true);
       expect(attachBlocked(made.state, made.ctx, ship, "12132")).toBe(true);
-      const bare = table({ staging: [code] }, without(line));
+      const bare = table({ staging: [code] }, withoutLine(EFFECTS, line));
       expect(attachBlocked(bare.state, bare.ctx, idOf(bare.state, code), "attachment")).toBe(false);
     });
   }
@@ -80,7 +79,7 @@ describe("the Dol Amroth towers (12134 to 12137)", () => {
       expect(state.cards[id]?.zone).toBe("staging");
       expect(guard).toMatchObject({ host: id, guard: true });
       expect(state.cards[idOf(state, "f3")]?.zone).toBe("encounterDeck");
-      const bare = table({ deck: ["f0", "f3"] }, without(line));
+      const bare = table({ deck: ["f0", "f3"] }, withoutLine(EFFECTS, line));
       const plain = reveal(bare, code);
       expect(plain.state.cards[plain.id]?.attachments).toEqual([]);
     });
@@ -108,7 +107,7 @@ describe("the Dol Amroth towers (12134 to 12137)", () => {
         return { guarded: guarded.cards[tower]?.claimed === true, freed: freed.cards[tower]?.claimed === true, zone: freed.cards[tower]?.zone, controller: freed.cards[tower]?.controller };
       };
       expect(controlled(EFFECTS)).toEqual({ guarded: false, freed: true, zone: "staging", controller: null });
-      expect(controlled(without(line)).freed).toBe(false);
+      expect(controlled(withoutLine(EFFECTS, line)).freed).toBe(false);
     });
   }
 
@@ -124,7 +123,7 @@ describe("the Dol Amroth towers (12134 to 12137)", () => {
     };
     expect(looked(false)).toBe(3);
     expect(looked(true)).toBe(1);
-    expect(looked(false, without("12134:A:3"))).toBe(1);
+    expect(looked(false, withoutLine(EFFECTS, "12134:A:3"))).toBe(1);
   });
 });
 
@@ -135,7 +134,7 @@ describe("Raider Flagship (12124)", () => {
     const flagship = idOf(made.state, FLAGSHIP);
     expect(legalAttackEnemies(made.state, 0, made.hero, made.cards)).not.toContain(flagship);
     expect(legalAttackEnemies(made.state, 0, idOf(made.state, SHIP), made.cards)).toContain(flagship);
-    const bare = table({ phase: "PlayerAttacks", engaged: [FLAGSHIP], play: [SHIP] }, without("12124:A:3"));
+    const bare = table({ phase: "PlayerAttacks", engaged: [FLAGSHIP], play: [SHIP] }, withoutLine(EFFECTS, "12124:A:3"));
     expect(legalAttackEnemies(bare.state, 0, bare.hero, bare.cards)).toContain(idOf(bare.state, FLAGSHIP));
   });
 
@@ -149,7 +148,7 @@ describe("Raider Flagship (12124)", () => {
     expect(state.seats[1].engaged.map((id) => state.cards[id]?.code)).toEqual([FLAGSHIP, "11060"]);
     expect(state.seats[0].engaged).toEqual([]);
     expect(state.cards[idOf(state, "11061")]?.zone).toBe("corsairDeck");
-    const bare = announce(table(layout, without("12124:A:4")), END_OF_ENCOUNTER);
+    const bare = announce(table(layout, withoutLine(EFFECTS, "12124:A:4")), END_OF_ENCOUNTER);
     expect(bare.cards[idOf(bare, "11060")]?.zone).toBe("corsairDeck");
   });
 
@@ -170,7 +169,7 @@ describe("the locations of the heading (12128, 12129)", () => {
     expect(threat("Sun")).toBe(3);
     expect(threat("Cloud")).toBe(5);
     expect(threat("Storm")).toBe(5);
-    expect(threat("Storm", without("12128:A:1"))).toBe(3);
+    expect(threat("Storm", withoutLine(EFFECTS, "12128:A:1"))).toBe(3);
   });
 
   // "You cannot travel to Belfalas Islet if you are off-course (Cloud, Rain, or Storm)."
@@ -181,7 +180,7 @@ describe("the locations of the heading (12128, 12129)", () => {
     };
     expect(travels("Sun")).toBe(true);
     expect(travels("Rain")).toBe(false);
-    expect(travels("Rain", without("12129:A:1"))).toBe(true);
+    expect(travels("Rain", withoutLine(EFFECTS, "12129:A:1"))).toBe(true);
   });
 });
 
@@ -201,7 +200,7 @@ describe("Gavin (11210)", () => {
     const id = shown.id;
     expect(state.cards[id]).toMatchObject({ zone: "play", controller: 1, committed: true });
     expect(state.cards[idOf(state, LANWYN)]?.resources).toBe(1);
-    const bare = withLanwyn(tableFromLayout(ID, layout, { extra: [LANWYN], effects: without("11210:A:5") }));
+    const bare = withLanwyn(tableFromLayout(ID, layout, { extra: [LANWYN], effects: withoutLine(EFFECTS, "11210:A:5") }));
     const plain = reveal(bare, "11210");
     expect(passOut(plain, bare).state.cards[plain.id]?.zone).not.toBe("play");
   });

@@ -11,13 +11,11 @@ import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { whenRevealedUncancelable } from "../../../rules/families/wilderland/heath.ts";
-import { play } from "../../../../test/harness/card-spec-play.ts";
-import { attack, defend, endPhase, endRound, quest, reveal, travel, withoutLine, type Act, type Row } from "../../../../test/harness/card-spec.ts";
+import { playedLayout } from "../../../../test/harness/card-spec-play.ts";
+import { attack, defend, endPhase, endRound, quest, reveal, travel, withoutLine } from "../../../../test/harness/card-spec.ts";
 import { finish, idOf, legalIntents, legalTargets, revealFromTop, send, start, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "lost-in-mirkwood";
-const without = (line: string): readonly Effect[] => withoutLine(EFFECTS, line);
-const played = (layout: Layout, act: Act | readonly Act[], effects: readonly Effect[] = EFFECTS): ScenarioState => play(SCENARIO, { line: "", layout, act, expect: [] } satisfies Row, effects, false).run.state;
 const card = (state: ScenarioState, code: string) => state.cards[idOf(state, code)];
 const threatOf = (state: ScenarioState, code: string, cards: LayoutTable["cards"]): number => modifiedStat(state, card(state, code)!, "threat", cards);
 
@@ -28,15 +26,15 @@ describe("18029 to 18032 Guarded (location) and Guarded (enemy)", () => {
     ["18031:A:1", "18031", "f3", ["place", "f3", "f0"]],
   ] as const)("%s attaches the objective to the card found, which guards it", (line, objective, found, deck) => {
     const layout: Layout = { deck };
-    const state = played(layout, reveal(objective));
+    const state = playedLayout(SCENARIO, layout, reveal(objective)).run.state;
     expect(card(state, found)).toMatchObject({ zone: "staging", host: idOf(state, objective), guard: true });
-    expect(card(played(layout, reveal(objective), without(line)), found)?.guard).not.toBe(true);
+    expect(card(playedLayout(SCENARIO, layout, reveal(objective), withoutLine(EFFECTS, line)).run.state, found)?.guard).not.toBe(true);
   });
 });
 
 describe("18031 Bare Hilltop: advance to the next stage A, if able (18031:A:3)", () => {
   it("18031:A:3 at the last level there is no stage to advance to: the quest stays", () => {
-    const state = played({ stage: "18077", phase: "Travel", staging: ["18031"], deck: ["f0", "f0"] }, travel("18031"));
+    const state = playedLayout(SCENARIO, { stage: "18077", phase: "Travel", staging: ["18031"], deck: ["f0", "f0"] }, travel("18031")).run.state;
     expect(card(state, "18077")?.zone).toBe("questStage");
   });
 });
@@ -52,7 +50,7 @@ describe("18033 Twilight Hall", () => {
   it("18033:A:3 with no resource on it the players cannot travel there; with 1 they can", () => {
     expect(travelOffered(0, EFFECTS)).toBe(false);
     expect(travelOffered(1, EFFECTS)).toBe(true);
-    expect(travelOffered(0, without("18033:A:1"))).toBe(true);
+    expect(travelOffered(0, withoutLine(EFFECTS, "18033:A:1"))).toBe(true);
   });
 
   it("18033:A:1 with no resource it keeps its printed Threat 2", () => {
@@ -62,7 +60,7 @@ describe("18033 Twilight Hall", () => {
 
   // "After a Forest location is explored": "place" has no trait, so its exploration places nothing.
   it("18033:A:2 a location without the Forest trait explored places no resource", () => {
-    const state = played({ staging: ["18033"], active: { code: "place", progress: 1 }, deck: ["f0"] }, quest("success"));
+    const state = playedLayout(SCENARIO, { staging: ["18033"], active: { code: "place", progress: 1 }, deck: ["f0"] }, quest("success")).run.state;
     expect(card(state, "place")?.zone).toBe("encounterDiscard");
     expect(card(state, "18033")?.resources ?? 0).toBe(0);
   });
@@ -71,13 +69,13 @@ describe("18033 Twilight Hall", () => {
 describe("18034 Mirkwood Patrol", () => {
   // "Forced: At the end of the encounter phase, if Mirkwood Patrol is in the staging area with an unguarded objective-location, attach that objective-location to Mirkwood Patrol, guarding it."
   // Engagement cost 40 against a threat of 28: it stays in the staging area through the engagement checks.
-  const patrolled = (layout: Layout, effects: readonly Effect[] = EFFECTS) => played({ phase: "Encounter", deck: ["f0", "f0", "f0"], ...layout }, endPhase, effects);
+  const patrolled = (layout: Layout, effects: readonly Effect[] = EFFECTS) => playedLayout(SCENARIO, { phase: "Encounter", deck: ["f0", "f0", "f0"], ...layout }, endPhase, effects).run.state;
 
   it("18034:A:1 at the end of the encounter phase it guards the unguarded objective-location in the staging area", () => {
     const state = patrolled({ staging: ["18034", "18029"] });
     expect(state.phase).not.toBe("Encounter");
     expect(card(state, "18034")).toMatchObject({ zone: "staging", host: idOf(state, "18029"), guard: true });
-    expect(card(patrolled({ staging: ["18034", "18029"] }, without("18034:A:1")), "18034")?.guard).not.toBe(true);
+    expect(card(patrolled({ staging: ["18034", "18029"] }, withoutLine(EFFECTS, "18034:A:1")), "18034")?.guard).not.toBe(true);
   });
 
   it("18034:A:1 an objective-location another card already guards is left as it is", () => {
@@ -95,7 +93,7 @@ describe("18034 Mirkwood Patrol", () => {
 
   // Shadow: "The defender cannot ready this round." The next round's refresh phase readies it.
   it("18034:A:2 the defender readies in the refresh phase of the next round", () => {
-    const state = played({}, [attack("f0", { shadow: "18034" }), defend("dh1"), endRound, endRound]);
+    const state = playedLayout(SCENARIO, {}, [attack("f0", { shadow: "18034" }), defend("dh1"), endRound, endRound]).run.state;
     expect(card(state, "dh1")?.exhausted ?? false).toBe(false);
   });
 });
@@ -113,7 +111,7 @@ function runToCombat(state: ScenarioState, made: LayoutTable): ScenarioState {
 
 describe("18036 Unseen Danger", () => {
   it("18036:A:1 a discarded Threat 3 is greater than the removed hero's Willpower 2: the hero is discarded", () => {
-    const state = played({ committed: ["dh1"], deck: ["f3", "f0"] }, reveal("18036"));
+    const state = playedLayout(SCENARIO, { committed: ["dh1"], deck: ["f3", "f0"] }, reveal("18036")).run.state;
     expect(card(state, "f3")?.zone).toBe("encounterDiscard");
     expect(card(state, "dh1")?.zone).toBe("discard");
   });
@@ -123,10 +121,10 @@ describe("18037 Vastness of Mirkwood", () => {
   // "Until the end of the phase": the +1 Threat is gone once the quest phase is over. The active location is not in the staging area and gets nothing.
   it("18037:A:1 the +1 Threat ends with the phase, and the active location gets none", () => {
     const made = tableFromLayout(SCENARIO, { staging: ["place"], active: "01100" });
-    const revealed = played({ staging: ["place"], active: "01100", deck: ["f0", "f0"] }, reveal("18037"));
+    const revealed = playedLayout(SCENARIO, { staging: ["place"], active: "01100", deck: ["f0", "f0"] }, reveal("18037")).run.state;
     expect(threatOf(revealed, "place", made.cards)).toBe(3);
     expect(threatOf(revealed, "01100", made.cards)).toBe(2);
-    const after = played({ staging: ["place"], active: "01100", deck: ["f0", "f0"] }, [reveal("18037"), endPhase]);
+    const after = playedLayout(SCENARIO, { staging: ["place"], active: "01100", deck: ["f0", "f0"] }, [reveal("18037"), endPhase]).run.state;
     expect(after.phase).not.toBe("Quest");
     expect(threatOf(after, "place", made.cards)).toBe(2);
   });
@@ -200,7 +198,7 @@ describe("18039 Dark Black Woods", () => {
 
 describe("18040 Gathering Gloom", () => {
   it("18040:A:3 an attack that destroys no character discards no ally", () => {
-    const state = played({ play: ["ally", "ally"] }, attack("f0", { shadow: "18040", undefended: true }));
+    const state = playedLayout(SCENARIO, { play: ["ally", "ally"] }, attack("f0", { shadow: "18040", undefended: true })).run.state;
     expect(card(state, "dh1")?.damage).toBe(2);
     expect(Object.values(state.cards).filter((one) => one.code === "ally" && one.zone === "play")).toHaveLength(2);
   });
@@ -219,7 +217,7 @@ describe("18041 Swarm of Bats", () => {
     expect(state.seats[0]?.threat).toBe(30);
     expect(state.seats[1]?.threat).toBe(28);
     expect(state.encounterDeck).toHaveLength(2);
-    expect(revealed(without("18041:A:1")).seats[0]?.threat).toBe(28);
+    expect(revealed(withoutLine(EFFECTS, "18041:A:1")).seats[0]?.threat).toBe(28);
   });
 });
 
@@ -243,21 +241,21 @@ describe("18071 Ambushed at Night", () => {
 
   it("18071:B:1 a player card does not reduce a player's threat", () => {
     expect(greeted("18071", EFFECTS)).toBe(28);
-    expect(greeted("18071", without("18071:B:1"))).toBe(22);
+    expect(greeted("18071", withoutLine(EFFECTS, "18071:B:1"))).toBe(22);
   });
 });
 
 describe("18072 Spiders of Mirkwood: a Spider that damages a character (18072:B:2)", () => {
   it("18072:B:2 an attacker that is not a Spider leaves the damaged defender free to ready", () => {
     // East Bight Patrol (Goblin, Orc; 3 Attack) against the 2 Defense hero.
-    const state = played({ stage: "18072" }, [attack("01097", { shadow: "f0" }), defend("dh1"), endRound]);
+    const state = playedLayout(SCENARIO, { stage: "18072" }, [attack("01097", { shadow: "f0" }), defend("dh1"), endRound]).run.state;
     expect(card(state, "dh1")?.damage).toBe(1);
     expect(card(state, "dh1")?.exhausted ?? false).toBe(false);
   });
 
   it("18072:B:2 a Spider attack that deals no damage leaves the defender free to ready", () => {
     // Forest Spider (Spider; 2 Attack) against the 2 Defense hero.
-    const state = played({ stage: "18072" }, [attack("01096", { shadow: "f0" }), defend("dh1"), endRound]);
+    const state = playedLayout(SCENARIO, { stage: "18072" }, [attack("01096", { shadow: "f0" }), defend("dh1"), endRound]).run.state;
     expect(card(state, "dh1")?.damage ?? 0).toBe(0);
     expect(card(state, "dh1")?.exhausted ?? false).toBe(false);
   });
@@ -265,7 +263,7 @@ describe("18072 Spiders of Mirkwood: a Spider that damages a character (18072:B:
   // "Until the end of the round": the bar is gone once the round in which the Spider attacked is over (the hero, still exhausted, could ready again).
   it("18072:B:2 the bar on readying ends with the round", () => {
     const made = tableFromLayout(SCENARIO, { stage: "18072" });
-    const state = played({ stage: "18072" }, [attack("01074", { shadow: "f0" }), defend("dh1"), endRound]);
+    const state = playedLayout(SCENARIO, { stage: "18072" }, [attack("01074", { shadow: "f0" }), defend("dh1"), endRound]).run.state;
     expect(card(state, "dh1")?.exhausted).toBe(true);
     expect(modifiedStat(state, card(state, "dh1")!, "cannotReady", made.cards)).toBe(0);
   });

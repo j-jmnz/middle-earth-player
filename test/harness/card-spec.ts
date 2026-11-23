@@ -112,6 +112,11 @@ export function withoutLine(effects: readonly Effect[], line: string): readonly 
   return effects.filter((effect) => !effect.lines.includes(line));
 }
 
+/** The records without those that implement any of `lines`. A new list: the shared list is never changed. */
+export function withoutLines(effects: readonly Effect[], ...lines: readonly string[]): readonly Effect[] {
+  return lines.reduce(withoutLine, effects);
+}
+
 /**
  * One test for each row, and for each row a second one that runs it with the records of its line removed and fails when the row still
  * holds. A line no record names is an error: the row would test nothing.

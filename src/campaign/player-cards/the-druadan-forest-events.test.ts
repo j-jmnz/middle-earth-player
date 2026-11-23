@@ -10,12 +10,11 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { combat, enter, passAll, play, playerTable, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { begin, idsOf } from "../../../test/harness/scene.ts";
+import { canPlay, combat, enter, passAll, passWhile, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
 
 const STRENGTH = "06034";
 const TRAINED = "06036";
@@ -43,8 +42,7 @@ const CHEAP = "cheap";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
-const playable = (state: Table["state"], tab: Table, id: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -61,7 +59,7 @@ function playableWith(effects: readonly Effect[], code: string, heroes: readonly
   const seats = theirs.length > 0 ? 2 : 1;
   const tab = table(effects, { seats, heroes: [...heroes.map((hero) => ({ code: hero, seat: 0 })), ...theirs.map((hero) => ({ code: hero, seat: 1 }))], allies: [{ code: ALLY, seat: 0 }], hand: [{ code, seat: 0 }], attached: song ? [{ code: SONG, host: heroes[0] ?? "" }] : [] });
   const state = updateCard(tab.state, idsOf(tab, ALLY), { exhausted: true });
-  return playable(state, tab, idsOf(tab, code));
+  return canPlay(state, tab, idsOf(tab, code));
 }
 
 describe("Strength of Arms (06034:A:1, A:2)", () => {
@@ -88,7 +86,7 @@ describe("Strength of Arms (06034:A:1, A:2)", () => {
   // With every ally ready the Action can ready nothing, so it is not played (rr.triggered-ability).
   it("06034:A:2 Strength of Arms: not played with no exhausted ally", () => {
     const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }, { code: THEODRED, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: STRENGTH, seat: 0 }] });
-    expect(playable(tab.state, tab, idsOf(tab, STRENGTH))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, STRENGTH))).toBe(false);
   });
 });
 
@@ -107,7 +105,7 @@ describe("Trained for War (06036:A:1, A:2)", () => {
     const stage = tab.state.questStage ?? "";
     let run = play(begin(tab.state), tab, idsOf(tab, TRAINED));
     run = sendUnledgered(run, { type: "Commit", cardIds: [idsOf(tab, LEGOLAS), idsOf(tab, GIMLI)] }, tab.ctx);
-    for (let guard = 0; guard < 5 && run.state.mode === "questCommit"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.mode === "questCommit", 5);
     run = passAll(run, tab.ctx, { responses: true });
     expect(run.state.mode).toBe("travel");
     expect(run.state.cards[stage]?.progress).toBe(3 + 2);
@@ -117,7 +115,7 @@ describe("Trained for War (06036:A:1, A:2)", () => {
   it("06036:A:2 Trained for War: without it the heroes quest with their Willpower", () => {
     const tab = table(EFFECTS, { start: "quest", heroes: [{ code: LEGOLAS, seat: 0 }, { code: GIMLI, seat: 0 }], deck: ["f0", "f0"] });
     let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, LEGOLAS), idsOf(tab, GIMLI)] }, tab.ctx);
-    for (let guard = 0; guard < 5 && run.state.mode === "questCommit"; guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.mode === "questCommit", 5);
     run = passAll(run, tab.ctx, { responses: true });
     expect(run.state.cards[tab.state.questStage ?? ""]?.progress).toBe(1 + 2);
   });
@@ -138,7 +136,7 @@ describe("Against the Shadow (06038:A:1, A:2)", () => {
     const tab = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: ELEANOR, seat: 0 }], allies: [{ code: SPIRIT_DREAMER, seat: 0 }, { code: DREAMER, seat: 0 }], hand: [{ code: AGAINST, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }, { code: BRUTE, seat: 0 }, { code: BRUTE, seat: 0 }] });
     const [first = "", second = "", third = ""] = tab.ids[BRUTE] ?? [];
     let run = combat(tab.state, tab);
-    expect(playable(run.state, tab, idsOf(tab, AGAINST))).toBe(true);
+    expect(canPlay(run.state, tab, idsOf(tab, AGAINST))).toBe(true);
     run = passAll(play(run, tab, idsOf(tab, AGAINST)), tab.ctx);
     for (const [enemy, defender] of [[first, EOWYN], [second, SPIRIT_DREAMER], [third, DREAMER]] as const) {
       if (run.state.window?.kind === "chooseEnemy") run = passAll(sendUnledgered(run, { type: "ChooseEnemy", enemyId: enemy }, tab.ctx), tab.ctx);
@@ -170,7 +168,7 @@ describe("Advance Warning (06040:A:1, A:2)", () => {
     const tab = encounter(effects);
     let run = sendUnledgered(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
     expect(run.state.window?.kind).toBe("frameAction");
-    expect(playable(run.state, tab, idsOf(tab, WARNING))).toBe(true);
+    expect(canPlay(run.state, tab, idsOf(tab, WARNING))).toBe(true);
     run = passAll(play(run, tab, idsOf(tab, WARNING)), tab.ctx);
     expect(run.state.phase).not.toBe("Encounter");
     expect(run.state.cards[idsOf(tab, CHEAP)]?.zone).toBe("staging");

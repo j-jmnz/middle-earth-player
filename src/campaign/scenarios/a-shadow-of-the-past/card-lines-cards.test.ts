@@ -7,7 +7,6 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
-import type { ScenarioState } from "../../../rules/core/state.ts";
 import { attachTo, moveCard, spawn } from "../../../rules/core/zones.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { settle } from "../../../rules/engine/machine.ts";
@@ -18,7 +17,7 @@ import { endPhase } from "../../../../test/harness/card-spec.ts";
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
 import { hosts, playerTable, type PlayerBase } from "../../../../test/harness/player-table.ts";
 import { begin, idsOf, send as sendScene } from "../../../../test/harness/scene.ts";
-import { finish, idOf, idsOf as idsIn, revealFromTop, send, start, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
+import { finish, idOf, idsOf as idsIn, type Layout, type LayoutTable, revealFromTop, type Run, send, start, tableFromLayout, zoneOf } from "../../../../test/harness/scene-kit.ts";
 import { starterBase } from "../../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 
 const SCENARIO = "a-shadow-of-the-past";
@@ -27,7 +26,6 @@ const SNARE = "01069";
 const ARAGORN = "01001";
 const BULWARK = "17137";
 const table = (layout: Layout): LayoutTable => tableFromLayout(SCENARIO, layout);
-const zoneOf = (state: ScenarioState, code: string) => state.cards[idOf(state, code)]?.zone;
 
 // The card is put on top of the encounter deck and revealed by `seat` (saga staging, mec109.saga-staging-rules: each player reveals in turn). A choice it opens is left open.
 function revealBy(made: LayoutTable, code: string, seat: number): Run {

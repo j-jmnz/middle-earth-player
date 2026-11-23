@@ -16,7 +16,7 @@ import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-pa
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, endRound, enter, hosts, passAll, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, attacking, choices, endRound, enter, hosts, passAll, passWhile, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const MIRLONDE = "06032";
 const FORLONG = "06033";
@@ -51,7 +51,7 @@ const BRUTE = "brute";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -175,8 +175,7 @@ describe("Silvan Refugee (06037:A:1)", () => {
   // is discarded.
   lineSpec("06037:A:1", "Silvan Refugee: discarded after a character leaves play", (effects) => {
     const tab = table(effects, { heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: ALLY, seat: 0 }, { code: REFUGEE, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }] });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, ALLY) }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.cards[idsOf(tab, ALLY)]?.zone).toBe("discard");
     expect(run.state.cards[idsOf(tab, REFUGEE)]?.zone).toBe("discard");
@@ -213,7 +212,7 @@ describe("Harbor Master (06039:A:1)", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: ARAGORN, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: HARBOR, seat: 0 }], hand: [{ code: STEWARD, seat: 1 }] });
     // The first player passes his planning turn: the other player plays in his.
     let run = begin(tab.state);
-    for (let guard = 0; guard < 3 && !legalIntents(run.state, tab.ctx).some((intent) => intent.type === "PlayCard"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => !legalIntents(run.state, tab.ctx).some((intent) => intent.type === "PlayCard"), 3);
     expect(run.state.activeSeat).toBe(1);
     run = sendUnledgered(run, { type: "PlayCard", cardId: idsOf(tab, STEWARD), hostId: idsOf(tab, PAL), payments: [{ heroId: idsOf(tab, PAL), amount: 2 }] }, tab.ctx);
     run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, STEWARD), effectId: "01026:action:1" }, tab.ctx);
@@ -234,8 +233,7 @@ describe("White Tower Watchman (06041:A:1)", () => {
   // The Brute (Attack 4) attacks the player, undefended.
   function undefended(effects: readonly Effect[], heroes: readonly string[]): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: heroes.map((code) => ({ code, seat: 0 })), allies: [{ code: WATCHMAN, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }] });
-    const run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    const run = atDefense(tab);
     return { tab, run };
   }
 

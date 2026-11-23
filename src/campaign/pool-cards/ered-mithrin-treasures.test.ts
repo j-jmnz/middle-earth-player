@@ -16,7 +16,7 @@ import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-pa
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, passAll, playerTable, stat, type PlayerBase } from "../../../test/harness/player-table.ts";
+import { attacking, choices, combat, passAll, type PlayerBase, playerTableFor, stat } from "../../../test/harness/player-table.ts";
 
 const ANVIL = "12196";
 const AXE = "12197";
@@ -40,7 +40,7 @@ const WEAK = "weak";
 
 let base: PlayerBase;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 // The scene with the treasure `code` in the staging area, guarded by nothing: the settle sweep claims it and asks the first player for the
 // character (freeTreasures, src/rules/families/wilderland/mirkwood.ts) as the engine settles after an intent (the window cleared).

@@ -17,8 +17,8 @@ import { playCost } from "../../rules/player/attach.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, combat, enter, fillers, hosts, passAll, play, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
+import { atDefense, attach, choices, enter, fillers, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const SONG_OF_HOPE = "17082";
 const BURST = "17083";
@@ -49,7 +49,7 @@ const WEAK = "weak";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 const hero = (code: string, sphere: "leadership" | "tactics" | "lore" | "spirit", traits: string[] = [], isUnique = false) =>
   definePrinted({ code, name: code, type: "hero", sphere, threat: 8, willpower: 1, attack: 1, defense: 1, health: 5, traits, isUnique });
 
@@ -147,8 +147,7 @@ describe("Defender of Cair Andros (17084:A:1, A:2)", () => {
   // The Defender declared as the defender against the engaged enemy, at `threat`.
   function declared(effects: readonly Effect[], threat: number) {
     const tab = atThreat(table(effects, { heroes: [{ code: TAC, seat: 0 }], allies: [{ code: DEFENDER, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] }), threat);
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, DEFENDER) }, tab.ctx);
     return { tab, run };
   }

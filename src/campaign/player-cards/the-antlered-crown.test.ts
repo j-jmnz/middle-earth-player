@@ -15,7 +15,7 @@ import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-pa
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, endRound, enter, hosts, passAll, play, playCode, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, choices, endRound, enter, hosts, passAll, play, playCode, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ERKENBRAND = "08137";
 const DAYS = "08139";
@@ -63,8 +63,7 @@ describe("Erkenbrand (08137:A:2)", () => {
   // Erkenbrand and Beravor; the Brute (attack 2) is engaged and gets the Boost as its shadow card when the combat phase deals them.
   function defended(effects: readonly Effect[], defender: string): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: ERKENBRAND, seat: 0 }, { code: BERAVOR, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }], deck: [BOOST] });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     // An action window opens after the defender is declared, before the shadow card is turned.
     run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx);
     return { tab, run };

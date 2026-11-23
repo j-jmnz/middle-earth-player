@@ -11,12 +11,11 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { withMode } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, combat, fillers, hosts, passAll, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { atDefense, attach, canPlay, choices, fillers, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ELFHELM = "12057";
 const DESTRIER = "12059";
@@ -56,7 +55,7 @@ const SMALL = "small";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -74,8 +73,6 @@ beforeAll(async () => {
   cards.set(SMALL, definePrinted({ code: SMALL, name: "Small", type: "location", threat: 1, questPoints: 1 }));
   base = { ...starter, cards };
 });
-
-const playable = (state: Table["state"], tab: Table, id: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
 
 describe("Elfhelm (12057:A:1, A:2, A:3)", () => {
   // Elfhelm (Leadership), a Spirit and a Tactics hero, two Mounts and the Plain attachment in hand.
@@ -135,8 +132,7 @@ describe("Déorwine (12060:A:2)", () => {
   // The Black Rider attacks with Green Hill Country as its shadow card; `defender` defends. The Pal pays.
   function defended(effects: readonly Effect[], defender: string): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: PAL, seat: 0 }, { code: SPIRIT, seat: 0 }], allies: [{ code: DEORWINE, seat: 0 }], engaged: [{ code: RIDER, seat: 0 }], deck: [GREEN_HILL] });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx);
     return { tab, run };
   }
@@ -162,8 +158,7 @@ describe("Déorwine (12060:A:2)", () => {
   // "Any player may trigger this response.": the first player has no Leadership hero; the second player's Pal spends the resource.
   it("12060:A:2 Déorwine: another player may trigger the Response and pay for it", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: SPIRIT, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: DEORWINE, seat: 0 }], engaged: [{ code: RIDER, seat: 0 }], deck: [GREEN_HILL] });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, DEORWINE) }, tab.ctx), tab.ctx);
     expect(triggers(run.state, tab)).toContain("12060:response:1");
     const from = run.steps.length;
@@ -178,15 +173,15 @@ describe("Revealed in Wrath (12061:A:1)", () => {
   // it cannot. A non-unique enemy is in the staging area for the Action to choose.
   lineSpec("12061:A:1", "Revealed in Wrath: play only if you control a Noldor hero", (effects) => {
     const noldor = table(effects, { heroes: [{ code: ELLADAN, seat: 0 }], hand: [{ code: WRATH, seat: 0 }], staging: [DEAR] });
-    expect(playable(noldor.state, noldor, idsOf(noldor, WRATH))).toBe(true);
+    expect(canPlay(noldor.state, noldor, idsOf(noldor, WRATH))).toBe(true);
     const ally = table(effects, { heroes: [{ code: TACTICS, seat: 0 }], allies: [{ code: SWORD_ELF, seat: 0 }], hand: [{ code: WRATH, seat: 0 }], staging: [DEAR] });
-    expect(playable(ally.state, ally, idsOf(ally, WRATH))).toBe(false);
+    expect(canPlay(ally.state, ally, idsOf(ally, WRATH))).toBe(false);
   });
 
   // "you control": the other player's Noldor hero does not count.
   it("12061:A:1 Revealed in Wrath: another player's Noldor hero does not count", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: TACTICS, seat: 0 }, { code: ELLADAN, seat: 1 }], hand: [{ code: WRATH, seat: 0 }], staging: [DEAR] });
-    expect(playable(tab.state, tab, idsOf(tab, WRATH))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, WRATH))).toBe(false);
   });
 });
 
@@ -319,8 +314,8 @@ describe("Arrows from the Trees (12065:A:1, A:2)", () => {
   // The engine opens no player window in the encounter phase before the checks, so the line is tested on all records only.
   it("12065:A:1 Arrows from the Trees: play only after making engagement checks", () => {
     const tab = scene(EFFECTS, [DEAR]);
-    expect(playable(tab.state, tab, idsOf(tab, ARROWS))).toBe(false);
-    expect(playable(checked(tab).state, tab, idsOf(tab, ARROWS))).toBe(true);
+    expect(canPlay(tab.state, tab, idsOf(tab, ARROWS))).toBe(false);
+    expect(canPlay(checked(tab).state, tab, idsOf(tab, ARROWS))).toBe(true);
   });
 
   // "Encounter Action: If no enemies were engaged this phase, deal 1 damage to each enemy in the staging area. Then, the players as a group
@@ -357,7 +352,7 @@ describe("Arrows from the Trees (12065:A:1, A:2)", () => {
   // No enemy is in the staging area: neither part can deal damage, so the event is not offered (rr.triggered-ability).
   it("12065:A:2 Arrows from the Trees: not offered with no enemy in the staging area", () => {
     const tab = scene(EFFECTS, []);
-    expect(playable(checked(tab).state, tab, idsOf(tab, ARROWS))).toBe(false);
+    expect(canPlay(checked(tab).state, tab, idsOf(tab, ARROWS))).toBe(false);
   });
 
   // "If no enemies were engaged this phase": the Cheap enemy (engagement cost 2) engages at the checks; Arrows cannot be played.
@@ -365,7 +360,7 @@ describe("Arrows from the Trees (12065:A:1, A:2)", () => {
     const tab = scene(EFFECTS, [CHEAP, DEAR]);
     const run = checked(tab);
     expect(run.state.cards[idsOf(tab, CHEAP)]?.zone).toBe("engaged");
-    expect(playable(run.state, tab, idsOf(tab, ARROWS))).toBe(false);
+    expect(canPlay(run.state, tab, idsOf(tab, ARROWS))).toBe(false);
   });
 });
 

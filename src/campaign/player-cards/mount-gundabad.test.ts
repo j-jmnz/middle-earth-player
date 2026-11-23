@@ -9,13 +9,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { playCost } from "../../rules/player/attach.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { idsOf, type Run, type Scene, type Table, SAM } from "../../../test/harness/scene.ts";
-import { choices, combat, endRound, enter, fillers, passAll, play, playCode, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, canPlay, choices, combat, endRound, enter, fillers, passAll, play, playCode, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const DEFENDER = "19113";
 const GUIDE = "19114";
@@ -44,7 +43,7 @@ const CHEAP = "cheap";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -55,15 +54,12 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-const playable = (state: Table["state"], tab: Table, id: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
-
 describe("Greenwood Defender (19113:A:1)", () => {
   // Aragorn plays the Defender from the hand; the Brute is engaged.
   const defender = (effects: readonly Effect[]): Table => table(effects, { heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: DEFENDER, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }] });
   // The combat phase on `state`: the Defender is declared as the defender of the Brute's attack.
   const defends = (state: Table["state"], tab: Table): Run => {
-    const run = passAll(combat(state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    const run = atDefense(tab, state);
     return sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, DEFENDER) }, tab.ctx);
   };
 
@@ -118,7 +114,7 @@ describe("Elf Guide (19114:A:1)", () => {
   // "you control": only the second player controls a Silvan ally, so the cost cannot be paid and the event is not offered.
   it("19114:A:1 is not offered when only another player controls a Silvan ally", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: ARAGORN, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: ALLY, seat: 0 }, { code: SILVAN, seat: 1 }], hand: [{ code: GUIDE, seat: 0 }] });
-    expect(playable(tab.state, tab, idsOf(tab, GUIDE))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, GUIDE))).toBe(false);
   });
 });
 

@@ -10,16 +10,15 @@ import { ruleCause } from "../../../rules/core/cause.ts";
 import { placeDamage } from "../../../rules/core/keywords.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { attachmentHostIds } from "../../../rules/player/attach.ts";
-import { answer, attack, damageOn, deckCount, defend, endPhase, endRound, flag, resolve, reveal, rowProblems, stat, threat, withoutLine, zone, type Row } from "../../../../test/harness/card-spec.ts";
-import { finish, first, idOf, legalIntents, resolveRecords, send, start, tableFromLayout, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
+import { answer, attack, damageOn, deckCount, defend, endPhase, endRound, flag, resolve, reveal, type Row, rowProblems, stat, threat, withoutLines, zone } from "../../../../test/harness/card-spec.ts";
+import { finish, first, idOf, type Layout, layoutTableFor, legalIntents, resolveRecords, send, start } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "journey-along-the-anduin";
 const HILL_TROLL = "01082";
 const MENDOR = "01135";
 const VALOR = "01133";
 const SCARRED = "01138";
-const without = (...lines: string[]): readonly Effect[] => lines.reduce(withoutLine, EFFECTS);
-const make = (layout: Layout, effects: readonly Effect[] = EFFECTS): LayoutTable => tableFromLayout(ID, layout, { effects });
+const make = layoutTableFor(ID);
 // What a row says is wrong on these records: nothing when it holds.
 const problems = (row: Row, effects: readonly Effect[] = EFFECTS): string[] => rowProblems(ID, row, effects);
 
@@ -29,7 +28,7 @@ describe("900202 Marshland Outlaws", () => {
     expect(problems({ line: "900202:A:2", act: [attack("f3", { shadow: "900202" }), defend("dh1")], expect: [damageOn("dh1", 0), threat(28)] })).toEqual([]);
     const undefended: Row = { line: "900202:A:2", act: attack("f3", { shadow: "900202", undefended: true }), expect: threat(29) };
     expect(problems(undefended)).toEqual([]);
-    expect(problems(undefended, without("900202:A:2"))).not.toEqual([]);
+    expect(problems(undefended, withoutLines(EFFECTS, "900202:A:2"))).not.toEqual([]);
   });
 });
 
@@ -39,7 +38,7 @@ describe("900203 Anduin Troll Spawn", () => {
     const surge: Row = { line: "900203:A:1", layout: { deck: ["f0", "f0"] }, act: reveal("900203"), expect: deckCount(1) };
     expect(problems({ line: "900203:A:1", layout: { engaged: [HILL_TROLL], deck: ["f0", "f0"] }, act: reveal("900203"), expect: deckCount(2) })).toEqual([]);
     expect(problems({ line: "900203:A:1", layout: { staging: [HILL_TROLL], deck: ["f0", "f0"] }, act: reveal("900203"), expect: deckCount(2) })).toEqual([]);
-    expect(problems(surge, without("900203:A:1"))).not.toEqual([]);
+    expect(problems(surge, withoutLines(EFFECTS, "900203:A:1"))).not.toEqual([]);
   });
 });
 
@@ -53,13 +52,13 @@ describe("900204 Brown Water Rats", () => {
       return { zone: state.cards[id]?.zone, damage: state.cards[id]?.damage ?? 0 };
     };
     expect(hurt(EFFECTS)).toEqual({ zone: "engaged", damage: 0 });
-    expect(hurt(without("900204:A:1"))).not.toEqual({ zone: "engaged", damage: 0 });
+    expect(hurt(withoutLines(EFFECTS, "900204:A:1"))).not.toEqual({ zone: "engaged", damage: 0 });
   });
 
   // A:3 "Shadow: Attacking enemy cannot be damaged this round." The round is passed to its end after the attack.
   it("900204:A:3 the attacking enemy can be damaged again once the round is over", () => {
     expect(problems({ line: "900204:A:3", act: [attack("f3", { shadow: "900204" }), defend("dh1"), endRound], expect: flag("f3", "cannotTakeDamage", false) })).toEqual([]);
-    expect(problems({ line: "900204:A:3", act: [attack("f3", { shadow: "900204" }), defend("dh1")], expect: flag("f3", "cannotTakeDamage") }, without("900204:A:3"))).not.toEqual([]);
+    expect(problems({ line: "900204:A:3", act: [attack("f3", { shadow: "900204" }), defend("dh1")], expect: flag("f3", "cannotTakeDamage") }, withoutLines(EFFECTS, "900204:A:3"))).not.toEqual([]);
   });
 });
 
@@ -67,7 +66,7 @@ describe("900205 A Flooded Ford", () => {
   // "Shadow: If this attack is undefended, put A Flooded Ford into the staging area with 1 progress token on it."
   it("900205:A:2 a defended attack leaves A Flooded Ford with the attacker as its shadow card, out of the staging area", () => {
     expect(problems({ line: "900205:A:2", act: [attack("f3", { shadow: "900205" }), defend("dh1")], expect: zone("900205", "shadow") })).toEqual([]);
-    expect(problems({ line: "900205:A:2", act: attack("f3", { shadow: "900205", undefended: true }), expect: zone("900205", "staging") }, without("900205:A:2"))).not.toEqual([]);
+    expect(problems({ line: "900205:A:2", act: attack("f3", { shadow: "900205", undefended: true }), expect: zone("900205", "staging") }, withoutLines(EFFECTS, "900205:A:2"))).not.toEqual([]);
   });
 });
 
@@ -75,7 +74,7 @@ describe("900206 Gladden Marshlands", () => {
   // A:1 "Action: Deal 1 damage to a hero you control to reduce Gladden Marshlands' Threat by 1 until the end of the phase. Any player may trigger this effect." It prints 10 Threat.
   it("900206:A:1 the Threat is 10 again once the phase is over", () => {
     expect(problems({ line: "900206:A:1", layout: { phase: "Planning", staging: ["900206"] }, act: [resolve("900206", "action"), answer("dh1"), endPhase], expect: stat("900206", "threat", 10) })).toEqual([]);
-    expect(problems({ line: "900206:A:1", layout: { phase: "Planning", staging: ["900206"] }, act: [resolve("900206", "action"), answer("dh1")], expect: stat("900206", "threat", 9) }, without("900206:A:1"))).not.toEqual([]);
+    expect(problems({ line: "900206:A:1", layout: { phase: "Planning", staging: ["900206"] }, act: [resolve("900206", "action"), answer("dh1")], expect: stat("900206", "threat", 9) }, withoutLines(EFFECTS, "900206:A:1"))).not.toEqual([]);
   });
 
   it("900206:A:1 the second player may trigger it, dealing the damage to a hero he controls", () => {
@@ -89,7 +88,7 @@ describe("900206 Gladden Marshlands", () => {
       return { dh3: run.state.cards[idOf(run.state, "dh3")]?.damage ?? 0, dh1: run.state.cards[idOf(run.state, "dh1")]?.damage ?? 0 };
     };
     expect(used(EFFECTS)).toEqual({ dh3: 1, dh1: 0 });
-    expect(used(without("900206:A:1"))).toBeNull();
+    expect(used(withoutLines(EFFECTS, "900206:A:1"))).toBeNull();
   });
 
   // A:2 "Shadow: Each enemy engaged with the defending player gets +1 Attack until the end of the phase." Marshland Outlaws 900202 (2 Attack) is engaged with him beside the attacker f3; another f3 is engaged with the
@@ -98,7 +97,7 @@ describe("900206 Gladden Marshlands", () => {
     const layout: Layout = { seats: 2, engaged: ["f3", "900202", { code: "01082", seat: 1 }] };
     expect(problems({ line: "900206:A:2", layout, act: [attack("f3", { shadow: "900206" }), defend("dh1")], expect: [stat("900202", "attack", 3), stat("01082", "attack", 6)] })).toEqual([]);
     expect(problems({ line: "900206:A:2", layout, act: [attack("f3", { shadow: "900206" }), defend("dh1"), endPhase], expect: stat("900202", "attack", 2) })).toEqual([]);
-    expect(problems({ line: "900206:A:2", layout, act: [attack("f3", { shadow: "900206" }), defend("dh1")], expect: stat("900202", "attack", 3) }, without("900206:A:2"))).not.toEqual([]);
+    expect(problems({ line: "900206:A:2", layout, act: [attack("f3", { shadow: "900206" }), defend("dh1")], expect: stat("900202", "attack", 3) }, withoutLines(EFFECTS, "900206:A:2"))).not.toEqual([]);
   });
 });
 
@@ -111,7 +110,7 @@ describe("01133 Valor and 01138 Scarred", () => {
         return attachmentHostIds(made.state, 0, code, made.ctx).map((id) => made.state.cards[id]?.code ?? id).sort();
       };
       expect(hosts(EFFECTS)).toEqual(["dh2"]);
-      expect(hosts(without(line))).toContain("dh1");
+      expect(hosts(withoutLines(EFFECTS, line))).toContain("dh1");
     });
   }
 });
@@ -130,6 +129,6 @@ describe("01130 Journey Along the Anduin (campaign card)", () => {
       };
     };
     expect(setUp(EFFECTS)).toEqual({ mendor: [["play", 1]], valor: 2, scarred: 2 });
-    expect(setUp(without("01130:A:2"))).toEqual({ mendor: [], valor: 0, scarred: 0 });
+    expect(setUp(withoutLines(EFFECTS, "01130:A:2"))).toEqual({ mendor: [], valor: 0, scarred: 0 });
   });
 });

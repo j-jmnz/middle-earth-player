@@ -10,12 +10,11 @@ import { EFFECTS } from "../../effects/index.ts";
 import { ruleCause } from "../../rules/core/cause.ts";
 import { placeDamage } from "../../rules/core/keywords.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, enter, fillers, play, playerTable, printed, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Scene } from "../../../test/harness/scene.ts";
+import { canPlay, choices, enter, fillers, play, playerTableFor, printed, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
 
 const HAMMER = "06111";
 const CHILDREN = "06113";
@@ -41,7 +40,7 @@ const padAction: Effect = { id: "pad:action:1", cardCode: PAD, lines: ["fixture:
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -52,8 +51,6 @@ beforeAll(async () => {
   cards.set(NOLDO, definePrinted({ code: NOLDO, name: "Noldo", type: "ally", sphere: "spirit", cost: 1, willpower: 1, attack: 1, defense: 1, health: 2, traits: ["Noldor"] }));
   base = { ...starter, cards };
 });
-
-const playable = (tab: Table, state: Table["state"], cardId: string) => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === cardId);
 
 describe("The Hammer-stroke (06111:A:1)", () => {
   // Two players: a Weak in the staging area, one engaged with the other player and one engaged with the first player.
@@ -77,7 +74,7 @@ describe("The Hammer-stroke (06111:A:1)", () => {
   // "Encounter Action": not played in the planning phase.
   it("06111:A:1 The Hammer-stroke: not played outside the encounter phase", () => {
     const tab = scene(EFFECTS, "planning");
-    expect(playable(tab, tab.state, idsOf(tab, HAMMER))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, HAMMER))).toBe(false);
   });
 
   // Every enemy in play is already engaged with you: engaging them changes nothing, so the card is not played (rr.triggered-ability). Another legal Encounter Action
@@ -87,8 +84,8 @@ describe("The Hammer-stroke (06111:A:1)", () => {
     let run = sendUnledgered(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
     run = sendUnledgered(run, { type: "DeclineEngage" }, tab.ctx);
     expect(run.state.phase).toBe("Encounter");
-    expect(playable(tab, run.state, idsOf(tab, PAD))).toBe(true);
-    expect(playable(tab, run.state, idsOf(tab, HAMMER))).toBe(false);
+    expect(canPlay(run.state, tab, idsOf(tab, PAD))).toBe(true);
+    expect(canPlay(run.state, tab, idsOf(tab, HAMMER))).toBe(false);
   });
 });
 
@@ -131,7 +128,7 @@ describe("Children of the Sea (06113:A:1)", () => {
   // No Silvan or Noldor ally you control (the other player's Guide is one): nothing to choose, so the card is not played.
   it("06113:A:1 Children of the Sea: not played with no Silvan or Noldor ally you control", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: EOWYN, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: TOOK, seat: 0 }, { code: GUIDE, seat: 1 }], hand: [{ code: CHILDREN, seat: 0 }] });
-    expect(playable(tab, tab.state, idsOf(tab, CHILDREN))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, CHILDREN))).toBe(false);
   });
 });
 
@@ -179,6 +176,6 @@ describe("Well-Equipped (06116:A:1)", () => {
   // An empty deck: nothing is discarded and nothing can be attached, so the card can change nothing and is not played.
   it("06116:A:1 Well-Equipped: not played with an empty deck", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: WELL, seat: 0 }] });
-    expect(playable(tab, tab.state, idsOf(tab, WELL))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, WELL))).toBe(false);
   });
 });

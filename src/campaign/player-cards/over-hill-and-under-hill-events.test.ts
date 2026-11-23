@@ -9,11 +9,11 @@ import { definePrinted } from "../../rules/core/printed.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import { type ScenarioState } from "../../rules/core/state.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
-import { fund, payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { fund, payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, buildTable, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { begin, buildTable, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { attacking, choices, combat, passWhile, playerTableFor, playRefusal, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const THORIN = "131002";
 const ORI = "131004";
@@ -36,7 +36,7 @@ const ORC = "orc";
 
 let base: Awaited<ReturnType<typeof starterBase>>;
 
-const table = (effects: readonly Effect[], scene: Scene = {}, resources = 6): Table => playerTable(base, effects, scene, resources);
+const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -50,11 +50,6 @@ beforeAll(async () => {
 function playIn(state: ScenarioState, tab: Table, code: string): Run {
   const card = idsOf(tab, code);
   return sendUnledgered(begin(state), { type: "PlayCard", cardId: card, payments: payFor(state, tab.ctx, card) }, tab.ctx);
-}
-
-function playable(state: ScenarioState, tab: Table, code: string): string | null {
-  const card = idsOf(tab, code);
-  return refusal(state, { type: "PlayCard", cardId: card, payments: payFor(state, tab.ctx, card) }, tab.ctx);
 }
 
 describe("A Very Good Tale (131014:A:1)", () => {
@@ -87,7 +82,7 @@ describe("A Very Good Tale (131014:A:1)", () => {
 
   it("131014:A:1 is not played while you control fewer than 2 ready allies", () => {
     const tab = table(EFFECTS, { heroes: [{ code: THORIN, seat: 0 }], allies: [{ code: FILI, seat: 0 }], hand: [{ code: TALE, seat: 0 }], playerDeck: [{ code: "card", seat: 0 }] });
-    expect(playable(tab.state, tab, TALE)).not.toBeNull();
+    expect(playRefusal(tab.state, tab, TALE)).not.toBeNull();
   });
 });
 
@@ -143,9 +138,9 @@ describe("Goblin-cleaver (131016:A:1)", () => {
 
   lineSpec("131016:A:1", "is a Combat Action: not played in the planning phase, nor without a ready Weapon on a hero", (effects) => {
     const tab = table(effects, { heroes: [{ code: GIMLI, seat: 0 }], attached: [{ code: AXE, host: GIMLI }], hand: [{ code: CLEAVER, seat: 0 }], engaged: [{ code: TOUGH, seat: 0 }] });
-    expect(playable(tab.state, tab, CLEAVER)).not.toBeNull();
+    expect(playRefusal(tab.state, tab, CLEAVER)).not.toBeNull();
     const opened = combat(tab.state, tab);
-    expect(playable(opened.state, tab, CLEAVER)).toBeNull();
+    expect(playRefusal(opened.state, tab, CLEAVER)).toBeNull();
     const unarmed = table(effects, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: CLEAVER, seat: 0 }], engaged: [{ code: TOUGH, seat: 0 }] });
     // With no ready Weapon on a hero nothing can be played in the combat action window, so the engine does not open it: the first enemy attacks (a defense window).
     expect(opened.state.window?.kind).toBe("frameAction");
@@ -153,7 +148,7 @@ describe("Goblin-cleaver (131016:A:1)", () => {
     // The same window opened by hand, the card is refused for the missing Weapon and not for the window.
     const window = { ...opened.state, cards: unarmed.state.cards, seats: unarmed.state.seats };
     expect(window.window?.kind).toBe("frameAction");
-    expect(playable(window, unarmed, CLEAVER)).toBe("That card cannot be played now");
+    expect(playRefusal(window, unarmed, CLEAVER)).toBe("That card cannot be played now");
   });
 });
 
@@ -185,13 +180,13 @@ describe("Expecting Mischief (131018:A:1)", () => {
   lineSpec("131018:A:1", "is played in the quest phase before staging, not in the planning phase nor after staging", (effects) => {
     const tab = table(effects, { start: "quest", heroes: [{ code: ORI, seat: 0 }, { code: THORIN, seat: 0 }], hand: [{ code: MISCHIEF, seat: 0 }], deck: ["f0", "f0", "f0"] });
     // The quest phase opens on the commit pass: the staging step has not begun.
-    expect(playable(tab.state, tab, MISCHIEF)).toBeNull();
+    expect(playRefusal(tab.state, tab, MISCHIEF)).toBeNull();
     const planning = table(effects, { heroes: [{ code: ORI, seat: 0 }, { code: THORIN, seat: 0 }], hand: [{ code: MISCHIEF, seat: 0 }] });
-    expect(playable(planning.state, planning, MISCHIEF)).not.toBeNull();
+    expect(playRefusal(planning.state, planning, MISCHIEF)).not.toBeNull();
     // The heroes commit and the staging step reveals: the window after staging (3.3) is too late.
     let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, THORIN)] }, tab.ctx);
-    for (let guard = 0; guard < 5 && run.state.window?.kind !== "frameAction" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = passWhile(run, tab, (run) => run.state.window?.kind !== "frameAction" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"), 5);
     expect(run.state.mode).not.toBe("questCommit");
-    expect(playable(run.state, tab, MISCHIEF)).not.toBeNull();
+    expect(playRefusal(run.state, tab, MISCHIEF)).not.toBeNull();
   });
 });
