@@ -148,7 +148,7 @@ cd webapp && npx wrangler deploy
 
 `webapp/wrangler.toml` deploys the export as the Worker's static assets. Cloudflare answers a file's path itself; `webapp/worker.ts` runs only for the rest and answers a route with a parameter (`/table/<id>`) with its page, and any other path with the not-found page and a 404. `npx wrangler dev` in `webapp/` serves the same site on localhost.
 
-The site is public (`docs/plans/pwa-iphone-ipad.md`, Decisions for the user). Its pages carry `X-Robots-Tag: noindex`, so search engines do not list it.
+`npx wrangler deploy` goes to the Worker's `workers.dev` name, for a test. `npx wrangler deploy --env production` goes to `https://ringsplayer.app`, the permanent origin, once the domain is in the Cloudflare account; a game saved on one origin is not on the other. The site is public (`docs/plans/pwa-iphone-ipad.md`, Decisions for the user). Its pages carry `X-Robots-Tag: noindex`, so search engines do not list it.
 
 ## Asset mirror
 

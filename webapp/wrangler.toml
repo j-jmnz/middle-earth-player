@@ -14,3 +14,10 @@ not_found_handling = "none"
 
 [observability]
 enabled = true
+
+# The permanent origin, which holds every player's saves and never changes (docs/plans/pwa-iphone-ipad.md, Decisions for the user): npx wrangler deploy --env production.
+# A deploy with no --env goes to the workers.dev name, for a test.
+[env.production]
+name = "ringsplayer"
+workers_dev = false
+routes = [{ pattern = "ringsplayer.app", custom_domain = true }]
