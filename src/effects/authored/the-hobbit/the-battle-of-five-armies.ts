@@ -68,8 +68,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 132053 Bolg. X is the number of players; he cannot leave the staging area; the first Goblin revealed each round gains surge (the Setup's reveals count for round 1).
     copyLine("110077:A:1", "132053:A:2"),
-    // "Cannot leave the staging area": no engagement check or optional engagement names him, as the engagement would move him out (the stat cannotLeaveStaging refuses every move).
-    { id: "132053:constant:2", cardCode: "132053", lines: ["132053:A:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", target: "self" }] },
+    // "Cannot leave the staging area": no engagement check or optional engagement names him, as the engagement would move him out (the stat cannotLeaveStaging refuses every move). The one exit is his defeat, which discards him and wins the game (132079:B:3: leavesStagingWhenDefeated).
+    { id: "132053:constant:2", cardCode: "132053", lines: ["132053:A:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "leavesStagingWhenDefeated", amount: 1, until: "whileSourceInPlay", target: "self" }] },
     { id: "132053:constant:3", cardCode: "132053", lines: ["132053:A:4"], timing: "constant", instructions: [{ verb: "FirstRevealedSurges", trait: "Goblin", type: "enemy" }] },
 
     // 132054 Bodyguard of Bolg. Bolg cannot take damage while it is in play. Forced: when it attacks, it is dealt an additional shadow card for each quest stage in play with no progress on it.

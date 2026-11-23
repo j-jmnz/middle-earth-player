@@ -418,6 +418,14 @@ describe("Stage 5 (132079:B:1, 132079:B:2, 132079:B:3)", () => {
     expect(flagged(unsynced, idOf(unsynced, "132053"), "engagedWithFirst")).toBe(false);
   });
 
+  it("132079:B:3 damage that destroys Bolg in the staging area discards him and wins the game", () => {
+    const made = table({ stage: S5, staging: ["132053"] });
+    const bolg = idOf(made.state, "132053");
+    const hit = settle({ ...runInstruction({ ...syncConstants(made.state, made.ctx), mode: "stopped" }, { verb: "DamageCard", amount: 8, target: "self" }, { seat: 0, sourceId: bolg }, made.ctx, []), window: null }, made.ctx, []);
+    expect(hit.cards[bolg]?.zone).toBe("encounterDiscard");
+    expect(hit.stageCleared).toBe(true);
+  });
+
   it("132079:B:3 destroying Bolg wins the game, and any other enemy does not", () => {
     const made = table({ stage: S5, staging: ["132053", "f3"] });
     const event = (code: string) => ({ trigger: "enemyDestroyed" as const, seat: 0, cardId: idOf(made.state, code), subject: idOf(made.state, code) });

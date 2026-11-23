@@ -35,6 +35,7 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
     - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - this card: stat leavesStagingWhenDefeated (it cannot leave the staging area, except that damage that destroys it discards it) 1, while this card is in play
 
 132053:A:4 (front): The first Goblin revealed each round gains surge.
   132053:constant:3: Constant
@@ -322,4 +323,4 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
-(rendered pieces: 181 by template, 0 as JSON)
+(rendered pieces: 182 by template, 0 as JSON)
