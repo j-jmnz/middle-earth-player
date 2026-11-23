@@ -24,7 +24,6 @@ import {
 const LARGE_SECTIONS: Readonly<Record<string, number>> = {
   "docs/design-system-table.md#Cards": 100985,
   "docs/scenarios/dream-chaser.md#Dream-chaser": 64878,
-  "docs/scenarios/ered-mithrin.md#Ered Mithrin": 66826,
 };
 
 // Doc paths that may name a file that does not exist: test fixtures of `pnpm move`, and the desktop comment issue #181
