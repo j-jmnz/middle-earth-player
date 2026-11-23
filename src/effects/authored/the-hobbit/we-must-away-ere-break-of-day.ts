@@ -212,12 +212,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   { id: "131053:shadow:1", cardCode: "131053", lines: ["131053:A:2"], timing: "shadow", instructions: [{ verb: "SearchToStaging", code: "131036", deckOnly: true }, { verb: "ShuffleEncounterDeck", when: { kind: "thenResolves" } }] },
 
   // 131054 Hungry Troll.
+  // The Surge record comes first in the list so that it reads the staging area before the chosen Troll is engaged: a lone staged Troll is engaged and the card gains no Surge.
+  { id: "131054:whenRevealed:2", cardCode: "131054", lines: ["131054:A:1"], timing: "whenRevealed", instructions: [{ verb: "GainSurge", when: NO_TROLL_IN_STAGING }] },
   {
     id: "131054:whenRevealed:1",
     cardCode: "131054",
     lines: ["131054:A:1"],
     timing: "whenRevealed",
-    instructions: [{ verb: "GainSurge", when: NO_TROLL_IN_STAGING }, { verb: "Pick", pick: { ...TROLL_IN_STAGING, who: "firstPlayer" } }, { verb: "EngageFirstPlayer", target: "picked" }],
+    instructions: [{ verb: "Pick", pick: { ...TROLL_IN_STAGING, who: "firstPlayer" } }, { verb: "EngageFirstPlayer", target: "picked" }],
   },
   {
     id: "131054:shadow:1",

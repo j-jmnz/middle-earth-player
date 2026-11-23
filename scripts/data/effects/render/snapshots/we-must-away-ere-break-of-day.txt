@@ -392,9 +392,10 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 131054:A:1 (front): When Revealed: The first player chooses a Troll enemy in the staging area and engages that enemy. If there are no Troll enemies in the staging area, this card gains Surge.
+  131054:whenRevealed:2: When revealed
+    - if the number of Troll enemy (any player controls) in the staging area only is at most 0: this card gains surge (one more encounter card is revealed when it has been resolved)
   131054:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if the number of Troll enemy (any player controls) in the staging area only is at most 0: this card gains surge (one more encounter card is revealed when it has been resolved)
     - choose Troll enemy (any player controls) in the staging area only, chosen by the first player
     - the picked enemy, in the staging area, engages the first player
 
@@ -403,4 +404,4 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
     who acts: the acting player is the defending player (the player the attack is against)
     - deal 4 damage to each character (any player controls) with a Sack card attached
 
-(rendered pieces: 234 by template, 0 as JSON)
+(rendered pieces: 235 by template, 0 as JSON)
