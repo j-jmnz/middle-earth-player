@@ -108,7 +108,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   if (familial !== null) return familial;
   switch (condition.kind) {
     // A family's condition hook answers these before this switch (south: noneDiscarded; black-gate: embassy; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
-    case "holderExhausted": case "noneDiscarded": case "lastPlayer": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives": case "discardedHasShadowOrTentacle": case "firstLetterMatches":
+    case "noneDiscarded": case "lastPlayer": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives": case "discardedHasShadowOrTentacle": case "firstLetterMatches":
     case "attackedThisPhase": case "optionTaken": case "namedFlag": case "discoverUnavailable": case "investigateIgnored": case "investigationTop": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "questProgressNoted": case "committedThisRound": case "guardianCanChange": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastEscapeFailed": case "lastEscapePassed": case "lastLocateFailed": case "lastLocatePassed": case "hasPass": case "playerWithoutReady": case "drew": case "thenResolves": case "engagedWithLastPlayer": case "firstTreachery": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "allAtStage": case "setAsideHas": case "exploredPending": case "night":
       return false;
     case "hideFailed":
@@ -230,7 +230,11 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return holder != null && inAreaOf(state, holder, condition.seat);
     }
     // Answered by the captured family's condition hook above (families/captured/values.ts).
-    case "versusVictoryTrait": return false;
+    case "versusVictoryTrait":
+      return false;
+    // holderExhausted is a stat condition, read where the stat is (core/keywords.ts).
+    case "holderExhausted":
+      return false;
     case "versusHighEngagement": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && versusHighEngagement(state, condition.role, holder, ctx.cards, scope.against);

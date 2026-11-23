@@ -66,8 +66,7 @@ export function modifiedStat(
   // The Threat of the enemies grappled with a location is added to it (dcce.grapple).
   let total = printedStat(printed, stat, instance.face) + (stat === "threat" ? grappleThreat(state, instance.id) : 0);
   let set: number | null = null;
-  // The table's noWillpowerGain, read once and only if a raise of Willpower is met.
-  let gainBarred: boolean | undefined;
+  let gainBarred: boolean | undefined; // The table's noWillpowerGain, read once and only if a raise of Willpower is met.
   // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2), or its Defense (900506:A:1).
   let floor = total;
   const has: TraitCheck = (trait) => hasTrait(state, instance.id, trait, { effects: [], cards }); // A class named by a Trait reads the Traits the card has now.
@@ -78,7 +77,8 @@ export function modifiedStat(
     if (modifier.when?.kind === "versusDefender" && !versusDefender(state, instance, modifier.when, cards)) continue;
     if (modifier.when?.kind === "defendingAgainst" && !defendingAgainst(state, instance, modifier.when.trait, { effects: [], cards })) continue;
     if (modifier.when?.kind === "versusVictoryTrait" && !versusVictoryTrait(state, instance, cards, against)) continue;
-    if ((modifier.when?.kind === "inArea" && !inAreaOf(state, instance, modifier.when.seat)) || (modifier.when?.kind === "holderExhausted" && !isExhausted(instance))) continue;
+    if (modifier.when?.kind === "inArea" && !inAreaOf(state, instance, modifier.when.seat)) continue;
+    if (modifier.when?.kind === "holderExhausted" && !isExhausted(instance)) continue; // "While the character is exhausted" (Weighed Down, 132038:A:1); an unconscious character is not exhausted (hob.unconscious-characters)
     // "+2 Attack while attacking that enemy": only while the holder attacks it.
     if (modifier.against != null && modifier.against !== against) continue;
     // "+1 Attack when attacking an Orc" (families/attack/strike.ts).

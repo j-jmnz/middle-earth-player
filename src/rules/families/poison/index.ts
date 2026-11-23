@@ -1,12 +1,11 @@
 // Rules: hob.venom-poison, hob.unconscious-characters, hob.staging-area-creating, hob.staging-area-combining (data/rules/entries.json); ledger lines 132028:A:1 to 132034:A:2, 132067:B:1, 132068:B:1, 132069:A:1 to 132070:B:4.
 // The verbs src/catalog/families/poison.ts adds: poison and the unconscious state (poison.ts), the pick filters (pick.ts), the poison amount (amounts.ts), Venom (venom.ts) and the stages that split the players (stages.ts).
-import type { Condition, Instruction } from "../../../catalog/boundary.ts";
+import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
-import type { Scope } from "../../interpret/conditions.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
@@ -18,7 +17,6 @@ import { venomPoison } from "./venom.ts";
 import { discardPoison, givePoison, makeUnconscious, readyUnconscious } from "./poison.ts";
 import { sweepCommitted } from "./quest.ts";
 import { advanceOtherPlayers, joinAtStage } from "./stages.ts";
-import { isExhausted } from "../../core/state.ts";
 
 // The card the instruction's `target` names, the last picked card by default.
 function targetOf(state: ScenarioState, ref: Extract<Instruction, { verb: "GivePoison" }>["target"], focus: Focus): string | null {
@@ -51,13 +49,6 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 // The settle sweep runs only in a game that has a card that makes a character unconscious, so every other game's state stays as it was.
 const sweep = (state: ScenarioState, ctx: ReduceContext): ScenarioState => (gameReads(state, ctx, '"verb":"MakeUnconscious"') ? sweepCommitted(state, ctx) : state);
 
-// "Exhausted" for a modifier's `when` (holderExhausted): an unconscious character is neither ready nor exhausted (hob.unconscious-characters), so Weighed Down's penalty does not reach it.
-function condition(state: ScenarioState, named: Condition, scope: Scope): boolean | null {
-  if (named.kind !== "holderExhausted") return null;
-  const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
-  return holder != null && isExhausted(holder);
-}
-
 export const manifest: RulesFamily = {
   name: "poison",
   verbs: ["GivePoison", "DiscardPoison", "MakeUnconscious", "ReadyUnconscious", "AttackPickedPlayer", "AdvanceOtherPlayers", "JoinAtStage"],
@@ -66,7 +57,6 @@ export const manifest: RulesFamily = {
   wholeState: ["AdvanceOtherPlayers", "JoinAtStage"],
   combat: { damaged: venomPoison },
   pick: poisonPickMatches,
-  condition,
   amount: (state, amount, scope) => poisonAmount(state, amount, scope),
   settle: { sweep },
 };

@@ -236,13 +236,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   },
   UNCONSCIOUS_BARS,
 
-  // 132068 Lost in the Dark. The first player takes stage 3 and a staging area of his own; the others advance to stage 4 in the shared area. Alone, the stage and its staging cards are discarded.
+  // 132068 Lost in the Dark. The first player takes stage 3 and a staging area of his own; the others advance to stage 4 in the shared area. Alone, the stage and its staging cards are discarded, the active location is not (it is not in the staging area).
   {
     id: "132068:whenRevealed:1",
     cardCode: "132068",
     lines: ["132068:B:1"],
     timing: "whenRevealed",
-    instructions: [{ verb: "SplitToOwnStage", code: "132069" }, { verb: "AdvanceOtherPlayers", code: "132070" }],
+    instructions: [{ verb: "SplitToOwnStage", code: "132069", keepActive: true }, { verb: "AdvanceOtherPlayers", code: "132070" }],
   },
 
   // 132069 Captured by Spiders. 3A empties the resource pools of the first player's area and makes his characters but Bilbo unconscious; 3B freezes the first player token, holds its own defeat to the end of the quest phase, then joins him to stage 4.

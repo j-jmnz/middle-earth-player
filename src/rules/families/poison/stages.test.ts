@@ -51,6 +51,24 @@ describe("stage 2B alone (132068:B:1)", () => {
   });
 });
 
+describe("stage 2B alone with an active location (132068:B:1)", () => {
+  it("keeps the active location, which is not in the staging area, with its progress; the staging cards go", () => {
+    const { t, state } = revealed({ seats: 1, staging: ["132032"], active: "132027" });
+    const location = t.state.activeLocation ?? "";
+    expect(state.cards[location]?.code).toBe("132027");
+    expect(state.activeLocation).toBe(location);
+    expect(state.cards[location]?.zone).toBe("activeLocation");
+    expect(state.staging).toEqual([]);
+    expect(state.encounterDiscard.map((id) => codeOf(state, id))).toEqual(["132032"]);
+    expect(codeOf(state, state.questStage)).toBe(STAGE_3);
+  });
+
+  it("with two players the other player keeps it, as the stage's own", () => {
+    const { t, state } = revealed({ seats: 2, active: "132027" });
+    expect(state.seats[1].active).toBe(t.state.activeLocation);
+  });
+});
+
 describe("stage 3B (132069:B:2)", () => {
   it("the first player joins the player at stage 4: his area's cards join the shared area, stage 4A is not revealed again, the areas are one", () => {
     const { t, state } = revealed({ seats: 2, staging: ["132032"] });
