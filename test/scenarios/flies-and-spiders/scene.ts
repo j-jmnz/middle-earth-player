@@ -5,7 +5,12 @@ import { runInstruction } from "../../../src/rules/interpret/interpret.ts";
 import type { Instruction } from "../../../src/catalog/boundary.ts";
 import { syncConstants } from "../../../src/rules/interpret/constants.ts";
 import { spawn } from "../../../src/rules/core/zones.ts";
-import { legalIntents, send, tableFromLayout, type Run } from "../../harness/scene-kit.ts";
+import { stagingDest } from "../../../src/rules/families/breaking/areas.ts";
+import { startReveal } from "../../../src/rules/windows/frames.ts";
+import { fireForced } from "../../../src/rules/windows/triggers.ts";
+import type { GameEvent } from "../../../src/rules/core/state.ts";
+import type { Effect } from "../../../src/catalog/boundary.ts";
+import { finish, legalIntents, resolveRecords, send, tableFromLayout, type Run } from "../../harness/scene-kit.ts";
 import { settle } from "../../../src/rules/engine/machine.ts";
 import type { EngineStep } from "../../../src/rules/core/intents.ts";
 import type { PlayerIntent, ReduceContext } from "../../../src/rules/engine/reduce.ts";
@@ -47,4 +52,26 @@ export function toNextRound(first: ScenarioState, ctx: ReduceContext, guard = 80
     current = send(current, next as PlayerIntent, ctx);
   }
   return current;
+}
+
+/** The table after stage 2B is revealed with two players: seat 0 alone at stage 3, seat 1 at stage 4 in the original area, which the Glade joined (the layout may add to it). */
+export function splitTable(effects: readonly Effect[], layout: SpiderLayout = {}) {
+  const t = spiderTable({ stage: STAGE_2, setAside: [GLADE], seats: 2, ...layout }, { effects });
+  return { t, state: resolveRecords(t.state, t.ctx, STAGE_2, "whenRevealed", t.state.questStage ?? "").state };
+}
+/** A card of `code` is put in the staging area of the area `seat` heads. */
+export function placeIn(state: ScenarioState, code: string, seat: number): { state: ScenarioState; id: string } {
+  return spawn(state, code, stagingDest(state, seat));
+}
+/** The engine announces the event to the Forced effects, as a step of the game does, and the effects it opens are settled and answered with their first option. */
+export function fire(ctx: ReduceContext, state: ScenarioState, event: GameEvent): ScenarioState {
+  const steps: EngineStep[] = [];
+  return finish({ state: settle(fireForced({ ...state, window: null, mode: "stopped" }, event, ctx, steps), ctx, steps), steps }, ctx).state;
+}
+/** The card is revealed from the top of the encounter deck to the player `seat`, who reveals for his own area, and its effects settle. */
+export function revealTo(ctx: ReduceContext, state: ScenarioState, code: string, seat: number): ScenarioState {
+  const steps: EngineStep[] = [];
+  const spawned = spawn({ ...state, window: null, mode: "stopped" }, code, { zone: "encounterDeck" }, "down");
+  const top = { ...spawned.state, encounterDeck: [spawned.id, ...spawned.state.encounterDeck.filter((id) => id !== spawned.id)] };
+  return finish({ state: settle(startReveal(top, seat, ctx, steps), ctx, steps), steps }, ctx).state;
 }

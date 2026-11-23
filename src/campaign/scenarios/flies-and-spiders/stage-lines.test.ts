@@ -156,3 +156,40 @@ lineSpec("132069:B:2", "when stage 3 is complete the first player advances to st
   expect(state.staging).toContain(enemy);
   expect(Object.values(state.cards).filter((card) => card.code === GLADE).length, "4A did not add a second Glade").toBe(1);
 });
+
+// ---- 132070:A:1, 132070:B:2, 132070:B:4 Battle with the Spiders ----
+lineSpec("132070:A:1", "stage 4A adds The Spider's Glade to the staging area", (effects) => {
+  const t = on(effects, { seats: 1, stage: STAGE_4, side: "A", setAside: [GLADE] });
+  expect(Object.values(t.state.cards).find((card) => card.code === GLADE)?.zone).toBe("setAside");
+  const out = resolveRecords(t.state, t.ctx, STAGE_4, "whenRevealed", t.state.questStage ?? "").state;
+  expect(Object.values(out.cards).find((card) => card.code === GLADE)?.zone, "the Glade is in the staging area").toBe("staging");
+});
+// The first player commits both stand-in heroes (4 Willpower) against the Glade's 1 Threat, or against an empty staging area: 3 progress when none is barred, the 3 quest points of stage 4.
+const questStage4 = (effects: readonly Effect[], layout: Parameters<typeof spiderTable>[0]) => {
+  const t = on(effects, { seats: 1, stage: STAGE_4, ...layout });
+  let run = send(start(t.state), { type: "Commit", cardIds: [t.hero, t.hero2] }, t.ctx);
+  for (let guard = 0; guard < 12 && run.state.phase === "Quest" && !run.state.stageCleared; guard += 1) {
+    const pass = legalIntents(run.state, t.ctx).find((intent) => intent.type === "Pass");
+    if (!pass) break;
+    run = send(run, pass as PlayerIntent, t.ctx);
+  }
+  return { state: run.state, stage: idOf(t.state, STAGE_4) };
+};
+lineSpec("132070:B:2", "no progress is placed on stage 4 while The Spider's Glade is in play, in the staging area or as the active location", (effects) => {
+  const staged = questStage4(effects, { staging: [GLADE] });
+  expect(staged.state.cards[staged.stage]?.progress, "the quest succeeded but no progress was placed").toBe(0);
+  expect(staged.state.stageCleared).toBeFalsy();
+  const active = questStage4(effects, { active: GLADE });
+  expect(active.state.cards[active.stage]?.progress).toBe(0);
+  const gone = questStage4(effects, { setAside: [GLADE] });
+  expect(gone.state.cards[gone.stage]?.progress, "progress is placed when the Glade is not in play").toBeGreaterThan(0);
+});
+// The record of this line is empty (the win is the last stage's defeat, the Ring is discovered nowhere), so there is nothing to remove: a plain test.
+it("132070:B:4 if the players defeat stage 4 they have won the game, and not while the Glade holds the progress off", () => {
+  const effects = EFFECTS;
+  const won = questStage4(effects, { setAside: [GLADE] });
+  expect(won.state.stageCleared, "stage 4 was defeated").toBe(true);
+  expect(won.state.lost).toBeFalsy();
+  const held = questStage4(effects, { staging: [GLADE] });
+  expect(held.state.stageCleared).toBeFalsy();
+});
