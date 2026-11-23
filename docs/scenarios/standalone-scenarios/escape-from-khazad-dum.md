@@ -49,6 +49,7 @@ The 2020 print-on-demand scenario kit (pack `EfKD`, RingsDB's code for it, posit
 31. **Watchful Eyes** (`recommended`; "Limit 1 per hero" is part of the card's own attached text, no source): the opposing team attaches it to the hero with the highest Willpower that has no Watchful Eyes yet; with every hero holding one, none is attached.
 32. **Elder Nameless Thing's gained Forced effect** (`recommended`; precedent 51007:B:1, which reads "after the players have committed characters to the quest" as the beginning of the staging step): while it is in the staging area it attacks the first player at the beginning of the staging step.
 33. **Black Uruks and the Travel of Lightless Grotto** (`recommended`): +1 Attack for each shadow card is read while the stat is read and only while Black Uruks is the attacking enemy (the flag `attackPerShadow`); Lightless Grotto's Travel engages the chosen enemy with the first player, who chooses it.
+- An enemy in the staging area that is considered engaged with a player is engaged with him for a card that reads "engaged with", and is no engagement event (docs/brief.md, Considered to be engaged).
 
 ## Readings to confirm
 
