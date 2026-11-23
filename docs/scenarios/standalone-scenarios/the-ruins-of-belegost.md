@@ -36,6 +36,7 @@ The 2015 print-on-demand scenario (pack `TRoB`, RingsDB's code for it, position 
 ## The table
 
 - **The table.** The Table step (`docs/agents/agent-brief.md`, Scenario procedure; lines `50603:B:1`, `50603:B:2`, `50608:A:1`, `50615:A:2`; `src/play/readouts/standalone-scenarios/belegost.ts`, words `belegost-words.ts`; test `belegost.test.ts`): two top-bar dials after the seat dials. The Stalking dial counts the resources on Stalking the Ruins against the 3 that bring Naurlhûg (read from the card's own record), warms when the next quest phase brings him and, with Naurlhûg in play, says his X (50615:A:2); a tap shows the card. On stage 2D a goal dial counts the resources on the stage against the 3 it asks for (50603:B:1, 50603:B:2). The Loot objective facedown under Stalking the Ruins (50601:A:1) is the peek every game draws under a staging card, and it stays hidden: no readout says which Loot it is. The Loot objectives attached to heroes and to locations are the attachments and guarded objectives the table already draws. No pick needs more than the owner names the choice tray already gives. Checked with `pnpm browser shot --fixture belegost-lost --at 100 --landscape --tap text=Continue` (the Stalking dial reads 2).
+- An enemy in the staging area that is considered engaged with a player is engaged with him for a card that reads "engaged with", and is no engagement event (docs/brief.md, Considered to be engaged).
 
 ## Readings to confirm
 

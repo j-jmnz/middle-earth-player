@@ -12,6 +12,7 @@ import { flagged, inPlay, type CardInstance, type ScenarioState } from "../../co
 import { committedWillpower, stagingThreat } from "../../quest/quest.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { effectData } from "../encounter/moves.ts";
+import { stagesInPlay } from "../armies/stages.ts";
 import { questCardPool } from "../quest/quest-card.ts";
 import { makeCurrentQuest } from "../wilderland/night.ts";
 import { currentQuestId, currentSideQuest, mainQuestBarred, stagedSideQuests } from "../wilderland/night-quest.ts";
@@ -26,7 +27,7 @@ export function questCardsInPlay(state: ScenarioState, seat: number, ctx: Reduce
 
 /** The cards that may be the current quest: the main quest card (not in the quest phase while it cannot be chosen, 10094:B:3) and the side quests, encounter and player, in the staging area. */
 function choosable(state: ScenarioState, ctx: ReduceContext): string[] {
-  return [...(state.questStage && !mainQuestBarred(state) ? [state.questStage] : []), ...stagedSideQuests(state, ctx)];
+  return [...(state.questStage && !mainQuestBarred(state) ? [state.questStage] : []), ...stagesInPlay(state).filter((id) => id !== state.questStage), ...stagedSideQuests(state, ctx)];
 }
 
 /** The quest card that is the current quest now: the side quest chosen until the end of the phase, else the main quest card; none in the quest phase while the main quest card cannot be chosen and no side quest was. */
@@ -34,10 +35,12 @@ function currentQuestCard(state: ScenarioState): string | null {
   return currentQuestId(state);
 }
 
-/** The current quest is the card (`id`): the mark of the side quest that held it ends, and a side quest takes it until the end of the phase; the main quest card takes it by holding no mark. */
-export function setCurrentQuest(state: ScenarioState, id: string, ctx: ReduceContext): ScenarioState {
+/** The current quest is the card (`id`): the mark of the side quest that held it ends, and a side quest takes it until the end of the phase (`until`: of the round); the main quest card takes it by holding no mark. */
+export function setCurrentQuest(state: ScenarioState, id: string, ctx: ReduceContext, until?: "endOfRound"): ScenarioState {
   const cleared: ScenarioState = state.modifiers.some((modifier) => modifier.stat === "currentQuest") ? { ...state, modifiers: state.modifiers.filter((modifier) => modifier.stat !== "currentQuest") } : state;
-  return id === cleared.questStage ? cleared : makeCurrentQuest(cleared, { verb: "MakeCurrentQuest", card: id }, ctx);
+  // One of the stages in play together (The Battle of Five Armies) is the current quest stage by being the stage the quest is at (hob.current-quest-stage).
+  if (cleared.armies?.stages.includes(id)) return { ...cleared, questStage: id };
+  return id === cleared.questStage ? cleared : makeCurrentQuest(cleared, { verb: "MakeCurrentQuest", card: id }, ctx, until);
 }
 
 /**
@@ -50,7 +53,8 @@ export function chooseCurrentQuest(state: ScenarioState, instruction: Verb<"Choo
   if (options.length === 0) return state;
   const chosen = focus.chosen != null && options.includes(focus.chosen) ? focus.chosen : options.length === 1 || !effectData(state) ? options[0] : undefined;
   if (chosen == null) return askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, options);
-  return setCurrentQuest(state, chosen, ctx);
+  // "Until the end of the round" (132066:A:2): a side quest keeps the mark that long. A stage of The Battle of Five Armies stays the current stage until the first player chooses again at the start of the next round (hob.current-quest-stage).
+  return setCurrentQuest(state, chosen, ctx, instruction.until);
 }
 
 /** The amount `questCards` (09016:A:1, 09048:A:1, 09047:A:2, 09050:A:1: "X is the number of quest cards in play"). */

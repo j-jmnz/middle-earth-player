@@ -415,6 +415,8 @@ export function onTableFor(game: ScenarioState, seat: number, folded?: ReadonlyS
       case "secondActiveLocation":
         return !isSeparate(game) || activeOf(game, seat) === cardId;
       case "questStage":
+        // The stages of The Battle of Five Armies are in play together but the quest area draws the current one: a choice among them opens as the tray.
+        if (game.armies) return game.questStage === cardId;
         return !isSeparate(game) || stageOf(game, seat) === cardId || game.questStage === cardId;
       case "hand":
       case "heroes":

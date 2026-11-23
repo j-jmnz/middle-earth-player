@@ -375,6 +375,12 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("currentQuest"), is: z.enum(["side", "self", "other"]) }),
   // The current quest card holds 1 or more progress (`some`) or none (`none`) ("While the current quest has 1 or more progress on it", 10099:A:1; "has 0 progress on it", 10099:A:2). Both are false while there is no current quest: the main quest card cannot be it in the quest phase (10094:B:3). Read by the angmar family.
   z.strictObject({ kind: z.literal("currentQuestProgress"), is: z.enum(["some", "none"]) }),
+  // The Battle of Five Armies, read by the armies family: every stage in play with one of these codes holds at least its quest points in progress (a stage not in play is not complete), or (`is: false`) not every one does ("Players cannot advance from this stage unless stage 3 and stage 4 are complete", 132076:B:1; hob.multiple-stages-in-play).
+  z.strictObject({ kind: z.literal("stagesComplete"), codes: z.array(z.string().min(1)).min(1), is: z.boolean().optional() }),
+  // The quest stage with this code is the current quest stage now ("stage 3B is the current quest", 132061:A:3; Battle on stage 3B holds only while it is, 132077:B:2).
+  z.strictObject({ kind: z.literal("stageIsCurrent"), code: z.string().min(1) }),
+  // The stage in play with this code holds no progress ("If there is no progress on this stage at the end of the round", 132076:B:2). False when no such stage is in play.
+  z.strictObject({ kind: z.literal("stageNoProgress"), code: z.string().min(1) }),
   // The total Willpower of the characters committed to the quest is greater than the total Threat in the staging area, as the quest would count them now ("If the total Willpower of characters committed to the quest is greater than the total Threat in the staging area", 09021:A:1; rr.step-3-4). Read by the angmar family.
   z.strictObject({ kind: z.literal("questLeads") }),
   // The card in play with this code has any hit points remaining: its damage is below its hit points now ("cannot defeat this stage while Thaurdir has any hit points remaining", 09074:B:2). False while no such card is in play. Read by the angmar family.

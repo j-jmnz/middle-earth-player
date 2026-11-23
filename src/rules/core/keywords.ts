@@ -61,8 +61,7 @@ export function modifiedStat(
   // The Threat of the enemies grappled with a location is added to it (dcce.grapple).
   let total = printedStat(printed, stat, instance.face) + (stat === "threat" ? grappleThreat(state, instance.id) : 0);
   let set: number | null = null;
-  // The table's noWillpowerGain, read once and only if a raise of Willpower is met.
-  let gainBarred: boolean | undefined;
+  let gainBarred: boolean | undefined; // The table's noWillpowerGain, read once and only if a raise of Willpower is met.
   // The value with no modifier that lowers it: what a card that "cannot have its Willpower reduced" keeps (09013:A:2), or its Defense (900506:A:1).
   let floor = total;
   const has: TraitCheck = (trait) => hasTrait(state, instance.id, trait, { effects: [], cards }); // A class named by a Trait reads the Traits the card has now.

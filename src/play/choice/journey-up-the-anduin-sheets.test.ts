@@ -7,7 +7,8 @@ import { CODES, idOf, loadUpanduinWorld, upanduinTable, type UpanduinWorld } fro
 import { momentOf } from "../store/outcome.ts";
 import { logLines } from "../store/log.ts";
 import type { SheetNames } from "./sheet-types.ts";
-import { sheetFor, travelRefusals } from "./sheets.ts";
+import { sheetFor } from "./sheets.ts";
+import { travelRefusals } from "./travel-refusals.ts";
 
 // Rules: emce.campaign-pool-encounter, rr.travel (data/rules/entries.json); ledger lines 12167:A:2, 18016:A:3, 18068:B:1.
 // The travel sheet of The Old Ford says why the players cannot go yet and who attacks when they do, and A Growing Threat tells which card it set aside.

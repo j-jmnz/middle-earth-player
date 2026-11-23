@@ -1,4 +1,4 @@
-// Rules: rr.resources, rr.resource-match, rr.cost, rr.attachment-cards, rr.lasting-effects (data/rules/entries.json).
+// Rules: rr.resources, rr.resource-match, rr.cost, rr.attachment-cards, rr.lasting-effects, mec108.create-staging-area, hob.staging-area-creating (data/rules/entries.json).
 //
 // The costs family's verbs that change a pool, the effect's X or a discount: ReduceNextCost ("reduce the cost of the next
 // Silvan ally you play this phase by 1"), ChooseX ("discard X cards from your hand"), DiscardResources, SpendResources ("the
@@ -19,10 +19,10 @@ import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import { printedOf, type Sphere } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { Discount, ScenarioState } from "../../core/state.ts";
-import { livingSeats, updateCard } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { attachTo } from "../../core/zones.ts";
-import { isolatedAreas, sharing } from "../breaking/areas.ts";
+import { sharing } from "../breaking/areas.ts";
 import { noteSpent, spentThisRound, spheresOf } from "./pay.ts";
 
 type Focus = { seat: number; sourceId: string | null; chosen?: string };
@@ -94,8 +94,8 @@ export function discardResources(state: ScenarioState, instruction: Extract<Inst
 
 // The heroes whose resources can pay `sphere` for the actor, or for any player with `group`, and what they hold in all.
 export function spendablePools(state: ScenarioState, actor: number, spec: { sphere?: Sphere | undefined; group?: boolean | undefined }, ctx: ReduceContext): { pools: string[]; total: number } {
-  // The players as a group are the players of the actor's area once the areas are isolated: they cannot spend what a player of another area holds (Hidden Path, 132035:A:2; hob.staging-area-creating).
-  const seats = spec.group ? (isolatedAreas(state) ? sharing(state, actor) : livingSeats(state)) : [actor];
+  // `group`: the players who share the actor's staging area, all of them while the area is shared (mec108.create-staging-area, hob.staging-area-creating: only players that share a staging area can interact).
+  const seats = spec.group ? sharing(state, actor) : [actor];
   const pools = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, spec.sphere ?? null, ctx));
   return { pools, total: pools.reduce((sum, id) => sum + (state.cards[id]?.resources ?? 0), 0) };
 }

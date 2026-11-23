@@ -1,7 +1,7 @@
 // Rules: dwd.durins-bane, rr.attachment-cards (data/rules/entries.json); ledger lines 04150:A:2, 04145:A:1, 04152:A:1, 04153:A:1. Shadow and Flame's Durin's Bane: which players it is considered engaged with, and the encounter cards attached to it that no player controls.
 // The engine decided each (families/south/watcher.ts); this only says it.
 import { flagged, livingSeats } from "../../rules/core/state.ts";
-import { engagedWithThreatening } from "../../rules/families/south/watcher.ts";
+import { engagedWithThreatening } from "../../rules/core/engaged.ts";
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
 
 /** The muted line under a card's name in its preview: Durin's Bane says the players it is considered engaged with (threat 1 or greater) and that it attacks each of them once in the combat phase, and the players it is not engaged with; an encounter card attached to it says it is no player's. Null for any other card. */

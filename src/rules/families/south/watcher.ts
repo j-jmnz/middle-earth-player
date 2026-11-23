@@ -23,6 +23,7 @@ import { patchTop } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
 import { effectData } from "../encounter/moves.ts";
 import { activeLocations } from "./locations.ts";
+import { engagedWithThreatening } from "../../core/engaged.ts";
 
 // An enemy in the staging area that is considered engaged with each player (the Watcher in the Water), with the first player only (the
 // Balrog, `engagedWithFirst`, 142044:A:2) or with each player whose threat is 1 or greater (Durin's Bane, `engagedWithThreatening`, 04150:A:2): it stays in the staging area and attacks from there.
@@ -30,10 +31,6 @@ export function engagedWithAll(state: ScenarioState, id: string): boolean {
   return state.cards[id]?.zone === "staging" && (flagged(state, id, "engagedWithAll") || flagged(state, id, "engagedWithFirst") || flagged(state, id, "engagedWithThreatening"));
 }
 
-// Durin's Bane: considered engaged with a seat while its threat is 1 or greater, read live (04150:A:2, dwd.durins-bane).
-export function engagedWithThreatening(state: ScenarioState, id: string, seat: number): boolean {
-  return state.cards[id]?.zone === "staging" && flagged(state, id, "engagedWithThreatening") && (state.seats[seat]?.threat ?? 0) >= 1 && state.seats[seat]?.eliminated !== true;
-}
 
 // The combat phase begins: the seats whose threat is below 1 are noted when an enemy that is engaged by threat is in the staging area. A seat raised to 1 later in the phase is attacked too, with no shadow card dealt for the attack (dwd.durins-bane; docs/scenarios/dwarrowdelf/shadow-and-flame.md, Shadow and Flame). The note is cleared when no such enemy is in the staging area at the next combat phase; every other game's state stays as it was.
 export function noteBelowThreat(state: ScenarioState): ScenarioState {

@@ -251,7 +251,7 @@ export const HEATH_GOLDENS: readonly HeathGolden[] = [
   { name: "two-handed, weak, lost on threat", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, brittle, lost with every hero dead", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed, brittle, lost with every hero dead", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
-  { name: "true solo, lost at the last stage, after the earlier parts, Cold-Drake alive with 4 Dragon Signs", seatCount: 1, seed: 17, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, policy: { accolades: [4] }, lossReason: "No seats remain" },
+  { name: "true solo, lost at the last stage, after the earlier parts, Cold-Drake alive with 4 Dragon Signs", seatCount: 1, seed: 19, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, policy: { accolades: [4] }, lossReason: "No seats remain" },
   { name: "two-handed, lost at the last stage, after the earlier parts", seatCount: 2, seed: 11, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, policy: { accolades: [2, 4], song: "last", treasure: "last" }, lossReason: "No seats remain" },
 ];
 

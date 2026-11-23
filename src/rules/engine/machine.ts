@@ -68,6 +68,7 @@ import { chooseLookDone, chooseShift, performSailing, sailingStep } from "../fam
 import { askSmaug } from "../families/smaug/deck.ts";
 import { askingToCommit, askingToLook, askingToShift } from "../families/sea/sailing-legal.ts";
 import { askCurrentQuest } from "../families/wilderland/night.ts";
+import { askCurrentStage } from "../families/armies/stages.ts";
 import { phaseEnds } from "../families/angmar/phase.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -220,7 +221,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "beginRound":
       return enterBegin(state, ctx);
     case "resourceGrant":
-      return grant(state, steps, ctx);
+      return askCurrentStage(state, steps) ?? grant(state, steps, ctx);
     case "resourceActions":
       return openPass(state);
     // The Sailing test comes before the characters are committed to the quest (dcce.sailing).
