@@ -5,7 +5,7 @@ import { copyLine, withCopies } from "./reprint.ts";
 
 // Records for Shelob's Lair (the-two-towers part 6, campaign card 144073, whose records are in the-two-towers.ts): Shelob and her resource tokens, the Great Spider set lying beside the encounter deck (the wilderland pile `greatSpider`), the locations'
 // Travel costs, the quest stages and the encounter cards no template reads. Every line is read from the scan ledger (data/printed/the-two-towers.json); a line a template already writes (pnpm data build) or another card prints word for word
-// needs no record here. See docs/scenarios/the-two-towers.md, The Two Towers, for each reading.
+// needs no record here. See docs/scenarios/the-two-towers/shelobs-lair.md, Shelob's Lair, for each reading.
 // Rules: mec112.setup-shelobs-lair, mec112.gollum-smeagol, mec112.saga-staging-rules, mec112.multiplayer-the-one-ring, rr.forced, rr.travel, rr.cannot, rr.first-player, rr.effects, rr.then, rr.search, rr.reveal, rr.cancel, rr.damage, rr.victory,
 // rr.explored, rr.active-location, rr.attachment-cards, rr.play-and-put-into-play, rr.in-player-order, faq.enemy-attacks-outside-combat, faq.additional-attacks (data/rules/entries.json).
 const SHELOB = "144040";

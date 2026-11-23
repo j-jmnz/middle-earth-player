@@ -43,7 +43,7 @@ export function loseWhenLeftPlay(before: ScenarioState, after: ScenarioState, ca
 export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, ctx?: ReduceContext): ScenarioState {
   if (state.lost) return state;
   let next = state;
-  // Gollum is engaged with the first player and Sméagol is controlled by them (144075:A:1, 144076:A:1): when that seat leaves they pass to the new first player, keeping their exhaustion and damage (agent recommendation, docs/scenarios/the-two-towers.md, The Two Towers).
+  // Gollum is engaged with the first player and Sméagol is controlled by them (144075:A:1, 144076:A:1): when that seat leaves they pass to the new first player, keeping their exhaustion and damage (agent recommendation, docs/scenarios/the-two-towers/the-passage-of-the-marshes.md, The Passage of the Marshes).
   const heir = livingSuccessor(next);
   for (let index = 0; index < next.seatCount; index += 1) {
     const seat = next.seats[index];
