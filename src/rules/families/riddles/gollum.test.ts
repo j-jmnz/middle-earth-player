@@ -2,6 +2,8 @@
 import { describe, expect, it } from "vitest";
 
 import { legalIntents } from "../../engine/reduce.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { placeDamage } from "../../core/keywords.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { updateCard } from "../../core/state.ts";
 import { idOf, legalTargets, revealFromTop, send, type Run } from "../../../../test/harness/scene-kit.ts";
@@ -61,5 +63,16 @@ describe("Gollum attacks Bilbo (131074:A:1)", () => {
     let run = { state: revealFromTop(made.state, made.ctx, "131076", steps).state, steps };
     for (const pick of ["answer", "ally"]) run = send(run, { type: "Choose", optionId: pick }, made.ctx);
     expect(run.state.pendingAttack).toBeNull();
+  });
+});
+
+describe("Bilbo takes damage only from Gollum while he is in the riddle area (hob.riddle-area)", () => {
+  it("takes no damage from another card's effect, and takes the damage of Gollum's attack", () => {
+    const made = riddleTable();
+    const hurt = placeDamage(made.state, made.bilbo, 2, made.ctx.cards, [], "framework", ruleCause("rr.damage"), idOf(made.state, "f0"));
+    expect(hurt.cards[made.bilbo]?.damage).toBe(0);
+    const byGollum = placeDamage(made.state, made.bilbo, 2, made.ctx.cards, [], "framework", ruleCause("rr.damage"), idOf(made.state, "131074"));
+    expect(byGollum.cards[made.bilbo]?.damage).toBe(2);
+    expect(placeDamage(made.state, made.hero, 2, made.ctx.cards, [], "framework", ruleCause("rr.damage"), idOf(made.state, "f0")).cards[made.hero]?.damage).toBe(2);
   });
 });
