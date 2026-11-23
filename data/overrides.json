@@ -4525,6 +4525,15 @@
   ],
   "scenarioCounts": [
     {
+      "scenario": "flies-and-spiders",
+      "code": "132019",
+      "pile": "setAside",
+      "normal": 4,
+      "easy": 4,
+      "reason": "The Setup (132067:A:1) lets each player shuffle 1 copy of Bilbo's Magic Ring into his deck, and the cycle plays one to four players (hob.staging-area-creating). A copy goes to each deck, since Bilbo and his token pass from player to player, so the table of four needs four. The load list sets aside 3 and the box holds 1; no source gives a count (agent recommendation, docs/scenarios/the-hobbit.md, Flies and Spiders).",
+      "source": "scan 132067.A (Setup line); docs/scenarios/the-hobbit.md, Flies and Spiders, Readings to confirm; agent recommendation"
+    },
+    {
       "scenario": "the-treachery-of-rhudaur",
       "code": "09057",
       "pile": "staging",
