@@ -34,7 +34,7 @@ import type { IconName } from "../../ui/icon-map.ts";
 import { stagePoints } from "../readouts/objective.ts";
 import { stageDefeatLoses } from "../readouts/fortress.ts";
 import { determinedMark, type DeterminedMark } from "./determined-mark.ts";
-import { poisonMark } from "../readouts/poison.ts";
+import { poisonMark } from "./poison-mark.ts";
 import { deadSpeech } from "./realm-preview.ts";
 import { sideQuestMark, stagedSideQuest, type SideQuestMark } from "./side-quest-mark.ts";
 

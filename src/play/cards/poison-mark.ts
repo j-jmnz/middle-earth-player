@@ -1,6 +1,6 @@
 // Rules: hob.venom-poison, hob.unconscious-characters (data/rules/entries.json). The poison of a character on the table (Flies and Spiders): the facedown cards under it, as a night pill "2/5 poison" (its poison against its printed hit points; threat red when one more poison
 // makes it unconscious), and the word "Unconscious" on a character turned 180 degrees. The reader hears the same words.
-import type { UnderMark } from "../cards/card-effects.ts";
+import type { UnderMark } from "./card-effects.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { poisonOf } from "../../rules/families/poison/poison.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";

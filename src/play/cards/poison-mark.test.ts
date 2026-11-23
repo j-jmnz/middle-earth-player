@@ -5,7 +5,7 @@ import { slotOf } from "../layout/slots.ts";
 import { slotRotation } from "../motion/motion.ts";
 import { givePoison, makeUnconscious } from "../../rules/families/poison/poison.ts";
 import { spiderTable } from "../../../test/scenarios/flies-and-spiders/scene.ts";
-import { poisonMark } from "./poison.ts";
+import { poisonMark } from "./poison-mark.ts";
 
 const rect = { x: 0, y: 0, w: 60, h: 84 };
 
