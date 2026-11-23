@@ -10,12 +10,11 @@ import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
 import { attachTo, spawn } from "../../rules/core/zones.ts";
 import { playCost } from "../../rules/player/attach.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, combat, passAll, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { attach, choices, combat, passAll, play, playableCards, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const GIMLI = "01004";
@@ -57,10 +56,6 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-function playable(state: ScenarioState, tab: Table): string[] {
-  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
-}
-
 describe("Traffic from Dale (18012:A:1)", () => {
   // "Planning Action: Choose a Dale hero you control. Add 1 resource to its pool for each character you control with a player
   // attachment. You can only play 1 copy of Traffic from Dale each round.": Bard (Hauberk), Aragorn (Citadel Plate) and a Warrior of
@@ -79,12 +74,12 @@ describe("Traffic from Dale (18012:A:1)", () => {
     const tab = attach(scene, [[bow ?? "", mine ?? ""], [other ?? "", theirs ?? ""]]);
     const [first, second] = tab.ids[TRAFFIC] ?? [];
     const bard = idsOf(tab, BARD);
-    expect(playable(combat(tab.state, tab).state, tab)).not.toContain(first);
+    expect(playableCards(combat(tab.state, tab).state, tab)).not.toContain(first);
     let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: first ?? "", payments: [{ heroId: idsOf(tab, BRAND), amount: 1 }] }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, BRAND), bard].sort());
     run = sendUnledgered(run, { type: "Choose", optionId: bard }, tab.ctx);
     expect(run.state.cards[bard]?.resources).toBe(1 + 3);
-    expect(playable(run.state, tab)).not.toContain(second);
+    expect(playableCards(run.state, tab)).not.toContain(second);
   });
 });
 
@@ -203,6 +198,6 @@ describe("Bartering (18015:A:1)", () => {
     const web = Object.values(tab.state.cards).find((card) => card.code === WEB);
     expect(run.state.cards[web?.id ?? ""]?.host).toBe(idsOf(tab, ARAGORN));
     const bare = build(false);
-    expect(playable(bare.state, bare)).not.toContain(idsOf(bare, BARTERING));
+    expect(playableCards(bare.state, bare)).not.toContain(idsOf(bare, BARTERING));
   });
 });

@@ -13,12 +13,11 @@ import { deckSaveRefusal } from "../../catalog/deck-save.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { choices, deckSaveFacts, endRound, fillers, packRow, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf } from "../../../test/harness/scene.ts";
+import { canPlay, choices, deckSaveFacts, endRound, fillers, packRow, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const GILDOR = "22081";
 const EXILE = "22082";
@@ -49,7 +48,6 @@ const WALL = "wall";
 let base: Awaited<ReturnType<typeof starterBase>>;
 
 const table = playerTableFor(() => base);
-const playable = (state: Table["state"], tab: Table, id: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -127,12 +125,12 @@ describe("Northern Bowmaster (22086:A:2)", () => {
   // be played; with the Wall in the staging area, or engaged with the other player, he cannot. Legolas (Tactics) pays.
   lineSpec("22086:A:2", "Northern Bowmaster: played from the hand only while you are engaged with an enemy", (effects) => {
     const engaged = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }], hand: [{ code: BOWMASTER, seat: 0 }], engaged: [{ code: WALL, seat: 0 }] });
-    expect(playable(engaged.state, engaged, idsOf(engaged, BOWMASTER))).toBe(true);
+    expect(canPlay(engaged.state, engaged, idsOf(engaged, BOWMASTER))).toBe(true);
     expect(play(begin(engaged.state), engaged, idsOf(engaged, BOWMASTER)).state.cards[idsOf(engaged, BOWMASTER)]?.zone).toBe("play");
     const staged = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }], hand: [{ code: BOWMASTER, seat: 0 }], staging: [WALL] });
-    expect(playable(staged.state, staged, idsOf(staged, BOWMASTER))).toBe(false);
+    expect(canPlay(staged.state, staged, idsOf(staged, BOWMASTER))).toBe(false);
     const theirs = table(effects, { seats: 2, heroes: [{ code: LEGOLAS, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: BOWMASTER, seat: 0 }], engaged: [{ code: WALL, seat: 1 }] });
-    expect(playable(theirs.state, theirs, idsOf(theirs, BOWMASTER))).toBe(false);
+    expect(canPlay(theirs.state, theirs, idsOf(theirs, BOWMASTER))).toBe(false);
   });
 });
 
@@ -154,7 +152,7 @@ describe("Reckless Attack (22087:A:2)", () => {
   // With no enemy engaged with any player (the Wall in the staging area) no damage can be dealt, so it is not played (rr.triggered-ability).
   it("22087:A:2 Reckless Attack: not played with no enemy engaged", () => {
     const tab = table(EFFECTS, { heroes: [{ code: LEGOLAS, seat: 0 }], hand: [{ code: RECKLESS, seat: 0 }], staging: [WALL] });
-    expect(playable(tab.state, tab, idsOf(tab, RECKLESS))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, RECKLESS))).toBe(false);
   });
 });
 
@@ -214,7 +212,7 @@ describe("Defiant Challenge (22089:A:2)", () => {
   // With no exhausted character in play no player can ready one, so it is not played (rr.triggered-ability).
   it("22089:A:2 Defiant Challenge: not played with no exhausted character", () => {
     const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: DEFIANT, seat: 0 }] });
-    expect(playable(tab.state, tab, idsOf(tab, DEFIANT))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, DEFIANT))).toBe(false);
   });
 });
 

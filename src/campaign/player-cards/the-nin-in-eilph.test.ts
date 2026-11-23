@@ -10,14 +10,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import type { ScenarioState } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { stagingThreat } from "../../rules/quest/quest.ts";
 import { DEAR, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, IntentRefused, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, endRound, enter, hosts, passAll, play, playCode, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, canPlay, choices, combat, endRound, enter, hosts, passAll, play, playCode, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const MABLUNG = "08084";
 const BELTS = "08086";
@@ -68,7 +66,6 @@ beforeAll(async () => {
 });
 
 // Whether the engine offers to play the card `cardId` from hand.
-const playable = (state: ScenarioState, tab: Table, cardId: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === cardId);
 
 describe("Mablung (08084:A:1)", () => {
   // "Response: After you engage an enemy, add 1 resource to Mablung's resource pool. (Limit once per phase.)": the player engages the Dear
@@ -134,10 +131,10 @@ describe("Tighten Our Belts (08086:A:1)", () => {
   it("08086:A:1 Tighten Our Belts: a second copy cannot be played the same round", () => {
     const { tab, run: start } = refreshed(EFFECTS, 2);
     const [first = "", second = ""] = tab.ids[BELTS] ?? [];
-    expect(playable(start.state, tab, second)).toBe(true);
+    expect(canPlay(start.state, tab, second)).toBe(true);
     const run = chooseFirst(play(start, tab, first), tab);
     expect(run.state.cards[first]?.zone).toBe("discard");
-    expect(playable(run.state, tab, second)).toBe(false);
+    expect(canPlay(run.state, tab, second)).toBe(false);
   });
 
   // Every hero of every player spent resources this round: no hero can gain a resource, so the event can change nothing and is not offered
@@ -147,13 +144,13 @@ describe("Tighten Our Belts (08086:A:1)", () => {
     const run = enter(playCode(tab, GUARD).state, tab, "refresh");
     // The only card that could be played there can change nothing, so the refresh action window does not open as one for it.
     expect([run.state.window?.kind, run.state.activeSeat]).toEqual(["pass", 0]);
-    expect(playable(run.state, tab, idsOf(tab, BELTS))).toBe(false);
+    expect(canPlay(run.state, tab, idsOf(tab, BELTS))).toBe(false);
   });
 
   // "Refresh Action": in the planning phase it is not offered.
   it("08086:A:1 Tighten Our Belts: not offered in the planning phase", () => {
     const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: BELTS, seat: 0 }] });
-    expect(playable(tab.state, tab, idsOf(tab, BELTS))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, BELTS))).toBe(false);
   });
 });
 
@@ -241,7 +238,7 @@ describe("Island Amid Perils (08090:A:1)", () => {
   // No Silvan ally you control (the other player's Archer is not yours): not offered.
   it("08090:A:1 Island Amid Perils: not offered without a Silvan ally you control", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: EOWYN, seat: 0 }, { code: LEGOLAS, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: GUARD, seat: 0 }, { code: ARCHER, seat: 1 }], hand: [{ code: ISLAND, seat: 0 }] });
-    expect(playable(tab.state, tab, idsOf(tab, ISLAND))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, ISLAND))).toBe(false);
   });
 });
 

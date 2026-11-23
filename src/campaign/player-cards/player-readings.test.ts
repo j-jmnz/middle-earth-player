@@ -11,10 +11,9 @@ import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard, withThreat } from "../../rules/core/state.ts";
 import type { EngineStep } from "../../rules/core/intents.ts";
 import { settle } from "../../rules/engine/machine.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
-import { attacking, attach, choices, combat, enter, fillers, passAll, play, playCode, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attach, attacking, choices, combat, enter, fillers, passAll, play, playableCards, playCode, playerTable, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
 
 const RING = "19093";
@@ -56,7 +55,6 @@ let base: Awaited<ReturnType<typeof starterBase>>;
 
 const table = (scene: Scene = {}, resources = 6): Table => playerTable(base, EFFECTS, scene, resources);
 const exhaust = (tab: Table, ...codes: string[]): Table => ({ ...tab, state: codes.reduce((state, code) => updateCard(state, idsOf(tab, code), { exhausted: true }), tab.state) });
-const playable = (tab: Table, state = tab.state): string[] => legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -158,17 +156,17 @@ describe("Treebeard 08146: his resources and the resource match", () => {
 
   it("a 0-cost Lore Ent is not offered with no Lore hero, though Treebeard holds resources", () => {
     const tab = ents(4);
-    expect(playable(tab)).not.toContain(idsOf(tab, ENTMOOT));
+    expect(playableCards(tab.state, tab)).not.toContain(idsOf(tab, ENTMOOT));
   });
 
   it("the same Entmoot is offered once a Lore hero is there", () => {
     const tab = table({ heroes: [{ code: ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }], allies: [{ code: TREEBEARD, seat: 0 }], hand: [{ code: ENTMOOT, seat: 0 }], playerDeck: fillers(CARD, 5) }, 0);
-    expect(playable(tab)).toContain(idsOf(tab, ENTMOOT));
+    expect(playableCards(tab.state, tab)).toContain(idsOf(tab, ENTMOOT));
   });
 
   it("a Tactics Ent that costs resources is offered with no Tactics hero, to be paid from his pool", () => {
     const tab = ents(4);
-    expect(playable(tab)).toContain(idsOf(tab, BOOMING));
+    expect(playableCards(tab.state, tab)).toContain(idsOf(tab, BOOMING));
   });
 });
 
@@ -177,9 +175,9 @@ describe("Treebeard 08146: his resources and the resource match", () => {
 describe("Elrond 04128:A:1 and a 0-cost ally of another sphere", () => {
   it("offers Galion with Elrond and a Leadership hero, and not with the Leadership hero alone", () => {
     const withElrond = table({ heroes: [{ code: ELROND_HERO, seat: 0 }, { code: ARAGORN, seat: 0 }], hand: [{ code: GALION, seat: 0 }] }, 3);
-    expect(playable(withElrond)).toContain(idsOf(withElrond, GALION));
+    expect(playableCards(withElrond.state, withElrond)).toContain(idsOf(withElrond, GALION));
     const alone = table({ heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: GALION, seat: 0 }] }, 3);
-    expect(playable(alone)).not.toContain(idsOf(alone, GALION));
+    expect(playableCards(alone.state, alone)).not.toContain(idsOf(alone, GALION));
   });
 });
 
@@ -298,7 +296,7 @@ describe("Descendants of Kings 10030:A:1 prints no timing word", () => {
   // It is played as an action in any action window: the planning phase, the quest phase and the combat phase (recommended reading, docs/brief.md,
   // Player card readings; data/printed holds no ledger for this pack).
   const hand = (start: "planning" | "quest"): Table => table({ start, heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: DESCENDANTS, seat: 0 }], engaged: [{ code: SOFT, seat: 0 }] });
-  const offered = (tab: Table, state = tab.state): boolean => playable(tab, state).includes(idsOf(tab, DESCENDANTS));
+  const offered = (tab: Table, state = tab.state): boolean => playableCards(state, tab).includes(idsOf(tab, DESCENDANTS));
 
   it("is offered in the planning and quest windows, once a Dúnedain character is exhausted", () => {
     for (const start of ["planning", "quest"] as const) {

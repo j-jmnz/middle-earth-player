@@ -9,12 +9,11 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { withThreat } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { choices, fillers, playCode, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { canPlay, choices, fillers, playCode, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const GIMLI = "16001";
 const LEGOLAS = "16002";
@@ -43,7 +42,6 @@ beforeAll(async () => {
 });
 
 // Whether the engine offers to play the card `cardId` from the hand.
-const playable = (tab: Table, cardId: string): boolean => legalIntents(tab.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === cardId);
 
 describe("Unlikely Friendship (16007:A:1, A:2)", () => {
   // Gimli (Leadership, a unique Dwarf) pays; `others` are the other heroes and `allies` the allies of the first seat; the second seat
@@ -61,15 +59,15 @@ describe("Unlikely Friendship (16007:A:1, A:2)", () => {
   // non-unique Silvan ally it cannot be played; with Legolas (a unique Silvan hero) it can.
   lineSpec("16007:A:1", "Unlikely Friendship: played only with a unique Silvan and another unique Dwarf character", (effects) => {
     const ally = friendship(effects, [], [SILVERLODE]);
-    expect(playable(ally, idsOf(ally, FRIENDSHIP))).toBe(false);
+    expect(canPlay(ally.state, ally, idsOf(ally, FRIENDSHIP))).toBe(false);
     const hero = friendship(effects, [CORE_LEGOLAS]);
-    expect(playable(hero, idsOf(hero, FRIENDSHIP))).toBe(true);
+    expect(canPlay(hero.state, hero, idsOf(hero, FRIENDSHIP))).toBe(true);
   });
 
   // "you control": the other player's Legolas does not count.
   it("16007:A:1 Unlikely Friendship: another player's unique Silvan character does not count", () => {
     const tab = friendship(EFFECTS, [], [], true);
-    expect(playable(tab, idsOf(tab, FRIENDSHIP))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, FRIENDSHIP))).toBe(false);
   });
 
   // "Action: Draw 1 card and add 1 resource to the resource pool of a hero you control.": one card is drawn; Gimli and Legolas are offered

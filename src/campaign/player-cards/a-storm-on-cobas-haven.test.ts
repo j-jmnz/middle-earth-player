@@ -12,12 +12,11 @@ import { deckSaveRefusal } from "../../catalog/deck-save.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, deckSaveFacts, discarded, endRound, enter, fillers, hosts, packRow, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, canPlay, choices, combat, deckSaveFacts, discarded, endRound, enter, fillers, hosts, packRow, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const NAASIYAH = "12109";
 const RUNE_MASTER = "12110";
@@ -60,8 +59,6 @@ beforeAll(async () => {
   cards.set(WALL, definePrinted({ code: WALL, name: "Wall", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 5, health: 9 }));
   base = { ...starter, cards };
 });
-
-const playable = (state: Table["state"], tab: Table, id: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
 
 describe("Na'asiyah (12109:A:1, A:2)", () => {
   // "Resources in Na'asiyah's resource pool cannot be used to pay for allies.": her resources cannot pay for the Gondorian Spearman (a
@@ -271,7 +268,7 @@ describe("The Houses of Healing (12118:A:1, A:2)", () => {
   // "Refresh Action": in the planning phase it cannot be played.
   it("12118:A:2 The Houses of Healing: not offered outside the refresh phase", () => {
     const { tab } = scene(EFFECTS);
-    expect(playable(tab.state, tab, idsOf(tab, HOUSES))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, HOUSES))).toBe(false);
   });
 });
 
@@ -305,6 +302,6 @@ describe("Justice Shall Be Done (12119:A:1, A:2)", () => {
   // "Planning Action": not in the quest phase.
   it("12119:A:2 Justice Shall Be Done: not offered outside the planning phase", () => {
     const tab = table(EFFECTS, { start: "quest", heroes: [{ code: PAL, seat: 0 }], hand: [{ code: JUSTICE, seat: 0 }], playerDeck: fillers("card", 4) });
-    expect(playable(tab.state, tab, idsOf(tab, JUSTICE))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, JUSTICE))).toBe(false);
   });
 });

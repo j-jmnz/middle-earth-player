@@ -12,14 +12,13 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard, withMode, withThreat } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { hasTrait } from "../../rules/interpret/conditions.ts";
 import { playCost } from "../../rules/player/attach.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, discarded, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf } from "../../../test/harness/scene.ts";
+import { attach, canPlay, choices, discarded, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const FARAMIR = "06081";
 const SWORD = "06082";
@@ -60,7 +59,6 @@ const TARGET = "target";
 let base: Awaited<ReturnType<typeof starterBase>>;
 
 const table = playerTableFor(() => base);
-const playable = (tab: Table, cardId: string, state = tab.state) => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === cardId);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -334,11 +332,11 @@ describe("Forest Patrol (06089:A:1, A:2)", () => {
   // is not played; with the player's own Ranger ally it is.
   lineSpec("06089:A:1", "Forest Patrol: played only while you control a Ranger character", (effects) => {
     const none = patrol(effects, null);
-    expect(playable(none.tab, none.card)).toBe(false);
+    expect(canPlay(none.tab.state, none.tab, none.card)).toBe(false);
     const theirs = patrol(effects, 1, 2);
-    expect(playable(theirs.tab, theirs.card)).toBe(false);
+    expect(canPlay(theirs.tab.state, theirs.tab, theirs.card)).toBe(false);
     const mine = patrol(effects, 0);
-    expect(playable(mine.tab, mine.card)).toBe(true);
+    expect(canPlay(mine.tab.state, mine.tab, mine.card)).toBe(true);
   });
 
   // "Action: Deal 3 damage to an enemy with at least 1 Trap card attached to it.": both Walls with a Snare are offered, the enemy with no
@@ -355,7 +353,7 @@ describe("Forest Patrol (06089:A:1, A:2)", () => {
   // No enemy with a Trap card: the event is not played.
   it("06089:A:2 Forest Patrol: not played with no enemy with a Trap card attached", () => {
     const { tab, card } = patrol(EFFECTS, 0, 1, false);
-    expect(playable(tab, card)).toBe(false);
+    expect(canPlay(tab.state, tab, card)).toBe(false);
   });
 });
 

@@ -10,13 +10,12 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard, updateCards } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { setAsideEncounterCards } from "../../rules/families/sidequests/encounter.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, fillers, passAll, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { canPlay, choices, combat, fillers, passAll, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
 
 const QUICKBEAM = "17135";
 const HALFAST = "17136";
@@ -44,7 +43,6 @@ const WALL = "wall";
 let base: Awaited<ReturnType<typeof starterBase>>;
 
 const table = playerTableFor(() => base);
-const playable = (tab: Table, cardId: string, state = tab.state) => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === cardId);
 
 beforeAll(async () => {
   const starter = await starterBase();
@@ -87,7 +85,7 @@ describe("Bulwark of the West (17137:A:1)", () => {
     const scene = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: BULWARK, seat: 0 }], attached: [{ code: ENC_COND, host: ARAGORN }] });
     const condition = idsOf(scene, ENC_COND);
     const tab = { ...scene, state: updateCard(scene.state, condition, { controller: null }) };
-    expect(playable(tab, idsOf(tab, BULWARK))).toBe(true);
+    expect(canPlay(tab.state, tab, idsOf(tab, BULWARK))).toBe(true);
     const run = play(begin(tab.state), tab, idsOf(tab, BULWARK));
     expect(run.state.cards[idsOf(tab, ALLY)]?.zone).toBe("discard");
     expect(run.state.cards[condition]?.zone).toBe("encounterDiscard");
@@ -96,9 +94,9 @@ describe("Bulwark of the West (17137:A:1)", () => {
   // No ally you control (the other player's does not count), or no Condition attachment: the event is not played.
   it("17137:A:1 Bulwark of the West: not played without an ally you control or without a Condition attachment", () => {
     const noAlly = table(EFFECTS, { seats: 2, heroes: [{ code: ARAGORN, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: ALLY, seat: 1 }], hand: [{ code: BULWARK, seat: 0 }], attached: [{ code: COND, host: ARAGORN }] });
-    expect(playable(noAlly, idsOf(noAlly, BULWARK))).toBe(false);
+    expect(canPlay(noAlly.state, noAlly, idsOf(noAlly, BULWARK))).toBe(false);
     const { tab, card } = bulwark(EFFECTS, false);
-    expect(playable(tab, card)).toBe(false);
+    expect(canPlay(tab.state, tab, card)).toBe(false);
   });
 });
 
@@ -110,9 +108,9 @@ describe("Flight to the Sea (17140:A:1)", () => {
   // "Play only if you control a Noldor or Silvan hero.": with Legolas it is played; with Aragorn it is not.
   lineSpec("17140:A:1", "Flight to the Sea: played only with a Noldor or Silvan hero", (effects) => {
     const without = flight(effects, ARAGORN);
-    expect(playable(without, idsOf(without, FLIGHT))).toBe(false);
+    expect(canPlay(without.state, without, idsOf(without, FLIGHT))).toBe(false);
     const tab = flight(effects, LEGOLAS);
-    expect(playable(tab, idsOf(tab, FLIGHT))).toBe(true);
+    expect(canPlay(tab.state, tab, idsOf(tab, FLIGHT))).toBe(true);
   });
 
   // "Planning Action: Shuffle a set aside Wind from the Sea into the encounter deck. Then, remove Flight to the Sea from the game.": Wind
@@ -131,7 +129,7 @@ describe("Flight to the Sea (17140:A:1)", () => {
   // "Planning Action": not in the quest phase.
   it("17140:A:2 Flight to the Sea: not played outside the planning phase", () => {
     const tab = flight(EFFECTS, LEGOLAS, "quest");
-    expect(playable(tab, idsOf(tab, FLIGHT))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, FLIGHT))).toBe(false);
   });
 });
 
@@ -147,9 +145,9 @@ describe("The Dam Bursts (17142:A:1, A:2)", () => {
   // is played; with the Pal (not unique) it is not.
   lineSpec("17142:A:1", "The Dam Bursts: played only with a unique Ent and another unique Hobbit", (effects) => {
     const pal = dam(effects, PAL);
-    expect(playable(pal, idsOf(pal, DAM))).toBe(false);
+    expect(canPlay(pal.state, pal, idsOf(pal, DAM))).toBe(false);
     const tab = dam(effects, HALFAST);
-    expect(playable(tab, idsOf(tab, DAM))).toBe(true);
+    expect(canPlay(tab.state, tab, idsOf(tab, DAM))).toBe(true);
   });
 
   // "Action: Ready each damaged Ent character you control.": Quickbeam and an Ent ally, damaged and exhausted, are readied; an Ent ally

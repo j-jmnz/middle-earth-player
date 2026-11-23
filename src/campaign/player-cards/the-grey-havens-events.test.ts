@@ -10,12 +10,11 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, discarded, enter, play, playerTableFor, printed, questing, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { choices, combat, discarded, enter, play, playableCards, playerTableFor, printed, questing, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
 
 const VOLLEY = "11004";
 const EVENING_STAR = "11010";
@@ -45,7 +44,6 @@ beforeAll(async () => {
 });
 
 // The card ids a PlayCard intent is offered for.
-const playable = (tab: Table, state = tab.state) => legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
 
 describe("Skyward Volley (11004:A:1, A:2)", () => {
   // Legolas (ranged) and Gimli for the first player, the Horseback Archer (ranged) for the second; an enemy engaged with each player and one in
@@ -65,7 +63,7 @@ describe("Skyward Volley (11004:A:1, A:2)", () => {
     const { tab, volley, mine } = scene(EFFECTS, 0);
     const legolas = idsOf(tab, LEGOLAS);
     const run = combat(tab.state, tab);
-    expect(playable(tab, updateCard(run.state, legolas, { exhausted: true }))).not.toContain(volley);
+    expect(playableCards(updateCard(run.state, legolas, { exhausted: true }), tab)).not.toContain(volley);
     let played = play(run, tab, volley);
     expect(played.state.cards[legolas]?.exhausted).toBe(true);
     expect(played.state.cards[idsOf(tab, ARCHER)]?.exhausted).toBe(false);
@@ -108,7 +106,7 @@ describe("Skyward Volley (11004:A:1, A:2)", () => {
   // "Combat Action": in the planning phase it is not offered.
   it("11004:A:2 Skyward Volley: not played outside the combat phase", () => {
     const { tab, volley } = scene(EFFECTS, 0);
-    expect(playable(tab)).not.toContain(volley);
+    expect(playableCards(tab.state, tab)).not.toContain(volley);
   });
 });
 
@@ -189,6 +187,6 @@ describe("Elwing's Flight (11013:A:1)", () => {
   it("11013:A:1 Elwing's Flight: not played outside the quest phase", () => {
     const { tab, flight } = scene(EFFECTS, 0);
     const planning = { ...tab.state, phase: "Planning" as const, boundaryPhase: "Planning" as const, mode: "planning" as const, window: { kind: "pass" as const } };
-    expect(playable(tab, planning)).not.toContain(flight);
+    expect(playableCards(planning, tab)).not.toContain(flight);
   });
 });

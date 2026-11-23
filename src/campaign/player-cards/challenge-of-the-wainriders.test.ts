@@ -12,12 +12,11 @@ import { deckSaveRefusal } from "../../catalog/deck-save.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, deckSaveFacts, discarded, endRound, enter, fillers, packRow, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, choices, deckSaveFacts, discarded, endRound, enter, fillers, packRow, play, playableCards, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const SARUMAN = "22054";
 const NORI = "22059";
@@ -59,7 +58,6 @@ beforeAll(async () => {
 });
 
 // The ids of the PlayCard intents the engine offers.
-const playable = (tab: Table, state = tab.state): string[] => legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
 
 describe("Saruman (22054:A:2, A:3)", () => {
   // "While playing an event with the printed doomed keyword, Saruman gains the printed Leadership, Spirit, and Tactics icons.": Saruman (Lore)
@@ -240,7 +238,7 @@ describe("The Muster of Rohan (22062:A:1, A:2)", () => {
 
   it("22062:A:2 The Muster of Rohan: not played outside the planning phase", () => {
     const tab = table(EFFECTS, { start: "quest", heroes: [{ code: THEODRED, seat: 0 }], hand: [{ code: MUSTER, seat: 0 }], playerDeck: [{ code: SNOWBOURN, seat: 0 }] });
-    expect(playable(tab)).not.toContain(idsOf(tab, MUSTER));
+    expect(playableCards(tab.state, tab)).not.toContain(idsOf(tab, MUSTER));
   });
 });
 

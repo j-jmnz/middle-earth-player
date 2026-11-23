@@ -9,13 +9,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
+import { updateCard, withMode } from "../../rules/core/state.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, discarded, endRound, enter, fillers, passAll, play, playCode, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, canPlay, choices, combat, discarded, endRound, enter, fillers, passAll, play, playCode, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const HAMA = "04076";
 const ERESTOR = "04077";
@@ -58,8 +57,6 @@ beforeAll(async () => {
   cards.set(FIELD, definePrinted({ code: FIELD, name: "Field", type: "location", threat: 1, questPoints: 3 }));
   base = { ...starter, cards };
 });
-
-const playable = (state: ScenarioState, tab: Table, id: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
 
 describe("Háma (04076:A:1)", () => {
   // Háma and the Wall engaged with the player; Feint (Tactics event), Ever Vigilant (Leadership event) and Round Shield (Tactics
@@ -266,14 +263,14 @@ describe("Word of Command (04084:A:1)", () => {
   it("04084:A:1 Word of Command: not played without a ready Istari character", () => {
     const exhausted = word(EFFECTS, { allies: [{ code: GANDALF, seat: 0 }], playerDeck: fillers(CARD, 2) });
     const state = updateCard(exhausted.state, idsOf(exhausted, GANDALF), { exhausted: true });
-    expect(playable(state, exhausted, idsOf(exhausted, WORD))).toBe(false);
+    expect(canPlay(state, exhausted, idsOf(exhausted, WORD))).toBe(false);
     const none = word(EFFECTS, { heroes: [{ code: DENETHOR, seat: 0 }, { code: ARAGORN, seat: 0 }], playerDeck: fillers(CARD, 2) });
-    expect(playable(none.state, none, idsOf(none, WORD))).toBe(false);
+    expect(canPlay(none.state, none, idsOf(none, WORD))).toBe(false);
   });
 
   // With the deck empty nothing can be searched for: it is not played, and Gandalf is not exhausted for nothing.
   it("04084:A:1 Word of Command: not played with an empty deck", () => {
     const tab = word(EFFECTS, { allies: [{ code: GANDALF, seat: 0 }] });
-    expect(playable(tab.state, tab, idsOf(tab, WORD))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, WORD))).toBe(false);
   });
 });

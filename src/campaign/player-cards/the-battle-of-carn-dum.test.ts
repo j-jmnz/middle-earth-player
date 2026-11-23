@@ -11,12 +11,11 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard, withThreat } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { choices, discarded, endRound, enter, fillers, hosts, play, playCode, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { choices, discarded, endRound, enter, fillers, hosts, play, playableCards, playCode, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const AMARTHIUL = "10115";
 const GUARDIAN = "10116";
@@ -57,7 +56,6 @@ beforeAll(async () => {
 // `count` Weak enemies engaged with `seat`.
 const engagedWith = (count: number, seat = 0) => Array.from({ length: count }, () => ({ code: WEAK, seat }));
 // The card ids a PlayCard intent is offered for.
-const playable = (tab: Table, state = tab.state) => legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
 
 describe("Amarthiúl (10115:A:1, A:2)", () => {
   // "While you are engaged with at least 1 enemy, Amarthiúl gains the Tactics resource icon.": with no enemy engaged he cannot pay for the
@@ -155,7 +153,7 @@ describe("Hold Your Ground! (10119:A:1, A:2)", () => {
   it("10119:A:1 Hold Your Ground!: not offered when no sentinel character is exhausted", () => {
     const tab = table(EFFECTS, { heroes: [{ code: LEGOLAS, seat: 0 }], allies: [{ code: SPEARMAN, seat: 0 }, { code: AXEHAND, seat: 0 }], hand: [{ code: HOLD, seat: 0 }] });
     const state = updateCard(tab.state, idsOf(tab, AXEHAND), { exhausted: true });
-    expect(playable(tab, state)).not.toContain(idsOf(tab, HOLD));
+    expect(playableCards(state, tab)).not.toContain(idsOf(tab, HOLD));
   });
 
   // "Valour Action: Ready all sentinel characters." (bts.valour: at threat 40 the player picks one of the two effects): every sentinel character
@@ -215,9 +213,9 @@ describe("Lords of the Eldar (10121:A:1, A:2)", () => {
   // "Lords of the Eldar can only be played from your discard pile.": in the hand it is not offered, in the discard pile it is.
   lineSpec("10121:A:1", "Lords of the Eldar: played from the discard pile, not from the hand", (effects) => {
     const inHand = scene(effects, "hand");
-    expect(playable(inHand.tab)).not.toContain(inHand.lords);
+    expect(playableCards(inHand.tab.state, inHand.tab)).not.toContain(inHand.lords);
     const inDiscard = scene(effects, "discard");
-    expect(playable(inDiscard.tab)).toContain(inDiscard.lords);
+    expect(playableCards(inDiscard.tab.state, inDiscard.tab)).toContain(inDiscard.lords);
   });
 
   // "Action: Place Lords of the Eldar on the bottom of your deck from your discard pile. Then, until the end of the round all Noldor characters

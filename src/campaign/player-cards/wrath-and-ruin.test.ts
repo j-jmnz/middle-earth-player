@@ -9,15 +9,14 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { withThreat, type ScenarioState } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
+import { withThreat } from "../../rules/core/state.ts";
 import { setAsideEncounterCards } from "../../rules/families/sidequests/encounter.ts";
 import { playCost } from "../../rules/player/attach.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, fillers, playCode, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, canPlay, choices, fillers, playCode, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const THORIN = "22001";
 const PILLARS = "22003";
@@ -45,7 +44,6 @@ beforeAll(async () => {
 });
 
 // Whether the engine offers to play the card `cardId` from hand.
-const playable = (state: ScenarioState, tab: Table, cardId: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === cardId);
 
 describe("Thorin Stonehelm (22001:A:1)", () => {
   // Two seats: two Walls are engaged with the player, the Dear with the other player. Thorin's deck holds `deck` cards.
@@ -131,7 +129,7 @@ describe("Pillars of the Kings (22003:A:1, A:2)", () => {
   // At threat 40 the effect can change nothing (the threat is already 40 and nothing is drawn), so it is not offered (rr.triggered-ability).
   it("22003:A:2 Pillars of the Kings: not offered at threat 40", () => {
     const tab = pillars(EFFECTS, 40);
-    expect(playable(tab.state, tab, idsOf(tab, PILLARS))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, PILLARS))).toBe(false);
   });
 });
 
@@ -145,12 +143,12 @@ describe("Tom Bombadillo! (22005:A:1)", () => {
   // victory display it is not.
   lineSpec("22005:A:1", "Tom Bombadillo!: played only with a Hobbit hero you control and no copy in the victory display", (effects) => {
     const hobbit = scene(effects, [{ code: PAL, seat: 0 }, { code: BERAVOR, seat: 0 }, { code: DENETHOR, seat: 1 }]);
-    expect(playable(hobbit.state, hobbit, idsOf(hobbit, BOMBADILLO))).toBe(true);
+    expect(canPlay(hobbit.state, hobbit, idsOf(hobbit, BOMBADILLO))).toBe(true);
     const none = scene(effects, [{ code: BERAVOR, seat: 0 }, { code: DENETHOR, seat: 0 }, { code: PAL, seat: 1 }]);
-    expect(playable(none.state, none, idsOf(none, BOMBADILLO))).toBe(false);
+    expect(canPlay(none.state, none, idsOf(none, BOMBADILLO))).toBe(false);
     const shown = scene(effects, [{ code: PAL, seat: 0 }, { code: BERAVOR, seat: 0 }, { code: DENETHOR, seat: 1 }], [BOMBADILLO]);
     const inHand = shown.ids[BOMBADILLO]?.find((id) => shown.state.cards[id]?.zone === "hand") ?? "";
-    expect(playable(shown.state, shown, inHand)).toBe(false);
+    expect(canPlay(shown.state, shown, inHand)).toBe(false);
   });
 });
 
@@ -165,12 +163,12 @@ describe("Charge into Battle (22007:A:1)", () => {
   lineSpec("22007:A:1", "Charge into Battle: played only after the staging step", (effects) => {
     const tab = scene(effects);
     const charge = idsOf(tab, CHARGE);
-    expect(playable(tab.state, tab, charge)).toBe(false);
+    expect(canPlay(tab.state, tab, charge)).toBe(false);
     let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, PAL)] }, tab.ctx);
-    expect(playable(run.state, tab, charge)).toBe(false);
+    expect(canPlay(run.state, tab, charge)).toBe(false);
     run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, "f0")]?.zone).toBe("staging");
-    expect(playable(run.state, tab, charge)).toBe(true);
+    expect(canPlay(run.state, tab, charge)).toBe(true);
   });
 });
 

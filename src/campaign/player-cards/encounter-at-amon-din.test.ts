@@ -10,14 +10,13 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
+import { updateCard } from "../../rules/core/state.ts";
 import { playCost } from "../../rules/player/attach.ts";
 import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attach, attacking, combat, endRound, enter, fillers, hosts, passAll, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { attach, attacking, canPlay, combat, endRound, enter, fillers, hosts, passAll, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const PIPPIN = "06056";
 const MORTHOND = "06058";
@@ -71,8 +70,6 @@ beforeAll(async () => {
   cards.set(FIELD, definePrinted({ code: FIELD, name: "Field", type: "location", threat: 1, questPoints: 3 }));
   base = { ...starter, cards };
 });
-
-const playable = (state: ScenarioState, tab: Table, id: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
 
 describe("Pippin (06056:A:1)", () => {
   // The encounter phase opens on the optional engagement with the Near (cost 5) in the staging area; the player engages it.
@@ -295,7 +292,7 @@ describe("Hobbit-sense (06065:A:1, A:2)", () => {
   // Aragorn it may not.
   lineSpec("06065:A:1", "Hobbit-sense: played only if each of your heroes is a Hobbit", (effects) => {
     const hobbits = sense(effects, [PIPPIN, PAL]);
-    expect(playable(combat(hobbits.state, hobbits).state, hobbits, idsOf(hobbits, SENSE))).toBe(true);
+    expect(canPlay(combat(hobbits.state, hobbits).state, hobbits, idsOf(hobbits, SENSE))).toBe(true);
     const mixed = sense(effects, [PIPPIN, ARAGORN]);
     expect(refusal(combat(mixed.state, mixed).state, { type: "PlayCard", cardId: idsOf(mixed, SENSE), payments: [{ heroId: idsOf(mixed, PIPPIN), amount: 2 }] }, mixed.ctx)).not.toBeNull();
   });
@@ -318,6 +315,6 @@ describe("Hobbit-sense (06065:A:1, A:2)", () => {
   // "Combat Action": in the planning phase it cannot be played.
   it("06065:A:2 Hobbit-sense: not played outside the combat phase", () => {
     const tab = sense(EFFECTS, [PIPPIN, PAL]);
-    expect(playable(tab.state, tab, idsOf(tab, SENSE))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, SENSE))).toBe(false);
   });
 });

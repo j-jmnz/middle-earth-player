@@ -11,12 +11,11 @@ import { deckSaveRefusal } from "../../catalog/deck-save.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { withThreat } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, deckSaveFacts, enter, packRow, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { canPlay, choices, combat, deckSaveFacts, enter, packRow, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const INGOLD = "10002";
 const RALLYING = "10003";
@@ -50,7 +49,6 @@ const STRIDER = "strider";
 let base: Awaited<ReturnType<typeof starterBase>>;
 
 const table = playerTableFor(() => base);
-const playable = (state: Table["state"], tab: Table, id: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
 const threatened = (tab: Table, threat: number, seat = 0): Table => ({ ...tab, state: withThreat(tab.state, seat, threat) });
 
 beforeAll(async () => {
@@ -140,7 +138,7 @@ describe("Rallying Cry (10003:A:1, A:2)", () => {
     const tab = threatened(table(effects, { heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: RALLYING, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }] }), 40);
     const [ally, cry] = [idsOf(tab, ALLY), idsOf(tab, RALLYING)];
     let run = combat(tab.state, tab);
-    expect(playable(run.state, tab, cry)).toBe(true);
+    expect(canPlay(run.state, tab, cry)).toBe(true);
     run = passAll(play(run, tab, cry), tab.ctx);
     expect(run.state.cards[idsOf(tab, ARAGORN)]?.resources).toBe(6 - 2);
     expect(run.state.window?.kind).toBe("defense");
@@ -169,7 +167,7 @@ describe("Rallying Cry (10003:A:1, A:2)", () => {
     // The combat action window does not open, as nothing can be played in it: the run is at the defense.
     const run = combat(tab.state, tab);
     expect(run.state.window?.kind).toBe("defense");
-    expect(playable(tab.state, tab, idsOf(tab, RALLYING))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, RALLYING))).toBe(false);
   });
 });
 

@@ -8,10 +8,10 @@ import { attachTo, spawn } from "../../src/rules/core/zones.ts";
 import { settle } from "../../src/rules/engine/machine.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext } from "../../src/rules/engine/reduce.ts";
 import { syncConstants } from "../../src/rules/interpret/constants.ts";
-import { fund, payFor, starterBase } from "../scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { fund, payFor, refusal, starterBase } from "../scenarios/a-shadow-of-the-past/starter-scene.ts";
 
 import { causeProblems } from "./cause-check.ts";
-import { accepted, begin, buildTable, type Run, type Scene, type Table } from "./scene.ts";
+import { accepted, begin, buildTable, idsOf, type Run, type Scene, type Table } from "./scene.ts";
 
 // Test helper. The table and the readers that the player-card tests (src/campaign/player-cards) share: a table on the records under test with every
 // seat's heroes funded and the constants brought up to date as the reducer does after an intent, the intents the engine offers, a stat as the
@@ -44,6 +44,22 @@ export function triggers(state: ScenarioState, tab: Table): string[] {
 /** The option ids of the Choose intents the engine offers. */
 export function choices(state: ScenarioState, tab: Table): string[] {
   return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "Choose" ? [intent.optionId] : []));
+}
+
+/** Whether the engine offers a PlayCard of the card `cardId` in `state` (the table's `ctx`). */
+export function canPlay(state: ScenarioState, tab: Table, cardId: string): boolean {
+  return legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === cardId);
+}
+
+/** The ids of the cards the engine offers a PlayCard for in `state`, in the order it offers them. */
+export function playableCards(state: ScenarioState, tab: Table): string[] {
+  return legalIntents(state, tab.ctx).flatMap((intent) => (intent.type === "PlayCard" ? [intent.cardId] : []));
+}
+
+/** The engine's refusal (a reason, or null when it would play) of a PlayCard of the first card of `code`, paid as `payFor` pays it. */
+export function playRefusal(state: ScenarioState, tab: Table, code: string): string | null {
+  const card = idsOf(tab, code);
+  return refusal(state, { type: "PlayCard", cardId: card, payments: payFor(state, tab.ctx, card) }, tab.ctx);
 }
 
 /** A stat as the game reads it, modifiers included. */

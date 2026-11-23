@@ -9,12 +9,11 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { withThreat } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, playCode, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
+import { canPlay, choices, combat, playCode, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
 
 const FIERCE = "17113";
 const HEIRS = "17115";
@@ -53,7 +52,6 @@ beforeAll(async () => {
 });
 
 const threatened = (tab: Table, threat: number): Table => ({ ...tab, state: withThreat(tab.state, 0, threat) });
-const playable = (run: Run, tab: Table, code: string): boolean => legalIntents(run.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === idsOf(tab, code));
 
 describe("Fierce Defense (17113:A:1, A:2)", () => {
   // Legolas (Tactics) pays 3. The Weak, the Grunt and the unique Boss are engaged with the first player (only the Boss when `bossOnly`), a
@@ -81,13 +79,13 @@ describe("Fierce Defense (17113:A:1, A:2)", () => {
   // "Combat Action": below threat 40 it is not played in the planning phase.
   it("17113:A:1 Fierce Defense: not played outside the combat phase below threat 40", () => {
     const tab = fierce(EFFECTS, 39);
-    expect(playable(begin(tab.state), tab, FIERCE)).toBe(false);
+    expect(canPlay(begin(tab.state).state, tab, idsOf(tab, FIERCE))).toBe(false);
   });
 
   // Only a unique enemy engaged with the player: there is no enemy to choose, so it is not played.
   it("17113:A:1 Fierce Defense: not played with only a unique enemy engaged", () => {
     const tab = fierce(EFFECTS, 8, true);
-    expect(playable(combat(tab.state, tab), tab, FIERCE)).toBe(false);
+    expect(canPlay(combat(tab.state, tab).state, tab, idsOf(tab, FIERCE))).toBe(false);
   });
 
   // "Valour Action: Discard a non-unique enemy engaged with you.": at threat 40 in the planning phase, the Grunt is discarded.
@@ -124,9 +122,9 @@ describe("Heirs of Earendil (17115:A:1)", () => {
   // Son of Arnor (a non-unique Dúnedain ally) it cannot be played; with Aragorn (a unique Dúnedain hero) it can.
   lineSpec("17115:A:1", "Heirs of Earendil: played only with a unique Noldor and another unique Dúnedain character", (effects) => {
     const ally = heirs(effects, "ally");
-    expect(playable(begin(ally.state), ally, HEIRS)).toBe(false);
+    expect(canPlay(begin(ally.state).state, ally, idsOf(ally, HEIRS))).toBe(false);
     const hero = heirs(effects, "hero");
-    expect(playable(begin(hero.state), hero, HEIRS)).toBe(true);
+    expect(canPlay(begin(hero.state).state, hero, idsOf(hero, HEIRS))).toBe(true);
   });
 });
 

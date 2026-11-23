@@ -10,13 +10,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard, withMode, type ScenarioState } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
+import { updateCard, withMode } from "../../rules/core/state.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, fillers, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { attacking, canPlay, choices, fillers, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const BRAND = "02072";
 const TOOK = "02073";
@@ -64,8 +63,6 @@ beforeAll(async () => {
   cards.set(FIELD, definePrinted({ code: FIELD, name: "Field", type: "location", threat: 1, questPoints: 9 }));
   base = { ...starter, cards };
 });
-
-const playable = (state: ScenarioState, tab: Table, id: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === id);
 
 describe("Brand son of Bain (02072:A:2)", () => {
   // Two players: Brand for the first, the Pal and an ally (both exhausted) for the second. Brand attacks `enemy`, engaged with `seat`.
@@ -168,13 +165,13 @@ describe("Rear Guard (02074:A:1)", () => {
   // "Quest Action": in the planning phase it cannot be played.
   it("02074:A:1 Rear Guard: not played outside the quest phase", () => {
     const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: SCOUT, seat: 0 }], hand: [{ code: REAR, seat: 0 }] });
-    expect(playable(tab.state, tab, idsOf(tab, REAR))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, REAR))).toBe(false);
   });
 
   // No hero is committed: the bonus would go to nobody, so the card is not played and no ally is discarded for nothing (rr.cost).
   it("02074:A:1 Rear Guard: not played when no hero is committed", () => {
     const { tab, run } = committed(EFFECTS, false);
-    expect(playable({ ...run.state, activeSeat: 0 }, tab, idsOf(tab, REAR))).toBe(false);
+    expect(canPlay({ ...run.state, activeSeat: 0 }, tab, idsOf(tab, REAR))).toBe(false);
   });
 });
 
@@ -243,7 +240,7 @@ describe("Meneldor's Flight (02076:A:1)", () => {
   // No Eagle ally in play: it is not played.
   it("02076:A:1 Meneldor's Flight: not played without an Eagle ally", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: FLIGHT, seat: 0 }] });
-    expect(playable(tab.state, tab, idsOf(tab, FLIGHT))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, FLIGHT))).toBe(false);
   });
 });
 
@@ -299,13 +296,13 @@ describe("Ride to Ruin (02078:A:1)", () => {
   // No Rohan ally to discard: it is not played.
   it("02078:A:1 Ride to Ruin: not played without a Rohan ally", () => {
     const tab = ruin(EFFECTS, { allies: [{ code: SPIRIT_ALLY, seat: 0 }], staging: [FIELD] });
-    expect(playable(tab.state, tab, idsOf(tab, RUIN))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, RUIN))).toBe(false);
   });
 
   // No location in play: the progress has nowhere to go, so it is not played and no ally is discarded for nothing (rr.cost).
   it("02078:A:1 Ride to Ruin: not played without a location", () => {
     const tab = ruin(EFFECTS, { allies: [{ code: RIDER, seat: 0 }] });
-    expect(playable(tab.state, tab, idsOf(tab, RUIN))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, RUIN))).toBe(false);
   });
 });
 

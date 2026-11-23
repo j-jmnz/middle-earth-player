@@ -9,13 +9,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
+import { updateCard } from "../../rules/core/state.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { choices, fillers, hosts, play, playCode, playerTableFor, printed, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { canPlay, choices, fillers, hosts, play, playCode, playerTableFor, printed, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
 
 const HIRLUIN = "06001";
 const LOSSARNACH = "06002";
@@ -53,7 +52,6 @@ beforeAll(async () => {
 });
 
 // Whether the engine offers to play the card `cardId` from hand.
-const playable = (state: ScenarioState, tab: Table, cardId: string): boolean => legalIntents(state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === cardId);
 
 describe("Hirluin the Fair (06001:A:2)", () => {
   // "You may use resources from Hirluin the Fair's resource pool to pay for Outlands ally cards of any sphere.": Hirluin (Leadership) pays
@@ -133,7 +131,7 @@ describe("Gaining Strength (06003:A:1)", () => {
   // No hero of yours holds 2 resources: the cost cannot be paid, so the event is not offered.
   it("06003:A:1 is not offered when no hero of yours holds 2 resources", () => {
     const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }], hand: [{ code: GAINING, seat: 0 }] }, 1);
-    expect(playable(tab.state, tab, idsOf(tab, GAINING))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, GAINING))).toBe(false);
   });
 });
 
@@ -226,6 +224,6 @@ describe("Mithrandir's Advice (06009:A:1)", () => {
   // Ring of Barahir pays for it, but his gained icon is not printed.
   it("06009:A:1 is not offered without a hero with a printed Lore icon", () => {
     const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }, { code: EOWYN, seat: 0 }], attached: [{ code: BARAHIR, host: ARAGORN }], hand: [{ code: ADVICE, seat: 0 }], playerDeck: fillers("card", 5) });
-    expect(playable(tab.state, tab, idsOf(tab, ADVICE))).toBe(false);
+    expect(canPlay(tab.state, tab, idsOf(tab, ADVICE))).toBe(false);
   });
 });
