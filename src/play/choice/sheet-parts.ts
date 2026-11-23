@@ -91,7 +91,7 @@ export function seatedLabel(game: ScenarioState, ctx: ReduceContext, names: Shee
     const on = isReanimatedCode(host.code) ? `${hostName}, Player ${seat + 1}'s card` : hostType === "enemy" ? `${hostName}, enemy engaged with Player ${seat + 1}` : `${hostName}, Player ${seat + 1}'s ${hostType}`;
     return `${names.card(id)} \u00b7 on ${on}`;
   }
-  const kind = type === "hero" || type === "attachment" || type === "event" ? type : type === "player-side-quest" ? "side quest" : "ally";
+  const kind = type === "hero" || type === "attachment" || type === "event" || type === "treasure" ? type : type === "player-side-quest" ? "side quest" : "ally";
   return type === "enemy" ? `${names.card(id)} \u00b7 engaged with Player ${seat + 1}` : `${names.card(id)} \u00b7 Player ${seat + 1}'s ${kind}`;
 }
 

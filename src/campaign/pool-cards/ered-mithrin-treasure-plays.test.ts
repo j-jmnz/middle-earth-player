@@ -90,9 +90,8 @@ describe("Anvil of Gundabad (12196:A:2)", () => {
     expect(codesOf(run.state.seats[0]?.deck)).toEqual([STEWARD, PLATE, SCOUT, DWARVEN_AXE].sort());
   });
 
-  // KNOWN (issue #193): the Anvil prints "After you claim or play Anvil of Gundabad"; a treasure in the hand cannot be played at all (PlayCard of a
-  // treasure is refused, "That card cannot be played"), so the play half never offers the Response.
-  it.fails("12196:A:2 Anvil of Gundabad: after it is played from the hand, its Response is offered", () => {
+  // "After you claim or play Anvil of Gundabad": played from the hand onto Gimli, the Anvil offers the Response too.
+  it("12196:A:2 Anvil of Gundabad: after it is played from the hand, its Response is offered", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: ANVIL, seat: 0 }], playerDeck: deck });
     const run = playOn(begin(tab.state), tab, idsOf(tab, ANVIL), idsOf(tab, GIMLI));
     expect(triggers(run.state, tab)).toContain("12196:response:1");
@@ -115,10 +114,9 @@ describe("Axe of the Edain (12197:A:3) and Glittering Lute (12200:A:3)", () => {
     expect(triggers(run.state, tab)).not.toContain("12200:response:1");
   });
 
-  // KNOWN (issue #193): "Response: After you play Axe of the Edain, deal 2 damage to a non-unique enemy engaged with you.": played from the hand onto
-  // Gimli, with the non-unique Weak and the unique Boss engaged, the Response offers only the Weak, which takes 2 damage. The engine refuses
-  // the play of a treasure from the hand ("That card cannot be played"), so the Response never runs.
-  it.fails("12197:A:3 Axe of the Edain: after it is played, 2 damage to a non-unique enemy engaged with you", () => {
+  // "Response: After you play Axe of the Edain, deal 2 damage to a non-unique enemy engaged with you.": played from the hand onto
+  // Gimli, with the non-unique Weak and the unique Boss engaged, the Response offers only the Weak, which takes 2 damage.
+  it("12197:A:3 Axe of the Edain: after it is played, 2 damage to a non-unique enemy engaged with you", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: AXE, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }, { code: BOSS, seat: 0 }] });
     let run = playOn(begin(tab.state), tab, idsOf(tab, AXE), idsOf(tab, GIMLI));
     expect(triggers(run.state, tab)).toContain("12197:response:1");
@@ -127,10 +125,9 @@ describe("Axe of the Edain (12197:A:3) and Glittering Lute (12200:A:3)", () => {
     expect(run.state.cards[idsOf(tab, BOSS)]?.damage ?? 0).toBe(0);
   });
 
-  // KNOWN (issue #193): "Response: After you play Glittering Lute, each player may discard a card from their hand. Each player who does so reduces their
-  // threat by 2.": two players, the first discards and goes from 8 to 6, the second declines and stays at 6. The play of the Lute from the
-  // hand is refused, so the Response never runs.
-  it.fails("12200:A:3 Glittering Lute: after it is played, each player who discards a card reduces their threat by 2", () => {
+  // "Response: After you play Glittering Lute, each player may discard a card from their hand. Each player who does so reduces their
+  // threat by 2.": two players, the first discards and goes from 8 to 6, the second declines and stays at 6.
+  it("12200:A:3 Glittering Lute: after it is played, each player who discards a card reduces their threat by 2", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: GIMLI, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: LUTE, seat: 0 }, { code: CARD, seat: 0 }, { code: CARD, seat: 1 }] });
     let run = playOn(begin(tab.state), tab, idsOf(tab, LUTE), idsOf(tab, GIMLI));
     run = send(run, { type: "Trigger", cardId: idsOf(tab, LUTE), effectId: "12200:response:1" }, tab.ctx);
@@ -142,9 +139,9 @@ describe("Axe of the Edain (12197:A:3) and Glittering Lute (12200:A:3)", () => {
 });
 
 describe("Durin's Dagger (12198:A:3)", () => {
-  // KNOWN (issue #193): "You may play Durin's Dagger from your discard pile.": the Dagger in the discard pile is offered as a PlayCard and goes onto Gimli
-  // for its cost 1. The engine offers no play of it: a treasure is never played, from the hand or the discard pile.
-  it.fails("12198:A:3 Durin's Dagger: played from the discard pile", () => {
+  // "You may play Durin's Dagger from your discard pile.": the Dagger in the discard pile is offered as a PlayCard and goes onto Gimli
+  // for its cost 1.
+  it("12198:A:3 Durin's Dagger: played from the discard pile", () => {
     const made = discarded(table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }] }), [[DAGGER, 0]]);
     const [dagger = ""] = made.ids;
     const gimli = idsOf(made.tab, GIMLI);
@@ -156,9 +153,8 @@ describe("Durin's Dagger (12198:A:3)", () => {
 });
 
 describe("A treasure in the hand (12196:A:1 to 12204:A:1)", () => {
-  // KNOWN (issue #193): each treasure prints its Attach to line and a cost (0, 1 for the Dagger, 2 for the Crown), and emce.treasure lets it be in a deck;
-  // in the planning phase its player plays it from the hand onto Gimli. The engine refuses the PlayCard of any treasure ("That card cannot
-  // be played": planning.ts plays only allies, attachments, events and player side quests).
+  // Each treasure prints its Attach to line and a cost (0, 1 for the Dagger, 2 for the Crown), and emce.treasure lets it be in a deck;
+  // in the planning phase its player plays it from the hand onto Gimli.
   const rows = [
     ["12196:A:1", ANVIL],
     ["12197:A:1", AXE],
@@ -171,7 +167,7 @@ describe("A treasure in the hand (12196:A:1 to 12204:A:1)", () => {
     ["12204:A:1", BOW],
   ] as const;
   for (const [line, code] of rows) {
-    it.fails(`${line} played from the hand onto a character in the planning phase`, () => {
+    it(`${line} played from the hand onto a character in the planning phase`, () => {
       const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code, seat: 0 }] });
       expect(playOn(begin(tab.state), tab, idsOf(tab, code), idsOf(tab, GIMLI)).state.cards[idsOf(tab, code)]?.host).toBe(idsOf(tab, GIMLI));
     });
