@@ -65,7 +65,7 @@ The readings of Into Ithilien use the statuses defined in the Readings bullet of
 
 ### 05049 Morgul Spider
 
-- `05049:A:1` (span-settled). Until the end of the round +1 Attack for each character of any player not committed to a quest, counted again as the game changes; exhausted characters in play count, Celador and the Guardians in the staging area do not (they are committed). Not taken: The count is fixed when it is revealed. Basis: faq.lasting-effects; `ats.ally-objectives`. Sources: VOTP says the count is taken when it enters play (fan summary); the FAQ span wins.
+- `05049:A:1` (researched). Until the end of the round +1 Attack for each character of any player not committed to a quest, counted again as the game changes; exhausted characters in play count, Celador and the Guardians in the staging area do not (they are committed). Not taken: The count is fixed when it is revealed. Basis: faq.lasting-effects; `ats.ally-objectives`. Sources: the FAQ's own example (Poisoned Vapour, "each damaged character") is a condition on the game state that is read again when the state changes, as "currently" is here; no official ruling names Morgul Spider. VOTP (https://visionofthepalantir.com/2018/03/18/into-ithilien/, "at that time"), https://talesfromthecards.wordpress.com/2014/05/06/surviving-into-ithilien/ and the FFG forum archive play-through (https://ffg-forum-archive.entropicdreams.com/topic/308703-preotets-play-throughs/) restate the card and do not say; Hall of Beorn has no ruling. After the quest phase nobody is committed, so in combat the Spider gets +1 for every character in play.
 
 ### 05050 Forest Bat
 
