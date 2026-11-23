@@ -166,6 +166,21 @@ lineSpec("131073:A:1", "revealed outside the quest phase, the Stone-Giant engage
 });
 
 
+// faq.search-effects: the search for a Stone-Giant is followed by a shuffle of the encounter deck, and no shuffle happens when a giant was chosen in the staging area.
+lineSpec("131073:A:1", "the encounter deck is shuffled after the search for a Stone-Giant, and not when one is in the staging area", (effects) => {
+  const deck = ["c0", "c1", "c2", "c3", "ally", "event", "filler", "131064", "c0", "c1", "c2", "c3"];
+  const layout = { stage: "131027", phase: "Quest", deck } satisfies Layout;
+  const made = table(layout, effects);
+  const before = made.state.encounterDeck.filter((id) => made.state.cards[id]?.code !== "131064");
+  const run = playedLayout(ID, layout, [resolve("131073", "whenRevealed")], effects).run.state;
+  expect(run.cards[idOf(run, "131064")]?.zone).toBe("staging");
+  expect([...run.encounterDeck].sort()).toEqual([...before].sort());
+  expect(run.encounterDeck).not.toEqual(before);
+  const chosen = { ...layout, staging: ["131064"], deck: deck.filter((code) => code !== "131064") } satisfies Layout;
+  const start = table(chosen, effects).state.encounterDeck;
+  expect(playedLayout(ID, chosen, [resolve("131073", "whenRevealed")], effects).run.state.encounterDeck).toEqual(start);
+});
+
 // The delayed Pick reads the chosen Stone-Giant again at the end of the quest phase: one that left the staging area engages nobody and no tie is asked.
 lineSpec("131073:A:1", "the chosen Stone-Giant engages only while it is still in the staging area", (effects) => {
   const layout = { stage: "131028", side: "A", seats: 2, threat: [30, 35], phase: "Quest", staging: ["131064"], deck: ["f0"], setAside: ["131063"] } satisfies Layout;

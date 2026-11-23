@@ -199,7 +199,7 @@ Scenario piles that place cards with no record (quest: 131026 A Short Rest; ques
       - if the picked card is in the staging area: choose player (any player controls) with the highest threat among the players still in the game (ties: the chooser decides), chosen by the first player
       - then, if the card picked before is in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): the effect goes on with the picked player as the acting player
       - then, if the card picked before is in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): engage the card picked before
-    - then, if not (there is a enemy (any player controls) in the staging area only, named "Stone-Giant" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one enemy with code 131064 in the encounter deck and adds it to the staging area (it is not revealed)
     - then, if not (there is a enemy (any player controls) in the staging area only, named "Stone-Giant" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter deck
+    - then, if not (there is a enemy (any player controls) in the staging area only, named "Stone-Giant" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one enemy with code 131064 in the encounter deck and adds it to the staging area (it is not revealed)
 
 (rendered pieces: 149 by template, 0 as JSON)

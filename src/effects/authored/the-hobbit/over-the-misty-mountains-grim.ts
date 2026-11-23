@@ -225,8 +225,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
             { verb: "Engage", target: "previous", when: GIANT_STILL_IN_STAGING },
           ],
         },
-        { verb: "SearchMove", code: STONE_GIANT, type: "enemy", to: "staging", deckOnly: true, when: { kind: "not", condition: { kind: "canPick", pick: STONE_GIANT_IN_STAGING } } },
+        // The shuffle runs first: a search that moves the giant would make the condition false for a shuffle after it, and a uniform shuffle with one card removed leaves the rest uniform (faq.search-effects).
         { verb: "ShuffleEncounterDeck", when: { kind: "not", condition: { kind: "canPick", pick: STONE_GIANT_IN_STAGING } } },
+        { verb: "SearchMove", code: STONE_GIANT, type: "enemy", to: "staging", deckOnly: true, when: { kind: "not", condition: { kind: "canPick", pick: STONE_GIANT_IN_STAGING } } },
       ],
     },
   ],
