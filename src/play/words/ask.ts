@@ -14,6 +14,7 @@ import { seaAsk } from "./scenarios/sea.ts";
 import { tradeWords } from "./scenarios/uncharted.ts";
 import { wilderlandAsk } from "./scenarios/wilderland.ts";
 import { lootLeaveOutWords } from "./loot.ts";
+import { riddleAsk } from "./scenarios/the-hobbit/riddles.ts";
 
 /** What the instruction a player is asked about says to ask. `queue` is the instructions after the asked one (`queue[0]` is the next instruction), `picked` the card the effect last picked. */
 /** Which of an expanded discard's picks this is, "Card 2 of 4."; none for a discard of one. */
@@ -52,6 +53,8 @@ export function askWords(a: {
   }
   // The Burglar's Turn's Setup with more candidates than the loot deck takes (22024:A:2).
   if (instruction.verb === "BuildLootDeck") return lootLeaveOutWords(options.length, instruction.size);
+  const riddle = riddleAsk(instruction, queue, game, ctx, names);
+  if (riddle) return riddle;
   const words = (
     grappleAsk(instruction, source, names, grappleFactsOf(game, ctx, instruction, picked)) ??
     wilderlandAsk(instruction, source, names, queue[0], picked, { game, ctx, options }) ??

@@ -16,7 +16,7 @@ import { immuneBuffer } from "../../interpret/immune-targets.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
-import { inPlay } from "../../core/state.ts";
+import { inPlay, livingSeats } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import type { Focus } from "../index.ts";
@@ -111,7 +111,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return addTableModifier(state, { stat: instruction.min === 1 ? "revealFewerMinOne" : "revealFewer", amount: instruction.amount, until: "endOfPhase", ...(seat != null ? { seat } : {}) }, focus);
     }
     case "RevealMore":
-      return addTableModifier(state, { stat: "revealMore", amount: instruction.amount, until: "endOfPhase" }, focus);
+      return addTableModifier(state, { stat: "revealMore", amount: instruction.perPlayer ? instruction.amount * livingSeats(state).length : instruction.amount, until: "endOfPhase" }, focus);
     case "WatchReveals": {
       const when = instruction.type ? { when: { kind: "matches" as const, card: "subject" as const, pick: { type: instruction.type, control: "any" as const } } } : {};
       return addTableModifier(state, { stat: WATCH_STATS[instruction.effect], amount: instruction.amount ?? 1, until: instruction.until, seat: focus.seat, ...when }, focus);

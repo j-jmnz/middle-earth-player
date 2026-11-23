@@ -90,6 +90,7 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "the-hunt-for-the-dreadnaught", kind: "standalone", names: ["dreadnaught-lost"] },
   { scenarioId: "we-must-away-ere-break-of-day", kind: "standalone", names: ["day-lost"] },
   { scenarioId: "over-the-misty-mountains-grim", kind: "standalone", names: ["grim-lost"] },
+  { scenarioId: "dungeons-deep-and-caverns-dim", kind: "standalone", names: ["dim-lost"] },
   { scenarioId: "flies-and-spiders", kind: "standalone", names: ["spiders-lost"] },
 ] as const satisfies readonly { scenarioId: string; file?: string; kind?: "standalone"; names: readonly string[] }[];
 

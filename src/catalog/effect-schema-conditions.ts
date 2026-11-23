@@ -341,6 +341,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The encounter discard pile (`discard`), or the encounter deck and its discard pile (`deckAndDiscard`), holds a card of this printed type and/or with the Aflame keyword: the either/or of a search
   // that has something to find ("search ... for the Aflame location", 11040:A:1; `code`: a copy of the card with this code, "While there is a copy of Eastern Crows in the discard pile", 51031:A:1; "the topmost enemy in the encounter discard pile", 11044:A:2; rr.effects). Read by the aflame family.
   z.strictObject({ kind: z.literal("encounterHas"), piles: z.enum(["discard", "deckAndDiscard"]), cardType: z.enum(["enemy", "location", "treachery"]).optional(), aflame: z.literal(true).optional(), trait: z.string().min(1).optional(), code: z.string().min(1).optional() }),
+  // The riddles of Dungeons Deep and Caverns Dim (hob.riddles, hob.riddle-area; families/riddles/conditions.ts). `complete`: stage 1 and stage 2 both hold their quest points ("Players cannot advance to stage 3A unless both 1B and 2B are complete", 131029:B:1).
+  // `offered`: the source riddle card is being revealed from the encounter deck while no card ignores riddles, so the first player may answer its riddle instead of resolving it. `shadow`: the source enemy was dealt a shadow card that has a riddle. `answering`: a riddle is being answered
+  // in the running effect (Bilbo's Magic Ring's discard action is offered then).
+  z.strictObject({ kind: z.literal("riddle"), is: z.enum(["complete", "offered", "shadow", "answering"]) }),
   // The encounter deck holds no card ("if there are no cards left in the encounter deck", 131024:B:1). Read by the sack family (src/rules/families/sack/).
   z.strictObject({ kind: z.literal("encounterDeckEmpty") }),
   // Bilbo Baggins has the card with code `key` attached and his pool holds the Baggins resources the travel costs: `amount`, or `reduced` while the card with code `purse` is attached too ("Players cannot travel to Troll Cave unless Bilbo Baggins has the Troll Key attached and the first player spends 5 Baggins resources", 131037:A:2). Read by the sack family.

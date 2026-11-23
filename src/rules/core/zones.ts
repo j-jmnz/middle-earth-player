@@ -30,6 +30,7 @@ export type Destination =
   | { zone: "nightmare" }
   | { zone: "modeCard" }
   | { zone: "nightObjective" }
+  | { zone: "riddleArea" }
   | { zone: "under"; locationId: string }
   // `hostId` null: a prisoner hero, held under no card (families/prisoner.ts).
   | { zone: "captive"; hostId: string | null }

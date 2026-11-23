@@ -140,6 +140,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "the-hunt-for-the-dreadnaught": SEA,
   "we-must-away-ere-break-of-day": { calm: "shire", combat: "chase" },
   "over-the-misty-mountains-grim": UNDERGROUND,
+  "dungeons-deep-and-caverns-dim": UNDERGROUND,
   "flies-and-spiders": FOREST,
 };
 

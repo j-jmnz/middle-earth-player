@@ -184,7 +184,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ShufflePileIntoEncounterDeck: [{ verb: "ShufflePileIntoEncounterDeck", pile: "angmarOrcs" }],
   StageSetAside: [{ verb: "StageSetAside", code: "09046", remember: true }, { verb: "StageSetAside", name: "Orc Ambush" }, { verb: "StageSetAside", code: "09046", reveal: true }],
   ResolveWhenRevealed: [{ verb: "ResolveWhenRevealed", card: "self" }, { verb: "ResolveWhenRevealed", card: "self", reveal: true }],
-  RevealMore: [{ verb: "RevealMore", amount: 1 }],
+  RevealMore: [{ verb: "RevealMore", amount: 1 }, { verb: "RevealMore", amount: 1, perPlayer: true }],
   FlipInPlace: [{ verb: "FlipInPlace", code: "09071", into: "09072", attachTo: "picked", entersPlay: true }],
   AddToPool: [{ verb: "AddToPool", code: "10160", eachPlayer: true }],
   ShuffleIntoEncounterDeck: [{ verb: "ShuffleIntoEncounterDeck", code: "10160" }],

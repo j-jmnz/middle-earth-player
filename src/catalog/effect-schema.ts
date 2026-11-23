@@ -96,7 +96,8 @@ export const costSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("exhaustCode"), code: z.string().min(1) }),
   // A card in play that the player controls with this title exhausts, whichever printing the game deals ("exhaust The One Ring", 141001:A:1).
   z.strictObject({ kind: z.literal("exhaustNamed"), name: z.string().min(1) }),
-  z.strictObject({ kind: z.literal("raiseThreat"), amount: z.number().int().positive() }),
+  // `each`: every player's threat is raised, not only the payer's ("raise each player's threat by 2", 131079:A:3).
+  z.strictObject({ kind: z.literal("raiseThreat"), amount: z.number().int().positive(), each: z.literal(true).optional() }),
   // Damage on the source itself ("Deal 1 damage to ~ to ...").
   z.strictObject({ kind: z.literal("damageSelf"), amount: z.number().int().positive() }),
   z.strictObject({ kind: z.literal("returnSelfToHand") }),

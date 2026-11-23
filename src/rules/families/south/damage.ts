@@ -11,6 +11,7 @@ import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { placeDamage } from "../../core/keywords.ts";
+import { damageBarred } from "../defense/damage.ts";
 import { discardFromHand, moveCard } from "../../core/zones.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -31,7 +32,8 @@ export function assignDamage(state: ScenarioState, instruction: Assign, focus: F
     return queueFront(state, seats.map((seat) => ({ instruction: { ...instruction, who: undefined, left: total, of: total }, seat, chosen: null, cause })));
   }
   if (instruction.left <= 0) return state;
-  const options = pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx).filter((id) => inPlay(state.cards[id]?.zone ?? "removed"));
+  // A character that takes no damage from this card (Bilbo Baggins in the riddle area, rr.cannot) is not one to choose.
+  const options = pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx).filter((id) => inPlay(state.cards[id]?.zone ?? "removed") && !damageBarred(state, id, "framework", focus.sourceId));
   if (options.length === 0) return state;
   const chosen = focus.chosen && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
   if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: focus.seat, chosen: null, cause }, options) : state;

@@ -26,6 +26,7 @@ import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
 import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
 import { attachedStageFrom, branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
 import { leaveStage, randomStageFrom } from "../families/wilderland/random-stage.ts";
+import { skipAreaStage } from "../families/riddles/area.ts";
 import { headOf, sharing, viewOf, withView } from "../families/breaking/areas.ts";
 import { threatFromOtherAreas } from "../families/breaking/threat.ts";
 import { engagedContributors } from "./engaged-threat.ts";
@@ -290,7 +291,7 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     const attached = ordered || branched || rolled ? null : attachedStageFrom(next, current.code, cards);
     if (attached) next = attached.state;
     const nextId = ordered ? ordered.id : rolled ? rolled.id : attached ? attached.id : (() => {
-      const nextCode = branched ? branched.code : index < 0 || flagged(next, currentId, "holdsWin") ? undefined : next.stages[index + 1]?.code;
+      const nextCode = branched ? branched.code : index < 0 || flagged(next, currentId, "holdsWin") ? undefined : skipAreaStage(next, index);
       return nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
     })();
     if (!nextId) return flagged(next, currentId, "holdsWin") ? holdStage(next, currentId) : clearStage(next);

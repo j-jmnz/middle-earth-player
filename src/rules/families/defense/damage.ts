@@ -19,6 +19,7 @@ import { patchTop, topFrame } from "../../windows/windows.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { defendingAgainst } from "../angmar/combat.ts";
 import { listened, queueHeard, trimFollowUps } from "./listen.ts";
+import { bilboDamageBarred } from "../riddles/gollum.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -69,6 +70,11 @@ export function damageGoesTo(state: ScenarioState, id: string): string {
     if (host && host !== id && inPlay(state.cards[host]?.zone ?? "removed")) return host;
   }
   return id;
+}
+
+// Damage a card does not take from this source: Bilbo Baggins in the riddle area takes it only from Gollum (families/riddles/gollum.ts).
+export function damageBarred(state: ScenarioState, id: string, source: string, sourceId: string | null | undefined): boolean {
+  return bilboDamageBarred(state, id, source, sourceId);
 }
 
 // Characters of any player that may take the damage of an undefended attack against `seat` because a card that player controls

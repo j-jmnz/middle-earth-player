@@ -252,6 +252,7 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "nightmare" ||
     zone === "modeCard" ||
     zone === "nightObjective" ||
+    zone === "riddleArea" ||
     zone === "captive" || zone === "grappled"
   );
 }
