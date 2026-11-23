@@ -2,7 +2,7 @@
 import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, exhausted, flag, handCount, lost, progressOn, quest, resolve, respond, resourcesOn, reveal, stat, threat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Woodland Realm (standalone-scenarios part 11): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
 const F0 = ["f0", "f0", "f0", "f0", "f0", "f0"];
 const DEN = "51110";
 const MENDOR = "51111";

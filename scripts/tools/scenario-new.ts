@@ -280,6 +280,7 @@ function nextSteps(facts: Facts, log: Log): void {
   log.info("next (docs/agents/agent-brief.md, Scenario procedure):");
   log.info("  pnpm data build                   rewrites the barrels of authored effect files (src/effects/generated/authored.ts) and of asks files (src/play/words/asks/index.ts)");
   log.info(`  pnpm scenario pack ${facts.id}   runs effects draft and writes .agent/pack/${facts.id}.md: the vocabulary, the families' manifests the drafts need, the cookbook sections and the drafts`);
+  log.info(`  pnpm scenario tests ${facts.id}      after Build: a failing row stub in spec.test.ts for each record no test names`);
   log.info("  pnpm effects open                 after the records, then add the scenario to src/campaign/playable.ts when none of its lines is open");
   log.info(`  fill the skeletons: spec rows (src/campaign/scenarios/${facts.id}/spec.test.ts)${facts.cycle ? ", the standalone test" : ""}, asks (src/play/words/asks/${facts.id}.ts), test/scenarios/${facts.id}/game.ts, the golden test (a skipped suite), the seed finder; then list the goldens in test/harness/golden-registry.ts`);
 }

@@ -117,6 +117,11 @@ export function withoutLines(effects: readonly Effect[], ...lines: readonly stri
   return lines.reduce(withoutLine, effects);
 }
 
+/** Why a row cannot stand as a test: it is a stub `pnpm scenario tests` wrote (`todo`) that nobody filled. Null for a written row. */
+export function stubProblem(row: Row): string | null {
+  return row.todo === undefined ? null : `row ${row.line} is a stub (${row.todo}): write its layout, action and expectation from the printed line, then delete its todo`;
+}
+
 /**
  * One test for each row, and for each row a second one that runs it with the records of its line removed and fails when the row still
  * holds. A line no record names is an error: the row would test nothing.
@@ -126,6 +131,13 @@ export function cardSpecs(scenarioId: string, rows: readonly Row[], options: { e
   describe(`${scenarioId} card specs`, () => {
     rows.forEach((row, index) => {
       const title = `${row.line} ${row.name ?? `row ${index + 1}`}`;
+      const stub = stubProblem(row);
+      if (stub !== null) {
+        it(title, () => {
+          throw new Error(stub);
+        });
+        return;
+      }
       it(title, () => {
         if (!effects.some((effect) => effect.lines.includes(row.line))) throw new Error(`no record names line ${row.line}`);
         const problems = rowProblems(scenarioId, row, effects);

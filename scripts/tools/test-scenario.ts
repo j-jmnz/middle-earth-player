@@ -23,6 +23,7 @@ import { unreachedReport } from "./unreached.ts";
 //   pnpm test scenario <scenario-id> --quick      the loop while authoring: skips the goldens (the registry-wide golden tests and the scenario's own golden.test.ts) and the reader
 //                                                 check; the full run, once before the hand-back, runs them (docs/agents/agent-brief.md, Scenario procedure)
 //   pnpm test scenario <scenario-id> --words      only src/play/words/scenario-words.test.ts for the scenario, and src/play/words/asks.test.ts when it has an asks file
+//   pnpm test scenario <scenario-id> --no-records   with any of the above: the records part reports the records no test names and does not fail (the Build task, before Tests)
 //                                                 (src/play/words/asks/<id>.ts), with WORDS_DUMP=<id>: it prints every sentence the scenario's choices say (the
 //                                                 check for a bare "Choose a player." or a fallback sentence, and for a scenario with an asks file every asks entry rendered)
 //
@@ -268,8 +269,10 @@ async function main(log: Log): Promise<void> {
   const listOnly = process.argv.includes("--list");
   const wordsOnly = process.argv.includes("--words");
   const quick = process.argv.includes("--quick");
+  // The Build task writes the records before the Tests task names them: it runs with --no-records, which reports the count and does not fail on it.
+  const noRecords = process.argv.includes("--no-records");
   const id = args[0];
-  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test scenario <scenario-id> [--list | --quick | --words]");
+  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test scenario <scenario-id> [--list | --quick | --words] [--no-records]");
   if (!existsSync(path.join(DATA_DIR, "scenarios", `${id}.json`))) throw new Error(`${id} is not a scenario in data/scenarios`);
 
   if (wordsOnly) {
@@ -345,7 +348,7 @@ async function main(log: Log): Promise<void> {
 
   // Every record of the scenario's cards is named by a test.
   const unnamed = unnamedOfScenario(scenarioCodes(id), EFFECTS, namedInTests());
-  results.push({ name: "records", ok: unnamed.length === 0, ms: 0, detail: unnamed.length === 0 ? "every record of the scenario's cards is named by a test" : `${unnamed.length} records no test names (docs/agents/card-audit.md, Tests from the printed line): ${unnamed.slice(0, 20).join(" ")}${unnamed.length > 20 ? " ..." : ""}` });
+  results.push({ name: "records", ok: unnamed.length === 0 || noRecords, ms: 0, detail: unnamed.length === 0 ? "every record of the scenario's cards is named by a test" : noRecords ? `${unnamed.length} records wait for a test (--no-records: the Tests task names them)` : `${unnamed.length} records no test names (docs/agents/card-audit.md, Tests from the printed line): ${unnamed.slice(0, 20).join(" ")}${unnamed.length > 20 ? " ..." : ""}` });
 
   // The records no golden resolves (the golden suite ran: a full run, or one that named the scenario's golden test).
   if (existsSync(unreachedPath)) {

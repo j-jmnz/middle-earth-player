@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, count, damageOn, defend, flag, handCount, quest, resolve, respond, reveal, offers, stat, stagingThreat, threat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Murder at the Prancing Pony (standalone-scenarios part 7): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The lines a row cannot express (the seeded hiding of the Suspect and
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The lines a row cannot express (the seeded hiding of the Suspect and
 // Hideout, the table-wide stats) are tests in lines.test.ts, each titled with its line id.
 const F0 = ["f0", "f0", "f0", "f0", "f0", "f0"];
 const TAKEN_ONLY = { investigationDeck: ["50714"] } as const;
