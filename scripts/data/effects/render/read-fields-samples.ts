@@ -292,7 +292,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   GuardReturnedBy: [{ verb: "GuardReturnedBy", code: "04041", returns: "firstPlayer" }],
   MakeEngagementChecks: [{ verb: "MakeEngagementChecks", lower: { name: "Raider Flagship", amount: 50 } }],
   ImmediateAttackBy: [{ verb: "ImmediateAttackBy", target: "subject" }],
-  ImmediateAttackEach: [{ verb: "ImmediateAttackEach", trait: "Troll", notTrait: "Orc", enemy: "Dagnir", own: true }, { verb: "ImmediateAttackEach", shadow: false }],
+  ImmediateAttackEach: [{ verb: "ImmediateAttackEach", trait: "Troll", notTrait: "Orc", enemy: "Dagnir", own: true }, { verb: "ImmediateAttackEach", shadow: false, notStaging: true }],
   DiscardTopEncounter: [{ verb: "DiscardTopEncounter", ambushCheck: true }],
   FirstEnemyGains: [{ verb: "FirstEnemyGains", keyword: "surge", withKeyword: "ambush" }],
   RevealEnemies: [{ verb: "RevealEnemies", ids: ["a"] }],
