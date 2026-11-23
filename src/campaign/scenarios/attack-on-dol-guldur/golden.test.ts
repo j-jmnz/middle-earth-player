@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, rr.victory, rr.forced, rr.destroy, rr.explored, docs/scenarios/standalone-scenarios.md (Attack on Dol Guldur) (data/rules/entries.json).
+// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, rr.victory, rr.forced, rr.destroy, rr.explored, docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md (Attack on Dol Guldur) (data/rules/entries.json).
 import { describe, expect } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";

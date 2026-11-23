@@ -346,7 +346,7 @@ function attackAfterThis(state: ScenarioState, sourceId: string | null, steps: E
   // The source is the attacking enemy, or the shadow card dealt to it for this attack (144039:A:2, 144057:A:2).
   const isItsShadowCard = source?.zone === "shadow" && source.host === attack?.enemyId;
   if (!attack || !sourceId || (attack.enemyId !== sourceId && !isItsShadowCard)) return state;
-  // Smaug's attack against Lake-town (50211:A:1) is followed by another against Lake-town (Esgaroth Wharf's Shadow, 50224:A:3; docs/scenarios/standalone-scenarios.md, The Battle of Lake-town).
+  // Smaug's attack against Lake-town (50211:A:1) is followed by another against Lake-town (Esgaroth Wharf's Shadow, 50224:A:3; docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town).
   const next: Instruction = attack.toLakeTown === true ? { verb: "AttackLakeTown" } : { verb: "ImmediateAttack" };
   return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), next], afterCause: currentCause(steps, UNATTRIBUTED) } };
 }

@@ -1,4 +1,4 @@
-// Rules: rr.in-play-and-out-of-play, rr.quest-cards-quest-deck, rr.first-player (data/rules/entries.json); ledger line 51001:A:1 (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 2).
+// Rules: rr.in-play-and-out-of-play, rr.quest-cards-quest-deck, rr.first-player (data/rules/entries.json); ledger line 51001:A:1 (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, reading 2).
 // The kit's Quick-build: 7 of the 14 encounter sets stay in the encounter deck (the game's seed picks them) and the other 7 lie set aside; the first player chooses one stage 2 and one stage 3 of the quest cards in the quest deck, and the rest lie set aside.
 import type { Instruction } from "../../../catalog/boundary.ts";
 

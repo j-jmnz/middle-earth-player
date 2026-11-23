@@ -10,6 +10,7 @@ import { dealtCodes, loadAnyScenario, loadCampaigns } from "./load-scenarios.ts"
 import { DATA_DIR } from "./paths.ts";
 import { keyOf, ledgerSchema, loadLedger, type Ledger, type LedgerEntry } from "./printed/ledger.ts";
 import { playerScopeCodes, scanTargets, type ScanTarget } from "./printed/scope.ts";
+import { FAN_MADE_PUBLISHERS } from "./sources/origins.ts";
 import { codesArg, packsArg } from "./sources/scans.ts";
 import { parseArgs } from "../cli-args.ts";
 
@@ -41,9 +42,9 @@ function linesOf(...texts: (string | null | undefined)[]): string[] {
 }
 
 /** The entry for one scanned side: the source text of the card's front (with its shadow line) or back, `readBy` empty. */
-export function seedEntry(card: Card, target: ScanTarget, scan: { url: string; sha256: string }): LedgerEntry {
+export function seedEntry(card: Card, target: ScanTarget, scan: { url: string; sha256: string }, origin?: { publisher: string; version: string }): LedgerEntry {
   const lines = target.side === "A" ? linesOf(card.text, card.shadowText) : linesOf(card.back?.text);
-  return { code: target.code, side: target.side, printing: target.printing, scan, lines, inert: [], misprints: [], readBy: "", confirmedBy: null };
+  return { code: target.code, side: target.side, printing: target.printing, ...(origin ?? {}), scan, lines, inert: [], misprints: [], readBy: "", confirmedBy: null };
 }
 
 type Pins = ReadonlyMap<string, { url: string; sha256: string }>;
@@ -64,7 +65,7 @@ export function nightmareDeckCodes(scenarioId: string, cards: readonly Card[]): 
 }
 
 /** The entries to add: every scanned side of the codes that no ledger holds yet, in code and side order. A side with no pinned scan is reported, not seeded. */
-export function seedEntries(codes: ReadonlySet<string>, held: Ledger, cards: readonly Card[], pins: Pins): { entries: LedgerEntry[]; unpinned: string[] } {
+export function seedEntries(codes: ReadonlySet<string>, held: Ledger, cards: readonly Card[], pins: Pins, origin?: { publisher: string; version: string }): { entries: LedgerEntry[]; unpinned: string[] } {
   const byCode = new Map(cards.map((card) => [card.code, card]));
   const entries: LedgerEntry[] = [];
   const unpinned: string[] = [];
@@ -74,7 +75,7 @@ export function seedEntries(codes: ReadonlySet<string>, held: Ledger, cards: rea
     const pin = pins.get(key);
     const card = byCode.get(target.code);
     if (!pin || !card) unpinned.push(key);
-    else entries.push(seedEntry(card, target, pin));
+    else entries.push(seedEntry(card, target, pin, origin));
   }
   entries.sort((a, b) => a.code.localeCompare(b.code) || a.side.localeCompare(b.side));
   return { entries, unpinned };
@@ -95,11 +96,22 @@ export function withSeeded(file: unknown | null, campaign: string, seeded: reado
 
 export const PLAYER_LEDGER_ID = "player-cards";
 
-export const LEDGER_SEED_USAGE = "Usage: pnpm data ledger-seed <scenario-id> [--nightmare] | --pack <pack>... | --codes <code,code,...>";
+export const LEDGER_SEED_USAGE = "Usage: pnpm data ledger-seed <scenario-id> [--nightmare] [--publisher <id> --version <set version>] | --pack <pack>... | --codes <code,code,...>";
+
+/** `--publisher <id> --version <v>` (a fan-made set's entries); both or neither, and the publisher is declared (scripts/data/sources/origins.ts). */
+export function originArgs(argv: readonly string[]): { publisher: string; version: string } | undefined {
+  const value = (flag: string) => argv.flatMap((arg, at) => (arg === flag && argv[at + 1] ? [argv[at + 1] as string] : []))[0];
+  const publisher = value("--publisher");
+  const version = value("--version");
+  if (publisher === undefined && version === undefined) return undefined;
+  if (publisher === undefined || version === undefined) throw new Error(`--publisher and --version go together. ${LEDGER_SEED_USAGE}`);
+  if (!(publisher in FAN_MADE_PUBLISHERS)) throw new Error(`The publisher ${publisher} is not declared in scripts/data/sources/origins.ts`);
+  return { publisher, version };
+}
 
 /** The arguments of a run: a misspelt flag (`--nightmar` would seed the campaign's ledger) throws, and `--help` asks for the usage. */
 export function ledgerSeedArguments(args: readonly string[]): { id: string | undefined; nightmare: boolean; help: boolean } {
-  const parsed = parseArgs(args, LEDGER_SEED_USAGE, { flags: ["nightmare"], spaced: ["pack", "codes"] });
+  const parsed = parseArgs(args, LEDGER_SEED_USAGE, { flags: ["nightmare"], spaced: ["pack", "codes", "publisher", "version"] });
   return { id: parsed.positional[0], nightmare: parsed.flags.has("nightmare"), help: parsed.help };
 }
 
@@ -123,7 +135,7 @@ function main(log: Log): void {
   const raw = existsSync(file) ? readFileSync(file, "utf8") : null;
   const existing = raw === null ? null : (JSON.parse(raw) as unknown);
   const codes = player ? new Set(playerScopeCodes(packs, listed, cards)) : nightmare ? nightmareDeckCodes(id as string, cards) : dealtCodes(campaign as NonNullable<typeof campaign>, [loadAnyScenario(id as string)], { nightmare: false });
-  const { entries, unpinned } = seedEntries(codes, loadLedger(), cards, pinnedScans(undefined, { nightmare }));
+  const { entries, unpinned } = seedEntries(codes, loadLedger(), cards, pinnedScans(undefined, { nightmare }), originArgs(args));
   for (const key of unpinned) log.warn(`${key} has no pinned scan: run pnpm data sync ${nightmare ? "nightmare" : player ? `scans${packs.map((pack) => ` --pack ${pack}`).join("")}${listed.length > 0 ? ` --codes ${listed.join(",")}` : ""}` : "scans"}`);
   const next = withSeeded(existing, ledgerId, entries);
   writeFileSync(file, `${JSON.stringify(next, null, indentOf(raw))}\n`);

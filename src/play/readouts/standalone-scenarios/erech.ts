@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Stone of Erech), rr.forced (data/rules/entries.json); ledger lines 50301:A:1, 50303:B:2, 50304:A:1, 50304:A:4, 50308:A:1, 50308:A:2, 50309:A:1, 50309:A:2, 50310:A:1.
+// Rules: docs/scenarios/standalone-scenarios/the-stone-of-erech.md (The Stone of Erech), rr.forced (data/rules/entries.json); ledger lines 50301:A:1, 50303:B:2, 50304:A:1, 50304:A:4, 50308:A:1, 50308:A:2, 50309:A:1, 50309:A:2, 50310:A:1.
 //
 // The pieces The Stone of Erech's cards hold on the table, as top-bar dials: the progress on the Night objective in play (Eventide, Dusk and Midnight lie one at a time beside the current quest, 50301:A:1) against the 4 that brings the next Night in (the limit is read
 // from the card's own NightAdvance record, 50308:A:2, 50309:A:2; it warms near the limit, and Midnight has none, 50310:A:1), and Derufin, controlled by a player or still attached to the Stone (50304:A:1, 50303:B:2), whose controller's seat wears a mark. The engine decided every number

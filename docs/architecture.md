@@ -161,7 +161,7 @@ desktop/                the Electron shell, outside the app's bundle (main, prel
 discord/                the Discord issue bot, a Cloudflare Worker outside the app (docs/discord-issues.md); imports nothing from src/
 data/  assets/  drizzle/  modules/  plugins/   sources and builds; bundled files; user.db migrations; native modules; Expo and Babel plugins
 .maestro/               showcase/, subflows/ (the README's screenshot flows)
-docs/                   brief, architecture, design system; scenarios/ (one file per box: rulings, readings, table pieces); agents/ (procedures); phases/ (STATUS.md, open phases); plans/; handover/
+docs/                   brief, architecture, design system; scenarios/ (a box file for what its scenarios share, and a folder of one file per scenario: rulings, readings, table pieces); agents/ (procedures); phases/ (STATUS.md, open phases); plans/; handover/
 ```
 
 ## State

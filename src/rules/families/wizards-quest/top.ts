@@ -1,4 +1,4 @@
-// Rules: rr.search, rr.reveal, rr.cancel, rr.encounter-deck (data/rules/entries.json); ledger lines 51003:A:1, 51004:A:1, 51005:A:1, 51007:A:1, 51008:A:1, 51009:A:1 (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, readings 3 and 5).
+// Rules: rr.search, rr.reveal, rr.cancel, rr.encounter-deck (data/rules/entries.json); ledger lines 51003:A:1, 51004:A:1, 51005:A:1, 51007:A:1, 51008:A:1, 51009:A:1 (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, readings 3 and 5).
 // "The opposing team searches the top 5 cards of the encounter deck for a card with cost N or less, sets it aside, and shuffles the encounter deck. Reveal the set aside card. Its 'when revealed' effects cannot be canceled."
 import type { Instruction } from "../../../catalog/boundary.ts";
 

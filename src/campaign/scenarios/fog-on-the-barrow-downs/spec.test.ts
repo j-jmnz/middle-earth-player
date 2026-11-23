@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.reveal, rr.shadow-effects, rr.travel, rr.engaged, rr.victory, rr.quest-advancement, rr.immune, rr.lasting-effects, rr.surge, mec109.peril (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (Fog on the Barrow-downs).
+// Rules: rr.forced, rr.reveal, rr.shadow-effects, rr.travel, rr.engaged, rr.victory, rr.quest-advancement, rr.immune, rr.lasting-effects, rr.surge, mec109.peril (data/rules/entries.json); docs/scenarios/standalone-scenarios/fog-on-the-barrow-downs.md (Fog on the Barrow-downs).
 import { describe, it } from "vitest";
 
 import { announce, attack, cardSpecs, damageOn, deckCount, defend, endPhase, endRound, flag, handCount, notWon, progressOn, quest, resolve, resourcesOn, reveal, stagingThreat, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";

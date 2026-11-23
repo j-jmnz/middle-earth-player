@@ -1,4 +1,4 @@
-// Rules: rr.quest-advancement, rr.quest-cards-quest-deck, rr.play-and-put-into-play, rr.victory, rr.active-location, rr.optional-engagement, rr.travel (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Old Forest, Line readings).
+// Rules: rr.quest-advancement, rr.quest-cards-quest-deck, rr.play-and-put-into-play, rr.victory, rr.active-location, rr.optional-engagement, rr.travel (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-old-forest.md (The Old Forest, Line readings).
 import { describe, expect, it } from "vitest";
 
 import { forestStart, forestWorld } from "../../../../test/scenarios/the-old-forest/game.ts";

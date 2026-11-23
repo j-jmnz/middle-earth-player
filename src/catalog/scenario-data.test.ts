@@ -61,14 +61,14 @@ describe("a-shadow-of-the-past scenario data", () => {
     expect(definition.stages.map((stage) => stage.code)).toEqual(["141022", "141023", "141024"]);
   });
 
-  // docs/scenarios/fellowship-of-the-ring.md, A Knife in the Dark: the table gains no widget for scenario 2.
+  // docs/scenarios/fellowship-of-the-ring/a-knife-in-the-dark.md, A Knife in the Dark: the table gains no widget for scenario 2.
   it("declares no widget for A Knife in the Dark", () => {
     const knife = scenarioDefinitionSchema.parse(scenarioDefinition(loadScenario("a-knife-in-the-dark"), campaign, EFFECTS));
     expect(knife.widgets).toEqual({ hide: false, lifeTracker: false, burdenDeck: false, secondActiveLocation: false, perSeatStaging: false });
     expect(knife.resolution.map((instruction) => instruction.verb)).toEqual(["ChooseCards"]);
   });
 
-  // docs/scenarios/fellowship-of-the-ring.md, Flight to the Ford burden deck and life: the Setup line creates both pieces.
+  // docs/scenarios/fellowship-of-the-ring/flight-to-the-ford.md, Flight to the Ford burden deck and life: the Setup line creates both pieces.
   it("declares the life tracker and the burden deck for Flight to the Ford, and nothing else", () => {
     const ford = scenarioDefinitionSchema.parse(scenarioDefinition(loadScenario("flight-to-the-ford"), campaign, EFFECTS));
     expect(ford.widgets).toEqual({ hide: false, lifeTracker: true, burdenDeck: true, secondActiveLocation: false, perSeatStaging: false });
