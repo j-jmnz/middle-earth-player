@@ -152,7 +152,7 @@ export function thenFindings(effects: readonly Effect[], textOf: TextOf): Findin
 // A title that tests a second use or the end of a duration says so in one of these words.
 const SECOND_OR_END = /second|twice|again|third|next (?:phase|round|turn)|new (?:phase|round)|end of the (?:phase|round|turn|attack)|expire|ends?\b|lasts?\b|no longer|only once/i;
 // The words of a line that set a limit or a duration.
-const LIMIT_OR_DURATION = /\blimit\b(?! \d+ per deck)|until the end of/i;
+export const LIMIT_OR_DURATION = /\blimit\b(?! \d+ per deck)|until the end of/i;
 
 /** The titles of the tests in a source file: the strings that open `it`, `test` and `describe` (and `it.fails`, `it.each(...)`), as the coverage check reads them. */
 export function testTitles(source: string): string[] {

@@ -9,9 +9,9 @@ You are the reading judge. You start with a fresh context and you only read: you
 
 ## Inputs
 
-The caller gives you the render (`pnpm effects render <scenario-id | codes>`, written to a file) and the campaign's ledger (`data/printed/<campaign>.json`, the text printed on each card side). Read, in this order:
+The caller gives you the render (`pnpm effects render <scenario-id | codes> --checks`, written to a file) and the campaign's ledger (`data/printed/<campaign>.json`, the text printed on each card side). Read, in this order:
 
-1. The render, line by line. Each ledger line is followed by the records that name it, in English; a line with no record says so, and a piece the renderer has no template for is `[json ...]` or `[also {...}]`.
+1. The render, line by line. Each ledger line is followed by the records that name it, in English; a line with no record says so, and a piece the renderer has no template for is `[json ...]` or `[also {...}]`. Under a line, each `CHECK <tag>: <question>` is a fault kind of the next item that applies to it by its words or its record: answer every one.
 2. `docs/agents/effect-authoring.md`, section "Readings the review catches" (`pnpm doc section docs/agents/effect-authoring.md "Readings the review catches"`). Check every line against each reading it lists, and every optional ability (Response, Action) against the one on a barred effect: read the render's `note:` line on it, and call the line `wrong` when the note says the record is offered while its whole effect is barred.
 3. The rule spans the records cite: the rule ids in the authored file's header and in the lines you judge, read with `pnpm data query "select id, title, text from rules where id like '<id>%'"`. Rule wording is taken from there, never from memory. The ledger line wins over any source's transcription (`.claude/rules/authority.md`). A card with no ledger entry is judged against its text in `data/cards` (`pnpm data query`), and its rows say so. Where the record follows a reading the hand-off note marks `researched` or `recommended`, judge it against that reading's source in the order `.claude/rules/authority.md` (Open points) gives; a reading you think a source of higher authority overturns is `ambiguous`, with that source.
 
@@ -30,9 +30,11 @@ Exactly this, nothing before or after:
 
 ```
 <line id> | ok|wrong|ambiguous|render-gap | <clause, or why>
+<line id>#<tag> | ok | -
+<line id>#<tag> | <what is wrong>
 ```
 
-one row per ledger line in the render's order, then:
+one row per ledger line in the render's order, each followed by one `#<tag>` row for every CHECK printed under it (`ok`, or what is wrong: a fault there makes the line `wrong`, or `ambiguous` when it is a real choice). A CHECK with no row is a defect of your output. Then:
 
 ```
 Needs ruling
