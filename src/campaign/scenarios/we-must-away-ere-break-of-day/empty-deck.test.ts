@@ -6,7 +6,7 @@ import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import { idOf, legalIntents, send, start as begin, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 import type { PlayerIntent } from "../../../rules/core/intents.ts";
 
-// 131024:B:1 "Forced: If there are no Troll enemies left in play, or if there are no cards left in the encounter deck, advance it to the next stage." The recorded reading (docs/scenarios/the-hobbit.md): an empty encounter deck advances the stage as soon as the deck has
+// 131024:B:1 "Forced: If there are no Troll enemies left in play, or if there are no cards left in the encounter deck, advance it to the next stage." The recorded reading (docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md, We Must Away, Ere Break of Day): an empty encounter deck advances the stage as soon as the deck has
 // no card, before any reset of it (rr.running-out-of-cards resets an empty deck in the quest phase; here the Forced effect comes first, and the discard pile stays where it is). The Troll half is in spec.test.ts. William is the Troll that stays in play in the rows
 // that need the other half false.
 const B = { stage: "131024", side: "B" } as const;
