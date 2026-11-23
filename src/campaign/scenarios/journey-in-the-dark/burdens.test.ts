@@ -128,12 +128,13 @@ describe("Shadow of Fear (142085:A:2)", () => {
 });
 
 describe("Pursued by the Enemy (142086:A:2)", () => {
-  it("has each enemy engaged with a player attack, and not the Balrog in the staging area", () => {
+  it("has each enemy engaged with a player attack, the Balrog in the staging area too: he is considered engaged with the first player (rr.engaged)", () => {
     const table = make({ seats: 2, doom: 0, staging: [BALROG, "142086"], engaged: [{ code: "orc", seat: 1 }], heroes: ["strong"] });
     const state = fire(table, table.state, first(table.state, "142086"), "142086:whenRevealed:1");
+    // The engaged orc attacks first, then the Balrog (each queued attack runs when the one before it is resolved).
     expect(state.pendingAttack?.enemyId).toBe(first(state, "orc"));
     expect(state.pendingAttack?.seat).toBe(1);
     const alone = make({ doom: 0, staging: [BALROG, "142086"] });
-    expect(fire(alone, alone.state, first(alone.state, "142086"), "142086:whenRevealed:1").pendingAttack).toBeNull();
+    expect(fire(alone, alone.state, first(alone.state, "142086"), "142086:whenRevealed:1").pendingAttack?.enemyId).toBe(first(alone.state, BALROG));
   });
 });
