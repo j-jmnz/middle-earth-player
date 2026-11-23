@@ -19,7 +19,6 @@ import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { lowerThreatByEffect, playerSource } from "../families/quest/threat.ts";
 import { destroyCard, placeDamage } from "../core/keywords.ts";
-import { stagingLocations } from "../quest/quest.ts";
 import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { flagged, inPlay, livingSeats, updateCard, withSeat, withThreat } from "../core/state.ts";
 import { printedOf, scenarioOwned, type PrintedCard } from "../core/printed.ts";
@@ -35,7 +34,7 @@ import { addToVictory } from "../families/sidequests/victory.ts";
 import { placeSideQuest } from "../families/sidequests/play.ts";
 import { isQuestSource } from "../families/wilderland/night-quest.ts";
 import { announceCanceled } from "../families/nightmare/index.ts";
-import { immuneTo } from "./immune-targets.ts";
+import { touchableStagingLocations } from "./immune-targets.ts";
 
 // Verbs of the player cards. A Pick (effect-frames.ts) chooses a card or a player and the verbs after it act on the choice.
 export type PlayerFocus = { seat: number; sourceId: string | null };
@@ -188,7 +187,7 @@ export function runPlayerVerb(
       const scope = frameScope(state, focus.seat, focus.sourceId);
       const targets =
         instruction.target === "eachStagingLocation"
-          ? stagingLocations(state, ctx.cards).filter((id) => !immuneTo(state, id, focus.sourceId, ctx))
+          ? touchableStagingLocations(state, focus.sourceId, ctx)
           : [refCard(state, instruction.target === "self" ? "self" : instruction.target, scope) ?? ""];
       const amount = resolveAmount(state, instruction.amount, scope, ctx);
       let next = state;

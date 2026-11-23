@@ -12,9 +12,8 @@ import { familyIdle, familyIdleCards } from "../interpret/family-hooks.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { pickCandidates, seatsOf } from "../interpret/pick.ts";
 import { targetCandidates } from "../interpret/effect-verbs.ts";
-import { immuneTo } from "../interpret/immune-targets.ts";
+import { touchableStagingLocations } from "../interpret/immune-targets.ts";
 import { characters } from "../combat/combat.ts";
-import { stagingLocations } from "../quest/quest.ts";
 import type { AmountScope } from "../interpret/amounts.ts";
 import { deckPool } from "../families/uncharted/pick.ts";
 import { amountIdle, candidatesOf, conditionScope, namedCards, readCandidates, readsTable, seatsOfWho } from "./idle-reads.ts";
@@ -115,15 +114,15 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
     }
     case "PlaceProgressOn":
       // "Place 1 progress on each location in the staging area" with none there, or none that the effect may touch.
-      return (instruction.target === "eachStagingLocation" && stagingLocations(state, ctx.cards).filter((id) => !immuneTo(state, id, sourceId, ctx)).length === 0) || amountIdle(state, instruction.amount, frame, ctx);
+      return (instruction.target === "eachStagingLocation" && touchableStagingLocations(state, sourceId, ctx).length === 0) || amountIdle(state, instruction.amount, frame, ctx);
     case "Each": {
       // "Heal 1 damage on up to 2 damaged characters" with no damaged character: an upTo that finds no card does nothing.
       // A pick from a deck with cards in it reads cards the player cannot see (rr.search): the deck's contents are not read, so the effect is not told idle.
       if (readsHiddenDeck(state, instruction.pick, frame)) return false;
-      if (instruction.upTo != null) return frame.picked == null && pickCandidates(state, instruction.pick, frame.seat, [], sourceId, ctx, frame.scope.x, frame.scope.participants, false, { subject: frame.scope.subject ?? null, other: frame.scope.other ?? null }).length === 0;
+      if (instruction.upTo != null) return frame.picked == null && eachCandidates(state, instruction.pick, [], sourceId, frame, ctx).length === 0;
       // The cards the Each reads may depend on the card an earlier Pick chose ("each hero the chosen player controls"): read for each candidate of that choice.
       return (frame.picked ?? [null]).every((from) => {
-        const found = pickCandidates(state, instruction.pick, frame.seat, from == null ? [] : [from], sourceId, ctx, frame.scope.x, frame.scope.participants, false, { subject: frame.scope.subject ?? null, other: frame.scope.other ?? null });
+        const found = eachCandidates(state, instruction.pick, from == null ? [] : [from], sourceId, frame, ctx);
         return found.every((id) => idleList(state, instruction.instructions, sourceId, { ...frame, picked: [id] }, ctx, inBranch(mark)));
       });
     }
@@ -145,6 +144,11 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
     default:
       return ON_PICKED.has(instruction.verb) && frame.picked != null && frame.picked.length === 0;
   }
+}
+
+// The cards an Each reads: the pick's candidates for the cards an earlier Pick chose (`from`), with the event's subject and other card.
+function eachCandidates(state: ScenarioState, pick: PickSpec, from: readonly string[], sourceId: string, frame: IdleFrame, ctx: ReduceContext): string[] {
+  return pickCandidates(state, pick, frame.seat, from, sourceId, ctx, frame.scope.x, frame.scope.participants, false, { subject: frame.scope.subject ?? null, other: frame.scope.other ?? null });
 }
 
 // A step that pays for the rest of the effect ("discard a card to draw 1", "give it Doomed 1 to draw a card", "exhaust Gandalf to search"): it is idle when the rest is.
