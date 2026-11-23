@@ -1,4 +1,4 @@
-// Rules: rr.resources, rr.resource-match, rr.cost, rr.attachment-cards, rr.lasting-effects (data/rules/entries.json).
+// Rules: rr.resources, rr.resource-match, rr.cost, rr.attachment-cards, rr.lasting-effects, mec108.create-staging-area, hob.staging-area-creating (data/rules/entries.json).
 //
 // The costs family's verbs that change a pool, the effect's X or a discount: ReduceNextCost ("reduce the cost of the next
 // Silvan ally you play this phase by 1"), ChooseX ("discard X cards from your hand"), DiscardResources, SpendResources ("the
@@ -94,7 +94,7 @@ export function discardResources(state: ScenarioState, instruction: Extract<Inst
 
 // The heroes whose resources can pay `sphere` for the actor, or for any player with `group`, and what they hold in all.
 export function spendablePools(state: ScenarioState, actor: number, spec: { sphere?: Sphere | undefined; group?: boolean | undefined }, ctx: ReduceContext): { pools: string[]; total: number } {
-  // `group`: the players who share the actor's staging area, all of them while the area is shared (hob.staging-area-creating: only players that share a staging area can interact).
+  // `group`: the players who share the actor's staging area, all of them while the area is shared (mec108.create-staging-area, hob.staging-area-creating: only players that share a staging area can interact).
   const seats = spec.group ? sharing(state, actor) : [actor];
   const pools = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, spec.sphere ?? null, ctx));
   return { pools, total: pools.reduce((sum, id) => sum + (state.cards[id]?.resources ?? 0), 0) };
