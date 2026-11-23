@@ -16,5 +16,6 @@
 - [ ] `pnpm test`
 - [ ] `pnpm data check` (when the engine or `data/` could move)
 - [ ] `pnpm effects open` run if records changed
+- [ ] A `Reviewed:` line in a commit body if `src/rules` or `src/effects/authored` changed
 - [ ] No version bump or tag (the release workflow makes them)
 - [ ] No card scans, card pictures, PDFs, `assets/catalog.db` or filled `scan-map.ts` committed
