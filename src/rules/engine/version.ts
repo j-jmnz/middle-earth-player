@@ -139,6 +139,8 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: ["across-the-ettenmoors", "escape-from-khazad-dum", "fog-on-the-barrow-downs", "into-the-pit", "mount-gundabad", "murder-at-the-prancing-pony", "the-battle-of-the-pelennor-fields", "the-black-gate-opens", "the-dread-realm", "the-ghost-of-framsburg", "the-hunt-for-gollum", "the-kings-quest", "the-long-dark", "the-mines-of-moria", "the-old-forest", "the-road-to-isengard", "the-wastes-of-eriador", "the-woodland-realm"], note: "A card that attaches itself to a card, like Hired Muscle, never attaches to a card that cannot have attachments: Hired Muscle never goes on a Suspect, but on another Brigand enemy." },
   { version: 38, scenarios: "all", note: "A character that gains a resource icon belongs to that sphere for the cards that read a sphere, not only for paying: Song of Wisdom makes a hero a Lore hero for Healing Herbs, and Narya lets Mariner's Compass go on Círdan or Gandalf." },
   { version: 38, scenarios: "all", note: "Thrór's Ring is not offered while the hero it readies is ready, Gimli (16001) and Legolas (16002) only when another hero is exhausted or the partner they give a bonus is there, and Imladris Stargazer only for a player whose deck holds a card." },
+  { version: 38, scenarios: "all", note: "A card that costs nothing still needs a hero with its sphere, even when Treebeard or Radagast holds resources: their pool stands in for a hero only when something is paid from it." },
+  { version: 38, scenarios: "all", note: "Wiglaf's Action cannot exhaust an encounter attachment on him, such as a Condition: only an attachment you control pays it." },
 ];
 
 export const ENGINE_VERSION = 38;

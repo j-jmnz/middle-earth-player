@@ -43,6 +43,7 @@ const FATTY = "141005";
 const SAM = "141002";
 const CARD = "card";
 const PAL = "pal";
+const PLAIN = "plain";
 const ALLY = "ally";
 const WEAK = "f0";
 // A Noble hero for Valiant Sword, and an enemy with no defense that no attack here destroys.
@@ -145,6 +146,31 @@ describe("Soldier of Erebor 19085:A:1 with fewer than 3 cards in the deck", () =
   });
 });
 
+describe("Treebeard 08146: his resources and the resource match", () => {
+  // Aragorn (Leadership) is the only hero. Treebeard holds resources; Booming Ent (Tactics, cost 4 in the hand: too dear) and Entmoot (Lore,
+  // cost 0) are in the hand. His pool pays for an Ent of any sphere with no resource match (AEP 2.26); a 0-cost Ent has nothing for his pool to pay,
+  // so it still needs a hero with its sphere (AEP 2.61).
+  function ents(resources: number): Table {
+    const tab = table({ heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: TREEBEARD, seat: 0 }], hand: [{ code: ENTMOOT, seat: 0 }, { code: BOOMING, seat: 0 }], playerDeck: fillers(CARD, 5) }, 0);
+    return { ...tab, state: updateCard(tab.state, idsOf(tab, TREEBEARD), { resources }) };
+  }
+
+  it("a 0-cost Lore Ent is not offered with no Lore hero, though Treebeard holds resources", () => {
+    const tab = ents(4);
+    expect(playable(tab)).not.toContain(idsOf(tab, ENTMOOT));
+  });
+
+  it("the same Entmoot is offered once a Lore hero is there", () => {
+    const tab = table({ heroes: [{ code: ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }], allies: [{ code: TREEBEARD, seat: 0 }], hand: [{ code: ENTMOOT, seat: 0 }], playerDeck: fillers(CARD, 5) }, 0);
+    expect(playable(tab)).toContain(idsOf(tab, ENTMOOT));
+  });
+
+  it("a Tactics Ent that costs resources is offered with no Tactics hero, to be paid from his pool", () => {
+    const tab = ents(4);
+    expect(playable(tab)).toContain(idsOf(tab, BOOMING));
+  });
+});
+
 describe("Ithilien Pit 06064:A:3 on an enemy in the staging area", () => {
   // "Any character may choose attached enemy as the target of an attack.": the attached enemy lies in the staging area, engaged with no one, and the
   // player attacks it in the player attack window of the combat phase (AEP 3.084; community reading, docs/brief.md, Player card readings).
@@ -217,6 +243,29 @@ describe("Favor of the Valar 10124:A:1 on another player's threat dial", () => {
     expect(saved.seats[1]?.threat).toBe(45);
     expect(saved.cards[favor]?.zone).toBe("discard");
     expect(raised(0).seats[0]?.eliminated).toBe(true);
+  });
+});
+
+describe("Wiglaf 19027:A:2 and an encounter attachment on him", () => {
+  // "Exhaust an attachment on Wiglaf to ready him.": a cost is paid with cards the player controls (rr.cost), and an encounter attachment stays the
+  // scenario's (AEP 1.06): with only that one on him the Action is not offered; a player attachment beside it is the only one offered.
+  function wiglaf(withOwn: boolean): { tab: Table; own: string } {
+    const scene = table({ heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: WIGLAF, seat: 0 }, { code: PLAIN, seat: 0 }, ...(withOwn ? [{ code: PLAIN, seat: 0 }] : [])] });
+    const [encounter = "", own = ""] = scene.ids[PLAIN] ?? [];
+    const hung = attach({ ...scene, state: updateCard(scene.state, encounter, { controller: null }) }, [[encounter, idsOf(scene, WIGLAF)], ...(withOwn ? [[own, idsOf(scene, WIGLAF)] as const] : [])]);
+    return { tab: { ...hung, state: updateCard(hung.state, idsOf(hung, WIGLAF), { exhausted: true }) }, own };
+  }
+
+  it("is not offered when the only attachment on him is the scenario's", () => {
+    const { tab } = wiglaf(false);
+    expect(triggers(tab.state, tab)).not.toContain("19027:action:1");
+  });
+
+  it("offers only the player's attachment when both are on him", () => {
+    const { tab, own } = wiglaf(true);
+    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, WIGLAF), effectId: "19027:action:1" }, tab.ctx);
+    expect(run.state.cards[idsOf(tab, WIGLAF)]?.exhausted).toBe(false);
+    expect(run.state.cards[own]?.exhausted).toBe(true);
   });
 });
 

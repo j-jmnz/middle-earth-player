@@ -1,5 +1,6 @@
 // Rules: rr.resource-match, rr.resources (data/rules/entries.json).
 import { grantedIcons } from "../interpret/conditions.ts";
+import { playCost } from "./attach.ts";
 import { heroPaysFor } from "./cost-rules.ts";
 import { deckPlayIcons } from "./deck-play.ts";
 import { allyPools, cannotPay, flagIcons, iconLost, payerOk, payingIcons } from "../families/costs/pay.ts";
@@ -29,7 +30,11 @@ export function heroPays(state: ScenarioState, heroId: string, sphere: Sphere | 
 // 0-cost card is no exception (rr.resource-match). A neutral card needs none. An ally whose pool pays for the card counts.
 export function hasResourceMatch(state: ScenarioState, seat: number, sphere: Sphere | null, ctx: ReduceContext, forCard?: string): boolean {
   if (sphere == null || sphere === "neutral") return true;
-  return [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, forCard, ctx), ...openPools(state, seat, forCard, ctx)].some((id) => heroPays(state, id, sphere, ctx, forCard));
+  if ((state.seats[seat]?.heroes ?? []).some((id) => heroPays(state, id, sphere, ctx, forCard))) return true;
+  // A pool that pays for the card by its own text (Treebeard, Radagast) stands in for a hero's icon only when a resource is paid from it: a card that costs
+  // nothing has nothing to pay, so it still needs a hero with its icon (AEP 2.26 and 2.61, docs/brief.md, Player card readings).
+  if (forCard == null || (playCost(state, forCard, seat, ctx) ?? 1) <= 0) return false;
+  return [...allyPools(state, seat, forCard, ctx), ...openPools(state, seat, forCard, ctx)].some((id) => heroPays(state, id, sphere, ctx, forCard));
 }
 
 // Checks an offered resource payment against a cost: whole numbers, heroes the seat controls, the sphere
