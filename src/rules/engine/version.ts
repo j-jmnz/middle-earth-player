@@ -144,6 +144,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 38, scenarios: "all", note: "Wiglaf's Action cannot exhaust an encounter attachment on him, such as a Condition: only an attachment you control pays it." },
   { version: 39, scenarios: ["the-uruk-hai", "helms-deep", "the-road-to-isengard", "the-passing-of-the-grey-company", "the-siege-of-gondor", "the-battle-of-the-pelennor-fields", "the-black-gate-opens"], note: "A player whose last hero is Aragorn is eliminated when the first player token passes him on." },
   { version: 39, scenarios: ["journey-up-the-anduin", "lost-in-mirkwood", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"], note: "A treasure in your hand, like Anvil of Gundabad or Axe of the Edain, can be played onto its host like an attachment, and Durin's Dagger can be played from the discard pile." },
+  { version: 39, scenarios: "all", note: "Sting's Response is offered only to a hero that exhausted to defend, not to one an effect made a defender while it was already exhausted." },
 ];
 
 export const ENGINE_VERSION = 39;

@@ -51,12 +51,24 @@ describe("after the attached hero exhausts to defend (Sting, 142011:A:3)", () =>
     const sting = put(orc.state, "142011", "play");
     let state = attachTo(updateCard(sting.state, ranger, { exhausted: true }), sting.id, ranger);
     state = { ...state, pendingAttack: { enemyId: orc.id, seat: 0, defenderId: ranger } };
-    const asked = respond(state, { trigger: "declaredDefender", seat: 0, cardId: ranger, other: orc.id });
+    const asked = respond(state, { trigger: "declaredDefender", seat: 0, cardId: ranger, other: orc.id, exhaustedToDefend: true });
     expect(offered(asked, ctx)).toContainEqual({ type: "Trigger", cardId: sting.id, effectId: "142011:response:1" });
     const done = send(asked, { type: "Trigger", cardId: sting.id, effectId: "142011:response:1" }, ctx);
     expect(done.encounterDiscard[0]).toBe(built.ids[0]);
     // The troll's 3 Threat destroys the 3 hit point orc.
     expect(done.cards[orc.id]?.zone).toBe("encounterDiscard");
+  });
+
+  it("is not offered to a hero that was exhausted already when an effect declared it a defender", () => {
+    const table = seat();
+    const ranger = table.heroes[0] ?? "";
+    const built = deck(table.state, ["troll", "marsh"]);
+    const orc = put(built.state, "orc", "engaged");
+    const sting = put(orc.state, "142011", "play");
+    let state = attachTo(updateCard(sting.state, ranger, { exhausted: true }), sting.id, ranger);
+    state = { ...state, pendingAttack: { enemyId: orc.id, seat: 0, defenderId: ranger } };
+    const asked = respond(state, { trigger: "declaredDefender", seat: 0, cardId: ranger, other: orc.id });
+    expect(offered(asked, ctx)).not.toContainEqual({ type: "Trigger", cardId: sting.id, effectId: "142011:response:1" });
   });
 });
 
