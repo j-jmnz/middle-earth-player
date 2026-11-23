@@ -1,4 +1,4 @@
-// Rules: hob.staging-area-creating, hob.staging-area-combining, mec109.multiple-staging-areas (data/rules/entries.json); ledger lines 132025:A:3, 132028:A:2, 132030:A:2, 132069:B:3, 132070:B:3, 132035:A:1, 132035:A:2, 132037:A:1.
+// Rules: hob.staging-area-creating, hob.staging-area-combining, mec109.multiple-staging-areas (data/rules/entries.json); ledger lines 132038:A:1, 132025:A:3, 132028:A:2, 132030:A:2, 132069:B:3, 132070:B:3, 132035:A:1, 132035:A:2, 132037:A:1.
 // Once stage 2B has split the players, each staging area resolves as if only its players were in the game: "Encounter card effects are limited to each staging area" (hob.staging-area-creating). The first player is at stage 3 in an area of his own (seat 0); the other player is at stage 4 in the original area (seat 1).
 import { describe, expect, it } from "vitest";
 
@@ -133,8 +133,7 @@ describe("area scope of Flies and Spiders' own cards", () => {
     for (const hero of out.seats[0]?.heroes ?? []) expect(out.cards[hero]?.committed, "area of the token holder").toBe(true);
   });
 
-  // Weighed Down's lasting effect reaches every exhausted character in play, the other area's included (the set's record is `target: characters`, owned by the branch of The Battle of Five Armies): the gap stays visible until its fix lands.
-  it.fails("132038:A:1 Weighed Down gives -1 only to the exhausted characters of the area it was revealed to", () => {
+  it("132038:A:1 Weighed Down gives -1 only to the exhausted characters of the area it was revealed to", () => {
     const { t, state: made } = split();
     const out = revealTo(t, awake(t, made, false, true), "132038", 1);
     const printed = (hero: string) => t.ctx.cards.get(out.cards[hero]?.code ?? "")?.willpower ?? 0;
