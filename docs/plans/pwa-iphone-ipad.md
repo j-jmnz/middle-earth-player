@@ -26,6 +26,10 @@ The app already runs in a browser: the desktop app is the web export in Electron
 - **Keep awake.** The Screen Wake Lock API works in Safari, and in Home Screen apps from iOS 18.4.
 - **Install.** iOS shows no install prompt: the player uses Share, then Add to Home Screen. The app must show those steps.
 
+### Other browsers
+
+The site is one web build with standard headers, so it serves more than Apple devices. Chrome and Edge on a computer run it and offer Install once the manifest exists; Chrome on Android does the same, a second client beside the APK. Every browser on iOS uses Safari's engine and behaves as Safari does. Firefox on a computer has the headers and the storage but no install, so the app stays a tab. Only Chromium is checked here. Each browser keeps its own saves; Back up saves moves a game between them. A browser inside another app (Discord, Facebook, Instagram) often blocks the storage or the install, and a browser too old for isolation or OPFS cannot open the database.
+
 ### Cloudflare fit
 
 | Need | Cloudflare product | Note |
@@ -90,9 +94,12 @@ No player has to find a Settings page to get pictures (user decision, 2026-11-23
 - **Status where the player is.** The campaign hub marks each campaign "Ready offline" or shows its progress, and a tap starts or stops that campaign's download. With no network, a briefing whose pictures are not all on the device says how many cards will be drawn as text before the game starts.
 - **Settings only manages.** A Pictures page shows the storage used for each campaign, the decks and all, with Remove. Remove deletes the pictures no other kept group uses, and never a save or a deck.
 
-## Phase 3: iPhone and iPad fit
+## Phase 3: iPhone, iPad and other browsers
 
 - An install screen for Safari on iOS that is not standalone: the Share and Add to Home Screen steps, and a warning that games in the tab are deleted after a week away and do not move to the installed app.
+- A check before the database opens: a browser that is not cross-origin isolated or has no OPFS shows one screen, "This browser cannot run the app. Open this address in Safari or Chrome.", never an error or an empty page.
+- A browser inside another app (the user agent of Discord, Facebook, Instagram and the like) shows "Open in Safari" with the steps, or "Open in Chrome" on Android, before anything is saved: a link shared on Discord opens there first.
+- The install steps follow the browser: Share and Add to Home Screen on iOS, the browser's own Install prompt on Chrome and Edge, none on Firefox.
 - A reminder to back up: the Saves page says when the last backup was made, since the web app has no system backup.
 - Haptic settings hidden, the Screen Wake Lock for Keep the screen awake, audio unlocked on the first tap and paused when the page is hidden.
 - Touch and layout pass on the phone and tablet sizes with `pnpm browser shot` (Chromium) and on the devices: pinch and double-tap zoom off on the table, no rubber-band scroll behind the canvas, the keyboard over the deck search, the Home indicator and the notch.
