@@ -151,6 +151,8 @@ export const RECORDS: readonly Effect[] = [
     timing: "action",
     anyPlayer: true,
     limit: "oncePerPhase",
+    // Ceorl must be exhausted: what follows "Then" resolves only if the ready did (rr.then), and a ready of a ready card does nothing (rr.triggered-ability).
+    condition: { kind: "matches", card: "self", pick: { type: "ally", control: "any", state: "exhausted" } },
     cost: { kind: "resources", amount: 1, sphere: "spirit" },
     instructions: [
       { verb: "Ready" },

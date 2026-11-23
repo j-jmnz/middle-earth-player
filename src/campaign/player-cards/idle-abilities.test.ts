@@ -23,6 +23,8 @@ const MEN_OF_THE_WEST = "06083";
 const HUNTER = "05014";
 const EXPLORER = "12037";
 const WARDEN = "04083";
+const CEORL = "12058";
+const MENDOR = "01135";
 const KNIFE_WORK = "12114";
 const ELROND = "08032";
 const ATHELAS = "09011";
@@ -51,7 +53,7 @@ const offeredPlay = (tab: Table, code: string): boolean => playableCards(tab.sta
 
 beforeAll(async () => {
   const starter = await starterBase();
-  base = { ...starter, cards: new Map([...starter.cards, ...(await loadPrinted([STALLION, BILL, RALLYING_CRY, KNIFE_WORK, ELROND, ATHELAS, SHADOW, GIMLI, GRIM_RESOLVE, NORTHERN_TRACKER, WE_DO_NOT_SLEEP, CAPTAINS, MEN_OF_THE_WEST, HUNTER, EXPLORER, WARDEN, ARAGORN_LORE, ARAGORN, BERAVOR, ELEANOR, DUNHERE]))]) };
+  base = { ...starter, cards: new Map([...starter.cards, ...(await loadPrinted([STALLION, BILL, RALLYING_CRY, KNIFE_WORK, ELROND, ATHELAS, SHADOW, GIMLI, GRIM_RESOLVE, NORTHERN_TRACKER, WE_DO_NOT_SLEEP, CAPTAINS, MEN_OF_THE_WEST, HUNTER, EXPLORER, WARDEN, CEORL, MENDOR, ARAGORN_LORE, ARAGORN, BERAVOR, ELEANOR, DUNHERE]))]) };
   base.cards.set(NOBLE, definePrinted({ code: NOBLE, name: "Noble", type: "hero", sphere: "leadership", threat: 9, willpower: 1, attack: 1, defense: 1, health: 3, traits: ["Noble"] }));
 });
 
@@ -260,5 +262,41 @@ describe("Wild Stallion 19033:A:2 with only an ally that cannot have attachments
 
   it("is offered when another ally can take it", () => {
     expect(triggers(stallion(HELPER).state, stallion(HELPER))).toContain("19033:action:1");
+  });
+});
+
+describe("Ceorl 12058:A:1 while he is ready", () => {
+  // "Spend 1 Spirit resource to ready Ceorl. Then, you may give control of Ceorl to another player." The part after "Then" resolves only if the ready did (rr.then), so a ready Ceorl is not offered.
+  const ceorl = (exhausted: boolean): Table => {
+    const tab = table({ heroes: [{ code: ELEANOR, seat: 0 }], allies: [{ code: CEORL, seat: 0 }] });
+    return exhausted ? exhaust(tab, CEORL) : tab;
+  };
+
+  it("is not offered while Ceorl is ready", () => {
+    expect(triggers(ceorl(false).state, ceorl(false))).not.toContain("12058:action:1");
+  });
+
+  it("is offered once Ceorl is exhausted", () => {
+    expect(triggers(ceorl(true).state, ceorl(true))).toContain("12058:action:1");
+  });
+});
+
+describe("Mendor 01135:A:3 while he is ready", () => {
+  // "Response: After a quest card is defeated, ready Mendor. Then, each player draws 1 card." The draw resolves only if the ready did (rr.then), so a ready Mendor is not offered.
+  function defeated(exhausted: boolean): { tab: Table; state: ReturnType<typeof settle> } {
+    const base = table({ heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: MENDOR, seat: 0 }] });
+    const tab = exhausted ? exhaust(base, MENDOR) : base;
+    const event = { ...tab.state, window: null, pendingEvents: [{ trigger: "questCardDefeated" as const, seat: 0, cardId: idsOf(tab, MENDOR) }] };
+    return { tab, state: settle(event, tab.ctx, []) };
+  }
+
+  it("is not offered while Mendor is ready", () => {
+    const { tab, state } = defeated(false);
+    expect(triggers(state, tab)).not.toContain("01135:response:1");
+  });
+
+  it("is offered once Mendor is exhausted", () => {
+    const { tab, state } = defeated(true);
+    expect(triggers(state, tab)).toContain("01135:response:1");
   });
 });
