@@ -7,6 +7,7 @@ import { answer, endPhase, endRound, resolve } from "../../../../test/harness/ca
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import { playedLayout } from "../../../../test/harness/card-spec-play.ts";
 import { finish, idOf, legalIntents, legalTargets, resolveRecords, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { spentThisRound } from "../../../rules/families/costs/pay.ts";
 import { updateCard } from "../../../rules/core/state.ts";
 import { spawn } from "../../../rules/core/zones.ts";
@@ -98,6 +99,37 @@ lineSpec("131068:A:1", "the Action costs 1 Baggins resource, adds 1 of the top 2
   const two = withBilbo(table({ ...layout, seats: 2 }, effects), 1);
   expect(offered(two, "131068")).toBeDefined();
   expect(offered({ ...two, state: { ...two.state, activeSeat: 1 } }, "131068")).toBeUndefined();
+});
+
+const blanked = (state: { modifiers: readonly { stat: string; instanceId: string }[] }, id: string): boolean => state.modifiers.some((modifier) => modifier.stat === "blankText" && modifier.instanceId === id);
+
+const threatOf = (done: ReturnType<typeof playedLayout>, code: string): number => modifiedStat(done.run.state, done.run.state.cards[idOf(done.run.state, code)]!, "threat", done.table.cards);
+
+lineSpec("131071:A:1", "the +1 Threat holds only after enemies returned (rr.then), lasts to the end of the phase and is not given again by a second reveal with none engaged", (effects) => {
+  const layout = { stage: "131027", phase: "Quest", staging: ["131058"], engaged: ["f3"] } satisfies Layout;
+  const once = playedLayout(ID, layout, resolve("131071", "whenRevealed"), effects, true);
+  expect(threatOf(once, "131058")).toBe(3);
+  // With no enemy engaged the part before "then" resolves nothing: no Goblin gets +1 Threat.
+  const none = playedLayout(ID, { ...layout, engaged: [] }, [resolve("131071", "whenRevealed")], effects, true);
+  expect(threatOf(none, "131058")).toBe(2);
+  // A second reveal in the phase finds no engaged enemy left: the first +1 stays and no second one is added.
+  expect(threatOf(playedLayout(ID, layout, [resolve("131071", "whenRevealed"), resolve("131071", "whenRevealed")], effects, true), "131058")).toBe(3);
+  // The end of the phase ends the +1 Threat.
+  expect(threatOf(playedLayout(ID, layout, [resolve("131071", "whenRevealed"), endPhase], effects, true), "131058")).toBe(2);
+});
+
+lineSpec("131066:A:2", "the text is blank until the end of the round, so the Action is not offered a second time in the round and is offered again in the next round", (effects) => {
+  const layout = { active: "131066", phase: "Quest" } satisfies Layout;
+  const made = withBilbo(table(layout, effects), 4);
+  const porch = idOf(made.state, "131066");
+  const first = finish(send(start(made.state), paying(offered(made, "131066"), idOf(made.state, BILBO), 2), made.ctx), made.ctx);
+  expect(blanked(first.state, porch)).toBe(true);
+  // Blank, the card has no Action: with 2 Baggins resources left it is not offered again this round.
+  expect(offered({ ...made, state: first.state }, "131066")).toBeUndefined();
+  // The end of the round ends the blank.
+  const done = playedLayout(ID, layout, [resolve("131066", "action"), ...Array.from({ length: 7 }, () => endPhase)], effects, true);
+  expect(blanked(done.run.state, idOf(done.run.state, "131066"))).toBe(false);
+  expect(blanked(playedLayout(ID, layout, [resolve("131066", "action")], effects, true).run.state, porch)).toBe(true);
 });
 
 lineSpec("131066:A:2", "the first player pays 2 Baggins resources from Bilbo's pool, and no other player may", (effects) => {

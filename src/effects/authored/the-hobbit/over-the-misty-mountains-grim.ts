@@ -11,6 +11,8 @@ const GREAT_GOBLIN = "131063";
 const STONE_GIANT = "131064";
 const BILBO: PickSpec = { type: "card", control: "any", names: ["Bilbo Baggins"] };
 const TREASURE_IN_DECK: PickSpec = { type: "card", control: "you", from: "deck", cardType: "treasure" };
+const ENGAGED_ENEMY_YOU: PickSpec = { type: "enemy", control: "any", engaged: "you" };
+const ENGAGED_ENEMY_OTHER: PickSpec = { type: "enemy", control: "any", engaged: "other" };
 const GOBLIN_ENEMIES: PickSpec = { type: "enemy", control: "any", trait: "Goblin", staging: true };
 const STONE_GIANT_IN_STAGING: PickSpec = { type: "enemy", control: "any", stagingOnly: true, names: ["Stone-Giant"] };
 /** "If The Great Goblin is in the victory display". */
@@ -183,9 +185,11 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "131071",
       lines: ["131071:A:1"],
       timing: "whenRevealed",
+      // "Then" (rr.then; recommended, docs/scenarios/the-hobbit.md): with no enemy engaged the return resolves nothing, so no Goblin gets +1 Threat. The +1 comes first, on every Goblin enemy in play
+      // (an engaged one returns at once), because the check for an engaged enemy reads the table before the return.
       instructions: [
+        { verb: "ModifyStat", stat: "threat", amount: 1, until: "endOfPhase", holders: GOBLIN_ENEMIES, when: { kind: "any", conditions: [{ kind: "canPick", pick: ENGAGED_ENEMY_YOU }, { kind: "canPick", pick: ENGAGED_ENEMY_OTHER }] } },
         { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Each", pick: { type: "enemy", control: "any", engaged: "you" }, instructions: [{ verb: "ReturnToStaging", target: { kind: "picked" } }] }] },
-        { verb: "ModifyStat", stat: "threat", amount: 1, until: "endOfPhase", holders: GOBLIN_ENEMIES },
       ],
     },
     { id: "131071:shadow:1", cardCode: "131071", lines: ["131071:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ReturnToStaging", target: { kind: "self" } }] }] },

@@ -48,6 +48,7 @@ const ROWS: readonly Row[] = [
   { line: "131069:A:2", name: "Forced: at the end of the round X progress tokens come off the current quest", layout: { stage: "131027", seats: 2, progress: 5, staging: [HIGH_PASS] }, act: announce("endOfRound", undefined, { seat: null, phase: "End of round" }), expect: [progressOn("131027", 3)] },
   // 131071 Chaos in the Cavern.
   { line: "131071:A:1", name: "When Revealed: all engaged enemies return to the staging area, then each Goblin enemy gets +1 Threat until the end of the phase", layout: { stage: "131027", engaged: [AXEMAN, "f3"] }, act: resolve(CHAOS, "whenRevealed"), expect: [zone(AXEMAN, "staging"), zone("f3", "staging"), stat(AXEMAN, "threat", 3), stat("f3", "threat", 3)] },
+  { line: "131071:A:1", name: "an enemy engaged with the second player returns too, and the Goblin that was in the staging area gets +1 Threat", layout: { stage: "131027", seats: 2, staging: [AXEMAN], engaged: ["f3"] }, act: resolve(CHAOS, "whenRevealed"), expect: [zone("f3", "staging"), stat(AXEMAN, "threat", 3)] },
   { line: "131071:A:2", name: "Shadow: the attacking enemy returns to the staging area after its attack resolves", layout: { stage: "131027", engaged: ["f3"], deck: ["f0", "f0", "f0"] }, act: attack("f3", { shadow: CHAOS, undefended: true }), expect: [zone("f3", "staging"), damageOn("dh1", 1)] },
 ];
 
