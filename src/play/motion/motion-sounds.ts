@@ -21,8 +21,8 @@ function cueOf(slot: CardSlot | undefined, motion: Motion, fresh: boolean): Soun
   if (slot.zone === "hand" && motion.arc > 0) return { at: motion.delay, slot: "card.draw" };
   // Revealed or turned face up: flips and lands with a pop.
   if (motion.flip && motion.land === "pop") return { at: motion.delay, slot: "card.flip" };
-  // Exhausted or readied in place: the quarter turn.
-  if (turnOnly(motion)) return { at: motion.delay, slot: slot.exhausted ? "card.exhaust" : "card.ready" };
+  // Exhausted or readied in place: the quarter turn. A character made unconscious turns away like an exhausted one, and one readied turns back (hob.unconscious-characters).
+  if (turnOnly(motion)) return { at: motion.delay, slot: slot.exhausted || slot.unconscious === true ? "card.exhaust" : "card.ready" };
   return null;
 }
 

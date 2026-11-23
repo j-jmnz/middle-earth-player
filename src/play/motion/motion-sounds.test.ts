@@ -38,6 +38,13 @@ describe("motion sounds", () => {
     expect(motionCues(motions, [], slots, new Set(["x", "r"]), false).map((cue) => cue.slot)).toEqual(["card.exhaust", "card.ready", "dread.shadow", "card.flip"]);
   });
 
+  it("sounds a character made unconscious as an exhaust and one readied from it as a ready (hob.unconscious-characters)", () => {
+    const down = new Map([["u", { ...AT_REST, fromRot: 0, toRot: Math.PI }]]);
+    expect(motionCues(down, [], [slot("u", "play", { unconscious: true })], new Set(["u"]), false).map((cue) => cue.slot)).toEqual(["card.exhaust"]);
+    const up = new Map([["u", { ...AT_REST, fromRot: Math.PI, toRot: 0 }]]);
+    expect(motionCues(up, [], [slot("u", "play")], new Set(["u"]), false).map((cue) => cue.slot)).toEqual(["card.ready"]);
+  });
+
   it("makes no sound for a card that only shifts, and discards when a card shakes away", () => {
     const slots = [slot("a", "play")];
     const ghost = { slot: slot("g", "play"), dx: 0, dy: 0, scale: 1, rot: 0, leave: "shake" } as Ghost;
