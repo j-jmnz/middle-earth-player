@@ -7,11 +7,11 @@ const sorted = (verbs: ReadonlySet<string>) => [...verbs].sort();
 
 describe("verb flags", () => {
   it("mark exactly the verbs a Shadow effect runs in a frame for", () => {
-    expect(sorted(verbsRunningInFrame())).toEqual(["AssignDamage", "Choose", "DiscardBottom", "DiscardFromDeck", "EngageOrGrapple", "Each", "EscapeTest", "ForEachPlayer", "ImmediateAttack", "LocateTest", "Pick", "Repeat", "ResolveGrapple", "ResolveWhenRevealed", "ResolveWhenRevealedOf", "RevealEncounter", "RevealEnemies", "RevealTopEnemies", "SearchMove", "SearchReveal", "TriggerLost"].sort());
+    expect(sorted(verbsRunningInFrame())).toEqual(["AssignDamage", "Choose", "DiscardBottom", "DiscardFromDeck", "EngageOrGrapple", "Each", "EscapeTest", "ForEachPlayer", "ImmediateAttack", "LocateTest", "Pick", "Repeat", "ResolveGrapple", "ResolveWhenRevealed", "ResolveWhenRevealedOf", "RevealEncounter", "RevealEnemies", "RevealTopEnemies", "Sack", "SearchMove", "SearchReveal", "TriggerLost"].sort());
   });
 
   it("mark exactly the verbs that make a quest card's Setup run", () => {
-    expect(sorted(setupRunVerbs("top"))).toEqual(["AttachSetAside", "BuildInvestigationDeck", "BuildQuickDeck", "ChooseQuestStage", "DiscardUntilAflame", "DiscardUntilEnemies", "GuardGollum", "HideRandomLoot", "HideSuspectAndHideout", "PlaceDamageOn", "PrepareFleet", "PrepareGrottoDeck", "PrepareIslandMap", "PrepareUnchartedDeck", "PutNightObjective", "PutSetAsideInPlay", "SearchToStaging", "ShufflePile", "StageRandomGuardedPair", "TakeControlOfSetAside", "TakeLoggedCaptives"]);
+    expect(sorted(setupRunVerbs("top"))).toEqual(["AttachSetAside", "BuildInvestigationDeck", "BuildQuickDeck", "ChooseQuestStage", "DiscardUntilAflame", "DiscardUntilEnemies", "GuardGollum", "HideRandomLoot", "HideSuspectAndHideout", "PlaceDamageOn", "PrepareFleet", "PrepareGrottoDeck", "PrepareIslandMap", "PrepareSackDeck", "PrepareUnchartedDeck", "PutNightObjective", "PutSetAsideInPlay", "SearchToStaging", "ShufflePile", "StageRandomGuardedPair", "TakeControlOfSetAside", "TakeLoggedCaptives"]);
     expect(sorted(setupRunVerbs("inForEachPlayer"))).toEqual(["AttachToDial", "HeroesGainResources", "PrepareCapturedDeck", "Reanimate", "RevealEncounter", "SearchMove", "ShuffleSetAsideIntoEncounterDeck"]);
     expect(sorted(setupRunVerbs("inChoose"))).toEqual(["ShuffleCopyIntoEachDeck"]);
     expect(sorted(setupRunVerbs("inEach"))).toEqual(["GuardObjective"]);
