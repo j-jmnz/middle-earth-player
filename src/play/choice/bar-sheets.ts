@@ -2,7 +2,7 @@
 // opens (playing it, paying for it, using its Action), and the intents a multi-choice or distribute sheet sends for what the
 // player picked. The reducer still checks every intent.
 import { legalAttackEnemies } from "../../rules/combat/combat.ts";
-import { printedOf } from "../../rules/core/printed.ts";
+import { playsOntoHost, printedOf } from "../../rules/core/printed.ts";
 import { flagged } from "../../rules/core/state.ts";
 import { questSeat } from "../store/selectors.ts";
 import { stagingThreat } from "../../rules/quest/quest.ts";
@@ -162,7 +162,7 @@ export function playSheet(game: ScenarioState, ctx: ReduceContext, legal: readon
     const sheet = paySheet(game, names, request as PayRequest, { kind: "play", cardId, hostId: host });
     return { ...sheet, note: said(sheet.note) ?? sheet.note, ...caution };
   };
-  if (printed.type === "attachment" && hostId == null) {
+  if (playsOntoHost(printed) && hostId == null) {
     const hosts = legalTargets(game, { type: "PlayCard", cardId }, ctx);
     return {
       kind: "pick",

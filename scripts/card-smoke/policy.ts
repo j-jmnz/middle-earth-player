@@ -1,6 +1,6 @@
 import { firstShares, playRequest, sharesReady, toPayments, triggerRequest, type PayRequest } from "../../src/play/choice/pay.ts";
 import type { Payment } from "../../src/rules/core/intents.ts";
-import { printedOf } from "../../src/rules/core/printed.ts";
+import { playsOntoHost, printedOf } from "../../src/rules/core/printed.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { nextUint } from "../../src/rules/core/seed.ts";
 import { topFrame } from "../../src/rules/windows/windows.ts";
@@ -58,11 +58,11 @@ function paymentsOf(request: PayRequest | null, roll: Dice): Payment[] | null {
   return sharesReady(shares, request.total, true) ? toPayments(shares) : null;
 }
 
-/** The PlayCard the table would send for this card: its first shares and, for an attachment, the first legal host. */
+/** The PlayCard the table would send for this card: its first shares and, for an attachment or treasure, the first legal host. */
 export function playIntent(state: ScenarioState, ctx: ReduceContext, cardId: string, roll: Dice): PlayerIntent | null {
   const instance = state.cards[cardId];
   if (!instance) return null;
-  const attachment = printedOf(ctx.cards, instance.code).type === "attachment";
+  const attachment = playsOntoHost(printedOf(ctx.cards, instance.code));
   const host = attachment ? legalTargets(state, { type: "PlayCard", cardId }, ctx)[0] : undefined;
   if (attachment && !host) return null;
   const payments = paymentsOf(playRequest(state, ctx, cardId, host ?? null), roll);
