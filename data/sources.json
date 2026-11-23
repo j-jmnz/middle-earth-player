@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "92dce2cf8af6584a836be2c8243d276a086a0ffdba95e81920fa5a3a968b4a21"
+        "value": "215a1e85a653e4142365836ed2a54ee40c39bf7d2899cc46442e25d383b7c13a"
       },
-      "fetchedAt": "2026-11-20T16:18:43.860Z",
+      "fetchedAt": "2026-11-23T08:24:12.350Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -505,6 +505,42 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/The-Fate-of-Wilderland",
           "sha256": "f2e1a88d1924552af62c8662c901f06ae16c1fef4cd26a34130dd1b56d6098a9",
           "bytes": 11229
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/We-Must-Away,-Ere-Break-of-Day.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/We-Must-Away,-Ere-Break-of-Day",
+          "sha256": "173c03b89898818d1958979b849da0ed9a4f190377bb4e43e4a84b00777219bb",
+          "bytes": 14384
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Over-the-Misty-Mountains-Grim.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Over-the-Misty-Mountains-Grim",
+          "sha256": "9ebe347ffd6b8bccf2590ba8ffaac1a80efabfae6b3ddd8cfe0574cb85b39141",
+          "bytes": 13564
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Dungeons-Deep-and-Caverns-Dim.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Dungeons-Deep-and-Caverns-Dim",
+          "sha256": "faf7d8936415d96d6423518e50c0a8cbd0eb6721a13ad525de1b69f3817b3622",
+          "bytes": 12450
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Flies-and-Spiders.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Flies-and-Spiders",
+          "sha256": "4dc4460d42397aa6a3be8cd5c2f58c9957fef510952fd7427052ce124e015f63",
+          "bytes": 13913
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Lonely-Mountain.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Lonely-Mountain",
+          "sha256": "d5aa10c544e1f0ae203f89f3cf1c8d7333ec9ba74e419306888ebab815e9748c",
+          "bytes": 14173
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Battle-of-Five-Armies.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Battle-of-Five-Armies",
+          "sha256": "4c1db494b8dd90758039cf031c02e58563ebd1039b738b3fa2e345fffe1970a0",
+          "bytes": 14273
         },
         {
           "path": "raw/hallofbeorn/Scenarios/The-Massing-at-Osgiliath.json",
