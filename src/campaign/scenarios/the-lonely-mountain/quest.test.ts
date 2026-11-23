@@ -1,4 +1,4 @@
-// Rules: hob.burgle, rr.forced, rr.response, rr.quest-advancement, rr.winning-the-game, rr.first-player, rr.attachment-cards, rr.objective-cards, faq.progress-without-advancing, faq.triggering-forced-effects, faq.enemy-attacks-outside-combat (data/rules/entries.json); docs/scenarios/the-hobbit.md (The Lonely Mountain).
+// Rules: hob.burgle, rr.forced, rr.response, rr.quest-advancement, rr.winning-the-game, rr.first-player, rr.attachment-cards, rr.objective-cards, faq.progress-without-advancing, faq.triggering-forced-effects, faq.enemy-attacks-outside-combat (data/rules/entries.json); docs/scenarios/the-hobbit/the-lonely-mountain.md (The Lonely Mountain).
 import { describe, expect } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";

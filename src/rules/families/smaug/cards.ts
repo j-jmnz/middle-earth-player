@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town; the Smaug deck and Burn X come from the Quest Companion), rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 50207:A:1, 50204:A:1, 50203:B:3.
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town; the Smaug deck and Burn X come from the Quest Companion), rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 50207:A:1, 50204:A:1, 50203:B:3.
 // The cards of The Battle of Lake-town the family reads: the Lake-town objective (damage tokens go on it, never dealt) and the Smaug in play, in the staging area or engaged. Pure lookups.
 import { victoryPointsOf } from "../../core/printed-stat.ts";
 import type { PrintedCard } from "../../core/printed.ts";
@@ -21,7 +21,7 @@ export function isSmaug(state: ScenarioState, id: string): boolean {
   return code != null && SMAUG_CODES.has(code);
 }
 
-/** The Smaug in play (staging area or engaged), or null: at most one lies there, since a new one takes the old one's damage and discards it (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town). */
+/** The Smaug in play (staging area or engaged), or null: at most one lies there, since a new one takes the old one's damage and discards it (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town). */
 export function smaugInPlay(state: ScenarioState): string | null {
   return Object.values(state.cards).find((card) => SMAUG_CODES.has(card.code) && (card.zone === "staging" || card.zone === "engaged"))?.id ?? null;
 }
@@ -51,7 +51,7 @@ export function turnOrder(state: ScenarioState): number[] {
   return from < 0 ? living : [...living.slice(from), ...living.slice(0, from)];
 }
 
-/** The last player: the one who plays last in turn order, the first player alone (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town; the player who may defend Smaug's attack against Lake-town, 50211:A:1). */
+/** The last player: the one who plays last in turn order, the first player alone (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town; the player who may defend Smaug's attack against Lake-town, 50211:A:1). */
 export function lastSeat(state: ScenarioState): number {
   return turnOrder(state).at(-1) ?? state.firstPlayer;
 }

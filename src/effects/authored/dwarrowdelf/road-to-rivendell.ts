@@ -6,7 +6,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for Road to Rivendell (Dwarrowdelf part 5, no campaign card). Every line is read from the scan ledger (data/printed/dwarrowdelf.json). Ambush is a keyword (the build reads it from the printed line, src/rules/families/encounter/ambush.ts), so the lines that print only
 // it have no record; Goblin Gate gives it to the round's first enemy (a marker and a Forced line), Barren Hills ignores it. The quest 2B's When Revealed is the same as Up the Pass's (the Redhorn Gate), Arwen's three lines are the Redhorn Gate Arwen's, and the Wild Bear's
-// immediate attack is Cornered Orc's. The Nightmare deck's records are in ../nightmare/road-to-rivendell.ts. The readings are in docs/scenarios/dwarrowdelf.md (Road to Rivendell).
+// immediate attack is Cornered Orc's. The Nightmare deck's records are in ../nightmare/road-to-rivendell.ts. The readings are in docs/scenarios/dwarrowdelf/road-to-rivendell.md (Road to Rivendell).
 // Rules: dwd.ambush, dwd.setup-road-to-rivendell, dwd.ally-objective-arwen-road-to-rivendell, rr.engagement-check, rr.engaged, rr.guarded, rr.explored, rr.search, rr.reveal, rr.defending-player, rr.exhausted, faq.first-player-elimination (data/rules/entries.json).
 const ARWEN = "04041";
 const GOBLIN_GATE = "04043";

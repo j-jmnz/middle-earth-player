@@ -92,7 +92,7 @@ function fleetSetups(state: ScenarioState, ctx: ReduceContext, steps: EngineStep
   for (const id of ordered) {
     const ship = next.cards[id];
     if (!ship || ship.controller == null) continue;
-    // The Setup lines, and a Forced line on the starting hand ("When you draw your starting hand", Pride of Lebennin): the box's ships are taken after the opening hands, so it resolves here (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, reading 3).
+    // The Setup lines, and a Forced line on the starting hand ("When you draw your starting hand", Pride of Lebennin): the box's ships are taken after the opening hands, so it resolves here (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, reading 3).
     const records = recordsOfFace(ship, effectsOf(ctx, ship.code)).filter((effect) => effect.timing === "setup" || (effect.timing === "forced" && effect.trigger === "setupHandDrawn"));
     if (records.length > 0) next = pushCardEffects(next, "setup", id, ship.controller, false, records, ctx, steps);
   }

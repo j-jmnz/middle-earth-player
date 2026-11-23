@@ -5,7 +5,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for The Lonely Mountain (the-hobbit cycle part 5, no campaign card): the four quest stages, the Smaugs, A Bare Patch, The Lonely Mountain and its locations, Croaking Crows and the four treacheries. Every line is read from the scan ledger (data/printed/); a line a template already writes
 // (pnpm data build) or another card prints word for word needs no record here. The set Wilderland (10 cards) is The Battle of Five Armies' (src/effects/authored/the-hobbit/set-wilderland.ts).
-// The burgle attempt (families/burgle) is a verb of the record that makes it; a Burgle line is a constant marker, read only for the card step 1 of an attempt stops at. The readings are in docs/scenarios/the-hobbit.md (The Lonely Mountain).
+// The burgle attempt (families/burgle) is a verb of the record that makes it; a Burgle line is a constant marker, read only for the card step 1 of an attempt stops at. The readings are in docs/scenarios/the-hobbit/the-lonely-mountain.md (The Lonely Mountain).
 // Rules: hob.burgle, hob.burgle-example, hob.indestructible, hob.treasure-otd, rr.modifiers, rr.travel, rr.first-player, rr.then, rr.cancel, rr.immune, rr.action, rr.forced, rr.response, rr.attachment-cards, rr.objective-cards, rr.winning-the-game, rr.surge,
 // rr.in-play-and-out-of-play, rr.staging, rr.effects, rr.exhausted, rr.damage, rr.resources, rr.cost, faq.additional-attacks, faq.enemy-attacks-outside-combat, faq.lasting-effects, faq.progress-without-advancing, faq.triggering-forced-effects (data/rules/entries.json).
 const GOLDEN = "132040";

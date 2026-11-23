@@ -1,4 +1,4 @@
-// Rules: rr.setup, hob.setup-the-lonely-mountain, hob.treasure-otd, hob.bilbo-baggins-otd (data/rules/entries.json); docs/scenarios/the-hobbit.md (The Lonely Mountain).
+// Rules: rr.setup, hob.setup-the-lonely-mountain, hob.treasure-otd, hob.bilbo-baggins-otd (data/rules/entries.json); docs/scenarios/the-hobbit/the-lonely-mountain.md (The Lonely Mountain).
 import { describe, expect, it } from "vitest";
 
 import { loadAnyScenario } from "../../../../scripts/data/load-scenarios.ts";

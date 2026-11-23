@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { printedKeywordsSchema } from "./boundary.ts";
+import { originSchema } from "./origin.ts";
 
 // One card as data/cards stores it. The sync adapters feed it, scripts/data/normalize/ builds it, and
 // the engine reads the subset it needs through src/rules/core/printed.ts.
@@ -14,6 +15,8 @@ export const printingSchema = z.strictObject({
 
 export const cardSchema = z.strictObject({
   code: z.string().min(1),
+  // Absent on an official card; a fan-made one names its publisher and the version of its set (src/catalog/origin.ts).
+  origin: originSchema.optional(),
   name: z.string(),
   type: z.string().min(1),
   typeName: z.string(),

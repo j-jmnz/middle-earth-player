@@ -1,4 +1,4 @@
-// Rules: rr.guarded, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 51004:B:1, 51004:B:2, 51013:A:1 (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, readings 9 and 3).
+// Rules: rr.guarded, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 51004:B:1, 51004:B:2, 51013:A:1 (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, readings 9 and 3).
 // What the table says of the player cards Carried Away and Necromancer's Pass hold faceup under them: the host's pill counts them and names each owner, and the held card's preview says where it lies. The engine decided
 // who holds what; nothing here changes one.
 import { describe, expect, it } from "vitest";

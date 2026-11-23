@@ -23,7 +23,9 @@ const DIFFERENCES: Readonly<Record<string, string>> = {
 };
 
 const entries = JSON.parse(readFileSync(path.join(DATA_DIR, "rules", "entries.json"), "utf8")) as RuleEntry[];
-const errata = entries.filter((entry) => /^faq\.errata\.\d+$/.test(entry.id));
+// A publisher's own errata document is imported the same way, one span per card: `<publisher id>.errata.<card code>` (docs/brief.md, Data sources, Fan-made content).
+const ERRATUM_ID = /^[a-z0-9]+\.errata\.([0-9a-z]+)$/;
+const errata = entries.filter((entry) => ERRATUM_ID.test(entry.id));
 const cards = new Map(loadCards().map((card) => [card.code, card]));
 
 // The FAQ prints the sphere and icon glyphs as letters of its font (Ì Î Ï Ê); they cannot be told apart, so a quote that has one is compared with every icon left out.
@@ -67,17 +69,25 @@ function missing(card: Card, text: string): string[] {
   return out;
 }
 
+const codeOf = (id: string): string => ERRATUM_ID.exec(id)?.[1] ?? "";
+
 const compared = errata.flatMap((entry) => {
-  const card = cards.get(entry.id.slice("faq.errata.".length));
+  const card = cards.get(codeOf(entry.id));
   const { pieces, title } = wording(entry.text);
   return card && (pieces.length > 0 || title !== null) ? [{ entry, card }] : [];
 });
-const found = new Map(compared.map(({ entry, card }) => [entry.id.slice("faq.errata.".length), missing(card, entry.text)] as const).filter(([, parts]) => parts.length > 0));
+const found = new Map(compared.map(({ entry, card }) => [codeOf(entry.id), missing(card, entry.text)] as const).filter(([, parts]) => parts.length > 0));
 
 describe("errata spans", () => {
   it("holds the FAQ's card errata, each span on the FAQ's errata pages", () => {
     expect(errata.length).toBeGreaterThan(40);
     for (const entry of entries.filter((item) => item.id.startsWith("faq.errata."))) expect([2, 3, 4], entry.id).toContain(entry.page);
+  });
+
+  it("reads a publisher's errata spans like the FAQ's, and not a span that names no card", () => {
+    expect(codeOf("faq.errata.01012")).toBe("01012");
+    expect(codeOf("alep.errata.9001")).toBe("9001");
+    expect(codeOf("faq.errata.core-rulebook-quest-phase")).toBe("");
   });
 
   it("reads a quoted wording, a title and a clarification", () => {

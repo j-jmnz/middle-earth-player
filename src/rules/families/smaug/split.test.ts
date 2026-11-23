@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town, Fisherman's Dock), rr.active-location, rr.step-3-4; ledger line 50223:A:2.
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town, Fisherman's Dock), rr.active-location, rr.step-3-4; ledger line 50223:A:2.
 // With two active locations, one of them Fisherman's Dock, the progress from questing is split as the first player chooses; a split that fills both is not asked, and two active locations without the Dock fill in order (The Ring Goes South).
 import { describe, expect, it } from "vitest";
 

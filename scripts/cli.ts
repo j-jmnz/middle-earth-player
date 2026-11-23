@@ -69,6 +69,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     changed: { steps: [{ script: VITEST, args: ["run", "--changed"] }], about: "the tests that import a file changed since the last commit" },
     lines: { steps: [{ script: "tools/test-lines.ts" }], about: "only the tests that name the lines of the records that changed since <base-ref>, or of <code,...> (--list shows the choice)" },
     scenario: { steps: [{ script: "tools/test-scenario.ts" }], about: "one scenario's tests, goldens, checks and smokes" },
+    reached: { steps: [{ script: "tools/test-reached.ts", node: ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "--disable-warning=ExperimentalWarning"], env: { VITE_CONFIG_NATIVE_IGNORE_WARNING: "true" } }], about: "what a change can break: the tests that import a changed file or name a moved record, the goldens and smokes of the scenarios that deal its cards, all games for engine code; prints its plan and what it did not run ([<base-ref>] --committed --list)" },
     pins: { steps: [{ script: "tools/test-pins.ts" }], about: "lists the pins in test/harness/golden-pins.ts that no test or seed finder reads" },
     smoke: { steps: [{ script: "card-smoke/run.ts" }], about: "plays seeded games with player cards' records" },
     encounter: { steps: [{ script: "card-smoke/encounter.ts" }], about: "plays a scenario's encounter cards and seeded games" },

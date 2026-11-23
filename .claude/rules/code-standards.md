@@ -62,7 +62,7 @@ Whole games are what the suite spends its time on, so a scenario adds its games 
 
 Run the cheap checks often and the full suite once.
 
-- While working: `pnpm lint` and `pnpm typecheck` take seconds, so run them after each edit that could break them. Run the tests the edit touches: `pnpm vitest run <file>`, `pnpm test scenario <scenario-id>` while authoring a scenario, or `pnpm test changed` for every test that imports a file changed since the last commit. `pnpm test fast` runs everything but the slow files (`slowFiles` in `vitest.config.mts`) when the edit is wide.
+- While working: `pnpm lint` and `pnpm typecheck` take seconds, so run them after each edit that could break them. Run the tests the edit touches: `pnpm vitest run <file>`, `pnpm test scenario <scenario-id>` while authoring a scenario, or `pnpm test reached` for what a change can break (it lists what it skips). `pnpm test fast` runs everything but the slow files (`slowFiles` in `vitest.config.mts`) when the edit is wide.
 - `pnpm test changed` and `pnpm vitest related` follow imports only. A change under `data/`, `scripts/data/` or a file a test reads at run time needs `pnpm test fast`, then the full run.
 - Once, at the end: the full `pnpm test` (an agent task run under the orchestrator follows `.claude/agents/orchestrator.md`, Implementer tasks, instead), and `pnpm data check` when the engine or `data/` could move. Do not run the full suite again on an unchanged tree: a green run stands until a file changes. Fix a failure with the failing file (`pnpm vitest run <file> -t "<name>"`), then run the full suite once more.
 - Report each command with its result and whether the tree changed after it ran.

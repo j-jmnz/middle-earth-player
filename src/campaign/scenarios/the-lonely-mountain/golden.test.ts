@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, hob.burgle, hob.bilbo-baggins-otd, hob.bilbo-multiplayer-otd, ltp.scoring, docs/scenarios/the-hobbit.md (The Lonely Mountain) (data/rules/entries.json).
+// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, hob.burgle, hob.bilbo-baggins-otd, hob.bilbo-multiplayer-otd, ltp.scoring, docs/scenarios/the-hobbit/the-lonely-mountain.md (The Lonely Mountain) (data/rules/entries.json).
 import { describe, expect, it } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";

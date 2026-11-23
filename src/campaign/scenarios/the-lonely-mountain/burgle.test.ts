@@ -1,4 +1,4 @@
-// Rules: hob.burgle, hob.burgle-example, rr.first-player, rr.response, rr.forced, rr.action, rr.cost, rr.resources (data/rules/entries.json); docs/scenarios/the-hobbit.md (The Lonely Mountain).
+// Rules: hob.burgle, hob.burgle-example, rr.first-player, rr.response, rr.forced, rr.action, rr.cost, rr.resources (data/rules/entries.json); docs/scenarios/the-hobbit/the-lonely-mountain.md (The Lonely Mountain).
 import { describe, expect } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";

@@ -6,7 +6,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for The Long Dark (Dwarrowdelf part 7, no campaign card). Every line is read from the scan ledger (data/printed/dwarrowdelf.json). PASS is a keyword (the build reads it from the printed line, src/catalog/keyword-line.ts), so the lines that print only it have no record. A Lost line's record is
 // a `forced` effect on the trigger `lost` (src/rules/families/long-dark/lost.ts); a locate test (LocateTest) is followed by instructions that read its result (`lastLocateFailed`, `lastLocatePassed`). The Twists and Turns and Deeps of Moria cards, Cave Torch and +1 Defense (04088:A:2, a template)
-// have their records elsewhere. The Nightmare deck's records are in ../nightmare/the-long-dark.ts. The readings are in docs/scenarios/dwarrowdelf.md (The Long Dark).
+// have their records elsewhere. The Nightmare deck's records are in ../nightmare/the-long-dark.ts. The readings are in docs/scenarios/dwarrowdelf/the-long-dark.md (The Long Dark).
 // Rules: dwd.lost-effects, dwd.locate-test, dwd.locate-test-example, dwd.cave-torch-the-long-dark, dwd.setup-the-long-dark, dwd.last-player, dwd.revealing-enemies, rr.in-play-and-out-of-play, rr.shadow-effects, rr.first-player, rr.next-player, faq.next-player, rr.forced, rr.attachment-cards, rr.active-location,
 // rr.damage, rr.defending-player, rr.effects, rr.travel, rr.step-4-2, rr.running-out-of-cards, faq.last-encounter-card (data/rules/entries.json).
 const TORCH = "03041";

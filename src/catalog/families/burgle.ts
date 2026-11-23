@@ -1,4 +1,4 @@
-// The burgle family (The Lonely Mountain, hob.burgle, hob.burgle-example; docs/scenarios/the-hobbit.md, The Lonely Mountain): the burgle attempt the first player makes (a frame of its own like the escape test's: encounter cards are discarded until one with a burgle effect, the first
+// The burgle family (The Lonely Mountain, hob.burgle, hob.burgle-example; docs/scenarios/the-hobbit/the-lonely-mountain.md, The Lonely Mountain): the burgle attempt the first player makes (a frame of its own like the escape test's: encounter cards are discarded until one with a burgle effect, the first
 // player's deck is shuffled and its top card revealed, the players take actions once, then the hand's matching cards are discarded or the attempt fails), the burgle effect lines that are read only inside an attempt, and the treasures stacked facedown under a card.
 // The conditions `burgleSucceeded`, `burgleFailed`, `burgling`, `burgleCanDiscard` and `shadowBurgle` and the Pick filter `burgleMatch` are in the shared schemas. src/rules/families/burgle/ runs and reads them.
 import { z } from "zod";

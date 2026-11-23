@@ -1,4 +1,4 @@
-// Rules: hob.burgle, rr.modifiers, rr.quest-advancement (data/rules/entries.json); ledger lines 132040:A:3, 132043:A:1, 132043:A:2, 132071:A:1 (docs/scenarios/the-hobbit.md, The Lonely Mountain, The table). What the table draws for The Lonely Mountain: the stack under the Mountain and
+// Rules: hob.burgle, rr.modifiers, rr.quest-advancement (data/rules/entries.json); ledger lines 132040:A:3, 132043:A:1, 132043:A:2, 132071:A:1 (docs/scenarios/the-hobbit/the-lonely-mountain.md, The Lonely Mountain, The table). What the table draws for The Lonely Mountain: the stack under the Mountain and
 // Smaug the Golden's progress against 6 as top-bar dials, and the action window of a burgle attempt with its revealed card. The engine decides all of it; nothing here changes a card.
 import { describe, expect, it } from "vitest";
 

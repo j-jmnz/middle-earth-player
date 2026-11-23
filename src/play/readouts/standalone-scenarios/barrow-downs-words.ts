@@ -1,4 +1,4 @@
-// Rules: mec108.create-staging-area, mec109.multiple-staging-areas, rr.quest-advancement (data/rules/entries.json); ledger lines 148003:B:1, 148003:B:3, 148004:B:2, 148007:A:2 (docs/scenarios/standalone-scenarios.md, Fog on the Barrow-downs, The table).
+// Rules: mec108.create-staging-area, mec109.multiple-staging-areas, rr.quest-advancement (data/rules/entries.json); ledger lines 148003:B:1, 148003:B:3, 148004:B:2, 148007:A:2 (docs/scenarios/standalone-scenarios/fog-on-the-barrow-downs.md, Fog on the Barrow-downs, The table).
 // What the table says of Fog on the Barrow-downs' separate staging areas: the parked stage 3B (no player is at it), a player who is apart at his own stage 4A, and the progress and the win stage 3B withholds. The numbers and the cards are the engine's; the words only read them. Pure.
 
 /** The label of the parked stage's dial and what a screen reader calls it: the count is the cards of that staging area. */

@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.forced, rr.response, rr.action, rr.travel, rr.first-player, rr.modifiers, rr.immune, rr.active-location, rr.winning-the-game, rr.quest-advancement, rr.attachment-cards, rr.effects, hob.burgle, hob.indestructible, faq.additional-attacks, faq.enemy-attacks-outside-combat, faq.progress-without-advancing (data/rules/entries.json); docs/scenarios/the-hobbit.md (The Lonely Mountain).
+// Rules: rr.setup, rr.forced, rr.response, rr.action, rr.travel, rr.first-player, rr.modifiers, rr.immune, rr.active-location, rr.winning-the-game, rr.quest-advancement, rr.attachment-cards, rr.effects, hob.burgle, hob.indestructible, faq.additional-attacks, faq.enemy-attacks-outside-combat, faq.progress-without-advancing (data/rules/entries.json); docs/scenarios/the-hobbit/the-lonely-mountain.md (The Lonely Mountain).
 import { describe, it } from "vitest";
 
 import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, drew, endPhase, flag, handCount, notWon, progressOn, quest, resolve, respond, resourcesOn, reveal, stat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";

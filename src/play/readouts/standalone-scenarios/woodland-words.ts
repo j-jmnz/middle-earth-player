@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Woodland Realm, The table); ledger lines 51103:B:2, 51104:B:3, 51105:B:2, 51108:B:3. The words of the two top-bar dials of The Woodland Realm (woodland.ts beside them). Pure.
+// Rules: docs/scenarios/standalone-scenarios/the-woodland-realm.md (The Woodland Realm, The table); ledger lines 51103:B:2, 51104:B:3, 51105:B:2, 51108:B:3. The words of the two top-bar dials of The Woodland Realm (woodland.ts beside them). Pure.
 
 /** What a tap on the progress cap dial says: what this round has placed, the cap and why it is that number. */
 export const capWords = (placed: number, cap: number, stage: string): string =>

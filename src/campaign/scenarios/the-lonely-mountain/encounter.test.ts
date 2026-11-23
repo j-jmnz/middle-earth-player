@@ -1,4 +1,4 @@
-// Rules: hob.burgle, rr.forced, rr.travel, rr.cost, rr.resources, rr.first-player, rr.surge, rr.damage, rr.immune, rr.staging, faq.additional-attacks, faq.enemy-attacks-outside-combat, hob.bilbo-multiplayer-otd (data/rules/entries.json); docs/scenarios/the-hobbit.md (The Lonely Mountain).
+// Rules: hob.burgle, rr.forced, rr.travel, rr.cost, rr.resources, rr.first-player, rr.surge, rr.damage, rr.immune, rr.staging, faq.additional-attacks, faq.enemy-attacks-outside-combat, hob.bilbo-multiplayer-otd (data/rules/entries.json); docs/scenarios/the-hobbit/the-lonely-mountain.md (The Lonely Mountain).
 import { describe, expect } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";

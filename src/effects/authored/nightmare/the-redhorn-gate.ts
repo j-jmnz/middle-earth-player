@@ -1,7 +1,7 @@
 import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 
 // The Redhorn Gate Nightmare (deck 9013, data/printed/nightmare.json). The setup card sets the two Blinding Blizzards aside, makes the player cards in the victory display worth nothing, and shuffles the Blizzards into the encounter deck when stage 2B is revealed (beside 2B's own
-// When Revealed, faq.simultaneous-effects); side B is the recipe the build applies (its lines are inert). The cards put Snow cards into the staging area and take willpower and progress away. The readings are in docs/scenarios/dwarrowdelf.md (The Redhorn Gate).
+// When Revealed, faq.simultaneous-effects); side B is the recipe the build applies (its lines are inert). The cards put Snow cards into the staging area and take willpower and progress away. The readings are in docs/scenarios/dwarrowdelf/the-redhorn-gate.md (The Redhorn Gate).
 // Rules: dwd.caradhras, rr.reveal, rr.staging, rr.travel, rr.victory, rr.defending-player, rr.then, rr.lasting-effects, faq.simultaneous-effects, faq.lasting-effects (data/rules/entries.json).
 const BLIZZARD = "901307";
 const FREEZING_COLD = "04023";

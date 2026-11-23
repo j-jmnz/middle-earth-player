@@ -1,4 +1,4 @@
-// Rules: hob.burgle (data/rules/entries.json); ledger lines 132042:A:3, 132044:A:2, 132046:A:2, 132047:A:2, 132048:A:3, 132049:A:2, 132050:A:2. A burgle effect and what "matches the revealed card" means (docs/scenarios/the-hobbit.md, The Lonely Mountain: sphere with the same sphere, neutral with neutral and
+// Rules: hob.burgle (data/rules/entries.json); ledger lines 132042:A:3, 132044:A:2, 132046:A:2, 132047:A:2, 132048:A:3, 132049:A:2, 132050:A:2. A burgle effect and what "matches the revealed card" means (docs/scenarios/the-hobbit/the-lonely-mountain.md, The Lonely Mountain: sphere with the same sphere, neutral with neutral and
 // Baggins with Baggins; type with the same card type; cost with an equal printed cost, an X cost matching nothing).
 import type { Instruction } from "../../../catalog/boundary.ts";
 

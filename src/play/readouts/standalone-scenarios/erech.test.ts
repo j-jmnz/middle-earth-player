@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Stone of Erech); ledger lines 50301:A:1, 50303:B:2, 50304:A:1, 50308:A:2, 50309:A:2, 50310:A:1.
+// Rules: docs/scenarios/standalone-scenarios/the-stone-of-erech.md (The Stone of Erech); ledger lines 50301:A:1, 50303:B:2, 50304:A:1, 50308:A:2, 50309:A:2, 50310:A:1.
 // The top-bar dials of The Stone of Erech: the progress on the Night objective in play against the 4 that brings the next Night in (it warms near the limit; Midnight has none), and Derufin, free or held, with the mark of the seat that controls him.
 import { describe, expect, it } from "vitest";
 

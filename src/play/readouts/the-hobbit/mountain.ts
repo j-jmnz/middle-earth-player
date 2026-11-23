@@ -1,4 +1,4 @@
-// Rules: hob.burgle, rr.modifiers, rr.quest-advancement (data/rules/entries.json); ledger lines 132040:A:3, 132043:A:1, 132071:A:1 (docs/scenarios/the-hobbit.md, The Lonely Mountain, The table).
+// Rules: hob.burgle, rr.modifiers, rr.quest-advancement (data/rules/entries.json); ledger lines 132040:A:3, 132043:A:1, 132071:A:1 (docs/scenarios/the-hobbit/the-lonely-mountain.md, The Lonely Mountain, The table).
 //
 // The pieces The Lonely Mountain's cards hold on the table, as top-bar dials: the treasure cards stacked facedown under The Lonely Mountain (the Setup's stack, 132071:A:1; each lowers its Threat by 2 and the top one is the prize of a successful burgle attempt, 132043:A:1, 132072:B:1) and the progress
 // on Smaug the Golden against the 6th that advances the players to stage 4A (132040:A:3; a warming dial, since the players cannot place that progress and stay on stage 2). The engine decided every number (the cards under the Mountain, its modified Threat, the tokens); nothing here changes one.

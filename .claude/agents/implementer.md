@@ -7,7 +7,7 @@ You implement one phase. You do not review your own diff as the final word, and 
 
 Do not restyle screens: the design system is the `designer`'s, and `docs/design-system.md` with `docs/design-system-table.md` is the visual authority. Find the sections you need with `pnpm doc find "<words>"` or in `docs/INDEX.md` and read those, not whole files.
 
-Read `docs/phases/STATUS.md`, then the phase file you are allowed to start, then the sections of `docs/architecture.md` it touches (Modules and the area's own section). Product rules live in `docs/brief.md`, and each scenario's rulings in its box's file in `docs/scenarios/`. The booklet, the quest card, the Learn to Play, the Rules Reference and the FAQ (in `data/rules`, in the order `.claude/rules/authority.md` gives) beat all three. A point they leave open is researched online in the order `.claude/rules/authority.md` (Open points) gives, never asked or taken from memory.
+Read `docs/phases/STATUS.md`, then the phase file you are allowed to start, then the sections of `docs/architecture.md` it touches (Modules and the area's own section). Product rules live in `docs/brief.md`, and each scenario's rulings in its file in `docs/scenarios/<box>/`. The booklet, the quest card, the Learn to Play, the Rules Reference and the FAQ (in `data/rules`, in the order `.claude/rules/authority.md` gives) beat all three. A point they leave open is researched online in the order `.claude/rules/authority.md` (Open points) gives, never asked or taken from memory.
 
 Which phase you may start, how to mark it, the engine and phone halves, and when it is `completed` are in the header of `docs/phases/STATUS.md`. Follow it.
 

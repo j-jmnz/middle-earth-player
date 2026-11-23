@@ -1,4 +1,4 @@
-// Rules: rr.attachment-cards, rr.cannot, rr.in-play-and-out-of-play (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (Murder at the Prancing Pony).
+// Rules: rr.attachment-cards, rr.cannot, rr.in-play-and-out-of-play (data/rules/entries.json); docs/scenarios/standalone-scenarios/murder-at-the-prancing-pony.md (Murder at the Prancing Pony).
 // The Suspects' "Cannot have attachments.", which a card-spec row cannot read for a player card: `attachBlocked` is the gate every attach
 // of a player card passes. Hired Muscle ("Attach to a Brigand enemy without a copy of Hired Muscle attached and return that enemy to the staging area") is the encounter card that
 // attaches to a Brigand, and every Suspect is a Brigand. Each table is `tableFromLayout`; `lineSpec` runs the check again without the records of its line, where it must fail. Each test title starts with the line id it tests.

@@ -2,7 +2,7 @@ import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/
 
 // Return to Mirkwood Nightmare (deck 9009, data/printed/nightmare.json). The setup card makes the guard pay at the start of each quest phase (exhaust a hero or play a Tantrum again) and finds an Attercop when the last stage appears; its cards turn more of the encounter deck on the guard: effects that spread to every
 // player, Isolation (no new guard), Befouled Equipment (no attachments, no discard pile), Wickedness and Mischief (a Tantrum again), the Spiders that come back from the discard pile. The deck prints no quest card.
-// Rules: sotm.guarding-gollum, rr.forced, rr.then, rr.cannot, rr.destroy, rr.shadow-effects, rr.first-player, rr.active-location, sotm.removed-from-game (data/rules/entries.json); the readings are in docs/scenarios/shadows-of-mirkwood.md (Return to Mirkwood).
+// Rules: sotm.guarding-gollum, rr.forced, rr.then, rr.cannot, rr.destroy, rr.shadow-effects, rr.first-player, rr.active-location, sotm.removed-from-game (data/rules/entries.json); the readings are in docs/scenarios/shadows-of-mirkwood/return-to-mirkwood.md (Return to Mirkwood).
 const ATTERCOP = "02139";
 const READY_HERO: PickSpec = { type: "hero", control: "you", state: "ready" };
 const HAS_READY_HERO: Condition = { kind: "canPick", pick: READY_HERO };

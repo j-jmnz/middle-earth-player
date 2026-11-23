@@ -119,7 +119,7 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
   }
 }
 
-// The first of the enemies with the most hit points left (the opposing team's choice of host, docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 3).
+// The first of the enemies with the most hit points left (the opposing team's choice of host, docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, reading 3).
 function mostHitPointsLeft(state: ScenarioState, ids: readonly string[], ctx: ReduceContext): string[] {
   const left = (id: string): number => {
     const instance = state.cards[id];
@@ -146,7 +146,7 @@ export function targeted(state: ScenarioState, item: QueueItem, frame: Frame, ct
     if (found.length > 1) return askTarget(state, { ...item, seat: state.firstPlayer }, found);
     ids = found.slice(0, 1);
   } else if ((item.instruction.verb === "SearchMove" || item.instruction.verb === "SearchReveal") && item.instruction.byChallenge === true) {
-    // "The opposing team searches" (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 3): nobody is asked; the card that gives the players the greatest challenge is found. `each` takes every card, as it does without a choice.
+    // "The opposing team searches" (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, reading 3): nobody is asked; the card that gives the players the greatest challenge is found. `each` takes every card, as it does without a choice.
     const taken = item.instruction.verb === "SearchMove" && item.instruction.each === true ? found : [greatestChallenge(state, found, ctx)].filter((id): id is string => id != null);
     ids = taken;
   } else if (picksOne(item.instruction)) {

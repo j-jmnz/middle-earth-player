@@ -1,4 +1,4 @@
-// Rules: rr.player-elimination, rr.engaged, rr.damage, rr.forced, rr.response, rr.setup, docs/scenarios/standalone-scenarios.md (The Hunt for the Dreadnaught) (data/rules/entries.json); ledger lines 40013:A:1, 40013:A:3, 40013:B:3, 40034:A:1, 40033:A:2, 40001:A:5, 40002:A:3, 40002:B:2, 40021:A:1.
+// Rules: rr.player-elimination, rr.engaged, rr.damage, rr.forced, rr.response, rr.setup, docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md (The Hunt for the Dreadnaught) (data/rules/entries.json); ledger lines 40013:A:1, 40013:A:3, 40013:B:3, 40034:A:1, 40033:A:2, 40001:A:5, 40002:A:3, 40002:B:2, 40021:A:1.
 // The verbs and flags The Hunt for the Dreadnaught added to the sea family, each on a table of the scenario's real cards.
 import { describe, expect, it } from "vitest";
 

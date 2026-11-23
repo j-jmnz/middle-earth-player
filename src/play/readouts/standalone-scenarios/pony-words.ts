@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (Murder at the Prancing Pony, reading 23 and The table); ledger lines 50701:A:1, 50702:B:2. The words of the Investigation List dial (pony.ts beside it). Pure.
+// Rules: docs/scenarios/standalone-scenarios/murder-at-the-prancing-pony.md (Murder at the Prancing Pony, reading 23 and The table); ledger lines 50701:A:1, 50702:B:2. The words of the Investigation List dial (pony.ts beside it). Pure.
 
 const RULE = "A name is checked off once a look showed its card or it is in play, in the victory display or in the discard pile.";
 

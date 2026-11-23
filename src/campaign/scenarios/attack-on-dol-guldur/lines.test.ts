@@ -1,4 +1,4 @@
-// Rules: rr.response, rr.forced, rr.travel, rr.cancel, rr.setup, rr.lasting-effects, faq.lasting-effects, rr.in-play-and-out-of-play (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (Attack on Dol Guldur).
+// Rules: rr.response, rr.forced, rr.travel, rr.cancel, rr.setup, rr.lasting-effects, faq.lasting-effects, rr.in-play-and-out-of-play (data/rules/entries.json); docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md (Attack on Dol Guldur).
 // The lines a card-spec row cannot express (spec.test.ts holds the rest): the Setup the deal and the mode card leave, the Response at the end of the round, the lines that must not work in the other zone or stage, the bars that reach one location only and the lasting numbers.
 import { describe, expect, it } from "vitest";
 
