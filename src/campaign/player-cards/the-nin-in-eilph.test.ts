@@ -15,7 +15,7 @@ import { DEAR, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, IntentRefused, type Table } from "../../../test/harness/scene.ts";
-import { attacking, canPlay, choices, combat, endRound, enter, hosts, passAll, play, playCode, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, attacking, canPlay, choices, combat, endRound, enter, hosts, passAll, play, playCode, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const MABLUNG = "08084";
 const BELTS = "08086";
@@ -318,8 +318,7 @@ describe("Defender of the West (08093:A:1, A:3)", () => {
     const tab = defended(effects, 0);
     const beechbone = idsOf(tab, BEECHBONE);
     const played = play(begin(tab.state), tab, idsOf(tab, DEFENDER), beechbone);
-    let run = passAll(combat(played.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab, played.state);
     run = passAll(sendUnledgered(run, { type: "Undefended", heroId: beechbone }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.cards[beechbone]?.damage).toBe(2);
     expect(run.state.cards[idsOf(tab, EOWYN)]?.damage).toBe(0);

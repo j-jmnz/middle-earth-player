@@ -16,7 +16,7 @@ import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-pa
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { combat, endRound, enter, fillers, passAll, play, playableCards, playCode, playerTableFor, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, combat, endRound, enter, fillers, passAll, play, playableCards, playCode, playerTableFor, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const DAIN = "19084";
 const SOLDIER = "19085";
@@ -57,8 +57,7 @@ describe("Dáin Ironfoot (19084:A:1)", () => {
   // Dáin and the Pal, a deck of `cards` cards; the Brute is engaged and attacks in the combat phase.
   function attacked(effects: readonly Effect[], cards: number): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: DAIN, seat: 0 }, { code: PAL, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }], playerDeck: fillers(CARD, cards) });
-    const run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    const run = atDefense(tab);
     return { tab, run };
   }
 

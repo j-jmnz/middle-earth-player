@@ -15,7 +15,7 @@ import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-pa
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { canPlay, choices, combat, endRound, enter, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, canPlay, choices, endRound, enter, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const BEREGOND = "05001";
 const BOROMIR = "05002";
@@ -173,8 +173,7 @@ describe("Behind Strong Walls (05008:A:1)", () => {
   // Legolas pays (Tactics); `defender` defends the Weak enemy's attack; the Guard of the Citadel stands by.
   function defending(effects: readonly Effect[], defender: string): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }, { code: DENETHOR, seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: GUARD, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }], hand: [{ code: WALLS, seat: 0 }] });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx);
     return { tab, run };
   }
@@ -238,8 +237,7 @@ describe("Light the Beacons (05011:A:1)", () => {
     expect(stat(run.state, tab, eleanor, "defense")).toBe(2 + 2);
     expect(stat(run.state, tab, ally ?? "", "defense")).toBe(1 + 2);
     expect(stat(run.state, tab, spirit, "defense")).toBe(1 + 2);
-    run = passAll(combat(run.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    run = atDefense(tab, run.state);
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: ally ?? "" }, tab.ctx);
     expect(run.state.cards[ally ?? ""]?.exhausted).toBe(false);
     expect(stat(endRound(run.state, tab).state, tab, ally ?? "", "defense")).toBe(1);

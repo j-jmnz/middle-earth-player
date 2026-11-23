@@ -15,7 +15,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { combat, discarded, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, combat, discarded, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const BREAKFAST = "02027";
 const BEEKEEPER = "02028";
@@ -106,8 +106,7 @@ describe("Éomund and Nor am I a Stranger (02030:A:1, 02031:A:1, A:2)", () => {
   function destroyed(state: Table["state"], tab: Table): Run {
     let next = state;
     for (const code of [THEODRED, ARAGORN, SNOWBOURN]) next = updateCard(next, idsOf(tab, code), { exhausted: true });
-    let run = passAll(combat(next, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab, next);
     run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, EOMUND) }, tab.ctx), tab.ctx);
     expect(run.state.cards[idsOf(tab, EOMUND)]?.zone).toBe("discard");
     return run;

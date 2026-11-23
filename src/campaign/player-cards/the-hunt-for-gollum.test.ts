@@ -14,7 +14,7 @@ import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-pa
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf } from "../../../test/harness/scene.ts";
-import { answerFirst, choices, combat, enter, fillers, hosts, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { answerFirst, atDefense, choices, enter, fillers, hosts, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const BILBO = "02001";
 const MARK = "02002";
@@ -111,8 +111,7 @@ describe("Winged Guardian (02004:A:2, A:3)", () => {
   function defended(effects: readonly Effect[], resources: number) {
     const tab = table(effects, { heroes: [{ code: TAC, seat: 0 }, { code: LEAD, seat: 0 }], allies: [{ code: GUARDIAN, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] });
     const state = updateCard(tab.state, idsOf(tab, TAC), { resources });
-    let run = passAll(combat(state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab, state);
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, GUARDIAN) }, tab.ctx);
     run = passAll(run, tab.ctx, { responses: true });
     return { tab, run };

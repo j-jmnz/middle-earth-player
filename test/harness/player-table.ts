@@ -1,5 +1,7 @@
 import { readFileSync } from "node:fs";
 
+import { expect } from "vitest";
+
 import type { Effect, ModifierStat } from "../../src/catalog/boundary.ts";
 import type { DeckSaveCard } from "../../src/catalog/deck-save.ts";
 import { modifiedStat, placeDamage } from "../../src/rules/core/keywords.ts";
@@ -88,6 +90,13 @@ export function destroyed(state: ScenarioState, tab: Table, id: string): Run {
 /** The combat phase begins with the enemies engaged: its action window (6.2) is open. */
 export function combat(state: ScenarioState, tab: Table): Run {
   return begin(settle({ ...withMode(state, "combatStart"), window: null }, tab.ctx, []));
+}
+
+/** The combat phase on `state` (the table's by default) up to the first enemy attack: the defense window is open, as it must be (an expectation). */
+export function atDefense(tab: Table, state: ScenarioState = tab.state): Run {
+  const run = passAll(combat(state, tab), tab.ctx);
+  expect(run.state.window?.kind).toBe("defense");
+  return run;
 }
 
 /** The combat phase with no enemy attacking: the player attack window, the first seat to declare. */

@@ -11,7 +11,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf } from "../../../test/harness/scene.ts";
-import { canPlay, choices, combat, fillers, passAll, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { atDefense, canPlay, choices, combat, fillers, passAll, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
 
 const LEGACY = "07011";
 const DEEP = "07012";
@@ -99,8 +99,7 @@ describe("The Wizards's Voice (07013:A:2)", () => {
     const played = play(begin(tab.state), tab, idsOf(tab, VOICE));
     expect(played.state.cards[idsOf(tab, VOICE)]?.zone).toBe("discard");
     expect(played.state.modifiers).toContainEqual(expect.objectContaining({ instanceId: idsOf(tab, BRUTE), stat: "cannotAttack", until: "endOfPhase", seat: 0 }));
-    const run = passAll(combat(played.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    atDefense(tab, played.state);
   });
 });
 

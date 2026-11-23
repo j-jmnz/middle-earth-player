@@ -15,7 +15,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, destroyed, endRound, enter, fillers, passAll, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, choices, destroyed, endRound, enter, fillers, passAll, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const CAIRN = "04054";
 const WATCHER = "04056";
@@ -92,8 +92,7 @@ describe("Watcher of the Bruinen (04056:A:2, A:3)", () => {
   // The Watcher is the only character that can defend the Weak enemy's attack; `hand` cards are in the player's hand.
   function defends(effects: readonly Effect[], hand: number): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: PAL, seat: 0 }], allies: [{ code: WATCHER, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }], hand: fillers("card", hand) });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, WATCHER) }, tab.ctx);
     return { tab, run };
   }

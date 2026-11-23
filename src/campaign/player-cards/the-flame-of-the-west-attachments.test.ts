@@ -13,7 +13,7 @@ import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-pa
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf } from "../../../test/harness/scene.ts";
-import { combat, hosts, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, combat, hosts, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "145001";
 const HALBARAD = "145006";
@@ -64,8 +64,7 @@ describe("Golden Shield (145010:A:1, A:2)", () => {
   // Théodred defends while Éowyn holds the Shield: no Response.
   it("145010:A:2 Golden Shield: not offered when another character defends", () => {
     const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }, { code: THEODRED, seat: 0 }], attached: [{ code: SHIELD, host: EOWYN }], engaged: [{ code: WEAK, seat: 0 }] });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, THEODRED) }, tab.ctx);
     expect(triggers(run.state, tab)).not.toContain("145010:response:1");
   });

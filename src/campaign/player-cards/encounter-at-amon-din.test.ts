@@ -16,7 +16,7 @@ import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-o
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attach, attacking, canPlay, combat, endRound, enter, fillers, hosts, passAll, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, attach, attacking, canPlay, combat, endRound, enter, fillers, hosts, passAll, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const PIPPIN = "06056";
 const MORTHOND = "06058";
@@ -183,8 +183,7 @@ describe("Gondorian Discipline (06060:A:1)", () => {
   // `defender` defends the Brute's attack (4 against Defense 1): 3 damage is dealt to him. Gondorian Discipline is in hand.
   function defended(effects: readonly Effect[], defender: string): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: defender, seat: 0 }], hand: [{ code: DISCIPLINE, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }] });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx);
     return { tab, run: passAll(run, tab.ctx) };
   }

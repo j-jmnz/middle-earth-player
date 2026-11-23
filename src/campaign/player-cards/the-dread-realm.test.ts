@@ -13,7 +13,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, discarded, enter, fillers, passAll, play, playableCards, playCode, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, attacking, choices, combat, discarded, enter, fillers, passAll, play, playableCards, playCode, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARWEN = "10140";
 const BOWMAN = "10143";
@@ -120,8 +120,7 @@ describe("Hour of Wrath (10144:A:1, A:2)", () => {
     expect(run.state.cards[gimli]?.exhausted).toBe(false);
     // The next phase: the lasting effect is over, so Gimli exhausts to defend.
     const later = enter(run.state, tab, "questCommit");
-    let next = passAll(combat(later.state, tab), tab.ctx);
-    expect(next.state.window?.kind).toBe("defense");
+    let next = atDefense(tab, later.state);
     next = sendUnledgered(next, { type: "DeclareDefender", defenderId: gimli }, tab.ctx);
     expect(next.state.cards[gimli]?.exhausted).toBe(true);
   });

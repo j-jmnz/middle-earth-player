@@ -18,7 +18,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, deckSaveFacts, enter, fillers, hosts, packRow, passAll, passWhile, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, choices, deckSaveFacts, enter, fillers, hosts, packRow, passAll, passWhile, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const VETERAN = "10029";
 const DESCENDANTS = "10030";
@@ -130,8 +130,7 @@ describe("Derndingle Warrior (10031:A:2 to A:4)", () => {
   // The Warrior in play, the Weak enemy engaged; the combat phase is at the first attack's defense step.
   function defending(effects: readonly Effect[]): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: SPIRIT, seat: 0 }], allies: [{ code: DERNDINGLE, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] });
-    const run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    const run = atDefense(tab);
     return { tab, run };
   }
 

@@ -13,7 +13,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { attacking, combat, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, attacking, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const SWORD = "10142";
 const CLOAK = "10148";
@@ -142,8 +142,7 @@ describe("Weather-stained Cloak (10148:A:1, A:2)", () => {
   it("10148:A:2 Weather-stained Cloak: no Response for damage while the character is not committed", () => {
     const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }], attached: [{ code: CLOAK, host: ARAGORN }], engaged: [{ code: BRUTE, seat: 0 }] });
     const aragorn = idsOf(tab, ARAGORN);
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: aragorn }, tab.ctx), tab.ctx);
     expect(run.state.cards[aragorn]?.damage).toBe(2);
     expect(triggers(run.state, tab)).not.toContain("10148:response:1");

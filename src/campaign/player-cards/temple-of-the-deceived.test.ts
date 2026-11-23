@@ -15,7 +15,7 @@ import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-pas
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attach, canPlay, choices, combat, fillers, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, attach, canPlay, choices, fillers, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ELFHELM = "12057";
 const DESTRIER = "12059";
@@ -132,8 +132,7 @@ describe("Déorwine (12060:A:2)", () => {
   // The Black Rider attacks with Green Hill Country as its shadow card; `defender` defends. The Pal pays.
   function defended(effects: readonly Effect[], defender: string): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: PAL, seat: 0 }, { code: SPIRIT, seat: 0 }], allies: [{ code: DEORWINE, seat: 0 }], engaged: [{ code: RIDER, seat: 0 }], deck: [GREEN_HILL] });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx);
     return { tab, run };
   }
@@ -159,8 +158,7 @@ describe("Déorwine (12060:A:2)", () => {
   // "Any player may trigger this response.": the first player has no Leadership hero; the second player's Pal spends the resource.
   it("12060:A:2 Déorwine: another player may trigger the Response and pay for it", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: SPIRIT, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: DEORWINE, seat: 0 }], engaged: [{ code: RIDER, seat: 0 }], deck: [GREEN_HILL] });
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, DEORWINE) }, tab.ctx), tab.ctx);
     expect(triggers(run.state, tab)).toContain("12060:response:1");
     const from = run.steps.length;

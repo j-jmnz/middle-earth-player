@@ -14,7 +14,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, send, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attach, attacking, choices, combat, passAll, type PlayerBase, playerTableFor, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, attach, attacking, choices, combat, passAll, type PlayerBase, playerTableFor, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ANVIL = "12196";
 const CROWN = "12199";
@@ -130,8 +130,7 @@ describe("Gondolin Shield (12201:A:3)", () => {
   function defended(effects: readonly Effect[], defender: string, holder: string = GIMLI): { tab: Table; run: Run } {
     const made = table(effects, { heroes: [{ code: GIMLI, seat: 0 }, { code: LEGOLAS, seat: 0 }], allies: [{ code: AXEHAND, seat: 0 }, { code: SHIELD, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }], deck: [EATEN, LURE] });
     const tab = attach(made, [[idsOf(made, SHIELD), idsOf(made, holder)]]);
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = passAll(send(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx);
     return { tab, run };
   }

@@ -16,7 +16,7 @@ import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-pa
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attacking, canPlay, choices, combat, deckSaveFacts, discarded, endRound, enter, fillers, hosts, packRow, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, attacking, canPlay, choices, deckSaveFacts, discarded, endRound, enter, fillers, hosts, packRow, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const NAASIYAH = "12109";
 const RUNE_MASTER = "12110";
@@ -102,8 +102,7 @@ describe("Na'asiyah (12109:A:1, A:2)", () => {
   lineSpec("12109:A:2", "Na'asiyah: while defending, pay 1 resource from her pool for +2 Defense for this attack", (effects) => {
     const tab = table(effects, { heroes: [{ code: NAASIYAH, seat: 0 }], engaged: [{ code: WALL, seat: 0 }] });
     const naasiyah = idsOf(tab, NAASIYAH);
-    let run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    let run = atDefense(tab);
     run = sendUnledgered(run, { type: "DeclareDefender", defenderId: naasiyah }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("12109:action:1");
     run = sendUnledgered(run, { type: "Trigger", cardId: naasiyah, effectId: "12109:action:1", payments: [{ heroId: naasiyah, amount: 1 }] }, tab.ctx);
@@ -118,8 +117,7 @@ describe("Na'asiyah (12109:A:1, A:2)", () => {
   it("12109:A:2 Na'asiyah: not offered while she neither attacks nor defends", () => {
     const tab = table(EFFECTS, { heroes: [{ code: NAASIYAH, seat: 0 }], engaged: [{ code: WALL, seat: 0 }] });
     expect(triggers(tab.state, tab)).not.toContain("12109:action:1");
-    const run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    const run = atDefense(tab);
     expect(triggers(run.state, tab)).not.toContain("12109:action:1");
   });
 });
@@ -193,8 +191,7 @@ describe("Ioreth (12117:A:1, A:2)", () => {
     const tab = table(effects, { heroes: [{ code: SAGE, seat: 0 }], allies: [{ code: IORETH, seat: 0 }], engaged: [{ code: WALL, seat: 0 }] });
     const ioreth = idsOf(tab, IORETH);
     expect(refusal(attacking(tab.state), { type: "DeclareAttackers", enemyId: idsOf(tab, WALL), attackerIds: [ioreth] }, tab.ctx)).not.toBeNull();
-    const run = passAll(combat(tab.state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    const run = atDefense(tab);
     expect(refusal(run.state, { type: "DeclareDefender", defenderId: ioreth }, tab.ctx)).not.toBeNull();
     expect(refusal(run.state, { type: "DeclareDefender", defenderId: idsOf(tab, SAGE) }, tab.ctx)).toBeNull();
   });

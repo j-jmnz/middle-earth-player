@@ -14,7 +14,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { idsOf, type Run, type Scene, type Table, SAM } from "../../../test/harness/scene.ts";
-import { canPlay, choices, combat, endRound, enter, fillers, passAll, play, playCode, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { atDefense, canPlay, choices, combat, endRound, enter, fillers, passAll, play, playCode, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const DEFENDER = "19113";
 const GUIDE = "19114";
@@ -59,8 +59,7 @@ describe("Greenwood Defender (19113:A:1)", () => {
   const defender = (effects: readonly Effect[]): Table => table(effects, { heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: DEFENDER, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }] });
   // The combat phase on `state`: the Defender is declared as the defender of the Brute's attack.
   const defends = (state: Table["state"], tab: Table): Run => {
-    const run = passAll(combat(state, tab), tab.ctx);
-    expect(run.state.window?.kind).toBe("defense");
+    const run = atDefense(tab, state);
     return sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, DEFENDER) }, tab.ctx);
   };
 
