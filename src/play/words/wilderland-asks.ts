@@ -1,14 +1,23 @@
 // Rules: rr.the-word-choose, rr.first-player, rr.neutral-cards (data/rules/entries.json); ledger line 132037:A:1. The choice words of the Wilderland set (the cards of the Wilderland encounter deck, 132035-132038) that more than one scenario deals.
-// A game reads only its own scenario's asks file, so each scenario that deals the set (The Lonely Mountain, The Battle of Five Armies, and the third Hobbit scenario that deals it) spreads this table into its own (`...WILDERLAND_ASKS`), as the Goblins set's is (src/play/words/misty-mountain-goblins-asks.ts); an entry keys a record of a card the set holds.
+// A game reads only its own scenario's asks file, so each scenario that deals the set spreads this table into its own (`...WILDERLAND_ASKS`); only The Lonely Mountain does on this tree, and Flies and Spiders and The Battle of Five Armies, which deal 132037, will spread it when they land. An entry keys a record of a card the set holds.
 import type { PickSpec } from "../../catalog/boundary.ts";
+import { AUTHORED_EFFECTS } from "../../effects/authored/the-hobbit/set-wilderland.ts";
 
 import type { Ask } from "./asks.ts";
 
 const SPHERES = ["leadership", "lore", "spirit", "tactics"] as const;
 const NAMES: Readonly<Record<(typeof SPHERES)[number], string>> = { leadership: "Leadership", lore: "Lore", spirit: "Spirit", tactics: "Tactics" };
 
-// The committed characters a sphere removes: those outside it, a Baggins one excepted (a neutral character belongs to none of the four, so it leaves too).
-const LEAVING = (sphere: (typeof SPHERES)[number]): PickSpec => ({ type: "character", control: "any", committed: true, atStage: true, exceptSphere: [sphere, "baggins"] });
+const RECORD_ID = "132037:whenRevealed:1";
+
+// The committed characters a sphere removes, read from the record's own Choose option (its Each pick), so a change to the record moves the count.
+const LEAVING = (sphere: (typeof SPHERES)[number]): PickSpec => {
+  const choose = AUTHORED_EFFECTS.find((effect) => effect.id === RECORD_ID)?.instructions[0];
+  const option = choose?.verb === "Choose" ? choose.options.find((o) => o.id === sphere) : undefined;
+  const each = option?.instructions[0];
+  if (each?.verb !== "Each") throw new Error(`${RECORD_ID}: no Each pick in the ${sphere} option`);
+  return each.pick;
+};
 
 const rows = Object.fromEntries(
   SPHERES.map((sphere) => [
