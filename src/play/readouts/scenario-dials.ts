@@ -32,7 +32,7 @@ import { marshesDials } from "./marshes.ts";
 import { pelennorDials, pelennorHands } from "./pelennor.ts";
 import { pitDials } from "./dwarrowdelf/pit.ts";
 import { roadsDials } from "./roads.ts";
-import { sackDials } from "./sack.ts";
+import { sackDials } from "./hobbit/sack.ts";
 import { siegeDials, siegeHands } from "./siege.ts";
 import { ungolDials, ungolHands } from "./ungol.ts";
 import { wastesDials, wastesHands } from "./wastes.ts";

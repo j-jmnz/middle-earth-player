@@ -3,9 +3,9 @@
 // The Sack deck as a top-bar dial: how many of the 7 Sack cards the deck still holds, and how many are attached to characters. The deck itself is a pile that shows its count and a back only (the cards are facedown and the players never look at them);
 // a Sack card lies under the character it is attached to, like any attachment. The dial's limit is the 7 the Setup builds the deck from, and it warns when the deck is empty, since an empty Sack deck ignores Sack X (hob.sack-x). The engine decided every card's place;
 // nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
-import type { ScenarioState } from "../../rules/core/state.ts";
+import type { ScenarioState } from "../../../rules/core/state.ts";
 
-import type { TableDial } from "./dials.ts";
+import type { TableDial } from "../dials.ts";
 
 const SCENARIO = "we-must-away-ere-break-of-day";
 const SACKS = 7;

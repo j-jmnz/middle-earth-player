@@ -1,9 +1,9 @@
 // Rules: hob.sack-deck, hob.sack-x (data/rules/entries.json); ledger lines 131023:A:1, 131044:A:1. What the table says for We Must Away, Ere Break of Day's Sack deck: a dial with the cards left of the 7, the cards attached, and a warning when the deck is empty; and the deck as a pile of the second slot.
 import { describe, expect, it } from "vitest";
 
-import { tableFromLayout } from "../../../test/harness/scene-kit.ts";
-import { EFFECTS } from "../../effects/index.ts";
-import { pileIds, secondPilesOf } from "../store/pile-ids.ts";
+import { tableFromLayout } from "../../../../test/harness/scene-kit.ts";
+import { EFFECTS } from "../../../effects/index.ts";
+import { pileIds, secondPilesOf } from "../../store/pile-ids.ts";
 
 import { sackDials } from "./sack.ts";
 

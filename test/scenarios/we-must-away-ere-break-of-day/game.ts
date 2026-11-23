@@ -55,12 +55,12 @@ export type DayGame = PlayedGame;
 // The goldens (src/campaign/scenarios/we-must-away-ere-break-of-day/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type DayGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: DayDecks; outcome: "won" | "lost"; policy?: Partial<DayPolicy>; lossReason?: string };
 
-// The games to pin (about 300 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and one solo on Easy (the deck runs out in the first, and the Trolls engage and are fought in the others), and a loss for each way to lose: every player's threat at 50
+// The games to pin (the first is the longest win: the reader parity test plays it, src/play/reader-play/games.ts; about 300 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and one solo on Easy (the deck runs out in the first, and the Trolls engage and are fought in the others), and a loss for each way to lose: every player's threat at 50
 // (heroes too small to quest) and Bilbo Baggins destroyed by a Troll. Nightmare is out of scope.
 export const DAY_GOLDENS: readonly DayGolden[] = [
+  { name: "solo win on Easy, the Trolls are fought", seatCount: 1, seed: 6, difficulty: "Easy", decks: "steady", outcome: "won", policy: { choose: "last", fight: true } },
   { name: "solo win, the encounter deck runs out", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win, the Trolls are fought and the Sack cards are drawn", seatCount: 2, seed: 5, difficulty: "Normal", decks: "steady", outcome: "won", policy: { choose: "last", fight: true } },
-  { name: "solo win on Easy, the Trolls are fought", seatCount: 1, seed: 6, difficulty: "Easy", decks: "steady", outcome: "won", policy: { choose: "last", fight: true } },
   { name: "solo loss, the threat reaches 50", seatCount: 1, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "solo loss, Bilbo Baggins is destroyed", seatCount: 1, seed: 3, difficulty: "Normal", decks: "steady", outcome: "lost", lossReason: "Bilbo Baggins left play", policy: { fight: true } },
 ];
