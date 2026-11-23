@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { BUDGET_SLACK, budgetProblem, changedFamilyTests, hasReaderGames, otherSnapshots, OVER_BUDGET, quickParts, registryTitle, scenarioTests, selectTests, smokeRuns, TEST_BUDGET_SECONDS } from "./test-scenario.ts";
+import type { Effect } from "../../src/catalog/boundary.ts";
+import { BUDGET_SLACK, budgetProblem, changedFamilyTests, hasReaderGames, otherSnapshots, OVER_BUDGET, quickParts, registryTitle, scenarioCodes, scenarioTests, selectTests, smokeRuns, TEST_BUDGET_SECONDS, unnamedOfScenario } from "./test-scenario.ts";
 
 // pnpm test scenario <id>: the selection is a pure function of the id, the changed paths and the tree of test files.
 const TREE = [
@@ -218,5 +219,21 @@ describe("the render snapshots of other scenarios (otherSnapshots)", () => {
   it("names nothing when only the scenario's own snapshot changed, or none did", () => {
     expect(otherSnapshots([snapshot("the-oath")], "the-oath")).toEqual([]);
     expect(otherSnapshots([], "the-oath")).toEqual([]);
+  });
+});
+
+describe("the records of a scenario's cards that no test names (unnamedOfScenario)", () => {
+  const record = (id: string, cardCode: string, lines: string[]): Effect => ({ id, cardCode, lines, timing: "action", instructions: [] }) as unknown as Effect;
+  const effects = [record("1:action:1", "1", ["1:A:1"]), record("1:response:1", "1", ["1:A:2"]), record("2:action:1", "2", ["2:A:1"])];
+
+  it("lists a record of the scenario's cards named by neither its id nor its line, and no record of another card", () => {
+    expect(unnamedOfScenario(new Set(["1"]), effects, new Set(["1:action:1"]))).toEqual(["1:response:1"]);
+    expect(unnamedOfScenario(new Set(["1"]), effects, new Set(["1:A:1", "1:A:2"]))).toEqual([]);
+    expect(unnamedOfScenario(new Set(["1"]), effects, new Set())).toEqual(["1:action:1", "1:response:1"]);
+  });
+
+  it("reads the cards a real scenario deals, the starter decks of the first scenario of its campaign included", () => {
+    expect(scenarioCodes("a-shadow-of-the-past").size).toBeGreaterThan(20);
+    expect([...scenarioCodes("a-shadow-of-the-past")]).toEqual(expect.arrayContaining(["141085", "01025"]));
   });
 });
