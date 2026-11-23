@@ -1,0 +1,89 @@
+// The browser's half of the web app's saves (memory-databases.ts): reading the two snapshot files (snapshot.ts) from the origin's private file storage, and writing one
+// from a worker of its own. Safari's engine writes such a file only through a sync access handle, which only a worker has; and that worker must not be expo-sqlite's,
+// because the page waits on that one for every database call, and on Safari a worker growing a file waits on the page.
+import { decodeSnapshot, encodeSnapshot, newestOf, SLOTS, SNAPSHOT_DIRECTORY, type Slot, type Stored } from "./snapshot";
+
+async function readSlot(directory: FileSystemDirectoryHandle, slot: Slot): Promise<Stored | null> {
+  try {
+    const file = await (await directory.getFileHandle(slot)).getFile();
+    const snapshot = await decodeSnapshot(new Uint8Array(await file.arrayBuffer()));
+    return snapshot ? { ...snapshot, slot } : null;
+  } catch {
+    // No such file yet, or one that does not read: the other slot answers.
+    return null;
+  }
+}
+
+/** The newest whole snapshot in storage, or null on a first launch. */
+export async function readNewest(): Promise<Stored | null> {
+  const root = await navigator.storage.getDirectory();
+  const directory = await root.getDirectoryHandle(SNAPSHOT_DIRECTORY, { create: true });
+  return newestOf(await Promise.all(SLOTS.map((slot) => readSlot(directory, slot))));
+}
+
+// The worker's whole program. Each call is awaited, since an older Safari returns a promise from a sync access handle's methods.
+const WORKER_SOURCE = `
+self.onmessage = async (event) => {
+  const { id, directory, name, buffer } = event.data;
+  try {
+    const root = await navigator.storage.getDirectory();
+    const folder = await root.getDirectoryHandle(directory, { create: true });
+    const file = await folder.getFileHandle(name, { create: true });
+    const handle = await file.createSyncAccessHandle();
+    try {
+      const bytes = new Uint8Array(buffer);
+      await handle.write(bytes, { at: 0 });
+      await handle.truncate(bytes.byteLength);
+      await handle.flush();
+    } finally {
+      await handle.close();
+    }
+    self.postMessage({ id });
+  } catch (error) {
+    self.postMessage({ id, error: String(error && error.message ? error.message : error) });
+  }
+};
+`;
+
+export type SnapshotWriter = (data: Uint8Array, generation: number, slot: Slot) => Promise<void>;
+
+/** Starts the worker and returns the call that writes one snapshot file through it. */
+export function snapshotWriter(): SnapshotWriter {
+  const url = URL.createObjectURL(new Blob([WORKER_SOURCE], { type: "text/javascript" }));
+  const worker = new Worker(url);
+  let nextId = 0;
+  const waiting = new Map<number, { resolve: () => void; reject: (error: Error) => void }>();
+  worker.addEventListener("message", (event: MessageEvent<{ id: number; error?: string }>) => {
+    const call = waiting.get(event.data.id);
+    if (!call) return;
+    waiting.delete(event.data.id);
+    if (event.data.error) call.reject(new Error(event.data.error));
+    else call.resolve();
+  });
+  return async (data, generation, slot) => {
+    const file = await encodeSnapshot(data, generation);
+    const id = nextId;
+    nextId += 1;
+    await new Promise<void>((resolve, reject) => {
+      waiting.set(id, { resolve, reject });
+      worker.postMessage({ id, directory: SNAPSHOT_DIRECTORY, name: slot, buffer: file.buffer }, [file.buffer]);
+    });
+  };
+}
+
+const LOCK = "middle-earth-player.user-db";
+
+/**
+ * Whether this page is the only one of the origin with the saves open, and from now on it is: it holds a lock until it closes. Two pages would each keep their own
+ * copy in memory and write over the other's file. A browser with no Web Locks is let through.
+ */
+export function holdOnlyPage(): Promise<boolean> {
+  if (typeof navigator === "undefined" || !navigator.locks) return Promise.resolve(true);
+  return new Promise((resolve) => {
+    void navigator.locks.request(LOCK, { ifAvailable: true }, (lock) => {
+      resolve(lock !== null);
+      // Never settles: the lock is held until the page goes.
+      return lock ? new Promise<void>(() => undefined) : undefined;
+    });
+  });
+}

@@ -13,7 +13,7 @@ The app already runs in a browser: the desktop app is the web export in Electron
 
 ### Risks only a device can answer
 
-- **The database on iOS.** The main thread waits on the database worker for every accepted intent (`src/screens/data/web/worker-channel.ts`). Whether WebKit's OPFS sync access handles and that wait are fast and stable on an iPhone is unknown.
+- **The database on iOS.** Found on an iPad: with `user.db` in OPFS, writes ended as "Sync operation timeout" and the page stopped for seconds. The web app's build now keeps the databases in memory and copies `user.db` to storage after each write (`docs/architecture.md`, Persistence). Checked in Chromium only; whether it ends the faults on Safari's engine is the next device check.
 - **Memory.** iOS ends a web page that uses too much memory, at a limit far under a desktop's. The table holds CanvasKit, the catalog, the decoded card pictures and one WebGL canvas. An older iPhone may reload the page in a long game. The save survives (it is written on every intent), but the reload is a fault to the player.
 - **Storage.** The full export is about a gigabyte, most of it pictures. WebKit gives an origin up to 60% of the disk since iOS 17, and a Home Screen web app keeps its storage, but data in a Safari tab is deleted after seven days without a visit. Removing the icon deletes the saves, and there is no system backup of them; Back up saves (`docs/brief.md`, Persistence and shipping) is the player's only copy.
 - **A Safari tab and the Home Screen app do not share storage.** A game started in the tab does not appear in the installed app.

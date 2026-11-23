@@ -1,5 +1,6 @@
 // `pnpm webapp build`: the web export in webapp/build/web with what Cloudflare needs beside it (site.ts), ready for `npx wrangler deploy` in webapp/. It is the desktop's
-// export (EXPO_PUBLIC_DESKTOP=1: every picture bundled, none fetched) until the web app has its own flag (docs/plans/pwa-iphone-ipad.md, Phase 1: the web app build).
+// export (EXPO_PUBLIC_DESKTOP=1: every picture bundled, none fetched) with EXPO_PUBLIC_WEBAPP=1 (src/screens/nav/webapp.ts), until the web app's own pictures rule
+// (docs/plans/pwa-iphone-ipad.md, Phase 1: the web app build).
 // `--skip-assets` leaves the packs as they are, `--optional` lets a pack fail, `--skip-export` stages the export that is there.
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -31,7 +32,7 @@ async function main(log: Log): Promise<void> {
   const args = process.argv.slice(2);
   if (!args.includes("--skip-export")) {
     if (!args.includes("--skip-assets")) packAssets(log, [], args.includes("--optional") ? ["--optional"] : []);
-    exportDesktopWeb(log, { out: WEB_DIR });
+    exportDesktopWeb(log, { out: WEB_DIR, env: { EXPO_PUBLIC_WEBAPP: "1" } });
   }
   if (!existsSync(path.join(WEB_DIR, "index.html"))) throw new Error("webapp/build/web has no export; run pnpm webapp build without --skip-export");
   const files = filesIn(WEB_DIR, WEB_DIR).filter((file) => !WRITTEN.has(file.path));
