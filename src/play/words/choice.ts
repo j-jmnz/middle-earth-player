@@ -30,7 +30,7 @@ import { smaugBranchWords } from "./scenarios/standalone-scenarios/smaug.ts";
 import { stormcallerBranchWords } from "./scenarios/stormcaller.ts";
 import { commandBranchWords } from "./command.ts";
 import { wilderlandBranchWords } from "./scenarios/wilderland.ts";
-import { burgleBranchWords } from "./scenarios/burgle.ts";
+import { burgleBranchWords } from "./scenarios/the-hobbit/burgle.ts";
 import { activePickWords, attachEnemyWords } from "./active.ts";
 import { claimedEffectWords } from "./objective.ts";
 import { objectiveTokensWords } from "./scenarios/assault.ts";

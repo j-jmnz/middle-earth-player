@@ -1,12 +1,12 @@
 // The words of the burgle family's choices (src/catalog/families/burgle.ts, The Lonely Mountain) inside a Choose branch: the card type Secret Entrance names, the Baggins resources Pretending to Sleep spends, the progress Western Slopes removes from Smaug the Golden.
 // Every sentence names what the branch does and leads with it; the numbers are the engine's, read from the table.
-import type { Instruction } from "../../../catalog/boundary.ts";
+import type { Instruction } from "../../../../catalog/boundary.ts";
 
-import type { ScenarioState } from "../../../rules/core/state.ts";
-import { inPlay } from "../../../rules/core/state.ts";
+import type { ScenarioState } from "../../../../rules/core/state.ts";
+import { inPlay } from "../../../../rules/core/state.ts";
 
-import { article } from "../instruction.ts";
-import type { ChoiceNames } from "../choice.ts";
+import { article } from "../../instruction.ts";
+import type { ChoiceNames } from "../../choice.ts";
 
 type ChooseInstruction = Extract<Instruction, { verb: "Choose" }>;
 
