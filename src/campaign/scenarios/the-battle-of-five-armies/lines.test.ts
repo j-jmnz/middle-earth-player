@@ -491,11 +491,11 @@ describe("Ravenous Warg forcing an exhausted Bilbo to defend (132059:A:1)", () =
     }
     run = send(run, { type: "DeclareDefender", defenderId: made.bilbo }, made.ctx);
     const ring = first(run.state, "132019");
-    return legalIntents(run.state, made.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === ring);
+    // Only the Response (132019:A:3): the Action (132019:A:2) is offered in any window and says nothing of defending.
+    return legalIntents(run.state, made.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === ring && intent.effectId === "132019:response:1");
   }
 
-  // The base branch fixes the Ring, Sting and Glamdring ("After Bilbo exhausts to defend"); until it is merged here the Ring is offered for a defender that was exhausted already.
-  it.fails("132059:A:1 Bilbo already exhausted, forced to defend, does not trigger the Ring's After Bilbo exhausts to defend", () => {
+  it("132059:A:1 Bilbo already exhausted, forced to defend, does not trigger the Ring's After Bilbo exhausts to defend (132019:A:3)", () => {
     expect(offeredRing(true)).toBe(false);
   });
 
