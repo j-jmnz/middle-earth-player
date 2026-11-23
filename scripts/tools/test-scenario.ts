@@ -246,10 +246,15 @@ function git(args: string[]): string[] {
   return out.stdout.split("\n").filter(Boolean);
 }
 
-/** The files changed since the merge base with origin/main (HEAD when there is no such ref), in the commits, the index and the working tree, and the untracked ones. */
-function changedFiles(): string[] {
+/** The commit changes are read against: the merge base with origin/main, or HEAD when there is no such ref. */
+export function mergeBase(): string {
   const merged = spawnSync("git", ["merge-base", "HEAD", "origin/main"], { cwd: ROOT, encoding: "utf8" });
-  const base = merged.status === 0 && merged.stdout.trim() !== "" ? merged.stdout.trim() : "HEAD";
+  return merged.status === 0 && merged.stdout.trim() !== "" ? merged.stdout.trim() : "HEAD";
+}
+
+/** The files changed since `base` (the merge base with origin/main by default) in the commits, the index and the working tree, and the untracked ones; with `committed`, only those of the commits up to HEAD. */
+export function changedFiles(base = mergeBase(), committed = false): string[] {
+  if (committed) return git(["diff", "--name-only", base, "HEAD"]);
   return [...new Set([...git(["diff", "--name-only", base]), ...git(["ls-files", "--others", "--exclude-standard"])])];
 }
 
