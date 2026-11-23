@@ -14,6 +14,7 @@ import { seaAsk } from "./scenarios/sea.ts";
 import { tradeWords } from "./scenarios/uncharted.ts";
 import { wilderlandAsk } from "./scenarios/wilderland.ts";
 import { lootLeaveOutWords } from "./loot.ts";
+import { burglePickWords } from "./scenarios/the-hobbit/burgle.ts";
 import { riddleAsk } from "./scenarios/the-hobbit/riddles.ts";
 
 /** What the instruction a player is asked about says to ask. `queue` is the instructions after the asked one (`queue[0]` is the next instruction), `picked` the card the effect last picked. */
@@ -42,6 +43,9 @@ export function askWords(a: {
 }): AskedWords {
   const { game, ctx, names, instruction, queue, options, source, picked, amountNow, effectId, cause } = a;
   const asked = a.origin?.verb === "DiscardFromHand" ? a.origin : instruction;
+  // The hand card step 3 of a burgle attempt makes the first player discard: before the asks, since the burgle's effect frame stands on the card that has the burgle effect and its records may ask too.
+  const burgling = burglePickWords(game, ctx, names, effectId, game.window?.kind === "choose" ? game.window.seat : game.firstPlayer);
+  if (burgling) return burgling;
   // The same Pick queued again (a Repeat's later rounds), counted when an entry has a `countdown`.
   const again = instruction.verb === "Pick" ? () => queue.filter((later) => JSON.stringify(later) === JSON.stringify(instruction)).length : undefined;
   const written = asksPick({ game, ctx, names, instruction: asked, source, amountNow, options, ...(again ? { again } : {}), ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });

@@ -6,7 +6,6 @@ import { locationThreatHolds } from "../families/grapple/values.ts";
 import { islandHolds } from "../families/island/pick.ts";
 import { DIRE_VALOUR_SHIFT } from "../families/black-gate/dire.ts";
 import type { Condition } from "../../catalog/boundary.ts";
-
 import { hostOf, resolveAmount, type AmountScope } from "./amounts.ts";
 import { questSucceeded } from "../families/costs/pay.ts";
 import { discardedCost } from "../families/uncharted/cards.ts";
@@ -107,9 +106,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   const familial = familyCondition(state, condition, scope, ctx);
   if (familial !== null) return familial;
   switch (condition.kind) {
-    // A family's condition hook answers these before this switch (south: noneDiscarded; black-gate: embassy; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
+    // A family's condition hook answers these before this switch (south: noneDiscarded; black-gate: embassy; burgle: its conditions, results.ts; captured: versusVictoryTrait; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
     case "noneDiscarded": case "lastPlayer": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives": case "discardedHasShadowOrTentacle": case "firstLetterMatches":
     case "attackedThisPhase": case "optionTaken": case "namedFlag": case "discoverUnavailable": case "investigateIgnored": case "investigationTop": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "questProgressNoted": case "committedThisRound": case "guardianCanChange": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastEscapeFailed": case "lastEscapePassed": case "lastLocateFailed": case "lastLocatePassed": case "hasPass": case "playerWithoutReady": case "drew": case "thenResolves": case "engagedWithLastPlayer": case "firstTreachery": case "firstEnemy": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "allAtStage": case "setAsideHas": case "exploredPending": case "night": case "encounterDeckEmpty": case "bagginsTravel": case "riddle":
+    case "burgleSucceeded": case "burgleFailed": case "burgling": case "burgleCanDiscard": case "shadowBurgle": case "bagginsAtLeast": case "encounterTop":
       return false;
     case "hideFailed":
       return state.hideFailures.some(

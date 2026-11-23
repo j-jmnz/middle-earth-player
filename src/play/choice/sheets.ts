@@ -20,6 +20,7 @@ import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/scenarios/island.ts";
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/scenarios/grapple.ts";
 import { isBoonCode } from "../words/scenarios/angmar/angmar-table.ts";
+import { burgleChooseNote, burgleWindowNote } from "../words/scenarios/the-hobbit/burgle.ts";
 import { smaugChooseNote } from "../words/scenarios/standalone-scenarios/smaug.ts";
 import { isFreedTreasureClaim, isTreasureDraw, wilderlandBranchNow, wilderlandChooseNote, wilderlandOptionLabel, wilderlandTravel } from "../words/scenarios/wilderland.ts";
 import { embassyPairCards } from "../readouts/black-gate.ts";
@@ -122,11 +123,11 @@ export function travelRefusals(whole: ScenarioState, ctx: ReduceContext, names: 
 }
 
 /**
- * An action window between two framework steps (rr.framework-steps), not the one inside a Hide test: the bar answers it
+ * An action window between two framework steps (rr.framework-steps), not the one inside a Hide test, a Fortitude test, an escape test or a burgle attempt (which say what they count or reveal): the bar answers it
  * like any action window, with Pass, the Actions list and the hand.
  */
 export function isStepWindow(game: ScenarioState): boolean {
-  return game.window?.kind === "frameAction" && topFrame(game)?.frame !== "hide" && topFrame(game)?.frame !== "fortitude" && topFrame(game)?.frame !== "escape";
+  return game.window?.kind === "frameAction" && topFrame(game)?.frame !== "hide" && topFrame(game)?.frame !== "fortitude" && topFrame(game)?.frame !== "escape" && topFrame(game)?.frame !== "burgle";
 }
 
 /**
@@ -243,15 +244,20 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       // An escape test's action window: the stat committed against the cards dealt after it.
       const escape = frame?.data.kind === "escape" ? escapeCountNote(game, ctx) : null;
       const escapeCaution = escape ? escapePassCaution(game) : null;
+      // A burgle attempt's action window: the card revealed from the first player's deck, what step 3 asks and the Action that takes the card.
+      const burgle = frame?.data.kind === "burgle" ? burgleWindowNote(game, ctx, { card: names.card, code: (code) => ctx.cards.get(code)?.name ?? code }) : null;
       const source = frame?.cardId ?? null;
+      // The Read button of a burgle window opens the revealed card (the card the discards must match) first, then the card that makes the attempt, which the title names.
+      const revealed = frame?.data.kind === "burgle" ? frame.data.revealedId : null;
       return {
         kind: "trigger",
         key: `frameAction:${frame?.id ?? ""}:${frame?.step ?? 0}`,
-        step: hide ? "Hide test" : fortitude ? "Fortitude test" : escape ? "Escape test" : step(game),
+        step: hide ? "Hide test" : fortitude ? "Fortitude test" : escape ? "Escape test" : burgle ? "Burgle attempt" : step(game),
         title: source ? names.card(source) : "Action window",
-        sourceId: source,
+        sourceId: revealed ?? source,
+        ...(revealed && source ? { about: [revealed, source] } : {}),
         timing: "Action",
-        note: hide ? `Hide ${hide.x}: willpower ${hide.willpower} against threat ${hide.threat}.` : (fortitude ?? escape ?? "Actions may be used before this resolves."),
+        note: hide ? `Hide ${hide.x}: willpower ${hide.willpower} against threat ${hide.threat}.` : (fortitude ?? escape ?? burgle ?? "Actions may be used before this resolves."),
         hide,
         options: triggerOptions(game, ctx, legal, names),
         pass: "Continue",
@@ -296,7 +302,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         // The line printed is the one of the record the entry words: one frame can resolve two records of a card (a stage's two When Revealed).
         const askerId = xAsk?.effectId ?? written.at?.id;
         const asker = askerId ? effectById(ctx, askerId) : undefined;
-        const ask = asksChoose(written)?.note ?? torch?.note ?? xAsk?.note ?? smaugChooseNote(choose, game, ctx, words, window.seat) ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
+        const ask = asksChoose(written)?.note ?? torch?.note ?? xAsk?.note ?? smaugChooseNote(choose, game, ctx, words, window.seat) ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? burgleChooseNote(choose, game, ctx, words, window.seat) ?? "Choose one.";
         return {
           ...base,
           note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, lineOf(asker ?? effect, names)].filter((part) => part != null).join(" "),

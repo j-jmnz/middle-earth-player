@@ -3,6 +3,7 @@ import { cardRef, renderAmount } from "./amounts.ts";
 import { ERECH_STAT_NOTES } from "./families/erech.ts";
 import { RIDDLES_STAT_NOTES } from "./families/riddles.ts";
 import { ESCAPE_STAT_NOTES } from "./families/escape.ts";
+import { BURGLE_STAT_NOTES } from "./families/burgle.ts";
 import { FOG_STAT_NOTES } from "./families/fog.ts";
 import { POISON_STAT_NOTES } from "./families/poison.ts";
 import { FLAG_NOTES } from "./stat-notes.ts";
@@ -49,6 +50,7 @@ const targetStat = (value: string): string => TARGET_STAT[value] ?? cardRef(valu
 // What a stat flag means where the bare name would not say it.
 const STAT_NOTE: Readonly<Record<string, string>> = {
   ...ESCAPE_STAT_NOTES,
+  ...BURGLE_STAT_NOTES,
   ...SMAUG_STAT_NOTES,
   ...ERECH_STAT_NOTES,
   ...RIDDLES_STAT_NOTES,

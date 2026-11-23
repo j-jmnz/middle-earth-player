@@ -31,7 +31,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 export function setAsideInPlay(state: ScenarioState, instruction: Extract<Instruction, { verb: "SetAsideInPlay" }>, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = Object.values(state.cards).find((entry) => entry.code === instruction.code && inPlay(entry.zone));
   if (!card) return state;
-  const away = updateCard(moveCard(leavePlay(state, card.id, ctx, steps), card.id, { zone: "setAside" }), card.id, { face: "down", controller: null });
+  const away = updateCard(moveCard(leavePlay(state, card.id, ctx, steps), card.id, { zone: "setAside" }, instruction.byQuest === true ? { supersedes: true } : {}), card.id, { face: "down", controller: null });
   return instruction.keepDamage === true ? updateCard(away, card.id, { damage: card.damage, keepsDamage: true }) : away;
 }
 

@@ -3,6 +3,7 @@ import { cardRef as cardRefWords, renderAmount } from "./amounts.ts";
 import { done, isObj, jsonOf, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 import { ESCAPE_CONDITIONS } from "./families/escape.ts";
+import { BURGLE_CONDITIONS } from "./families/burgle.ts";
 import { GUARDIAN_CONDITIONS } from "./families/guardian.ts";
 import { ERECH_CONDITIONS } from "./families/erech.ts";
 import { SACK_CONDITIONS } from "./families/sack.ts";
@@ -13,6 +14,7 @@ import { SHARED_CONDITIONS } from "./shared-conditions.ts";
 import { FAMILY_CONDITIONS } from "./families.ts";
 
 export { ESCAPE_CONDITION_SAMPLES } from "./families/escape.ts";
+export { BURGLE_CONDITION_SAMPLES } from "./families/burgle.ts";
 export { GUARDIAN_CONDITION_SAMPLES } from "./families/guardian.ts";
 export { ERECH_CONDITION_SAMPLES } from "./families/erech.ts";
 export { SACK_CONDITION_SAMPLES } from "./families/sack.ts";
@@ -47,6 +49,7 @@ type Template = (c: Obj, ctx: Ctx) => { text: string; read: readonly string[] } 
 
 export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   ...ESCAPE_CONDITIONS,
+  ...BURGLE_CONDITIONS,
   ...GUARDIAN_CONDITIONS,
   ...ERECH_CONDITIONS,
   ...SACK_CONDITIONS,

@@ -137,7 +137,7 @@ export function noteSpent(state: ScenarioState, payments: readonly Payment[], ct
   if (ids.length === 0) return state;
   const seatsHeard = gameReads(state, ctx, '"trigger":"resourcesSpent"') ? announceSpent(state, spent) : state;
   // Forage for Food (10082:A:1) hears each hero whose pool paid, once for the payment.
-  const announced = gameReads(seatsHeard, ctx, '"trigger":"heroResourcesSpent"') ? announceHeroesSpent(seatsHeard, ids) : seatsHeard;
+  const announced = gameReads(seatsHeard, ctx, '"trigger":"heroResourcesSpent"') ? announceHeroesSpent(seatsHeard, spent) : seatsHeard;
   if (!gameReads(announced, ctx, '"unspent":true')) return announced;
   const before = announced.spent?.round === announced.round ? announced.spent.ids : [];
   return { ...announced, spent: { round: announced.round, ids: [...new Set([...before, ...ids])] } };
@@ -155,10 +155,12 @@ function announceSpent(state: ScenarioState, spent: readonly Payment[]): Scenari
   return next;
 }
 
-// One `heroResourcesSpent` event for each hero whose pool paid (families/angmar).
-function announceHeroesSpent(state: ScenarioState, heroIds: readonly string[]): ScenarioState {
+// One `heroResourcesSpent` event for each hero whose pool paid, with the number it spent (families/angmar; "takes X damage. X is equal to the number of resources spent", 132051:A:1).
+function announceHeroesSpent(state: ScenarioState, spent: readonly Payment[]): ScenarioState {
+  const byHero = new Map<string, number>();
+  for (const payment of spent) byHero.set(payment.heroId, (byHero.get(payment.heroId) ?? 0) + payment.amount);
   let next = state;
-  for (const heroId of new Set(heroIds)) next = queueEvent(next, { trigger: "heroResourcesSpent", seat: state.cards[heroId]?.controller ?? null, cardId: heroId });
+  for (const [heroId, amount] of byHero) next = queueEvent(next, { trigger: "heroResourcesSpent", seat: state.cards[heroId]?.controller ?? null, cardId: heroId, amount });
   return next;
 }
 

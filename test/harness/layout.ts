@@ -61,6 +61,8 @@ export type Layout = {
   hand?: readonly Dealt[];
   deckOf?: readonly Dealt[];
   play?: readonly Placed[];
+  // Heroes besides the stand-ins dh1 to dh3, placed in the heroes zone of their seat (Bilbo Baggins, the Baggins resources of a saga game: 132001).
+  heroes?: readonly Placed[];
   phase?: ScenePhase;
   threat?: readonly [number, number];
   // Resources in the pool of every hero stand-in (a cost a row pays, a cancel).
@@ -194,6 +196,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     const spawned = spawn(state, code, dest, face);
     state = updateCard(spawned.state, spawned.id, { progress: row.progress, damage: row.damage, resources: row.resources, ...(row.upgraded ? { face: "B" as const } : {}) });
   };
+  for (const item of layout.heroes ?? []) put(entry(item).code, { zone: "heroes", seat: seatOf(item) }, item);
   for (const item of layout.play ?? []) put(entry(item).code, { zone: "play", seat: seatOf(item) }, item);
   for (const code of layout.deck ?? []) put(code, { zone: "encounterDeck" }, code, "down");
   for (const code of layout.discard ?? []) put(code, { zone: "encounterDiscard" });

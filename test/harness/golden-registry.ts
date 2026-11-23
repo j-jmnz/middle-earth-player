@@ -83,6 +83,7 @@ import * as dreadnaught from "../scenarios/the-hunt-for-the-dreadnaught/game.ts"
 import * as grim from "../scenarios/over-the-misty-mountains-grim/game.ts";
 import * as day from "../scenarios/we-must-away-ere-break-of-day/game.ts";
 import * as dim from "../scenarios/dungeons-deep-and-caverns-dim/game.ts";
+import * as mountain from "../scenarios/the-lonely-mountain/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -177,6 +178,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("over-the-misty-mountains-grim", "Over the Misty Mountains Grim", grim.GRIM_GOLDENS, grim.grimWorld, grim.playGolden),
   entry("dungeons-deep-and-caverns-dim", "Dungeons Deep and Caverns Dim", dim.DIM_GOLDENS, dim.dimWorld, dim.playGolden),
   entry("flies-and-spiders", "Flies and Spiders", spiders.SPIDERS_GOLDENS, spiders.spidersWorld, spiders.playGolden),
+  entry("the-lonely-mountain", "The Lonely Mountain", mountain.MOUNTAIN_GOLDENS, mountain.mountainWorld, mountain.playGolden),
   entry("peril-in-pelargir", "Peril in Pelargir", pelargir.PELARGIR_GOLDENS, pelargir.pelargirWorld, pelargir.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
