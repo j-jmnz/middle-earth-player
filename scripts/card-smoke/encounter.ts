@@ -20,8 +20,11 @@ import { encounterStart, encounterWorld, kept, type EncounterWorld } from "./enc
 // that does not replay to the same state is a problem, reported with the card or the game, the intent and the step. It proves that
 // the records run without breaking the game, not that they do what the cards say. `pnpm test scenario` runs it for each scenario.
 //
-// Usage: pnpm test encounter <scenario-id>... [--all] [--games=<n>] [--cards-only] [--games-only] [--verbose]
+// Usage: pnpm test encounter <scenario-id>... [--all] [--games=<n>] [--from=<n>] [--minutes=<n>] [--cards-only] [--games-only] [--verbose]
 // --all smokes every playable scenario (src/campaign/playable.ts).
+// --from=<n> numbers the first game n instead of 0: game n is the same game every run (profile, seat count and seed follow from the number), so a new range is new seeds.
+// --minutes=<n> is the soak (.claude/agents/orchestrator.md, Implementer tasks): games only, from a random first number (printed, or --from), as many as fit in n minutes, the time shared
+// by the scenarios named. The committed smoke and `pnpm test scenario` use the fixed numbers 0 to 23, so a soak finds what they do not. A problem prints the `pnpm game show` source that opens it.
 
 /**
  * Failures the engine has and this smoke reports without failing the run, each open in a GitHub issue its note names. A game is named by its scenario, number and seed, and the entry matches only the
@@ -48,8 +51,11 @@ export function probeTable(world: EncounterWorld): ScenarioState {
   return state;
 }
 
-/** Plays every encounter-side card of the scenario, and `games` seeded random games (none with 0). */
-export async function smokeScenario(scenarioId: string, options: { games?: number; cards?: boolean } = {}): Promise<EncounterSummary> {
+/**
+ * Plays every encounter-side card of the scenario, and `games` seeded random games (none with 0), numbered from `from` (0 by default). With `until` (a time on the `performance.now()` clock) it plays games from
+ * `from` until then instead of `games` of them, and at least one.
+ */
+export async function smokeScenario(scenarioId: string, options: { games?: number; cards?: boolean; from?: number; until?: number } = {}): Promise<EncounterSummary> {
   const begin = performance.now();
   const world = await encounterWorld(scenarioId);
   const ctx = world.contexts.strong;
@@ -61,7 +67,9 @@ export async function smokeScenario(scenarioId: string, options: { games?: numbe
     for (const stage of stages) for (const probe of probesOf(ctx, { stage })) results.push(probeCard(base, ctx, stage, probe));
   }
   const games: GameSummary[] = [];
-  for (let game = 0; game < (options.games ?? GAMES); game += 1) games.push(playGame(world, game));
+  const first = options.from ?? 0;
+  const more = (played: number): boolean => (options.until === undefined ? played < (options.games ?? GAMES) : played === 0 || performance.now() < options.until);
+  for (let played = 0; more(played); played += 1) games.push(playGame(world, first + played));
   return { scenario: scenarioId, cards: results, games, ms: performance.now() - begin };
 }
 
@@ -107,6 +115,16 @@ export function countOf(name: string, value: string): number {
   return Number(value);
 }
 
+/** The first game number of a soak: `from` when given, else a random number past the committed games, so each soak plays seeds the last one did not. */
+export function soakStart(from: number | undefined, random: () => number = Math.random): number {
+  return from ?? GAMES + Math.floor(random() * 1_000_000);
+}
+
+/** When the next scenario of a soak must stop: its share of the time left, `remaining` scenarios including it. */
+export function soakDeadline(now: number, end: number, remaining: number): number {
+  return now + Math.max(0, end - now) / Math.max(1, remaining);
+}
+
 async function main(log: Log): Promise<void> {
   const args = process.argv.slice(2);
   const number = (name: string) => {
@@ -119,10 +137,16 @@ async function main(log: Log): Promise<void> {
   const unknown = ids.filter((id) => !existsSync(path.join(DATA_DIR, "scenarios", `${id}.json`)));
   if (unknown.length > 0) throw new Error(`Not a scenario in data/scenarios: ${unknown.join(", ")}`);
   const games = args.includes("--cards-only") ? 0 : number("games");
+  const minutes = number("minutes");
+  if (minutes !== undefined && (args.includes("--cards-only") || games !== undefined)) throw new Error("--minutes plays games only, as many as fit: it takes neither --cards-only nor --games");
+  const from = minutes === undefined ? number("from") : soakStart(number("from"));
+  const end = minutes === undefined ? 0 : performance.now() + minutes * 60_000;
+  if (minutes !== undefined) log.info(`soak: ${minutes} min over ${ids.length} scenarios, games from number ${from} (--from=${from} plays them again)`);
   let failed = 0;
-  for (const id of ids) {
+  for (const [at, id] of ids.entries()) {
     try {
-      const summary = await smokeScenario(id, { ...(games == null ? {} : { games }), cards: !args.includes("--games-only") });
+      const soak = minutes === undefined ? {} : { until: soakDeadline(performance.now(), end, ids.length - at) };
+      const summary = await smokeScenario(id, { ...(games == null ? {} : { games }), ...(from == null ? {} : { from }), ...soak, cards: minutes === undefined && !args.includes("--games-only") });
       if (problemsOf(summary).length > 0) failed += 1;
       (problemsOf(summary).length > 0 ? log.error : log.info)(formatSummary(summary));
     } catch (error) {
