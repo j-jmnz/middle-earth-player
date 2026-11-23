@@ -20,7 +20,10 @@ export function advanceOtherPlayers(state: ScenarioState, code: string, focus: F
   if (!state.separate) return state;
   const others = livingSeats(state).filter((seat) => seat !== focus.seat);
   if (others.length > 0) {
-    let next = state;
+    // The others left the shared stage 2, not the stage 3 the first player holds: stage 2 is the stage defeated before stage 4. noteSkippedStage reads the stage before it in order, which is in play for the first player, so the stage left is set before the advance (it queues the defeat).
+    const parked = state.seats[others[0] ?? 0]?.stage;
+    const arriving = state.questDeck.find((id) => state.cards[id]?.code === code);
+    let next: ScenarioState = parked && arriving ? { ...state, stageLeft: { to: arriving, from: parked } } : state;
     for (const seat of others) next = withView(next, seat, (view) => advanceToStage(view, code, ctx, steps));
     return next;
   }

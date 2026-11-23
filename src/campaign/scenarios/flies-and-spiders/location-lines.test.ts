@@ -62,7 +62,7 @@ it("132025:A:2 Bilbo pays for a Glade in the staging area of the first player's 
 it("132025:A:2 the Travel exhausts the Bilbo of the Glade's own area, and a Bilbo of the other area cannot be the one", () => {
   const { t, state } = splitTable(EFFECTS, { engaged: [{ code: "f0", seat: 1 }] });
   // Bilbo goes with the first player token (ControlledBy): with the token at seat 1 he is the second area's.
-  const bilbo = withBilbo({ ...state, firstPlayer: 1, delayed: [] }, 1);
+  const bilbo = withBilbo({ ...state, firstPlayer: 1 }, 1);
   const glade = idOf(bilbo.state, GLADE);
   const travel = (seat: number, at: ScenarioState) => send(start({ ...at, phase: "Travel", mode: "travel", window: { kind: "travel" }, activeSeat: seat }), { type: "Travel", locationId: glade }, t.ctx);
   expect(bilbo.state.cards[bilbo.id]?.controller, "the token holder controls Bilbo").toBe(1);

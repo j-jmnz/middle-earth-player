@@ -129,6 +129,15 @@ lineSpec("132069:B:2", "do not pass the first player token while stage 3 is in p
   expect(out.round).toBeGreaterThan(quiet.round);
   expect(out.firstPlayer, "the token did not pass").toBe(0);
 });
+// The other players advance from stage 2 to stage 4: stage 2 is the stage defeated, so the Forced of stage 3 ("when this stage is defeated") does not hear it and schedules no join.
+// A negative lock, so a plain test: it holds without the Forced record of the line.
+it("132069:B:2 stage 3 is not defeated when the other players advance to stage 4, so its delayed join is not scheduled", () => {
+  const { state } = revealed(EFFECTS);
+  expect(codeOf(state, stageOf(state, 0))).toBe(STAGE_3);
+  expect(codeOf(state, stageOf(state, 1))).toBe(STAGE_4);
+  expect(state.delayed ?? [], "no delayed join").toEqual([]);
+  expect(state.stageHeld, "stage 3 is not held").toBeUndefined();
+});
 // The false case of the lock: with no stage 3 in play the token passes (it holds without the line's records, so it is a plain test and the lineSpec above is the one that fails without them).
 it("132069:B:2 the first player token passes at the end of a round when stage 3 is not in play", () => {
   const t = on(EFFECTS, { seats: 2, stage: STAGE_1, phase: "Refresh" });
@@ -142,7 +151,7 @@ const questToComplete = (effects: readonly Effect[]) => {
   const { t, state: split } = revealed(effects, { staging: ["f0"] });
   const withB = withBilbo(split);
   const stage3 = stageOf(withB.state, 0) ?? "";
-  const placed = spawn(withB.state, "f3", stagingDest(withB.state, 0));
+  const placed = spawn(withB.state, "f0", stagingDest(withB.state, 0));
   const ready = updateCard({ ...placed.state, phase: "Quest", mode: "questCommit", window: { kind: "pass" }, activeSeat: 0 }, stage3, { progress: (t.cards.get(STAGE_3)?.questPoints ?? 11) - 1 });
   const before = syncConstants(ready, t.ctx);
   let run = send(start(before), { type: "Commit", cardIds: [withB.id] }, t.ctx);
