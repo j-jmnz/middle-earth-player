@@ -19,7 +19,7 @@ const VERBS = [
   // adds it to the staging area", 906101:A:2; rr.search). It is not revealed. Nothing happens when no copy is in those places. The deck is
   // shuffled by a ShuffleEncounterDeck after it (the line says so). In a quest card's Setup it runs at the top level ("Search the encounter deck for Gollum, and add it to the staging area", 02105:A:1).
   // `deckOnly`: only the encounter deck is searched ("Search the encounter deck for Troll Camp", 131053:A:2).
-  verbFlags(z.strictObject({ verb: z.literal("SearchToStaging"), code: z.string().min(1), deckOnly: z.literal(true).optional(), ...when }), { setupRuns: "top" }),
+  verbFlags(z.strictObject({ verb: z.literal("SearchToStaging"), code: z.string().min(1), deckOnly: z.literal(true).optional(), ...when }), { setupRuns: "top", runsInFrame: true }),
   // The source enemy attacks the actor now, as an attack outside the combat phase: from the staging area though it is not engaged, or while
   // it is engaged with the actor ("Southern Spy makes an immediate attack against you", 906203:A:1). It is dealt a shadow card of its own.
   // Nothing happens when it is engaged with another player or out of play.

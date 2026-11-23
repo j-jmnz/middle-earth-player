@@ -3,7 +3,7 @@ import { expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
-import { idOf, resolveRecords, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
+import { fightEnemy, idOf, resolveRecords, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 // The Troll lines whose second step depends on the first: "Then, shuffle the encounter deck" (rr.then), and Surge only when no Troll was in the staging area as the card resolved.
 const ID = "we-must-away-ere-break-of-day";
@@ -20,12 +20,23 @@ lineSpec("131053:A:2", "Shadow: Troll Camp is found in the encounter deck, added
   expect(done.state.seedCursor).toBeGreaterThan(table.state.seedCursor);
 });
 
-it("131053:A:2 when Troll Camp is not in the encounter deck nothing is added and the deck is not shuffled (rr.then)", () => {
-  const table = tableFromLayout(ID, { deck: ["f0", "f0", "f0", "f0"], discard: [CAMP] }, { effects: EFFECTS });
-  const done = resolveRecords(table.state, table.ctx, "131053", "shadow");
-  expect(done.state.cards[idOf(done.state, CAMP)]?.zone).toBe("encounterDiscard");
-  expect(done.state.encounterDeck).toEqual(table.state.encounterDeck);
-  expect(done.state.seedCursor).toBe(table.state.seedCursor);
+// Through a real attack: a Shadow effect with no cancel resolves in a frame the engine pushes for it, and the "Then" step reads that frame (rr.then).
+it("131053:A:2 when Troll Camp is not in the encounter deck nothing is added and the deck is not shuffled, in a real attack (rr.then)", () => {
+  const make = (layout: Parameters<typeof tableFromLayout>[1]) => tableFromLayout(ID, layout, { effects: EFFECTS });
+  const rest = { discard: [CAMP], seats: 1 as const };
+  const fought = fightEnemy(make, "131053", "f3", { ...rest, deck: ["131053", "f0", "f0", "f0", "f0"] }, { undefended: true });
+  const plain = fightEnemy(make, "f0", "f3", { ...rest, deck: ["f0", "f0", "f0", "f0", "f0"] }, { undefended: true });
+  expect(fought.run.state.cards[idOf(fought.run.state, CAMP)]?.zone).toBe("encounterDiscard");
+  expect(fought.run.state.seedCursor).toBe(plain.run.state.seedCursor);
+  expect(fought.run.state.encounterDeck).toHaveLength(plain.run.state.encounterDeck.length);
+});
+
+it("131053:A:2 when Troll Camp is in the encounter deck it is added to the staging area and the deck is shuffled, in a real attack", () => {
+  const make = (layout: Parameters<typeof tableFromLayout>[1]) => tableFromLayout(ID, layout, { effects: EFFECTS });
+  const fought = fightEnemy(make, "131053", "f3", { seats: 1 as const, deck: ["131053", "f0", "f0", CAMP, "f0"] }, { undefended: true });
+  const plain = fightEnemy(make, "f0", "f3", { seats: 1 as const, deck: ["f0", "f0", "f0", CAMP, "f0"] }, { undefended: true });
+  expect(fought.run.state.cards[idOf(fought.run.state, CAMP)]?.zone).toBe("staging");
+  expect(fought.run.state.seedCursor).toBeGreaterThan(plain.run.state.seedCursor);
 });
 
 lineSpec("131054:A:1", "a lone Troll enemy in the staging area is engaged by the first player and the card gains no Surge", (effects) => {
