@@ -153,7 +153,7 @@ describe("The Chasm, stage 3 (41006:A:1, 41006:B:1 to 41006:B:3)", () => {
     expect(effect?.instructions).toEqual([{ verb: "RevealMore", amount: 1 }]);
   });
 
-  it("takes no progress on Cracked Pillar while it is in the staging area, and has no quest points of its own", () => {
+  it("41006:B:2 takes no progress on Cracked Pillar while it is in the staging area, and has no quest points of its own", () => {
     const made = make({ stage: "41006", staging: ["41028"] });
     const pillar = first(made.state, "41028");
     const placed = settle(runInstruction({ ...made.state, window: null }, { verb: "PlaceProgressOn", amount: 2, target: "picked" }, { seat: 0, sourceId: made.state.questStage }, { ...made.ctx }, []), made.ctx, []);

@@ -5,8 +5,10 @@ import { describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import { legalIntents } from "../../../rules/engine/legal.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../rules/engine/reduce.ts";
+import type { Effect } from "../../../catalog/boundary.ts";
 import { playerCardEffectCanChoose } from "../../../rules/core/keywords.ts";
-import { first, opening, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
+import { whenRevealedUncancelable } from "../../../rules/families/wilderland/heath.ts";
+import { first, legalTargets, opening, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
 
 const table = (layout: Layout) => tableFromLayout("the-siege-of-annuminas", layout);
 const PLACES = ["place", "place", "place", "place", "place", "place"];
@@ -63,12 +65,37 @@ describe("the Responses at the end of the round", () => {
   });
 });
 
+describe("50820:A:3 City Wall's Travel cost", () => {
+  // Researched (rr.travel, rr.running-out-of-cards; Caleb Grace, ALeP 3.243 and 3.358, docs/scenarios/standalone-scenarios.md): "Reveal the top card of the encounter deck to travel here" is a cost; with an empty deck outside the quest phase it cannot be paid, and the deck is not reset for it.
+  const travelOffered = (layout: Layout): boolean => {
+    const made = table({ stage: "50805", phase: "Travel", staging: ["50820"], ...layout });
+    return legalTargets(made.state, { type: "Travel" }, made.ctx).includes(first(made.state, "50820"));
+  };
+
+  it("50820:A:3 the players cannot travel there with an empty encounter deck, whatever the discard pile holds", () => {
+    expect(travelOffered({ deck: [], discard: ["place", "f0"] })).toBe(false);
+    expect(travelOffered({ deck: [] })).toBe(false);
+  });
+
+  it("50820:A:3 they can with a card in the deck", () => {
+    expect(travelOffered({ deck: ["place"] })).toBe(true);
+  });
+});
+
 describe("table-wide effects and keywords in a line with X", () => {
+  // "While Hills of Evendim is in the staging area, 'when revealed' effects cannot be canceled": a cancel of the When Revealed effects (A Test of Will) or of the reveal itself (The Master Ring), asked about a card just revealed.
   it("50822:A:1 bars the cancel of 'when revealed' effects only while Hills of Evendim is in the staging area", () => {
-    const barred = (layout: Layout) => table(layout).state.modifiers.some((modifier) => modifier.stat === "encounterUncancelable");
-    expect(barred({ stage: "50805", staging: ["50822"] })).toBe(true);
-    expect(barred({ stage: "50805", engaged: ["50822"] })).toBe(false);
-    expect(barred({ stage: "50805" })).toBe(false);
+    const cancels = (trigger: "whenRevealedPending" | "encounterRevealed"): Effect => ({ id: "x:response:1", cardCode: "x", lines: ["x:A:1"], timing: "response", trigger, instructions: [{ verb: "CancelEffect" }] });
+    const barred = (layout: Layout, trigger: "whenRevealedPending" | "encounterRevealed"): boolean => {
+      const effect = cancels(trigger);
+      const made = table({ ...layout, staging: [...(layout.staging ?? []), "f0"] });
+      return whenRevealedUncancelable(made.state, { trigger, seat: 0, subject: first(made.state, "f0") }, effect, { ...made.ctx, effects: [...made.ctx.effects, effect] });
+    };
+    for (const trigger of ["whenRevealedPending", "encounterRevealed"] as const) {
+      expect(barred({ stage: "50805", staging: ["50822"] }, trigger)).toBe(true);
+      expect(barred({ stage: "50805", engaged: ["50822"] }, trigger)).toBe(false);
+      expect(barred({ stage: "50805" }, trigger)).toBe(false);
+    }
   });
 
   it("50828:A:2 caps the progress placed on the main quest at 5 each round while Vanguard of Carn Dûm is in the staging area", () => {

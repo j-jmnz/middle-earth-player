@@ -85,6 +85,8 @@ const ROWS: readonly Row[] = [
 
   { line: "145061:A:2", name: "When Revealed: each player deals 1 damage to a hero they control", layout: { seats: 2 }, act: [reveal("145061"), answer("dh1")], expect: damageOn("dh1", 1) },
 
+  // "Setup: Add Wraith on Wings to the staging area." The copy is set aside, as a campaign game deals a pool burden.
+  { line: "145062:A:1", name: "Setup: the set-aside Wraith on Wings is added to the staging area", layout: { setAside: [WRAITH] }, act: resolve(WRAITH, "setup"), expect: zone(WRAITH, "staging") },
   { line: "145062:A:3", name: "+1 Threat and -1 engagement cost for each resource on it", layout: { staging: [{ code: WRAITH, resources: 3 }] }, act: [], expect: [stat(WRAITH, "threat", 3), stat(WRAITH, "engagementCost", 42)] },
   { line: "145062:A:4", name: "Forced at the beginning of the quest phase it gets 1 resource", layout: { staging: [WRAITH] }, act: resolve(WRAITH, "forced"), expect: resourcesOn(WRAITH, 1) },
 

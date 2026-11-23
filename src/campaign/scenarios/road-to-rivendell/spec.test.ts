@@ -100,6 +100,9 @@ const ROWS: readonly Row[] = [
 
   // 901402 Ambush in the Night: A:1 finds Goblin Gate and reveals the enemies it discards for each player.
   { line: "901402:A:1", name: "Goblin Gate is added to the staging area and an enemy discarded from the shuffled deck is revealed", layout: { stage: "901402", side: "A", deck: ["04043", "04049"], threat: [0, 0] }, act: resolve("901402", "whenRevealed"), expect: [zone("04043", "staging"), zone("04049", "staging")] },
+
+  // 901403:A:3 "Shadow: Attacking enemy gets +2 Attack." f0 (1 Attack) undefended deals 3.
+  { line: "901403:A:3", name: "Shadow: the attacking enemy gets +2 Attack", layout: {}, act: attack("f0", { shadow: "901403", undefended: true }), expect: damageOn("dh1", 3) },
 ];
 
 if (ROWS.length > 0) cardSpecs("road-to-rivendell", ROWS);

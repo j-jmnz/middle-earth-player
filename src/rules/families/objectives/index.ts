@@ -3,7 +3,7 @@
 //
 // The guarded objectives of Escape from Dol Guldur. An objective with the Guarded keyword is guarded when it is revealed (even in
 // Setup): the next card of the encounter deck that is not itself an objective is revealed and attached to it, and both stay in the
-// staging area. While an encounter card is attached the objective cannot be claimed. Claiming attaches the objective to a hero its
+// staging area; a next card that also has the Guarded keyword is revealed after it, and guarded in turn. While an encounter card is attached the objective cannot be claimed. Claiming attaches the objective to a hero its
 // claimer controls; it counts as an attachment, and when it is detached (its hero leaves play, a card discards it, a Restricted slot
 // is over) it returns to the staging area.
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
@@ -22,7 +22,9 @@ import { updateCard } from "../../core/state.ts";
 import { resetEncounterDeck } from "../../interpret/verbs.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { discardUntilType } from "../encounter/discard-until.ts";
-import { moveEncounter } from "../encounter/moves.ts";
+import { effectData, moveEncounter } from "../encounter/moves.ts";
+import { queueFront } from "../play/refs.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import type { Focus } from "../index.ts";
 import { controlSweep } from "./control.ts";
 import { freeOfEncounters } from "./free.ts";
@@ -48,7 +50,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 }
 
 // GuardObjective: reveals the first card of the encounter deck that is not an objective for the actor and attaches it to the objective.
-// An objective that would be the next card stays on the deck: it is revealed, and guarded, in its own turn (rr.guarded).
+// An objective with the Guarded keyword that would be the next card is revealed after that card has been used to guard the first (rr.guarded): the card after it guards the first objective, then the second
+// objective is revealed and its own Guarded keyword takes the card after that. An objective without the keyword stays on the deck.
 function guardObjective(state: ScenarioState, instruction: Extract<Instruction, { verb: "GuardObjective" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = refCard(state, instruction.target ?? "self", frameScope(state, focus.seat, focus.sourceId));
   const objective = id ? state.cards[id] : undefined;
@@ -60,7 +63,16 @@ function guardObjective(state: ScenarioState, instruction: Extract<Instruction, 
   if (at < 0) return ready;
   // The guard comes to the top of the deck, the objectives above it keep their order below it.
   const deck = [ready.encounterDeck[at] ?? "", ...ready.encounterDeck.slice(0, at), ...ready.encounterDeck.slice(at + 1)];
-  return startReveal({ ...ready, encounterDeck: deck }, focus.seat, ctx, steps, undefined, id);
+  // The second Guarded card is the first card of the deck behind the guard: the next reveal of this effect is its own.
+  const second = at > 0 ? ready.encounterDeck[0] : undefined;
+  const queued = second && isGuardedObjective(ready, second, ctx) && effectData(ready) ? queueFront(ready, [{ instruction: { verb: "RevealEncounter" }, seat: focus.seat, chosen: null }]) : ready;
+  return startReveal({ ...queued, encounterDeck: deck }, focus.seat, ctx, steps, undefined, id);
+}
+
+// Whether the card is an objective whose When Revealed record guards it (the Guarded keyword).
+function isGuardedObjective(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+  const card = state.cards[id];
+  return card != null && printedOf(ctx.cards, card.code).type === "objective" && effectsOf(ctx, card.code).some((effect) => effect.timing === "whenRevealed" && effect.instructions.some((instruction) => instruction.verb === "GuardObjective"));
 }
 
 // Guarded (X) on an objective (emce.guarded-x, wor.guarded-x): cards are discarded from the encounter deck until one of the types is discarded (the discard pile is shuffled into an empty deck), and that card is added to the staging area

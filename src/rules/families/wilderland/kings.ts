@@ -8,6 +8,7 @@ import { gameReads } from "../../core/game-reads.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { attachSelf } from "../../interpret/effect-targeted.ts";
+import { attachBlocked } from "../../interpret/restrictions.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { NAMED_PILES, pileDealt, pileOf, withPile } from "../../core/piles.ts";
@@ -59,6 +60,8 @@ export function attachSelfToPicked(state: ScenarioState, instruction: Verb<"Atta
   const code = focus.sourceId ? state.cards[focus.sourceId]?.code : undefined;
   if (!focus.sourceId || !host || !state.cards[host]) return state;
   if (instruction.unlimited !== true && state.cards[host].attachments.some((other) => state.cards[other]?.code === code)) return state;
+  // A host that cannot have attachments takes none ("Cannot have attachments", 50709:A:1 to 50713:A:1).
+  if (code != null && attachBlocked(state, ctx, host, code)) return state;
   return attachSelf(state, focus.sourceId, host, ctx);
 }
 

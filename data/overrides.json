@@ -3726,6 +3726,18 @@
       },
       "reason": "Fierce Marauder's line 1 prints \"Pillage 3.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, Mechanics for Build).",
       "source": "scan 40023.A, data/printed/standalone-scenarios.json"
+    },
+    {
+      "match": {
+        "code": "12204"
+      },
+      "set": {
+        "keywords": {
+          "restricted": true
+        }
+      },
+      "reason": "Masterwork Bow prints \"Attach to a character. Restricted.\" (line 1 of its ledger entry, read from the scan), but Hall of Beorn lists no Restricted keyword for it, as it does for the other Ered Mithrin treasures that print it. Without the keyword the Bow is never a third Restricted attachment (rr.restricted).",
+      "source": "scan 12204.A, data/printed/ered-mithrin.json"
     }
   ],
   "scenarioPiles": [

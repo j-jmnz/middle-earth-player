@@ -195,6 +195,8 @@ export const pickSchema = z.strictObject({
   attachable: z.string().min(1).optional(),
   guarded: z.boolean().optional(),
   progress: z.boolean().optional(),
+  // Only a card the source card may attach to: one that cannot have attachments ("Cannot have attachments") is not offered (Hired Muscle, 50726:A:2).
+  takesSource: z.literal(true).optional(),
   // Only a card a card effect can affect: one immune to card effects is not counted ("If Cave In removed no progress tokens", East-gate's own tokens are out of reach, 03048:A:1; dwd.immune-to-card-effects).
   affectable: z.literal(true).optional(),
   // The uncharted family's filters (src/rules/families/uncharted/pick.ts). `uncharted`: a double-sided location lying on its Lost Island side, the keyword Uncharted (dcce.uncharted),

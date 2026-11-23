@@ -1,7 +1,7 @@
 // Rules: rr.forced, rr.action, rr.shadow-effects, rr.travel, rr.active-location, rr.reveal, rr.keywords, rr.first-player, rr.blank, rr.surge, faq.lasting-effects, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Stone of Erech).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, damageOn, defend, exhausted, flag, quest, resolve, respond, reveal, stat, threat, travel, zone, deckCount, handCount, progressOn, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, damageOn, deckCount, defend, exhausted, flag, handCount, lost, progressOn, quest, resolve, respond, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Stone of Erech (standalone-scenarios part 3): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The Night objective in play is the layout's `night`
@@ -74,6 +74,9 @@ const ROWS: readonly Row[] = [
   { line: "50326:A:1", name: "When Revealed: 1 damage to each character with less than 2 Willpower", layout: { play: ["50304"], attached: [{ code: "50325", to: "dh1" }] }, act: resolve("50326", "whenRevealed"), expect: [damageOn("dh1", 1), damageOn("dh2", 0)] },
   { line: "50326:A:1", name: "Dusk: less than 3 Willpower instead", layout: { night: DUSK }, act: resolve("50326", "whenRevealed"), expect: [damageOn("dh1", 1), damageOn("dh2", 1)] },
   { line: "50327:A:2", name: "When Revealed: 1 progress on the Night objective", layout: { night: EVENTIDE }, act: resolve("50327", "whenRevealed"), expect: [progressOn(EVENTIDE, 1)] },
+
+  // 50304:A:4 "If Derufin leaves play, the players lose the game." Under the first player's control, Derufin (1 Defense, 2 hit points, 1 damage) defends Shadow-man (4 Attack) and is destroyed.
+  { line: "50304:A:4", name: "Derufin destroyed defending an attack loses the game", layout: { play: [{ code: "50304", damage: 1 }] }, act: [attack("50312"), defend("50304")], expect: [zone("50304", "encounterDiscard"), lost] },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-stone-of-erech", ROWS);

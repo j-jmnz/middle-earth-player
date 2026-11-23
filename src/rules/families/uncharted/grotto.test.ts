@@ -154,7 +154,7 @@ describe("flipping a double-sided location (12098:A:2, 12099:A:1, 12100:A:2, 120
   });
 });
 
-describe("Shrine to Morgoth, Grotto side (12094:A:1, 12094:A:2)", () => {
+describe("Shrine to Morgoth (12094:A:1, 12094:A:2, 12095:A:1)", () => {
   it("cannot have attachments and cannot enter the staging area", () => {
     const made = make({ sided: [{ code: SHRINE.grotto, back: SHRINE.underwater, zone: "activeLocation" }] });
     const id = idOf(made.state, SHRINE.grotto);
@@ -167,6 +167,16 @@ describe("Shrine to Morgoth, Grotto side (12094:A:1, 12094:A:2)", () => {
     // Any other location can be returned to the staging area.
     const other = make({ sided: [{ ...UNDERSEA, zone: "activeLocation" }] });
     expect(moveCard(other.state, idOf(other.state, UNDERSEA.code), { zone: "staging" }).cards[idOf(other.state, UNDERSEA.code)]?.zone).toBe("staging");
+  });
+
+  it("12095:A:1 its Underwater side cannot have attachments and cannot enter the staging area either", () => {
+    const made = make({ sided: [{ code: SHRINE.underwater, back: SHRINE.grotto, zone: "activeLocation" }] });
+    const id = idOf(made.state, SHRINE.underwater);
+    expect(attachBlocked(made.state, made.ctx, id, CODES.blackKey)).toBe(true);
+    expect(attachBlocked(made.state, made.ctx, id, CODES.revenant)).toBe(true);
+    const moved = moveCard(made.state, id, { zone: "staging" });
+    expect(moved.cards[id]?.zone).toBe("activeLocation");
+    expect(moved.staging).not.toContain(id);
   });
 
   it("flips to its Underwater side at the beginning of the quest phase, keeping its progress tokens", () => {

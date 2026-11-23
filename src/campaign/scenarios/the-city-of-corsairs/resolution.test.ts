@@ -8,6 +8,8 @@ import type { ScenarioState } from "../../../rules/engine/reduce.ts";
 import { openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
 import { CODES, corsairsTable, loadCorsairsWorld, type CorsairsLayout, type CorsairsWorld, campaign } from "../../../../test/scenarios/the-city-of-corsairs/scene.ts";
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
+import { withoutLine } from "../../../../test/harness/card-spec.ts";
+import type { Effect } from "../../../catalog/boundary.ts";
 
 import { applyResolution, emptyLog } from "../../log.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
@@ -51,6 +53,22 @@ describe("11215:B Gain the following", () => {
     const base = xp({});
     expect(xp({ victory: [CODES.thunderstruck] }) - base).toBe(2);
     expect(xp({ victory: [OMINOUS_FATE] }) - base).toBe(-1);
+  });
+});
+
+describe("11215:B:8 Thunderstruck", () => {
+  // "2 XP if Thunderstruck is in the victory display." Counted on the Resolution's own lines, and on the lines without its record.
+  const xpWith = (layout: CorsairsLayout, effects: readonly Effect[]): number => {
+    const made = corsairsTable(world, { stage: "12150", ...layout });
+    const state = openResolution({ ...made.state, scenarioId: "the-city-of-corsairs", window: null, stageCleared: true, resolution: sideInstructions(effects, CODES.campaignCard, "B", "resolution") }, made.ctx);
+    return resolutionResult(state)?.xp ?? 0;
+  };
+
+  it("11215:B:8 gives 2 XP for Thunderstruck in the victory display, none for it in the encounter discard pile, and none without its record", () => {
+    const base = xpWith({}, EFFECTS);
+    expect(xpWith({ victory: [CODES.thunderstruck] }, EFFECTS) - base).toBe(2);
+    expect(xpWith({ discard: [CODES.thunderstruck] }, EFFECTS) - base).toBe(0);
+    expect(xpWith({ victory: [CODES.thunderstruck] }, withoutLine(EFFECTS, "11215:B:8")) - base).toBe(0);
   });
 });
 

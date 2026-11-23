@@ -97,6 +97,8 @@ const ROWS: readonly Row[] = [
   { line: "50712:A:2", name: "Johnny Goblin-fingers: the card discarded raises the defender's threat by its printed cost", layout: { engaged: ["50712"], threat: [30, 30], hand: ["ally"], deck: ["f0", "f0"] }, act: attack("50712", { undefended: true }), expect: [handCount(0)] },
   { line: "50719:A:1", name: "Investigate 1: the first player looks at the top card, which shows Taken by Surprise", layout: { stage: "50701", active: "50719", piles: TAKEN_ONLY, deck: ["f0"], discard: ["f3"] }, act: [announce("activeExplored", "50719"), answer("reduce")], expect: [zone("50714", "removed")] },
   { line: "50719:A:2", name: "the first player may look at 2 additional cards, which shows Taken by Surprise among the three", layout: { stage: "50701", active: "50719", seed: 1, piles: { investigationDeck: ["f0", "f0", "50714"] }, deck: ["f0"], discard: ["f3"] }, act: [announce("activeExplored", "50719"), answer("look")], expect: [zone("50714", "removed")] },
+  // "Travel: Reveal the top card of the encounter deck to travel here."
+  { line: "50719:A:3", name: "Travel: the top card of the encounter deck is revealed", layout: { phase: "Travel", staging: ["50719"], deck: ["f3", "f0"] }, act: travel("50719"), expect: [count("f3", "staging", 1)] },
 ];
 
 if (ROWS.length > 0) cardSpecs("murder-at-the-prancing-pony", ROWS);

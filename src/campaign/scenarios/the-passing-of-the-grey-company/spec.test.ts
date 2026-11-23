@@ -76,6 +76,9 @@ const ROWS: readonly Row[] = [
   { line: "145067:A:2", name: "X, its Threat, is 2 times the number of players", layout: { seats: 2, staging: [ARMY] }, act: [], expect: stat(ARMY, "threat", 4) },
   { line: "145067:A:3", name: "Forced when it attacks: you attach a set aside Overcome by Fear to your threat dial", layout: { engaged: [{ code: ARMY, seat: 0 }], setAside: [FEAR], play: ["ally"] }, act: [announce("attacks", ARMY), answer("attach")], expect: [zone(FEAR, "play"), zone("ally", "play")] },
   { line: "145067:A:3", name: "or discard an ally you control", layout: { engaged: [{ code: ARMY, seat: 0 }], setAside: [FEAR], play: ["ally"] }, act: [announce("attacks", ARMY), answer("discard")], expect: [zone("ally", "discard"), zone(FEAR, "setAside")] },
+
+  // 145022:A:3 "Shadow: Attacking enemy gets +1 Attack." f0 (1 Attack) undefended deals 2.
+  { line: "145022:A:3", name: "Shadow: the attacking enemy gets +1 Attack", layout: {}, act: attack("f0", { shadow: "145022", undefended: true }), expect: damageOn("dh1", 2) },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-passing-of-the-grey-company", ROWS);

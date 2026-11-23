@@ -516,7 +516,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 906204:A:2 (front): The Witch-king cannot be damaged.
   906204:constant:1: Constant
-    - each enemy (any player controls) named "The Witch-king": stat cannotTakeDamage 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "The Witch-king": stat cannotTakeDamage 1, while this card is in play
 
 906204:A:3 (front): Forced: After Weathertop becomes the active location, exhaust The One Ring. The One Ring cannot ready while Weathertop is the active location.
   906204:forced:1: Forced after this location becomes the active location
@@ -555,7 +555,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - 1 resource(s) come off the resource pool of this card (discarded, not spent)
-    - then, if not (this card is a location (any player controls) with resources on it) (checked when this step runs, after the steps above; not tied to whether they did anything): one out-of-play copy of the card with code 141069 (set aside, in the encounter discard pile, in the victory display or under a card) joins the encounter deck, which is shuffled (when copies are out of play in more than one zone the first player chooses which; nothing with no copy left)
+    - then, if all of: (every draw and every discard of the top of the deck this effect ran so far resolved in full (what follows "then" is attempted only when they did)) and (resources of this card is less than 1) (checked when this step runs, after the steps above; not tied to whether they did anything): one out-of-play copy of the card with code 141069 (set aside, in the encounter discard pile, in the victory display or under a card) joins the encounter deck, which is shuffled (when copies are out of play in more than one zone the first player chooses which; nothing with no copy left)
 
 ## 906207 Forsaken Inn
 
@@ -600,4 +600,4 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906209:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 279 by template, 0 as JSON)
+(rendered pieces: 280 by template, 0 as JSON)

@@ -57,6 +57,9 @@ const ROWS: readonly Row[] = [
   { line: "147021:A:2", name: "When Revealed: at the end of the phase each player raises his threat by the enemies in the staging area", layout: { staging: ["f3", "f0"], phase: "Travel", deck: FILLERS }, act: [resolve("147021", "whenRevealed"), endPhase], expect: [threat(30)] },
   { line: "147022:A:1", name: "When Revealed: the chosen player gains control of Tom Bombadil, ready and committed to the quest", layout: { deck: FILLERS }, act: resolve("147022", "whenRevealed"), expect: [zone("147022", "play")] },
   { line: "147022:A:1", name: "At the end of the round Tom is discarded and then the encounter discard pile, Tom in it, is shuffled into the encounter deck", layout: { deck: FILLERS, discard: ["f0", "f0"] }, act: [resolve("147022", "whenRevealed"), endPhase, endRound], expect: [zone("147022", "encounterDeck"), deckCount(7)] },
+
+  // 147021:A:3 "Shadow: Return attacking enemy to the staging area after this attack." The undefended attack of f0 is made (1 damage), then f0 is back in the staging area.
+  { line: "147021:A:3", name: "Shadow: the attacking enemy returns to the staging area after the attack", layout: {}, act: attack("f0", { shadow: "147021", undefended: true }), expect: [damageOn("dh1", 1), zone("f0", "staging")] },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-old-forest", ROWS);

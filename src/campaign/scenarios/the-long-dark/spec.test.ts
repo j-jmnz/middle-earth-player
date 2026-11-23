@@ -1,7 +1,7 @@
 // Rules: dwd.lost-effects, dwd.locate-test, dwd.cave-torch-the-long-dark, rr.forced, rr.reveal, rr.shadow-effects, rr.first-player, rr.then, rr.attachment-cards, rr.defending-player (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, damageOn, deckCount, drew, exhausted, handCount, progressOn, quest, resolve, reveal, stagingThreat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, damageOn, deckCount, drew, exhausted, handCount, progressOn, quest, resolve, reveal, stagingThreat, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Long Dark (dwarrowdelf part 7): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The rows here are the lines a table and one action show; the flows of several steps (the locate test and its
@@ -87,6 +87,9 @@ const ROWS: readonly Row[] = [
   // 901608 Lost and Helpless. A:2: attached to a hero; its Lost effect discards the hero. A:3: the defending character is discarded when his player has no card in hand.
   { line: "901608:A:2", name: "revealed it attaches to a hero, and Lost discards the hero", layout: { deck: ["f0"] }, act: [reveal("901608"), announce("lost", "901608")], expect: zone("901608", "encounterDiscard") },
   { line: "901608:A:3", name: "with no card in hand the defending character is discarded from play", layout: { phase: "Encounter", hand: [] }, act: attack("f0", { shadow: "901608" }), expect: zone("dh1", "discard") },
+
+  // 04088:A:2 "Attached hero gets +1 Defense." Revealed, Durin's Greaves is attached to dh1 (04088:A:1), whose 2 Defense becomes 3.
+  { line: "04088:A:2", name: "the hero it is attached to gets +1 Defense", layout: { deck: ["f0"] }, act: [reveal("04088"), answer("dh1")], expect: [stat("dh1", "defense", 3), stat("dh2", "defense", 2)] },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-long-dark", ROWS);
