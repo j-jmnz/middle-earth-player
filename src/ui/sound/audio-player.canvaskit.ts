@@ -3,6 +3,9 @@
 // loop asked again once a gesture lets it play, and the music paused while the window is not in front. It makes no player until a sound or a
 // loop plays, so the static render never touches the browser's audio.
 import { createAudioPlayer as createPlayer, setAudioModeAsync, type AudioPlayer } from "./audio-player.native";
+import { Asset } from "expo-asset";
+
+import { browserHost, pooledAudio, type PooledPlayer } from "../web/pooled-audio.ts";
 import { browserPage, webAudio, type Media, type Player } from "../web/web-audio.ts";
 
 export { setAudioModeAsync, type AudioPlayer };
@@ -12,6 +15,19 @@ const page = typeof window === "undefined" ? null : browserPage(window);
 // `media` is private in expo-audio's types; it is the element the player plays.
 const wrap = webAudio(page, process.env.EXPO_PUBLIC_DESKTOP !== "1", (player) => (player as unknown as { media: Media }).media);
 
+// The web app's build (EXPO_PUBLIC_WEBAPP=1) plays through elements it keeps and blesses in each gesture (src/ui/web/pooled-audio.ts), since Safari refuses
+// an element that has had none; the page's wrapper is the same.
+const pool = page && process.env.EXPO_PUBLIC_WEBAPP === "1" ? pooledAudio(browserHost(window)) : null;
+const wrapPooled = webAudio(page, true, (player) => (player as unknown as PooledPlayer).media);
+
+// A bundled file as the web gives it: its URL, an object that holds it, or an asset number.
+function uriOf(source: unknown): string {
+  if (typeof source === "string") return source;
+  if (typeof source === "number") return Asset.fromModule(source).uri;
+  return (source as { uri: string }).uri;
+}
+
 export function createAudioPlayer(source: number): AudioPlayer {
+  if (pool) return wrapPooled(pool.create(uriOf(source)) as unknown as Player) as unknown as AudioPlayer;
   return wrap(createPlayer(source) as unknown as Player) as unknown as AudioPlayer;
 }
