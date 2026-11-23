@@ -1,4 +1,5 @@
 import type { Ask } from "../asks.ts";
+import { MISTY_MOUNTAIN_GOBLINS_ASKS } from "../misty-mountain-goblins-asks.ts";
 
 // The choice words of Over the Misty Mountains Grim (the-hobbit part 2), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario over-the-misty-mountains-grim --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=over-the-misty-mountains-grim` prints each sentence.
@@ -19,4 +20,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 131073:A:1 (Guffawing of Giants): the first player chooses a Stone-giant in the staging area; at the end of the quest phase it engages the player with the highest threat (the first player breaks a tie, rr.first-player).
   "131073:whenRevealed:1 @0 Pick": { owned: true, note: "Guffawing of Giants: choose a Stone-giant in the staging area. At the end of the quest phase it engages the player with the highest threat.", verb: "Choose" },
   "131073:whenRevealed:1 @1.0 Pick": { owned: true, note: "Guffawing of Giants: players are tied for the highest threat. As first player, choose the one the Stone-giant engages.", verb: "Engage" },
+
+  ...MISTY_MOUNTAIN_GOBLINS_ASKS,
 };
