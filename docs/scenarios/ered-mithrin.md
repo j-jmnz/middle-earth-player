@@ -48,5 +48,4 @@ Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open point
 
 - A treasure that leaves play goes to its owner's discard pile (`recommended`, https://hallofbeorn.com/LotR/Details/Durin's-Dagger-EMC, `docs/scenarios/ered-mithrin.md`, Treasure readings).
 - A treasure in play is not an attachment for card effects (`recommended`, `docs/scenarios/ered-mithrin.md`, Treasure readings).
-- Lost in Mirkwood stages 2A and 2C reveal 1 card per player even when the set they shuffle in has no card left (`recommended`, `docs/scenarios/ered-mithrin.md`, Ered Mithrin).
 - The Lower Depths' Response (18079:B:2) is the first player's alone (`recommended`, https://hallofbeorn.com/LotR/Details/The-Lower-Depths, `docs/scenarios/ered-mithrin.md`, Ered Mithrin).

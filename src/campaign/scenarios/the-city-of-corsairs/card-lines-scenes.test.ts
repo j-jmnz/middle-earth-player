@@ -92,15 +92,16 @@ describe("12157 Serpent's Tail", () => {
   const shadowOf = (state: ScenarioState, code: string): string | null => state.cards[idOf(state, code)]?.shadowId ?? null;
   const cost = (made: LayoutTable, state: ScenarioState, code: string): number => modifiedStat(state, state.cards[idOf(state, code)]!, "engagementCost", made.cards);
 
-  // The box's ruling (docs/scenarios/dream-chaser.md, the Raiders of the City of Corsairs; user ruling, 2026-11-05): only an engaged Ship enemy is dealt one, a Ship in the staging area is not (rr.step-6-2).
-  it("12157:A:1 deals a shadow card to the engaged Ship enemy, and none to the Ship in the staging area or to another enemy", () => {
+  // "Deal 1 shadow card to each Ship enemy in play." A Ship enemy in the staging area is in play (rr.in-play-and-out-of-play) and is dealt a shadow card too; an enemy that is not a Ship is not.
+  it("12157:A:1 deals a shadow card to each Ship enemy in play, engaged or in the staging area, and none to another enemy", () => {
     const made = make(layout, { heading: "Sun" });
     const state = revealedTop(made, "12157");
     expect(shadowOf(state, "11057")).not.toBeNull();
-    expect(shadowOf(state, "12152")).toBeNull();
+    expect(shadowOf(state, "12152")).not.toBeNull();
     expect(shadowOf(state, "11064")).toBeNull();
     const bare = make(layout, { heading: "Sun", effects: withoutLines(EFFECTS, "12157:A:1") });
     expect(shadowOf(revealedTop(bare, "12157"), "11057")).toBeNull();
+    expect(shadowOf(revealedTop(bare, "12157"), "12152")).toBeNull();
   });
 
   // Researched (rr.then; Caleb Grace, ALeP 3.119): "each ... Then" follows only when the first part found a Ship enemy in play. With none, nothing is dealt and no -10 applies, not even to a Ship enemy that enters play later in the round.

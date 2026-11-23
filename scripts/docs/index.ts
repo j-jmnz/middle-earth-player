@@ -55,7 +55,7 @@ export function groups(): Group[] {
     { title: "Agents", note: "Each agent reads its own file.", files: markdownIn(".claude/agents") },
     { title: "Product, code and design", note: "Read the sections your task touches.", files: markdownIn("docs", (name) => name === "INDEX.md") },
     { title: "Scenarios", note: "One file per box or cycle: each scenario's mechanics, readings, decisions and table pieces. Read the scenario your task names.", files: markdownIn("docs/scenarios") },
-    { title: "Agent procedures", note: "The scenario procedure and the effect-authoring cookbook; read when a task names one.", files: markdownIn("docs/agents") },
+    { title: "Agent procedures", note: "The scenario procedure, the effect-authoring cookbook and the card audit; read when a task names one.", files: markdownIn("docs/agents") },
     { title: "Phases", note: "STATUS.md, then the active phase file.", files: ["docs/phases/STATUS.md", ...markdownIn("docs/phases", (name) => name === "STATUS.md")] },
     { title: "Live plans", note: "Read when a task names the plan.", files: markdownIn("docs/plans") },
     { title: "Handovers", note: "Open work; read when a task names it.", files: markdownIn("docs/handover") },
