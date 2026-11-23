@@ -22,11 +22,12 @@ import { APP_VERSION } from "../update/offer";
 import { useShownOffer } from "./about";
 import { CategoryList, changeSettings, QuickSetups, SearchResults } from "./home";
 import { CategoryPage } from "./page";
+import { PhoneSaves } from "./phone-saves";
 
 /**
  * A pushed screen with Back beside its title (docs/design-system.md, Navigation). With no `category` it is the first page, whose Back goes
  * to the hub whose gear opened it, or, when `fromTable` is set (route param `from=table`, the table's All settings), to the table. With a
- * `category` it is that category's page, whose Back goes to the first page. `saves` is the web's and the desktop's Saves page (view.canvaskit.tsx).
+ * `category` it is that category's page, whose Back goes to the first page. `saves` is the web's and the desktop's Saves page (view.canvaskit.tsx); without it the page is the phone's (phone-saves.native.tsx).
  */
 export function SettingsView({ fromTable = false, category, saves }: { fromTable?: boolean; category?: CategoryId; saves?: ReactNode }) {
   const s = useUiScale();
@@ -67,7 +68,7 @@ export function SettingsView({ fromTable = false, category, saves }: { fromTable
       <SearchField testID="app-settings-search" value={search} onChangeText={setSearch} placeholder="Search settings" accessibilityLabel="Search settings" accessibilityHint="Finds a setting by its name or what it does" />
     </View>
   );
-  const page = (id: CategoryId) => <CategoryPage id={id} settings={settings} always={always} onChange={changeSettings} saves={saves} scrollRef={scroll} />;
+  const page = (id: CategoryId) => <CategoryPage id={id} settings={settings} always={always} onChange={changeSettings} saves={saves ?? <PhoneSaves />} scrollRef={scroll} />;
   const results = <SearchResults query={query} settings={settings} always={always} onChange={changeSettings} onOpen={open} />;
 
   if (expanded) {
