@@ -177,6 +177,9 @@ export function cardsUnder(state: ScenarioState, locationId: string): string[] {
     .map((card) => card.id);
 }
 
+// The attachments on a card with the loot guarding it, for the readers of this file's zones (attached.ts).
+export { attachmentsOn } from "./attached.ts";
+
 // The facedown player cards under a location (Truly Lost, 18075:A:1): the cards under it that a player owns, in instance id order.
 export function playerCardsUnder(state: ScenarioState, locationId: string): string[] {
   return cardsUnder(state, locationId).filter((id) => state.cards[id]?.owner != null);

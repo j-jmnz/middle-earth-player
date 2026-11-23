@@ -161,6 +161,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 39, scenarios: "all", note: "An ability that chooses X is not offered when no X can be chosen: To the Sea, to the Sea! and The Old Thrush (whose X is scaled or negated in its steps) with an empty hand, Radagast with an empty pool, Elevenses with no questing Hobbit." },
   { version: 39, scenarios: "all", note: "Miruvor and Good Meal read a discard of the card itself that ends their steps as the price of the steps before it, so Miruvor is not offered when the other steps change nothing (Good Meal's discount always changes the game). Silvan Tracker and Elrond are not offered when the character the event names has no damage to heal." },
   { version: 39, scenarios: "all", note: "Sting's Response, and the Fellowship's Sting, are not offered when the encounter deck is empty, in any phase: the move of the top encounter card does not refill the deck." },
+  { version: 39, scenarios: "all", note: "The loot The Burglar's Turn attaches to a location is an attachment on it for every card that counts or asks for one: Forest Road Traveler, Mirkwood Hunter, Haldan, South Away! and the other cards that read a location's attachments." },
 ];
 
 export const ENGINE_VERSION = 39;
