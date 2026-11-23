@@ -13,8 +13,8 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 131028:B:2 (Down, Down to Goblin Town): Bilbo Baggins may spend X resources from his pool to reduce the encounter cards revealed by X, to a minimum of 1. The first player (Bilbo's controller) chooses X and pays.
   "131028:whenRevealed:2 @0 ChooseX": {
     owned: true,
-    bind: { pool: { stat: "resources", ofNamed: "Bilbo Baggins" }, cards: { players: true, times: 3 } },
-    note: "Down, Down to Goblin Town: choose X, from 0 to {pool}, the resources in Bilbo Baggins' pool. Bilbo spends X resources, and the players reveal {cards} encounter cards less X, and at least 1.",
+    bind: { pool: { stat: "resources", ofNamed: "Bilbo Baggins" } },
+    note: "Choose X, from 0 to {pool}, the resources in Bilbo Baggins' pool. Bilbo spends X of them.",
     xRows: { label: "Spend {x}: reveal {reveals}", less: { name: "reveals", of: { players: true, times: 3 }, min: 1, unit: "card" } },
   },
   "131028:whenRevealed:2 @1 Pick": { owned: true, note: "Down, Down to Goblin Town: Bilbo Baggins' pool pays the X resources.", verb: "Pay" },

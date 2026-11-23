@@ -71,13 +71,13 @@ describe("the encounter choices name their owner and the full effect", () => {
 describe("the choice of X on Down, Down to Goblin Town", () => {
   it("131028:B:2 says what X is and what each number buys, each row from the resources Bilbo holds", () => {
     const sheet = xSheet(2, 1);
-    expect(sheet?.note).toBe("Down, Down to Goblin Town: choose X, from 0 to 2, the resources in Bilbo Baggins' pool. Bilbo spends X resources, and the players reveal 3 encounter cards less X, and at least 1. line 131028:B:2");
+    expect(sheet?.note).toBe("Choose X, from 0 to 2, the resources in Bilbo Baggins' pool. Bilbo spends X of them. line 131028:B:2");
     expect(sheet?.options?.map((option) => option.label)).toEqual(["Spend 0: reveal 3 cards", "Spend 1: reveal 2 cards", "Spend 2: reveal 1 card"]);
   });
 
   it("131028:B:2 names the player who chooses and reveals 3 for each player two-handed", () => {
     const sheet = xSheet(3, 2);
-    expect(sheet?.note).toBe("Player 1: Down, Down to Goblin Town: choose X, from 0 to 3, the resources in Bilbo Baggins' pool. Bilbo spends X resources, and the players reveal 6 encounter cards less X, and at least 1. line 131028:B:2");
+    expect(sheet?.note).toBe("Player 1: choose X, from 0 to 3, the resources in Bilbo Baggins' pool. Bilbo spends X of them. line 131028:B:2");
     expect(sheet?.options?.map((option) => option.label)).toEqual(["Spend 0: reveal 6 cards", "Spend 1: reveal 5 cards", "Spend 2: reveal 4 cards", "Spend 3: reveal 3 cards"]);
   });
 });
