@@ -230,8 +230,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return holder != null && inAreaOf(state, holder, condition.seat);
     }
     // Answered by the captured family's condition hook above (families/captured/values.ts).
-    case "versusVictoryTrait":
-      return false;
+    case "versusVictoryTrait": return false;
+    case "holderExhausted": return state.cards[scope.holderId ?? scope.sourceId ?? ""]?.exhausted === true;
     case "versusHighEngagement": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && versusHighEngagement(state, condition.role, holder, ctx.cards, scope.against);

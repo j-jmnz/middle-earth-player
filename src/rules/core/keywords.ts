@@ -78,7 +78,7 @@ export function modifiedStat(
     if (modifier.when?.kind === "versusDefender" && !versusDefender(state, instance, modifier.when, cards)) continue;
     if (modifier.when?.kind === "defendingAgainst" && !defendingAgainst(state, instance, modifier.when.trait, { effects: [], cards })) continue;
     if (modifier.when?.kind === "versusVictoryTrait" && !versusVictoryTrait(state, instance, cards, against)) continue;
-    if (modifier.when?.kind === "inArea" && !inAreaOf(state, instance, modifier.when.seat)) continue;
+    if ((modifier.when?.kind === "inArea" && !inAreaOf(state, instance, modifier.when.seat)) || (modifier.when?.kind === "holderExhausted" && !instance.exhausted)) continue;
     // "+2 Attack while attacking that enemy": only while the holder attacks it.
     if (modifier.against != null && modifier.against !== against) continue;
     // "+1 Attack when attacking an Orc" (families/attack/strike.ts).

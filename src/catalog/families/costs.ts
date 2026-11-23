@@ -10,7 +10,7 @@ import { verbFlags } from "../verb-flags.ts";
 
 const icon = z.enum(["leadership", "tactics", "spirit", "lore"]);
 // The sphere a spent resource may be: an icon, or Fellowship ("Spend 1 Fellowship resource to travel here", 144020:A:3).
-const spendIcon = z.enum(["leadership", "tactics", "spirit", "lore", "fellowship"]);
+const spendIcon = z.enum(["leadership", "tactics", "spirit", "lore", "fellowship", "baggins"]);
 
 const VERBS = [
   // Constant on a card in play (an encounter card: it applies to every player): a card a player plays (from any zone, the discard pile included) costs `amount` more when it matches `pick`, read from the playing seat's side ("increase its cost by 1 if there is a card that has the same
