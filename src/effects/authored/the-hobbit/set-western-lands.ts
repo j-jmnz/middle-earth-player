@@ -3,7 +3,7 @@ import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 import { copyLine, withCopies } from "../reprint.ts";
 
 // Registered by the-hobbit.ts (the cycle's file). The records of the Western Lands encounter set (131035, 131039 to 131041, 131055 to 131057), which We Must Away, Ere Break of Day and Over the Misty Mountains Grim both deal. Every line is read from the scan ledger (data/printed/the-hobbit.json);
-// the readings are in docs/scenarios/the-hobbit.md (We Must Away, Ere Break of Day). The Doomed 1 of No Campfire is the keyword the build reads.
+// the readings are in docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md (We Must Away, Ere Break of Day). The Doomed 1 of No Campfire is the keyword the build reads.
 // Rules: rr.reveal, rr.discard-pile-and-victory-display, rr.forced, rr.response, rr.explored, rr.resources, rr.doomed-x, rr.the-word-choose, rr.attachment-cards, hob.bilbo-baggins-ohauh (data/rules/entries.json).
 const BILBO: PickSpec = { type: "hero", control: "any", names: ["Bilbo Baggins"] };
 const HERO_WITH_RESOURCES: PickSpec = { type: "hero", control: "you", hasResources: true };
@@ -28,7 +28,7 @@ export const WESTERN_LANDS_EFFECTS: readonly Effect[] = withCopies([
     instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ShuffleShadowIntoEncounterDeck", code: "131035", when: DEALT_DAMAGE }] }],
   },
 
-  // 131039 Dreary Hills. Forced: each player discards 1 card at random from his hand. "After placing 1 or more progress tokens" is heard for every placement on it, the one that explores it too (`progressPlacedOnSelf`, as Bottomless Chasm 901606:A:1 is read; docs/scenarios/the-hobbit.md, We Must Away).
+  // 131039 Dreary Hills. Forced: each player discards 1 card at random from his hand. "After placing 1 or more progress tokens" is heard for every placement on it, the one that explores it too (`progressPlacedOnSelf`, as Bottomless Chasm 901606:A:1 is read; docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md, We Must Away, Ere Break of Day).
   {
     id: "131039:forced:1",
     cardCode: "131039",
