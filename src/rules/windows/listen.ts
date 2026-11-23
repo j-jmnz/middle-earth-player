@@ -6,8 +6,8 @@ import { triggerHears } from "../families/play/hooks.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { matchesPick } from "../interpret/pick.ts";
 import type { CardInstance, GameEvent, ScenarioState } from "../core/state.ts";
-import { flagged, livingSeats } from "../core/state.ts";
-import { consideredEngagedSeats } from "../families/south/watcher.ts";
+import { flagged } from "../core/state.ts";
+import { engagedAs } from "../core/engaged.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { areaHeadOf, firstOfArea, isolatedAreas } from "../families/breaking/areas.ts";
 
@@ -70,8 +70,7 @@ export function subjectMatches(state: ScenarioState, id: string, spec: PickSpec,
   const seat = answeringSeat(state, listener, ctx);
   if (spec.type === "enemy") {
     // An enemy in the staging area that is considered engaged with the player is engaged with him (rr.engaged).
-    if (spec.engaged === "you" && !((card.zone === "engaged" && card.controller === seat) || consideredEngagedSeats(state, id, [seat]).length > 0)) return false;
-    if (spec.engaged === "other" && !((card.zone === "engaged" && card.controller !== seat) || consideredEngagedSeats(state, id, livingSeats(state).filter((other) => other !== seat)).length > 0)) return false;
+    if (spec.engaged != null && !engagedAs(state, id, spec.engaged, seat)) return false;
     if (spec.stagingOnly && card.zone !== "staging") return false;
   } else if (spec.control === "you" && card.controller !== seat) return false;
   else if (spec.control === "other" && (card.controller == null || card.controller === seat)) return false;

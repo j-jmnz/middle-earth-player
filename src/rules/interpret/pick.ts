@@ -1,5 +1,5 @@
 // Rules: rr.in-play-and-out-of-play, mec109.immune-to-player-card-effects, mec109.permanent (data/rules/entries.json).
-import { consideredEngagedSeats } from "../families/south/watcher.ts";
+import { consideredEngagedSeats } from "../core/engaged.ts";
 import { discardLockedFor } from "../families/angmar/lock.ts";
 import { captiveIds } from "../families/captives/values.ts";
 import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
@@ -148,10 +148,10 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   } else if (spec.type === "enemy") {
     const engagedSeats = spec.atStage && state.separate ? sharing(state, asking) : spec.engaged === "you" ? [asking] : spec.engaged === "other" ? livingSeats(state).filter((seat) => seat !== asking) : livingSeats(state);
     if (!spec.stagingOnly) for (const index of engagedSeats) raw.push(...(state.seats[index]?.engaged ?? []));
-    // An enemy in the staging area that is considered engaged with one of those players is engaged with him too (the Watcher, the Balrog, Bolg at stage 5: rr.engaged); only a filter that names the engaged player reads it.
-    if (spec.engaged != null && !spec.stagingOnly) raw.push(...state.staging.filter((id) => !raw.includes(id) && consideredEngagedSeats(state, id, engagedSeats).length > 0));
     // `staging` with `engaged`: the staging area and the enemies engaged as `engaged` says ("or engaged with another player").
     if (spec.staging || (spec.stagingOnly && spec.engaged == null)) raw.push(...stagingFor(state, spec, asking));
+    // An enemy in the staging area that is considered engaged with one of those players is engaged with him too (the Watcher, the Balrog, Bolg at stage 5: rr.engaged); only a filter that names the engaged player reads it (after the staging area a `staging` filter lists, so none is listed twice).
+    if (spec.engaged != null && !spec.stagingOnly) raw.push(...state.staging.filter((id) => !raw.includes(id) && consideredEngagedSeats(state, id, engagedSeats).length > 0));
     if (spec.inStormcallerArea) raw.push(...Object.values(state.cards).filter((card) => card.zone === "stormcallerArea").map((card) => card.id));
   } else if (spec.type === "location") {
     if (!spec.active) raw.push(...stagingFor(state, spec, asking).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location"));

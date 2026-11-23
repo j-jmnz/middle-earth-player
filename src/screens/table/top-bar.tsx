@@ -136,7 +136,9 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   const mapCompact = chipHere && bar.width > 0 && dials > 0 && chipCompact(bar.width - 2 * BAR_PAD, dials - chipW - DIAL_GAP * s, s, center);
   // While the dials scroll, the row keeps the Heading dial whole in the zone, clear of the fade (headingOffset).
   // Without a Heading dial, a scenario dial that is the current stage of several is kept whole the same way.
-  const offset = zones ? (heading ? headingOffset(zones, { x: headingBox.x, w: headingBox.w }, dials, s) : scenario.some((dial) => dial.current) ? headingOffset(zones, currentBox, dials, s) : 0) : 0;
+  const hasCurrent = scenario.some((dial) => dial.current);
+  const keptBox = (heading && headingBox) || (hasCurrent && currentBox) || null;
+  const offset = zones && keptBox ? headingOffset(zones, { x: keptBox.x, w: keptBox.w }, dials, s) : 0;
   useEffect(() => {
     scroller.current?.scrollTo({ x: offset, animated: false });
   }, [offset]);

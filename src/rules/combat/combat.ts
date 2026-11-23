@@ -28,7 +28,8 @@ import { flightAttackBarred } from "../families/attack/flight.ts";
 import { countsDefense, rangedAttack, struck } from "../families/attack/strike.ts";
 import { attackStatAgainst } from "../families/attack/spectral.ts";
 import { mustBeDeclared } from "../families/armies/defender.ts";
-import { attackHere, dealForAttack, engagedWithAll, engagedWithThreatening, noteBelowThreat, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
+import { attackHere, dealForAttack, engagedWithAll, noteBelowThreat, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
+import { engagedWithThreatening } from "../core/engaged.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
 import { barredFromDreadnaught } from "../families/sea/dreadnaught.ts";
 

@@ -10,7 +10,7 @@ import type { Condition } from "../../catalog/boundary.ts";
 import { hostOf, resolveAmount, type AmountScope } from "./amounts.ts";
 import { questSucceeded } from "../families/costs/pay.ts";
 import { discardedCost } from "../families/uncharted/cards.ts";
-import { engagedAs } from "../families/south/watcher.ts";
+import { engagedAs } from "../core/engaged.ts";
 import { spendablePools } from "../families/costs/verbs.ts";
 import { engagedThisRound } from "../families/attack/events.ts";
 import { attackingHolds } from "../families/attack/strike.ts";
