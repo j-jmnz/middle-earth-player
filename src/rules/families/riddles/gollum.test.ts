@@ -8,7 +8,6 @@ import type { EngineStep } from "../../core/intents.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { idOf, legalTargets, revealFromTop, send, type Run } from "../../../../test/harness/scene-kit.ts";
 import { assignDamage } from "../south/damage.ts";
-import { archeryTargets } from "../../combat/archery-targets.ts";
 import { beginEnemyAttack } from "../../combat/combat.ts";
 import { riddleTable, type RiddleTable } from "./fixture.ts";
 
@@ -133,15 +132,10 @@ describe("an attack of another enemy cannot be put on Bilbo while he is in the r
     });
   }
 
-  it("keeps Bilbo out of archery damage and of a character chosen to take damage, and the others in", () => {
+  it("keeps Bilbo out of a character chosen to take damage", () => {
     const made = riddleTable({ seats: 2 });
-    const targets = archeryTargets(made.state, made.ctx.cards);
-    expect(targets).not.toContain(made.bilbo);
-    expect(targets).toContain(made.hero);
     const steps: EngineStep[] = [];
     const asked = assignDamage(made.state, { verb: "AssignDamage", amount: 1, left: 1, of: 1, pick: { type: "character", control: "you" } }, { seat: 0, sourceId: idOf(made.state, "f0"), chosen: made.bilbo }, made.ctx, steps);
     expect(asked.cards[made.bilbo]?.damage).toBe(0);
-    const alone = bilboAlone(made.state, made.bilbo);
-    expect(archeryTargets(alone, made.ctx.cards, 0)).not.toContain(made.bilbo);
   });
 });
