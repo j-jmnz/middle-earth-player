@@ -142,7 +142,7 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
         return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length === 0;
       }
       // "Spend 1 Fellowship resource to travel here" (144020:A:3): a hero of the players must hold the resources, the record says whose (`group`: any player's).
-      if (instruction.verb === "SpendResources") return spendablePools(state, state.firstPlayer, instruction, ctx).total < instruction.amount;
+      if (instruction.verb === "SpendResources") return spendablePools(state, state.firstPlayer, instruction, ctx).total < (typeof instruction.amount === "number" ? instruction.amount : 0);
       // "Either exhaust Sméagol, or discard 1 random card from each player's hand" (144044:A:2): a cost of a choice is payable when some option can be taken (rr.effects, rr.cost).
       if (instruction.verb === "Choose") return !instruction.options.some((option) => option.requires == null || holds(state, option.requires, { actor: state.firstPlayer, sourceId: locationId, returned: 0 }, ctx));
       // "Reveal the top card of the burden deck to travel here" (141058:A:3): an empty burden deck has none to reveal.

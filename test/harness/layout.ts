@@ -114,7 +114,7 @@ function loadedWorld(scenarioId: string): Loaded {
   const campaign = loadCampaigns().find((one) => one.scenarios.includes(scenarioId));
   if (!campaign) throw new Error(`no campaign plays ${scenarioId}`);
   const dealt = campaignScenario(data);
-  const codes = new Set([...dealt.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])), ...dealt.campaignPlaced, ...(dealt.campaignCard !== undefined ? [dealt.campaignCard] : []), ...dealt.stages, ...gameCodes(campaign, data), ...sagaStartCodes(data), ...(data.nightmare ? [data.nightmare.setupCard, ...data.nightmare.cards.map((card) => card.code), ...(data.nightmare.questCards ?? [])] : [])]);
+  const codes = new Set([...dealt.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])), ...dealt.campaignPlaced, ...(dealt.campaignCard !== undefined ? [dealt.campaignCard] : []), ...dealt.stages, ...gameCodes(campaign, data), ...sagaStartCodes(data), ...(data.treasures ?? []), ...(data.nightmare ? [data.nightmare.setupCard, ...data.nightmare.cards.map((card) => card.code), ...(data.nightmare.questCards ?? [])] : [])]);
   const cards = new Map<string, PrintedCard>();
   for (const code of codes) {
     const card = cardsByCode().get(code);

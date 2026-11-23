@@ -35,11 +35,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
               verb: "Choose",
               who: "actor",
               options: [
-                { id: "search", requires: { kind: "canPick", pick: TREASURE_IN_DECK }, instructions: [{ verb: "Pick", pick: TREASURE_IN_DECK }, { verb: "MovePicked", to: "hand" }] },
+                { id: "search", requires: { kind: "canPick", pick: TREASURE_IN_DECK }, instructions: [{ verb: "Pick", pick: TREASURE_IN_DECK }, { verb: "MovePicked", to: "hand" }, { verb: "ShuffleDeck" }] },
                 { id: "decline", instructions: [] },
               ],
             },
-            { verb: "ShuffleDeck" },
           ],
         },
         { verb: "AdvanceStage" },
@@ -81,7 +80,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         { verb: "ChooseX", min: 0, max: [{ stat: "resources", ofNamed: "Bilbo Baggins" }] },
         { verb: "Pick", pick: BILBO, when: { kind: "canPick", pick: BILBO } },
-        { verb: "DiscardResources", amount: { x: true }, target: "picked", when: { kind: "canPick", pick: BILBO } },
+        { verb: "SpendResources", amount: { x: true }, target: "picked", when: { kind: "canPick", pick: BILBO } },
         { verb: "RevealEncounter", times: { players: true, times: 3 }, lessX: true },
       ],
     },
@@ -161,7 +160,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["131068:A:1"],
       timing: "action",
       cost: { kind: "resources", amount: 1, sphere: "baggins" },
-      condition: ACTIVE,
+      condition: { kind: "all", conditions: [ACTIVE, { kind: "canPick", pick: { type: "card", control: "you", from: "deck" } }] },
       instructions: [
         { verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: 2 } },
         { verb: "MovePicked", to: "hand" },
@@ -209,6 +208,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         {
           verb: "Delay",
           until: "endOfPhase",
+          phase: "Quest",
           subject: "picked",
           instructions: [{ verb: "Pick", pick: { type: "player", control: "any", highestThreat: true, who: "firstPlayer" } }, { verb: "SwitchActor", to: "picked" }, { verb: "Engage", target: "previous" }],
         },

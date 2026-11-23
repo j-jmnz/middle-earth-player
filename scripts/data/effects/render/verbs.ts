@@ -399,8 +399,8 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     children: Array.isArray(i.rest) ? (i.rest as readonly Obj[]) : Array.isArray(i.instructions) ? (i.instructions as readonly Obj[]) : [],
   }),
   Delay: (i, ctx) => ({
-    text: `later, ${DELAY_UNTIL[str(i.until)] ?? `at ${str(i.until)}`}${i.subject === "picked" ? ", acting on the card last picked" : ""}${isObj(i.uncancelable) ? ` (cannot be canceled while ${renderCondition(i.uncancelable, ctx)})` : ""}:`,
-    read: ["until", "uncancelable", "subject", "instructions"],
+    text: `later, ${i.phase === "Quest" ? "at the end of the quest phase (the next one, when this is not the quest phase)" : (DELAY_UNTIL[str(i.until)] ?? `at ${str(i.until)}`)}${i.subject === "picked" ? ", acting on the card last picked" : ""}${isObj(i.uncancelable) ? ` (cannot be canceled while ${renderCondition(i.uncancelable, ctx)})` : ""}:`,
+    read: ["until", "phase", "uncancelable", "subject", "instructions"],
     children: Array.isArray(i.instructions) ? (i.instructions as readonly Obj[]) : [],
   }),
   AfterAttack: () => ({ text: "when the attack in progress ends:", read: ["instructions"], children: [] }),

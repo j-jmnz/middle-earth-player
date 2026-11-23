@@ -53,7 +53,7 @@ function amount(state: ScenarioState, found: Exclude<Amount, number>, scope: Amo
 function unpayable(state: ScenarioState, instruction: Instruction, ctx: ReduceContext): boolean {
   if (instruction.verb !== "ForEachPlayer") return false;
   const spend = instruction.instructions.find((inner) => inner.verb === "SpendResources");
-  return spend?.verb === "SpendResources" && livingSeats(state).some((seat) => spendablePools(state, seat, {}, ctx).total < spend.amount);
+  return spend?.verb === "SpendResources" && livingSeats(state).some((seat) => spendablePools(state, seat, {}, ctx).total < (typeof spend.amount === "number" ? spend.amount : 0));
 }
 
 export const manifest: RulesFamily = {
