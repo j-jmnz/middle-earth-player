@@ -363,6 +363,14 @@ describe("The stages (132075:A:1, 132076:B:2, 132077:B:2, 132078:B:2, 132078:B:3
     expect(run.state.encounterDeck).toHaveLength(2);
   });
 
+  it("132053:A:4 the first Goblin the Setup reveals gains surge, so the Setup round shows a second card revealed", () => {
+    // Goblins only, so the shuffle changes nothing: 1 player reveals 1 card, and the surge of the first Goblin reveals 1 more.
+    const made = table({ deck: ["132055", "132056", "132058"], staging: ["132053"] });
+    const run = resolveRecords(made.state, made.ctx, S1, "setup", first(made.state, S1));
+    expect(run.state.staging).toHaveLength(3);
+    expect(run.state.encounterDeck).toHaveLength(1);
+  });
+
   it("132076:B:2 with no progress on stage 2 at the end of the round each player discards 1 random card from his hand", () => {
     const made = inPlay({ hand: ["filler", "filler", "filler"] });
     const discarded = (state: ScenarioState) => 3 - state.seats[0]!.hand.length;
