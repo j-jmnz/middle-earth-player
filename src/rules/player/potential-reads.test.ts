@@ -74,6 +74,23 @@ describe("an X that no number can be, and a discount for a card of the attached 
     expect(seen([choose, { verb: "AddResources", amount: { x: true, plus: 1 }, to: "host" }], [], threat(49))).toBe(true);
   });
 
+  it("reads a step of X negated or scaled as 0 when no X can be chosen (The Old Thrush, 50208:A:2)", () => {
+    const choose = { verb: "ChooseX", min: 1, max: [{ threat: "actor", times: -1, plus: 49 }] } as const;
+    expect(seen([choose, { verb: "AddResources", amount: { x: true, times: 2 }, to: "host" }], [], threat(49))).toBe(false);
+    expect(seen([choose, { verb: "ModifyStat", stat: "defense", amount: { x: true, negative: true }, until: "endOfAttack", target: "host" }], [], threat(49))).toBe(false);
+    expect(seen([choose, { verb: "ModifyStat", stat: "defense", amount: { x: true, negative: true }, until: "endOfAttack", target: "host" }], [], threat(20))).toBe(true);
+  });
+
+  it("is refused with an empty hand and offered with a card in it (The Old Thrush, 50208:A:2)", () => {
+    const thrush = [
+      { verb: "ChooseX", min: 1, max: [{ count: { type: "card", control: "you", from: "hand" } }] },
+      { verb: "DiscardFromHand", amount: { x: true } },
+      { verb: "ModifyStat", stat: "defense", amount: { x: true, negative: true }, until: "endOfAttack", target: "host" },
+    ] as const;
+    expect(seen(thrush)).toBe(false);
+    expect(seen(thrush, [inHand])).toBe(true);
+  });
+
   it("is refused with no card of the attached hero's sphere in hand, and offered with one", () => {
     expect(seen(arkenstone, [], threat(20))).toBe(false);
     expect(seen(arkenstone, [["att", { zone: "hand", seat: 0 }]], threat(20))).toBe(false);
@@ -88,9 +105,9 @@ describe("an X that no number can be, and a discount for a card of the attached 
     expect(hostSpheres(flag("losesIcons")(state), host, { effects: [], cards })).toEqual([]);
   });
 
-  it("is refused with no event of the attached hero's sphere in hand although the card discards itself, and offered with one (Good Meal, 04010:A:2)", () => {
+  it("is offered with no event in hand since the discount lasts the round (Good Meal, 04010:A:2)", () => {
     const meal = [{ verb: "ReduceNextCost", pick: { type: "card", control: "you", cardType: "event" }, amount: 2, until: "endOfRound", hostSphere: true }, { verb: "Discard", target: { kind: "self" } }] as const;
-    expect(seen(meal)).toBe(false);
+    expect(seen(meal)).toBe(true);
     expect(seen(meal, [["ev", { zone: "hand", seat: 0 }]])).toBe(true);
   });
 
