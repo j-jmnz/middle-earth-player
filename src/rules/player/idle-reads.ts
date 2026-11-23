@@ -43,6 +43,7 @@ export function readsTable(condition: Condition): boolean {
   switch (condition.kind) {
     case "threat":
     case "phase":
+    case "resources":
       return true;
     // A pick that reads the running effect is not settled before the effect runs.
     case "count":

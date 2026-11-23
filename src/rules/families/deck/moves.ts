@@ -41,7 +41,7 @@ function ownerOf(card: CardInstance): number | null {
 }
 
 // The zone group MoveCard's `from` names.
-function zoneGroup(card: CardInstance): "hand" | "play" | "discard" | "deck" | null {
+export function zoneGroup(card: CardInstance): "hand" | "play" | "discard" | "deck" | null {
   if (inPlay(card.zone)) return "play";
   return card.zone === "hand" || card.zone === "discard" || card.zone === "deck" ? card.zone : null;
 }

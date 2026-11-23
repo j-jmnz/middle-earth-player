@@ -246,7 +246,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
     - shuffle the encounter discard pile into the encounter deck
     - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
     - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
-    - this card is removed from the game
+    - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is removed from the game
 
 ## 50715 The Prancing Pony
 (the scenario deals it into the activeLocation pile; the piles place it, no record does)
@@ -508,4 +508,4 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
     who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the Investigate value of the active location (its printed Investigate X; 0 with no active location or none printed), until the end of the attack
 
-(rendered pieces: 264 by template, 2 as JSON)
+(rendered pieces: 266 by template, 2 as JSON)

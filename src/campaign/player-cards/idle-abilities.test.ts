@@ -1,0 +1,264 @@
+// Rules: rr.triggered-ability, rr.cost (data/rules/entries.json).
+// An Action, a Response or an event whose whole effect cannot change the game as the table stands is not offered, and its cost is not paid for nothing
+// (src/rules/player/potential.ts). Each card here was found offered with nothing to act on by the idle check of the card smoke (scripts/card-smoke/idle.ts):
+// a table where the printed words leave nothing to do (not offered) and the nearest table where they leave something (offered). The packs have no ledger,
+// so every intent goes through sendUnledgered.
+import { beforeAll, describe, expect, it } from "vitest";
+
+import { EFFECTS } from "../../effects/index.ts";
+import { definePrinted } from "../../rules/core/printed.ts";
+import { updateCard, withThreat } from "../../rules/core/state.ts";
+import { moveCard, spawn } from "../../rules/core/zones.ts";
+import { settle } from "../../rules/engine/machine.ts";
+import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
+import { loadPrinted } from "../../../test/harness/catalog.ts";
+import { enter, playableCards, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
+
+const GRIM_RESOLVE = "01025";
+const NORTHERN_TRACKER = "01045";
+const WE_DO_NOT_SLEEP = "02101";
+const CAPTAINS = "146010";
+const MEN_OF_THE_WEST = "06083";
+const HUNTER = "05014";
+const EXPLORER = "12037";
+const WARDEN = "04083";
+const KNIFE_WORK = "12114";
+const ELROND = "08032";
+const ATHELAS = "09011";
+const SHADOW = "02125";
+const STALLION = "19033";
+const BILL = "141006";
+const RALLYING_CRY = "10003";
+const HELPER = "ally";
+const GIMLI = "01004";
+const FOE = "f0";
+const ARAGORN_LORE = "04053";
+const ARAGORN = "01001";
+const BERAVOR = "01012";
+const ELEANOR = "01008";
+const DUNHERE = "01009";
+const NOBLE = "noble";
+const PAL = "pal";
+const RIDER = "141039";
+const FORD = "141072";
+
+let base: Awaited<ReturnType<typeof starterBase>>;
+
+const table = (scene: Scene = {}, resources = 6): Table => playerTable(base, EFFECTS, scene, resources);
+const exhaust = (tab: Table, code: string): Table => ({ ...tab, state: updateCard(tab.state, idsOf(tab, code), { exhausted: true }) });
+const offeredPlay = (tab: Table, code: string): boolean => playableCards(tab.state, tab).includes(idsOf(tab, code));
+
+beforeAll(async () => {
+  const starter = await starterBase();
+  base = { ...starter, cards: new Map([...starter.cards, ...(await loadPrinted([STALLION, BILL, RALLYING_CRY, KNIFE_WORK, ELROND, ATHELAS, SHADOW, GIMLI, GRIM_RESOLVE, NORTHERN_TRACKER, WE_DO_NOT_SLEEP, CAPTAINS, MEN_OF_THE_WEST, HUNTER, EXPLORER, WARDEN, ARAGORN_LORE, ARAGORN, BERAVOR, ELEANOR, DUNHERE]))]) };
+  base.cards.set(NOBLE, definePrinted({ code: NOBLE, name: "Noble", type: "hero", sphere: "leadership", threat: 9, willpower: 1, attack: 1, defense: 1, health: 3, traits: ["Noble"] }));
+});
+
+describe("Grim Resolve 01025:A:1 with every character ready", () => {
+  // "Action: Ready all character cards in play."
+  const grim = (): Table => table({ heroes: [{ code: ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }], hand: [{ code: GRIM_RESOLVE, seat: 0 }] });
+
+  it("is not offered while no character is exhausted", () => {
+    expect(offeredPlay(grim(), GRIM_RESOLVE)).toBe(false);
+  });
+
+  it("is offered once a character is exhausted", () => {
+    expect(offeredPlay(exhaust(grim(), BERAVOR), GRIM_RESOLVE)).toBe(true);
+  });
+});
+
+describe("We Do Not Sleep 02101:A:1 and Captains of the West 146010:A:1 with no character to hold the lasting effect", () => {
+  // "Action: Until the end of the phase, Rohan characters do not exhaust to commit to quests."
+  const sleepless = (heroes: readonly string[]): Table => table({ heroes: heroes.map((code) => ({ code, seat: 0 })), hand: [{ code: WE_DO_NOT_SLEEP, seat: 0 }] });
+
+  it("We Do Not Sleep is not offered with no Rohan character in play", () => {
+    expect(offeredPlay(sleepless([ELEANOR]), WE_DO_NOT_SLEEP)).toBe(false);
+  });
+
+  it("We Do Not Sleep is offered with a Rohan character in play", () => {
+    expect(offeredPlay(sleepless([ELEANOR, DUNHERE]), WE_DO_NOT_SLEEP)).toBe(true);
+  });
+
+  // "Quest Action: Until the end of the phase, each Noble hero gets +1 Willpower and does not exhaust to commit to the quest."
+  const captains = (heroes: readonly string[]): Table => table({ start: "quest", heroes: heroes.map((code) => ({ code, seat: 0 })), hand: [{ code: CAPTAINS, seat: 0 }] });
+
+  it("Captains of the West is not offered with no Noble hero in play", () => {
+    expect(offeredPlay(captains([PAL]), CAPTAINS)).toBe(false);
+  });
+
+  it("Captains of the West is offered with a Noble hero in play", () => {
+    expect(offeredPlay(captains([PAL, NOBLE]), CAPTAINS)).toBe(true);
+  });
+});
+
+describe("Men of the West 06083:A:1 with no Outlands ally in the discard pile", () => {
+  // "Action: Return X Outlands allies from your discard pile to your hand."
+  function men(inDiscard: boolean): Table {
+    const tab = table({ heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: MEN_OF_THE_WEST, seat: 0 }] });
+    return inDiscard ? { ...tab, state: spawn(tab.state, HUNTER, { zone: "discard", seat: 0 }).state } : tab;
+  }
+
+  it("is not offered with none", () => {
+    expect(offeredPlay(men(false), MEN_OF_THE_WEST)).toBe(false);
+  });
+
+  it("is offered with one", () => {
+    expect(offeredPlay(men(true), MEN_OF_THE_WEST)).toBe(true);
+  });
+});
+
+describe("Mirkwood Explorer 12037:A:2 holding no progress", () => {
+  // "Action: Exhaust Mirkwood Explorer to move all progress from it to a location in play."
+  function explorer(progress: number): Table {
+    const tab = table({ heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: EXPLORER, seat: 0 }], staging: [FORD] });
+    return { ...tab, state: updateCard(tab.state, idsOf(tab, EXPLORER), { progress }) };
+  }
+
+  it("is not offered with no progress on it, so the exhaust is not paid for nothing", () => {
+    expect(triggers(explorer(0).state, explorer(0))).not.toContain("12037:action:1");
+  });
+
+  it("is offered with progress on it and a location in play", () => {
+    expect(triggers(explorer(2).state, explorer(2))).toContain("12037:action:1");
+  });
+});
+
+describe("Warden of Healing 04083:A:1 with no damaged character", () => {
+  // "Action: Exhaust Warden of Healing to heal 1 damage on up to 2 different characters."
+  function warden(damage: number): Table {
+    const tab = table({ heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: WARDEN, seat: 0 }] });
+    return { ...tab, state: updateCard(tab.state, idsOf(tab, ARAGORN), { damage }) };
+  }
+
+  it("is not offered with no damage anywhere", () => {
+    expect(triggers(warden(0).state, warden(0))).not.toContain("04083:action:1");
+  });
+
+  it("is offered once a character has damage", () => {
+    expect(triggers(warden(1).state, warden(1))).toContain("04083:action:1");
+  });
+});
+
+describe("Aragorn 04053:A:2 at his starting threat level", () => {
+  // "Refresh Action: Reduce your threat to your starting threat level. (Limit once per game.)"
+  const refresh = (threat: number): Table => {
+    const tab = table({ heroes: [{ code: ARAGORN_LORE, seat: 0 }] });
+    const run = enter(withThreat(tab.state, 0, threat), tab, "refresh");
+    return { ...tab, state: run.state };
+  };
+
+  it("is not offered when the threat is already at or below the starting threat level", () => {
+    expect(triggers(refresh(5).state, refresh(5))).not.toContain("04053:action:1");
+  });
+
+  it("is offered when the threat is above the starting threat level", () => {
+    expect(triggers(refresh(30).state, refresh(30))).toContain("04053:action:1");
+  });
+});
+
+describe("Northern Tracker 01045:A:1 with no location in the staging area", () => {
+  // "Response: After Northern Tracker commits to a quest, place 1 progress token on each location in the staging area."
+  function committed(staging: readonly string[]): boolean {
+    const tab = table({ start: "quest", heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: NORTHERN_TRACKER, seat: 0 }], staging });
+    const run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, NORTHERN_TRACKER)] }, tab.ctx);
+    return triggers(run.state, tab).includes("01045:response:1");
+  }
+
+  it("is not offered with only an enemy in the staging area", () => {
+    expect(committed([RIDER])).toBe(false);
+  });
+
+  it("is offered with a location in the staging area", () => {
+    expect(committed([RIDER, FORD])).toBe(true);
+  });
+});
+
+describe("Knife-work 12114:A:1 with no enemy engaged and no Lore resources to spend", () => {
+  // "Action: Choose a player. Each enemy engaged with that player gets -1 Defense until the end of the phase. Then, the players as a group may spend 2 Lore resources to have the chosen player draw 1 card each time he attacks and destroys an enemy this phase."
+  const knife = (engaged: boolean): Table => table({ heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: KNIFE_WORK, seat: 0 }], ...(engaged ? { engaged: [{ code: FOE, seat: 0 }] } : {}) });
+
+  it("is not offered with no enemy to weaken and no Lore hero to pay the 2 resources", () => {
+    expect(offeredPlay(knife(false), KNIFE_WORK)).toBe(false);
+  });
+
+  it("is offered with an enemy engaged with a player", () => {
+    expect(offeredPlay(knife(true), KNIFE_WORK)).toBe(true);
+  });
+});
+
+describe("Message from Elrond 08032:A:1 with no other player", () => {
+  // "Action: Choose a player. That player may choose 1 card from his hand and add it to another player's hand."
+  const message = (seats: 1 | 2): Table =>
+    table({ seats, heroes: [{ code: BERAVOR, seat: 0 }, ...(seats === 2 ? [{ code: PAL, seat: 1 }] : [])], hand: [{ code: ELROND, seat: 0 }, { code: MEN_OF_THE_WEST, seat: 0 }] });
+
+  it("is not offered to a player with no other player in the game", () => {
+    expect(offeredPlay(message(1), ELROND)).toBe(false);
+  });
+
+  it("is offered when there is another player to give a card to", () => {
+    expect(offeredPlay(message(2), ELROND)).toBe(true);
+  });
+});
+
+describe("Athelas 09011:A:2 with nothing to heal or discard", () => {
+  // "Action: Discard Athelas and exhaust attached character to heal all damage on a character. You may discard a Condition attachment from that character."
+  const athelas = (damage: number): Table => {
+    const tab = table({ heroes: [{ code: BERAVOR, seat: 0 }], attached: [{ code: ATHELAS, host: BERAVOR }] });
+    return { ...tab, state: updateCard(tab.state, idsOf(tab, BERAVOR), { damage }) };
+  };
+
+  it("is not offered with no damage on any character and no Condition attachment to discard", () => {
+    expect(triggers(athelas(0).state, athelas(0))).not.toContain("09011:action:1");
+  });
+
+  it("is offered once a character has damage", () => {
+    expect(triggers(athelas(2).state, athelas(2))).toContain("09011:action:1");
+  });
+});
+
+describe("Shadow of the Past 02125:A:1 with an empty encounter discard pile", () => {
+  // "Action: Move the top card of the encounter discard pile to the top of the encounter deck."
+  const shadow = (discard: readonly string[]): Table => table({ heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: SHADOW, seat: 0 }], discard });
+
+  it("is not offered with no card in the encounter discard pile", () => {
+    expect(offeredPlay(shadow([]), SHADOW)).toBe(false);
+  });
+
+  it("is offered with a card in the encounter discard pile", () => {
+    expect(offeredPlay(shadow([FOE]), SHADOW)).toBe(true);
+  });
+});
+
+describe("Rallying Cry 10003:A:1 for an ally that did not go to the discard pile", () => {
+  // "Response: After an ally leaves play, add it to its owner's hand instead of placing it in the discard pile."
+  function left(to: "discard" | "hand"): { tab: Table; state: ReturnType<typeof settle> } {
+    const tab = table({ heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: HELPER, seat: 0 }], hand: [{ code: RALLYING_CRY, seat: 0 }] });
+    const ally = idsOf(tab, HELPER);
+    const gone = { ...moveCard(tab.state, ally, { zone: to, seat: 0 }), window: null, pendingEvents: [{ trigger: "allyLeftPlay" as const, seat: 0, cardId: ally }] };
+    return { tab, state: settle(gone, tab.ctx, []) };
+  }
+
+  it("is offered for an ally in the discard pile", () => {
+    const { tab, state } = left("discard");
+    expect(triggers(state, tab)).toContain("10003:response:1");
+  });
+
+  it("is not offered for an ally that already went to its owner's hand", () => {
+    const { tab, state } = left("hand");
+    expect(triggers(state, tab)).not.toContain("10003:response:1");
+  });
+});
+
+describe("Wild Stallion 19033:A:2 with only an ally that cannot have attachments", () => {
+  // "Planning Action: Attach Wild Stallion to an ally you control. (Counts as a Mount attachment with the text: "Restricted. Limit 1 per ally. ...")" Bill the Pony: "Cannot have attachments."
+  const stallion = (other: string): Table => table({ heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: STALLION, seat: 0 }, { code: other, seat: 0 }] });
+
+  it("is not offered when the only other ally is Bill the Pony", () => {
+    expect(triggers(stallion(BILL).state, stallion(BILL))).not.toContain("19033:action:1");
+  });
+
+  it("is offered when another ally can take it", () => {
+    expect(triggers(stallion(HELPER).state, stallion(HELPER))).toContain("19033:action:1");
+  });
+});
