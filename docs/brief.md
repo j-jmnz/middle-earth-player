@@ -681,8 +681,6 @@ The table is landscape only (user request, 2026-10-25).
 
 Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.
 
-- Player card readings (docs/brief.md, Player card readings): Ithilien Pit's staging-area attack is community-sourced; `recommended` are Message from Elrond, Soldier of Erebor, Ring of Thrór, Gimli and Legolas, Descendants of Kings, Imladris Stargazer, Favor of the Valar, Hobbit Pipe with Smoke Rings, a card that costs nothing played with only a pool that pays by its text (Treebeard and Radagast for an Ent or a Creature; Elrond, Hirluin and Kahliel for allies).
-- A gained resource icon on an ally (Narya on Gandalf) makes it a hero of that sphere for a filter (`recommended`, docs/brief.md, Three layers).
 - Beechbone 10118:A:2 reads X as 0 when its own cost destroys him (`recommended`, docs/brief.md, Core round).
 - A card played from the hand or the deck "at no cost" (Host of Galadhrim, Send for Help, Scavenge for Supplies) needs no resource match (community-sourced, docs/brief.md, Core round).
 - A resource moved to a hero's pool (Errand-rider) is gained, not added: Heir of Mardil answers it, Harbor Master does not (community-sourced, docs/brief.md, Core round).
