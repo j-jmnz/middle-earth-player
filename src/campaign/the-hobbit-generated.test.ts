@@ -1,4 +1,4 @@
-// Rules: rr.travel, rr.shadow-effects, rr.when-revealed (data/rules/entries.json).
+// Rules: rr.travel, rr.shadow-effects, rr.reveal (data/rules/entries.json).
 // Lines: 131059:A:2, 132025:A:2, 132070:A:1. The Hobbit's encounter cards whose records the templates write at build time (src/effects/generated/the-hobbit.ts), each played on a table built from data/ from its printed
 // line (data/printed/the-hobbit.json), the rows run again without the records of their line (test/harness/card-spec.ts). The treasures' lines are tested in src/campaign/player-cards/the-hobbit-treasures.test.ts.
 import { describe, expect, it } from "vitest";
