@@ -5,6 +5,7 @@ import { renderPick } from "./picks.ts";
 import { ESCAPE_CONDITIONS } from "./families/escape.ts";
 import { GUARDIAN_CONDITIONS } from "./families/guardian.ts";
 import { ERECH_CONDITIONS } from "./families/erech.ts";
+import { SACK_CONDITIONS } from "./families/sack.ts";
 import { FOG_CONDITIONS } from "./families/fog.ts";
 import { INVESTIGATION_CONDITIONS } from "./families/investigation.ts";
 import { LONG_DARK_CONDITIONS } from "./families/long-dark.ts";
@@ -14,6 +15,7 @@ import { FAMILY_CONDITIONS } from "./families.ts";
 export { ESCAPE_CONDITION_SAMPLES } from "./families/escape.ts";
 export { GUARDIAN_CONDITION_SAMPLES } from "./families/guardian.ts";
 export { ERECH_CONDITION_SAMPLES } from "./families/erech.ts";
+export { SACK_CONDITION_SAMPLES } from "./families/sack.ts";
 export { FOG_CONDITION_SAMPLES } from "./families/fog.ts";
 export { INVESTIGATION_CONDITION_SAMPLES } from "./families/investigation.ts";
 export { LONG_DARK_CONDITION_SAMPLES } from "./families/long-dark.ts";
@@ -47,6 +49,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   ...ESCAPE_CONDITIONS,
   ...GUARDIAN_CONDITIONS,
   ...ERECH_CONDITIONS,
+  ...SACK_CONDITIONS,
   ...FOG_CONDITIONS,
   ...INVESTIGATION_CONDITIONS,
   ...LONG_DARK_CONDITIONS,

@@ -26,7 +26,7 @@ const RETURN_UNLESS_RAISED: Instruction[] = [
 ];
 
 // A Troll Key and Troll Purse that are discarded come back to the staging area; one in the staging area with no host waits for a Troll.
-const WAIT_FOR_TROLL: Instruction[] = [{ verb: "Pick", pick: TROLL, who: "firstPlayer" } as Instruction, { verb: "AttachSelfToPicked", unlimited: true }];
+const WAIT_FOR_TROLL: Instruction[] = [{ verb: "Pick", pick: { ...TROLL, who: "firstPlayer" } }, { verb: "AttachSelfToPicked", unlimited: true }];
 
 function sackRecords(code: string, attach: Instruction): Effect[] {
   return [{ id: `${code}:triggered:1`, cardCode: code, lines: [`${code}:A:1`], timing: "triggered", trigger: "sacked", instructions: [attach] }];
@@ -216,7 +216,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     cardCode: "131054",
     lines: ["131054:A:1"],
     timing: "whenRevealed",
-    instructions: [{ verb: "Pick", pick: TROLL_IN_STAGING, who: "firstPlayer" } as Instruction, { verb: "EngageFirstPlayer", target: "picked" }, { verb: "GainSurge", when: NO_TROLL_IN_STAGING }],
+    instructions: [{ verb: "Pick", pick: { ...TROLL_IN_STAGING, who: "firstPlayer" } }, { verb: "EngageFirstPlayer", target: "picked" }, { verb: "GainSurge", when: NO_TROLL_IN_STAGING }],
   },
   {
     id: "131054:shadow:1",
