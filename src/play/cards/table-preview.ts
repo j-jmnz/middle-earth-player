@@ -4,7 +4,7 @@ import { stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
 import { isLostIsland } from "../../rules/families/uncharted/pick.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import type { CardInstance } from "../../rules/core/state.ts";
-import { flagged } from "../../rules/core/state.ts";
+import { flagged, isExhausted } from "../../rules/core/state.ts";
 import { BLIZZARD_LIMIT } from "../../rules/families/quest/blizzard.ts";
 
 
@@ -57,12 +57,12 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
  * What lies on the card now, one phrase a counter: its damage, progress and resource tokens, and whether it is exhausted or committed to the
  * quest. Empty for a card with none (a card in the hand, a fresh enemy). `progressLimit`: the progress is counted against a limit ("3 / 5 progress", Blinding Blizzard, 901307:A:2).
  */
-export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "resources" | "exhausted" | "committed">, progressLimit?: number): string[] {
+export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "resources" | "exhausted" | "unconscious" | "committed">, progressLimit?: number): string[] {
   return [
     ...(card.damage > 0 ? [`${card.damage} damage`] : []),
     ...(card.progress > 0 ? [`${card.progress}${progressLimit == null ? "" : ` / ${progressLimit}`} progress`] : []),
     ...(card.resources > 0 ? [`${card.resources} resource${card.resources === 1 ? "" : "s"}`] : []),
-    ...(card.exhausted ? ["Exhausted"] : []),
+    ...(isExhausted(card) ? ["Exhausted"] : []),
     ...(card.committed ? ["Committed"] : []),
   ];
 }

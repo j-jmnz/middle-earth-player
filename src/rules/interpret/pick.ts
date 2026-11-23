@@ -28,7 +28,7 @@ import { cardTypeOf, isAllyLike, isQuestCardType, isSideQuestType, isPlayerType,
 import { activeFor, firstPlayerFor, headOf, sharedStaging, sharing } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { flagged, heldAmount, inPlay, livingSeats } from "../core/state.ts";
+import { flagged, heldAmount, inPlay, isExhausted, livingSeats } from "../core/state.ts";
 import { canDeclareDefender, isDefending } from "../families/defense/defenders.ts";
 import { facedownShadow } from "../families/defense/shadow.ts";
 import { deckPool, unchartedPickMatches } from "../families/uncharted/pick.ts";
@@ -295,7 +295,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.noVictory !== undefined && (printed.victory ?? 0) > 0 === spec.noVictory) return false;
   if (spec.state === "ready" && instance.exhausted) return false;
   // An unconscious character is neither ready nor exhausted (hob.unconscious-characters): the Weighed Down penalty and the "exhausted" filters do not reach it.
-  if (spec.state === "exhausted" && (!instance.exhausted || instance.unconscious === true)) return false;
+  if (spec.state === "exhausted" && !isExhausted(instance)) return false;
   if (spec.canAttack && !legalAttackEnemies(state, instance.controller ?? asking, id, ctx.cards, true).length) return false;
   if (spec.attackableByPicked) {
     const attacker = picked.at(-1);
