@@ -26,6 +26,6 @@ const rows = Object.fromEntries(
 
 export const WILDERLAND_ASKS: Readonly<Record<string, Ask>> = {
   // 132037 Fighting Among Friends. When Revealed: the first player names a sphere; each committed character outside it, a Baggins one excepted, is removed from the quest.
-  "132037:whenRevealed:1 @0 Choose": { owned: true, note: "{card}: as the first player, name a sphere. Each committed non-Baggins character outside it is removed from the quest." },
+  "132037:whenRevealed:1 @0 Choose": { owned: true, note: "{card}: name a sphere. Each committed non-Baggins character outside it is removed from the quest." },
   ...rows,
 };
