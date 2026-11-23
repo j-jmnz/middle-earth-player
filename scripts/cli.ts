@@ -67,6 +67,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     all: { steps: [{ script: VITEST, args: ["run"] }], about: "vitest run (any arguments go to vitest)" },
     fast: { steps: [{ script: VITEST, args: ["run"], env: { VITEST_FAST: "1" } }], about: "vitest run without the slow files" },
     changed: { steps: [{ script: VITEST, args: ["run", "--changed"] }], about: "the tests that import a file changed since the last commit" },
+    lines: { steps: [{ script: "tools/test-lines.ts" }], about: "only the tests that name the lines of the records that changed since <base-ref>, or of <code,...> (--list shows the choice)" },
     scenario: { steps: [{ script: "tools/test-scenario.ts" }], about: "one scenario's tests, goldens, checks and smokes" },
     smoke: { steps: [{ script: "card-smoke/run.ts" }], about: "plays seeded games with player cards' records" },
     encounter: { steps: [{ script: "card-smoke/encounter.ts" }], about: "plays a scenario's encounter cards and seeded games" },

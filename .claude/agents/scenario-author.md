@@ -28,7 +28,7 @@ You build one scenario's engine half. The procedure is `docs/agents/agent-brief.
 - Inputs: the hand-off note and the judge's rows for every line. Research an `ambiguous` row that is a real choice as Read does.
 - Do: fix every line the judge called `wrong` and render again; `pnpm scenario tests <id>` (`--dry-run` first) for the row stubs; a spec row or a test for every record, written from the printed line and failing without the line's records (`docs/agents/card-audit.md`, Tests from the printed line; `scripts/checks/line-coverage.test.ts` fails on a record no test names).
 - Hand back: the lines fixed, each spec row or test file with the lines it covers, and the spec rows that needed a record changed to pass. This is the last task that changes records.
-- Checks: `pnpm test scenario <id> --quick` while working; the exit is the one in `.claude/agents/orchestrator.md` (Implementer tasks). Change no golden, fixture or asks file.
+- Checks: `pnpm test lines origin/main` after a record fix and `pnpm test scenario <id> --quick` while working; the exit is the one in `.claude/agents/orchestrator.md` (Implementer tasks). Change no golden, fixture or asks file.
 
 ## Words
 
