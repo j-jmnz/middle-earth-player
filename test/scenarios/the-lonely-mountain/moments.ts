@@ -18,7 +18,7 @@ export const STAGES = ["132071", "132072", "132073", "132074"] as const;
 export const bilbo = (resources = 0) => ({ code: "132001", resources });
 
 // Player cards of other codes a layout may hold: 01016 Snowbourn Scout (leadership ally, cost 1), 01028 Veteran Axehand (tactics ally, 2), 02102 Silvan Tracker (lore ally, 3), 01048 Hasty Stroke (spirit event, 1), 04108 Daeron's Runes (lore event, 0), 01067 Gandalf's Search (lore event, cost X), 08010 The White Council (neutral event, cost X).
-export const PLAYER_CARDS = ["01016", "01028", "02102", "01048", "04108", "01050", "01067", "08010"];
+export const PLAYER_CARDS = ["01001", "01004", "01007", "01016", "01028", "02102", "01048", "04108", "01050", "01067", "08010"];
 
 export const make = (layout: Layout, effects: readonly Effect[] = EFFECTS): LayoutTable => tableFromLayout(SCENARIO, { stages: STAGES, ...layout }, { effects, extra: PLAYER_CARDS });
 

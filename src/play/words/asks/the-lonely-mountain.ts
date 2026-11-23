@@ -1,5 +1,6 @@
 import type { Ask } from "../asks.ts";
 import { HOBBIT_BILBO_ASKS, HOBBIT_TREASURE_ASKS } from "../hobbit-asks.ts";
+import { WILDERLAND_ASKS } from "../wilderland-asks.ts";
 
 // The choice words of The Lonely Mountain (the-hobbit part 5), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-lonely-mountain --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-lonely-mountain` prints each sentence. The burgle attempt's own choices (discard the matching cards or decline, the hand card to discard) are
@@ -7,6 +8,7 @@ import { HOBBIT_BILBO_ASKS, HOBBIT_TREASURE_ASKS } from "../hobbit-asks.ts";
 export const ASKS: Readonly<Record<string, Ask>> = {
   ...HOBBIT_BILBO_ASKS,
   ...HOBBIT_TREASURE_ASKS,
+  ...WILDERLAND_ASKS,
 
   // 132045:A:2 (Secret Entrance, Travel): the first player exhausts a ready hero and names a card type; the top card of the encounter deck is looked at.
   "132045:travel:1 @0 Pick": { owned: true, note: "{card}: as the first player, choose 1 ready hero you control to exhaust to travel here. Bilbo Baggins may be the hero.", verb: "Exhaust" },
