@@ -1,12 +1,12 @@
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useDeferredValue, useState } from "react";
 import { View } from "react-native";
 
 import { isPlayable } from "../../../campaign/playable";
 import { isOpenStatus, standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
 import { BOXES, boxOf, scenarioName, scenarioOf } from "../../data/campaign-data";
 import { campaignListQueries } from "../../campaign/list";
-import { PillButton, PrimaryButton, TextButton } from "../../kit/chrome";
+import { BodyText, PillButton, PrimaryButton, SearchField, TextButton } from "../../kit/chrome";
 import { deckFaces } from "../../deck/store";
 import { useDatabases } from "../../data/databases";
 import { keepSame } from "../../data/keep-same";
@@ -14,7 +14,7 @@ import { FoldHeader, useFolds } from "../../kit/fold-section";
 import { foldAllOffer } from "../../kit/fold-state";
 import { heroFace } from "../../art/hero-tile";
 import { CatalogTile, LockedTiles, OtherRuns, PrimaryPlate, RunHero, RunRow } from "../../campaign/hub-parts";
-import { boxFoldId, hubItems, type HubEntry, type HubItem } from "../../campaign/hub-items";
+import { boxFoldId, hubItems, searchHub, type HubEntry, type HubItem } from "../../campaign/hub-items";
 import { HubListPage } from "../../campaign/hub-page";
 import { comingLater, splitRuns } from "../../campaign/hub-runs";
 import { usePalette } from "../../kit/palette-hook";
@@ -27,7 +27,7 @@ import { useSizeClass } from "../../../ui/use-size-class";
 
 // Standalone play (mec109.campaign-mode: "players can still play the scenarios as standalone adventures"). The Scenarios hub
 // (docs/design-system.md, Scenarios): the game in progress dealt last as the hero over its scenario's scene, the
-// other games in progress as rows, one fold per box holding the scenarios it can deal, then Coming later; the boxes and Coming later
+// other games in progress as rows, the search of the catalog, one fold per box holding the scenarios it can deal, then Coming later; the boxes and Coming later
 // are the items of one FlashList under the head (HubListPage). Finished and archived games
 // are in History. Reads the scenario files, user.db and the campaigns and heroes the catalog names.
 export default function Scenarios() {
@@ -39,6 +39,9 @@ export default function Scenarios() {
   const [games, setGames] = useState<ListedStandalone[]>([]);
   const folds = useFolds();
   const fold = (id: string, defaultFolded = false) => ({ folded: folds.folded(id, defaultFolded), onFold: (next: boolean) => folds.setFolded(id, next, defaultFolded) });
+  // The field shows each keystroke at once; the list catches up when React has time.
+  const [search, setSearch] = useState("");
+  const query = useDeferredValue(search);
 
   useFocusEffect(
     useCallback(() => {
@@ -110,8 +113,11 @@ export default function Scenarios() {
   });
   // Coming later: the scenarios no box can deal yet and the locked campaigns and cycles, in the campaigns table's order (no card is read for them).
   const waiting = comingLater(BOXES, campaignListQueries(catalog).campaigns.all(), isPlayable, scenarioName);
+  // What the search keeps of them. While it narrows the list every fold is open, and a tap on a fold header changes no stored fold.
+  const found = searchHub(boxes, waiting, query, scenarioName);
+  const listFold = (id: string) => (found.searching ? { folded: false, onFold: () => undefined } : fold(id));
   // The catalog is the list's items (hub-items.ts): a folded box mounts its header alone.
-  const items = hubItems({ boxes, waiting: waiting.length, posters, folded: (id) => folds.folded(id, false) });
+  const items = hubItems({ boxes: found.boxes, waiting: found.waiting.length, posters, folded: (id) => folds.folded(id, false), searching: found.searching });
   // The scenarios list's folds, each box and Coming later: Collapse all folds every one while any is open, else Expand all opens them.
   const listFolds = [...boxes.map(({ box }) => ({ id: boxFoldId(box.id), defaultFolded: false })), ...(waiting.length > 0 ? [{ id: "scenarios-coming", defaultFolded: false }] : [])];
   const offer = foldAllOffer(listFolds.map(({ id, defaultFolded }) => folds.folded(id, defaultFolded)));
@@ -126,6 +132,18 @@ export default function Scenarios() {
   const section = (lead: boolean) => (lead ? undefined : { paddingTop: 18 * s });
   const renderItem = (item: HubItem, lead: boolean) => {
     switch (item.type) {
+      case "search":
+        return (
+          <View className="flex-row" style={section(lead)}>
+            <SearchField testID="scenarios-search" value={search} onChangeText={setSearch} placeholder="Search scenario or box" accessibilityLabel="Search scenarios" accessibilityHint="Searches scenario and box names" />
+          </View>
+        );
+      case "empty":
+        return (
+          <BodyText testID="scenarios-empty" tone="muted" className="mt-6">
+            No scenario matches.
+          </BodyText>
+        );
       case "fold-all":
         return (
           <View className="-mx-3 flex-row justify-end" style={section(lead)}>
@@ -142,7 +160,7 @@ export default function Scenarios() {
       case "box":
         return (
           <View testID={item.id} style={section(lead)}>
-            <FoldHeader id={item.id} title={item.name} count={item.count} unit="scenario" {...fold(item.id)} />
+            <FoldHeader id={item.id} title={item.name} count={item.count} unit="scenario" {...listFold(item.id)} />
           </View>
         );
       case "tiles": {
@@ -158,11 +176,11 @@ export default function Scenarios() {
       case "coming":
         return (
           <View style={section(lead)}>
-            <FoldHeader id="scenarios-coming" title="Coming later" count={item.count} {...fold("scenarios-coming")} />
+            <FoldHeader id="scenarios-coming" title="Coming later" count={item.count} {...listFold("scenarios-coming")} />
           </View>
         );
       case "locked":
-        return <LockedTiles tiles={waiting} testID="locked-scenarios" />;
+        return <LockedTiles tiles={found.waiting} testID="locked-scenarios" />;
     }
   };
 

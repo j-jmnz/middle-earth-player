@@ -103,7 +103,8 @@ export function searchWords(text: string): string[] {
     .filter((word) => word.length > 0);
 }
 
-function holds(haystack: string, words: readonly string[]): boolean {
+/** Whether the text holds every word typed, each as the start of one of its words. */
+export function holds(haystack: string, words: readonly string[]): boolean {
   const found = searchWords(haystack);
   return words.every((word) => found.some((candidate) => candidate.startsWith(word)));
 }
