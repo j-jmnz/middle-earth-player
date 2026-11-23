@@ -76,9 +76,10 @@ function watchErrors(show: (text: string) => void): void {
 /**
  * One second of the meter: its frame rate, its longest frame, how many of its frames took over two frames' time, how long its frames ran late in all (`late`: what
  * each took beyond a sixtieth of a second), and how long the animation frame callbacks ran (`raf`: the animations and the canvases' drawing). A second whose `late`
- * is far over its `raf` lost its time outside the drawing: React's work, the engine, a save, or the browser's own layout, painting and graphics.
+ * is far over its `raf` lost its time outside the drawing: React's work, the engine, a save, or the browser's own layout, painting and graphics. `draw` is how
+ * long Skia took to record the canvases' scenes again, and `draws` how many times it did (watchDraws).
  */
-export type Second = { fps: number; worst: number; slow: number; late: number; raf: number };
+export type Second = { fps: number; worst: number; slow: number; late: number; raf: number; draw: number; draws: number };
 
 // A frame over this is one the eye sees as a stutter at 60 frames a second.
 const SLOW_MS = 34;
@@ -88,7 +89,7 @@ const FRAME_MS = 1000 / 60;
 export const LOG_SECONDS = 60;
 
 /** A second's frames as its log entry. */
-export function secondOf(gaps: readonly number[], raf: number = 0): Second {
+export function secondOf(gaps: readonly number[], raf: number = 0, draw: number = 0, draws: number = 0): Second {
   const total = gaps.reduce((sum, gap) => sum + gap, 0);
   return {
     fps: total > 0 ? Math.round((1000 * gaps.length) / total) : 0,
@@ -96,6 +97,8 @@ export function secondOf(gaps: readonly number[], raf: number = 0): Second {
     slow: gaps.filter((gap) => gap > SLOW_MS).length,
     late: Math.round(gaps.reduce((sum, gap) => sum + Math.max(0, gap - FRAME_MS), 0)),
     raf: Math.round(raf),
+    draw: Math.round(draw),
+    draws,
   };
 }
 
@@ -109,11 +112,38 @@ export function summaryLine(log: readonly Second[]): string {
 
 /** The log as text to send: the summary, then each second's frame rate and longest frame, oldest first. */
 export function logText(log: readonly Second[], scale: number): string {
-  return [`x${scale}  ${summaryLine(log)}`, ...log.map((second, index) => `${String(index + 1).padStart(2)}  ${second.fps} fps  worst ${second.worst} ms  late ${second.late}  raf ${second.raf}`)].join("\n");
+  return [`x${scale}  ${summaryLine(log)}`, ...log.map((second, index) => `${String(index + 1).padStart(2)}  ${second.fps} fps  worst ${second.worst} ms  late ${second.late}  raf ${second.raf}  draw ${second.draw}/${second.draws}`)].join("\n");
 }
 
 // How long the animation frame callbacks ran since the meter last read it. Every caller asks the window for a frame at call time, so wrapping it here times them all.
 let rafBusy = 0;
+
+// How long Skia took to record scenes since the meter last read it, and how many it recorded.
+let drawBusy = 0;
+let drawCount = 0;
+
+type Recorder = { finishRecordingAsPicture: (...args: unknown[]) => unknown };
+
+/**
+ * Times each scene Skia records for a canvas: from the picture recorder it makes to the picture that recorder finishes (the two ends of Skia's own draw of a
+ * canvas's tree, which walks every drawing command into CanvasKit). `skia` is the Skia API object. Does nothing unless the meter shows.
+ */
+export function watchDraws(skia: { PictureRecorder: () => unknown }): void {
+  if (!metering) return;
+  const make = skia.PictureRecorder.bind(skia);
+  skia.PictureRecorder = () => {
+    const started = performance.now();
+    const recorder = make() as Recorder;
+    const finish = recorder.finishRecordingAsPicture.bind(recorder);
+    recorder.finishRecordingAsPicture = (...args) => {
+      const picture = finish(...args);
+      drawBusy += performance.now() - started;
+      drawCount += 1;
+      return picture;
+    };
+    return recorder;
+  };
+}
 
 function watchFrames(): void {
   const frame = window.requestAnimationFrame.bind(window);
@@ -137,7 +167,8 @@ function startMeter(): void {
   const fault = document.createElement("div");
   fault.style.color = "#ffb4a8";
   box.append(rate, fault);
-  document.body.appendChild(box);
+  // Beside the body, not in it: an open sheet makes the body's other children inert (modal-layers.ts), and the meter must still take its tap.
+  document.documentElement.appendChild(box);
   watchErrors((text) => {
     fault.textContent = text;
   });
@@ -171,8 +202,10 @@ function startMeter(): void {
     if (!paused) {
       gaps.push(now - last);
       if (now - shown >= 1000) {
-        log = [...log, secondOf(gaps, rafBusy)].slice(-LOG_SECONDS);
+        log = [...log, secondOf(gaps, rafBusy, drawBusy, drawCount)].slice(-LOG_SECONDS);
         rafBusy = 0;
+        drawBusy = 0;
+        drawCount = 0;
         rate.textContent = `${meterLine(gaps, window.devicePixelRatio)}  (tap to stop)`;
         summary.textContent = summaryLine(log);
         gaps = [];
@@ -186,6 +219,8 @@ function startMeter(): void {
 }
 
 let applied = false;
+// Whether the meter shows, once the controls are applied.
+let metering = false;
 
 /** Reads the two controls from the address and storage and applies them, once. Only the web app's build calls it. */
 export function applyRenderControls(): void {
@@ -198,5 +233,6 @@ export function applyRenderControls(): void {
   if (scale !== null) Object.defineProperty(window, "devicePixelRatio", { configurable: true, get: () => scale });
   const meter = meterChosen(search, read(FPS_KEY));
   if (params.has("fps")) write(FPS_KEY, meter ? "1" : null);
+  metering = meter;
   if (meter) startMeter();
 }
