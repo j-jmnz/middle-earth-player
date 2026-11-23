@@ -5,7 +5,8 @@ import path from "node:path";
 
 import type { Effect } from "../../src/catalog/boundary.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
-import { EXEMPT, namedInTests, unnamedRecords } from "../checks/line-coverage.ts";
+import { EXEMPT, unnamedRecords } from "../checks/line-coverage.ts";
+import { namedInTests } from "../checks/tracked.ts";
 import { loadCards } from "../data/load-cards.ts";
 import { dealtCodes, loadCampaigns, loadCampaignsInOrder, loadAnyScenario } from "../data/load-scenarios.ts";
 import { DATA_DIR, ROOT } from "../data/paths.ts";

@@ -7,7 +7,11 @@
 //   pnpm game log passage-through-mirkwood/1 --from 40 --to 60 --steps
 //   pnpm game diff passage-through-mirkwood/1             # where the golden played now leaves golden.json
 //   pnpm game show encounter:the-oath:7 --at 120          # a game of `pnpm test encounter`; smoke:<code> opens a card smoke failure
+//   pnpm game moved [<base-ref>]                         # each golden whose golden.json differs from the base: result, first differing step, what resolved there
 //   pnpm game scene passage-through-mirkwood '{"phase":"Combat","engaged":["01096"]}' --legal   # a table from a test layout
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
 import { flagValue, flagValues } from "../args.ts";
 import { runScript, type Log } from "../log.ts";
 import { reduce, type PlayerIntent } from "../../src/rules/engine/reduce.ts";
@@ -15,7 +19,10 @@ import { reduce, type PlayerIntent } from "../../src/rules/engine/reduce.ts";
 import { firstDifferent, stateDiff } from "./diff.ts";
 import { intentText, stepText } from "./names.ts";
 import { layoutOf, sceneSource } from "./scene-source.ts";
-import { listSources, loadSource, type GameSource } from "./source.ts";
+import { ROOT } from "../data/paths.ts";
+import { compareGoldens, type StoredGolden } from "./compare.ts";
+import { baseRef, changedScenarios, detailOf, goldenAt, renderMoved, type StepDetail } from "./moved.ts";
+import { goldenNames, listSources, loadSource, type GameSource } from "./source.ts";
 import { stateText } from "./state-text.ts";
 import { parseUntil, walk, type Move } from "./walk.ts";
 
@@ -24,6 +31,7 @@ const USAGE = `usage:
   pnpm game show <source> [--at <n> | --until <cond>] [--legal] [--full] [--json] [--send '<intent json>']...
   pnpm game log <source> [--from <n>] [--to <n>] [--until <cond>] [--steps] [--grep <text>]
   pnpm game diff <scenario-id>/<golden>
+  pnpm game moved [<base-ref>]
   pnpm game scene <scenario-id> ['<layout json>' | @<file>] [show's flags]
 <source> is a fixture name, <scenario-id>/<golden number or name>, encounter:<scenario-id>:<game> or smoke:<code>[:<seed>[:<deal>]]; <cond> is lost, won, round=N, phase=X, mode=X, window=X, seat=N or code=X.`;
 
@@ -107,12 +115,51 @@ function diff(source: GameSource): void {
   process.stdout.write(`${out.join("\n")}\n`);
 }
 
+// The blocks of `pnpm game moved`: each moved golden, with the intent where its table first differs replayed for the records and cards that resolved.
+// A scenario that cannot be compared or replayed prints one line that names it and the others go on.
+async function movedBlocks(ref: string, scenarioId: string): Promise<string[]> {
+  const now = JSON.parse(readFileSync(path.join(ROOT, "src", "campaign", "scenarios", scenarioId, "golden.json"), "utf8")) as StoredGolden[];
+  const blocks: string[] = [];
+  for (const move of compareGoldens(goldenAt(ref, scenarioId), now, goldenNames(scenarioId))) {
+    let detail: StepDetail | null = null;
+    let refused: string | undefined;
+    if (move.number !== null && move.first !== null) {
+      try {
+        const source = await loadSource(`${scenarioId}/${move.number}`);
+        const walked = walk(source, { at: move.endsNow ? move.first + 1 : move.first + 2 });
+        const last = walked.moves.at(-1);
+        if (walked.refused) refused = `refused at #${walked.refused.index + 1}: ${walked.refused.reason}`;
+        else if (last) detail = detailOf(last, source.ctx);
+      } catch (error) {
+        refused = `not replayed: ${error instanceof Error ? error.message : String(error)}`;
+      }
+    }
+    blocks.push(renderMoved(scenarioId, move, detail, refused));
+  }
+  return blocks;
+}
+
+async function moved(log: Log, refArg: string | undefined): Promise<void> {
+  const ref = baseRef(refArg);
+  const blocks: string[] = [];
+  for (const scenarioId of changedScenarios(ref)) {
+    try {
+      blocks.push(...(await movedBlocks(ref, scenarioId)));
+    } catch (error) {
+      blocks.push(`${scenarioId}: not compared: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  process.stdout.write(blocks.length > 0 ? `${blocks.join("\n\n")}\n` : `no golden.json differs from ${ref.slice(0, 10)}\n`);
+  log.info(`${blocks.length} moved golden${blocks.length === 1 ? "" : "s"} against ${ref.slice(0, 10)}`);
+}
+
 async function main(log: Log): Promise<void> {
   const [command = "", name, ...args] = process.argv.slice(2);
   if (command === "list") {
     process.stdout.write(`${listSources().join("\n")}\n`);
     return;
   }
+  if (command === "moved") return moved(log, name?.startsWith("--") ? undefined : name);
   if (!["show", "log", "diff", "scene"].includes(command) || !name || name.startsWith("--")) throw new Error(USAGE);
   if (command === "scene") {
     // The layout is the argument after the scenario, when it is not a flag.

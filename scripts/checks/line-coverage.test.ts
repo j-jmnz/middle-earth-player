@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import { EFFECTS } from "../../src/effects/index.ts";
 
 import { loadCards } from "../data/load-cards.ts";
-import { EXEMPT, namedInTests, unnamedRecords } from "./line-coverage.ts";
+import { EXEMPT, unnamedRecords } from "./line-coverage.ts";
+import { namedInTests } from "./tracked.ts";
 
 // Every effect record is named by a test: its id, or one of the printed lines it implements, stands in a test file. That holds for the deck-legal player cards and for every other card (encounter cards,
 // quest stages, objectives, campaign cards, boons, burdens and treasures). The smokes (scripts/card-smoke) only show that a record runs without breaking the game, so they do not count. A record that no
