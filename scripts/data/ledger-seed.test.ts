@@ -35,6 +35,13 @@ describe("ledger seed", () => {
     expect(entry.lines).toEqual(["Guarded.", `Response: it's "here".`, "Shadow: x."]);
   });
 
+  it("writes a player card's tags and icons as plain words", () => {
+    const card = cards.find((one) => one.code === "05009");
+    const target = { code: "05009", side: "A" as const, printing: "HoN", urls: [] };
+    const entry = seedEntry(card as NonNullable<typeof card>, target, { url: "https://x.test/a.jpg", sha256: "0".repeat(64) });
+    expect(entry.lines).toEqual(["Restricted.", "Attach to a Tactics character. Limit 1 per character.", "Response: After attached character is declared as a defender, deal 1 damage to the attacking enemy."]);
+  });
+
   it("puts a printed Escape value on its own line", () => {
     const card = cards.find((one) => one.code === "02108");
     const target = { code: "02108", side: "A" as const, printing: "TDM", urls: [] };
