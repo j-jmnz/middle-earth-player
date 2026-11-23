@@ -191,11 +191,12 @@ function searchesEmptyDeck(state: ScenarioState, instruction: Instruction, at: I
   return seatsOf(state, pick, at.seat).every((index) => deckPool(state, index, pick).length === 0);
 }
 
-// Whether the amount of the step is the effect's X alone: with no X chosen it is 0. An amount that adds to X (`{ x: true, plus: 1 }`) or scales it is not 0 without an X, so it is not read.
+// Whether the amount of the step is the effect's X, scaled or negated: with no X chosen it is 0 (`resolveAmount` computes `value * times` and then applies `negative`). An amount that adds
+// to X (`plus`, `plusChosen`) is not 0 without an X, so it is not read.
 const readsX = (instruction: Instruction): boolean => {
   if (!("amount" in instruction) || typeof instruction.amount !== "object") return false;
-  const keys = Object.keys(instruction.amount);
-  return keys.length === 1 && instruction.amount.x === true;
+  const { x, ...rest } = instruction.amount;
+  return x === true && Object.keys(rest).every((key) => key === "negative" || key === "times");
 };
 
 /**

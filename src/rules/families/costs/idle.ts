@@ -12,9 +12,10 @@ import { spentThisRound } from "./pay.ts";
 import { playOptions } from "./play.ts";
 import { hostSpheres } from "./verbs.ts";
 
-// A discount for the next card "that matches the attached hero's sphere" (hostSphere) with no card in the hand that does: it lowers nothing (rr.triggered-ability).
+// A discount for the next card "that matches the attached hero's sphere" (hostSphere) with no card in the hand that does: it lowers nothing (rr.triggered-ability). A discount that lasts the round
+// is not read: a matching card may be drawn later in the round, and the lasting effect is a change of the game state (Good Meal, 04010:A:2; docs/brief.md, Player card readings).
 function noHostSphereCard(state: ScenarioState, instruction: Extract<Instruction, { verb: "ReduceNextCost" }>, sourceId: string, frame: IdleFrame, ctx: ReduceContext): boolean {
-  if (!instruction.hostSphere) return false;
+  if (!instruction.hostSphere || instruction.until === "endOfRound") return false;
   const spheres = hostSpheres(state, state.cards[sourceId]?.host ?? "", ctx);
   return spheres.length === 0 || pickCandidates(state, { ...instruction.pick, from: "hand", spheres }, frame.seat, [], sourceId, ctx).length === 0;
 }
