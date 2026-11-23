@@ -13,7 +13,7 @@ const codeOf = (state: ScenarioState, id: string | null | undefined) => (id ? st
 const cardsOf = (state: ScenarioState, code: string) => Object.values(state.cards).filter((card) => card.code === code);
 
 // A permanent golden: whole standalone games of Over the Misty Mountains Grim played by the auto-player (test/scenarios/over-the-misty-mountains-grim/game.ts) on fixed seeds, Bilbo Baggins dealt in front of the first seat by the loadout.
-// A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned. The wins are true solo and two-handed on Normal and Easy: the Setup shuffles the first deck and sets the second aside, A Short Rest advances at once, The Mountain Pass finds a Stone-giant,
+// A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned. The wins are true solo and two-handed on Normal and true solo on Easy: the Setup shuffles the first deck and sets the second aside, A Short Rest advances at once, The Mountain Pass finds a Stone-giant,
 // Down, Down to Goblin Town swaps the decks, and the game is won when The Great Goblin is in the victory display and the stage is defeated. The losses are every player's threat at 50 (heroes too weak to quest), every hero destroyed (heroes too
 // brittle) and Bilbo Baggins leaving play. Update the snapshot only when the change is meant.
 describe("Over the Misty Mountains Grim golden", () => {

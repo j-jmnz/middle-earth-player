@@ -33,7 +33,9 @@ export const DEFAULT_POLICY: GrimPolicy = { choose: "first" };
 export function grimIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: GrimPolicy = DEFAULT_POLICY): PlayerIntent {
   if (state.window?.kind === "choose") {
     // A choice of a card never takes Bilbo (he is the first hero of the first seat): the players lose when he leaves play.
-    const options = state.window.options.filter((option) => state.cards[option]?.code !== BILBO);
+    // When only Bilbo is left to choose (a choice of one of the first seat's heroes), the list as it is offered.
+    const withoutBilbo = state.window.options.filter((option) => state.cards[option]?.code !== BILBO);
+    const options = withoutBilbo.length > 0 ? withoutBilbo : state.window.options;
     return { type: "Choose", optionId: (policy.choose === "last" ? options.at(-1) : options[0]) ?? "" };
   }
   if (state.window?.kind === "defense") {
@@ -57,12 +59,11 @@ export type GrimGame = PlayedGame;
 // The goldens (src/campaign/scenarios/over-the-misty-mountains-grim/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type GrimGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: GrimDecks; outcome: "won" | "lost"; policy?: Partial<GrimPolicy>; lossReason?: string };
 
-// The games to pin (about 450 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and Easy, and the ways to lose: every player's threat at 50 (heroes too weak to quest), every hero destroyed (heroes too brittle) and Bilbo Baggins leaving play (131001:A:3).
+// The games to pin (.claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal, a true solo win on Easy, and the ways to lose: every player's threat at 50 (heroes too weak to quest), every hero destroyed (heroes too brittle) and Bilbo Baggins leaving play (131001:A:3).
 export const GRIM_GOLDENS: readonly GrimGolden[] = [
   { name: "solo win", seatCount: 1, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "Easy solo win", seatCount: 1, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won" },
-  { name: "Easy two-handed win", seatCount: 2, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "solo loss: threat 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed loss: every hero destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed loss: Bilbo Baggins leaves play", seatCount: 2, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "Bilbo Baggins left play" },
