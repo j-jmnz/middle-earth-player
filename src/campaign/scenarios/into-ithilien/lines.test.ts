@@ -3,9 +3,9 @@
 // Each test builds its moment with the scene kit (the Setup test starts the game and plays nothing else). The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points. Celador has 2 Willpower, 2 Attack, 2 Defense and a Guardian 2, 2, 1.
 import { describe, expect, it } from "vitest";
 
-import { archeryRecipients, archeryTotal } from "../../../rules/combat/combat.ts";
-import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
+import { archeryRecipients, archeryTotal } from "../../../rules/combat/combat.ts";
+import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { legalIntents, reduce, startScenario, type PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
@@ -15,7 +15,7 @@ import type { EngineStep } from "../../../rules/core/intents.ts";
 import { advanceStage, committedWillpower, engagementCostOf, engagementStep, qualifyingEnemies, questStatOf } from "../../../rules/quest/quest.ts";
 import { endPhase, endRound, reveal } from "../../../../test/harness/card-spec.ts";
 import { play } from "../../../../test/harness/card-spec-play.ts";
-import { finish, idOf, revealFromTop, send, start, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
+import { finish, idOf, idsOf, revealFromTop, send, start, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
 import { ithilienStart, ithilienWorld } from "../../../../test/scenarios/into-ithilien/game.ts";
 import { CODES, leaves, questPhase, table } from "../../../../test/scenarios/into-ithilien/table.ts";
 
@@ -170,7 +170,7 @@ describe("05052:A:1 and 05052:A:2 Archery X, 05069:B:2 and 05069:B:3 on the ques
   it("05052:A:2 X counts the players in the game now: a second Mercenaries adds its own X, and a player who is gone is not counted", () => {
     const two = table({ seats: 2, staging: [MERCENARIES, MERCENARIES], stage: HIDDEN_WAY });
     expect(archeryTotal(two.state, two.ctx.cards)).toBe(4);
-    const gone = { ...two.state, seats: two.state.seats.map((seat, index) => (index === 1 ? { ...seat, eliminated: true } : seat)) };
+    const gone = { ...two.state, seats: [two.state.seats[0], { ...two.state.seats[1], eliminated: true }] as const };
     expect(archeryTotal(gone, two.ctx.cards)).toBe(2);
   });
 
@@ -200,5 +200,107 @@ describe("05052:A:1 and 05052:A:2 Archery X, 05069:B:2 and 05069:B:3 on the ques
     expect(run.state.window).toMatchObject({ kind: "archery", total: 1 });
     run = send(run, { type: "Distribute", assignments: [{ cardId: idOf(run.state, CELADOR), amount: 1 }] }, made.ctx);
     expect(run.state.cards[idOf(run.state, CELADOR)]?.damage).toBe(1);
+  });
+});
+
+describe("05068:A:1 Setup", () => {
+  it("05068:A:1 puts Celador in the staging area committed, Ithilien Road as the active location and one Southron Company in the staging area for each player", async () => {
+    const { ctx } = await ithilienWorld();
+    for (const seats of [1, 2] as const) {
+      let state = startScenario(ithilienStart(seats, 3, "Normal"), ctx);
+      // Each seat keeps its hand: the Setup is played by the engine.
+      for (let guard = 0; guard < 12 && state.window?.kind === "mulligan"; guard += 1) state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
+      expect(state.cards[idOf(state, CELADOR)]?.zone).toBe("staging");
+      expect(flagged(state, idOf(state, CELADOR), "committedInStaging")).toBe(true);
+      expect(idsOf(state, ROAD).filter((id) => state.cards[id]?.zone === "activeLocation")).toHaveLength(1);
+      const companies = idsOf(state, COMPANY).filter((id) => state.cards[id]?.zone === "staging");
+      expect(companies).toHaveLength(seats);
+    }
+  });
+});
+
+describe("05068:B:1 and 05069:B:1 Battle and Siege", () => {
+  it("05068:B:1 Battle: characters quest with their Attack", () => {
+    const made = table({ staging: [GUARDIAN], committed: ["dh1"], stage: BATTLE });
+    const { state } = made;
+    expect(questStatOf(state, idOf(state, "dh1"), made.ctx.cards)).toBe("attack");
+    expect(questStatOf(state, idOf(state, GUARDIAN), made.ctx.cards)).toBe("attack");
+  });
+
+  it("05069:B:1 Siege: characters quest with their Defense (a Guardian adds 1, not the 2 of his Willpower)", () => {
+    const made = table({ staging: [GUARDIAN], committed: ["dh1"], stage: SIEGE });
+    expect(questStatOf(made.state, idOf(made.state, "dh1"), made.ctx.cards)).toBe("defense");
+    expect(committedWillpower(made.state, made.ctx.cards)).toBe(2 + 1);
+  });
+});
+
+describe("05068:B:2 and 05069:B:4 the stage that is skipped", () => {
+  it("05068:B:2 completed with Celador in the staging area, stage 1 goes to stage 3 (bypassing stage 2)", () => {
+    expect(nextStage(table({ staging: [CELADOR], stage: BATTLE }))).toBe(HIDDEN_WAY);
+  });
+
+  it("05068:B:2 without Celador in the staging area stage 1 goes to stage 2: he is under a player's control, removed from the game, or not in the game", () => {
+    expect(nextStage(table({ play: [CELADOR], stage: BATTLE }))).toBe(SIEGE);
+    expect(nextStage(table({ stage: BATTLE }))).toBe(SIEGE);
+    const made = table({ staging: [{ code: CELADOR, damage: 2 }], stage: BATTLE });
+    const removed = leaves(made, CELADOR);
+    expect(nextStage({ ...made, state: syncConstants(removed, made.ctx) })).toBe(SIEGE);
+  });
+
+  it("05068:B:2 a Guardian in the staging area does not skip the stage: only Celador does", () => {
+    expect(nextStage(table({ staging: [GUARDIAN], stage: BATTLE }))).toBe(SIEGE);
+  });
+
+  it("05069:B:4 stage 2 goes to stage 4 (bypassing stage 3), with Celador in the staging area or not", () => {
+    expect(nextStage(table({ staging: [CELADOR], stage: SIEGE }))).toBe(APPROACHING);
+    expect(nextStage(table({ stage: SIEGE }))).toBe(APPROACHING);
+  });
+});
+
+describe("05070:B:1 The Hidden Way", () => {
+  it("05070:B:1 When Revealed: the first player takes control of Celador and every Guardian in the staging area; each is ready and committed no more", () => {
+    const made = table({ seats: 2, firstPlayer: 1, staging: [CELADOR, GUARDIAN, GUARDIAN, COMPANY], stage: HIDDEN_WAY });
+    const state = syncConstants(runInstruction({ ...made.state, window: null }, { verb: "TakeControlOfStagedObjectives", trait: "Ranger" }, { seat: 1, sourceId: null }, made.ctx, []), made.ctx);
+    for (const id of [idOf(state, CELADOR), ...idsOf(state, GUARDIAN)]) {
+      expect(state.cards[id]).toMatchObject({ zone: "play", controller: 1, committed: false, exhausted: false });
+    }
+    expect(state.cards[idOf(state, COMPANY)]?.zone).toBe("staging");
+    expect(committedWillpower(state, made.ctx.cards)).toBe(0);
+  });
+});
+
+describe("05071:B:1 Approaching Cair Andros and 05071:B:3 the last stage", () => {
+  const siege = (layout: Parameters<typeof table>[0]) => {
+    const made = table({ stage: APPROACHING, ...layout });
+    return { made, state: made.state };
+  };
+
+  it("05071:B:1 at threat 37 or more the stage has Siege: quest resolution uses Defense and the Southron Company gets its Siege bonus", () => {
+    const high = siege({ threat: [37, 28], staging: [COMPANY, GUARDIAN], committed: ["dh1"] });
+    expect(questStatOf(high.state, idOf(high.state, "dh1"), high.made.ctx.cards)).toBe("defense");
+    expect(committedWillpower(high.state, high.made.ctx.cards)).toBe(2 + 1);
+    expect(modifiedStat(high.state, high.state.cards[idOf(high.state, COMPANY)]!, "attack", high.made.ctx.cards)).toBe(3 + 2);
+    expect(modifiedStat(high.state, high.state.cards[idOf(high.state, COMPANY)]!, "threat", high.made.ctx.cards)).toBe(1 + 2);
+  });
+
+  it("05071:B:1 at threat 36 or less (every player) the stage has no Siege: Willpower counts and the Company keeps its printed 3 Attack", () => {
+    const low = siege({ seats: 2, threat: [36, 36], staging: [COMPANY, GUARDIAN], committed: ["dh1"] });
+    expect(questStatOf(low.state, idOf(low.state, "dh1"), low.made.ctx.cards)).toBe("willpower");
+    expect(committedWillpower(low.state, low.made.ctx.cards)).toBe(2 + 2);
+    expect(modifiedStat(low.state, low.state.cards[idOf(low.state, COMPANY)]!, "attack", low.made.ctx.cards)).toBe(3);
+  });
+
+  it("05071:B:1 the second player's threat counts too, and a threat that rises to 37 gives Siege on the spot", () => {
+    const two = siege({ seats: 2, threat: [28, 37], staging: [COMPANY] });
+    expect(modifiedStat(two.state, two.state.cards[idOf(two.state, COMPANY)]!, "attack", two.made.ctx.cards)).toBe(3 + 2);
+    const base = siege({ staging: [COMPANY] });
+    const raised = syncConstants({ ...base.state, seats: [{ ...base.state.seats[0], threat: 37 }, base.state.seats[1]] as const }, base.made.ctx);
+    expect(modifiedStat(raised, raised.cards[idOf(raised, COMPANY)]!, "attack", base.made.ctx.cards)).toBe(3 + 2);
+  });
+
+  it("05071:B:3 defeating the last stage wins the game: no stage follows it", () => {
+    const made = table({ stage: APPROACHING });
+    const advanced = advanceStage(made.state, made.ctx.cards, [], () => true);
+    expect(advanced.stageCleared).toBe(true);
   });
 });
