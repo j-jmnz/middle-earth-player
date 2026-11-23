@@ -2,7 +2,7 @@
 // the other runs, then the catalog and Coming later. `HubPage` scrolls them in a ScrollView (Campaigns, whose catalog is a few tiles);
 // `HubListPage` holds the head as the header of a FlashList whose items are the catalog (Scenarios, whose boxes hold a picture row for
 // every playable scenario: docs/design-system.md, Performance).
-import { FlashList, type ListRenderItem } from "@shopify/flash-list";
+import { FlashList, type FlashListRef, type ListRenderItem } from "@shopify/flash-list";
 import { useState, type ComponentRef, type ReactNode, type RefObject } from "react";
 import { View, type ScrollView } from "react-native";
 
@@ -144,23 +144,30 @@ export function HubPage({
  * The hub as one FlashList: the head is its header and `items` the catalog under it, so only the rows in view are mounted and a row
  * scrolled away is recycled. `renderItem` is handed `lead`, true for the first item, which sits 18 pt under the hero or the other runs
  * (none without either), as `HubPage`'s catalog does. The list keeps `ScreenScroll`'s frame: it reaches 8 pt past the page inset, and
- * outside compact its content is a centred column at the cap.
+ * outside compact its content is a centred column at the cap. `listRef` lets the screen scroll an item to the top (its search on
+ * focus); `fill` adds a window's height under the items, so a list a search made short still holds that item at the top. A drag
+ * dismisses the keyboard.
  */
 export function HubListPage<T extends { id: string; type: string }>({
   items,
   renderItem,
   listTestID,
+  listRef,
+  fill = false,
   ...headProps
 }: HeadProps & {
   items: readonly T[];
   renderItem: (item: T, lead: boolean) => ReactNode;
   listTestID?: string;
+  listRef?: RefObject<FlashListRef<T> | null>;
+  fill?: boolean;
 }) {
   const { size, s, width: windowWidth } = useSizeClass();
   const { head, art, wide } = useHubHead(headProps);
   const { hero, others, testID } = headProps;
   // Outside compact the first frame takes the window less the page inset, plus the 8 the list reaches past it, so it opens in the column.
   const [listWidth, setListWidth] = useState(() => (size === "compact" ? 0 : seedWidth(size, windowWidth, s, 24) + 16 * s));
+  const [listHeight, setListHeight] = useState(0);
   const cap = capWidth(size, wide ? "wide" : "readable", s);
   // ScreenScroll's content is min(the list's width, the cap plus 16) wide and centred, padded 8 inside: the same inset here.
   const inset = 8 * s + (cap == null || listWidth === 0 ? 0 : Math.max(0, Math.floor((listWidth - 16 * s - cap) / 2)));
@@ -171,8 +178,14 @@ export function HubListPage<T extends { id: string; type: string }>({
   };
   return (
     <Screen testID={testID} scene={art ? "hero" : "moon"} art={art}>
-      <View className="min-h-0 flex-1" style={{ marginHorizontal: -8 * s }} onLayout={(event) => setListWidth(event.nativeEvent.layout.width)}>
+      <View className="min-h-0 flex-1" style={{ marginHorizontal: -8 * s }} 
+        onLayout={(event) => {
+          setListWidth(event.nativeEvent.layout.width);
+          setListHeight(event.nativeEvent.layout.height);
+        }}
+      >
         <FlashList
+          ref={listRef}
           testID={listTestID}
           data={items}
           keyExtractor={(item) => item.id}
@@ -182,7 +195,9 @@ export function HubListPage<T extends { id: string; type: string }>({
           contentContainerStyle={{ paddingHorizontal: inset, paddingBottom: 32 * s }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
           ListHeaderComponent={<View>{head}</View>}
+          ListFooterComponent={fill ? <View style={{ height: listHeight }} /> : null}
         />
       </View>
     </Screen>

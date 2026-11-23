@@ -1,7 +1,8 @@
 // The one fold control (phase 28b): a header that folds and unfolds the section under it. A 44 pt target; a chevron (down while
 // open, right while folded), the title, and the count of what is inside while folded. A screen reader hears whether it is
 // expanded and an announcement on each toggle. The body stays mounted and is hidden, so what it holds keeps its state; there is
-// no animation (docs/design-system.md, Performance: a fold is a state change, not a motion).
+// no animation (docs/design-system.md, Performance: a fold is a state change, not a motion). With no `onFold` (a search holds
+// every section open) the header is a plain heading: no chevron, no press, no sound, and its count beside the title.
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
@@ -73,7 +74,8 @@ export type FoldHeaderProps = {
   id: string;
   title: string;
   folded: boolean;
-  onFold: (folded: boolean) => void;
+  // Left out while the section cannot fold (a search holds it open): the header is then a plain heading with its count shown.
+  onFold?: (folded: boolean) => void;
   // What the section holds, said beside the title while folded ("3 scenarios" with a unit, else the bare number).
   count?: number;
   unit?: string;
@@ -93,6 +95,19 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, le
   const plain = usePlainTitles();
   const counted = summary != null ? (lead ? `${lead}, ${summary}` : summary) : count == null ? null : unit ? plural(count, unit) : String(count);
   const summaryTone = attention ? "text-danger" : "text-muted";
+  if (!onFold) {
+    const shown = count == null ? null : counted;
+    return (
+      <View testID={testID ?? `section-${id}`} accessible accessibilityRole="header" accessibilityLabel={foldWords(title, false, shown)} className="min-h-touch flex-row items-center gap-3">
+        <View className="w-3" />
+        <Text className="shrink font-display text-moon" style={sectionTitleStyle(s, plain)}>
+          {title}
+        </Text>
+        <View className="min-w-3 flex-1" />
+        {shown != null ? <Text className="pr-1 text-label text-muted">{shown}</Text> : null}
+      </View>
+    );
+  }
   return (
     // The heading is the row, so screen-reader heading navigation lands on it and the button stays inside.
     <View accessibilityRole="header" className="flex-row items-center">

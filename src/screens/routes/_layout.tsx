@@ -1,9 +1,9 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../../../global.css";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Platform, StatusBar, View } from "react-native";
-import { Stack, usePathname } from "expo-router";
+import { Stack, usePathname, useSegments } from "expo-router";
 import Head from "expo-router/head";
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
@@ -29,6 +29,7 @@ import { setTableMusic, startMusic } from "../../ui/sound/music";
 import { SCREEN_SOUNDS } from "../../ui/sound/slots";
 import { primeSounds } from "../../ui/sound/sound";
 import { keepsTableMusic } from "../nav/route-music";
+import { hubsWarm, opensOnHubs, subscribeHubsWarm, WARM_CAP_MS } from "../nav/tabs-warm";
 import { APP_VERSION } from "../update/offer";
 import { UpdateFrame } from "../update/ribbon";
 
@@ -90,7 +91,7 @@ export default function RootLayout() {
   const [databases, setDatabases] = useState<AppDatabases | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const splashHidden = useRef(false);
-  // The drawn splash (SplashGlow) stays until its fade ends, over the first screen.
+  // The drawn splash (SplashGlow) breathes until the databases are open and the hubs have mounted, then stays until its fade ends, over the first screen.
   const [splashDone, setSplashDone] = useState(false);
   const themeSetting = useStore(tableSettings, (state) => state.settings.theme);
   const resolved = useResolvedTheme();
@@ -99,6 +100,12 @@ export default function RootLayout() {
   const scale = uiFactor(scaleSetting);
   const themeStyle = useMemo(() => vars(themeVars(resolved)), [resolved]);
   const tablet = useIsTablet();
+  // A launch on a hub keeps the splash until every hub has mounted behind it (nav/tabs-warm.ts), so no tab mounts under the player's first tap on the dock.
+  const segments = useSegments();
+  const [waitsForHubs] = useState(() => opensOnHubs(segments));
+  const warm = useSyncExternalStore(subscribeHubsWarm, hubsWarm, hubsWarm);
+  const [warmCapped, setWarmCapped] = useState(false);
+  const opening = !failure && (!databases || (waitsForHubs && !warm && !warmCapped));
 
   // Before paint, so a changed scale never shows a frame at the old size.
   useLayoutEffect(() => {
@@ -130,6 +137,13 @@ export default function RootLayout() {
     if (!databases && !failure) return;
     hideNativeSplash(splashHidden);
   }, [databases, failure]);
+
+  // The hubs' wait has an end: one that never mounts must not keep the splash over the error it shows.
+  useEffect(() => {
+    if (!databases) return;
+    const timer = setTimeout(() => setWarmCapped(true), WARM_CAP_MS);
+    return () => clearTimeout(timer);
+  }, [databases]);
 
   useEffect(() => {
     if (!databases || Platform.OS === "web") return;
@@ -251,7 +265,7 @@ export default function RootLayout() {
           ) : null}
         </View>
       </SafeAreaProvider>
-      {splashDone ? null : <SplashGlow loading={!databases && !failure} onShown={() => hideNativeSplash(splashHidden)} onDone={() => setSplashDone(true)} />}
+      {splashDone ? null : <SplashGlow loading={opening} onShown={() => hideNativeSplash(splashHidden)} onDone={() => setSplashDone(true)} />}
     </GestureHandlerRootView>
     </UiScaleContext.Provider>
     </ThemeContext.Provider>
