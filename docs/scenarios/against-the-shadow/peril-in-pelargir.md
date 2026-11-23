@@ -115,6 +115,14 @@ The readings of Peril in Pelargir use the statuses defined in the Readings bulle
 - `05067:B:2` (which enemy, when) (span-settled). Only an enemy revealed from the deck counts, in the staging step (3.3) or by another reveal effect: not an enemy dealt as a shadow card, discarded by the Fish and added, or added by a search. The attack happens after the enemy is placed in the staging area (it attacks from there); "each round" resets at the start of each round. Not taken: Any enemy that enters the staging area. Basis: rr.reveal; rr.staging (placement is step 3); faq.reveal-and-add; dwd.revealing-enemies (shadow-dealt enemies are not revealed)
 - `05067:B:3` (recommended). "cannot defeat this stage unless Alcaron's Scroll is attached to a hero": progress is still placed; the stage is defeated once progress reaches the quest points AND the Scroll is on a hero (checked again when the Scroll attaches). Defeating it wins the game. Not taken: Progress stops at the points. Basis: faq.progress-without-advancing; rr.quest-advancement. Sources: same source gap as 05066:B:2 (the later-attach check). The "wins the game" half is printed.
 
+## Table
+
+No tracker, dial or zone: no record creates one. The one held card is Alcaron's Scroll.
+
+- **Held card** (`05065:A:1` Setup attaches it to a hero; `05019:A:1` returns it to the staging area; `05019:A:2`, `05066:B:3` and Lurking in Shadows move it with its host to an enemy). The table draws it as an attachment under its host in every zone the host can be in: a hero in the play area, an enemy in the staging area or engaged (`selectors.ts` lists a card's `attachments` under it; an objective on an enemy carries no `guard` flag, so it is not drawn beside the host as a guard is). In the staging area, unattached, it is a card of its own. No widget was added; the Gate Key (12071) and Temple Guardian's key use the same drawing.
+- **Owner on each row**: the picks that span seats say the player on each row (`owned` entries in `src/play/words/asks/peril-in-pelargir.ts`): the first player's hero for the Scroll (`05065:A:1`), the per-player searches (`05065:B:2`, `05067:A:1`, `05040:A:1`), Market Square's payment (`05039:A:2`), the hero of Pickpocket (`05037:A:1`, `05037:A:2`), of Umbar Assassin (`05044:A:2`) and of the Scroll's Action (`05019:A:1`), and the enemy for the Scroll at stage 2B (`05066:B:3`).
+- Stages 1 and 2 print Battle (`05065:B:1`, `05066:B:1`): the stage card shows the keyword, as for every stage with a printed keyword.
+
 ## Engine notes
 
 Where the engine does not read a reading above to the letter, and why.
