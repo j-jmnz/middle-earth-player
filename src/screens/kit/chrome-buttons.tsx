@@ -102,7 +102,10 @@ export function PillButton({ label, onPress, testID, accessibilityLabel, accessi
   );
 }
 
-/** A capsule text field on the tonal fill: a magnifier when it searches, the words, no edge, and nothing that reads as a button. */
+/**
+ * A capsule text field on the tonal fill: a magnifier when it searches, the words, no edge, and nothing that reads as a button. A
+ * search that holds text ends with a clear mark (`<testID>-clear`, a 44 pt target spoken as "Clear search") that empties it.
+ */
 export function SearchField({
   value,
   onChangeText,
@@ -112,6 +115,7 @@ export function SearchField({
   accessibilityHint,
   search = true,
   minWidth,
+  onFocus,
 }: {
   value: string;
   onChangeText: (next: string) => void;
@@ -124,11 +128,13 @@ export function SearchField({
   search?: boolean;
   // The narrowest the field gets: in a row that wraps, the field then moves to its own line instead of shrinking to nothing.
   minWidth?: number;
+  onFocus?: () => void;
 }) {
   const palette = usePalette();
   const t = useTableTokens();
+  const clears = search && value !== "";
   return (
-    <View className="min-h-touch min-w-0 flex-1 flex-row items-center gap-2.5 rounded-control px-4" style={minWidth == null ? sunkSurface(t) : { ...sunkSurface(t), minWidth }}>
+    <View className={`min-h-touch min-w-0 flex-1 flex-row items-center gap-2.5 rounded-control pl-4 ${clears ? "pr-0" : "pr-4"}`} style={minWidth == null ? sunkSurface(t) : { ...sunkSurface(t), minWidth }}>
       {search ? <Magnifier color={palette.faint} /> : null}
       <TextInput
         testID={testID}
@@ -140,8 +146,14 @@ export function SearchField({
         autoCapitalize="none"
         accessibilityLabel={accessibilityLabel}
         accessibilityHint={accessibilityHint}
+        onFocus={onFocus}
         className="min-h-touch min-w-0 flex-1 text-body text-bone"
       />
+      {clears ? (
+        <Pressable testID={`${testID}-clear`} accessibilityRole="button" accessibilityLabel="Clear search" onPress={withSound(() => onChangeText(""), "ui.confirm")} className="min-h-touch min-w-touch items-center justify-center">
+          <Text className="text-body text-muted">{"\u2715"}</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }

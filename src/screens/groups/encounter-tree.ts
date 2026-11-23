@@ -2,6 +2,7 @@
 // order (a cycle titled with the word Cycle), the Nightmare decks last, each holding its encounter sets and then its campaigns' sections (campaign cards, Boons, Burdens, Treasures).
 // A pack's one set is a row of its own; a pack of several sets is a heading over them, unless the product is that one pack. A campaign is filed
 // under the product that prints most of its cards. A search keeps the rows, headings and products whose words hold every word typed. Pure.
+import { holdsWords, searchWords } from "../kit/fold";
 import { cardsWord } from "./card-group";
 import type { CampaignNode, CampaignTree } from "./campaign-tree";
 import type { ScenarioTree } from "./scenario-tree";
@@ -93,21 +94,6 @@ export function encounterList(scenario: ScenarioTree, campaign: CampaignTree, co
   });
 }
 
-/** The words a search compares: lower case, accents and punctuation dropped ("Númenor" is "numenor"). */
-export function searchWords(text: string): string[] {
-  return text
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .split(/[^a-z0-9]+/)
-    .filter((word) => word.length > 0);
-}
-
-function holds(haystack: string, words: readonly string[]): boolean {
-  const found = searchWords(haystack);
-  return words.every((word) => found.some((candidate) => candidate.startsWith(word)));
-}
-
 /**
  * The products a search keeps: a product whose title holds the words keeps every row; otherwise a row stays when its words, with its heading's
  * and its product's, hold them, and a heading stays over the rows it keeps. An empty search keeps everything.
@@ -116,7 +102,7 @@ export function searchEncounter(products: readonly EncounterProduct[], text: str
   const words = searchWords(text);
   if (words.length === 0) return products;
   return products.flatMap((product): EncounterProduct[] => {
-    if (holds(product.title, words)) return [product];
+    if (holdsWords(product.title, words)) return [product];
     const kept: EncounterItem[] = [];
     let heading: EncounterHeading | null = null;
     let headingShown = false;
@@ -126,7 +112,7 @@ export function searchEncounter(products: readonly EncounterProduct[], text: str
         headingShown = false;
         continue;
       }
-      if (!holds(`${product.title} ${heading?.title ?? ""} ${item.label} ${item.find}`, words)) continue;
+      if (!holdsWords(`${product.title} ${heading?.title ?? ""} ${item.label} ${item.find}`, words)) continue;
       if (heading && !headingShown) {
         kept.push(heading);
         headingShown = true;
