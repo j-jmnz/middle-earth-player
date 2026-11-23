@@ -6,10 +6,11 @@ import { frameScope, refCard } from "../../interpret/amounts.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
+import type { DamageSource } from "../../core/keywords.ts";
 import { printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { attachBlocked } from "../../interpret/restrictions.ts";
-import type { ScenarioState } from "../../core/state.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
@@ -22,9 +23,9 @@ function inPlayWith(state: ScenarioState, code: string): string | undefined {
   return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id;
 }
 
-// The hero the card with this code is attached to, when it is attached to a hero in play (the hero "with Alcaron's Scroll attached").
-function holderOf(state: ScenarioState, code: string): string | null {
-  const objective = Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone) && card.host != null);
+// The hero that "has Alcaron's Scroll attached": the hero in play the card `is` picks out (the Scroll, by its code or by the flag it holds) is attached to. Null when no such card is attached to a hero.
+function heroWithScroll(state: ScenarioState, is: (card: CardInstance) => boolean): string | null {
+  const objective = Object.values(state.cards).find((card) => card.host != null && inPlay(card.zone) && is(card));
   const host = objective?.host ? state.cards[objective.host] : undefined;
   return host?.zone === "heroes" ? host.id : null;
 }
@@ -55,21 +56,20 @@ export function attachObjectiveTo(state: ScenarioState, instruction: Verb<"Attac
  */
 export function attackScrollHolder(state: ScenarioState, instruction: Verb<"AttackScrollHolder">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const enemyId = frameScope(state, focus.seat, focus.sourceId).subject;
-  const hero = holderOf(state, instruction.code);
+  const hero = heroWithScroll(state, (card) => card.code === instruction.code);
   const seat = hero ? state.cards[hero]?.controller : null;
   if (!enemyId || seat == null) return state;
   return attackNowFromStaging(state, enemyId, seat, ctx, steps, { shadow: true });
 }
 
 /**
- * The card an attack's damage is placed on when the attacking enemy holds `damageToScroll` (a Shadow effect of this attack): the hero the card holding `takesAttackDamage` is attached to, for damage assigned to a character of the player the attack is against.
- * Null when the enemy holds no such flag, the damage is assigned to another card, or no hero holds the card ("if able"), so the damage stays where it was assigned. Called by damageGoesTo (families/defense/damage.ts) with state alone.
+ * The card an attack's damage is placed on when the attacking enemy holds `damageToScroll` (a Shadow effect of this attack): the hero the card holding `takesAttackDamage` is attached to, for the combat damage of this attack, whoever controls the card it was assigned to
+ * (a defender of another player, an undefended hero). Null when the enemy holds no such flag, the damage is not the attack's combat damage (`source`), it is assigned to a card no player controls, or no hero holds the card ("if able"), so the damage stays
+ * where it was assigned. Called by damageGoesTo (families/defense/damage.ts).
  */
-export function scrollDamageTarget(state: ScenarioState, assigned: string): string | null {
+export function scrollDamageTarget(state: ScenarioState, assigned: string, source?: DamageSource): string | null {
   const attack = state.pendingAttack;
-  if (!attack || state.modifiers.length === 0 || !flagged(state, attack.enemyId, "damageToScroll")) return null;
-  if (state.cards[assigned]?.controller !== attack.seat) return null;
-  const objective = Object.values(state.cards).find((card) => card.host != null && flagged(state, card.id, "takesAttackDamage"));
-  const host = objective?.host ? state.cards[objective.host] : undefined;
-  return host?.zone === "heroes" && inPlay(host.zone) ? host.id : null;
+  if (source !== "combat" || !attack || state.modifiers.length === 0 || !flagged(state, attack.enemyId, "damageToScroll")) return null;
+  if (state.cards[assigned]?.controller == null) return null;
+  return heroWithScroll(state, (card) => flagged(state, card.id, "takesAttackDamage"));
 }

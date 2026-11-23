@@ -1,5 +1,5 @@
 // Rules: rr.attachment-cards, rr.objective-cards, rr.damage, rr.step-6-4-3, rr.optional-engagement, rr.reveal, rr.first-player, rr.travel, rr.running-out-of-cards (data/rules/entries.json). The pelargir family's verbs, flags and hooks
-// (src/catalog/families/pelargir.ts) and the shared reads they join: damageGoesTo, the travel restriction by title, the announcement of a card discarded from the encounter deck and the mark of an optional engagement. The cards that use them
+// (src/catalog/families/pelargir.ts) and the shared reads they join: the travel restriction by title, the announcement of a card discarded from the encounter deck and the mark of an optional engagement. The cards that use them
 // are tested in src/campaign/scenarios/peril-in-pelargir/.
 import { describe, expect, it } from "vitest";
 
@@ -7,54 +7,21 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { destroyCard } from "../../core/keywords.ts";
-import { flagged, updateCard, type GameEvent, type ScenarioState } from "../../core/state.ts";
-import { attachTo, spawn } from "../../core/zones.ts";
+import { flagged, type GameEvent, type ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 import { settle } from "../../engine/machine.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
-import { syncConstants } from "../../interpret/constants.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { travelBlocked } from "../../interpret/restrictions.ts";
-import { fireForced } from "../../windows/triggers.ts";
-import { fightEnemy, finish, first, idOf, revealFromTop, tableFromLayout, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
-import { noteOptionalEngage } from "./first-enemy.ts";
+import { finish, idOf, revealFromTop, tableFromLayout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
+import { announced, SCENARIO, SCROLL, scrollTable, withScroll } from "../../../../test/scenarios/peril-in-pelargir/scroll.ts";
+import { noteOptionalEngage } from "./optional-engage.ts";
 
-const SCENARIO = "peril-in-pelargir";
-const SCROLL = "05019";
 const THUG = "05020";
 const STOREHOUSE = "05023";
 const LOCAL_TROUBLE = "05041";
 
-// The Scroll on the first hero, claimed, as the quest card's Setup leaves it (a layout's attachment is a plain one in play, not zone attached).
-function withScroll(table: LayoutTable, hostCode = "dh1"): LayoutTable {
-  const hostId = idOf(table.state, hostCode);
-  const spawned = spawn(table.state, SCROLL, { zone: "attached" }, "up");
-  const attached = attachTo(spawned.state, spawned.id, hostId);
-  const state = updateCard(attached, spawned.id, { claimed: true, controller: attached.cards[hostId]?.controller ?? 0, face: "up" });
-  return { ...table, state: syncConstants(state, table.ctx) };
-}
-
-const scrollTable = (layout: Layout, hostCode = "dh1"): LayoutTable => withScroll(tableFromLayout(SCENARIO, layout), hostCode);
-
-// The engine announces an event to the Forced effects, and the choices they open are answered with their first option.
-function announced(table: LayoutTable, event: GameEvent): ScenarioState {
-  const steps: EngineStep[] = [];
-  return finish({ state: settle(fireForced({ ...table.state, window: null }, event, table.ctx, steps), table.ctx, steps), steps }, table.ctx).state;
-}
-
 describe("AttachObjectiveTo", () => {
-  it("moves the Scroll from the hero the enemy damaged to that enemy, a claimed objective nobody controls", () => {
-    const table = scrollTable({ engaged: [THUG] });
-    const scroll = idOf(table.state, SCROLL);
-    const thug = idOf(table.state, THUG);
-    const state = announced(table, { trigger: "damagedByAttack", seat: 0, cardId: table.hero, subject: table.hero, other: thug, amount: 1 } as GameEvent);
-    expect(state.cards[scroll]?.host).toBe(thug);
-    expect(state.cards[scroll]?.zone).toBe("attached");
-    expect(state.cards[scroll]?.claimed).toBe(true);
-    expect(state.cards[scroll]?.controller).toBeNull();
-    expect(state.cards[table.hero]?.attachments).not.toContain(scroll);
-    expect(state.cards[thug]?.attachments).toContain(scroll);
-  });
-
   it("returns the Scroll to the staging area when the enemy that holds it leaves play, as it does when its hero does", () => {
     const table = scrollTable({ engaged: [THUG] });
     const scroll = idOf(table.state, SCROLL);
@@ -118,17 +85,6 @@ describe("AttackScrollHolder", () => {
   // Stage 3B's Forced effect (05067:B:2): the first enemy the encounter deck reveals in a round attacks, from the staging area, the player whose hero has the Scroll.
   const revealed = (table: LayoutTable, code: string): ScenarioState => revealFromTop(table.state, table.ctx, code, []).state;
 
-  it("makes the first enemy revealed attack the player whose hero has the Scroll, from the staging area, with a shadow card dealt to it", () => {
-    const table = scrollTable({ stage: "05067", deck: ["f0", "f0", "f0"], seats: 2 });
-    const state = revealed(table, THUG);
-    const thug = idOf(state, THUG);
-    expect(state.pendingAttack?.enemyId).toBe(thug);
-    expect(state.pendingAttack?.seat).toBe(0);
-    expect(state.pendingAttack?.fromStaging).toBe(true);
-    expect(state.cards[thug]?.zone).toBe("staging");
-    expect(state.cards[thug]?.shadowId).toBeDefined();
-  });
-
   it("attacks the player of the other seat when the Scroll is on his hero", () => {
     const base = tableFromLayout(SCENARIO, { stage: "05067", deck: ["f0", "f0", "f0"], seats: 2 });
     const table = withScroll(base, "dh3");
@@ -145,36 +101,6 @@ describe("AttackScrollHolder", () => {
     const noted = scrollTable({ stage: "05067", deck: ["f0", "f0", "f0"] });
     const later = { ...noted, state: { ...noted.state, modifiers: [...noted.state.modifiers, { instanceId: "table", sourceId: noted.hero, stat: "firstEnemyNoted" as const, amount: 1, until: "endOfRound" as const }] } };
     expect(revealed(later, THUG).pendingAttack ?? null).toBeNull();
-  });
-});
-
-describe("a Shadow effect that sends the damage to the hero with the Scroll", () => {
-  // Collateral Damage (05024:A:2) is the shadow card dealt to a Harbor Thug (attack 3) attacking the first hero, who defends with Defense 2; the Scroll is on the second hero.
-  const fight = (layout: Layout = {}, options: { undefended?: boolean } = {}) =>
-    fightEnemy((made: Layout) => scrollTable(made, "dh2"), "05024", THUG, layout, options);
-
-  it("places the damage on the hero with the Scroll and none on the defender, and then the Scroll hops to the attacker", () => {
-    const result = fight();
-    const state = result.run.state;
-    const defender = state.cards[result.made.hero];
-    const holder = state.cards[result.made.hero2];
-    expect(defender?.damage).toBe(0);
-    expect(holder?.damage).toBeGreaterThan(0);
-    expect(state.cards[idOf(state, SCROLL)]?.host).toBe(first(state, THUG));
-  });
-
-  it("places an undefended attack's damage on the hero with the Scroll too", () => {
-    const result = fight({}, { undefended: true });
-    expect(result.run.state.cards[result.made.hero]?.damage).toBe(0);
-    expect(result.run.state.cards[result.made.hero2]?.damage).toBeGreaterThan(0);
-  });
-
-  it("leaves the damage on the defender when no hero has the Scroll, and when the attack's enemy holds no such shadow", () => {
-    const bare = fightEnemy((made: Layout) => tableFromLayout(SCENARIO, made), "05024", THUG, {});
-    expect(bare.run.state.cards[bare.made.hero]?.damage).toBeGreaterThan(0);
-    const plain = fightEnemy((made: Layout) => scrollTable(made, "dh2"), "f0", THUG, {});
-    expect(plain.run.state.cards[plain.made.hero]?.damage).toBeGreaterThan(0);
-    expect(plain.run.state.cards[plain.made.hero2]?.damage).toBe(0);
   });
 });
 

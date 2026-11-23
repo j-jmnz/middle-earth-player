@@ -1,51 +1,31 @@
 // Rules: rr.attachment-cards, rr.objective-cards, rr.ownership-and-control, rr.forced, rr.damage, rr.shadow-effects, rr.optional-engagement, rr.engagement-check, rr.travel, rr.reveal, rr.cancel, rr.quest-advancement, rr.step-3-4, hon.battle, mec109.setup (data/rules/entries.json).
 // The lines of Peril in Pelargir that a card-spec row cannot show (spec.test.ts holds the rest): the ones that need Alcaron's Scroll on a hero or on an enemy, a played Setup, a refused travel, an engagement the player chose, a held-back stage and the
 // first enemy of a round: 05019:A:1, 05019:A:2, 05020:A:1, 05020:A:2, 05021:A:1, 05024:A:2, 05037:A:2, 05038:A:2, 05039:A:2, 05040:A:1, 05042:A:1, 05043:A:1, 05044:A:2, 05065:A:1, 05065:B:1, 05066:B:1, 05066:B:2, 05066:B:3, 05067:B:1, 05067:B:2, 05067:B:3.
-// Each test builds its moment with the scene kit (the Setup test starts the game and plays nothing else). The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points. The Scroll is spawned with zone `attached` and claimed, as the Setup leaves it (a layout's
-// attachment is a plain one in play), with `withScroll`.
+// Each test builds its moment with the scene kit (the Setup test starts the game and plays nothing else). The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points. The Scroll is put on a hero with `scrollTable` (test/scenarios/peril-in-pelargir/scroll.ts).
 import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
-import { destroyCard } from "../../../rules/core/keywords.ts";
+import { UNATTRIBUTED } from "../../../rules/core/cause.ts";
+import { destroyCard, placeDamage } from "../../../rules/core/keywords.ts";
 import { flagged, updateCard, type GameEvent, type ScenarioState } from "../../../rules/core/state.ts";
-import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
-import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { holds } from "../../../rules/interpret/conditions.ts";
 import { questStatOf } from "../../../rules/quest/quest.ts";
 import { topFrame } from "../../../rules/windows/windows.ts";
 import { pushCardEffects } from "../../../rules/interpret/effect-frames.ts";
-import { fireForced } from "../../../rules/windows/triggers.ts";
 import { fightEnemy, finish, first, idOf, idsOf, resolveRecords, revealFromTop, send, start, tableFromLayout, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
 import { pelargirStart, pelargirWorld } from "../../../../test/scenarios/peril-in-pelargir/game.ts";
+import { announced, SCENARIO, SCROLL, scrollTable } from "../../../../test/scenarios/peril-in-pelargir/scroll.ts";
 
-const SCENARIO = "peril-in-pelargir";
-const SCROLL = "05019";
 const THUG = "05020";
 const FISH = "05021";
 const ZEALOUS = "05042";
 const BANDIT = "05043";
 const ASSASSIN = "05044";
 const PICKPOCKET = "05037";
-
-// The Scroll on a hero (the first by default), claimed.
-function withScroll(table: LayoutTable, hostCode = "dh1"): LayoutTable {
-  const hostId = idOf(table.state, hostCode);
-  const spawned = spawn(table.state, SCROLL, { zone: "attached" }, "up");
-  const attached = attachTo(spawned.state, spawned.id, hostId);
-  const state = updateCard(attached, spawned.id, { claimed: true, controller: attached.cards[hostId]?.controller ?? 0, face: "up" });
-  return { ...table, state: syncConstants(state, table.ctx) };
-}
-const scrollTable = (layout: Layout, hostCode = "dh1"): LayoutTable => withScroll(tableFromLayout(SCENARIO, layout), hostCode);
-
-// The engine announces an event to the Forced effects; the choices they open take their first option.
-function announced(table: LayoutTable, event: GameEvent): ScenarioState {
-  const steps: EngineStep[] = [];
-  return finish({ state: settle(fireForced({ ...table.state, window: null }, event, table.ctx, steps), table.ctx, steps), steps }, table.ctx).state;
-}
 
 describe("05065:A:1 Setup", () => {
   it("05065:A:1 leaves exactly one Alcaron's Scroll in the game, attached to a hero, with The Leaping Fish the active location", async () => {
@@ -97,6 +77,10 @@ describe("05019 Alcaron's Scroll", () => {
     const thug = idOf(table.state, THUG);
     const state = announced(table, { trigger: "damagedByAttack", seat: 0, cardId: table.hero, subject: table.hero, other: thug, amount: 1 } as GameEvent);
     expect(state.cards[scroll]?.host).toBe(thug);
+    expect(state.cards[scroll]?.zone).toBe("attached");
+    expect(state.cards[scroll]?.claimed).toBe(true);
+    expect(state.cards[scroll]?.controller).toBeNull();
+    expect(state.cards[thug]?.attachments).toContain(scroll);
     expect(state.cards[table.hero]?.attachments).not.toContain(scroll);
   });
 
@@ -149,6 +133,28 @@ describe("05020 Harbor Thug and 05024 Collateral Damage as a shadow card", () =>
     const result = fight("05024", {}, true);
     expect(result.run.state.cards[result.made.hero]?.damage).toBe(0);
     expect(result.run.state.cards[result.made.hero2]?.damage).toBeGreaterThan(0);
+  });
+  // A stand-in ally of the other player with Sentinel defends the first player's attack: the damage is still the attack's, so it goes to the Scroll hero, and the Spearman takes none.
+  const sentinel = { seats: 2 as const, play: [{ code: "ally", seat: 1 }] };
+  const sentineled = (shadow: string, options: { undefended?: boolean } = {}) =>
+    fightEnemy((made: Layout) => scrollTable(made, "dh2"), shadow, THUG, sentinel, {
+      ...options,
+      defender: (made) => idOf(made.state, "ally"),
+      tweak: (state, made) => ({ ...state, modifiers: [...state.modifiers, { instanceId: idOf(state, "ally"), sourceId: made.hero, stat: "sentinel" as const, amount: 1, until: "endOfGame" as const }] }),
+    });
+  it.each([["05020:A:2", THUG], ["05024:A:2", "05024"]])("%s Shadow: a Sentinel defender of another player takes none of the attack's damage; the Scroll hero takes it", (_line, shadow) => {
+    const result = sentineled(shadow);
+    const state = result.run.state;
+    expect(state.cards[idOf(state, "ally")]?.damage).toBe(0);
+    expect(state.cards[result.made.hero2]?.damage).toBeGreaterThan(0);
+  });
+  it("05024:A:2 non-combat damage dealt to the attacked player's characters during the attack is not sent to the Scroll hero", () => {
+    const table = scrollTable({ engaged: [THUG], deck: ["05024", "f0"] }, "dh2");
+    const thug = idOf(table.state, THUG);
+    const shadowed = { ...table.state, pendingAttack: { enemyId: thug, seat: 0, defenderId: table.hero }, modifiers: [...table.state.modifiers, { instanceId: thug, sourceId: thug, stat: "damageToScroll" as const, amount: 1, until: "endOfAttack" as const }] };
+    const hit = placeDamage(shadowed, table.hero, 1, table.ctx.cards, [], "framework", UNATTRIBUTED);
+    expect(hit.cards[table.hero]?.damage).toBe(1);
+    expect(hit.cards[table.hero2]?.damage).toBe(0);
   });
   it("05020:A:2 with the Scroll on no hero the damage stays with the defender", () => {
     const result = fightEnemy((made: Layout) => tableFromLayout(SCENARIO, made), THUG, THUG, {});

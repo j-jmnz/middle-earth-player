@@ -1,5 +1,5 @@
-// Rules: rr.reveal, rr.optional-engagement, rr.step-5-2, rr.engaged, faq.reveal-and-add (data/rules/entries.json); ledger lines 05042:A:1, 05043:A:1, 05044:A:1, 05067:B:2.
-// What the engine notes for the cards of Peril in Pelargir: the first enemy the encounter deck reveals each round, and an engagement the player chose in the optional engagement step. Each is noted only in a game with a record that reads it, so no other game's state moves.
+// Rules: rr.reveal, rr.step-5-2, faq.reveal-and-add (data/rules/entries.json); ledger line 05067:B:2.
+// What the engine notes for Escape to the Quays: the first enemy the encounter deck reveals each round. It is noted only in a game with a record that reads it, so no other game's state moves.
 import type { Condition } from "../../../catalog/boundary.ts";
 
 import { gameReads } from "../../core/game-reads.ts";
@@ -22,10 +22,4 @@ export function noteFirstEnemy(state: ScenarioState, cardId: string, ctx: Reduce
 /** The condition `firstEnemy`: the enemy the answered reveal is about is the first the encounter deck revealed this round. Null for any other condition. */
 export function pelargirCondition(state: ScenarioState, condition: Condition, scope: Scope): boolean | null {
   return condition.kind === "firstEnemy" ? scope.subject != null && flagged(state, scope.subject, "firstEnemy") : null;
-}
-
-/** The player optionally engages the enemy (the `Engage` intent of the optional engagement step): the enemy is marked `engagedOptionally` until the phase ends, before the engagement is announced, in a game with a record that reads the flag. */
-export function noteOptionalEngage(state: ScenarioState, enemyId: string, ctx: ReduceContext): ScenarioState {
-  if (!state.cards[enemyId] || !gameReads(state, ctx, '"stat":"engagedOptionally"')) return state;
-  return { ...state, modifiers: [...state.modifiers, { instanceId: enemyId, sourceId: enemyId, stat: "engagedOptionally", amount: 1, until: "endOfPhase" }] };
 }

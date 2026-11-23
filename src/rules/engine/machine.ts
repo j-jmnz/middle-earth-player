@@ -55,7 +55,7 @@ import { damageHeld, destroyOverwhelmed } from "../core/keywords.ts";
 import { clearEliminated, eliminateHeroless } from "../core/eliminate.ts";
 import { effectsOf } from "../windows/listen.ts";
 import { engagesAgain, optionallyEngaged } from "../families/quest/engage.ts";
-import { noteOptionalEngage } from "../families/pelargir/first-enemy.ts";
+import { noteOptionalEngage } from "../families/pelargir/optional-engage.ts";
 import { syncThreatSaves } from "../families/quest/threat.ts";
 import { eventWaits } from "../families/defense/listen.ts";
 import { announceShadowsDealt } from "../families/defense/shadow.ts";

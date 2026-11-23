@@ -9,7 +9,7 @@ import { currentCause, effectCause, UNATTRIBUTED, type Cause } from "../../core/
 import { effectsOf } from "../../windows/listen.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { modifiedStat, placeDamage } from "../../core/keywords.ts";
+import { modifiedStat, placeDamage, type DamageSource } from "../../core/keywords.ts";
 import { isCharacterType, printedOf, type PrintedCard } from "../../core/printed.ts";
 import { placeQuestProgress, questPointsOf } from "../../quest/quest.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
@@ -62,14 +62,14 @@ export function redirectDamage(state: ScenarioState, instruction: Extract<Instru
 
 // "Attached hero takes all damage assigned to the chosen hero": damage assigned to a card that holds damageToSourceHost goes to
 // the host of that modifier's source while the host is in play.
-export function damageGoesTo(state: ScenarioState, id: string): string {
+export function damageGoesTo(state: ScenarioState, id: string, source?: DamageSource): string {
   for (const modifier of state.modifiers) {
     if (modifier.stat !== "damageToSourceHost" || modifier.instanceId !== id || modifier.amount <= 0 || !modifierActive(state, modifier)) continue;
     const host = state.cards[modifier.sourceId]?.host;
     if (host && host !== id && inPlay(state.cards[host]?.zone ?? "removed")) return host;
   }
   // "Any damage dealt by this attack is dealt to the hero with Alcaron's Scroll attached, if able" (05020:A:2): the pelargir family names the hero, or none.
-  return scrollDamageTarget(state, id) ?? id;
+  return scrollDamageTarget(state, id, source) ?? id;
 }
 
 // Characters of any player that may take the damage of an undefended attack against `seat` because a card that player controls
