@@ -34,7 +34,9 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
 
 131030:B:2 (back): Progress tokens cannot be added to, or removed from, this quest except by answering riddles.
   131030:constant:2: Constant
-    - this card: stat noEffectProgress (card effects cannot place progress on this stage or on an active location; the progress a successful quest places is not an effect) 1, while this card is in play
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat noProgressPlaced 1, while this card is in play
+    - this card: stat noProgressRemoved 1, while this card is in play
 
 131030:B:3 (back): Cards in the riddle area are immune to player card effects and cannot leave the riddle area except by quest effects.
   131030:constant:3: Constant
@@ -151,7 +153,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
 
 131078:A:2 (front): Players cannot travel here.
   131078:constant:2: Constant
-    - the players cannot travel to this location while this holds
+    - the players cannot travel to the location with code 131078 while this holds
 
 131078:A:3: Immune to player card effects.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -176,10 +178,8 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
     - the top 1 card(s) of the acting player's deck go to their discard pile
 
 131079:A:3 (front): Action: Exhaust Bilbo's Magic Ring and raise each player's threat by 2 to add 1 Baggins resource to Bilbo Baggins' resource pool.
-  131079:action:2: Action (cost: exhaust this card)
+  131079:action:2: Action (cost: exhaust this card and raise each player's threat by 2)
     who acts: any player may trigger it; the acting player is the one who does
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - raise threat by 2 (each player)
     - add 1 resources to its host
 
 ## 131080 Come Down Little Bird
@@ -258,4 +258,4 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
     - discard 3 card(s) from the top of the encounter deck
     - for each card this effect discarded from the top of the encounter deck that is not of the named type, remove 1 progress from stage 2
 
-(rendered pieces: 144 by template, 0 as JSON)
+(rendered pieces: 145 by template, 0 as JSON)
