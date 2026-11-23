@@ -9,6 +9,7 @@ import { questPointsOf } from "../../rules/quest/quest.ts";
 import { restricted } from "../../rules/interpret/restrictions.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { inPlay, type CardInstance } from "../../rules/core/state.ts";
+import { stageTurnsProgressIntoDiscards } from "./hobbit/roast-mutton.ts";
 
 /**
  * The quest points progress fills on this quest stage, or null when progress never defeats it: it prints none, or has 0 and the
@@ -16,6 +17,8 @@ import { inPlay, type CardInstance } from "../../rules/core/state.ts";
  * Progress may still be placed on it; the table does not count it against a target.
  */
 export function stagePoints(game: ScenarioState, stage: CardInstance, ctx: ReduceContext): number | null {
+  // Stage 2B of We Must Away, Ere Break of Day turns its progress into discards: no strip (hobbit/roast-mutton.ts).
+  if (stageTurnsProgressIntoDiscards(game, stage)) return null;
   const points = questPointsOf(game, stage, ctx.cards);
   // A stage at 0 that may still advance (Surprise Attack, 41005:B:2, 4 for each enemy) still fills with progress.
   return points === 0 && restricted(game, ctx, "advance").length > 0 ? null : points;

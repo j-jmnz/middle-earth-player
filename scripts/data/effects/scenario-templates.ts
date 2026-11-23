@@ -28,6 +28,9 @@ function unlabelledBlocked(context: TemplateContext, timing: "constant" | "trigg
   return context.unreadBefore(timing) || context.inert();
 }
 
+// A card type, sphere or role word standing where a card name would.
+const GENERIC_CARD_NOUN = /^(?:hero|character|ally|enemy|location|objective|attachment|player card|card|(?:leadership|tactics|spirit|lore|baggins|fellowship) (?:hero|character|ally))s?$/i;
+
 export const SCENARIO_TEMPLATES: readonly Template[] = [
   {
     id: "quest-setup",
@@ -246,6 +249,8 @@ export const SCENARIO_TEMPLATES: readonly Template[] = [
     pattern: /^Travel: (?:(The first player|Players|Each player) must )?[Ee]xhaust (?:the |an? )?(.+?)(?: to travel here)?\.$/,
     build: (match, context) => {
       const name = match[2] ?? "";
+      // A generic noun ("a hero", "an ally") names no card: the line stays open for the scenario author.
+      if (GENERIC_CARD_NOUN.test(name)) return null;
       const code = context.codeOf(name);
       const target = code ? { kind: "byCode" as const, code } : context.hasName(name) ? { kind: "byName" as const, name } : null;
       if (!target || match[1] === "Each player") return null;

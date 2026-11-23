@@ -1,0 +1,286 @@
+Scenario piles that place cards with no record (quest: 132067 Into Mirkwood; quest: 132068 Lost in the Dark; quest: 132069 Captured by Spiders; quest: 132070 Battle with the Spiders; setAside: 132025 The Spider's Glade; setAside: 132019 Bilbo's Magic Ring)
+
+## 132025 The Spider's Glade
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+132025:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+132025:A:2 (front): Travel: Exhaust Bilbo Baggins to travel here.
+  132025:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no ready copy of the card it exhausts is in play
+    - exhaust "Bilbo Baggins"
+
+132025:A:3 (front): Forced: At the start of each quest phase, search the encounter deck for 1 Spider enemy and add it to the staging area. (2 Spider enemies instead if 3 or more players are at this stage.) Shuffle the encounter deck.
+  132025:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one Spider enemy in the encounter deck and adds it to the staging area (it is not revealed)
+    - then, if the number of player (any player controls) at the acting player's staging area (every area before they are separate) is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one Spider enemy in the encounter deck and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 132026 Giant Web
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132026:A:1 (front): While Giant Web is the active location, each character gets -1 Willpower, -1 Attack, and -1 Defense for each poison it has.
+  132026:constant:1: Constant
+    only if this card is the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each character (any player controls) at the acting player's staging area (every area before they are separate), with any poison attached (poisoned): stat willpower -1 for each card (any player controls) or in the staging area or the active location, (the cards counted are the poison under the holder) attached to the holder, while this card is in play
+    - each character (any player controls) at the acting player's staging area (every area before they are separate), with any poison attached (poisoned): stat attack -1 for each card (any player controls) or in the staging area or the active location, (the cards counted are the poison under the holder) attached to the holder, while this card is in play
+    - each character (any player controls) at the acting player's staging area (every area before they are separate), with any poison attached (poisoned): stat defense -1 for each card (any player controls) or in the staging area or the active location, (the cards counted are the poison under the holder) attached to the holder, while this card is in play
+
+132026:A:2 (front): Response: After Giant Web leaves play as an explored location, ready an unconscious character.
+  132026:response:1: Response after a card leaves play (heard about this card)
+    only if all of: (the card the event is about had enough progress to be explored) and (there is a character (any player controls) at the acting player's staging area (every area before they are separate), that is unconscious to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (any player controls) at the acting player's staging area (every area before they are separate), chosen by the first player, that is unconscious
+    - the picked card, if it is unconscious, is no longer unconscious and is ready
+
+## 132027 Forest Stream
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132027:A:1 (front): While Forest Stream is the active location, poisoned characters cannot quest.
+  132027:constant:1: Constant
+    only if this card is the active location
+    - each character (any player controls) at the acting player's staging area (every area before they are separate), with any poison attached (poisoned): stat cannotQuest 1, while this card is in play
+
+132027:A:2 (front): Response: After Forest Stream leaves play as an explored location, discard 4 poison.
+  132027:response:1: Response after a card leaves play (heard about this card)
+    only if all of: (the card the event is about had enough progress to be explored) and (there is a character (any player controls) at the acting player's staging area (every area before they are separate), with any poison attached (poisoned) to choose)
+    - repeat 4 times:
+      - if there is a character (any player controls) at the acting player's staging area (every area before they are separate), with any poison attached (poisoned) to choose: choose character (any player controls) at the acting player's staging area (every area before they are separate), chosen by the first player, with any poison attached (poisoned)
+      - then, if there is a character (any player controls) at the acting player's staging area (every area before they are separate), with any poison attached (poisoned) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): 1 poison on the picked card is discarded, each to the discard pile of the player who owns it
+
+## 132028 Old Tomnoddy
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132028:A:1 (front): Venom.
+  132028:constant:1: Constant
+    - this card: stat venom (the keyword Venom: an enemy that damages a character in an attack gives it 1 poison, whatever the damage; none when the damage is canceled or destroys it) 1, while this card is in play
+
+132028:A:2 (front): Forced: At the end of each round, each player must give a hero he controls 1 poison.
+  132028:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for each player, first player first:
+      - if there is a hero (you control) that is not unconscious to choose: choose hero (you control) that is not unconscious
+      - then, if there is a hero (you control) that is not unconscious to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card gets 1 poison: for each, the top card of its controller's deck is attached to it facedown (no poison when the deck is empty or the character cannot be poisoned); with poison equal to its printed hit points it is made unconscious at once
+
+## 132029 Crazy Cob
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132029:A:1 (front): Venom.
+  132029:constant:1: Constant
+    - this card: stat venom (the keyword Venom: an enemy that damages a character in an attack gives it 1 poison, whatever the damage; none when the damage is canceled or destroys it) 1, while this card is in play
+
+132029:A:2 (front): When Revealed: This enemy attacks the character with the most poison attached.
+  132029:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (any player controls) at the acting player's staging area (every area before they are separate), chosen by the first player, with as much poison as any character at the asking player's staging area (every such character when none is poisoned, and then the chooser decides)
+    - this enemy, in the staging area, attacks the player who controls the picked character now, from the staging area, dealt a shadow card
+
+132029:A:3 (shadow): Shadow: Defending character gets 1 poison.
+  132029:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the defender gets 1 poison: for each, the top card of its controller's deck is attached to it facedown (no poison when the deck is empty or the character cannot be poisoned); with poison equal to its printed hit points it is made unconscious at once
+
+## 132030 Lazy Lob
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132030:A:1 (front): Venom.
+  132030:constant:1: Constant
+    - this card: stat venom (the keyword Venom: an enemy that damages a character in an attack gives it 1 poison, whatever the damage; none when the damage is canceled or destroys it) 1, while this card is in play
+
+132030:A:2 (front): When Revealed: Each character committed to the quest gets 1 poison.
+  132030:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - for each character (you control) committed to the quest:
+        - the picked card gets 1 poison: for each, the top card of its controller's deck is attached to it facedown (no poison when the deck is empty or the character cannot be poisoned); with poison equal to its printed hit points it is made unconscious at once
+
+132030:A:3 (shadow): Shadow: If defending character is poisoned, make that character unconscious.
+  132030:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - if the defender is a character (any player controls) with any poison attached (poisoned): the defender is made unconscious: it is rotated 180 degrees (neither ready nor exhausted), it leaves the quest and its poison is discarded
+
+## 132031 Fat Spider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132031:A:1 (front): Venom.
+  132031:constant:1: Constant
+    - this card: stat venom (the keyword Venom: an enemy that damages a character in an attack gives it 1 poison, whatever the damage; none when the damage is canceled or destroys it) 1, while this card is in play
+
+132031:A:2 (front): This enemy gets +3 Attack while engaged with a player who controls at least 1 poisoned character.
+  132031:constant:2: Constant
+    only if all of: (this card is engaged with a player (that player is who "you" means in this record)) and (the number of character (you control) with any poison attached (poisoned) is at least 1)
+    - this card: stat attack 3, while this card is in play
+
+132031:A:3 (shadow): Shadow: Defending character gets 1 poison. (Give 2 poison to a character you control if undefended.)
+  132031:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the defender gets 1 poison: for each, the top card of its controller's deck is attached to it facedown (no poison when the deck is empty or the character cannot be poisoned); with poison equal to its printed hit points it is made unconscious at once
+    - then, if all of: (the attack has no defender) and (there is a character (you control) that is not unconscious to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose character (you control) that is not unconscious
+    - then, if all of: (the attack has no defender) and (there is a character (you control) that is not unconscious to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card gets 2 poison: for each, the top card of its controller's deck is attached to it facedown (no poison when the deck is empty or the character cannot be poisoned); with poison equal to its printed hit points it is made unconscious at once
+
+## 132032 Wicked Spider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132032:A:1 (front): Venom.
+  132032:constant:1: Constant
+    - this card: stat venom (the keyword Venom: an enemy that damages a character in an attack gives it 1 poison, whatever the damage; none when the damage is canceled or destroys it) 1, while this card is in play
+
+132032:A:2 (front): Forced: When this enemy attacks, defending player must attach 1 poison to a character he controls.
+  132032:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a character (you control) that is not unconscious to choose: choose character (you control) that is not unconscious
+    - then, if there is a character (you control) that is not unconscious to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card gets 1 poison: for each, the top card of its controller's deck is attached to it facedown (no poison when the deck is empty or the character cannot be poisoned); with poison equal to its printed hit points it is made unconscious at once
+
+132032:A:3 (shadow): Shadow: Defending character gets 2 poison.
+  132032:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the defender gets 2 poison: for each, the top card of its controller's deck is attached to it facedown (no poison when the deck is empty or the character cannot be poisoned); with poison equal to its printed hit points it is made unconscious at once
+
+## 132033 Caught in Webs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132033:A:1 (front): When Revealed: Choose a hero to be removed from the quest and make that hero unconscious. If no hero was removed from the quest by this effect, this card gains surge.
+  132033:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a hero (any player controls) at the acting player's staging area (every area before they are separate), committed to the quest to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if there is a hero (any player controls) at the acting player's staging area (every area before they are separate), committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose hero (any player controls) at the acting player's staging area (every area before they are separate), committed to the quest, chosen by the first player
+    - then, if there is a hero (any player controls) at the acting player's staging area (every area before they are separate), committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked character is removed from the quest (it stays exhausted)
+    - the picked card is made unconscious: it is rotated 180 degrees (neither ready nor exhausted), it leaves the quest and its poison is discarded
+
+## 132034 Poisoned by Spiders
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132034:A:1 (front): When Revealed: Each character takes damage equal to the number of poison it has. If no characters were damaged by this effect, this card gains surge.
+  132034:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a character (any player controls) at the acting player's staging area (every area before they are separate), with any poison attached (poisoned) to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - for each character (any player controls) at the acting player's staging area (every area before they are separate), with any poison attached (poisoned):
+      - deal the number of poison on the picked card damage to the picked card
+
+132034:A:2 (shadow): Shadow: Discard an unconscious character you control.
+  132034:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a character (you control) that is unconscious to choose: choose character (you control) that is unconscious
+    - then, if there is a character (you control) that is unconscious to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 132067 Into Mirkwood
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+132067:A:1 (front): Setup: Each player may shuffle 1 copy Bilbo's Magic Ring into his deck. Search the encounter deck for The Spider's Glade and set it aside, out of play. Then, shuffle the encounter deck and reveal 1 encounter card per player.
+  132067:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "shuffle":
+          - the acting player puts the set-aside card with code 132019 into his deck and shuffles the deck (nothing when none is set aside)
+        * option "keep":
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+132067:B:1 (back): Unconscious characters cannot quest, attack, defend, collect resources, trigger abilities, be poisoned, or ready (except by effects that target unconscious characters).
+  132067:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each character (any player controls) that is unconscious: stat cannotQuest 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotAttack 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotDefend 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat noCollection 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotTriggerEffects (the holder cannot start its own Action or Response abilities; held by a player, he triggers no Action or Response and plays no event; Constant and Forced effects still work) 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotTriggerForced (the card's Forced effects do not trigger; cannotTriggerEffects bars its Actions and Responses) 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotBePoisoned (the character gets no poison) 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotReady 1, while this card is in play
+
+## 132068 Lost in the Dark
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+132068:B:1 (back): When Revealed: Reveal stage 3 and create a separate staging area for the first player using that stage. If there are no other players in the game, discard this stage and each card in its staging area. All other players advance to stage 4.
+  132068:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player leaves the stage the players share for a stage and a staging area of his own: the quest deck's card with code 132069 becomes his stage, side B up, and its When Revealed effects resolve for him; the others keep the shared stage and its staging area, this card with them; from then on each area resolves as if only its players were in the game, and a stage no player is at stays in play; a player alone at the shared stage keeps his active location, which is not in the staging area (nothing when the player is not at the shared stage or no copy is left)
+    - every other player advances to the stage with code 132070 and keeps the staging area the players shared; with no other player the stage the acting player left and each card in its staging area are discarded instead
+
+## 132069 Captured by Spiders
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+132069:A:1 (front): When Revealed: Remove all resources from each hero's resource pool. Then, make each character you control (except Bilbo Baggins) unconscious.
+  132069:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each hero (any player controls) at the acting player's staging area (every area before they are separate), with resources on it:
+      - all the resources come off the resource pool of the picked card (discarded, not spent)
+    - for each character (you control) not named "Bilbo Baggins":
+      - the picked card is made unconscious: it is rotated 180 degrees (neither ready nor exhausted), it leaves the quest and its poison is discarded
+
+132069:B:1 (back): Unconscious characters cannot quest, attack, defend, collect resources, trigger abilities, be poisoned, or ready (except by effects that target unconscious characters).
+  132069:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each character (any player controls) that is unconscious: stat cannotQuest 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotAttack 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotDefend 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat noCollection 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotTriggerEffects (the holder cannot start its own Action or Response abilities; held by a player, he triggers no Action or Response and plays no event; Constant and Forced effects still work) 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotTriggerForced (the card's Forced effects do not trigger; cannotTriggerEffects bars its Actions and Responses) 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotBePoisoned (the character gets no poison) 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotReady 1, while this card is in play
+
+132069:B:2 (back): Do not pass the first player token. When this stage is complete, do not advance to stage 4 until the end of the quest phase. (Combine staging areas if necessary.)
+  132069:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat firstPlayerLocked 1, while this card is in play
+    - this card: stat holdsWin (defeating this final stage does not win the game: it stays the current quest card, defeated, and its own Forced effects win the game or reset the quest) 1, while this card is in play
+  132069:forced:1: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - later, when the next travel phase begins:
+      - the acting player goes on to the stage with code 132070: he joins the players at it (his staging area joins theirs, engaged enemies stay engaged, the stage is not revealed again), or, with none at it, advances alone and it is revealed
+
+132069:B:3 (back): Action: Spend 2 Baggins resources to ready an unconscious character you control.
+  132069:action:1: Action (cost: pay 2 baggins resource(s))
+    only if there is a character (you control) that is unconscious to choose
+    who acts: any player may trigger it; the acting player is the one who does
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control) that is unconscious
+    - the picked card, if it is unconscious, is no longer unconscious and is ready
+
+## 132070 Battle with the Spiders
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+132070:A:1 (front): When Revealed: Add The Spider's Glade to the staging area.
+  132070:whenRevealed:1: When revealed
+    - one set-aside card with code 132025 joins the staging area (it is not revealed)
+
+132070:B:1 (back): Unconscious characters cannot quest, attack, defend, collect resources, trigger abilities, be poisoned, or ready (except by effects that target unconscious characters).
+  132070:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each character (any player controls) that is unconscious: stat cannotQuest 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotAttack 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotDefend 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat noCollection 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotTriggerEffects (the holder cannot start its own Action or Response abilities; held by a player, he triggers no Action or Response and plays no event; Constant and Forced effects still work) 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotTriggerForced (the card's Forced effects do not trigger; cannotTriggerEffects bars its Actions and Responses) 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotBePoisoned (the character gets no poison) 1, while this card is in play
+    - each character (any player controls) that is unconscious: stat cannotReady 1, while this card is in play
+
+132070:B:2 (back): Progress cannot be placed on this stage while The Spider's Glade is in play.
+  132070:constant:2: Constant
+    only if the card with code 132025 is in play
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+132070:B:3 (back): Action: Spend 2 Baggins resources to ready an unconscious character you control.
+  132070:action:1: Action (cost: pay 2 baggins resource(s))
+    only if there is a character (you control) that is unconscious to choose
+    who acts: any player may trigger it; the acting player is the one who does
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control) that is unconscious
+    - the picked card, if it is unconscious, is no longer unconscious and is ready
+
+132070:B:4 (back): If the players defeat this stage, they have won the game and discovered the treasure card Bilbo's Magic Ring.
+  132070:constant:4: Constant
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
+
+(rendered pieces: 234 by template, 0 as JSON)

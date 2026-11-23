@@ -22,8 +22,12 @@ export const pickSchema = z.strictObject({
   // Only an enemy in the staging area ("an enemy in the staging area"), or only one engaged with a player. With `type: card`:
   // any card in the staging area ("choose a card in the staging area").
   stagingOnly: z.boolean().optional(),
+  // With `type: objective`: the objectives an encounter card's effect attached to a character in play count too, claimed or not and whoever controls the character ("remove 1 Sack card from a character", 131036:A:2). Read by src/rules/interpret/pick.ts.
+  onCharacter: z.literal(true).optional(),
   // An enemy in the Stormcaller's area counts too: it is in play, though not in the staging area while the players are at another stage ("if Captain Sahír is in play", 11192:A:3; dcce.stormcallers-area). Read by src/rules/interpret/pick.ts.
   inStormcallerArea: z.literal(true).optional(),
+  // With `type: card`: only the cards of the riddle area (Dungeons Deep and Caverns Dim, hob.riddle-area): stage 2, Gollum, Bilbo Baggins and the Ring attached to him while they are in it. Read by src/rules/interpret/pick.ts through the riddles family's pool.
+  riddleArea: z.literal(true).optional(),
   // Which staging area the staging cards of the filter are in once stages are separate (Breaking of the Fellowship, mec109.multiple-staging-areas):
   // the chooser's own (`own`, the default: "the staging area", "this stage"), the shared area stage 2B deals out (`shared`), or any seat's (`any`:
   // "in any staging area"). Read by src/rules/interpret/pick.ts; a game with one staging area ignores it.
@@ -293,6 +297,12 @@ export const pickSchema = z.strictObject({
   hasFacedownUnder: z.literal(true).optional(),
   facedownUnder: z.literal(true).optional(),
   nemesis: z.literal(true).optional(),
+  // Flies and Spiders (read by the poison family, src/rules/families/poison/pick.ts; hob.venom-poison, hob.unconscious-characters). `poisoned`: a character with any poison under it (`false`: one with none). `unconscious`: an unconscious character (`false`: a conscious one).
+  // `mostPoison`: a character of those the chooser's area holds with as much poison as any of them (all of them when none is poisoned). `poison`, in an `eachAttached`: the cards counted are the poison under the holder.
+  poisoned: z.boolean().optional(),
+  unconscious: z.boolean().optional(),
+  mostPoison: z.literal(true).optional(),
+  poison: z.literal(true).optional(),
   // The Ghost of Framsburg (ledger lines 19097:A:2, 19098:A:2, 19109:B:1, 12191:A:1; emce.loot). `lootKeyword`: an objective that prints the Loot keyword (its record has the constant verb Loot), "the Loot objectives the players control" with `controlled`.
   // `engagedWithUnique` (with `type: player`): a player who has a unique enemy engaged with them ("Choose a player that is engaged with a unique enemy", 12191:A:1). Read by the wilderland family (src/rules/families/wilderland/pick.ts).
   lootKeyword: z.literal(true).optional(),
@@ -364,6 +374,10 @@ export const pickSchema = z.strictObject({
   // Of the cards that match, only those with the highest printed cost, a card with no printed cost counting as 0 ("discard the highest cost attachment you control", 145041:A:1); every one of them when tied, and then the
   // chooser decides. Read by the costs family (src/rules/families/costs/pick.ts).
   highestCost: z.literal(true).optional(),
+  // The burgle family's filters (src/rules/families/burgle/match.ts, hob.burgle). `burgleMatch`: with `from: hand`, a card of the hand that matches the revealed card of the burgle attempt in progress in what its burgle effect names (sphere, type, cost). `mostResources`: of the cards that matched (heroes),
+  // only those holding the most resources in their pool, every one when tied and then the chooser decides ("the hero with the most resources", 132051:A:1).
+  burgleMatch: z.literal(true).optional(),
+  mostResources: z.literal(true).optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

@@ -34,6 +34,7 @@ import type { IconName } from "../../ui/icon-map.ts";
 import { stagePoints } from "../readouts/objective.ts";
 import { stageDefeatLoses } from "../readouts/fortress.ts";
 import { determinedMark, type DeterminedMark } from "./determined-mark.ts";
+import { poisonMark } from "./poison-mark.ts";
 import { deadSpeech } from "./realm-preview.ts";
 import { sideQuestMark, stagedSideQuest, type SideQuestMark } from "./side-quest-mark.ts";
 
@@ -44,7 +45,7 @@ export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "thre
 // round), so the pill shows it will go (rr.lasting-effects).
 export type StatBadge = { stat: BadgeStat; icon: IconName; word: string; value: number; delta: number; lasting: boolean };
 
-export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit" | "cancelsDamage" | "mustCommit";
+export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit" | "cancelsDamage" | "mustCommit" | "cannotQuest" | "noPlayerAttachments" | "bilboLimitedToGollum";
 
 // The short word on the pill of a card that must commit to the quest (A Fell Dread, 101163:A:1): a "must", not a "cannot", so it is drawn as the Willpower icon and this word on an accent pill, never struck through.
 export const MUST_COMMIT_WORD = "Quest";
@@ -76,6 +77,10 @@ const STAT_WORD: Readonly<Record<BadgeStat, string>> = {
 
 const FLAGS: readonly { flag: FlagStat; icon: IconName; word: string }[] = [
   { flag: "cannotAttack", icon: "attack", word: "Cannot attack" },
+  // Bilbo Baggins in the riddle area (131030:B:3, hob.riddle-area): the stage's other limits on him, as the preview lists them.
+  { flag: "cannotQuest", icon: "willpower", word: "Cannot quest" },
+  { flag: "noPlayerAttachments", icon: "attachment", word: "Takes no attachments from players" },
+  { flag: "bilboLimitedToGollum", icon: "defense", word: "Defends against and takes damage from Gollum only" },
   { flag: "cannotTakeDamage", icon: "hitPoints", word: "Takes no damage" },
   { flag: "cannotTakeNonCombatDamage", icon: "hitPoints", word: "Takes only combat damage" },
   { flag: "cannotBeEngaged", icon: "engagementCost", word: "Cannot be engaged" },
@@ -279,7 +284,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     engagement: cost != null ? { cost, engages: engagesAt(game, ctx).get(cardId) === seat } : null,
     delayed: game.delayed.some((entry) => actsOn(entry, cardId)),
     // The cards underneath The Havens Burn against the number that loses (11038:A:2); `loses` when one more card does.
-    under: card != null && inPlay(card.zone) ? (underMark(burnTally(game, cardId, ctx)) ?? heldMark(game, ctx, cardId) ?? lootMark(game, ctx, cardId)) : null,
+    under: card != null && inPlay(card.zone) ? (underMark(burnTally(game, cardId, ctx)) ?? heldMark(game, ctx, cardId) ?? lootMark(game, ctx, cardId) ?? poisonMark(game, ctx, cardId)) : null,
     // An Aflame location in play: its damage against the value that destroys it.
     fire: card != null && inPlay(card.zone) ? fireMark(aflameTally(game, cardId, ctx)) : null,
     // A Ship location while the stage that loses at a total Threat of 9 is in play: its Threat against that total (12041:B:2).
@@ -317,8 +322,8 @@ function stagingPlace(game: ScenarioState, cardId: string): PlaceMark | null {
   return at ? { row: at.row, col: at.col, from: marker } : null;
 }
 
-/** The pill on The Havens Burn: "2/5" (cards under it against the number that loses), threat red when the next card placed under it loses the game; `speech` is "2 under, lose at 5". */
-export type UnderMark = { text: string; loses: boolean; speech: string; count?: number };
+/** The pill on The Havens Burn: "2/5" (cards under it against the number that loses), threat red when the next card placed under it loses the game; `speech` is "2 under, lose at 5". `clearName`: on a card turned sideways the pill stands at its far end, clear of the name (a character with poison). */
+export type UnderMark = { text: string; loses: boolean; speech: string; count?: number; clearName?: true };
 
 function underMark(tally: { count: number; limit: number } | null): UnderMark | null {
   return tally ? burnMark(tally) : null;

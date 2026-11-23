@@ -57,6 +57,8 @@ export const amountExprSchema = z.strictObject({
   // The cards attached facedown to the source (Eagles of the Misty Mountains), and the resource tokens other copies of the
   // source card hold above the number on this one (Keeping Count; the most any copy holds), read by src/rules/families/misc/amounts.ts.
   facedown: z.literal(true).optional(),
+  // The poison under the card the reference names ("equal to the number of poison it has", 132034:A:1; hob.venom-poison). Read by the poison family (src/rules/families/poison/amounts.ts).
+  poison: cardRefSchema.optional(),
   resourcesAboveCopies: z.literal(true).optional(),
   // The Victory points of the cards in the victory display added up, read live ("X is the number of victory points in the victory display", 03025:A:3; dwd.the-nameless-fear). Read by src/rules/families/misc/amounts.ts.
   victoryPoints: z.literal(true).optional(),

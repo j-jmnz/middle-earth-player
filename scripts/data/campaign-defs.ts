@@ -137,6 +137,14 @@ export const PRODUCTS: readonly ProductDef[] = [
   // The Hobbit: the two saga boxes (RingsDB's cycle 40), three scenarios each. Hall of Beorn names the products "The Hobbit: ..."; the packs are RingsDB's OHaUH and OtD, which carry the player cards, and the encounter and quest cards are Hall of Beorn's.
   { name: "The Hobbit: Over Hill and Under Hill", packs: ["OHaUH"], home: "the-hobbit", load: "dragncards", easySheet: false, twinPack: null, sagaStart: true },
   { name: "The Hobbit: On the Doorstep", packs: ["OtD"], home: "the-hobbit", load: "dragncards", easySheet: false, twinPack: null, sagaStart: true },
+  // Against the Shadow: the Heirs of Númenor deluxe expansion (three scenarios) and the six Adventure Packs, whose scenario and encounter cards are Hall of Beorn's like the earlier cycles'.
+  { name: "Heirs of Númenor", packs: ["HoN"], home: "against-the-shadow", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Steward's Fear", packs: ["TSF"], home: "against-the-shadow", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Drúadan Forest", packs: ["TDF"], home: "against-the-shadow", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Encounter at Amon Dîn", packs: ["EaAD"], home: "against-the-shadow", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Assault on Osgiliath", packs: ["AoO"], home: "against-the-shadow", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Blood of Gondor", packs: ["BoG"], home: "against-the-shadow", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Morgul Vale", packs: ["TMV"], home: "against-the-shadow", load: "dragncards", easySheet: false, twinPack: null },
   // Standalone scenarios: each official scenario printed on its own, Hall of Beorn's cards of it alone. Hall of Beorn lists the event scenarios of 2011 to 2017 under the year (`scenarioProduct`).
   { name: "The Massing at Osgiliath", packs: ["TMaO"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2011" },
   { name: "The Battle of Lake-town", packs: ["TBoLT"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2012" },

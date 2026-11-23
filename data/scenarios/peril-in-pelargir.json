@@ -1,0 +1,145 @@
+{
+  "id": "peril-in-pelargir",
+  "name": "Peril in Pelargir",
+  "number": 1,
+  "stages": [
+    "05065",
+    "05066",
+    "05067"
+  ],
+  "encounterSets": [
+    {
+      "name": "Peril in Pelargir",
+      "count": 13
+    },
+    {
+      "name": "Streets of Gondor",
+      "count": 11
+    },
+    {
+      "name": "Brigands",
+      "count": 8
+    }
+  ],
+  "cards": [
+    {
+      "code": "05020",
+      "normal": 5,
+      "easy": 5,
+      "pile": "encounter"
+    },
+    {
+      "code": "05022",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "05023",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "05024",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "05037",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "05038",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "05039",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "05040",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "05041",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "05042",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "05043",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "05044",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "05045",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "05065",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "05066",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "05067",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "05021",
+      "normal": 1,
+      "easy": 1,
+      "pile": "activeLocation"
+    },
+    {
+      "code": "05019",
+      "normal": 1,
+      "easy": 1,
+      "pile": "attachedChosen"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q03.1",
+    "dragnEasy": "E03.1",
+    "hobSlug": "Peril-in-Pelargir"
+  }
+}

@@ -30,7 +30,7 @@ export type Motion = {
 };
 
 // The decks of the second slot a card is revealed from, and the decks that are refilled from a discard pile of their own.
-const SECOND_DECK_PILES: Readonly<Record<string, true>> = { corsairDeck: true, evilCreaturesDeck: true, balrogDeck: true, cavesDeck: true, haradDeck: true, angmarOrcDeck: true, investigationDeck: true, smaugDeck: true };
+const SECOND_DECK_PILES: Readonly<Record<string, true>> = { corsairDeck: true, evilCreaturesDeck: true, balrogDeck: true, cavesDeck: true, haradDeck: true, angmarOrcDeck: true, investigationDeck: true, smaugDeck: true, sackDeck: true };
 const REFILLED = [["corsairDeck", "corsairDiscard"], ["evilCreaturesDeck", "evilCreaturesDiscard"], ["balrogDeck", "balrogDiscard"], ["smaugDeck", "smaugDiscard"]] as const;
 
 // How a card that left the table goes: "shake" (destroyed or discarded from play: it shakes, then shrinks and fades to its
@@ -50,9 +50,10 @@ export type MotionOptions = {
   grappledFrom?: (cardId: string) => string | null;
 };
 
-/** The turn a slot is drawn at: an exhausted card lies sideways, a hand card keeps its slight fan. */
+/** The turn a slot is drawn at: an exhausted card lies sideways, an unconscious character is upside down, a hand card keeps its slight fan. */
 export function slotRotation(slot: CardSlot): number {
   "worklet";
+  if (slot.unconscious === true) return Math.PI;
   return slot.exhausted ? Math.PI / 2 : slot.tilt;
 }
 

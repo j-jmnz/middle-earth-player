@@ -28,7 +28,7 @@ import { DECKS } from "../core/piles.ts";
 import { shadowFace } from "../families/defense/shadow.ts";
 import { drawCards } from "../families/dungeon/deck.ts";
 import { withView } from "../families/breaking/areas.ts";
-import { isBreakingVerb } from "../families/breaking/index.ts";
+import { familyWholeStateVerb } from "./family-hooks.ts";
 import { announceDraw } from "../families/dreamchaser/index.ts";
 import { heroDrawn } from "../families/deck/hero.ts";
 import { announceEnteredHand } from "../families/island/hand.ts";
@@ -100,9 +100,8 @@ export function runInstruction(
   if (state.failure) return state;
   const twin = withTwin(state, instruction, ctx.cards);
   // Once stages are separate "the staging area", "this stage" and "the quest" of an instruction are the acting seat's (mec109.multiple-staging-areas): the
-  // instruction runs on the state as that seat sees it, with its own staging area and stage in the shared fields (families/breaking/areas.ts). The verbs of the
-  // breaking family are about the areas themselves and run on the whole state.
-  if (state.separate && !isBreakingVerb(twin.verb)) return withView(state, focus.seat, (view) => runTwinned(view, twin, focus, ctx, steps));
+  // instruction runs on the state as that seat sees it, with its own staging area and stage in the shared fields (families/breaking/areas.ts). A verb a family declares in `wholeState` is about the areas themselves and runs on the whole state.
+  if (state.separate && !familyWholeStateVerb(twin.verb)) return withView(state, focus.seat, (view) => runTwinned(view, twin, focus, ctx, steps));
   return runTwinned(state, twin, focus, ctx, steps);
 }
 
@@ -156,7 +155,7 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
       return modifyStat(state, instruction, focus, ctx);
     case "Exhaust": {
       const target = instruction.target;
-      const id = target?.kind === "byCode" || target?.kind === "byName" ? readyNamedCard(state, ctx, target, instruction.who === "firstPlayer" ? state.firstPlayer : null)?.id : focus.sourceId;
+      const id = target?.kind === "byCode" || target?.kind === "byName" ? readyNamedCard(state, ctx, target, instruction.who === "firstPlayer" ? state.firstPlayer : null, focus.seat)?.id : focus.sourceId;
       return id ? exhaustCard(state, id) : state;
     }
     case "Ready":

@@ -60,10 +60,10 @@ export const CORE_TEMPLATES: Templates = {
     text: `Resolution: ${typeof i.amount === "number" && i.amount < 0 ? `lose ${-i.amount}` : `gain ${str(i.amount)}`} XP${isObj(i.each) ? ` for ${(XP_EACH[str(i.each.kind)] ?? (() => str(i.each)))(i.each)}` : ""}${typeof i.max === "number" ? `, at most ${i.max} XP from the line` : ""} (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)`,
     read: ["amount", "each", "max"],
   }),
-  SpendResources: (i) => ({
+  SpendResources: (i, ctx) => ({
     text: i.target === undefined
-      ? `${i.group === true ? "the players as a group" : "the acting player"} spend ${str(i.amount)} resource(s) from heroes with ${typeof i.sphere === "string" ? `the ${SPHERE(i.sphere)} icon` : "this card's sphere icon"}, choosing a hero for each resource${i.group === true ? " (any player's)" : " (their own)"} (with fewer resources than that, nothing is spent)`
-      : `${str(i.amount)} resource(s) are spent from the pool of ${cardRef(i.target)} (nobody chooses; a pool with fewer spends nothing)`,
+      ? `${i.group === true ? "the players as a group" : "the acting player"} spend ${amt(i.amount, ctx)} resource(s) from heroes with ${typeof i.sphere === "string" ? `the ${SPHERE(i.sphere)} icon` : "this card's sphere icon"}, choosing a hero for each resource${i.group === true ? " (any player's)" : " (their own)"} (with fewer resources than that, nothing is spent)`
+      : `${amt(i.amount, ctx)} resource(s) are spent from the pool of ${cardRef(i.target)} (nobody chooses; a pool with fewer spends nothing)`,
     read: ["amount", "target", "sphere", "group", "paid"],
   }),
   Earn: (i) => ({ text: `Resolution: the cards with codes ${codes(i.codes)} are earned, with no choice${i.eachPlayer === true ? " (one copy for each living player)" : ""}${i.afterHand === true ? "; the copy goes into its player's deck, shuffled in once the starting hand is drawn" : ""}${i.forFirstPlayer === true ? "; the card is the first player's, a pool entry for that seat" : ""}`, read: ["codes", "eachPlayer", "afterHand", "forFirstPlayer"] }),

@@ -1,4 +1,5 @@
 // Rules: rr.in-play-and-out-of-play, rr.attachment-cards, rr.active-location, rr.quest-advancement, rr.effects (data/rules/entries.json).
+import { firstPlayerFor } from "../families/breaking/areas.ts";
 import { isStatCondition, type Instruction } from "../../catalog/boundary.ts";
 
 import { frameScope, hostOf, refCard, resolveAmount } from "./amounts.ts";
@@ -26,6 +27,7 @@ import { mayGainResources } from "../families/misc/guards.ts";
 import { queueHeard } from "../families/quest/events.ts";
 import { countDiscarded } from "../families/south/damage.ts";
 import { refillsAnyTime } from "../families/nightmare/guards.ts";
+import { hearsEmptyDeck } from "../families/sack/empty-deck.ts";
 import { returnUndeadBeforeReset } from "../families/angmar/run-out.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
@@ -46,7 +48,7 @@ export function seatFor(state: ScenarioState, who: "actor" | "firstPlayer" | "ot
   if (who === "otherPlayer") return otherSeat(state, actor) ?? actor;
   // "guardian": the player guarding Gollum (sotm.guarding-gollum), the actor when nobody does.
   if (who === "guardian") return guardianSeat(state) ?? actor;
-  return who === "firstPlayer" ? state.firstPlayer : actor;
+  return who === "firstPlayer" ? firstPlayerFor(state, actor) : actor;
 }
 
 export function shuffleEncounterDeck(state: ScenarioState): ScenarioState {
@@ -60,6 +62,8 @@ export function shuffleEncounterDeck(state: ScenarioState): ScenarioState {
 export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   // In any phase while the Nightmare setup card says so (encounterRefill, 900201:A:3).
   if (state.phase !== "Quest" && !refillsAnyTime(state)) return state;
+  // A card in play that advances the stage on an empty deck hears it first (131024:B:1, families/sack/empty-deck.ts).
+  if (hearsEmptyDeck(state, ctx)) return state;
   return reshuffleDiscard(returnUndeadBeforeReset(state, ctx, steps), steps, "rr.running-out-of-cards");
 }
 
@@ -371,7 +375,7 @@ function damageAllies(
 }
 
 // The seat discards cards from its hand chosen by the seed, one roll each.
-function discardRandom(state: ScenarioState, seat: number, amount: number, sourceId: string | null, ctx: ReduceContext): ScenarioState {
+export function discardRandom(state: ScenarioState, seat: number, amount: number, sourceId: string | null, ctx: ReduceContext): ScenarioState {
   let next = state;
   for (let count = 0; count < amount; count += 1) {
     // A card a player card cannot discard (Lost in the Wild, 18026:A:1) is not among the cards drawn at random.

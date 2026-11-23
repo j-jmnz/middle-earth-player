@@ -1,8 +1,8 @@
 // Rules: rr.lasting-effects, rr.attachment-cards (data/rules/entries.json).
 import type { ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
 
-import { cardTypeOf, isCharacterType, printedOf, type PrintedCard } from "./printed.ts";
-import type { CardInstance, ScenarioState } from "./state.ts";
+import { cardTypeOf, isCharacterType, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
+import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
 import { flagged, inPlay, modifierActive } from "./state.ts";
 
 // The holder of a modifier on every ally in play, now and entering play later: an encounter card's lasting effect
@@ -112,4 +112,10 @@ export function readyBarred(state: ScenarioState, id: string, byPlayer?: Readonl
 /** A flag modifier the card holds by its id or by a class it belongs to (`cannotQuest` on every character one seat controls, 00018:B:3). */
 export function flaggedByClass(state: ScenarioState, instance: CardInstance, printed: PrintedCard, stat: ModifierStat, has?: TraitCheck): boolean {
   return state.modifiers.some((modifier) => modifier.stat === stat && modifier.amount > 0 && modifierActive(state, modifier) && heldBy(modifier, instance, printed, has));
+}
+
+/** A modifier a player card gives: its source is a player card (an attachment's bonus, a hero's ability, an event). */
+export function fromPlayerCard(state: ScenarioState, modifier: Modifier, cards: ReadonlyMap<string, PrintedCard>): boolean {
+  const source = state.cards[modifier.sourceId];
+  return source != null && isPlayerType(printedOf(cards, source.code));
 }

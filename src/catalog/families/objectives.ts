@@ -22,7 +22,8 @@ const VERBS = [
   // restricted attachments than it can hold discards the one its controller chooses, and a discarded objective returns to the staging area.
   // A claimed objective attached to another hero is claimed from there as well, and moves to the last picked hero (Book of Mazarbul, 03024:A:2; dwd.book-of-mazarbul).
   // `card`: the objective claimed is this card (`previous`: the objective picked before the hero, "claim 1 objective in play", 04121:A:2) and not the source.
-  z.strictObject({ verb: z.literal("ClaimObjective"), card: cardRefSchema.optional(), ...when }),
+  // `fromHost`: the objective may be claimed from the enemy it is attached to, or from the encounter discard pile where its destroyed host left it, as well as from the staging area ("claim this objective" by the Troll Key and the Troll Purse, 131042:A:2, 131043:A:2).
+  z.strictObject({ verb: z.literal("ClaimObjective"), card: cardRefSchema.optional(), fromHost: z.literal(true).optional(), ...when }),
   // "Attach X to that objective, guarding it" (12121:A:1, 12126:A:3, 12127:A:3, 12133:A:1): the encounter card `guard` (the source by default), in the staging area or engaged
   // (an engaged one returns to the staging area first, 12133:A:1), is attached to the objective `to` (the last picked card by default) as its guard (rr.guarded). It stays
   // in the staging area, counts its Threat there, and leaves the objective when it leaves play. A guard that already guards another objective is moved and frees that one.

@@ -14,7 +14,8 @@ import { returnAttachedEnemy } from "../angmar/reanimate/attached.ts";
 // attached facedown under it (AttachFacedown). A player card that took attachments with it is announced with them
 // (leftPlayWithAttachments: "When a character leaves play, return each attachment attached to that character").
 export function leaveWith(state: ScenarioState, card: CardInstance, released: readonly string[]): ScenarioState {
-  let next = state;
+  // The unconscious state is gone with the poison: a card that left play is a new card when it returns (hob.unconscious-characters, families/poison).
+  let next = card.unconscious === true ? updateCard(state, card.id, { unconscious: undefined }) : state;
   const gone = [...released];
   for (const id of card.attachments) {
     const attachment = next.cards[id];
@@ -36,7 +37,7 @@ export function leaveWith(state: ScenarioState, card: CardInstance, released: re
     for (const id of cardsUnder(next, card.id)) {
       const owner = next.cards[id]?.owner;
       if (owner == null) continue;
-      next = updateCard(moveCard(next, id, { zone: "discard", seat: owner }), id, { face: "up", owner: undefined });
+      next = updateCard(moveCard(next, id, { zone: "discard", seat: owner }), id, { face: "up", owner: undefined, poison: undefined });
     }
   }
   // A lost game is over: nothing answers any more (rr.player-elimination).

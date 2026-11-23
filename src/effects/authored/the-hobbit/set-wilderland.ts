@@ -1,6 +1,6 @@
 import type { Condition, Effect, Instruction } from "../../../catalog/boundary.ts";
 
-// Records for the Wilderland encounter set (132035 to 132038), which Flies and Spiders, The Lonely Mountain and The Battle of Five Armies all deal. Every line is read from the scan ledger (data/printed/the-hobbit.json). The readings are in docs/scenarios/the-hobbit/the-battle-of-five-armies.md (Wilderland set).
+// Records for the Wilderland encounter set (132035 to 132038), which Flies and Spiders, The Lonely Mountain and The Battle of Five Armies all deal. Every line is read from the scan ledger (data/printed/the-hobbit.json). The readings are in docs/scenarios/the-hobbit/the-battle-of-five-armies.md (The Battle of Five Armies).
 // Rules: rr.active-location, rr.travel, rr.attachment-cards, rr.forced, rr.neutral-cards, faq.lasting-effects, hob.baggins-sphere-otd, hob.bilbo-multiplayer-otd, rr.damage, rr.destroy (data/rules/entries.json).
 const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
 // "Attached character gets ...": the penalty holds only while the host is a character (a host can change type).

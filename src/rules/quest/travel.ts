@@ -71,6 +71,11 @@ export function effectMadeActive(state: ScenarioState): boolean {
   return data?.kind === "effect" && state.activeLocation != null && state.activeLocation !== (data.activeAtStart ?? null);
 }
 
+// Whether a Travel effect travels itself: a Travel instruction at its top level or in an option of its Choose (Secret Entrance names a card type first, 132045:A:2).
+function travelsItself(instructions: readonly Instruction[]): boolean {
+  return instructions.some((instruction) => instruction.verb === "Travel" || (instruction.verb === "Choose" && instruction.options.some((option) => travelsItself(option.instructions))));
+}
+
 // The Travel intent. A location with a Travel effect makes the first player resolve it first, in a
 // frame that can wait for a player, and the travel happens when the frame reaches its last step.
 export function travelIntent(state: ScenarioState, locationId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -105,7 +110,7 @@ export function travelIntent(state: ScenarioState, locationId: string, ctx: Redu
       effectId: first?.id ?? `${location.code}:travel`,
       ...(state.activeLocation != null ? { activeAtStart: state.activeLocation } : {}),
       // A Travel effect that travels itself, before the test the card prints after it (Eastern Mines, 901605:A:1), needs no travel at the end.
-      instructions: [...effects.flatMap((effect) => effect.instructions), ...granted, ...(effects.some((effect) => effect.instructions.some((instruction) => instruction.verb === "Travel")) ? [] : [TRAVEL_HERE])],
+      instructions: [...effects.flatMap((effect) => effect.instructions), ...granted, ...(effects.some((effect) => travelsItself(effect.instructions)) ? [] : [TRAVEL_HERE])],
       causes: [...effects.flatMap((effect) => effect.instructions.map(() => effectCause(effect))), ...granted.map(() => ruleCause("rr.travel"))],
       cancel: null,
       blockCancel: null,

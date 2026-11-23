@@ -5,6 +5,7 @@ import { reshuffleWords } from "./pile-ids.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { discoverLogLine, setAsideLine } from "../words/scenarios/wilderland.ts";
+import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
 import type { Cause } from "../../rules/core/cause.ts";
 import type { EngineStep } from "../../rules/core/intents.ts";
 
@@ -118,6 +119,8 @@ function words(step: EngineStep, names: LogNames): string | null {
       return `${escapeResultTitle(step.success, step.seat, true)}: ${escapeCountedWords(step.stat ?? "willpower", step.committed, step.escape)}`;
     case "locateTest":
       return `${step.success ? "Locate test passed" : "Locate test failed"}: ${plural(step.handIds.length, "card")} discarded from the hand, ${plural(step.dealtIds.length, "encounter card")} discarded`;
+    case "burgle":
+      return `${step.success ? "Burgle attempt succeeded" : "Burgle attempt failed"}: ${plural(step.dealtIds.length, "encounter card")} discarded, ${plural(step.discardedIds.length, "card")} discarded from the hand`;
     case "fortitudeTest":
       return `Fortitude test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against ${plural(step.eyes, "Sauron's Eye icon")}`;
     case "hideTest":
@@ -145,6 +148,10 @@ function words(step: EngineStep, names: LogNames): string | null {
       return step.count === 0 ? null : `${step.count} ${step.count === 1 ? "card" : "cards"} of ${step.set} ${step.count === 1 ? "is" : "are"} shuffled into the encounter deck`;
     case "setAsideForPool":
       return setAsideLine(names.card(step.sourceId), names.card(step.cardId));
+    case "poison":
+      return poisonLine(names.card(step.targetId), step.count, step.of);
+    case "unconscious":
+      return unconsciousLine(names.card(step.targetId), step.ready === true);
     case "resetEncounterDeck":
       return `The encounter discard pile (${step.count}) is shuffled into the encounter deck`;
     case "reshuffleDeck":

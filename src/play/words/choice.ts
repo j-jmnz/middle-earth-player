@@ -30,6 +30,7 @@ import { smaugBranchWords } from "./scenarios/standalone-scenarios/smaug.ts";
 import { stormcallerBranchWords } from "./scenarios/stormcaller.ts";
 import { commandBranchWords } from "./command.ts";
 import { wilderlandBranchWords } from "./scenarios/wilderland.ts";
+import { burgleBranchWords } from "./scenarios/the-hobbit/burgle.ts";
 import { activePickWords, attachEnemyWords } from "./active.ts";
 import { claimedEffectWords } from "./objective.ts";
 import { objectiveTokensWords } from "./scenarios/assault.ts";
@@ -76,7 +77,7 @@ export function branchWords(choose: ChooseInstruction, optionId: string, game: S
   if (!option) return capital(optionId);
   const refresh = readyPaymentWords(choose, option, game, names, sourceId);
   if (refresh) return refresh;
-  const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId) ?? (ctx ? smaugBranchWords(choose, optionId, game, ctx, names, sourceId) : null) ?? wilderlandBranchWords(choose, optionId, names, now, sourceId ? names.card(sourceId) : null, game, ctx);
+  const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId) ?? (ctx ? smaugBranchWords(choose, optionId, game, ctx, names, sourceId) : null) ?? wilderlandBranchWords(choose, optionId, names, now, sourceId ? names.card(sourceId) : null, game, ctx) ?? burgleBranchWords(choose, optionId, game, names, ctx);
   if (family) return family;
   if (option.instructions.length === 0) return "Do nothing";
   const whole = deckBranchWords(option.instructions) ?? burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions) ?? breakingBranchWords(option.instructions, names, sourceId, game);
@@ -111,7 +112,8 @@ export function branchThreat(choose: ChooseInstruction, optionId: string): numbe
   return null;
 }
 
-export type PickWords = { verb: string; prompt: string; owned?: true };
+// `title`: the sheet's title when it is not the card that opened the window (the Ring's question, which a riddle card opened).
+export type PickWords = { verb: string; prompt: string; owned?: true; title?: string };
 
 /** What a Pick asks for, from the instruction that uses the picked card: the verb for the button and a prompt sentence. */
 export function pickWords(pick: Instruction, next: Instruction | undefined, names: ChoiceNames, sourceId: string | null, restricted = 2, game?: ScenarioState, amountNow?: number, after?: readonly Instruction[]): PickWords {
