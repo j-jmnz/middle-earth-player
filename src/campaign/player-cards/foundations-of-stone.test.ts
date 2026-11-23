@@ -166,15 +166,25 @@ const REMOVE: Effect = { id: "onward:action:1", cardCode: ONWARD, lines: ["onwar
 
 // FAULT: "After Glorfindel exhausts to commit to a quest": Windfola commits him a second time while he is still exhausted from the first commit. He does not exhaust to be committed again,
 // so his threat must not rise again; the Forced effect reads the exhausted state (04101:forced:1), not the exhaust that committed him.
-it.fails("04101:A:1 Glorfindel: no second rise of threat when Windfola commits him again without an exhaust", () => {
+// The table after Windfola commits Glorfindel a second time; the first commit raised his threat to 9.
+function windfolaCommitsAgain() {
   const tab = table([...EFFECTS, REMOVE], { start: "quest", heroes: [{ code: GLORFINDEL, seat: 0 }], attached: [{ code: WINDFOLA, host: GLORFINDEL }], hand: [{ code: ONWARD, seat: 0 }], deck: ["f0", "f0"] });
   const glorfindel = idsOf(tab, GLORFINDEL);
   let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [glorfindel] }, tab.ctx);
-  expect(run.state.seats[0]?.threat).toBe(9);
+  const first = run.state.seats[0]?.threat;
   run = playCode(tab, ONWARD, run);
   run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, WINDFOLA), effectId: "12116:response:1", payments: [] }, tab.ctx);
+  return { run, glorfindel, first };
+}
+
+it("04101:A:1 Glorfindel: the first commit raises his threat to 9 and Windfola commits him again, still exhausted", () => {
+  const { run, glorfindel, first } = windfolaCommitsAgain();
+  expect(first).toBe(9);
   expect(run.state.cards[glorfindel]).toMatchObject({ committed: true, exhausted: true });
-  expect(run.state.seats[0]?.threat).toBe(9);
+});
+
+it.fails("04101:A:1 Glorfindel: no second rise of threat when Windfola commits him again without an exhaust", () => {
+  expect(windfolaCommitsAgain().run.state.seats[0]?.threat).toBe(9);
 });
 
 describe("Daeron's Runes (04108:A:1)", () => {
