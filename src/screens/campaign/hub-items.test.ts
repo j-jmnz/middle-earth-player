@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { hubItems, searchHub, type HubItemsInput } from "./hub-items";
+import { hubItems, looselyHolds, searchHub, type HubItemsInput } from "./hub-items";
 
 const entries = (ids: string[]) => ids.map((id, index) => ({ id, number: index + 1 }));
 const input = (over: Partial<HubItemsInput> = {}): HubItemsInput => ({
@@ -65,6 +65,23 @@ describe("searchHub", () => {
 
   it("ignores accents and case", () => {
     expect(kept("NUMENOR")).toEqual(["cycle:d"]);
+  });
+
+  it("forgives a one-letter slip in a word of five letters or more, also in a name half typed", () => {
+    expect(kept("golum")).toEqual(["cycle:e"]);
+    expect(kept("mirkwod")).toEqual(["core:a"]);
+    expect(kept("anudin")).toEqual(["core:b"]);
+    expect(kept("jorney")).toEqual(["core:b"]);
+    expect(kept("gul")).toEqual(["core:c"]);
+    expect(kept("gol")).toEqual(["cycle:e"]);
+    expect(kept("nuemnor")).toEqual(["cycle:d"]);
+    expect(kept("fxte")).toEqual([]);
+  });
+
+  it("finds a word typed from its middle, and one typed without its apostrophe", () => {
+    expect(kept("wood")).toEqual(["core:a"]);
+    expect(looselyHolds("Helm\u2019s Deep", ["helms"])).toBe(true);
+    expect(looselyHolds("Helm's Deep", ["helm", "deep"])).toBe(true);
   });
 
   it("keeps every scenario of a box whose name holds the words", () => {

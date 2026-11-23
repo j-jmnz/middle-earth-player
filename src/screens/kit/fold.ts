@@ -17,3 +17,18 @@ export function searchFold(text: string): string {
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .trim();
 }
+
+/** Whether a and b differ by at most one insertion, deletion, substitution or swap of two neighbours. */
+export function withinOneEdit(a: string, b: string): boolean {
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let start = 0;
+  while (start < a.length && start < b.length && a[start] === b[start]) start += 1;
+  if (start === a.length && start === b.length) return true;
+  const restA = a.slice(start + 1);
+  const restB = b.slice(start + 1);
+  if (a.length === b.length) {
+    if (restA === restB) return true;
+    return a[start] === b[start + 1] && a[start + 1] === b[start] && a.slice(start + 2) === b.slice(start + 2);
+  }
+  return a.length > b.length ? restA === b.slice(start) : a.slice(start) === restB;
+}
