@@ -445,11 +445,11 @@ export function destroyCard(
   if (!instance) return state;
   const printed = printedOf(cards, instance.code);
   if (printed.keywords.permanent && heroHostInPlay(state, instance)) return state;
-  // The cards attached to a location that leaves play hear about it (Elf-stone), and those attached to a destroyed enemy that it was destroyed (`hostDestroyed`, "After attached Troll enemy is destroyed", 131042:A:2). Whether the location was explored is
+  // The cards attached to a location that leaves play hear about it (Elf-stone), and the objectives attached to a destroyed enemy that it was destroyed (`hostDestroyed`, "After attached Troll enemy is destroyed", 131042:A:2). Whether the location was explored is
   // decided here, while the attachments still count (rr.explored): an Elf-stone's extra quest point is gone once it is discarded.
   let next = state;
   if (isLocationCard(printed) || printed.type === "enemy") {
-    for (const attachmentId of instance.attachments) next = queueEvent(next, { trigger: printed.type === "enemy" ? "hostDestroyed" : "hostLeftPlay", seat: state.firstPlayer, cardId: attachmentId, subject: id, explored });
+    for (const attachmentId of instance.attachments) if (isLocationCard(printed) || printedOf(cards, state.cards[attachmentId]?.code ?? "").type === "objective") next = queueEvent(next, { trigger: printed.type === "enemy" ? "hostDestroyed" : "hostLeftPlay", seat: state.firstPlayer, cardId: attachmentId, subject: id, explored });
   }
   // The active location explored: every card hears it, with the number of attachments it had (10006:A:1, 19026:A:2).
   if (explored && isLocationCard(printed) && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
