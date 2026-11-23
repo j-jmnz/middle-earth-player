@@ -10,6 +10,7 @@ import { instructionSchema, type Effect } from "../../catalog/boundary.ts";
 import { reduce } from "../engine/reduce.ts";
 import { withThreat, type Modifier } from "../core/state.ts";
 import { hostSpheres } from "../families/costs/verbs.ts";
+import { allIdle } from "./idle.ts";
 import { cards, idOf, seenTrigger as seen, triggerTable, type Shape } from "../../../test/harness/potential-kit.ts";
 
 const flag = (stat: Modifier["stat"], code = "hero"): Shape => (state) => ({ ...state, modifiers: [...state.modifiers, { instanceId: idOf(state, code), sourceId: "x", stat, amount: 1, until: "endOfRound" }] });
@@ -33,6 +34,27 @@ describe("a gain of resources for a hero that may not gain them from this card",
   });
 });
 
+describe("a gain of resources for the card the answered event names", () => {
+  const idleFor = (steps: readonly unknown[], shape: Shape, scope: "subject" | "other"): boolean => {
+    const { state, id } = triggerTable([]);
+    const hero = idOf(state, "hero");
+    const instructions = z.array(instructionSchema).parse(steps);
+    return allIdle(shape(state), instructions, id, 0, { effects: [], cards }, { actor: 0, sourceId: id, [scope]: hero }, {});
+  };
+
+  it("is idle for the subject hero barred from player card effects, and not for one that may gain (Proud Hunters, 17032:A:2)", () => {
+    const steps = [{ verb: "AddResources", amount: 2, to: "subject" }] as const;
+    expect(idleFor(steps, flag("noPlayerCardResources"), "subject")).toBe(true);
+    expect(idleFor(steps, (state) => state, "subject")).toBe(false);
+  });
+
+  it("is idle for the other card's hero barred, though the step has a condition on the card's type (Rune-master, 12110:A:2)", () => {
+    const steps = [{ verb: "AddResources", amount: 1, to: "other", when: { kind: "matches", card: "other", pick: { type: "hero", control: "any" } } }] as const;
+    expect(idleFor(steps, flag("noPlayerCardResources"), "other")).toBe(true);
+    expect(idleFor(steps, (state) => state, "other")).toBe(false);
+  });
+});
+
 describe("an X that no number can be, and a discount for a card of the attached hero's sphere", () => {
   const arkenstone = [
     { verb: "ChooseX", min: 1, max: [{ threat: "actor", times: -1, plus: 49 }] },
@@ -44,6 +66,12 @@ describe("an X that no number can be, and a discount for a card of the attached 
   it("is refused at a threat where X can only be 0, and offered one below", () => {
     expect(seen(arkenstone, [inHand], threat(48))).toBe(true);
     expect(seen(arkenstone, [inHand], threat(49))).toBe(false);
+  });
+
+  it("reads a step of X alone as 0 when no X can be chosen, and not a step of X plus 1", () => {
+    const choose = { verb: "ChooseX", min: 1, max: [{ threat: "actor", times: -1, plus: 49 }] } as const;
+    expect(seen([choose, { verb: "AddResources", amount: { x: true }, to: "host" }], [], threat(49))).toBe(false);
+    expect(seen([choose, { verb: "AddResources", amount: { x: true, plus: 1 }, to: "host" }], [], threat(49))).toBe(true);
   });
 
   it("is refused with no card of the attached hero's sphere in hand, and offered with one", () => {
@@ -58,6 +86,12 @@ describe("an X that no number can be, and a discount for a card of the attached 
     expect(hostSpheres(state, host, { effects: [], cards })).toEqual(["spirit"]);
     expect(hostSpheres(flag("leadershipIcon")(state), host, { effects: [], cards })).toEqual(["spirit", "leadership"]);
     expect(hostSpheres(flag("losesIcons")(state), host, { effects: [], cards })).toEqual([]);
+  });
+
+  it("is refused with no event of the attached hero's sphere in hand although the card discards itself, and offered with one (Good Meal, 04010:A:2)", () => {
+    const meal = [{ verb: "ReduceNextCost", pick: { type: "card", control: "you", cardType: "event" }, amount: 2, until: "endOfRound", hostSphere: true }, { verb: "Discard", target: { kind: "self" } }] as const;
+    expect(seen(meal)).toBe(false);
+    expect(seen(meal, [["ev", { zone: "hand", seat: 0 }]])).toBe(true);
   });
 
   it("keeps the discount for a card of each sphere the hero has (Good Meal, 04010:A:2)", () => {
@@ -75,5 +109,19 @@ describe("a discard of the top card of the encounter deck", () => {
   it("is refused with an empty encounter deck, and offered with a card in it (Sting, 131020:A:3)", () => {
     expect(seen(discard)).toBe(false);
     expect(seen(discard, [inEncounterDeck])).toBe(true);
+  });
+
+  it("is refused with an empty deck whatever the phase and the discard pile, since the move refills nothing (rr.running-out-of-cards)", () => {
+    const inDiscard = ["place", { zone: "encounterDiscard" }] as const;
+    const quest: Shape = (state) => ({ ...state, phase: "Quest" });
+    expect(seen(discard, [inDiscard])).toBe(false);
+    expect(seen(discard, [inDiscard], quest)).toBe(false);
+    expect(seen(discard, [inEncounterDeck, inDiscard], quest)).toBe(true);
+  });
+
+  it("is offered with an empty deck and a discard pile while the Nightmare setup card refills the deck at any time (900201:A:3)", () => {
+    const inDiscard = ["place", { zone: "encounterDiscard" }] as const;
+    const refill: Shape = (state) => ({ ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "x", stat: "encounterRefill", amount: 1, until: "endOfRound" }] });
+    expect(seen(discard, [inDiscard], refill)).toBe(true);
   });
 });

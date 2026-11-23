@@ -54,12 +54,12 @@ export function reduceNextCost(state: ScenarioState, instruction: Extract<Instru
   return { ...state, discounts: [...(state.discounts ?? []), discount] };
 }
 
-// The spheres of influence of the hero a card is attached to: its printed sphere and every resource icon it gained (docs/brief.md, Three layers). A Fellowship or Baggins hero without
-// a gained icon has none (rr.neutral-cards).
+// The spheres of influence of the hero a card is attached to: its printed sphere and every resource icon it gained (docs/brief.md, Three layers). A Baggins or Fellowship hero is of that
+// sphere, so a Baggins or Fellowship card matches him; only a neutral hero has none, since a neutral card has no sphere (rr.neutral-cards).
 export function hostSpheres(state: ScenarioState, hostId: string, ctx: ReduceContext): Sphere[] {
   const host = state.cards[hostId];
   if (!host) return [];
-  return spheresOf(state, hostId, printedOf(ctx.cards, host.code).sphere, ctx).filter((sphere) => sphere !== "fellowship" && sphere !== "baggins" && sphere !== "neutral");
+  return spheresOf(state, hostId, printedOf(ctx.cards, host.code).sphere, ctx).filter((sphere) => sphere !== "neutral");
 }
 
 // ChooseX: the actor picks X among the numbers that can be chosen (a branch per number); one number is taken without asking.

@@ -26,6 +26,7 @@ const RULES: readonly Rule[] = [
   { tag: "canceled", entry: "\"After a 'When Revealed' effect is canceled\"", words: /\bcancell?ed\b/i, ask: "does it hear the cancel the line names and no other?" },
   { tag: "any-reason", entry: "\"For any reason\" and \"cannot enter …\"", words: /for any reason|\bcannot enter\b/i, ask: "does it cover every way the card can arrive or leave?" },
   { tag: "trigger-scope", entry: "The trigger's scope", words: /\bafter\b[^.:]*\b(?:explored|travel|engages?|defeated|destroyed|discarded)\b/i, ask: "does the trigger hear every zone the event happens in, and no more?" },
+  { tag: "exhausts-to", entry: "\"After X exhausts to …\"", words: /\bexhaust(?:s|ed)? to (?:defend|attack|commit|quest)\b/i, ask: "does the event it answers exhaust the card (a card already exhausted, made to defend or quest by an effect, does not answer)?" },
   { tag: "own-name", entry: "The card's own name in a filter", words: /\bcop(?:y|ies)\b/i, ask: "does the count match cards with that printed title, not every chosen card?" },
   // A sphere word (a sphere is printed as its name), or "resource icon" or "sphere": not every "non-" ("a non-unique enemy", "non-Ship").
   { tag: "sphere", entry: "A sphere", words: new RegExp(`\\b(?:${SPHERE})\\b|\\bresource icons?\\b|\\bspheres?\\b`, "i"), ask: "does it hold the sphere as printed (a gained icon counts, a payment allowance does not, non-X excludes one sphere)?" },

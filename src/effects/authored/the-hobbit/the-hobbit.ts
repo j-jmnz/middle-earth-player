@@ -10,7 +10,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 // rr.attachment-cards, rr.restricted, rr.ranged, rr.defending-player, rr.cancel, rr.victory, rr.cost (data/rules/entries.json).
 const BILBO = "Bilbo Baggins";
 /** "After Bilbo Baggins exhausts to defend": the declaration exhausted the host (an already exhausted Bilbo, made to defend by an effect, did not exhaust to defend). */
-const HOST_EXHAUSTED: Condition = { kind: "exhaustedToDefend" };
+const HOST_EXHAUSTED_TO_DEFEND: Condition = { kind: "exhaustedToDefend" };
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
@@ -34,7 +34,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "response",
       trigger: "declaredDefender",
       subject: "host",
-      condition: HOST_EXHAUSTED,
+      condition: HOST_EXHAUSTED_TO_DEFEND,
       instructions: [{ verb: "MoveEncounterCard", card: "deckTop", to: "discard" }, { verb: "DamageCard", amount: { stat: "threat", of: "picked", printed: true }, target: "attacker" }],
     },
 
@@ -79,7 +79,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       trigger: "declaredDefender",
       subject: "host",
       cost: [{ kind: "exhaustSelf" }, { kind: "raiseThreat", amount: 3 }],
-      condition: HOST_EXHAUSTED,
+      condition: HOST_EXHAUSTED_TO_DEFEND,
       instructions: [{ verb: "ModifyStat", stat: "dealsNoDamage", amount: 1, until: "endOfAttack", target: "other" }],
     },
 
