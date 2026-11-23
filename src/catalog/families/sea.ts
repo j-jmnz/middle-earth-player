@@ -20,7 +20,7 @@ const VERBS = [
   // Setup: "Players prepare their fleet" (dcce.prepare-your-fleet). Each player in turn takes one of the six ship-objectives set aside (the
   // Dream-chaser is forced on the last player who has not got it; a lone player takes the Dream-chaser and one other), the unused ships leave the
   // game, and the Heading card is attached to the Dream-chaser, set to on-course. A seat with a choice asks it as a choice of cards.
-  // `own` (The Hunt for the Dreadnaught, docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, reading 4): the ships are the box's own unique ship-objectives set aside; each seat takes one, in player order (a lone player one), there is no
+  // `own` (The Hunt for the Dreadnaught, docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, reading 4): the ships are the box's own unique ship-objectives set aside; each seat takes one, in player order (a lone player one), there is no
   // Dream-chaser and no Heading card, and the unused ships stay set aside.
   verbFlags(z.strictObject({ verb: z.literal("PrepareFleet"), own: z.literal(true).optional(), ...when }), { setupRuns: "top" }),
   // "Shift your heading off-course" / "on-course" (dcce.heading): one step toward Storm / toward Sun, never past either end. Nothing happens in a
@@ -29,7 +29,7 @@ const VERBS = [
   // "Reveal the top card of the Corsair deck and put it into play, engaged with you" (dcce.boarding, dcce.corsair-deck): `count` cards (1 by
   // default) for the actor, or for each player (`eachSeat`), or for one player the first player names (`anyPlayer`: "One player must reveal the top card of the Corsair deck and engage it", 12154:A:1; the only
   // player takes it without being asked). The deck refills from its discard pile when it runs out.
-  // `shadow` (Descendant of Castamir, Ramming Ship: "deal each of them 1 shadow card"): each card put into play is dealt this many shadow cards at once (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, reading 22).
+  // `shadow` (Descendant of Castamir, Ramming Ship: "deal each of them 1 shadow card"): each card put into play is dealt this many shadow cards at once (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, reading 22).
   z.strictObject({ verb: z.literal("RevealCorsair"), count: positiveAmountSchema.optional(), who: z.enum(["actor", "eachSeat", "anyPlayer"]).optional(), shadow: z.number().int().positive().optional(), ...when }),
   // "Engages the last player" (dcce.last-player): the source enemy, in the staging area, engages the player to the right of the first player.
   z.strictObject({ verb: z.literal("EngageLastPlayer"), ...when }),
@@ -119,7 +119,7 @@ const VERBS = [
   // round", 12155:A:1). An ally that entered play and left again counts (families/sea/entries.ts).
   // `perPlayer`: each player's own count, by the seat that controls the ally as it enters ("Each player cannot play, or put into play, more than 1 ally each round", 144071:B:2; rr.play-and-put-into-play).
   z.strictObject({ verb: z.literal("LimitEntries"), cardType: z.literal("ally"), max: z.number().int().min(0), perPlayer: z.literal(true).optional(), ...when }),
-  // Pillage X (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, reading 21): the actor discards the top `amount` cards of their deck, one at a time, each event card among them announced as `pillaged` (the source enemy, the card as the other card). The attack's
+  // Pillage X (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, reading 21): the actor discards the top `amount` cards of their deck, one at a time, each event card among them announced as `pillaged` (the source enemy, the card as the other card). The attack's
   // end runs it for an enemy with the Pillage keyword (printed or gained, the flag `pillage`), in the frame of its other effects (families/sea/pillage.ts).
   z.strictObject({ verb: z.literal("Pillage"), amount: positiveAmountSchema, ...when }),
   // "Deal 4 damage to the Ship enemy or Ship objective with the fewest remaining hit points" (40033:A:2): the Ship enemies and the Ship objectives in play (any player's) with the fewest hit points left are the candidates; the first player chooses among tied ones, and the one found is picked.
@@ -130,7 +130,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("EliminateWithoutShip"), ...when }),
   // "Until the end of the game, that hero gains the printed Traits of another hero you control" (40006:A:3): the second-last picked hero (the first pick) gains the printed Traits of the last picked one.
   z.strictObject({ verb: z.literal("GainHeroTraits"), ...when }),
-  // "Choose up to 2 events from your discard pile and/or your collection and add them to your hand (following deckbuilding rules)" (40009:B:2, docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, reading 10): the actor chooses up to `upTo` event cards one at a time and may stop:
+  // "Choose up to 2 events from your discard pile and/or your collection and add them to your hand (following deckbuilding rules)" (40009:B:2, docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, reading 10): the actor chooses up to `upTo` event cards one at a time and may stop:
   // events of their discard pile, and events of the collection (every deck-legal event the world holds), a copy of a title they hold 3 of in the deck, hand, discard pile and play with the ones added not offered. A collection card is a card the game did not hold: it is made in the hand. `taken` is engine use: the answers so far.
   verbFlags(z.strictObject({ verb: z.literal("AddEventsToHand"), upTo: z.number().int().positive(), taken: z.array(z.string()).optional(), ...when }), { collection: "event" }),
   // "Flip it to its Upgraded side" (40034:A:1): the last picked Ship objective, if it shows its Basic side and has an Upgraded side, flips to it, keeping its damage and tokens, and hears `flipped`.

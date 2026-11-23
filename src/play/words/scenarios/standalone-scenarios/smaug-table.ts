@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town), rr.victory, ltp.scoring (data/rules/entries.json); ledger lines 50201:B:1, 50202:B:1, 50203:B:3, 50207:A:1. The words of the pieces Lake-town's cards hold on the table (readouts/standalone-scenarios/lake-town.ts): the damage on Lake-town against the 50 that loses
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town), rr.victory, ltp.scoring (data/rules/entries.json); ledger lines 50201:B:1, 50202:B:1, 50203:B:3, 50207:A:1. The words of the pieces Lake-town's cards hold on the table (readouts/standalone-scenarios/lake-town.ts): the damage on Lake-town against the 50 that loses
 // the game, the Victory points in the display against that damage on stage 3, and the damage on Smaug against the cap the stage gives him. Pure.
 
 /** Lake-town's damage, the way the dial's note says it. */

@@ -1,4 +1,4 @@
-// Rules: rr.search, rr.reveal, rr.encounter-deck (data/rules/entries.json); ledger lines 51241:A:1, 51203:B:1 (docs/scenarios/standalone-scenarios.md, The Mines of Moria, readings 9 and 11).
+// Rules: rr.search, rr.reveal, rr.encounter-deck (data/rules/entries.json); ledger lines 51241:A:1, 51203:B:1 (docs/scenarios/standalone-scenarios/the-mines-of-moria.md, The Mines of Moria, readings 9 and 11).
 // The two ways the kit's "opposing team" handles the top of the encounter deck without a prompt: Hidden Threat lays a card facedown under the main quest until the players next quest successfully, and A Presence in the Dark puts the weaker of the top two cards on the bottom.
 import type { Instruction } from "../../../catalog/boundary.ts";
 

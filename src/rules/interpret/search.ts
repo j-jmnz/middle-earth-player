@@ -64,7 +64,7 @@ export function searchable(
 }
 
 /**
- * The card "the opposing team" finds when it searches (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 3): of enemies and locations the highest printed Threat (an enemy: the highest Attack when Threat is level), then the one nearest the top of the deck;
+ * The card "the opposing team" finds when it searches (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, reading 3): of enemies and locations the highest printed Threat (an enemy: the highest Attack when Threat is level), then the one nearest the top of the deck;
  * of any other card the one nearest the top. `found` lists them in deck order, the discard pile after the deck. Null when nothing was found.
  */
 export function greatestChallenge(state: ScenarioState, found: readonly string[], ctx: ReduceContext): string | null {

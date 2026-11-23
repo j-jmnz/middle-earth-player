@@ -1,4 +1,4 @@
-// Rules: rr.in-play-and-out-of-play (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (Murder at the Prancing Pony, reading 23 and The table); ledger lines 50701:A:1, 50702:B:2.
+// Rules: rr.in-play-and-out-of-play (data/rules/entries.json); docs/scenarios/standalone-scenarios/murder-at-the-prancing-pony.md (Murder at the Prancing Pony, reading 23 and The table); ledger lines 50701:A:1, 50702:B:2.
 // The Investigation List dial: the names checked off by what the players have seen, and nothing of the hidden Suspect and Hideout or of the unlooked Investigation deck.
 import { describe, expect, it } from "vitest";
 

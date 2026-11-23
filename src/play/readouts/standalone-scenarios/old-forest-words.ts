@@ -1,4 +1,4 @@
-// Rules: rr.quest-advancement, rr.victory (data/rules/entries.json); ledger lines 147002:B:2, 147003:B:2, 147004:B:2, 147005:B:2 (docs/scenarios/standalone-scenarios.md, The Old Forest).
+// Rules: rr.quest-advancement, rr.victory (data/rules/entries.json); ledger lines 147002:B:2, 147003:B:2, 147004:B:2, 147005:B:2 (docs/scenarios/standalone-scenarios/the-old-forest.md, The Old Forest).
 // What the table says of The Old Forest's stage 2 test: "advance to stage 3A if there are X or more total victory points on locations in the victory display, otherwise to a different random stage 2A; X is the number of players times 5". The numbers are the
 // engine's (the points of the cards in the victory display, the players in the game, the `times` in the stage's own record); the words only read them. Told on a stage that holds such a record, never by a code or a title. Pure.
 import type { ScenarioState } from "../../../rules/core/state.ts";

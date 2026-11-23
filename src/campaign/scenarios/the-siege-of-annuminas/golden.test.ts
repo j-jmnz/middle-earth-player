@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, rr.victory, rr.immune, rr.forced, docs/scenarios/standalone-scenarios.md (The Siege of Annúminas) (data/rules/entries.json).
+// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, rr.victory, rr.immune, rr.forced, docs/scenarios/standalone-scenarios/the-siege-of-annuminas.md (The Siege of Annúminas) (data/rules/entries.json).
 import { describe, expect } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";

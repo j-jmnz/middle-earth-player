@@ -1,7 +1,7 @@
 import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
 // Records for The Siege of Annúminas (standalone-scenarios cycle part 8, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints word for word needs no record here.
-// Played in the Standard Game Mode only (docs/scenarios/standalone-scenarios.md, The Siege of Annúminas, readings 1 and 2): "each stage", "each team" and "at this stage" read as the one table. The mode card 50801 is the scenario's `modeCard`: its front Setup runs before the quest card's,
+// Played in the Standard Game Mode only (docs/scenarios/standalone-scenarios/the-siege-of-annuminas.md, The Siege of Annúminas, readings 1 and 2): "each stage", "each team" and "at this stage" read as the one table. The mode card 50801 is the scenario's `modeCard`: its front Setup runs before the quest card's,
 // then it is flipped and its back lines work all game (reading 3). The city strength of Annúminas is the resource tokens on it: Setup places 20, "deal X damage to Annúminas" removes X, a constant loses the game at none (reading 4).
 // Rules: rr.forced, rr.response, rr.then, rr.travel, rr.first-player, rr.player-elimination, rr.the-word-choose, rr.victory, rr.engaged, rr.in-play-and-out-of-play, faq.additional-attacks (data/rules/entries.json).
 const MODE = "50801";

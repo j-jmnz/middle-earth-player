@@ -1,4 +1,4 @@
-// Rules: rr.step-6-2, rr.step-6-4-2, rr.shadow-effects, rr.cancel, rr.search, faq.additional-attacks (data/rules/entries.json); ledger lines 51335:A:2, 51342:A:2, 51320:A:2 (docs/scenarios/standalone-scenarios.md, Escape from Khazad-dûm, readings 20, 21 and 27).
+// Rules: rr.step-6-2, rr.step-6-4-2, rr.shadow-effects, rr.cancel, rr.search, faq.additional-attacks (data/rules/entries.json); ledger lines 51335:A:2, 51342:A:2, 51320:A:2 (docs/scenarios/standalone-scenarios/escape-from-khazad-dum.md, Escape from Khazad-dûm, readings 20, 21 and 27).
 // The verbs of Escape from Khazad-dûm that read or change the enemy attack in progress and the cancel of a When Revealed effect: RemoveDefender, SearchTopShadow and Undisturbed Bones' replacement of a cancel.
 import type { Condition, Instruction, ModifierStat } from "../../../catalog/boundary.ts";
 

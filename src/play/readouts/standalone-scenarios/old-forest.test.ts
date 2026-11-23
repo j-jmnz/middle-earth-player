@@ -1,4 +1,4 @@
-// Rules: rr.quest-advancement, rr.victory, rr.engaged (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Old Forest, The table); ledger lines 147002:B:2, 147006:B:1, 147011:A:2, 147022:A:1.
+// Rules: rr.quest-advancement, rr.victory, rr.engaged (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-old-forest.md (The Old Forest, The table); ledger lines 147002:B:2, 147006:B:1, 147011:A:2, 147022:A:1.
 // What the table says of The Old Forest: the Victory dial of stage 2, the advance beat, the stage 2 preview, the dock's hold on stage 3B, Old Man Willow's words and Tom Bombadil's delayed lines.
 import { describe, expect, it } from "vitest";
 

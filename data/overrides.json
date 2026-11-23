@@ -1423,7 +1423,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1435,7 +1435,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1447,7 +1447,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1459,7 +1459,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1471,7 +1471,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1483,7 +1483,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1495,7 +1495,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1507,7 +1507,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1519,7 +1519,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1531,7 +1531,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -3688,7 +3688,7 @@
           "pillage": 8
         }
       },
-      "reason": "Captain of the Haven's line 1 prints \"Pillage 8.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "reason": "Captain of the Haven's line 1 prints \"Pillage 8.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, Mechanics for Build).",
       "source": "scan 40014.A, data/printed/standalone-scenarios.json"
     },
     {
@@ -3700,7 +3700,7 @@
           "pillage": 2
         }
       },
-      "reason": "Corsair Plunderer's line 1 prints \"Pillage 2.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "reason": "Corsair Plunderer's line 1 prints \"Pillage 2.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, Mechanics for Build).",
       "source": "scan 40021.A, data/printed/standalone-scenarios.json"
     },
     {
@@ -3712,7 +3712,7 @@
           "pillage": 3
         }
       },
-      "reason": "Daring Buccaneer's line 1 prints \"Pillage 3.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "reason": "Daring Buccaneer's line 1 prints \"Pillage 3.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, Mechanics for Build).",
       "source": "scan 40022.A, data/printed/standalone-scenarios.json"
     },
     {
@@ -3724,7 +3724,7 @@
           "pillage": 3
         }
       },
-      "reason": "Fierce Marauder's line 1 prints \"Pillage 3.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "reason": "Fierce Marauder's line 1 prints \"Pillage 3.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, Mechanics for Build).",
       "source": "scan 40023.A, data/printed/standalone-scenarios.json"
     },
     {
@@ -4032,7 +4032,7 @@
       "code": "50204",
       "from": "setAside",
       "pile": "smaugDeck",
-      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Mighty is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town).",
+      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Mighty is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town).",
       "source": "dragncards preBuiltDecks.json (Q99.02); Terror from the Mountain 50201 printed Setup; Quest Companion Rulings: The Smaug Deck"
     },
     {
@@ -4040,7 +4040,7 @@
       "code": "50205",
       "from": "setAside",
       "pile": "smaugDeck",
-      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Terrible is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town).",
+      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Terrible is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town).",
       "source": "dragncards preBuiltDecks.json (Q99.02); Terror from the Mountain 50201 printed Setup; Quest Companion Rulings: The Smaug Deck"
     },
     {
@@ -4048,7 +4048,7 @@
       "code": "50206",
       "from": "setAside",
       "pile": "smaugDeck",
-      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Magnificent is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town).",
+      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Magnificent is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town).",
       "source": "dragncards preBuiltDecks.json (Q99.02); Terror from the Mountain 50201 printed Setup; Quest Companion Rulings: The Smaug Deck"
     },
     {

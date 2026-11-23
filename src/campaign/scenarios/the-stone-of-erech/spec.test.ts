@@ -1,4 +1,4 @@
-// Rules: rr.forced, rr.action, rr.shadow-effects, rr.travel, rr.active-location, rr.reveal, rr.keywords, rr.first-player, rr.blank, rr.surge, faq.lasting-effects, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Stone of Erech).
+// Rules: rr.forced, rr.action, rr.shadow-effects, rr.travel, rr.active-location, rr.reveal, rr.keywords, rr.first-player, rr.blank, rr.surge, faq.lasting-effects, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-stone-of-erech.md (The Stone of Erech).
 import { describe, it } from "vitest";
 
 import { announce, answer, attack, cardSpecs, damageOn, deckCount, defend, exhausted, flag, handCount, lost, progressOn, quest, resolve, respond, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
