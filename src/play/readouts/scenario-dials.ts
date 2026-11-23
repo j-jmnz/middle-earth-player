@@ -18,6 +18,7 @@ import { isengardDials, isengardHands, type HandMark } from "./isengard.ts";
 import { lairDials, lairHands } from "./lair.ts";
 import { erechDials, erechHands } from "./standalone-scenarios/erech.ts";
 import { lakeTownDials } from "./standalone-scenarios/lake-town.ts";
+import { mountainDials } from "./the-hobbit/mountain.ts";
 import { downsDials, downsHands } from "./standalone-scenarios/barrow-downs.ts";
 import { forestDials } from "./standalone-scenarios/old-forest.ts";
 import { belegostDials } from "./standalone-scenarios/belegost.ts";
@@ -38,7 +39,7 @@ import { wastesDials, wastesHands } from "./wastes.ts";
 
 /** Every scenario dial the game holds now. */
 export function scenarioDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
-  return [...isengardDials(game, ctx, nameOf), ...marshesDials(game, ctx, nameOf), ...roadsDials(game, ctx, nameOf), ...lairDials(game, ctx, nameOf), ...companyDials(game, ctx, nameOf), ...siegeDials(game, ctx, nameOf), ...pelennorDials(game, ctx, nameOf), ...ungolDials(game, ctx, nameOf), ...blackGateDials(game, nameOf), ...mountDoomDials(game, nameOf), ...rhudaurCurrentDials(game, nameOf), ...angmarDials(game, ctx, nameOf), ...wastesDials(game, nameOf), ...ettenmoorsDials(game, nameOf), ...rhudaurDials(game, ctx, nameOf), ...dumDials(game, ctx, nameOf), ...realmDials(game, ctx, nameOf), ...pitDials(game), ...lakeTownDials(game, ctx, nameOf), ...erechDials(game, ctx, nameOf), ...forestDials(game, ctx), ...downsDials(game, ctx, nameOf), ...belegostDials(game, ctx, nameOf), ...ponyDials(game, nameOf), ...woodlandDials(game, nameOf), ...annuminasDials(game, ctx, nameOf), ...guldurDials(game, ctx, nameOf), ...khazadDials(game, ctx, nameOf), ...huntDials(game, ctx, nameOf)];
+  return [...isengardDials(game, ctx, nameOf), ...marshesDials(game, ctx, nameOf), ...roadsDials(game, ctx, nameOf), ...lairDials(game, ctx, nameOf), ...companyDials(game, ctx, nameOf), ...siegeDials(game, ctx, nameOf), ...pelennorDials(game, ctx, nameOf), ...ungolDials(game, ctx, nameOf), ...blackGateDials(game, nameOf), ...mountDoomDials(game, nameOf), ...rhudaurCurrentDials(game, nameOf), ...angmarDials(game, ctx, nameOf), ...wastesDials(game, nameOf), ...ettenmoorsDials(game, nameOf), ...rhudaurDials(game, ctx, nameOf), ...dumDials(game, ctx, nameOf), ...realmDials(game, ctx, nameOf), ...pitDials(game), ...lakeTownDials(game, ctx, nameOf), ...erechDials(game, ctx, nameOf), ...forestDials(game, ctx), ...downsDials(game, ctx, nameOf), ...belegostDials(game, ctx, nameOf), ...ponyDials(game, nameOf), ...woodlandDials(game, nameOf), ...annuminasDials(game, ctx, nameOf), ...guldurDials(game, ctx, nameOf), ...khazadDials(game, ctx, nameOf), ...huntDials(game, ctx, nameOf), ...mountainDials(game, ctx, nameOf)];
 }
 
 /** The dials for the top bar: the same list while no dial's words or number changed, so the bar re-renders only when a token, a hit point or a card moves. */

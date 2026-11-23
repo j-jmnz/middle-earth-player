@@ -78,3 +78,28 @@ export function burglePickWords(game: ScenarioState, ctx: ReduceContext, names: 
   const says = seatSays(game, seat);
   return { verb: "Discard", prompt: says.titled(facts.effectCard, `burgle attempt, card ${Math.min(facts.done + 1, facts.need)} of ${facts.need}. Choose a card from your hand to discard that matches the revealed ${facts.revealed} in its ${facts.shared}.`), ...says.owned };
 }
+
+const SPHERES: Readonly<Record<string, string>> = { leadership: "leadership", lore: "lore", spirit: "spirit", tactics: "tactics", neutral: "neutral", baggins: "Baggins" };
+
+/** What the first player sees of the revealed card: "Snowbourn Scout (a leadership ally, cost 1)". */
+function revealedWords(game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, revealedId: string | null): string {
+  const code = revealedId ? game.cards[revealedId]?.code : undefined;
+  const printed = code ? ctx.cards.get(code) : undefined;
+  if (!code || !printed) return "no card (his deck is empty)";
+  const sphere = printed.sphere ? `${SPHERES[printed.sphere] ?? printed.sphere} ` : "";
+  const cost = printed.costX ? ", cost X" : printed.cost != null ? `, cost ${printed.cost}` : "";
+  return `${names.code(code)} (${article(`${sphere}${printed.type}`)}${cost})`;
+}
+
+/** The note of the action window of a burgle attempt (after step 2): the card the attempt stopped at, the revealed card that stays on the deck, what step 3 asks and The Lonely Mountain's Action. Null with no attempt at the window. */
+export function burgleWindowNote(game: ScenarioState, ctx: ReduceContext, names: ChoiceNames): string | null {
+  const found = nearestBurgle(game);
+  const data = found?.frame.data;
+  const effectCode = data?.effectCardId ? game.cards[data.effectCardId]?.code : undefined;
+  const effect = effectCode ? burgleEffectOf(ctx, effectCode) : undefined;
+  if (!data || !effectCode || !effect) return null;
+  const shared = effect.match.map((trait) => TRAIT_WORDS[trait] ?? trait).join(" and ");
+  const mountain = Object.values(game.cards).some((card) => card.code === "132043" && inPlay(card.zone));
+  const action = mountain ? ` ${names.code("132043")}: Action, spend 2 Baggins resources to take the revealed card into hand and reveal the next card.` : "";
+  return `Burgle attempt, step 2: the first player's deck is shuffled and ${revealedWords(game, ctx, names, data.revealedId)} is revealed; it stays on the deck. ${names.code(effectCode)} asks for ${cards(effect.discard)} from his hand that ${effect.discard === 1 ? "matches" : "match"} its ${shared}.${action}`;
+}
