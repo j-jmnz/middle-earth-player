@@ -37,6 +37,8 @@ import { archerySheet, defenseSheet, extraDefender, playerAttackSheet } from "./
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { STEP_WORDS } from "../phases/rail.ts";
+import { armiesOptionLabel } from "../words/scenarios/the-hobbit/armies.ts";
+import { ARMIES_STAGE_FRAME } from "../../rules/families/armies/stages.ts";
 import { DEFENDERS_FRAME } from "../../rules/families/defense/defenders.ts";
 import { viewOf } from "../../rules/families/breaking/areas.ts";
 import { questSeat } from "../store/selectors.ts";
@@ -273,7 +275,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         // The claim of a freed guarded treasure is the settle sweep's, not the Setup that guarded it.
         step: isFreedTreasureClaim(game, ctx, source, data?.picked?.at(-1) ?? null) ? "Claim" : effect ? TIMING_WORDS[effect.timing] : step(game),
         // Stand Together's further defenders (families/defense/defenders.ts): the sheet names the attack it is about.
-        title: source ? names.card(source) : defending && game.pendingAttack ? `${names.card(game.pendingAttack.enemyId)} attacks` : "Choose",
+        title: data?.effectId === ARMIES_STAGE_FRAME ? "Current quest stage" : source ? names.card(source) : defending && game.pendingAttack ? `${names.card(game.pendingAttack.enemyId)} attacks` : "Choose",
         ...(defending && game.pendingAttack ? { stats: statOf(game, ctx, game.pendingAttack.enemyId, "attack") } : {}),
         primary: null,
         alternative: null,
@@ -334,7 +336,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // Gollum's pick of the card whose Sauron's Eye icons are not counted: each row shows the icons it adds.
           const eyes = data?.queue[0]?.instruction.verb === "IgnoreFortitudeEyes" ? [eyesStat(game, ctx, id)] : [];
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
-          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words, ctx.cards) ?? gundabadOptionLabel(wait.item.instruction, id, game, ctx, words) ?? (isBoonCode(wait.item.instruction, id) ? words.code(id) : null)) : null;
+          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words, ctx.cards) ?? gundabadOptionLabel(wait.item.instruction, id, game, ctx, words) ?? (isBoonCode(wait.item.instruction, id) ? words.code(id) : null) ?? armiesOptionLabel(wait.item.instruction, id, game, ctx, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.
           // A pick that puts damage on a location or a character, or takes it off a location: the damage it would stand at, as a mark, with a caution when it burns the location or loses the game.
           const fire = wait?.kind === "target" ? (fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) ?? gundabadRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names.card(id))) : null;

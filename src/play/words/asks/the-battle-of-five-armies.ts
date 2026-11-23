@@ -20,6 +20,18 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "132037:whenRevealed:1 @0 spirit": { label: "Spirit: the others leave the quest" },
   "132037:whenRevealed:1 @0 tactics": { label: "Tactics: the others leave the quest" },
 
-  // 132066:A:2 (Heedless of Order): the first player chooses a stage other than the current one to be the current stage until the end of the round.
-  "132066:whenRevealed:1 @1 ChooseCurrentQuest": { note: "Heedless of Order: choose a quest stage other than the current stage to be the current stage until the end of the round. Progress goes on that stage only.", verb: "Choose" },
+  // 132066:A:2 (Heedless of Order): the first player chooses a quest other than the current one, a stage or a side quest, to be the current quest until the end of the round.
+  "132066:whenRevealed:1 @1 ChooseCurrentQuest": { owned: true, note: "Heedless of Order: choose another quest, a stage or a side quest, to be the current quest until the end of the round. Progress goes on that quest only.", verb: "Choose" },
+
+  // 132061 to 132063 (the stage locations) and 132035 (Hidden Path): the travel cost is paid by the group from its Baggins resources, one at a time; the first line says the total and why.
+  "132061:travel:1 @0 SpendResources": { note: "{card}: the group pays 1 Baggins resource to travel here, since stage 3B is the current quest. Choose whose pool pays it.", verb: "Pay" },
+  "132061:travel:1 @1 SpendResources": { note: "{card}: the group pays 3 Baggins resources to travel here, since stage 3B is not the current quest. Choose whose pool pays 1 of them.", verb: "Pay" },
+  "132062:travel:1 @0 SpendResources": { note: "{card}: the group pays 1 Baggins resource to travel here, since stage 4B is the current quest. Choose whose pool pays it.", verb: "Pay" },
+  "132062:travel:1 @1 SpendResources": { note: "{card}: the group pays 3 Baggins resources to travel here, since stage 4B is not the current quest. Choose whose pool pays 1 of them.", verb: "Pay" },
+  "132063:travel:1 @0 SpendResources": { note: "{card}: the group pays 1 Baggins resource to travel here, since stage 2B is the current quest. Choose whose pool pays it.", verb: "Pay" },
+  "132063:travel:1 @1 SpendResources": { note: "{card}: the group pays 3 Baggins resources to travel here, since stage 2B is not the current quest. Choose whose pool pays 1 of them.", verb: "Pay" },
+  "132035:travel:1 @0 SpendResources": { note: "{card}: the group pays 2 Baggins resources to travel here. Choose whose pool pays 1 of them.", verb: "Pay" },
+
+  // 132058:A:1 (Gundabad Archer): each player deals 2 damage to a character he controls.
+  "132058:whenRevealed:1 @0.0 Pick": { owned: true, note: "{card}: choose a character you control to take 2 damage.", verb: "Assign" },
 };

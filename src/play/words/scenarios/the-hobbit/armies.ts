@@ -19,26 +19,36 @@ const isStageChoice = (choose: Choose): boolean => choose.options.length >= 2 &&
 export function armiesChooseNote(choose: Choose, game: ScenarioState): string | null {
   if (!isStageChoice(choose)) return null;
   const { say } = seatSays(game);
-  return say("choose the current quest stage for this round. Progress goes on that stage only, and a card effect that affects the current quest affects that stage only.");
+  return say("choose the current quest stage for this round. Progress goes on that stage only. A stage with no progress at the end of the round applies its Forced effect. Cards are drawn next, so this cannot be undone.");
 }
 
-/** What each stage of the choice holds now: "3 of 8 progress, Battle, the current stage". Empty for any other Choose. */
+const QUESTS_WITH: Readonly<Record<"Battle" | "Siege", string>> = { Battle: "quest with Attack", Siege: "quest with Defense" };
+
+/** What a stage brings and holds now: "Battle, quest with Attack. 3 of 8 progress, the current stage". */
+function stageRow(game: ScenarioState, ctx: ReduceContext, id: string): string {
+  const stage = game.cards[id];
+  if (!stage) return "";
+  const points = modifiedStat(game, stage, "questPoints", ctx.cards);
+  // The keyword the stage prints (its record gives it while the stage is the current one), so a stage that is not current still tells what choosing it brings.
+  const keyword = stageKeyword(ctx, stage.code);
+  const brings = keyword ? `${keyword}, ${QUESTS_WITH[keyword]}. ` : "";
+  return `${brings}${stage.progress} of ${points} progress${game.questStage === id ? ", the current stage" : ""}`;
+}
+
+/** What each stage of the start-of-round choice brings and holds now. Empty for any other Choose. */
 export function armiesBranchRows(game: ScenarioState, ctx: ReduceContext, choose: Choose): Readonly<Record<string, string>> {
-  if (!isStageChoice(choose)) return {};
-  return Object.fromEntries(
-    choose.options.map((option): [string, string] => {
-      const stage = game.cards[option.id];
-      if (!stage) return [option.id, ""];
-      const points = modifiedStat(game, stage, "questPoints", ctx.cards);
-      const keyword = stageKeyword(ctx, stage.code);
-      return [option.id, `${stage.progress} of ${points} progress${keyword ? `, ${keyword}` : ""}${game.questStage === option.id ? ", the current stage" : ""}`];
-    }),
-  );
+  return isStageChoice(choose) ? Object.fromEntries(choose.options.map((option): [string, string] => [option.id, stageRow(game, ctx, option.id)])) : {};
 }
 
-/** The row of a stage of that choice: "Make Ruins of Dale the current stage (2 of 8 progress)". Null for another Choose. */
+/** The row of a card Heedless of Order offers (ChooseCurrentQuest): a stage with what it brings and holds, a side quest named as one. Null for another instruction. */
+export function armiesOptionLabel(instruction: Instruction, id: string, game: ScenarioState, ctx: ReduceContext, names: ChoiceNames): string | null {
+  if (instruction.verb !== "ChooseCurrentQuest" || game.armies == null) return null;
+  return `${names.card(id)}: ${game.armies.stages.includes(id) ? stageRow(game, ctx, id) : "a side quest"}`;
+}
+
+/** The row of a stage of that choice: "Battle in the Dale: Battle, quest with Attack. 2 of 8 progress". Null for another Choose. */
 export function armiesBranchWords(choose: Choose, optionId: string, names: ChoiceNames, rows?: Readonly<Record<string, string>>): string | null {
   if (!isStageChoice(choose)) return null;
   const held = rows?.[optionId];
-  return `Make ${names.card(optionId)} the current stage${held ? ` (${held})` : ""}`;
+  return `${names.card(optionId)}${held ? `: ${held}` : ""}`;
 }

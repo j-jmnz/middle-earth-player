@@ -23,7 +23,7 @@ function stagesTable() {
 describe("the words of the current stage choice", () => {
   it("132076:B:1 the sentence says what the choice changes, and another Choose has none of it", () => {
     const { game, choose } = stagesTable();
-    expect(armiesChooseNote(choose, game)).toMatch(/^Choose the current quest stage for this round\. Progress goes on that stage only/);
+    expect(armiesChooseNote(choose, game)).toMatch(/^Choose the current quest stage for this round\. Progress goes on that stage only\. A stage with no progress at the end of the round applies its Forced effect\. Cards are drawn next, so this cannot be undone\./);
     expect(armiesChooseNote({ verb: "Choose", who: "firstPlayer", options: [{ id: "a", instructions: [] }, { id: "b", instructions: [] }] }, game)).toBeNull();
   });
 
@@ -32,10 +32,10 @@ describe("the words of the current stage choice", () => {
     const rows = armiesBranchRows(game, made.ctx, choose);
     const [two, three, four] = stages.map((id) => rows[id]);
     expect(two).toMatch(/^0 of \d+ progress, the current stage$/);
-    expect(three).toMatch(/^0 of \d+ progress, Battle$/);
-    expect(four).toMatch(/^0 of \d+ progress, Siege$/);
+    expect(three).toBe("Battle, quest with Attack. 0 of 8 progress");
+    expect(four).toBe("Siege, quest with Defense. 0 of 8 progress");
     const three_id = stages.find((id) => game.cards[id]?.code === "132077") ?? "";
-    expect(armiesBranchWords(choose, three_id, names, rows)).toMatch(/^Make .+ the current stage \(0 of \d+ progress, Battle\)$/);
+    expect(armiesBranchWords(choose, three_id, names, rows)).toMatch(/^.+: Battle, quest with Attack\. 0 of 8 progress$/);
     expect(idOf(game, "132077")).toBe(three_id);
   });
 });

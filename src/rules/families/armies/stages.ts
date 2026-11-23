@@ -16,6 +16,9 @@ import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
+/** The effect id of the first player's choice of the current stage at the start of a round (the table words its sheet by it). */
+export const ARMIES_STAGE_FRAME = "armies:current";
+
 /** The quest stages in play: stages 2 to 4 once they are in play together, else the one stage the quest is at. */
 export function stagesInPlay(state: ScenarioState): string[] {
   return state.armies ? state.armies.stages.filter((id) => state.cards[id] != null) : state.questStage ? [state.questStage] : [];
@@ -86,5 +89,5 @@ export function askCurrentStage(state: ScenarioState, steps: EngineStep[]): Scen
   const first = stages[0];
   if (first == null || stages.length < 2) return marked;
   const choose: Instruction = { verb: "Choose", who: "firstPlayer", options: stages.map((id) => ({ id, instructions: [{ verb: "SetCurrentStage" as const, card: id }] })) };
-  return pushEffectFrame(marked, { frame: "forced", sourceId: first, actor: marked.firstPlayer, peril: false, effectId: "armies:current", instructions: [choose], cancel: null, blockCancel: null, cause: ruleCause("hob.current-quest-stage") }, steps);
+  return pushEffectFrame(marked, { frame: "forced", sourceId: first, actor: marked.firstPlayer, peril: false, effectId: ARMIES_STAGE_FRAME, instructions: [choose], cancel: null, blockCancel: null, cause: ruleCause("hob.current-quest-stage") }, steps);
 }
