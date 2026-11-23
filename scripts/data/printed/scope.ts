@@ -62,6 +62,8 @@ const SCAN_URL_FIXES: Readonly<Record<string, readonly string[]>> = {
   "11206": [`${DREAM_CHASER_SCANS}/Cirdan's-Blessing-Tactics.jpg`],
   "11207": [`${DREAM_CHASER_SCANS}/Cirdan's-Blessing-Spirit.jpg`],
   "11208": [`${DREAM_CHASER_SCANS}/Cirdan's-Blessing-Lore.jpg`],
+  // Hall of Beorn's Dwarves of Durin picture of Ered Luin Miner is 299 px wide; DragnCards' picture is the same card at full size.
+  "12066": ["https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/c2c8d69a-6639-49af-89ed-86f2ffc8c096.jpg"],
   "142075": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Argonath.jpg"],
   "141064": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Stricken-Dumb.jpg"],
   // Hall of Beorn's SetupB image of The Siege of Gondor's campaign card is a blank parchment, and The Battle of the Pelennor Fields' shows only the flavor quotation; DragnCards' pictures of the

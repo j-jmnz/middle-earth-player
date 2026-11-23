@@ -612,6 +612,489 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "02033",
+      "side": "A",
+      "printing": "Conflict at the Carrock",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Conflict-at-the-Carrock/A-Burning-Brand.jpg",
+        "sha256": "20f231e5af86aec4d1029a38e3ee4761910779fde302511ff93664418001b155"
+      },
+      "lines": [
+        "Attach to a Lore character. Restricted.",
+        "Response: Exhaust A Burning Brand to cancel a shadow effect just triggered during an attack that attached character is defending."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02095",
+      "side": "A",
+      "printing": "The Dead Marshes",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dead-Marshes/Boromir.jpg",
+        "sha256": "9d07d32629b6fb57b6bf23ee89d1418aa2d311295eb3e7594bf0759d3736c4fd"
+      },
+      "lines": [
+        "Action: Raise your threat by 1 to ready Boromir. (Limit once per phase.)",
+        "Action: Discard Boromir to deal 2 damage to each enemy engaged with a single player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "02116",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Dáin-Ironfoot.jpg",
+        "sha256": "0838fa282691884a784064653e3568f81f36024108811c94ef0047817880f776"
+      },
+      "lines": [
+        "While Dáin Ironfoot is ready, Dwarf characters get +1 Attack and +1 Willpower."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "03003",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Narvi's-Belt.jpg",
+        "sha256": "2413f725d389009b7bef7b6bc541a318ae3442d2ccfca98d0dac23d47faaa660"
+      },
+      "lines": [
+        "Attach to a Dwarf hero.",
+        "Action: Exhaust Narvi's Belt to give attached hero a Leadership, Lore, Tactics or Spirit icon until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "03009",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Zigil-Miner.jpg",
+        "sha256": "78da1ac1b1298a951632361db28671a062abc7ed7423323e8fa968a74489c3d9"
+      },
+      "lines": [
+        "Action: Exhaust Zigil Miner and name a number to discard the top 2 cards of your deck. If at least one of those cards has cost equal to the named number, choose a hero you control. For each card that matches the named number, add 1 resource to that hero's resource pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "04036",
+      "side": "A",
+      "printing": "Road to Rivendell",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Road-to-Rivendell/Out-of-the-Wild.jpg",
+        "sha256": "0d9b918b95198b0197c95fb069c1bf2a5cdd6520c3250e83affd856d05d01499"
+      },
+      "lines": [
+        "Secrecy 2.",
+        "Action: Search the top 5 cards of the encounter deck for any 1 non-objective card worth no victory points and add it to your victory display. Shuffle the encounter deck. Add Out of the Wild to the victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "04061",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Legacy-of-Durin.jpg",
+        "sha256": "5e762b63801036fc6c914f0eaf22badd87677b37e80885049ba39955c7574033"
+      },
+      "lines": [
+        "Attach to a Dwarf hero.",
+        "Response: After you play a Dwarf character from your hand, exhaust Legacy of Durin to draw 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "04076",
+      "side": "A",
+      "printing": "The Long Dark",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Háma.jpg",
+        "sha256": "72de7d19abd2b9625b77a7fdbe2816e249c153ab0fe958db1c63ca02d74ebacd"
+      },
+      "lines": [
+        "Response: After Háma is declared as an attacker, return a Tactics event from your discard pile to your hand. Then, choose and discard 1 card from your hand. (Limit 3 times per game for the group.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "04079",
+      "side": "A",
+      "printing": "The Long Dark",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Erebor-Battle-Master.jpg",
+        "sha256": "ef64d0f3e6091dae76641e27c67d636f9233bca7d870899d9a95f1ce13fec34a"
+      },
+      "lines": [
+        "Erebor Battle Master gets +1 Attack for each other Dwarf ally you control. (Limit +4 Attack.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "04081",
+      "side": "A",
+      "printing": "The Long Dark",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Out-of-Sight.jpg",
+        "sha256": "2c3c0a91818bd8f9196d8dbd0110088df278df1c7c739762fdd54ce5cb3f6436"
+      },
+      "lines": [
+        "Secrecy 3.",
+        "Action: Enemies engaged with you cannot attack you this phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "04085",
+      "side": "A",
+      "printing": "The Long Dark",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Long-Dark/Love-of-Tales.jpg",
+        "sha256": "8b46c61f8a44b15ce7f2b1191d51b7f68b2c5f904e88fef1a10612586d5e92b5"
+      },
+      "lines": [
+        "Attach to a Lore hero. Limit 1 per hero.",
+        "Response: After a Song card is played, exhaust Love of Tales to add 1 resource to attached hero's resource pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "04109",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Healing-Herbs.jpg",
+        "sha256": "666bc8149aee1e8fa3512756e475363f8208fd7c529adfb1646f4ed6a717daaf"
+      },
+      "lines": [
+        "Attach to a Lore hero.",
+        "Action: Discard Healing Herbs and exhaust attached hero to heal all damage on 1 character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "04129",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/We-Are-Not-Idle.jpg",
+        "sha256": "8ab2c62153de600fbcaf293aaa31b029730e9647ef62fb1d58775b0dfab18728"
+      },
+      "lines": [
+        "Action: Exhaust X Dwarf heroes to add X resources to a hero's resource pool and draw 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "04132",
+      "side": "A",
+      "printing": "Shadow and Flame",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Shadow-and-Flame/A-Elbereth-Gilthoniel.jpg",
+        "sha256": "9935653817c7d0d10fb9c545eec88e362ca3e1b6d25b24bf32b6b1a3bd711b87"
+      },
+      "lines": [
+        "Secrecy 4.",
+        "Response: After a non-unique enemy attacks you, put that enemy on the bottom of the encounter deck. If your threat is lower than that enemy's engagement cost, set your threat equal to the engagement cost of that enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "06036",
+      "side": "A",
+      "printing": "The Drúadan Forest",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Druadan-Forest/Trained-for-War.jpg",
+        "sha256": "1e68e2ad4cbf1c1eb34a9f5021f606a2154c7ef0697e6a9fca89fe73618a643e"
+      },
+      "lines": [
+        "Play only if each hero you control has the printed Tactics resource icon.",
+        "Action: Until the end of the phase, if the current quest does not have Siege, it gains Battle."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "06037",
+      "side": "A",
+      "printing": "Elves of Lórien",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Silvan-Refugee.jpg",
+        "sha256": "07eaebb3b73b95782f4c1f26e7ef3405e01ad85b070373b224c3391fc881f27e"
+      },
+      "lines": [
+        "Forced: After a character leaves play, discard Silvan Refugee from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "06107",
+      "side": "A",
+      "printing": "The Blood of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Blood-of-Gondor/Caldara.jpg",
+        "sha256": "8e4b4700685cd5e4635319cd43efef1e05db0c7a6c0e162ea4e6e0ace9274ad9"
+      },
+      "lines": [
+        "Action: Discard Caldara to put 1 Spirit ally from your discard pile into play for each other hero you control with a printed Spirit resource icon. (Limit once per game.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "08006",
+      "side": "A",
+      "printing": "Two-Player Limited Edition Starter",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Two-Player-Limited-Edition-Starter/Blue-Mountain-Trader.jpg",
+        "sha256": "d0090e93d3e8af35275c3b55ab61c2ff64aab50a0cde156c1251c6117f6186d8"
+      },
+      "lines": [
+        "Action: Choose another player. That player gains control of Blue Mountain Trader. Then, that player moves 1 resource from the resource pool of a hero he controls to the resource pool of a hero you control, or Blue Mountain Trader is discarded. (Limit once per round.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "08092",
+      "side": "A",
+      "printing": "Elves of Lórien",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Wingfoot.jpg",
+        "sha256": "6e053a138830db779fa7f5d70b79bba55bd026929bc6bd9001d6ac20a2e8b945"
+      },
+      "lines": [
+        "Attach to a Ranger hero.",
+        "Response: After attached hero commits to a quest. name enemy, location or treachery. If a card of the named type is revealed during this quest phase, exhaust Wingfoot to ready attached hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "12060",
+      "side": "A",
+      "printing": "Temple of the Deceived",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Temple-of-the-Deceived/Déorwine.jpg",
+        "sha256": "4341462e40328282632e37a2a6bf08ee1377c93396d8a72f6fb5ca3c8a0d7728"
+      },
+      "lines": [
+        "Sentinel.",
+        "While Déorwine is defending, he gains: \"Response: Spend 1 Leadership resource to cancel a shadow effect just triggered. Any player may trigger this response.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "12066",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/c2c8d69a-6639-49af-89ed-86f2ffc8c096.jpg",
+        "sha256": "1405588f73156b07c33926f6e909b72170842b863bb0ca2701fb3543f11d6db3"
+      },
+      "lines": [
+        "Response: After Ered Luin Miner is discarded from your deck, put it into play under your control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "12116",
+      "side": "A",
+      "printing": "A Storm on Cobas Haven",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Storm-on-Cobas-Haven/Windfola.jpg",
+        "sha256": "4dc95ad724df3f7887ab88a36ad2158b697be12383aa3c83ce442c34b3366d87"
+      },
+      "lines": [
+        "Attach to a Spirit hero, or to Éowyn. Restricted.",
+        "Attached character gets +1 Willpower.",
+        "Response: After attached character is removed from the quest, exhaust Windfola to commit that character to the quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "132011",
+      "side": "A",
+      "printing": "The Hobbit: On the Doorstep",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Ravens-of-the-Mountain.jpg",
+        "sha256": "198c2a57ca6fefb64c4c6ce5afef57e1ab96918c5b98fd0c6b34ef4040753103"
+      },
+      "lines": [
+        "Action: Exhaust a hero you control to shuffle the encounter deck and look at its top card. Place progress tokens on the current quest equal to the Threat of the card you looked at. Then, put that card back on top of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "132017",
+      "side": "A",
+      "printing": "The Hobbit: On the Doorstep",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/Expert-Treasure-hunter.jpg",
+        "sha256": "bea628b4e803e8edb49a713f7f24ca71090bb70f76371e02d3d7307d08c6b59f"
+      },
+      "lines": [
+        "Attach to a hero. Limit 1 per hero.",
+        "Response: After attached hero quests successfully, name a card type and discard the top card of your deck. If the discarded card is the named type, take it into your hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "17007",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Dwarf-Pipe.jpg",
+        "sha256": "1af20856d82e6114f8f10e3e3898949840a104b3e20c615c5414e43d4c0171ce"
+      },
+      "lines": [
+        "Attach to a Dwarf character. Limit 1 per character.",
+        "Response: After a card is discarded from your deck, exhaust Dwarf Pipe to place that card on the bottom of your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "17135",
+      "side": "A",
+      "printing": "The Crossings of Poros",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/b62716d9-5e70-4ec1-bcb7-852f67299e82.jpg",
+        "sha256": "6e385ad0dc0df1fce41cdfb0a50d4a974f25997fab2962b75055f6048e130876"
+      },
+      "lines": [
+        "Cannot have restricted attachments.",
+        "Action: Deal 2 damage to Quickbeam to ready him. (Limit once per phase.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "19145",
+      "side": "A",
+      "printing": "The Fate of Wilderland",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fate-of-Wilderland/Radagast.jpg",
+        "sha256": "f2acfff6554d1be91aebeaa12bac540177e0c18ccf0fcc46e5ae4548ff2e5b86"
+      },
+      "lines": [
+        "While playing a Creature ally, Radagast gains the printed Leadership, Spirit, and Tactics icons.",
+        "Response: After you play a Creature card, Radagast does not exhaust to quest this round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "19153",
+      "side": "A",
+      "printing": "The Fate of Wilderland",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fate-of-Wilderland/Reforged.jpg",
+        "sha256": "104f76a56ef9be50ea070359315d4f8cd2dbae21b0750e5d25e922459729f1e2"
+      },
+      "lines": [
+        "Action: Choose an Item attachment with a printed cost of X in any player's discard pile and play that attachment for no cost. (The chosen attachment can belong to any sphere of influence.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "22090",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Helm-of-Secrecy.jpg",
+        "sha256": "6b62d424073989db6156ff0e7d6b6dd6180a1fd2b029d7ba14afdf2257caf88f"
+      },
+      "lines": [
+        "Limit 1 per deck.",
+        "Action: Choose a hero you control and discard all tokens from it. Select a different non-Fellowship, non-Baggins hero from your collection with a threat cost less than or equal to the chosen hero. Swap those heroes, moving all eligible attachments to the hero from your collection."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
     }
   ]
 }
