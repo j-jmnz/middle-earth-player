@@ -1,4 +1,4 @@
-// Rules: rr.setup, hob.setup-dungeons-deep-and-caverns-dim, hob.riddle-area, hob.bilbo-baggins-ohauh, easy-mode.the-hobbit (data/rules/entries.json); docs/scenarios/the-hobbit.md (Dungeons Deep and Caverns Dim).
+// Rules: rr.setup, hob.setup-dungeons-deep-and-caverns-dim, hob.riddle-area, hob.bilbo-baggins-ohauh, easy-mode.the-hobbit (data/rules/entries.json); docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md (Dungeons Deep and Caverns Dim).
 import { describe, expect, it } from "vitest";
 
 import { loadAnyScenario } from "../../../../scripts/data/load-scenarios.ts";

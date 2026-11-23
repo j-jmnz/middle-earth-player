@@ -1,4 +1,4 @@
-// Rules: hob.riddle-area, hob.riddles, hob.riddles-steps-2-and-3, hob.setup-dungeons-deep-and-caverns-dim, rr.quest-advancement, faq.progress-without-advancing, rr.forced, rr.first-player, rr.immune, rr.cancel, rr.surge, mec112.gollum-smeagol (data/rules/entries.json); docs/scenarios/the-hobbit.md (Dungeons Deep and Caverns Dim).
+// Rules: hob.riddle-area, hob.riddles, hob.riddles-steps-2-and-3, hob.setup-dungeons-deep-and-caverns-dim, rr.quest-advancement, faq.progress-without-advancing, rr.forced, rr.first-player, rr.immune, rr.cancel, rr.surge, mec112.gollum-smeagol (data/rules/entries.json); docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md (Dungeons Deep and Caverns Dim).
 import { chai, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";

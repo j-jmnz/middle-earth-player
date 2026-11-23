@@ -6,7 +6,7 @@ import { ALWAYS } from "../conditions.ts";
 import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for Dungeons Deep and Caverns Dim (The Hobbit, part 3, no campaign card): the riddle area and the two quest stages beside each other, the riddles encounter cards print and the first player answers, and Gollum's attack on Bilbo Baggins. The Misty Mountain Goblins set is the
-// records of the scenario that owns it (set-misty-mountain-goblins.ts). The families' engine is src/rules/families/riddles/; the readings are in docs/scenarios/the-hobbit.md (Dungeons Deep and Caverns Dim).
+// records of the scenario that owns it (set-misty-mountain-goblins.ts). The families' engine is src/rules/families/riddles/; the readings are in docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md (Dungeons Deep and Caverns Dim).
 // A riddle (hob.riddles) is a constant record with the marker `Riddle` (what the first player names, how many cards come off his deck), read by AnswerRiddle. A card revealed from the encounter deck that offers the choice has a second record: the When Revealed Choose between answering and resolving the card.
 // Rules: hob.riddle-area, hob.riddles, hob.riddles-steps-2-and-3, hob.setup-dungeons-deep-and-caverns-dim, rr.forced, rr.cannot, rr.immune, mec109.immune-to-player-card-effects, rr.cancel, rr.travel, rr.damage, rr.first-player, rr.action, rr.encounter-deck, rr.staging (data/rules/entries.json).
 const NOT_COMPLETE: Condition = { kind: "not", condition: { kind: "riddle", is: "complete" } };

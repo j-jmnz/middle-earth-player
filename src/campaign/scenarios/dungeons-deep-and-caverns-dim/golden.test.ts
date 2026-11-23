@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, hob.riddle-area, hob.riddles, hob.riddles-steps-2-and-3, hob.bilbo-baggins-ohauh, docs/scenarios/the-hobbit.md (Dungeons Deep and Caverns Dim) (data/rules/entries.json).
+// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, hob.riddle-area, hob.riddles, hob.riddles-steps-2-and-3, hob.bilbo-baggins-ohauh, docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md (Dungeons Deep and Caverns Dim) (data/rules/entries.json).
 import { describe, expect } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";

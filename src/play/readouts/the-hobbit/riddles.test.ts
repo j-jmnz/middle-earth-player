@@ -1,4 +1,4 @@
-// Rules: hob.riddle-area, hob.riddles (data/rules/entries.json); docs/scenarios/the-hobbit.md (Dungeons Deep and Caverns Dim); ledger lines 131030:A:1, 131030:B:2, 131030:B:3, 131031:B:1.
+// Rules: hob.riddle-area, hob.riddles (data/rules/entries.json); docs/scenarios/the-hobbit/dungeons-deep-and-caverns-dim.md (Dungeons Deep and Caverns Dim); ledger lines 131030:A:1, 131030:B:2, 131030:B:3, 131031:B:1.
 // The riddle area on the table: the dial of stage 2 with its progress against 9 (the players' way out, so it never warms), a tap that shows the stage and Gollum, and the mark Bilbo's seat wears while he is in the area.
 import { describe, expect, it } from "vitest";
 
