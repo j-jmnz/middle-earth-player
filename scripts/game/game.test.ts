@@ -6,6 +6,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
+import { baseDiffText, type BaseDiff } from "./base-diff.ts";
 import { firstDifferent, stateDiff } from "./diff.ts";
 import { compareGoldens, type StoredGolden } from "./compare.ts";
 import { endOf, goldenText } from "./golden-file.ts";
@@ -121,6 +122,17 @@ describe("pnpm game", () => {
     expect(moved?.storage).toBeUndefined();
     expect(moved?.fields[0]).toContain("state hash");
     expect(goldenText([{ name: "a", intents: [1], checks: [2], end: endOf(state), state: undefined }])).toBe(`[\n{\n"name":"a",\n"intents":[1],\n"checks":[2],\n"end":${JSON.stringify(endOf(state))}\n}\n]\n`);
+  });
+
+  it("reports the replay of a golden on a base's engine: the first intent whose table differs and the fields", () => {
+    const same: BaseDiff = { ref: "a".repeat(40), intents: 3, first: null, refused: null, atFields: [], finalFields: [], intent: null, move: null };
+    expect(baseDiffText("golden x 1 \"solo\"", same).join("\n")).toContain("the table is the same after every intent");
+    const parted: BaseDiff = { ...same, first: 2, atFields: ["clock: 8 → 9"], finalFields: ["clock: 14 → 23"], intent: "Pass" };
+    const text = baseDiffText("golden x 1 \"solo\"", { ...parted, move: {} as BaseDiff["move"] }).join("\n");
+    expect(text).toContain("first intent after which the tables differ: #3 (the Keep is #1): Pass");
+    expect(text).toContain("clock: 8 → 9");
+    expect(text).toContain("fields that differ in the final state, base → working tree:\n    clock: 14 → 23");
+    expect(baseDiffText("g", { ...same, refused: "the base engine refuses intent #4" }).join("\n")).toContain("refuses intent #4");
   });
 
   it("returns no golden.json only for a file the ref does not hold, and refuses a flag as a ref", () => {

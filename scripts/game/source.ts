@@ -26,6 +26,8 @@ export type GameSource = {
   intents: readonly PlayerIntent[];
   /** A golden only: the game the auto-player plays now, and the final state golden.json pins: the state when it stores one, else the hash of it. */
   played?: GoldenGame;
+  /** A golden only: whose it is, for `pnpm game diff --base` (it reads the base's golden.json by these). */
+  golden?: { scenarioId: string; name: string; number: number };
   pinned?: { state?: ScenarioState; hash?: string };
 };
 
@@ -60,7 +62,7 @@ async function goldenSource(scenarioId: string, which: string): Promise<GameSour
   const played = entry.play(golden, ctx);
   // The first seat's Keep opens the game and is not among a golden's intents (test/harness/game-kit.ts, playToEnd).
   const intents: PlayerIntent[] = [{ type: "Keep" }, ...(pinned?.intents ?? played.intents)];
-  return { label: `golden ${scenarioId} ${index + 1} "${golden.name}"${pinned ? "" : " (not in golden.json: the game played now)"}`, ctx, opening: startScenario(played.start, ctx), intents, played, ...(pinned ? { pinned: { state: pinned.state, hash: pinned.end?.hash ?? (pinned.state ? stateHash(pinned.state) : undefined) } } : {}) };
+  return { label: `golden ${scenarioId} ${index + 1} "${golden.name}"${pinned ? "" : " (not in golden.json: the game played now)"}`, ctx, opening: startScenario(played.start, ctx), intents, played, golden: { scenarioId, name: golden.name, number: index + 1 }, ...(pinned ? { pinned: { state: pinned.state, hash: pinned.end?.hash ?? (pinned.state ? stateHash(pinned.state) : undefined) } } : {}) };
 }
 
 /**

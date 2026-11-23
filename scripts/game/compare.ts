@@ -90,7 +90,7 @@ export function compareGoldens(base: readonly StoredGolden[] | null, now: readon
       first,
       endsNow: first !== null && first >= (golden.intents ?? []).length,
       ...(differs ? { was: intentAt(was.intents) ?? "(ended)", now: intentAt(golden.intents) ?? "(ended)" } : {}),
-      fields: was.state && golden.state ? stateDiff(was.state, golden.state, 5) : wasEnd?.hash === nowEnd?.hash ? [] : [`state hash ${wasEnd?.hash ?? "none"} → ${nowEnd?.hash ?? "none"} (\`pnpm game diff\` replays the game and names the fields)`],
+      fields: was.state && golden.state ? stateDiff(was.state, golden.state, 5) : wasEnd?.hash === nowEnd?.hash ? [] : [`state hash ${wasEnd?.hash ?? "none"} → ${nowEnd?.hash ?? "none"} (\`pnpm game diff <scenario-id>/<n> --base <ref>\` replays the golden's intents on the engine of <ref> and on this tree and names the first intent and the fields)`],
       ...(storage ? { storage: true as const } : {}),
     });
   });
