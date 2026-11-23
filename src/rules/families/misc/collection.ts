@@ -100,7 +100,7 @@ function swap(state: ScenarioState, oldId: string, newId: string, seat: number, 
     const attachment = next.cards[attachmentId];
     if (!attachment) continue;
     const owner = attachment.owner ?? attachment.controller ?? seat;
-    if (!attachmentHostIds(next, owner, attachment.code, ctx, true).includes(newId)) continue;
+    if (!attachmentHostIds(next, owner, attachment.code, ctx, { byEffect: true }).includes(newId)) continue;
     next = attachTo(updateCard(next, oldId, { attachments: (next.cards[oldId]?.attachments ?? []).filter((id) => id !== attachmentId) }), attachmentId, newId);
   }
   next = releaseAttachments(next, oldId, ctx.cards, steps);

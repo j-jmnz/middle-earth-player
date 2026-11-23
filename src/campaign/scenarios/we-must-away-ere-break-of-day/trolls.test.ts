@@ -62,5 +62,5 @@ it("131033:A:1 bars the play of an attachment card on a Troll but not an effect 
   const table = tableFromLayout(ID, { engaged: [BERT, WILLIAM] }, { effects: [...EFFECTS, toEnemy] });
   const william = idOf(table.state, WILLIAM);
   expect(attachmentHostIds(table.state, 0, "attachment", table.ctx)).not.toContain(william);
-  expect(attachmentHostIds(table.state, 0, "attachment", table.ctx, true)).toContain(william);
+  expect(attachmentHostIds(table.state, 0, "attachment", table.ctx, { byEffect: true })).toContain(william);
 });
