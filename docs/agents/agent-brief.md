@@ -106,7 +106,7 @@ The one way to build a scenario. A subagent cannot start agents, so the orchestr
 
    `pnpm test scenario <id> --quick` is the loop while working (it skips the goldens and the reader check); `pnpm test scenario <id>` runs once before the hand-back. The exit of every writing task is in `.claude/agents/orchestrator.md` (Implementer tasks).
 5. **Review.** The round of `.claude/agents/orchestrator.md` (One review round).
-6. **Fix**, by an `implementer`, ending with the one full `pnpm test` (`.claude/agents/orchestrator.md`, One review round).
+6. **Fix**, by an `implementer`, which reads the cards its change reaches first (`pnpm effects reach origin/main`, with the printed line of each), ending with the one full `pnpm test` (`.claude/agents/orchestrator.md`, One review round).
 
 **The Table step.** A zone or widget exists only when a setup record or a card line creates it: cite the line in the scenario's section of `docs/scenarios/<box>.md`. For each tracker, zone or held card a record creates, the table has:
 - a readout with its limit, which warms near the limit;
