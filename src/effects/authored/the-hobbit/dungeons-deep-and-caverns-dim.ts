@@ -63,7 +63,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "constant",
       instructions: [{ verb: "ModifyStat", stat: "noProgressPlaced", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "noProgressRemoved", amount: 1, until: "whileSourceInPlay", target: "self" }],
     },
-    // The riddle area: its cards are immune to player card effects, and Bilbo Baggins (the first player still controls him) cannot quest, attack or take attachments played by the players; he defends only against Gollum (families/riddles/gollum.ts).
+    // The riddle area: its cards are immune to player card effects, and Bilbo Baggins (the first player still controls him) cannot quest, attack or take attachments played by the players; he defends only against Gollum and takes damage only from him (families/riddles/gollum.ts). "Cannot leave the riddle area except by quest effects" has no instruction of its own: the area is a zone no pick or verb reaches (the pool `riddleArea` is for the records of this set, player card effects cannot pick it) and only stage 3B's LeaveRiddleArea and GollumEngagesFirstPlayer take stage 2, Gollum and Bilbo out (tests: riddles/bars.test.ts, lines.test.ts).
     {
       id: "131030:constant:3",
       cardCode: "131030",

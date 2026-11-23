@@ -12,6 +12,7 @@ import { updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { effectData, pushPicked, shuffleDiscardIn } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
@@ -32,7 +33,7 @@ export function revealedEffects(state: ScenarioState, id: string, seat: number, 
 /** Whether the card just revealed offers the first player its riddle: the card is not added to the staging area until he resolves it (an answered riddle card is discarded, never added: hob.riddles). */
 export function offersRiddle(state: ScenarioState, id: string, seat: number, ctx: ReduceContext): boolean {
   const code = state.cards[id]?.code;
-  return ctx.effects.some((effect) => effect.cardCode === code && effect.timing === "whenRevealed" && offers(effect) && (!effect.condition || holds(state, effect.condition, { actor: seat, sourceId: id, returned: 0 }, ctx)));
+  return effectsOf(ctx, code ?? "").some((effect) => effect.timing === "whenRevealed" && offers(effect) && (!effect.condition || holds(state, effect.condition, { actor: seat, sourceId: id, returned: 0 }, ctx)));
 }
 
 /** ResolveNormally: the card's When Revealed records, but the riddle offer, resolve for the first player as the reveal would have run them. The card is added to the staging area now (the reveal held that back while the riddle was offered). */
