@@ -2,18 +2,18 @@
 import type { ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
-import { isGuarded, noteHostDefeated, releaseGuarded, textBlank } from "../families/attachments/hold.ts";
+import { announceHostLeaving, isGuarded, noteHostDefeated, releaseGuarded, textBlank } from "../families/attachments/hold.ts";
 import { keywordsKept } from "../families/angmar/blank.ts";
 import { defendingAgainst } from "../families/angmar/combat.ts";
 import type { EngineStep } from "./intents.ts";
 import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "../windows/queue.ts";
 import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
-import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
+import { flagged, heldAmount, isExhausted, modifierActive, updateCard, withThreat } from "./state.ts";
 import { claimedDestination, discardedDetached, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
-import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
-import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
+import { attachmentsOn, inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
+import { damageBarred, damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
 import { attackingHolds } from "../families/attack/strike.ts";
 import { resourceCancel, resourceShield } from "../families/aflame/attack.ts";
 import { cancelAllDamage, damageShield } from "../families/wilderland/shield.ts";
@@ -79,6 +79,8 @@ export function modifiedStat(
     if (modifier.when?.kind === "defendingAgainst" && !defendingAgainst(state, instance, modifier.when.trait, { effects: [], cards })) continue;
     if (modifier.when?.kind === "versusVictoryTrait" && !versusVictoryTrait(state, instance, cards, against)) continue;
     if (modifier.when?.kind === "inArea" && !inAreaOf(state, instance, modifier.when.seat)) continue;
+    // "While the character is exhausted" (Weighed Down, 132038:A:1); an unconscious character is not exhausted (hob.unconscious-characters).
+    if (modifier.when?.kind === "holderExhausted" && !isExhausted(instance)) continue;
     // "+2 Attack while attacking that enemy": only while the holder attacks it.
     if (modifier.against != null && modifier.against !== against) continue;
     // "+1 Attack when attacking an Orc" (families/attack/strike.ts).
@@ -257,10 +259,10 @@ function placeDamageHere(state: ScenarioState, assigned: string, amount: number,
   if (source === "player" && flagged(state, id, "noPlayerEffectDamage")) return state;
   // "When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead" (141057:A:2).
   if (takesLifeInstead(state, id)) return reduceLife(state, amount, steps, cause);
-  // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed.
+  // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed. Bilbo Baggins in the riddle area takes damage only from Gollum (hob.riddle-area).
   // "Cannot take damage" is lost by Goblin Chieftain while the stage says so (41007:B:1); combat damage dealt to an attacking enemy is canceled
   // by Lightless Passage's Shadow (41033:A:2).
-  if ((flagged(state, id, "cannotTakeDamage") && !flagged(state, id, "losesNoDamage")) || (source !== "combat" && flagged(state, id, "cannotTakeNonCombatDamage"))) return state;
+  if ((flagged(state, id, "cannotTakeDamage") && !flagged(state, id, "losesNoDamage")) || (source !== "combat" && flagged(state, id, "cannotTakeNonCombatDamage")) || damageBarred(state, id, source, sourceId)) return state;
   // "Cannot take damage from non-quest effects" (19127:A:1): the damage of a combat or of a quest card's effect is still placed.
   if (source !== "combat" && source !== "quest" && flagged(state, id, "cannotTakeNonQuestDamage")) return state;
   if (source === "combat" && flagged(state, id, "combatDamageCanceled")) return state;
@@ -445,16 +447,12 @@ export function destroyCard(
   if (!instance) return state;
   const printed = printedOf(cards, instance.code);
   if (printed.keywords.permanent && heroHostInPlay(state, instance)) return state;
-  // The cards attached to a location that leaves play hear about it (Elf-stone). Whether the location was explored is
-  // decided here, while the attachments still count (rr.explored): an Elf-stone's extra quest point is gone once it is discarded.
-  let next = state;
-  if (isLocationCard(printed)) {
-    for (const attachmentId of instance.attachments) next = queueEvent(next, { trigger: "hostLeftPlay", seat: state.firstPlayer, cardId: attachmentId, subject: id, explored });
-  }
+  // The cards attached to a leaving location or destroyed enemy hear about it, with whether the location was explored decided here (announceHostLeaving).
+  let next = announceHostLeaving(state, id, cards, explored);
   // The active location explored: every card hears it, with the number of attachments it had (10006:A:1, 19026:A:2).
-  if (explored && isLocationCard(printed) && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
+  if (explored && isLocationCard(printed) && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: attachmentsOn(state, id).length });
   // A location explored in the staging area (not the active location, which announced itself above) is heard by "after a location is explored" (Northern Tracker, The Evening Star).
-  if (explored && isLocationCard(printed) && instance.zone === "staging") next = queueEvent(next, { trigger: "locationExplored", seat: null, subject: id, amount: instance.attachments.length });
+  if (explored && isLocationCard(printed) && instance.zone === "staging") next = queueEvent(next, { trigger: "locationExplored", seat: null, subject: id, amount: attachmentsOn(state, id).length });
   // A location in the staging area that is explored detaches the enemies grappled with it (dcce.grapple).
   if (explored && isLocationCard(printed) && instance.zone === "staging") next = releaseGrappled(next, id);
   next = releaseAttachments(next, id, cards, steps);

@@ -10,7 +10,7 @@ import { verbFlags } from "../verb-flags.ts";
 
 const icon = z.enum(["leadership", "tactics", "spirit", "lore"]);
 // The sphere a spent resource may be: an icon, or Fellowship ("Spend 1 Fellowship resource to travel here", 144020:A:3).
-const spendIcon = z.enum(["leadership", "tactics", "spirit", "lore", "fellowship"]);
+const spendIcon = z.enum(["leadership", "tactics", "spirit", "lore", "fellowship", "baggins"]);
 
 const VERBS = [
   // Constant on a card in play (an encounter card: it applies to every player): a card a player plays (from any zone, the discard pile included) costs `amount` more when it matches `pick`, read from the playing seat's side ("increase its cost by 1 if there is a card that has the same
@@ -51,7 +51,7 @@ const VERBS = [
   // a hero for each resource: their own heroes, or (`group`) any player's ("the players as a group may spend 2 Leadership
   // resources"). With fewer resources than that, nothing is spent: an option that spends names the `resources` condition.
   // `paid` is engine use: the pools chosen so far, one entry per resource. `target`: the resources come from that card's own pool, nobody chooses ("spend 1 resource from that hero's pool", 04016:A:1); a pool with fewer spends nothing.
-  z.strictObject({ verb: z.literal("SpendResources"), amount: z.number().int().positive(), target: z.enum(["picked", "subject", "host", "self"]).optional(), sphere: spendIcon.optional(), group: z.boolean().optional(), paid: z.array(z.string()).optional(), ...when }),
+  z.strictObject({ verb: z.literal("SpendResources"), amount: positiveAmountSchema, target: z.enum(["picked", "subject", "host", "self"]).optional(), sphere: spendIcon.optional(), group: z.boolean().optional(), paid: z.array(z.string()).optional(), ...when }),
   // Each hero the actor (or the picked player) controls gains `amount` resources; with `unspent`, only each one that did not
   // spend a resource this round.
   // Setup, in a top-level ForEachPlayer: "Each player adds 1 resource to each of his heroes' resource pools" (51201:A:1).

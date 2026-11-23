@@ -5,6 +5,7 @@ import { renderPick } from "./picks.ts";
 import { ESCAPE_CONDITIONS } from "./families/escape.ts";
 import { GUARDIAN_CONDITIONS } from "./families/guardian.ts";
 import { ERECH_CONDITIONS } from "./families/erech.ts";
+import { SACK_CONDITIONS } from "./families/sack.ts";
 import { FOG_CONDITIONS } from "./families/fog.ts";
 import { INVESTIGATION_CONDITIONS } from "./families/investigation.ts";
 import { LONG_DARK_CONDITIONS } from "./families/long-dark.ts";
@@ -14,6 +15,7 @@ import { FAMILY_CONDITIONS } from "./families.ts";
 export { ESCAPE_CONDITION_SAMPLES } from "./families/escape.ts";
 export { GUARDIAN_CONDITION_SAMPLES } from "./families/guardian.ts";
 export { ERECH_CONDITION_SAMPLES } from "./families/erech.ts";
+export { SACK_CONDITION_SAMPLES } from "./families/sack.ts";
 export { FOG_CONDITION_SAMPLES } from "./families/fog.ts";
 export { INVESTIGATION_CONDITION_SAMPLES } from "./families/investigation.ts";
 export { LONG_DARK_CONDITION_SAMPLES } from "./families/long-dark.ts";
@@ -47,6 +49,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   ...ESCAPE_CONDITIONS,
   ...GUARDIAN_CONDITIONS,
   ...ERECH_CONDITIONS,
+  ...SACK_CONDITIONS,
   ...FOG_CONDITIONS,
   ...INVESTIGATION_CONDITIONS,
   ...LONG_DARK_CONDITIONS,
@@ -97,6 +100,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   currentQuest: (c) => ({ text: c.is === "side" ? "the current quest is a side quest" : c.is === "self" ? "this card is the current quest" : "there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area)", read: ["is"] }),
   questProgressNoted: (c) => ({ text: typeof c.min === "number" ? `${c.is === false ? "fewer than " : ""}${c.min} or more progress was placed on the current quest card this quest phase in all (the quest card itself; progress an active location took does not count)` : c.is === false ? "no progress was placed on the current quest card this quest phase (the quest card itself; progress an active location took does not count)" : "progress was placed on the current quest card this quest phase (the quest card itself, the overflow of an explored active location included)", read: ["is", "min"] }),
   currentQuestProgress: (c) => ({ text: c.is === "some" ? "the current quest card holds 1 or more progress" : "the current quest card holds no progress (neither is true while there is no current quest)", read: ["is"] }),
+  holderExhausted: () => ({ text: "the card holding this stat is exhausted now (read each time the stat is read)", read: [] }),
   versusDefender: (c) => ({ text: `the card holding this stat is an enemy attacking a declared defender${c.ally === true ? " that is an ally" : ""}${typeof c.maxHitPoints === "number" ? ` with ${c.maxHitPoints} or fewer printed hit points` : ""}${typeof c.maxWillpower === "number" ? ` with a current Willpower of ${c.maxWillpower} or less (modifiers counted)` : ""}`, read: ["ally", "maxHitPoints", "maxWillpower"] }),
   defendingAgainst: (c) => ({ text: `the card holding this stat (its host, or this card itself) is the declared defender of the attack against a ${str(c.trait)} enemy`, read: ["trait"] }),
   attacking: (c, ctx) => ({ text: `${c.card === "host" ? "its host" : "this card"} is attacking${isObj(c.enemy) ? ` a ${renderPick(c.enemy, ctx)}` : ""}${isObj(c.notEnemy) ? ` that is not a ${renderPick(c.notEnemy, ctx)}` : ""}${c.alone === true ? ", alone" : ""}${c.ranged === true ? ", with a ranged attack" : ""}`, read: ["card", "enemy", "notEnemy", "alone", "ranged"] }),

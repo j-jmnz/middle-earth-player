@@ -16,7 +16,7 @@ import { immuneBuffer } from "../../interpret/immune-targets.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
-import { inPlay } from "../../core/state.ts";
+import { inPlay, livingSeats } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import type { Focus } from "../index.ts";
@@ -61,7 +61,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       const seat = instruction.who === "eventSeat" ? (effectData(state)?.eventSeat ?? focus.seat) : instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
       if (state.seats[seat]?.eliminated) return state;
       // `times` cards, one after the other: the rest wait in the effect's queue behind this reveal.
-      const times = instruction.times == null ? 1 : resolveAmount(state, instruction.times, frameScope(state, focus.seat, focus.sourceId), ctx);
+      const scope = frameScope(state, focus.seat, focus.sourceId);
+      const named = instruction.times == null ? 1 : resolveAmount(state, instruction.times, scope, ctx);
+      const times = instruction.lessX === true ? Math.max(1, named - (scope.x ?? 0)) : named;
       if (times <= 0) return state;
       const rest: Instruction = { verb: "RevealEncounter", ...(instruction.who ? { who: instruction.who } : {}), times: times - 1 };
       const queued = times > 1 && effectData(state) ? queueFront(state, [{ instruction: rest, seat: focus.seat, chosen: null }]) : state;
@@ -109,7 +111,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return addTableModifier(state, { stat: instruction.min === 1 ? "revealFewerMinOne" : "revealFewer", amount: instruction.amount, until: "endOfPhase", ...(seat != null ? { seat } : {}) }, focus);
     }
     case "RevealMore":
-      return addTableModifier(state, { stat: "revealMore", amount: instruction.amount, until: "endOfPhase" }, focus);
+      return addTableModifier(state, { stat: "revealMore", amount: instruction.perPlayer ? instruction.amount * livingSeats(state).length : instruction.amount, until: "endOfPhase" }, focus);
     case "WatchReveals": {
       const when = instruction.type ? { when: { kind: "matches" as const, card: "subject" as const, pick: { type: instruction.type, control: "any" as const } } } : {};
       return addTableModifier(state, { stat: WATCH_STATS[instruction.effect], amount: instruction.amount ?? 1, until: instruction.until, seat: focus.seat, ...when }, focus);

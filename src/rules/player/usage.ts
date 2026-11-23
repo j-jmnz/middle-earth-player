@@ -16,7 +16,7 @@ import { addToVictory } from "../families/sidequests/victory.ts";
 import { eventPlayReason } from "../families/costs/play.ts";
 import { printedOf, type Sphere } from "../core/printed.ts";
 import type { CardInstance, GameEvent, ScenarioState } from "../core/state.ts";
-import { flagged, inPlay, updateCard } from "../core/state.ts";
+import { flagged, inPlay, livingSeats, updateCard } from "../core/state.ts";
 import { moveCard } from "../core/zones.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { exhaustAnnounced } from "../windows/exhaust.ts";
@@ -244,7 +244,7 @@ export function payUsage(
       }
       case "raiseThreat":
         // The cost of a Response taken before its frame is pushed has no running effect: it is the record's own (40005:B:3, "raise your threat by 4").
-        next = raiseThreat(next, seat, cost.amount, steps, currentCause(steps, effectCause(effect)));
+        for (const raised of cost.each === true ? livingSeats(next) : [seat]) next = raiseThreat(next, raised, cost.amount, steps, currentCause(steps, effectCause(effect)));
         break;
       case "discardDeckTop": {
         // Each card is announced ("After ~ is discarded from your deck", families/deck/moves.ts).

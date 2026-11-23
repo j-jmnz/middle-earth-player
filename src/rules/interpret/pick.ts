@@ -20,15 +20,16 @@ import { seatThreat } from "../families/play/hooks.ts";
 import { playPickMatches } from "../families/play/pick.ts";
 import { playBlocked } from "../families/sidequests/contract.ts";
 import { sidequestsPickMatches } from "../families/sidequests/pick.ts";
+import { attachmentsOn, lootUnder } from "../core/attached.ts";
 import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
 import { flaggedByClass } from "../core/holder-classes.ts";
-import { cardTypeOf, isAllyLike, isQuestCardType, isSideQuestType, isPlayerType, printedOf } from "../core/printed.ts";
-import { activeFor, headOf, sharedStaging, sharing } from "../families/breaking/areas.ts";
+import { cardTypeOf, isAllyLike, isCharacterType, isQuestCardType, isSideQuestType, isPlayerType, printedOf } from "../core/printed.ts";
+import { activeFor, firstPlayerFor, headOf, sharedStaging, sharing } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { flagged, heldAmount, inPlay, livingSeats } from "../core/state.ts";
+import { flagged, heldAmount, inPlay, isExhausted, livingSeats } from "../core/state.ts";
 import { canDeclareDefender, isDefending } from "../families/defense/defenders.ts";
 import { facedownShadow } from "../families/defense/shadow.ts";
 import { deckPool, unchartedPickMatches } from "../families/uncharted/pick.ts";
@@ -101,6 +102,9 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   // The captured cards a pick starts from (families/captured/values.ts).
   const captured = spec.captured ? familyPool(state, spec, asking, sourceId, ctx) : null;
   if (captured) return captured;
+  // The cards of the riddle area (families/riddles/area.ts).
+  const riddleArea = spec.riddleArea ? familyPool(state, spec, asking, sourceId, ctx) : null;
+  if (riddleArea) return riddleArea;
   // Every card in play of any kind (families/angmar/reanimate/pick.ts).
   const everything = spec.allInPlay ? familyPool(state, spec, asking, sourceId, ctx) : null;
   if (everything) return everything;
@@ -160,6 +164,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     // player claimed: attached to a hero, controlled by that player (families/objectives.ts).
     if (spec.control !== "you" && !spec.controlled) raw.push(...stagingFor(state, spec, asking));
     if (!spec.stagingOnly) raw.push(...Object.values(state.cards).filter((card) => card.claimed === true && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
+    // An objective an encounter card attached to a character (a Sack card) is unclaimed and controlled by no one (131036:A:2).
+    if (spec.onCharacter) raw.push(...Object.values(state.cards).filter((card) => card.zone === "attached" && card.host != null && !raw.includes(card.id) && isCharacterType(printedOf(ctx.cards, state.cards[card.host]?.code ?? ""))).map((card) => card.id));
     // A location with the safe keyword (an objective-location) may be the active location (10075:A:2).
     if (spec.safe && !spec.stagingOnly) raw.push(...activeFor(state, asking, spec.stagingArea === "any"));
     // `controlled` also counts a tower the players control as a group: freed of encounters, in the staging area, claimed with no controller (ControlWhenFree, families/objectives/control.ts).
@@ -191,7 +197,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   const instance = state.cards[id];
   if (!instance) return false;
   const printed = printedOf(ctx.cards, instance.code);
-  const asking = spec.who === "firstPlayer" ? state.firstPlayer : at.seat;
+  const asking = spec.who === "firstPlayer" ? firstPlayerFor(state, at.seat) : at.seat;
   const picked = at.picked ?? [];
   const from = spec.from ?? "play";
   if ((id === at.sourceId && (from !== "play" || spec.other)) || (spec.different && picked.includes(id))) return false;
@@ -243,7 +249,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (!attachmentsPickMatches(state, id, spec, ctx, at.sourceId)) return false;
   // The uncharted family's filters: a Lost Island, progress enough (families/uncharted/pick.ts).
   if (!unchartedPickMatches(state, id, spec, ctx) || !aflamePickMatches(state, id, spec, ctx) || !sidePickMatches(state, id, spec)) return false;
-  if (spec.attachable != null && !attachmentHostIds(state, asking, spec.attachable, ctx).includes(id)) return false;
+  if (spec.attachable != null && !attachmentHostIds(state, asking, spec.attachable, ctx, { byEffect: true }).includes(id)) return false;
   // The attack family's filters: printed keywords, the source's host, engaged with whom, a shared Trait, an attachment on the
   // event's card, printed hit points, the top of a discard pile (families/attack/pick.ts).
   if (!attackPickMatches(state, id, spec, at, ctx)) return false;
@@ -271,7 +277,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.attackingEnemy != null && (state.pendingAttack?.enemyId === id) !== spec.attackingEnemy) return false;
   if (spec.hasAttachment) {
     const want = spec.hasAttachment;
-    const found = instance.attachments.some((attachmentId) => {
+    // The loot guarding a location is attached to it (core/attached.ts).
+    const found = attachmentsOn(state, id).some((attachmentId) => {
       const attachment = state.cards[attachmentId];
       if (!attachment) return false;
       if (want.trait && !hasTrait(state, attachmentId, want.trait, ctx)) return false;
@@ -294,7 +301,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.cost != null && (from === "play" || printed.cost !== spec.cost)) return false;
   if (spec.noVictory !== undefined && (printed.victory ?? 0) > 0 === spec.noVictory) return false;
   if (spec.state === "ready" && instance.exhausted) return false;
-  if (spec.state === "exhausted" && !instance.exhausted) return false;
+  // An unconscious character is neither ready nor exhausted (hob.unconscious-characters): the Weighed Down penalty and the "exhausted" filters do not reach it.
+  if (spec.state === "exhausted" && !isExhausted(instance)) return false;
   if (spec.canAttack && !legalAttackEnemies(state, instance.controller ?? asking, id, ctx.cards, true).length) return false;
   if (spec.attackableByPicked) {
     const attacker = picked.at(-1);
@@ -368,12 +376,12 @@ function candidatesOf(
   // The answered event's subject and other card, for a condition read about it (families/attack/pick.ts).
   event?: { subject?: string | null; other?: string | null; discards?: boolean },
 ): string[] {
-  const asking = spec.who === "firstPlayer" ? state.firstPlayer : seat;
+  const asking = spec.who === "firstPlayer" ? firstPlayerFor(state, seat) : seat;
   if (spec.type === "player") return seatsOf(state, spec, asking).filter((index) => !state.seats[index]?.eliminated && seatPickMatches(state, index, spec, ctx)).map((index) => `seat:${index}`);
   if (spec.hostForPicked) {
     const card = state.cards[picked.at(-1) ?? ""];
     // An attachment already on a card moves to another one ("attach Dúnedain Warning to another hero", 02026:A:3).
-    return card ? attachmentHostIds(state, asking, card.code, ctx).filter((id) => id !== card.host) : [];
+    return card ? attachmentHostIds(state, asking, card.code, ctx, { byEffect: true }).filter((id) => id !== card.host) : [];
   }
   // Immunity is to player card effects: an encounter card's Pick may choose an immune card (mec109.immune-to-player-card-effects).
   // An ally with an encounter back is an encounter card and has encounter card effects (dcce.encounter-cards: the ship-objectives, the Modification attachments, Calaerion, Gavin, Send for Help). The Stormcaller Elite's objective allies have no encounter back (dcce.stormcaller-elite) and stay objectives.
@@ -427,7 +435,10 @@ function attachedPool(state: ScenarioState, where: "source" | "host" | "activeLo
   const defender = state.pendingAttack?.defenderId && !state.pendingAttack.undefended ? state.cards[state.pendingAttack.defenderId] : undefined;
   const holder =
     where === "defender" ? defender : where === "activeLocation" ? (state.activeLocation ? state.cards[state.activeLocation] : undefined) : where === "source" ? source : hostId ? state.cards[hostId] : undefined;
-  return holder ? holder.attachments.filter((id) => state.cards[id] != null && inPlay(state.cards[id]?.zone ?? "removed")) : [];
+  if (!holder) return [];
+  const attached = holder.attachments.filter((id) => state.cards[id] != null && inPlay(state.cards[id]?.zone ?? "removed"));
+  // The loot guarding the active location is on it, out of play as it is (core/attached.ts; Mirkwood Hunter, 19087:A:2).
+  return where === "activeLocation" ? [...attached, ...lootUnder(state, holder.id)] : attached;
 }
 
 /** Whether the instructions after a pick discard what it chose. */

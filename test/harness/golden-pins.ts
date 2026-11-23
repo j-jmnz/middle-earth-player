@@ -29,6 +29,10 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
     "two-handed, lost, a deck runs out and Iârion leaves play",
     "two-handed, won, Normal",
   ],
+  "dungeons-deep-and-caverns-dim": [
+    "solo loss: threat 50",
+    "solo win",
+  ],
   "escape-from-dol-guldur": [
     "two-handed, won",
   ],
@@ -327,5 +331,8 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
     "true solo, won, after the earlier parts, Dragon-slayer, 4 Dragon Signs, a treasure chosen",
     "two-handed, Easy, won, Melanwar's and Isolde's lines, 4 Dragon Signs",
     "two-handed, won, after the earlier parts, an Accolade boon for each player, 4 Dragon Signs",
+  ],
+  "we-must-away-ere-break-of-day": [
+    "two-handed win, the Sack cards are drawn and the encounter deck runs out",
   ],
 };

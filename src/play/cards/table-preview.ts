@@ -4,7 +4,7 @@ import { stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
 import { isLostIsland } from "../../rules/families/uncharted/pick.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import type { CardInstance } from "../../rules/core/state.ts";
-import { flagged } from "../../rules/core/state.ts";
+import { flagged, isExhausted } from "../../rules/core/state.ts";
 import { BLIZZARD_LIMIT } from "../../rules/families/quest/blizzard.ts";
 
 
@@ -24,6 +24,7 @@ import { inspectTargets } from "../store/selectors.ts";
 import { whyNotPlayable } from "../choice/why.ts";
 import { previewKeywords } from "./preview-keywords.ts";
 import { contractSides } from "./contract-sides.ts";
+import { LOOT_ROLE } from "../words/loot.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 
 // A card code as the preview draws it: its name, its picture (or null) by picture key (picture-key.ts: side B of a revealed quest
@@ -57,12 +58,12 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
  * What lies on the card now, one phrase a counter: its damage, progress and resource tokens, and whether it is exhausted or committed to the
  * quest. Empty for a card with none (a card in the hand, a fresh enemy). `progressLimit`: the progress is counted against a limit ("3 / 5 progress", Blinding Blizzard, 901307:A:2).
  */
-export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "resources" | "exhausted" | "committed">, progressLimit?: number): string[] {
+export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "resources" | "exhausted" | "unconscious" | "committed">, progressLimit?: number): string[] {
   return [
     ...(card.damage > 0 ? [`${card.damage} damage`] : []),
     ...(card.progress > 0 ? [`${card.progress}${progressLimit == null ? "" : ` / ${progressLimit}`} progress`] : []),
     ...(card.resources > 0 ? [`${card.resources} resource${card.resources === 1 ? "" : "s"}`] : []),
-    ...(card.exhausted ? ["Exhausted"] : []),
+    ...(isExhausted(card) ? ["Exhausted"] : []),
     ...(card.committed ? ["Committed"] : []),
   ];
 }
@@ -103,7 +104,9 @@ export function previewCards(
     const card = game.cards[id];
     if (!card) return [];
     if (earlier.includes(id)) return [earlierStage(game, ctx, card.code, describe)];
-    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : card.host ? "Attachment" : null;
+    // The loot a location guards is under it, out of play, and still its player's (22024:B:2).
+    const loot = game.lootDecks != null && card.zone === "under" && card.controller != null;
+    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : loot ? LOOT_ROLE : card.host ? "Attachment" : null;
     // The effects on it, then what a delayed effect will do to it (Sneak Attack's return); for the pressed hand card, why it
     // does not glow.
     const effects = [...effectLines(game, ctx, id, cardName), ...delayedLines(game, id, cardName)];

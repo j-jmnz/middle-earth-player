@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CONDITION_TEMPLATES, ERECH_CONDITION_SAMPLES, FOG_CONDITION_SAMPLES, INVESTIGATION_CONDITION_SAMPLES, ESCAPE_CONDITION_SAMPLES, GUARDIAN_CONDITION_SAMPLES, LONG_DARK_CONDITION_SAMPLES, renderCondition, SHARED_CONDITION_SAMPLES } from "./conditions.ts";
+import { CONDITION_TEMPLATES, ERECH_CONDITION_SAMPLES, SACK_CONDITION_SAMPLES, FOG_CONDITION_SAMPLES, INVESTIGATION_CONDITION_SAMPLES, ESCAPE_CONDITION_SAMPLES, GUARDIAN_CONDITION_SAMPLES, LONG_DARK_CONDITION_SAMPLES, renderCondition, SHARED_CONDITION_SAMPLES } from "./conditions.ts";
 import { FAMILY_CONDITION_SAMPLES } from "./families.ts";
 import type { Obj } from "./kit.ts";
 import { checkPiece, type Render } from "./read-fields-piece.ts";
@@ -48,6 +48,7 @@ describe("effects render read fields, conditions", () => {
     questProgressNoted: [{ kind: "questProgressNoted", is: true, min: 10 }, { kind: "questProgressNoted", is: false }],
     currentQuestProgress: [{ kind: "currentQuestProgress", is: "some" }, { kind: "currentQuestProgress", is: "none" }],
     defendingAgainst: [{ kind: "defendingAgainst", trait: "Undead" }],
+    holderExhausted: [{ kind: "holderExhausted" }],
     versusDefender: [{ kind: "versusDefender", maxHitPoints: 2, maxWillpower: 1, ally: true }],
     attacking: [{ kind: "attacking", card: "host", enemy: { type: "enemy", control: "any" }, notEnemy: { type: "enemy", control: "any" }, alone: true, ranged: true }],
     timeOfDay: [{ kind: "timeOfDay", is: "day" }, { kind: "timeOfDay", is: "night" }],
@@ -67,6 +68,7 @@ describe("effects render read fields, conditions", () => {
     lastFortitudeFailed: [{ kind: "lastFortitudeFailed" }],
     ...ESCAPE_CONDITION_SAMPLES,
     ...ERECH_CONDITION_SAMPLES,
+    ...SACK_CONDITION_SAMPLES,
     ...FOG_CONDITION_SAMPLES,
     ...INVESTIGATION_CONDITION_SAMPLES,
     ...GUARDIAN_CONDITION_SAMPLES,

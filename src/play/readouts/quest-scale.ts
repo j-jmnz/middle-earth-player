@@ -3,11 +3,12 @@
 // The table's quest scale (docs/design-system-table.md, Quest scale): the threat in the staging area against the willpower committed to the
 // quest, and how far apart they are. While the players commit, the dock's readout already adds the picked characters' willpower
 // (readout.ts), so the scale moves as each one is picked; otherwise it reads the engine's own totals. Pure, so a test reads it.
-import { committedWillpower, stagingThreat } from "../../rules/quest/quest.ts";
+import { committedWillpower } from "../../rules/quest/quest.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
 import type { Readout } from "./readout.ts";
 import { stageHasDefense } from "./fortress.ts";
+import { stagingThreatNow } from "./the-hobbit/riddles.ts";
 import { questSeat } from "../store/selectors.ts";
 
 // `live` is whether the comparison means anything now: only in the Quest phase, where characters are committed and the quest resolves,
@@ -28,7 +29,7 @@ export function questScaleOf(game: ScenarioState, ctx: ReduceContext, readout: R
     const threat = readout.stats.find((stat) => stat.icon === "threat")?.value ?? 0;
     return { threat, willpower, delta: willpower - threat, live: true, seat: owner, ...defense };
   }
-  const threat = stagingThreat(game, ctx.cards, seat);
+  const threat = stagingThreatNow(game, ctx, seat);
   const willpower = committedWillpower(game, ctx.cards, seat);
   return { threat, willpower, delta: willpower - threat, live: game.phase === "Quest" && !game.questResolved, seat: owner, ...defense };
 }

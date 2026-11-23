@@ -49,3 +49,12 @@ export function matchOf(instructions: readonly Instruction[], wanted: Instructio
 export function pathOf(instructions: readonly Instruction[], wanted: Instruction): string | null {
   return matchOf(instructions, wanted)?.path ?? null;
 }
+
+/** The fixed number of times a Repeat of the record runs the instruction `wanted` (Forest Stream's 4 discards), null when no Repeat around it has a plain number. */
+export function repeatTimesOf(instructions: readonly Instruction[], wanted: Instruction): number | null {
+  let times: number | null = null;
+  walk(instructions, (instruction) => {
+    if (times === null && instruction.verb === "Repeat" && typeof instruction.times === "number" && matchOf(instruction.instructions, wanted) !== null) times = instruction.times;
+  });
+  return times;
+}

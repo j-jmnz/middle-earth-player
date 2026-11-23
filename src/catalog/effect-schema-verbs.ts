@@ -249,6 +249,9 @@ export const simpleVerbs = [
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1), challenge: z.literal(true).optional() }),
       // The enemy making the attack in progress ("Shadow: Attach this card to attacking enemy", 18018:A:2).
       z.strictObject({ kind: z.literal("attackingEnemy") }),
+      // The character the answered event is about ("Forced: After Dark Bats damages a character, attach it to that character", 132036:A:1), or (`defender`) the defending character of the attack in progress ("Shadow: Attach this card to the defending character", 132036:A:2). Nobody chooses; an undefended attack has no defender and the card is not attached.
+      z.strictObject({ kind: z.literal("subject") }),
+      z.strictObject({ kind: z.literal("defender") }),
       // A Ship objective the players control, chosen by the first player ("Attach to a Ship objective.", 12132:A:1), or (`defender`) the Ship objective defending the attack in progress
       // ("If defending character is a Ship, attach ~ to it.", 12132:A:2).
       z.strictObject({ kind: z.literal("ship"), defender: z.literal(true).optional() }),
@@ -305,8 +308,7 @@ export const simpleVerbs = [
     belowSourceHitPoints: z.boolean().optional(), anyDefender: z.literal(true).optional(), // `anyDefender`: no character can defend against the source ("Players cannot declare defenders against Rock Adder", 51324:A:1).
     // With "travel" on a card that is not the location: the players cannot travel to any location but the source ("players cannot travel to other locations", 50217:A:2).
     exceptSelf: z.boolean().optional(),
-    // With "travel" on a card that is not the location: the players cannot travel to a location whose title is not this one ("players cannot travel to a location that does not have the title City Street", 05038:A:2).
-    exceptTitle: z.string().min(1).optional(),
+    exceptTitle: z.string().min(1).optional(), // With "travel" on a card that is not the location: no travel to a location whose title is not this one (05038:A:2).
     // With "commit" (a player who does not control a card that matches this cannot commit characters to the quest, 02013:B:1) and "draw" (such a player cannot draw cards through card effects, 900404:A:1: the resource phase's and the round's draws are framework
     // draws, not card effects). The pick is read from each player's side.
     unlessControls: pickSchema.optional(),

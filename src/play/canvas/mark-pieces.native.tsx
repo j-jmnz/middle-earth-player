@@ -77,11 +77,11 @@ export function OptionMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect
  * The cards underneath The Havens Burn against the number that loses the game: a night pill at the card's foot with the short count ("2/5"), threat red when the next card placed under it loses (11038:A:2).
  * The count is short on purpose: it stays inside the card at every size (the full sentence is in the preview and the screen reader's line). Only the count is shown, never which cards are underneath.
  */
-export function UnderMarkView({ rect, mark, fonts, t, s }: { rect: Rect; mark: { text: string; loses: boolean; count?: number }; fonts: Fonts; t: TableTokens; s: number }) {
+export function UnderMarkView({ rect, mark, sideways, fonts, t, s }: { rect: Rect; mark: { text: string; loses: boolean; count?: number; clearName?: true }; sideways: boolean; fonts: Fonts; t: TableTokens; s: number }) {
   // Captured cards (a `count`) stand a row above the foot, clear of the engagement cost, the combat number and the quest strip; where "3 captured" does not fit, a facedown-card glyph and the bare count stand in.
   const counted = mark.count != null;
   const count = String(mark.count ?? "");
-  const box = underMarkBox(rect, fonts.badge.getTextWidth(mark.text), fonts.badge.getTextWidth(count), s, counted);
+  const box = underMarkBox(rect, fonts.badge.getTextWidth(mark.text), fonts.badge.getTextWidth(count), s, counted, sideways && mark.clearName === true);
   const text = box.kind === "words" ? mark.text : count;
   const words = fonts.badge.getTextWidth(text);
   const token = box.height;

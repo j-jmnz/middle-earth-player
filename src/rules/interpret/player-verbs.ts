@@ -1,4 +1,5 @@
 // Rules: rr.exhausted, rr.in-play-and-out-of-play, rr.ownership-and-control, rr.damage, rr.explored, rr.cancel, rr.shadow-effects, rr.restricted, rr.initiating-abilities-playing-cards (data/rules/entries.json).
+import { firstPlayerFor } from "../families/breaking/areas.ts";
 import { counterCancel } from "../families/pelennor/combat.ts";
 import { bonesCancel } from "../families/wizards-quest/khazad.ts";
 import { sendAway } from "../families/objectives/claimed.ts";
@@ -66,7 +67,7 @@ export function otherSeat(state: ScenarioState, seat: number): number | null {
 // The seats a verb names: the actor's, each living one, the picked player's, or the one the answered event happened to.
 export function seatsFor(state: ScenarioState, who: "actor" | "picked" | "eachSeat" | "eventSeat" | "firstPlayer", actor: number): number[] {
   if (who === "eachSeat") return livingSeats(state);
-  if (who === "firstPlayer") return [state.firstPlayer];
+  if (who === "firstPlayer") return [firstPlayerFor(state, actor)];
   if (who === "picked") {
     const seat = seatOf(lastPicked(state));
     return seat == null ? [] : [seat];
@@ -263,7 +264,7 @@ export function runPlayerVerb(
       if (!card) return state;
       // A card out of a deck or a discard pile goes to its own player's hand.
       if (instruction.to === "hand") return moveCard(state, id, { zone: "hand", seat: card.controller ?? focus.seat });
-      const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
+      const seat = instruction.who === "firstPlayer" ? firstPlayerFor(state, focus.seat) : focus.seat;
       // An ally taken from another player's discard pile is put into play under the new controller and stays its owner's card.
       const owner = card.controller != null && card.controller !== seat && card.owner == null ? { owner: card.controller } : {};
       // A player side quest put into play lies in the staging area, as one played does (families/sidequests/play.ts).

@@ -9,6 +9,7 @@ import { currentCause, effectCause, UNATTRIBUTED, type Cause } from "../../core/
 import { effectsOf } from "../../windows/listen.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
+import { familyAttackDamaged } from "../../interpret/family-hooks.ts";
 import { modifiedStat, placeDamage, type DamageSource } from "../../core/keywords.ts";
 import { isCharacterType, printedOf, type PrintedCard } from "../../core/printed.ts";
 import { placeQuestProgress, questPointsOf } from "../../quest/quest.ts";
@@ -19,6 +20,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import { defendingAgainst } from "../angmar/combat.ts";
 import { scrollDamageTarget } from "../pelargir/scroll.ts";
 import { listened, queueHeard, trimFollowUps } from "./listen.ts";
+import { bilboDamageBarred } from "../riddles/gollum.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -70,6 +72,11 @@ export function damageGoesTo(state: ScenarioState, id: string, source?: DamageSo
   }
   // "Any damage dealt by this attack is dealt to the hero with Alcaron's Scroll attached, if able" (05020:A:2): the pelargir family names the hero, or none.
   return scrollDamageTarget(state, id, source) ?? id;
+}
+
+// Damage a card does not take from this source: Bilbo Baggins in the riddle area takes it only from Gollum (families/riddles/gollum.ts).
+export function damageBarred(state: ScenarioState, id: string, source: string, sourceId: string | null | undefined): boolean {
+  return bilboDamageBarred(state, id, source, sourceId);
 }
 
 // Characters of any player that may take the damage of an undefended attack against `seat` because a card that player controls
@@ -127,7 +134,9 @@ export function questDamageCause(state: ScenarioState, ctx: ReduceContext): Ques
 
 // Each character that took damage from the enemy attack in progress and is still in play hears it ("After attached hero takes
 // damage from an enemy attack"): the characters whose damage went up between the two states; the enemy making the attack is the event's other card.
-export function noteAttackDamage(before: ScenarioState, after: ScenarioState, ctx: ReduceContext): ScenarioState {
+export function noteAttackDamage(before: ScenarioState, damaged: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // A family may act on the damage (an enemy with Venom gives each character it damaged 1 poison: hob.venom-poison, families/poison/venom.ts).
+  const after = familyAttackDamaged(before, damaged, ctx, steps);
   if (!listened(after, ctx, ["damagedByAttack"])) return after;
   let next = after;
   for (const now of Object.values(after.cards)) {

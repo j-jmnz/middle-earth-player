@@ -43,6 +43,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["top"], typeof pick.top === "number" ? (pick.from === "discard" ? `among the top ${pick.top} cards of each player's own discard pile` : `among the top ${pick.top}`) : null);
   note(["bottom"], typeof pick.bottom === "number" ? `among the bottom ${pick.bottom}` : null);
   note(["staging"], pick.staging === true ? "or in the staging area" : null);
+  note(["riddleArea"], pick.riddleArea === true ? "in the riddle area: stage 2, Gollum, Bilbo Baggins and the Ring on him (while stage 2 is there)" : null);
   note(["stagingArea"], pick.stagingArea === "shared" ? "in the shared staging area (the one stage 2B deals out)" : pick.stagingArea === "any" ? "in any player's staging area" : pick.stagingArea === "own" ? "in the chooser's own staging area (the only one while the stages are not separate)" : null);
   note(["otherArea"], pick.otherArea === true ? "whose staging area is a different one from the chooser's (every other player while the areas are not separate)" : null);
   note(["atOtherStage"], pick.atOtherStage === true ? "at another stage than the chooser's (none while the game has one stage)" : null);
@@ -51,6 +52,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["atStage"], pick.atStage === true ? "at the acting player's staging area (every area before they are separate)" : null);
   note(["playerCard"], pick.playerCard === true ? "that is a player card" : pick.playerCard === false ? "that is an encounter card" : null);
   note(["stagingOnly"], pick.stagingOnly === true ? "in the staging area only" : null);
+  note(["onCharacter"], pick.onCharacter === true ? "including the ones an encounter card attached to a character" : null);
   note(["highestThreatPlusRemaining"], pick.highestThreatPlusRemaining === true ? "with the highest sum of its current Threat and its remaining quest points (the quest points less the progress on it; a tie is the chooser's)" : null);
   note(["attachable"], typeof pick.attachable === "string" ? `that the card with code ${pick.attachable} can be attached to` : null);
   note(["engaged"], typeof pick.engaged === "string" ? (ENGAGED[pick.engaged] ?? pick.engaged) : null);

@@ -299,8 +299,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("SearchBoonOrTreasureToHand") }),
   // "Search the encounter deck, discard pile, and victory display for a Goblin Troop and add it to the staging area" (19161:A:3): the card with this code in any of the three is added to the staging area, entering play there. Nothing happens when none is left.
   z.strictObject({ verb: z.literal("SearchStageCard"), code, ...when }),
-  // "Add each enemy discarded by this effect to the staging area" (19162:A:2): every card of `type` that the effect's DiscardEncounterTop discarded and that is still in the encounter discard pile enters the staging area, in the order they were discarded.
-  z.strictObject({ verb: z.literal("StageDiscarded"), type: z.literal("enemy"), ...when }),
+  // "Add each enemy discarded by this effect to the staging area" (19162:A:2): every card of `type` that the effect's DiscardEncounterTop discarded and that is still in the encounter discard pile enters the staging area, in the order they were discarded. With `trait`, only an enemy with that Trait goes ("Add each Goblin enemy discarded by this effect to the staging area", 131063:A:1); the others stay in the discard pile.
+  z.strictObject({ verb: z.literal("StageDiscarded"), type: z.literal("enemy"), trait: z.string().min(1).optional(), ...when }),
   // "Remove 1 progress from The Goblins' Assault" (19163:A:2): progress comes off the card in play with this title, at most as much as it holds. `target` names the card itself instead ("remove 1 progress from River Ninglor", 02017:A:1:
   // a card's own title is the card, though another copy is in play).
   z.strictObject({ verb: z.literal("RemoveProgressFrom"), amount: positiveAmountSchema, named: z.string().min(1).optional(), target: cardRefSchema.optional(), ...when }),

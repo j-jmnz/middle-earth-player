@@ -10,9 +10,10 @@ import { printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
 import { heldAmount, updateCard } from "../../core/state.ts";
+import { attachmentsOn } from "../../core/attached.ts";
 import { moveCard, playerCardsUnder } from "../../core/zones.ts";
 import { familyPlayBarred } from "../../interpret/family-hooks.ts";
-import { lootUnder } from "./loot.ts";
+import { poisonOf } from "../poison/poison.ts";
 
 // The `faceUp` condition: the card shows this side. A card dealt face up shows its side A.
 export function faceUp(state: ScenarioState, sourceId: string | null, side: "A" | "B"): boolean {
@@ -51,11 +52,11 @@ export function flipCard(state: ScenarioState, sourceId: string | null): Scenari
 export function attachedCount(state: ScenarioState, holderId: string, pick: PickSpec, sourceId: string, ctx: ReduceContext): number {
   // "+1 quest point for each facedown player card under it" (18075:B:1): the cards counted lie under the holder, not on it.
   if (pick.facedownUnder) return playerCardsUnder(state, holderId).length;
-  const holder = state.cards[holderId];
+  // "-1 Willpower for each poison it has" (132026:A:1): the poison under the holder.
+  if (pick.poison) return poisonOf(state, holderId);
   const seat = state.cards[sourceId]?.controller ?? state.firstPlayer;
   // A guarded objective counts as attached to the location it guards (The Burglar's Turn).
-  const attached = [...(holder?.attachments ?? []), ...lootUnder(state, holderId)];
-  return attached.filter((id) => matchesPick(state, id, pick, { seat, sourceId, counting: true }, ctx)).length;
+  return attachmentsOn(state, holderId).filter((id) => matchesPick(state, id, pick, { seat, sourceId, counting: true }, ctx)).length;
 }
 
 // ReduceFirstOnEachHero: how much less the card costs to play on this host, a hero of the seat, when it is the first card that

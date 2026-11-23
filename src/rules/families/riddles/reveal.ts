@@ -1,0 +1,101 @@
+// Rules: hob.riddles, rr.encounter-deck (data/rules/entries.json); ledger lines 131081:A:1, 131084:A:1. The riddle cards as they are revealed: the first player's choice between resolving the card and answering its riddle, the discards of It Likes Riddles? and Not Fair! Not Fair!.
+import type { Effect, Instruction } from "../../../catalog/boundary.ts";
+
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { takeProgressOff } from "../../core/progress.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
+import { askTarget } from "../../windows/choices.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import { effectsOf } from "../../windows/listen.ts";
+import { patchTop } from "../../windows/windows.ts";
+import { effectData, pushPicked, shuffleDiscardIn } from "../encounter/moves.ts";
+import type { Focus } from "../index.ts";
+import { areaStage } from "./area.ts";
+import { riddleOf } from "./conditions.ts";
+
+type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
+
+// The record that offers the choice: its top-level Choose has an option that answers the riddle.
+const offers = (effect: Effect): boolean => effect.instructions.some((instruction) => instruction.verb === "Choose" && instruction.options.some((option) => option.instructions.some((inner) => inner.verb === "AnswerRiddle")));
+
+// The record that offers the riddle among these When Revealed records, when its condition holds for the card being revealed (one reading, for the reveal's records and for the staging event alike).
+function riddleOffer(state: ScenarioState, id: string, seat: number, effects: readonly Effect[], ctx: ReduceContext): Effect | undefined {
+  return effects.find((effect) => offers(effect) && (!effect.condition || holds(state, effect.condition, { actor: seat, sourceId: id, returned: 0 }, ctx)));
+}
+
+/** The When Revealed records the reveal of the card pushes: the riddle offer alone when it holds (the others wait for ResolveNormally), else every record but the offer (a card that is not revealed from the encounter deck, or while riddles are ignored). */
+export function revealedEffects(state: ScenarioState, id: string, seat: number, effects: readonly Effect[], ctx: ReduceContext): readonly Effect[] {
+  const offer = riddleOffer(state, id, seat, effects, ctx);
+  return offer ? [offer] : effects.filter((effect) => !offers(effect));
+}
+
+/** Whether the card just revealed offers the first player its riddle: the card is not added to the staging area until he resolves it (an answered riddle card is discarded, never added: hob.riddles). */
+export function offersRiddle(state: ScenarioState, id: string, seat: number, ctx: ReduceContext): boolean {
+  const code = state.cards[id]?.code;
+  return riddleOffer(state, id, seat, effectsOf(ctx, code ?? "").filter((effect) => effect.timing === "whenRevealed"), ctx) !== undefined;
+}
+
+/** The riddle card whose offer the open Choose is: it lies in the staging area, but answering its riddle keeps it out of it (the table's quest figure leaves its threat out). Null when no riddle offer is open. */
+export function offeredRiddleCard(state: ScenarioState, ctx: ReduceContext): string | null {
+  if (state.window?.kind !== "choose") return null;
+  const frame = state.stack.at(-1);
+  const card = frame?.cardId != null ? state.cards[frame.cardId] : undefined;
+  if (!card || card.zone !== "staging" || frame?.data.kind !== "effect") return null;
+  const effectId = frame.data.effectId;
+  return effectsOf(ctx, card.code).some((effect) => effect.id === effectId && offers(effect)) ? card.id : null;
+}
+
+/** ResolveNormally: the card's When Revealed records, but the riddle offer, resolve for the first player as the reveal would have run them. The card is added to the staging area now (the reveal held that back while the riddle was offered). */
+export function resolveNormally(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = focus.sourceId;
+  const code = id ? state.cards[id]?.code : undefined;
+  if (!id || !code) return state;
+  const added = state.cards[id]?.zone === "staging" ? queueEvent(state, { trigger: "addedToStaging", seat: state.firstPlayer, cardId: id }) : state;
+  const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed" && !offers(effect));
+  return pushCardEffects(added, "whenRevealed", id, focus.seat, false, effects, ctx, steps);
+}
+
+/** DiscardUntilRiddle: encounter cards go to the discard pile until another card that prints a riddle is discarded; it is the picked card (empty when no such card is left in the deck or the discard pile). The source card is no "other" card: shuffled back with the discard pile it is not found. */
+export function discardUntilRiddle(state: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
+  const wanted = (id: string) => id !== focus.sourceId && riddleOf(ctx, state.cards[id]?.code ?? "") != null;
+  if (![...state.encounterDeck, ...state.encounterDiscard].some(wanted)) return pushPicked(state, null);
+  let current = state;
+  for (;;) {
+    const top = current.encounterDeck[0];
+    if (!top) {
+      current = shuffleDiscardIn(current);
+      continue;
+    }
+    current = updateCard(moveCard(current, top, { zone: "encounterDiscard" }), top, { face: "up", controller: null });
+    if (wanted(top)) return pushPicked(current, top);
+  }
+}
+
+const TYPES = ["enemy", "location", "treachery", "objective"] as const;
+
+/** NameEncounterType: the first player names one of the types; the effect keeps it. */
+export function nameEncounterType(state: ScenarioState, instruction: Verb<"NameEncounterType">, focus: Focus, steps: EngineStep[]): ScenarioState {
+  const data = effectData(state);
+  if (!data) return state;
+  const chosen = focus.chosen != null && instruction.types.includes(focus.chosen as (typeof TYPES)[number]) ? focus.chosen : undefined;
+  if (chosen === undefined) return askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, instruction.types);
+  return patchTop(state, { data: { ...data, named: [...(data.named ?? []).filter((entry) => !entry.startsWith("riddle:encounterType:")), `riddle:encounterType:${chosen}`] } });
+}
+
+/** RemoveRiddleProgress: each card the effect discarded from the top of the encounter deck whose type is not the named one takes 1 progress off stage 2. */
+export function removeRiddleProgress(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const data = effectData(state);
+  const stage = areaStage(state);
+  const name = (data?.named ?? []).findLast((entry) => entry.startsWith("riddle:encounterType:"))?.slice("riddle:encounterType:".length);
+  if (!data || !stage || name == null) return state;
+  const missed = (data.looked ?? []).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type !== name).length;
+  // Stage 2B's "cannot be ... removed ... except by answering riddles" is absolute (rr.cannot): this card is no riddle answered, so the bar holds against it.
+  return takeProgressOff(state, stage.id, missed, steps);
+}

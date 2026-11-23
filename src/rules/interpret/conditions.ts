@@ -17,7 +17,7 @@ import { seatThreat } from "../families/play/hooks.ts";
 import { distinctTraitCount, flaggedTrait, lostTrait } from "../families/misc/traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "../families/quest/conditions.ts";
-import { headOf, inAreaOf, isolatedAreas } from "../families/breaking/areas.ts";
+import { firstPlayerFor, headOf, inAreaOf, isolatedAreas } from "../families/breaking/areas.ts";
 import { victoryPointsOf } from "../core/printed-stat.ts";
 import { modifiedStat, versusDefender, versusHighEngagement } from "../core/keywords.ts";
 import { defendingAgainst } from "../families/angmar/combat.ts";
@@ -109,7 +109,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   switch (condition.kind) {
     // A family's condition hook answers these before this switch (south: noneDiscarded; black-gate: embassy; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
     case "noneDiscarded": case "lastPlayer": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives": case "discardedHasShadowOrTentacle": case "firstLetterMatches":
-    case "attackedThisPhase": case "optionTaken": case "namedFlag": case "discoverUnavailable": case "investigateIgnored": case "investigationTop": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "questProgressNoted": case "committedThisRound": case "guardianCanChange": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastEscapeFailed": case "lastEscapePassed": case "lastLocateFailed": case "lastLocatePassed": case "hasPass": case "playerWithoutReady": case "drew": case "thenResolves": case "engagedWithLastPlayer": case "firstTreachery": case "firstEnemy": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "allAtStage": case "setAsideHas": case "exploredPending": case "night":
+    case "attackedThisPhase": case "optionTaken": case "namedFlag": case "discoverUnavailable": case "investigateIgnored": case "investigationTop": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "questProgressNoted": case "committedThisRound": case "guardianCanChange": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastEscapeFailed": case "lastEscapePassed": case "lastLocateFailed": case "lastLocatePassed": case "hasPass": case "playerWithoutReady": case "drew": case "thenResolves": case "engagedWithLastPlayer": case "firstTreachery": case "firstEnemy": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "allAtStage": case "setAsideHas": case "exploredPending": case "night": case "encounterDeckEmpty": case "bagginsTravel": case "riddle":
       return false;
     case "hideFailed":
       return state.hideFailures.some(
@@ -156,7 +156,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
         (id) => id != null && id !== scope.sourceId && printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location",
       );
     case "firstPlayer":
-      return scope.actor === state.firstPlayer;
+      return scope.actor === firstPlayerFor(state, scope.actor);
     case "tokens":
       return tokensOn(state, condition.code) >= condition.min * (condition.perPlayer ? livingSeats(state).length : 1);
     case "stagingThreat":
@@ -229,8 +229,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && inAreaOf(state, holder, condition.seat);
     }
-    // Answered by the captured family's condition hook above (families/captured/values.ts).
-    case "versusVictoryTrait":
+    // Answered by the captured family's condition hook above (families/captured/values.ts); holderExhausted is a stat condition, read where the stat is (core/keywords.ts).
+    case "versusVictoryTrait": case "holderExhausted":
       return false;
     case "versusHighEngagement": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
@@ -424,7 +424,7 @@ function engagedAs(card: { zone: string; controller: number | null }, engaged: "
   return engaged === "you" ? card.controller === seat : card.controller !== seat;
 }
 
-function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory" | "hand" | "stormcallerArea" | "encounterDeck" | "attached"): boolean {
+function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory" | "hand" | "stormcallerArea" | "encounterDeck" | "attached" | "encounterDiscard"): boolean {
   const source = sourceId ? state.cards[sourceId] : undefined;
   if (!source) return false;
   // The second active location slot is an active location too (mec109.stage-4).

@@ -41,6 +41,8 @@ export function authoredOrder(names: readonly string[], campaigns: readonly Pick
     for (const id of campaign.scenarios) take(id);
   }
   for (const scenario of scenarios) take(scenario.id);
+  // A file named `set-<encounter set>` holds the records of a set that several scenarios deal (set-wilderland.ts); it follows the scenario files.
+  for (const name of names) if (name.slice(name.lastIndexOf("/") + 1).startsWith("set-") && !order.includes(name)) order.push(name);
   const unknown = names.filter((name) => !order.includes(name));
   if (unknown.length > 0) throw new Error(`src/effects/authored/${unknown.join(".ts, ")}.ts is named for no campaign or scenario in data/: rename it to a scenario id, or fold it into a folder with an index.ts`);
   return order;

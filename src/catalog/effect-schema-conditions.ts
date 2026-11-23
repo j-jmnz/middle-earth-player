@@ -87,7 +87,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2). `hand`: an Action
   // its player uses from the hand ("put Emery into play from your hand", src/rules/families/deck/play.ts). `encounterDeck`: a card that left play
   // for the encounter deck (Gavin's Planning Action shuffles him in; "When Gavin leaves play (other than by his ability)", 11210:A:3). `attached`: the source is attached to a card now (an event that attaches itself, then does more only if it did: 10172:A:1, rr.then).
-  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand", "stormcallerArea", "encounterDeck", "attached"]) }),
+  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand", "stormcallerArea", "encounterDeck", "attached", "encounterDiscard"]) }),
   // The source card shows this side (a contract, flipped by FlipCard; side A at the start).
   z.strictObject({ kind: z.literal("faceUp"), side: z.enum(["A", "B"]) }),
   // The actor's seat (`seat`), the source card (`self`) or the table (`table`, the flags every seat holds: 901201:A:3) holds this flag, a modifier of that stat that is in force now (`is`: false
@@ -344,6 +344,14 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The encounter discard pile (`discard`), or the encounter deck and its discard pile (`deckAndDiscard`), holds a card of this printed type and/or with the Aflame keyword: the either/or of a search
   // that has something to find ("search ... for the Aflame location", 11040:A:1; `code`: a copy of the card with this code, "While there is a copy of Eastern Crows in the discard pile", 51031:A:1; "the topmost enemy in the encounter discard pile", 11044:A:2; rr.effects). Read by the aflame family.
   z.strictObject({ kind: z.literal("encounterHas"), piles: z.enum(["discard", "deckAndDiscard"]), cardType: z.enum(["enemy", "location", "treachery"]).optional(), aflame: z.literal(true).optional(), trait: z.string().min(1).optional(), code: z.string().min(1).optional() }),
+  // The riddles of Dungeons Deep and Caverns Dim (hob.riddles, hob.riddle-area; families/riddles/conditions.ts). `complete`: stage 1 and stage 2 both hold their quest points ("Players cannot advance to stage 3A unless both 1B and 2B are complete", 131029:B:1).
+  // `offered`: the source riddle card is being revealed from the encounter deck while no card ignores riddles, so the first player may answer its riddle instead of resolving it. `shadow`: the source enemy was dealt a shadow card that has a riddle. `answering`: a riddle is being answered
+  // in the running effect (Bilbo's Magic Ring's discard action is offered then).
+  z.strictObject({ kind: z.literal("riddle"), is: z.enum(["complete", "offered", "shadow", "answering"]) }),
+  // The encounter deck holds no card ("if there are no cards left in the encounter deck", 131024:B:1). Read by the sack family (src/rules/families/sack/).
+  z.strictObject({ kind: z.literal("encounterDeckEmpty") }),
+  // Bilbo Baggins has the card with code `key` attached and his pool holds the Baggins resources the travel costs: `amount`, or `reduced` while the card with code `purse` is attached too ("Players cannot travel to Troll Cave unless Bilbo Baggins has the Troll Key attached and the first player spends 5 Baggins resources", 131037:A:2). Read by the sack family.
+  z.strictObject({ kind: z.literal("bagginsTravel"), amount: z.number().int().positive(), reduced: z.number().int().positive(), key: z.string().min(1), purse: z.string().min(1) }),
   // A location in play with this trait has a total Threat of at least `min`, its grappled enemies' Threat included ("if the total Threat of any one Ship location is 9 or higher", 12041:B:2;
   // src/rules/families/grapple/values.ts).
   z.strictObject({ kind: z.literal("locationThreat"), trait: z.string().min(1), min: z.number().int().min(0) }),
@@ -385,6 +393,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The holder is in the staging area of the player `seat` or engaged with a player who shares it (mec108.create-staging-area): an encounter card's lasting effect on "each enemy" reaches the enemies of its own staging area only while the staging areas are separate. Engine use: the stat modifier
   // an encounter card's effect makes carries it; read while a stat is read (src/rules/core/keywords.ts).
   z.strictObject({ kind: z.literal("inArea"), seat: z.number().int().min(0) }),
+  // A stat modifier's: the holder is exhausted now, read each time the stat is read ("exhausted characters get -1 Willpower, -1 Attack, and -1 Defense", 132038:A:1; faq.lasting-effects).
+  z.strictObject({ kind: z.literal("holderExhausted") }),
   // The sole attacker: exactly one character was declared as an attacker in the attack in progress ("declared as the only attacker", 143015:A:3; rr.step-6-8b). Read by the attack family.
   // The encounter deck placed at least 1 progress on the current quest stage itself as the result of questing, in the quest resolution just made (the Defense keyword, mec112.defense):
   // progress the active location took does not count (143074:B:2). False while no quest has resolved under Defense. Read by the fortress family.
@@ -423,8 +433,8 @@ export const conditionSchema = z.discriminatedUnion("kind", [
 
 export type Condition = z.infer<typeof conditionSchema>;
 
-export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" | "versusVictoryTrait" | "inArea" | "defendingAgainst" }> {
-  return condition?.kind === "versusHighEngagement" || condition?.kind === "defendingAgainst" || condition?.kind === "attacking" || condition?.kind === "versusDefender" || condition?.kind === "versusVictoryTrait" || condition?.kind === "inArea";
+export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" | "versusVictoryTrait" | "inArea" | "defendingAgainst" | "holderExhausted" }> {
+  return condition?.kind === "versusHighEngagement" || condition?.kind === "defendingAgainst" || condition?.kind === "attacking" || condition?.kind === "versusDefender" || condition?.kind === "versusVictoryTrait" || condition?.kind === "inArea" || condition?.kind === "holderExhausted";
 }
 
 export const targetSchema = z.discriminatedUnion("kind", [

@@ -34,4 +34,17 @@ describe("table menu rows", () => {
     expect(rows[0]).toMatchObject({ testID: "update-open", label: "Version 0.5.0 is out", accessibilityLabel: "Get version 0.5.0", tone: "accent", icon: "oneRing" });
     expect(menuItems({ backLabel: "Path", backAccessibilityLabel: "" }, undefined, null).some((row) => row.id === "update")).toBe(false);
   });
+
+  it("puts Set aside after Log with the number of cards its list holds, and leaves it out while the list holds none", () => {
+    const nav = { backLabel: "Path", backAccessibilityLabel: "Back to the path" };
+    const rows = menuItems(nav, undefined, null, 3);
+    expect(rows.map((row) => row.id)).toEqual(["log", "setAside", "rules", "booklet", "setup", "settings", "debug", "resign", "leave"]);
+    expect(rows[1]).toMatchObject({ testID: "set-aside-open", label: "Set aside (3)", accessibilityLabel: "Set aside cards, 3", accessibilityHint: "Lists the cards that are set aside", icon: null });
+    expect(rows[1]?.tone).toBeUndefined();
+    expect(menuItems(nav, undefined, null, 0).some((row) => row.id === "setAside")).toBe(false);
+    expect(menuItems(nav).some((row) => row.id === "setAside")).toBe(false);
+    expect(menuItems(nav, ["setAside"], null, 3).some((row) => row.id === "setAside")).toBe(false);
+    // After the update offer when there is one.
+    expect(menuItems(nav, undefined, "0.5.0", 1).map((row) => row.id).slice(0, 3)).toEqual(["update", "log", "setAside"]);
+  });
 });

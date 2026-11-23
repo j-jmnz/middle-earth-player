@@ -20,7 +20,7 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   const uncharted = useMemo(() => pileSelector("unchartedDeck", seat), [seat]);
   const grotto = useMemo(() => pileSelector("grottoDeck", seat), [seat]);
   // The Evil Creatures pair and the Caves deck (Ered Mithrin), only while the game has dealt them; shared, so a peek leaves them too.
-  const wilderland = useMemo(() => ({ evilDeck: pileSelector("evilCreaturesDeck", seat), evilDiscard: pileSelector("evilCreaturesDiscard", seat), caves: pileSelector("cavesDeck", seat), harad: pileSelector("haradDeck", seat), orcs: pileSelector("angmarOrcDeck", seat), investigation: pileSelector("investigationDeck", seat), balrogDeck: pileSelector("balrogDeck", seat), balrogDiscard: pileSelector("balrogDiscard", seat), smaugDeck: pileSelector("smaugDeck", seat), smaugDiscard: pileSelector("smaugDiscard", seat) }), [seat]);
+  const wilderland = useMemo(() => ({ evilDeck: pileSelector("evilCreaturesDeck", seat), evilDiscard: pileSelector("evilCreaturesDiscard", seat), caves: pileSelector("cavesDeck", seat), harad: pileSelector("haradDeck", seat), orcs: pileSelector("angmarOrcDeck", seat), investigation: pileSelector("investigationDeck", seat), sack: pileSelector("sackDeck", seat), balrogDeck: pileSelector("balrogDeck", seat), balrogDiscard: pileSelector("balrogDiscard", seat), smaugDeck: pileSelector("smaugDeck", seat), smaugDiscard: pileSelector("smaugDiscard", seat) }), [seat]);
   // The victory display, shared by the seats, drawn only while a card is in it.
   const victoryOf = useMemo(() => victoryPileSelector(facts.pointsOf ?? noPoints), [facts]);
   const questStage = useStore(store, (state) => zones.questStage(state.game));
@@ -48,13 +48,14 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   const investigationDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("investigationDeck") ? wilderland.investigation(state.game) : null));
   const smaugDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("smaugDeck") ? wilderland.smaugDeck(state.game) : null));
   const smaugDiscard = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("smaugDiscard") ? wilderland.smaugDiscard(state.game) : null));
+  const sackDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("sackDeck") ? wilderland.sack(state.game) : null));
   const victory = useStore(store, (state) => victoryOf(state.game));
   return useMemo(
     () => ({
       views: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand },
-      piles: { deck, discard, encounterDeck, encounterDiscard, ...(corsairDeck ? { corsairDeck } : {}), ...(corsairDiscard ? { corsairDiscard } : {}), ...(unchartedDeck ? { unchartedDeck } : {}), ...(grottoDeck ? { grottoDeck } : {}), ...(evilCreaturesDeck ? { evilCreaturesDeck } : {}), ...(evilCreaturesDiscard ? { evilCreaturesDiscard } : {}), ...(balrogDeck ? { balrogDeck } : {}), ...(balrogDiscard ? { balrogDiscard } : {}), ...(cavesDeck ? { cavesDeck } : {}), ...(angmarOrcDeck ? { angmarOrcDeck } : {}), ...(investigationDeck ? { investigationDeck } : {}), ...(haradDeck ? { haradDeck } : {}), ...(smaugDeck ? { smaugDeck } : {}), ...(smaugDiscard ? { smaugDiscard } : {}), ...(victory ? { victory } : {}) },
+      piles: { deck, discard, encounterDeck, encounterDiscard, ...(corsairDeck ? { corsairDeck } : {}), ...(corsairDiscard ? { corsairDiscard } : {}), ...(unchartedDeck ? { unchartedDeck } : {}), ...(grottoDeck ? { grottoDeck } : {}), ...(evilCreaturesDeck ? { evilCreaturesDeck } : {}), ...(evilCreaturesDiscard ? { evilCreaturesDiscard } : {}), ...(balrogDeck ? { balrogDeck } : {}), ...(balrogDiscard ? { balrogDiscard } : {}), ...(cavesDeck ? { cavesDeck } : {}), ...(angmarOrcDeck ? { angmarOrcDeck } : {}), ...(investigationDeck ? { investigationDeck } : {}), ...(haradDeck ? { haradDeck } : {}), ...(smaugDeck ? { smaugDeck } : {}), ...(smaugDiscard ? { smaugDiscard } : {}), ...(sackDeck ? { sackDeck } : {}), ...(victory ? { victory } : {}) },
     }),
-    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard, corsairDeck, corsairDiscard, unchartedDeck, grottoDeck, evilCreaturesDeck, evilCreaturesDiscard, balrogDeck, balrogDiscard, cavesDeck, haradDeck, angmarOrcDeck, investigationDeck, smaugDeck, smaugDiscard, victory],
+    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard, corsairDeck, corsairDiscard, unchartedDeck, grottoDeck, evilCreaturesDeck, evilCreaturesDiscard, balrogDeck, balrogDiscard, cavesDeck, haradDeck, angmarOrcDeck, investigationDeck, smaugDeck, smaugDiscard, sackDeck, victory],
   );
 }
 
