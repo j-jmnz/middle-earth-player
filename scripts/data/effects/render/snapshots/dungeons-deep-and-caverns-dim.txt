@@ -23,8 +23,8 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
 131030:A:1 (front): Setup: Search the encounter deck for Gollum and Bilbo's Magic Ring. Place Gollum and Bilbo Baggins in the riddle area and attach Bilbo's Magic Ring to Bilbo Baggins. Then, shuffle the encounter deck.
   131030:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - find the card with code 131074 in the encounter deck or its discard pile and put it into the riddle area (nothing when none is left)
-    - find the card with code 131079 in the encounter deck or its discard pile and attach it to Bilbo Baggins (nothing when none is left)
+    - find the card with code 131074 in the encounter deck and put it into the riddle area (nothing when none is left)
+    - find the card with code 131079 in the encounter deck and attach it to Bilbo Baggins (nothing when none is left)
     - shuffle the encounter deck
 
 131030:B:1 (back): Players cannot advance to stage 3A unless both 1B and 2B are complete.
@@ -45,6 +45,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
     - each card (any player controls) or in the staging area or the active location, in the riddle area: stage 2, Gollum, Bilbo Baggins and the Ring on him (while stage 2 is there), of card type hero: stat cannotQuest 1, while this card is in play
     - each card (any player controls) or in the staging area or the active location, in the riddle area: stage 2, Gollum, Bilbo Baggins and the Ring on him (while stage 2 is there), of card type hero: stat cannotAttack 1, while this card is in play
     - each card (any player controls) or in the staging area or the active location, in the riddle area: stage 2, Gollum, Bilbo Baggins and the Ring on him (while stage 2 is there), of card type hero: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
+    - each card (any player controls) or in the staging area or the active location, in the riddle area: stage 2, Gollum, Bilbo Baggins and the Ring on him (while stage 2 is there), of card type hero: stat bilboLimitedToGollum (Bilbo Baggins takes damage only from Gollum and defends only against Gollum) 1, while this card is in play
 
 ## 131031 Into the Fire
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -210,7 +211,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
   131081:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
-    - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): discard cards from the top of the encounter deck until a card with a riddle is discarded, and pick it (the discard pile is shuffled into the deck when it runs out; nothing is picked when no such card is left)
+    - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): discard cards from the top of the encounter deck until another card with a riddle is discarded (never this card itself), and pick it (the discard pile is shuffled into the deck when it runs out; nothing is picked when no such card is left)
     - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the first player answers the riddle of the picked card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
 
 131081:A:2 (front): Riddle: The first player names a cost, shuffles his deck, then discards the top 2 cards. For each of those cards that matches, place 1 progress token on stage 2.
@@ -241,7 +242,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 131083:A:1 (front): When Revealed: The first player must choose to answer the riddle on this card. This effect cannot be canceled.
-  131083:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+  131083:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
     - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
 
 131083:A:2 (front): Riddle: The first player names a sphere and cost, shuffles his deck, then discards the top 2 cards. For each of those cards that matches both items, place 1 progress token on stage 2.
@@ -252,10 +253,10 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 131084:A:1 (front): When Revealed: The first player names a card type and then discards the top 3 cards of the encounter deck. For each of those cards that does not match the named type, remove 1 progress token from stage 2. This effect cannot be canceled.
-  131084:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+  131084:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player names a card type: enemy, location, treachery, objective
     - discard 3 card(s) from the top of the encounter deck
-    - for each card this effect discarded from the top of the encounter deck that is not of the named type, remove 1 progress from stage 2
+    - for each card this effect discarded from the top of the encounter deck that is not of the named type, remove 1 progress from stage 2 (stage 2 takes none off while it holds its bar against card effects: no card effect but an answered riddle changes its progress)
 
-(rendered pieces: 145 by template, 0 as JSON)
+(rendered pieces: 149 by template, 0 as JSON)

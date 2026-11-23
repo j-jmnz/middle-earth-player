@@ -2,6 +2,7 @@
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { takeProgressOff } from "../../core/progress.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -80,8 +81,6 @@ export function removeRiddleProgress(state: ScenarioState, ctx: ReduceContext, s
   const name = (data?.named ?? []).findLast((entry) => entry.startsWith("riddle:encounterType:"))?.slice("riddle:encounterType:".length);
   if (!data || !stage || name == null) return state;
   const missed = (data.looked ?? []).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type !== name).length;
-  const removed = Math.min(stage.progress, missed);
-  if (removed <= 0) return state;
-  steps.push({ kind: "progress", targetId: stage.id, amount: -removed, cause: currentCause(steps, UNATTRIBUTED) });
-  return updateCard(state, stage.id, { progress: stage.progress - removed });
+  // Stage 2B's "cannot be ... removed ... except by answering riddles" is absolute (rr.cannot): this card is no riddle answered, so the bar holds against it.
+  return takeProgressOff(state, stage.id, missed, steps);
 }

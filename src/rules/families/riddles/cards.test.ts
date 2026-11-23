@@ -11,24 +11,25 @@ import { idOf, resolveRecords } from "../../../../test/harness/scene-kit.ts";
 import { progressOf, revealAnswering, riddleTable, stacked } from "./fixture.ts";
 
 describe("Not Fair! Not Fair! (131084:A:1)", () => {
-  it("takes 1 progress off stage 2 for each of the top 3 encounter cards that is not of the named type", () => {
+  // rr.cannot: stage 2B's "cannot be ... removed ... except by answering riddles" is absolute and Not Fair! Not Fair! answers no riddle, so the discards happen and the progress stays (docs/scenarios/the-hobbit.md, Dungeons Deep and Caverns Dim).
+  it("131084:A:1 discards the top 3 encounter cards and takes no progress off stage 2, whose bar holds against it", () => {
     const made = riddleTable({ deck: ["131074", "131079", "f0", "f0", "treachery", "f0", "f0"] });
     const state = updateCard(stacked(made.state, ["f0", "f0", "treachery"]), idOf(made.state, "131030"), { progress: 5 });
     const run = revealAnswering(state, made.ctx, "131084", ["enemy"]);
-    expect(progressOf(run.state)).toBe(4);
+    expect(progressOf(run.state)).toBe(5);
     expect(run.state.encounterDiscard.map((id) => run.state.cards[id]?.code).sort()).toEqual(["131084", "f0", "f0", "treachery"]);
   });
 
-  it("offers the types an encounter card can have, and takes none off a stage with no progress", () => {
+  it("131084:A:1 takes none off a stage with no progress either", () => {
     const made = riddleTable({ deck: ["131074", "131079", "f0", "f0", "treachery", "f0", "f0"] });
     const run = revealAnswering(stacked(made.state, ["treachery", "treachery", "treachery"]), made.ctx, "131084", ["location"]);
     expect(progressOf(run.state)).toBe(0);
   });
 
-  it("takes every discarded card off when none is of the type named", () => {
+  it("131084:A:1 takes nothing off even when none of the discarded cards is of the type named", () => {
     const made = riddleTable({ deck: ["131074", "131079", "f0", "f0", "f0", "f0", "f0"] });
     const state = updateCard(stacked(made.state, ["f0", "f0", "f0"]), idOf(made.state, "131030"), { progress: 5 });
-    expect(progressOf(revealAnswering(state, made.ctx, "131084", ["treachery"]).state)).toBe(2);
+    expect(progressOf(revealAnswering(state, made.ctx, "131084", ["treachery"]).state)).toBe(5);
   });
 });
 

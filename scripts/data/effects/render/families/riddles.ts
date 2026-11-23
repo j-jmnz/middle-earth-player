@@ -7,14 +7,14 @@ const NAMES: Readonly<Record<string, string>> = { type: "a card type (ally, even
 
 export const RIDDLES_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Made>> = {
   CreateRiddleArea: (i) => ({ text: `create the riddle area: the quest deck's card with code ${str(i.stage)} lies in it, side B up, beside the current quest, and its Setup resolves; the quest advances from the first stage past it`, read: ["stage"] }),
-  PlaceInRiddleArea: (i) => ({ text: `${i.attachTo ? `find the card with code ${str(i.code)} in the encounter deck or its discard pile and attach it to ${str(i.attachTo)}` : `find the card with code ${str(i.code)} in the encounter deck or its discard pile and put it into the riddle area`} (nothing when none is left)`, read: ["code", "attachTo"] }),
+  PlaceInRiddleArea: (i) => ({ text: `${i.attachTo ? `find the card with code ${str(i.code)} in the encounter deck and attach it to ${str(i.attachTo)}` : `find the card with code ${str(i.code)} in the encounter deck and put it into the riddle area`} (nothing when none is left)`, read: ["code", "attachTo"] }),
   Riddle: (i) => ({ text: `a riddle: the first player names ${(Array.isArray(i.names) ? i.names : []).map((name) => NAMES[str(name)] ?? str(name)).join(", ")}, shuffles his deck and discards its top ${str(i.discard)} card(s); each discarded card that matches every named item puts 1 progress on stage 2 (a marker, read when the riddle is answered)`, read: ["names", "discard"] }),
   AnswerRiddle: (i) => ({ text: `the first player answers the riddle of ${i.card === "picked" ? "the picked card" : "this card"}: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored`, read: ["card"] }),
   RiddleStep: (i) => ({ text: `a step of the riddle of the card ${str(i.card)}, answered by the first player: ${str(i.step)}${i.item ? ` (${str(i.item)})` : ""}`, read: ["step", "item", "card"] }),
   ResolveNormally: () => ({ text: "resolve this card's other When Revealed effects for the first player, as the reveal would have, leaving its riddle out", read: [] }),
-  DiscardUntilRiddle: () => ({ text: "discard cards from the top of the encounter deck until a card with a riddle is discarded, and pick it (the discard pile is shuffled into the deck when it runs out; nothing is picked when no such card is left)", read: [] }),
+  DiscardUntilRiddle: () => ({ text: "discard cards from the top of the encounter deck until another card with a riddle is discarded (never this card itself), and pick it (the discard pile is shuffled into the deck when it runs out; nothing is picked when no such card is left)", read: [] }),
   NameEncounterType: (i) => ({ text: `the first player names a card type: ${(Array.isArray(i.types) ? i.types : []).map(str).join(", ")}`, read: ["types"] }),
-  RemoveRiddleProgress: () => ({ text: "for each card this effect discarded from the top of the encounter deck that is not of the named type, remove 1 progress from stage 2", read: [] }),
+  RemoveRiddleProgress: () => ({ text: "for each card this effect discarded from the top of the encounter deck that is not of the named type, remove 1 progress from stage 2 (stage 2 takes none off while it holds its bar against card effects: no card effect but an answered riddle changes its progress)", read: [] }),
   GollumAttacksBilbo: () => ({ text: "Gollum, in the riddle area, attacks Bilbo Baggins' player: no shadow card is dealt, only Bilbo can defend, and damage nobody defends goes on Bilbo", read: [] }),
   LeaveRiddleArea: () => ({ text: "stage 2 is removed from the game with the riddle area; Bilbo Baggins stays with the first player and is no longer limited", read: [] }),
   GollumEngagesFirstPlayer: () => ({ text: "Gollum, in the riddle area or engaged with another player, engages the first player (once stage 2 has left)", read: [] }),
@@ -23,6 +23,7 @@ export const RIDDLES_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Ma
 };
 
 export const RIDDLES_STAT_NOTES: Readonly<Record<string, string>> = {
+  bilboLimitedToGollum: " (Bilbo Baggins takes damage only from Gollum and defends only against Gollum)",
   gollumDamageToBilbo: " (damage from the undefended attacks of Gollum goes on Bilbo Baggins)",
 };
 

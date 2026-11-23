@@ -50,12 +50,12 @@ describe("131030:B:2 no card effect adds progress to or takes it off stage 2", (
     expect(takeProgressOff(loaded, first, 2, steps).cards[first]?.progress).toBe(3);
   });
 
-  it("131030:B:2 still takes progress off by answering riddles and by Not Fair! Not Fair!, and puts it on by answering", () => {
+  it("131030:B:2 puts progress on by answering riddles, and Not Fair! Not Fair! (no riddle answered) takes none off it (rr.cannot)", () => {
     const made = riddleTable({ deck: ["131074", "131079", "f0", "f0", "treachery", "f0", "f0"], deckOf: ["01013", "01013"] });
     const answered = revealAnswering(made.state, made.ctx, "131076", ["answer", "ally"]);
     expect(progressOf(answered.state)).toBe(2);
     const removed = revealAnswering(stacked(answered.state, ["f0", "f0", "treachery"]), made.ctx, "131084", ["enemy"]);
-    expect(progressOf(removed.state)).toBe(1);
+    expect(progressOf(removed.state)).toBe(2);
   });
 
   it("131030:B:2 ends with the stage: once stage 3 has removed it, the flags are gone", () => {
@@ -118,7 +118,6 @@ describe("131081:A:1 It Likes Riddles? does not find itself again", () => {
   it("131081:A:1 answers no second riddle when the only riddle card left is It Likes Riddles? itself, shuffled back with the discard pile", () => {
     const made = riddleTable({ deck: ["131074", "131079", "f0", "f0", "f0"], deckOf: ["01013", "01013", "01013"] });
     const run = revealAnswering(stacked(made.state, ["f0", "f0", "f0"]), made.ctx, "131081", ["2"]);
-    expect(progressOf(run.state)).toBeGreaterThanOrEqual(0);
     // Nothing is left to discard: the three f0 cards stay in the deck and the source card is the only card in the encounter discard pile.
     expect(run.state.encounterDiscard.map((id) => run.state.cards[id]?.code)).toEqual(["131081"]);
     expect(inDiscard(run.state, "01013")).toBe(2);

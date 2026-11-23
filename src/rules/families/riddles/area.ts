@@ -57,9 +57,9 @@ export function createRiddleArea(state: ScenarioState, instruction: Verb<"Create
   return pushCardEffects(placed, "setup", id, focus.seat, false, own, ctx, steps);
 }
 
-/** PlaceInRiddleArea: the card with this code, found in the encounter deck or its discard pile, goes into the area: attached to the hero with the title `attachTo`, or lying in it. */
+/** PlaceInRiddleArea: the card with this code, found in the encounter deck, goes into the area: attached to the hero with the title `attachTo`, or lying in it. */
 export function placeInRiddleArea(state: ScenarioState, instruction: Verb<"PlaceInRiddleArea">, ctx: ReduceContext): ScenarioState {
-  const id = [...state.encounterDeck, ...state.encounterDiscard].find((candidate) => state.cards[candidate]?.code === instruction.code);
+  const id = state.encounterDeck.find((candidate) => state.cards[candidate]?.code === instruction.code);
   if (!id) return state;
   if (instruction.attachTo == null) return updateCard(moveCard(state, id, { zone: "riddleArea" }), id, { face: "up", controller: null });
   const host = Object.values(state.cards).find((card) => card.zone === "heroes" && printedOf(ctx.cards, card.code).name === instruction.attachTo);

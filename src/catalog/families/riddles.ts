@@ -49,7 +49,8 @@ const VERBS = [
 const TRIGGERS = ["riddleFailed"] as const;
 
 // "Damage from undefended attacks made by Gollum must be placed on Bilbo Baggins" (131031:B:2): set on the table by the stage's constant; the combat hook reads it (families/riddles/gollum.ts).
+// `bilboLimitedToGollum`: on Bilbo Baggins while he is in the riddle area, he takes damage only from Gollum and defends only against Gollum (hob.riddle-area); read by the damage and defense hooks of families/riddles/gollum.ts.
 // `noProgressRemoved`: on a card, no card effect takes progress off it ("no progress can be added to or removed from this quest except by answering riddles", 131030:B:2); the card's own riddles (AnswerRiddle, RemoveRiddleProgress) are not card effects on it. Read by takeProgressOff (rules/core/progress.ts). The other half is `noProgressPlaced`.
-const FLAGS = ["gollumDamageToBilbo", "noProgressRemoved"] as const;
+const FLAGS = ["gollumDamageToBilbo", "noProgressRemoved", "bilboLimitedToGollum"] as const;
 
 export const manifest = { name: "riddles", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

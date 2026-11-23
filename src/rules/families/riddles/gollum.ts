@@ -5,7 +5,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
-import { areaGollum, areaStage, bilbo, GOLLUM, inArea } from "./area.ts";
+import { areaGollum, bilbo, GOLLUM } from "./area.ts";
 
 /** GollumAttacksBilbo: Gollum, in the riddle area, attacks the player who controls Bilbo as an immediate attack with no shadow card; Bilbo is the only defender, and what nobody defends is dealt to Bilbo (onlyHeroes). */
 export function gollumAttacksBilbo(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -20,12 +20,12 @@ export function gollumAttacksBilbo(state: ScenarioState, ctx: ReduceContext, ste
 export function defenseReason(state: ScenarioState, _defender: PrintedCard, _cards: ReadonlyMap<string, PrintedCard>, defenderId: string): string | null {
   const attacker = state.pendingAttack ? state.cards[state.pendingAttack.enemyId] : undefined;
   if (attacker?.zone === "riddleArea") return defenderId === bilbo(state)?.id ? null : "Only Bilbo Baggins can defend against Gollum in the riddle area";
-  return inArea(state, defenderId) ? "Bilbo Baggins cannot defend while he is in the riddle area, except against Gollum" : null;
+  return flagged(state, defenderId, "bilboLimitedToGollum") ? "Bilbo Baggins cannot defend while he is in the riddle area, except against Gollum" : null;
 }
 
 /** Whether Bilbo Baggins, in the riddle area, takes no damage from this source: only Gollum's attack damages him there (hob.riddle-area: "cannot ... take damage from cards other than Gollum"). `sourceId`: the card whose effect deals it, when known. */
 export function bilboDamageBarred(state: ScenarioState, id: string, source: string, sourceId: string | null | undefined): boolean {
-  if (id !== bilbo(state)?.id || !areaStage(state)) return false;
+  if (!flagged(state, id, "bilboLimitedToGollum")) return false;
   const attacker = state.pendingAttack ? state.cards[state.pendingAttack.enemyId] : undefined;
   if (source === "combat" && attacker?.code === GOLLUM) return false;
   return (sourceId != null ? state.cards[sourceId]?.code : undefined) !== GOLLUM;

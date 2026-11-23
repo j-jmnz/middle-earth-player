@@ -103,12 +103,12 @@ describe("131030:A:1 to B:3 Riddles in the Dark", () => {
       expect(takeProgressOff(updateCard(made.state, stage, { progress: 4 }), stage, 3, []).cards[stage]?.progress).toBe(4);
     }));
 
-  it("131030:B:2 answering a riddle puts progress on it and Not Fair! Not Fair! takes some off", () =>
+  it("131030:B:2 answering a riddle puts progress on it and Not Fair! Not Fair! takes none off (rr.cannot: the bar is absolute)", () =>
     proves("131030:B:2", (effects) => {
       const made = riddleTable({ deck: ["131074", "131079", "f0", "f0", "treachery", "f0", "f0"], deckOf: ["01013", "01013"] }, effects);
       const answered = revealAnswering(made.state, made.ctx, "131076", ["answer", "ally"]);
       expect(progressOf(answered.state)).toBe(2);
-      expect(progressOf(revealAnswering(stacked(answered.state, ["f0", "f0", "treachery"]), made.ctx, "131084", ["enemy"]).state)).toBe(1);
+      expect(progressOf(revealAnswering(stacked(answered.state, ["f0", "f0", "treachery"]), made.ctx, "131084", ["enemy"]).state)).toBe(2);
       const stage = idOf(answered.state, "131030");
       expect(placeProgress(answered.state, stage, 3, made.ctx, []).cards[stage]?.progress).toBe(2);
     }));
@@ -275,15 +275,16 @@ describe("the riddles the encounter cards print", () => {
       const made = riddleTable({ deckOf: ALLIES }, effects);
       const revealed = revealFromTop(made.state, made.ctx, "131083", []).state;
       expect(revealed.window?.kind === "choose" ? revealed.window.options : []).toEqual(["leadership", "spirit", "lore", "tactics", "baggins"]);
-      expect(EFFECTS.find((effect) => effect.id === "131083:whenRevealed:1")?.uncancelable).toEqual({ kind: "sourceIn", zone: "staging" });
     }));
 
-  it("131084:A:1 Not Fair! Not Fair!: the first player names a type; each of the top 3 encounter cards of another type takes 1 progress off stage 2", () =>
+  // The removal is barred by 131030:B:2 (rr.cannot, recorded reading in docs/scenarios/the-hobbit.md): what the card still does is name a type and discard 3 cards.
+  it("131084:A:1 Not Fair! Not Fair!: the first player names a type and the top 3 encounter cards are discarded; stage 2 keeps its progress", () =>
     proves("131084:A:1", (effects) => {
       const made = riddleTable({ deck: ["131074", "131079", "f0", "f0", "treachery", "f0", "f0"] }, effects);
       const state = updateCard(stacked(made.state, ["f0", "f0", "treachery"]), idOf(made.state, "131030"), { progress: 5 });
       const run = revealAnswering(state, made.ctx, "131084", ["enemy"]);
-      expect(progressOf(run.state)).toBe(4);
+      expect(run.state.encounterDiscard.map((id) => run.state.cards[id]?.code).sort()).toEqual(["131084", "f0", "f0", "treachery"]);
+      expect(progressOf(run.state)).toBe(5);
     }));
 });
 

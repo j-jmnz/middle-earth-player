@@ -2,6 +2,7 @@ import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/
 
 import { AUTHORED_EFFECTS as STONE } from "../standalone-scenarios/the-stone-of-erech.ts";
 import { AUTHORED_EFFECTS as HOBBIT } from "./the-hobbit.ts";
+import { ALWAYS } from "../conditions.ts";
 import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for Dungeons Deep and Caverns Dim (The Hobbit, part 3, no campaign card): the riddle area and the two quest stages beside each other, the riddles encounter cards print and the first player answers, and Gollum's attack on Bilbo Baggins. The Misty Mountain Goblins set is the
@@ -63,7 +64,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "constant",
       instructions: [{ verb: "ModifyStat", stat: "noProgressPlaced", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "noProgressRemoved", amount: 1, until: "whileSourceInPlay", target: "self" }],
     },
-    // The riddle area: its cards are immune to player card effects, and Bilbo Baggins (the first player still controls him) cannot quest, attack or take attachments played by the players; he defends only against Gollum and takes damage only from him (families/riddles/gollum.ts). "Cannot leave the riddle area except by quest effects" has no instruction of its own: the area is a zone no pick or verb reaches (the pool `riddleArea` is for the records of this set, player card effects cannot pick it) and only stage 3B's LeaveRiddleArea and GollumEngagesFirstPlayer take stage 2, Gollum and Bilbo out (tests: riddles/bars.test.ts, lines.test.ts).
+    // The riddle area: its cards are immune to player card effects, and Bilbo Baggins (the first player still controls him) cannot quest, attack or take attachments played by the players; he defends only against Gollum and takes damage only from him (the flag bilboLimitedToGollum, read by families/riddles/gollum.ts). "Cannot leave the riddle area except by quest effects" has no instruction of its own: the area is a zone no pick or verb reaches (the pool `riddleArea` is for the records of this set, player card effects cannot pick it) and only stage 3B's LeaveRiddleArea and GollumEngagesFirstPlayer take stage 2, Gollum and Bilbo out (tests: riddles/bars.test.ts, lines.test.ts).
     {
       id: "131030:constant:3",
       cardCode: "131030",
@@ -74,6 +75,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "ModifyStat", stat: "cannotQuest", amount: 1, until: "whileSourceInPlay", holders: AREA_BILBO },
         { verb: "ModifyStat", stat: "cannotAttack", amount: 1, until: "whileSourceInPlay", holders: AREA_BILBO },
         { verb: "ModifyStat", stat: "noPlayerAttachments", amount: 1, until: "whileSourceInPlay", holders: AREA_BILBO },
+        { verb: "ModifyStat", stat: "bilboLimitedToGollum", amount: 1, until: "whileSourceInPlay", holders: AREA_BILBO },
       ],
     },
 
@@ -205,7 +207,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     offer("131082:whenRevealed:2", "131082", "131082:A:2"),
 
     // 131083 What's In My Pocket? The first player must answer the riddle on this card, and no card cancels that.
-    { id: "131083:whenRevealed:1", cardCode: "131083", lines: ["131083:A:1"], timing: "whenRevealed", uncancelable: { kind: "sourceIn", zone: "staging" }, instructions: [{ verb: "AnswerRiddle" }] },
+    { id: "131083:whenRevealed:1", cardCode: "131083", lines: ["131083:A:1"], timing: "whenRevealed", uncancelable: ALWAYS, instructions: [{ verb: "AnswerRiddle" }] },
     riddle("131083", "131083:A:2", ["sphere", "cost"], 2),
 
     // 131084 Not Fair! Not Fair! The first player names a card type and the top 3 cards of the encounter deck are discarded; each that is not of that type takes 1 progress off stage 2. No card cancels it.
@@ -214,7 +216,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "131084",
       lines: ["131084:A:1"],
       timing: "whenRevealed",
-      uncancelable: { kind: "sourceIn", zone: "staging" },
+      uncancelable: ALWAYS,
       instructions: [{ verb: "NameEncounterType", types: ["enemy", "location", "treachery", "objective"] }, { verb: "DiscardEncounterTop", count: 3 }, { verb: "RemoveRiddleProgress" }],
     },
   ],
