@@ -2,21 +2,23 @@
 // (data/rules/entries.json). The Ered Mithrin treasure lines that answer a claim or a play, each tested from the line read from its scan
 // (data/printed/ered-mithrin.json): Anvil of Gundabad 12196:A:2, Axe of the Edain 12197:A:3, Durin's Dagger 12198:A:3, Glittering Lute
 // 12200:A:3, and the play from the hand that the Attach to lines 12196:A:1 to 12204:A:1 allow. emce.treasure: "A player is permitted to add a
-// treasure card to their player deck before the game begins if that treasure card is marked in the campaign log", and The Fate of Wilderland
-// searches the deck for one (SearchBoonOrTreasureToHand, 12195:A), so a treasure in the hand is a card its player plays. The claim (the
-// first player puts a treasure free of encounters on a character, freeTreasures in src/rules/families/wilderland/mirkwood.ts) is no play.
+// treasure card to their player deck before the game begins if that treasure card is marked in the campaign log". No saved deck holds a
+// treasure yet, so the tests place the treasure in the hand (a deck that admits one, or a search that finds one, is the work that makes it
+// reachable). The claim (the first player puts a treasure free of encounters on a character, freeTreasures in
+// src/rules/families/wilderland/mirkwood.ts) is no play.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { settle } from "../../rules/engine/machine.ts";
+import { dice, playIntent } from "../../../scripts/card-smoke/policy.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, discarded, playerTable, triggers, type PlayerBase } from "../../../test/harness/player-table.ts";
+import { canPlay, choices, destroyed, discarded, playerTable, triggers, type PlayerBase } from "../../../test/harness/player-table.ts";
 
 const ANVIL = "12196";
 const AXE = "12197";
@@ -30,6 +32,8 @@ const BOW = "12204";
 // Core heroes Gimli and Legolas (Tactics), Aragorn (Leadership, unique).
 const GIMLI = "01004";
 const LEGOLAS = "01005";
+// Veteran Axehand, a Dwarf ally: a host that leaves play when it is destroyed.
+const AXEHAND = "01028";
 // Core cards for the deck the Anvil searches: Blade of Gondolin (Item Weapon attachment), Steward of Gondor (Title attachment), Citadel Plate
 // (Item Armor attachment), Snowbourn Scout (ally), Horn of Gondor (Item Artifact attachment), Dwarven Axe (Item Weapon attachment).
 const BLADE = "01039";
@@ -60,7 +64,7 @@ const playOn = (run: Run, tab: Table, cardId: string, hostId: string): Run => se
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const codes = [ANVIL, AXE, DAGGER, CROWN, LUTE, SHIELD, HELM, JEWELS, BOW, GIMLI, LEGOLAS, BLADE, STEWARD, PLATE, SCOUT, HORN, DWARVEN_AXE];
+  const codes = [ANVIL, AXE, DAGGER, CROWN, LUTE, SHIELD, HELM, JEWELS, BOW, GIMLI, LEGOLAS, BLADE, STEWARD, PLATE, SCOUT, HORN, DWARVEN_AXE, AXEHAND];
   const cards = new Map([...starter.cards, ...(await loadPrinted(codes))]);
   cards.set(WEAK, definePrinted({ code: WEAK, name: "Weak", type: "enemy", threat: 1, engagementCost: 30, attack: 1, defense: 0, health: 9 }));
   cards.set(BOSS, definePrinted({ code: BOSS, name: "Boss", type: "enemy", isUnique: true, threat: 1, engagementCost: 30, attack: 1, defense: 0, health: 9 }));
@@ -90,9 +94,8 @@ describe("Anvil of Gundabad (12196:A:2)", () => {
     expect(codesOf(run.state.seats[0]?.deck)).toEqual([STEWARD, PLATE, SCOUT, DWARVEN_AXE].sort());
   });
 
-  // KNOWN (issue #193): the Anvil prints "After you claim or play Anvil of Gundabad"; a treasure in the hand cannot be played at all (PlayCard of a
-  // treasure is refused, "That card cannot be played"), so the play half never offers the Response.
-  it.fails("12196:A:2 Anvil of Gundabad: after it is played from the hand, its Response is offered", () => {
+  // "After you claim or play Anvil of Gundabad": played from the hand onto Gimli, the Anvil offers the Response too.
+  it("12196:A:2 Anvil of Gundabad: after it is played from the hand, its Response is offered", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: ANVIL, seat: 0 }], playerDeck: deck });
     const run = playOn(begin(tab.state), tab, idsOf(tab, ANVIL), idsOf(tab, GIMLI));
     expect(triggers(run.state, tab)).toContain("12196:response:1");
@@ -115,10 +118,9 @@ describe("Axe of the Edain (12197:A:3) and Glittering Lute (12200:A:3)", () => {
     expect(triggers(run.state, tab)).not.toContain("12200:response:1");
   });
 
-  // KNOWN (issue #193): "Response: After you play Axe of the Edain, deal 2 damage to a non-unique enemy engaged with you.": played from the hand onto
-  // Gimli, with the non-unique Weak and the unique Boss engaged, the Response offers only the Weak, which takes 2 damage. The engine refuses
-  // the play of a treasure from the hand ("That card cannot be played"), so the Response never runs.
-  it.fails("12197:A:3 Axe of the Edain: after it is played, 2 damage to a non-unique enemy engaged with you", () => {
+  // "Response: After you play Axe of the Edain, deal 2 damage to a non-unique enemy engaged with you.": played from the hand onto
+  // Gimli, with the non-unique Weak and the unique Boss engaged, the Response offers only the Weak, which takes 2 damage.
+  it("12197:A:3 Axe of the Edain: after it is played, 2 damage to a non-unique enemy engaged with you", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: AXE, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }, { code: BOSS, seat: 0 }] });
     let run = playOn(begin(tab.state), tab, idsOf(tab, AXE), idsOf(tab, GIMLI));
     expect(triggers(run.state, tab)).toContain("12197:response:1");
@@ -127,10 +129,9 @@ describe("Axe of the Edain (12197:A:3) and Glittering Lute (12200:A:3)", () => {
     expect(run.state.cards[idsOf(tab, BOSS)]?.damage ?? 0).toBe(0);
   });
 
-  // KNOWN (issue #193): "Response: After you play Glittering Lute, each player may discard a card from their hand. Each player who does so reduces their
-  // threat by 2.": two players, the first discards and goes from 8 to 6, the second declines and stays at 6. The play of the Lute from the
-  // hand is refused, so the Response never runs.
-  it.fails("12200:A:3 Glittering Lute: after it is played, each player who discards a card reduces their threat by 2", () => {
+  // "Response: After you play Glittering Lute, each player may discard a card from their hand. Each player who does so reduces their
+  // threat by 2.": two players, the first discards and goes from 8 to 6, the second declines and stays at 6.
+  it("12200:A:3 Glittering Lute: after it is played, each player who discards a card reduces their threat by 2", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: GIMLI, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: LUTE, seat: 0 }, { code: CARD, seat: 0 }, { code: CARD, seat: 1 }] });
     let run = playOn(begin(tab.state), tab, idsOf(tab, LUTE), idsOf(tab, GIMLI));
     run = send(run, { type: "Trigger", cardId: idsOf(tab, LUTE), effectId: "12200:response:1" }, tab.ctx);
@@ -142,9 +143,9 @@ describe("Axe of the Edain (12197:A:3) and Glittering Lute (12200:A:3)", () => {
 });
 
 describe("Durin's Dagger (12198:A:3)", () => {
-  // KNOWN (issue #193): "You may play Durin's Dagger from your discard pile.": the Dagger in the discard pile is offered as a PlayCard and goes onto Gimli
-  // for its cost 1. The engine offers no play of it: a treasure is never played, from the hand or the discard pile.
-  it.fails("12198:A:3 Durin's Dagger: played from the discard pile", () => {
+  // "You may play Durin's Dagger from your discard pile.": the Dagger in the discard pile is offered as a PlayCard and goes onto Gimli
+  // for its cost 1.
+  it("12198:A:3 Durin's Dagger: played from the discard pile", () => {
     const made = discarded(table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }] }), [[DAGGER, 0]]);
     const [dagger = ""] = made.ids;
     const gimli = idsOf(made.tab, GIMLI);
@@ -156,9 +157,8 @@ describe("Durin's Dagger (12198:A:3)", () => {
 });
 
 describe("A treasure in the hand (12196:A:1 to 12204:A:1)", () => {
-  // KNOWN (issue #193): each treasure prints its Attach to line and a cost (0, 1 for the Dagger, 2 for the Crown), and emce.treasure lets it be in a deck;
-  // in the planning phase its player plays it from the hand onto Gimli. The engine refuses the PlayCard of any treasure ("That card cannot
-  // be played": planning.ts plays only allies, attachments, events and player side quests).
+  // Each treasure prints its Attach to line and a cost (0, 1 for the Dagger, 2 for the Crown), and emce.treasure lets it be in a deck;
+  // in the planning phase its player plays it from the hand onto Gimli.
   const rows = [
     ["12196:A:1", ANVIL],
     ["12197:A:1", AXE],
@@ -171,9 +171,64 @@ describe("A treasure in the hand (12196:A:1 to 12204:A:1)", () => {
     ["12204:A:1", BOW],
   ] as const;
   for (const [line, code] of rows) {
-    it.fails(`${line} played from the hand onto a character in the planning phase`, () => {
+    it(`${line} played from the hand onto a character in the planning phase`, () => {
       const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code, seat: 0 }] });
       expect(playOn(begin(tab.state), tab, idsOf(tab, code), idsOf(tab, GIMLI)).state.cards[idsOf(tab, code)]?.host).toBe(idsOf(tab, GIMLI));
     });
   }
+});
+
+describe("Treasure rules (rr.restricted, rr.ownership-and-control)", () => {
+  // "Restricted.": Gimli holds Citadel Plate and Helm of Heroes; the Axe of the Edain, a third restricted card, is played onto him and its
+  // controller chooses which of the three goes to the discard pile (rr.restricted).
+  it("12197:A:1 a third Restricted treasure played onto a host makes its controller discard one", () => {
+    const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], hand: [{ code: AXE, seat: 0 }], attached: [{ code: PLATE, host: GIMLI }, { code: HELM, host: GIMLI }] });
+    const run = playOn(begin(tab.state), tab, idsOf(tab, AXE), idsOf(tab, GIMLI));
+    expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, PLATE), idsOf(tab, HELM), idsOf(tab, AXE)].sort());
+    const done = send(run, { type: "Choose", optionId: idsOf(tab, PLATE) }, tab.ctx);
+    expect(done.state.cards[idsOf(tab, PLATE)]?.zone).toBe("discard");
+    expect(done.state.cards[idsOf(tab, GIMLI)]?.attachments).toHaveLength(2);
+  });
+
+  // "You may play Durin's Dagger from your discard pile." and rr.ownership-and-control: a claimed treasure whose host leaves play goes to
+  // the discard pile of its owner, here the only player.
+  it("12198:A:3 a claimed treasure whose host leaves play goes to its owner's discard pile", () => {
+    const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], allies: [{ code: AXEHAND, seat: 0 }], staging: [DAGGER] });
+    const asked = begin(settle({ ...tab.state, window: null }, tab.ctx, []));
+    const held = send(asked, { type: "Choose", optionId: idsOf(tab, AXEHAND) }, tab.ctx);
+    const dagger = idsOf(tab, DAGGER);
+    expect(held.state.cards[dagger]?.host).toBe(idsOf(tab, AXEHAND));
+    const gone = destroyed(held.state, tab, idsOf(tab, AXEHAND));
+    expect(gone.state.cards[dagger]?.zone).toBe("discard");
+    expect(gone.state.seats[0]?.discard).toContain(dagger);
+  });
+
+  // Two players: player 1 claims the Dagger onto player 2's ally, player 2 controls it, and when the ally leaves play it goes to player 1's
+  // discard pile, from which player 1 plays it (rr.ownership-and-control; the claiming seat owns it).
+  it("12198:A:3 a Dagger claimed onto another player's ally goes to the claiming player's discard pile and is played from there", () => {
+    const tab = table(EFFECTS, { seats: 2, heroes: [{ code: GIMLI, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: AXEHAND, seat: 1 }], staging: [DAGGER] });
+    const asked = begin(settle({ ...tab.state, window: null }, tab.ctx, []));
+    const held = send(asked, { type: "Choose", optionId: idsOf(tab, AXEHAND) }, tab.ctx);
+    const dagger = idsOf(tab, DAGGER);
+    expect(held.state.cards[dagger]).toMatchObject({ host: idsOf(tab, AXEHAND), controller: 1, owner: 0 });
+    const gone = destroyed(held.state, tab, idsOf(tab, AXEHAND));
+    expect(gone.state.seats[0]?.discard).toContain(dagger);
+    expect(gone.state.seats[1]?.discard).not.toContain(dagger);
+    const seat0 = { ...gone.state, activeSeat: 0 };
+    expect(canPlay(seat0, tab, dagger)).toBe(true);
+    const run = playOn({ ...gone, state: seat0 }, tab, dagger, idsOf(tab, GIMLI));
+    expect(run.state.cards[dagger]).toMatchObject({ zone: "play", host: idsOf(tab, GIMLI) });
+  });
+});
+
+describe("The card smoke's PlayCard (scripts/card-smoke/policy.ts)", () => {
+  // "You may play Durin's Dagger from your discard pile.": the policy builds a legal PlayCard with a host for a Dagger offered from the
+  // discard pile, and the engine accepts it.
+  it("12198:A:3 playIntent gives a Dagger in the discard pile a host", () => {
+    const made = discarded(table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }] }), [[DAGGER, 0]]);
+    const [dagger = ""] = made.ids;
+    const intent = playIntent(made.tab.state, made.tab.ctx, dagger, dice(1));
+    expect(intent).toMatchObject({ type: "PlayCard", cardId: dagger, hostId: idsOf(made.tab, GIMLI) });
+    if (intent) expect(send(begin(made.tab.state), intent, made.tab.ctx).state.cards[dagger]).toMatchObject({ zone: "play", host: idsOf(made.tab, GIMLI) });
+  });
 });

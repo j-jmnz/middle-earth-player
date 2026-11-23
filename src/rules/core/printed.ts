@@ -378,6 +378,12 @@ export function isSideQuestType(type: CardType): boolean {
   return type === "encounter-side-quest" || type === "player-side-quest";
 }
 
+// A card played onto a host from the hand: an attachment, or a treasure, which prints a cost and an "Attach to" line
+// (emce.treasure, rr.attachment-cards).
+export function playsOntoHost(printed: PrintedCard): boolean {
+  return printed.type === "attachment" || printed.type === "treasure";
+}
+
 // A treasure is a player card ("Treasure is a new type of player card", emce.treasure).
 export function isPlayerType(printed: PrintedCard): boolean {
   return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event" || printed.type === "player-side-quest" || printed.type === "contract" || printed.type === "treasure";
