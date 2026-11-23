@@ -26,6 +26,8 @@ import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
 
 const SCRIM = 0.9;
+// A screen this many points tall or less, at Medium, is short for the question's column.
+const SHORT = 440;
 
 export function QuestAdvanceView({
   card,
@@ -56,6 +58,8 @@ export function QuestAdvanceView({
   const s = useUiScale();
   const progress = useSharedValue(scale === 0 ? 1 : 0);
   const wide = screen.width > screen.height;
+  // On a short wide screen (a phone on its side) the question's sentence keeps its first lines and the printed line after it is cut, so every row and the answer fit under it (the reader still hears all of it).
+  const short = wide && screen.height < SHORT * s;
   const roomW = screen.width - insets.left - insets.right;
   const roomH = screen.height - insets.top - insets.bottom;
   const size = wide ? previewSideSize(roomW, roomH, card.landscape ?? false, s) : previewSize(screen.width, roomH, card.landscape ?? false, s);
@@ -106,7 +110,11 @@ export function QuestAdvanceView({
             <View testID="quest-advance-asks" className="mt-3" style={{ flexShrink: 1 }}>
               <Text className="font-display text-eyebrow uppercase text-accent">{choice.header.step}</Text>
               <Text className="mt-1 text-body text-bone">{choice.header.title}</Text>
-              {choice.header.note ? <Text className="mt-0.5 text-label text-muted">{choice.header.note}</Text> : null}
+              {choice.header.note ? (
+                <Text className="mt-0.5 text-label text-muted" numberOfLines={short ? 3 : undefined}>
+                  {choice.header.note}
+                </Text>
+              ) : null}
               <ScrollView style={{ flexShrink: 1, marginTop: 8 * s - ringRoom(s), marginHorizontal: ringScroll(s).style.marginHorizontal }} contentContainerStyle={ringScroll(s).content} showsVerticalScrollIndicator={false}>
                 {tiles.map((tile) => {
                   const source = tile.code ? picture(tile.code) : null;

@@ -398,7 +398,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
               extras={pills.pills}
               more={pills.more} aidsFolded={aidsFolded} onMore={more.show} onLines={more.showLines}
               resetKey={choice.resetKey} momentKey={choice.sheet.key} stay={choice.stayFocus}
-              guide={choice.guide}
+              guide={choice.guide} hidden={advance.shown != null && advance.asks}
               trayOpen={choice.panelOpen}
               count={trayCount(choice.sheet, choice.choice)}
               tray={<ChoiceTray open={choice.panelOpen} sheet={choice.sheet} choice={choice.choice} refusedRows={choice.refusedRows} picture={pictureOf} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} onStep={choice.onStep} />}

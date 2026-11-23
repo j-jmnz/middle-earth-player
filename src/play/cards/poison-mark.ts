@@ -1,4 +1,4 @@
-// Rules: hob.venom-poison, hob.unconscious-characters (data/rules/entries.json). The poison of a character on the table (Flies and Spiders): the facedown cards under it, as a night pill "2 poison" (threat red when one more poison makes it unconscious; the preview and the reader say it against the printed hit points), and the word "Unconscious" on a character turned 180 degrees. The reader hears the same words.
+// Rules: hob.venom-poison, hob.unconscious-characters (data/rules/entries.json). The poison of a character on the table (Flies and Spiders): the facedown cards under it, as a night pill "2 poison" (threat red when one more poison makes it unconscious; the preview and the reader say it against the printed hit points), and the short word "Out" on a character turned 180 degrees (the preview and the reader say Unconscious; the full word does not fit a narrow card). The reader hears the same words.
 import type { UnderMark } from "./card-effects.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { poisonOf } from "../../rules/families/poison/poison.ts";
@@ -9,9 +9,9 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 export function poisonMark(game: ScenarioState, ctx: ReduceContext, cardId: string): UnderMark | null {
   const card = game.cards[cardId];
   if (!card) return null;
-  if (card.unconscious === true) return { text: "Unconscious", loses: false, speech: "Unconscious, turned upside down" };
+  if (card.unconscious === true) return { text: "Out", loses: false, speech: "Unconscious, turned upside down" };
   const poison = poisonOf(game, cardId);
   if (poison === 0) return null;
   const limit = printedOf(ctx.cards, card.code).health ?? 0;
-  return { text: `${poison} poison`, loses: limit > 0 && poison + 1 >= limit, speech: `${poison} poison of ${limit} hit points`, count: poison };
+  return { text: `${poison} poison`, loses: limit > 0 && poison + 1 >= limit, speech: `${poison} poison of ${limit} hit points`, count: poison, clearName: true };
 }

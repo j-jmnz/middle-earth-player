@@ -53,3 +53,25 @@ describe("the captured pill", () => {
     expect(box.kind).toBe("words");
   });
 });
+
+describe("the pill of a poisoned character turned sideways (hob.venom-poison)", () => {
+  it("stands at the right end of the card with the glyph and the count, clear of the name at its left, inside the card at every width", () => {
+    for (const w of [56, 70, 90, 120]) {
+      const rect = card(w);
+      const middle = underMarkBox(rect, width("2 poison"), width("2"), 1, true);
+      const end = underMarkBox(rect, width("2 poison"), width("2"), 1, true, true);
+      expect(end.kind, `w ${w}`).not.toBe("words");
+      expect(end.x + end.width, `w ${w}`).toBeLessThanOrEqual(rect.x + rect.w);
+      expect(end.x, `w ${w}`).toBeGreaterThanOrEqual(rect.x + rect.w / 2 - 1);
+      expect(end.y, `w ${w}`).toBe(middle.y);
+    }
+  });
+
+  it("says the short word Out on a card of any width: it fits the card, which the word Unconscious does not", () => {
+    for (const w of [34, 44, 56]) {
+      const box = underMarkBox(card(w), width("Out"), 0, 1, false);
+      expect(box.width, `w ${w}`).toBeLessThanOrEqual(w - 4);
+      expect(box.width, `w ${w}`).toBeGreaterThanOrEqual(width("Out"));
+    }
+  });
+});

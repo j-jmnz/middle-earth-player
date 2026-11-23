@@ -318,8 +318,8 @@ function stagingPlace(game: ScenarioState, cardId: string): PlaceMark | null {
   return at ? { row: at.row, col: at.col, from: marker } : null;
 }
 
-/** The pill on The Havens Burn: "2/5" (cards under it against the number that loses), threat red when the next card placed under it loses the game; `speech` is "2 under, lose at 5". */
-export type UnderMark = { text: string; loses: boolean; speech: string; count?: number };
+/** The pill on The Havens Burn: "2/5" (cards under it against the number that loses), threat red when the next card placed under it loses the game; `speech` is "2 under, lose at 5". `clearName`: on a card turned sideways the pill stands at its far end, clear of the name (a character with poison). */
+export type UnderMark = { text: string; loses: boolean; speech: string; count?: number; clearName?: true };
 
 function underMark(tally: { count: number; limit: number } | null): UnderMark | null {
   return tally ? burnMark(tally) : null;
