@@ -246,7 +246,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
     - shuffle the encounter discard pile into the encounter deck
     - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
     - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
-    - this card is removed from the game
+    - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is removed from the game
 
 ## 50715 The Prancing Pony
 (the scenario deals it into the activeLocation pile; the piles place it, no record does)
@@ -445,8 +445,8 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 50726:A:2 (front): When Revealed: Attach to a Brigand enemy without a copy of Hired Muscle attached and return that enemy to the staging area. (Counts as a Condition attachment with the text: "Attached enemy gets +1 Threat, +1 Attack, +1 Defense and gains: 'Forced: When attached enemy is defeated, look at the bottom card of the Investigation deck.'")
   50726:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose Brigand enemy (any player controls) or in the staging area, with no attachment named "Hired Muscle" [also {"takesSource":true}]
-    - then, if there is a Brigand enemy (any player controls) or in the staging area, with no attachment named "Hired Muscle" [also {"takesSource":true}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
+    - choose Brigand enemy (any player controls) or in the staging area, with no attachment named "Hired Muscle", that this card can be attached to (one that cannot have attachments is left out)
+    - then, if there is a Brigand enemy (any player controls) or in the staging area, with no attachment named "Hired Muscle", that this card can be attached to (one that cannot have attachments is left out) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
     - then, if there is a Brigand enemy (any player controls) or in the staging area, with an attachment named "Hired Muscle" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
   50726:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
@@ -508,4 +508,4 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
     who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack the Investigate value of the active location (its printed Investigate X; 0 with no active location or none printed), until the end of the attack
 
-(rendered pieces: 264 by template, 2 as JSON)
+(rendered pieces: 268 by template, 0 as JSON)

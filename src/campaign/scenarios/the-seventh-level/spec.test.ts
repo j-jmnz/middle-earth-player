@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, endRound, exhausted, flag, notWon, resolve, resourcesOn, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Seventh Level (dwarrowdelf part 2): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
 const ROWS: readonly Row[] = [
   // 03020 Cave-troll in a real attack: its excess is read before the damage lands (the ally defending 2 hit points takes 5: 3 excess), each point is the defending player's choice among his other characters and goes on after a kill.
   { line: "03020:A:1", name: "each excess point of its attack is 1 damage the defending player puts on another character, the defender excluded", layout: { play: ["ally"] }, act: [attack("03020"), defend("ally"), answer("dh2"), answer("dh1"), answer("dh1")], expect: [zone("ally", "discard"), damageOn("dh2", 1), damageOn("dh1", 2)] },

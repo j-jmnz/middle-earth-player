@@ -53,6 +53,7 @@ import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceConte
 import { nextIntent } from "../../test/harness/auto-player.ts";
 import { loadAnyScenario, loadCampaign, loadCampaignsInOrder, loadScenario, scenarioOrder } from "../data/load-scenarios.ts";
 import { FIXTURE_DECKS, SOLO_FIXTURE_DECK, prebuiltDeck } from "./seed-kit.ts";
+import { fixtureArguments, FIXTURE_USAGE } from "./fixture-args.ts";
 import { searchFlags } from "./search/options.ts";
 import { WRITERS, isChained, type Chained, type Written } from "./writers.ts";
 import { pastShowcase } from "./showcase-past.ts";
@@ -329,8 +330,13 @@ function position(order: readonly string[], id: string): number {
 // No legal win of the two starter decks has been found on this engine, so the search runs only when the user asks for it,
 // and `won` and `knife-lost` are written only when it finds one.
 void runScript("e2e-fixtures", async () => {
-  const searching = process.argv.includes("--won");
-  const only = scenarioArgument();
+  const parsed = fixtureArguments();
+  if (parsed.help) {
+    say.info(FIXTURE_USAGE);
+    return;
+  }
+  const searching = parsed.flags.has("won");
+  const only = scenarioArgument(parsed.positional[0]);
   if (only === null && searchFlags() !== null) throw new Error("--search takes one scenario id: a search of every scenario would run for hours");
   const dir = path.join(path.dirname(new URL(import.meta.url).pathname), "..", "..", "src", "campaign", "fixtures");
   if (only !== null && !isChained(only) && searchFlags() !== null) throw new Error(`${only} has its own search for its won game: pass --won`);
@@ -339,10 +345,7 @@ void runScript("e2e-fixtures", async () => {
 });
 
 // The scenario id named on the command line, or null for every scenario. It must be in the fixture registry.
-function scenarioArgument(): FixtureScenarioId | null {
-  const named = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
-  if (named.length > 1) throw new Error("Usage: scripts/e2e/fixtures.ts [<scenario-id>] [--won] [--search ...]");
-  const id = named[0];
+function scenarioArgument(id: string | undefined): FixtureScenarioId | null {
   if (id === undefined) return null;
   const entry = FIXTURE_REGISTRY.find((one) => one.scenarioId === id);
   if (!entry) throw new Error(`${id} has no fixtures in src/campaign/fixtures/registry.ts`);

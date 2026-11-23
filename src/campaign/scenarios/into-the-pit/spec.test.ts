@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, endPhase, endRound, exhausted, flag, handCount, offers, progressOn, quest, resolve, reveal, revealedBy, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Into the Pit (dwarrowdelf part 1): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
 const ROWS: readonly Row[] = [
   { line: "03048:A:1", name: "East-gate keeps its progress when Cave In removes it from the quest and the active location", layout: { active: { code: "03016", progress: 3 }, progress: 2 }, act: reveal("03048"), expect: [progressOn("03016", 3), progressOn("03064", 0)] },
   { line: "03048:A:1", name: "and Cave In gains surge when East-gate and the quest hold no progress", layout: { active: "03016", deck: ["f0", "f0"] }, act: reveal("03048"), expect: [deckCount(1)] },

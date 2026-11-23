@@ -192,7 +192,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "forced",
     trigger: "lookedAtInvestigationDeck",
     subject: "self",
-    instructions: [{ verb: "ShuffleEncounterDiscard" }, { verb: "DiscardUntil", type: "enemy" }, { verb: "MoveEncounterCard", card: "picked", to: "engaged" }, { verb: "RemoveSourceFromGame" }],
+    instructions: [{ verb: "ShuffleEncounterDiscard" }, { verb: "DiscardUntil", type: "enemy" }, { verb: "MoveEncounterCard", card: "picked", to: "engaged" }, { verb: "RemoveSourceFromGame", when: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any" } } }],
   },
 
   // 50715 The Prancing Pony: when explored the first player either looks at the top 2 cards of the Investigation deck or each player draws 2 cards (reading 10).

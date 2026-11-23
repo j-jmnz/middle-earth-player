@@ -33,7 +33,7 @@ export const LONG_DARK_CONDITIONS: Readonly<Record<string, (c: Obj, ctx: Ctx) =>
   hasPass: (c) => ({ text: `${CARD[str(c.card)] ?? str(c.card)} prints PASS in its text box`, read: ["card"] }),
   handSize: (c) => ({ text: c.actor === true ? `the acting player (the defending player, in a Shadow effect) holds at most ${str(c.max)} cards in hand` : `no player holds more than ${str(c.max)} cards in hand`, read: ["max", "actor"] }),
   drew: () => ({ text: "a Draw this effect ran drew at least 1 card (what follows \"then\" resolves only when it did)", read: [] }),
-  thenResolves: () => ({ text: "every draw and every discard of the top of the deck this effect ran so far resolved in full (what follows \"then\" is attempted only when they did)", read: [] }),
+  thenResolves: () => ({ text: "every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows \"then\" is attempted only when they all did)", read: [] }),
   engagedWithLastPlayer: () => ({ text: "this enemy is engaged with the last player (the first player in a one-player game)", read: [] }),
 };
 

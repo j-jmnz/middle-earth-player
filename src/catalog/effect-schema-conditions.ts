@@ -66,7 +66,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("playerWithoutReady") }),
   // A Draw the running effect ran drew at least 1 card ("draws 1 card. Then, ... discard 4 cards", 04097:A:1: what follows "then" resolves only when the draw did, rr.then).
   z.strictObject({ kind: z.literal("drew") }),
-  // Every Draw and every DiscardTopOfDeck the running effect ran before it resolved in full (a deck of fewer cards than the effect names stops it short): what follows "then" is attempted only when it did (rr.then; "Draw 2 cards. Then, discard 1 card", 04108:A:1).
+  // Every Draw, discard from a deck, discard of resources and Ready the running effect ran before it resolved in full (a deck or a card with fewer cards or tokens than the effect names stops it short, and a ready of a card that is ready already or cannot ready does not happen): what follows "then" is attempted only when it did (rr.then; "Draw 2 cards. Then, discard 1 card", 04108:A:1).
   z.strictObject({ kind: z.literal("thenResolves") }),
   // The source is an enemy engaged with the last player, the first player in a one-player game (dwd.last-player): "it engages the last player and attacks him" only when the engagement was made (901603:A:2).
   z.strictObject({ kind: z.literal("engagedWithLastPlayer") }),
@@ -142,6 +142,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("byPlayerCard") }),
   // The engagement the Forced effect answers was from the staging area ("When Corsair Skiff engages you from the staging area", 12022:A:3): known only in a game with ships (dcce.boarding).
   z.strictObject({ kind: z.literal("fromStaging") }),
+  // The declaredDefender event the Response answers exhausted its character: "After ~ exhausts to defend" (131020:A:3), not a defender that stayed ready or was exhausted already.
+  z.strictObject({ kind: z.literal("exhaustedToDefend") }),
   z.strictObject({ kind: z.literal("excess"), min: z.number().int().positive() }),
   z.strictObject({ kind: z.literal("dealt"), min: z.number().int().positive().optional() }),
   // The Heading card's setting (dcce.heading): on-course (Sun, the only on-course setting), off-course (Cloud, Rain or Storm), or at the worst

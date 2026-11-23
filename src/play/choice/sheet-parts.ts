@@ -71,9 +71,6 @@ function seatOfCard(game: ScenarioState, id: string): number | null {
   return card.zone === "play" || card.zone === "heroes" ? card.controller : null;
 }
 
-// The word a seated row uses for a card type; any other type reads as an ally.
-const SEATED_KINDS: Readonly<Record<string, string>> = { hero: "hero", attachment: "attachment", event: "event", treasure: "treasure", "player-side-quest": "side quest" };
-
 /**
  * The row of a card in a pick of Intruders in Chetwood whose options belong to more than one player (Borders of Bree-land's enemy, Angmar Orc's ally): the owner is named on each row, "Angmar Orc \u00b7 engaged with Player 2",
  * "Gimli \u00b7 Player 1's ally". An attachment names the card it lies on and whose that is, so two of one name read apart ("A Fell Dread \u00b7 on Aragorn, Player 2's hero", "Possession \u00b7 on Reanimated Dead, Player 1's card", "... on Orc Archer, enemy engaged with Player 1");
@@ -94,7 +91,7 @@ export function seatedLabel(game: ScenarioState, ctx: ReduceContext, names: Shee
     const on = isReanimatedCode(host.code) ? `${hostName}, Player ${seat + 1}'s card` : hostType === "enemy" ? `${hostName}, enemy engaged with Player ${seat + 1}` : `${hostName}, Player ${seat + 1}'s ${hostType}`;
     return `${names.card(id)} \u00b7 on ${on}`;
   }
-  const kind = SEATED_KINDS[type] ?? "ally";
+  const kind = type === "hero" || type === "attachment" || type === "event" || type === "treasure" ? type : type === "player-side-quest" ? "side quest" : "ally";
   return type === "enemy" ? `${names.card(id)} \u00b7 engaged with Player ${seat + 1}` : `${names.card(id)} \u00b7 Player ${seat + 1}'s ${kind}`;
 }
 

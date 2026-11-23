@@ -9,6 +9,7 @@ import { ROOT } from "../data/paths.ts";
 import { runScript, type Log } from "../log.ts";
 import { cycleGameFile, cycleGoldenTestFile, cycleSeedFinderFile, standaloneTestFile } from "./scenario-new-cycle.ts";
 import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile, goldenTestFile, seedFinderFile, specTestFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
+import { parseArgs } from "../cli-args.ts";
 
 // Writes the skeleton of a scenario that data/scenarios already has, and the lines that register it, so the work left is the scenario's own
 // (docs/agents/agent-brief.md, Scenario procedure):
@@ -279,18 +280,26 @@ function nextSteps(facts: Facts, log: Log): void {
   log.info("next (docs/agents/agent-brief.md, Scenario procedure):");
   log.info("  pnpm data build                   rewrites the barrels of authored effect files (src/effects/generated/authored.ts) and of asks files (src/play/words/asks/index.ts)");
   log.info(`  pnpm scenario pack ${facts.id}   runs effects draft and writes .agent/pack/${facts.id}.md: the vocabulary, the families' manifests the drafts need, the cookbook sections and the drafts`);
+  log.info(`  pnpm scenario tests ${facts.id}      after Build: a failing row stub in spec.test.ts for each record no test names`);
   log.info("  pnpm effects open                 after the records, then add the scenario to src/campaign/playable.ts when none of its lines is open");
   log.info(`  fill the skeletons: spec rows (src/campaign/scenarios/${facts.id}/spec.test.ts)${facts.cycle ? ", the standalone test" : ""}, asks (src/play/words/asks/${facts.id}.ts), test/scenarios/${facts.id}/game.ts, the golden test (a skipped suite), the seed finder; then list the goldens in test/harness/golden-registry.ts`);
 }
 
+export const SCENARIO_NEW_USAGE = "usage: pnpm scenario new <scenario-id> [--short <name>] [--dry-run]";
+
+/** The arguments of a run: a misspelt flag (`--dryrun`) throws instead of writing the skeleton files, and `--help` asks for the usage. */
+export function scenarioNewArguments(args: readonly string[]): { id: string | undefined; short: string | undefined; dry: boolean; help: boolean } {
+  const parsed = parseArgs(args, SCENARIO_NEW_USAGE, { flags: ["dry-run"], spaced: ["short"] });
+  return { id: parsed.positional[0], short: parsed.flags.get("short") ?? undefined, dry: parsed.flags.has("dry-run"), help: parsed.help };
+}
+
 function main(log: Log): void {
-  const args = process.argv.slice(2);
-  const flags = new Set(args.filter((arg) => arg.startsWith("--")));
-  const shortAt = args.indexOf("--short");
-  const short = shortAt >= 0 ? args[shortAt + 1] : undefined;
-  const taken = (index: number): boolean => shortAt >= 0 && index === shortAt + 1;
-  const id = args.find((arg, index) => !arg.startsWith("--") && !taken(index));
-  if (!id) throw new Error("usage: pnpm scenario new <scenario-id> [--short <name>] [--dry-run]");
+  const { id, short, dry, help } = scenarioNewArguments(process.argv.slice(2));
+  if (help) {
+    log.info(SCENARIO_NEW_USAGE);
+    return;
+  }
+  if (!id) throw new Error(SCENARIO_NEW_USAGE);
   const repo: Repo = {
     read: (file) => {
       try {
@@ -306,7 +315,6 @@ function main(log: Log): void {
     process.exitCode = 1;
     return;
   }
-  const dry = flags.has("--dry-run");
   describePlan(plan, log, dry);
   if (!dry) {
     for (const item of plan.files) {

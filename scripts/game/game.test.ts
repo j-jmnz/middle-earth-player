@@ -6,7 +6,11 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
+import { baseDiffText, type BaseDiff } from "./base-diff.ts";
 import { firstDifferent, stateDiff } from "./diff.ts";
+import { compareGoldens, type StoredGolden } from "./compare.ts";
+import { endOf, goldenText } from "./golden-file.ts";
+import { baseRef, changedScenarios, goldenAt, renderMoved } from "./moved.ts";
 import { intentText } from "./names.ts";
 import { layoutOf, sceneSource } from "./scene-source.ts";
 import { loadSource } from "./source.ts";
@@ -75,5 +79,69 @@ describe("pnpm game", () => {
 
   it("refuses a smoke source with a seed that is not a number", async () => {
     await expect(loadSource("encounter:the-oath:x")).rejects.toThrow("whole number");
+  });
+
+  it("compares two golden.json files: result, intents or stored state, the first intent whose table differs", () => {
+    const golden = (over: Partial<StoredGolden> = {}): StoredGolden => ({ name: "solo", outcome: "won", intents: [{ type: "Pass" }, { type: "Keep" }, { type: "Pass" }], checks: [1, 2, 3], state: { round: 3, lost: false, stageCleared: true }, ...over });
+    expect(compareGoldens([golden()], [golden()])).toEqual([]);
+    const [onlyState] = compareGoldens([golden()], [golden({ checks: [1, 9, 3], state: { round: 4, lost: false, stageCleared: true } })]);
+    expect(onlyState).toMatchObject({ number: 1, kind: "moved", before: "won, last round 3", after: "won, last round 4", intents: "same", first: 1, fields: ["round: 3 → 4"] });
+    const [changed] = compareGoldens([golden()], [golden({ outcome: "lost", intents: [{ type: "Pass" }, { type: "Keep" }, { type: "Mulligan" }], state: { round: 3, lost: true, lossReason: "threat" } })], ["other", "solo"]);
+    expect(changed).toMatchObject({ number: 2, intents: "changed", first: 2, was: '{"type":"Pass"}', now: '{"type":"Mulligan"}', after: "lost (threat), last round 3" });
+    expect(compareGoldens(null, [golden()])[0]).toMatchObject({ kind: "new", before: "none" });
+    expect(compareGoldens([golden(), golden({ name: "gone" })], [golden()])).toEqual([expect.objectContaining({ kind: "removed", name: "gone", number: null })]);
+    const block = renderMoved("a-scenario", onlyState!, { intent: "Pass", effects: ["01012:action:1 (Beravor)"], rules: [], cards: ["Beravor (01012)"], steps: ["draw"], more: 2 });
+    expect(block).toContain('a-scenario golden 1 "solo"');
+    expect(block).toContain("first differing step: intent #3 (golden.json's numbering, the Keep is #1): Pass");
+    expect(block).toContain("records that resolved there: 01012:action:1 (Beravor)");
+    expect(block).toContain("... 2 more");
+  });
+
+  it("says when a golden got shorter that the game now ends there, and keys a row without a name by its seed and place", () => {
+    const golden = (over: Partial<StoredGolden> = {}): StoredGolden => ({ name: "solo", outcome: "won", intents: [{ type: "Pass" }, { type: "Keep" }, { type: "Pass" }], checks: [1, 2, 3], state: { round: 3 }, ...over });
+    const [shorter] = compareGoldens([golden()], [golden({ intents: [{ type: "Pass" }, { type: "Keep" }], checks: [1, 2] })]);
+    expect(shorter).toMatchObject({ first: 2, endsNow: true, was: '{"type":"Pass"}', now: "(ended)" });
+    const block = renderMoved("a-scenario", shorter!, { intent: "Commit", effects: [], rules: [], cards: [], steps: [], more: 0 });
+    expect(block).toContain("the game now ends after intent #3");
+    expect(block).toContain("last intent: Commit");
+    expect(block).not.toContain("intent now");
+    const longer = compareGoldens([golden({ intents: [{ type: "Pass" }], checks: [1] })], [golden()])[0];
+    expect(longer).toMatchObject({ first: 1, endsNow: false });
+    const row = (seed: number, round: number): StoredGolden => ({ seed, intents: [{ type: "Pass" }], checks: [1], state: { round } });
+    const moves = compareGoldens([row(1, 2), row(1, 3)], [row(1, 2), row(1, 4)]);
+    expect(moves).toEqual([expect.objectContaining({ name: "seed 1, row 2", number: 2, kind: "moved", fields: ["round: 3 → 4"] })]);
+  });
+
+  it("reads a row in the end format, and reads a change of format alone as one", () => {
+    const state = { round: 3, lost: false, stageCleared: true, extra: 1 };
+    const old: StoredGolden = { name: "solo", outcome: "won", intents: [{ type: "Pass" }], checks: [1], state };
+    const now: StoredGolden = { name: "solo", outcome: "won", intents: [{ type: "Pass" }], checks: [1], end: endOf(state) };
+    expect(compareGoldens([old], [now])).toEqual([expect.objectContaining({ kind: "moved", storage: true, intents: "same", first: null, fields: [], before: "won, last round 3", after: "won, last round 3" })]);
+    expect(renderMoved("a-scenario", compareGoldens([old], [now])[0]!, null)).toContain("storage format changed, same intents and digests");
+    const [moved] = compareGoldens([now], [{ ...now, end: endOf(state, { ...state, extra: 2 }) }]);
+    expect(moved?.storage).toBeUndefined();
+    expect(moved?.fields[0]).toContain("state hash");
+    expect(goldenText([{ name: "a", intents: [1], checks: [2], end: endOf(state), state: undefined }])).toBe(`[\n{\n"name":"a",\n"intents":[1],\n"checks":[2],\n"end":${JSON.stringify(endOf(state))}\n}\n]\n`);
+  });
+
+  it("reports the replay of a golden on a base's engine: the first intent whose table differs and the fields", () => {
+    const same: BaseDiff = { ref: "a".repeat(40), intents: 3, first: null, refused: null, atFields: [], finalFields: [], intent: null, move: null };
+    expect(baseDiffText("golden x 1 \"solo\"", same).join("\n")).toContain("the table is the same after every intent");
+    const parted: BaseDiff = { ...same, first: 2, atFields: ["clock: 8 → 9"], finalFields: ["clock: 14 → 23"], intent: "Pass" };
+    const text = baseDiffText("golden x 1 \"solo\"", { ...parted, move: {} as BaseDiff["move"] }).join("\n");
+    expect(text).toContain("first intent after which the tables differ: #3 (the Keep is #1): Pass");
+    expect(text).toContain("clock: 8 → 9");
+    expect(text).toContain("fields that differ in the final state, base → working tree:\n    clock: 14 → 23");
+    expect(baseDiffText("g", { ...same, refused: "the base engine refuses intent #4" }).join("\n")).toContain("refuses intent #4");
+  });
+
+  it("returns no golden.json only for a file the ref does not hold, and refuses a flag as a ref", () => {
+    expect(goldenAt("HEAD", "no-such-scenario")).toBeNull();
+    expect(() => baseRef("--verbose")).toThrow("not a ref");
+  });
+
+  it("names the base ref and the scenarios whose golden.json differs from it", () => {
+    expect(baseRef("HEAD")).toMatch(/^[0-9a-f]{40}$/);
+    expect(changedScenarios("HEAD")).toEqual(expect.any(Array));
   });
 });

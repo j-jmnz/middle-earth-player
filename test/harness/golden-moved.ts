@@ -1,20 +1,26 @@
 // Test helper. The hint a failed golden snapshot (test/harness/golden-suite.ts) prints: which goldens moved against golden.json and how, and the
 // command that names the move where each parts (`pnpm game diff`, docs/development.md, Reading a game as text). The snapshot alone prints the
-// whole file as one changed line.
+// whole file as one changed line. The comparison is the one `pnpm game moved` makes (scripts/game/compare.ts).
 import { existsSync, readFileSync } from "node:fs";
 
-type Played = { name: string; intents?: unknown; state?: unknown };
+import { compareGoldens, type StoredGolden } from "../../scripts/game/compare.ts";
 
-export function goldensMovedHint(file: string, scenarioId: string, out: readonly Played[]): string | undefined {
+export function goldensMovedHint(file: string, scenarioId: string, out: readonly StoredGolden[]): string | undefined {
   if (!existsSync(file)) return undefined;
-  const pinned = JSON.parse(readFileSync(file, "utf8")) as Played[];
-  const moved = out.flatMap((golden, at) => {
-    const was = pinned.find((item) => item.name === golden.name);
-    if (!was) return [`${at + 1} "${golden.name}" is new`];
-    if (JSON.stringify(was.intents) !== JSON.stringify(golden.intents)) return [`${at + 1} "${golden.name}" plays other intents`];
-    if (JSON.stringify(was.state) !== JSON.stringify(golden.state)) return [`${at + 1} "${golden.name}" ends on another state`];
-    return [];
+  let pinned: StoredGolden[];
+  try {
+    pinned = JSON.parse(readFileSync(file, "utf8")) as StoredGolden[];
+  } catch {
+    return undefined;
+  }
+  const moved = compareGoldens(pinned, out).flatMap((move) => {
+    const label = `${move.number ?? 0} "${move.name}"`;
+    if (move.kind === "removed") return [];
+    if (move.kind === "new") return [`${label} is new`];
+    if (move.intents === "changed") return [`${label} plays other intents`];
+    if (move.storage) return [`${label} is stored in another format`];
+    return [move.fields.length > 0 ? `${label} ends on another state` : `${label} stores other tables`];
   });
   if (moved.length === 0) return undefined;
-  return `${moved.join("; ")}. \`pnpm game diff ${scenarioId}/<number>\` names the move where a golden parts and prints the table there`;
+  return `${moved.join("; ")}. \`pnpm game diff ${scenarioId}/<number> --base\` replays the golden's intents on the base's engine and on this tree and names the first intent after which the tables differ and the fields that differ (without --base it names the move where the played game parts from golden.json)`;
 }

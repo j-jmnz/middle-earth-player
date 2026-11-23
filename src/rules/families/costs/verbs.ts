@@ -7,7 +7,7 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
-import { readsThen } from "../../interpret/effect-verbs.ts";
+import { markShort } from "../../interpret/effect-verbs.ts";
 import { attachmentHostIds, enforceRestricted } from "../../player/attach.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { askTarget, openBranch } from "../../windows/choices.ts";
@@ -82,8 +82,7 @@ export function discardResources(state: ScenarioState, instruction: Extract<Inst
   const amount = Math.min(card.resources, named);
   const next = amount > 0 ? updateCard(state, id, { resources: card.resources - amount }) : state;
   // A discard that found fewer tokens than it names is not resolved in full, so the text after "then" is not attempted (the `thenResolves` condition, rr.then).
-  const data = topFrame(next)?.data;
-  return amount < named && data?.kind === "effect" && readsThen(ctx) ? patchTop(next, { data: { ...data, short: true } }) : next;
+  return amount < named ? markShort(next, ctx) : next;
 }
 
 // The heroes whose resources can pay `sphere` for the actor, or for any player with `group`, and what they hold in all.

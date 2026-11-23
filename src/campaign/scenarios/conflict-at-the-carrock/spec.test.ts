@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, damageOn, deckCount, defend, endPhase, exhausted, flag, quest, resolve, respond, reveal, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Conflict at the Carrock (shadows-of-mirkwood part 2): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
 const ROWS: readonly Row[] = [
   { line: "900502:A:2", name: "Shadow: against a Troll the defending character does not ready this round", layout: { engaged: ["02038"] }, act: [attack("02038", { shadow: "900502" }), defend("dh1")], expect: [flag("dh1", "cannotReady")] },
   { line: "900504:A:1", name: "after Nightmare Louis attacks the defending player raises threat by 3", layout: { engaged: ["900504"] }, act: attack("900504", { undefended: true }), expect: [threat(31)] },
