@@ -18,7 +18,7 @@ import { guardedSafeLocation } from "../families/angmar/safe.ts";
 import { flightDefenseBarred } from "../families/attack/flight.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
-import { areaHeadOf, firstOfArea, isolatedAreas } from "../families/breaking/areas.ts";
+import { areaHeadOf, firstOfArea, headOf, isolatedAreas } from "../families/breaking/areas.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
 // The `exceptTrait` the template "Cannot have non-<X> attachments" reads from the printed phrase "non-objective player card attachments" (51012:A:1): a card kind, not a Trait.
@@ -129,7 +129,8 @@ export function forcedTravel(state: ScenarioState, ctx: ReduceContext): string[]
 // can fail to pay. A Travel cost of cards (discard 2 at random, each player exhausts a hero) needs the cards to pay it.
 export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
   // The players who pay the Travel cost: those of the staging area the location lies in once the areas are isolated (hob.staging-area-creating).
-  const payer = isolatedAreas(state) ? firstOfArea(state, areaHeadOf(state, locationId) ?? state.firstPlayer) : state.firstPlayer;
+  const home = isolatedAreas(state) ? areaHeadOf(state, locationId) : null;
+  const payer = isolatedAreas(state) ? firstOfArea(state, home ?? state.firstPlayer) : state.firstPlayer;
   const code = state.cards[locationId]?.code;
   if (code == null) return false;
   // Only the Travel effect of the side the location shows counts: the Temple of the Deceived side of a map location prints one that its other side does not (12068:B:3).
@@ -189,14 +190,16 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
         return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.firstPlayer, [], locationId, ctx).length === 0;
       }
       if (instruction.verb !== "Exhaust" || (instruction.target?.kind !== "byCode" && instruction.target?.kind !== "byName")) return false;
-      return readyNamedCard(state, ctx, instruction.target, instruction.who === "firstPlayer" ? state.firstPlayer : null) == null;
+      return readyNamedCard(state, ctx, instruction.target, instruction.who === "firstPlayer" ? state.firstPlayer : null, home) == null;
     });
 }
 
 /** The card in play that an Exhaust names by code or by title and that is ready ("Exhaust the Gate Key to travel here"): a card named by title is one a player controls. `payer`: only a card this seat controls. */
-export function readyNamedCard(state: ScenarioState, ctx: ReduceContext, target: { kind: "byCode"; code: string } | { kind: "byName"; name: string }, payer: number | null): CardInstance | undefined {
+export function readyNamedCard(state: ScenarioState, ctx: ReduceContext, target: { kind: "byCode"; code: string } | { kind: "byName"; name: string }, payer: number | null, area: number | null = null): CardInstance | undefined {
+  // `area`: the head of the staging area the cost is paid in. While the areas are isolated a player's card is out of reach of players who do not share it (hob.staging-area-creating).
+  const reach = (card: CardInstance) => area == null || card.controller == null || !isolatedAreas(state) || headOf(state, card.controller) === headOf(state, area);
   return Object.values(state.cards).find(
-    (card) => (target.kind === "byCode" ? card.code === target.code : printedOf(ctx.cards, card.code).name === target.name) && inPlay(card.zone) && !card.exhausted && (target.kind === "byCode" || card.controller != null) && (payer == null || card.controller === payer),
+    (card) => (target.kind === "byCode" ? card.code === target.code : printedOf(ctx.cards, card.code).name === target.name) && inPlay(card.zone) && !card.exhausted && (target.kind === "byCode" || card.controller != null) && (payer == null || card.controller === payer) && reach(card),
   );
 }
 

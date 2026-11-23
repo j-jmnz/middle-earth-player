@@ -12,12 +12,13 @@ import { startReveal } from "../../../rules/windows/frames.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { legalTargets } from "../../../rules/engine/reduce.ts";
+import { triggerIntents } from "../../../rules/player/actions.ts";
 import { finish, resolveRecords } from "../../../../test/harness/scene-kit.ts";
 import { GLADE, spiderTable, STAGE_2 } from "../../../../test/scenarios/flies-and-spiders/scene.ts";
 
 // The table after stage 2B revealed with two players, seat 0 alone at stage 3 and seat 1 at stage 4 (the Glade joined seat 1's area).
-const split = (layout: Parameters<typeof spiderTable>[0] = {}) => {
-  const t = spiderTable({ stage: STAGE_2, setAside: [GLADE], seats: 2, ...layout });
+const split = (layout: Parameters<typeof spiderTable>[0] = {}, options: Parameters<typeof spiderTable>[1] = {}) => {
+  const t = spiderTable({ stage: STAGE_2, setAside: [GLADE], seats: 2, ...layout }, options);
   const state = resolveRecords(t.state, t.ctx, STAGE_2, "whenRevealed", t.state.questStage ?? "").state;
   return { t, state };
 };
@@ -84,5 +85,12 @@ describe("area scope of Flies and Spiders' own cards", () => {
     const printed = (hero: string) => t.ctx.cards.get(out.cards[hero]?.code ?? "")?.willpower ?? 0;
     for (const hero of out.seats[1]?.heroes ?? []) expect(modifiedStat(out, out.cards[hero]!, "willpower", t.ctx.cards)).toBe(printed(hero) - 1);
     for (const hero of out.seats[0]?.heroes ?? []) expect(modifiedStat(out, out.cards[hero]!, "willpower", t.ctx.cards)).toBe(printed(hero));
+  });
+  it("hob.staging-area-creating: a player cannot use the Action of a card in another area (Durin's Helm in the staging area of the other area)", () => {
+    const { t, state: made } = split({}, { extra: ["04120"] });
+    const helm = place(made, "04120", 1);
+    const offered = (seat: number) => triggerIntents({ ...helm.state, window: { kind: "frameAction" }, activeSeat: seat }, t.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === helm.id);
+    expect(offered(1), "a player of the Helm's own area claims it").toBe(true);
+    expect(offered(0), "the player of the other area cannot").toBe(false);
   });
 });

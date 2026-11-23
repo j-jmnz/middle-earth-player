@@ -46,8 +46,7 @@ lineSpec("132025:A:2", "Travel: exhaust Bilbo Baggins to travel here; a ready Bi
   expect(travelTargets(t, updateCard(ready.state, ready.id, { exhausted: true })), "an exhausted Bilbo cannot").not.toContain(glade);
   expect(travelTargets(t, t.state), "with no Bilbo nobody can").not.toContain(glade);
 });
-// FAULT: the Glade's Travel says "Exhaust Bilbo Baggins" and a staging area is closed to players who do not share it (hob.staging-area-creating), but `readyNamedCard` takes the first ready Bilbo of the table, so the first player's Bilbo pays for a Glade in the other player's area.
-it.fails("132025:A:2 Bilbo, who the first player controls at stage 3, cannot pay for a Glade in the staging area of the other player's area", () => {
+it("132025:A:2 Bilbo, who the first player controls at stage 3, cannot pay for a Glade in the staging area of the other player's area", () => {
   const { t, state } = splitTable(EFFECTS);
   const glade = idOf(state, GLADE);
   expect(stagingOf(state, 1), "the Glade lies in the area of the player at stage 4").toContain(glade);
@@ -59,6 +58,17 @@ it("132025:A:2 Bilbo pays for a Glade in the staging area of the first player's 
   const bilbo = withBilbo(state, 0);
   const own = placeIn(bilbo.state, GLADE, 0);
   expect(travelTargets(t, own.state, 0)).toContain(own.id);
+});
+it("132025:A:2 the Travel exhausts the Bilbo of the Glade's own area, and a Bilbo of the other area cannot be the one", () => {
+  const { t, state } = splitTable(EFFECTS, { engaged: [{ code: "f0", seat: 1 }] });
+  // Bilbo goes with the first player token (ControlledBy): with the token at seat 1 he is the second area's.
+  const bilbo = withBilbo({ ...state, firstPlayer: 1, delayed: [] }, 1);
+  const glade = idOf(bilbo.state, GLADE);
+  const travel = (seat: number, at: ScenarioState) => send(start({ ...at, phase: "Travel", mode: "travel", window: { kind: "travel" }, activeSeat: seat }), { type: "Travel", locationId: glade }, t.ctx);
+  expect(bilbo.state.cards[bilbo.id]?.controller, "the token holder controls Bilbo").toBe(1);
+  expect(travel(1, bilbo.state).state.cards[bilbo.id]?.exhausted, "the Bilbo of the Glade's area pays").toBe(true);
+  const other = placeIn(bilbo.state, GLADE, 0);
+  expect(travelTargets(t, other.state, 0), "no Bilbo in the area of seat 0").not.toContain(other.id);
 });
 const spiders = (state: ScenarioState, seat: number) => stagingOf(state, seat).filter((id) => ["132031", "132032"].includes(codeOf(state, id) ?? ""));
 lineSpec("132025:A:3", "at the start of each quest phase one Spider enemy is searched from the encounter deck (not the discard pile) and added to the staging area, and the deck is shuffled", (effects) => {

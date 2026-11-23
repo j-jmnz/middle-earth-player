@@ -6,8 +6,7 @@ import { moveCard } from "../../../rules/core/zones.ts";
 import { givePoison, makeUnconscious, poisonOf } from "../../../rules/families/poison/poison.ts";
 import { spiderTable } from "../../../../test/scenarios/flies-and-spiders/scene.ts";
 
-// FAULT: an unconscious character is out of the game's state once it leaves play (hob.unconscious-characters: the poison goes to its owner's discard pile and the card is a new one when it returns), but `unconscious` stays on the card instance, so a hero returned to hand and played again is still unconscious.
-it.fails("132067:B:1 an unconscious character that leaves play (returned to hand) and returns to play is no longer unconscious", () => {
+it("132067:B:1 an unconscious character that leaves play (returned to hand) and returns to play is no longer unconscious", () => {
   const t = spiderTable({ seats: 1, hand: [] }, { effects: EFFECTS });
   const down = makeUnconscious(t.state, t.hero, t.ctx);
   expect(down.cards[t.hero]?.unconscious).toBe(true);

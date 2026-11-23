@@ -159,6 +159,8 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 39, scenarios: "all", note: "An Action or Response that adds resources to a hero who cannot gain them from player card effects is not offered: Steward of Gondor and Orcrist on Bilbo Baggins of the Over Hill and Under Hill box, and Bilbo's Magic Ring too." },
   { version: 39, scenarios: "all", note: "The Arkenstone is not offered with no ally of the attached hero's sphere in your hand, or when X can only be 0 at a threat of 49, and a hero that gained a resource icon is also of that sphere for it and for Good Meal." },
   { version: 39, scenarios: "all", note: "Sting's Response, and the Fellowship's Sting, are not offered when the encounter deck is empty." },
+  { version: 39, scenarios: ["fog-on-the-barrow-downs", "escape-from-mount-gram", "foundations-of-stone", "flies-and-spiders"], note: "While the players have separate staging areas, a player cannot use the Action of a card in another area (Durin's Helm in the other player's staging area), and a Travel cost that exhausts a named card is paid by a player of the location's area." },
+  { version: 39, scenarios: ["flies-and-spiders"], note: "A character that leaves play and comes back is no longer unconscious." },
 ];
 
 export const ENGINE_VERSION = 39;

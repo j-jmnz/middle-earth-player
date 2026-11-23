@@ -156,7 +156,7 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
       return modifyStat(state, instruction, focus, ctx);
     case "Exhaust": {
       const target = instruction.target;
-      const id = target?.kind === "byCode" || target?.kind === "byName" ? readyNamedCard(state, ctx, target, instruction.who === "firstPlayer" ? state.firstPlayer : null)?.id : focus.sourceId;
+      const id = target?.kind === "byCode" || target?.kind === "byName" ? readyNamedCard(state, ctx, target, instruction.who === "firstPlayer" ? state.firstPlayer : null, focus.seat)?.id : focus.sourceId;
       return id ? exhaustCard(state, id) : state;
     }
     case "Ready":
