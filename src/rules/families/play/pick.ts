@@ -9,13 +9,14 @@ import { hasTrait } from "../../interpret/conditions.ts";
 import { traitsOf } from "../misc/traits.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
+import { spheresOf } from "../costs/pay.ts";
 import type { ScenarioState } from "../../core/state.ts";
 
-// `heroSphere`: the card's printed sphere is one of the spheres of the heroes `seat` controls; a neutral card and a Fellowship hero match none.
+// `heroSphere`: the card's printed sphere is one of the spheres of the heroes (a gained icon included) `seat` controls; a neutral card and a Fellowship hero match none.
 function matchesHeroSphere(state: ScenarioState, id: string, seat: number, ctx: ReduceContext): boolean {
   const sphere = printedOf(ctx.cards, state.cards[id]?.code ?? "").sphere;
   if (sphere == null || sphere === "neutral" || sphere === "fellowship") return false;
-  return (state.seats[seat]?.heroes ?? []).some((hero) => printedOf(ctx.cards, state.cards[hero]?.code ?? "").sphere === sphere);
+  return (state.seats[seat]?.heroes ?? []).some((hero) => spheresOf(state, hero, printedOf(ctx.cards, state.cards[hero]?.code ?? "").sphere, ctx).includes(sphere));
 }
 
 // `soleMostDamaged`: this character has damage on it and more than every other character of every player in play, Wilyador and the heroes and allies alike.

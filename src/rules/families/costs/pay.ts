@@ -8,7 +8,7 @@
 import type { Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
 import type { Cause } from "../../core/cause.ts";
-import { holds } from "../../interpret/conditions.ts";
+import { grantedIcons, holds } from "../../interpret/conditions.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import type { EngineStep, Payment } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -30,6 +30,13 @@ const ICON_FLAGS = [
 // The resource icons a card holds as a flag now (a constant, or a lasting effect until the end of the phase).
 export function flagIcons(state: ScenarioState, id: string): Sphere[] {
   return ICON_FLAGS.filter(([flag]) => heldAmount(state, id, flag) > 0).map(([, sphere]) => sphere);
+}
+
+// The spheres a card belongs to: its printed one and every resource icon it gained, from an attachment or a flag. A character with a gained icon
+// belongs to that sphere as well, for the filters that read a sphere as for paying (docs/brief.md, Core round; Song of Wisdom, Narya).
+export function spheresOf(state: ScenarioState, id: string, printed: Sphere | null, ctx: ReduceContext): Sphere[] {
+  const gained = state.cards[id] && inPlay(state.cards[id].zone) ? [...grantedIcons(state, id, ctx), ...flagIcons(state, id)] : [];
+  return printed == null ? gained : [printed, ...gained];
 }
 
 const LOSABLE: ReadonlySet<Sphere> = new Set(["leadership", "lore", "spirit", "tactics"]);
