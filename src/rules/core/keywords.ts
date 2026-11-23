@@ -12,7 +12,7 @@ import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
 import { claimedDestination, discardedDetached, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
-import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
+import { attachmentsOn, inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
 import { damageBarred, damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
 import { attackingHolds } from "../families/attack/strike.ts";
 import { resourceCancel, resourceShield } from "../families/aflame/attack.ts";
@@ -448,9 +448,9 @@ export function destroyCard(
   // The cards attached to a leaving location or destroyed enemy hear about it, with whether the location was explored decided here (announceHostLeaving).
   let next = announceHostLeaving(state, id, cards, explored);
   // The active location explored: every card hears it, with the number of attachments it had (10006:A:1, 19026:A:2).
-  if (explored && isLocationCard(printed) && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: instance.attachments.length });
+  if (explored && isLocationCard(printed) && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: attachmentsOn(state, id).length });
   // A location explored in the staging area (not the active location, which announced itself above) is heard by "after a location is explored" (Northern Tracker, The Evening Star).
-  if (explored && isLocationCard(printed) && instance.zone === "staging") next = queueEvent(next, { trigger: "locationExplored", seat: null, subject: id, amount: instance.attachments.length });
+  if (explored && isLocationCard(printed) && instance.zone === "staging") next = queueEvent(next, { trigger: "locationExplored", seat: null, subject: id, amount: attachmentsOn(state, id).length });
   // A location in the staging area that is explored detaches the enemies grappled with it (dcce.grapple).
   if (explored && isLocationCard(printed) && instance.zone === "staging") next = releaseGrappled(next, id);
   next = releaseAttachments(next, id, cards, steps);
