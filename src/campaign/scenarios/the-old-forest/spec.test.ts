@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, attack, cardSpecs, damageOn, deckCount, endPhase, endRound, flag, handCount, progressOn, quest, resolve, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Old Forest (standalone-scenarios part 4): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The lines a row cannot express (the random stage and its
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The lines a row cannot express (the random stage and its
 // timing, the play limit, the seeded choices) are tests in stages.test.ts, each titled with its line id.
 const FILLERS = ["f0", "f0", "f0", "f0", "f0"];
 const END_OF_PLANNING = { seat: null, phase: "Planning" } as const;

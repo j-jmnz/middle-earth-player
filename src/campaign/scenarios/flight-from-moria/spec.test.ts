@@ -5,7 +5,7 @@ import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCo
 import type { Layout } from "../../../../test/harness/scene-kit.ts";
 
 // Card specs for Flight from Moria (dwarrowdelf part 3): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The stage 2s and their quest-deck behaviour are in lines.test.ts (several steps each).
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The stage 2s and their quest-deck behaviour are in lines.test.ts (several steps each).
 // Victory 3 on the Great Cave-troll (03042) in the victory display makes The Nameless Fear's X 3.
 const FEAR_X3 = { staging: ["03025"], victory: ["03042"] } as const;
 

@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, damageOn, deckCount, flag, progressOn, resolve, resourcesOn, reveal, revealedBy, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Hills of Emyn Muil (shadows-of-mirkwood part 4): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot say (a play that is not offered, a card that is not reached,
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). What a row cannot say (a play that is not offered, a card that is not reached,
 // a game over several steps) is a test in lines.test.ts titled with the line id.
 const ROWS: readonly Row[] = [
   { line: "02083:A:1", name: "Amon Hen's Threat is twice the number of players", layout: { seats: 2, staging: ["02083"] }, act: announce("enteredPlay", "02083"), expect: [stat("02083", "threat", 4)] },

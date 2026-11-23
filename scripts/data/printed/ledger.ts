@@ -45,6 +45,12 @@ export const ledgerSchema = z.strictObject({
 export type Ledger = { campaign: string; entries: LedgerEntry[]; byKey: ReadonlyMap<string, LedgerEntry> };
 
 export const keyOf = (code: string, side: string): string => `${code}.${side}`;
+/** The printed text of a line id (`01026:A:2`, the second line of side A), or undefined when the ledger holds no such line. The one lookup of a line id's text. */
+export function printedLine(ledger: Ledger, id: string): string | undefined {
+  const [code = "", side = "", n = "0"] = id.split(":");
+  return ledger.byKey.get(keyOf(code, side))?.lines[Number(n) - 1];
+}
+
 export const lineId = (code: string, side: string, n: number): string => `${code}:${side}:${n}`;
 
 export function parseLedger(raw: unknown): Ledger {

@@ -12,7 +12,7 @@ import { loadCards } from "../data/load-cards.ts";
 import { generateEffects } from "../data/effects/generate.ts";
 import { lineTimings } from "../data/normalize/timings.ts";
 import { isKeywordLine } from "../data/normalize/keywords.ts";
-import { keyOf, lineId, loadLedger } from "../data/printed/ledger.ts";
+import { keyOf, lineId, loadLedger, printedLine } from "../data/printed/ledger.ts";
 import { isPoolCard, withPool } from "../data/printed/pool.ts";
 import { PLAYER_REQUESTS } from "../data/printed/scope.ts";
 import { authoredFileNames, authoredOrder, renderAuthoredBarrel } from "../data/effects/barrel.ts";
@@ -123,19 +123,15 @@ describe("effect coverage", () => {
   // the card came into play, so a constant record owns it: a Forced trigger on one way in (added to the staging area, engaged) would miss the others. Named one by one, with the reason.
   const REPLACEMENT_RECORDS: ReadonlySet<string> = new Set(["11181:constant:2"]);
 
-  const lineOf = (id: string): string => {
-    const [code, side, n] = id.split(":");
-    return lines.byKey.get(keyOf(code ?? "", side ?? ""))?.lines[Number(n) - 1] ?? "";
-  };
+  const lineOf = (id: string): string => printedLine(lines, id) ?? "";
 
   it("has a record that names a line of its own card, for every shipped record", () => {
     for (const effect of EFFECTS) {
       expect(effect.lines.length, `${effect.id} names a line`).toBeGreaterThan(0);
       for (const id of effect.lines) {
-        const [code, side, n] = id.split(":");
-        const entry = lines.byKey.get(keyOf(code ?? "", side ?? ""));
+        const code = id.split(":")[0];
         expect(code, `${effect.id} claims ${id}, a line of another card`).toBe(effect.cardCode);
-        const line = entry?.lines[Number(n) - 1];
+        const line = printedLine(lines, id);
         expect(line, `${effect.id} claims ${id}, which is not a printed line`).toBeDefined();
         // A ledger edit that shifts line numbers moves a record onto a line with another label. A record may also own an
         // unlabeled line it carries out with its labeled one (Close Call's "Doomed X." raised by its Response, 08005).

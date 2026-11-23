@@ -2,7 +2,7 @@
 import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, endPhase, endRound, exhausted, flag, handCount, progressOn, quest, resolve, respond, resourcesOn, reveal, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Wizard's Quest (standalone-scenarios part 10): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
 const F0 = ["f0", "f0", "f0", "f0", "f0", "f0"];
 const RHOSGOBEL = "51010";
 const RIDER = "51011";

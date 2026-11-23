@@ -273,7 +273,7 @@ A new verb extends an existing one where it can. Before adding one, read the dra
 
 ## Readings the review catches
 
-Read each new record against these before the review. Each one is a card bug a review has found.
+Read each new record against these before the review. Each one is a card bug a review has found. A reading added here gets its tag in `scripts/data/effects/render/checks.ts`, so `pnpm effects render --checks` asks the judge about it.
 
 - **"Side quest".** The words mean either kind, a player side quest or an encounter side quest (`mec108.side-quests`): a record counts or picks them with the pick filter `sideQuest: true`, not `cardType`.
 - **"Then".** The part after "then" resolves only if the part before it did (`rr.then`). Give the later instructions the same condition, or put them on a `then` branch. A first part that can come up short (a discard of tokens, a draw, a discard from the deck) holds the rest with the condition `thenResolves`: test the case where it finds nothing.
