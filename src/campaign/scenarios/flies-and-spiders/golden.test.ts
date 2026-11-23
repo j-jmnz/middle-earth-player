@@ -12,8 +12,8 @@ const spiders = loadAnyScenario("flies-and-spiders");
 const cardsOf = (state: ScenarioState, code: string) => Object.values(state.cards).filter((card) => card.code === code);
 
 // A permanent golden: whole standalone games of Flies and Spiders played by the auto-player (test/scenarios/flies-and-spiders/game.ts) on fixed seeds. A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned.
-// The wins are two-handed on Normal and Easy: the first player takes stage 3 alone with Bilbo Baggins, the other player advances to stage 4 and defeats Battle with the Spiders. The losses are the two ways to lose, true solo and two-handed: every player's
-// threat at 50 and Bilbo Baggins leaving play. No true solo win: the auto-player holds no ally and Bilbo alone cannot fill the 11 quest points of stage 3. The opening, the causes, a replay and the scoring are checked for each. Update the snapshot only when the change is meant.
+// The wins are one true solo and two-handed on Normal and Easy: the first player takes stage 3 with Bilbo Baggins (the other player takes stage 4 and, two-handed, defeats Battle with the Spiders after the first player joins it). The losses are the two ways to lose, true solo and
+// two-handed: every player's threat at 50 and Bilbo Baggins leaving play. The opening, the causes, a replay and the scoring are checked for each. Update the snapshot only when the change is meant.
 describe("Flies and Spiders golden", () => {
   goldenSuite<SpidersGolden, SpidersDecks>({
     title: "Flies and Spiders",
