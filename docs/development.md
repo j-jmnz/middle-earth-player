@@ -148,7 +148,7 @@ cd webapp && npx wrangler deploy
 
 `webapp/wrangler.toml` deploys the export as the Worker's static assets. Cloudflare answers a file's path itself; `webapp/worker.ts` runs only for the rest and answers a route with a parameter (`/table/<id>`) with its page, and any other path with the not-found page and a 404. `npx wrangler dev` in `webapp/` serves the same site on localhost.
 
-The first deploy is public until Cloudflare Access is on. Deploy once with no pictures (`pnpm webapp build --skip-assets` on a clone with no `assets/scans`), turn on Access for the Worker's `workers.dev` name in the dashboard (the Worker's Settings, Domains & Routes), then build with the pictures and deploy again.
+The site is public (`docs/plans/pwa-iphone-ipad.md`, Decisions for the user). Its pages carry `X-Robots-Tag: noindex`, so search engines do not list it.
 
 ## Asset mirror
 

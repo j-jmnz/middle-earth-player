@@ -34,7 +34,6 @@ The app already runs in a browser: the desktop app is the web export in Electron
 | A file over 25 MiB (the Dream-chaser booklet) | R2, read by the Worker on the same origin | The Worker answers `Range`, which pdf.js and Safari's media need. |
 | The RingsDB import, if RingsDB sends no CORS headers | A Worker route | A new request path: `PRIVACY.md` names it. |
 | The domain | Cloudflare Registrar and DNS | See Decisions for the user. |
-| A closed test | Cloudflare Access | Free for a small group, signs in by email code. |
 | Deploy | `wrangler deploy` from `.github/workflows/release.yml` | Only the release workflow deploys the public site (`docs/agents/release-standards.md`, Tags and releases). |
 
 The asset mirror bucket (`docs/development.md`, Asset mirror) stays private and stays a build cache: it holds the pinned source files (full-size pictures, scans, PDFs), not what the app shows. The site gets its own bucket.
@@ -49,7 +48,7 @@ If Phase 0 shows that a deploy of the whole export is too slow or too large, the
 
 ## Decisions for the user
 
-1. **Public pictures and music.** The site would serve every card picture and the music loops, cut from the film score, at a public URL. A release file needs a download and an install; a URL does not, so the copyright exposure is higher, and a complaint to Cloudflare can take the site down. Options: a public site without the music, a public site with all of it, or a site behind Cloudflare Access for invited players. Recommendation: start behind Access, and decide on the music before it opens.
+1. **The music on the public site.** The site is public (user decision, 2026-11-23), so it serves every card picture at a public URL, and a complaint to Cloudflare can take it down. Open: whether it also serves the music loops, which are cut from the film score. Recommendation: leave the music out of the web app, since a recording is the file a rights holder acts on first.
 2. **The domain.** The origin holds the saves, so it never changes after the first release, like the desktop's names (`desktop/identity.ts`). A `workers.dev` name is free but ties the saves to the account's subdomain. Recommendation: a domain bought at Cloudflare Registrar before Phase 2.
 3. **What "offline" means on the web.** The phone and desktop builds carry every picture. A gigabyte before the first game is too much in a browser. Recommendation: the app shell is cached at install (it plays offline with cards drawn as text), each picture is cached when first shown, and Settings has Download pictures for each campaign and for all, with the size and progress.
 4. **Save sync between devices.** Possible later with a Worker and R2 or D1, but it sends saves off the device, which the app never does today. Recommendation: not in this plan; Back up saves and Restore cover a move between devices.
@@ -57,9 +56,9 @@ If Phase 0 shows that a deploy of the whole export is too slow or too large, the
 
 ## Phase 0: device spike
 
-No product code. A test site behind Cloudflare Access answers the open risks. The site is the desktop's export with `require-corp`; in Chromium it is isolated, opens `user.db` and shows no error.
+No product code. A test site answers the open risks. The site is the desktop's export with `require-corp`; in Chromium it is isolated, opens `user.db` and shows no error.
 
-1. Build and deploy the test site to a `workers.dev` name behind Access (`docs/development.md`, The web app on Cloudflare).
+1. Build and deploy the test site to a `workers.dev` name (`docs/development.md`, The web app on Cloudflare).
 2. On an iPhone and an iPad (the oldest the user has, on iOS 17 or later), in Safari and from the Home Screen: `crossOriginIsolated` is true, `user.db` opens, a save survives a relaunch and a week, and Back up saves and Restore work.
 3. Play a full scenario from a save fixture. Record the time of one accepted intent, any page reload, and the table's frame rate with pictures on High and Low.
 4. Open a booklet, start the music, import a RingsDB deck.
@@ -100,4 +99,4 @@ Exit: a short report with each answer. The user decides to go on, to change the 
 
 ## Order and size
 
-Phase 0 is days and needs the user's devices and a Cloudflare account. Phases 1 and 2 are the bulk of the code and can be checked in Chromium. Phase 3 needs the devices again. Phase 4 can start after Phase 1 for the closed test. Decisions 1 and 2 are needed before Phase 4 opens the site; decision 3 before Phase 1.
+Phase 0 is days and needs the user's devices and a Cloudflare account. Phases 1 and 2 are the bulk of the code and can be checked in Chromium. Phase 3 needs the devices again. Phase 4 can start after Phase 1. Decisions 1 and 2 are needed before Phase 4 puts the site on its permanent origin; decision 3 before Phase 1.
