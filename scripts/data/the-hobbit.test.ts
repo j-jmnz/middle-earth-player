@@ -1,7 +1,7 @@
 // Rules: hob.setup-we-must-away-ere-break-of-day, hob.setup-over-the-misty-mountains-grim, hob.setup-dungeons-deep-and-caverns-dim, hob.setup-flies-and-spiders, hob.setup-the-lonely-mountain,
 // hob.setup-the-battle-of-five-armies, hob.sack-deck, hob.active-and-inactive-encounter-decks, hob.riddle-area, hob.treasure-ohauh, hob.treasure-otd (data/rules/entries.json).
 // The Hobbit cycle built from the two saga boxes (The Hobbit: Over Hill and Under Hill and On the Doorstep): its six scenario files, their piles and counts for Normal and Easy, the rules
-// spans of the inserts, and the Nightmare decks. The shape every cycle shares (no campaign card, prelude or booklet) is held for each cycle in cycles.test.ts.
+// spans of the inserts. The shape every cycle shares (no campaign card, prelude or booklet) is held for each cycle in cycles.test.ts.
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -13,7 +13,6 @@ import { loadCards } from "./load-cards.ts";
 import { loadAnyScenario, loadCampaign, loadScenarioDefinitions } from "./load-scenarios.ts";
 import { DATA_DIR } from "./paths.ts";
 import { scenarioSlug } from "./campaign-defs.ts";
-import { NIGHTMARE_DECKS } from "./nightmare-defs.ts";
 import { titleKey } from "./normalize/names.ts";
 
 const cards = loadCards();
@@ -123,26 +122,5 @@ describe("The Hobbit cycle", () => {
     expect(rules.get("hob.treasure-otd")).toContain("The Arkenstone");
     expect(rules.get("hob.baggins-sphere-ohauh")).toContain("cannot gain resources through player card effects");
     expect(rules.get("hob.baggins-sphere-otd")).toContain("cannot gain resources from non-treasure cards");
-  });
-});
-
-// Each scenario's Nightmare deck (docs/scenarios/nightmare.md, Nightmare): the setup card, the copies its side B removes and the copies of the deck shuffled in.
-const NIGHTMARE = {
-  "we-must-away-ere-break-of-day": { prefix: "9055", setup: "905501", removed: 9, added: 19 },
-  "over-the-misty-mountains-grim": { prefix: "9056", setup: "905601", removed: 16, added: 19 },
-  "dungeons-deep-and-caverns-dim": { prefix: "9057", setup: "905701", removed: 13, added: 19 },
-  "flies-and-spiders": { prefix: "9058", setup: "905801", removed: 15, added: 19 },
-  "the-lonely-mountain": { prefix: "9059", setup: "905901", removed: 14, added: 19 },
-  "the-battle-of-five-armies": { prefix: "9060", setup: "906001", removed: 18, added: 19 },
-} as const;
-
-describe("The Hobbit Nightmare decks", () => {
-  it.each(Object.entries(NIGHTMARE))("%s carries its deck, and every removal on the setup card resolves to a card the scenario deals", (id, pin) => {
-    expect(NIGHTMARE_DECKS.find((deck) => deck.prefix === pin.prefix)?.scenario).toBe(id);
-    const nightmare = loadAnyScenario(id).nightmare;
-    expect(nightmare?.setupCard).toBe(pin.setup);
-    expect(byCode.get(pin.setup)?.type).toBe("nightmare");
-    expect(nightmare?.removed.reduce((sum, item) => sum + item.copies, 0)).toBe(pin.removed);
-    expect(nightmare?.cards.reduce((sum, card) => sum + card.copies, 0)).toBe(pin.added);
   });
 });

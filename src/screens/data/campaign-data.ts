@@ -1,4 +1,5 @@
 import dwarrowdelf from "../../../data/campaigns/dwarrowdelf.json";
+import theHobbit from "../../../data/campaigns/the-hobbit.json";
 import shadowsOfMirkwood from "../../../data/campaigns/shadows-of-mirkwood.json";
 import standaloneScenarios from "../../../data/campaigns/standalone-scenarios.json";
 import dreamChaser from "../../../data/campaigns/dream-chaser.json";
@@ -24,6 +25,12 @@ import watcherInTheWater from "../../../data/scenarios/the-watcher-in-the-water.
 import longDark from "../../../data/scenarios/the-long-dark.json";
 import foundationsOfStone from "../../../data/scenarios/foundations-of-stone.json";
 import shadowAndFlame from "../../../data/scenarios/shadow-and-flame.json";
+import weMustAway from "../../../data/scenarios/we-must-away-ere-break-of-day.json";
+import misty from "../../../data/scenarios/over-the-misty-mountains-grim.json";
+import riddles from "../../../data/scenarios/dungeons-deep-and-caverns-dim.json";
+import fliesAndSpiders from "../../../data/scenarios/flies-and-spiders.json";
+import lonelyMountain from "../../../data/scenarios/the-lonely-mountain.json";
+import fiveArmies from "../../../data/scenarios/the-battle-of-five-armies.json";
 import massing from "../../../data/scenarios/the-massing-at-osgiliath.json";
 import lakeTown from "../../../data/scenarios/the-battle-of-lake-town.json";
 import stoneOfErech from "../../../data/scenarios/the-stone-of-erech.json";
@@ -95,8 +102,8 @@ import { campaignDataSchema, parseAnyScenarioData, type AnyScenarioData, type Ca
 // source for them. Metro needs static JSON imports, so the map is written by hand; campaign-data.test.ts checks it against
 // data/campaigns/index.json and data/scenarios. Each file is parsed (zod) the first time it is asked for, not when the module
 // loads, and kept: the app opens without parsing every scenario, and a screen pays only for the ones it shows.
-const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([shadowsOfMirkwood, dwarrowdelf, standaloneScenarios, fellowship, mirkwoodPaths, darkOfMirkwood, dreamChaser, eredMithrin, angmarAwakened, twoTowers, returnOfTheKing].map((raw) => [raw.id, raw]));
-const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([intoThePit, seventhLevel, flightFromMoria, redhornGate, roadToRivendell, watcherInTheWater, longDark, foundationsOfStone, shadowAndFlame, past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves, voyage, fate, raid, stormcaller, depths, temple, ruins, cobas, corsairs, upTheAnduin, lostInMirkwood, kingsQuest, witheredHeath, roam, fireInTheNight, framsburg, gundabad, wilderland, urukHai, helmsDeep, isengard, marshes, crossRoads, shelob, greyCompany, siege, pelennor, cirithUngol, blackGate, mountDoom, intruders, weatherHills, deadmensDike, wastes, mountGram, ettenmoors, rhudaur, carnDum, dreadRealm, hunt, carrock, rhosgobel, emynMuil, deadMarshes, returnToMirkwood, massing, lakeTown, stoneOfErech, oldForest, fogOnTheBarrowDowns, ruinsOfBelegost, murderAtThePrancingPony, siegeOfAnnuminas, attackOnDolGuldur, wizardsQuest, woodlandRealm, minesOfMoria, escapeFromKhazadDum, huntForTheDreadnaught].map((raw) => [raw.id, raw]));
+const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([shadowsOfMirkwood, dwarrowdelf, theHobbit, standaloneScenarios, fellowship, mirkwoodPaths, darkOfMirkwood, dreamChaser, eredMithrin, angmarAwakened, twoTowers, returnOfTheKing].map((raw) => [raw.id, raw]));
+const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([weMustAway, misty, riddles, fliesAndSpiders, lonelyMountain, fiveArmies, intoThePit, seventhLevel, flightFromMoria, redhornGate, roadToRivendell, watcherInTheWater, longDark, foundationsOfStone, shadowAndFlame, past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves, voyage, fate, raid, stormcaller, depths, temple, ruins, cobas, corsairs, upTheAnduin, lostInMirkwood, kingsQuest, witheredHeath, roam, fireInTheNight, framsburg, gundabad, wilderland, urukHai, helmsDeep, isengard, marshes, crossRoads, shelob, greyCompany, siege, pelennor, cirithUngol, blackGate, mountDoom, intruders, weatherHills, deadmensDike, wastes, mountGram, ettenmoors, rhudaur, carnDum, dreadRealm, hunt, carrock, rhosgobel, emynMuil, deadMarshes, returnToMirkwood, massing, lakeTown, stoneOfErech, oldForest, fogOnTheBarrowDowns, ruinsOfBelegost, murderAtThePrancingPony, siegeOfAnnuminas, attackOnDolGuldur, wizardsQuest, woodlandRealm, minesOfMoria, escapeFromKhazadDum, huntForTheDreadnaught].map((raw) => [raw.id, raw]));
 
 const campaigns = new Map<string, CampaignData>();
 const scenarios = new Map<string, AnyScenarioData>();
@@ -121,6 +128,8 @@ export const BOXES: readonly Box[] = [
   { id: "standalone-scenarios", name: "Standalone scenarios", campaignId: "standalone-scenarios", scenarios: ["the-massing-at-osgiliath", "the-battle-of-lake-town", "the-stone-of-erech", "the-old-forest", "fog-on-the-barrow-downs", "the-ruins-of-belegost", "murder-at-the-prancing-pony", "the-siege-of-annuminas", "attack-on-dol-guldur", "the-wizards-quest", "the-woodland-realm", "the-mines-of-moria", "escape-from-khazad-dum", "the-hunt-for-the-dreadnaught"] },
   // Dwarrowdelf is the second cycle (docs/scenarios/dwarrowdelf.md, Dwarrowdelf): the Khazad-dûm expansion and six Adventure Packs, standalone only.
   { id: "dwarrowdelf", name: "Dwarrowdelf", campaignId: "dwarrowdelf", scenarios: ["into-the-pit", "the-seventh-level", "flight-from-moria", "the-redhorn-gate", "road-to-rivendell", "the-watcher-in-the-water", "the-long-dark", "foundations-of-stone", "shadow-and-flame"] },
+  // The Hobbit is the cycle of the two saga boxes (docs/scenarios/the-hobbit.md, The Hobbit): standalone only, one box in release order.
+  { id: "the-hobbit", name: "The Hobbit", campaignId: "the-hobbit", scenarios: ["we-must-away-ere-break-of-day", "over-the-misty-mountains-grim", "dungeons-deep-and-caverns-dim", "flies-and-spiders", "the-lonely-mountain", "the-battle-of-five-armies"] },
   { id: "revised-core", name: "Revised Core Set", campaignId: "mirkwood-paths", scenarios: ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"] },
   { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood", campaignId: "the-dark-of-mirkwood", scenarios: ["the-oath", "the-caves-of-nibin-dum"] },
   // The Lost Realm and the six Adventure Packs are one box with the Campaign Expansion on the Scenarios tab, as the other campaign expansions' are.
