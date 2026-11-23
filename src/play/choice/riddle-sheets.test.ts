@@ -52,16 +52,16 @@ describe("the sheets of a riddle", () => {
     const made = riddleTable({ deckOf: ["01013", "01013", "01013"] });
     const state = after(made, updateCard(made.state, made.bilbo, { resources: 2 }), "131076", ["answer", "ally"]);
     expect(sheetOf(made, state)).toEqual({
-      note: "Bilbo's Magic Ring: spend 1 of Bilbo's 2 Baggins resources to discard 1 more card from your deck? It is checked for a match like the others.",
+      note: "Bilbo's Magic Ring: only the first player may use it. Spend 1 of the 2 Baggins resources in Bilbo's pool to discard 1 more card from your deck? It is checked for a match like the others.",
       verb: "Choose",
       labels: ["Spend 1 Baggins resource: discard 1 more card", "Stop: discard no more cards"],
     });
   });
 
-  it("131084:A:1 asks a card type, and says the 3 cards discarded and the progress each one takes off", () => {
+  it("131084:A:1 asks a card type, and says the 3 cards discarded and that stage 2 keeps its progress", () => {
     const made = riddleTable({ deck: ["131074", "131079", "f0", "f0", "treachery", "f0"] });
     const sheet = sheetOf(made, after(made, stacked(made.state, ["f0", "f0", "treachery"]), "131084", []));
-    expect(sheet.note).toBe("Name a card type. The top 3 cards of the encounter deck are discarded, and each one that is not of that type takes 1 progress off stage 2.");
+    expect(sheet.note).toBe("Name a card type. The top 3 cards of the encounter deck are discarded. Stage 2 keeps its progress, since it cannot be removed except by answering riddles.");
     expect(sheet.labels).toEqual(["Enemy", "Location", "Treachery", "Objective"]);
   });
 });

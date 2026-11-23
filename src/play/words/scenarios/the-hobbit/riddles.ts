@@ -30,7 +30,7 @@ export function riddleAsk(instruction: Instruction, queue: readonly Instruction[
   if (instruction.verb === "NameEncounterType") {
     const count = queue.find((item) => item.verb === "DiscardEncounterTop");
     const top = count?.verb === "DiscardEncounterTop" && typeof count.count === "number" ? count.count : 3;
-    return { verb: "Name", ...says.owned, prompt: says.say(`name a card type. The top ${top} cards of the encounter deck are discarded, and each one that is not of that type takes 1 progress off stage 2.`) };
+    return { verb: "Name", ...says.owned, prompt: says.say(`name a card type. The top ${top} cards of the encounter deck are discarded. Stage 2 keeps its progress, since it cannot be removed except by answering riddles.`) };
   }
   if (instruction.verb !== "RiddleStep") return null;
   const card = game.cards[instruction.card];
@@ -49,7 +49,7 @@ export function riddleAsk(instruction: Instruction, queue: readonly Instruction[
     return {
       verb: "Choose",
       ...says.owned,
-      prompt: `${says.titled("Bilbo's Magic Ring", `spend ${spend} of Bilbo's ${held} Baggins resources to discard ${ready?.discard ?? 1} more card from your deck?`)} It is checked for a match like the others.`,
+      prompt: `${says.titled("Bilbo's Magic Ring", `only the first player may use it. Spend ${spend} of the ${held} Baggins resources in Bilbo's pool to discard ${ready?.discard ?? 1} more card from your deck?`)} It is checked for a match like the others.`,
       labels: { ring: `Spend ${spend} Baggins resource: discard ${ready?.discard ?? 1} more card`, stop: "Stop: discard no more cards" },
     };
   }

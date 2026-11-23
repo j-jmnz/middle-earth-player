@@ -1,4 +1,5 @@
 import type { Ask } from "../asks.ts";
+import { MISTY_MOUNTAIN_GOBLINS_ASKS } from "../misty-mountain-goblins-asks.ts";
 
 // The choice words of Dungeons Deep and Caverns Dim (the-hobbit part 3), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario dungeons-deep-and-caverns-dim --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=dungeons-deep-and-caverns-dim` prints each sentence.
@@ -22,4 +23,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "131082:whenRevealed:2 @0 Choose": { owned: true, note: "Hiding in the Trees: answer its riddle, or resolve the card as any other card? The riddle names a card type and a sphere, then discards the top 3 cards of your deck." },
   "131082:whenRevealed:2 @0 answer": { label: "Answer the riddle: name a card type and a sphere" },
   "131082:whenRevealed:2 @0 resolve": { label: "Resolve Hiding in the Trees as any other card" },
+
+  ...MISTY_MOUNTAIN_GOBLINS_ASKS,
 };
