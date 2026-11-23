@@ -13,7 +13,8 @@ const NO_TROLL_IN_STAGING: Condition = { kind: "count", pick: TROLL_IN_STAGING, 
 const ATTACKER_IS_TROLL: Condition = { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", trait: "Troll", staging: true } };
 // A Sack card on a character is an encounter card that nobody controls (`onCharacter`).
 const SACK_CARD: PickSpec = { type: "objective", control: "any", trait: "Sack", onCharacter: true };
-const TRAVEL_PAYABLE: Condition = { kind: "bagginsTravel", amount: 5, reduced: 2, key: "131043", purse: "131042" };
+const TRAVEL_COST = { amount: 5, reduced: 2, key: "131043", purse: "131042" } as const;
+const TRAVEL_PAYABLE: Condition = { kind: "bagginsTravel", ...TRAVEL_COST };
 const SELF_ENGAGED: Condition = { kind: "all", conditions: [{ kind: "phase", is: "Combat" }, { kind: "sourceIn", zone: "engaged" }] };
 
 // Forced: "Return ~ to the staging area at the end of the combat phase. The engaged player may raise his threat by 1 to cancel this effect."
@@ -108,7 +109,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // 131037 Troll Cave. Immune to player card effects is its keyword.
   // The players cannot travel here unless Bilbo holds the Troll Key and his pool pays; the cost is paid as they travel (nothing between the two moves a resource).
   { id: "131037:constant:1", cardCode: "131037", lines: ["131037:A:2"], timing: "constant", condition: { kind: "not", condition: TRAVEL_PAYABLE }, instructions: [{ verb: "Restrict", what: "travel" }] },
-  { id: "131037:forced:1", cardCode: "131037", lines: ["131037:A:2"], timing: "forced", trigger: "traveled", subject: "self", instructions: [{ verb: "SpendBagginsToTravel", amount: 5, reduced: 2, key: "131043", purse: "131042" }] },
+  { id: "131037:forced:1", cardCode: "131037", lines: ["131037:A:2"], timing: "forced", trigger: "traveled", subject: "self", instructions: [{ verb: "SpendBagginsToTravel", ...TRAVEL_COST }] },
 
   // 131038 Hobbit-lands.
   // Hobbit-lands has 1 quest point, so any progress placed on it explores it, and a location the progress explored has left play and hears nothing (families/burden/effects.ts announceProgress). The Response is therefore heard as the card leaves play explored (rr.explored); every placement on it is that one.

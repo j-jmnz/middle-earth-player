@@ -19,7 +19,8 @@ import type { Focus } from "../index.ts";
 
 type Verb = Extract<Instruction, { verb: "AttachSacked" }>;
 
-function valueOf(state: ScenarioState, card: CardInstance, by: Verb["by"], ctx: ReduceContext): number {
+/** The number a Sack card compares the characters by: the printed value, the attachments or the resources the character holds (the table shows it beside each tied character). */
+export function valueOf(state: ScenarioState, card: CardInstance, by: Verb["by"], ctx: ReduceContext): number {
   const printed = printedOf(ctx.cards, card.code);
   switch (by) {
     case "cost":

@@ -1,6 +1,8 @@
 // Rules: rr.then, rr.surge, rr.shadow-effects, rr.reveal, hob.setup-we-must-away-ere-break-of-day (data/rules/entries.json); ledger lines 131053:A:2, 131054:A:1.
 import { expect, it } from "vitest";
 
+import type { Effect } from "../../../catalog/boundary.ts";
+import { attachmentHostIds } from "../../../rules/player/attach.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import { fightEnemy, idOf, resolveRecords, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
@@ -52,4 +54,13 @@ lineSpec("131054:A:1", "with several Troll enemies in the staging area the one c
   expect(done.state.cards[idOf(done.state, BERT)]?.zone).toBe("engaged");
   expect(done.state.cards[idOf(done.state, WILLIAM)]?.zone).toBe("staging");
   expect(done.state.encounterDeck).toHaveLength(2);
+});
+
+// Bert's bar (131033:A:1) is on playing an attachment card: an effect that attaches a card (Reattach, an "attach to" pick) is not barred. The stand-in attachment card is given an "Attach to an enemy" record.
+it("131033:A:1 bars the play of an attachment card on a Troll but not an effect that attaches one", () => {
+  const toEnemy: Effect = { id: "attachment:constant:1", cardCode: "attachment", lines: [], timing: "constant", instructions: [{ verb: "AttachesTo", hosts: [{ type: "enemy", control: "any" }] }] };
+  const table = tableFromLayout(ID, { engaged: [BERT, WILLIAM] }, { effects: [...EFFECTS, toEnemy] });
+  const william = idOf(table.state, WILLIAM);
+  expect(attachmentHostIds(table.state, 0, "attachment", table.ctx)).not.toContain(william);
+  expect(attachmentHostIds(table.state, 0, "attachment", table.ctx, true)).toContain(william);
 });

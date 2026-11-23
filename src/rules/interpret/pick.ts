@@ -245,7 +245,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (!attachmentsPickMatches(state, id, spec, ctx, at.sourceId)) return false;
   // The uncharted family's filters: a Lost Island, progress enough (families/uncharted/pick.ts).
   if (!unchartedPickMatches(state, id, spec, ctx) || !aflamePickMatches(state, id, spec, ctx) || !sidePickMatches(state, id, spec)) return false;
-  if (spec.attachable != null && !attachmentHostIds(state, asking, spec.attachable, ctx).includes(id)) return false;
+  if (spec.attachable != null && !attachmentHostIds(state, asking, spec.attachable, ctx, true).includes(id)) return false;
   // The attack family's filters: printed keywords, the source's host, engaged with whom, a shared Trait, an attachment on the
   // event's card, printed hit points, the top of a discard pile (families/attack/pick.ts).
   if (!attackPickMatches(state, id, spec, at, ctx)) return false;
@@ -375,7 +375,7 @@ function candidatesOf(
   if (spec.hostForPicked) {
     const card = state.cards[picked.at(-1) ?? ""];
     // An attachment already on a card moves to another one ("attach Dúnedain Warning to another hero", 02026:A:3).
-    return card ? attachmentHostIds(state, asking, card.code, ctx).filter((id) => id !== card.host) : [];
+    return card ? attachmentHostIds(state, asking, card.code, ctx, true).filter((id) => id !== card.host) : [];
   }
   // Immunity is to player card effects: an encounter card's Pick may choose an immune card (mec109.immune-to-player-card-effects).
   // An ally with an encounter back is an encounter card and has encounter card effects (dcce.encounter-cards: the ship-objectives, the Modification attachments, Calaerion, Gavin, Send for Help). The Stormcaller Elite's objective allies have no encounter back (dcce.stormcaller-elite) and stay objectives.

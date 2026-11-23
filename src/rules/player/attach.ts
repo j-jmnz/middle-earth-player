@@ -36,8 +36,9 @@ export function attachRule(ctx: ReduceContext, code: string): AttachRule | undef
 }
 
 // The cards an attachment with this code may be attached to. A card with an "Attach to" record may go on a card of any
-// seat; one without goes on a character of the seat that plays it.
-export function attachmentHostIds(state: ScenarioState, seat: number, code: string, ctx: ReduceContext): string[] {
+// seat; one without goes on a character of the seat that plays it. `byEffect`: an effect attaches a card already in play or set aside
+// (Reattach, an "attach to" pick), which a bar on playing attachment cards does not reach.
+export function attachmentHostIds(state: ScenarioState, seat: number, code: string, ctx: ReduceContext, byEffect = false): string[] {
   // A card played unattached or onto a threat dial goes on no card (families/attachments/play.ts).
   if (playIntoRule(ctx, code)) return [];
   const rule = attachRule(ctx, code);
@@ -61,7 +62,7 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
     }
   }
   // "Players cannot play attachment cards on Troll enemies" (131033:A:1): the play of an attachment card, not an effect that attaches one.
-  const barredPlay = printedOf(ctx.cards, code).type === "attachment";
+  const barredPlay = !byEffect && printedOf(ctx.cards, code).type === "attachment";
   return candidates.filter((id) => {
     const host = state.cards[id];
     if (barredPlay && flagged(state, id, "noAttachmentPlays")) return false;
