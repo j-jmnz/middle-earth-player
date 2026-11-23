@@ -28,9 +28,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 131072:A:1 (Galloping Boulders): the first player chooses a character committed to a quest; it takes 3 damage and is removed from the quest.
   "131072:whenRevealed:1 @0 Pick": { owned: true, note: "{card}: choose a character committed to the quest. It takes 3 damage and is removed from the quest.", verb: "Choose" },
 
-  // 131070:A:1 (Grip, Grab! Pinch, Nab!): starting with the first player, each player chooses 1 Goblin enemy from the encounter discard pile and adds it to the staging area.
-  "131070:whenRevealed:1 @0.0 Pick": { owned: true, note: "Grip, Grab! Pinch, Nab!: choose a Goblin enemy from the encounter discard pile to add to the staging area.", verb: "Add" },
-
   // 131073:A:1 (Guffawing of Giants): the first player chooses a Stone-giant in the staging area; at the end of the quest phase it engages the player with the highest threat (the first player breaks a tie, rr.first-player).
   "131073:whenRevealed:1 @0 Pick": { owned: true, note: "Guffawing of Giants: choose a Stone-giant in the staging area. At the end of the quest phase it engages the player with the highest threat.", verb: "Choose" },
   "131073:whenRevealed:1 @1.0 Pick": { owned: true, note: "Guffawing of Giants: players are tied for the highest threat. As first player, choose the one the Stone-giant engages.", verb: "Engage" },
