@@ -90,13 +90,47 @@ const shortVerb = (step: Json, text: string): boolean => typeof step.verb === "s
 const bodyOf = (step: Json): Json[] => (step.verb === "Repeat" || step.verb === "Each" || step.verb === "ForEachPlayer") && Array.isArray(step.instructions) ? (step.instructions as Json[]) : [];
 const canComeUpShort = (step: Json, text: string): boolean => shortVerb(step, text) || bodyOf(step).some((inner) => canComeUpShort(inner, text));
 
-// A Choose whose option holds the condition in `requires` ("you may flip it", offered only when the part before "then" resolved).
-const optionRequires = (step: Json | undefined, kind: string): boolean => Array.isArray(step?.options) && (step.options as Json[]).some((option) => (option.requires as Json | undefined)?.kind === kind);
+// The conditions of a record, the `all` members apart.
+const membersOf = (condition: unknown): Json[] => {
+  const found = condition as Json | undefined;
+  if (found == null) return [];
+  return found.kind === "all" && Array.isArray(found.conditions) ? (found.conditions as unknown[]).flatMap(membersOf) : [found];
+};
+const ofSelf = (step: Json): boolean => step.target == null || step.target === "self";
+const atLeastOneResource = (member: Json): boolean => {
+  const one = JSON.stringify(member);
+  return one === JSON.stringify({ kind: "not", condition: { kind: "less", left: { stat: "resources", of: "self" }, right: 1 } }) || one === JSON.stringify({ kind: "less", left: 0, right: { stat: "resources", of: "self" } });
+};
+
+// Whether a condition of the record itself holds that the step does what it says, so the step cannot come up short: a Ready of the card that is exhausted, an Exhaust of the card that is ready, a removal or
+// a discard of resources from the card that holds one. Any other condition may guard another part and is not read.
+const conditionHolds = (effect: Effect, step: Json): boolean =>
+  membersOf((effect as { condition?: unknown }).condition).some((member) => {
+    const state = ((member.pick as Json | undefined)?.state as string | undefined) ?? "";
+    const self = member.kind === "matches" && member.card === "self";
+    if (step.verb === "Ready") return ofSelf(step) && self && state === "exhausted";
+    if (step.verb === "Exhaust") return ofSelf(step) && self && state === "ready";
+    if (step.verb === "RemoveResourceTokens" || step.verb === "DiscardResources") return ofSelf(step) && atLeastOneResource(member);
+    return false;
+  });
+
+// Whether a condition is `thenResolves` or an `all` that holds it.
+const waitsForThen = (condition: unknown): boolean => {
+  const found = condition as Json | undefined;
+  return found?.kind === "thenResolves" || (found?.kind === "all" && Array.isArray(found.conditions) && (found.conditions as unknown[]).some(waitsForThen));
+};
+
+// Whether a step waits for the part before "then": its `when` holds `thenResolves`, a Choose option requires it ("you may flip it", offered only when the part before "then" resolved), or a step of the
+// list it is made of (a Repeat's, an Each's, a ForEachPlayer's) does.
+const holdsThen = (step: Json | undefined): boolean =>
+  step != null &&
+  (waitsForThen(step.when) || (Array.isArray(step.options) && (step.options as Json[]).some((option) => waitsForThen(option.requires))) || bodyOf(step).some((inner) => holdsThen(inner)));
 
 /**
  * (b) A line with "then" whose record has, in one instruction list (the record's, or one inside a Repeat, an Each, a Choose option or another list), an instruction that can come up short followed by a last
- * instruction with no condition: the part after "then" resolves only if the part before it did (rr.then), so it carries `thenResolves`, the same condition or sits on a `then` branch. A last instruction with any
- * `when` is read as holding one. The record's own `condition` is not read: it may guard another part.
+ * instruction that does not hold `thenResolves`: the part after "then" resolves only if the part before it did (rr.then), so its `when` holds `thenResolves` (alone or among the conditions of an `all`), a Choose
+ * option requires it, or a Repeat, Each or ForEachPlayer it is made of holds it in a step. A `when` that reads something else is not enough. The record's own `condition` is not read: it may guard another part
+ * (a record whose condition does hold the part before "then" is listed in THEN_SHORT with its reason).
  */
 export function thenFindings(effects: readonly Effect[], textOf: TextOf): Finding[] {
   const found: Finding[] = [];
@@ -104,10 +138,11 @@ export function thenFindings(effects: readonly Effect[], textOf: TextOf): Findin
     const text = textOfLines(effect, textOf);
     if (!/\bthen\b/i.test(text)) continue;
     const short = instructionLists(effect.instructions).some((steps) => {
-      const first = steps.findIndex((step) => canComeUpShort(step, text));
+      // A step the record's own `condition` holds the part of (the card is exhausted before a Ready of it) cannot come up short in the record's own list.
+      const first = steps.findIndex((step) => canComeUpShort(step, text) && !(steps === effect.instructions && conditionHolds(effect, step)));
       // The part after "then" is the last instruction of the list: it holds a condition on the part before it, or it is not read.
       const last = steps[steps.length - 1];
-      return first >= 0 && steps.length - 1 > first && last?.when == null && !optionRequires(last, "thenResolves");
+      return first >= 0 && steps.length - 1 > first && !holdsThen(last);
     });
     if (short) found.push({ check: "thenShort", recordId: effect.id, line: effect.lines.join(" "), text });
   }

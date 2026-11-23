@@ -3,7 +3,7 @@ import { EFFECTS } from "../../src/effects/index.ts";
 import type { IdleHit } from "./idle.ts";
 
 // The abilities the idle check (scripts/card-smoke/idle.ts) finds offered with nothing to change that are not a fault the engine can still fix, or not yet: each with its record id (an event
-// played from the hand is `<code>:play`) and why. The check fails on any other. The list may not grow: a record that is a real fault is fixed through `potential.ts`, a family `idle` hook or a
+// played from the hand is `<code>:play`) and why. The check fails on any other. The list may not grow (scripts/card-smoke/idle.test.ts holds the ids it has today): a record that is a real fault is fixed through `potential.ts`, a family `idle` hook or a
 // `canPick` condition on the record (docs/agents/card-audit.md, Fix and review), and an entry whose fix has landed is removed.
 export const KNOWN_IDLE: Readonly<Record<string, string>> = {
   "22146:response:1": "Thorongil searches the collection for another version of its hero: the smoke world has no such card in its catalog, so the record has nothing to attach. Not a fault of the card.",

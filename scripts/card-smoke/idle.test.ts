@@ -10,6 +10,8 @@ import { smokeCard, smokeWorld, type SmokeWorld } from "./run.ts";
 // The idle check of the card smoke (scripts/card-smoke/idle.ts): an Action that is offered, used and changes nothing is reported, one that changes the table is not. Sam Gamgee (141002) is
 // on the table from the start of the smoke game, so an Action added to his records is offered there.
 const SAM = "141002";
+// The ids KNOWN_IDLE held when its cap was written: the list may shrink, never grow (a new entry is a fault to fix through potential.ts, not to list).
+const HELD_KNOWN_IDLE: readonly string[] = ["22146:response:1"];
 
 let world: SmokeWorld;
 beforeAll(async () => {
@@ -39,5 +41,9 @@ describe("the idle check of the card smoke", () => {
   it("holds no known idle ability whose record is gone", () => {
     expect(staleKnownIdle()).toEqual([]);
     expect(Object.values(KNOWN_IDLE).every((reason) => reason.length > 20)).toBe(true);
+  });
+
+  it("holds no known idle entry that the list did not hold before", () => {
+    expect(Object.keys(KNOWN_IDLE).filter((id) => !HELD_KNOWN_IDLE.includes(id)), "fix the record instead of listing it").toEqual([]);
   });
 });

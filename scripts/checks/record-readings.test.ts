@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
@@ -35,19 +35,24 @@ const THEN_SHORT: Readonly<Record<string, string>> = {
   "50911:forced:1": "The second step reads the title of the card the first discarded from the deck: with an empty deck no title was discarded and it matches no card.",
   "40008:forced:1": "The starting hand is drawn from a full deck, so the draw cannot come up short before the shuffle.",
   "11208:response:1": "The record's own condition holds that the card has at least 1 resource, so the move that comes before the heal always resolves.",
-  "12172:forced:1": "The record's own condition holds that the card has a resource, so the removal that comes before the choice always resolves.",
   "11002:response:1": "A discard of any number may be 0, and the draw is for that many: nothing is short of 0.",
   "10136:whenRevealed:1": "The \"then\" only orders the two sentences: a player with an empty hand discarded no card, and the search for other copies of it finds none.",
   "00015:whenRevealed:1": "The Exhaust is the \"exhausted\" of the same sentence, done to the card just taken: it cannot come up short.",
   "50931:forced:2": "The discards belong to the Forced effect of the stage 3 the first step selected, which resolves as a whole; the part after \"Then\" holds the stage's own conditions.",
   "900106:whenRevealed:1": "The exhaust reads the ready heroes: a hero already exhausted is in the state the line asks for, so the line is resolved in full.",
-  "12142:action:1": "The record's own condition holds that Súlien is ready, so the exhaust before the \"Then\" always resolves.",
   "11195:action:1": "The \"then\" adds the event to the victory display after the number of characters is set; the later \"Until the end of the round\" sentences are the Heal and the bonuses.",
-  "12059:response:1": "The hero has just exhausted to defend, so the ready always resolves (a defender that stays ready is not met by any card of the game).",
-  "12036:action:1": "The chosen characters are questing, so they are exhausted and the ready resolves; the threat reduction is for the number chosen.",
+  "19046:whenRevealed:1": "The part after \"Then\" is for the players who did not engage an enemy, so it reads the result of the first part itself (its `when`): a first part that fell short is what it answers.",
+  "10172:action:1": "Both Each steps are the part after \"Then\"; the part before it is the attach, which `ATTACHED` reads, and the readies cannot come up short before the second Each.",
+  "144065:whenRevealed:1": "The `when` of both steps is the card's own \"if\" (fewer locations than players); the second step adds the card the discard stopped at, and the discard comes up short only when no location is left to add.",
+  "145072:forced:1": "The Fleet is added to the victory display and leaves play when its last resource goes, so a removal never meets a card with none; the `when` reads the count (\"if there are no resources here\").",
+  "04097:whenRevealed:1": "The draw is of 1 card and the discard has `drew`: the part before \"Then\" resolved in full exactly when a card was drawn.",
+  "50714:forced:1": "The \"Then\" is the removal of the card itself, which reads that an enemy was put into play (`matches picked`): with no enemy to discard there is nothing before it that resolved.",
+  "50820:forced:1": "Placing a resource cannot come up short; the steps after \"Then\" hold the card's own \"if there are 3 resources here\".",
+  "900905:forced:1": "The \"Then\" discards the card itself and holds `matches picked`: a discard of the encounter deck that found no location revealed nothing to make active.",
+  "19116:action:1": "Both draws are the part after \"Then\" (an equal number, then 1 more); the part before it is the shuffle of the hand, which cannot come up short.",
+  "12036:action:1": "The threat reduction after \"Then\" holds `thenResolves`; the finding is the Repeat's own list, where the removal from the quest is the same sentence as the ready, before \"Then\" (docs/brief.md, Three layers).",
+  "06112:action:1": "The record's own condition holds that the deck has 3 cards, so the discard before \"Then\" (a cost in the printed words) always resolves in full; the `when` is the card's own \"if any of the discarded cards have the sphere\".",
   "04083:action:1": "The action is not offered with no damaged character (the Warden of Healing test of src/campaign/player-cards/idle-abilities.test.ts), so the heal before the \"Then\" resolves.",
-  "01135:response:1": "The record's own condition holds that Mendor is exhausted, so the ready before the \"Then\" always resolves (rr.then).",
-  "12058:action:1": "The record's own condition holds that Ceorl is exhausted, so the ready before the \"Then\" always resolves (rr.then).",
   "131012:action:1": "The record's own condition holds that an exhausted character other than the host exists, so the ready always resolves.",
 };
 
@@ -59,7 +64,7 @@ const LIMIT_OPEN_HEADER = `// Generated by scripts/checks/record-readings.test.t
 // duration (second, twice, again, end of the phase, ...). These were not read one by one: a record here may be tested well under a title the check cannot see, or not at all.
 // What the check cannot see: the assertions of a test (a title that says "second" counts, whatever it asserts), a test that names neither the line id nor the record id, and a record whose limit
 // or duration lines carry no "Limit" or "until the end of" words. A record not on this list fails the test; a listed record that now has such a test fails as stale: remove it with \`prune\`.
-// The list only shrinks: \`seed\` writes it from nothing and is not run again.
+// The list only shrinks: \`seed\` refuses while this file exists.
 `;
 const writeLimitOpen = (ids: readonly string[]): void => {
   writeFileSync(LIMIT_OPEN_FILE, `${LIMIT_OPEN_HEADER}\nexport const LIMIT_TESTS_OPEN: readonly string[] = [\n${ids.map((id) => `  "${id}",`).join("\n")}\n];\n`);
@@ -153,6 +158,54 @@ describe("record readings: the checks find what they claim", () => {
     expect(thenFindings([copy], textOf)).toHaveLength(1);
   });
 
+  it("then: a last instruction whose `when` reads something else is found, `thenResolves` alone or inside an `all` is not", () => {
+    const line = text("Ready it. Then, draw 1 card.");
+    const last = (when: Json): Effect => record({ id: "9:action:1", instructions: [{ verb: "Ready" }, { verb: "Draw", when }] });
+    expect(thenFindings([last({ kind: "threat", max: 20 })], line)).toHaveLength(1);
+    expect(thenFindings([last({ kind: "all", conditions: [{ kind: "threat", max: 20 }] })], line)).toHaveLength(1);
+    expect(thenFindings([last({ kind: "thenResolves" })], line)).toHaveLength(0);
+    expect(thenFindings([last({ kind: "all", conditions: [{ kind: "threat", max: 20 }, { kind: "thenResolves" }] })], line)).toHaveLength(0);
+    // A ForEachPlayer whose step waits, and a Choose option that requires it among others, wait too.
+    expect(thenFindings([record({ id: "9:action:1", instructions: [{ verb: "Ready" }, { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Draw", when: { kind: "thenResolves" } }] }] })], line)).toHaveLength(0);
+    expect(thenFindings([record({ id: "9:action:1", instructions: [{ verb: "Ready" }, { verb: "Choose", who: "actor", options: [{ id: "a", requires: { kind: "all", conditions: [{ kind: "thenResolves" }, { kind: "otherPlayer" }] }, instructions: [] }] }] })], line)).toHaveLength(0);
+  });
+
+  it("then: a record's own condition that holds the first part (a Ready of the exhausted card, a removal from the card that has a resource) is read, any other is not", () => {
+    const line = text("Ready it. Then, draw 1 card.");
+    const exhausted = { kind: "matches", card: "self", pick: { type: "ally", control: "any", state: "exhausted" } };
+    expect(thenFindings([record({ id: "9:action:1", condition: exhausted, instructions: [{ verb: "Ready" }, { verb: "Draw" }] } as never)], line)).toHaveLength(0);
+    expect(thenFindings([record({ id: "9:action:1", condition: { kind: "phase", is: "Quest" }, instructions: [{ verb: "Ready" }, { verb: "Draw" }] } as never)], line)).toHaveLength(1);
+    // The condition holds the Ready of the card itself, not of another card.
+    expect(thenFindings([record({ id: "9:action:1", condition: exhausted, instructions: [{ verb: "Ready", target: "picked" }, { verb: "Draw" }] } as never)], line)).toHaveLength(1);
+  });
+
+  // Each record below holds `thenResolves` after its "Then" (rr.then); a copy without it is found.
+  it("then: removing `thenResolves` from 08003:action:1, 01135:response:1, 12058:action:1 and 12059:response:1, on copies of the real records, is found", () => {
+    // `thenResolves` goes where it stands: a `when` or a Choose option's `requires` that holds only it is dropped, one that holds it among others loses it.
+    const without = (value: unknown): unknown => {
+      if (Array.isArray(value)) return value.map(without);
+      if (value == null || typeof value !== "object") return value;
+      const out: Json = {};
+      for (const [key, inner] of Object.entries(value as Json)) {
+        if ((key === "when" || key === "requires") && (inner as Json)?.kind === "thenResolves") continue;
+        if ((inner as Json | undefined)?.kind === "all" && (key === "when" || key === "requires")) {
+          out[key] = { ...(inner as Json), conditions: ((inner as Json).conditions as Json[]).filter((member) => member.kind !== "thenResolves") };
+          continue;
+        }
+        out[key] = without(inner);
+      }
+      return out;
+    };
+    for (const id of ["08003:action:1", "01135:response:1", "12058:action:1", "12059:response:1"]) {
+      const real = EFFECTS.find((effect) => effect.id === id);
+      expect(real, id).toBeDefined();
+      expect(thenFindings([real as Effect], textOf), `${id} as it is`).toHaveLength(0);
+      const copy = without(real) as Effect;
+      expect(JSON.stringify(copy), id).not.toBe(JSON.stringify(real));
+      expect(thenFindings([copy], textOf), `${id} without thenResolves`).toHaveLength(1);
+    }
+  });
+
   it("limits and durations: a line is found until a title names its id with a second use or an end", () => {
     const limited = record({ id: "9:action:1", limit: "oncePerRound", instructions: [] } as never);
     const line = "9:A:1";
@@ -192,6 +245,7 @@ describe("record readings: today's findings", () => {
     const open = [...new Set(limitFindings(EFFECTS, textOf, titles).map((finding) => finding.recordId))].sort();
     const mode = process.env.LIMIT_OPEN_LIST;
     let listed = LIMIT_TESTS_OPEN;
+    if (mode === "seed" && existsSync(LIMIT_OPEN_FILE)) throw new Error("LIMIT_OPEN_LIST=seed refused: the list exists and only shrinks (use prune)");
     if (mode === "seed" || mode === "prune") {
       listed = mode === "seed" ? open : LIMIT_TESTS_OPEN.filter((id) => open.includes(id));
       writeLimitOpen(listed);

@@ -3,7 +3,7 @@
 // duration (second, twice, again, end of the phase, ...). These were not read one by one: a record here may be tested well under a title the check cannot see, or not at all.
 // What the check cannot see: the assertions of a test (a title that says "second" counts, whatever it asserts), a test that names neither the line id nor the record id, and a record whose limit
 // or duration lines carry no "Limit" or "until the end of" words. A record not on this list fails the test; a listed record that now has such a test fails as stale: remove it with `prune`.
-// The list only shrinks: `seed` writes it from nothing and is not run again.
+// The list only shrinks: `seed` refuses while this file exists.
 
 export const LIMIT_TESTS_OPEN: readonly string[] = [
   "00014:whenRevealed:1",
