@@ -105,9 +105,11 @@ function payees(effect: Effect, source: CardInstance): Set<string> {
 /** A first guess the player can change: the pools in seat order, each giving what it holds until the total is met. */
 export function firstShares(request: Pick<PayRequest, "total" | "exact" | "pools" | "distinct">): Share[] {
   const total = request.exact ? request.total : 0;
-  // "Paid from a single hero's resource pool": the first pool that holds it all.
-  const single = request.distinct?.max === 1 ? request.pools.find((pool) => pool.max >= total) : undefined;
-  if (single && total > 0) return [{ id: single.heroId, amount: total }];
+  // "Paid from a single hero's resource pool": the first pool that holds it all; with none, no split is legal and the guess is empty.
+  if (request.distinct?.max === 1 && total > 0) {
+    const single = request.pools.find((pool) => pool.max >= total);
+    return single ? [{ id: single.heroId, amount: total }] : [];
+  }
   // "From 3 different heroes' pools": one from each of the first pools before any pool gives more.
   const given = new Map<string, number>();
   let left = total;

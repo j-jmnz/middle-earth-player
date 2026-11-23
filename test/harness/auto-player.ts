@@ -2,8 +2,10 @@ import { costOfKind } from "../../src/catalog/costs.ts";
 import { playCost } from "../../src/rules/player/attach.ts";
 import { expectOk } from "../../src/rules/core/test-fixture.ts";
 import { heroPays } from "../../src/rules/player/payments.ts";
-import { printedOf } from "../../src/rules/core/printed.ts";
-import { costPayer } from "../../src/rules/player/usage.ts";
+import { printedOf, type Sphere } from "../../src/rules/core/printed.ts";
+import { costPayer, costSphere } from "../../src/rules/player/usage.ts";
+import { distinctRule } from "../../src/rules/families/costs/pay.ts";
+import { firstShares, sharesReady, toPayments } from "../../src/play/choice/pay.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "../../src/rules/core/intents.ts";
 import { hideCommitLimit } from "../../src/rules/families/nightmare/guards.ts";
 import { escapeCommitLimit } from "../../src/rules/families/escape/commit.ts";
@@ -40,20 +42,18 @@ export function withinCommitLimit(state: ScenarioState, ids: readonly string[], 
 // What the policy has done this round, so an Action with no limit is not used over and over.
 type Memory = Set<string>;
 
-// Resources the seat can pay for a card of this sphere, taken from its heroes in order, or null when it cannot pay.
-export function paymentsFor(state: ScenarioState, ctx: ReduceContext, seat: number, cardId: string, cost: number): { heroId: string; amount: number }[] | null {
-  const sphere = printedOf(ctx.cards, state.cards[cardId]?.code ?? "").sphere;
-  const out: { heroId: string; amount: number }[] = [];
-  let left = cost;
-  for (const heroId of state.seats[seat]?.heroes ?? []) {
-    if (left === 0) break;
-    const hero = state.cards[heroId];
-    if (!hero || hero.resources === 0 || !heroPays(state, heroId, sphere, ctx, cardId)) continue;
-    const amount = Math.min(left, hero.resources);
-    out.push({ heroId, amount });
-    left -= amount;
-  }
-  return left === 0 ? out : null;
+// Resources the seat can pay, taken from its heroes in order, or null when it cannot pay. For a card played, the sphere is the card's and
+// its own rule on how many pools pay ("from 3 different heroes' pools", "from a single hero's pool") sets the split the way the table's
+// first guess does (`firstShares`). For an Action's or Response's cost (`ability`), the sphere is the cost's and no card is paid for.
+export function paymentsFor(state: ScenarioState, ctx: ReduceContext, seat: number, cardId: string, cost: number, ability?: { sphere: Sphere | null }): { heroId: string; amount: number }[] | null {
+  const sphere = ability ? ability.sphere : printedOf(ctx.cards, state.cards[cardId]?.code ?? "").sphere;
+  const forCard = ability ? undefined : cardId;
+  const pools = (state.seats[seat]?.heroes ?? []).flatMap((heroId) => {
+    const held = state.cards[heroId]?.resources ?? 0;
+    return held > 0 && heroPays(state, heroId, sphere, ctx, forCard) ? [{ heroId, max: held }] : [];
+  });
+  const shares = firstShares({ total: cost, exact: true, pools, distinct: ability ? undefined : distinctRule(state, cardId, ctx) });
+  return sharesReady(shares, cost, true) ? toPayments(shares) : null;
 }
 
 function playable(state: ScenarioState, ctx: ReduceContext, intents: readonly LegalIntent[]): PlayerIntent | null {
@@ -90,7 +90,7 @@ export function triggerPayments(state: ScenarioState, ctx: ReduceContext, intent
     paid = cost == null ? null : paymentsFor(state, ctx, seat, intent.cardId, cost);
   } else if (resources) {
     const payer = costPayer(state, resources, source);
-    paid = payer === null ? null : payer !== undefined ? [{ heroId: payer, amount: resources.amount }] : paymentsFor(state, ctx, seat, intent.cardId, resources.amount);
+    paid = payer === null ? null : payer !== undefined ? [{ heroId: payer, amount: resources.amount }] : paymentsFor(state, ctx, seat, intent.cardId, resources.amount, { sphere: costSphere(resources, source, ctx) });
   }
   return paid;
 }

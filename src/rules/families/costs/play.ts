@@ -11,7 +11,7 @@ import { attachmentHostIds, playCost } from "../../player/attach.ts";
 import { effectCause, ruleCause } from "../../core/cause.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { holds } from "../../interpret/conditions.ts";
-import { discountFor, fewestHeroesReason } from "../../player/cost-rules.ts";
+import { discountFor, fewestHeroesReason, SINGLE_HERO_REASON } from "../../player/cost-rules.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { EngineStep, Payment, PlayerIntent } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -49,12 +49,15 @@ export function extraCostReason(state: ScenarioState, cardId: string, seat: numb
   const others = (state.seats[seat]?.hand ?? []).filter((id) => id !== cardId).length;
   for (const rule of cardRules(state, cardId, "PlayCost", ctx)) if (others < rule.discard) return "That card's additional cost cannot be paid";
   // "You must use resources from 3 different heroes' pools": fewer pools that could pay for it than that.
-  const need = distinctRule(state, cardId, ctx)?.min;
-  if (need != null) {
-    const sphere = printedOf(ctx.cards, state.cards[cardId]?.code ?? "").sphere;
-    const pools = [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, cardId, ctx)].filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, sphere, ctx, cardId));
-    if (pools.length < need) return fewestHeroesReason(need);
-  }
+  const distinct = distinctRule(state, cardId, ctx);
+  if (distinct?.min == null && distinct?.max !== 1) return null;
+  const sphere = printedOf(ctx.cards, state.cards[cardId]?.code ?? "").sphere;
+  const pools = [...(state.seats[seat]?.heroes ?? []), ...allyPools(state, seat, cardId, ctx)].filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, sphere, ctx, cardId));
+  if (distinct.min != null && pools.length < distinct.min) return fewestHeroesReason(distinct.min);
+  // "Paid from a single hero's resource pool": one pool that holds the whole cost, or no payment is legal (families/costs/pay.ts, distinctRule).
+  const cost = playCost(state, cardId, seat, ctx) ?? 0;
+  const held = pools.map((id) => state.cards[id]?.resources ?? 0);
+  if (distinct.max === 1 && cost > 0 && held.reduce((sum, amount) => sum + amount, 0) >= cost && !held.some((amount) => amount >= cost)) return SINGLE_HERO_REASON;
   return null;
 }
 
