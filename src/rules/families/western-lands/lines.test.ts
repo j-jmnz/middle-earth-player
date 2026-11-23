@@ -24,9 +24,9 @@ const ROWS: readonly Row[] = [
   { line: "131035:A:1", name: "the top card is taken whatever its type: a card of another type is revealed and the enemy under it stays", layout: { discard: ["f3", "131045"], deck: ["f0", "f0"] }, act: resolve("131035", "whenRevealed"), expect: [zone("131045", "staging"), zone("f3", "encounterDiscard")] },
   { line: "131035:A:2", name: "Shadow: once the attack dealt damage the shadow card is shuffled into the encounter deck", layout: {}, act: attack("f3", { shadow: "131035", undefended: true }), expect: [zone("131035", "encounterDeck")] },
   // 131039 Dreary Hills.
-  { line: "131039:A:1", name: "Forced: each player discards 1 card at random from his hand", layout: { staging: ["131039"], hand: ["f0", "f0"] }, act: announce("progressPlacedOnSelf", "131039"), expect: [count("f0", "hand", 1)] },
+  { line: "131039:A:1", name: "Forced: each player discards 1 card at random from his hand", layout: { staging: ["131039"], hand: ["f0", "f0"] }, act: announce("progressPlaced", "131039"), expect: [count("f0", "hand", 1)] },
   // 131040 Lone-Lands.
-  { line: "131040:A:1", name: "Forced: each player removes 1 resource from the pool of one of his heroes", layout: { staging: ["131040"], heroResources: 2 }, act: announce("progressPlacedOnSelf", "131040"), expect: [resourcesOn("dh1", 1)] },
+  { line: "131040:A:1", name: "Forced: each player removes 1 resource from the pool of one of his heroes", layout: { staging: ["131040"], heroResources: 2 }, act: announce("progressPlaced", "131040"), expect: [resourcesOn("dh1", 1)] },
   // 131041 Cave Entrance.
   { line: "131041:A:1", name: "in the staging area, at the end of the round one card for each player goes from the top of the discard pile to the bottom of the encounter deck", layout: { staging: ["131041"], discard: ["f3", "f0"], deck: ["f0"] }, act: announce("endOfRound"), expect: [deckCount(2), zone("f3", "encounterDiscard")] },
   // 131055 No Campfire.
@@ -85,8 +85,8 @@ for (const code of ["131039", "131040"]) {
   });
 }
 
-// 131039 Dreary Hills (2 quest points) and 131040 Lone-Lands (3): "Forced: After placing 1 or more progress tokens on this location, ..." The Forced hears every placement on the card, the one that explores it too (`progressPlacedOnSelf`, the reading of
-// 131038:A:1 Hobbit-lands and of Bottomless Chasm 901606:A:1; docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md, We Must Away, Ere Break of Day).
+// 131039 Dreary Hills (2 quest points) and 131040 Lone-Lands (3): "Forced: After placing 1 or more progress tokens on this location, ..." The Forced does not fire when the placement explores the card: it goes to the discard pile first (rr.explored) and a Forced effect must be in play to resolve (rr.forced), as for Pathless Country 04044
+// (docs/scenarios/the-hobbit/we-must-away-ere-break-of-day.md, We Must Away, Ere Break of Day).
 function placeOnActive(effects: readonly Effect[], code: string, layout: Parameters<typeof tableFromLayout>[1], progress: number): ScenarioState {
   const table = tableFromLayout(ID, { active: code, ...layout }, { effects });
   const location = idOf(table.state, code);
@@ -103,9 +103,9 @@ lineSpec("131039:A:1", "Forced (131039:forced:1): each player discards 1 card at
   const state = placeOnActive(effects, "131039", { seats: 2, hand: ["f0", "f0", "f0"] }, 1);
   expect(handSizes(state, 2)).toEqual([2, 2]);
 });
-lineSpec("131039:A:1", "Forced (131039:forced:1): the placement that explores it (2 quest points) is heard too", (effects) => {
-  const state = placeOnActive(effects, "131039", { hand: ["f0", "f0", "f0"] }, 5);
-  expect(handSizes(state)).toEqual([2]);
+lineSpec("131039:A:1", "Forced (131039:forced:1): the placement that explores it (2 quest points) is not heard, and one that leaves it in play is (one player)", (effects) => {
+  expect(handSizes(placeOnActive(effects, "131039", { hand: ["f0", "f0", "f0"] }, 5))).toEqual([3]);
+  expect(handSizes(placeOnActive(effects, "131039", { hand: ["f0", "f0", "f0"] }, 1))).toEqual([2]);
 });
 lineSpec("131039:A:1", "Forced (131039:forced:1): a player with an empty hand discards nothing and the others still discard", (effects) => {
   const state = placeOnActive(effects, "131039", { seats: 2, hand: [{ code: "f0", seat: 1 }, { code: "f0", seat: 1 }] }, 1);
@@ -116,9 +116,9 @@ lineSpec("131040:A:1", "Forced (131040:forced:1): each player removes 1 resource
   const state = placeOnActive(effects, "131040", { seats: 2, heroResources: 2 }, 1);
   expect(heroPools(state, 2)).toEqual([3, 1]);
 });
-lineSpec("131040:A:1", "Forced (131040:forced:1): the placement that explores it (3 quest points) is heard too", (effects) => {
-  const state = placeOnActive(effects, "131040", { heroResources: 2 }, 6);
-  expect(heroPools(state)).toEqual([3]);
+lineSpec("131040:A:1", "Forced (131040:forced:1): the placement that explores it (3 quest points) is not heard, and one that leaves it in play is (one player)", (effects) => {
+  expect(heroPools(placeOnActive(effects, "131040", { heroResources: 2 }, 6))).toEqual([4]);
+  expect(heroPools(placeOnActive(effects, "131040", { heroResources: 2 }, 2))).toEqual([3]);
 });
 lineSpec("131040:A:1", "Forced (131040:forced:1): a player whose heroes hold no resources loses none, and no progress placed removes none", (effects) => {
   const none = placeOnActive(effects, "131040", { seats: 2 }, 1);
