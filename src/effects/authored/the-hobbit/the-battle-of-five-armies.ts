@@ -48,8 +48,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["132052:A:1"],
       timing: "action",
       condition: { kind: "all", conditions: [{ kind: "sourceIn", zone: "staging" }, { kind: "firstPlayer" }] },
+      cost: { kind: "resources", amount: 2, sphere: "baggins" },
       instructions: [
-        { verb: "SpendResources", amount: 2, sphere: "baggins", group: true },
         {
           verb: "Choose",
           who: "actor",
@@ -57,8 +57,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
             { id: "control", instructions: [{ verb: "TakeControl", who: "actor" }] },
             {
               id: "discard",
-              requires: { kind: "canPick", pick: { type: "enemy", control: "any", staging: true, nonUnique: true } },
-              instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", staging: true, nonUnique: true } }, { verb: "Discard", target: { kind: "self" } }, { verb: "Discard", target: { kind: "picked" } }],
+              requires: { kind: "canPick", pick: { type: "enemy", control: "any", stagingOnly: true, nonUnique: true } },
+              instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", stagingOnly: true, nonUnique: true } }, { verb: "Discard", target: { kind: "self" } }, { verb: "Discard", target: { kind: "picked" } }],
             },
           ],
         },
@@ -68,11 +68,12 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 132053 Bolg. X is the number of players; he cannot leave the staging area; the first Goblin revealed each round gains surge (the Setup's reveals count for round 1).
     copyLine("110077:A:1", "132053:A:2"),
-    copyLine("146031:A:1", "132053:A:3"),
+    // "Cannot leave the staging area": no engagement check or optional engagement names him, as the engagement would move him out (the stat cannotLeaveStaging refuses every move).
+    { id: "132053:constant:2", cardCode: "132053", lines: ["132053:A:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", target: "self" }] },
     { id: "132053:constant:3", cardCode: "132053", lines: ["132053:A:4"], timing: "constant", instructions: [{ verb: "FirstRevealedSurges", trait: "Goblin", type: "enemy" }] },
 
     // 132054 Bodyguard of Bolg. Bolg cannot take damage while it is in play. Forced: when it attacks, it is dealt an additional shadow card for each quest stage in play with no progress on it.
-    { id: "132054:constant:1", cardCode: "132054", lines: ["132054:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", holders: BOLG }] },
+    { id: "132054:constant:1", cardCode: "132054", lines: ["132054:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", holders: { ...BOLG, staging: true } }] },
     { id: "132054:forced:1", cardCode: "132054", lines: ["132054:A:2"], timing: "forced", trigger: "attacks", instructions: [{ verb: "Repeat", times: STAGES_NO_PROGRESS, instructions: [{ verb: "DealShadow", additional: true }] }] },
 
     // 132055 Gundabad Wolf Rider. Forced: when it attacks, remove 1 progress from the current quest. Shadow: +1 Attack for each quest stage in play with no progress on it.
@@ -98,7 +99,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 132059 Ravenous Warg. Forced: when it attacks, the defending player declares the character with the most damage, an exhausted one too. Shadow: the defending character gets -1 Defense for each quest stage in play with no progress on it.
     { id: "132059:forced:1", cardCode: "132059", lines: ["132059:A:1"], timing: "forced", trigger: "attacks", instructions: [{ verb: "MustDefendMostDamaged" }] },
-    { id: "132059:shadow:1", cardCode: "132059", lines: ["132059:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "defense", amount: { ...STAGES_NO_PROGRESS, times: -1 }, until: "endOfAttack", target: "defender" }] },
+    { id: "132059:shadow:1", cardCode: "132059", lines: ["132059:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "defense", amount: { ...STAGES_NO_PROGRESS, negative: true }, until: "endOfAttack", target: "defender" }] },
 
     // 132060 Northern Slopes. In the staging area each Goblin enemy gets +1 Attack and +1 Defense. As the active location it has a Forced effect: when a character leaves play, remove 1 progress from the current quest.
     {
@@ -108,8 +109,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "constant",
       condition: { kind: "sourceIn", zone: "staging" },
       instructions: [
-        { verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", trait: "Goblin" } },
-        { verb: "ModifyStat", stat: "defense", amount: 1, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", trait: "Goblin" } },
+        { verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", trait: "Goblin", staging: true } },
+        { verb: "ModifyStat", stat: "defense", amount: 1, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", trait: "Goblin", staging: true } },
       ],
     },
     {
@@ -142,7 +143,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "132066",
       lines: ["132066:A:2"],
       timing: "whenRevealed",
-      instructions: [{ verb: "Doomed", amount: 3, when: { kind: "not", condition: { kind: "currentQuest", is: "other" } } }, { verb: "ChooseCurrentQuest", when: { kind: "currentQuest", is: "other" } }],
+      instructions: [{ verb: "Doomed", amount: 3, when: { kind: "not", condition: { kind: "currentQuest", is: "other" } } }, { verb: "ChooseCurrentQuest", until: "endOfRound", when: { kind: "currentQuest", is: "other" } }],
     },
 
     // 132075 The Gathering of the Clouds (stage 1). Setup: Bolg is already in the staging area (the load list stages him); shuffle the encounter deck, reveal 1 encounter card per player; stage 1 then shows side B and its When Revealed resolves after those reveals (families/quest/setup.ts). Side B: stages 2, 3 and 4 are put into play

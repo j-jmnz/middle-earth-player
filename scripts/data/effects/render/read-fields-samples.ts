@@ -113,7 +113,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   HoldUnder: [{ verb: "HoldUnder", code: "09016" }],
   DiscardHeld: [{ verb: "DiscardHeld" }],
   PlaceHandUnderSelf: [{ verb: "PlaceHandUnderSelf" }],
-  ChooseCurrentQuest: [{ verb: "ChooseCurrentQuest" }],
+  ChooseCurrentQuest: [{ verb: "ChooseCurrentQuest" }, { verb: "ChooseCurrentQuest", until: "endOfRound" }],
   AttachNewTo: [{ verb: "AttachNewTo", code: "10157", to: "Iârion" }],
   TradeDamageForResources: [{ verb: "TradeDamageForResources", code: "10158", damage: 4, resources: 1 }],
   FirstTraitSurge: [{ verb: "FirstTraitSurge", trait: "Weather", type: "enemy", doomed: 2 }, { verb: "FirstTraitSurge", trait: "Hazard", type: "any" }],

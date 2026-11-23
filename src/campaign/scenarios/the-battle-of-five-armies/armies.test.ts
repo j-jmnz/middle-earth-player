@@ -2,13 +2,13 @@
 // The armies family on a table of The Battle of Five Armies: the stages in play together, the first player's choice of the current stage, the joint advance, the stages with no progress and the first Goblin revealed each round.
 import { describe, expect, it } from "vitest";
 
-import { modifiedStat } from "../../core/keywords.ts";
-import type { ScenarioState } from "../../core/state.ts";
-import { runInstruction } from "../../interpret/interpret.ts";
-import { settle } from "../../engine/machine.ts";
-import { syncConstants } from "../../interpret/constants.ts";
+import { modifiedStat } from "../../../rules/core/keywords.ts";
+import type { ScenarioState } from "../../../rules/core/state.ts";
+import { runInstruction } from "../../../rules/interpret/interpret.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { answer, fightEnemy, first, resolveRecords, revealedTop, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
-import { askCurrentStage, stagesInPlay } from "./stages.ts";
+import { askCurrentStage, stagesInPlay } from "../../../rules/families/armies/stages.ts";
 
 const [S1, S2, S3, S4, S5] = ["132075", "132076", "132077", "132078", "132079"] as const;
 const table = (layout: Layout = {}) => tableFromLayout("the-battle-of-five-armies", { stage: S1, ...layout });

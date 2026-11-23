@@ -4,16 +4,14 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 132052:A:1 (front): Action: The first player may spend 2 Baggins resources to (choose one): take control of Misty Mountain Eagle, or discard this ally to discard a non-unique enemy in the staging area.
-  132052:action:1: Action
+  132052:action:1: Action (cost: pay 2 baggins resource(s))
     only if all of: (this card is in the staging area) and (the actor holds the first player token)
     who acts: any player may trigger it; the acting player is the one who does
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - the players as a group spend 2 resource(s) from heroes with the baggins icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
     - the acting player chooses one of:
       * option "control":
         - the acting player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
-      * option "discard" (only if there is a non-unique enemy (any player controls) or in the staging area to choose):
-        - choose non-unique enemy (any player controls) or in the staging area
+      * option "discard" (only if there is a non-unique enemy (any player controls) in the staging area only to choose):
+        - choose non-unique enemy (any player controls) in the staging area only
         - discard this card
         - discard the picked card
 
@@ -34,7 +32,9 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
 
 132053:A:3 (front): Cannot leave the staging area.
   132053:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
 
 132053:A:4 (front): The first Goblin revealed each round gains surge.
   132053:constant:3: Constant
@@ -45,7 +45,7 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
 
 132054:A:1 (front): Bolg cannot take damage.
   132054:constant:1: Constant
-    - each enemy (any player controls) named "Bolg": stat cannotTakeDamage 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Bolg": stat cannotTakeDamage 1, while this card is in play
 
 132054:A:2 (front): Forced: When this enemy attacks, deal it an additional shadow card for each quest stage in play with no progress tokens on it.
   132054:forced:1: Forced when this enemy attacks, before the defender is declared
@@ -116,7 +116,7 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
 132059:A:2 (shadow): Shadow: Defending character gets -1 Defense for each quest stage in play with no progress on it.
   132059:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - the defender: stat defense the number of quest stages in play with no progress on them (stages 2 to 4 in play together, the only stage before them, stage 5 after) x -1, until the end of the attack
+    - the defender: stat defense minus (the number of quest stages in play with no progress on them (stages 2 to 4 in play together, the only stage before them, stage 5 after)), until the end of the attack
 
 ## 132060 Northern Slopes
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -125,8 +125,8 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
   132060:constant:1: Constant
     only if this card is in the staging area
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each Goblin enemy (any player controls): stat attack 1, while this card is in play
-    - each Goblin enemy (any player controls): stat defense 1, while this card is in play
+    - each Goblin enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
+    - each Goblin enemy (any player controls) or in the staging area: stat defense 1, while this card is in play
 
 132060:A:2 (front): While Northern Slopes is the active location, it gains: "Forced: When a character leaves play, remove 1 progress from the current quest, if able."
   132060:forced:1: Forced after a card leaves play (heard about character (any player controls))
@@ -228,7 +228,7 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
   132066:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area)): each player raises their threat by 3 from the doomed keyword this card gains (doomedRaised is announced for each)
-    - then, if there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area) (checked when this step runs, after the steps above; not tied to whether they did anything): the first player chooses a quest card other than the current quest (the main quest card, or an encounter side quest in the staging area) to be the current quest until the end of the phase
+    - then, if there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area) (checked when this step runs, after the steps above; not tied to whether they did anything): the first player chooses a quest stage in play other than the current quest stage to be the current quest stage until the end of the round
 
 ## 132075 The Gathering of the Clouds
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -322,4 +322,4 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
-(rendered pieces: 180 by template, 0 as JSON)
+(rendered pieces: 181 by template, 0 as JSON)
