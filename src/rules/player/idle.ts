@@ -47,6 +47,12 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
   if (!source) return false;
   // A lasting effect that reaches only the cards in play now (rr.lasting-effects) changes nothing when no card matches, whatever the condition on the step says.
   if (instruction.verb === "ModifyStat" && instruction.holders != null && CARD_STATS.has(instruction.stat) && candidatesOf(state, instruction.holders, sourceId, frame, ctx, { counting: true, dependent: true }).length === 0) return true;
+  // A hero that cannot gain resources from this card's effect (Bilbo of the Over Hill and Under Hill box, "from player card effects"): when every hero the step may add them to is barred, it adds
+  // nothing whatever its condition says (rr.triggered-ability).
+  if (instruction.verb === "AddResources") {
+    const heroes = namedCards(state, instruction.to ?? "host", source, "picked", frame, mark);
+    if (heroes != null && heroes.length > 0 && heroes.every((hero) => hero != null && !mayGainResources(state, hero.id, sourceId, ctx))) return true;
+  }
   // A verb of a mechanic family: the family says whether it does nothing, and a step that does nothing is idle whatever its condition says.
   const own = familyIdle(state, instruction, sourceId, frame, ctx, mark);
   if (own === true) return true;
@@ -93,12 +99,8 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
     }
     case "SetThreat":
       return state.seats[frame.seat]?.threat === instruction.value;
-    case "AddResources": {
-      // A hero that cannot gain resources from this card's effect (Bilbo of the Over Hill and Under Hill box, "from player card effects"): every hero it may add them to is barred (rr.triggered-ability).
-      const heroes = namedCards(state, instruction.to ?? "host", source, "picked", frame, mark);
-      if (heroes != null && heroes.length > 0 && heroes.every((hero) => hero != null && !mayGainResources(state, hero.id, sourceId, ctx))) return true;
+    case "AddResources":
       return amountIdle(state, instruction.amount, frame, ctx);
-    }
     case "DamageCard":
       return amountIdle(state, instruction.amount, frame, ctx) || answeredCardLeftPlay(state, instruction, frame);
     case "ModifyStat":
@@ -163,7 +165,9 @@ function eachCandidates(state: ScenarioState, pick: PickSpec, from: readonly str
 }
 
 // A step that pays for the rest of the effect ("discard a card to draw 1", "give it Doomed 1 to draw a card", "exhaust Gandalf to search"): it is idle when the rest is.
-function paysForRest(step: Instruction): boolean {
+// A discard of the card itself that ends the list ("Discard Miruvor to ready the hero", "discard Good Meal to lower the cost") is the price of the steps before it.
+function paysForRest(step: Instruction, last: boolean): boolean {
+  if (last && step.verb === "Discard" && step.when == null && typeof step.target === "object" && step.target.kind === "self") return true;
   if (step.verb === "SpendResources" || step.verb === "DiscardFromHand" || step.verb === "RaiseThreat" || step.verb === "Doomed") return true;
   return (step.verb === "Discard" || step.verb === "Exhaust") && step.when == null && typeof step.target === "object" && step.target.kind === "picked";
 }
@@ -187,8 +191,12 @@ function searchesEmptyDeck(state: ScenarioState, instruction: Instruction, at: I
   return seatsOf(state, pick, at.seat).every((index) => deckPool(state, index, pick).length === 0);
 }
 
-// Whether the amount of the step is the effect's X.
-const readsX = (instruction: Instruction): boolean => "amount" in instruction && typeof instruction.amount === "object" && "x" in instruction.amount && instruction.amount.x === true;
+// Whether the amount of the step is the effect's X alone: with no X chosen it is 0. An amount that adds to X (`{ x: true, plus: 1 }`) or scales it is not 0 without an X, so it is not read.
+const readsX = (instruction: Instruction): boolean => {
+  if (!("amount" in instruction) || typeof instruction.amount !== "object") return false;
+  const keys = Object.keys(instruction.amount);
+  return keys.length === 1 && instruction.amount.x === true;
+};
 
 /**
  * Whether every instruction of the list is idle, in order: the first alone, and each later one idle or a "Then" part that the first one's empty Draw keeps from resolving. A Pick or a PlayFrom
@@ -200,7 +208,7 @@ export function idleList(state: ScenarioState, instructions: readonly Instructio
   let idleSteps = 0;
   // After a ChooseX that finds no number, a step whose amount is X changes nothing.
   let noX = false;
-  const rest = instructions.filter((step) => !paysForRest(step));
+  const rest = instructions.filter((step, at) => !paysForRest(step, at === instructions.length - 1));
   for (const instruction of rest.length > 0 ? rest : instructions) {
     const stays = pickedAttachmentStays(state, instruction, sourceId, at, ctx);
     if (stays === false) return false;

@@ -123,6 +123,21 @@ describe("the next card costs less (ReduceNextCost)", () => {
     expect(playCost(eaten, loreCard.id, 0, ctx)).toBe(3);
   });
 
+  it.each([
+    ["Bilbo Baggins 132001 and The Lucky Number 132013 (Baggins)", "baggins", 1],
+    ["Frodo Baggins 142001 and Frodo's Intuition 141012 (Fellowship)", "fellowship", 2],
+  ] as const)("Good Meal on a hero of a sphere of his own: %s costs 2 less (rr.neutral-cards)", (_name, sphere, cost) => {
+    const hobbit = card("bhero", "hero", sphere, null, { threat: 9, traits: ["Hobbit"] });
+    const own = card("bevent", "event", sphere, cost);
+    const { state, ctx } = table(RECORDS, [...CARDS, hobbit, own], [[]]);
+    const hero = put(state, "bhero", "heroes");
+    const food = put(hero.state, "04010", "play");
+    const event = put(attach(food.state, food.id, hero.id), "bevent", "hand");
+    const eaten = expectOk(reduce(event.state, { type: "Trigger", cardId: food.id, effectId: "04010:action:1" }, ctx)).state;
+    expect(eaten.cards[food.id]?.zone).toBe("discard");
+    expect(playCost(eaten, event.id, 0, ctx)).toBe(0);
+  });
+
   it("Hope Rekindled: only an event with a Valour ability costs 2 less", () => {
     const { state, ids, ctx } = table([...RECORDS, VALOUR, PLAIN], CARDS, [["lead"]]);
     const event = put(state, "10063", "hand");
