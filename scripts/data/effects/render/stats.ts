@@ -3,6 +3,7 @@ import { cardRef, renderAmount } from "./amounts.ts";
 import { ERECH_STAT_NOTES } from "./families/erech.ts";
 import { ESCAPE_STAT_NOTES } from "./families/escape.ts";
 import { FOG_STAT_NOTES } from "./families/fog.ts";
+import { POISON_STAT_NOTES } from "./families/poison.ts";
 import { FLAG_NOTES } from "./stat-notes.ts";
 import { RUINS_STAT_NOTES } from "./families/ruins.ts";
 import { INVESTIGATION_STAT_NOTES } from "./families/investigation.ts";
@@ -49,6 +50,7 @@ const STAT_NOTE: Readonly<Record<string, string>> = {
   ...SMAUG_STAT_NOTES,
   ...ERECH_STAT_NOTES,
   ...FOG_STAT_NOTES,
+  ...POISON_STAT_NOTES,
   ...RUINS_STAT_NOTES,
   ...INVESTIGATION_STAT_NOTES,
   ...FLAG_NOTES,

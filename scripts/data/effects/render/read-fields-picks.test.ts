@@ -120,6 +120,8 @@ describe("effects render read fields, picks", () => {
     { type: "card", control: "any" },
     { type: "card", control: "any", lootKeyword: true, minProgress: 2, island: "temple", aflame: true, lowestAflame: true, attackingEnemy: true, uncharted: true, nemesis: true, sameTitleAs: "picked", guardsHero: true, hasFacedownUnder: true, facedownUnder: true, guardsCard: true, guardsNamed: "Urdug's Horn", engagedThisRound: true },
     { type: "card", control: "any", objectiveLocation: true, notCardType: "ally", maxCost: 2, fewerHitPointsThan: "attackingEnemy", captured: "rescued", minResources: 4, noVictory: true, maxDefense: 1, minAttack: 2, oddCost: true, intoPlay: true, heroSphere: true, embassy: "player", burden: true, side: "B", sharesTrait: "host", hostForPicked: true, fromDeck: "evilCreatures", doubleSided: true },
+    { type: "character", control: "any", poisoned: true, unconscious: true, mostPoison: true, poison: true },
+    { type: "character", control: "any", poisoned: false, unconscious: false },
     { type: "card", control: "any", aflame: false, attackingEnemy: false, uncharted: false, doubleSided: false, noVictory: false, engagedThisRound: false, island: "secret", captured: "hosts", embassy: "encounter", sharesTrait: "activeLocation", sameTitleAs: "activeLocation" },
     { type: "card", control: "any", maxCost: { level: true, halved: true, plusChosen: true }, hasAttachment: { playerCard: true, treasure: true, trait: "Item" }, island: "adjacent", captured: "underSelf" },
     { type: "card", control: "any", hasAttachment: {}, island: "start" },

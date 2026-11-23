@@ -1,5 +1,6 @@
 // Amount shapes only one family or box reads (src/catalog/effect-schema-amount.ts; each says where the engine reads it): the captured counts, the excess damage, the island and Stormcaller values and the recorded count.
 import { str, type Obj } from "../kit.ts";
+import { cardRef } from "../amounts.ts";
 
 type Made = { text: string; read: string[] };
 
@@ -20,6 +21,7 @@ export function familyAmount(expr: Obj): Made | null {
   if (expr.stormcallerStage === true) return { text: "the stage number of the Stormcaller's current quest stage (0 with no Stormcaller's area)", read: ["stormcallerStage"] };
   if (expr.stagedAlliesCost === true) return { text: "the total printed cost of the allies in the staging area (a card with no printed cost counts 0)", read: ["stagedAlliesCost"] };
   if (typeof expr.recorded === "string") return { text: `the count the earlier Resolution recorded in the Campaign Log's notes as "${expr.recorded}" (0 when none is recorded or the game has no log)`, read: ["recorded"] };
+  if (typeof expr.poison === "string") return { text: `the number of poison on ${cardRef(expr.poison)}`, read: ["poison"] };
   if (expr.part === true) return { text: "the part number of the campaign card of the scenario being played: its place in its campaign, counting from 1", read: ["part"] };
   return null;
 }
@@ -37,4 +39,5 @@ export const FAMILY_AMOUNT_SAMPLES: readonly Obj[] = [
   { stagedAlliesCost: true },
   { recorded: "corsairFleet" },
   { part: true },
+  { poison: "picked" },
 ];
