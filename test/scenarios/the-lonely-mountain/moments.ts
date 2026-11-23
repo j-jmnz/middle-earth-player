@@ -1,6 +1,10 @@
 import type { Effect } from "../../../src/catalog/boundary.ts";
 import { EFFECTS } from "../../../src/effects/index.ts";
+import type { GameEvent } from "../../../src/rules/core/state.ts";
+import type { EngineStep } from "../../../src/rules/core/intents.ts";
+import { settle } from "../../../src/rules/engine/machine.ts";
 import type { PlayerIntent, ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import { fireForced } from "../../../src/rules/windows/triggers.ts";
 
 import { IntentRefused } from "../../harness/scene.ts";
 import { first, legalIntents, resolveRecords, send, start, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../harness/scene-kit.ts";
@@ -55,6 +59,13 @@ export function drive(run: Run, made: LayoutTable, plan: Plan = {}, stopAt: read
 export function resolveAndDrive(made: LayoutTable, code: string, timing: Effect["timing"], plan: Plan = {}, stopAt: readonly string[] = []): Run {
   const resolved = resolveRecords(made.state, made.ctx, code, timing, first(made.state, code) || undefined, undefined, true);
   return drive(resolved, made, plan, stopAt);
+}
+
+/** The engine announces an event to the Forced effects, as a step of the game does, and the windows it opens are driven. */
+export function announceAndDrive(made: LayoutTable, event: Partial<GameEvent> & Pick<GameEvent, "trigger">, plan: Plan = {}, stopAt: readonly string[] = []): Run {
+  const steps: EngineStep[] = [];
+  const fired = settle(fireForced({ ...made.state, window: null }, { seat: 0, ...event } as GameEvent, made.ctx, steps), made.ctx, steps);
+  return drive({ state: fired, steps }, made, plan, stopAt);
 }
 
 export { start };
