@@ -35,6 +35,8 @@ export const pickSchema = z.strictObject({
   atOtherStage: z.literal(true).optional(),
   // With `type: player`: only a player who controls heroes holding this many resources in all, so that he can pay them ("Any player may spend 1 resource to take control of Dúnedain of Annúminas", 50818:A:2). Read by src/rules/families/wilderland/seat-pick.ts.
   canSpendResources: z.number().int().positive().optional(),
+  // With `type: player`: only a player whose deck holds a card, so that the effect on that player can change something (Imladris Stargazer, 04106:A:1; rr.the-word-choose). Read by src/rules/families/wilderland/seat-pick.ts.
+  deckHasCards: z.literal(true).optional(),
   // With `type: player`: only a player whose staging area is a different one from the chooser's, once stages are separate ("a different player's staging area", 901703:A:2); with one staging area every other player. Read by src/rules/interpret/pick.ts.
   otherArea: z.literal(true).optional(),
   // A character whose printed hit points are fewer than those of the enemy making the attack in progress ("if the defending character has fewer printed hit

@@ -26,6 +26,7 @@ describe("effects render read fields, picks", () => {
     otherArea: true,
     atOtherStage: true,
     canSpendResources: 2,
+    deckHasCards: true,
     playerCard: false,
     highestThreatPlusRemaining: true,
     attachable: "03041",

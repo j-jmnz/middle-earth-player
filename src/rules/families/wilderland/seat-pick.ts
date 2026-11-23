@@ -1,4 +1,4 @@
-// Rules: (data/rules/entries.json) none; ledger lines 12191:A:1, 50818:A:2. The pick filter the wilderland family adds to a pick of players. A module of its own (it imports no rules code) so the core's pick can read it without a cycle.
+// Rules: (data/rules/entries.json) none; ledger lines 12191:A:1, 50818:A:2, 04106:A:1. The pick filter the wilderland family adds to a pick of players. A module of its own (it imports no rules code) so the core's pick can read it without a cycle.
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -17,6 +17,8 @@ export function seatPickMatches(state: ScenarioState, seat: number, spec: PickSp
     const held = (state.seats[seat]?.heroes ?? []).reduce((sum, id) => sum + (state.cards[id]?.resources ?? 0), 0);
     if (held < spec.canSpendResources) return false;
   }
+  // `deckHasCards`: the player's deck holds a card (04106:A:1).
+  if (spec.deckHasCards === true && (state.seats[seat]?.deck.length ?? 0) === 0) return false;
   if (!spec.engagedWithUnique) return true;
   return uniqueEnemiesEngaged(state, seat, ctx.cards).length > 0;
 }
