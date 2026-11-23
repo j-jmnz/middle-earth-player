@@ -76,6 +76,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The card the answered event is about is the first treachery the encounter deck revealed in this quest phase, whatever that card did ("the first treachery card revealed during the quest phase", 02082:B:1). The engine marks the card as it is revealed (mount-doom/treachery.ts), before the Forced effects
   // that hear the reveal, and only in a game with a record that reads this condition. Read by the mount-doom family.
   z.strictObject({ kind: z.literal("firstTreachery") }),
+  // The card the answered event is about is the first enemy the encounter deck revealed this round ("The first enemy revealed from the encounter deck each round", 05067:B:2): not one a search, a shadow card or a discard added. The engine marks the enemy as it is revealed (pelargir/first-enemy.ts), before the Forced
+  // effects that hear the reveal, and only in a game with a record that reads this condition. Read by the pelargir family.
+  z.strictObject({ kind: z.literal("firstEnemy") }),
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
   // The named phase has just ended: the engine has moved on and its boundary (Forced effects at the end of the phase) has not yet been crossed ("The players can only advance at the end of the quest phase", 40004:B:3).
   z.strictObject({ kind: z.literal("phaseEnded"), is: phaseNameSchema }),

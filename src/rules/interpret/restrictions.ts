@@ -25,7 +25,7 @@ const OBJECTIVE_PLAYER_CARD = "objective player card";
 // "Cannot have non-objective attachments" (19038:A:1, 19098:A:1): the same template word, a card type too: only an objective card may attach.
 const OBJECTIVE = "objective";
 
-export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; withResources?: true; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; anyDefender?: true; exceptSelf?: boolean; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true; engagedPlayer?: true };
+export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; withResources?: true; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean; anyDefender?: true; exceptSelf?: boolean; exceptTitle?: string; unlessControls?: PickSpec; guardian?: true; exceptAlone?: true; engagedPlayer?: true };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -62,6 +62,7 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
       ...(instruction.belowSourceHitPoints ? { belowSourceHitPoints: true } : {}),
       ...(instruction.anyDefender ? { anyDefender: true as const } : {}),
       ...(instruction.exceptSelf ? { exceptSelf: true } : {}),
+      ...(instruction.exceptTitle ? { exceptTitle: instruction.exceptTitle } : {}),
       ...(instruction.unlessControls ? { unlessControls: instruction.unlessControls } : {}),
       ...(instruction.guardian ? { guardian: true as const } : {}),
       ...(instruction.exceptAlone ? { exceptAlone: true as const } : {}),
@@ -80,6 +81,8 @@ export function travelBlocked(state: ScenarioState, ctx: ReduceContext, location
   return restricted(state, ctx, "travel").some((rule) => {
     // Every location but the source (South Pier, 50217:A:2: "players cannot travel to other locations").
     if (rule.exceptSelf) return rule.sourceId !== locationId;
+    // Every location without this title (City Street, 05038:A:2: another copy of the title may be travelled to).
+    if (rule.exceptTitle != null) return printedOf(ctx.cards, location?.code ?? "").name !== rule.exceptTitle;
     // Every location that holds a resource (A Fork in the Road, 51003:B:2).
     if (rule.withResources) return (location?.resources ?? 0) > 0;
     // Every location with a trait (Grond's, 145044:A:1 and the Gate's kin).

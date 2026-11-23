@@ -17,6 +17,7 @@ import { flagged, inPlay, modifierActive, updateCard } from "../../core/state.ts
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { defendingAgainst } from "../angmar/combat.ts";
+import { scrollDamageTarget } from "../pelargir/scroll.ts";
 import { listened, queueHeard, trimFollowUps } from "./listen.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -67,7 +68,8 @@ export function damageGoesTo(state: ScenarioState, id: string): string {
     const host = state.cards[modifier.sourceId]?.host;
     if (host && host !== id && inPlay(state.cards[host]?.zone ?? "removed")) return host;
   }
-  return id;
+  // "Any damage dealt by this attack is dealt to the hero with Alcaron's Scroll attached, if able" (05020:A:2): the pelargir family names the hero, or none.
+  return scrollDamageTarget(state, id) ?? id;
 }
 
 // Characters of any player that may take the damage of an undefended attack against `seat` because a card that player controls
