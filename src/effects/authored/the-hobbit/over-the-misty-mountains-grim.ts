@@ -5,7 +5,7 @@ import { AUTHORED_EFFECTS as FLIGHT_TO_THE_FORD } from "../flight-to-the-ford.ts
 import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for Over the Misty Mountains Grim (The Hobbit, Over Hill and Under Hill, part 2; no campaign card). The Misty Mountain Goblins set is shared with Dungeons Deep and Caverns Dim (set-misty-mountain-goblins.ts) and
-// Western Lands with We Must Away, Ere Break of Day (set-western-lands.ts); this file holds the quest, Over the Misty Mountains Grim and The Great Goblin. Readings: docs/scenarios/the-hobbit.md (Over the Misty Mountains Grim).
+// Western Lands with We Must Away, Ere Break of Day (set-western-lands.ts); this file holds the quest, Over the Misty Mountains Grim and The Great Goblin. Readings: docs/scenarios/the-hobbit/over-the-misty-mountains-grim.md (Over the Misty Mountains Grim).
 // Rules: hob.setup-over-the-misty-mountains-grim, hob.active-and-inactive-encounter-decks, hob.bilbo-baggins-ohauh, hob.baggins-sphere-ohauh, rr.victory, rr.search, rr.reveal, rr.active-location, rr.forced, rr.delayed-effects (data/rules/entries.json).
 const GREAT_GOBLIN = "131063";
 const STONE_GIANT = "131064";
@@ -185,7 +185,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "131071",
       lines: ["131071:A:1"],
       timing: "whenRevealed",
-      // "Then" (rr.then; recommended, docs/scenarios/the-hobbit.md): with no enemy engaged the return resolves nothing, so no Goblin gets +1 Threat. The +1 comes first, on every Goblin enemy in play
+      // "Then" (rr.then; recommended, docs/scenarios/the-hobbit/over-the-misty-mountains-grim.md): with no enemy engaged the return resolves nothing, so no Goblin gets +1 Threat. The +1 comes first, on every Goblin enemy in play
       // (an engaged one returns at once), because the check for an engaged enemy reads the table before the return.
       instructions: [
         { verb: "ModifyStat", stat: "threat", amount: 1, until: "endOfPhase", holders: GOBLIN_ENEMIES, when: { kind: "any", conditions: [{ kind: "canPick", pick: ENGAGED_ENEMY_YOU }, { kind: "canPick", pick: ENGAGED_ENEMY_OTHER }] } },

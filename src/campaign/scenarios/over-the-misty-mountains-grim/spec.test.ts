@@ -1,4 +1,4 @@
-// Rules: hob.setup-over-the-misty-mountains-grim, hob.active-and-inactive-encounter-decks, hob.bilbo-baggins-ohauh, rr.reveal, rr.search, rr.victory, rr.shadow-effects, rr.delayed-effects (data/rules/entries.json); docs/scenarios/the-hobbit.md (Over the Misty Mountains Grim).
+// Rules: hob.setup-over-the-misty-mountains-grim, hob.active-and-inactive-encounter-decks, hob.bilbo-baggins-ohauh, rr.reveal, rr.search, rr.victory, rr.shadow-effects, rr.delayed-effects (data/rules/entries.json); docs/scenarios/the-hobbit/over-the-misty-mountains-grim.md (Over the Misty Mountains Grim).
 import { announce, answer, attack, cardSpecs, committed, count, damageOn, endPhase, flag, progressOn, quest, resourcesOn, resolve, reveal, stat, window, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Over the Misty Mountains Grim (the-hobbit part 2): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).

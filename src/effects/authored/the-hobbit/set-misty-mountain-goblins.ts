@@ -4,7 +4,7 @@ import { AUTHORED_EFFECTS as OATH } from "../the-oath.ts";
 import { copyLine, withCopies } from "../reprint.ts";
 
 // The Misty Mountain Goblins encounter set (131058-131061, 131065, 131070): Over the Misty Mountains Grim deals it in its second deck and Dungeons Deep and Caverns Dim deals it too, so its records live in a file of their own, which the-hobbit.ts (the box's file, in the barrel) spreads.
-// Readings: docs/scenarios/the-hobbit.md (Over the Misty Mountains Grim). Rules: rr.in-play-and-out-of-play, rr.active-location, rr.defending-player, rr.engaged, rr.first-player, rr.damage, rr.discard-pile-and-victory-display (data/rules/entries.json).
+// Readings: docs/scenarios/the-hobbit/over-the-misty-mountains-grim.md (Over the Misty Mountains Grim). Rules: rr.in-play-and-out-of-play, rr.active-location, rr.defending-player, rr.engaged, rr.first-player, rr.damage, rr.discard-pile-and-victory-display (data/rules/entries.json).
 const CAVE_IN_PLAY = { type: "location", control: "any", trait: "Cave", staging: true } as const;
 const GOBLIN_ENGAGED_WITH_YOU = { type: "enemy", control: "any", trait: "Goblin", engaged: "you" } as const;
 const GOBLIN_FROM_DISCARD = { type: "enemy", control: "any", trait: "Goblin", from: "encounterDiscard" } as const;

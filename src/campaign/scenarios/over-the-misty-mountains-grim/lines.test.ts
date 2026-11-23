@@ -1,4 +1,4 @@
-// Rules: hob.bilbo-baggins-ohauh, hob.baggins-sphere-ohauh, hob.bilbo-multiplayer-ohauh, rr.search, rr.cost, rr.action, rr.travel, rr.delayed-effects, rr.victory (data/rules/entries.json); docs/scenarios/the-hobbit.md (Over the Misty Mountains Grim).
+// Rules: hob.bilbo-baggins-ohauh, hob.baggins-sphere-ohauh, hob.bilbo-multiplayer-ohauh, rr.search, rr.cost, rr.action, rr.travel, rr.delayed-effects, rr.victory (data/rules/entries.json); docs/scenarios/the-hobbit/over-the-misty-mountains-grim.md (Over the Misty Mountains Grim).
 // The lines a card-spec row cannot say (spec.test.ts holds the rest): a shuffle and the order of a deck, a cost paid from Bilbo's pool and who may pay it, the travel the players are left, an effect that waits for the next quest phase. 131026:A:1, 131026:B:1,
 // 131028:B:2, 131028:B:3, 131066:A:2, 131067:A:2, 131068:A:1, 131073:A:1.
 import { describe, expect, it } from "vitest";
