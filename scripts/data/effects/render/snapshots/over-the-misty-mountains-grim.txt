@@ -92,7 +92,7 @@ Scenario piles that place cards with no record (quest: 131026 A Short Rest; ques
 131064:A:1 (front): While at least one Stone-Giant is in the staging area, the Galloping Boulders card gains surge.
   131064:constant:1: Constant
     only if this card is in the staging area
-    - each card (any player controls) in the staging area only, named "Galloping Boulders": stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play
+    - each card (any player controls) in the staging area only, named "Galloping Boulders": stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play (does not stack: only the oldest copy of this card in play gives it)
 
 131064:A:2 (front): Forced: After Stone-Giant engages a player, that player chooses and discards 1 ally he controls.
   131064:forced:1: Forced after an enemy engages a player (heard about this card)
@@ -195,11 +195,11 @@ Scenario piles that place cards with no record (quest: 131026 A Short Rest; ques
   131073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a enemy (any player controls) in the staging area only, named "Stone-Giant" to choose: choose enemy (any player controls) in the staging area only, named "Stone-Giant", chosen by the first player
-    - later, at the end of the quest phase (the next one, when this is not the quest phase), acting on the card last picked:
-      - choose player (any player controls) with the highest threat among the players still in the game (ties: the chooser decides), chosen by the first player
-      - the effect goes on with the picked player as the acting player
-      - engage the card picked before
+    - then, if there is a enemy (any player controls) in the staging area only, named "Stone-Giant" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): later, at the end of the quest phase (the next one, when this is not the quest phase), acting on the card last picked:
+      - if the picked card is in the staging area: choose player (any player controls) with the highest threat among the players still in the game (ties: the chooser decides), chosen by the first player
+      - then, if the card picked before is in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): the effect goes on with the picked player as the acting player
+      - then, if the card picked before is in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): engage the card picked before
     - then, if not (there is a enemy (any player controls) in the staging area only, named "Stone-Giant" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one enemy with code 131064 in the encounter deck and adds it to the staging area (it is not revealed)
     - then, if not (there is a enemy (any player controls) in the staging area only, named "Stone-Giant" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter deck
 
-(rendered pieces: 139 by template, 0 as JSON)
+(rendered pieces: 144 by template, 0 as JSON)

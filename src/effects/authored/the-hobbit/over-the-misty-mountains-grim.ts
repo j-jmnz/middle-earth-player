@@ -15,6 +15,10 @@ const GOBLIN_ENEMIES: PickSpec = { type: "enemy", control: "any", trait: "Goblin
 const STONE_GIANT_IN_STAGING: PickSpec = { type: "enemy", control: "any", stagingOnly: true, names: ["Stone-Giant"] };
 /** "If The Great Goblin is in the victory display". */
 const GREAT_GOBLIN_WON: Condition = { kind: "inVictory", code: GREAT_GOBLIN, is: true };
+/** The Stone-Giant the first player chose is still in the staging area when the Delay resolves. */
+const GIANT_PICKED_IN_STAGING: Condition = { kind: "matches", card: "picked", inStaging: true };
+/** After the delayed Pick of the player, the giant is the previous pick. */
+const GIANT_STILL_IN_STAGING: Condition = { kind: "matches", card: "previous", inStaging: true };
 const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
@@ -117,7 +121,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["131064:A:1"],
       timing: "constant",
       condition: { kind: "sourceIn", zone: "staging" },
-      instructions: [{ verb: "ModifyStat", stat: "gainsSurge", amount: 1, until: "whileSourceInPlay", holders: { type: "card", control: "any", stagingOnly: true, names: ["Galloping Boulders"] } }],
+      instructions: [{ verb: "ModifyStat", stat: "gainsSurge", amount: 1, until: "whileSourceInPlay", holders: { type: "card", control: "any", stagingOnly: true, names: ["Galloping Boulders"] }, doesNotStack: true }],
     },
     { id: "131064:forced:1", cardCode: STONE_GIANT, lines: ["131064:A:2"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "Pick", pick: { type: "ally", control: "you" } }, { verb: "DiscardPicked" }] },
 
@@ -210,7 +214,12 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
           until: "endOfPhase",
           phase: "Quest",
           subject: "picked",
-          instructions: [{ verb: "Pick", pick: { type: "player", control: "any", highestThreat: true, who: "firstPlayer" } }, { verb: "SwitchActor", to: "picked" }, { verb: "Engage", target: "previous" }],
+          when: { kind: "canPick", pick: STONE_GIANT_IN_STAGING },
+          instructions: [
+            { verb: "Pick", pick: { type: "player", control: "any", highestThreat: true, who: "firstPlayer" }, when: GIANT_PICKED_IN_STAGING },
+            { verb: "SwitchActor", to: "picked", when: GIANT_STILL_IN_STAGING },
+            { verb: "Engage", target: "previous", when: GIANT_STILL_IN_STAGING },
+          ],
         },
         { verb: "SearchMove", code: STONE_GIANT, type: "enemy", to: "staging", deckOnly: true, when: { kind: "not", condition: { kind: "canPick", pick: STONE_GIANT_IN_STAGING } } },
         { verb: "ShuffleEncounterDeck", when: { kind: "not", condition: { kind: "canPick", pick: STONE_GIANT_IN_STAGING } } },

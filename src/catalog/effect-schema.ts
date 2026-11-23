@@ -184,6 +184,8 @@ const delaySchema = z.strictObject({
   // The delayed instructions act on the card the last Pick chose (Sneak Attack's ally).
   subject: z.literal("picked").optional(),
   instructions: z.array(simpleInstructionSchema),
+  // The Delay is scheduled only when this holds ("The first player chooses a Stone-giant ... it engages ... at the end of the quest phase", 131073:A:1).
+  ...when,
 });
 
 // Runs the instructions once for each card that matches the filter now, each time with that card as the picked card ("Ready
