@@ -289,10 +289,16 @@ describe("05042, 05043 and 05044: optional engagement and the engagement check",
 });
 
 describe("05065, 05066 and 05067: the quest stages", () => {
-  it.each([["05065:B:1", "05065"], ["05066:B:1", "05066"]])("%s Battle: the characters use their Attack instead of Willpower when questing", (_line, stage) => {
+  const questsWith = (stage: string): string => {
     const table = tableFromLayout(SCENARIO, { stage });
-    expect(questStatOf(table.state, table.hero, table.ctx.cards)).toBe("attack");
-    expect(questStatOf(tableFromLayout(SCENARIO, { stage: "05067" }).state, table.hero, table.ctx.cards)).toBe("willpower");
+    return questStatOf(table.state, table.hero, table.ctx.cards);
+  };
+  it("05065:B:1 Battle: the characters use their Attack instead of Willpower when questing", () => {
+    expect(questsWith("05065")).toBe("attack");
+    expect(questsWith("05067")).toBe("willpower");
+  });
+  it("05066:B:1 Battle: the characters use their Attack instead of Willpower when questing", () => {
+    expect(questsWith("05066")).toBe("attack");
   });
 
   // A stage whose quest points are reached while the Scroll is on no hero keeps its progress and does not advance; it advances once the Scroll is attached to a hero.
