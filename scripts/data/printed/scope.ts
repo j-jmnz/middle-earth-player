@@ -14,6 +14,7 @@ import type { HobCard } from "../sources/hallofbeorn.ts";
 import { foldTwoSided } from "../normalize/product-cards.ts";
 import { titleKey } from "../normalize/names.ts";
 import { MEC108_SCAN_URLS } from "./mec108-scans.ts";
+import { HOBBIT_PACKS } from "./pool.ts";
 
 // The packs the Campaign Expansions' cards are printed in (ProductDef.campaignExpansion, scripts/data/campaign-defs.ts).
 const CAMPAIGN_EXPANSION_PACKS: ReadonlySet<string> = new Set(PRODUCTS.filter((product) => product.campaignExpansion).flatMap((product) => product.packs));
@@ -137,7 +138,6 @@ function decklistCodes(cards: readonly Card[]): string[] {
 // The Hobbit saga boxes' own player cards (hob.bilbo-baggins-ohauh, hob.treasure-ohauh, hob.saga-player-cards-otd): both Bilbo Baggins heroes, the Baggins-sphere events and the nine treasure
 // cards, which only the six scenarios of the boxes use. The scenarios' own piles hold none of them (the first player takes control of Bilbo at the start of every game, the treasures are
 // discovered in play), so no scenario list names them.
-const HOBBIT_PACKS: ReadonlySet<string> = new Set(["OHaUH", "OtD"]);
 function hobbitCodes(): string[] {
   return loadCards()
     .filter((card) => card.printings.some((printing) => HOBBIT_PACKS.has(printing.pack)) && (card.sphere === "baggins" || card.type === "treasure" || (card.type === "hero" && card.name === "Bilbo Baggins")))

@@ -92,6 +92,7 @@ const EXTRA: PrintedCard[] = [
   definePrinted({ code: "treasure1", name: "A Treasure", type: "treasure", traits: ["Treasure"] }),
   heroCard("143001", "Aragorn", "leadership", ["Dúnedain", "Noble", "Ranger"]),
   heroCard("146002", "Aragorn", "leadership", ["Dúnedain", "Gondor", "Noble", "Warrior"]),
+  heroCard("145001", "Aragorn", "leadership", ["Dúnedain", "Noble", "Ranger"]),
   event("144013", "Speak Your Promise!", "neutral"),
   heroCard("21072", "Sméagol", "lore", ["Gollum"]),
   definePrinted({ code: "21071", name: "Stinker", type: "treasure" }),
