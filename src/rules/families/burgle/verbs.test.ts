@@ -134,7 +134,7 @@ describe("FirstTreacherySurge (132046:A:1)", () => {
   });
 });
 
-describe("the Pick filters mostResources and mostCommittedWillpower (132051:A:1, 132050:A:1)", () => {
+describe("the Pick filter mostResources (132051:A:1)", () => {
   it("offers only the heroes holding the most resources", () => {
     const base = table({ cards: [hero("a"), hero("b"), hero("c")], effects: [], heroes: [{ code: "a" }, { code: "b" }, { code: "c" }] });
     const poor = updateCard({ ...base.state, window: null }, base.ids.a ?? "", { resources: 1 });

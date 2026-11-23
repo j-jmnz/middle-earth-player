@@ -1,12 +1,10 @@
-// Rules: hob.burgle, rr.first-player (data/rules/entries.json); ledger lines 132042:A:3 and the other burgle lines, 132050:A:1, 132051:A:1. The Pick filters of the burgle family: the hand cards that match the revealed card (`burgleMatch`), the hero with the most resources (`mostResources`) and the player with the
-// highest total Willpower committed to the quest (`mostCommittedWillpower`); the last two keep every card that ties, and the chooser decides among them.
+// Rules: hob.burgle, rr.first-player (data/rules/entries.json); ledger lines 132042:A:3 and the other burgle lines, 132051:A:1. The Pick filters of the burgle family: the hand cards that match the revealed card (`burgleMatch`), and the hero with the most resources (`mostResources`), which keeps every card that ties, and the chooser decides among them.
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { PickContext } from "../../interpret/pick.ts";
 import { tiedExtreme } from "../../interpret/tied-extreme.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { committedWillpower } from "../../quest/quest.ts";
 import { burgleEffectOf, matchesRevealed, nearestBurgle } from "./match.ts";
 
 /** The `burgleMatch` filter: a card of a hand that matches the revealed card of the attempt going on. False for any other card, or with no attempt. */
@@ -23,9 +21,4 @@ export function burglePickMatches(state: ScenarioState, id: string, spec: PickSp
 /** `mostResources`: of the cards that matched, those holding the most resources. */
 export function mostResources(state: ScenarioState, found: readonly string[]): string[] {
   return found.length === 0 ? [] : tiedExtreme(found, (id) => state.cards[id]?.resources ?? 0, "highest");
-}
-
-/** `mostCommittedWillpower`: of the seats that matched (`seat:<n>`), those whose committed characters have the highest total Willpower. */
-export function mostCommitted(state: ScenarioState, found: readonly string[], ctx: ReduceContext): string[] {
-  return found.length === 0 ? [] : tiedExtreme(found, (id) => committedWillpower(state, ctx.cards, Number(id.slice("seat:".length))), "highest");
 }
