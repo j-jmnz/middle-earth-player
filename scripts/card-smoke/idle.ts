@@ -57,12 +57,6 @@ function projection(state: ScenarioState): string {
   return stable(kept);
 }
 
-/** The names of the table fields that differ, for a hit's report and for tuning the comparison. */
-export function differingFields(left: ScenarioState, right: ScenarioState): string[] {
-  const keys = new Set([...Object.keys(left), ...Object.keys(right)]);
-  return [...keys].filter((key) => !LEFT_OUT.has(key) && stable((left as Record<string, unknown>)[key]) !== stable((right as Record<string, unknown>)[key])).sort();
-}
-
 // The effect asked its player to take one of several branches: the branch taken may do nothing while another would have done something.
 function branches(state: ScenarioState): boolean {
   const data = state.stack[state.stack.length - 1]?.data;

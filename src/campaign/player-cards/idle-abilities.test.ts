@@ -8,11 +8,11 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard, withThreat } from "../../rules/core/state.ts";
-import { moveCard, spawn } from "../../rules/core/zones.ts";
+import { attachTo, moveCard, spawn } from "../../rules/core/zones.ts";
 import { settle } from "../../rules/engine/machine.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
-import { enter, playableCards, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { enter, play, playableCards, playerTable, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
 
 const GRIM_RESOLVE = "01025";
@@ -25,6 +25,9 @@ const EXPLORER = "12037";
 const WARDEN = "04083";
 const CEORL = "12058";
 const MENDOR = "01135";
+const OUTMATCHED = "19062";
+const SWIFT_AND_SILENT = "08003";
+const DETERMINATION = "10172";
 const KNIFE_WORK = "12114";
 const ELROND = "08032";
 const ATHELAS = "09011";
@@ -53,7 +56,7 @@ const offeredPlay = (tab: Table, code: string): boolean => playableCards(tab.sta
 
 beforeAll(async () => {
   const starter = await starterBase();
-  base = { ...starter, cards: new Map([...starter.cards, ...(await loadPrinted([STALLION, BILL, RALLYING_CRY, KNIFE_WORK, ELROND, ATHELAS, SHADOW, GIMLI, GRIM_RESOLVE, NORTHERN_TRACKER, WE_DO_NOT_SLEEP, CAPTAINS, MEN_OF_THE_WEST, HUNTER, EXPLORER, WARDEN, CEORL, MENDOR, ARAGORN_LORE, ARAGORN, BERAVOR, ELEANOR, DUNHERE]))]) };
+  base = { ...starter, cards: new Map([...starter.cards, ...(await loadPrinted([STALLION, BILL, RALLYING_CRY, KNIFE_WORK, ELROND, ATHELAS, SHADOW, GIMLI, GRIM_RESOLVE, NORTHERN_TRACKER, WE_DO_NOT_SLEEP, CAPTAINS, MEN_OF_THE_WEST, HUNTER, EXPLORER, WARDEN, CEORL, MENDOR, OUTMATCHED, SWIFT_AND_SILENT, DETERMINATION, ARAGORN_LORE, ARAGORN, BERAVOR, ELEANOR, DUNHERE]))]) };
   base.cards.set(NOBLE, definePrinted({ code: NOBLE, name: "Noble", type: "hero", sphere: "leadership", threat: 9, willpower: 1, attack: 1, defense: 1, health: 3, traits: ["Noble"] }));
 });
 
@@ -298,5 +301,76 @@ describe("Mendor 01135:A:3 while he is ready", () => {
   it("is offered once Mendor is exhausted", () => {
     const { tab, state } = defeated(true);
     expect(triggers(state, tab)).toContain("01135:response:1");
+  });
+});
+
+describe("Outmatched 19062:A:3 when the defending character is ready", () => {
+  // "Response: After attached enemy resolves its attack, ready the defending character." The attack resolved with the defender (Aragorn) as the event's other card.
+  function resolved(defenderExhausted: boolean, defended = true): { tab: Table; state: ReturnType<typeof settle> } {
+    const loose = table({ heroes: [{ code: ARAGORN, seat: 0 }], engaged: [{ code: FOE, seat: 0 }], allies: [{ code: OUTMATCHED, seat: 0 }] });
+    const base = { ...loose, state: attachTo(loose.state, idsOf(loose, OUTMATCHED), idsOf(loose, FOE)) };
+    const tab = defenderExhausted ? exhaust(base, ARAGORN) : base;
+    const event = { ...tab.state, window: null, pendingEvents: [{ trigger: "attackResolved" as const, seat: 0, cardId: idsOf(tab, FOE), ...(defended ? { other: idsOf(tab, ARAGORN) } : {}) }] };
+    return { tab, state: settle(event, tab.ctx, []) };
+  }
+
+  it("is not offered while the defending character is ready", () => {
+    const { tab, state } = resolved(false);
+    expect(triggers(state, tab)).not.toContain("19062:response:1");
+  });
+
+  it("is offered once the defending character is exhausted", () => {
+    const { tab, state } = resolved(true);
+    expect(triggers(state, tab)).toContain("19062:response:1");
+  });
+
+  it("is not offered after an undefended attack: there is no defending character to ready", () => {
+    const { tab, state } = resolved(true, false);
+    expect(triggers(state, tab)).not.toContain("19062:response:1");
+  });
+});
+
+describe("Swift and Silent 08003:A:1 with every hero ready", () => {
+  // "Action: Ready a hero you control. Then, if your threat is 20 or less and this is the first time you played a copy of Swift and Silent this round, return this card to your hand instead of discarding it."
+  const swift = (exhaustedHeroes: readonly string[]): Table => {
+    const tab = table({ heroes: [{ code: ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }], hand: [{ code: SWIFT_AND_SILENT, seat: 0 }] });
+    return exhaustedHeroes.reduce(exhaust, tab);
+  };
+  // The card is played and the hero `chosen` is the one to ready; where the event ends up.
+  const played = (tab: Table, chosen: string): string => {
+    const asked = play(begin(tab.state), tab, idsOf(tab, SWIFT_AND_SILENT));
+    const done = sendUnledgered(asked, { type: "Choose", optionId: idsOf(tab, chosen) }, tab.ctx);
+    return done.state.cards[idsOf(tab, SWIFT_AND_SILENT)]?.zone ?? "";
+  };
+
+  it("is not offered while every hero is ready: the ready changes nothing and the return waits for it (rr.then)", () => {
+    expect(offeredPlay(swift([]), SWIFT_AND_SILENT)).toBe(false);
+  });
+
+  it("is offered once a hero is exhausted", () => {
+    expect(offeredPlay(swift([BERAVOR]), SWIFT_AND_SILENT)).toBe(true);
+  });
+
+  it("returns to the hand when it readies an exhausted hero, and is discarded when the hero chosen was ready already", () => {
+    const tab = swift([BERAVOR]);
+    expect(played(tab, BERAVOR)).toBe("hand");
+    expect(played(tab, ARAGORN)).toBe("discard");
+  });
+});
+
+describe("Determination 10172:A:1 once it is attached", () => {
+  // "Action: Attach Determination to a unique character. Then, ready each character with a copy of Determination attached, ..." The Action plays the event from the hand: attached, the card is a Condition attachment and
+  // using its Action again would only discard it (the event's cost), with nothing readied.
+  const determined = (attachedTo: string | null): Table => {
+    const tab = table({ heroes: [{ code: ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }], ...(attachedTo ? { allies: [{ code: DETERMINATION, seat: 0 }] } : { hand: [{ code: DETERMINATION, seat: 0 }] }) });
+    return attachedTo ? { ...tab, state: attachTo(tab.state, idsOf(tab, DETERMINATION), idsOf(tab, attachedTo)) } : tab;
+  };
+
+  it("is not offered from the character it is attached to", () => {
+    expect(triggers(determined(ARAGORN).state, determined(ARAGORN))).not.toContain("10172:action:1");
+  });
+
+  it("is offered as the event in the hand when a unique character can carry it", () => {
+    expect(offeredPlay(determined(null), DETERMINATION)).toBe(true);
   });
 });

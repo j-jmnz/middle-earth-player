@@ -295,6 +295,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10172:A:1 (front): Action: Attach Determination to a unique character. Then, ready each character with a copy of Determination attached, as well as each character who is "determined" in the Campaign Log. (Counts as a Condition attachment with the text: "Forced: If you win this scenario, mark in the Campaign Log that attached character is 'determined.'")
   10172:action:1: Action
+    only if this card is in its player's hand
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose unique character (any player controls)
     - this card attaches to the picked card (any number of copies may be attached to one card)
@@ -316,4 +317,4 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - mark in the Campaign Log that each player's starting threat is reduced by 2 (cumulative; written when the scenario is won)
 
-(rendered pieces: 183 by template, 0 as JSON)
+(rendered pieces: 184 by template, 0 as JSON)

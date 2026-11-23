@@ -80,6 +80,12 @@ export function seatsFor(state: ScenarioState, who: "actor" | "picked" | "eachSe
   return [actor];
 }
 
+// A ready of a card that is ready already changes nothing, so it is not resolved in full and what follows "Then" is not attempted (the `thenResolves` condition, rr.then).
+function markShortWhenReady(state: ScenarioState, id: string, ctx: ReduceContext): ScenarioState {
+  const data = topFrame(state)?.data;
+  return state.cards[id]?.exhausted !== true && data?.kind === "effect" && readsThen(ctx) ? patchTop(state, { data: { ...data, short: true } }) : state;
+}
+
 // Returns the new state when the instruction is one of these verbs, otherwise null.
 export function runPlayerVerb(
   state: ScenarioState,
@@ -92,12 +98,12 @@ export function runPlayerVerb(
     case "Ready": {
       if (instruction.target === "picked" || instruction.target === "subject" || instruction.target === "defender" || instruction.target === "other") {
         const id = refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) ?? "";
-        return state.cards[id] ? readyCard(state, id, playerSource(state, focus.sourceId, ctx), ctx.cards) : state;
+        return state.cards[id] ? readyCard(markShortWhenReady(state, id, ctx), id, playerSource(state, focus.sourceId, ctx), ctx.cards) : state;
       }
       if (instruction.target === "host") {
         const hostId = refCard(state, "host", frameScope(state, focus.seat, focus.sourceId));
         // Every ready is heard ("After Wellinghall Preserver readies", 10061:A:3; Weighed Down, 18027:A:1).
-        return hostId && state.cards[hostId] ? readyCard(state, hostId, playerSource(state, focus.sourceId, ctx), ctx.cards) : state;
+        return hostId && state.cards[hostId] ? readyCard(markShortWhenReady(state, hostId, ctx), hostId, playerSource(state, focus.sourceId, ctx), ctx.cards) : state;
       }
       if (instruction.target !== "allCharacters") return null;
       let next = state;

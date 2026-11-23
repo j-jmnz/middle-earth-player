@@ -6,6 +6,8 @@ import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 const CAN_ENTER: Condition = { kind: "matches", card: "self", pick: { type: "ally", control: "any", intoPlay: true } };
 // "If your threat is 20 or less and this is the first time you played a copy of ~ this round": the event goes back to the hand.
 const AGAIN: Condition = { kind: "all", conditions: [{ kind: "threat", max: 20 }, { kind: "copiesPlayedThisRound", max: 0, you: true }] };
+// Swift and Silent returns to the hand only if the ready before "Then" resolved: a ready of a hero that was ready changes nothing (rr.then).
+const AGAIN_AFTER_READY: Condition = { kind: "all", conditions: [{ kind: "thenResolves" }, { kind: "threat", max: 20 }, { kind: "copiesPlayedThisRound", max: 0, you: true }] };
 const EXHAUSTED_SELF: Condition = { kind: "matches", card: "self", pick: { type: "character", control: "any", state: "exhausted" } };
 const ALLY_IN_HAND: PickSpec = { type: "card", control: "you", from: "hand", cardType: "ally" };
 
@@ -55,7 +57,7 @@ export const RECORDS: readonly Effect[] = [
   // Denethor: discarded as soon as his Willpower is 0 or less.
   { id: "06057:constant:2", cardCode: "06057", lines: ["06057:A:2"], timing: "constant", instructions: [{ verb: "DiscardWhen", stat: "willpower", max: 0 }] },
   // Swift and Silent, Noiseless Movement, Courage Awakened: back to the hand the first time each round at threat 20 or less.
-  { id: "08003:action:1", cardCode: "08003", lines: ["08003:A:1"], timing: "action", instructions: [{ verb: "Pick", pick: { type: "hero", control: "you" } }, { verb: "Ready", target: "picked" }, { verb: "ReturnEventToHand", when: AGAIN }] },
+  { id: "08003:action:1", cardCode: "08003", lines: ["08003:A:1"], timing: "action", instructions: [{ verb: "Pick", pick: { type: "hero", control: "you" } }, { verb: "Ready", target: "picked" }, { verb: "ReturnEventToHand", when: AGAIN_AFTER_READY }] },
   { id: "08033:action:1", cardCode: "08033", lines: ["08033:A:1"], timing: "action", instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", stagingOnly: true } }, { verb: "ModifyStat", stat: "noEngagementChecks", amount: 1, until: "endOfRound", target: "picked" }, { verb: "ReturnEventToHand", when: AGAIN }] },
   { id: "08061:action:1", cardCode: "08061", lines: ["08061:A:1"], timing: "action", instructions: [{ verb: "Pick", pick: { type: "hero", control: "any" } }, { verb: "ModifyStat", stat: "willpower", amount: 2, until: "endOfPhase", target: "picked" }, { verb: "ReturnEventToHand", when: AGAIN }] },
   // Blue Mountain Trader: another player gains control of it, then moves 1 resource from one of their heroes to one of yours,

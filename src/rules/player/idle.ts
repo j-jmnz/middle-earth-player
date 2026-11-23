@@ -2,7 +2,7 @@
 // Whether the instructions of an ability can change the game state as the table stands (src/rules/player/potential.ts has the rules and the header): the list is idle
 // when every step of it is, in order, with the cards a Pick chose read for each candidate. Each step is read by its kind and what it acts on (`idleStep`); the verbs a
 // mechanic family owns are read by that family's `idle` hook (docs/architecture.md, Mechanic families), the rest here.
-import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
+import type { Condition, Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { inPlay, livingSeats } from "../core/state.ts";
 import type { ScenarioState } from "../core/state.ts";
@@ -36,6 +36,9 @@ function answeredCardLeftPlay(state: ScenarioState, instruction: Instruction, fr
   return !inPlay(state.cards[frame.scope.other]?.zone ?? "removed");
 }
 
+// Whether a condition holds only when the part before "then" resolved in full (`thenResolves`, alone or among the conditions of an `all`).
+const waitsForThen = (when: Condition): boolean => when.kind === "thenResolves" || (when.kind === "all" && when.conditions.some(waitsForThen));
+
 /** Whether the instruction cannot change the game state as the table stands; false when it cannot be told. `mark.short` is set when a Draw found no card to draw. */
 function idleStep(state: ScenarioState, instruction: Instruction, sourceId: string, frame: IdleFrame, ctx: ReduceContext, mark: IdleMark): boolean {
   const source = state.cards[sourceId];
@@ -46,7 +49,7 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
   const own = familyIdle(state, instruction, sourceId, frame, ctx, mark);
   if (own === true) return true;
   if ("when" in instruction && instruction.when != null) {
-    if (mark.short && instruction.when.kind === "thenResolves") return true;
+    if (mark.short && waitsForThen(instruction.when)) return true;
     // A condition on the card an earlier Pick chose ("if that hero is Legolas"): the step does not happen when it fails for every card that Pick may have chosen.
     if (instruction.when.kind === "matches" && instruction.when.card === "picked" && frame.picked != null) {
       const scope = conditionScope(frame, sourceId);
@@ -62,7 +65,10 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
       // "Ready all character cards in play" with none exhausted.
       if (instruction.target === "allCharacters") return livingSeats(state).every((seat) => characters(state, seat, ctx.cards).every((id) => state.cards[id]?.exhausted !== true));
       const cards = namedCards(state, instruction.target, source, "self", frame, mark);
-      return cards != null && cards.every((card) => card != null && !card.exhausted);
+      const idle = cards != null && cards.every((card) => card != null && !card.exhausted);
+      // A ready of cards that are all ready did nothing, so what follows "Then" is not attempted (rr.then, the `thenResolves` condition).
+      if (idle) mark.short = true;
+      return idle;
     }
     case "Heal": {
       const cards = namedCards(state, instruction.target, source, "picked", frame, mark);
