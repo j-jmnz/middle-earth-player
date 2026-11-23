@@ -13,7 +13,7 @@ import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./s
 import { claimedDestination, discardedDetached, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
 import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
-import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
+import { damageBarred, damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
 import { attackingHolds } from "../families/attack/strike.ts";
 import { resourceCancel, resourceShield } from "../families/aflame/attack.ts";
 import { cancelAllDamage, damageShield } from "../families/wilderland/shield.ts";
@@ -30,7 +30,6 @@ import { wallRoom } from "../families/pelennor/wall.ts";
 import { heldBy, type TraitCheck } from "./holder-classes.ts";
 import { hasTrait } from "../interpret/conditions.ts";
 import { inAreaOf } from "../families/breaking/areas.ts";
-import { bilboDamageBarred } from "../families/riddles/gollum.ts";
 import { versusVictoryTrait } from "../families/captured/values.ts";
 import { eliminateEmpties, markLoss } from "./eliminate.ts";
 import { announceAllyLeft } from "./ally-left.ts";
@@ -258,12 +257,10 @@ function placeDamageHere(state: ScenarioState, assigned: string, amount: number,
   if (source === "player" && flagged(state, id, "noPlayerEffectDamage")) return state;
   // "When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead" (141057:A:2).
   if (takesLifeInstead(state, id)) return reduceLife(state, amount, steps, cause);
-  // Bilbo Baggins in the riddle area takes damage only from Gollum (hob.riddle-area, families/riddles/gollum.ts).
-  if (bilboDamageBarred(state, id, source, sourceId)) return state;
-  // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed.
+  // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed. Bilbo Baggins in the riddle area takes damage only from Gollum (hob.riddle-area).
   // "Cannot take damage" is lost by Goblin Chieftain while the stage says so (41007:B:1); combat damage dealt to an attacking enemy is canceled
   // by Lightless Passage's Shadow (41033:A:2).
-  if ((flagged(state, id, "cannotTakeDamage") && !flagged(state, id, "losesNoDamage")) || (source !== "combat" && flagged(state, id, "cannotTakeNonCombatDamage"))) return state;
+  if ((flagged(state, id, "cannotTakeDamage") && !flagged(state, id, "losesNoDamage")) || (source !== "combat" && flagged(state, id, "cannotTakeNonCombatDamage")) || damageBarred(state, id, source, sourceId)) return state;
   // "Cannot take damage from non-quest effects" (19127:A:1): the damage of a combat or of a quest card's effect is still placed.
   if (source !== "combat" && source !== "quest" && flagged(state, id, "cannotTakeNonQuestDamage")) return state;
   if (source === "combat" && flagged(state, id, "combatDamageCanceled")) return state;
