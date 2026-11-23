@@ -136,6 +136,16 @@ describe("an Action the table cannot settle is offered (rr.search, rr.then)", ()
     expect(seen(search.slice(0, 2), [["att", { zone: "deck", seat: 0 }]])).toBe(true);
   });
 
+  it("a search of the top of a deck for any number of cards with no shuffle after it is offered when the hidden top holds no match, and not with an empty deck", () => {
+    // "Search the top 5 cards of your deck for any number of Eagle cards and add them to your hand" (02005): the cards are hidden, so which of them match is not read (rr.search).
+    const each = (extra: object) => [{ verb: "Each", pick: { type: "card", control: "you", from: "deck", top: 5, trait: "Eagle", ...extra }, upTo: "any", instructions: [{ verb: "MovePicked", to: "hand" }] }] as const;
+    expect(seen(each({}))).toBe(false);
+    expect(seen(each({}), [["att", { zone: "deck", seat: 0 }]])).toBe(true);
+    const upTo = [{ verb: "Each", pick: { type: "card", control: "you", from: "deck", top: 5, cardType: "ally", trait: "Rohan" }, upTo: 4, instructions: [{ verb: "MovePicked", to: "play" }] }] as const;
+    expect(seen(upTo)).toBe(false);
+    expect(seen(upTo, [["att", { zone: "deck", seat: 0 }]])).toBe(true);
+  });
+
   it("an effect whose condition reads the running effect", () => {
     expect(seen([{ verb: "Draw", amount: 1, when: { kind: "matches", card: "picked" } }, { verb: "SetThreat", value: 0 }], [], (state) => withThreat(state, 0, 0))).toBe(true);
   });

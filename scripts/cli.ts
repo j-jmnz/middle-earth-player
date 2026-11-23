@@ -55,6 +55,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     draft: { steps: [{ script: "data/effects/draft.ts" }], about: "writes .agent/drafts for printed lines no record owns" },
     render: { steps: [{ script: "data/effects/render.ts" }], about: "prints each card's lines with its records in plain English" },
     open: { steps: [{ script: "data/effects/open.ts" }], about: "rewrites src/effects/open-lines.ts" },
+    reach: { steps: [{ script: "data/effects/reach.ts" }], about: "the cards whose render or records differ from <base-ref>, by card with the printed line (it cannot see a change in engine code that no record shows)" },
   },
   scenario: {
     new: { steps: [{ script: "tools/scenario-new.ts" }], about: "writes and registers a scenario's skeleton files (--dry-run first)" },
