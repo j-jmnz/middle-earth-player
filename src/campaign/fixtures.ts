@@ -87,6 +87,7 @@ import grimFixtures from "./fixtures/over-the-misty-mountains-grim.json";
 import spidersFixtures from "./fixtures/flies-and-spiders.json";
 import dayFixtures from "./fixtures/we-must-away-ere-break-of-day.json";
 import dimFixtures from "./fixtures/dungeons-deep-and-caverns-dim.json";
+import ithilienFixtures from "./fixtures/into-ithilien.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -188,6 +189,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "escape-from-khazad-dum": khazadFixtures,
   "the-hunt-for-the-dreadnaught": dreadnaughtFixtures,
   "peril-in-pelargir": pelargirFixtures,
+  "into-ithilien": ithilienFixtures,
   "we-must-away-ere-break-of-day": dayFixtures,
   "over-the-misty-mountains-grim": grimFixtures,
   "dungeons-deep-and-caverns-dim": dimFixtures,

@@ -83,6 +83,7 @@ import * as dreadnaught from "../scenarios/the-hunt-for-the-dreadnaught/game.ts"
 import * as grim from "../scenarios/over-the-misty-mountains-grim/game.ts";
 import * as day from "../scenarios/we-must-away-ere-break-of-day/game.ts";
 import * as dim from "../scenarios/dungeons-deep-and-caverns-dim/game.ts";
+// import * as ithilien from "../scenarios/into-ithilien/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -192,4 +193,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
   entry("escape-from-khazad-dum", "Escape from Khazad-dûm", khazad.KHAZAD_GOLDENS, khazad.khazadWorld, khazad.playGolden),
   entry("the-hunt-for-the-dreadnaught", "The Hunt for the Dreadnaught", dreadnaught.DREADNAUGHT_GOLDENS, dreadnaught.dreadnaughtWorld, dreadnaught.playGolden),
+  // entry("into-ithilien", "Into Ithilien", ithilien.ITHILIEN_GOLDENS, ithilien.ithilienWorld, ithilien.playGolden),
 ];
