@@ -92,12 +92,12 @@ function defenseAnswer(state: ScenarioState, ctx: ReduceContext): PlayerIntent |
   return heroes[0] ? { type: "Undefended", heroId: heroes[0] } : null;
 }
 
-/** In the player attack window: the first ready character that can reach an enemy attacks the first it can reach, alone. */
+/** In the player attack window: the first ready character that can reach an enemy attacks the first it can reach that no attack of the seat has declared this phase, alone. */
 function attackAnswer(state: ScenarioState, ctx: ReduceContext): PlayerIntent | null {
   if (state.window?.kind !== "playerAttack" || !legalIntents(state, ctx).some((intent) => intent.type === "DeclareAttackers")) return null;
   for (const id of characters(state, state.activeSeat, ctx.cards)) {
     if (legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx).length === 0) continue;
-    const enemy = legalAttackEnemies(state, state.activeSeat, id, ctx.cards)[0];
+    const enemy = legalAttackEnemies(state, state.activeSeat, id, ctx.cards).find((enemyId) => !state.declaredAttacks.includes(`${state.activeSeat}:${enemyId}`));
     if (enemy) return { type: "DeclareAttackers", enemyId: enemy, attackerIds: [id] };
   }
   return null;
