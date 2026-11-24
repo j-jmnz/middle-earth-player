@@ -10,6 +10,7 @@ Against the Shadow part 8 (pack `BoG`), standalone only, on Easy and Normal (Q03
 - **Name.** "The Crossroads" in the Setup line of 06117 is the card printed "The Cross-roads" (06123); there is one card.
 - **Source typos.** Hall of Beorn has "hiddien" (06119), "Brutual" (06121), "Easter Road" (06127), "destoys" and "a characters" (06130). The ledger prints "hidden", "Brutal Uruk", "Eastern Road" and "destroys a character".
 - **Shared cards.** Ravaging Orcs (05062 to 05064) is read in `the-siege-of-cair-andros.md`; its rows apply here as written there. One interaction is new: a hidden turn can engage Orc Arsonist in the middle of the combat phase (see `hidden.shadow-vs-arsonist`).
+- **Conflict at the Crossroads.** Hall of Beorn lists Surge as a keyword of Conflict at the Crossroads (06131), but the card prints no Surge line: its When Revealed text says it gains surge only when no Orc enemy is engaged. An override in `data/overrides.json` turns the keyword off and the record gains it by its condition.
 - **Rulesheet.** The hidden-card spans are read from the pinned rulesheet insert (`bog`). The Quest Companion transcription and the community FAQ compendium the research also used are community material.
 
 ## Readings
@@ -132,3 +133,24 @@ Each is a `recommended` reading, or one settled only by community discussion. Fu
 - `06132:A:1`, `06133:A:1`: control lines wait while Captured! holds the allies.
 - `06132:A:2` (card), (none): Faramir turns any player's hidden card, and is not offered with none.
 - `hidden.order-vs-shadow`: the engine turns before it deals shadow cards.
+
+## Engine notes
+
+The hidden cards are in the family `pelargir` (`src/catalog/families/pelargir.ts`, `src/rules/families/pelargir/hidden.ts`, `hidden-turn.ts`, `hidden-sweep.ts` and `engaged-threat.ts`; the render templates are in `scripts/data/effects/render/families/pelargir.ts`).
+
+- **A hidden card** (`ats.hidden-cards`). It is the top card of the encounter deck set aside facedown in a player's play area: zone `setAside`, `face` down, `owner` the seat, `hiddenAt` the order taken, controlled by nobody, so its text is inert and no core sweep moves it. No `EngineStep` names it. The Set aside list counts it as facedown and names none (`asideSecrets` of the family, `TakeHiddenCard` with `deck`). `pnpm game show` names it, as it names every hidden card.
+- **Taking** (`06117:B:1`, `06122:A:1`, `06123:A:3`). `TakeHiddenCard` takes `amount` cards as one instruction. An empty deck is refilled from the discard pile first. A Travel cost of it is unpayable when the deck and the discard pile hold fewer cards than it takes (the family's `travel.unpayable`).
+- **Turning** (`ats.hidden-cards-turn-faceup`, `faq.blood-of-gondor-hidden-cards`). `TurnHiddenCards` turns the cards held when it starts, one at a time: an enemy engages through the engine's own engagement, so Forced effects that hear `engaged` fire (a card they take stays facedown); a treachery or a location is discarded. `resolve` (Lying in Wait) resolves each card's When Revealed effects once the turn is done, the first card first, adds a location to the staging area and fires no surge. `shadow` (Brutal Uruk) deals each enemy turned a shadow card. A seat that left the game turns nothing.
+- **Faramir's Action** (`06132:A:2`). `TurnHiddenCard` queues a Choose of `seat:N` among the players who hold a hidden card (no Choose with one), then picks the card with the game's seed. An enemy takes the 3 damage in the staging area before it engages, so one destroyed never engages.
+- **The turn at 5 cards** (`06118:B:3`). A settle sweep (`hiddenSweep`) turns the cards of a player who holds 5 while the current stage holds `turnsAtFiveHidden`, once the stack, the attack and any window other than an action window are clear. It also discards the hidden cards of a player who left the game (`clearEliminated` is untouched).
+- **The amount `hidden`** (`06119:A:1`, `06119:A:2`). `own` counts the acting player's cards, `all` every player's; the family's `amount` hook reads it.
+- **The two allies** (`06132:A:1`, `06133:A:1`, `06118:A:1`). The Setup puts them in the first player's play area; each ally's Forced effect on `firstPlayerTokenPassed` moves it to the new first player (`GainControlOfSelf`). `HoldUnderStage` moves them to the captive zone under Captured!: in play, controlled by nobody, committed to nothing, with no Action and no leaving-play announcement. Their own `LoseGame` Forced effects hear a real leaving of play only.
+- **Siege and Battle** (`06123:A:1`). The constants of The Cross-roads use `until: whileSourceInPlay`, so Siege holds in the staging area; `losesBattle` takes Battle from the current stage (`stage-keyword.ts`).
+- **Conflict at the Crossroads** (`06131:A:1`). The flag `engagedOrcThreat` is held on the table until the end of the phase, and the total Threat in the staging area adds each engaged Orc's Threat live (`withStagingThreat` in `families/attachments/hold.ts` calls `engagedOrcRaise`, the one shared line; it adds 0 unless the flag is held).
+- **Easy mode** (`easy`). The scenario's own counts remove 2 Conflict at the Crossroads, 2 Orc Ambusher, 2 Brutal Uruk and 3 Orc Rabble, as the Quest Companion lists.
+
+## Limits
+
+- The first player's choice of order between turning the hidden cards at the beginning of the combat phase and dealing the shadow cards (`hidden.order-vs-shadow`) is not offered: the engine turns first. An Orc Arsonist that the turn engages deals its Forced shadow cards at once, and the card the combat phase would deal to an enemy that already holds one is not dealt, so each enemy ends with 1 shadow card.
+- A player who holds Faramir or Lord Alcaron and is eliminated discards the card with the rest of what he controls (`clearEliminated` in `src/rules/core/eliminate.ts`, which runs before any family sweep), so the players lose. The core code is not changed for it.
+- Faramir's hidden card is picked by the game's seed, not by the player.
