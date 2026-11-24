@@ -36,6 +36,9 @@ export function winWords(left: readonly string[], controlled: number): string {
 /** The bar on progress from player cards (06091:B:1). */
 export const PROGRESS_BAR_WORDS = "No player card effect can place progress on a location in the staging area. The active location, a controlled location and any card effect of the encounter deck are not barred";
 
+/** The log line of progress the bar kept: a progress step of 0 (06091:B:1; no other effect places 0). */
+export const barredWords = (name: string): string => `No progress on ${name}: Retake the City bars player card effects from placing progress on a location in the staging area`;
+
 /** The first player takes control of an explored Osgiliath location (06091:B:2). */
 export const TAKE_CONTROL_WORDS = "An Osgiliath location that leaves play explored goes to the first player's play area, ready and with no progress. The first player controls it";
 

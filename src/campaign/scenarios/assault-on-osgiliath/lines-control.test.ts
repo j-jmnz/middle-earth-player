@@ -83,17 +83,41 @@ lineSpec("06091:B:2", "a player who is eliminated returns the locations he contr
   expect(controlled(done)).toEqual([]);
 });
 
-lineSpec("06091:B:1", "places no progress from a player card on a location in the staging area, and places it on the active location", (effects) => {
+lineSpec("06091:B:1", "places no progress from a player card on a location in the staging area, and places it on the active location (Snowbourn Scout offers the active location alone)", (effects) => {
   // Snowbourn Scout (01016): "After Snowbourn Scout enters play, choose a location. Place 1 progress token on that location."
-  const scout = (placeOn: string) => {
-    const made = table({ phase: "Planning", active: { code: CODES.westQuarter }, staging: [CODES.harbor], hand: ["01016"], heroes: [{ code: "01001", seat: 0, resources: 3 }] }, effects, ["01016", "01001"]);
-    const card = idOf(made.state, "01016");
-    let run = send(opened(made), { type: "PlayCard", cardId: card, payments: payFor(made.state, made.ctx, card) }, made.ctx);
-    run = send(run, { type: "Trigger", cardId: card, effectId: "01016:response:1" }, made.ctx);
-    return finish(run, made.ctx, (state) => (state.window?.kind === "choose" ? idOf(state, placeOn) : "")).state;
-  };
-  expect(cardOf(scout(CODES.harbor), CODES.harbor)?.progress).toBe(0);
-  expect(cardOf(scout(CODES.westQuarter), CODES.westQuarter)?.progress).toBe(1);
+  const made = table({ phase: "Planning", active: { code: CODES.westQuarter }, staging: [CODES.harbor], hand: ["01016"], heroes: [{ code: "01001", seat: 0, resources: 3 }] }, effects, ["01016", "01001"]);
+  const card = idOf(made.state, "01016");
+  let run = send(opened(made), { type: "PlayCard", cardId: card, payments: payFor(made.state, made.ctx, card) }, made.ctx);
+  run = send(run, { type: "Trigger", cardId: card, effectId: "01016:response:1" }, made.ctx);
+  // The staged Ancient Harbor is no target: the one location left is chosen at once and no question is asked.
+  expect(run.state.window?.kind).not.toBe("choose");
+  const done = finish(run, made.ctx).state;
+  expect(cardOf(done, CODES.harbor)?.progress).toBe(0);
+  expect(cardOf(done, CODES.westQuarter)?.progress).toBe(1);
+});
+
+/** Asfaloth (04110) on a hero, in the Action window of the combat phase of stage 1B; the trigger of his Action, when it is offered. */
+function asfaloth(layout: Parameters<typeof table>[0], effects: readonly Effect[]) {
+  const made = table({ phase: "Combat", attached: [{ code: "04110", to: "dh1" }], ...layout }, effects, ["04110"]);
+  const trigger = legalIntents(made.state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === "04110:action:1");
+  return { made, trigger };
+}
+
+lineSpec("06091:B:1", "does not offer an Action that would place progress on a location in the staging area only, and offers it once a location it may touch is in play (Asfaloth)", (effects) => {
+  const staged = asfaloth({ staging: [CODES.library] }, effects);
+  expect(staged.trigger).toBeUndefined();
+  // The unused Action costs nothing: Asfaloth stays ready.
+  expect(cardOf(staged.made.state, "04110")?.exhausted).toBe(false);
+  const withActive = asfaloth({ active: { code: CODES.westQuarter }, staging: [CODES.library] }, effects);
+  expect(withActive.trigger).toBeDefined();
+});
+
+lineSpec("06091:B:1", "says in a step that the bar kept the progress of an effect that touches each location with no choice (Northern Tracker)", (effects) => {
+  const made = table({ phase: "Quest", active: { code: CODES.westQuarter }, staging: [CODES.library], play: [{ code: "01045", seat: 0 }] }, effects, ["01045"]);
+  const run = send(opened(made), { type: "Commit", cardIds: [made.hero, idOf(made.state, "01045")] }, made.ctx);
+  const done = finish(send(run, { type: "Trigger", cardId: idOf(made.state, "01045"), effectId: "01045:response:1" }, made.ctx), made.ctx);
+  expect(cardOf(done.state, CODES.library)?.progress).toBe(0);
+  expect(done.steps.filter((step) => step.kind === "progress" && step.targetId === idOf(done.state, CODES.library))).toEqual([expect.objectContaining({ amount: 0 })]);
 });
 
 lineSpec("06091:B:3", "wins at the end of the round when no Osgiliath location is in the staging area or active, and not while one is", (effects) => {

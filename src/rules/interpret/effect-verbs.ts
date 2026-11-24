@@ -4,7 +4,7 @@ import { redirectProgress } from "../families/quest/blizzard.ts";
 import { progressToQuest, sendsProgressToQuest } from "../families/quest/doors.ts";
 import { holdPlacement, holdsProgress } from "../families/long-dark/hold.ts";
 import { effectProgressBarredOn } from "../families/quest/effect-progress.ts";
-import { playerProgressBarredOn } from "../families/pelargir/progress-bar.ts";
+import { noteBarred, playerProgressBarredOn } from "../families/pelargir/progress-bar.ts";
 import { frameScope, resolveAmount } from "./amounts.ts";
 import { hasTrait } from "./conditions.ts";
 import type { EngineStep } from "../core/intents.ts";
@@ -144,7 +144,11 @@ export function progressPlacer(state: ScenarioState, ctx: ReduceContext, seat: n
 // Progress on a location in play. A location that is full is explored and leaves play. `placedBy` is the player whose card effect placed it (progressPlacer); `byPlayerCard`: a player card's effect places it (the bar of 06091:B:1, families/pelargir/progress-bar.ts).
 export function placeProgress(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[], placedBy?: number, held = false, byPlayerCard = false): ScenarioState {
   const location = state.cards[id];
-  if (!location || effectProgressBarredOn(state, id) || playerProgressBarredOn(state, id, byPlayerCard)) return state;
+  if (!location || effectProgressBarredOn(state, id)) return state;
+  if (playerProgressBarredOn(state, id, byPlayerCard)) {
+    noteBarred(steps, id);
+    return state;
+  }
   // "Progress that would be placed on Doors of Durin is instead placed on the current quest card" (04065:A:1, families/quest/doors.ts).
   if (sendsProgressToQuest(state, id)) return progressToQuest(state, amount, ctx, steps);
   // "Before placing progress tokens on Twisting Passage" (04092:A:1, families/long-dark/hold.ts): the placement waits for the location's Forced effect, which places what is let through with `held`.

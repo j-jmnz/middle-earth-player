@@ -6,6 +6,7 @@ import { villagersOf } from "./villager-steps.ts";
 import { controlOf } from "../readouts/against-the-shadow/osgiliath-steps.ts";
 import { changeWords } from "../readouts/against-the-shadow/osgiliath.ts";
 import { changedWords } from "../words/scenarios/against-the-shadow/amon-din.ts";
+import { barredWords } from "../words/scenarios/against-the-shadow/osgiliath.ts";
 import { reshuffleWords } from "./pile-ids.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
@@ -104,7 +105,7 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
       return `The Ring-bearer's life ${signed(step.amount)}`;
     case "progress":
       // A removal (141026:B:2) is a step with a negative amount: say what left the card, never a minus sign.
-      return step.amount < 0 ? `${-step.amount} progress removed from ${names.card(step.targetId)}` : `${step.amount} progress on ${names.card(step.targetId)}`;
+      return step.amount < 0 ? `${-step.amount} progress removed from ${names.card(step.targetId)}` : step.amount === 0 ? barredWords(names.card(step.targetId)) : `${step.amount} progress on ${names.card(step.targetId)}`;
     case "destroy":
       // A location placed facedown underneath The Havens Burn is out of play and hidden: the line never names it (dcce.aflame).
       return step.under ? "A location burns and is placed facedown underneath The Havens Burn" : `${names.card(step.targetId)} is destroyed`;
