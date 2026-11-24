@@ -149,7 +149,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 06075 Burning Farmhouse (Villagers 4). A:2: at the end of the round 1 villager token is discarded from it, in the staging area or active.
     ...VILLAGERS("06075", "06075:A:1", 4),
-    { id: "06075:forced:3", cardCode: "06075", lines: ["06075:A:2"], timing: "forced", trigger: "endOfRound", subject: "self", instructions: [{ verb: "DiscardVillagerTokens", from: "self", amount: 1 }] },
+    { id: "06075:forced:3", cardCode: "06075", lines: ["06075:A:2"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "DiscardVillagerTokens", from: "self", amount: 1 }] },
 
     // 06076 Gondorian Hamlet (Villagers 3). A:2: while it is in the staging area, after a treachery is revealed from the encounter deck 1 villager token is discarded from it.
     ...VILLAGERS("06076", "06076:A:1", 3),
