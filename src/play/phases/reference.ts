@@ -6,8 +6,9 @@
 // video's "keep a round summary nearby".
 import steps from "../../../data/rules/steps.json";
 
-import type { ModeName, ScenarioState } from "../../rules/core/state.ts";
+import { flagged, type ModeName, type ScenarioState } from "../../rules/core/state.ts";
 
+import { UNDEFENDED_GUIDE } from "../words/scenarios/against-the-shadow/cair-andros.ts";
 import { pointNote, pointTitle } from "./rail.ts";
 import type { QuestStat } from "./quest-stat.ts";
 
@@ -37,8 +38,10 @@ const QUEST_STEPS: Readonly<Record<string, (stat: string) => string>> = {
   "3.4": (stat) => `${stat[0]?.toUpperCase()}${stat.slice(1)} against staging threat: progress, or your threat rises by the difference.`,
 };
 
-function decisionOf(step: string, stat: QuestStat | undefined): string | undefined {
+function decisionOf(step: string, stat: QuestStat | undefined, game: ScenarioState): string | undefined {
   const quest = stat && stat !== "willpower" ? QUEST_STEPS[step] : undefined;
+  // While stage 1B of The Siege of Cair Andros is current a Battleground location takes the undefended attack, not a hero (05072:B:2).
+  if (step === "6.E" && game.questStage != null && flagged(game, game.questStage, "undefendedToBattleground")) return UNDEFENDED_GUIDE;
   return quest && stat ? quest(stat) : DECISIONS[step];
 }
 
@@ -88,7 +91,7 @@ export function turnReference(game: ScenarioState, title: (id: string) => string
   const now = STEP_OF[game.mode] ?? null;
   const phases: ReferencePhase[] = [];
   for (const row of steps as readonly StepRow[]) {
-    const decision = decisionOf(row.id, stat);
+    const decision = decisionOf(row.id, stat, game);
     if (!decision) continue;
     const step: ReferenceStep = {
       id: row.id,
@@ -120,7 +123,7 @@ const ASKS: Readonly<Record<string, string>> = { "2.P": "pass", "3.2": "pass", "
 export function guideLine(game: ScenarioState, window: boolean, stat?: QuestStat): { key: string; text: string } | null {
   if (window) return { key: "window", text: "An action window: play an event or use an Action now, or pass and the game moves on." };
   const step = stepOf(game);
-  const decision = step ? decisionOf(step, stat) : undefined;
+  const decision = step ? decisionOf(step, stat, game) : undefined;
   if (!step || !decision || game.window?.kind == null || ASKS[step] !== game.window.kind) return null;
   return { key: step, text: decision };
 }

@@ -32,6 +32,7 @@ import { fortitudeNumbers } from "./fortitude.ts";
 import { mountDoomQuestNote } from "./mount-doom.ts";
 import { seatLevel } from "./threat-level.ts";
 import { pelennorQuestWords } from "./pelennor.ts";
+import { undefendedRemoves } from "./against-the-shadow/cair-andros.ts";
 import { siegeProgressWords } from "./siege.ts";
 import { sailingReadout } from "./sea-readout.ts";
 import type { Sheet, SheetStat } from "../choice/sheet-types.ts";
@@ -142,7 +143,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
       return { kind: "defense", stats: [ATTACK(strength), DEFENSE(defense)], result: `${damageWords(strength, defense)}${shadowNote}${destroyed}` };
     }
     const hit = attack.heroId ?? (picked?.role === "hit" ? picked.id : undefined);
-    if (hit) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${shadowNote}${destroyedWords(game, ctx, hit, strength, cardName, shadowNext)}` };
+    if (hit) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${undefendedRemoves(game, hit, strength)}${shadowNote}${destroyedWords(game, ctx, hit, strength, cardName, shadowNext)}` };
     // The one hero the damage may go on (Gollum's attack from the riddle area, a shadow effect that names the hero) is named before it is picked.
     const only = attack.onlyHeroes?.length === 1 && !attack.undefended ? attack.onlyHeroes[0] : undefined;
     if (only && game.cards[only]) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended, ${cardName(only)} takes ${strength}${shadowNote}` };

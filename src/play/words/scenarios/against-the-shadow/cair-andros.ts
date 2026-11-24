@@ -2,9 +2,8 @@
 // The words of The Siege of Cair Andros' table pieces: the damage on each Battleground location against the number that removes it from the game, the stage lines (where undefended damage goes, the extra Threat and reveal, the victory points toward Battle), the stages removed from the
 // quest deck and a hero whose resources cannot be spent. Damage is never worded as progress (ats.cair-andros-location-damage). Pure.
 
-/** What a Battleground location's preview says: its damage against the limit, and what reaching it does (it is removed from the game, never explored, so no Response and no victory points). */
-export const battlegroundWords = (name: string, damage: number, limit: number): string =>
-  `${damage} of ${limit} damage. At ${limit} ${name} is removed from the game: it is not explored, its Response is not used and its victory points are not collected`;
+/** What a Battleground location's preview says: its damage against the limit, and what reaching it does (the card prints the rest). */
+export const battlegroundWords = (damage: number, limit: number): string => `${damage} of ${limit} damage. At ${limit} it is removed: no Response, no victory points.`;
 
 /** What a Battleground location's top-bar dial says it counts toward. */
 export const battlegroundDialWords = (name: string, limit: number): string => `${name} is removed from the game at ${limit} damage: it is not explored and its victory points are not collected`;
@@ -16,7 +15,13 @@ export const battlegroundNearWords = (name: string, damage: number, limit: numbe
 export const undefendedWords = (names: readonly string[]): string =>
   names.length === 0
     ? "No Battleground location is in play: the quest advances to the next stage at once"
-    : `An undefended attack deals all its damage to ${names.length === 1 ? names[0] : `one of ${names.join(" and ")}`}, the lowest Threat Battleground location in play, and none to a hero`;
+    : `Undefended damage goes to ${names.length === 1 ? names[0] : `one of ${names.join(" and ")}`} now.`;
+
+/** The attack sheet's 6.E guide while stage 1B is current. */
+export const UNDEFENDED_GUIDE = "Each enemy attacks: declare one defender, or leave it undefended: a Battleground location takes it.";
+
+/** The readout line of an undefended attack that alone reaches the limit of the location it lands on. */
+export const removesWords = (): string => "; it is removed from the game";
 
 /** The choice sheet of an attack while stage 1B sends the damage to a location: the location, the damage it holds and whether this attack removes it. */
 export const undefendedSheetWords = (name: string, damage: number, limit: number, attack: number): string =>

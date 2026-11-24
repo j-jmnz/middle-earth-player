@@ -12,11 +12,14 @@ import { stagePlace } from "../../../rules/families/quest/branch.ts";
 import { questPointsOf } from "../../../rules/quest/quest.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
-import { battleTurnWords, battlegroundDialWords, battlegroundNearWords, extraRevealWords, removedStagesWords, stagingThreatWords, undefendedSheetWords, undefendedWords } from "../../words/scenarios/against-the-shadow/cair-andros.ts";
+import { battleTurnWords, removesWords, battlegroundDialWords, battlegroundNearWords, extraRevealWords, removedStagesWords, stagingThreatWords, undefendedSheetWords, undefendedWords } from "../../words/scenarios/against-the-shadow/cair-andros.ts";
 import type { TableDial } from "../dials.ts";
 
 /** The number of damage that removes this card from the game (`removedAtDamage`), or 0 for a card without it. */
 export const removalLimit = (game: ScenarioState, id: string): number => (game.modifiers.length > 0 ? heldAmount(game, id, "removedAtDamage") : 0);
+
+/** The five stages of The Siege of Cair Andros (05072 to 05076). */
+const STAGE_CODES: ReadonlySet<string> = new Set(["05072", "05073", "05074", "05075", "05076"]);
 
 const printedName = (ctx: ReduceContext, card: CardInstance): string => printedOf(ctx.cards, card.code).name;
 
@@ -28,7 +31,7 @@ function limited(game: ScenarioState, ctx: ReduceContext): readonly CardInstance
   });
 }
 
-/** The dials of the Battleground locations that hold damage: its tokens against the limit, warming one short of it (the next damage removes the location). A location with no damage has none; its preview says the limit. */
+/** The dials of the Battleground locations that hold damage: its tokens against the limit (the disc reads "2/11" with the damage icon, and a tap shows the card), warming one short of it (the next damage removes the location). A location with no damage has none; its preview says the limit. */
 export function cairAndrosDials(game: ScenarioState, ctx: ReduceContext): readonly TableDial[] {
   return limited(game, ctx)
     .filter((card) => card.damage > 0)
@@ -42,6 +45,10 @@ export function cairAndrosDials(game: ScenarioState, ctx: ReduceContext): readon
         label: short,
         name: `Damage on ${name}, ${card.id === game.activeLocation ? "the active location" : "in the staging area"}, ${limit} removes it from the game:`,
         value: card.damage,
+        // The disc says the damage with its limit ("2/11") and the damage token under it; a tap shows the location's card, whose preview says what removes it.
+        word: `${card.damage}/${limit}`,
+        icon: "damage" as const,
+        cardId: card.id,
         limit,
         warms: true,
         ...(card.damage >= limit - 1 ? { warn: { level: "near" as const, words: battlegroundNearWords(name, card.damage, limit) } } : {}),
@@ -88,6 +95,8 @@ function battleTurn(game: ScenarioState, ctx: ReduceContext, code: string): { po
  * removed from the quest deck. Empty for a stage that is not current and for any other scenario.
  */
 export function cairAndrosStageLines(game: ScenarioState, ctx: ReduceContext, code: string): string[] {
+  // The stat names `revealMore` and `moreStagingThreat` are other scenarios' too (Fire in the Night, Journey Along the Anduin, Helm's Deep): only this scenario's stages are worded here.
+  if (!STAGE_CODES.has(code)) return [];
   const stage = game.questStage ? game.cards[game.questStage] : undefined;
   if (!stage || stage.code !== code) return [];
   const lines: string[] = [];
@@ -115,4 +124,11 @@ export function undefendedRedirectWords(game: ScenarioState, ctx: ReduceContext,
   const name = printedName(ctx, first);
   if (targets.length > 1) return `Undefended: ${targets.map((card) => printedName(ctx, card)).join(" or ")} takes all of it, the one you choose, and no hero does.`;
   return undefendedSheetWords(name, first.damage, removalLimit(game, first.id), attack);
+}
+
+/** "; it is removed from the game" when the damage of an undefended attack alone reaches the removal limit of the Battleground location it lands on, else "". */
+export function undefendedRemoves(game: ScenarioState, id: string, strength: number): string {
+  const card = game.cards[id];
+  const limit = removalLimit(game, id);
+  return card && limit > 0 && card.damage + strength >= limit ? removesWords() : "";
 }

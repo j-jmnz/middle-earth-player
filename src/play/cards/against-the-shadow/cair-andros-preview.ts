@@ -11,19 +11,21 @@ import { effectsOf } from "../../../rules/windows/listen.ts";
 import { removalLimit } from "../../readouts/against-the-shadow/cair-andros.ts";
 import { arbalestersWords, battlegroundWords, lockedResourcesWords } from "../../words/scenarios/against-the-shadow/cair-andros.ts";
 
+// Orc Arbalesters, the one card of this scenario with Archery X: other cards hold an `archeryBonus` (Wooded Shoreline, 142078) and say nothing here.
+const ARBALESTERS = "05057";
+
 const hasStat = (ctx: ReduceContext, code: string, stat: string): boolean => (effectsOf(ctx, code) as readonly Effect[]).some((effect) => effect.timing === "constant" && effect.instructions.some((step) => step.verb === "ModifyStat" && step.stat === stat));
 
 /** The muted line under the card's name in its preview, or null. */
 export function cairAndrosDetail(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
   const card = game.cards[cardId];
   if (!card) return null;
-  const name = printedOf(ctx.cards, card.code).name;
   const limit = removalLimit(game, cardId);
-  if (limit > 0 && (card.zone === "staging" || cardId === game.activeLocation)) return battlegroundWords(name, card.damage, limit);
+  if (limit > 0 && (card.zone === "staging" || cardId === game.activeLocation)) return battlegroundWords(card.damage, limit);
   if (resourcesLocked(game, cardId)) {
     const source = Object.values(game.cards).find((other) => other.zone === "staging" && hasStat(ctx, other.code, "cannotSpendResources"));
     return lockedResourcesWords(source ? printedOf(ctx.cards, source.code).name : "a card");
   }
-  if (hasStat(ctx, card.code, "archeryBonus") && (card.zone === "staging" || card.zone === "engaged")) return arbalestersWords(cardArchery(game, ctx.cards, card).own);
+  if (card.code === ARBALESTERS && hasStat(ctx, card.code, "archeryBonus") && (card.zone === "staging" || card.zone === "engaged")) return arbalestersWords(cardArchery(game, ctx.cards, card).own);
   return null;
 }

@@ -16,6 +16,7 @@ import { oathDetail } from "./oath-preview.ts";
 import { delayedLines, effectLines } from "./card-effects.ts";
 import type { PreviewCard } from "./card-preview.tsx";
 import { stageDetail } from "../readouts/fortress.ts";
+import { removalLimit } from "../readouts/against-the-shadow/cair-andros.ts";
 import { advanceHold, questObjective, stagePoints } from "../readouts/objective.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { forestScore, forestStageWords } from "../readouts/standalone-scenarios/old-forest-words.ts";
@@ -124,7 +125,8 @@ export function previewCards(
     const heading = game.sea?.headingCard === id ? headingStepOf(game.sea?.heading) : null;
     const turned = heading ? { title: headingPreviewTitle(heading), turn: headingLook(heading).turn } : {};
     const steps = heading ? { steps: headingPreviewSteps(heading).map((row) => ({ text: row.line, current: row.current })) } : {};
-    const tokens = tokenLines(card, flagged(game, id, "progressRedirect") ? BLIZZARD_LIMIT : undefined);
+    // A Battleground location's preview line says its damage against its limit, so the token line does not say the damage a second time.
+    const tokens = tokenLines(removalLimit(game, id) > 0 ? { ...card, damage: 0 } : card, flagged(game, id, "progressRedirect") ? BLIZZARD_LIMIT : undefined);
     const keywords = previewKeywords(game, ctx, id, described.text, options.ruleDoc ?? null);
     const sides = contractSides(printedOf(ctx.cards, card.code).type, described.text);
     if (sides) {

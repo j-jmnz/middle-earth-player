@@ -1,12 +1,17 @@
+import type { Condition } from "../../../catalog/boundary.ts";
 import type { Ask } from "../asks.ts";
+
+// The 2 damage of the shadow reach the limit of the named location (its quest points equal its removal limit): said by the note, read with the engine's reader.
+const REMOVES = (name: string): Condition => ({ kind: "less", left: { stat: "questPoints", ofNamed: name }, right: { stat: "damage", ofNamed: name, plus: 3 } });
+const SHADOW_NOTE = (card: string, name: string) => [{ when: REMOVES(name), text: `${card}: ${name} takes 2 damage, and the attacker gets no +2 Attack. This removes it from the game.` }, { text: `${card}: ${name} takes 2 damage, and the attacker gets no +2 Attack.` }] as const;
 
 // The choice words of The Siege of Cair Andros (against-the-shadow part 3), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-siege-of-cair-andros --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-siege-of-cair-andros` prints each sentence.
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 05030:A:3, 05031:A:3, 05032:A:2 (Shadow): the named Battleground location is in play, so it takes 2 damage and the attacker gets no +2 Attack. The defending player's own shadow card, so the seat is the defender's.
-  "05030:shadow:1 @1 Pick": { owned: true, note: "Orc Scramblers: The Citadel is in play. Choose it to take 2 damage. The attacking enemy gets no +2 Attack.", verb: "Damage" },
-  "05031:shadow:1 @1 Pick": { owned: true, note: "Battering Ram: The Approach is in play. Choose it to take 2 damage. The attacking enemy gets no +2 Attack.", verb: "Damage" },
-  "05032:shadow:1 @1 Pick": { owned: true, note: "Siege Raft: The Banks is in play. Choose it to take 2 damage. The attacking enemy gets no +2 Attack.", verb: "Damage" },
+  "05030:shadow:1 @1 Pick": { owned: true, note: SHADOW_NOTE("Orc Scramblers", "The Citadel"), verb: "Damage" },
+  "05031:shadow:1 @1 Pick": { owned: true, note: SHADOW_NOTE("Battering Ram", "The Approach"), verb: "Damage" },
+  "05032:shadow:1 @1 Pick": { owned: true, note: SHADOW_NOTE("Siege Raft", "The Banks"), verb: "Damage" },
   // 05032:A:1 (Siege Raft, When Revealed): 2 damage to the lowest Threat Battleground location in play; the Pick opens only when locations tie, and the first player breaks the tie.
   "05032:whenRevealed:1 @0 Pick": { owned: true, note: "Siege Raft: Battleground locations are tied for the lowest Threat. Choose the one that takes 2 damage. The first player chooses.", verb: "Damage" },
   // 05055:A:2 (Southron Support, When Revealed): each player searches the encounter deck and discard pile for 1 Harad enemy and adds it to the staging area, if able.
