@@ -38,7 +38,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "06105:whenRevealed:1 @1 stage": { label: "Do not exhaust: add the discarded location to the staging area" },
   "06105:whenRevealed:1 @1.take.0 Pick": { owned: true, note: "Street Fighting: choose a hero you control to exhaust. You take control of the discarded location.", verb: "Exhaust" },
   // 06106:A:2 (Counter-attack): each player, the first player first, returns the controlled location with the highest Threat or raises his threat by the total Threat of the locations he controls.
-  "06106:whenRevealed:1 @0.0 Choose": { owned: true, note: "Counter-attack: return the location you control with the highest Threat to the staging area, or raise your threat by the total Threat of the locations you control." },
+  "06106:whenRevealed:1 @0.0 Choose": { owned: true, note: "Counter-attack: return your highest-Threat location to the staging area, or raise your threat by the Threat of all your locations." },
   "06106:whenRevealed:1 @0.0 return": { label: "Return your highest-Threat location to the staging area" },
   "06106:whenRevealed:1 @0.0 raise": { label: "Raise your threat by the total Threat of your locations" },
   "06106:whenRevealed:1 @0.0.return.0 Pick": { owned: true, note: "Counter-attack: choose, among the locations you control with the highest Threat, the one to return to the staging area. Its progress is removed.", verb: "Return" },
