@@ -46,5 +46,5 @@ lineSpec("06096:A:1", "is used from West Gate while the first player controls it
   expect(trigger).toBeDefined();
   const run = drive(made, send(quested, trigger as PlayerIntent, made.ctx), (state) => state.activeLocation != null);
   expect(cardOf(run.state, CODES.westGate)).toMatchObject({ zone: "activeLocation", progress: 0, controller: null });
-  expect(run.state.modifiers.some((modifier) => modifier.stat === "controlledBy")).toBe(false);
+  expect(run.state.modifiers.some((modifier) => modifier.stat === "controlSeat")).toBe(false);
 });

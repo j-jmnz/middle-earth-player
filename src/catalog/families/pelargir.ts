@@ -86,7 +86,7 @@ const VERBS = [
   // controls it acts for the instructions after it. Nothing is picked when no character is in play. src/rules/families/pelargir/fewest.ts.
   z.strictObject({ verb: z.literal("PickFewestHitPointsLeft"), ...when }),
   // "The first player takes control of that location" (06091:B:2; 06105:A:1, ats.controlling-locations): the location the reference names (`subject`, the explored location the Forced effect hears, by default; `picked`, the location a discard stopped at) goes from the discard pile, the victory display,
-  // the staging area or the active slot into the first player's play area: faceup, ready, with no progress, its text working there. The table notes who controls it (the flag `controlledBy`), so the loss of that control is seen wherever it comes from. A location already in a play area, or a card that is no location, is left as it is.
+  // the staging area or the active slot into the first player's play area: faceup, ready, with no progress, its text working there. The table notes who controls it (the flag `controlSeat`), so the loss of that control is seen wherever it comes from. A location already in a play area, or a card that is no location, is left as it is.
   z.strictObject({ verb: z.literal("TakeControlOfLocation"), card: cardRefSchema.optional(), ...when }),
   // "Return a location he controls to the staging area" (06093:A:1, 06100:A:2, 06106:A:2; ats.losing-control-of-locations): the location the reference names (`picked` by default) goes to the staging area with its progress removed and nobody controls it; the table announces `controlLost`. A card that is not controlled is left as it is.
   z.strictObject({ verb: z.literal("LoseControlOfLocation"), card: cardRefSchema.optional(), ...when }),
@@ -169,7 +169,7 @@ const FLAGS = [
   // On the table while a stage is in play: progress placed by a player card's effect on a location in the staging area is not placed ("Player card effects cannot place progress tokens on locations in the staging area", 06091:B:1). Read where an effect places progress on a location (src/rules/families/pelargir/progress-bar.ts).
   "noProgressInStagingByPlayer",
   // On a location a player controls: the seat that took control, plus 1 (no record sets it; TakeControlOfLocation writes it and a settle sweep reads it to see the control lost). Held until the control is lost.
-  "controlledBy",
+  "controlSeat",
 ] as const;
 
 // The underworld deck lies set aside facedown, and the Villain and the Plot the Setup hides stay set aside facedown (06011:A:1): the table lists them as facedown cards without a name.

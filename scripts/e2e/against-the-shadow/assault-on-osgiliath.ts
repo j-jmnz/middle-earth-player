@@ -2,7 +2,7 @@
 // with the moments the table shows here, parked on the loss. A cycle has no log and no earlier part. There is no won fixture: the registry names none, so the finder plays for none (docs/architecture.md, Tests).
 // The saved decklists' policy answers the scenario's questions as the goldens do (`assaultIntent`, test/scenarios/assault-on-osgiliath/game.ts): the Setup takes the first enemy and the first unique location, the seat keeps its last two heroes out of the
 // quest, travels to the Osgiliath location with the fewest quest points (Ruined Tower as the second active location), each seat engages up to three enemies, the heroes attack one enemy each, a hero defends when he may and the cards of the hand are played.
-import { assaultIntent, controlledIds, type AssaultPolicy } from "../../../test/scenarios/assault-on-osgiliath/game.ts";
+import { assaultIntent, controlledIds, DEFAULT_POLICY, type AssaultPolicy } from "../../../test/scenarios/assault-on-osgiliath/game.ts";
 import { createLog } from "../../log.ts";
 import { firstStandaloneSeed, type StandaloneSeedSpec } from "../seed-kit.ts";
 import type { ScenarioState } from "../../../src/rules/core/state.ts";
@@ -35,7 +35,8 @@ function note(state: ScenarioState, previous: ScenarioState | undefined): void {
   }
 }
 
-const POLICY: Partial<AssaultPolicy> = { choose: "first", reserve: 2, engage: 3, play: true };
+// The goldens' policy, with the cards of the hand played.
+const POLICY: Partial<AssaultPolicy> = { play: true };
 const last = new Map<number, ScenarioState>();
 const spec: StandaloneSeedSpec<2> = {
   campaignId: "against-the-shadow",
@@ -44,7 +45,7 @@ const spec: StandaloneSeedSpec<2> = {
   answer: (state, ctx, memory) => {
     note(state, last.get(state.seed));
     last.set(state.seed, state);
-    return assaultIntent(state, ctx, memory, { choose: "first", enemy: "", location: "", reserve: 2, engage: 3, undefended: 0, retravel: 0, tower: true, play: true, ...POLICY });
+    return assaultIntent(state, ctx, memory, { ...DEFAULT_POLICY, ...POLICY });
   },
 };
 

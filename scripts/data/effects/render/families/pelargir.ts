@@ -160,6 +160,6 @@ export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
   gameEnding: " (held by the table until the end of the game: the game is ending; Rescued Villagers and Dead Villagers compare their tokens once Ghulat is not in play)",
   endingLost: " (held by the table until the end of the game: Lord Alcaron left play; the players lose once Ghulat is not in play, checked at every settle)",
   noProgressInStagingByPlayer: " (held by the table while the stage is in play: progress a player card's effect would place on a location in the staging area is not placed; an active location, a location in a play area and any encounter card's or location's own effect are not barred)",
-  controlledBy: " (held by a location a player controls, the amount is the seat plus 1: written by TakeControlOfLocation and read by a settle sweep that sees the control lost; not set by a record)",
+  controlSeat: " (held by a location a player controls, the amount is the seat plus 1: written by TakeControlOfLocation and read by a settle sweep that sees the control lost; not set by a record)",
   firstEnemyNoted: " (held by the table until the end of the round: an enemy was already marked firstEnemy this round)",
 };

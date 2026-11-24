@@ -1,10 +1,11 @@
-// Test helpers for the Assault on Osgiliath tests (src/rules/families/pelargir/osgiliath.test.ts, src/campaign/scenarios/assault-on-osgiliath/): a table of the scenario, a game driven through its windows, a card's id and zone.
+// Test helpers for the Assault on Osgiliath tests (src/campaign/scenarios/assault-on-osgiliath/, src/play/scenarios/assault-on-osgiliath-table.test.ts): a table of the scenario, a game driven through its windows, a card's id and zone.
 import type { Effect } from "../../../src/catalog/boundary.ts";
 import type { ScenarioState } from "../../../src/rules/core/state.ts";
 import type { PlayerIntent } from "../../../src/rules/engine/reduce.ts";
 import { takeControlOfLocation } from "../../../src/rules/families/pelargir/location-control.ts";
 import { syncConstants } from "../../../src/rules/interpret/constants.ts";
 
+import { controlledIds } from "./game.ts";
 import { idOf, legalIntents, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../harness/scene-kit.ts";
 
 export const SCENARIO = "assault-on-osgiliath";
@@ -76,7 +77,7 @@ export const cardOf = (state: ScenarioState, code: string) => state.cards[idOf(s
 export const playOf = (state: ScenarioState, seat = 0): readonly string[] => state.seats[seat]?.play ?? [];
 
 /** The codes of the locations a player controls (the table notes the control on the card). */
-export const controlled = (state: ScenarioState): string[] => state.modifiers.filter((modifier) => modifier.stat === "controlledBy").map((modifier) => state.cards[modifier.instanceId]?.code ?? "");
+export const controlled = (state: ScenarioState): string[] => controlledIds(state).map((id) => state.cards[id]?.code ?? "");
 
 /** The id of the first card with this code, whatever its zone. */
 export const idByCode = (state: ScenarioState, code: string): string => Object.values(state.cards).find((card) => card.code === code)?.id ?? "";

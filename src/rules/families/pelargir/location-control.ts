@@ -1,6 +1,6 @@
 // Rules: ats.controlling-locations, ats.losing-control-of-locations, rr.explored, rr.in-play-and-out-of-play, rr.ownership-and-control, rr.travel, rr.active-location, rr.player-elimination (data/rules/entries.json); ledger lines 06091:B:2, 06093:A:1, 06103:A:1, 06103:A:2, 06105:A:1
 // (docs/scenarios/against-the-shadow/assault-on-osgiliath.md, Engine notes).
-// A location a player controls lies in his play area (a seat's `play` list), faceup, with its text working. TakeControlOfLocation puts it there and notes the seat on the card (the flag `controlledBy`, the seat plus 1); the control is lost when the location is
+// A location a player controls lies in his play area (a seat's `play` list), faceup, with its text working. TakeControlOfLocation puts it there and notes the seat on the card (the flag `controlSeat`, the seat plus 1); the control is lost when the location is
 // in no play area any more. Every way to lose it is seen in one place, the settle sweep: a record that returns the location (LoseControlOfLocation, ReturnToStaging on the card itself), a travel to it or a card that makes it the active location (West Gate), and
 // the cards of an eliminated player, which the core sends to the encounter discard pile. A loss removes the progress, leaves the location in the staging area and announces `controlLost` for the seat that held it.
 import type { Instruction } from "../../../catalog/boundary.ts";
@@ -13,6 +13,7 @@ import { heldAmount, updateCard, type ScenarioState } from "../../core/state.ts"
 import { moveCard } from "../../core/zones.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
+import { TOWER } from "./ruined-tower.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { effectData } from "../encounter/moves.ts";
@@ -20,7 +21,7 @@ import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-const CONTROLLED_BY = "controlledBy" as const;
+const CONTROLLED_BY = "controlSeat" as const;
 
 function isLocation(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
   const card = state.cards[id];
@@ -104,8 +105,7 @@ export function controlledTravelCost(state: ScenarioState, ctx: ReduceContext, l
   return { source: locationId, instructions: [{ verb: "LoseControlOfLocation", card: "self" }] };
 }
 
-/** Ruined Tower (06103). */
-export const TOWER = "06103";
+export { TOWER };
 
 /** Ruined Tower may be traveled to as a second active location: exactly 1 active location is there and the second slot is free ("If there is 1 active location, exhaust a character to travel here. (There are now 2 active locations.)", 06103:A:1, faq.two-active-locations). */
 export function towerSecond(state: ScenarioState, locationId: string): boolean {

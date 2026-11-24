@@ -8,6 +8,7 @@ import { printedOf } from "../../../rules/core/printed.ts";
 import type { CardInstance, ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { controllerOf, controlledLocations } from "../../../rules/families/pelargir/location-control.ts";
+import { TOWER } from "../../../rules/families/pelargir/ruined-tower.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
 import { commanderWords, controlledWords, dialName, lostWords, pinnedWords, PROGRESS_BAR_WORDS, TAKE_CONTROL_WORDS, tookWords, towerWords, undefendedLocationsWords, undefendedReturnWords, winWords } from "../../words/scenarios/against-the-shadow/osgiliath.ts";
@@ -17,7 +18,6 @@ const SCENARIO = "assault-on-osgiliath";
 const STAGE = "06091";
 const PINNED_DOWN = "06104";
 const COMMANDER = "06095";
-const TOWER = "06103";
 
 /** Whether the game is Assault on Osgiliath: every hook below keys on it. */
 export const live = (game: ScenarioState): boolean => game.scenarioId === SCENARIO;

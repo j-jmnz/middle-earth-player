@@ -13,11 +13,14 @@ import { afterProgress } from "../../quest/stage-reveal.ts";
 import { openBranch } from "../../windows/choices.ts";
 import type { Focus } from "../index.ts";
 import { placeOn, progressRoom } from "../south/locations.ts";
+import { TOWER } from "../pelargir/ruined-tower.ts";
 import { DOCK } from "./travel.ts";
 
 // The locations whose text lets the players divide the progress between two active locations: Fisherman's Dock and Ruined Tower (06103, Assault on Osgiliath: the same second active location, faq.two-active-locations).
-const SPLITTERS: readonly string[] = [DOCK, "06103"];
+const SPLITTERS: readonly string[] = [DOCK, TOWER];
 const splits = (state: ScenarioState, id: string | null): boolean => id != null && SPLITTERS.includes(state.cards[id]?.code ?? "");
+
+const involvesTower = (state: ScenarioState): boolean => [state.activeLocation, state.secondActiveLocation].some((id) => id != null && state.cards[id]?.code === TOWER);
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -45,8 +48,8 @@ export function splitProgress(state: ScenarioState, instruction: Split, focus: F
   let next = state;
   if (one != null) next = placeOn(next, one, instruction.onFirst, ctx.cards, steps);
   if (two != null) next = placeOn(next, two, amount - instruction.onFirst, ctx.cards, steps);
-  // A location the share explored has left play: the cards that answer it hear it, as for progress placed by the quest itself (rr.explored; Ruined Tower's explore is taken by 06091:B:2).
-  return afterProgress(next, before, ctx, steps);
+  // A location the share explored has left play: the cards that answer it hear it (rr.explored; Ruined Tower's explore is taken by 06091:B:2). Only a split with Ruined Tower announces it: The Battle of Lake-town's Dock split plays as it always did.
+  return involvesTower(state) ? afterProgress(next, before, ctx, steps) : next;
 }
 
 /** The room each active location has for progress now, when the players divide it between two (Fisherman's Dock is one of them): [first, second], or null when there is no choice (no Dock, a location without quest points or room, or the progress fills both). */

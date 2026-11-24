@@ -1,7 +1,7 @@
 // Rules: rr.setup, rr.winning-the-game, rr.explored, rr.travel, rr.active-location, rr.player-elimination, rr.threat-elimination-level, ats.setup-assault-on-osgiliath, ats.controlling-locations, ats.losing-control-of-locations, faq.two-active-locations, hon.siege, hon.battle, ltp.scoring (data/rules/entries.json).
 import { describe, expect, it } from "vitest";
 
-import { ASSAULT_GOLDENS, assaultWorld, controlledIds, HARADRIM_ELITE, playGolden, RETAKE, WEST_GATE, type AssaultDecks, type AssaultGolden } from "../../../../test/scenarios/assault-on-osgiliath/game.ts";
+import { ASSAULT_GOLDENS, assaultWorld, controlledIds, HARADRIM_ELITE, OSGILIATH, playGolden, RETAKE, WEST_GATE, type AssaultDecks, type AssaultGolden } from "../../../../test/scenarios/assault-on-osgiliath/game.ts";
 import { controlledCodes, momentsOf, questKeyword, shadowReturns, stepsByIntent, type Moment } from "../../../../test/scenarios/assault-on-osgiliath/moments.ts";
 import type { ScenarioState } from "../../../../src/rules/core/state.ts";
 import { loadAnyScenario, loadCampaign } from "../../../../scripts/data/load-scenarios.ts";
@@ -12,8 +12,6 @@ const assault = loadAnyScenario("assault-on-osgiliath");
 const codeOf = (state: ScenarioState, id: string | null | undefined): string => state.cards[id ?? ""]?.code ?? "";
 const idOf = (moments: readonly Moment[], kind: Moment["kind"], at: number): string => moments.find((moment) => moment.kind === kind && moment.at === at)?.id ?? "";
 const golden = (name: string): AssaultGolden => ASSAULT_GOLDENS.find((entry) => entry.name === name) as AssaultGolden;
-// The Osgiliath locations: the cards of the Assault on Osgiliath set that are locations (06096 to 06103).
-const OSGILIATH: ReadonlySet<string> = new Set(["06096", "06097", "06098", "06099", "06100", "06101", "06102", "06103"]);
 const osgiliathIn = (state: ScenarioState): string[] => [...state.staging, state.activeLocation ?? "", state.secondActiveLocation ?? ""].map((id) => codeOf(state, id)).filter((code) => OSGILIATH.has(code));
 const list = (moments: readonly Moment[], kind: Moment["kind"]): string[] => moments.filter((moment) => moment.kind === kind).map((moment) => `${moment.at}:${moment.code}`);
 const keptOf = (played: { kept: ScenarioState; trail?: ScenarioState[] }, at: number): ScenarioState => (at === 0 ? played.kept : (played.trail?.[at - 1] as ScenarioState));

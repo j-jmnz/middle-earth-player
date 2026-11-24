@@ -1,3 +1,4 @@
+import { TOWER } from "../../../src/rules/families/pelargir/ruined-tower.ts";
 import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
@@ -46,14 +47,16 @@ export const DEFAULT_POLICY: AssaultPolicy = { choose: "first", enemy: "", locat
 
 export const RETAKE = "06091";
 export const WEST_GATE = "06096";
-export const TOWER = "06103";
+export { TOWER };
+/** The Osgiliath locations: the cards of the Assault on Osgiliath set that are locations (06096 to 06103). */
+export const OSGILIATH: ReadonlySet<string> = new Set(["06096", "06097", "06098", "06099", "06100", "06101", "06102", TOWER]);
 /** The unique locations the Setup offers. */
 export const UNIQUE = ["06096", "06097", "06098", "06099"] as const;
 export const HARADRIM_ELITE = "05053";
 const codeOf = (state: ScenarioState, id: string | null | undefined): string => state.cards[id ?? ""]?.code ?? "";
 
 /** The ids of the locations the players control (the table notes the first player's seat on the card). */
-export const controlledIds = (state: ScenarioState): string[] => state.modifiers.filter((modifier) => modifier.stat === "controlledBy").map((modifier) => modifier.instanceId);
+export const controlledIds = (state: ScenarioState): string[] => state.modifiers.filter((modifier) => modifier.stat === "controlSeat").map((modifier) => modifier.instanceId);
 const controlsUnique = (state: ScenarioState): boolean => controlledIds(state).some((id) => (UNIQUE as readonly string[]).includes(codeOf(state, id)));
 
 /** A Choose window: the Setup's enemy and unique location by the codes the policy names (an option is a card id for the enemy and a card code for the location), any other choice the first or last option. */
