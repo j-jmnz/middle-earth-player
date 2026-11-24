@@ -7,6 +7,7 @@ import { send, revealFromTop, type LayoutTable, type Run } from "../../../test/h
 import { CODES, table } from "../../../test/scenarios/the-druadan-forest/table.ts";
 import type { Sheet, SheetNames } from "../choice/sheet-types.ts";
 import { sheetFor } from "../choice/sheets.ts";
+import { holdsProwl } from "./group-steps.ts";
 
 const sheetOf = (made: LayoutTable, state: Run["state"]): Sheet | null => {
   const names: SheetNames = { card: (id) => made.ctx.cards.get(state.cards[id]?.code ?? "")?.name ?? state.cards[id]?.code ?? id, line: () => null };
@@ -36,17 +37,34 @@ describe("06047:A:1 Prowl X, the sheets", () => {
   it("06047:A:1 the first player's Choose says the discard is of his own heroes, what is left, and that he may stop; the pick after it says the same count", () => {
     const made = table({ seats: 2, heroResources: 2, phase: "Quest", deck: ["f0", "f0"] });
     const seen = sheets(made, CODES.elite, ["discard", (options) => options[0] ?? "", "stop"]);
-    expect(seen[0]?.note).toBe("Player 1, Drúadan Elite: its Prowl makes the players discard resources from their heroes. Discard 1 resource from one of your heroes, or stop and leave the rest to the players after you. Left to discard: 2.");
+    expect(seen[0]?.note).toBe("Player 1: Left to discard: 2. Discard 1 resource from one of your heroes, or stop and leave the rest to the players after you.");
     expect(seen[0]?.rows).toEqual(["Discard 1 resource from one of your heroes", "Stop: the players after you discard the rest"]);
-    expect(seen[1]?.note).toBe("Player 1, Drúadan Elite: its Prowl makes the players discard resources from their heroes. Choose one of your heroes to discard 1 resource from. Left to discard: 2.");
+    expect(seen[1]?.note).toBe("Player 1: Left to discard: 2. Choose one of your heroes to discard 1 resource from.");
     expect(seen[2]?.note).toContain("Left to discard: 1.");
   });
 
   it("06048:A:1 a Prowl 1 of the Hunter counts one resource left, and the second player is asked for the rest as a discard", () => {
     const made = table({ seats: 2, heroResources: 1, phase: "Quest", deck: ["f0", "f0"] });
     const seen = sheets(made, CODES.hunter, ["stop", (options) => options[0] ?? ""]);
-    expect(seen[0]?.note).toContain("Drúadan Hunter: its Prowl");
-    expect(seen[0]?.note).toContain("Left to discard: 1.");
+    expect(seen[0]?.note).toContain("Player 1: Left to discard: 1.");
+  });
+});
+
+describe("06047:A:1 Prowl X, the sheet with no Stop row", () => {
+  it("06048:A:1 alone at the table nobody comes after the player: no Stop row is offered, and the sheet says the players after him cannot discard the rest", () => {
+    const made = table({ seats: 1, heroResources: 1, phase: "Quest", deck: ["f0", "f0"] });
+    const seen = sheets(made, CODES.hunter, [(options) => options[0] ?? ""]);
+    expect(seen[0]?.note).toBe("Left to discard: 1. Choose one of your heroes to discard 1 resource from. The players after you cannot discard the rest.");
+  });
+});
+
+describe("the Prowl words key on the Prowl verb, not on a pick another record shares", () => {
+  it("a record with the same hero Pick but no GroupDiscardResources holds no Prowl; one with the verb does, at any depth", () => {
+    const pick = { verb: "Pick", pick: { type: "hero", control: "you", hasResources: true } } as const;
+    const prowl = { verb: "GroupDiscardResources", amount: 2 } as const;
+    expect(holdsProwl([pick, { verb: "DiscardResources", amount: 1, target: "picked" }])).toBe(false);
+    expect(holdsProwl([prowl])).toBe(true);
+    expect(holdsProwl([{ verb: "ForEachPlayer", order: "firstFirst", instructions: [prowl] }])).toBe(true);
   });
 });
 

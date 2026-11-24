@@ -35,16 +35,18 @@ export function druadanDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   const printed = printedOf(ctx.cards, card.code);
   const parts: string[] = [];
   if (printed.type === "enemy") {
+    // The progress it holds comes first: it is what the player is working on. Prowl is told only until the card is revealed, as it fires then (06047:A:1).
+    const held = enemyProgress(game, ctx, cardId);
+    if (held) parts.push(enemyProgressWords(held.progress, held.hits));
     const prowl = prowlValue(game, ctx, cardId);
-    if (prowl > 0) parts.push(prowlWords(prowl));
+    const revealed = card.zone === "staging" || card.zone === "engaged";
+    if (prowl > 0 && !revealed) parts.push(prowlWords(prowl));
     if (printsArcheryX(game, ctx, card.code) && card.face !== "down") parts.push(archeryXWords(cardArchery(game, ctx.cards, card).own));
     const gains = archeryGains(game, ctx, cardId, nameOf);
-    if (gains.length > 0 && (card.zone === "staging" || card.zone === "engaged")) {
+    if (gains.length > 0 && revealed) {
       const { keyword, own } = cardArchery(game, ctx.cards, card);
       parts.push(woseArcheryWords(keyword + own, gains));
     }
-    const held = enemyProgress(game, ctx, cardId);
-    if (held) parts.push(enemyProgressWords(held.progress, held.hits));
   }
   // Ancestral Clearing: the cost it adds to each player card, and the travel cost it prints.
   if (card.code === CLEARING && increaseOf(ctx, card.code) > 0 && (card.zone === "staging" || card.zone === "activeLocation")) parts.push(clearingWords(increaseOf(ctx, card.code)));

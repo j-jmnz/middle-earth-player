@@ -1,7 +1,7 @@
 // Where an instruction stands in an effect record, the one path scheme the words allowlist (src/play/words/scenario-words.test.ts) and the asks files (src/play/words/asks.ts) key on.
 import type { Instruction } from "../../catalog/boundary.ts";
 
-import { groupSteps } from "./scenarios/against-the-shadow/group-steps.ts";
+import { groupSteps } from "./group-steps.ts";
 
 /**
  * One walker over a record's instructions: every instruction, nested ones too (`instructions` of Each, If, ...) and every branch of a Choose, each with the instruction that follows it in its list and the ones after that.

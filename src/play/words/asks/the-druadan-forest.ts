@@ -5,15 +5,15 @@ import { BROODING_FOREST_ASKS } from "../scenarios/against-the-shadow/brooding-f
 // The choice words of The Drúadan Forest (against-the-shadow part 5), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-druadan-forest --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-druadan-forest` prints each sentence.
 // A choice of one player's own (a Prowl discard, a payment, the shadow's pick for the defending player) is owned: two-handed the sentence leads with the player. The first player answers for the group at Ancestral Clearing's exhaust, so that sentence is not owned.
-// The steps of a group verb (Prowl's discard, Garden of Poisons' payment) stand below the verb in the record walk (words/scenarios/against-the-shadow/group-steps.ts): `@0.0` is the Prowl's Choose, `@0.0.discard.0` its hero Pick, `@0.0` the Garden's SpendResources.
+// The steps of a group verb (Prowl's discard, Garden of Poisons' payment) stand below the verb in the record walk (words/group-steps.ts): `@0.0` is the Prowl's Choose, `@0.0.discard.0` its hero Pick, `@0.0` the Garden's SpendResources.
 
-// Prowl X (ats.prowl): the players as a group discard X resources from their heroes, each player in turn for his own heroes, one resource at a time, and he may stop while the players after him hold enough for the rest. A discard, not a spend. `{left}` is what is still to discard.
-const PROWL_WHY = "its Prowl makes the players discard resources from their heroes.";
+// Prowl X (ats.prowl): the players as a group discard X resources from their heroes, each player in turn for his own heroes, one resource at a time, and he may stop while the players after him hold enough for the rest. A discard, not a spend. `{left}` is what is still to discard; `{forced}` says why no Stop row is offered.
+// The count comes first and the sheet's title says the card: the sentence must show the count and the instruction whole in the dock.
 const prowl = (record: string): Record<string, Ask> => ({
-  [`${record} @0.0 Choose`]: { owned: true, why: PROWL_WHY, note: "Discard 1 resource from one of your heroes, or stop and leave the rest to the players after you. Left to discard: {left}." },
+  [`${record} @0.0 Choose`]: { owned: true, note: "Left to discard: {left}. Discard 1 resource from one of your heroes, or stop and leave the rest to the players after you." },
   [`${record} @0.0 discard`]: { label: "Discard 1 resource from one of your heroes" },
   [`${record} @0.0 stop`]: { label: "Stop: the players after you discard the rest" },
-  [`${record} @0.0.discard.0 Pick`]: { owned: true, why: PROWL_WHY, note: "Choose one of your heroes to discard 1 resource from. Left to discard: {left}.", verb: "Discard" },
+  [`${record} @0.0.discard.0 Pick`]: { owned: true, note: "Left to discard: {left}. Choose one of your heroes to discard 1 resource from.{forced}", verb: "Discard" },
 });
 
 // "Shadow: Return attacking enemy to the staging area after it attacks unless any player pays 1 resource" (06047:A:3, 06049:A:2): the defending player decides, and the resource comes from the pool of any player's hero. With nothing to pay the enemy returns and nobody is asked.

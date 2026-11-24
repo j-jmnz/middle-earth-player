@@ -12,7 +12,18 @@ type Verb = Extract<Instruction, { verb: "GroupDiscardResources" }>;
 type Step = Effect["instructions"][number];
 type Item = { instruction: Step; seat: number; chosen: null };
 
-const HEROES_WITH_RESOURCES = { type: "hero", control: "you", hasResources: true } as const;
+/** The heroes a Prowl discard takes from: the asking player's own, with resources. */
+export const HEROES_WITH_RESOURCES = { type: "hero", control: "you", hasResources: true } as const;
+
+/** One discard of a Prowl: a hero of the asked player with resources loses 1, then `next` (the verb queued again with what is left) runs. The words read the same steps with no `next` (play/words/group-steps.ts). */
+export function discardSteps(next?: Instruction): Instruction[] {
+  return [{ verb: "Pick", pick: HEROES_WITH_RESOURCES }, { verb: "DiscardResources", amount: 1, target: "picked" }, ...(next ? [next] : [])];
+}
+
+/** The Choose a player is asked when he may stop: discard one more (`discard`) or leave the rest to the players after him (`stop`, the verb queued again for them). */
+export function discardOrStop(discard?: Instruction, stop?: Instruction): Step {
+  return { verb: "Choose", who: "actor", options: [{ id: "discard", instructions: discardSteps(discard) }, { id: "stop", instructions: stop ? [stop] : [] }] };
+}
 
 const held = (state: ScenarioState, seat: number): number => (state.seats[seat]?.heroes ?? []).reduce((sum, id) => sum + (state.cards[id]?.resources ?? 0), 0);
 
@@ -27,10 +38,10 @@ export function groupDiscardResources(state: ScenarioState, instruction: Verb, s
   const [turn, ...later] = turns;
   // Every player had his turn: a player stops only while the players after him hold enough for the rest, so nothing is left unless nobody holds a resource.
   if (turn === undefined) return state;
-  const discard: Instruction[] = [{ verb: "Pick", pick: HEROES_WITH_RESOURCES }, { verb: "DiscardResources", amount: 1, target: "picked" }, { ...instruction, rest: left - 1, turns: [turn, ...later] }];
+  const again: Instruction = { ...instruction, rest: left - 1, turns: [turn, ...later] };
   const items = (steps: Step[]): Item[] => steps.map((step) => ({ instruction: step, seat: turn, chosen: null }));
   // The players after him cannot discard the rest: he goes on.
-  if (later.reduce((sum, other) => sum + held(state, other), 0) < left) return queue(items(discard));
+  if (later.reduce((sum, other) => sum + held(state, other), 0) < left) return queue(items(discardSteps(again)));
   const stop: Instruction = { ...instruction, rest: left, turns: later };
-  return queue(items([{ verb: "Choose", who: "actor", options: [{ id: "discard", instructions: discard }, { id: "stop", instructions: [stop] }] }]));
+  return queue(items([discardOrStop(again, stop)]));
 }

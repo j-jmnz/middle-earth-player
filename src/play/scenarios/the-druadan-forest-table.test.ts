@@ -35,7 +35,10 @@ describe("Prowl X and Archery X chips (06047:A:1, 06048:A:1, 06049:A:1, 06054:A:
     const two = table({ seats: 2, staging: [ELITE] });
     expect(chips(two, ELITE)).toEqual(["Archery 2", "Prowl 2"]);
     expect(chips(table({ seats: 1, staging: [ELITE] }), ELITE)).toEqual(["Archery 2", "Prowl 1"]);
-    expect(say(two, ELITE)).toBe("Prowl 2: when it is revealed, the players as a group discard 2 resources from their heroes' pools, as many as they can. It is a discard, not a spend.");
+    // Prowl is told until the card is revealed; once it is in the staging area or engaged it has fired and the sentence is gone.
+    expect(say(two, ELITE)).toBeNull();
+    const unrevealed = table({ seats: 2, deck: [ELITE] });
+    expect(say(unrevealed, ELITE)).toBe("Prowl 2: when it is revealed, the players as a group discard 2 resources from their heroes' pools, as many as they can. It is a discard, not a spend.");
   });
 
   it("06048:A:1 the Hunter's Prowl 1, and its Archery X counts the heroes with no resources, shown at 0 too and said in its preview", () => {
@@ -75,7 +78,7 @@ describe("Glade of Cleansing's archery on the Woses (06052:A:1)", () => {
     expect(say(made, ELITE)).toContain("Archery 3: +1 from Glade of Cleansing.");
     expect(chips(made, DRUMMER)).toContain("Archery 1");
     const bare = table({ seats: 1, staging: [ELITE] });
-    expect(say(bare, ELITE)).not.toContain("Glade");
+    expect(say(bare, ELITE) ?? "").not.toContain("Glade");
   });
 
   it("06052:A:2 the Glade's Threat X reads the highest archery of a Wose, the grant included", () => {
@@ -114,8 +117,8 @@ describe("Ancestral Clearing and Garden of Poisons (06050:A:1, 06051:A:1, 06051:
 
   it("06051:A:1 and 06051:A:2 the location's preview says the gain it stops, the resource phase it leaves and the payment that can stop the travel; a hero's preview names it", () => {
     const made = table({ seats: 1, staging: [GARDEN] });
-    expect(say(made, GARDEN)).toBe("While it is in play, heroes gain no resources from card effects: the resource phase still gives 1 to each hero. To travel here each player pays 1 resource from his heroes' pools, and the players cannot travel here while a player cannot.");
-    expect(dungeonDetail(made.state, made.ctx, made.hero, cardName(made, made.state))).toBe("It gains no resources from card effects while Garden of Poisons is in play. The resource phase still gives it 1.");
+    expect(say(made, GARDEN)).toBe("Heroes still gain 1 resource in the resource phase. The players cannot travel here while a player cannot pay 1 resource from their heroes' pools.");
+    expect(dungeonDetail(made.state, made.ctx, made.hero, cardName(made, made.state))).toBe("Garden of Poisons stops card effects from giving it resources. The resource phase still gives it 1.");
     const none = table({ seats: 1, staging: [ELITE] });
     expect(dungeonDetail(none.state, none.ctx, none.hero, cardName(none, none.state))).toBeNull();
   });
@@ -157,7 +160,8 @@ describe("stage 3 (06044:B:1, 06044:B:2, 06044:B:3, 06045:A:2, 06045:A:3)", () =
   it("06044:B:2 an enemy's preview says its progress against its hit points and what the full number does, without a second token line", () => {
     const made = stage3({ staging: [{ code: HUNTER, progress: 2 }] });
     const id = idOf(made.state, HUNTER);
-    expect(say(made, HUNTER)).toContain("2 of 3 progress. At 3 it goes to the victory display and its progress goes to the quest.");
+    // The progress is the first line of the preview.
+    expect(say(made, HUNTER)?.startsWith("2 of 3 progress. At 3 it goes to the victory display and its progress goes to the quest.")).toBe(true);
     expect(tokenLines({ ...made.state.cards[id]!, progress: 0 })).toEqual([]);
   });
 
@@ -231,6 +235,11 @@ describe("stage 3 (06044:B:1, 06044:B:2, 06044:B:3, 06045:A:2, 06045:A:3)", () =
     expect(lines).toContain("Willpower 5 against defense 3");
     expect(lines.some((line) => /2 progress on/.test(line))).toBe(true);
     expect(lines).not.toContain("No damage");
+    // The attack is told with the Willpower icon, not the Attack icon.
+    expect(moment?.lines.find((line) => line.text === "Willpower 5 against defense 3")?.mark).toBe("willpower");
+    // The progress is this scenario's: the same steps on a state of another scenario still end in "No damage".
+    const other = momentOf({ ...buffed, scenarioId: "the-stewards-fear" }, run.state, run.steps, { card: cardName(made, run.state) });
+    expect(other?.lines.map((line) => line.text)).toContain("No damage");
   });
 
   it("06045:A:2 each character's preview names the +1 Willpower and +1 Defense of the victory display and its source", () => {

@@ -20,7 +20,7 @@ import { effectById, effectsOf } from "../../rules/windows/listen.ts";
 import { ASKS_BY_SCENARIO } from "./asks/index.ts";
 import type { ChoiceNames, PickWords } from "./choice.ts";
 import { matchOf, repeatTimesOf, walk, type PathMatch } from "./record-path.ts";
-import { prowlLeft } from "./scenarios/against-the-shadow/group-steps.ts";
+import { holdsProwl, prowlForced, prowlLeft } from "./group-steps.ts";
 import { askedSeat, seatSays } from "./seat.ts";
 
 /**
@@ -31,7 +31,7 @@ export type Text = string | readonly { when?: Condition; text: string }[];
 
 /**
  * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{picked}` (the card an Each or an earlier Pick of the record chose, in a note too; in a caution, the card of the row it is about), `{host}` (the card the record's card lies on), `{subject}` (the card that triggered the record: the ally that entered play), `{pair}` (the Embassy's pair being decided: the player card with its owner and the encounter card it is paired with) and `{ringBearer}` (the hero with the Ring-bearer trait), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
- * has none), `{left}` (the damage an AssignDamage still has to place, or the resources a Prowl still has to discard, counting the step asked: its note only), `{countdown}` (an entry with `countdown`: "2 of 4"), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
+ * has none), `{left}` (the damage an AssignDamage still has to place, or the resources a Prowl still has to discard, counting the step asked: its note only), `{forced}` (a Prowl's hero Pick: the words that say no Stop row was offered because the players after cannot discard the rest, or nothing), `{countdown}` (an entry with `countdown`: "2 of 4"), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
  * - `note`: the sentence over a Pick or a Choose (the entry keyed with the instruction's verb).
  * - `why`: the reason the window opened. It is said after the card's title and before the note, "Card: why note" ("Player 1, Card: why note" when owned and two-handed).
  * - `owned`: one player's own choice. Two-handed the sentence leads with the player and the sheet adds no "Player N chooses."; solo it has no lead, and a note with no `why` is capitalised.
@@ -104,7 +104,7 @@ export function templatesOf(entry: Ask): string[] {
 
 /** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `subject`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` and `named` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", "x", "picked", "host", "subject", "ringBearer", "pair", "left", "dealt", "pursuitLimit", ...(entry.countdown != null ? ["countdown"] : []), ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...(entry.xRows?.less ? [entry.xRows.less.name] : []), ...Object.keys(entry.named ?? {}), ...Object.keys(entry.named ?? {}).map((name) => `${name}Cost`)]);
+  const known = new Set(["card", "owner", "x", "picked", "host", "subject", "ringBearer", "pair", "left", "forced", "dealt", "pursuitLimit", ...(entry.countdown != null ? ["countdown"] : []), ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...(entry.xRows?.less ? [entry.xRows.less.name] : []), ...Object.keys(entry.named ?? {}), ...Object.keys(entry.named ?? {}).map((name) => `${name}Cost`)]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -164,7 +164,14 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   // An AssignDamage not yet split into steps holds all of its amount.
   if (a.instruction.verb === "AssignDamage") values.left = a.instruction.left ?? resolveAmount(a.game, a.instruction.amount, scope, a.ctx);
   // A Prowl's discard: the resources the players still have to discard, counting the step asked (group-steps.ts).
-  else values.left = prowlLeft(a.game, a.instruction);
+  else {
+    // Only a record that holds a GroupDiscardResources has Prowl steps: another record's Pick of the same heroes has no count (group-steps.ts).
+    const id = a.cause && "effect" in a.cause ? a.cause.effect : a.effectId;
+    const code = a.source ? (a.game.cards[a.source]?.code ?? a.source) : undefined;
+    const prowl = candidatesOf(a, id, code).some((record) => record != null && holdsProwl(record.instructions));
+    if (prowl) values.left = prowlLeft(a.game, a.instruction);
+    values.forced = prowl && prowlForced(a.game, a.instruction) ? " The players after you cannot discard the rest." : "";
+  }
   // The encounter cards a locate test has discarded so far, each with whether it prints PASS (dwd.locate-test), named only where an entry says them.
   if (a.instruction.verb === "LocateTest" && templatesOf(entry).some((template) => placeholdersOf(template).includes("dealt"))) {
     const dealt = (a.instruction.dealtIds ?? []).map((id) => `${a.names.card(id)}${printedOf(a.ctx.cards, a.game.cards[id]?.code ?? "").keywords.pass === true ? " (PASS)" : " (no PASS)"}`);

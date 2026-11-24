@@ -54,11 +54,11 @@ export const clearingCostWords = (cost: number, more: number, source: string): s
 /** Ancestral Clearing's preview. */
 export const clearingWords = (more: number): string => `While it is in play, each player card costs ${more} more to play. To travel here, exhaust 1 ready hero of any player; the first player chooses.`;
 
-/** Garden of Poisons' preview: the gain it stops, and the payment that can stop the travel. */
-export const GARDEN_WORDS = "While it is in play, heroes gain no resources from card effects: the resource phase still gives 1 to each hero. To travel here each player pays 1 resource from his heroes' pools, and the players cannot travel here while a player cannot.";
+/** Garden of Poisons' preview: what its printed lines leave unsaid (the resource phase still gives resources, and when the players cannot travel here). */
+export const GARDEN_WORDS = "Heroes still gain 1 resource in the resource phase. The players cannot travel here while a player cannot pay 1 resource from their heroes' pools.";
 
 /** A hero's preview while Garden of Poisons is in play. */
-export const gardenHeroWords = (source: string): string => `It gains no resources from card effects while ${source} is in play. The resource phase still gives it 1.`;
+export const gardenHeroWords = (source: string): string => `${source} stops card effects from giving it resources. The resource phase still gives it 1.`;
 
 /** The Archery sheet's note while An Untimely End sends archery damage to allies. */
 export const ALLIES_ARCHERY_WORDS = "Archery damage must go to allies while any ally is in play: only allies are listed.";
