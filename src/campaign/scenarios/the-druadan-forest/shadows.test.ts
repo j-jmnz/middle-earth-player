@@ -35,32 +35,55 @@ describe("06046:A:2 the Drummer's shadow", () => {
 });
 
 // "Shadow: Return attacking enemy to the staging area after it attacks unless any player pays 1 resource" (the Elite 06047:A:3 and the Thief 06049:A:2 print it alike).
-for (const [line, code] of [["06047:A:3", ELITE], ["06049:A:2", THIEF]] as const) {
-  describe(`${line} the shadow of ${code}`, () => {
-    const resources = (hero: string, amount: number, seat = 0) => ({ code: hero, seat, resources: amount });
+describe("06047:A:3 the shadow", () => {
+  const resources = (hero: string, amount: number, seat = 0) => ({ code: hero, seat, resources: amount });
 
-    it(`${line} the attacker returns to the staging area after its attack when nobody pays`, () => {
-      const { run } = fight(code, "f3", { heroes: [resources(EOWYN, 1)] }, { pick: choose("return") });
-      expect(zone(run.state, "f3")).toBe("staging");
-      expect(run.state.cards[idOf(run.state, EOWYN)]?.resources).toBe(1);
-    });
-
-    it(`${line} it stays engaged when any player pays 1 resource: a Spirit hero pays for a card with no sphere`, () => {
-      const { run } = fight(code, "f3", { heroes: [resources(EOWYN, 1)] }, { pick: choose("pay") });
-      expect(zone(run.state, "f3")).toBe("engaged");
-      expect(run.state.cards[idOf(run.state, EOWYN)]?.resources).toBe(0);
-    });
-
-    it(`${line} the resource may come from the other player's hero, and with none anywhere the attacker returns without a question`, () => {
-      const second = { seats: 2, heroes: [resources(EOWYN, 1, 1)] } as const;
-      const { run } = fight(code, "f3", second, { pick: choose("pay") });
-      expect(zone(run.state, "f3")).toBe("engaged");
-      expect(run.state.cards[idOf(run.state, EOWYN)]?.resources).toBe(0);
-      const none = fight(code, "f3", {}, { pick: () => { throw new Error("a choice was asked"); } });
-      expect(zone(none.run.state, "f3")).toBe("staging");
-    });
+  it("06047:A:3 the attacker returns to the staging area after its attack when nobody pays", () => {
+    const { run } = fight(ELITE, "f3", { heroes: [resources(EOWYN, 1)] }, { pick: choose("return") });
+    expect(zone(run.state, "f3")).toBe("staging");
+    expect(run.state.cards[idOf(run.state, EOWYN)]?.resources).toBe(1);
   });
-}
+
+  it("06047:A:3 it stays engaged when any player pays 1 resource: a Spirit hero pays for a card with no sphere", () => {
+    const { run } = fight(ELITE, "f3", { heroes: [resources(EOWYN, 1)] }, { pick: choose("pay") });
+    expect(zone(run.state, "f3")).toBe("engaged");
+    expect(run.state.cards[idOf(run.state, EOWYN)]?.resources).toBe(0);
+  });
+
+  it("06047:A:3 the resource may come from the other player's hero, and with none anywhere the attacker returns without a question", () => {
+    const second = { seats: 2, heroes: [resources(EOWYN, 1, 1)] } as const;
+    const { run } = fight(ELITE, "f3", second, { pick: choose("pay") });
+    expect(zone(run.state, "f3")).toBe("engaged");
+    expect(run.state.cards[idOf(run.state, EOWYN)]?.resources).toBe(0);
+    const none = fight(ELITE, "f3", {}, { pick: () => { throw new Error("a choice was asked"); } });
+    expect(zone(none.run.state, "f3")).toBe("staging");
+  });
+});
+
+describe("06049:A:2 the shadow", () => {
+  const resources = (hero: string, amount: number, seat = 0) => ({ code: hero, seat, resources: amount });
+
+  it("06049:A:2 the attacker returns to the staging area after its attack when nobody pays", () => {
+    const { run } = fight(THIEF, "f3", { heroes: [resources(EOWYN, 1)] }, { pick: choose("return") });
+    expect(zone(run.state, "f3")).toBe("staging");
+    expect(run.state.cards[idOf(run.state, EOWYN)]?.resources).toBe(1);
+  });
+
+  it("06049:A:2 it stays engaged when any player pays 1 resource: a Spirit hero pays for a card with no sphere", () => {
+    const { run } = fight(THIEF, "f3", { heroes: [resources(EOWYN, 1)] }, { pick: choose("pay") });
+    expect(zone(run.state, "f3")).toBe("engaged");
+    expect(run.state.cards[idOf(run.state, EOWYN)]?.resources).toBe(0);
+  });
+
+  it("06049:A:2 the resource may come from the other player's hero, and with none anywhere the attacker returns without a question", () => {
+    const second = { seats: 2, heroes: [resources(EOWYN, 1, 1)] } as const;
+    const { run } = fight(THIEF, "f3", second, { pick: choose("pay") });
+    expect(zone(run.state, "f3")).toBe("engaged");
+    expect(run.state.cards[idOf(run.state, EOWYN)]?.resources).toBe(0);
+    const none = fight(THIEF, "f3", {}, { pick: () => { throw new Error("a choice was asked"); } });
+    expect(zone(none.run.state, "f3")).toBe("staging");
+  });
+});
 
 describe("06053:A:2 the shadow of Men in the Dark", () => {
   it("06053:A:2 the attacker gets +1 Attack for each hero the defending player controls with no resources: 3 against the Defense 2 of the defender", () => {

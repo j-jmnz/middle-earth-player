@@ -20,19 +20,29 @@ const progressOf = (state: ScenarioState): number => state.cards[state.questStag
 const committedIn = (state: ScenarioState): string[] => Object.values(state.cards).filter((card) => card.committed && card.zone === "heroes").map((card) => card.code).sort();
 
 // "Shadow: Remove X progress tokens from the current quest, where X is the attacking enemy's Threat" (Overgrown Trail 05046:A:2, Secluded Glade 05047:A:2).
-for (const [line, shadow] of [["05046:A:2", TRAIL], ["05047:A:2", GLADE]] as const) {
-  describe(`${line} the shadow of ${shadow} with a Wose attacking`, () => {
-    it(`${line} X is the printed Threat 2 of the engaged Thief, though a Drummer in the staging area gives the Woses there +2: the Siege stage loses 2 of its 5 progress`, () => {
-      const { run } = fightEnemy(scene, shadow, THIEF, { stage: STAGE_3, progress: 5, staging: [DRUMMER] });
-      expect(progressOf(run.state)).toBe(3);
-    });
-
-    it(`${line} the progress comes off whatever the enemies' progress put on the stage, and no more than the stage holds`, () => {
-      const { run } = fightEnemy(scene, shadow, THIEF, { stage: STAGE_3, progress: 1 });
-      expect(progressOf(run.state)).toBe(0);
-    });
+describe("05046:A:2 the shadow with a Wose attacking", () => {
+  it("05046:A:2 X is the printed Threat 2 of the engaged Thief, though a Drummer in the staging area gives the Woses there +2: the Siege stage loses 2 of its 5 progress", () => {
+    const { run } = fightEnemy(scene, TRAIL, THIEF, { stage: STAGE_3, progress: 5, staging: [DRUMMER] });
+    expect(progressOf(run.state)).toBe(3);
   });
-}
+
+  it("05046:A:2 the progress comes off whatever the enemies' progress put on the stage, and no more than the stage holds", () => {
+    const { run } = fightEnemy(scene, TRAIL, THIEF, { stage: STAGE_3, progress: 1 });
+    expect(progressOf(run.state)).toBe(0);
+  });
+});
+
+describe("05047:A:2 the shadow with a Wose attacking", () => {
+  it("05047:A:2 X is the printed Threat 2 of the engaged Thief, though a Drummer in the staging area gives the Woses there +2: the Siege stage loses 2 of its 5 progress", () => {
+    const { run } = fightEnemy(scene, GLADE, THIEF, { stage: STAGE_3, progress: 5, staging: [DRUMMER] });
+    expect(progressOf(run.state)).toBe(3);
+  });
+
+  it("05047:A:2 the progress comes off whatever the enemies' progress put on the stage, and no more than the stage holds", () => {
+    const { run } = fightEnemy(scene, GLADE, THIEF, { stage: STAGE_3, progress: 1 });
+    expect(progressOf(run.state)).toBe(0);
+  });
+});
 
 describe("05048:A:1 Lost Companion on the Siege stage", () => {
   it("05048:A:1 each player removes 1 character he controls from the quest; the stage counts the Defense of those that stay", () => {
