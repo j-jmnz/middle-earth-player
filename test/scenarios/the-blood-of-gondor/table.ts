@@ -1,5 +1,7 @@
 // Test helpers for the Blood of Gondor tests (src/rules/families/pelargir/hidden.test.ts, src/campaign/scenarios/the-blood-of-gondor/): a table of the scenario, the hidden cards taken by the engine's own verb, a game driven through its windows.
 import type { Effect, Instruction } from "../../../src/catalog/boundary.ts";
+import { UNATTRIBUTED } from "../../../src/rules/core/cause.ts";
+import { placeDamage } from "../../../src/rules/core/keywords.ts";
 import type { ScenarioState } from "../../../src/rules/core/state.ts";
 import type { EngineStep } from "../../../src/rules/core/intents.ts";
 import type { PlayerIntent } from "../../../src/rules/engine/reduce.ts";
@@ -105,3 +107,12 @@ export function fight(made: LayoutTable, from: Run, stop: (state: ScenarioState)
   }
   return current;
 }
+
+/** The hero (or any card) of this code takes `amount` damage from the framework, as a heavy attack of an earlier round left it. */
+export const hurt = (made: LayoutTable, state: ScenarioState, code: string, amount: number): ScenarioState => ({ ...placeDamage({ ...state, window: null }, idOf(state, code), amount, made.ctx.cards, [], "framework", UNATTRIBUTED), window: state.window });
+
+/** The codes of the cards engaged with a seat (the first seat by default), in engagement order. */
+export const engagedCodes = (state: ScenarioState, seat = 0): string[] => (state.seats[seat]?.engaged ?? []).map((id) => state.cards[id]?.code ?? "");
+
+/** The Trigger effect ids the engine offers the active seat now. */
+export const offeredActions = (made: LayoutTable, state: ScenarioState): string[] => legalIntents(state, made.ctx).filter((intent) => intent.type === "Trigger").map((intent) => (intent as { effectId: string }).effectId);

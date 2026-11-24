@@ -18,6 +18,8 @@ const DESTROYS_A_CHARACTER = { trigger: "characterDestroyedByAttack", subject: {
 const WHEN_EXPLORED = { trigger: "leftPlay", subject: "self", condition: { kind: "subjectExplored" } } as const;
 // Some hidden card lies in a play area (Faramir's Action is offered only then).
 const SOME_HIDDEN = { kind: "less", left: 0, right: { hidden: "all" } } as const satisfies Condition;
+// An objective ally belongs to the player who controls it, not to every player (ats.ally-objectives: it is used "the same as any other ally"), though its card type is objective: the Action is the controller's alone, and none while the card lies under Captured!.
+const CONTROLLER_ONLY = (name: string) => ({ kind: "canPick", pick: { type: "ally", control: "you", names: [name] } }) as const satisfies Condition;
 // No Orc enemy is engaged with any player (Conflict at the Crossroads gains surge).
 const ORCS_ENGAGED: PickSpec = { type: "enemy", control: "any", trait: "Orc" };
 // "If this attack destroys a character, that character's controller ...": read once the attack has dealt its damage; the player who controls the destroyed character acts, which a Sentinel defender may make another player than the defending one.
@@ -131,7 +133,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     // 06132 Faramir. A:1: the first player gains control of him, each time the token passes (the Setup gave him to the first player). A:2: Combat Action, exhaust him: a player chosen among those who hold a hidden card has 1 of his hidden cards turned faceup; an enemy takes 3 damage first and one destroyed never engages.
     // A:3: if he leaves play, the players lose.
     { id: "06132:forced:1", cardCode: "06132", lines: ["06132:A:1"], timing: "forced", trigger: "firstPlayerTokenPassed", instructions: [{ verb: "GainControlOfSelf" }] },
-    { id: "06132:action:1", cardCode: "06132", lines: ["06132:A:2"], timing: "action", condition: { kind: "all", conditions: [PHASE("Combat"), SOME_HIDDEN] }, cost: { kind: "exhaustSelf" }, instructions: [{ verb: "TurnHiddenCard", damageEnemy: 3 }] },
+    { id: "06132:action:1", cardCode: "06132", lines: ["06132:A:2"], timing: "action", condition: { kind: "all", conditions: [PHASE("Combat"), SOME_HIDDEN, CONTROLLER_ONLY("Faramir")] }, cost: { kind: "exhaustSelf" }, instructions: [{ verb: "TurnHiddenCard", damageEnemy: 3 }] },
     LOSE_WHEN_GONE("06132", "06132:A:3", "Faramir"),
 
     // 06133 Lord Alcaron. A:1: as Faramir's. A:2: Action, exhaust him: return an enemy engaged with you to the staging area. A:3: if he leaves play, the players lose.
@@ -141,7 +143,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "06133",
       lines: ["06133:A:2"],
       timing: "action",
-      condition: { kind: "canPick", pick: { type: "enemy", control: "any", engaged: "you" } },
+      condition: { kind: "all", conditions: [CONTROLLER_ONLY("Lord Alcaron"), { kind: "canPick", pick: { type: "enemy", control: "any", engaged: "you" } }] },
       cost: { kind: "exhaustSelf" },
       instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", engaged: "you" } }, { verb: "ReturnToStaging", target: { kind: "picked" } }],
     },
