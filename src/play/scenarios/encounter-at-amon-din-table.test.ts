@@ -116,7 +116,7 @@ describe("the comparison that decides the game (06068:A:2, 06069:A:2)", () => {
 
   it("two dials in the top bar, Rescued and Dead, read the villager tokens and the damage tokens and open their cards", () => {
     const dials = dialsOf(made, made.state);
-    expect(dials.map((dial) => [dial.label, dial.value, dial.icon ?? null, dial.cardId])).toEqual([["Rescued", 4, null, idOf(made.state, rescued)], ["Dead", 3, "damage", idOf(made.state, dead)]]);
+    expect(dials.map((dial) => [dial.label, dial.value, dial.icon ?? null, dial.cardId])).toEqual([["Rescued", 4, "resource", idOf(made.state, rescued)], ["Dead", 3, "damage", idOf(made.state, dead)]]);
     expect(dials[0]?.note).toBe("4 villager tokens on Rescued Villagers, against 3 damage tokens on Dead Villagers. The players win at the end of the game with more villager tokens than damage tokens. A tie loses.");
     expect(dials[1]?.note).toBe("3 damage tokens on Dead Villagers, against 4 villager tokens on Rescued Villagers. Each villager token discarded adds 1, and none comes off. The players lose at the end of the game with as many or more damage tokens than villager tokens. A tie loses.");
   });
@@ -151,7 +151,7 @@ describe("stage 1B moves villager tokens (06066:B:2, 06066:B:3)", () => {
 
   it("a dial reads the villager tokens left on the quest card, and is gone once stage 2B is current", () => {
     const dial = dialsOf(made, state).find((one) => one.id === "quest-villagers");
-    expect(dial).toMatchObject({ label: "Stage", value: 5, cardId: idOf(state, savagery), note: "5 villager tokens left on the quest card. Each point of progress moves 1 to Rescued Villagers, and the stage advances when the last one leaves." });
+    expect(dial).toMatchObject({ label: "Stage", value: 5, icon: "resource", cardId: idOf(state, savagery), note: "5 villager tokens left on the quest card. Each point of progress moves 1 to Rescued Villagers, and the stage advances when the last one leaves." });
     const two = table({ stage: protect, staging: [rescued, dead] });
     expect(dialsOf(two, two.state).some((one) => one.id === "quest-villagers")).toBe(false);
   });

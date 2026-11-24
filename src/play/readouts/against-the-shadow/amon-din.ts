@@ -58,7 +58,7 @@ export function amonDinDials(game: ScenarioState, ctx: ReduceContext): readonly 
   const { rescued: saved, dead: lost } = counts(game);
   const stage = game.questStage ? game.cards[game.questStage] : undefined;
   // Stage 1B has no quest points: the villager tokens left on its card are what the progress uses up (06066:B:2).
-  const quest: TableDial[] = stage?.code === STAGE_ONE ? [{ id: "quest-villagers", testID: "din-quest", label: "Stage", name: questDialName, value: stage.resources, cardId: stage.id, note: questDialWords(stage.resources) }] : [];
+  const quest: TableDial[] = stage?.code === STAGE_ONE ? [{ id: "quest-villagers", testID: "din-quest", label: "Stage", name: questDialName, value: stage.resources, icon: "resource", cardId: stage.id, note: questDialWords(stage.resources) }] : [];
   // Not more villager tokens than damage tokens (a tie loses) is not winning: the dial says so once either count is above 0.
   const behind = saved <= lost && saved + lost > 0 ? { warn: { level: lost > saved ? ("critical" as const) : ("near" as const), words: notWinningWords(saved, lost) } } : {};
   // The end is held while stage 2B is defeated and Ghulat is in play: his hit points left are what the players have to use up.
@@ -67,7 +67,7 @@ export function amonDinDials(game: ScenarioState, ctx: ReduceContext): readonly 
   const held: TableDial[] = ghulat ? [{ id: "ghulat", testID: "din-ghulat", label: "Ghulat", name: ghulatDialName, value: left, cardId: ghulat.id, warn: { level: "near", words: ghulatHeldWords }, note: ghulatDialWords(left) }] : [];
   return [
     ...quest,
-    { id: "rescued", testID: "din-rescued", label: "Rescued", name: rescuedDialName, value: saved, cardId: rescued.id, note: rescuedDialWords(saved, lost), ...behind },
+    { id: "rescued", testID: "din-rescued", label: "Rescued", name: rescuedDialName, value: saved, icon: "resource", cardId: rescued.id, note: rescuedDialWords(saved, lost), ...behind },
     { id: "dead", testID: "din-dead", label: "Dead", name: deadDialName, value: lost, icon: "damage", cardId: dead.id, note: deadDialWords(lost, saved) },
     ...held,
   ];
