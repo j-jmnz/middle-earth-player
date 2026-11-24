@@ -15,7 +15,7 @@ const MINE: PickSpec = { type: "location", control: "you", controlled: true };
 const ANY_CONTROLLED: PickSpec = { type: "location", control: "any", controlled: true };
 const HIGHEST_OF_MINE: PickSpec = { ...MINE, highestThreat: true };
 // "If the players control all Osgiliath locations in play": none is in the staging area or active.
-const NONE_UNCONTROLLED: Condition = { kind: "count", pick: OSGILIATH, max: 0 };
+const NONE_UNCONTROLLED: Condition = { kind: "all", conditions: [{ kind: "count", pick: { ...OSGILIATH, stagingOnly: true }, max: 0 }, { kind: "count", pick: { ...OSGILIATH, active: true }, max: 0 }] };
 const ALWAYS: Condition = { kind: "count", pick: { type: "hero", control: "any" }, min: 0 };
 const READY_HERO: PickSpec = { type: "hero", control: "you", state: "ready" };
 const ONE_ACTIVE: Condition = { kind: "count", pick: { type: "location", control: "any", active: true }, min: 1 };

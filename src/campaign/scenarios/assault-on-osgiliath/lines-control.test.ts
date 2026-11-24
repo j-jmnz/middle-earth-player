@@ -5,10 +5,12 @@ import { expect } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
-import { finish, idOf, legalIntents, revealFromTop, send, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
+import type { ScenarioState } from "../../../rules/core/state.ts";
+import { syncConstants } from "../../../rules/interpret/constants.ts";
+import { finish, idOf, legalIntents, revealFromTop, send, start as begin, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import { payFor } from "../../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
-import { BOROMIR, CODES, EVIL_CROW, cardOf, controlled, drive, opened, playOf, table, where } from "../../../../test/scenarios/assault-on-osgiliath/table.ts";
+import { BOROMIR, CODES, EVIL_CROW, cardOf, controlled, controlling, drive, opened, playOf, table, where } from "../../../../test/scenarios/assault-on-osgiliath/table.ts";
 
 /** The quest phase of a table that opens on it, played out: the committed heroes quest and the game goes on to the travel phase. */
 const quested = (made: LayoutTable, from: Run = opened(made)): Run => drive(made, send(from, { type: "Pass" }, made.ctx), (state) => state.phase !== "Quest");
@@ -29,6 +31,31 @@ lineSpec("06091:B:2", "takes a location explored in the staging area too, by the
   const run = drive(made, send(opened(made), trigger as PlayerIntent, made.ctx), (state) => state.window?.kind !== "choose" && where(state, CODES.harbor) === "play");
   expect(cardOf(run.state, CODES.harbor)).toMatchObject({ zone: "play", controller: 0, progress: 0 });
   expect(controlled(run.state)).toEqual([CODES.harbor]);
+});
+
+/** Seat 0 controls these locations, then the first-player token is with seat 1; Ancient Harbor holds 4 of its 5 quest points and the Action of Ancient Harbor explores it again. */
+function exploredAgain(codes: readonly string[], effects: readonly Effect[]): ScenarioState {
+  const made = table({ seats: 2, phase: "Combat", staging: [...codes, ...(codes.includes(CODES.harbor) ? [] : [CODES.harbor])] }, effects);
+  const held = controlling(made, made.state, codes);
+  const harbor = idOf(held, CODES.harbor);
+  const state = { ...held, firstPlayer: 1, cards: { ...held.cards, [harbor]: { ...held.cards[harbor]!, progress: 4 } } } as ScenarioState;
+  const trigger = legalIntents(state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === "06098:action:1");
+  expect(trigger).toBeDefined();
+  return drive(made, send(begin(syncConstants(state, made.ctx)), trigger as PlayerIntent, made.ctx), (now) => now.window?.kind !== "choose" && (now.cards[harbor]?.progress ?? 1) === 0).state;
+}
+
+lineSpec("06091:B:2", "a controlled location explored again is taken by the first player now, not by the seat that held it (the first player is the second seat)", (effects) => {
+  const done = exploredAgain([CODES.harbor], effects);
+  expect(cardOf(done, CODES.harbor)).toMatchObject({ zone: "play", controller: 1, progress: 0 });
+  expect(playOf(done, 1)).toContain(idOf(done, CODES.harbor));
+  expect(playOf(done, 0)).not.toContain(idOf(done, CODES.harbor));
+  expect(controlled(done)).toEqual([CODES.harbor]);
+});
+
+lineSpec("06103:A:2", "the seat that held the location loses control of it when another first player takes it, and its Ruined Tower returns to the staging area", (effects) => {
+  const done = exploredAgain([CODES.harbor, CODES.tower], effects);
+  expect(cardOf(done, CODES.harbor)).toMatchObject({ zone: "play", controller: 1 });
+  expect(cardOf(done, CODES.tower)).toMatchObject({ zone: "staging" });
 });
 
 lineSpec("06091:B:2", "the first player takes it when he is not the player whose heroes quested (the first player is the second seat)", (effects) => {
@@ -118,6 +145,21 @@ lineSpec("06091:B:1", "says in a step that the bar kept the progress of an effec
   const done = finish(send(run, { type: "Trigger", cardId: idOf(made.state, "01045"), effectId: "01045:response:1" }, made.ctx), made.ctx);
   expect(cardOf(done.state, CODES.library)?.progress).toBe(0);
   expect(done.steps.filter((step) => step.kind === "progress" && step.targetId === idOf(done.state, CODES.library))).toEqual([expect.objectContaining({ amount: 0 })]);
+});
+
+lineSpec("06091:B:2", "lets a player card place progress on a controlled location: Snowbourn Scout fills Ancient Harbor, and the first player takes it again", (effects) => {
+  const made = table({ phase: "Planning", active: { code: CODES.westQuarter }, staging: [CODES.harbor], hand: ["01016"], heroes: [{ code: "01001", seat: 0, resources: 3 }] }, effects, ["01016", "01001"]);
+  const held = controlling(made, made.state, [CODES.harbor]);
+  const harbor = idOf(held, CODES.harbor);
+  const state = { ...held, cards: { ...held.cards, [harbor]: { ...held.cards[harbor]!, progress: 4 } } } as ScenarioState;
+  const card = idOf(state, "01016");
+  let run = send(begin(syncConstants(state, made.ctx)), { type: "PlayCard", cardId: card, payments: payFor(state, made.ctx, card) }, made.ctx);
+  run = send(run, { type: "Trigger", cardId: card, effectId: "01016:response:1" }, made.ctx);
+  // The controlled location and the active one are the two places the progress may go.
+  expect(run.state.window).toMatchObject({ kind: "choose", options: expect.arrayContaining([harbor]) });
+  const done = finish(run, made.ctx, (now) => (now.window?.kind === "choose" ? harbor : "")).state;
+  expect(cardOf(done, CODES.harbor)).toMatchObject({ zone: "play", controller: 0, progress: 0 });
+  expect(controlled(done)).toEqual([CODES.harbor]);
 });
 
 lineSpec("06091:B:3", "wins at the end of the round when no Osgiliath location is in the staging area or active, and not while one is", (effects) => {

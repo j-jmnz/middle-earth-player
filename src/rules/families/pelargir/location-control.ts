@@ -76,6 +76,13 @@ export function loseControlOfLocation(state: ScenarioState, instruction: Verb<"L
   return id && seat != null && card?.zone === "play" ? lose(state, id, seat) : state;
 }
 
+/** A controlled location explored again is taken by the first player as he is now (06091:B:2 "the first player takes control"): when that is another seat than the one that held it, that seat loses control of it, which `controlLost` announces (06103:A:2 hears every loss of control). */
+function takenAgain(state: ScenarioState, id: string, held: number): ScenarioState {
+  const seat = state.seats[state.firstPlayer]?.eliminated === true ? held : state.firstPlayer;
+  const taken = noted(updateCard(moveCard(state, id, { zone: "play", seat }), id, { face: "up", exhausted: false, progress: 0 }), id, seat);
+  return seat === held ? taken : queueEvent(taken, { trigger: "controlLost", seat: held, subject: id });
+}
+
 /** The settle sweep: a location with a noted controller that lies in no play area has been lost. A location that was explored while controlled (progress full: it went to the discard pile or the victory display of a living player) is taken again at once, with no loss
  * (06091:B:2 hears it too, and finds it in play). A location in the discard pile of an eliminated player (core clearEliminated) or anywhere else is lost. Inert unless the game has a record that takes control. */
 export function controlSweep(state: ScenarioState, ctx: ReduceContext, _steps: EngineStep[]): ScenarioState {
@@ -89,7 +96,7 @@ export function controlSweep(state: ScenarioState, ctx: ReduceContext, _steps: E
     if (!card || (card.zone === "play" && card.controller === seat)) continue;
     const living = next.seats[seat]?.eliminated !== true;
     const explored = living && (card.zone === "encounterDiscard" || card.zone === "victory");
-    next = explored ? noted(updateCard(moveCard(next, id, { zone: "play", seat }), id, { face: "up", exhausted: false, progress: 0 }), id, seat) : lose(next, id, seat);
+    next = explored ? takenAgain(next, id, seat) : lose(next, id, seat);
   }
   return next;
 }

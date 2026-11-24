@@ -173,6 +173,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     if (!spec.stagingOnly) raw.push(...activeFor(state, asking, spec.stagingArea === "any"));
     // The locations of the Island Map outside the staging area are in play too (families/island/pick.ts).
     if (!spec.stagingOnly && !spec.active) raw.push(...outsideCells(state));
+    // A location a player controls lies in his play area and is a location in play: "a location" names it too (06091:B:2, researched reading; families/pelargir/location-control.ts). Only a game that holds a controlled location reads it.
+    if (!spec.stagingOnly && !spec.active && state.modifiers.some((modifier) => modifier.stat === "controlSeat")) raw.push(...seats.flatMap((index) => (state.seats[index]?.play ?? []).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location")));
   } else if (spec.type === "objective") {
     // The objectives in the staging area (any player's filter sees them) and, unless it asks for the staging area only, the ones a
     // player claimed: attached to a hero, controlled by that player (families/objectives.ts).
