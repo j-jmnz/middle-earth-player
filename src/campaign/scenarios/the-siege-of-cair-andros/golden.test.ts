@@ -1,6 +1,7 @@
 // Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.victory, rr.quest-advancement, hon.battle, hon.siege, ats.setup-the-siege-of-cair-andros, ats.cair-andros-location-damage, ats.cair-andros-defense-carry-over, ats.cair-andros-remove-stage, ltp.scoring (data/rules/entries.json).
 import { describe, expect, it } from "vitest";
 
+import type { EngineStep } from "../../../rules/core/intents.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { victoryPointsOf } from "../../../rules/core/printed-stat.ts";
 import { currentQuestHas } from "../../../rules/families/quest/conditions.ts";
@@ -18,7 +19,7 @@ const codeOf = (state: ScenarioState, id: string | null | undefined) => (id ? st
 const zoneOf = (state: ScenarioState, code: string) => cardsOf(state, code)[0]?.zone;
 
 // The stages the quest went through, from the Setup's stage 1 on: every advance the engine took names the stage it reached.
-const pathOf = (state: ScenarioState, steps: readonly { kind: string; cardId?: string }[]) => ["05072", ...steps.filter((step) => step.kind === "advance").map((step) => codeOf(state, step.cardId) ?? "?")];
+const pathOf = (state: ScenarioState, steps: readonly EngineStep[]) => ["05072", ...steps.flatMap((step) => (step.kind === "advance" ? [codeOf(state, step.cardId) ?? "?"] : []))];
 // The path each win takes (the stages played, a Battleground location explored or removed by damage) and the keyword The Last Battle counts by.
 const PATHS: Record<string, { path: string[]; explored: string[]; destroyed: string[]; lastBattle: "Siege" | "Battle" }> = {
   "solo win, all five stages": { path: STAGES, explored: [], destroyed: [], lastBattle: "Siege" },
