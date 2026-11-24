@@ -95,6 +95,7 @@ import fearFixtures from "./fixtures/the-stewards-fear.json";
 import druadanFixtures from "./fixtures/the-druadan-forest.json";
 import dinFixtures from "./fixtures/encounter-at-amon-din.json";
 import assaultFixtures from "./fixtures/assault-on-osgiliath.json";
+import bloodFixtures from "./fixtures/the-blood-of-gondor.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -202,6 +203,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-druadan-forest": druadanFixtures,
   "encounter-at-amon-din": dinFixtures,
   "assault-on-osgiliath": assaultFixtures,
+  "the-blood-of-gondor": bloodFixtures,
   "we-must-away-ere-break-of-day": dayFixtures,
   "over-the-misty-mountains-grim": grimFixtures,
   "dungeons-deep-and-caverns-dim": dimFixtures,
