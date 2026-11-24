@@ -3,6 +3,7 @@
 // the hand slice alone (docs/architecture.md, State). The reducer keeps the references of the zones it did not touch;
 // these selectors only keep that property through the join of ids and instances.
 import { BLACK_GATE } from "../../rules/families/harad/under.ts";
+import { live as stewardsFear, stackUnder } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { isReanimatedCode } from "../../rules/core/printed.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import { flagged, type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
@@ -37,7 +38,7 @@ export type FightKind = "defense" | "undefended" | "attack";
 // attackers.
 // `kind` and `ship` are what the table knows of the card's printing when it is given the facts (ZoneFacts): the fold order of staging reads the kind, and the
 // play area stands ships first (0 the Dream-chaser, 1 any other ship-objective). `area` is the card's place in the Stormcaller's area (stormcaller-table.ts): its group heads staging.
-export type ZoneEntry = { card: CardInstance; attached: readonly CardInstance[]; paired: readonly CardInstance[]; fight: FightKind | null; kind?: "enemy" | "location" | "other"; ship?: 0 | 1; area?: AreaRole };
+export type ZoneEntry = { card: CardInstance; attached: readonly CardInstance[]; stacked?: readonly string[]; paired: readonly CardInstance[]; fight: FightKind | null; kind?: "enemy" | "location" | "other"; ship?: 0 | 1; area?: AreaRole };
 
 /** What the zone selectors read of a card's printing: its type, and its place among the ships (null for a card that is no ship). Absent: nothing is known. */
 export type ZoneFacts = { typeOf: (code: string) => string | null; shipRank: (code: string) => 0 | 1 | null; pointsOf?: (game: ScenarioState, cardId: string) => number };
@@ -58,8 +59,8 @@ export function isPrisoner(card: Pick<CardInstance, "prisoner" | "zone" | "host"
   return card.prisoner === true && card.zone === "captive" && card.host == null;
 }
 
-/** Whether a staging card with more than one card under it shows one counted peek (layout.ts, `stacks`): a sea game (a grappled arm, Black Key) a game with the Harad deck (the enemies under The Black Gate, 144027:A:2) and Escape from Mount Gram (the captured cards under a host, up to 7 under a stage); every other game peeks each card. */
-export const stacksUnder = (state: { game: ScenarioState }): boolean => state.game.sea != null || state.game.piles?.haradDeck !== undefined || state.game.capture != null;
+/** Whether a staging card with more than one card under it shows one counted peek (layout.ts, `stacks`): a sea game (a grappled arm, Black Key) a game with the Harad deck (the enemies under The Black Gate, 144027:A:2) and Escape from Mount Gram (the captured cards under a host, up to 7 under a stage) and The Steward's Fear (the facedown underworld cards under a location); every other game peeks each card. */
+export const stacksUnder = (state: { game: ScenarioState }): boolean => state.game.sea != null || state.game.piles?.haradDeck !== undefined || state.game.capture != null || stewardsFear(state.game);
 
 const NONE: readonly string[] = [];
 const EMPTY: readonly CardInstance[] = [];
@@ -237,15 +238,15 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     const capturedHere = captured?.get(id) ?? NONE;
     const under = captives.length > 0 ? captives : captive ? [captive] : capturedHere;
     // The enemies grappled with a location are drawn facedown under it, as its attachments are (dcce.grapple).
-    // The enemies facedown under The Black Gate lie under it, one counted peek (144027:A:2).
-    const gated = card.code === BLACK_GATE ? cardsUnder(game, id) : NONE;
+    // The enemies facedown under The Black Gate lie under it, one counted peek (144027:A:2); the facedown underworld cards under a location of The Steward's Fear the same way (06018:A:1).
+    const gated = card.code === BLACK_GATE ? cardsUnder(game, id) : stackUnder(game, id);
     // The loot a location guards lies faceup under it, drawn as its attachments are (The Burglar's Turn, 22024:B:2); none in a game that dealt no loot deck.
     const loot = game.lootDecks ? lootUnder(game, id) : NONE;
     const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...loot, ...shadowCards(card), ...under, ...gated, ...(card.zone === "staging" ? grappledWith(game, id) : []), ...(card.zone === "activeLocation" ? guardedAllyOf(game, card) : [])]);
     const pair = pairs.get(id);
     const rank = facts?.shipRank(card.code) ?? null;
     const area = game.sea?.stormcaller ? areaRoleOf(game, id) : null;
-    entries.push({ card, attached, paired: pair ? cardsOf(game, pair.ids) : EMPTY, fight: pair?.kind ?? null, ...(facts ? { kind: kindOf(facts.typeOf(card.code)) } : {}), ...(rank != null ? { ship: rank } : {}), ...(area ? { area } : {}) });
+    entries.push({ card, attached, ...(card.code !== BLACK_GATE && gated.length > 0 ? { stacked: gated } : {}), paired: pair ? cardsOf(game, pair.ids) : EMPTY, fight: pair?.kind ?? null, ...(facts ? { kind: kindOf(facts.typeOf(card.code)) } : {}), ...(rank != null ? { ship: rank } : {}), ...(area ? { area } : {}) });
   }
   return entries;
 }

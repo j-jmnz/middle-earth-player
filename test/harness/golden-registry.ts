@@ -87,6 +87,7 @@ import * as dim from "../scenarios/dungeons-deep-and-caverns-dim/game.ts";
 import * as mountain from "../scenarios/the-lonely-mountain/game.ts";
 import * as ithilien from "../scenarios/into-ithilien/game.ts";
 import * as andros from "../scenarios/the-siege-of-cair-andros/game.ts";
+import * as fear from "../scenarios/the-stewards-fear/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -186,6 +187,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("peril-in-pelargir", "Peril in Pelargir", pelargir.PELARGIR_GOLDENS, pelargir.pelargirWorld, pelargir.playGolden),
   entry("into-ithilien", "Into Ithilien", ithilien.ITHILIEN_GOLDENS, ithilien.ithilienWorld, ithilien.playGolden),
   entry("the-siege-of-cair-andros", "The Siege of Cair Andros", andros.ANDROS_GOLDENS, andros.androsWorld, andros.playGolden),
+  entry("the-stewards-fear", "The Steward's Fear", fear.FEAR_GOLDENS, fear.fearWorld, fear.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),

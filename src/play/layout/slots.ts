@@ -68,12 +68,18 @@ export function cardRect(card: CardInstance, x: number, y: number, size: { w: nu
   return { x: x + offset, y, w: size.w, h: size.h };
 }
 
+// A card peeking out under its host: the slot of the card, but a facedown card of The Steward's Fear's underworld stack (`entry.stacked`) carries no code, as a grappled enemy does, and opens its host.
+export function slotUnder(entry: ZoneEntry, card: CardInstance, zone: SlotZone, kind: SlotKind, rect: Rect, landscape = false): CardSlot {
+  const slot = slotOf(card, zone, kind, rect, landscape);
+  return entry.stacked?.includes(card.id) ? { ...slot, code: "", opens: entry.card.id } : slot;
+}
+
 // Attachments and face-down shadow cards peek out from under the host, the most recent lowest.
 export function placeUnder(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: CardSlot[], faceUpShadows: CardInstance[], peek: number): void {
   const under = entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down"));
   under.forEach((attached, at) => {
     const kind: SlotKind = attached.zone === "shadow" ? "shadow" : "attachment";
-    out.push(slotOf(attached, zone, kind, { x: rect.x, y: rect.y + (under.length - at) * peek, w: rect.w, h: rect.h }));
+    out.push(slotUnder(entry, attached, zone, kind, { x: rect.x, y: rect.y + (under.length - at) * peek, w: rect.w, h: rect.h }));
   });
   faceUpShadows.push(...entry.attached.filter((attached) => attached.zone === "shadow" && attached.face !== "down"));
 }
@@ -88,7 +94,7 @@ export function placeCounted(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: Ca
   const under = entry.attached.filter((card) => !(card.zone === "shadow" && card.face !== "down"));
   const last = under[under.length - 1];
   if (!last) return;
-  const slot = slotOf(last, zone, last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + peek, w: rect.w, h: rect.h }, landscape);
+  const slot = slotUnder(entry, last, zone, last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + peek, w: rect.w, h: rect.h }, landscape);
   out.push(under.length > 1 ? { ...slot, stack: under.length } : slot);
 }
 
@@ -100,5 +106,5 @@ export function placeStaging(entry: ZoneEntry, rect: Rect, out: CardSlot[], m: M
     return;
   }
   const last = under[under.length - 1] as CardInstance;
-  out.push({ ...slotOf(last, "staging", last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + m.peek, w: rect.w, h: rect.h }), stack: under.length });
+  out.push({ ...slotUnder(entry, last, "staging", last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + m.peek, w: rect.w, h: rect.h }), stack: under.length });
 }

@@ -25,6 +25,8 @@ import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wild
 import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
 import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
 import { STAT_WORD } from "../cards/card-effects.ts";
+import { stackTakes, underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
+import { releasedWords, UNDERWORLD_TITLE } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
 // is at that line (resolve in beats).
@@ -220,6 +222,13 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
           line(`Revealed ${names.card(step.cardId)} from the side quest deck: it is added to the staging area.${cancel}`, null, [step.cardId]);
           return;
         }
+        // A card of The Steward's Fear's underworld stack, revealed because the location it lay under left play: the line says where it came from.
+        const stackedUnder = underHost(before, step.cardId);
+        if (stackedUnder) {
+          if (!current || current.title !== UNDERWORLD_TITLE) open(2, UNDERWORLD_TITLE, "plain");
+          line(releasedWords(names.card(step.cardId), names.card(stackedUnder)), null, [step.cardId]);
+          return;
+        }
         if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
         line(`Revealed ${names.card(step.cardId)}`);
         // The first treachery of a round, while a stage bars canceling its When Revealed effect (19137:B:1).
@@ -315,6 +324,10 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
     }
   });
+
+  // The cards an Underworld location took from the underworld deck in this intent (The Steward's Fear): no step of their own.
+  const takes = stackTakes(before, after, names.card);
+  if (takes.length > 0) groups.push({ rank: 9, title: UNDERWORLD_TITLE, tone: "plain", lines: takes.map((text) => ({ text, mark: null })) });
 
   // A stage of Mount Gundabad's quest deck flipped to side B at the beginning of the quest phase, or bypassed (emce.bypassing): no step of its own.
   const stage = stageBeats(before, after, { card: stageNamed, ...(names.mustBypass ? { mustBypass: names.mustBypass } : {}), ...(names.atStaging ? { atStaging: names.atStaging } : {}) });

@@ -96,6 +96,12 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       const amount = amountWords(instruction.amount);
       return `place ${amount} resource${amount === "1" ? "" : "s"} on ${instruction.on === "self" ? "this card" : "the card you chose"}`;
     }
+    // The Steward's Fear (06014:A:2, 06025:A:2; the asks file words the choice again for the sheet): tokens taken off the current quest.
+    case "RemoveQuestTokens": {
+      const amount = instruction.amount ?? "all";
+      const kind = instruction.kind === "any" ? "" : `${instruction.kind} `;
+      return amount === "all" ? `remove all ${kind}tokens from the current quest` : `remove ${amount} ${kind}token${amount === 1 ? "" : "s"} from the current quest`;
+    }
     // The Stone of Erech's Tarlang's Neck (the asks file words the choice again for the sheet).
     case "EndPhase":
       return "end the phase now";

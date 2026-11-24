@@ -91,6 +91,7 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "peril-in-pelargir", kind: "standalone", names: ["pelargir-lost"] },
   { scenarioId: "into-ithilien", kind: "standalone", names: ["ithilien-lost"] },
   { scenarioId: "the-siege-of-cair-andros", kind: "standalone", names: ["andros-lost"] },
+  { scenarioId: "the-stewards-fear", kind: "standalone", names: ["fear-lost"] },
   { scenarioId: "we-must-away-ere-break-of-day", kind: "standalone", names: ["day-lost"] },
   { scenarioId: "over-the-misty-mountains-grim", kind: "standalone", names: ["grim-lost"] },
   { scenarioId: "dungeons-deep-and-caverns-dim", kind: "standalone", names: ["dim-lost"] },

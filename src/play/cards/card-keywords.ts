@@ -13,6 +13,7 @@ import { printedOf } from "../../rules/core/printed.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { flagged, heldAmount } from "../../rules/core/state.ts";
 
+import { underworldValue } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { KEYWORD_RULES, type KeywordKey } from "./keyword-rules.ts";
 
 /** One keyword chip: its key in KEYWORD_RULES, the word with its value now ("Archery 2"), and whether an effect has taken it away (drawn struck through). */
@@ -81,6 +82,10 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
   else shown("pillage", (kw.pillage ?? 0) > 0, kw.pillage ?? undefined);
   // Massive: an enemy that stays in the staging area, engaged with every player, which every player may attack (the Dreadnaught).
   if (flagged(game, cardId, "attackableEngagedWithAll")) add("massive", false);
+
+  // Underworld X: the value its own record takes (06018:A:1 and the other four Underworld locations); none in any other scenario.
+  const underworld = underworldValue(game, ctx, cardId);
+  if (underworld > 0 && usable) add("underworld", lostAll, underworld);
 
   if (indestructible(game, cardId, printed)) add("indestructible", false);
   else shown("indestructible", kw.indestructible);

@@ -17,6 +17,7 @@ import { shipLoss, type ShipLoss } from "../words/scenarios/grapple.ts";
 import { heldWords } from "../words/scenarios/sea.ts";
 import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
+import { stackMark } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
 import { capturedOwners } from "../readouts/gram.ts";
 import { hiddenMark, isHeldFaceup, keptMark } from "../readouts/standalone-scenarios/wizards-quest.ts";
@@ -364,6 +365,9 @@ function underMark(tally: { count: number; limit: number } | null): UnderMark | 
 // The Ship enemy Belfalas Islet holds out of play while it is the active location (12129:A:2) is the same night pill as the cards under The Havens Burn: "1 held", and the reader hears the enemy's name.
 // The Captives of The Uruk-hai lying under To Isengard! or held by Grishnákh are counted the same way (families/captives): "2 held", and the reader hears each hero's name.
 function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): UnderMark | null {
+  // The facedown underworld cards under a location of The Steward's Fear: "2 underworld", never which cards (06018:A:1).
+  const stack = stackMark(game, cardId);
+  if (stack) return stack;
   // The cards captured underneath a card in Escape from Mount Gram: "3 captured", with their owners spoken (readouts/gram.ts).
   const owners = game.capture != null ? capturedOwners(game, cardId) : [];
   if (owners.length > 0) return capturedPill(owners);

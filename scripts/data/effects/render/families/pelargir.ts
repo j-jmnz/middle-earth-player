@@ -1,7 +1,9 @@
 // The pelargir family's pieces (src/catalog/families/pelargir.ts): Alcaron's Scroll, the treachery that attaches to the hero with the highest threat cost, the discards Collateral Damage counts in two steps, Into Ithilien's ally objectives committed from the staging area and the first player's taking of them, The Siege of Cair Andros's stage removal, copied treachery and staging shuffle, and the flags those cards read: templates, samples and stat notes.
 import { cardRef } from "../amounts.ts";
-import { amt, type Samples, type Templates } from "../family-kit.ts";
+import { amt, pck, type Samples, type Templates } from "../family-kit.ts";
 import { str } from "../kit.ts";
+
+const codeList = (value: unknown): string => (Array.isArray(value) ? value.map(String).join(", ") : str(value));
 
 export const PELARGIR_TEMPLATES: Templates = {
   AttachObjectiveTo: (i) => ({
@@ -34,6 +36,33 @@ export const PELARGIR_TEMPLATES: Templates = {
     read: ["uncancelable"],
   }),
   ShuffleStagingIntoEncounterDeck: () => ({ text: "every card in the staging area (enemies, locations, objectives) leaves play and is shuffled into the encounter deck; X is how many cards there were (0 when there were none)", read: [] }),
+  BuildUnderworldDeck: (i) => ({
+    text: `the set-aside cards with code ${codeList(i.codes)} are shuffled with the game's seed and form the underworld deck, facedown, apart from the encounter deck; no card of it is dealt a shadow card, searched or shuffled before it is shuffled into the encounter deck`,
+    read: ["codes"],
+  }),
+  HideOneAside: (i) => ({
+    text: `one of the set-aside cards with code ${codeList(i.codes)} is chosen with the game's seed and stays set aside facedown, unseen; the others leave the game unseen`,
+    read: ["codes"],
+  }),
+  TakeUnderworld: (i, ctx) => ({
+    text: `the top ${amt(i.amount, ctx)} card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under ${i.host === "self" ? "this location (self)" : i.host === "activeLocation" ? "the active location (activeLocation: nothing with no active location)" : "no location"}, out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area`,
+    read: ["amount", "host"],
+  }),
+  RevealSetAside: (i) => ({ text: `the set-aside card with the Trait ${str(i.trait)} is revealed by the actor as an encounter card (its Doomed, When Revealed effects, Surge and the effects that hear a reveal resolve) and so added to the staging area; with none set aside nothing happens`, read: ["trait"] }),
+  RevealUnderworld: (i) => ({
+    text: `the top card of the underworld deck is revealed in full (its When Revealed effects, Surge and Doomed resolve) and added to the staging area${i.discardTrait != null ? `; a card with the Trait ${str(i.discardTrait)} is placed in the encounter discard pile instead` : ""}; with the deck empty nothing happens`,
+    read: ["discardTrait"],
+  }),
+  ShuffleUnderworldIntoEncounterDeck: () => ({ text: "every card of the underworld deck is shuffled into the encounter deck; the cards stacked under locations stay there, and a later Underworld takes nothing", read: [] }),
+  RevealTopThenDiscard: () => ({
+    text: "the top card of the encounter deck (the discard pile is shuffled back first when the deck is empty) goes faceup to the encounter discard pile and never enters play; its Doomed, When Revealed effects and Surge resolve, and a card that hears \"revealed from the encounter deck\" hears it",
+    read: [],
+  }),
+  PickRandom: (i, ctx) => ({ text: `one card among ${pck(i.pick, ctx)} is chosen with the game's seed and becomes the picked card; with none nothing is picked and nobody is asked`, read: ["pick"] }),
+  RemoveQuestTokens: (i) => ({
+    text: `${i.amount == null || i.amount === "all" ? "all" : String(i.amount)} ${i.kind === "any" ? "any (progress first, then resource)" : str(i.kind)} token(s) leave the current quest card (progress first when both kinds are named; at most the card holds)`,
+    read: ["kind", "amount"],
+  }),
 };
 
 export const PELARGIR_SAMPLES: Samples = {
@@ -46,6 +75,15 @@ export const PELARGIR_SAMPLES: Samples = {
   RemoveStage: [{ verb: "RemoveStage", code: "05075" }],
   ResolveTopmostTreachery: [{ verb: "ResolveTopmostTreachery", uncancelable: true }],
   ShuffleStagingIntoEncounterDeck: [{ verb: "ShuffleStagingIntoEncounterDeck" }],
+  BuildUnderworldDeck: [{ verb: "BuildUnderworldDeck", codes: ["05037", "06026"] }],
+  HideOneAside: [{ verb: "HideOneAside", codes: ["06015", "06016", "06017"] }],
+  TakeUnderworld: [{ verb: "TakeUnderworld", amount: 2, host: "self" }, { verb: "TakeUnderworld", amount: 1, host: "activeLocation" }],
+  RevealSetAside: [{ verb: "RevealSetAside", trait: "Plot" }],
+  RevealUnderworld: [{ verb: "RevealUnderworld", discardTrait: "Clue" }],
+  ShuffleUnderworldIntoEncounterDeck: [{ verb: "ShuffleUnderworldIntoEncounterDeck" }],
+  RevealTopThenDiscard: [{ verb: "RevealTopThenDiscard" }],
+  PickRandom: [{ verb: "PickRandom", pick: { type: "ally", control: "any", controlledBy: "firstPlayer" } }],
+  RemoveQuestTokens: [{ verb: "RemoveQuestTokens", kind: "any", amount: 1 }, { verb: "RemoveQuestTokens", kind: "progress" }],
 };
 
 export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {

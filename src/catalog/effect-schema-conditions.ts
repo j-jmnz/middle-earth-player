@@ -89,6 +89,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The card the answered event is about is the first enemy the encounter deck revealed this round ("The first enemy revealed from the encounter deck each round", 05067:B:2): not one a search, a shadow card or a discard added. The engine marks the enemy as it is revealed (pelargir/first-enemy.ts), before the Forced
   // effects that hear the reveal, and only in a game with a record that reads this condition. Read by the pelargir family.
   z.strictObject({ kind: z.literal("firstEnemy") }),
+  // No facedown card lies under a location that is out of play: the stacks of the locations that left play are revealed ("When a location leaves play, any facedown cards stacked underneath that location are revealed", ats.underworld). Read by the pelargir family (families/pelargir/underworld.ts), which holds the stage's advance back until the stack is revealed (06011:B:3, 06012:B:3).
+  z.strictObject({ kind: z.literal("underworldReleased") }),
+  // A player still in the game has no cards in his deck ("If any player has no cards in his deck", 06030:A:2). Read by the pelargir family (families/pelargir/empty-deck.ts).
+  z.strictObject({ kind: z.literal("deckEmpty") }),
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
   // The named phase has just ended: the engine has moved on and its boundary (Forced effects at the end of the phase) has not yet been crossed ("The players can only advance at the end of the quest phase", 40004:B:3).
   z.strictObject({ kind: z.literal("phaseEnded"), is: phaseNameSchema }),
