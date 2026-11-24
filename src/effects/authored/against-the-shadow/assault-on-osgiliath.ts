@@ -154,15 +154,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "06100:constant:1", cardCode: "06100", lines: ["06100:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "siege", amount: 1, until: "whileSourceActive", target: "currentQuest" }] },
     { id: "06100:shadow:1", cardCode: "06100", lines: ["06100:A:2"], timing: "shadow", instructions: SHADOW_RETURN },
 
-    // 06101 East Quarter. A:1: while it is the active location the current quest gains battle, unless West Quarter is an active location too: a quest that has both uses Defense (siege), never both (Readings, 06100:A:1). A:2 (Shadow): as West Quarter.
-    {
-      id: "06101:constant:1",
-      cardCode: "06101",
-      lines: ["06101:A:1"],
-      timing: "constant",
-      condition: { kind: "not", condition: { kind: "canPick", pick: { type: "location", control: "any", active: true, names: ["West Quarter"] } } },
-      instructions: [{ verb: "ModifyStat", stat: "battle", amount: 1, until: "whileSourceActive", target: "currentQuest" }],
-    },
+    // 06101 East Quarter. A:1: while it is the active location the current quest gains battle. West Quarter and East Quarter are never active together: the second active slot is Ruined Tower's alone (the pelargir family's travel hook), so the quest never has both keywords (Readings, 06100:A:1). A:2 (Shadow): as West Quarter.
+    { id: "06101:constant:1", cardCode: "06101", lines: ["06101:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "battle", amount: 1, until: "whileSourceActive", target: "currentQuest" }] },
     copyLine("06100:A:2", "06101:A:2"),
 
     // 06102 Ruined Square (surge is a keyword). A:2: Response after any enemy is destroyed: it takes 1 progress, wherever it is. A:3: Forced, when any character leaves play while a player controls it, it returns to the staging area.

@@ -4,6 +4,7 @@
 // in no play area any more. Every way to lose it is seen in one place, the settle sweep: a record that returns the location (LoseControlOfLocation, ReturnToStaging on the card itself), a travel to it or a card that makes it the active location (West Gate), and
 // the cards of an eliminated player, which the core sends to the encounter discard pile. A loss removes the progress, leaves the location in the staging area and announces `controlLost` for the seat that held it.
 import type { Instruction } from "../../../catalog/boundary.ts";
+import type { TravelCharge } from "../../interpret/family-manifest.ts";
 
 import { gameReads } from "../../core/game-reads.ts";
 import type { EngineStep } from "../../core/intents.ts";
@@ -93,6 +94,12 @@ export function controlSweep(state: ScenarioState, ctx: ReduceContext, _steps: E
 /** The locations a player controls are places the players may travel to (Caleb, FFG: "the rules for the scenario do allow it"; the control is lost as the location leaves the play area). */
 export function controlledTravelReach(state: ScenarioState, ctx: ReduceContext): readonly string[] {
   return state.modifiers.length === 0 || !gameReads(state, ctx, '"TakeControlOfLocation"') ? [] : controlledLocations(state);
+}
+
+/** Traveling to a location a player controls first takes it out of his play area: the control is lost (progress removed, in the staging area), then the location's own Travel line and the travel itself follow as for any location in the staging area (Caleb: "You would lose control of the location when it leaves your play area"). */
+export function controlledTravelCost(state: ScenarioState, ctx: ReduceContext, locationId: string | null): TravelCharge | null {
+  if (locationId == null || state.modifiers.length === 0 || state.cards[locationId]?.zone !== "play" || !controlledTravelReach(state, ctx).includes(locationId)) return null;
+  return { source: locationId, instructions: [{ verb: "LoseControlOfLocation", card: "self" }] };
 }
 
 /** Ruined Tower (06103). */

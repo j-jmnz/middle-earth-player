@@ -8,7 +8,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { takeControlOfStagedObjectives } from "./control.ts";
 import { alcaronLoss } from "./ending.ts";
-import { controlSweep, controlledTravelReach, loseControlOfLocation, takeControlOfLocation, towerSecond } from "./location-control.ts";
+import { controlSweep, controlledTravelCost, controlledTravelReach, loseControlOfLocation, takeControlOfLocation, towerSecond } from "./location-control.ts";
 import { undefendedAnnounced } from "./undefended.ts";
 import { archeryOfAmount } from "./archery-of.ts";
 import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
@@ -97,7 +97,7 @@ export const manifest: RulesFamily = {
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,
   settle: { sweep: (state, ctx, steps) => alcaronLoss(advanceWithoutVillagers(progressesToVictory(releaseUnderworldStacks(controlSweep(sieges(state, ctx, steps), ctx, steps), ctx, steps), ctx, steps), ctx, steps), ctx) },
-  travel: { unpayable: (state, instruction, ctx, locationId) => eachPlayerSpendsUnpayable(state, instruction, ctx, locationId), reach: controlledTravelReach, second: towerSecond },
+  travel: { unpayable: (state, instruction, ctx, locationId) => eachPlayerSpendsUnpayable(state, instruction, ctx, locationId), reach: controlledTravelReach, cost: controlledTravelCost, second: towerSecond },
   pick: (state, id, spec) => noResourcesMatches(state, id, spec),
   amount: (state, amount, scope, ctx) => archeryOfAmount(state, amount, scope, ctx),
   combat: {
