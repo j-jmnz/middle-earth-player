@@ -15,7 +15,7 @@ import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { currentQuestHas } from "../../../rules/families/quest/conditions.ts";
 import { progressRoom } from "../../../rules/families/south/locations.ts";
 import { advanceStage, committedWillpower, questStatOf } from "../../../rules/quest/quest.ts";
-import { attack, defend, quest, resolve, rowProblems, threat, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, attack, defend, endPhase, endRound, quest, resolve, rowProblems, stagingThreat, stat, threat, type Row } from "../../../../test/harness/card-spec.ts";
 import { payerOk } from "../../../rules/families/costs/pay.ts";
 import { spendablePools } from "../../../rules/families/costs/verbs.ts";
 import { play } from "../../../../test/harness/card-spec-play.ts";
@@ -65,6 +65,30 @@ describe("05036:A:1 later entrants", () => {
     expect(modifiedStat(state, hero, "attack", done.table.ctx.cards)).toBe(0);
     expect(modifiedStat(state, hero, "defense", done.table.ctx.cards)).toBe(0);
   });
+});
+
+// The durations end: each line is read twice, in force after the effect and gone at the end of the round or the phase (rr.lasting-effects).
+describe("05036:A:1, 05062:A:1 and 05064:A:1 the effect ends at the end of the round or the phase", () => {
+  const SCOURGE = "05064";
+  const both = (effects: readonly Effect[], line: string, inForce: Row, gone: Row) => {
+    expect(rowProblems(SCENARIO, { ...inForce, line }, effects)).toEqual([]);
+    expect(rowProblems(SCENARIO, { ...gone, line }, effects)).toEqual([]);
+  };
+  lineSpec("05036:A:1", "the -2 Attack and -2 Defense are in force until the end of the round and are gone at the end of the round", (effects) =>
+    both(effects, "05036:A:1",
+      { line: "", layout: { stage: REINFORCING }, act: [resolve(ASSAULT, "whenRevealed")], expect: [stat("dh1", "attack", 0), stat("dh1", "defense", 0)] },
+      { line: "", layout: { stage: REINFORCING }, act: [resolve(ASSAULT, "whenRevealed"), endPhase, endRound], expect: [stat("dh1", "attack", 2), stat("dh1", "defense", 2)] }),
+  );
+  lineSpec("05062:A:1", "the +2 Attack lasts until the end of the phase and is gone at the end of the phase (it came again after the phase)", (effects) =>
+    both(effects, "05062:A:1",
+      { line: "", layout: { stage: REINFORCING, engaged: [ORC] }, act: announce("shadowDealtTo", ORC), expect: stat(ORC, "attack", 3) },
+      { line: "", layout: { stage: REINFORCING, engaged: [ORC] }, act: [announce("shadowDealtTo", ORC), endPhase], expect: stat(ORC, "attack", 1) }),
+  );
+  lineSpec("05064:A:1", "the raised staging Threat lasts until the end of the phase and is gone at the end of the phase", (effects) =>
+    both(effects, "05064:A:1",
+      { line: "", layout: { stage: REINFORCING, deckOf: ["event"], staging: ["f3"] }, act: resolve(SCOURGE, "whenRevealed"), expect: stagingThreat(4) },
+      { line: "", layout: { stage: REINFORCING, deckOf: ["event"], staging: ["f3"] }, act: [resolve(SCOURGE, "whenRevealed"), endPhase], expect: stagingThreat(3) }),
+  );
 });
 
 describe("05056:A:1 allies cannot defend", () => {
