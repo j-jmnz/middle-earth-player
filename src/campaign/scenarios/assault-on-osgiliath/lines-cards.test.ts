@@ -94,14 +94,39 @@ function counted(active: string, effects: readonly Effect[]): number {
   return quest?.kind === "quest" ? quest.willpower : -1;
 }
 
+/** As `counted`, with a location in the staging area, and with Ruined Tower traveled to as the second active location when `tower` is set (Boromir is committed after the travel). */
+function countedWith(active: string, staging: readonly string[], tower: boolean, effects: readonly Effect[]): number {
+  const made = table({ phase: tower ? "Travel" : "Quest", active, staging: tower ? [...staging, CODES.tower] : staging, heroes: [{ code: BOROMIR, seat: 0 }], committed: tower ? [] : [BOROMIR] }, effects, [BOROMIR]);
+  let run = opened(made);
+  if (tower) {
+    run = send(run, { type: "Travel", locationId: idOf(made.state, CODES.tower) } as PlayerIntent, made.ctx);
+    run = drive(made, run, (state) => state.phase === "Quest" && state.mode === "questCommit");
+    run = send(run, { type: "Commit", cardIds: [idOf(run.state, BOROMIR)] }, made.ctx);
+  }
+  const quest = send(run, { type: "Pass" }, made.ctx).steps.find((step) => step.kind === "quest");
+  return quest?.kind === "quest" ? quest.willpower : -1;
+}
+
 lineSpec("06100:A:1", "while West Quarter is the active location the quest counts Defense in place of Willpower", (effects) => {
   expect(counted(CODES.westQuarter, effects)).toBe(2);
   expect(counted(CODES.harbor, effects)).toBe(1);
 });
 
+lineSpec("06100:A:1", "counts Willpower while West Quarter is only in the staging area, and Defense when Ruined Tower is the second active location beside it", (effects) => {
+  expect(countedWith(CODES.harbor, [CODES.westQuarter], false, effects)).toBe(1);
+  expect(countedWith(CODES.harbor, [CODES.westQuarter], true, effects)).toBe(1);
+  expect(countedWith(CODES.westQuarter, [], true, effects)).toBe(2);
+});
+
 lineSpec("06101:A:1", "while East Quarter is the active location the quest counts Attack in place of Willpower", (effects) => {
   expect(counted(CODES.eastQuarter, effects)).toBe(3);
   expect(counted(CODES.harbor, effects)).toBe(1);
+});
+
+lineSpec("06101:A:1", "counts Willpower while East Quarter is only in the staging area, and Attack when Ruined Tower is the second active location beside it", (effects) => {
+  expect(countedWith(CODES.harbor, [CODES.eastQuarter], false, effects)).toBe(1);
+  expect(countedWith(CODES.harbor, [CODES.eastQuarter], true, effects)).toBe(1);
+  expect(countedWith(CODES.eastQuarter, [], true, effects)).toBe(3);
 });
 
 /** Round 1 explores Ancient Harbor; round 2 reveals Pinned Down, and the combat phase asks the players to divide the archery total (the first round's is divided first). */

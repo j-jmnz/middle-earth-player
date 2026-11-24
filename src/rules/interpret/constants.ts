@@ -93,6 +93,11 @@ function setRecord(state: ScenarioState, source: CardInstance, effectId: string,
   }));
 }
 
+// A location that gives the quest Siege or Battle "while it is the active location" (06100:A:1, 06101:A:1) holds the keyword only while it is an active location. Only the two keyword stats read the record's `until` here: every other constant keeps the modifier for as long as its source is in play.
+function keywordWhileActive(instruction: Extract<Instruction, { verb: "ModifyStat" }>): boolean {
+  return instruction.until === "whileSourceActive" && (instruction.stat === "siege" || instruction.stat === "battle");
+}
+
 function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
   const found: Modifier[] = [];
   // The records of a "does not stack" ModifyStat that a copy already gave (the oldest copy gives it).
@@ -121,7 +126,7 @@ function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
         sourceId: source.id,
         stat: instruction.stat,
         amount: amount * factor,
-        until: source.zone === "victory" ? "whileSourceInVictory" : "whileSourceInPlay",
+        until: source.zone === "victory" ? "whileSourceInVictory" : keywordWhileActive(instruction) ? "whileSourceActive" : "whileSourceInPlay",
         origin: effect.id,
         ...(instruction.per === "committed" || instruction.per === "ally" ? { per: instruction.per } : {}),
         ...(isStatCondition(instruction.when) ? { when: instruction.when } : {}),
