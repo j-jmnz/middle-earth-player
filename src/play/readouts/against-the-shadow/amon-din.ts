@@ -9,7 +9,7 @@ import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { placeQuestProgress } from "../../../rules/quest/quest.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
-import { alcaronLeftWords, alcaronWords, questDialName, questDialWords, changedWords, deadChangedWords, deadDialName, deadDialWords, deadWords, endWords, ghulatWords, heldTitle, heldWords, movesWords, protectWords, rescuedDialName, rescuedDialWords, rescuedWords, savageryWords, undefendedVillagersResult, undefendedVillagersWords, villagerTokens } from "../../words/scenarios/against-the-shadow/amon-din.ts";
+import { alcaronLeftWords, alcaronWords, questDialName, questDialWords, changedWords, deadChangedWords, deadDialName, deadDialWords, deadWords, endWords, ghulatWords, heldTitle, heldWords, movesWords, protectWords, rescuedDialName, rescuedDialWords, rescuedWords, savageryWords, undefendedVillagersResult, undefendedVillagersWords, villagerTokens, winWords } from "../../words/scenarios/against-the-shadow/amon-din.ts";
 import { ownerWords } from "../../words/owner.ts";
 import type { TableDial } from "../dials.ts";
 
@@ -63,6 +63,12 @@ export function amonDinDials(game: ScenarioState): readonly TableDial[] {
     { id: "rescued", testID: "din-rescued", label: "Rescued", name: rescuedDialName, value: saved, cardId: rescued.id, note: rescuedDialWords(saved, lost) },
     { id: "dead", testID: "din-dead", label: "Dead", name: deadDialName, value: lost, icon: "damage", cardId: dead.id, note: deadDialWords(lost, saved) },
   ];
+}
+
+/** Stage 1's "To win" line, naming Rescued Villagers where the printed line says "here" (06068:A:2): null on any other stage and in any other scenario, where the printed objective line is used. */
+export function amonDinWin(game: ScenarioState): string | null {
+  const stage = game.questStage ? game.cards[game.questStage] : undefined;
+  return live(game) && stage?.code === STAGE_ONE ? winWords : null;
 }
 
 /** The lines the current stage adds to its preview and to the screen that tells the advance to it: stage 1B's tokens and what progress does to them, stage 2B's undefended attack and the end (or the held end). Empty for another stage and in any other scenario. */

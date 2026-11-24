@@ -12,10 +12,12 @@ import { CODES, quested, runSettled, table, undefendedAtRescued, withVillagers }
 import { cardKeywords } from "../cards/card-keywords.ts";
 import { slotNumbers } from "../cards/card-effects.ts";
 import { dungeonDetail } from "../cards/dungeon-preview.ts";
+import { ledgerLine } from "../cards/ledger.ts";
 import { previewCards, questTitle } from "../cards/table-preview.ts";
 import { defenseSheet } from "../choice/combat-sheets.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
 import { instructionWords } from "../words/instruction.ts";
+import { advanceWords } from "../readouts/quest-advance.ts";
 import { readoutFor } from "../readouts/readout.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
 import { discardLoss, damageOutcome, lossWords, outcomeWords } from "../store/foresight.ts";
@@ -34,7 +36,9 @@ const preview = (made: Made, state: ScenarioState, code: string) => previewCards
 const chips = (made: Made, state: ScenarioState, code: string) => cardKeywords(state, made.ctx, idOf(state, code)).map((chip) => chip.word);
 const say = (made: Made, state: ScenarioState, code: string) => dungeonDetail(state, made.ctx, idOf(state, code), idName(made, state));
 const dialsOf = (made: Made, state: ScenarioState) => scenarioDials(state, made.ctx, nameOf(made));
-const stageLine = (made: Made, state: ScenarioState) => questTitle(state, made.ctx, state.questStage ?? "", "Stage", () => null)?.detail ?? "";
+// The stage's preview detail and the advance screen's detail, both through the real line reader (the printed lines of the ledger).
+const stageLine = (made: Made, state: ScenarioState) => questTitle(state, made.ctx, state.questStage ?? "", "Stage", ledgerLine)?.detail ?? "";
+const advanceLine = (made: Made, state: ScenarioState) => advanceWords(state, made.ctx, state.questStage ?? "", "Stage", ledgerLine).detail ?? "";
 const speechDeps = (made: Made): CardSpeechDeps => ({
   nameOf: (key) => made.cards.get(pictureCode(key))?.name ?? key,
   inactive: () => false,
@@ -137,7 +141,7 @@ describe("stage 1B moves villager tokens (06066:B:2, 06066:B:3)", () => {
   });
 
   it("the stage's preview says progress moves tokens to Rescued Villagers, the surplus is lost and the last token advances it", () => {
-    expect(stageLine(made, state)).toBe("No quest points. Progress is not placed on this stage: each point moves 1 villager token from here to Rescued Villagers, and progress beyond the tokens it holds is lost. The stage advances when its last token leaves.");
+    expect(stageLine(made, state)).toBe("To win: have more villager tokens on Rescued Villagers than damage tokens on Dead Villagers at the end of the game. Progress is not placed on this stage: each point moves 1 villager token from here to Rescued Villagers, and progress beyond the tokens it holds is lost. The stage advances when its last token leaves.");
   });
 
   it("the quest readout says tokens move, not progress, with the surplus lost and the stage advancing", () => {
@@ -180,7 +184,7 @@ describe("stage 2B: the undefended attack (06067:B:1)", () => {
 
   it("the stage's preview says where the damage goes and what the end is, before any attack", () => {
     const made = orc(4);
-    expect(stageLine(made, made.state)).toContain("An undefended attack discards 1 villager token from Rescued Villagers for each point of damage, and no hero is damaged. Each token discarded puts 1 damage token on Dead Villagers.");
+    expect(stageLine(made, made.state)).toContain("An undefended attack discards 1 villager token from Rescued Villagers for each point of damage, and no hero is damaged. Each token discarded puts 1 damage token on Dead Villagers. At the end");
     expect(stageLine(made, made.state)).toContain("At the end of the game: the players win if nothing changes (4 villager tokens on Rescued Villagers, 0 damage tokens on Dead Villagers; a tie loses).");
   });
 
@@ -215,6 +219,34 @@ describe("stage 2B: the undefended attack (06067:B:1)", () => {
     const made = orc(4);
     const other = { ...made.state, scenarioId: "the-stewards-fear" };
     expect(readoutFor({ ...other, pendingAttack: { enemyId: idOf(other, marauding), undefended: true, heroId: made.hero } as never }, made.ctx, null, null, idName(made, other))?.result).toMatch(/^Undefended: 4 damage on /);
+  });
+});
+
+describe("the stage lines say each sentence once (06066:B:1, 06067:B:1, 06068:A:2)", () => {
+  const WIN = "To win: have more villager tokens on Rescued Villagers than damage tokens on Dead Villagers at the end of the game";
+  const SAVERY = "Progress is not placed on this stage: each point moves 1 villager token from here to Rescued Villagers, and progress beyond the tokens it holds is lost. The stage advances when its last token leaves.";
+  const PROTECT = "An undefended attack discards 1 villager token from Rescued Villagers for each point of damage, and no hero is damaged. Each token discarded puts 1 damage token on Dead Villagers";
+
+  it("stage 1B: its win line names Rescued Villagers (not 'here'), and the preview and the advance screen read the same, with no double period", () => {
+    const made = table({ staging: [{ code: rescued, resources: 4 }, dead] });
+    const state = withVillagers(made.state, savagery, 5);
+    expect(stageLine(made, state)).toBe(`${WIN}. ${SAVERY}`);
+    expect(advanceLine(made, state)).toBe(`${WIN}. ${SAVERY}`);
+  });
+
+  it("stage 2B: the undefended attack and the end, in the preview and on the advance screen", () => {
+    const made = table({ stage: protect, staging: [{ code: rescued, resources: 4 }, { code: dead, damage: 1 }] });
+    const end = "At the end of the game: the players win if nothing changes (4 villager tokens on Rescued Villagers, 1 damage token on Dead Villagers; a tie loses).";
+    expect(stageLine(made, made.state)).toBe(`${PROTECT}. ${end}`);
+    expect(advanceLine(made, made.state)).toBe(`15 quest points to complete it. ${PROTECT}. ${end}`);
+  });
+
+  it("no line of any moment joins to a double period, held, with Alcaron gone or not", () => {
+    const made = table({ stage: protect, staging: [{ code: rescued, resources: 4 }, { code: dead, damage: 1 }, ghulat], play: [alcaron] });
+    const gone = runSettled(made, made.state, { verb: "Discard", target: { kind: "self" } }, idOf(made.state, alcaron));
+    const held = runSettled(made, made.state, { verb: "ProgressQuest", amount: 20 });
+    for (const state of [made.state, gone, held]) for (const text of [stageLine(made, state), advanceLine(made, state)]) expect(text).not.toMatch(/\.\./);
+    expect(stageLine(made, gone)).toBe(`${PROTECT}. Lord Alcaron left play. The players lose once Ghulat leaves play, because the game cannot end while he is in play.`);
   });
 });
 

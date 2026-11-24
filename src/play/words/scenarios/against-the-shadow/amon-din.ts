@@ -28,8 +28,11 @@ export const deadDialWords = (dead: number, rescued: number): string => `${plura
 export const savageryWords = (): string =>
   "Progress is not placed on this stage: each point moves 1 villager token from here to Rescued Villagers, and progress beyond the tokens it holds is lost. The stage advances when its last token leaves.";
 
-/** The line stage 2B adds to its preview: where an undefended attack's damage goes (06067:B:1). */
-export const protectWords = "An undefended attack discards 1 villager token from Rescued Villagers for each point of damage, and no hero is damaged. Each token discarded puts 1 damage token on Dead Villagers.";
+/** Stage 1's "To win" line: the win line of Rescued Villagers (06068:A:2) said for the stage card, which has no "here". No period: the stage's lines are joined with ". " (the last line of a stage's text keeps its own). */
+export const winWords = "To win: have more villager tokens on Rescued Villagers than damage tokens on Dead Villagers at the end of the game";
+
+/** The line stage 2B adds to its preview: where an undefended attack's damage goes (06067:B:1). No period: it is not the last line of the stage's text. */
+export const protectWords = "An undefended attack discards 1 villager token from Rescued Villagers for each point of damage, and no hero is damaged. Each token discarded puts 1 damage token on Dead Villagers";
 
 /** What stage 2B says of the end: the comparison that decides it (06068:A:2, 06069:A:2). */
 export const endWords = (rescued: number, dead: number): string =>
