@@ -1,0 +1,319 @@
+Scenario piles that place cards with no record (quest: 05072 The Defense; quest: 05073 Reinforcing the Banks; quest: 05074 Breakthrough at the Approach; quest: 05075 Breakthrough at the Citadel; quest: 05076 The Last Battle; staging: 05033 The Citadel; staging: 05034 The Approach; staging: 05035 The Banks)
+
+## 05030 Orc Scramblers
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05030:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+05030:A:2 (front): When Revealed: Deal 1 damage to each Battleground location in play, if able.
+  05030:whenRevealed:1: When revealed
+    - deal 1 damage to each Battleground location (any player controls)
+
+05030:A:3 (shadow): Shadow: Deal 2 damage to The Citadel if it is in play. Otherwise, attacking enemy gets +2 Attack.
+  05030:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a location (any player controls) named "The Citadel" to choose: choose location (any player controls) named "The Citadel"
+    - then, if there is a location (any player controls) named "The Citadel" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+    - then, if not (there is a location (any player controls) named "The Citadel" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 05031 Battering Ram
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05031:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+05031:A:2 (front): When Revealed: If the active location is a Battleground, deal 3 damage to it.
+  05031:whenRevealed:1: When revealed
+    - if there is a Battleground location (any player controls) that is the active location to choose: deal 3 damage to the active location
+
+05031:A:3 (shadow): Shadow: Deal 2 damage to The Approach if it is in play. Otherwise, attacking enemy gets +2 Attack.
+  05031:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a location (any player controls) named "The Approach" to choose: choose location (any player controls) named "The Approach"
+    - then, if there is a location (any player controls) named "The Approach" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+    - then, if not (there is a location (any player controls) named "The Approach" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 05032 Siege Raft
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05032:A:1 (front): When Revealed: Deal 2 damage to the lowest Threat Battleground location in play, if able.
+  05032:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Battleground location (any player controls) with the lowest Threat of those (ties: the chooser decides)
+    - deal 2 damage to the picked card
+
+05032:A:2 (shadow): Shadow: Deal 2 damage to The Banks if it is in play. Otherwise, attacking enemy gets +2 Attack.
+  05032:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a location (any player controls) named "The Banks" to choose: choose location (any player controls) named "The Banks"
+    - then, if there is a location (any player controls) named "The Banks" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+    - then, if not (there is a location (any player controls) named "The Banks" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 05033 The Citadel
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+05033:A:1 (front): If The Citadel has 11 or more damage, remove it from the game (do not collect its victory points).
+  05033:constant:1: Constant
+    - this card: stat removedAtDamage (held by a Battleground location in play, the amount is the damage at which it is removed from the game: not explored, to no pile, no Response, its damage and progress gone; checked at every settle) 11, while this card is in play
+
+05033:A:2 (front): Response: After The Citadel leaves play as an explored location, remove stage 4 from the quest deck, if able.
+  05033:response:1: Response on the event locationExplored (heard about this card)
+    - the stage with code 05075 is set aside and no longer part of the quest deck: the stage that is defeated before it goes to the next stage still in the quest deck; if it is the current stage, the quest advances at once to the next stage still in the quest deck and that stage is revealed; a stage already gone is not an error
+
+## 05034 The Approach
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+05034:A:1 (front): If The Approach has 7 or more damage, remove it from the game (do not collect its victory points).
+  05034:constant:1: Constant
+    - this card: stat removedAtDamage (held by a Battleground location in play, the amount is the damage at which it is removed from the game: not explored, to no pile, no Response, its damage and progress gone; checked at every settle) 7, while this card is in play
+
+05034:A:2 (front): Response: After The Approach leaves play as an explored location, remove stage 3 from the quest deck, if able.
+  05034:response:1: Response on the event locationExplored (heard about this card)
+    - the stage with code 05074 is set aside and no longer part of the quest deck: the stage that is defeated before it goes to the next stage still in the quest deck; if it is the current stage, the quest advances at once to the next stage still in the quest deck and that stage is revealed; a stage already gone is not an error
+
+## 05035 The Banks
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+05035:A:1 (front): If The Banks has 3 or more damage, remove it from the game (do not collect its victory points).
+  05035:constant:1: Constant
+    - this card: stat removedAtDamage (held by a Battleground location in play, the amount is the damage at which it is removed from the game: not explored, to no pile, no Response, its damage and progress gone; checked at every settle) 3, while this card is in play
+
+05035:A:2 (front): Response: After The Banks leaves play as an explored location, remove stage 2 from the quest deck, if able.
+  05035:response:1: Response on the event locationExplored (heard about this card)
+    - the stage with code 05073 is set aside and no longer part of the quest deck: the stage that is defeated before it goes to the next stage still in the quest deck; if it is the current stage, the quest advances at once to the next stage still in the quest deck and that stage is revealed; a stage already gone is not an error
+
+## 05036 Orc Assault
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05036:A:1 (front): When Revealed: Each character gets -2 Attack and -2 Defense until the end of the round.
+  05036:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every character in play, now and entering later: stat attack -2, until the end of the round
+    - every character in play, now and entering later: stat defense -2, until the end of the round
+
+05036:A:2 (shadow): Shadow: Deal 2 damage to all Battleground locations in play.
+  05036:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - deal 2 damage to each Battleground location (any player controls)
+
+## 05056 Lieutenant of Mordor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05056:A:1 (front): Allies cannot defend against Lieutenant of Mordor.
+  05056:constant:1: Constant
+    - this card: stat alliesCannotDefend (allies cannot be declared as defenders against it) 1, while this card is in play
+
+05056:A:2 (front): When Revealed: Resolve the 'when revealed' effect on the topmost treachery card in the encounter discard pile, if able. This effect cannot be canceled.
+  05056:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
+    - resolve the When Revealed effects (not Doomed, not Surge) of the last treachery card placed in the encounter discard pile; the card stays in the discard pile; with no treachery there nothing happens; these effects cannot be canceled
+
+## 05057 Orc Arbalesters
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05057:A:1 (front): Archery X.
+  05057:constant:1: Constant (record also names 05057:A:2)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of leadership hero (any player controls) is at least 1: this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) 1, while this card is in play
+    - then, if the number of tactics hero (any player controls) is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) 1, while this card is in play
+    - then, if the number of spirit hero (any player controls) is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) 1, while this card is in play
+    - then, if the number of lore hero (any player controls) is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) 1, while this card is in play
+
+05057:A:2 (front): X is the number of different resource icons (Leadership, Tactics, Spirit, or Lore) on heroes in play.
+  05057:constant:1: Constant (record also names 05057:A:1)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of leadership hero (any player controls) is at least 1: this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) 1, while this card is in play
+    - then, if the number of tactics hero (any player controls) is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) 1, while this card is in play
+    - then, if the number of spirit hero (any player controls) is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) 1, while this card is in play
+    - then, if the number of lore hero (any player controls) is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) 1, while this card is in play
+
+05057:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
+  05057:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack 2, until the end of the attack
+
+## 05058 Orc Vanguard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05058:A:1 (front): While Orc Vanguard is in the staging area, resources cannot be spent from the resource pools of heroes who have a Leadership, Spirit, or Lore resource icon.
+  05058:constant:1: Constant
+    only if this card is in the staging area
+    - each leadership/spirit/lore hero (any player controls): stat cannotSpendResources (held by a hero: no resource can be spent from its pool, for a card, an ability or an effect; resources can still be gained and moved) 1, while this card is in play
+
+05058:A:2 (shadow): Shadow: Deal the attacking enemy two additional shadow cards.
+  05058:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+
+## 05059 Orc War Camp
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05059:A:1 (front): If an Orc enemy is in play, progress tokens cannot be placed on Orc War Camp while it is in the staging area.
+  05059:constant:1: Constant
+    only if all of: (this card is in the staging area) and (the number of Orc enemy (any player controls) is at least 1)
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+05059:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each shadow card dealt to it.
+  05059:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack shadowCards of the attacking enemy, until the end of the attack
+
+## 05060 The Master's Malice
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05060:A:1 (front): When Revealed: Each player chooses 1 sphere of influence (Leadership, Tactics, Spirit, or Lore). Each character a player controls that does not belong to his chosen sphere takes 3 damage.
+  05060:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "leadership":
+          - deal 3 damage to each character (you control) that is not a leadership card
+        * option "tactics":
+          - deal 3 damage to each character (you control) that is not a tactics card
+        * option "spirit":
+          - deal 3 damage to each character (you control) that is not a spirit card
+        * option "lore":
+          - deal 3 damage to each character (you control) that is not a lore card
+
+## 05061 The Power of Mordor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05061:A:1: Doomed 3.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+05061:A:2 (front): When Revealed: Count the number of encounter cards in the staging area and shuffle them into the encounter deck. Reveal an equal number of cards from the encounter deck and add them to the staging area. This effect cannot be canceled.
+  05061:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every card in the staging area (enemies, locations, objectives) leaves play and is shuffled into the encounter deck; X is how many cards there were (0 when there were none)
+    - the first player reveals X encounter cards, one after the other, each in a staging of its own
+
+## 05062 Orc Rabble
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05062:A:1 (front): Forced: When Orc Rabble is dealt a shadow card, it gets +2 Attack until the end of the phase.
+  05062:forced:1: Forced on the event shadowDealtTo (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card: stat attack 2, until the end of the phase
+
+05062:A:2 (shadow): Shadow: Deal the attacking enemy an additional shadow card for each player in the game.
+  05062:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - repeat the number of players times:
+      - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+
+## 05063 Orc Arsonist
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05063:A:1 (front): Forced: When Orc Arsonist engages a player, deal 1 shadow card to each enemy engaged with that player.
+  05063:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    - for each enemy (any player controls) engaged with you:
+      - the picked card is dealt a shadow card
+
+05063:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Deal it another shadow card.
+  05063:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+
+## 05064 Scourge of Mordor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05064:A:1 (front): When Revealed: Each player discards the top card of his deck. Until the end of the phase, raise the total Threat in the staging area by X, where X is the total cost of all cards discarded by this effect.
+  05064:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the top 1 card(s) of the acting player's deck go to their discard pile
+    - the total Threat in the staging area is the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0) higher until the end of the phase
+
+05064:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Deal it another shadow card.
+  05064:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+
+## 05072 The Defense
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+05072:A:1 (front): Setup: Add The Approach, The Citadel, and The Banks to the staging area. Shuffle the encounter deck.
+  05072:setup:1: Setup
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+05072:B:1 (back): Siege. (Characters quest using Defense instead of Willpower.)
+  (the keyword part is owned by the card's keywords; the records cover: (Characters quest using Defense instead of Willpower.))
+  05072:constant:1: Constant
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+05072:B:2 (back): Players must deal damage from undefended attacks to the lowest Threat Battleground location in play. If there are no Battleground locations in play, immediately advance to the next stage.
+  05072:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat undefendedToBattleground (held by the current quest stage: the damage of an undefended attack goes to the Battleground location in play with the lowest Threat, none to a hero; on a tie the defending player names it) 1, while this card is in play
+    - this card: stat advancesWithoutBattleground (held by the current quest stage: when no Battleground location is in play the quest advances at once to the next stage still in the quest deck) 1, while this card is in play
+
+## 05073 Reinforcing the Banks
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+05073:B:1 (back): Reveal 1 additional card from the encounter deck and add it to the staging area during the staging step each round.
+  05073:constant:1: Constant
+    - the table: stat revealMore (the staging step reveals this many more cards, after the one each player makes; they go to the players in turn, the first player first, and while the stages are separate to the player whose stage holds the effect) 1, while this card is in play
+
+## 05074 Breakthrough at the Approach
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+05074:B:1 (back): Battle. (Characters quest using Attack instead of Willpower.)
+  (the keyword part is owned by the card's keywords; the records cover: (Characters quest using Attack instead of Willpower.))
+  05074:constant:1: Constant
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+05074:B:2 (back): Forced: After the players quest unsuccessfully, instead of raising threat, each player must choose and discard 1 character he controls.
+  05074:forced:1: Forced after the players quest unsuccessfully
+    only if the actor holds the first player token
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each player does not raise their threat from questing unsuccessfully until the end of the phase
+    - for each player, first player first:
+      - choose character (you control)
+      - discard the picked card
+
+## 05075 Breakthrough at the Citadel
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+05075:B:1 (back): Siege. (Characters quest using Defense instead of Willpower.)
+  (the keyword part is owned by the card's keywords; the records cover: (Characters quest using Defense instead of Willpower.))
+  05075:constant:1: Constant
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+05075:B:2 (back): Breakthrough at the Citadel adds 5 Threat to the staging area.
+  05075:constant:2: Constant
+    - the table: stat moreStagingThreat 5, while this card is in play
+
+## 05076 The Last Battle
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+05076:B:1 (back): Siege. (Characters quest using Defense instead of Willpower.)
+  (the keyword part is owned by the card's keywords; the records cover: (Characters quest using Defense instead of Willpower.))
+  05076:constant:1: Constant
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
+
+05076:B:2 (back): When Revealed: Reveal 1 card per player from the encounter deck and add it to the staging area.
+  05076:whenRevealed:1: When revealed
+    - the first player reveals the number of players encounter cards, one after the other, each in a staging of its own
+
+05076:B:3 (back): If the players have collected 4 or more victory points, The Last Battle gains battle and loses siege.
+  05076:constant:2: Constant
+    only if the victory display holds at least 4 Victory points
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat battle 1, while this card is in play
+    - this card: stat losesSiege (held by the current quest stage: it does not have the Siege keyword it prints) 1, while this card is in play
+
+05076:B:4 (back): If the players defeat this stage, they have won the game.
+  05076:constant:3: Constant
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
+
+(rendered pieces: 184 by template, 0 as JSON)

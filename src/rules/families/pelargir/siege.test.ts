@@ -142,6 +142,16 @@ describe("ShuffleStagingIntoEncounterDeck (05061:A:2)", () => {
   });
 });
 
+describe("ShuffleStagingIntoEncounterDeck, the revealed card (05061:A:2)", () => {
+  it("does not shuffle the revealed card itself, or any treachery, into the deck", () => {
+    const t = table({ staging: [CITADEL, "05061"] });
+    const source = idOf(t.state, "05061");
+    const mordor = runInstruction({ ...t.state, window: null }, { verb: "ShuffleStagingIntoEncounterDeck" }, { seat: 0, sourceId: source }, t.ctx, []);
+    expect(mordor.staging).toEqual([source]);
+    expect(mordor.cards[idOf(t.state, CITADEL)]?.zone).toBe("encounterDeck");
+  });
+});
+
 describe("ResolveTopmostTreachery (05056:A:2)", () => {
   it("resolves the When Revealed effects of the last treachery in the encounter discard pile and leaves it there", () => {
     const t = table({ discard: ["05036", "05056"], phase: "Encounter" });

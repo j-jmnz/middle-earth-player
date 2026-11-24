@@ -25,7 +25,8 @@ export function resolveTopmostTreachery(state: ScenarioState, instruction: Extra
 
 /** ShuffleStagingIntoEncounterDeck: each card in the staging area leaves play and is shuffled into the encounter deck; the effect's X is how many there were. A location's damage and progress go with it, and it is not explored. */
 export function shuffleStagingIntoEncounterDeck(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const ids = [...state.staging];
+  // The card itself is not counted (it resolves while the revealed card is still held with the staging area), nor is any treachery.
+  const ids = state.staging.filter((id) => id !== focus.sourceId && printedOf(ctx.cards, state.cards[id]?.code ?? "").type !== "treachery");
   let next = state;
   for (const id of ids) next = moveEncounter(next, id, "shuffle", focus.seat, ctx, steps);
   const data = effectData(next);

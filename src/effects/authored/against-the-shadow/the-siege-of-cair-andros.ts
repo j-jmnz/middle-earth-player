@@ -89,7 +89,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     // 05057 Orc Arbalesters (Archery X is a keyword). A:2: X is the number of different Leadership, Tactics, Spirit and Lore icons on the heroes in play, each counted once, an icon a hero gains included: one archery point for each (the sphere filter reads printed and gained icons, and the
     // constants are read again at every change). A:3 (Shadow): +2 Attack.
     { id: "05057:constant:1", cardCode: "05057", lines: ["05057:A:1", "05057:A:2"], timing: "constant", instructions: SPHERES.map(ARCHERY_ICON) },
-    { id: "05057:shadow:1", cardCode: "05057", lines: ["05057:A:3"], timing: "shadow", instructions: [PLUS_TWO_ATTACK] },
 
     // 05058 Orc Vanguard. A:1: while it is in the staging area no resource can be spent from the pool of a hero with a Leadership, Spirit or Lore icon (a hero with a Tactics icon and one of those is held too). A:2 (Shadow): two additional shadow cards, face down, resolved in the order dealt after this one.
     {
