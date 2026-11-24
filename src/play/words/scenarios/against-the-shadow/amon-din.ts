@@ -61,6 +61,9 @@ export const alcaronHeldWords = (name: string): string => `${name} leaves play: 
 /** Ghulat's preview: what his Attack X counts now and what his presence holds (06071:A:1, 06071:A:3). */
 export const ghulatWords = (dead: number): string => `Attack X: X is the number of damage tokens on Dead Villagers (${dead} now). While Ghulat is in play the game cannot end.`;
 
+/** The rail's 6.E guide while stage 2B is current: an undefended attack discards villager tokens, it does not damage a hero (06067:B:1). */
+export const UNDEFENDED_VILLAGERS_GUIDE = "Each enemy attacks: declare one defender, or leave it undefended: it discards villager tokens from Rescued Villagers.";
+
 /** The Undefended line of an enemy's attack sheet while stage 2B aims it at Rescued Villagers (06067:B:1). */
 export const undefendedVillagersWords = (held: number): string =>
   held > 0

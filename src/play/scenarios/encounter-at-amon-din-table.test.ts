@@ -17,6 +17,7 @@ import { previewCards, questTitle } from "../cards/table-preview.ts";
 import { defenseSheet } from "../choice/combat-sheets.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
 import { instructionWords } from "../words/instruction.ts";
+import { turnReference } from "../phases/reference.ts";
 import { advanceWords } from "../readouts/quest-advance.ts";
 import { readoutFor } from "../readouts/readout.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
@@ -213,6 +214,15 @@ describe("stage 2B: the undefended attack (06067:B:1)", () => {
     const run = undefendedAtRescued(made);
     const lines = momentOf(made.state, run.state, run.steps, { card: idName(made, run.state) })?.lines.map((line) => line.text) ?? [];
     expect(lines).toEqual(["Attack 4 on Rescued Villagers, undefended", "No hero takes damage", "Villager tokens", "Rescued Villagers: 6 → 2 villager tokens", "Dead Villagers: 0 → 4 damage tokens"]);
+  });
+
+  it("the turn reference's 6.E step says the attack discards villager tokens on stage 2B, and keeps its hero line on stage 1B and in another scenario", () => {
+    const decision = (made: Made, state: ScenarioState) => turnReference(state, () => null).flatMap((phase) => phase.steps).find((step) => step.id === "6.E")?.decision;
+    const two = orc(4);
+    expect(decision(two, two.state)).toBe("Each enemy attacks: declare one defender, or leave it undefended: it discards villager tokens from Rescued Villagers.");
+    const one = table({ staging: [rescued, dead] });
+    expect(decision(one, one.state)).toBe("Each enemy attacks: declare one defender, or take it undefended on a hero.");
+    expect(decision(two, { ...two.state, scenarioId: "the-stewards-fear", modifiers: [] })).toBe("Each enemy attacks: declare one defender, or take it undefended on a hero.");
   });
 
   it("another scenario's undefended attack keeps its hero line", () => {

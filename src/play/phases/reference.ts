@@ -8,6 +8,7 @@ import steps from "../../../data/rules/steps.json";
 
 import { flagged, type ModeName, type ScenarioState } from "../../rules/core/state.ts";
 
+import { UNDEFENDED_VILLAGERS_GUIDE } from "../words/scenarios/against-the-shadow/amon-din.ts";
 import { UNDEFENDED_GUIDE } from "../words/scenarios/against-the-shadow/cair-andros.ts";
 import { pointNote, pointTitle } from "./rail.ts";
 import type { QuestStat } from "./quest-stat.ts";
@@ -42,6 +43,8 @@ function decisionOf(step: string, stat: QuestStat | undefined, game: ScenarioSta
   const quest = stat && stat !== "willpower" ? QUEST_STEPS[step] : undefined;
   // While stage 1B of The Siege of Cair Andros is current a Battleground location takes the undefended attack, not a hero (05072:B:2).
   if (step === "6.E" && game.questStage != null && flagged(game, game.questStage, "undefendedToBattleground")) return UNDEFENDED_GUIDE;
+  // While stage 2B of Encounter at Amon Dîn is current the undefended attack discards villager tokens from Rescued Villagers, not a hero (06067:B:1).
+  if (step === "6.E" && game.questStage != null && game.modifiers.length > 0 && flagged(game, game.questStage, "undefendedToVillagers")) return UNDEFENDED_VILLAGERS_GUIDE;
   return quest && stat ? quest(stat) : DECISIONS[step];
 }
 
