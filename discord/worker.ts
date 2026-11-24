@@ -3,7 +3,7 @@
 // and on submit it creates the issue in GITHUB_REPO and links it in the channel. GitHub's webhook calls /github, and the
 // bot posts each issue update beside the report (docs/discord-issues.md). The commands are answered in one server only
 // (GUILD_ID) and for a member who may manage messages there, whatever the server's command settings say.
-import { discord, editReply, type Context, type Env } from "./env.ts";
+import { discord, DiscordError, editReply, type Context, type Env } from "./env.ts";
 import { handleGitHub } from "./github.ts";
 import { createIssue, failureReason, issueBody, issueForm, readForm } from "./issue.ts";
 import { loadReport, nameOf, postAt, sourceFromId, sourceToId, type SourceRef } from "./source.ts";
@@ -67,9 +67,15 @@ function refusal(env: Env, interaction: Interaction): string | null {
 
 // Whether the channel or thread a submitted form names is in the interaction's server. The id travels in the form's
 // custom id, which a changed client can rewrite, so the bot asks Discord where it is before it reads or posts there.
+// A channel the bot may not see (403) is treated as one that is not in the server.
 async function inGuild(env: Env, source: SourceRef, guildId: string): Promise<boolean> {
-  const channel = await discord<{ guild_id?: string }>(env, "GET", `/channels/${source.kind === "message" ? source.channelId : source.threadId}`);
-  return channel?.guild_id === guildId;
+  try {
+    const channel = await discord<{ guild_id?: string }>(env, "GET", `/channels/${source.kind === "message" ? source.channelId : source.threadId}`);
+    return channel?.guild_id === guildId;
+  } catch (error) {
+    if (error instanceof DiscordError && error.status === 403) return false;
+    throw error;
+  }
 }
 
 // The command's source: the message it was run on, or the thread it was run in.

@@ -189,10 +189,34 @@ describe("Discord issue bot", () => {
     await run({ type: 5, token: "t", guild_id: "1", member: moderator, data: { custom_id: "issue:m:200:300", components } });
     expect(calls.map((call) => call.method)).toEqual(["GET", "PATCH"]);
     expect(calls[1]!.body).toMatchObject({ content: expect.stringContaining("isn't in a channel of this server") });
-    // A thread the bot cannot find is refused the same way.
+    // So is a channel the bot may not see (403).
     calls.length = 0;
-    await run({ type: 5, token: "t", guild_id: "1", member: moderator, data: { custom_id: "issue:t:999:0", components } });
+    vi.stubGlobal("fetch", async (url: string, init: RequestInit = {}) => {
+      calls.push({ method: init.method ?? "GET", url, body: init.body ? JSON.parse(String(init.body)) : undefined });
+      return init.method === "PATCH" ? Response.json({}) : new Response("Missing Access", { status: 403 });
+    });
+    await run({ type: 5, token: "t", guild_id: "1", member: moderator, data: { custom_id: "issue:m:200:300", components } });
     expect(calls.map((call) => call.method)).toEqual(["GET", "PATCH"]);
+    expect(calls[1]!.body).toMatchObject({ content: expect.stringContaining("isn't in a channel of this server") });
+    // A thread the bot cannot find is refused the same way.
+    const missing = stubFetch({ "PATCH /webhooks/100/t/messages/@original": {} });
+    await run({ type: 5, token: "t", guild_id: "1", member: moderator, data: { custom_id: "issue:t:999:0", components } });
+    expect(missing.map((call) => call.method)).toEqual(["GET", "PATCH"]);
+  });
+
+  it("posts the link in the report's channel, not in another channel whose id the form gave as the message", async () => {
+    const calls = stubFetch({
+      "GET /channels/200": { id: "200", guild_id: "1" },
+      // The "message" id names a channel of another server.
+      "GET /channels/300": { id: "300", type: 0, guild_id: "2" },
+      "POST github/repos/owner/repo/issues": { number: 42, html_url: "https://github.com/owner/repo/issues/42" },
+      "POST /channels/300/messages": {},
+      "POST /channels/200/messages": {},
+      "PATCH /webhooks/100/t/messages/@original": {},
+    });
+    await run({ type: 5, token: "t", guild_id: "1", member: moderator, data: { custom_id: "issue:m:200:300", components } });
+    const posts = calls.filter((call) => call.method === "POST" && call.url.includes("discord.com")).map((call) => new URL(call.url).pathname);
+    expect(posts).toEqual(["/api/v10/channels/200/messages"]);
   });
 
   it("registers the two commands the worker answers", () => {

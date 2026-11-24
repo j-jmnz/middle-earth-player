@@ -29,6 +29,16 @@ export interface Context {
 
 const DISCORD_API = "https://discord.com/api/v10";
 
+/** A refusal from the Discord API, with its status. */
+export class DiscordError extends Error {
+  readonly status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
+
 /** A Discord REST call as the bot. Returns the parsed JSON, or null on a 404. */
 export async function discord<T>(env: Env, method: string, route: string, body?: unknown): Promise<T | null> {
   const response = await fetch(`${DISCORD_API}${route}`, {
@@ -37,7 +47,7 @@ export async function discord<T>(env: Env, method: string, route: string, body?:
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   if (response.status === 404) return null;
-  if (!response.ok) throw new Error(`Discord ${method} ${route} answered ${response.status}: ${await response.text()}`);
+  if (!response.ok) throw new DiscordError(response.status, `Discord ${method} ${route} answered ${response.status}: ${await response.text()}`);
   return response.status === 204 ? null : ((await response.json()) as T);
 }
 
