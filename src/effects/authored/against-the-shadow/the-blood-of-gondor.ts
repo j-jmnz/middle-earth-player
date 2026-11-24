@@ -120,13 +120,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "06130:whenRevealed:1", cardCode: "06130", lines: ["06130:A:2"], timing: "whenRevealed", instructions: [EACH_PLAYER([TAKE])] },
     { id: "06130:shadow:1", cardCode: "06130", lines: ["06130:A:3"], timing: "shadow", instructions: SHADOW_TURN },
 
-    // 06131 Conflict at the Crossroads. A:1: until the end of the phase each Orc enemy engaged with a player adds its Threat to the staging area, those engaged later in the phase too (`engagedOrcThreat`, read live); with no Orc engaged it gains surge. A:2 (Shadow): the defending player takes 1 hidden card.
+    // 06131 Conflict at the Crossroads. A:1: until the end of the phase each Orc enemy engaged with a player adds its Threat to the staging area, those engaged later in the phase too (`engagedThreatSeat` with the Orc trait on each seat, read live: a copy counts once however many copies are revealed); with no Orc engaged it gains surge. A:2 (Shadow): the defending player takes 1 hidden card.
     {
       id: "06131:whenRevealed:1",
       cardCode: "06131",
       lines: ["06131:A:1"],
       timing: "whenRevealed",
-      instructions: [{ verb: "ModifyStat", stat: "engagedOrcThreat", amount: 1, until: "endOfPhase", target: "table" }, { verb: "GainSurge", when: { kind: "count", pick: ORCS_ENGAGED, max: 0 } }],
+      instructions: [EACH_PLAYER([{ verb: "ModifyStat", stat: "engagedThreatSeat", amount: 1, until: "endOfPhase", target: "actorSeat", trait: "Orc" }]), { verb: "GainSurge", when: { kind: "count", pick: ORCS_ENGAGED, max: 0 } }],
     },
     copyLine("06122:A:2", "06131:A:2"),
 

@@ -187,8 +187,6 @@ const FLAGS = [
   "losesBattle",
   // On a quest stage that is current: a player who holds 5 hidden cards turns them faceup, one at a time, as soon as an instruction has left him with 5 ("If a player has 5 hidden cards, he must turn them faceup", 06118:B:3; a settle sweep, src/rules/families/pelargir/hidden-sweep.ts).
   "turnsAtFiveHidden",
-  // On the table until the end of the phase: each Orc enemy engaged with a player adds its Threat to the total Threat in the staging area, read live, so an Orc that engages later in the phase counts too ("Until the end of the phase, Orc enemies engaged with players add their Threat to the staging area", 06131:A:1; src/rules/families/pelargir/engaged-threat.ts).
-  "engagedOrcThreat",
   // On a location a player controls: the seat that took control, plus 1 (no record sets it; TakeControlOfLocation writes it and a settle sweep reads it to see the control lost). Held until the control is lost.
   "controlSeat",
 ] as const;

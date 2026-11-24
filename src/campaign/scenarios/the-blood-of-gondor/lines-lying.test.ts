@@ -44,6 +44,16 @@ lineSpec("06129:A:1", "the When Revealed effects of the turned cards resolve onc
   expect(where(revealed, looms)).toBe("encounterDiscard");
 });
 
+lineSpec("06129:A:1", "a treachery turned by Lying in Wait stays out of the discard pile until its When Revealed effect is done: Mordor Looms with both piles empty takes no card, not itself (rr.step-3-3)", (effects) => {
+  const made = table({ phase: "Quest", deck: [looms], discard: [] }, effects);
+  const held = takes(made, made.state, 0);
+  expect(hiddenCodes(held)).toEqual([looms]);
+  const revealed = revealedTop({ state: held, ctx: made.ctx }, lyingInWait);
+  expect(hiddenCodes(revealed)).toEqual([]);
+  // Both treacheries are in the encounter piles; the reset that follows the reveal put the discard pile back into the empty deck.
+  expect(revealed.encounterDeck.map((id) => revealed.cards[id]?.code).sort()).toEqual([lyingInWait, looms]);
+});
+
 lineSpec("06129:A:1", "a turned enemy engages the first player and then its When Revealed effects resolve (Uruk Lieutenant adds the topmost Orc of the discard pile to the staging area)", (effects) => {
   const made = table({ phase: "Quest", discard: [rabble], deck: [LIEUTENANT, ...fillers(8)] }, effects, [LIEUTENANT]);
   const revealed = revealedTop({ state: takes(made, made.state, 0), ctx: made.ctx }, lyingInWait);

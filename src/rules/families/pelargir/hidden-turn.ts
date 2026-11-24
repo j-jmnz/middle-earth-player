@@ -1,7 +1,7 @@
 // Rules: ats.hidden-cards-turn-faceup, faq.blood-of-gondor-hidden-cards, rr.engaged, rr.damage, rr.surge (data/rules/entries.json); ledger lines 06117:B:2, 06118:A:1, 06121:A:1, 06129:A:1, 06132:A:2.
 // Turning hidden cards faceup, one card at a time. The cards held when the turn starts are the ones turned: a card taken during it (Evil Crow) stays facedown. An enemy engages the player whatever its engagement cost, a treachery goes to the encounter discard pile, a location goes there too
 // or, for Lying in Wait, to the staging area when it is turned. The card is not revealed (hidden.turn-enemy-not-revealed): no When Revealed effect and no surge, but Lying in Wait names the When Revealed effects of the cards it turns, enemies included (each after it has engaged), which resolve once the turn is done, the first card first.
-import type { Instruction } from "../../../catalog/boundary.ts";
+import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
@@ -12,6 +12,7 @@ import { moveCard } from "../../core/zones.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { engageWith } from "../../quest/quest.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { dealShadowTo } from "../defense/shadow.ts";
@@ -22,7 +23,8 @@ import { hiddenIds, randomHidden, unhide } from "./hidden.ts";
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
 type Turn = { readonly resolve?: boolean; readonly shadow?: boolean; readonly damage?: number; readonly sourceId?: string | null };
-type Pending = { readonly id: string; readonly seat: number };
+// `discard`: a treachery waits in the staging area while its When Revealed effect resolves and goes to the encounter discard pile after it (rr.step-3-3).
+type Pending = { readonly id: string; readonly seat: number; readonly discard?: boolean };
 
 // One card turned faceup for a seat. The card leaves the hidden list first. The returned list holds the cards whose When Revealed effects are still to resolve.
 function turnOne(state: ScenarioState, id: string, seat: number, turn: Turn, ctx: ReduceContext, steps: EngineStep[], pending: Pending[]): ScenarioState {
@@ -42,18 +44,31 @@ function turnOne(state: ScenarioState, id: string, seat: number, turn: Turn, ctx
     if (turn.resolve === true) pending.push({ id, seat });
     return turn.shadow === true ? dealShadowTo(next, id, steps, ctx) : next;
   }
-  if (turn.resolve === true) pending.push({ id, seat });
-  if (type === "location" && turn.resolve === true) return queueEvent(moveCard(open, id, { zone: "staging" }), { trigger: "addedToStaging", seat, cardId: id });
+  if (turn.resolve === true && type === "location") {
+    pending.push({ id, seat });
+    return queueEvent(moveCard(open, id, { zone: "staging" }), { trigger: "addedToStaging", seat, cardId: id });
+  }
+  if (turn.resolve === true) {
+    pending.push({ id, seat, discard: true });
+    return moveCard(open, id, { zone: "staging" });
+  }
   return moveCard(open, id, { zone: "encounterDiscard" });
 }
 
 // The When Revealed effects of the turned cards, each in a frame of its own: the frames are pushed last card first, so the first card turned resolves first.
 function resolvePending(state: ScenarioState, pending: readonly Pending[], ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
-  for (const { id, seat } of [...pending].reverse()) {
-    const code = next.cards[id]?.code;
-    const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
-    if (effects.length > 0) next = pushCardEffects(next, "whenRevealed", id, seat, false, effects, ctx, steps);
+  for (const { id, seat, discard } of [...pending].reverse()) {
+    const code = next.cards[id]?.code ?? "";
+    const effects = effectsOf(ctx, code).filter((effect) => effect.timing === "whenRevealed");
+    const first = effects[0];
+    if (!first) {
+      if (discard === true && next.cards[id]?.zone === "staging") next = moveCard(next, id, { zone: "encounterDiscard" });
+      continue;
+    }
+    // The last instruction of the frame puts the treachery in the discard pile, once its effects are done.
+    const leaves: Effect = { id: `${first.id}:discard`, cardCode: code, lines: first.lines, timing: "whenRevealed", instructions: [{ verb: "Discard", target: { kind: "self" } }] };
+    next = pushCardEffects(next, "whenRevealed", id, seat, false, discard === true ? [...effects, leaves] : effects, ctx, steps);
   }
   return next;
 }

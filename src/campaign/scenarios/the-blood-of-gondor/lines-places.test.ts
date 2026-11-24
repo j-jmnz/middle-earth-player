@@ -99,7 +99,7 @@ lineSpec("06119:A:2", "Forced: at the end of the round each player raises his th
   expect([(apart.seats[0]?.threat ?? 0) - (plain.seats[0]?.threat ?? 0), (apart.seats[1]?.threat ?? 0) - (plain.seats[1]?.threat ?? 0)]).toEqual([2, 1]);
 });
 
-describe("06131:A:1 the lasting effect: until the end of the phase, and again for a second copy", () => {
+describe("06131:A:1 the lasting effect: until the end of the phase, once however many copies", () => {
   lineSpec("06131:A:1", "When Revealed: until the end of the phase each Orc enemy engaged with any player adds its Threat to the staging area, an Orc that engages later in the phase too; a non-Orc adds nothing", (effects) => {
     const made = table({ phase: "Quest", seats: 2, engaged: [arsonist, { code: uruk, seat: 1 }, "f3"], deck: [rabble, "f0", "f0", "f0"] }, effects);
     const held = takes(made, made.state, 0);
@@ -121,13 +121,13 @@ describe("06131:A:1 the lasting effect: until the end of the phase, and again fo
     expect(stagingThreat(next.state, made.ctx.cards) - before).toBe(0);
   });
 
-  lineSpec("06131:A:1", "a second Conflict at the Crossroads in the same phase adds the engaged Orcs' Threat again: each copy is a lasting effect of its own, so two copies add the Threat twice", (effects) => {
+  lineSpec("06131:A:1", "a second Conflict at the Crossroads in the same phase adds nothing more: an engaged Orc adds its Threat once however many copies are revealed (the engaged-Threat lasting effect of Long Groping Arm and Uruk Raiding Party counts the same way)", (effects) => {
     const made = table({ phase: "Quest", engaged: [arsonist, uruk], deck: fillers(6) }, effects);
     const before = stagingThreat(made.state, made.ctx.cards);
     const once = revealedTop(made, conflict);
     expect(stagingThreat(once, made.ctx.cards) - before).toBe(6);
     const twice = revealedTop({ state: once, ctx: made.ctx }, conflict);
-    expect(stagingThreat(twice, made.ctx.cards) - before).toBe(12);
+    expect(stagingThreat(twice, made.ctx.cards) - before).toBe(6);
   });
 });
 

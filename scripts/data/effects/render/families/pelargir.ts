@@ -183,7 +183,6 @@ export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
   noProgressInStagingByPlayer: " (held by the table while the stage is in play: progress a player card's effect would place on a location in the staging area is not placed; an active location, a location in a play area and any encounter card's or location's own effect are not barred)",
   losesBattle: " (held by the current quest stage: it does not have the Battle keyword it prints)",
   turnsAtFiveHidden: " (held by the current quest stage: a player who holds 5 hidden cards turns them faceup, one at a time, once the instruction that gave him the fifth is done; checked at every settle)",
-  engagedOrcThreat: " (held by the table until the end of the phase: each Orc enemy engaged with a player adds its Threat to the total Threat in the staging area, counted again whenever it is read)",
   controlSeat: " (held by a location a player controls, the amount is the seat plus 1: written by TakeControlOfLocation and read by a settle sweep that sees the control lost; not set by a record)",
   firstEnemyNoted: " (held by the table until the end of the round: an enemy was already marked firstEnemy this round)",
 };

@@ -214,7 +214,8 @@ Scenario piles that place cards with no record (quest: 06117 The Ambush; quest: 
 06131:A:1 (front): When Revealed: Until the end of the phase, Orc enemies engaged with players add their Threat to the staging area. If no Orc enemies are engaged with players, Conflict at the Crossroads gains surge.
   06131:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the table: stat engagedOrcThreat (held by the table until the end of the phase: each Orc enemy engaged with a player adds its Threat to the total Threat in the staging area, counted again whenever it is read) 1, until the end of the phase
+    - for each player, first player first:
+      - actorSeat (Orc only): stat engagedThreatSeat (each enemy engaged with that player adds its Threat to the staging area's total, counted live: an enemy that engages later counts too) 1, until the end of the phase
     - then, if the number of Orc enemy (any player controls) is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 06131:A:2 (shadow): Shadow: Take 1 hidden card.
@@ -262,4 +263,4 @@ Scenario piles that place cards with no record (quest: 06117 The Ambush; quest: 
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game (Lord Alcaron left play)
 
-(rendered pieces: 128 by template, 0 as JSON)
+(rendered pieces: 129 by template, 0 as JSON)
