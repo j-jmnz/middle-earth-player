@@ -7,14 +7,18 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { takeControlOfStagedObjectives } from "./control.ts";
+import { archeryOfAmount } from "./archery-of.ts";
 import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
 import { noteFirstEnemy, pelargirCondition } from "./first-enemy.ts";
+import { eachPlayerSpends, eachPlayerSpendsUnpayable } from "./group-spend.ts";
 import { attachToHighestThreatCost } from "./host.ts";
+import { noResourcesMatches } from "./no-resources.ts";
 import { attachObjectiveTo, attackScrollHolder } from "./scroll.ts";
 import { pickRandom } from "./pick-random.ts";
 import { removeQuestTokens } from "./quest-tokens.ts";
 import { revealTopThenDiscard } from "./reveal-discard.ts";
 import { sieges, undefendedBattlegrounds } from "./siege.ts";
+import { progressesToVictory } from "./stage-progress.ts";
 import { removeStage } from "./stage-remove.ts";
 import { resolveTopmostTreachery, shuffleStagingIntoEncounterDeck } from "./staging.ts";
 import { buildUnderworldDeck, hideOneAside, releaseUnderworldStacks, revealSetAside, revealUnderworld, shuffleUnderworldIntoEncounterDeck, takeUnderworld } from "./underworld.ts";
@@ -58,6 +62,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return pickRandom(state, instruction, focus, ctx);
     case "RemoveQuestTokens":
       return removeQuestTokens(state, instruction);
+    case "EachPlayerSpends":
+      return eachPlayerSpends(state, instruction);
     default:
       return null;
   }
@@ -65,10 +71,13 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelargir",
-  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealSetAside", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens"],
+  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealSetAside", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens", "EachPlayerSpends"],
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,
-  settle: { sweep: (state, ctx, steps) => releaseUnderworldStacks(sieges(state, ctx, steps), ctx, steps) },
+  settle: { sweep: (state, ctx, steps) => progressesToVictory(releaseUnderworldStacks(sieges(state, ctx, steps), ctx, steps), ctx, steps) },
+  travel: { unpayable: (state, instruction, ctx, locationId) => eachPlayerSpendsUnpayable(state, instruction, ctx, locationId) },
+  pick: (state, id, spec) => noResourcesMatches(state, id, spec),
+  amount: (state, amount, scope, ctx) => archeryOfAmount(state, amount, scope, ctx),
   combat: { undefended: (state, _candidates, cards) => undefendedBattlegrounds(state, cards) },
 };

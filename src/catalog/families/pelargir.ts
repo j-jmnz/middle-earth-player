@@ -65,6 +65,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("PickRandom"), pick: pickSchema, ...when }),
   // "Remove 1 token from the current quest" (06014:A:2), "remove all tokens from the current quest" (06025:A:2): progress tokens (`progress`), resource tokens (`resource`) or both (`any`, progress first) are taken off the current quest card, `amount` of them (`all` by default, at most the card holds).
   z.strictObject({ verb: z.literal("RemoveQuestTokens"), kind: z.enum(["progress", "resource", "any"]), amount: z.union([z.number().int().positive(), z.literal("all")]).optional(), ...when }),
+  // "Each player must pay 1 resource to travel here" (06051:A:2): every living player, the first player first, spends `amount` resources from his own heroes' pools, choosing the hero for each resource when more than one can pay. The players cannot travel here while any player holds fewer
+  // than `amount` in all (rr.travel; src/rules/families/pelargir/group-spend.ts, the family's travel hook). A player's pools are his own: no resource of another player pays for him.
+  z.strictObject({ verb: z.literal("EachPlayerSpends"), amount: positiveAmountSchema, ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;
@@ -107,6 +110,14 @@ const FLAGS = [
   "cannotSpendResources",
   // On the current quest stage: it does not have the Siege keyword ("The Last Battle gains battle and loses siege", 05076:B:3); read by rules/families/quest/conditions.ts currentQuestHas (src/rules/families/pelargir/stage-keyword.ts).
   "losesSiege",
+  // On the current quest stage (target `table`, while the source is in play): characters use their Willpower, as it stands, instead of their Attack to determine attack strength; attack bonuses are not added ("Characters use their Willpower instead of Attack when attacking enemies", 06044:B:2).
+  // The enemy's Defense is still subtracted. Read by rules/combat/combat.ts attackStrength (src/rules/families/pelargir/stage-attack.ts).
+  "attackWithWillpower",
+  // On the table: the damage a character's attack deals to an enemy becomes progress tokens on that enemy ("If an enemy would be damaged this way, place progress tokens on it instead of damage tokens", 06044:B:2). Damage from an effect, a shadow card or archery stays damage. Read by rules/combat/combat.ts strikeEnemy.
+  "attackDamageAsProgress",
+  // On the table: an enemy in play with progress equal to (or more than) its printed hit points is added to the victory display, and all its progress goes on the current quest ("When an enemy has progress equal to its hit points, add it to the victory display and place those progress tokens on the quest", 06044:B:2).
+  // Checked at every settle (src/rules/families/pelargir/stage-progress.ts).
+  "progressToVictory",
 ] as const;
 
 // The underworld deck lies set aside facedown, and the Villain and the Plot the Setup hides stay set aside facedown (06011:A:1): the table lists them as facedown cards without a name.

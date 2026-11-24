@@ -100,8 +100,10 @@ export const amountExprSchema = z.strictObject({
   excessOf: z.literal("subject").optional(),
   // The resource tokens on the cards that match, added up ("+1 quest point for each resource token on a Raider enemy in play", 12042:A:2).
   resourcesOn: pickSchema.optional(),
-  // With `resourcesOn`: the most resource tokens on any one of those cards, not the sum ("X is the highest number of resources on a Raider enemy in play", 12161:A:1). 0 when none matches.
+  // With `resourcesOn` or `archeryOf`: the most on any one of those cards, not the sum, as for resource tokens ("X is the highest number of resources on a Raider enemy in play", 12161:A:1). 0 when none matches.
   max: z.literal(true).optional(),
+  // With `max`: the total archery value (printed, gained, and what the card gives itself) of the card among those that match with the most, 0 when none matches ("X is equal to the total archery value of the highest archery Wose enemy in play", 06052:A:2). Read by the pelargir family.
+  archeryOf: pickSchema.optional(),
   // The number of cards left in this deck beside the encounter deck ("gets -1 Threat for each facedown card under it", 144030:A:2: the Harad deck lies under The Cross-roads). 0 in a game that did not deal it. Read by the wilderland family.
   pile: pileNameSchema.optional(),
   // What the running effect discarded from the top of decks so far, over every player it acted for: `cost` the combined printed cost of the cards (a card with no printed cost counts 0: "X is the combined printed cost of the discarded cards", 09034:A:1), `types`

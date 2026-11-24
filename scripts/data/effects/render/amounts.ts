@@ -75,6 +75,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.hand === true) return { text: "the cards in your hand", read: ["hand"] };
   if (expr.attackDamage === true) return { text: "the damage the player attack this effect answers would deal this enemy: the attackers' total Attack less this enemy's Defense (0 at the least)", read: ["attackDamage"] };
   if (expr.dealt === true) return { text: "the damage just dealt", read: ["dealt"] };
+  if (isObj(expr.archeryOf)) return { text: `the total archery value (printed, gained and what the card gives itself) of the card with the most among ${pick(expr.archeryOf, ctx)}, 0 when none`, read: ["archeryOf", "max"] };
   if (isObj(expr.resourcesOn)) return { text: `the resource tokens on ${pick(expr.resourcesOn, ctx)}${expr.max === true ? " (the most on any one)" : ""}`, read: ["resourcesOn", "max"] };
   if (isObj(expr.damageOn)) return { text: `the damage tokens on ${pick(expr.damageOn, ctx)}`, read: ["damageOn"] };
   return familyAmount(expr);

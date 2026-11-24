@@ -39,6 +39,7 @@ describe("effects render read fields, amounts", () => {
     { dealt: true },
     { attackDamage: true },
     { resourcesOn: PICK, max: true },
+    { archeryOf: PICK, max: true },
     { damageOn: PICK },
     { facedown: true, times: 2 },
     { firstPlayerTens: true },
