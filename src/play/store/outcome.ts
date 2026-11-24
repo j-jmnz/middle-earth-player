@@ -60,7 +60,8 @@ function seatWord(state: ScenarioState, seat: number): string {
 }
 
 // `whole`: the group's lines are kept together, uncut, and come last (Discover's, whose last line lays the look strip).
-type Group = { rank: number; title: string; tone: MomentTone; lines: MomentLine[]; whole?: boolean };
+// `early`: the group is told right after the lead, ahead of the other groups (the villager tokens of Encounter at Amon Dîn, which the quest result moved).
+type Group = { rank: number; title: string; tone: MomentTone; lines: MomentLine[]; whole?: boolean; early?: true };
 
 /**
  * The banner for one accepted intent, or null when it changed nothing worth one (a draw, a resource, a pass that only moved
@@ -340,7 +341,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
 
   // The villager tokens of Encounter at Amon Dîn that moved or were discarded in this intent, and the defeat of stage 2B that Ghulat holds: no step of their own.
   const villagers = villagerLines(before, after, names.card);
-  if (villagers.length > 0) groups.push({ rank: 8, title: VILLAGERS_TITLE, tone: "plain", lines: villagers.map((text) => ({ text, mark: null })) });
+  if (villagers.length > 0) groups.push({ rank: 8, title: VILLAGERS_TITLE, tone: "plain", lines: villagers.map((text) => ({ text, mark: null })), early: true });
   const held = heldBeat(before, after);
   if (held) groups.push({ rank: 8, title: held.title, tone: "plain", lines: held.lines.map((text) => ({ text, mark: null })) });
 
@@ -382,7 +383,8 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   const lead = [...(flow.length > 0 ? flow : shown)].sort((a, b) => a.rank - b.rank)[0] ?? shown[0];
   if (!lead) return null;
   const told = (group: Group): MomentLine[] => (group === lead || !group.title ? group.lines : [{ text: group.title, mark: null }, ...group.lines]);
-  const lines = (flow.includes(lead) ? [lead, ...flow.filter((group) => group !== lead)] : []).flatMap(told);
+  const rest = flow.filter((group) => group !== lead);
+  const lines = (flow.includes(lead) ? [lead, ...rest.filter((group) => group.early), ...rest.filter((group) => !group.early)] : []).flatMap(told);
   const kept = lines.slice(0, MOST);
   if (lines.length > MOST) kept.push({ text: `And ${lines.length - MOST} more in the log`, mark: null });
   return { title: lead.title || "This turn", tone: lead.tone, lines: [...kept, ...shown.filter((group) => group.whole).flatMap(told)] };

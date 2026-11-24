@@ -120,17 +120,26 @@ export function questMovesWords(game: ScenarioState, ctx: ReduceContext, progres
   return movesWords(reaching, stage.resources, active ? { name: nameOf(active), share: progress - reaching } : undefined);
 }
 
-/** The banner's lines for the tokens that changed in one intent: each card whose villager tokens changed, and Dead Villagers' damage tokens. Empty in any other scenario. */
-export function villagerLines(before: ScenarioState, after: ScenarioState, nameOf: (id: string) => string): string[] {
+/** One card whose villager tokens changed in an intent: the card, the tokens it held and the tokens it holds. */
+export type VillagerChange = { id: string; was: number; now: number };
+
+/** The cards of a holder code whose villager tokens changed in one intent, in card order. Empty in any other scenario. A card that was not in play held none. */
+export function villagerChanges(before: ScenarioState, after: ScenarioState): readonly VillagerChange[] {
   if (!live(after)) return [];
-  const lines: string[] = [];
+  const changes: VillagerChange[] = [];
   for (const card of Object.values(after.cards)) {
     if (!inPlay(card.zone) || !HOLDERS.has(card.code)) continue;
     const was = before.cards[card.id];
     const had = was && inPlay(was.zone) ? was.resources : 0;
-    if (card.resources !== had) lines.push(changedWords(nameOf(card.id), had, card.resources));
+    if (card.resources !== had) changes.push({ id: card.id, was: had, now: card.resources });
   }
-  const dead = cardWith(after, DEAD);
+  return changes;
+}
+
+/** The banner's lines for the tokens that changed in one intent: each card whose villager tokens changed, and Dead Villagers' damage tokens. Empty in any other scenario. */
+export function villagerLines(before: ScenarioState, after: ScenarioState, nameOf: (id: string) => string): string[] {
+  const lines = villagerChanges(before, after).map((change) => changedWords(nameOf(change.id), change.was, change.now));
+  const dead = live(after) ? cardWith(after, DEAD) : undefined;
   const had = dead ? (before.cards[dead.id]?.damage ?? 0) : 0;
   if (dead && dead.damage !== had) lines.push(deadChangedWords(nameOf(dead.id), had, dead.damage));
   return lines;

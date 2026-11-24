@@ -22,7 +22,9 @@ import { advanceWords } from "../readouts/quest-advance.ts";
 import { readoutFor } from "../readouts/readout.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
 import { discardLoss, damageOutcome, lossWords, outcomeWords } from "../store/foresight.ts";
+import { logLines, type LogNames } from "../store/log.ts";
 import { momentOf } from "../store/outcome.ts";
+import { nextRoundSteps } from "../store/store.ts";
 import { pictureCode } from "../canvas/picture-key.ts";
 import { NO_HIGHLIGHT } from "../store/peek.ts";
 import { cardSpeech, type CardSpeechDeps } from "../words/card-speech.ts";
@@ -163,6 +165,32 @@ describe("stage 1B moves villager tokens (06066:B:2, 06066:B:3)", () => {
     const moment = momentOf(state, run.state, run.steps, { card: idName(made, run.state) });
     expect(moment?.lines.map((line) => line.text)).toEqual(["Willpower 4 against threat 0", "Villager tokens", "Savagery of the Orcs: 5 → 1 villager token", "Rescued Villagers: 0 → 4 villager tokens"]);
     expect(moment?.lines.some((line) => /progress/.test(line.text) && !/Willpower/.test(line.text))).toBe(false);
+  });
+});
+
+describe("the villager tokens in the banner and the log (06066:B:2, 06068:A:1)", () => {
+  it("the quest banner tells the tokens that moved before the staging reveals, so a long reveal list cuts the reveals and not the tokens", () => {
+    const made = table({ staging: [rescued, dead], deck: [CODES.marauding, CODES.ravager, CODES.eagle, "f0"] });
+    const state = withVillagers(made.state, savagery, 5);
+    const run = quested(made, state);
+    const moment = momentOf(state, run.state, run.steps, { card: idName(made, run.state) });
+    const lines = moment?.lines.map((line) => line.text) ?? [];
+    expect(lines.slice(0, 4)).toEqual(["Willpower 4 against threat 2", "Villager tokens", "Savagery of the Orcs: 5 → 3 villager tokens", "Rescued Villagers: 0 → 2 villager tokens"]);
+    expect(lines.at(-1)).toMatch(/^And \d+ more in the log$/);
+  });
+
+  it("the log lists each card whose villager tokens changed in the intent, after the intent's steps, and says nothing in another scenario", () => {
+    const made = table({ staging: [rescued, dead], deck: [CODES.marauding, "f0"] });
+    const state = withVillagers(made.state, savagery, 5);
+    const run = quested(made, state);
+    const kept = nextRoundSteps([], state, run.state, run.steps, made.ctx);
+    const names: LogNames = { card: idName(made, run.state), code: nameOf(made), effectCard: () => null, rule: () => null, line: () => null };
+    const text = logLines(kept, names).map((line) => line.text);
+    expect(text).toContain("Savagery of the Orcs: 5 → 3 villager tokens");
+    expect(text).toContain("Rescued Villagers: 0 → 2 villager tokens");
+    const other = { ...run.state, scenarioId: "the-stewards-fear" };
+    const plain = logLines(nextRoundSteps([], { ...state, scenarioId: "the-stewards-fear" }, other, run.steps, made.ctx), names).map((line) => line.text);
+    expect(plain.some((line) => /villager/.test(line))).toBe(false);
   });
 });
 

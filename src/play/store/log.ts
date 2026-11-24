@@ -2,6 +2,8 @@
 // its printed line), so a player can check a number against its source. It is text, not a control.
 import { plural } from "../words/list.ts";
 import { countedOf } from "./counted.ts";
+import { villagersOf } from "./villager-steps.ts";
+import { changedWords } from "../words/scenarios/against-the-shadow/amon-din.ts";
 import { reshuffleWords } from "./pile-ids.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
@@ -170,8 +172,9 @@ export function logLines(steps: readonly EngineStep[], names: LogNames): LogLine
   steps.forEach((step, index) => {
     const stat = countedOf(step);
     const text = words(step, names, stat);
-    if (!text) return;
-    lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : null, mark: markOf(step, stat) });
+    if (text) lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : null, mark: markOf(step, stat) });
+    // The villager tokens of Encounter at Amon Dîn that moved in the intent this step ended: no engine step tells them (villager-steps.ts).
+    villagersOf(step).forEach((change, at) => lines.push({ key: `${index}-v${at}`, text: changedWords(names.card(change.id), change.was, change.now), cause: null, mark: "resource" }));
   });
   return lines;
 }
