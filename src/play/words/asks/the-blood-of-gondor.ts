@@ -20,7 +20,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
     ],
     bind: { held: { hidden: "own" } },
   },
-  "06117:forced:2 @0.0 take": { label: "Take 1 hidden card: the top card of the encounter deck lies facedown in your play area, unseen (you hold {held} now)", bind: { held: { hidden: "own" } } },
+  "06117:forced:2 @0.0 take": { label: "Take 1 hidden card: the top card of the encounter deck lies facedown in your play area, unseen" },
   // 06120:A:1 (Orc Ambusher, Forced): after it engages you, discard 1 non-objective ally you control, if able.
   "06120:forced:1 @0 Pick": { owned: true, note: "Orc Ambusher engaged you: choose a non-objective ally you control to discard. Faramir and Lord Alcaron are objectives and cannot be chosen.", verb: "Discard" },
   // 06133:A:2 (Lord Alcaron, Action): exhaust him to return an enemy engaged with you to the staging area, an enemy just engaged by a hidden turn too.
