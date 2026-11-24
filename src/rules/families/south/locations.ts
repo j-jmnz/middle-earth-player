@@ -118,6 +118,14 @@ export function placeOn(state: ScenarioState, id: string, placed: number, cards:
   return next;
 }
 
+// A location in play whose progress already equals or exceeds its quest points is explored (rr.explored), as when the players travel to a location that took progress in the staging area.
+export function exploreIfFull(state: ScenarioState, id: string, cards: Cards, steps: EngineStep[]): ScenarioState {
+  const location = state.cards[id];
+  if (!location || exploring(state)) return state;
+  const points = questPointsOf(state, location, cards);
+  return points != null && location.progress > 0 && location.progress >= points ? destroyCard(state, id, cards, steps, true) : state;
+}
+
 // Progress from questing goes on the active locations first (rr.active-location): each takes what it can, a location that is held
 // back goes after the ones that are not, and a full one is explored. Returns the progress left for the quest card.
 export function placeOnActive(state: ScenarioState, amount: number, cards: Cards, steps: EngineStep[]): { state: ScenarioState; remaining: number } {

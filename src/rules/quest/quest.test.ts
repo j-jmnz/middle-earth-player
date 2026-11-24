@@ -5,7 +5,7 @@ import { definePrinted } from "../core/printed.ts";
 import { legalIntents, reduce } from "../engine/reduce.ts";
 import { blankScenario, updateCard, type ScenarioState } from "../core/state.ts";
 import { spawn } from "../core/zones.ts";
-import { resolveQuest } from "./quest.ts";
+import { resolveQuest, travelTo } from "./quest.ts";
 
 const heroCard = hero("aragorn", "leadership", 10, 4);
 const quester = hero("sam", "leadership", 8, 1);
@@ -392,5 +392,16 @@ describe("quest resolution", () => {
       expect(refused.reason).toBe("The game is lost");
       expect(refused.state).toBe(opened.state);
     }
+  });
+
+  it("explores a location on travel when its progress already fills its quest points (rr.explored)", () => {
+    const { state, cards } = atCommit({ willpower: 4, threat: 10, stages: ["stage-1"] });
+    const spawned = spawn(state, "road", { zone: "staging" });
+    // 4 progress put on the location in the staging area; its printed quest points are 3 (and are higher only while it is in staging).
+    const full = updateCard(spawned.state, spawned.id, { progress: 4 });
+    const travel = new Map(cards).set("road", definePrinted({ code: "road", name: "Road", type: "location", threat: 0, questPoints: 3 }));
+    const traveled = travelTo(full, spawned.id, travel);
+    expect(traveled?.cards[spawned.id]?.zone).toBe("encounterDiscard");
+    expect(traveled?.activeLocation).toBeNull();
   });
 });

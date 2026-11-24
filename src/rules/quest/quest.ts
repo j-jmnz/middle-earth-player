@@ -21,7 +21,7 @@ import { queueEvent } from "../windows/queue.ts";
 import { moveCard } from "../core/zones.ts";
 import { placeQuestingProgress, type QuestDamageCause } from "../families/defense/damage.ts";
 import { travelsOverActive } from "../families/grapple/travel.ts";
-import { freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
+import { exploreIfFull, freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
 import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
 import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
 import { attachedStageFrom, branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
@@ -347,7 +347,9 @@ export function travelTo(state: ScenarioState, locationId: string, cards: Cards,
   const instance = state.cards[locationId];
   if (!instance || instance.zone !== "staging") return null;
   if (!isLocationCard(printedOf(cards, instance.code))) return null;
-  return slot ? moveCard(state, locationId, { zone: slot }) : makeActiveIn(state, locationId);
+  const traveled = slot ? moveCard(state, locationId, { zone: slot }) : makeActiveIn(state, locationId);
+  // Progress placed in the staging area may already fill the location's quest points once they drop to the printed value: it is explored on arrival (rr.explored).
+  return exploreIfFull(traveled, locationId, cards, steps);
 }
 
 // The locations in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking/areas.ts).
