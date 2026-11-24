@@ -6,16 +6,17 @@ import { legalIntents } from "../../rules/engine/legal.ts";
 import { send, revealFromTop, type LayoutTable, type Run } from "../../../test/harness/scene-kit.ts";
 import { CODES, table } from "../../../test/scenarios/the-druadan-forest/table.ts";
 import type { Sheet, SheetNames } from "../choice/sheet-types.ts";
+import { ledgerLine } from "../cards/ledger.ts";
 import { sheetFor } from "../choice/sheets.ts";
 import { holdsProwl } from "./group-steps.ts";
 
-const sheetOf = (made: LayoutTable, state: Run["state"]): Sheet | null => {
-  const names: SheetNames = { card: (id) => made.ctx.cards.get(state.cards[id]?.code ?? "")?.name ?? state.cards[id]?.code ?? id, line: () => null };
+const sheetOf = (made: LayoutTable, state: Run["state"], line: SheetNames["line"]): Sheet | null => {
+  const names: SheetNames = { card: (id) => made.ctx.cards.get(state.cards[id]?.code ?? "")?.name ?? state.cards[id]?.code ?? id, line };
   return sheetFor(state, made.ctx, legalIntents(state, made.ctx), names);
 };
 
 // The note and the rows of each choice a reveal opens, answered by the picks in turn (a pick may be a function of the options).
-function sheets(made: LayoutTable, code: string, answers: readonly (string | ((options: readonly string[]) => string))[]): { note: string; rows: string[] }[] {
+function sheets(made: LayoutTable, code: string, answers: readonly (string | ((options: readonly string[]) => string))[], line: SheetNames["line"] = () => null): { note: string; rows: string[] }[] {
   let run: Run = { state: revealFromTop(made.state, made.ctx, code, []).state, steps: [] };
   const seen: { note: string; rows: string[] }[] = [];
   for (let guard = 0; guard < 40 && run.state.window; guard += 1) {
@@ -24,7 +25,7 @@ function sheets(made: LayoutTable, code: string, answers: readonly (string | ((o
       run = send(run, { type: "Pass" }, made.ctx);
       continue;
     }
-    const sheet = sheetOf(made, run.state);
+    const sheet = sheetOf(made, run.state, line);
     if (sheet?.kind === "pick") seen.push({ note: sheet.note ?? "", rows: sheet.options.map((option) => option.label ?? "") });
     const answer = answers[seen.length - 1];
     if (answer === undefined) break;
@@ -38,8 +39,8 @@ describe("06047:A:1 Prowl X, the sheets", () => {
     const made = table({ seats: 2, heroResources: 2, phase: "Quest", deck: ["f0", "f0"] });
     const seen = sheets(made, CODES.elite, ["discard", (options) => options[0] ?? "", "stop"]);
     expect(seen[0]?.note).toBe("Player 1: Left to discard: 2. Discard 1 resource from one of your heroes, or stop and leave the rest to the players after you.");
-    expect(seen[0]?.rows).toEqual(["Discard 1 resource from one of your heroes", "Stop: the players after you discard the rest"]);
-    expect(seen[1]?.note).toBe("Player 1: Left to discard: 2. Choose one of your heroes to discard 1 resource from.");
+    expect(seen[0]?.rows).toEqual(["Discard 1 resource from one of your heroes (2 left to discard)", "Stop: the players after you discard the rest"]);
+    expect(seen[1]?.note).toBe("Player 1: Left to discard: 2. Choose a hero to discard 1 resource from.");
     expect(seen[2]?.note).toContain("Left to discard: 1.");
   });
 
@@ -50,11 +51,28 @@ describe("06047:A:1 Prowl X, the sheets", () => {
   });
 });
 
+describe("06047:A:1 Prowl X, the sheets say no printed line", () => {
+  it("06049:A:1 the notes of the Choose and the Pick end with the sentence: the printed \"Surge. Prowl 1.\" and \"Archery 2. Prowl X.\" lines hold other keywords and are not said after it", () => {
+    for (const [code, printed] of [[CODES.thief, /Surge\./], [CODES.elite, /Archery 2\./]] as const) {
+      const made = table({ seats: 1, heroResources: 1, phase: "Quest", deck: ["f0", "f0"] });
+      const seen = sheets(made, code, [(options) => options[0] ?? "", (options) => options[0] ?? ""], ledgerLine);
+      expect(seen.length).toBeGreaterThan(0);
+      for (const one of seen) expect(one.note).not.toMatch(printed);
+    }
+  });
+
+  it("06047:A:1 each row of the Choose says the count still to discard, as the dock shows the rows and not the sentence", () => {
+    const made = table({ seats: 2, heroResources: 2, phase: "Quest", deck: ["f0", "f0"] });
+    const seen = sheets(made, CODES.elite, ["discard"]);
+    expect(seen[0]?.rows).toEqual(["Discard 1 resource from one of your heroes (2 left to discard)", "Stop: the players after you discard the rest"]);
+  });
+});
+
 describe("06047:A:1 Prowl X, the sheet with no Stop row", () => {
-  it("06048:A:1 alone at the table nobody comes after the player: no Stop row is offered, and the sheet says the players after him cannot discard the rest", () => {
+  it("06048:A:1 alone at the table nobody comes after the player: no Stop row is offered, and the sheet says later players cannot discard the rest", () => {
     const made = table({ seats: 1, heroResources: 1, phase: "Quest", deck: ["f0", "f0"] });
     const seen = sheets(made, CODES.hunter, [(options) => options[0] ?? ""]);
-    expect(seen[0]?.note).toBe("Left to discard: 1. Choose one of your heroes to discard 1 resource from. The players after you cannot discard the rest.");
+    expect(seen[0]?.note).toBe("Left to discard: 1. Choose a hero to discard 1 resource from. Later players cannot discard the rest.");
   });
 });
 

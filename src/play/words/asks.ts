@@ -31,9 +31,10 @@ export type Text = string | readonly { when?: Condition; text: string }[];
 
 /**
  * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{picked}` (the card an Each or an earlier Pick of the record chose, in a note too; in a caution, the card of the row it is about), `{host}` (the card the record's card lies on), `{subject}` (the card that triggered the record: the ally that entered play), `{pair}` (the Embassy's pair being decided: the player card with its owner and the encounter card it is paired with) and `{ringBearer}` (the hero with the Ring-bearer trait), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
- * has none), `{left}` (the damage an AssignDamage still has to place, or the resources a Prowl still has to discard, counting the step asked: its note only), `{forced}` (a Prowl's hero Pick: the words that say no Stop row was offered because the players after cannot discard the rest, or nothing), `{countdown}` (an entry with `countdown`: "2 of 4"), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
+ * has none), `{left}` (the damage an AssignDamage still has to place, or the resources a Prowl still has to discard, counting the step asked: its note only), `{forced}` (a Prowl's hero Pick: the words that say no Stop row was offered because later players cannot discard the rest, or nothing), `{countdown}` (an entry with `countdown`: "2 of 4"), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
  * - `note`: the sentence over a Pick or a Choose (the entry keyed with the instruction's verb).
  * - `why`: the reason the window opened. It is said after the card's title and before the note, "Card: why note" ("Player 1, Card: why note" when owned and two-handed).
+ * - `bare`: the sheet says the entry's sentence alone, with no printed line of the record after it (a keyword line that holds other keywords, "Surge. Prowl 1.", is no use there).
  * - `owned`: one player's own choice. Two-handed the sentence leads with the player and the sheet adds no "Player N chooses."; solo it has no lead, and a note with no `why` is capitalised.
  * - `verb`: the button's word over a Pick, one or two words ("Exhaust"); "Choose" when absent.
  * - `labels`: the rows of a Pick that are no card, by option id ("skip", "done"). A key that names a card is refused.
@@ -49,6 +50,7 @@ export type Ask = {
   note?: Text;
   why?: string;
   owned?: true;
+  bare?: true;
   verb?: string;
   label?: Text;
   labels?: Readonly<Record<string, Text>>;
@@ -63,7 +65,7 @@ export type Ask = {
 export type AsksTable = Readonly<Record<string, Ask>>;
 
 /** What a Pick's entry says: the words the chain returns, with the rows that are no card and the warning of each row an entry can add. */
-export type AskedWords = PickWords & { labels?: Readonly<Record<string, string>>; cautions?: Readonly<Record<string, string>> };
+export type AskedWords = PickWords & { labels?: Readonly<Record<string, string>>; cautions?: Readonly<Record<string, string>>; bare?: true };
 
 /** Where the instruction stands: the record (its id), the path in it, and the table of the scenario that worded it. Worked out once for a sheet (askAt) and handed to every row's lookup. */
 export type AskAt = { id: string; path: string; table: AsksTable };
@@ -170,7 +172,7 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
     const code = a.source ? (a.game.cards[a.source]?.code ?? a.source) : undefined;
     const prowl = candidatesOf(a, id, code).some((record) => record != null && holdsProwl(record.instructions));
     if (prowl) values.left = prowlLeft(a.game, a.instruction);
-    values.forced = prowl && prowlForced(a.game, a.instruction) ? " The players after you cannot discard the rest." : "";
+    values.forced = prowl && prowlForced(a.game, a.instruction) ? " Later players cannot discard the rest." : "";
   }
   // The encounter cards a locate test has discarded so far, each with whether it prints PASS (dwd.locate-test), named only where an entry says them.
   if (a.instruction.verb === "LocateTest" && templatesOf(entry).some((template) => placeholdersOf(template).includes("dealt"))) {
@@ -267,14 +269,14 @@ export function asksPick(a: AskFacts, table?: AsksTable): AskedWords | undefined
     if (caution !== undefined) cautions[id] = caution;
   }
   const owned = hit.entry.owned === true && a.game.seatCount > 1;
-  return { verb: hit.entry.verb ?? "Choose", prompt, ...(owned ? { owned: true as const } : {}), ...(Object.keys(labels).length > 0 ? { labels } : {}), ...(Object.keys(cautions).length > 0 ? { cautions } : {}) };
+  return { verb: hit.entry.verb ?? "Choose", prompt, ...(owned ? { owned: true as const } : {}), ...(hit.entry.bare === true ? { bare: true as const } : {}), ...(Object.keys(labels).length > 0 ? { labels } : {}), ...(Object.keys(cautions).length > 0 ? { cautions } : {}) };
 }
 
 /** The sentence over a Choose from its entry (the one keyed "Choose"), or undefined. `owned` says it leads with the player. */
-export function asksChoose(a: AskFacts, table?: AsksTable): { note: string; owned: boolean } | undefined {
+export function asksChoose(a: AskFacts, table?: AsksTable): { note: string; owned: boolean; bare?: true } | undefined {
   const hit = found(a, "Choose", table);
   const note = hit ? sentence(a, hit) : null;
-  return hit && note !== null ? { note, owned: hit.entry.owned === true && a.game.seatCount > 1 } : undefined;
+  return hit && note !== null ? { note, owned: hit.entry.owned === true && a.game.seatCount > 1, ...(hit.entry.bare === true ? { bare: true as const } : {}) } : undefined;
 }
 
 /** The row of one branch of a Choose, and the warning before it sends, from the entry keyed with the option id, or undefined. */

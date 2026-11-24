@@ -282,10 +282,11 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         // The line printed is the one of the record the entry words: one frame can resolve two records of a card (a stage's two When Revealed).
         const askerId = xAsk?.effectId ?? written.at?.id;
         const asker = askerId ? effectById(ctx, askerId) : undefined;
-        const ask = asksChoose(written)?.note ?? torch?.note ?? xAsk?.note ?? smaugChooseNote(choose, game, ctx, words, window.seat) ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? burgleChooseNote(choose, game, ctx, words, window.seat) ?? "Choose one.";
+        const chosen = asksChoose(written);
+        const ask = chosen?.note ?? torch?.note ?? xAsk?.note ?? smaugChooseNote(choose, game, ctx, words, window.seat) ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? burgleChooseNote(choose, game, ctx, words, window.seat) ?? "Choose one.";
         return {
           ...base,
-          note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, lineOf(asker ?? effect, names)].filter((part) => part != null).join(" "),
+          note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, chosen?.bare ? null : lineOf(asker ?? effect, names)].filter((part) => part != null).join(" "),
           verb: "Choose",
           confirm: "Confirm",
           // The Embassy's pair: the Read button opens the player card and the encounter card it is paired with.
@@ -316,7 +317,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         ...base,
         ...(asked.title ? { title: asked.title } : {}),
         ...(stopsDefenders ? { alternative: { label: "No more defenders", intent: { type: "Choose" as const, optionId: DONE } } } : {}),
-        note: [`${asked.prompt}${asked.owned ? "" : who}`, committedNote(game, ctx, effect, window.seat), line].filter((part) => part != null).join(" "),
+        note: [`${asked.prompt}${asked.owned ? "" : who}`, committedNote(game, ctx, effect, window.seat), asked.bare ? null : line].filter((part) => part != null).join(" "),
         verb: asked.verb,
         // Which Ringwraith copy goes in: the primary says the action alone, so the pill does not wrap on a long zone name.
         ...(outOfPlay ? { confirm: asked.verb } : {}),
