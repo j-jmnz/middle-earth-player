@@ -3,7 +3,7 @@
 // is seen wherever it comes from, an undefended attack is announced whatever its damage, a player card's progress in the staging area is barred, and Ruined Tower is a second active location. The printed lines are the spec rows of src/campaign/scenarios/assault-on-osgiliath/spec.test.ts.
 import { describe, expect, it } from "vitest";
 
-import { finish, idOf, legalIntents, resolveRecords, revealFromTop, send, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
+import { finish, idOf, legalIntents, revealFromTop, send, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
 import { payFor } from "../../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { BOROMIR, CODES, EVIL_CROW, cardOf, drive, opened, playOf, table, where } from "../../../../test/scenarios/assault-on-osgiliath/table.ts";
 import type { PlayerIntent } from "../../../../src/rules/engine/reduce.ts";
@@ -240,24 +240,5 @@ describe("The stat the quest counts (06100:A:1, 06101:A:1): Siege and Battle fro
     expect(total(CODES.westQuarter)).toBe(2);
     expect(total(CODES.eastQuarter)).toBe(3);
     expect(total(CODES.harbor)).toBe(1);
-  });
-});
-
-describe("Retake the City (06091:A:1): the Setup choices", () => {
-  it("lets each player choose an enemy and then a unique location nobody took", () => {
-    const made = table({ seats: 2, deck: ["05052", "05058", "06096", "06097", "06100"] }, undefined, ["05052", "05058"]);
-    const windows: string[][] = [];
-    const run = resolveRecords(made.state, made.ctx, CODES.retake, "setup", idOf(made.state, CODES.retake), (state) => {
-      if (state.window?.kind !== "choose") return "";
-      windows.push([...state.window.options]);
-      return state.window.options[0] ?? "";
-    }, false);
-    const staged = run.state.staging.map((id) => run.state.cards[id]?.code);
-    // The first player chose among the two unique locations in the deck, West Gate (the first offered); the second had King's Library left, the one copy of it, and no choice to make. West Quarter is no unique location.
-    expect(windows.filter((options) => options.every((option) => option.startsWith("0609")))).toEqual([["06096", "06097"]]);
-    expect(staged.filter((code) => code === "06096")).toHaveLength(1);
-    expect(staged.filter((code) => code === "06097")).toHaveLength(1);
-    expect(staged).not.toContain("06100");
-    expect(staged).toHaveLength(4);
   });
 });

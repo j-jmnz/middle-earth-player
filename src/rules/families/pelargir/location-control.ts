@@ -109,3 +109,9 @@ export const TOWER = "06103";
 export function towerSecond(state: ScenarioState, locationId: string): boolean {
   return state.cards[locationId]?.code === TOWER && state.activeLocation != null && state.secondActiveLocation == null;
 }
+
+/** AnnounceAddedToStaging: the named card, if it lies in the staging area, is announced as added there (`addedToStaging`), so its own Forced effect hears it. Opt-in: SearchMove announces only an ambush enemy, so no other record changes. */
+export function announceAddedToStaging(state: ScenarioState, instruction: Verb<"AnnounceAddedToStaging">, focus: Focus): ScenarioState {
+  const id = refCard(state, instruction.card ?? "picked", frameScope(state, focus.seat, focus.sourceId));
+  return id && state.cards[id]?.zone === "staging" ? queueEvent(state, { trigger: "addedToStaging", seat: focus.seat, cardId: id }) : state;
+}

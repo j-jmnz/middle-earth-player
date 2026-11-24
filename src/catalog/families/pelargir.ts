@@ -90,6 +90,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("TakeControlOfLocation"), card: cardRefSchema.optional(), ...when }),
   // "Return a location he controls to the staging area" (06093:A:1, 06100:A:2, 06106:A:2; ats.losing-control-of-locations): the location the reference names (`picked` by default) goes to the staging area with its progress removed and nobody controls it; the table announces `controlLost`. A card that is not controlled is left as it is.
   z.strictObject({ verb: z.literal("LoseControlOfLocation"), card: cardRefSchema.optional(), ...when }),
+  // "Add it to the staging area" read as an entry the card's own Forced effect hears (05053:A:1, ats.setup-assault-on-osgiliath, 06091:A:1): the card the reference names (`picked`: the card an earlier SearchMove with `remember` put in the staging area) is announced as added to the staging area. SearchMove announces it for an ambush enemy alone, so a record opts in with this verb; a card not in the staging area is left as it is.
+  z.strictObject({ verb: z.literal("AnnounceAddedToStaging"), card: cardRefSchema.optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [

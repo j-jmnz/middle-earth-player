@@ -55,7 +55,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
           verb: "ForEachPlayer",
           order: "firstFirst",
           instructions: [
-            { verb: "SearchMove", type: "enemy", to: "staging", deckOnly: true },
+            { verb: "SearchMove", type: "enemy", to: "staging", deckOnly: true, remember: true },
+            // A Haradrim Elite chosen here makes its attack as it is added to the staging area (05053:A:1): the search announces only an ambush enemy, so the record announces the card.
+            { verb: "AnnounceAddedToStaging" },
             { verb: "Choose", who: "actor", options: UNIQUE_LOCATIONS.map((code) => ({ id: code, requires: { kind: "searchable", code, type: "location", deckOnly: true }, instructions: [{ verb: "SearchMove", code, to: "staging", deckOnly: true }] })) },
           ],
         },

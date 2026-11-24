@@ -92,6 +92,10 @@ export const PELARGIR_TEMPLATES: Templates = {
     text: `the player who controls ${cardRef(str(i.card ?? "picked"))}, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is`,
     read: ["card"],
   }),
+  AnnounceAddedToStaging: (i) => ({
+    text: `${cardRef(str(i.card ?? "picked"))}, if it lies in the staging area, is announced as added to the staging area, so its own Forced effect that hears it resolves (a search puts a card there without that announcement unless the record opts in with this instruction)`,
+    read: ["card"],
+  }),
   GroupDiscardResources: (i, ctx) => ({
     text: `the players as a group discard ${amt(i.amount, ctx)} resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)`,
     read: ["amount", "rest", "turns"],
@@ -125,6 +129,7 @@ export const PELARGIR_SAMPLES: Samples = {
   PickFewestHitPointsLeft: [{ verb: "PickFewestHitPointsLeft" }],
   TakeControlOfLocation: [{ verb: "TakeControlOfLocation" }, { verb: "TakeControlOfLocation", card: "previous" }],
   LoseControlOfLocation: [{ verb: "LoseControlOfLocation", card: "self" }, { verb: "LoseControlOfLocation" }],
+  AnnounceAddedToStaging: [{ verb: "AnnounceAddedToStaging" }, { verb: "AnnounceAddedToStaging", card: "previous" }],
 };
 
 export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
