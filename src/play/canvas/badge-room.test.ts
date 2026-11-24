@@ -1,4 +1,4 @@
-// Rules: docs/design-system-table.md (Effect pills). The count of effect pills hidden behind the "N more" pill, which badgeReach keeps a word pill clear of.
+// Rules: docs/design-system-table.md (Tokens and effects). The count of effect pills hidden behind the "N more" pill, which badgeReach keeps a word pill clear of.
 import { describe, expect, it } from "vitest";
 
 import { badgeRoom, hiddenBadges } from "./badge-room.ts";
