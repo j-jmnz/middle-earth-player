@@ -1,0 +1,252 @@
+Scenario piles that place cards with no record (activeLocation: 06075 Burning Farmhouse; quest: 06066 Savagery of the Orcs; quest: 06067 Protect the Villagers; staging: 06068 Rescued Villagers; staging: 06069 Dead Villagers; setAside: 06070 Lord Alcaron; setAside: 06071 Ghulat)
+
+## 06066 Savagery of the Orcs
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+06066:A:1 (front): Setup: Set Ghulat aside, out of play. Put Lord Alcaron into play. Make Burning Farmhouse the active location. Add the Rescued Villagers and Dead Villagers objectives to the staging area. Then, shuffle the encounter deck and reveal 1 encounter card per player and add it to the staging area.
+  06066:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the set-aside card with code 06070 enters play under the first player's control, ready
+    - place 4 resource tokens on the active location
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+06066:B:1 (back): Villagers 5.
+  06066:whenRevealed:1: When revealed
+    - place 5 resource tokens on this card
+
+06066:B:2 (back): When progress would be placed on Savagery of the Orcs, move an equal number of villager tokens from this quest onto Rescued Villagers instead.
+  06066:constant:1: Constant
+    - this card: stat progressToVillagers (held by the current quest stage: the progress that would be placed on it is not placed; its record hears the amount and moves that many villager tokens from the quest card to Rescued Villagers, the rest of the progress is lost) 1, while this card is in play
+  06066:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - move up to X villager token(s) from this card to the card in play with code 06068, a card in play (a move is no discard: nothing hears it); the number moved is added to the effect's X
+
+06066:B:3 (back): If there are no villager tokens on Savagery of the Orcs, advance to the next stage.
+  06066:constant:2: Constant
+    - this card: stat advancesWithoutVillagers (held by the current quest stage: when its card holds no villager token the quest advances at once to the next stage) 1, while this card is in play
+
+## 06067 Protect the Villagers
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+06067:A:1 (front): When Revealed: Add Ghulat to the staging area.
+  06067:whenRevealed:1: When revealed
+    - one set-aside card with code 06071 joins the staging area (it is not revealed)
+
+06067:B:1 (back): If an attack goes undefended, discard X villager tokens from Rescued Villagers instead of damaging a hero. X is the amount of damage that would have been dealt.
+  06067:constant:1: Constant
+    - this card: stat undefendedToVillagers (held by the current quest stage: an undefended attack is aimed at Rescued Villagers, no hero takes it, and the damage it would deal becomes that many villager tokens discarded from Rescued Villagers, all of them when fewer) 1, while this card is in play
+
+06067:B:2 (back): When the players defeat this stage, end the game. Compare the number of tokens on Rescued Villagers to the number of tokens on Dead Villagers.
+  06067:constant:2: Constant
+    - this card: stat holdsWin (defeating this final stage does not win the game: it stays the current quest card, defeated, and its own Forced effects win the game or reset the quest) 1, while this card is in play
+  06067:forced:1: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the table: stat gameEnding (held by the table until the end of the game: the game is ending; Rescued Villagers and Dead Villagers compare their tokens once Ghulat is not in play) 1, until the end of the game
+
+## 06068 Rescued Villagers
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+06068:A:1 (front): If a location leaves play as an explored location, move any villager tokens from that location to Rescued Villagers.
+  06068:forced:1: Forced after a card leaves play (heard about location (any player controls))
+    only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - move all the villager token(s) from the card the event is about to this card, a card in play (a move is no discard: nothing hears it); the number moved is added to the effect's X
+
+06068:A:2 (front): At the end of the game, if there are more villager tokens here than damage tokens on Dead Villagers, the players have won.
+  06068:constant:1: Constant
+    only if all of: (the table holds the flag gameEnding) and (damage of "Dead Villagers" is less than resources of "Rescued Villagers") and (the card with code 06071 is not in play) and (the table does not hold the flag endingLost)
+    - the players win the game
+
+## 06069 Dead Villagers
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+06069:A:1 (front): If a villager token is discarded from a location, objective, or quest stage, place a damage token on Dead Villagers.
+  06069:forced:1: Forced on the event villagerDiscarded
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 1 damage token(s) on the card in play with code 06069 (placed, not dealt: nothing cancels or reduces them)
+
+06069:A:2 (front): At the end of the game, if there are more damage tokens here than villager tokens on Rescued Villagers, the players have lost.
+  06069:constant:1: Constant
+    only if all of: (the table holds the flag gameEnding) and (resources of "Rescued Villagers" is less than damage of "Dead Villagers" + 1) and (the card with code 06071 is not in play)
+    - the players lose the game (Dead Villagers: not more villager tokens were rescued than died)
+
+## 06070 Lord Alcaron
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+06070:A:1 (front): The first player gains control of Lord Alcaron.
+  06070:constant:1: Constant
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+06070:A:2 (front): Response: After a villager token is discarded, exhaust Lord Alcaron to place that villager token on a location instead.
+  06070:response:1: Response on the event villagerDiscarded (cost: exhaust this card)
+    only if there is a location (any player controls) to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls)
+    - place 1 resource tokens on the picked card
+
+06070:A:3 (front): If Lord Alcaron leaves play, the players have lost the game.
+  06070:forced:1: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the table: stat endingLost (held by the table until the end of the game: Lord Alcaron left play; the players lose once Ghulat is not in play, checked at every settle) 1, until the end of the game
+
+## 06071 Ghulat
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+06071:A:1 (front): X is the number of damage tokens on Dead Villagers.
+  06071:constant:1: Constant
+    - this card: stat attack damage of "Dead Villagers", while this card is in play
+
+06071:A:2 (front): Forced: When Ghulat attacks, place 1 damage token on Dead Villagers.
+  06071:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
+    - place 1 damage token(s) on the card in play with code 06069 (placed, not dealt: nothing cancels or reduces them)
+
+06071:A:3 (front): While Ghulat is in play, the game cannot end.
+  06071:constant:2: Constant
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+## 06072 Marauding Orc
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06072:A:1 (front): Forced: After Marauding Orc attacks and destroys a character, place 1 damage token on Dead Villagers.
+  06072:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 1 damage token(s) on the card in play with code 06069 (placed, not dealt: nothing cancels or reduces them)
+
+06072:A:2 (shadow): Shadow: If this attack destroys a character, discard 1 villager token from Rescued Villagers.
+  06072:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): discard up to 1 villager token(s) from the card in play with code 06068 (fewer when it holds fewer; each goes back to the token bank and is announced, one by one); the effect's X is the number discarded
+
+## 06073 Orc Ravager
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06073:A:1 (front): When Revealed: Discard 1 villager token from the active location. If no villager token is discarded by this effect, Orc Ravager gains surge.
+  06073:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard up to 1 villager token(s) from the active location (fewer when it holds fewer; each goes back to the token bank and is announced, one by one); the effect's X is the number discarded
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+06073:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if undefended.)
+  06073:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 06074 Craven Eagle
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06074:A:1 (front): When Revealed: Discard the character with the fewest remaining hit points. That character's controller may discard 3 cards at random from his hand to prevent this effect.
+  06074:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the hero or ally in play (any player's, an objective ally too) with the fewest hit points left, as modified, becomes the picked card (the first player chooses among those tied); the player who controls it acts for the instructions after this one; with no character in play nothing is picked
+    - the acting player chooses one of:
+      * option "prevent" (only if 2 is less than the number of card (you control) in hand):
+        - the acting player discards 3 random card(s) from hand
+      * option "allow":
+        - discard the picked card
+
+## 06075 Burning Farmhouse
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+06075:A:1 (front): Villagers 4.
+  06075:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 4 resource tokens on this card
+  06075:forced:2: Forced on the event searchedIntoPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 4 resource tokens on this card
+
+06075:A:2 (front): Forced: At the end of the round, discard 1 villager token from Burning Farmhouse.
+  06075:forced:3: Forced at the end of the round (heard about this card)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - discard up to 1 villager token(s) from this card (fewer when it holds fewer; each goes back to the token bank and is announced, one by one); the effect's X is the number discarded
+
+## 06076 Gondorian Hamlet
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06076:A:1 (front): Villagers 3.
+  06076:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 3 resource tokens on this card
+  06076:forced:2: Forced on the event searchedIntoPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 3 resource tokens on this card
+
+06076:A:2 (front): While Gondorian Hamlet is in the staging area it gains: 'Forced: After a treachery card is revealed from the encounter deck, discard 1 villager token from Gondorian Hamlet.'
+  06076:forced:3: Forced after a card is revealed (heard about treachery (any player controls); only when the encounter deck revealed it)
+    only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - discard up to 1 villager token(s) from this card (fewer when it holds fewer; each goes back to the token bank and is announced, one by one); the effect's X is the number discarded
+
+## 06077 Secluded Farmhouse
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06077:A:1 (front): Villagers 2.
+  06077:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 2 resource tokens on this card
+  06077:forced:2: Forced on the event searchedIntoPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 2 resource tokens on this card
+
+06077:A:2 (front): Travel: Reveal the top card of the encounter deck and add it to the staging area to travel here.
+  06077:travel:1: Travel
+    - the acting player reveals an encounter card
+
+## 06078 Burnt Homestead
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06078:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+06078:A:2 (front): When Revealed: Raise each player's threat by the number of damage tokens on Dead Villagers.
+  06078:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - raise threat by damage of "Dead Villagers" (the acting player)
+
+06078:A:3 (shadow): Shadow: Defending player raises his threat by 1 for each damage token on Dead Villagers.
+  06078:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - raise threat by damage of "Dead Villagers" (the acting player)
+
+## 06079 Trapped Inside
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06079:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+06079:A:2 (front): When Revealed: Discard 1 villager token from the active location for each player in the game. If no villager tokens were removed by this effect, Trapped Inside gains surge.
+  06079:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard up to the number of players villager token(s) from the active location (fewer when it holds fewer; each goes back to the token bank and is announced, one by one); the effect's X is the number discarded
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+06079:A:3 (shadow): Shadow: If this attack destroys a character, discard 1 villager token from Rescued Villagers.
+  06079:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): discard up to 1 villager token(s) from the card in play with code 06068 (fewer when it holds fewer; each goes back to the token bank and is announced, one by one); the effect's X is the number discarded
+
+## 06080 Panicked!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06080:A:1 (front): When Revealed: Each player must take a villager token from Rescued Villagers and place it on a location in the staging area, if able. If no villager tokens were placed on a location by this effect, Panicked! gains surge.
+  06080:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - if 0 is less than resources of "Rescued Villagers": choose location (any player controls) in the staging area only
+      - move up to 1 villager token(s) from the card in play with code 06068 to the picked card, a card in play (a move is no discard: nothing hears it); the number moved is added to the effect's X
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+06080:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each damage token on Dead Villagers.
+  06080:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack damage of "Dead Villagers", until the end of the attack
+
+(rendered pieces: 142 by template, 0 as JSON)

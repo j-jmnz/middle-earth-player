@@ -138,6 +138,6 @@ export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
   advancesWithoutVillagers: " (held by the current quest stage: when its card holds no villager token the quest advances at once to the next stage)",
   undefendedToVillagers: " (held by the current quest stage: an undefended attack is aimed at Rescued Villagers, no hero takes it, and the damage it would deal becomes that many villager tokens discarded from Rescued Villagers, all of them when fewer)",
   gameEnding: " (held by the table until the end of the game: the game is ending; Rescued Villagers and Dead Villagers compare their tokens once Ghulat is not in play)",
-  endingLost: " (held by the table until the end of the game: Lord Alcaron left play; Dead Villagers loses the game once Ghulat is not in play)",
+  endingLost: " (held by the table until the end of the game: Lord Alcaron left play; the players lose once Ghulat is not in play, checked at every settle)",
   firstEnemyNoted: " (held by the table until the end of the round: an enemy was already marked firstEnemy this round)",
 };

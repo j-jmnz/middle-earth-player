@@ -1,7 +1,7 @@
 // The vocabulary Peril in Pelargir (Against the Shadow part 1) adds to effect records: Alcaron's Scroll, an objective that hops from a hero to the enemy that damages him, and the cards that look for the hero that holds it; a treachery that
 // attaches to the hero with the highest threat cost that has none; the discards from the top of the encounter deck that Collateral Damage counts in two steps; and the first enemy revealed each round. Into Ithilien (part 2) adds the ally objectives that are
 // committed to the quest from the staging area, the stage that bypasses the next one, and the first player's taking of every Ranger objective in the staging area. Simple verbs and stat flags; effect-schema-verbs.ts,
-// effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/pelargir/ runs them.
+// effect-schema.ts and effect-schema-stats.ts compose them. Encounter at Amon Dîn (part 6) adds the villager tokens (their discard and their move, the trigger that hears a discard), the character with the fewest hit points left, and the flags that end the game or hold it. src/rules/families/pelargir/ runs them.
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
@@ -146,9 +146,9 @@ const FLAGS = [
   // On the quest stage 2B: while it is current, an undefended attack's damage goes to Rescued Villagers and to no hero, and the damage becomes discarded villager tokens ("If an attack goes undefended, discard X villager tokens from Rescued Villagers instead of damaging a hero", 06067:B:1;
   // families/pelargir/villagers.ts, the family's combat hooks).
   "undefendedToVillagers",
-  // On the table until the end of the game: the game is ending ("When the players defeat this stage, end the game", 06067:B:2). The constants of Rescued Villagers and Dead Villagers compare the tokens once it is set and Ghulat is not in play.
+  // On the table until the end of the game: the game is ending ("When the players defeat this stage, end the game", 06067:B:2). The constants of Rescued Villagers and Dead Villagers compare the tokens once it is set and Ghulat is not in play (rr.cannot).
   "gameEnding",
-  // On the table until the end of the game: Lord Alcaron left play, so the players lose as soon as Ghulat is not in play ("If Lord Alcaron leaves play, the players have lost the game", 06070:A:3; the constant of Dead Villagers ends the game).
+  // On the table until the end of the game: Lord Alcaron left play, so the players lose as soon as Ghulat is not in play ("If Lord Alcaron leaves play, the players have lost the game", 06070:A:3; a settle sweep, families/pelargir/ending.ts).
   "endingLost",
 ] as const;
 
