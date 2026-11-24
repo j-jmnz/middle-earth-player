@@ -7,6 +7,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { takeControlOfStagedObjectives } from "./control.ts";
+import { alcaronLoss } from "./ending.ts";
 import { archeryOfAmount } from "./archery-of.ts";
 import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
 import { noteFirstEnemy, pelargirCondition } from "./first-enemy.ts";
@@ -89,7 +90,7 @@ export const manifest: RulesFamily = {
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,
-  settle: { sweep: (state, ctx, steps) => advanceWithoutVillagers(progressesToVictory(releaseUnderworldStacks(sieges(state, ctx, steps), ctx, steps), ctx, steps), ctx, steps) },
+  settle: { sweep: (state, ctx, steps) => alcaronLoss(advanceWithoutVillagers(progressesToVictory(releaseUnderworldStacks(sieges(state, ctx, steps), ctx, steps), ctx, steps), ctx, steps), ctx) },
   travel: { unpayable: (state, instruction, ctx, locationId) => eachPlayerSpendsUnpayable(state, instruction, ctx, locationId) },
   pick: (state, id, spec) => noResourcesMatches(state, id, spec),
   amount: (state, amount, scope, ctx) => archeryOfAmount(state, amount, scope, ctx),
