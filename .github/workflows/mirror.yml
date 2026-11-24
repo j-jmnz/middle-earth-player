@@ -1,0 +1,39 @@
+name: mirror
+
+# Fills the asset mirror with the files a merge pinned (docs/development.md, Asset mirror), so a release's pack reads them from
+# the mirror and not from their sources: a source that answers other bytes fails this small job, not a release. It downloads
+# only the pinned files the mirror lacks. Start it by hand from the Actions tab or with `gh workflow run mirror.yml --ref main`.
+
+on:
+  push:
+    branches: [main]
+    paths: [data/sources.json]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Two runs would download and upload the same files.
+concurrency:
+  group: mirror
+  cancel-in-progress: false
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      # Electron's postinstall downloads its binary (about 110 MB), which this job does not run.
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET: ${{ vars.R2_BUCKET || secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/install
+      # Without the mirror's secrets (docs/releasing.md, Asset mirror secrets) there is no mirror to fill.
+      - name: Push the pinned files the mirror lacks
+        run: |
+          if [ -z "$R2_SECRET_ACCESS_KEY" ]; then echo "::notice::No R2 secrets: the asset mirror is not set up, so nothing is pushed."; exit 0; fi
+          pnpm --silent data mirror push --fetch --strict
