@@ -14,7 +14,8 @@ describe("progressToVictory ends the game in the window of the attack that fills
     const made = table({ stage: STAGE_3, phase: "PlayerAttacks", progress: 12, engaged: [{ code: DRU, progress: 4 }] });
     const hero = idOf(made.state, HERO);
     const hero2 = idOf(made.state, "dh2");
-    const boosted = ["willpower"].flatMap(() => [hero, hero2]).reduce((state, id) => ({ ...state, modifiers: [...state.modifiers, { instanceId: id, sourceId: id, stat: "willpower" as const, amount: 3, until: "endOfPhase" as const }] }), made.state);
+    const boosts = [hero, hero2].map((id) => ({ instanceId: id, sourceId: id, stat: "willpower" as const, amount: 3, until: "endOfPhase" as const }));
+    const boosted = { ...made.state, modifiers: [...made.state.modifiers, ...boosts] };
     const sent = send(begin(boosted), { type: "DeclareAttackers", enemyId: idOf(made.state, DRU), attackerIds: [hero, hero2] }, made.ctx);
     const state = finish(sent, made.ctx).state;
     expect(state.cards[idOf(made.state, DRU)]?.zone).toBe("victory");

@@ -131,7 +131,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
     { id: "06053:shadow:1", cardCode: "06053", lines: ["06053:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: { count: { ...OWN_HEROES, hasResources: false } }, until: "endOfAttack", target: "attacker" }] },
 
-    // 06054 Stars in Sky. A:1 and A:2: Prowl 2 resolves first, then each player in turn has each questing hero pay 1 resource from its own pool or be removed from the quest. A:3 (Shadow): all resources of the defending character's pool are discarded (none on an ally, nothing with no defender).
+    // 06054 Stars in Sky. A:1 and A:2: the When Revealed resolves first (each player in turn has each questing hero pay 1 resource from its own pool or be removed from the quest), then the Forced Prowl 2 record, which is heard after the When Revealed step (docs/scenarios/against-the-shadow/the-druadan-forest.md, Prowl). A:3 (Shadow): all resources of the defending character's pool are discarded (none on an ally, nothing with no defender).
     PROWL_ON_REVEAL("06054:forced:1", "06054", ["06054:A:1"], 2),
     {
       id: "06054:whenRevealed:1",
