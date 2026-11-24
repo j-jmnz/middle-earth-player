@@ -9,7 +9,7 @@ export const REFUSALS = {
   noSaves: "That file has no saves in it, so it is not a Middle-earth Player backup.",
   newer: "That backup was made by a newer version of the app. Update the app, then restore it.",
   damaged: "That backup is damaged and cannot be read.",
-  unreadable: "A campaign in that backup does not read, so nothing was changed.",
+  unreadable: "A campaign, game, deck or setting in that backup does not read, so nothing was changed.",
   failed: "The restore did not finish, so nothing was changed.",
 } as const;
 
@@ -48,4 +48,24 @@ export const KEPT_TABLES: readonly string[] = ["meta", "booklets", "image_files"
 /** The tables a restore replaces, from the ones the live database has. */
 export function restoredTables(live: readonly string[]): string[] {
   return live.filter((name) => !KEPT_TABLES.includes(name) && !name.startsWith("sqlite_") && !name.startsWith("__drizzle"));
+}
+
+/** A row of the file's `sqlite_master`. */
+export type SchemaRow = { type: string | null; name: string | null; rootpage: number | null; sql: string | null };
+
+// What this app's own schema holds: tables, and indexes (one made for a constraint has no SQL).
+const OWN_SQL = /^\s*CREATE\s+(TABLE|(UNIQUE\s+)?INDEX)\s/i;
+
+/**
+ * Whether the file's schema holds something the app never makes: a trigger, a view or a virtual table. Each one runs code or SQL of the file's choice
+ * when a table is read or written, so a file with one is not a backup. A table and an index have a page of their own and SQL that creates one; a view, a
+ * trigger and a virtual table have no page, whatever their row calls them.
+ */
+export function hasForeignSchema(rows: readonly SchemaRow[]): boolean {
+  return rows.some((row) => {
+    if (row.type !== "table" && row.type !== "index") return true;
+    if (!row.rootpage) return true;
+    if (row.sql === null) return row.type !== "index";
+    return !OWN_SQL.test(row.sql) || /^\s*CREATE\s+VIRTUAL\s/i.test(row.sql);
+  });
 }

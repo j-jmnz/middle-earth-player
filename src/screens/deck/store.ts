@@ -3,6 +3,7 @@ import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { cards } from "../../catalog/schema";
 import { notAppliedCodes } from "../../play/cards/not-applied";
+import { deckOfRow } from "./row";
 import type { DeckFace } from "./status";
 import { STEALTH_ID, WISDOM_ID, starterDeck } from "./starter-decks";
 import { decks, type DeckCard } from "../data/user-schema";
@@ -43,18 +44,21 @@ export function newDeckId(now: number = Date.now(), random: () => number = Math.
   return `deck-${now.toString(36)}-${Math.floor(random() * 36 ** 8).toString(36).padStart(8, "0")}`;
 }
 
-const columns = { id: decks.id, name: decks.name, heroes: decks.heroes, cards: decks.cards, side: decks.side, updatedAt: decks.updatedAt };
+// The JSON columns are selected as their text and read by deckOfRow (row.ts): a row whose text is not a deck's (a restored backup can hold one) is
+// skipped, where the column's own JSON decoder would throw and take the deck screens with it.
+const columns = { id: decks.id, name: decks.name, heroes: sql<string>`${decks.heroes}`, cards: sql<string>`${decks.cards}`, side: sql<string>`${decks.side}`, updatedAt: decks.updatedAt };
 
 /**
  * Every saved deck in the player's order: the decks with no position first (new, imported or duplicated ones; the one saved last
- * first, then rows never saved since 0005 in the order they were made), then the dragged order by position.
+ * first, then rows never saved since 0005 in the order they were made), then the dragged order by position. A row that does not read as a deck is left out.
  */
 export function listDecks<TRun>(user: Db<TRun>): SavedDeck[] {
   return user
     .select(columns)
     .from(decks)
     .orderBy(sql`${decks.position} is not null`, asc(decks.position), desc(decks.updatedAt), asc(sql`rowid`))
-    .all();
+    .all()
+    .flatMap((row) => deckOfRow(row) ?? []);
 }
 
 /** Stores the list's order: position 0..n-1 for these ids, in one transaction. Ids that are not saved decks are ignored. */
@@ -66,8 +70,10 @@ export function writeDeckOrder<TRun>(user: Db<TRun>, ids: readonly string[]): vo
   });
 }
 
+/** The saved deck, or null when there is none under `id` or its row does not read as a deck. */
 export function readDeck<TRun>(user: Db<TRun>, id: string): SavedDeck | null {
-  return user.select(columns).from(decks).where(eq(decks.id, id)).get() ?? null;
+  const row = user.select(columns).from(decks).where(eq(decks.id, id)).get();
+  return row ? deckOfRow(row) : null;
 }
 
 function copied(deck: Pick<DeckWrite, "heroes" | "cards" | "side">): { heroes: string[]; cards: DeckCard[]; side: DeckCard[] } {

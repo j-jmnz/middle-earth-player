@@ -4,10 +4,10 @@ import { migrate } from "drizzle-orm/expo-sqlite/migrator";
 import { describe, expect, it, vi } from "vitest";
 
 import migrations from "../../../../drizzle/migrations";
-import { AsyncSqlite, drizzleOf, openMemory } from "../../../../test/harness/sqlite-async";
+import { AsyncSqlite, deserializeDatabaseAsync, drizzleOf, openMemory } from "../../../../test/harness/sqlite-async";
 import { newSave } from "../../../campaign/save";
 import { createSave } from "../../data/campaign-store";
-import { restoreBackup, exportBackup } from "./backup-db";
+import { checkCopy, restoreBackup, exportBackup } from "./backup-db";
 
 vi.mock("expo-sqlite", async () => ({ deserializeDatabaseAsync: (await import("../../../../test/harness/sqlite-async")).deserializeDatabaseAsync }));
 vi.mock("drizzle-orm/expo-sqlite", async () => ({ drizzle: (await import("../../../../test/harness/sqlite-async")).drizzleOf }));
@@ -84,6 +84,57 @@ describe("restoreBackup", () => {
     expect(snapshot(target.client)).toEqual(before);
   });
 
+  it("refuses a file with a deck, a run or a setting that does not read, and leaves the live rows as they were", async () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const target = await live();
+    const before = snapshot(target.client);
+    const run = (heroes: string, result = "won") =>
+      `INSERT INTO runs (id, kind, ref_id, box, scenario_id, result, seat_count, heroes) VALUES ('r', 'campaign', 's', 'b', 'x', '${result}', 1, '${heroes}')`;
+    const crafted = [
+      "INSERT INTO decks (id, name, heroes, cards) VALUES ('d', 'Bad', 'not json', '[]')",
+      "INSERT INTO decks (id, name, heroes, cards) VALUES ('d', 'Bad', '{}', '[]')",
+      `INSERT INTO decks (id, name, heroes, cards) VALUES ('d', 'Bad', '[]', '[{"code":7,"count":1}]')`,
+      `INSERT INTO decks (id, name, heroes, cards, side) VALUES ('d', 'Bad', '[]', '[]', '[{"code":"01001","count":"many"}]')`,
+      "INSERT INTO decks (id, name, heroes, cards, position) VALUES ('d', 'Bad', '[]', '[]', 'first')",
+      run("not json"),
+      run('["01001"]'),
+      run("[]", "drawn"),
+      "INSERT INTO settings (key, value) VALUES ('table', '{broken')",
+    ];
+    for (const statement of crafted) {
+      const bytes = await backupWith((client) => client.raw.exec(statement));
+      expect(await restoreBackup(target.db as never, bytes), statement).toEqual({ ok: false, reason: "unreadable" });
+    }
+    expect(snapshot(target.client)).toEqual(before);
+    // The same rows, well formed, restore.
+    const good = await backupWith((client) => client.raw.exec(`${run('[["01001"]]')}; INSERT INTO settings (key, value) VALUES ('table', '{"stops":true}'); INSERT INTO decks (id, name, heroes, cards, position) VALUES ('d', 'Good', '["01001"]', '[{"code":"01073","count":3}]', 0)`));
+    expect(await restoreBackup(target.db as never, good)).toEqual({ ok: true });
+    expect(ids(target.client, "decks")).toEqual(["d", "file-deck"]);
+  });
+
+  it("refuses a file whose schema holds a trigger, a view or a virtual table", async () => {
+    const target = await live();
+    const before = snapshot(target.client);
+    const foreign = [
+      "CREATE TRIGGER t AFTER INSERT ON saves BEGIN DELETE FROM decks; END",
+      "CREATE VIEW v AS SELECT * FROM saves",
+      "CREATE VIRTUAL TABLE f USING fts5(body)",
+    ];
+    for (const statement of foreign) {
+      const bytes = await backupWith((client) => client.raw.exec(statement));
+      expect(await restoreBackup(target.db as never, bytes), statement).toEqual({ ok: false, reason: "notDatabase" });
+    }
+    expect(snapshot(target.client)).toEqual(before);
+  });
+
+  it("tells SQLite the file's copy is not trusted before it reads it", async () => {
+    const copy = await deserializeDatabaseAsync(await backupWith());
+    expect(copy.raw.pragma("trusted_schema", { simple: true })).toBe(1);
+    expect(await checkCopy(copy as never)).toBeNull();
+    expect(copy.raw.pragma("trusted_schema", { simple: true })).toBe(0);
+    expect(copy.raw.pragma("cell_size_check", { simple: true })).toBe(1);
+  });
+
   it("migrates an older file on the copy and then restores it, with the tables it lacked now present and empty", async () => {
     const target = await live();
     const older = await backupWith(() => undefined, 4);
@@ -98,7 +149,7 @@ describe("restoreBackup", () => {
     const target = await live();
     const before = snapshot(target.client);
     // `settings` is created after `saves` and `decks`, which are already replaced when its insert fails.
-    const bad = await backupWith((client) => client.raw.exec("ALTER TABLE settings ADD COLUMN junk TEXT; INSERT INTO settings (key, value, junk) VALUES ('a', 'b', 'c')"));
+    const bad = await backupWith((client) => client.raw.exec("ALTER TABLE settings ADD COLUMN junk TEXT; INSERT INTO settings (key, value, junk) VALUES ('a', '1', 'c')"));
     expect(await restoreBackup(target.db as never, bad)).toEqual({ ok: false, reason: "failed" });
     expect(snapshot(target.client)).toEqual(before);
     expect(target.client.raw.inTransaction).toBe(false);
