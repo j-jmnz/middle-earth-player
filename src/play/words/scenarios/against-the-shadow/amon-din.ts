@@ -10,7 +10,7 @@ export const villagerTokens = (count: number): string => plural(count, "villager
 export const rescuedWords = (dead: number): string => `At the end of the game the players win with more villager tokens here than damage tokens on Dead Villagers (${dead} now). A tie loses.`;
 
 /** The preview of Dead Villagers: the damage tokens it holds and what they lose. */
-export const deadWords = (rescued: number): string => `Each villager token discarded puts 1 damage token here, and none comes off. At the end of the game the players lose with as many or more damage tokens here than villager tokens on Rescued Villagers (${rescued} now). A tie loses.`;
+export const deadWords = (rescued: number): string => `Each villager token discarded puts 1 damage token here, and none comes off. At the end of the game the players lose with as many damage tokens here as, or more than, villager tokens on Rescued Villagers (${rescued} now). A tie loses.`;
 
 /** The top-bar dial of Rescued Villagers: its name for a screen reader and the words a tap on it reads. */
 export const rescuedDialName = "Villager tokens on Rescued Villagers:";
@@ -22,7 +22,7 @@ export const questDialWords = (held: number): string => `${villagerTokens(held)}
 
 /** The top-bar dial of Dead Villagers. */
 export const deadDialName = "Damage tokens on Dead Villagers:";
-export const deadDialWords = (dead: number, rescued: number): string => `${plural(dead, "damage token")} on Dead Villagers, against ${villagerTokens(rescued)} on Rescued Villagers. Each villager token discarded adds 1, and none comes off. The players lose at the end of the game with as many or more damage tokens than villager tokens. A tie loses.`;
+export const deadDialWords = (dead: number, rescued: number): string => `${plural(dead, "damage token")} on Dead Villagers, against ${villagerTokens(rescued)} on Rescued Villagers. Each villager token discarded adds 1, and none comes off. The players lose at the end of the game with as many damage tokens as, or more than, villager tokens. A tie loses.`;
 
 /** The line stage 1B adds to its preview: its tokens and what progress does to them (06066:B:2, 06066:B:3). */
 export const savageryWords = (): string =>
@@ -68,6 +68,9 @@ export function alcaronResponseWords(by: string | null, holder: string, same: bo
   return `${told} Use: Lord Alcaron exhausts and puts ${many ? "1 of them" : "that token"} on a location in play. Dead Villagers keeps its damage token${many ? "s" : ""}. Pass: ${many ? "they stay" : "it stays"} discarded.`;
 }
 
+/** The defeat sheet's note when the comparison lost the game (06069:A:2): the counts as they stood, not the record's reason. */
+export const comparisonLossWords = (rescued: number, dead: number): string => `The players lose: ${villagerTokens(rescued)} on Rescued Villagers, not more than the ${plural(dead, "damage token")} on Dead Villagers. A tie loses.`;
+
 /** The banner's title for the villager tokens that moved or were discarded. */
 export const VILLAGERS_TITLE = "Villager tokens";
 
@@ -95,7 +98,7 @@ export const undefendedVillagersWords = (held: number): string =>
 
 /** The dock readout of an undefended attack on Rescued Villagers: the tokens discarded. */
 export const undefendedVillagersResult = (discarded: number, shadowNext: boolean): string =>
-  `Undefended: ${discarded > 0 ? `${villagerTokens(discarded)} discarded from Rescued Villagers, each a damage token on Dead Villagers` : "no villager token to discard"}${shadowNext ? ", shadow card next" : ""}`;
+  `Undefended: ${discarded > 0 ? `${villagerTokens(discarded)} discarded from Rescued Villagers, each a damage token on Dead Villagers` : "no villager token to discard"}${shadowNext ? ", if nothing changes, shadow card next" : ""}`;
 
 /** The quest readout while stage 1B replaces progress: the tokens that move and the surplus that is lost. */
 export function movesWords(progress: number, held: number, location?: { name: string; share: number }): string {

@@ -17,7 +17,9 @@ import { ledgerLine } from "../cards/ledger.ts";
 import { previewCards, questTitle } from "../cards/table-preview.ts";
 import { defenseSheet } from "../choice/combat-sheets.ts";
 import { responseNote } from "../choice/sheet-notes.ts";
+import { sheetFor } from "../choice/sheets.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
+import { ASKS } from "../words/asks/encounter-at-amon-din.ts";
 import { instructionWords } from "../words/instruction.ts";
 import { turnReference } from "../phases/reference.ts";
 import { advanceWords } from "../readouts/quest-advance.ts";
@@ -118,7 +120,7 @@ describe("the comparison that decides the game (06068:A:2, 06069:A:2)", () => {
     const dials = dialsOf(made, made.state);
     expect(dials.map((dial) => [dial.label, dial.value, dial.icon ?? null, dial.cardId])).toEqual([["Rescued", 4, "resource", idOf(made.state, rescued)], ["Dead", 3, "damage", idOf(made.state, dead)]]);
     expect(dials[0]?.note).toBe("4 villager tokens on Rescued Villagers, against 3 damage tokens on Dead Villagers. The players win at the end of the game with more villager tokens than damage tokens. A tie loses.");
-    expect(dials[1]?.note).toBe("3 damage tokens on Dead Villagers, against 4 villager tokens on Rescued Villagers. Each villager token discarded adds 1, and none comes off. The players lose at the end of the game with as many or more damage tokens than villager tokens. A tie loses.");
+    expect(dials[1]?.note).toBe("3 damage tokens on Dead Villagers, against 4 villager tokens on Rescued Villagers. Each villager token discarded adds 1, and none comes off. The players lose at the end of the game with as many damage tokens as, or more than, villager tokens. A tie loses.");
   });
 
   it("the Rescued dial warns in words when the players are not winning: critical behind, near on a tie, none ahead or at the start", () => {
@@ -134,9 +136,15 @@ describe("the comparison that decides the game (06068:A:2, 06069:A:2)", () => {
 
   it("the two objectives' previews say the win line and the loss line with the other count, and a tie loses", () => {
     expect(say(made, made.state, rescued)).toBe("At the end of the game the players win with more villager tokens here than damage tokens on Dead Villagers (3 now). A tie loses.");
-    expect(say(made, made.state, dead)).toBe("Each villager token discarded puts 1 damage token here, and none comes off. At the end of the game the players lose with as many or more damage tokens here than villager tokens on Rescued Villagers (4 now). A tie loses.");
+    expect(say(made, made.state, dead)).toBe("Each villager token discarded puts 1 damage token here, and none comes off. At the end of the game the players lose with as many damage tokens here as, or more than, villager tokens on Rescued Villagers (4 now). A tie loses.");
     // The token line of Dead Villagers says damage tokens, never villager tokens.
-    expect(preview(made, made.state, dead)?.tokens).toEqual(["3 damage"]);
+    expect(preview(made, made.state, dead)?.tokens).toEqual(["3 damage tokens"]);
+    const one = table({ stage: protect, staging: [rescued, { code: dead, damage: 1 }] });
+    expect(preview(one, one.state, dead)?.tokens).toEqual(["1 damage token"]);
+    // A hero's damage keeps its word, here and in another scenario.
+    const hurt = updateCard(made.state, made.hero, { damage: 2 });
+    expect(preview(made, hurt, "dh1")?.tokens).toEqual(["2 damage"]);
+    expect(preview(made, { ...made.state, scenarioId: "the-stewards-fear" }, dead)?.tokens).toEqual(["3 damage"]);
   });
 
   it("no dial and no line in another scenario", () => {
@@ -241,7 +249,7 @@ describe("stage 2B: the undefended attack (06067:B:1)", () => {
   });
 
   it("the dock readout of the undefended attack says the tokens discarded, fewer when it holds fewer, and no hero takes damage", () => {
-    for (const [tokens, words] of [[6, "Undefended: 4 villager tokens discarded from Rescued Villagers, each a damage token on Dead Villagers, shadow card next"], [1, "Undefended: 1 villager token discarded from Rescued Villagers, each a damage token on Dead Villagers, shadow card next"], [0, "Undefended: no villager token to discard, shadow card next"]] as const) {
+    for (const [tokens, words] of [[6, "Undefended: 4 villager tokens discarded from Rescued Villagers, each a damage token on Dead Villagers, if nothing changes, shadow card next"], [1, "Undefended: 1 villager token discarded from Rescued Villagers, each a damage token on Dead Villagers, if nothing changes, shadow card next"], [0, "Undefended: no villager token to discard, if nothing changes, shadow card next"]] as const) {
       const made = orc(tokens);
       const waiting = atDefense(made).state;
       // The moment after the Leave undefended tap: the engine marks the attack undefended and aimed at Rescued Villagers.
@@ -358,6 +366,24 @@ describe("Lord Alcaron's Response window (06070:A:2)", () => {
     const made = table({ stage: protect, active: { code: farmhouse, resources: 3 }, staging: [{ code: rescued, resources: 2 }, dead, hamlet], play: [alcaron] });
     const revealed = revealFromTop(made.state, made.ctx, CODES.trapped, []).state;
     expect(noteOf(made, { ...revealed, scenarioId: "the-stewards-fear" })).toBe("A Response may be used now, or passed.");
+  });
+});
+
+describe("Craven Eagle's tie ask (06074:A:1)", () => {
+  it("says the tie once: the sheet adds who chooses, so the note does not", () => {
+    expect(ASKS["06074:whenRevealed:1 @0 PickFewestHitPointsLeft"]?.note).toBe("Craven Eagle: characters are tied for the fewest remaining hit points. Choose the one that is discarded.");
+  });
+});
+
+describe("the defeat sheet when the comparison loses (06069:A:2)", () => {
+  it("says the counts as they stood, not the record's reason, and keeps the record's reason for Lord Alcaron's loss and in another scenario", () => {
+    const made = table({ stage: protect, staging: [{ code: rescued, resources: 2 }, { code: dead, damage: 4 }], play: [alcaron] });
+    const lostState = runSettled(made, made.state, { verb: "ProgressQuest", amount: 20 });
+    expect(lostState.lost).toBe(true);
+    const sheet = (state: ScenarioState) => sheetFor(state, made.ctx, legalIntents(state, made.ctx), namesOf(made, state));
+    expect(sheet(lostState)).toMatchObject({ kind: "outcome", result: "lost", title: "Defeat", note: "The players lose: 2 villager tokens on Rescued Villagers, not more than the 4 damage tokens on Dead Villagers. A tie loses." });
+    expect(sheet({ ...lostState, lossReason: "Lord Alcaron left play" })).toMatchObject({ note: "Lord Alcaron left play." });
+    expect(sheet({ ...lostState, scenarioId: "the-stewards-fear" })).toMatchObject({ note: "Dead Villagers: not more villager tokens were rescued than died." });
   });
 });
 

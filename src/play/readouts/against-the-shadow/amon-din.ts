@@ -10,7 +10,7 @@ import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { placeQuestProgress } from "../../../rules/quest/quest.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
-import { alcaronLeftWords, alcaronResponseWords, alcaronWords, questDialName, questDialWords, changedWords, deadChangedWords, deadDialName, deadDialWords, deadWords, endWords, ghulatWords, ghulatDialName, ghulatDialWords, ghulatHeldWords, heldLine, heldTitle, heldWords, movesWords, notWinningWords, protectWords, rescuedDialName, rescuedDialWords, rescuedWords, savageryWords, undefendedVillagersResult, undefendedVillagersWords, villagerTokens, winWords } from "../../words/scenarios/against-the-shadow/amon-din.ts";
+import { alcaronLeftWords, comparisonLossWords, alcaronResponseWords, alcaronWords, questDialName, questDialWords, changedWords, deadChangedWords, deadDialName, deadDialWords, deadWords, endWords, ghulatWords, ghulatDialName, ghulatDialWords, ghulatHeldWords, heldLine, heldTitle, heldWords, movesWords, notWinningWords, protectWords, rescuedDialName, rescuedDialWords, rescuedWords, savageryWords, undefendedVillagersResult, undefendedVillagersWords, villagerTokens, winWords } from "../../words/scenarios/against-the-shadow/amon-din.ts";
 import { ownerWords } from "../../words/owner.ts";
 import type { TableDial } from "../dials.ts";
 
@@ -184,6 +184,16 @@ export { villagerTokens };
 
 /** Whether the card is Rescued Villagers in a game of this scenario: an undefended attack that lands on it damages no hero (06067:B:1). */
 export const onVillagers = (game: ScenarioState, cardId: string): boolean => live(game) && game.cards[cardId]?.code === RESCUED;
+
+/** The defeat sheet's note when Dead Villagers' comparison lost the game, with the counts as they stand: null for any other loss and in any other scenario. */
+export function comparisonLossNote(game: ScenarioState): string | null {
+  if (!live(game) || !game.lost || !game.lossReason?.startsWith("Dead Villagers:")) return null;
+  const { rescued, dead } = counts(game);
+  return comparisonLossWords(rescued, dead);
+}
+
+/** The word for one damage token on the card: "damage token" on Dead Villagers (its damage tokens are the count the comparison reads), else null (the caller keeps "damage"). */
+export const damageUnit = (game: ScenarioState, card: Pick<CardInstance, "code">): string | null => (live(game) && card.code === DEAD ? "damage token" : null);
 
 /** Whether the card is Dead Villagers in a game of this scenario: its damage tokens are told with the villager tokens that put them there. */
 export const deadVillagers = (game: ScenarioState, cardId: string): boolean => live(game) && game.cards[cardId]?.code === DEAD;
