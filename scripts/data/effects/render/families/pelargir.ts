@@ -3,6 +3,7 @@ import { cardRef } from "../amounts.ts";
 import { amt, pck, type Samples, type Templates } from "../family-kit.ts";
 import { str } from "../kit.ts";
 
+const holder = (value: unknown): string => (typeof value === "string" ? cardRef(value) : `the card in play with code ${str((value as { code?: unknown }).code)}`);
 const codeList = (value: unknown): string => (Array.isArray(value) ? value.map(String).join(", ") : str(value));
 
 export const PELARGIR_TEMPLATES: Templates = {
@@ -71,6 +72,18 @@ export const PELARGIR_TEMPLATES: Templates = {
     text: `the picked card takes ${amt(i.amount, ctx)} damage, and the effect's X is set to ${i.value} only if the card holds more damage once the responses to it were heard (canceled or prevented damage sets nothing)`,
     read: ["amount", "value", "before"],
   }),
+  DiscardVillagerTokens: (i, ctx) => ({
+    text: `discard up to ${amt(i.amount, ctx)} villager token(s) from ${holder(i.from)} (fewer when it holds fewer; each goes back to the token bank and is announced, one by one); the effect's X is the number discarded`,
+    read: ["from", "amount"],
+  }),
+  MoveVillagerTokens: (i, ctx) => ({
+    text: `move ${i.all === true ? "all the" : `up to ${amt(i.amount ?? 1, ctx)}`} villager token(s) from ${holder(i.from)} to ${holder(i.to)}, a card in play (a move is no discard: nothing hears it); the number moved is added to the effect's X`,
+    read: ["from", "to", "amount", "all"],
+  }),
+  PickFewestHitPointsLeft: () => ({
+    text: "the hero or ally in play (any player's, an objective ally too) with the fewest hit points left, as modified, becomes the picked card (the first player chooses among those tied); the player who controls it acts for the instructions after this one; with no character in play nothing is picked",
+    read: [],
+  }),
   GroupDiscardResources: (i, ctx) => ({
     text: `the players as a group discard ${amt(i.amount, ctx)} resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)`,
     read: ["amount", "rest", "turns"],
@@ -99,6 +112,9 @@ export const PELARGIR_SAMPLES: Samples = {
   EachPlayerSpends: [{ verb: "EachPlayerSpends", amount: 1 }],
   DamageCardThenSetX: [{ verb: "DamageCardThenSetX", amount: 1, value: 1 }],
   GroupDiscardResources: [{ verb: "GroupDiscardResources", amount: 2 }],
+  DiscardVillagerTokens: [{ verb: "DiscardVillagerTokens", from: "activeLocation", amount: 1 }, { verb: "DiscardVillagerTokens", from: { code: "06068" }, amount: { players: true } }],
+  MoveVillagerTokens: [{ verb: "MoveVillagerTokens", from: { code: "06068" }, to: "picked", amount: 2 }, { verb: "MoveVillagerTokens", from: "subject", to: { code: "06068" }, all: true }],
+  PickFewestHitPointsLeft: [{ verb: "PickFewestHitPointsLeft" }],
 };
 
 export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
@@ -118,5 +134,10 @@ export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
   attackWithWillpower: " (held by the table while the stage is in play: a character's attack strength is its current Willpower instead of its Attack, attack bonuses not added; the enemy's Defense is still subtracted)",
   attackDamageAsProgress: " (held by the table: the damage a character's attack deals to an enemy is placed as progress tokens on it instead; damage from an effect, a shadow card or archery stays damage)",
   progressToVictory: " (held by the table: an enemy in play with progress equal to its printed hit points goes to the victory display and all its progress goes on the current quest; checked at every settle)",
+  progressToVillagers: " (held by the current quest stage: the progress that would be placed on it is not placed; its record hears the amount and moves that many villager tokens from the quest card to Rescued Villagers, the rest of the progress is lost)",
+  advancesWithoutVillagers: " (held by the current quest stage: when its card holds no villager token the quest advances at once to the next stage)",
+  undefendedToVillagers: " (held by the current quest stage: an undefended attack is aimed at Rescued Villagers, no hero takes it, and the damage it would deal becomes that many villager tokens discarded from Rescued Villagers, all of them when fewer)",
+  gameEnding: " (held by the table until the end of the game: the game is ending; Rescued Villagers and Dead Villagers compare their tokens once Ghulat is not in play)",
+  endingLost: " (held by the table until the end of the game: Lord Alcaron left play; the players lose once Ghulat is not in play, checked at every settle)",
   firstEnemyNoted: " (held by the table until the end of the round: an enemy was already marked firstEnemy this round)",
 };

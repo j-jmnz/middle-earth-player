@@ -61,7 +61,7 @@ function keyFor(name: string, code: string, used: Set<string>): string {
 }
 
 // A scenario whose last word another scenario already uses (The Dread Realm owns "realm", Flight from Moria "moria", The Caves of Nibin-Dûm and The Battle of Carn Dûm "dum") starts from another word.
-const SHORT_OF: Readonly<Record<string, string>> = { "the-woodland-realm": "woodland", "the-mines-of-moria": "mines", "escape-from-khazad-dum": "khazad", "the-druadan-forest": "druadan" };
+const SHORT_OF: Readonly<Record<string, string>> = { "the-woodland-realm": "woodland", "the-mines-of-moria": "mines", "escape-from-khazad-dum": "khazad", "the-druadan-forest": "druadan", "assault-on-osgiliath": "assault", "the-blood-of-gondor": "blood" };
 
 // The box file of docs/scenarios/ a campaign's scenarios belong to, where the campaign's id is not the box file's name.
 const DOC_BOX: Readonly<Record<string, string>> = { "the-dark-of-mirkwood": "mirkwood-paths" };

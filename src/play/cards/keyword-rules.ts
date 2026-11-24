@@ -8,7 +8,7 @@ import { ruleDoc } from "./ledger.ts";
 
 export type KeywordKey =
   | "surge" | "peril" | "indestructible" | "permanent" | "sentinel" | "ranged" | "restricted" | "battle" | "siege" | "immune" | "sailing" | "uncharted"
-  | "phantom" | "dire" | "spectral" | "pass" | "ambush" | "hide" | "doomed" | "regenerate" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple" | "burn" | "pillage" | "massive" | "underworld" | "prowl";
+  | "phantom" | "dire" | "spectral" | "pass" | "ambush" | "hide" | "doomed" | "regenerate" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple" | "burn" | "pillage" | "massive" | "underworld" | "prowl" | "villagers";
 
 /** `word` is the keyword as printed, without its value; `rules` are the span ids that define it, most specific book first. `text`: a keyword no rules span defines (Burn X) says its definition itself, with the source it comes from. */
 export type RuleWord = { word: string; rules: readonly string[]; text?: { paragraphs: readonly string[]; source: string } };
@@ -43,6 +43,8 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
   underworld: { word: "Underworld", rules: ["ats.underworld"] },
   // Prowl X (The Drúadan Forest): a keyword the scenario's rules span defines (ats.prowl); the card's own record carries it, so the chip reads its value from the record (cards/card-keywords.ts).
   prowl: { word: "Prowl", rules: ["ats.prowl"] },
+  // Villagers X (Encounter at Amon Dîn): a keyword the scenario's rules span defines (ats.villagers); the card's own record carries it, so the chip reads its value from the record (cards/card-keywords.ts).
+  villagers: { word: "Villagers", rules: ["ats.villagers"] },
   // Burn X (The Battle of Lake-town): printed on no rules span; the Quest Companion defines it (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town, Burn X).
   burn: {
     word: "Burn",

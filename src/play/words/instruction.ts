@@ -31,6 +31,7 @@ import { companyWords } from "./scenarios/company.ts";
 import { angmarWords } from "./scenarios/angmar/angmar.ts";
 import { investigationWords } from "./scenarios/standalone-scenarios/investigation.ts";
 import { riddlesWords } from "./scenarios/the-hobbit/riddles.ts";
+import { villagerWords } from "./scenarios/against-the-shadow/amon-din.ts";
 import type { ChoiceNames } from "./choice.ts";
 
 export const PICK_NOUNS: Readonly<Record<string, string>> = { hero: "hero", ally: "ally", attachment: "attachment", enemy: "enemy", character: "character", location: "location", player: "player", objective: "objective" };
@@ -94,7 +95,9 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
     // Shelob's Lair: Shelob's resources (144040:A:3, 144061:A:2; the asks file words the choice again for the sheet).
     case "PlaceResourceTokens": {
       const amount = amountWords(instruction.amount);
-      return `place ${amount} resource${amount === "1" ? "" : "s"} on ${instruction.on === "self" ? "this card" : "the card you chose"}`;
+      // Encounter at Amon Dîn: the tokens a card places are villager tokens (ats.villagers), never resources.
+      const unit = game.scenarioId === "encounter-at-amon-din" ? "villager token" : "resource";
+      return `place ${amount} ${unit}${amount === "1" ? "" : "s"} on ${instruction.on === "self" ? "this card" : instruction.on === "activeLocation" ? "the active location" : "the card you chose"}`;
     }
     // The Steward's Fear (06014:A:2, 06025:A:2; the asks file words the choice again for the sheet): tokens taken off the current quest.
     case "RemoveQuestTokens": {
@@ -349,7 +352,7 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? fortressWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction, names.code) ?? encounterWords(instruction) ?? attachmentWords(instruction, names.code) ?? companyWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction, game) ?? pelennorWords(instruction) ?? blackGateWords(instruction) ?? angmarWords(instruction) ?? investigationWords(instruction) ?? riddlesWords(instruction);
+      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? fortressWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction, names.code) ?? encounterWords(instruction) ?? attachmentWords(instruction, names.code) ?? companyWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction, game) ?? pelennorWords(instruction) ?? blackGateWords(instruction) ?? angmarWords(instruction) ?? investigationWords(instruction) ?? riddlesWords(instruction) ?? villagerWords(instruction);
   }
 }
 

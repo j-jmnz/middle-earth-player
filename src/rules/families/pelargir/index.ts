@@ -1,4 +1,4 @@
-// Rules: ats.cair-andros-location-damage, ats.cair-andros-remove-stage, rr.attachment-cards, rr.objective-cards, rr.first-player, rr.damage, rr.reveal, rr.optional-engagement, rr.running-out-of-cards, rr.quest-advancement, ats.ally-objectives (data/rules/entries.json); the cards of Peril in Pelargir (05019 to 05024, 05037 to 05045, 05065 to 05067) and Into Ithilien (05025 to 05029, 05046 to 05055, 05068 to 05071; committed.ts, stage-skip.ts and control.ts), The Siege of Cair Andros (05030 to 05036, 05056 to 05064, 05072 to 05076; siege.ts, stage-remove.ts, staging.ts, spending.ts, stage-keyword.ts).
+// Rules: ats.villagers, ats.cair-andros-location-damage, ats.cair-andros-remove-stage, rr.attachment-cards, rr.objective-cards, rr.first-player, rr.damage, rr.reveal, rr.optional-engagement, rr.running-out-of-cards, rr.quest-advancement, ats.ally-objectives (data/rules/entries.json); the cards of Peril in Pelargir (05019 to 05024, 05037 to 05045, 05065 to 05067) and Into Ithilien (05025 to 05029, 05046 to 05055, 05068 to 05071; committed.ts, stage-skip.ts and control.ts), The Siege of Cair Andros (05030 to 05036, 05056 to 05064, 05072 to 05076; siege.ts, stage-remove.ts, staging.ts, spending.ts, stage-keyword.ts).
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 
@@ -7,6 +7,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { takeControlOfStagedObjectives } from "./control.ts";
+import { alcaronLoss } from "./ending.ts";
 import { archeryOfAmount } from "./archery-of.ts";
 import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
 import { noteFirstEnemy, pelargirCondition } from "./first-enemy.ts";
@@ -14,6 +15,7 @@ import { damageCardThenSetX } from "./damage-noted.ts";
 import { groupDiscardResources } from "./group-discard.ts";
 import { eachPlayerSpends, eachPlayerSpendsUnpayable } from "./group-spend.ts";
 import { attachToHighestThreatCost } from "./host.ts";
+import { pickFewestHitPointsLeft } from "./fewest.ts";
 import { noResourcesMatches } from "./no-resources.ts";
 import { attachObjectiveTo, attackScrollHolder } from "./scroll.ts";
 import { pickRandom } from "./pick-random.ts";
@@ -23,6 +25,7 @@ import { sieges, undefendedBattlegrounds } from "./siege.ts";
 import { progressesToVictory } from "./stage-progress.ts";
 import { removeStage } from "./stage-remove.ts";
 import { resolveTopmostTreachery, shuffleStagingIntoEncounterDeck } from "./staging.ts";
+import { advanceWithoutVillagers, discardVillagerTokens, moveVillagerTokens, undefendedVillagers, villagersDamaged } from "./villagers.ts";
 import { buildUnderworldDeck, hideOneAside, releaseUnderworldStacks, revealSetAside, revealUnderworld, shuffleUnderworldIntoEncounterDeck, takeUnderworld } from "./underworld.ts";
 
 // The verbs src/catalog/families/pelargir.ts adds. Null when the verb is not one of them.
@@ -70,6 +73,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return damageCardThenSetX(state, instruction, focus, ctx, steps);
     case "GroupDiscardResources":
       return groupDiscardResources(state, instruction, focus.seat, ctx);
+    case "DiscardVillagerTokens":
+      return discardVillagerTokens(state, instruction, focus, ctx, steps);
+    case "MoveVillagerTokens":
+      return moveVillagerTokens(state, instruction, focus, ctx);
+    case "PickFewestHitPointsLeft":
+      return pickFewestHitPointsLeft(state, focus, ctx, steps);
     default:
       return null;
   }
@@ -77,13 +86,19 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelargir",
-  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealSetAside", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens", "EachPlayerSpends", "GroupDiscardResources", "DamageCardThenSetX"],
+  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealSetAside", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens", "EachPlayerSpends", "GroupDiscardResources", "DamageCardThenSetX", "DiscardVillagerTokens", "MoveVillagerTokens", "PickFewestHitPointsLeft"],
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,
-  settle: { sweep: (state, ctx, steps) => progressesToVictory(releaseUnderworldStacks(sieges(state, ctx, steps), ctx, steps), ctx, steps) },
+  settle: { sweep: (state, ctx, steps) => alcaronLoss(advanceWithoutVillagers(progressesToVictory(releaseUnderworldStacks(sieges(state, ctx, steps), ctx, steps), ctx, steps), ctx, steps), ctx) },
   travel: { unpayable: (state, instruction, ctx, locationId) => eachPlayerSpendsUnpayable(state, instruction, ctx, locationId) },
   pick: (state, id, spec) => noResourcesMatches(state, id, spec),
   amount: (state, amount, scope, ctx) => archeryOfAmount(state, amount, scope, ctx),
-  combat: { undefended: (state, _candidates, cards) => undefendedBattlegrounds(state, cards) },
+  combat: {
+    undefended: (state, _candidates, cards) => {
+      const battlegrounds = undefendedBattlegrounds(state, cards);
+      return battlegrounds.length > 0 ? battlegrounds : undefendedVillagers(state);
+    },
+    damaged: villagersDamaged,
+  },
 };

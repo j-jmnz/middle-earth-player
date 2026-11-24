@@ -26,7 +26,9 @@ import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poiso
 import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
 import { STAT_WORD } from "../cards/card-effects.ts";
 import { progressAttack, willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
+import { deadVillagers, heldBeat, onVillagers, villagerLines } from "../readouts/against-the-shadow/amon-din.ts";
 import { stackTakes, underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
+import { NO_HERO_DAMAGE, VILLAGERS_TITLE } from "../words/scenarios/against-the-shadow/amon-din.ts";
 import { releasedWords, UNDERWORLD_TITLE } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
@@ -58,7 +60,8 @@ function seatWord(state: ScenarioState, seat: number): string {
 }
 
 // `whole`: the group's lines are kept together, uncut, and come last (Discover's, whose last line lays the look strip).
-type Group = { rank: number; title: string; tone: MomentTone; lines: MomentLine[]; whole?: boolean };
+// `early`: the group is told right after the lead, ahead of the other groups (the villager tokens of Encounter at Amon Dîn, which the quest result moved).
+type Group = { rank: number; title: string; tone: MomentTone; lines: MomentLine[]; whole?: boolean; early?: true };
 
 /**
  * The banner for one accepted intent, or null when it changed nothing worth one (a draw, a resource, a pass that only moved
@@ -194,13 +197,16 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         const end = rest.findIndex((later) => later.kind === "strike" || later.kind === "attack");
         // Progress the attack placed on the enemy (stage 3 of The Drúadan Forest) is what it dealt: no "No damage" line after it.
         const placed = (end < 0 ? rest : rest.slice(0, end)).some((later) => (later.kind === "damage" || (later.kind === "progress" && progressAttack(before))) && later.amount > 0 && later.targetId === step.targetId);
-        if (!placed) line("No damage");
+        // An undefended attack on Rescued Villagers (06067:B:1) damages no hero: the villager tokens it discards come in their own beat below.
+        if (!placed) line(onVillagers(before, step.targetId) ? NO_HERO_DAMAGE : "No damage");
         // The enemy that takes no damage until he has attacked says why (The Fate of Wilderland).
         const shielded = !placed && step.side === "player" ? names.fate?.shielded(before, step.enemyId) : null;
         if (shielded) line(shielded, null, [step.enemyId]);
         return;
       }
       case "damage":
+        // The damage tokens put on Dead Villagers (06069:A:1) are told once, with the villager tokens that caused them (villagerLines).
+        if (deadVillagers(after, step.targetId)) return;
         // A heal is a damage step with a negative amount (rr.damage).
         line(step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`, "damage", [step.targetId]);
         return;
@@ -333,6 +339,12 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   const takes = stackTakes(before, after, names.card);
   if (takes.length > 0) groups.push({ rank: 9, title: UNDERWORLD_TITLE, tone: "plain", lines: takes.map((text) => ({ text, mark: null })) });
 
+  // The villager tokens of Encounter at Amon Dîn that moved or were discarded in this intent, and the defeat of stage 2B that Ghulat holds: no step of their own.
+  const villagers = villagerLines(before, after, names.card);
+  if (villagers.length > 0) groups.push({ rank: 8, title: VILLAGERS_TITLE, tone: "plain", lines: villagers.map((text) => ({ text, mark: null })), early: true });
+  const held = heldBeat(before, after);
+  if (held) groups.push({ rank: 8, title: held.title, tone: "plain", lines: held.lines.map((text) => ({ text, mark: null })) });
+
   // A stage of Mount Gundabad's quest deck flipped to side B at the beginning of the quest phase, or bypassed (emce.bypassing): no step of its own.
   const stage = stageBeats(before, after, { card: stageNamed, ...(names.mustBypass ? { mustBypass: names.mustBypass } : {}), ...(names.atStaging ? { atStaging: names.atStaging } : {}) });
   if (stage) groups.push({ rank: stage.rank, title: stage.title, tone: "plain", lines: stage.lines.map((text) => ({ text, mark: null })) });
@@ -371,7 +383,8 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   const lead = [...(flow.length > 0 ? flow : shown)].sort((a, b) => a.rank - b.rank)[0] ?? shown[0];
   if (!lead) return null;
   const told = (group: Group): MomentLine[] => (group === lead || !group.title ? group.lines : [{ text: group.title, mark: null }, ...group.lines]);
-  const lines = (flow.includes(lead) ? [lead, ...flow.filter((group) => group !== lead)] : []).flatMap(told);
+  const rest = flow.filter((group) => group !== lead);
+  const lines = (flow.includes(lead) ? [lead, ...rest.filter((group) => group.early), ...rest.filter((group) => !group.early)] : []).flatMap(told);
   const kept = lines.slice(0, MOST);
   if (lines.length > MOST) kept.push({ text: `And ${lines.length - MOST} more in the log`, mark: null });
   return { title: lead.title || "This turn", tone: lead.tone, lines: [...kept, ...shown.filter((group) => group.whole).flatMap(told)] };

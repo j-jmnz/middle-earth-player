@@ -14,6 +14,9 @@ import type { EngineStep, ReduceContext, ScenarioState } from "../../rules/engin
 import { flagged, inPlay, livingSeats } from "../../rules/core/state.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 
+import { lossWaits } from "../readouts/against-the-shadow/amon-din.ts";
+import { alcaronHeldWords } from "../words/scenarios/against-the-shadow/amon-din.ts";
+
 export type DamageOutcome = {
   damage: number;
   destroyed: boolean;
@@ -34,16 +37,23 @@ function place(game: ScenarioState, ctx: ReduceContext, cardId: string, amount: 
 
 // "If X leaves play, the players lose the game" printed as a Forced-style line of its own (Bilbo Baggins, "If Bilbo Baggins leaves play, the players lose the game", 131001:A:3 and 132001:A:3): a record that hears the card leave play and loses the game. The engine applies
 // it when the record resolves, after the destruction, so a copy of the state that only destroys the card does not show it. A card in play whose record names the leaving card (Mendor's) counts too.
+const HELD = ", held";
+const waits = (effect: ReturnType<typeof effectsOf>[number]): boolean => effect.trigger === "leftPlay" && effect.subject === "self" && effect.condition == null && effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "endingLost");
+
 function leavesPlayLoss(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
   const leaving = game.cards[cardId];
   const name = leaving ? ctx.cards.get(leaving.code)?.name : undefined;
   if (!leaving || name == null || !inPlay(leaving.zone)) return null;
   const loses = Object.values(game.cards).some((card) => inPlay(card.zone) && effectsOf(ctx, card.code).some((effect) => {
+    // Lord Alcaron's own line (06070:A:3) sets the flag the end of the game reads (`endingLost`): the loss itself comes at once, or once Ghulat has left play.
+    if (card.id === cardId && waits(effect)) return true;
     if (effect.timing !== "triggered" || effect.trigger !== "leftPlay" || effect.condition != null || !effect.instructions.some((instruction) => instruction.verb === "LoseGame")) return false;
     const subject = effect.subject;
     return subject === "self" ? card.id === cardId : typeof subject === "object" && subject.names?.includes(name) === true;
   }));
-  return loses ? `${name} left play` : null;
+  // The loss waits for Ghulat (the game cannot end while he is in play): the dock says so (lossWords).
+  const waiting = lossWaits(game) && effectsOf(ctx, leaving.code).some(waits);
+  return loses ? `${name} left play${waiting ? HELD : ""}` : null;
 }
 
 /** Whether discarding a card from play would lose the game now (a hero who carries Wormsbane, the One Ring's bearer, Bilbo Baggins): the reason, or null. */
@@ -94,6 +104,8 @@ export function undefendedDamage(game: ScenarioState, ctx: ReduceContext, enemyI
 /** The words for a loss reason, as the dock says it: "The One Ring leaves play and the game is lost". */
 export function lossWords(reason: string): string {
   if (reason === "No seats remain") return "the game is lost";
+  const held = new RegExp(`^(.*) left play${HELD}$`).exec(reason);
+  if (held) return alcaronHeldWords(held[1] ?? "");
   const left = /^(.*) left play$/.exec(reason);
   return left ? `${left[1]} leaves play and the game is lost` : "the game is lost";
 }

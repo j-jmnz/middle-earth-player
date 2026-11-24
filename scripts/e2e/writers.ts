@@ -85,6 +85,7 @@ import { armiesFixtures } from "./the-hobbit/the-battle-of-five-armies.ts";
 import { androsFixtures } from "./against-the-shadow/the-siege-of-cair-andros.ts";
 import { fearFixtures } from "./against-the-shadow/the-stewards-fear.ts";
 import { druadanFixtures } from "./against-the-shadow/the-druadan-forest.ts";
+import { dinFixtures } from "./against-the-shadow/encounter-at-amon-din.ts";
 
 // The scenarios scenario 1's block writes by hand (`won` is the one fixture not committed that the registry names, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -175,6 +176,7 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "the-siege-of-cair-andros": () => androsFixtures(),
   "the-stewards-fear": () => fearFixtures(),
   "the-druadan-forest": () => druadanFixtures(),
+  "encounter-at-amon-din": () => dinFixtures(),
   "we-must-away-ere-break-of-day": () => dayFixtures(),
   "over-the-misty-mountains-grim": () => grimFixtures(),
   "dungeons-deep-and-caverns-dim": () => dimFixtures(),
