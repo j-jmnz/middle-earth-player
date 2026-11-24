@@ -10,7 +10,7 @@ import { destroyCard } from "../../core/keywords.ts";
 import { hasQuestPoints, printedOf, type PrintedCard } from "../../core/printed.ts";
 import { questPointsOf } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { flagged, heldAmount, updateCard } from "../../core/state.ts";
+import { flagged, heldAmount, inPlay, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { exploring } from "../island/map.ts";
 import { redirectProgress } from "../quest/blizzard.ts";
@@ -119,7 +119,7 @@ export function placeOn(state: ScenarioState, id: string, placed: number, cards:
 // A location in play whose progress already equals or exceeds its quest points is explored (rr.explored), as when the players travel to a location that took progress in the staging area.
 export function exploreIfFull(state: ScenarioState, id: string, cards: Cards, steps: EngineStep[]): ScenarioState {
   const location = state.cards[id];
-  if (!location || exploring(state)) return state;
+  if (!location || !inPlay(location.zone) || exploring(state)) return state;
   const points = questPointsOf(state, location, cards);
   return points != null && location.progress > 0 && location.progress >= points ? destroyCard(state, id, cards, steps, true) : state;
 }

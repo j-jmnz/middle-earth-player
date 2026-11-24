@@ -290,9 +290,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 901402:B:2 (back): Goblin Gate gets +1 quest point for each enemy engaged with a player.
   901402:constant:1: Constant
-    (steps run in order; a step depends on an earlier one only through its own condition)
     - each location (any player controls) named "Goblin Gate": stat questPoints the number of enemy (any player controls), while this card is in play
-    - each location (any player controls) named "Goblin Gate": stat exploredWhenFull 1, while this card is in play
 
 901402:B:3 (back): Progress cannot be placed on this stage unless the players control Arwen Undómiel.
   901402:constant:2: Constant
@@ -388,4 +386,4 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
     - the players make engagement checks against each enemy in the staging area, outside the encounter phase: in player order each engages the enemy of the highest engagement cost at or below their threat, pass after pass until a pass engages none
     - then, if the number of enemy (any player controls) or in the staging area, with the ambush keyword, printed or gained is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
-(rendered pieces: 175 by template, 0 as JSON)
+(rendered pieces: 173 by template, 0 as JSON)

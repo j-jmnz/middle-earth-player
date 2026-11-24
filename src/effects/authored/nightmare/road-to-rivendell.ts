@@ -53,7 +53,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "constant",
     instructions: [
     { verb: "ModifyStat", stat: "questPoints", amount: { count: ENGAGED_ENEMIES }, until: "whileSourceInPlay", holders: GATE_HOLDER },
-    { verb: "ModifyStat", stat: "exploredWhenFull", amount: 1, until: "whileSourceInPlay", holders: GATE_HOLDER },
   ],
   },
   {

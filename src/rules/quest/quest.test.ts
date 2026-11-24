@@ -419,4 +419,15 @@ describe("quest resolution", () => {
     const traveled = travelTo(spawned.state, spawned.id, cards);
     expect(traveled?.activeLocation).toBe(spawned.id);
   });
+
+  it("explores an active location whose quest points dropped to its progress once the engine settles (rr.explored)", () => {
+    const { state, cards } = atCommit({ willpower: 4, threat: 10, stages: ["stage-1"], location: { questPoints: 3, threat: 0 } });
+    const road = Object.values(state.cards).find((card) => card.code === "road")?.id ?? "";
+    const full = updateCard(state, road, { progress: 4 });
+    const resolved = expectOk(reduce(full, { type: "Pass" }, { effects: [], cards }));
+    // The explored location leaves play before staging (the empty encounter deck then deals it again from the discard pile), so the quest takes all the progress.
+    expect(resolved.steps[0]).toEqual({ kind: "destroy", targetId: road });
+    expect(resolved.state.activeLocation).toBeNull();
+    expect(resolved.state.cards[resolved.state.questStage ?? ""]?.progress).toBe(4);
+  });
 });

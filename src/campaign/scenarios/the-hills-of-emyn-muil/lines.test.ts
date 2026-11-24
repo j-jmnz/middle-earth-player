@@ -221,7 +221,7 @@ describe("02088:A:1 Shores of Nen Hithoel", () => {
 describe("02091:A:1 Impassable Chasm", () => {
   it("02091:A:1 takes all the progress off the active location, which returns to the staging area and is not discarded", () => {
     const made = table({ phase: "Quest", active: "02085", deck: ["f0"] });
-    const state = updateCard(made.state, first(made.state, "02085"), { progress: 3 });
+    const state = updateCard(made.state, first(made.state, "02085"), { progress: 1 });
     const run = resolveRecords(state, made.ctx, "02091", "whenRevealed");
     const muil = run.state.cards[first(run.state, "02085")];
     expect(muil).toMatchObject({ zone: "staging", progress: 0 });
@@ -245,9 +245,9 @@ describe("02093:A:1 Slick Footing", () => {
   };
 
   it("02093:A:1 removes 1 progress from each location in play, the active location too, and each player discards that many cards for every token removed in all", () => {
-    const { run } = slip({ place: 1, "02085": 2, "02086": 0 });
+    const { run } = slip({ place: 1, "02085": 1, "02086": 0 });
     expect(run.state.cards[first(run.state, "place")]?.progress).toBe(0);
-    expect(run.state.cards[first(run.state, "02085")]?.progress).toBe(1);
+    expect(run.state.cards[first(run.state, "02085")]?.progress).toBe(0);
     expect(run.state.seats.map((seat) => seat.discard.length)).toEqual([2, 2]);
   });
 
@@ -326,9 +326,9 @@ describe("900707:A:2 and A:3 Blast of Savage Wind", () => {
   it("900707:A:2 removes all the progress from each Emyn Muil location in play, and not from another location", () => {
     const made = table({ active: "02085", staging: ["02086", "place"] });
     let state = made.state;
-    for (const code of ["02085", "02086", "place"]) state = updateCard(state, first(state, code), { progress: 2 });
+    for (const code of ["02085", "02086", "place"]) state = updateCard(state, first(state, code), { progress: 1 });
     const run = resolveRecords(state, made.ctx, "900707", "whenRevealed");
-    expect(["02085", "02086", "place"].map((code) => run.state.cards[first(run.state, code)]?.progress)).toEqual([0, 0, 2]);
+    expect(["02085", "02086", "place"].map((code) => run.state.cards[first(run.state, code)]?.progress)).toEqual([0, 0, 1]);
   });
 
   it("900707:A:2 gives each Emyn Muil location +2 Threat until the end of the round, one that arrives later in the round too", () => {
