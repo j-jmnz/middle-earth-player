@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.winning-the-game, rr.victory-display, ats.setup-the-druadan-forest (data/rules/entries.json).
+// Rules: rr.setup, rr.winning-the-game, rr.victory, ats.setup-the-druadan-forest (data/rules/entries.json).
 import { describe, expect, it } from "vitest";
 
 import { loadAnyScenario } from "../../../../scripts/data/load-scenarios.ts";

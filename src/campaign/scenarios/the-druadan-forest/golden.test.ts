@@ -1,4 +1,4 @@
-// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, rr.victory-display, rr.destroy, rr.attack, ats.prowl, ats.setup-the-druadan-forest, ltp.scoring (data/rules/entries.json).
+// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.quest-advancement, rr.victory, rr.discard-pile-and-victory-display, rr.attack-strength, ats.prowl, ats.setup-the-druadan-forest, ltp.scoring (data/rules/entries.json).
 import { describe, expect, it } from "vitest";
 
 import { DRUADAN_GOLDENS, playGolden, druadanWorld, prowlSeats, type DruadanDecks, type DruadanGolden } from "../../../../test/scenarios/the-druadan-forest/game.ts";
