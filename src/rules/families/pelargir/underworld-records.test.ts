@@ -6,6 +6,7 @@ import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { settle } from "../../engine/machine.ts";
+import { restricted } from "../../interpret/restrictions.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { finish, idOf, resolveRecords, revealedTop, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
 import { CODES, DECK_CODES, codeOf, deckCodes, run, table, underCodes } from "../../../../test/scenarios/the-stewards-fear/table.ts";
@@ -96,5 +97,18 @@ describe("The stages' tokens (06011:B:2, 06011:B:3)", () => {
     const four = { ...loaded, cards: { ...loaded.cards, [stage]: { ...loaded.cards[stage]!, resources: 4 } } } as ScenarioState;
     const advanced = settle(four, t.ctx, []);
     expect(codeOf(advanced, advanced.questStage)).toBe(CODES.design);
+  });
+});
+
+describe("The Confrontation (06013:B:2)", () => {
+  it("the quest cannot advance while a Villain is in play, in the staging area or engaged, and can when none is", () => {
+    const none = table({ stage: CODES.confrontation });
+    expect(restricted(none.state, none.ctx, "advance")).toEqual([]);
+    for (const layout of [{ staging: [CODES.castamir] }, { engaged: [CODES.bane] }]) {
+      const villain = table({ stage: CODES.confrontation, ...layout });
+      expect(restricted(villain.state, villain.ctx, "advance").length).toBeGreaterThan(0);
+    }
+    const other = table({ stage: CODES.confrontation, staging: [CODES.dissident] });
+    expect(restricted(other.state, other.ctx, "advance")).toEqual([]);
   });
 });

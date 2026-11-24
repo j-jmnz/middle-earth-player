@@ -61,7 +61,7 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 
 06013:B:2 (back): The players cannot defeat this stage while a Villain is in play. If this stage is defeated, the players have won the game.
   06013:constant:1: Constant
-    only if the number of Villain enemy (any player controls) is at least 1
+    only if there is Villain enemy in play (in the staging area or engaged)
     - the players cannot defeat this stage while this holds
 
 ## 06014 Underworld Dissident
@@ -341,4 +341,4 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
     who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 2 (each player)
 
-(rendered pieces: 202 by template, 0 as JSON)
+(rendered pieces: 201 by template, 0 as JSON)

@@ -15,7 +15,6 @@ const UNDERWORLD_LOCATION: PickSpec = { type: "location", control: "any", trait:
 const READY_HERO: PickSpec = { type: "hero", control: "you", state: "ready" };
 const FIRST_PLAYER_ALLY: PickSpec = { type: "ally", control: "any", controlledBy: "firstPlayer" };
 const FIRST_PLAYER_HERO: PickSpec = { type: "hero", control: "any", controlledBy: "firstPlayer", who: "firstPlayer" };
-const A_VILLAIN: PickSpec = { type: "enemy", control: "any", trait: "Villain" };
 const UNDEFENDED = { kind: "undefended" } as const satisfies Condition;
 const CAN_PICK = (pick: PickSpec) => ({ kind: "canPick", pick }) as const satisfies Condition;
 const HAS_NONE = (pick: PickSpec) => ({ kind: "not", condition: CAN_PICK(pick) }) as const satisfies Condition;
@@ -82,7 +81,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 06013 The Confrontation (stage 3, the last). A:1: the hidden Villain is turned faceup and staged. B:1: the underworld deck is shuffled into the encounter deck. B:2: no advance while a Villain is in play; the last stage defeated wins the game.
   { id: "06013:whenRevealed:1", cardCode: "06013", lines: ["06013:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", trait: "Villain" }] },
   { id: "06013:whenRevealed:2", cardCode: "06013", lines: ["06013:B:1"], timing: "whenRevealed", instructions: [{ verb: "ShuffleUnderworldIntoEncounterDeck" }] },
-  { id: "06013:constant:1", cardCode: "06013", lines: ["06013:B:2"], timing: "constant", condition: { kind: "count", pick: A_VILLAIN, min: 1 }, instructions: [{ verb: "Restrict", what: "advance" }] },
+  { id: "06013:constant:1", cardCode: "06013", lines: ["06013:B:2"], timing: "constant", condition: { kind: "enemyInPlay", trait: "Villain", is: true }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
   // 06014 Underworld Dissident (Brigand). A:1: +1 Attack for each location with the Trait Underworld in the staging area or active. A:2 (Shadow): undefended, the defending player removes 1 token from the current quest: a progress token or a resource token when the card holds both.
   { id: "06014:constant:1", cardCode: "06014", lines: ["06014:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "attack", amount: { count: UNDERWORLD_LOCATION }, until: "whileSourceInPlay", target: "self" }] },
