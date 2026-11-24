@@ -1,5 +1,5 @@
 // Rules: ats.underworld, ats.underworld-example, ats.setup-the-stewards-fear-underworld-deck, rr.running-out-of-cards, rr.player-elimination (data/rules/entries.json); ledger lines 06011:A:1, 06011:B:3, 06012:B:3, 06013:B:1, 06018:A:1, 06019:A:1, 06020:A:1, 06021:A:1, 06022:A:1, 06029:A:1, 06030:A:1, 06030:A:2, 06031:A:1.
-// The words of The Steward's Fear' table pieces: the underworld deck's count, the facedown cards under an Underworld location, the Underworld X chip's value, the resource tokens that advance stages 1 and 2, Up in Flames' discard and its loss, and the extra reveal and threat of the two other Plots.
+// The words of The Steward's Fear table pieces: the underworld deck's count, the facedown cards under an Underworld location, the Underworld X chip's value, the resource tokens that advance stages 1 and 2, Up in Flames' discard and its loss, and the extra reveal and threat of the two other Plots.
 // A sentence never names a facedown card or says in what order the underworld deck lies. Each stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words). Pure.
 import { plural } from "../../list.ts";
 

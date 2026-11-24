@@ -1,6 +1,6 @@
 // Rules: ats.underworld, ats.setup-the-stewards-fear-underworld-deck, rr.running-out-of-cards (data/rules/entries.json); ledger lines 06011:A:1, 06011:B:3, 06012:B:3, 06013:B:1, 06018:A:1, 06022:A:1, 06029:A:1, 06030:A:1, 06030:A:2, 06031:A:1.
 //
-// The pieces The Steward's Fear' cards hold on the table: the underworld deck's count (a top-bar dial; the deck is the set-aside cards that hold a place in it, and its order is never read), the facedown cards under an Underworld location (a pill, the preview line and the Underworld X chip),
+// The pieces The Steward's Fear cards hold on the table: the underworld deck's count (a top-bar dial; the deck is the set-aside cards that hold a place in it, and its order is never read), the facedown cards under an Underworld location (a pill, the preview line and the Underworld X chip),
 // the resource tokens that advance stages 1 and 2 against their 4, Up in Flames' tokens against each deck, and the lines of the Plots. Every hook reads this scenario's own records (the verb TakeUnderworld, the `tokens` condition of a stage's `advanceNow` record) or its Plots' codes,
 // and is empty in any other scenario. The engine decided every number; nothing here changes one. Pure, so a test reads it.
 import type { Effect } from "../../../catalog/boundary.ts";
