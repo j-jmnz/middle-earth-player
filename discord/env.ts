@@ -1,4 +1,4 @@
-// The Worker's bindings: the five secrets set with `wrangler secret put` and the repository named in wrangler.toml
+// The Worker's bindings: the secrets set with `wrangler secret put` and the variables in wrangler.toml
 // (docs/discord-issues.md, Deploy the Worker).
 export interface Env {
   DISCORD_PUBLIC_KEY: string;
@@ -13,6 +13,13 @@ export interface Env {
   RELEASES_ROLE_ID?: string;
   /** `owner/name` of the repository the issues go to. */
   GITHUB_REPO: string;
+  /**
+   * The login of the account that owns GITHUB_TOKEN, so the author of every issue the bot makes. The bot follows the
+   * marker of an issue this account wrote and of no other; unset, it follows none.
+   */
+  GITHUB_ISSUE_AUTHOR?: string;
+  /** The one Discord server the bot answers commands from; unset, it answers none. */
+  GUILD_ID?: string;
 }
 
 /** The part of the Worker's execution context the bot uses: work that goes on after the response is sent. */

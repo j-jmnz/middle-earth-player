@@ -12,14 +12,13 @@ beforeAll(async () => {
   keys = (await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"])) as CryptoKeyPair;
   const raw = new Uint8Array(await crypto.subtle.exportKey("raw", keys.publicKey));
   const publicKey = [...raw].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-  env = { DISCORD_PUBLIC_KEY: publicKey, DISCORD_APPLICATION_ID: "100", DISCORD_BOT_TOKEN: "bot", GITHUB_TOKEN: "gh", GITHUB_WEBHOOK_SECRET: "hook", GITHUB_REPO: "owner/repo" };
+  env = { DISCORD_PUBLIC_KEY: publicKey, DISCORD_APPLICATION_ID: "100", DISCORD_BOT_TOKEN: "bot", GITHUB_TOKEN: "gh", GITHUB_WEBHOOK_SECRET: "hook", GITHUB_REPO: "owner/repo", GUILD_ID: "1" };
 });
 
 afterEach(() => vi.unstubAllGlobals());
 
-async function signed(interaction: unknown, signer = keys.privateKey): Promise<Request> {
+async function signed(interaction: unknown, signer = keys.privateKey, timestamp = String(Math.floor(Date.now() / 1000))): Promise<Request> {
   const body = JSON.stringify(interaction);
-  const timestamp = "1700000000";
   const signature = new Uint8Array(await crypto.subtle.sign({ name: "Ed25519" }, signer, new TextEncoder().encode(timestamp + body)));
   const hex = [...signature].map((byte) => byte.toString(16).padStart(2, "0")).join("");
   return new Request("https://bot.example/", { method: "POST", body, headers: { "x-signature-ed25519": hex, "x-signature-timestamp": timestamp } });
@@ -58,12 +57,26 @@ const report = {
   mentions: [{ id: "8", username: "sam" }],
   attachments: [{ filename: "shot.png", url: "https://cdn.discordapp.com/shot.png" }],
 };
-const moderator = { user: { id: "9", username: "elrond", global_name: null } };
+// A member with Manage Messages (8192) among other permissions.
+const moderator = { user: { id: "9", username: "elrond", global_name: null }, permissions: String(8192 + 1024) };
+const player = { ...moderator, permissions: "1024" };
+
+const components = [
+  { type: 18, component: { type: 4, custom_id: "title", value: "Gandalf costs 5" } },
+  { type: 18, component: { type: 3, custom_id: "kind", values: ["rules"] } },
+  { type: 18, component: { type: 4, custom_id: "body", value: "Gandalf costs 4." } },
+];
 
 describe("Discord issue bot", () => {
   it("refuses a request that Discord did not sign", async () => {
     const other = (await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"])) as CryptoKeyPair;
     const response = await worker.fetch(await signed({ type: 1 }, other.privateKey), env, { waitUntil: () => {} });
+    expect(response.status).toBe(401);
+  });
+
+  it("refuses a signed request whose timestamp is more than five minutes old", async () => {
+    const old = String(Math.floor(Date.now() / 1000) - 301);
+    const response = await worker.fetch(await signed({ type: 1 }, keys.privateKey, old), env, { waitUntil: () => {} });
     expect(response.status).toBe(401);
   });
 
@@ -73,7 +86,7 @@ describe("Discord issue bot", () => {
 
   it("opens a form filled from the message the command was run on", async () => {
     stubFetch({ "GET /channels/200/messages/300": report });
-    const { body } = await run({ type: 2, token: "t", guild_id: "1", channel: { id: "200", type: 0 }, data: { type: 3, name: "Create GitHub issue", target_id: "300" } });
+    const { body } = await run({ type: 2, token: "t", guild_id: "1", member: moderator, channel: { id: "200", type: 0 }, data: { type: 3, name: "Create GitHub issue", target_id: "300" } });
     expect(body.type).toBe(9);
     expect(body.data.custom_id).toBe("issue:m:200:300");
     expect(body.data.components[0].component.value).toBe("Gandalf costs 4, not 5 @sam");
@@ -81,7 +94,7 @@ describe("Discord issue bot", () => {
   });
 
   it("tells the moderator to use a thread when /issue runs in a channel", async () => {
-    const { body } = await run({ type: 2, token: "t", guild_id: "1", channel: { id: "200", type: 0 }, data: { type: 1, name: "issue" } });
+    const { body } = await run({ type: 2, token: "t", guild_id: "1", member: moderator, channel: { id: "200", type: 0 }, data: { type: 1, name: "issue" } });
     expect(body.type).toBe(4);
     expect(body.data.flags).toBe(64);
   });
@@ -95,7 +108,7 @@ describe("Discord issue bot", () => {
       ],
       "GET /channels/200/messages/300": report,
     });
-    const { body } = await run({ type: 2, token: "t", guild_id: "1", channel: { id: "500", type: 11 }, data: { type: 1, name: "issue", options: [{ name: "replies", value: true }] } });
+    const { body } = await run({ type: 2, token: "t", guild_id: "1", member: moderator, channel: { id: "500", type: 11 }, data: { type: 1, name: "issue", options: [{ name: "replies", value: true }] } });
     expect(body.data.custom_id).toBe("issue:t:500:1");
     expect(body.data.components[0].component.value).toBe("Gandalf costs too much");
     expect(body.data.components[2].component.value).toBe("**Gandalf** costs 4, not 5 @sam\nSteps: play him\n\n> **sam:** Same here\n> in Mirkwood");
@@ -103,17 +116,13 @@ describe("Discord issue bot", () => {
 
   it("creates the labelled issue on submit, links it in a thread on the report and tells the moderator", async () => {
     const calls = stubFetch({
+      "GET /channels/200": { id: "200", guild_id: "1" },
       "GET /channels/200/messages/300": report,
       "POST github/repos/owner/repo/issues": { number: 42, html_url: "https://github.com/owner/repo/issues/42" },
       "POST /channels/200/messages/300/threads": { id: "300" },
       "POST /channels/300/messages": {},
       "PATCH /webhooks/100/t/messages/@original": {},
     });
-    const components = [
-      { type: 18, component: { type: 4, custom_id: "title", value: "Gandalf costs 5" } },
-      { type: 18, component: { type: 3, custom_id: "kind", values: ["rules"] } },
-      { type: 18, component: { type: 4, custom_id: "body", value: "Gandalf costs 4." } },
-    ];
     const { body } = await run({ type: 5, token: "t", guild_id: "1", member: moderator, data: { custom_id: "issue:m:200:300", components } });
     expect(body).toEqual({ type: 5, data: { flags: 64 } });
     const issue = calls.find((call) => call.url.includes("api.github.com"))!;
@@ -137,10 +146,53 @@ describe("Discord issue bot", () => {
   });
 
   it("tells the moderator when GitHub refuses the issue", async () => {
-    const calls = stubFetch({ "GET /channels/200/messages/300": report, "PATCH /webhooks/100/t/messages/@original": {} });
+    const calls = stubFetch({ "GET /channels/200": { id: "200", guild_id: "1" }, "GET /channels/200/messages/300": report, "PATCH /webhooks/100/t/messages/@original": {} });
     const components = [{ custom_id: "title", value: "A bug" }, { custom_id: "kind", values: ["bug"] }, { custom_id: "body", value: "Text" }];
     await run({ type: 5, token: "t", guild_id: "1", member: moderator, data: { custom_id: "issue:m:200:300", components } });
     expect(calls.find((call) => call.method === "PATCH")!.body).toMatchObject({ content: "Sorry, I couldn't create the issue: I couldn't find the repository, or the GitHub token can't see it." });
+  });
+
+  it("refuses a command from another server, and every command while GUILD_ID is unset", async () => {
+    const calls = stubFetch({ "GET /channels/200/messages/300": report });
+    const command = { type: 2, token: "t", member: moderator, channel: { id: "200", type: 0 }, data: { type: 3, name: "Create GitHub issue", target_id: "300" } };
+    const elsewhere = await run({ ...command, guild_id: "2" });
+    expect(elsewhere.body).toMatchObject({ type: 4, data: { flags: 64 } });
+    const guild = env.GUILD_ID;
+    delete env.GUILD_ID;
+    const unset = await run({ ...command, guild_id: "1" }).finally(() => (env.GUILD_ID = guild));
+    expect(unset.body.type).toBe(4);
+    // A direct message has no server and no member.
+    expect((await run({ ...command, member: undefined })).body.type).toBe(4);
+    expect(calls).toEqual([]);
+  });
+
+  it("refuses a command and a submitted form from a member who may not manage messages", async () => {
+    const calls = stubFetch({ "GET /channels/200/messages/300": report });
+    const command = await run({ type: 2, token: "t", guild_id: "1", member: player, channel: { id: "200", type: 0 }, data: { type: 3, name: "Create GitHub issue", target_id: "300" } });
+    expect(command.body).toMatchObject({ type: 4, data: { content: expect.stringContaining("Manage Messages"), flags: 64 } });
+    const submit = await run({ type: 5, token: "t", guild_id: "1", member: player, data: { custom_id: "issue:m:200:300", components } });
+    expect(submit.body.type).toBe(4);
+    expect((await run({ type: 5, token: "t", guild_id: "1", member: { ...player, permissions: undefined }, data: { custom_id: "issue:m:200:300", components } })).body.type).toBe(4);
+    expect(calls).toEqual([]);
+    // An administrator needs no Manage Messages bit.
+    expect((await run({ type: 2, token: "t", guild_id: "1", member: { ...player, permissions: "8" }, channel: { id: "200", type: 0 }, data: { type: 3, name: "Create GitHub issue", target_id: "300" } })).body.type).toBe(9);
+  });
+
+  it("creates no issue when the submitted form names a channel of another server", async () => {
+    const calls = stubFetch({
+      "GET /channels/200": { id: "200", guild_id: "2" },
+      "GET /channels/200/messages/300": report,
+      "POST github/repos/owner/repo/issues": { number: 42, html_url: "https://github.com/owner/repo/issues/42" },
+      "POST /channels/200/messages": {},
+      "PATCH /webhooks/100/t/messages/@original": {},
+    });
+    await run({ type: 5, token: "t", guild_id: "1", member: moderator, data: { custom_id: "issue:m:200:300", components } });
+    expect(calls.map((call) => call.method)).toEqual(["GET", "PATCH"]);
+    expect(calls[1]!.body).toMatchObject({ content: expect.stringContaining("isn't in a channel of this server") });
+    // A thread the bot cannot find is refused the same way.
+    calls.length = 0;
+    await run({ type: 5, token: "t", guild_id: "1", member: moderator, data: { custom_id: "issue:t:999:0", components } });
+    expect(calls.map((call) => call.method)).toEqual(["GET", "PATCH"]);
   });
 
   it("registers the two commands the worker answers", () => {

@@ -1,8 +1,9 @@
 // The Discord issue bot: a Cloudflare Worker that Discord calls at its Interactions Endpoint URL. A moderator runs
 // /issue in a thread, or Apps > Create GitHub issue on a message; the bot answers with a form filled from the report,
 // and on submit it creates the issue in GITHUB_REPO and links it in the channel. GitHub's webhook calls /github, and the
-// bot posts each issue update beside the report (docs/discord-issues.md).
-import { editReply, type Context, type Env } from "./env.ts";
+// bot posts each issue update beside the report (docs/discord-issues.md). The commands are answered in one server only
+// (GUILD_ID) and for a member who may manage messages there, whatever the server's command settings say.
+import { discord, editReply, type Context, type Env } from "./env.ts";
 import { handleGitHub } from "./github.ts";
 import { createIssue, failureReason, issueBody, issueForm, readForm } from "./issue.ts";
 import { loadReport, nameOf, postAt, sourceFromId, sourceToId, type SourceRef } from "./source.ts";
@@ -22,13 +23,18 @@ const CHAT_INPUT = 1;
 const MESSAGE_COMMAND = 3;
 // Channel types of a thread: announcement, public and private.
 const THREADS = new Set([10, 11, 12]);
+// The permission bits of a member who may file an issue: Administrator, or Manage Messages (the commands' own
+// `default_member_permissions` in commands.json).
+const ADMINISTRATOR = 8n;
+const MANAGE_MESSAGES = 8192n;
 
 interface Interaction {
   type: number;
   token: string;
   guild_id?: string;
   channel?: { id: string; type: number };
-  member?: { user: { id: string; username: string; global_name?: string | null } };
+  /** `permissions` is the member's permission bits in the interaction's channel, as a decimal string. */
+  member?: { user: { id: string; username: string; global_name?: string | null }; permissions?: string };
   data?: {
     type?: number;
     name?: string;
@@ -46,6 +52,24 @@ function json(body: unknown, status = 200): Response {
 /** A reply only the moderator sees. */
 function note(content: string): Response {
   return json({ type: CHANNEL_MESSAGE, data: { content, flags: EPHEMERAL, allowed_mentions: { parse: [] } } });
+}
+
+// Why the bot refuses the interaction, or null. Discord's own command permissions are a server setting an admin can
+// widen, and a bot added to a second server would answer there too, so the Worker checks both itself. With GUILD_ID
+// unset it refuses every command.
+function refusal(env: Env, interaction: Interaction): string | null {
+  if (!env.GUILD_ID || interaction.guild_id !== env.GUILD_ID) return "I only work on the Middle-Earth Player server.";
+  const permissions = interaction.member?.permissions;
+  const bits = permissions && /^\d+$/.test(permissions) ? BigInt(permissions) : 0n;
+  if ((bits & (ADMINISTRATOR | MANAGE_MESSAGES)) === 0n) return "Only members with the Manage Messages permission can create an issue.";
+  return null;
+}
+
+// Whether the channel or thread a submitted form names is in the interaction's server. The id travels in the form's
+// custom id, which a changed client can rewrite, so the bot asks Discord where it is before it reads or posts there.
+async function inGuild(env: Env, source: SourceRef, guildId: string): Promise<boolean> {
+  const channel = await discord<{ guild_id?: string }>(env, "GET", `/channels/${source.kind === "message" ? source.channelId : source.threadId}`);
+  return channel?.guild_id === guildId;
 }
 
 // The command's source: the message it was run on, or the thread it was run in.
@@ -72,6 +96,10 @@ async function openForm(env: Env, interaction: Interaction): Promise<Response> {
 // and tell the moderator. A failure is told to the moderator only.
 async function fileIssue(env: Env, interaction: Interaction, source: SourceRef, values: NonNullable<ReturnType<typeof readForm>>): Promise<void> {
   try {
+    if (!(await inGuild(env, source, interaction.guild_id!))) {
+      await editReply(env, interaction.token, "Sorry, I couldn't create the issue: that report isn't in a channel of this server that I can see.");
+      return;
+    }
     const report = await loadReport(env, interaction.guild_id!, source);
     const filedBy = interaction.member ? nameOf(interaction.member.user) : "a moderator";
     const issue = await createIssue(env, values, issueBody(values, report, filedBy, source));
@@ -114,10 +142,12 @@ export default {
     if (request.method !== "POST") return new Response("The Discord issue bot answers Discord interactions only.", { status: 405 });
     if (new URL(request.url).pathname === "/github") return handleGitHub(request, env);
     const body = await request.text();
-    const signed = await verifyDiscordRequest(env.DISCORD_PUBLIC_KEY, request.headers.get("x-signature-ed25519"), request.headers.get("x-signature-timestamp"), body);
+    const signed = await verifyDiscordRequest(env.DISCORD_PUBLIC_KEY, request.headers.get("x-signature-ed25519"), request.headers.get("x-signature-timestamp"), body, Date.now());
     if (!signed) return new Response("Bad request signature.", { status: 401 });
     const interaction = JSON.parse(body) as Interaction;
     if (interaction.type === PING) return json({ type: PONG });
+    const refused = interaction.type === APPLICATION_COMMAND || interaction.type === MODAL_SUBMIT ? refusal(env, interaction) : null;
+    if (refused) return note(refused);
     if (interaction.type === APPLICATION_COMMAND) return openForm(env, interaction);
     if (interaction.type === MODAL_SUBMIT) return submitForm(env, interaction, context);
     return new Response("Unknown interaction type.", { status: 400 });

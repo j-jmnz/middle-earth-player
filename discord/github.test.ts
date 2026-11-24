@@ -13,6 +13,7 @@ const env: Env = {
   GITHUB_TOKEN: "gh",
   GITHUB_WEBHOOK_SECRET: "hook",
   GITHUB_REPO: "owner/repo",
+  GITHUB_ISSUE_AUTHOR: "Issue-Bot",
 };
 
 afterEach(() => vi.unstubAllGlobals());
@@ -41,9 +42,9 @@ function stubFetch(routes: Record<string, unknown>): Call[] {
   return calls;
 }
 
-const fromMessage = { number: 42, title: "Gandalf costs 5", html_url: "https://github.com/owner/repo/issues/42", body: "Text\n<!-- discord issue:m:200:300 -->" };
+const fromMessage = { number: 42, title: "Gandalf costs 5", html_url: "https://github.com/owner/repo/issues/42", user: { login: "issue-bot" }, body: "Text\n<!-- discord issue:m:200:300 -->" };
 const fromThread = { ...fromMessage, body: "Text\n<!-- discord issue:t:500:0 -->" };
-const run = (request: Request) => worker.fetch(request, env, { waitUntil: () => {} });
+const run = (request: Request, bindings = env) => worker.fetch(request, bindings, { waitUntil: () => {} });
 
 describe("issue updates", () => {
   it("refuses a delivery GitHub did not sign with the secret", async () => {
@@ -98,6 +99,23 @@ describe("issue updates", () => {
     await run(await delivery("issues", { action: "closed", issue: { ...fromThread, pull_request: {} } }));
     await run(await delivery("issues", { action: "closed", issue: { ...fromThread, body: "No marker" } }));
     expect(calls).toEqual([]);
+  });
+
+  it("follows no marker in an issue that another account wrote, and none while the author is unset", async () => {
+    const calls = stubFetch({
+      "GET api.github.com/repos/owner/repo/issues/42": { ...fromMessage, user: { login: "stranger" } },
+      "POST discord.com/channels/500/messages": {},
+      "POST discord.com/channels/200/messages": {},
+    });
+    const comment = { body: "@everyone free cards", html_url: "x", user: { login: "stranger", type: "User" } };
+    const strangers = { ...fromThread, user: { login: "stranger" } };
+    expect(await (await run(await delivery("issue_comment", { action: "created", issue: strangers, comment }))).text()).toBe("Nothing to post.");
+    await run(await delivery("issues", { action: "reopened", issue: { ...fromMessage, user: null } }));
+    const release = { tag_name: "v0.4.0", html_url: "x", body: "- A (closes #42)", prerelease: false, draft: false };
+    await run(await delivery("release", { action: "published", release }));
+    await run(await delivery("issues", { action: "reopened", issue: fromThread }), { ...env, GITHUB_ISSUE_AUTHOR: undefined });
+    await run(await delivery("issues", { action: "reopened", issue: fromThread }), { ...env, GITHUB_ISSUE_AUTHOR: " " });
+    expect(calls.filter((call) => call.method !== "GET")).toEqual([]);
   });
 
   it("tells each report that a published release closes which version has its fix, then stops following it", async () => {
