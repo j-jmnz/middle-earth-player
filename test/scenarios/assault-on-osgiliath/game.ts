@@ -166,7 +166,7 @@ export const ASSAULT_GOLDENS: readonly AssaultGolden[] = [
   { name: "solo win, Haradrim Elite at Setup", seatCount: 1, seed: 14, difficulty: "Normal", decks: "strong", outcome: "won", policy: { enemy: HARADRIM_ELITE } },
   { name: "two-handed win", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "Easy solo win", seatCount: 1, seed: 25, difficulty: "Easy", decks: "strong", outcome: "won" },
-  { name: "solo loss: every hero destroyed", seatCount: 1, seed: 71, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+  { name: "solo loss: every hero destroyed", seatCount: 1, seed: 31, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed loss: threat 50", seatCount: 2, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
 ];
 

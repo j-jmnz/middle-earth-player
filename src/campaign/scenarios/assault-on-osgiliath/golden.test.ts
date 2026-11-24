@@ -172,17 +172,17 @@ describe("Assault on Osgiliath golden", () => {
         const played = game(golden("solo loss: every hero destroyed"));
         const { ctx } = world(golden("solo loss: every hero destroyed"));
         const returns = shadowReturns(played, ctx);
-        expect(list(returns, "shadowReturn")).toEqual(["31:06100"]);
+        expect(list(returns, "shadowReturn")).toEqual(["23:06096"]);
         const moments = momentsOf(played);
-        expect(list(moments, "lostDestroyed")).toEqual(["31:06100"]);
+        expect(list(moments, "lostDestroyed")).toEqual(["23:06096"]);
         expect(list(moments, "lostUndefended")).toEqual([]);
-        // At that intent the first player controlled West Quarter alone, a hero was destroyed by the attack, and West Quarter is back in the staging area.
-        const before = keptOf(played, 31);
-        const after = played.trail?.[31] as ScenarioState;
-        expect(controlledCodes(before)).toEqual(["06100"]);
+        // At that intent the first player controlled West Gate alone, a hero was destroyed by the attack, and West Gate is back in the staging area.
+        const before = keptOf(played, 23);
+        const after = played.trail?.[23] as ScenarioState;
+        expect(controlledCodes(before)).toEqual(["06096"]);
         expect(controlledCodes(after)).toEqual([]);
-        expect(after.staging).toContain(idOf(returns, "shadowReturn", 31));
-        const killed = stepsByIntent(played, ctx)[31]?.filter((step) => step.kind === "destroy" && before.cards[step.targetId]?.zone === "heroes") ?? [];
+        expect(after.staging).toContain(idOf(returns, "shadowReturn", 23));
+        const killed = stepsByIntent(played, ctx)[23]?.filter((step) => step.kind === "destroy" && before.cards[step.targetId]?.zone === "heroes") ?? [];
         expect(killed).toHaveLength(1);
       });
 
