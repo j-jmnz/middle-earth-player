@@ -98,21 +98,48 @@ export function fetchFailureMessage(ref: RingsDbRef, failure: FetchFailure): str
   return "RingsDB would not send that deck. Check the link is your own deck's page, and that Share my decks is on and saved in your RingsDB account settings.";
 }
 
-export function cardUrl(code: string): string {
-  return `https://ringsdb.com/api/public/card/${code}.json`;
+// A card code is five to eight digits (01073, 141002, the MotK heroes' 9901014 and 99131006). A decklist's codes are RingsDB's answer, so
+// one is checked before it is put into a URL.
+const CARD_CODE = /^\d{5,8}$/;
+// The most cards outside the pool whose names one import asks RingsDB for; the rest are named by their code.
+export const DROPPED_LOOKUPS_MAX = 20;
+// The bounds of what a decklist may hold: more copies or more entries than any deck has is not a deck.
+const COUNT_MAX = 99;
+const ENTRIES_MAX = 500;
+const NAME_MAX = 200;
+/** How long one RingsDB request may take before the import gives up on it. */
+export const REQUEST_TIMEOUT_MS = 15_000;
+
+/** The card's public JSON, or null for a code that is not a card code. */
+export function cardUrl(code: string): string | null {
+  return CARD_CODE.test(code) ? `https://ringsdb.com/api/public/card/${code}.json` : null;
 }
 
+/** The dropped codes whose names the import looks up: card codes only, each once, at most DROPPED_LOOKUPS_MAX. */
+export function droppedLookups(codes: readonly string[]): ReadonlySet<string> {
+  return new Set([...new Set(codes)].filter((code) => CARD_CODE.test(code)).slice(0, DROPPED_LOOKUPS_MAX));
+}
+
+/** A dropped card as the import names it: the name RingsDB gave, or its code, cut to a length a sentence can hold. */
+export function droppedLabel(code: string, name: unknown): string {
+  const named = typeof name === "string" ? name.trim() : "";
+  return (named || code).slice(0, 80);
+}
+
+// Counts are whole numbers, held to 0..COUNT_MAX.
 function countRecord(value: unknown): DecklistCounts | null {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return null;
+  const entries = Object.entries(value);
+  if (entries.length > ENTRIES_MAX) return null;
   const counts: DecklistCounts = {};
-  for (const [code, count] of Object.entries(value)) {
+  for (const [code, count] of entries) {
     if (!Number.isInteger(count) || typeof count !== "number") return null;
-    counts[code] = count;
+    counts[code] = Math.min(Math.max(count, 0), COUNT_MAX);
   }
   return counts;
 }
 
-/** Reads name, heroes, slots and sideslots (the side deck). A sideslots that is not a count record (an empty list) is no side deck. */
+/** Reads name, heroes, slots and sideslots (the side deck), each count held to a deck's range. A sideslots that is not a count record (an empty list) is no side deck. */
 export function readDecklistBody(payload: unknown): DecklistBody | null {
   if (typeof payload !== "object" || payload === null) return null;
   const record = payload as { name?: unknown; heroes?: unknown; slots?: unknown; sideslots?: unknown };
@@ -121,7 +148,7 @@ export function readDecklistBody(payload: unknown): DecklistBody | null {
   const slots = countRecord(record.slots ?? {});
   if (!heroes || !slots) return null;
   const side = countRecord(record.sideslots ?? {});
-  return { name: record.name, heroes, slots, ...(side && Object.keys(side).length > 0 ? { side } : {}) };
+  return { name: record.name.slice(0, NAME_MAX), heroes, slots, ...(side && Object.keys(side).length > 0 ? { side } : {}) };
 }
 
 // RingsDB lists the ally a Messenger of the King deck turns into a hero (22134:A:2) as a "(MotK)" hero, coded 99 and the ally's code

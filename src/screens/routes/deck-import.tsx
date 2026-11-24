@@ -8,7 +8,7 @@ import { BodyText, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchFi
 import { startNewDeck } from "../deck/draft";
 import { savedDeckName } from "../deck/status";
 import { listDecks, readDeck, writeDeck } from "../deck/store";
-import { buildDecklist, cardUrl, deckRefusal, droppedSentence, fetchFailureMessage, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, type BuiltDecklist, type FetchFailure, type PrebuiltRow } from "../deck/import";
+import { buildDecklist, cardUrl, deckRefusal, droppedLabel, droppedLookups, droppedSentence, REQUEST_TIMEOUT_MS, fetchFailureMessage, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, type BuiltDecklist, type FetchFailure, type PrebuiltRow } from "../deck/import";
 import { useDatabases } from "../data/databases";
 import { poolOf } from "../pool/cache";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
@@ -29,28 +29,39 @@ class RingsDbFailure extends Error {
 const PRIVATE_DECK = "That deck is not shared. Its owner turns on Share my decks in their RingsDB account settings.";
 const MISSING_DECK = "RingsDB has no deck with that number.";
 
+// One request, given up after REQUEST_TIMEOUT_MS: a server that never answers, or never ends its answer, counts as no answer.
 async function readJson(url: string): Promise<unknown> {
-  let response: Response;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    response = await fetch(url);
-  } catch {
-    throw new RingsDbFailure({ kind: "no-answer" });
+    let response: Response;
+    try {
+      response = await fetch(url, { signal: controller.signal });
+    } catch {
+      throw new RingsDbFailure({ kind: "no-answer" });
+    }
+    if (!response.ok) throw new RingsDbFailure({ kind: "status", status: response.status });
+    try {
+      return (await response.json()) as unknown;
+    } catch (error) {
+      if (controller.signal.aborted) throw new RingsDbFailure({ kind: "no-answer" });
+      throw error;
+    }
+  } finally {
+    clearTimeout(timer);
   }
-  if (!response.ok) throw new RingsDbFailure({ kind: "status", status: response.status });
-  return response.json() as Promise<unknown>;
 }
 
+// The name of a card outside the pool, asked of RingsDB; its code when the code is not a card code or RingsDB gives no name.
 async function droppedName(code: string): Promise<string> {
+  const url = cardUrl(code);
+  if (!url) return droppedLabel(code, null);
   try {
-    const payload = await readJson(cardUrl(code));
-    if (typeof payload === "object" && payload !== null && "name" in payload && typeof payload.name === "string") {
-      const name = payload.name.trim();
-      if (name.length > 0) return name;
-    }
+    const payload = await readJson(url);
+    return droppedLabel(code, typeof payload === "object" && payload !== null && "name" in payload ? payload.name : null);
   } catch {
-    return code;
+    return droppedLabel(code, null);
   }
-  return code;
 }
 
 // The try/catch and try/finally below live here because the React Compiler cannot compile them inside a component.
@@ -122,7 +133,9 @@ export default function DeckImportScreen() {
         return;
       }
       const built = buildDecklist(body, pool);
-      const names = await Promise.all(built.droppedCodes.map((code) => droppedName(code)));
+      // The first few unknown cards are looked up by name; past that, and for a code that is not a card code, the code names the card.
+      const lookups = droppedLookups(built.droppedCodes);
+      const names = await Promise.all(built.droppedCodes.map((code) => (lookups.has(code) ? droppedName(code) : droppedLabel(code, null))));
       save(built, names);
     });
   }

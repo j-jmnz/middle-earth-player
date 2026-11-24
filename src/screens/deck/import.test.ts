@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildDecklist,
+  cardUrl,
+  DROPPED_LOOKUPS_MAX,
+  droppedLabel,
+  droppedLookups,
   droppedSentence,
   fetchFailureMessage,
   parseDecklistRef,
@@ -245,5 +249,38 @@ describe("the lazy pre-built list", () => {
     expect(list.rows.length).toBeGreaterThan(prebuiltDecks().length);
     expect(list.sticky.length).toBeGreaterThan(0);
     expect(list.sticky.every((at) => list.rows[at]?.kind === "group")).toBe(true);
+  });
+});
+
+describe("what an import trusts of RingsDB's answer", () => {
+  it("builds a card URL only for a card code", () => {
+    expect(cardUrl("01073")).toBe("https://ringsdb.com/api/public/card/01073.json");
+    expect(cardUrl("99131006")).toBe("https://ringsdb.com/api/public/card/99131006.json");
+    for (const code of ["", "1073", "010730000", "01073/../../decklist/1", "01073?x=1", "0107a", " 01073", "../x"]) expect(cardUrl(code), code).toBeNull();
+  });
+
+  it("looks up at most twenty unknown cards, each once, and none whose code is not a card code", () => {
+    const codes = Array.from({ length: 30 }, (_, at) => String(90000 + at));
+    const lookups = droppedLookups(["../x", "90000", ...codes]);
+    expect(lookups.size).toBe(DROPPED_LOOKUPS_MAX);
+    expect(lookups.has("../x")).toBe(false);
+    expect([...lookups][0]).toBe("90000");
+    expect(lookups.has("90029")).toBe(false);
+  });
+
+  it("names a dropped card by RingsDB's name or its code, cut short", () => {
+    expect(droppedLabel("01073", " Gandalf ")).toBe("Gandalf");
+    expect(droppedLabel("01073", "")).toBe("01073");
+    expect(droppedLabel("01073", { name: "x" })).toBe("01073");
+    expect(droppedLabel("01073", "x".repeat(500))).toHaveLength(80);
+  });
+
+  it("holds each count to a deck's range and refuses a list with more entries than any deck", () => {
+    const body = readDecklistBody({ name: "n".repeat(900), heroes: { "01001": -4 }, slots: { "01073": 1e9, "01074": 3 } })!;
+    expect(body.heroes).toEqual({ "01001": 0 });
+    expect(body.slots).toEqual({ "01073": 99, "01074": 3 });
+    expect(body.name).toHaveLength(200);
+    const huge = Object.fromEntries(Array.from({ length: 501 }, (_, at) => [String(10000 + at), 1]));
+    expect(readDecklistBody({ name: "Huge", heroes: {}, slots: huge })).toBeNull();
   });
 });
