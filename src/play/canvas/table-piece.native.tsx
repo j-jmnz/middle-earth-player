@@ -68,7 +68,7 @@ function drawOverlay(p: PieceProps) {
   return (
     <Group>
       <Group opacity={veiled ? 0.55 : 1}>
-        {info ? <Badges slot={slot} rect={rect} effects={info.effects} willpower={info.willpower} questPoints={info.questPoints} stageLoses={info.stageLoses} owner={p.owner} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
+        {info ? <Badges slot={slot} rect={rect} effects={info.effects} willpower={info.willpower} commitStat={info.commitStat} questPoints={info.questPoints} stageLoses={info.stageLoses} owner={p.owner} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
         {info?.combat ? <CombatPill rect={rect} combat={info.combat} fonts={fonts} t={t} s={s} /> : null}
         {info?.engagement ? <EngagementMark rect={rect} cost={info.engagement.cost} engages={info.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.fire ? <FireMarkView rect={rect} mark={info.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}

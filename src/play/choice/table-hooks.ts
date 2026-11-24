@@ -8,6 +8,7 @@ import { setBeat, type BeatStore } from "../store/beat-store.ts";
 import { stageText } from "../readouts/objective.ts";
 import { intentWords, momentOf, roundSummary, takenBack, type Moment } from "../store/outcome.ts";
 import { guideLine } from "../phases/reference.ts";
+import type { QuestStat } from "../readouts/quest-stat.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { followAnswers, passableWindow, tableAnswer, usableIds, type StopSettings } from "../phases/stops.ts";
 import { printedOf } from "../../rules/core/printed.ts";
@@ -138,8 +139,8 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
  * not in a sheet the player opened, and not when the note already says it. A showing is counted when its moment ends, so
  * the line stays up for the whole moment it explains.
  */
-export function useGuide(settings: Pick<TableSettings, "guide" | "guideSeen">, game: ScenarioState, sheet: Sheet, legal: readonly LegalIntent[], opened: boolean, note: string | null): string | null {
-  const line = settings.guide && !opened ? guideLine(game, sheet.kind === "window" && passableWindow(game, sheet, legal)) : null;
+export function useGuide(settings: Pick<TableSettings, "guide" | "guideSeen">, game: ScenarioState, sheet: Sheet, legal: readonly LegalIntent[], opened: boolean, note: string | null, stat?: QuestStat): string | null {
+  const line = settings.guide && !opened ? guideLine(game, sheet.kind === "window" && passableWindow(game, sheet, legal), stat) : null;
   const guide = line && (settings.guideSeen[line.key] ?? 0) < 2 && !(note ?? "").includes(line.text) ? line : null;
   const guideKey = guide ? `${guide.key}:${sheet.key}` : "";
   const showing = useRef<string | null>(null);

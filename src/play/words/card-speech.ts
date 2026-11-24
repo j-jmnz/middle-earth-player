@@ -85,7 +85,9 @@ function statWords(game: ScenarioState, card: CardInstance, printed: PrintedCard
     if (stat === "willpower" && info.willpower != null) continue;
     if (printed[stat] == null) continue;
     const value = modifiedStat(game, card, stat, deps.cards);
-    const delta = info.effects.stats.find((badge) => badge.stat === stat)?.delta ?? 0;
+    const badge = info.effects.stats.find((entry) => entry.stat === stat);
+    // A number taken past its floor says only the 0 ("0 engagementCost"), not the -99 behind it.
+    const delta = badge?.floored ? 0 : (badge?.delta ?? 0);
     words.push(`${value} ${stat}${delta !== 0 ? ` (${delta > 0 ? "+" : ""}${delta})` : ""}`);
   }
   return words;

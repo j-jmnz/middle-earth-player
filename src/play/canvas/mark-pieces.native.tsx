@@ -4,7 +4,7 @@
 import { Circle, Group, Image, Line, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
 
 import { cardCorner } from "../../ui/card-corner.ts";
-import { MUST_COMMIT_WORD, type CardEffects, type CombatNumber } from "../cards/card-effects.ts";
+import { chipText, MUST_COMMIT_WORD, type CardEffects, type CombatNumber } from "../cards/card-effects.ts";
 import { DETERMINED_WORD } from "../words/scenarios/angmar/wastes-table.ts";
 import { type IconName } from "../../ui/icon-map.ts";
 import { glyphCells, type PlaceMark } from "../store/island-place.ts";
@@ -152,7 +152,7 @@ export function DeterminedMarkView({ rect, word, clear, fonts, t, s }: { rect: R
 /** How far the widest effect badge reaches from the card's left edge, so a word pill keeps clear of the badge column (the rows are drawn by `Badges`: a stat is the icon, the number and 5 pt, a flag the pill and 4 pt (the must-commit pill is a stat's width), the "more" pill 24 pt). */
 export function badgeReach(effects: CardEffects, fonts: Fonts, s: number): number {
   const widths = [
-    ...effects.stats.map((badge) => 15 * s + fonts.badge.getTextWidth(`${badge.delta > 0 ? "+" : "-"}${Math.abs(badge.delta)}`) + 5 * s),
+    ...effects.stats.map((badge) => 15 * s + fonts.badge.getTextWidth(chipText(badge)) + 5 * s),
     ...effects.flags.map((flag) => (flag.flag === "mustCommit" ? 15 * s + fonts.badge.getTextWidth(MUST_COMMIT_WORD) + 5 * s : BADGE_H * s + 4 * s)),
   ];
   return widths.length === 0 ? 0 : 2 * s + Math.max(24 * s, ...widths);

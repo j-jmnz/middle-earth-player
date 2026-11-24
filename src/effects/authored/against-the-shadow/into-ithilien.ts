@@ -96,7 +96,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["05028:A:1"],
       timing: "constant",
       condition: { kind: "sourceIn", zone: "activeLocation" },
-      instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: -99, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", stagingOnly: true } }],
+      instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: -99, until: "whileSourceActive", holders: { type: "enemy", control: "any", stagingOnly: true } }],
     },
     copyLine("05045:A:2", "05028:A:2"),
 

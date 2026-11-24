@@ -13,6 +13,7 @@ import { questStatOf } from "../../rules/quest/quest.ts";
 import { FALLEN_SUFFIX, ORC_GUARD_CODE, fallenBase, isShipObjectiveCode, printedOf, type PrintedCard } from "../../rules/core/printed.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
+import { STAT_WORD } from "./card-effects.ts";
 import { ownerWords } from "../words/owner.ts";
 import { prisonerWords } from "../readouts/widgets.ts";
 import { pelennorDetail } from "./pelennor-preview.ts";
@@ -44,15 +45,13 @@ export function standInText(cards: ReadonlyMap<string, PrintedCard>, code: strin
   return `${fallen ? "Fallen into evil: an enemy now" : "Enemy"}. Attack ${printed.attack ?? 0}, Defense ${printed.defense ?? 0}, ${printed.health ?? 0} hit point${printed.health === 1 ? "" : "s"}, ${threat}.`;
 }
 
-const QUEST_STAT_WORDS = { willpower: "Willpower", attack: "Attack", defense: "Defense" } as const;
-
 // Celador or an Ithilien Guardian in the staging area (05025:A:1, 05026:A:1; ats.ally-objectives, hon.battle, hon.siege): committed to the quest by its own text, with the stat the stage counts (Attack under Battle, Defense under Siege) and its value now.
 function ithilienDetail(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
   const card = game.cards[cardId];
   if (!card || !committedInStaging(game, cardId)) return null;
   const stat = questStatOf(game, cardId, ctx.cards);
   const value = modifiedStat(game, card, stat, ctx.cards);
-  return `Committed to the quest from the staging area, adding ${value} ${QUEST_STAT_WORDS[stat]} to the quest total. No player controls it, so it cannot attack, defend or pay a cost.`;
+  return `Committed to the quest from the staging area, adding ${value} ${STAT_WORD[stat]} to the quest total. No player controls the card: it cannot attack, defend or pay a cost.`;
 }
 
 /** The muted line under a card's name in its preview, or null: what only the table knows about it. */

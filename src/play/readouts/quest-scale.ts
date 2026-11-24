@@ -1,12 +1,13 @@
-// Rules: rr.step-3-4, ltp.quest-resolution (data/rules/entries.json).
+// Rules: rr.step-3-4, ltp.quest-resolution, hon.battle, hon.siege (data/rules/entries.json).
 //
 // The table's quest scale (docs/design-system-table.md, Quest scale): the threat in the staging area against the willpower committed to the
-// quest, and how far apart they are. While the players commit, the dock's readout already adds the picked characters' willpower
+// quest, and how far apart they are (the "willpower" is the Attack of a quest with Battle and the Defense of one with Siege: `stat`). While the players commit, the dock's readout already adds the picked characters' willpower
 // (readout.ts), so the scale moves as each one is picked; otherwise it reads the engine's own totals. Pure, so a test reads it.
 import { committedWillpower } from "../../rules/quest/quest.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
 import type { Readout } from "./readout.ts";
+import { questStatNow, questStatWord } from "./quest-stat.ts";
 import { stageHasDefense } from "./fortress.ts";
 import { stagingThreatNow } from "./the-hobbit/riddles.ts";
 import { questSeat } from "../store/selectors.ts";
@@ -16,7 +17,8 @@ import { questSeat } from "../store/selectors.ts";
 // false alarm, and so would one after resolution (window 3.4), once the committed willpower is cleared.
 // `seat`: the seat whose staging area and willpower these are once stages are separate between players (the acting seat's, whichever seat a peek draws), else null.
 // `defense`: the current stage has Defense (mec112.defense), so the Threat that beats the Willpower is progress the encounter deck places and the Willpower that beats it places none.
-export type QuestScale = { threat: number; willpower: number; delta: number; live: boolean; seat: number | null; defense?: boolean };
+// `stat`: the stat the committed total is made of when it is not Willpower, the current quest having Battle (Attack) or Siege (Defense; hon.battle, hon.siege); absent otherwise. Not `defense`, which is the mec112 stage.
+export type QuestScale = { threat: number; willpower: number; delta: number; live: boolean; seat: number | null; defense?: boolean; stat?: "attack" | "defense" };
 
 /** The scale now: the quest readout's numbers when the dock shows one, else the engine's staging threat and committed willpower. */
 export function questScaleOf(game: ScenarioState, ctx: ReduceContext, readout: Readout | null): QuestScale {
@@ -24,20 +26,27 @@ export function questScaleOf(game: ScenarioState, ctx: ReduceContext, readout: R
   const seat = questSeat(game);
   const owner = seat != null && game.seatCount > 1 ? seat : null;
   const defense = stageHasDefense(game) ? { defense: true } : {};
+  const counted = questStatNow(game, ctx);
+  const stat = counted === "willpower" ? {} : { stat: counted };
   if (readout?.kind === "quest") {
-    const willpower = readout.stats.find((stat) => stat.icon === "willpower")?.value ?? 0;
-    const threat = readout.stats.find((stat) => stat.icon === "threat")?.value ?? 0;
-    return { threat, willpower, delta: willpower - threat, live: true, seat: owner, ...defense };
+    const willpower = readout.stats.find((entry) => entry.icon !== "threat")?.value ?? 0;
+    const threat = readout.stats.find((entry) => entry.icon === "threat")?.value ?? 0;
+    return { threat, willpower, delta: willpower - threat, live: true, seat: owner, ...defense, ...stat };
   }
   const threat = stagingThreatNow(game, ctx, seat);
   const willpower = committedWillpower(game, ctx.cards, seat);
-  return { threat, willpower, delta: willpower - threat, live: game.phase === "Quest" && !game.questResolved, seat: owner, ...defense };
+  return { threat, willpower, delta: willpower - threat, live: game.phase === "Quest" && !game.questResolved, seat: owner, ...defense, ...stat };
 }
 
-/** What a screen reader hears of the scale: the threat in staging, the willpower committed and how far ahead or short it is. */
+/** The word under the committed bar and in the spoken scale: "willpower", or the stat the quest counts instead ("attack" under Battle, "defense" under Siege). */
+export function scaleStatWord(scale: QuestScale): string {
+  return questStatWord(scale.stat ?? "willpower").toLowerCase();
+}
+
+/** What a screen reader hears of the scale: the threat in staging, the willpower (or Attack or Defense) committed and how far ahead or short it is. */
 export function scaleLabel(scale: QuestScale): string {
   const whose = scale.seat == null ? "" : `Player ${scale.seat + 1}'s `;
-  return `${whose}threat in staging ${scale.threat}, willpower committed ${scale.willpower}, ${gapWords(scale)}`;
+  return `${whose}threat in staging ${scale.threat}, ${scaleStatWord(scale)} committed ${scale.willpower}, ${gapWords(scale)}`;
 }
 
 // How far apart the bars are, by the marker's word: the Defense cases say where the progress goes.
