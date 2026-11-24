@@ -1,0 +1,86 @@
+[
+{
+"name":"solo win",
+"seatCount":1,
+"seed":1,
+"difficulty":"Normal",
+"decks":"strong",
+"outcome":"won",
+"intents":[{"type":"Trigger","cardId":"i69","effectId":"06070:response:1"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"Engage","enemyId":"i9"},{"type":"DeclareDefender","defenderId":"i37"},{"type":"DeclareAttackers","enemyId":"i9","attackerIds":["i38"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"Travel","locationId":"i17"},{"type":"Engage","enemyId":"i6"},{"type":"DeclareDefender","defenderId":"i37"},{"type":"DeclareAttackers","enemyId":"i6","attackerIds":["i38"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"Travel","locationId":"i14"},{"type":"Engage","enemyId":"i70"},{"type":"DeclareDefender","defenderId":"i37"},{"type":"DeclareAttackers","enemyId":"i70","attackerIds":["i38"]}],
+"checks":[392163570,1474325909,3195840904,1811478887,3094414713,312806135,2654810477,51828864,1460988734,51116635,2774719776,1082704579,978826038,638518788,441756035,2044658892,2444872349,3338367118,3591272510,3269239941,1897671142,3231543081,89276613,1932155994,3457057202,2676447084,2627062142],
+"end":{"round":3,"lost":false,"cleared":true,"hash":"d5beaf8fb0d5c74b5f829e77"}
+},
+{
+"name":"two-handed win, hunt first",
+"seatCount":2,
+"seed":4,
+"difficulty":"Normal",
+"decks":"strong",
+"outcome":"won",
+"policy":{"huntFirst":true},
+"intents":[{"type":"Keep"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"Commit","cardIds":["i69"]},{"type":"Pass"},{"type":"Travel","locationId":"i21"},{"type":"Engage","enemyId":"i31"},{"type":"Engage","enemyId":"i28"},{"type":"DeclareDefender","defenderId":"i37"},{"type":"DeclareDefender","defenderId":"i70"},{"type":"DeclareAttackers","enemyId":"i31","attackerIds":["i38"]},{"type":"DeclineAttack"},{"type":"DeclareAttackers","enemyId":"i28","attackerIds":["i71"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Choose","optionId":"prevent"},{"type":"Trigger","cardId":"i102","effectId":"06070:response:1"},{"type":"Choose","optionId":"i20"},{"type":"DeclineTravel"},{"type":"Engage","enemyId":"i5"},{"type":"Engage","enemyId":"i103"},{"type":"DeclareDefender","defenderId":"i69"},{"type":"DeclareDefender","defenderId":"i36"},{"type":"DeclareAttackers","enemyId":"i5","attackerIds":["i70","i71"]},{"type":"DeclineAttack"},{"type":"DeclareAttackers","enemyId":"i103","attackerIds":["i37","i38"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"Commit","cardIds":["i69"]},{"type":"Pass"}],
+"checks":[3526920399,3526920399,2873534044,2873534044,2873534044,2873534044,3710379479,2187914658,2187914658,2382739765,1259850788,2912822301,1275277902,669782400,1768489915,4063531275,958056913,958056913,1086006801,821884120,821884120,2161741431,2161741431,2161741431,2161741431,3762891466,3762891466,3586773090,3372278145,698758540,3997776431,595834363,1109151027,2835048805,2957245239,2662797621,826090993,826090993,1132417614,2845547022,2845547022,3278273653,3278273653,3278273653,3278273653,2318268630,2845139333,2845139333,2986782554,452998117],
+"end":{"round":3,"lost":false,"cleared":true,"hash":"e85be4cc51739d34af203212"}
+},
+{
+"name":"Easy two-handed win",
+"seatCount":2,
+"seed":1,
+"difficulty":"Easy",
+"decks":"strong",
+"outcome":"won",
+"intents":[{"type":"Keep"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i29"]},{"type":"Pass"},{"type":"Commit","cardIds":["i62"]},{"type":"Pass"},{"type":"Travel","locationId":"i16"},{"type":"Engage","enemyId":"i24"},{"type":"Engage","enemyId":"i3"},{"type":"DeclareDefender","defenderId":"i30"},{"type":"DeclareDefender","defenderId":"i63"},{"type":"DeclareAttackers","enemyId":"i24","attackerIds":["i31"]},{"type":"DeclineAttack"},{"type":"DeclareAttackers","enemyId":"i3","attackerIds":["i64"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i62"]},{"type":"Pass"},{"type":"Commit","cardIds":["i29"]},{"type":"Pass"},{"type":"Trigger","cardId":"i95","effectId":"06070:response:1"},{"type":"DeclineTravel"},{"type":"Engage","enemyId":"i96"},{"type":"Engage","enemyId":"i5"},{"type":"DeclareDefender","defenderId":"i63"},{"type":"DeclareDefender","defenderId":"i30"},{"type":"DeclareAttackers","enemyId":"i96","attackerIds":["i64"]}],
+"checks":[607116718,607116718,1417872777,1417872777,1417872777,1417872777,2771461492,2255882405,2255882405,76155240,4182316216,2952360598,4000590261,769557086,1091549955,1942028828,61220844,61220844,2719263775,639268366,639268366,3586253737,3586253737,3586253737,3586253737,1421134060,1299783535,1299783535,2423274662,3947972834,2566664306,2468325532,2354290406,820441405,1442746098,3247818032,3171576273],
+"end":{"round":2,"lost":false,"cleared":true,"hash":"f10247f09c12c99314e4e297"}
+},
+{
+"name":"solo loss: every hero destroyed",
+"seatCount":1,
+"seed":1,
+"difficulty":"Normal",
+"decks":"brittle",
+"outcome":"lost",
+"lossReason":"No seats remain",
+"intents":[{"type":"Trigger","cardId":"i69","effectId":"06070:response:1"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"Engage","enemyId":"i9"},{"type":"DeclareDefender","defenderId":"i37"},{"type":"DeclareAttackers","enemyId":"i9","attackerIds":["i38"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"Travel","locationId":"i17"},{"type":"Engage","enemyId":"i6"},{"type":"DeclareDefender","defenderId":"i37"},{"type":"DeclareAttackers","enemyId":"i6","attackerIds":["i38"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36","i38","i69"]},{"type":"Pass"},{"type":"Travel","locationId":"i14"},{"type":"Engage","enemyId":"i70"},{"type":"Undefended","heroId":"i71"},{"type":"Trigger","cardId":"i69","effectId":"06070:response:1"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"Engage","enemyId":"i33"},{"type":"ChooseEnemy","enemyId":"i70"},{"type":"DeclareDefender","defenderId":"i36"},{"type":"DeclareDefender","defenderId":"i38"},{"type":"Trigger","cardId":"i69","effectId":"06070:response:1"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"Engage","enemyId":"i30"},{"type":"ChooseEnemy","enemyId":"i70"},{"type":"DeclareDefender","defenderId":"i38"}],
+"checks":[392163570,1474325909,3195840904,1811478887,3094414713,312806135,2654810477,4206153009,1296512929,1640985372,500617843,3681722382,3432678219,2974188303,1027769254,2066495209,961743480,3337774391,4153222809,4118307870,930595267,817072024,2051986510,395706209,1810083499,2755627676,862079546,1732961765,354770712,1385282606,4165561472,3236619687,3485521781,2093115514,3969179389,1355346152,2448084211,3883839472,1939263860,987865048,1783345374,2673718386,3783140979],
+"end":{"round":5,"lost":true,"cleared":false,"lossReason":"No seats remain","hash":"f43d9a61a3fe70e7cf7af023"}
+},
+{
+"name":"solo loss: Lord Alcaron leaves play",
+"seatCount":1,
+"seed":8,
+"difficulty":"Normal",
+"decks":"strong",
+"outcome":"lost",
+"policy":{"choose":"last"},
+"lossReason":"Lord Alcaron left play",
+"intents":[{"type":"Trigger","cardId":"i69","effectId":"06070:response:1"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"Engage","enemyId":"i9"},{"type":"DeclareDefender","defenderId":"i37"},{"type":"DeclareAttackers","enemyId":"i9","attackerIds":["i38"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"Choose","optionId":"allow"},{"type":"DeclineTravel"},{"type":"Engage","enemyId":"i7"},{"type":"DeclareDefender","defenderId":"i37"},{"type":"DeclareAttackers","enemyId":"i7","attackerIds":["i38"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"Travel","locationId":"i21"},{"type":"Engage","enemyId":"i70"},{"type":"DeclareDefender","defenderId":"i37"},{"type":"DeclareAttackers","enemyId":"i70","attackerIds":["i38"]}],
+"checks":[1598604474,1491544189,1551060688,3907729859,467927201,2860320479,3791758953,2579946399,1370551236,1876528583,4225617572,4125129359,874833162,1460991428,180946120,2943896674,1676818578,76240164,2321288098,2889357522,1226778993,3774613786,724712253,2856729395,852900301,3395996719,2265667755,2913509131],
+"end":{"round":3,"lost":true,"cleared":false,"lossReason":"Lord Alcaron left play","hash":"e69a61d7edabcb926dbc7b71"}
+},
+{
+"name":"two-handed loss: threat 50",
+"seatCount":2,
+"seed":3,
+"difficulty":"Normal",
+"decks":"weak",
+"outcome":"lost",
+"lossReason":"No seats remain",
+"intents":[{"type":"Keep"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"Commit","cardIds":["i69"]},{"type":"Pass"},{"type":"Trigger","cardId":"i102","effectId":"06070:response:1"},{"type":"Choose","optionId":"i18"},{"type":"DeclineTravel"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i69"]},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"Trigger","cardId":"i102","effectId":"06070:response:1"},{"type":"Choose","optionId":"i18"},{"type":"DeclineTravel"},{"type":"Engage","enemyId":"i7"},{"type":"DeclineEngage"},{"type":"DeclareDefender","defenderId":"i70"},{"type":"DeclareAttackers","enemyId":"i7","attackerIds":["i71"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"Commit","cardIds":["i69"]},{"type":"Pass"},{"type":"Choose","optionId":"prevent"},{"type":"DeclineTravel"},{"type":"Engage","enemyId":"i5"},{"type":"Engage","enemyId":"i11"},{"type":"DeclareDefender","defenderId":"i37"},{"type":"ChooseEnemy","enemyId":"i7"},{"type":"DeclareDefender","defenderId":"i70"},{"type":"DeclareDefender","defenderId":"i71"},{"type":"DeclareAttackers","enemyId":"i5","attackerIds":["i38"]},{"type":"DeclineAttack"}],
+"checks":[1419552139,1419552139,1316867008,1316867008,1316867008,1316867008,3189946643,650336782,650336782,133076413,2188091790,609652305,3123737126,2537549793,3356807705,1418997547,1102379883,1102379883,3287138548,3287138548,3287138548,3287138548,3203563553,3091998552,3091998552,3425553001,498086259,4215392746,733793656,477617980,805667959,3937413276,652094110,3061684873,921590902,3323627280,301628128,1642015208,1642015208,2110967767,2110967767,2110967767,2110967767,3873256762,1127124395,1127124395,1728003084,1737397752,3575690703,3423556279,2035600831,3235930454,951844296,2106494111,1603962061,1233000277,3008178966,1486941352],
+"end":{"round":3,"lost":true,"cleared":false,"lossReason":"No seats remain","hash":"57c7587a259c0019260ea489"}
+},
+{
+"name":"two-handed loss: the comparison",
+"seatCount":2,
+"seed":1,
+"difficulty":"Normal",
+"decks":"strong",
+"outcome":"lost",
+"policy":{"undefended":2},
+"lossReason":"Dead Villagers: not more villager tokens were rescued than died",
+"intents":[{"type":"Keep"},{"type":"Trigger","cardId":"i102","effectId":"06070:response:1"},{"type":"Choose","optionId":"i14"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"Commit","cardIds":["i69"]},{"type":"Pass"},{"type":"Choose","optionId":"prevent"},{"type":"Travel","locationId":"i14"},{"type":"Engage","enemyId":"i9"},{"type":"Engage","enemyId":"i11"},{"type":"Undefended","heroId":"i104"},{"type":"Undefended","heroId":"i104"},{"type":"DeclareAttackers","enemyId":"i9","attackerIds":["i37","i38"]},{"type":"DeclineAttack"},{"type":"DeclareAttackers","enemyId":"i11","attackerIds":["i70","i71"]},{"type":"DeclineAttack"},{"type":"Trigger","cardId":"i102","effectId":"06070:response:1"},{"type":"Choose","optionId":"i12"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i69"]},{"type":"Pass"},{"type":"Commit","cardIds":["i36"]},{"type":"Pass"},{"type":"Travel","locationId":"i12"},{"type":"Engage","enemyId":"i103"},{"type":"Engage","enemyId":"i4"},{"type":"DeclareDefender","defenderId":"i70"},{"type":"DeclareDefender","defenderId":"i37"},{"type":"DeclareAttackers","enemyId":"i103","attackerIds":["i71"]}],
+"checks":[2630217215,4134619370,2450648300,2450648300,1391013555,1391013555,1391013555,1391013555,32989174,1509474791,1509474791,618938504,2374075296,3719044754,3538476809,65199086,2592069584,3261512308,1283641741,3289252098,3289252098,457381984,1834632980,3571533249,1240918646,1240918646,973290769,973290769,973290769,973290769,3934871700,1655005349,1655005349,2008500212,1615339718,1664572857,429841151,316130206,3131684141,1839104343,2926024509],
+"end":{"round":2,"lost":true,"cleared":false,"lossReason":"Dead Villagers: not more villager tokens were rescued than died","hash":"1c59b79914da59f553f5a5b9"}
+}
+]
