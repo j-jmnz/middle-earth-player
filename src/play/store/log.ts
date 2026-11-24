@@ -1,6 +1,7 @@
 // The table's log: this round's engine steps in words, each with its cause from phase 8d (the rule title, or the card and
 // its printed line), so a player can check a number against its source. It is text, not a control.
 import { plural } from "../words/list.ts";
+import { countedOf } from "./counted.ts";
 import { reshuffleWords } from "./pile-ids.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
@@ -24,9 +25,6 @@ export type LogNames = {
 // high-resolution source of those tokens exists; docs/design-system.md, Icons).
 export type LogMark = "threat" | "willpower" | "attack" | "defense" | "damage" | "progress" | "resource" | null;
 
-/** The stat the quest counted at a quest step, given the stage the quest advanced to right after it (null: it did not advance in the round's steps). */
-export type QuestStatAt = (advancedTo: string | null) => "willpower" | "attack" | "defense";
-
 export type LogLine = { key: string; text: string; cause: string | null; mark: LogMark };
 
 /** What a screen reader hears of a log line, as one element: the step, then its cause ("3 damage on Aragorn. Enemy attack, rr.step-6-4-3"). */
@@ -41,9 +39,9 @@ function markOf(step: EngineStep, stat: LogMark = null): LogMark {
     case "hideTest":
     case "fortitudeTest":
       return "willpower";
-    // The quest's mark is the stat the stage counted (Attack under Battle, Defense under Siege).
+    // The quest's mark is the stat the stage counted (Attack under Battle, Defense under Siege); none for a step kept without it.
     case "quest":
-      return stat ?? "willpower";
+      return stat;
     case "escapeTest":
       return step.stat ?? "willpower";
     case "strike":
@@ -84,7 +82,7 @@ export function causeText(cause: Cause, names: LogNames): string {
   return line ? `${card}: ${line}` : card;
 }
 
-function words(step: EngineStep, names: LogNames, questStat: string): string | null {
+function words(step: EngineStep, names: LogNames, questStat: string | null): string | null {
   switch (step.kind) {
     case "push":
     case "pop":
@@ -131,7 +129,7 @@ function words(step: EngineStep, names: LogNames, questStat: string): string | n
     case "hideTest":
       return `Hide test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against threat ${step.threat}`;
     case "quest":
-      return `Quest: ${questStat} ${step.willpower} against threat ${step.threat}`;
+      return `Quest: ${questStat ? `${questStat} ` : ""}${step.willpower} against threat ${step.threat}`;
     case "strike":
       return step.undefended ? `Attack ${step.attack}, undefended, on ${names.card(step.targetId)}` : `Attack ${step.attack} against defense ${step.defense} on ${names.card(step.targetId)}`;
     case "advance":
@@ -166,14 +164,12 @@ function words(step: EngineStep, names: LogNames, questStat: string): string | n
   }
 }
 
-/** The round's steps as log lines, oldest first. Frame pushes and pops are bookkeeping and are left out. */
-export function logLines(steps: readonly EngineStep[], names: LogNames, questStat?: QuestStatAt): LogLine[] {
+/** The round's steps as log lines, oldest first. Frame pushes and pops are bookkeeping and are left out. A quest step names the stat it counted when the table kept it (counted.ts), else it names none. */
+export function logLines(steps: readonly EngineStep[], names: LogNames): LogLine[] {
   const lines: LogLine[] = [];
   steps.forEach((step, index) => {
-    // A quest step names the stat the stage counted: the stage that was current then, which is the one the quest advanced from when an advance follows in the round.
-    const advanced = step.kind === "quest" ? steps.slice(index + 1).find((later) => later.kind === "advance" && later.stormcaller !== true) : undefined;
-    const stat = step.kind === "quest" && questStat ? questStat(advanced?.kind === "advance" ? advanced.cardId : null) : null;
-    const text = words(step, names, stat ?? "willpower");
+    const stat = countedOf(step);
+    const text = words(step, names, stat);
     if (!text) return;
     lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : null, mark: markOf(step, stat) });
   });

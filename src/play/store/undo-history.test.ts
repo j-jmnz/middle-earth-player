@@ -133,7 +133,7 @@ describe("reopening a save", () => {
     const store = createTableStore({ ctx, game: start });
     for (const { intent } of upTo) expect(store.getState().dispatch(intent)).toBe(true);
     let kept: Kept = { roundSteps: [], history: [] };
-    for (const { before, after, steps, intent } of upTo) kept = keepIntent(kept, before, after, steps, intent);
+    for (const { before, after, steps, intent } of upTo) kept = keepIntent(kept, before, after, steps, intent, ctx);
     expect(kept.roundSteps).toEqual(store.getState().roundSteps);
     expect(kept.history.map((entry) => entry.intent)).toEqual(store.getState().history.map((entry) => entry.intent));
     expect(kept.history.length).toBe(store.getState().history.length);

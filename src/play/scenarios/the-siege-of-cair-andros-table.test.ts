@@ -9,6 +9,8 @@ import { UNATTRIBUTED } from "../../rules/core/cause.ts";
 import type { EngineStep } from "../../rules/core/intents.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { legalIntents } from "../../rules/engine/legal.ts";
+import { reduce, type PlayerIntent } from "../../rules/engine/reduce.ts";
+import { expectOk } from "../../rules/core/test-fixture.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { heroCard, idOf, send, start, type Layout } from "../../../test/harness/scene-kit.ts";
 import type { Run } from "../../../test/harness/scene.ts";
@@ -26,11 +28,12 @@ import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
 import { playRequest } from "../choice/pay.ts";
 import { pointNote } from "../phases/rail.ts";
 import { guideLine, turnReference } from "../phases/reference.ts";
-import { questStatNow, questStatThen } from "../phases/quest-stat.ts";
+import { questStatNow } from "../phases/quest-stat.ts";
 import { cairAndrosStageLines } from "../readouts/against-the-shadow/cair-andros.ts";
 import { advanceWords } from "../readouts/quest-advance.ts";
 import { momentOf } from "../store/outcome.ts";
 import { logLines } from "../store/log.ts";
+import { keepIntent, type Kept } from "../store/store.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
 import { adjustWords, threatSourcesOf } from "../readouts/threat-sources.ts";
 
@@ -266,20 +269,38 @@ describe("the quest's words follow the stat the stage counts", () => {
     expect(bannerLine("05073")).toEqual({ text: "Willpower 16 against threat 13", mark: "willpower" });
   });
 
-  it("the log says the same, and a quest that advanced the stage is worded by the stage it left", () => {
-    const made = table({ stage: "05074" });
-    const stat = (advancedTo: string | null) => questStatThen(made.state, made.ctx, advancedTo);
-    expect(logLines([quest], logNames, stat)[0]).toMatchObject({ text: "Quest: attack 16 against threat 13", mark: "attack" });
-    // Stage 3 (Battle) was beaten, and stage 4 (Siege) is the stage now: the quest step before the advance counted Attack.
-    const after = table({ stage: "05075" });
-    const state = updateCard(played(after.state), idOf(after.state, "05074"), { progress: 7 });
-    const advance: EngineStep = { kind: "advance", cardId: state.questStage ?? "" };
-    const lines = logLines([quest, advance], logNames, (advancedTo) => questStatThen(state, after.ctx, advancedTo));
-    expect(lines[0]).toMatchObject({ text: "Quest: attack 16 against threat 13", mark: "attack" });
-    expect(logLines([quest], logNames, (advancedTo) => questStatThen(state, after.ctx, advancedTo))[0]).toMatchObject({ text: "Quest: defense 16 against threat 13" });
-    const plain = table({ stage: "05073" });
-    expect(logLines([quest], logNames, (advancedTo) => questStatThen(plain.state, plain.ctx, advancedTo))[0]).toMatchObject({ text: "Quest: willpower 16 against threat 13", mark: "willpower" });
-    expect(logLines([quest], logNames)[0]).toMatchObject({ text: "Quest: willpower 16 against threat 13", mark: "willpower" });
+  // The quest of a table played through the store's own fold: each intent is kept as the table keeps it (keepIntent), and the log reads the kept steps.
+  function questLog(layout: Layout): string {
+    const made = table({ phase: "Quest", ...layout });
+    let state = syncConstants(made.state, made.ctx);
+    let kept: Kept = { roundSteps: [], history: [] };
+    const take = (intent: PlayerIntent) => {
+      const result = expectOk(reduce(state, intent, made.ctx));
+      kept = keepIntent(kept, state, result.state, result.steps, intent, made.ctx);
+      state = result.state;
+    };
+    take({ type: "Commit", cardIds: [made.hero, made.hero2] });
+    for (let guard = 0; guard < 12 && !kept.roundSteps.some((step) => step.kind === "quest"); guard += 1) take({ type: "Pass" });
+    // The Response of the location the quest explored, then the rest of the round's windows.
+    const response = legalIntents(state, made.ctx).find((intent) => intent.type === "Trigger");
+    if (response) take(response as PlayerIntent);
+    const text = logLines(kept.roundSteps, logNames).find((line) => line.text.startsWith("Quest:"))?.text;
+    if (!text) throw new Error("no quest line");
+    return text;
+  }
+
+  it("the log names the stat the quest counted, from the state at the quest step: a Response that removes the current stage does not change it", () => {
+    // Stage 2 (Willpower) is current; the quest explores The Banks, whose Response removes stage 2 itself and advances to stage 3 (Battle).
+    expect(questLog({ stage: "05073", active: { code: BANKS, progress: 2 } })).toBe("Quest: willpower 4 against threat 0");
+  });
+
+  it("the log names Defense for The Last Battle at 1 victory point though the location it explores gains it Battle after the quest step", () => {
+    expect(questLog({ stage: "05076", victory: [BANKS], active: { code: CITADEL, progress: 10 } })).toBe("Quest: defense 4 against threat 0");
+  });
+
+  it("a quest step kept without the stat (an old line) is worded without one", () => {
+    expect(logLines([quest], logNames)[0]).toMatchObject({ text: "Quest: 16 against threat 13", mark: null });
+    expect(logLines([{ ...quest, counted: "attack" } as EngineStep], logNames)[0]).toMatchObject({ text: "Quest: attack 16 against threat 13", mark: "attack" });
   });
 
   it("the stop before the quest resolves names the stat, in the window point and in the reference", () => {
