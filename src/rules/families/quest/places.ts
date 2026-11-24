@@ -18,6 +18,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { fireForced } from "../../windows/triggers.ts";
 import { effectsOfCard } from "../misc/text.ts";
+import { playerSource } from "./threat.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import type { Focus } from "../index.ts";
@@ -78,7 +79,7 @@ export function moveProgress(
     return askNumber(state, moved, (n) => ({ ...rest, amount: n }));
   }
   steps.push({ kind: "progress", targetId: fromId, amount: -moved, cause: currentCause(steps, UNATTRIBUTED) });
-  return placeProgress(updateCard(state, fromId, { progress: from.progress - moved }), toId, moved, ctx, steps, progressPlacer(state, ctx, focus.seat, focus.sourceId));
+  return placeProgress(updateCard(state, fromId, { progress: from.progress - moved }), toId, moved, ctx, steps, progressPlacer(state, ctx, focus.seat, focus.sourceId), false, playerSource(state, focus.sourceId, ctx));
 }
 
 // The card gets -amount Threat until the phase or round ends, and the effect's X records whether that took its Threat from above

@@ -1,0 +1,104 @@
+// Rules: ats.controlling-locations, ats.losing-control-of-locations, rr.explored, rr.in-play-and-out-of-play, rr.ownership-and-control, rr.travel, rr.active-location, rr.player-elimination (data/rules/entries.json); ledger lines 06091:B:2, 06093:A:1, 06103:A:1, 06103:A:2, 06105:A:1
+// (docs/scenarios/against-the-shadow/assault-on-osgiliath.md, Engine notes).
+// A location a player controls lies in his play area (a seat's `play` list), faceup, with its text working. TakeControlOfLocation puts it there and notes the seat on the card (the flag `controlledBy`, the seat plus 1); the control is lost when the location is
+// in no play area any more. Every way to lose it is seen in one place, the settle sweep: a record that returns the location (LoseControlOfLocation, ReturnToStaging on the card itself), a travel to it or a card that makes it the active location (West Gate), and
+// the cards of an eliminated player, which the core sends to the encounter discard pile. A loss removes the progress, leaves the location in the staging area and announces `controlLost` for the seat that held it.
+import type { Instruction } from "../../../catalog/boundary.ts";
+
+import { gameReads } from "../../core/game-reads.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { printedOf } from "../../core/printed.ts";
+import { heldAmount, updateCard, type ScenarioState } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
+import { frameScope, refCard } from "../../interpret/amounts.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { queueEvent } from "../../windows/queue.ts";
+import type { Focus } from "../index.ts";
+
+type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
+
+const CONTROLLED_BY = "controlledBy" as const;
+
+function isLocation(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+  const card = state.cards[id];
+  return card != null && printedOf(ctx.cards, card.code).type === "location";
+}
+
+/** The seat that controls the location, noted when it took control, or null when no player does. */
+export function controllerOf(state: ScenarioState, id: string): number | null {
+  const held = heldAmount(state, id, CONTROLLED_BY);
+  return held > 0 ? held - 1 : null;
+}
+
+/** The locations a player controls now: in the play area of the seat that took control. */
+export function controlledLocations(state: ScenarioState): string[] {
+  return state.modifiers.flatMap((modifier) => {
+    if (modifier.stat !== CONTROLLED_BY) return [];
+    const card = state.cards[modifier.instanceId];
+    return card?.zone === "play" && card.controller === modifier.amount - 1 ? [card.id] : [];
+  });
+}
+
+function noted(state: ScenarioState, id: string, seat: number | null): ScenarioState {
+  const rest = state.modifiers.filter((modifier) => !(modifier.stat === CONTROLLED_BY && modifier.instanceId === id));
+  const modifiers = seat == null ? rest : [...rest, { instanceId: id, sourceId: id, stat: CONTROLLED_BY, amount: seat + 1, until: "endOfGame" as const }];
+  return rest.length === state.modifiers.length && seat == null ? state : { ...state, modifiers };
+}
+
+/** TakeControlOfLocation: the named location enters the first player's play area, faceup, ready and with no progress; nothing happens for a card in a play area already or one that is no location. */
+export function takeControlOfLocation(state: ScenarioState, instruction: Verb<"TakeControlOfLocation">, focus: Focus, ctx: ReduceContext): ScenarioState {
+  const id = refCard(state, instruction.card ?? "subject", frameScope(state, focus.seat, focus.sourceId));
+  const card = id ? state.cards[id] : undefined;
+  if (!id || !card || card.zone === "play" || !isLocation(state, id, ctx)) return state;
+  const seat = state.firstPlayer;
+  const moved = updateCard(moveCard(state, id, { zone: "play", seat }), id, { face: "up", exhausted: false, progress: 0 });
+  return noted(moved, id, seat);
+}
+
+/** The control of the location is lost: no progress, in the staging area, nobody controls it, and `controlLost` is announced for the seat that held it. */
+function lose(state: ScenarioState, id: string, seat: number): ScenarioState {
+  const card = state.cards[id];
+  if (!card) return noted(state, id, null);
+  const staged = card.zone === "staging" ? state : moveCard(state, id, { zone: "staging" });
+  const cleared = updateCard(staged, id, { progress: 0, controller: null });
+  return queueEvent(noted(cleared, id, null), { trigger: "controlLost", seat, subject: id });
+}
+
+/** LoseControlOfLocation: the named location, if a player controls it, goes to the staging area as a loss of control says. */
+export function loseControlOfLocation(state: ScenarioState, instruction: Verb<"LoseControlOfLocation">, focus: Focus): ScenarioState {
+  const id = refCard(state, instruction.card ?? "picked", frameScope(state, focus.seat, focus.sourceId));
+  const seat = id ? controllerOf(state, id) : null;
+  const card = id ? state.cards[id] : undefined;
+  return id && seat != null && card?.zone === "play" ? lose(state, id, seat) : state;
+}
+
+/** The settle sweep: a location with a noted controller that lies in no play area has been lost. A location that was explored while controlled (progress full: it went to the discard pile or the victory display of a living player) is taken again at once, with no loss
+ * (06091:B:2 hears it too, and finds it in play). A location in the discard pile of an eliminated player (core clearEliminated) or anywhere else is lost. Inert unless the game has a record that takes control. */
+export function controlSweep(state: ScenarioState, ctx: ReduceContext, _steps: EngineStep[]): ScenarioState {
+  if (state.modifiers.length === 0 || !gameReads(state, ctx, '"TakeControlOfLocation"')) return state;
+  let next = state;
+  for (const modifier of state.modifiers) {
+    if (modifier.stat !== CONTROLLED_BY) continue;
+    const id = modifier.instanceId;
+    const seat = modifier.amount - 1;
+    const card = next.cards[id];
+    if (!card || (card.zone === "play" && card.controller === seat)) continue;
+    const living = next.seats[seat]?.eliminated !== true;
+    const explored = living && (card.zone === "encounterDiscard" || card.zone === "victory");
+    next = explored ? noted(updateCard(moveCard(next, id, { zone: "play", seat }), id, { face: "up", exhausted: false, progress: 0 }), id, seat) : lose(next, id, seat);
+  }
+  return next;
+}
+
+/** The locations a player controls are places the players may travel to (Caleb, FFG: "the rules for the scenario do allow it"; the control is lost as the location leaves the play area). */
+export function controlledTravelReach(state: ScenarioState, ctx: ReduceContext): readonly string[] {
+  return state.modifiers.length === 0 || !gameReads(state, ctx, '"TakeControlOfLocation"') ? [] : controlledLocations(state);
+}
+
+/** Ruined Tower (06103). */
+export const TOWER = "06103";
+
+/** Ruined Tower may be traveled to as a second active location: exactly 1 active location is there and the second slot is free ("If there is 1 active location, exhaust a character to travel here. (There are now 2 active locations.)", 06103:A:1, faq.two-active-locations). */
+export function towerSecond(state: ScenarioState, locationId: string): boolean {
+  return state.cards[locationId]?.code === TOWER && state.activeLocation != null && state.secondActiveLocation == null;
+}

@@ -162,6 +162,9 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     // An enemy in the staging area that is considered engaged with one of those players is engaged with him too (the Watcher, the Balrog, Bolg at stage 5: rr.engaged); only a filter that names the engaged player reads it (after the staging area a `staging` filter lists, so none is listed twice).
     if (spec.engaged != null && !spec.stagingOnly) raw.push(...state.staging.filter((id) => !raw.includes(id) && consideredEngagedSeats(state, id, engagedSeats).length > 0));
     if (spec.inStormcallerArea) raw.push(...Object.values(state.cards).filter((card) => card.zone === "stormcallerArea").map((card) => card.id));
+  } else if (spec.type === "location" && spec.controlled) {
+    // The locations a player controls lie in his play area, not in the staging area and not as the active location (families/pelargir/location-control.ts).
+    for (const index of seats) raw.push(...(state.seats[index]?.play ?? []).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location"));
   } else if (spec.type === "location") {
     if (!spec.active) raw.push(...stagingFor(state, spec, asking).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location"));
     if (!spec.stagingOnly) raw.push(...activeFor(state, asking, spec.stagingArea === "any"));
