@@ -11,6 +11,7 @@ import { deckTopFaceUp } from "../../rules/player/deck-play.ts";
 import { clashesOf } from "./clash.ts";
 import { stampVillagers } from "./villager-steps.ts";
 import { stampControl } from "../readouts/against-the-shadow/osgiliath-steps.ts";
+import { stampHidden, typeIn } from "../readouts/against-the-shadow/blood-steps.ts";
 import { stampCounted } from "./counted.ts";
 import { finishedRoundSteps } from "./outcome.ts";
 import { peekSeat } from "./peek.ts";
@@ -111,7 +112,7 @@ export function keepIntent(kept: Kept, before: ScenarioState, after: ScenarioSta
  */
 export function nextRoundSteps(previous: readonly EngineStep[], before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], ctx?: ReduceContext): readonly EngineStep[] {
   if (steps.length === 0) return previous;
-  const kept = stampControl(stampVillagers(stampCounted(steps, before, ctx), before, after), before, after);
+  const kept = stampHidden(stampControl(stampVillagers(stampCounted(steps, before, ctx), before, after), before, after), before, after, ctx ? typeIn(after, ctx.cards) : undefined);
   return after.round !== before.round ? [...kept] : [...previous, ...kept];
 }
 

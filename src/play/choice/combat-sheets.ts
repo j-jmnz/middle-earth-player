@@ -10,6 +10,7 @@ import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, 
 
 import { undefendedVillagersLine } from "../readouts/against-the-shadow/amon-din.ts";
 import { undefendedLocationsLine } from "../readouts/against-the-shadow/osgiliath.ts";
+import { bloodAttackLine } from "../readouts/against-the-shadow/blood.ts";
 import { undefendedRedirectWords } from "../readouts/against-the-shadow/cair-andros.ts";
 import { alliesArchery, willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
 import { ALLIES_ARCHERY_WORDS, willpowerAttackWords } from "../words/scenarios/against-the-shadow/druadan.ts";
@@ -102,7 +103,8 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
   // While stage 1B of The Siege of Cair Andros is current the damage of an undefended attack goes to a Battleground location, not a hero (05072:B:2).
   // While stage 2B of Encounter at Amon Dîn is current it discards villager tokens from Rescued Villagers instead (06067:B:1).
   // In Assault on Osgiliath a hero still takes it, and the controlled unique locations of the defending player return to the staging area (06096:A:2).
-  const redirect = numbers ? (undefendedRedirectWords(game, ctx, numbers.attack) ?? undefendedVillagersLine(game) ?? undefendedLocationsLine(game, ctx)) : null;
+  // In The Blood of Gondor Brutal Uruk's attack says what a destroyed character costs its controller: his hidden cards turn faceup (06121:A:1).
+  const redirect = numbers ? (undefendedRedirectWords(game, ctx, numbers.attack) ?? undefendedVillagersLine(game) ?? undefendedLocationsLine(game, ctx) ?? bloodAttackLine(game)) : null;
   const undefended = undefendedSheet(game, ctx, names, title, note, redirect);
   // Leave undefended with one hero to take it: the armed line says when that hero falls and the game with it.
   const lone = "kind" in undefended ? null : undefended.type === "Undefended" ? undefended.heroId : null;

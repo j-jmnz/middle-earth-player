@@ -80,7 +80,7 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
     // Whether a card prints PASS, for the locate test's lines (dwd.locate-test); whether a stage flips at the staging step (Flight from Moria) or at the beginning of the quest phase (Mount Gundabad).
     const passes = (cardId: string) => printedOf(ctx.cards, codeOf(cardId)).keywords.pass === true;
     const atStaging = (cardId: string) => flipsAtStaging(ctx, codeOf(cardId));
-    const set = { card: names.card, questStat: (state: ScenarioState) => questStatNow(state, ctx), passes, shadow, stage, revealed, stageName: stageNamed, mustBypass, atStaging, fate, forestAdvance };
+    const set = { card: names.card, typeOf: (cardId: string) => printedOf(ctx.cards, codeOf(cardId)).type, questStat: (state: ScenarioState) => questStatNow(state, ctx), passes, shadow, stage, revealed, stageName: stageNamed, mustBypass, atStaging, fate, forestAdvance };
     // After an undo the game is the state before the intent taken back, and `left` the state it had made.
     if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card, shown.after, playInto), momentOf(shown.after, shown.left, shown.steps, set));
     return momentOf(shown.before, shown.after, shown.steps, set);

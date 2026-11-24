@@ -34,6 +34,7 @@ import { burgleBranchWords } from "./scenarios/the-hobbit/burgle.ts";
 import { activePickWords, attachEnemyWords } from "./active.ts";
 import { claimedEffectWords } from "./objective.ts";
 import { objectiveTokensWords } from "./scenarios/assault.ts";
+import { seatChoiceRow } from "./scenarios/against-the-shadow/blood-choice.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -71,7 +72,7 @@ function readyPaymentWords(choose: ChooseInstruction, option: ChooseInstruction[
 
 /** A branch of a Choose instruction in words: "Remove 2 progress from the quest", "Remove 2 heroes you control from the quest". */
 export function branchWords(choose: ChooseInstruction, optionId: string, game: ScenarioState, names: ChoiceNames, sourceId: string | null, now?: BranchNow, ctx?: ReduceContext): string {
-  const command = commandBranchWords(choose, optionId, now?.x);
+  const command = commandBranchWords(choose, optionId, now?.x) ?? seatChoiceRow(choose, optionId, game);
   if (command) return command;
   const option = choose.options.find((entry) => entry.id === optionId);
   if (!option) return capital(optionId);

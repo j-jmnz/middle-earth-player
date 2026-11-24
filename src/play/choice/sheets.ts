@@ -15,6 +15,7 @@ import { topFrame } from "../../rules/windows/windows.ts";
 import { asksPlayers } from "../../rules/setup/resolution.ts";
 
 import { askWords } from "../words/ask.ts";
+import { seatChoiceNote } from "../words/scenarios/against-the-shadow/blood-choice.ts";
 import { askAt, asksChoose, asksChooseX, asksOption, isXChoice, type AskedWords } from "../words/asks.ts";
 import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../words/choice.ts";
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/scenarios/island.ts";
@@ -284,7 +285,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         const askerId = xAsk?.effectId ?? written.at?.id;
         const asker = askerId ? effectById(ctx, askerId) : undefined;
         const chosen = asksChoose(written);
-        const ask = chosen?.note ?? torch?.note ?? xAsk?.note ?? smaugChooseNote(choose, game, ctx, words, window.seat) ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? burgleChooseNote(choose, game, ctx, words, window.seat) ?? "Choose one.";
+        const ask = chosen?.note ?? torch?.note ?? xAsk?.note ?? smaugChooseNote(choose, game, ctx, words, window.seat) ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? burgleChooseNote(choose, game, ctx, words, window.seat) ?? seatChoiceNote(choose, game, source ? names.card(source) : null) ?? "Choose one.";
         return {
           ...base,
           note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, chosen?.bare ? null : lineOf(asker ?? effect, names)].filter((part) => part != null).join(" "),

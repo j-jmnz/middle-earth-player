@@ -6,6 +6,7 @@
 import type { Instruction, ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
 import { memoOf, type StateMemo } from "../../rules/interpret/constant-records.ts";
 import { captivesUnder } from "../../rules/families/captives/values.ts";
+import { alliesUnder } from "../readouts/against-the-shadow/blood.ts";
 import { aflameTally, burnTally } from "../../rules/families/aflame/values.ts";
 import { cellOf, islandOf } from "../../rules/families/island/map.ts";
 
@@ -376,6 +377,9 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
   const hidden = hiddenMark(game, cardId);
   if (kept && hidden) return { text: `${kept.text} · ${hidden.text}`, loses: false, speech: `${kept.speech}. ${hidden.speech}`, count: kept.count + hidden.count };
   if (kept ?? hidden) return kept ?? hidden;
+  // The objective allies of The Blood of Gondor lie under Captured!, in play and controlled by nobody: "2 held".
+  const allies = alliesUnder(game, cardId);
+  if (allies.length > 0) return heldWords(allies.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const captives = captivesUnder(game, cardId);
   if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);

@@ -29,6 +29,8 @@ import { progressAttack, willpowerAttack } from "../readouts/against-the-shadow/
 import { controlChanges, changeWords } from "../readouts/against-the-shadow/osgiliath.ts";
 import { deadVillagers, heldBeat, onVillagers, villagerLines } from "../readouts/against-the-shadow/amon-din.ts";
 import { stackTakes, underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
+import { hiddenChanges, hiddenLines } from "../readouts/against-the-shadow/blood-steps.ts";
+import { HIDDEN_TITLE } from "../words/scenarios/against-the-shadow/blood.ts";
 import { NO_HERO_DAMAGE, VILLAGERS_TITLE } from "../words/scenarios/against-the-shadow/amon-din.ts";
 import { releasedWords, UNDERWORLD_TITLE } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 
@@ -48,7 +50,7 @@ export const BEAT_MS = 650;
 // `revealed` gives the printed When Revealed lines of a card (the Stormcaller's stage the C side of which was just revealed), or null.
 const SIDE_QUEST_TITLE = "End of the planning phase";
 
-type Names = { card: (cardId: string) => string; questStat?: (before: ScenarioState) => "willpower" | "attack" | "defense"; passes?: (cardId: string) => boolean; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; atStaging?: (cardId: string) => boolean; fate?: FateNames; forestAdvance?: (before: ScenarioState, after: ScenarioState, stageId: string) => string | null };
+type Names = { card: (cardId: string) => string; typeOf?: (cardId: string) => string | null; questStat?: (before: ScenarioState) => "willpower" | "attack" | "defense"; passes?: (cardId: string) => boolean; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; atStaging?: (cardId: string) => boolean; fate?: FateNames; forestAdvance?: (before: ScenarioState, after: ScenarioState, stageId: string) => string | null };
 
 // "stage 3 of 4" for the Stormcaller's stage `cardId` (the area's current stage once it has advanced), or "its next stage" for a state that moved on.
 function stormcallerStageWords(state: ScenarioState, cardId: string): string {
@@ -346,6 +348,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   // The locations a player took control of or lost in this intent (Assault on Osgiliath): the location is moved by the engine without a step.
   const control = controlChanges(before, after).map((change) => changeWords(change, after.seatCount, names.card(change.id)));
   if (control.length > 0) groups.push({ rank: 8, title: "", tone: "plain", lines: control.map((text) => ({ text, mark: null })), firm: true });
+  // The hidden cards of The Blood of Gondor taken or turned in this intent: a count and a name only once a card is faceup, never a facedown card.
+  const hidden = hiddenChanges(before, after, steps, after.questStage != null && after.cards[after.questStage]?.code === "06118", names.typeOf);
+  if (hidden) groups.push({ rank: 8, title: HIDDEN_TITLE, tone: "plain", lines: hiddenLines(hidden, names.card).map((text) => ({ text, mark: null })), firm: true });
   const held = heldBeat(before, after);
   if (held) groups.push({ rank: 8, title: held.title, tone: "plain", lines: held.lines.map((text) => ({ text, mark: null })) });
 

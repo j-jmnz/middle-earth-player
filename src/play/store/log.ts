@@ -4,6 +4,7 @@ import { plural } from "../words/list.ts";
 import { countedOf } from "./counted.ts";
 import { villagersOf } from "./villager-steps.ts";
 import { controlOf } from "../readouts/against-the-shadow/osgiliath-steps.ts";
+import { hiddenLines, hiddenOf } from "../readouts/against-the-shadow/blood-steps.ts";
 import { changeWords } from "../readouts/against-the-shadow/osgiliath.ts";
 import { changedWords } from "../words/scenarios/against-the-shadow/amon-din.ts";
 import { barredWords } from "../words/scenarios/against-the-shadow/osgiliath.ts";
@@ -182,6 +183,9 @@ export function logLines(steps: readonly EngineStep[], names: LogNames): LogLine
     villagersOf(step).forEach((change, at) => lines.push({ key: `${index}-v${at}`, text: changedWords(names.card(change.id), change.was, change.now), cause: null, mark: "resource" }));
     // The control of Osgiliath locations taken or lost in the intent this step ended (Assault on Osgiliath): no engine step tells it (readouts/against-the-shadow/osgiliath-steps.ts).
     controlOf(step)?.changes.forEach((change, at) => lines.push({ key: `${index}-c${at}`, text: changeWords(change, controlOf(step)?.seatCount ?? 1, names.card(change.id)), cause: null, mark: null }));
+    // The hidden cards of The Blood of Gondor taken, turned or discarded and the allies placed under Captured! in the intent this step ended (readouts/against-the-shadow/blood-steps.ts).
+    const hidden = hiddenOf(step);
+    if (hidden) hiddenLines(hidden, names.card).forEach((text, at) => lines.push({ key: `${index}-h${at}`, text, cause: null, mark: null }));
   });
   return lines;
 }

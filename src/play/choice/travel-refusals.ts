@@ -10,6 +10,8 @@ import { islandMayTravel } from "../../rules/families/island/travel.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { questSeat } from "../store/selectors.ts";
 import { grantedTravelWords } from "../words/scenarios/grapple.ts";
+import { noHiddenSupply } from "../words/scenarios/against-the-shadow/blood.ts";
+import { travelShort } from "../readouts/against-the-shadow/blood.ts";
 import { cardLabel } from "./sheet-parts.ts";
 import type { SheetNames, Unavailable } from "./sheet-types.ts";
 
@@ -25,8 +27,11 @@ export function travelRefusals(whole: ScenarioState, ctx: ReduceContext, names: 
   return game.staging.flatMap((id): Unavailable[] => {
     const card = game.cards[id];
     if (!card || targets.includes(id) || !isLocationCard(printedOf(ctx.cards, card.code))) return [];
-    const reason = rejectionReason(game, { type: "Travel", locationId: id }, ctx);
-    if (!reason) return [];
+    const refused = rejectionReason(game, { type: "Travel", locationId: id }, ctx);
+    if (!refused) return [];
+    // The Blood of Gondor: a Travel cost of hidden cards with too few cards left to take says so (readouts/against-the-shadow/blood.ts).
+    const short = travelShort(game, ctx, id);
+    const reason = short != null ? noHiddenSupply(short) : refused;
     const travel = recordsOfFace(card, effectsOf(ctx, card.code)).find((effect) => effect.timing === "travel");
     const lineId = travel?.lines[0];
     const line = (lineId ? names.line(lineId) : null) ?? grantedTravelWords(game, id);
