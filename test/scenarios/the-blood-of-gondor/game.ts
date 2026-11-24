@@ -146,7 +146,7 @@ export type BloodGolden = { name: string; seatCount: 1 | 2; seed: number; diffic
 // - solo win (seed 13): the whole scenario in one game: hidden cards taken in the quest phase, by the combat choice, by a Travel cost and by a Shadow line, the combat choice's turn (an enemy engages and attacks in the same phase, a
 //   location or treachery is discarded), Faramir's and Lord Alcaron's Actions, Captured! with the allies held under it, the turn at 5 hidden cards, The Cross-roads (Siege) and Conflict at the Crossroads, the win;
 // - two-handed win (seed 10): the same moments for two players, the first-player token passing and with it the control of Faramir and Lord Alcaron, each Action used by the controller only;
-// - Easy two-handed win (seed 29): the Easy deal (no Mordor Looms, no Conflict at the Crossroads, ...);
+// - Easy two-handed win (seed 29): the Easy deal (3 Mordor Looms, no Conflict at the Crossroads, ...);
 // - solo loss, Faramir leaves play (seed 5);
 // - two-handed loss, Lord Alcaron leaves play (seed 2, weak heroes);
 // - solo loss, every hero destroyed (seed 2, brittle heroes);

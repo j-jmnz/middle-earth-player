@@ -10,12 +10,12 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "06117:forced:2 @0.0 Choose": {
     owned: true,
     bind: { held: { hidden: "own" } },
-    note: "Beginning of combat, The Ambush: turn your hidden cards faceup, or take 1 more. Hidden cards you hold: {held}. Turning engages each enemy among them whatever its engagement cost and discards any other card. Taking adds the top card of the encounter deck, facedown and unseen.",
+    note: "Beginning of combat, The Ambush: turn your hidden cards faceup, or take 1 more. Hidden cards you hold: {held}. Turning engages each enemy among them whatever its engagement cost, and it attacks this phase; any other card is discarded. Turning cannot be undone. Taking adds the top card of the encounter deck, facedown and unseen.",
   },
   "06117:forced:2 @0.0 turn": {
     label: [
-      { when: MANY, text: "Turn your {held} hidden cards faceup: each enemy among them engages you and attacks this phase; any other card is discarded. This cannot be undone." },
-      { when: HELD, text: "Turn your hidden card faceup: if it is an enemy, it engages you and attacks this phase; any other card is discarded. This cannot be undone." },
+      { when: MANY, text: "Turn your {held} hidden cards faceup: each enemy engages you and attacks; any other card is discarded" },
+      { when: HELD, text: "Turn your hidden card faceup: an enemy engages you and attacks; any other card is discarded" },
       { text: "Turn nothing: you hold no hidden card" },
     ],
     bind: { held: { hidden: "own" } },

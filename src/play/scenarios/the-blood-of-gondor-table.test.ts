@@ -282,8 +282,8 @@ describe("the choice at the beginning of the combat phase (06117:B:2)", () => {
     const held = takes(made, takes(made, made.state, 1, 1), 0, 0);
     const at = drive(made, opened(made, held), (state) => state.window?.kind === "choose");
     const sheet = sheetFor(at.state, made.ctx, legalIntents(at.state, made.ctx), namesOf(made, at.state)) as PickSheet;
-    expect(sheet.note).toContain("Player 2: Beginning of combat, The Ambush: turn your hidden cards faceup, or take 1 more. Hidden cards you hold: 1. Turning engages each enemy among them whatever its engagement cost and discards any other card. Taking adds the top card of the encounter deck, facedown and unseen.");
-    expect(sheet.options.map((option) => option.label)).toEqual(["Turn your hidden card faceup: if it is an enemy, it engages you and attacks this phase; any other card is discarded. This cannot be undone.", "Take 1 hidden card: the top card of the encounter deck lies facedown in your play area, unseen"]);
+    expect(sheet.note).toContain("Player 2: Beginning of combat, The Ambush: turn your hidden cards faceup, or take 1 more. Hidden cards you hold: 1. Turning engages each enemy among them whatever its engagement cost, and it attacks this phase; any other card is discarded. Turning cannot be undone. Taking adds the top card of the encounter deck, facedown and unseen.");
+    expect(sheet.options.map((option) => option.label)).toEqual(["Turn your hidden card faceup: an enemy engages you and attacks; any other card is discarded", "Take 1 hidden card: the top card of the encounter deck lies facedown in your play area, unseen"]);
   });
 
   it("a player with none turns nothing, and the banner and the log tell the cards turned, each with its type and where it went", () => {
