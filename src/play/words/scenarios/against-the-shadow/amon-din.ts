@@ -38,9 +38,23 @@ export const protectWords = "An undefended attack discards 1 villager token from
 export const endWords = (rescued: number, dead: number): string =>
   `At the end of the game: ${rescued > dead ? "the players win" : "the players lose"} if nothing changes (${villagerTokens(rescued)} on Rescued Villagers, ${plural(dead, "damage token")} on Dead Villagers; a tie loses).`;
 
-/** The stage is defeated while Ghulat is in play: the game goes on (06067:B:2, 06071:A:3). */
-export const heldWords = (rescued: number, dead: number, alcaronGone: boolean): string =>
-  `This stage is defeated, but the game cannot end while Ghulat is in play. It goes on until he leaves play. Then ${alcaronGone ? "the players lose: Lord Alcaron left play" : rescued > dead ? `the players win: ${villagerTokens(rescued)} on Rescued Villagers against ${plural(dead, "damage token")} on Dead Villagers` : `the players lose: ${villagerTokens(rescued)} on Rescued Villagers against ${plural(dead, "damage token")} on Dead Villagers, and a tie loses`}.`;
+/** The held end, led by the action: the stage is defeated while Ghulat is in play, so the game cannot end until he leaves play (06067:B:2, 06071:A:3). No period: the stage's lines are joined with ". "; `heldWords` ends it for a banner. */
+export const heldLine = (rescued: number, dead: number, alcaronGone: boolean): string => {
+  const action = "Destroy Ghulat to end the game: it cannot end while he is in play.";
+  if (alcaronGone) return `${action} When he leaves play the players lose: Lord Alcaron left play`;
+  const counts = `${villagerTokens(rescued)} on Rescued Villagers against ${plural(dead, "damage token")} on Dead Villagers`;
+  const verdict = rescued > dead ? `the players win: ${counts}` : `the players lose: ${counts}, and a tie loses`;
+  return `${action} Explore locations with villager tokens first to raise Rescued Villagers. When he leaves play ${verdict}`;
+};
+export const heldWords = (rescued: number, dead: number, alcaronGone: boolean): string => `${heldLine(rescued, dead, alcaronGone)}.`;
+
+/** The mark of the Rescued dial while the players are not winning: more damage tokens than villager tokens is critical, a tie (which loses) is near. */
+export const notWinningWords = (rescued: number, dead: number): string => `Not winning: ${villagerTokens(rescued)} against ${plural(dead, "damage token")}. A tie loses.`;
+
+/** The top-bar dial of Ghulat while the end is held: his hit points left. */
+export const ghulatDialName = "Hit points left on Ghulat:";
+export const ghulatDialWords = (left: number): string => `Ghulat has ${plural(left, "hit point")} left. The game cannot end while he is in play: destroy him to end it.`;
+export const ghulatHeldWords = "Held: the game ends when Ghulat leaves play";
 
 /** Lord Alcaron left play while Ghulat is in play: the loss waits for Ghulat (06070:A:3, 06071:A:3). */
 export const alcaronLeftWords = "Lord Alcaron left play. The players lose once Ghulat leaves play, because the game cannot end while he is in play.";

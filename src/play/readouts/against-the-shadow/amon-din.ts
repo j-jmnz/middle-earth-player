@@ -6,10 +6,11 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 import { inPlay, flagged, type CardInstance, type ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
+import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { placeQuestProgress } from "../../../rules/quest/quest.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
-import { alcaronLeftWords, alcaronWords, questDialName, questDialWords, changedWords, deadChangedWords, deadDialName, deadDialWords, deadWords, endWords, ghulatWords, heldTitle, heldWords, movesWords, protectWords, rescuedDialName, rescuedDialWords, rescuedWords, savageryWords, undefendedVillagersResult, undefendedVillagersWords, villagerTokens, winWords } from "../../words/scenarios/against-the-shadow/amon-din.ts";
+import { alcaronLeftWords, alcaronWords, questDialName, questDialWords, changedWords, deadChangedWords, deadDialName, deadDialWords, deadWords, endWords, ghulatWords, ghulatDialName, ghulatDialWords, ghulatHeldWords, heldLine, heldTitle, heldWords, movesWords, notWinningWords, protectWords, rescuedDialName, rescuedDialWords, rescuedWords, savageryWords, undefendedVillagersResult, undefendedVillagersWords, villagerTokens, winWords } from "../../words/scenarios/against-the-shadow/amon-din.ts";
 import { ownerWords } from "../../words/owner.ts";
 import type { TableDial } from "../dials.ts";
 
@@ -50,7 +51,7 @@ export function villagersValue(game: ScenarioState, ctx: ReduceContext, cardId: 
 }
 
 /** The two dials that decide the game: the villager tokens on Rescued Villagers and the damage tokens on Dead Villagers (a tap shows each card). Empty in any other scenario and before the two objectives are in play. */
-export function amonDinDials(game: ScenarioState): readonly TableDial[] {
+export function amonDinDials(game: ScenarioState, ctx: ReduceContext): readonly TableDial[] {
   const rescued = cardWith(game, RESCUED);
   const dead = cardWith(game, DEAD);
   if (!live(game) || !rescued || !dead) return [];
@@ -58,12 +59,25 @@ export function amonDinDials(game: ScenarioState): readonly TableDial[] {
   const stage = game.questStage ? game.cards[game.questStage] : undefined;
   // Stage 1B has no quest points: the villager tokens left on its card are what the progress uses up (06066:B:2).
   const quest: TableDial[] = stage?.code === STAGE_ONE ? [{ id: "quest-villagers", testID: "din-quest", label: "Stage", name: questDialName, value: stage.resources, cardId: stage.id, note: questDialWords(stage.resources) }] : [];
+  // Not more villager tokens than damage tokens (a tie loses) is not winning: the dial says so once either count is above 0.
+  const behind = saved <= lost && saved + lost > 0 ? { warn: { level: lost > saved ? ("critical" as const) : ("near" as const), words: notWinningWords(saved, lost) } } : {};
+  // The end is held while stage 2B is defeated and Ghulat is in play: his hit points left are what the players have to use up.
+  const ghulat = amonDinHeld(game) ? cardWith(game, GHULAT) : undefined;
+  const left = ghulat ? Math.max(0, modifiedStat(game, ghulat, "hitPoints", ctx.cards) - ghulat.damage) : 0;
+  const held: TableDial[] = ghulat ? [{ id: "ghulat", testID: "din-ghulat", label: "Ghulat", name: ghulatDialName, value: left, cardId: ghulat.id, warn: { level: "near", words: ghulatHeldWords }, note: ghulatDialWords(left) }] : [];
   return [
     ...quest,
-    { id: "rescued", testID: "din-rescued", label: "Rescued", name: rescuedDialName, value: saved, cardId: rescued.id, note: rescuedDialWords(saved, lost) },
+    { id: "rescued", testID: "din-rescued", label: "Rescued", name: rescuedDialName, value: saved, cardId: rescued.id, note: rescuedDialWords(saved, lost), ...behind },
     { id: "dead", testID: "din-dead", label: "Dead", name: deadDialName, value: lost, icon: "damage", cardId: dead.id, note: deadDialWords(lost, saved) },
+    ...held,
   ];
 }
+
+/** Whether stage 2B is defeated while Ghulat is in play: the end of the game is held until he leaves play (06067:B:2, 06071:A:3). False in any other scenario. */
+export const amonDinHeld = (game: ScenarioState, code?: string): boolean => {
+  const stage = game.questStage ? game.cards[game.questStage] : undefined;
+  return live(game) && stage?.code === STAGE_TWO && (code == null || code === STAGE_TWO) && tableHolds(game, "gameEnding") && ghulatIn(game);
+};
 
 /** Stage 1's "To win" line, naming Rescued Villagers where the printed line says "here" (06068:A:2): null on any other stage and in any other scenario, where the printed objective line is used. */
 export function amonDinWin(game: ScenarioState): string | null {
@@ -78,9 +92,9 @@ export function amonDinStageLines(game: ScenarioState, code: string): string[] {
   if (code === STAGE_ONE) return [savageryWords()];
   if (code !== STAGE_TWO) return [];
   const { rescued, dead } = counts(game);
-  const ending = tableHolds(game, "gameEnding");
   const left = tableHolds(game, "endingLost") && ghulatIn(game);
-  if (ending && ghulatIn(game)) return [protectWords, heldWords(rescued, dead, left)];
+  // The held end leads with the action (destroy Ghulat); the undefended line is the last line of the text, so it ends the sentence.
+  if (amonDinHeld(game)) return [heldLine(rescued, dead, left), `${protectWords}.`];
   return [protectWords, left ? alcaronLeftWords : endWords(rescued, dead)];
 }
 

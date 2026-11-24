@@ -119,6 +119,17 @@ describe("the comparison that decides the game (06068:A:2, 06069:A:2)", () => {
     expect(dials[1]?.note).toBe("3 damage tokens on Dead Villagers, against 4 villager tokens on Rescued Villagers. Each villager token discarded adds 1, and none comes off. The players lose at the end of the game with as many or more damage tokens than villager tokens. A tie loses.");
   });
 
+  it("the Rescued dial warns in words when the players are not winning: critical behind, near on a tie, none ahead or at the start", () => {
+    const warn = (tokens: number, damage: number) => {
+      const here = table({ stage: protect, staging: [{ code: rescued, resources: tokens }, { code: dead, damage }] });
+      return dialsOf(here, here.state).find((dial) => dial.id === "rescued")?.warn;
+    };
+    expect(warn(2, 3)).toEqual({ level: "critical", words: "Not winning: 2 villager tokens against 3 damage tokens. A tie loses." });
+    expect(warn(3, 3)).toEqual({ level: "near", words: "Not winning: 3 villager tokens against 3 damage tokens. A tie loses." });
+    expect(warn(4, 3)).toBeUndefined();
+    expect(warn(0, 0)).toBeUndefined();
+  });
+
   it("the two objectives' previews say the win line and the loss line with the other count, and a tie loses", () => {
     expect(say(made, made.state, rescued)).toBe("At the end of the game the players win with more villager tokens here than damage tokens on Dead Villagers (3 now). A tie loses.");
     expect(say(made, made.state, dead)).toBe("Each villager token discarded puts 1 damage token here, and none comes off. At the end of the game the players lose with as many or more damage tokens here than villager tokens on Rescued Villagers (4 now). A tie loses.");
@@ -330,17 +341,36 @@ describe("Ghulat and the held end (06071:A:1, 06071:A:3, 06067:B:2)", () => {
     expect(modifiedStat(more.state, more.state.cards[idOf(more.state, ghulat)]!, "attack", more.cards)).toBe(5);
   });
 
-  it("when stage 2B is defeated with Ghulat in play the stage and the banner say the game goes on, and the result with the counts as they stand", () => {
+  // The held line leads with the action: destroy Ghulat, and explore locations with villager tokens first to raise Rescued Villagers (06067:B:2, 06071:A:3).
+  const HELD = (end: string) => `Destroy Ghulat to end the game: it cannot end while he is in play. Explore locations with villager tokens first to raise Rescued Villagers. When he leaves play ${end}`;
+  const PROTECT = "An undefended attack discards 1 villager token from Rescued Villagers for each point of damage, and no hero is damaged. Each token discarded puts 1 damage token on Dead Villagers";
+
+  it("when stage 2B is defeated with Ghulat in play the stage and the banner lead with the action, say the game goes on, and give the result with the counts as they stand", () => {
     const made = scene(3);
     const after = runSettled(made, made.state, { verb: "ProgressQuest", amount: 20 });
     expect(after.lost).toBeFalsy();
-    expect(stageLine(made, after)).toContain("This stage is defeated, but the game cannot end while Ghulat is in play. It goes on until he leaves play. Then the players win: 4 villager tokens on Rescued Villagers against 3 damage tokens on Dead Villagers.");
+    const win = HELD("the players win: 4 villager tokens on Rescued Villagers against 3 damage tokens on Dead Villagers");
+    // The preview and the advance screen: the held line first, no quest points line for a stage that is already defeated, no double period.
+    expect(stageLine(made, after)).toBe(`${win}. ${PROTECT}.`);
+    expect(advanceLine(made, after)).toBe(`${win}. ${PROTECT}.`);
     const moment = momentOf(made.state, after, [], { card: idName(made, after) });
     expect(moment?.title).toBe("The game goes on");
-    expect(moment?.lines.map((line) => line.text)).toEqual(["This stage is defeated, but the game cannot end while Ghulat is in play. It goes on until he leaves play. Then the players win: 4 villager tokens on Rescued Villagers against 3 damage tokens on Dead Villagers."]);
+    expect(moment?.lines.map((line) => line.text)).toEqual([`${win}.`]);
     // A tie loses.
     const tie = scene(4);
-    expect(stageLine(tie, runSettled(tie, tie.state, { verb: "ProgressQuest", amount: 20 }))).toContain("Then the players lose: 4 villager tokens on Rescued Villagers against 4 damage tokens on Dead Villagers, and a tie loses.");
+    expect(stageLine(tie, runSettled(tie, tie.state, { verb: "ProgressQuest", amount: 20 }))).toContain("the players lose: 4 villager tokens on Rescued Villagers against 4 damage tokens on Dead Villagers, and a tie loses. An undefended");
+  });
+
+  it("while the end is held a dial for Ghulat shows his hit points left and says the end waits for him, and none shows before or in another scenario", () => {
+    const made = scene(3);
+    expect(dialsOf(made, made.state).some((dial) => dial.id === "ghulat")).toBe(false);
+    const after = runSettled(made, made.state, { verb: "ProgressQuest", amount: 20 });
+    const dial = dialsOf(made, after).find((one) => one.id === "ghulat");
+    expect(dial).toMatchObject({ label: "Ghulat", value: 7, cardId: idOf(after, ghulat), warn: { level: "near", words: "Held: the game ends when Ghulat leaves play" } });
+    expect(dial?.note).toBe("Ghulat has 7 hit points left. The game cannot end while he is in play: destroy him to end it.");
+    const hurt = updateCard(after, idOf(after, ghulat), { damage: 5 });
+    expect(dialsOf(made, hurt).find((one) => one.id === "ghulat")?.value).toBe(2);
+    expect(dialsOf(made, { ...after, scenarioId: "the-stewards-fear" }).some((one) => one.id === "ghulat")).toBe(false);
   });
 
   it("with Lord Alcaron gone and Ghulat in play the stage and the banner say the players lose when Ghulat leaves play", () => {
@@ -357,7 +387,7 @@ describe("Ghulat and the held end (06071:A:1, 06071:A:3, 06067:B:2)", () => {
     const made = scene(0);
     const gone = runSettled(made, made.state, { verb: "Discard", target: { kind: "self" } }, idOf(made.state, alcaron));
     const done = runSettled(made, gone, { verb: "ProgressQuest", amount: 20 });
-    expect(stageLine(made, done)).toContain("Then the players lose: Lord Alcaron left play.");
+    expect(stageLine(made, done)).toContain("Destroy Ghulat to end the game: it cannot end while he is in play. When he leaves play the players lose: Lord Alcaron left play. An undefended");
   });
 
   it("no line in a game of another scenario", () => {
