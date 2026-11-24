@@ -1,4 +1,4 @@
-// The pelargir family's pieces (src/catalog/families/pelargir.ts): Alcaron's Scroll, the treachery that attaches to the hero with the highest threat cost, the discards Collateral Damage counts in two steps, and the flags those cards read: templates, samples and stat notes.
+// The pelargir family's pieces (src/catalog/families/pelargir.ts): Alcaron's Scroll, the treachery that attaches to the hero with the highest threat cost, the discards Collateral Damage counts in two steps, Into Ithilien's ally objectives committed from the staging area and the first player's taking of them, and the flags those cards read: templates, samples and stat notes.
 import { cardRef } from "../amounts.ts";
 import { amt, type Samples, type Templates } from "../family-kit.ts";
 import { str } from "../kit.ts";
@@ -21,6 +21,10 @@ export const PELARGIR_TEMPLATES: Templates = {
     text: `raise each player's threat by ${String(i.amount)} for each ${str(i.type)} card this effect discarded from the top of the encounter deck, in any of its discard steps, even one a reset of the deck put back in it`,
     read: ["type", "amount"],
   }),
+  TakeControlOfStagedObjectives: (i) => ({
+    text: `the first player takes control of each ${str(i.trait)} objective in the staging area: it comes into his play area, faceup and ready, and is no longer committed by its own text; with none there nothing happens`,
+    read: ["trait"],
+  }),
 };
 
 export const PELARGIR_SAMPLES: Samples = {
@@ -29,6 +33,7 @@ export const PELARGIR_SAMPLES: Samples = {
   AttackScrollHolder: [{ verb: "AttackScrollHolder", code: "05019" }],
   DiscardEncounterTopMore: [{ verb: "DiscardEncounterTopMore", count: 2, reset: true }],
   RaiseThreatPerDiscarded: [{ verb: "RaiseThreatPerDiscarded", type: "location", amount: 2 }],
+  TakeControlOfStagedObjectives: [{ verb: "TakeControlOfStagedObjectives", trait: "Ranger" }],
 };
 
 export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
@@ -37,5 +42,8 @@ export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
   engagedOptionally: " (marker: the player chose this enemy in the optional engagement step; set before the engagement is announced, in a game with a card that reads it)",
   noteDeckDiscards: " (held by the table: a card that goes from the top of the encounter deck to its discard pile is announced, so a card that hears \"discarded from the encounter deck\" answers it)",
   firstEnemy: " (marker: the first enemy the encounter deck revealed this round, read by the condition firstEnemy; set only in a game with a card that reads it)",
+  committedInStaging: " (an ally objective in the staging area: it counts in the quest total with the stat the quest uses, is a character committed to the quest for every effect that picks or counts one, and takes archery damage)",
+  skipsNextStage: " (held by a quest stage: once it is completed the quest goes to the stage after the next one, which is bypassed)",
+  attackForUncommitted: " (marker: the constant that gives the Attack for each character not committed to a quest holds while this flag does)",
   firstEnemyNoted: " (held by the table until the end of the round: an enemy was already marked firstEnemy this round)",
 };

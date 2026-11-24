@@ -5,7 +5,7 @@ import { legalAttackEnemies } from "../../rules/combat/combat.ts";
 import { playsOntoHost, printedOf } from "../../rules/core/printed.ts";
 import { flagged } from "../../rules/core/state.ts";
 import { questSeat } from "../store/selectors.ts";
-import { stagingThreat } from "../../rules/quest/quest.ts";
+import { questStatOf, stagingThreat } from "../../rules/quest/quest.ts";
 import type { PlayerIntent, LegalIntent, ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { legalTargets } from "../../rules/engine/reduce.ts";
 
@@ -16,6 +16,7 @@ import { playRequest, type PayRequest, type Share } from "./pay.ts";
 import { STEP_WORDS, windowPoint } from "../phases/rail.ts";
 import type { DistributePurpose, DistributeSheet, MultiSheet, PickSheet, Sheet, SheetNames, TriggerOption, TriggerSheet, WindowSheet } from "./sheet-types.ts";
 import { option, statOf, step } from "./sheet-parts.ts";
+import { questStatNow, questStatWord } from "../phases/quest-stat.ts";
 import { triggerOptions } from "./sheets.ts";
 import { currentSideQuest } from "../../rules/families/wilderland/night-quest.ts";
 
@@ -31,9 +32,9 @@ export function commitSheet(game: ScenarioState, ctx: ReduceContext, names: Shee
     key: `commit:${game.round}`,
     step: "Quest",
     title: commitTitle(game, names),
-    note: "Committed characters exhaust and add their willpower against the threat in staging.",
+    note: `Committed characters exhaust and add their ${questStatWord(questStatNow(game, ctx)).toLowerCase()} against the threat in staging.`,
     verb: "Commit",
-    options: legalTargets(game, { type: "Commit" }, ctx).map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "willpower") })),
+    options: legalTargets(game, { type: "Commit" }, ctx).map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, questStatOf(game, id, ctx.cards)) })),
     build: { kind: "Commit" },
     allowEmpty: false,
     preselected: [],

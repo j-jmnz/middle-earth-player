@@ -85,6 +85,7 @@ import * as grim from "../scenarios/over-the-misty-mountains-grim/game.ts";
 import * as day from "../scenarios/we-must-away-ere-break-of-day/game.ts";
 import * as dim from "../scenarios/dungeons-deep-and-caverns-dim/game.ts";
 import * as mountain from "../scenarios/the-lonely-mountain/game.ts";
+import * as ithilien from "../scenarios/into-ithilien/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -182,6 +183,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-lonely-mountain", "The Lonely Mountain", mountain.MOUNTAIN_GOLDENS, mountain.mountainWorld, mountain.playGolden),
   entry("the-battle-of-five-armies", "The Battle of Five Armies", armies.ARMIES_GOLDENS, armies.armiesWorld, armies.playGolden),
   entry("peril-in-pelargir", "Peril in Pelargir", pelargir.PELARGIR_GOLDENS, pelargir.pelargirWorld, pelargir.playGolden),
+  entry("into-ithilien", "Into Ithilien", ithilien.ITHILIEN_GOLDENS, ithilien.ithilienWorld, ithilien.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),

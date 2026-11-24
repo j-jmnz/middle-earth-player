@@ -1,4 +1,4 @@
-// Rules: rr.framework-steps, rr.attack-resolution-chart (data/rules/entries.json; data/rules/steps.json).
+// Rules: rr.framework-steps, rr.attack-resolution-chart, hon.battle, hon.siege (data/rules/entries.json; data/rules/steps.json).
 //
 // The turn reference behind the rail (the phase carousel, carousel.ts, lays it out): the round as the Rules Reference's framework
 // chart lays it out, phase by phase, each step with its rule title (from data/rules) and what the player decides there, the
@@ -9,6 +9,7 @@ import steps from "../../../data/rules/steps.json";
 import type { ModeName, ScenarioState } from "../../rules/core/state.ts";
 
 import { pointNote, pointTitle } from "./rail.ts";
+import type { QuestStat } from "./quest-stat.ts";
 
 export type ReferenceStep = { id: string; titles: readonly string[]; decision: string; current: boolean; windows: readonly { id: string; title: string; note: string }[] };
 export type ReferencePhase = { phase: string; steps: readonly ReferenceStep[] };
@@ -29,6 +30,17 @@ const DECISIONS: Readonly<Record<string, string>> = {
   "6.P": "Attack each engaged enemy once, with as many ready characters as you like.",
   "7.R": "Ready every card; each player's threat rises by 1; the first player token passes.",
 };
+
+// The two steps that name the quest total say the stat the stage counts instead of Willpower: Attack under Battle, Defense under Siege (hon.battle, hon.siege).
+const QUEST_STEPS: Readonly<Record<string, (stat: string) => string>> = {
+  "3.2": (stat) => `Commit characters to the quest: they exhaust and add their ${stat}.`,
+  "3.4": (stat) => `${stat[0]?.toUpperCase()}${stat.slice(1)} against staging threat: progress, or your threat rises by the difference.`,
+};
+
+function decisionOf(step: string, stat: QuestStat | undefined): string | undefined {
+  const quest = stat && stat !== "willpower" ? QUEST_STEPS[step] : undefined;
+  return quest && stat ? quest(stat) : DECISIONS[step];
+}
 
 // A step the chart draws as many boxes (the attack resolution charts) goes by one short name; its windows are listed under it.
 const NAMES: Readonly<Record<string, string>> = { "6.E": "Enemy attacks, one at a time", "6.P": "Player attacks, one enemy at a time" };
@@ -71,12 +83,12 @@ const STEP_OF: Readonly<Partial<Record<ModeName, string>>> = {
 
 type StepRow = { id: string; phase: string; entries: readonly string[] };
 
-/** The round, phase by phase, with the step the engine is in marked. `title` reads a rule span's title. */
-export function turnReference(game: ScenarioState, title: (id: string) => string | null): ReferencePhase[] {
+/** The round, phase by phase, with the step the engine is in marked. `title` reads a rule span's title; `stat` is the stat the stage counts (phases/quest-stat.ts), Willpower when absent. */
+export function turnReference(game: ScenarioState, title: (id: string) => string | null, stat?: QuestStat): ReferencePhase[] {
   const now = STEP_OF[game.mode] ?? null;
   const phases: ReferencePhase[] = [];
   for (const row of steps as readonly StepRow[]) {
-    const decision = DECISIONS[row.id];
+    const decision = decisionOf(row.id, stat);
     if (!decision) continue;
     const step: ReferenceStep = {
       id: row.id,
@@ -105,10 +117,10 @@ const ASKS: Readonly<Record<string, string>> = { "2.P": "pass", "3.2": "pass", "
  * The first-game guide's line for the moment (table-settings.ts, guide): the step's decision the first two times it comes up,
  * and what an action window is for. Null when the moment has no line. `key` counts how often it was shown.
  */
-export function guideLine(game: ScenarioState, window: boolean): { key: string; text: string } | null {
+export function guideLine(game: ScenarioState, window: boolean, stat?: QuestStat): { key: string; text: string } | null {
   if (window) return { key: "window", text: "An action window: play an event or use an Action now, or pass and the game moves on." };
   const step = stepOf(game);
-  const decision = step ? DECISIONS[step] : undefined;
+  const decision = step ? decisionOf(step, stat) : undefined;
   if (!step || !decision || game.window?.kind == null || ASKS[step] !== game.window.kind) return null;
   return { key: step, text: decision };
 }

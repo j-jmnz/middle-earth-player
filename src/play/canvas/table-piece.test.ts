@@ -22,7 +22,7 @@ const tokens: TokenImages = { resource: null, damage: null, progress: null, ques
 const clockOf = (at: number) => ({ progress: {}, epoch: {}, at, k: 1, span: 400 }) as unknown as Clock;
 const game = {} as ScenarioState;
 
-const numbersOf = (willpower: number | null): SlotNumbers => ({ effects: { stats: [], flags: [] }, willpower, questPoints: null, stageLoses: false, engagement: null, delayed: false, under: null, fire: null, loss: null, place: null, side: null, determined: null, dead: null, combat: null });
+const numbersOf = (willpower: number | null): SlotNumbers => ({ effects: { stats: [], flags: [] }, willpower, commitStat: "willpower", questPoints: null, stageLoses: false, engagement: null, delayed: false, under: null, fire: null, loss: null, place: null, side: null, determined: null, dead: null, combat: null });
 
 type Change = { highlight?: TableHighlight; liftedId?: string | null; motions?: ReadonlyMap<string, Motion>; clock?: Clock; willpowerOf?: (id: string) => number | null };
 
@@ -139,7 +139,7 @@ describe("samePiece on the Stormcaller's stage", () => {
 
 describe("sameNumbers", () => {
   it("compares the contents of the effects, the engagement and the marks", () => {
-    const badge = { stat: "attack" as const, icon: "attack" as const, word: "Attack", value: 3, delta: 1, lasting: false };
+    const badge = { stat: "attack" as const, icon: "attack" as const, word: "Attack", value: 3, delta: 1, lasting: false, floored: false };
     const a: SlotNumbers = { ...numbersOf(2), effects: { stats: [badge], flags: [] }, engagement: { cost: 30, engages: false }, under: { text: "2/5", loses: false, speech: "2 under, lose at 5" } };
     const b: SlotNumbers = { ...numbersOf(2), effects: { stats: [{ ...badge }], flags: [] }, engagement: { cost: 30, engages: false }, under: { text: "2/5", loses: false, speech: "2 under, lose at 5" } };
     expect(sameNumbers(a, b)).toBe(true);

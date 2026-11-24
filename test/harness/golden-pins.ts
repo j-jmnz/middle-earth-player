@@ -73,6 +73,13 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
   "helms-deep": [
     "two-handed, won, Normal",
   ],
+  "into-ithilien": [
+    "Easy solo win, stage 2 played",
+    "solo win, stage 2 bypassed",
+    "solo win, stage 2 played",
+    "two-handed win, stage 2 bypassed",
+    "two-handed win, stage 2 played",
+  ],
   "into-the-pit": [
     "Easy two-handed win",
     "Nightmare solo win",

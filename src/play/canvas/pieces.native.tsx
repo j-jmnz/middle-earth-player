@@ -6,7 +6,7 @@ import { Circle, DashPathEffect, FilterMode, Group, Image, Line, MipmapMode, Pat
 import type { ReactElement } from "react";
 
 import { cardCorner } from "../../ui/card-corner.ts";
-import { badgeSplit, MUST_COMMIT_WORD, type CardEffects } from "../cards/card-effects.ts";
+import { badgeSplit, chipText, MUST_COMMIT_WORD, type CardEffects } from "../cards/card-effects.ts";
 import { SPHERE_TINT, type IconName } from "../../ui/icon-map.ts";
 import { ICONS } from "../../ui/icons/generated.ts";
 import type { CardSlot, Rect } from "../layout/layout.ts";
@@ -259,6 +259,7 @@ export function Badges({
   rect,
   effects,
   willpower,
+  commitStat,
   questPoints,
   owner,
   stageLoses,
@@ -272,6 +273,7 @@ export function Badges({
   rect: Rect;
   effects: CardEffects;
   willpower: number | null;
+  commitStat: "willpower" | "attack" | "defense";
   questPoints: number | null;
   // Whose stage this is ("P2") once stages are separate between players: told on the progress strip.
   owner?: string | null;
@@ -316,7 +318,7 @@ export function Badges({
     }
     const { badge } = item;
     const up = badge.delta > 0;
-    const text = `${up ? "+" : "-"}${Math.abs(badge.delta)}`;
+    const text = chipText(badge);
     const width = 15 * s + fonts.badge.getTextWidth(text) + 5 * s;
     return (
       <Group key={`s${badge.stat}`}>
@@ -346,10 +348,10 @@ export function Badges({
   return (
     <Group>
       {rows}
-      {slot.committed && willpower != null ? (
+      {willpower != null ? (
         <Group>
           <RoundedRect x={x + w / 2 - 16 * s} y={y + h - pill - 3 * s} width={32 * s} height={pill} r={pill / 2} color={t.accent} />
-          <CanvasIcon name="willpower" x={x + w / 2 - 13 * s} y={y + h - pill - 1 * s} size={11 * s} color={t.onAccent} />
+          <CanvasIcon name={commitStat} x={x + w / 2 - 13 * s} y={y + h - pill - 1 * s} size={11 * s} color={t.onAccent} />
           <Text x={x + w / 2 + 1 * s} y={y + h - 6.5 * s} text={String(willpower)} font={fonts.badge} color={t.onAccent} />
         </Group>
       ) : null}

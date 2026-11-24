@@ -25,7 +25,9 @@ import { placedLimit } from "../../rules/families/uncharted/limit.ts";
 import { modifiedStat, printedStat } from "../../rules/core/keywords.ts";
 import { heldBy } from "../../rules/core/holder-classes.ts";
 import { isLocationCard, printedOf, type PrintedCard } from "../../rules/core/printed.ts";
-import { engagementCostOf, questPointsOf } from "../../rules/quest/quest.ts";
+import { effectById } from "../../rules/windows/listen.ts";
+import { engagementCostOf, questPointsOf, questStatOf } from "../../rules/quest/quest.ts";
+import { committedInStaging } from "../../rules/families/pelargir/committed.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import { flagged, inPlay, modifierActive, type ScenarioState } from "../../rules/core/state.ts";
 
@@ -43,7 +45,19 @@ export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "thre
 // A printed number an effect changed: its icon, the engine's value now and how far it is from the printed one. `lasting`
 // when every effect behind it ends with the phase, the round or the attack (the forest spider's +1 until the end of the
 // round), so the pill shows it will go (rr.lasting-effects).
-export type StatBadge = { stat: BadgeStat; icon: IconName; word: string; value: number; delta: number; lasting: boolean };
+// `floored`: the effects take the number past its floor of 0 (Ithilien Road's "engagement cost is 0": -99 on a 34), so the chip shows the 0 and not the difference.
+export type StatBadge = { stat: BadgeStat; icon: IconName; word: string; value: number; delta: number; lasting: boolean; floored: boolean };
+
+/** The chip's text: "+1" or "-2", or "0" for a number the effects took past its floor of 0. */
+export function chipText(badge: StatBadge): string {
+  return badge.floored ? "0" : `${badge.delta > 0 ? "+" : "-"}${Math.abs(badge.delta)}`;
+}
+
+// Whether the active modifiers lower a stat below 0 (the floor): the number a "-99" modifier prints would be a lie, so it is worded as 0.
+function overshoots(modifiers: readonly ScenarioState["modifiers"][number][], base: number): boolean {
+  const lowered = modifiers.reduce((total, modifier) => (!modifier.set && modifier.amount < 0 ? total + modifier.amount : total), 0);
+  return base + lowered < 0;
+}
 
 export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit" | "cancelsDamage" | "mustCommit" | "cannotQuest" | "noPlayerAttachments" | "bilboLimitedToGollum";
 
@@ -65,7 +79,8 @@ const STAT_ICON: Readonly<Record<BadgeStat, IconName>> = {
   engagementCost: "engagementCost",
 };
 
-const STAT_WORD: Readonly<Record<BadgeStat, string>> = {
+/** The word for each stat, as the table says it (the quest total says the one the stage counts, phases/quest-stat.ts). */
+export const STAT_WORD: Readonly<Record<BadgeStat, string>> = {
   willpower: "Willpower",
   attack: "Attack",
   defense: "Defense",
@@ -139,6 +154,12 @@ function cached<T>(memo: StateMemo<Map<string, T>>, game: ScenarioState, ctx: Re
   return built;
 }
 
+// A constant record's modifier lasts while its source is in play, but the record says what the card prints: "while it is the active location" (05028:A:1). The engine reads the record's stat only; this is the wording.
+function untilOf(ctx: ReduceContext, modifier: ScenarioState["modifiers"][number]): ModifierUntil {
+  const written = modifier.origin ? effectById(ctx, modifier.origin)?.instructions.find((entry) => entry.verb === "ModifyStat" && entry.stat === modifier.stat) : undefined;
+  return written?.verb === "ModifyStat" && written.until === "whileSourceActive" ? "whileSourceActive" : modifier.until;
+}
+
 /** The effects on one card in play now: changed numbers and "cannot"s. Empty for a card out of play or face down. */
 export function cardEffects(game: ScenarioState, ctx: ReduceContext, cardId: string): CardEffects {
   return cached(EFFECTS, game, ctx, cardId, () => effectsOnCard(game, ctx, cardId));
@@ -157,7 +178,7 @@ function effectsOnCard(game: ScenarioState, ctx: ReduceContext, cardId: string):
     if (value === base) continue;
     const behind = game.modifiers.filter((modifier) => modifier.stat === stat && heldBy(modifier, card, printed) && modifierActive(game, modifier));
     const lasting = behind.length > 0 && behind.every((modifier) => TEMPORARY.has(modifier.until));
-    stats.push({ stat, icon: STAT_ICON[stat], word: STAT_WORD[stat], value, delta: value - base, lasting });
+    stats.push({ stat, icon: STAT_ICON[stat], word: STAT_WORD[stat], value, delta: value - base, lasting, floored: value === 0 && overshoots(behind, base) });
   }
   // A card engaged with each player is engaged, so "Cannot be engaged" would contradict it: its words say it (engagedWithAllWords).
   const engagedWithAll = flagged(game, cardId, "engagedWithAll");
@@ -210,12 +231,14 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
     if (word) {
       // A conditional modifier counts only when its number shows.
       if (modifier.when && !shown.stats.some((badge) => badge.stat === modifier.stat)) continue;
-      const amount = modifier.set ? `${word} is ${modifier.amount}` : `${modifier.amount >= 0 ? "+" : ""}${modifier.amount} ${word}`;
-      lines.push(`${amount} from ${source}, ${UNTIL[modifier.until]}`);
+      // A modifier that takes the number past its floor of 0 says "is 0" ("Engagement cost is 0 from Ithilien Road"), not the -99 it is written as.
+      const floored = !modifier.set && modifier.amount < 0 && shown.stats.some((badge) => badge.stat === modifier.stat && badge.floored);
+      const amount = modifier.set ? `${word} is ${modifier.amount}` : floored ? `${word} is 0` : `${modifier.amount >= 0 ? "+" : ""}${modifier.amount} ${word}`;
+      lines.push(`${amount} from ${source}, ${UNTIL[untilOf(ctx, modifier)]}`);
       continue;
     }
     const flag = FLAGS.find((entry) => entry.flag === modifier.stat);
-    if (flag && modifier.amount > 0) lines.push(`${flagWord(flag.word, modifier.amount)}: ${source}, ${UNTIL[modifier.until]}`);
+    if (flag && modifier.amount > 0) lines.push(`${flagWord(flag.word, modifier.amount)}: ${source}, ${UNTIL[untilOf(ctx, modifier)]}`);
   }
   return lines;
 }
@@ -275,9 +298,13 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
   const questing = card != null && (stagedSideQuest(game, ctx, cardId) || card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || areaRoleOf(game, cardId) === "stage");
   const enemy = card != null && card.zone === "staging" && card.face !== "down" && printedOf(ctx.cards, card.code).type === "enemy";
   const cost = enemy ? engagementCostOf(game, card, ctx.cards) : null;
+  // A character committed to the quest, or an ally objective committed by its own text in the staging area (05025:A:1), shows the stat the quest counts (hon.battle, hon.siege).
+  const committed = card != null && (card.committed || committedInStaging(game, cardId));
+  const commitStat = committed ? questStatOf(game, cardId, ctx.cards) : "willpower";
   return {
     effects,
-    willpower: card?.committed ? modifiedStat(game, card, "willpower", ctx.cards) : null,
+    willpower: card != null && committed ? modifiedStat(game, card, commitStat, ctx.cards) : null,
+    commitStat,
     // A stage that progress never defeats has no strip (objective.ts): "25 / 0" would read as a stage that should be won.
     questPoints: questing ? (card.zone === "questStage" ? stagePoints(game, card, ctx) : questPointsOf(game, card, ctx.cards)) : null,
     stageLoses: card != null && card.zone === "questStage" && stageDefeatLoses(ctx, card.code),
@@ -370,7 +397,9 @@ function fireMark(tally: { value: number; damage: number } | null): FireMark | n
 
 export type SlotNumbers = {
   effects: CardEffects;
+  // The committed number, and the stat it is (Willpower unless the quest has Battle or Siege): its pill's icon.
   willpower: number | null;
+  commitStat: "willpower" | "attack" | "defense";
   questPoints: number | null;
   // The current stage's defeat loses the game (The Wall is Breached!, 143075:B:3): its strip says so in threat red.
   stageLoses: boolean;

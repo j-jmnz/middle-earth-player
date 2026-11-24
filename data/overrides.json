@@ -1187,6 +1187,44 @@
     },
     {
       "match": {
+        "code": "05025"
+      },
+      "set": {
+        "willpower": 2,
+        "attack": 2,
+        "defense": 2,
+        "health": 3
+      },
+      "reason": "Hall of Beorn has no stat fields for an ally objective, so Celador has none. The scan prints Willpower 2, Attack 2, Defense 2 and 3 hit points; an ally objective fights while committed (ats.ally-objectives), so the engine needs them.",
+      "source": "scan 05025.A (data/printed/against-the-shadow.json)"
+    },
+    {
+      "match": {
+        "code": "05026"
+      },
+      "set": {
+        "willpower": 2,
+        "attack": 2,
+        "defense": 1,
+        "health": 2
+      },
+      "reason": "Hall of Beorn has no stat fields for an ally objective, so Ithilien Guardian has none. The scan prints Willpower 2, Attack 2, Defense 1 and 2 hit points; an ally objective fights while committed (ats.ally-objectives), so the engine needs them.",
+      "source": "scan 05026.A (data/printed/against-the-shadow.json)"
+    },
+    {
+      "match": {
+        "code": "05047"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "Secluded Glade prints \"Immune to player card effects.\" as its first line; Hall of Beorn lists it as text only, so the engine would read no immunity.",
+      "source": "scan 05047.A (data/printed/against-the-shadow.json)"
+    },
+    {
+      "match": {
         "code": "145067"
       },
       "set": {

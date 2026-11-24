@@ -11,6 +11,7 @@ import { tickSent } from "../../ui/haptics.ts";
 import { refusedFeedback } from "../../ui/sound/feedback.ts";
 import { playSound, playUndo } from "../../ui/sound/sound.ts";
 import { pointTitle } from "../phases/rail.ts";
+import { questStatNow } from "../phases/quest-stat.ts";
 import { isFreeResponse, nextStopTitle, passableWindow } from "../phases/stops.ts";
 import { useAutoAnswer, useBanner, useGuide, useSettle } from "./table-hooks.ts";
 import { tableSettings, toggleAlways } from "../../ui/table-settings.ts";
@@ -193,7 +194,7 @@ export function useTableChoice({
   const baseHeader = limit ? { ...noted, note: [noted.note, limit.note].filter(Boolean).join(" ") } : noted;
   // While stops are on, the eyebrow says so first (a long eyebrow is cut at its end): the table passes some windows.
   const header = settings.stopsOn ? { ...baseHeader, step: `Stops on, ${baseHeader.step}` } : baseHeader;
-  const guide = useGuide(settings, game, sheet, legal, live != null, header.note);
+  const guide = useGuide(settings, game, sheet, legal, live != null, header.note, questStatNow(game, ctx));
   const reset = useCallback(() => {
     setOverlay(null);
     setHeld(null);

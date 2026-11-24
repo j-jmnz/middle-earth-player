@@ -7,9 +7,13 @@ import { captivesUnder } from "../../rules/families/captives/values.ts";
 import { heroGuardedBy } from "../../rules/families/wilderland/carried.ts";
 import { cardsUnder } from "../../rules/core/zones.ts";
 import { flagged, heldAmount } from "../../rules/core/state.ts";
+import { modifiedStat } from "../../rules/core/keywords.ts";
+import { committedInStaging } from "../../rules/families/pelargir/committed.ts";
+import { questStatOf } from "../../rules/quest/quest.ts";
 import { FALLEN_SUFFIX, ORC_GUARD_CODE, fallenBase, isShipObjectiveCode, printedOf, type PrintedCard } from "../../rules/core/printed.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
+import { STAT_WORD } from "./card-effects.ts";
 import { ownerWords } from "../words/owner.ts";
 import { prisonerWords } from "../readouts/widgets.ts";
 import { pelennorDetail } from "./pelennor-preview.ts";
@@ -41,6 +45,15 @@ export function standInText(cards: ReadonlyMap<string, PrintedCard>, code: strin
   return `${fallen ? "Fallen into evil: an enemy now" : "Enemy"}. Attack ${printed.attack ?? 0}, Defense ${printed.defense ?? 0}, ${printed.health ?? 0} hit point${printed.health === 1 ? "" : "s"}, ${threat}.`;
 }
 
+// Celador or an Ithilien Guardian in the staging area (05025:A:1, 05026:A:1; ats.ally-objectives, hon.battle, hon.siege): committed to the quest by its own text, with the stat the stage counts (Attack under Battle, Defense under Siege) and its value now.
+function ithilienDetail(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
+  const card = game.cards[cardId];
+  if (!card || !committedInStaging(game, cardId)) return null;
+  const stat = questStatOf(game, cardId, ctx.cards);
+  const value = modifiedStat(game, card, stat, ctx.cards);
+  return `Committed to the quest from the staging area, adding ${value} ${STAT_WORD[stat]} to the quest total. No player controls the card: it cannot attack, defend or pay a cost.`;
+}
+
 /** The muted line under a card's name in its preview, or null: what only the table knows about it. */
 export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
   const card = game.cards[cardId];
@@ -64,6 +77,8 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   // Poison under a character is a facedown player card too: told before the hands of Lost in Mirkwood, which would call it a hand under a location.
   const poisoned = poisonDetail(game, ctx, cardId);
   if (poisoned) return poisoned;
+  const ithilien = ithilienDetail(game, ctx, cardId);
+  if (ithilien) return ithilien;
   const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card) ?? barrowDetail(game, ctx, cardId, name);
   if (lost) return lost;
   const everyone = engagedWithAllWords(game, card);

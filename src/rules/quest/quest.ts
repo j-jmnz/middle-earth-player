@@ -26,6 +26,8 @@ import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
 import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
 import { attachedStageFrom, branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
 import { leaveStage, randomStageFrom } from "../families/wilderland/random-stage.ts";
+import { stagedCommitted } from "../families/pelargir/committed.ts";
+import { skippedStage } from "../families/pelargir/stage-skip.ts";
 import { skipAreaStage } from "../families/riddles/area.ts";
 import { headOf, sharing, viewOf, withView } from "../families/breaking/areas.ts";
 import { threatFromOtherAreas } from "../families/breaking/threat.ts";
@@ -115,6 +117,11 @@ export function committedWillpower(state: ScenarioState, cards: Cards, only?: nu
       // "Using its Attack instead of its Willpower" (11005:A:2).
       total += modifiedStat(view, instance, questStatOf(view, id, cards), cards);
     }
+  }
+  // An ally objective in the staging area committed by its own text counts too (05025:A:1, families/pelargir/committed.ts).
+  for (const id of stagedCommitted(view, only)) {
+    const instance = view.cards[id];
+    if (instance && !willpowerIgnored(view, id)) total += modifiedStat(view, instance, questStatOf(view, id, cards), cards);
   }
   return total;
 }
@@ -295,7 +302,7 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     const attached = ordered || branched || rolled ? null : attachedStageFrom(next, current.code, cards);
     if (attached) next = attached.state;
     const nextId = joint ? joint.id : ordered ? ordered.id : rolled ? rolled.id : attached ? attached.id : (() => {
-      const nextCode = branched ? branched.code : index < 0 || flagged(next, currentId, "holdsWin") ? undefined : skipAreaStage(next, index);
+      const nextCode = branched ? branched.code : index < 0 || flagged(next, currentId, "holdsWin") ? undefined : skippedStage(next, currentId, index) ?? skipAreaStage(next, index);
       return nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
     })();
     if (!nextId) return flagged(next, currentId, "holdsWin") ? holdStage(next, currentId) : clearStage(next);
