@@ -9,6 +9,9 @@ const SHARED_TYPES: ReadonlySet<string> = new Set(["objective", "quest", "locati
 const PHASE_EVENTS: ReadonlySet<string> = new Set(["beginningOfPhase", "endOfPhase", "endOfRound", "stagingStepBegins"]);
 const ATTACK_EVENTS: ReadonlySet<string> = new Set(["attacks", "attackResolved"]);
 
+// An objective ally that a player controls is used as any other ally: its Action condition names an ally the actor controls (The Blood of Gondor, 06132:A:2), so it is the controller's alone.
+const controllerOnly = (effect: Obj): boolean => /"type":"ally","control":"you"/.test(JSON.stringify(effect.condition ?? null));
+
 // A line saying who the acting player is, or "" when the record's fields do not decide it.
 export function actorNote(effect: Obj, ctx: Ctx): string {
   const timing = effect.timing;
@@ -21,6 +24,6 @@ export function actorNote(effect: Obj, ctx: Ctx): string {
     if (PHASE_EVENTS.has(trigger)) return "the acting player is the first player (a phase has no player of its own)";
     if (trigger !== "") return "the acting player is the player the event happened to (the first player when the event names no player)";
   }
-  if (timing === "action" && ctx.cardType !== undefined && SHARED_TYPES.has(ctx.cardType)) return "any player may trigger it; the acting player is the one who does";
+  if (timing === "action" && ctx.cardType !== undefined && SHARED_TYPES.has(ctx.cardType)) return controllerOnly(effect) ? "only the player who controls it may trigger it, as for any ally; the acting player is that player" : "any player may trigger it; the acting player is the one who does";
   return "";
 }
