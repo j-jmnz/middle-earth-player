@@ -9,7 +9,7 @@ import steps from "../../../data/rules/steps.json";
 import type { ModeName, ScenarioState } from "../../rules/core/state.ts";
 
 import { pointNote, pointTitle } from "./rail.ts";
-import type { QuestStat } from "../readouts/quest-stat.ts";
+import type { QuestStat } from "./quest-stat.ts";
 
 export type ReferenceStep = { id: string; titles: readonly string[]; decision: string; current: boolean; windows: readonly { id: string; title: string; note: string }[] };
 export type ReferencePhase = { phase: string; steps: readonly ReferenceStep[] };
@@ -83,7 +83,7 @@ const STEP_OF: Readonly<Partial<Record<ModeName, string>>> = {
 
 type StepRow = { id: string; phase: string; entries: readonly string[] };
 
-/** The round, phase by phase, with the step the engine is in marked. `title` reads a rule span's title; `stat` is the stat the stage counts (readouts/quest-stat.ts), Willpower when absent. */
+/** The round, phase by phase, with the step the engine is in marked. `title` reads a rule span's title; `stat` is the stat the stage counts (phases/quest-stat.ts), Willpower when absent. */
 export function turnReference(game: ScenarioState, title: (id: string) => string | null, stat?: QuestStat): ReferencePhase[] {
   const now = STEP_OF[game.mode] ?? null;
   const phases: ReferencePhase[] = [];

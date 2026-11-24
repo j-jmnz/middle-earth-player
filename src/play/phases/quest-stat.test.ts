@@ -6,11 +6,12 @@ import { idOf, tableFromLayout } from "../../../test/harness/scene-kit.ts";
 import type { SheetNames } from "../choice/sheet-types.ts";
 import { commitSheet } from "../choice/bar-sheets.ts";
 import { cardEffects, chipText, effectLines, slotNumbers } from "../cards/card-effects.ts";
-import { guideLine, turnReference } from "../phases/reference.ts";
+import { carouselOf } from "./carousel.ts";
+import { guideLine, turnReference } from "./reference.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import { questStatNow, questStatWord } from "./quest-stat.ts";
-import { questScaleOf, scaleLabel, scaleStatWord } from "./quest-scale.ts";
-import { readoutFor } from "./readout.ts";
+import { questScaleOf, scaleLabel, scaleStatWord } from "../readouts/quest-scale.ts";
+import { readoutFor } from "../readouts/readout.ts";
 
 const ID = "into-ithilien";
 const names: SheetNames = { card: (id) => id, line: () => null };
@@ -104,6 +105,16 @@ describe("the turn reference", () => {
     expect(decisions("defense")[0]).toContain("add their defense");
     expect(decisions("willpower")).toEqual(decisions());
     expect(decisions()[0]).toBe("Commit characters to the quest: they exhaust and add their willpower.");
+  });
+
+  it("words the panel's quest steps by the stat the stage counts", () => {
+    const words = (stage: string) => {
+      const made = at(stage);
+      return carouselOf(made.state, made.ctx, { stopsOn: false, stops: [] }, () => null).phases.flatMap((phase) => phase.steps).find((step) => step.id === "3.2")?.decision;
+    };
+    expect(words("05068")).toContain("add their attack");
+    expect(words("05069")).toContain("add their defense");
+    expect(words("05071")).toContain("add their willpower");
   });
 
   it("gives the first-game guide the stat's line", () => {

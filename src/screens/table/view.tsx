@@ -27,8 +27,7 @@ import { MomentBanner } from "../../play/readouts/moment-banner";
 import { TableDock } from "../../play/choice/dock/table-dock";
 import { TableLayers } from "../../play/chrome/table-layers";
 import { openReading, type Reading } from "../../play/chrome/reading";
-import { phaseCarousel, stopAheadOf } from "../../play/phases/carousel";
-import { questStatNow } from "../../play/readouts/quest-stat";
+import { carouselOf, stopAheadOf } from "../../play/phases/carousel";
 import { useLook } from "../../ui/display-prefs";
 import { tableSettings } from "../../ui/table-settings";
 import { useKeepAwake } from "../../play/chrome/use-keep-awake";
@@ -153,8 +152,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
   const rail = useMemo(() => railFor(game), [game]);
   // The strip is laid out only while it is open; the rail's S (a stop of the player's lies ahead) is read without laying it out.
   const carouselOpen = reading?.kind === "carousel";
-  const questStat = carouselOpen ? questStatNow(game, ctx) : undefined;
-  const carousel = useMemo(() => (carouselOpen ? phaseCarousel(game, { stopsOn, stops }, ruleTitle, questStat) : null), [carouselOpen, game, stopsOn, stops, questStat]);
+  const carousel = useMemo(() => (carouselOpen ? carouselOf(game, ctx, { stopsOn, stops }, ruleTitle) : null), [carouselOpen, game, ctx, stopsOn, stops]);
   const stopAhead = useMemo(() => stopAheadOf(game, { stopsOn, stops }), [game, stopsOn, stops]);
   const logNames: LogNames = useMemo(
     () => ({

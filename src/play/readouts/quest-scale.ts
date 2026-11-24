@@ -7,7 +7,7 @@ import { committedWillpower } from "../../rules/quest/quest.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
 import type { Readout } from "./readout.ts";
-import { questStatNow, questStatWord } from "./quest-stat.ts";
+import { questStatNow, questStatWord } from "../phases/quest-stat.ts";
 import { stageHasDefense } from "./fortress.ts";
 import { stagingThreatNow } from "./the-hobbit/riddles.ts";
 import { questSeat } from "../store/selectors.ts";

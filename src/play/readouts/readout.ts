@@ -37,7 +37,7 @@ import { sailingReadout } from "./sea-readout.ts";
 import type { Sheet, SheetStat } from "../choice/sheet-types.ts";
 import { escapeNumbers } from "../choice/escape-notes.ts";
 import { choiceFor, type Choice } from "../choice/table-choice.ts";
-import { questStatNow, questStatWord, type QuestStat } from "./quest-stat.ts";
+import { questStatNow, questStatWord, type QuestStat } from "../phases/quest-stat.ts";
 
 // `join` is the word between two numbers: "against" (willpower against threat), or "then" for the staging threat before and
 // after a travel.

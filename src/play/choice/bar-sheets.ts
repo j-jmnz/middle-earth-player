@@ -16,7 +16,7 @@ import { playRequest, type PayRequest, type Share } from "./pay.ts";
 import { STEP_WORDS, windowPoint } from "../phases/rail.ts";
 import type { DistributePurpose, DistributeSheet, MultiSheet, PickSheet, Sheet, SheetNames, TriggerOption, TriggerSheet, WindowSheet } from "./sheet-types.ts";
 import { option, statOf, step } from "./sheet-parts.ts";
-import { questStatNow, questStatWord } from "../readouts/quest-stat.ts";
+import { questStatNow, questStatWord } from "../phases/quest-stat.ts";
 import { triggerOptions } from "./sheets.ts";
 import { currentSideQuest } from "../../rules/families/wilderland/night-quest.ts";
 

@@ -8,7 +8,7 @@ import { setBeat, type BeatStore } from "../store/beat-store.ts";
 import { stageText } from "../readouts/objective.ts";
 import { intentWords, momentOf, roundSummary, takenBack, type Moment } from "../store/outcome.ts";
 import { guideLine } from "../phases/reference.ts";
-import type { QuestStat } from "../readouts/quest-stat.ts";
+import type { QuestStat } from "../phases/quest-stat.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { followAnswers, passableWindow, tableAnswer, usableIds, type StopSettings } from "../phases/stops.ts";
 import { printedOf } from "../../rules/core/printed.ts";

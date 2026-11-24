@@ -11,7 +11,7 @@ import { tickSent } from "../../ui/haptics.ts";
 import { refusedFeedback } from "../../ui/sound/feedback.ts";
 import { playSound, playUndo } from "../../ui/sound/sound.ts";
 import { pointTitle } from "../phases/rail.ts";
-import { questStatNow } from "../readouts/quest-stat.ts";
+import { questStatNow } from "../phases/quest-stat.ts";
 import { isFreeResponse, nextStopTitle, passableWindow } from "../phases/stops.ts";
 import { useAutoAnswer, useBanner, useGuide, useSettle } from "./table-hooks.ts";
 import { tableSettings, toggleAlways } from "../../ui/table-settings.ts";

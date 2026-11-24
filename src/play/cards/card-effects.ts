@@ -79,7 +79,7 @@ const STAT_ICON: Readonly<Record<BadgeStat, IconName>> = {
   engagementCost: "engagementCost",
 };
 
-/** The word for each stat, as the table says it (the quest total says the one the stage counts, readouts/quest-stat.ts). */
+/** The word for each stat, as the table says it (the quest total says the one the stage counts, phases/quest-stat.ts). */
 export const STAT_WORD: Readonly<Record<BadgeStat, string>> = {
   willpower: "Willpower",
   attack: "Attack",
