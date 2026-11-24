@@ -1,7 +1,7 @@
 // Rules: rr.reveal, rr.staging, rr.forced, rr.shadow-effects, rr.first-player, rr.explored, rr.attacks-outside-the-combat-phase, rr.optional-engagement, rr.player-elimination, rr.running-out-of-cards, rr.quest-advancement, rr.objective-cards, ats.underworld, ats.setup-the-stewards-fear-underworld-deck (data/rules/entries.json). Lines that need a played Setup, a stage that advances, a stack that is released or a loss are tests titled with their line id in lines.test.ts.
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, count, damageOn, exhausted, flag, progressOn, resolve, resourcesOn, respond, stat, threat, zone, revealedBy, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, count, damageOn, exhausted, flag, deckCount, progressOn, resolve, resourcesOn, respond, reveal, stat, threat, zone, revealedBy, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Steward's Fear (against-the-shadow part 4): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points;
@@ -36,6 +36,9 @@ const ROWS: readonly Row[] = [
   { line: "06012:A:1", name: "Whichever Plot is hidden is revealed and staged: Poisoned Counsels", layout: { stage: "06012", side: "A", setAside: ["06031"] }, act: resolve("06012", "whenRevealed"), expect: [zone("06031", "staging"), revealedBy("06031", 0)] },
   { line: "06013:A:1", name: "Whichever Villain is hidden is revealed and staged: Daughter of Berúthiel", layout: { stage: "06013", side: "A", setAside: ["06015"] }, act: resolve("06013", "whenRevealed"), expect: [zone("06015", "staging"), revealedBy("06015", 0)] },
   { line: "06013:A:1", name: "Whichever Villain is hidden is revealed and staged: Telemnar's Bane", layout: { stage: "06013", side: "A", setAside: ["06017"] }, act: resolve("06013", "whenRevealed"), expect: [zone("06017", "staging"), revealedBy("06017", 0)] },
+
+  { line: "06024:A:1", name: "When Revealed: a random ally of the first player is chosen, the first player deals X damage to one of his heroes, X its Attack, then discards it", layout: { play: ["ally"], deck: ["f0", "f0"] }, act: [reveal("06024"), answer("dh1")], expect: [damageOn("dh1", 1), zone("ally", "discard")] },
+  { line: "06024:A:1", name: "No ally: nothing is dealt and the card gains surge, so one more card is revealed", layout: { deck: ["f0", "f0", "f0"] }, act: reveal("06024"), expect: [damageOn("dh1", 0), deckCount(2)] },
 
   { line: "06026:A:1", name: "Action: a hero exhausts to claim A Scrap of History into the victory display and place 1 resource token on the current quest", layout: { staging: ["06026"], stage: "06011" }, act: respond("06026"), expect: [exhausted("dh1"), zone("06026", "victory"), resourcesOn("06011", 1)] },
   { line: "06028:A:1", name: "Action: a hero exhausts to claim A Prisoner into the victory display and place 2 resource tokens on the current quest", layout: { staging: [PRISONER], stage: "06011" }, act: respond(PRISONER), expect: [exhausted("dh1"), zone(PRISONER, "victory"), resourcesOn("06011", 2)] },

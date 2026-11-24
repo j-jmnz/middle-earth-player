@@ -1,11 +1,12 @@
 // Rules: ats.underworld, ats.underworld-example, ats.setup-the-stewards-fear-underworld-deck, rr.reveal, rr.surge, rr.in-play-and-out-of-play, rr.quest-advancement, rr.constant-ability (data/rules/entries.json). The engine facts of the verbs The Steward's Fear adds in the pelargir family that no printed line shows by
-// itself: the deck built and hidden by the Setup, what Underworld X takes and what it leaves, the card revealed from the deck, the deck shuffled into the encounter deck, the card revealed and discarded, the random pick, the tokens taken off the quest and the loss at an empty deck.
+// itself: the deck built and hidden by the Setup, what Underworld X takes and what it leaves, the card revealed from the deck, the card revealed and discarded from an empty deck, the random pick, the tokens taken off the quest and the loss at an empty deck.
 // The printed lines are tested in src/campaign/scenarios/the-stewards-fear/.
 import { describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { flagged, type ScenarioState } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { settle } from "../../engine/machine.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
@@ -133,39 +134,7 @@ describe("RevealUnderworld (06023:A:2)", () => {
   });
 });
 
-describe("ShuffleUnderworldIntoEncounterDeck (06013:B:1)", () => {
-  it("moves every card of the deck into the encounter deck, leaves the cards under locations where they lie, and a later Underworld takes nothing", () => {
-    const t = bare({ setAside: DECK_CODES, staging: [CODES.houses], deck: ["f0", "f0"] });
-    const built = run(t, t.state, SETUP);
-    const houses = idOf(t.state, CODES.houses);
-    const stacked = run(t, built, { verb: "TakeUnderworld", amount: 1, host: "self" }, houses);
-    const shuffled = run(t, stacked, { verb: "ShuffleUnderworldIntoEncounterDeck" });
-    expect(shuffled.encounterDeck).toHaveLength(2 + DECK_CODES.length - 1);
-    expect(deckCodes(shuffled)).toEqual([]);
-    expect(underCodes(shuffled, houses)).toHaveLength(1);
-    expect(underCodes(run(t, shuffled, { verb: "TakeUnderworld", amount: 1, host: "self" }, houses), houses)).toHaveLength(1);
-    for (const id of shuffled.encounterDeck) expect(shuffled.cards[id]?.stackedAt).toBeUndefined();
-  });
-});
-
 describe("RevealTopThenDiscard (06016:A:1)", () => {
-  it("puts the top card of the encounter deck faceup in the discard pile at once, and a location of it never enters the staging area", () => {
-    const t = bare({ staging: ["treachery"], deck: [CODES.storehouse, "f0"] });
-    const done = inFrame(t, t.state, idOf(t.state, "treachery"), [{ verb: "RevealTopThenDiscard" }]);
-    expect(done.encounterDiscard.map((id) => done.cards[id]?.code)).toEqual([CODES.storehouse]);
-    expect(done.cards[done.encounterDiscard[0] ?? ""]?.face).toBe("up");
-    expect(done.staging.map((id) => done.cards[id]?.code)).toEqual(["treachery"]);
-    expect(done.encounterDeck.map((id) => done.cards[id]?.code)).toEqual(["f0"]);
-  });
-
-  it("an enemy is discarded too, and the reveal hears itself: a surge reveals one more card the normal way", () => {
-    const t = bare({ staging: ["treachery"], deck: [CODES.discovery, "f0", "f0"] });
-    const done = inFrame(t, t.state, idOf(t.state, "treachery"), [{ verb: "RevealTopThenDiscard" }]);
-    // Unwelcome Discovery has Surge: the next card is revealed and staged, the first one is discarded.
-    expect(done.encounterDiscard.map((id) => done.cards[id]?.code)).toContain(CODES.discovery);
-    expect(done.staging.map((id) => done.cards[id]?.code)).toEqual(expect.arrayContaining(["treachery", "f0"]));
-  });
-
   it("with the encounter deck empty the discard pile is shuffled back first (the card is discarded, not staged), and with both empty nothing happens", () => {
     const t = bare({ staging: ["treachery"], discard: [CODES.storehouse] });
     const done = inFrame(t, t.state, idOf(t.state, "treachery"), [{ verb: "RevealTopThenDiscard" }]);
@@ -234,5 +203,27 @@ describe("losesAtEmptyDeck (06030:A:2)", () => {
     expect(lost.lossReason).toContain("deck");
     const off = table({ deckOf: ["filler"] }, [FLAG]);
     expect(settle({ ...off.state, window: null, seats: [{ ...off.state.seats[0], deck: [] }, off.state.seats[1]] } as ScenarioState, off.ctx, []).lost).toBe(false);
+  });
+});
+
+function moveToDiscard(state: ScenarioState, id: string): ScenarioState {
+  return moveCard(state, id, { zone: "encounterDiscard" });
+}
+
+describe("the release of the underworld stacks (06018:A:1, 06018:A:2)", () => {
+  // The records of the scenario run: the sweep acts only in a game that takes underworld cards.
+  const full = (layout: Layout) => table(layout);
+
+  it("reveals the cards under a location that left play one at a time, each one a reveal of its own,", () => {
+    const t = full({ staging: ["place", CODES.sewers], setAside: DECK_CODES });
+    const built = run(t, t.state, SETUP);
+    const host = idOf(t.state, "place");
+    const stacked = run(t, run(t, built, { verb: "TakeUnderworld", amount: 3, host: "self" }, host), { verb: "TakeUnderworld", amount: 1, host: "self" }, host);
+    expect(underCodes(stacked, host)).toHaveLength(4);
+    const steps: EngineStep[] = [];
+    const gone = settle({ ...moveToDiscard(stacked, host), window: null }, t.ctx, steps);
+    expect(underCodes(gone, host)).toHaveLength(0);
+    expect(steps.filter((step) => step.kind === "reveal")).toHaveLength(underCodes(stacked, host).length);
+    expect(gone.staging).toHaveLength(underCodes(stacked, host).length + 1);
   });
 });

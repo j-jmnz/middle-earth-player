@@ -592,3 +592,21 @@ describe("05045:A:1 Lurking in Shadows here", () => {
     expect(revealed.cards[idOf(revealed, "f3")]?.zone).toBe("engaged");
   });
 });
+
+describe("06025:A:2 False Lead's shadow", () => {
+  const underTokens = (state: ScenarioState) => updateCard(state, state.questStage ?? "", { progress: 2, resources: 2 });
+  const stage = (state: ScenarioState) => state.cards[state.questStage ?? ""];
+
+  it("06025:A:2 after an attack that destroys a character every progress and resource token leaves the current quest", () => {
+    // Underworld Dissident gets +1 Attack for each Underworld location: 4 in the staging area make 6 against a hero of 6 hit points.
+    const layout: Layout = { staging: [CODES.sewers, CODES.storehouse, CODES.houses, CODES.roots] };
+    const made = fightEnemy((made: Layout) => table(made), CODES.falseLead, CODES.dissident, layout, { undefended: true, tweak: underTokens });
+    expect(made.run.state.cards[idOf(made.run.state, "dh1")]?.zone).not.toBe("heroes");
+    expect([stage(made.run.state)?.progress, stage(made.run.state)?.resources]).toEqual([0, 0]);
+  });
+
+  it("06025:A:2 after an attack that destroys nothing the tokens stay", () => {
+    const made = fightEnemy((made: Layout) => table(made), CODES.falseLead, CODES.dissident, {}, { undefended: true, tweak: underTokens });
+    expect([stage(made.run.state)?.progress, stage(made.run.state)?.resources]).toEqual([2, 2]);
+  });
+});
