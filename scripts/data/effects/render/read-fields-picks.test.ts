@@ -141,7 +141,7 @@ describe("effects render read fields, picks", () => {
 
   it("claims no field whose value it leaves unsaid", () => {
     // A false the template has no words for stays out of its claim, so it prints as `[also {...}]` in place of vanishing.
-    for (const key of ["nonUnique", "hasResources", "attacking", "defending", "staging", "stagingOnly", "hasShadow", "copyInDiscard", "looked", "engagedEnemies", "objective", "nonObjective"]) {
+    for (const key of ["nonUnique", "attacking", "defending", "staging", "stagingOnly", "hasShadow", "copyInDiscard", "looked", "engagedEnemies", "objective", "nonObjective"]) {
       expect(renderPick({ type: "hero", control: "you", [key]: false }, newCtx()), key).toContain(`[also {"${key}":false}]`);
     }
   });

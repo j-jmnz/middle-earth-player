@@ -26,6 +26,7 @@ import { flameDetail } from "./flame-preview.ts";
 import { rhovanionDetail } from "./rhovanion-preview.ts";
 import { plotLine, underworldLine } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { cairAndrosDetail } from "./against-the-shadow/cair-andros-preview.ts";
+import { druadanDetail } from "./against-the-shadow/druadan-preview.ts";
 
 /**
  * The text of the engine's Orc Guard stand-in, and of a hero Fallen Into Evil made an enemy (`<code>~enemy`; its card shows the hero's art and its game text
@@ -81,7 +82,7 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (poisoned) return poisoned;
   const ithilien = ithilienDetail(game, ctx, cardId);
   if (ithilien) return ithilien;
-  const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card) ?? barrowDetail(game, ctx, cardId, name) ?? cairAndrosDetail(game, ctx, cardId) ?? underworldLine(game, ctx, cardId) ?? plotLine(game, cardId);
+  const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card) ?? barrowDetail(game, ctx, cardId, name) ?? cairAndrosDetail(game, ctx, cardId) ?? druadanDetail(game, ctx, cardId, name) ?? underworldLine(game, ctx, cardId) ?? plotLine(game, cardId);
   if (lost) return lost;
   const everyone = engagedWithAllWords(game, card);
   if (everyone) return everyone;

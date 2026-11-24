@@ -206,6 +206,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return { verb: down ? "Weaken" : "Boost", prompt: `Choose ${one} to ${down ? "weaken" : "boost"}${until}.` };
     }
     case "DamageCard":
+    case "DamageCardThenSetX":
       return { verb: "Assign", prompt: `Choose ${one} to take ${amountNow != null ? amountNow : amountWords(next.amount)} damage.` };
     // The Oath's Adaptations (41044:A:3, 41046:A:3) and Abandoned Camp (41015:A:1): the hero healed, the location that takes progress, the ally put into play.
     case "Heal":

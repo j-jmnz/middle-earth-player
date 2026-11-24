@@ -70,7 +70,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["attacking"], pick.attacking === true ? "attacking" : null);
   note(["defending"], pick.defending === true ? "defending" : null);
   note(["canExhaust"], pick.canExhaust === true ? "that can exhaust (not held by a rule that stops it exhausting)" : null);
-  note(["hasResources"], pick.hasResources === true ? "with resources on it" : null);
+  note(["hasResources"], pick.hasResources === true ? "with resources on it" : pick.hasResources === false ? "with no resources on it" : null);
   note(["affectable"], pick.affectable === true ? "that a card effect can affect (not one immune to card effects)" : null);
   note(["progress"], pick.progress === true ? "with progress on it" : pick.progress === false ? "with no progress on it" : null);
   note(["captive"], typeof pick.captive === "string" ? (pick.captive === "only" ? "that is a Captive (held by an enemy or lying free)" : pick.captive === "free" ? "that is a Captive that no enemy holds" : "(Captives included)") : null);

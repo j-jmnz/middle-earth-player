@@ -27,7 +27,7 @@ import { holdAttack, queueHeard } from "../families/defense/listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/attack/flow.ts";
 import { flightAttackBarred } from "../families/attack/flight.ts";
 import { countsDefense, rangedAttack, struck } from "../families/attack/strike.ts";
-import { attackStatAgainst } from "../families/attack/spectral.ts";
+import { attackStatOf, placeAttackDamage } from "../families/pelargir/stage-attack.ts";
 import { mustBeDeclared } from "../families/armies/defender.ts";
 import { attackHere, dealForAttack, engagedWithAll, noteBelowThreat, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
 import { engagedWithThreatening } from "../core/engaged.ts";
@@ -401,7 +401,7 @@ export function strikeEnemy(
   const enemyNow = next.cards[enemyId];
   if (!enemyNow) return next;
   steps.push({ kind: "strike", side: "player", enemyId, targetId: enemyId, attack, defense, undefended: false, cause: ruleCause("rr.step-6-8-3") });
-  const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
+  const damaged = placeAttackDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, ruleCause("rr.step-6-8-3"));
   // Each attacker hears that the attack damaged or destroyed the enemy ("After Merry participates in an attack that destroys
   // an enemy"), and excess damage goes where a card sends it (families/attack/strike.ts).
   return struck(next, damaged, seat, enemyId, attacking, Math.max(0, attack - defense), ctx, steps);
@@ -412,8 +412,8 @@ export function attackStrength(state: ScenarioState, attackerIds: readonly strin
   let attack = 0;
   // "Immune to ranged damage" (Great Cave-troll, 03042:A:1; dwd.immune-to-ranged-damage): a character that takes part through the ranged keyword deals it no damage, a ranged character that attacks it another way does.
   const strike = flagged(state, enemyId, "immuneToRangedDamage") && state.pendingStrike?.enemyId === enemyId ? state.pendingStrike : undefined;
-  // Against a Spectral enemy a character's Willpower is its attack strength (families/attack/spectral.ts).
-  const stat = attackStatAgainst(state, enemyId, cards);
+  // Against a Spectral enemy, and while the table holds `attackWithWillpower`, a character's Willpower is its attack strength (families/attack/spectral.ts, families/pelargir/stage-attack.ts).
+  const stat = attackStatOf(state, enemyId, cards);
   for (const attackerId of attackerIds) {
     const attacker = state.cards[attackerId];
     if (attacker && strike && rangedAttack(strike, attacker)) continue;

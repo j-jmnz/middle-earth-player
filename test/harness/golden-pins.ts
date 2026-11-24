@@ -215,6 +215,11 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
   "the-dead-marshes": [
     "Nightmare two-handed win",
   ],
+  "the-druadan-forest": [
+    "Easy two-handed win",
+    "solo win",
+    "two-handed win",
+  ],
   "the-fate-of-wilderland": [
     "true solo, Easy, lost after the earlier parts, Melanwar's and Isolde's lines, every Choose window places progress",
     "true solo, Easy, won, Melanwar's and Isolde's lines, the attacks made together",

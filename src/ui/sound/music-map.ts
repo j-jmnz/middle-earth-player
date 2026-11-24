@@ -142,6 +142,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "into-ithilien": { calm: "crossroads", combat: "pelennor" },
   "the-siege-of-cair-andros": { calm: "gondor", combat: "siege" },
   "the-stewards-fear": { calm: "gondor", combat: "shadow" },
+  "the-druadan-forest": { calm: "crossroads", combat: "uruk" },
   "we-must-away-ere-break-of-day": { calm: "shire", combat: "chase" },
   "over-the-misty-mountains-grim": UNDERGROUND,
   "dungeons-deep-and-caverns-dim": UNDERGROUND,

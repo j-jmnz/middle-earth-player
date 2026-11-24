@@ -63,6 +63,18 @@ export const PELARGIR_TEMPLATES: Templates = {
     text: `${i.amount == null || i.amount === "all" ? "all" : String(i.amount)} ${i.kind === "any" ? "any (progress first, then resource)" : str(i.kind)} token(s) leave the current quest card (progress first when both kinds are named; at most the card holds)`,
     read: ["kind", "amount"],
   }),
+  EachPlayerSpends: (i, ctx) => ({
+    text: `each player, the first player first, spends ${amt(i.amount, ctx)} resource(s) from his own heroes' pools (he chooses the hero for each resource); the players cannot travel here while any player holds fewer than that in all`,
+    read: ["amount"],
+  }),
+  DamageCardThenSetX: (i, ctx) => ({
+    text: `the picked card takes ${amt(i.amount, ctx)} damage, and the effect's X is set to ${i.value} only if the card holds more damage once the responses to it were heard (canceled or prevented damage sets nothing)`,
+    read: ["amount", "value", "before"],
+  }),
+  GroupDiscardResources: (i, ctx) => ({
+    text: `the players as a group discard ${amt(i.amount, ctx)} resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)`,
+    read: ["amount", "rest", "turns"],
+  }),
 };
 
 export const PELARGIR_SAMPLES: Samples = {
@@ -84,6 +96,9 @@ export const PELARGIR_SAMPLES: Samples = {
   RevealTopThenDiscard: [{ verb: "RevealTopThenDiscard" }],
   PickRandom: [{ verb: "PickRandom", pick: { type: "ally", control: "any", controlledBy: "firstPlayer" } }],
   RemoveQuestTokens: [{ verb: "RemoveQuestTokens", kind: "any", amount: 1 }, { verb: "RemoveQuestTokens", kind: "progress" }],
+  EachPlayerSpends: [{ verb: "EachPlayerSpends", amount: 1 }],
+  DamageCardThenSetX: [{ verb: "DamageCardThenSetX", amount: 1, value: 1 }],
+  GroupDiscardResources: [{ verb: "GroupDiscardResources", amount: 2 }],
 };
 
 export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
@@ -100,5 +115,8 @@ export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
   advancesWithoutBattleground: " (held by the current quest stage: when no Battleground location is in play the quest advances at once to the next stage still in the quest deck)",
   cannotSpendResources: " (held by a hero: no resource can be spent from its pool, for a card, an ability or an effect; resources can still be gained and moved)",
   losesSiege: " (held by the current quest stage: it does not have the Siege keyword it prints)",
+  attackWithWillpower: " (held by the table while the stage is in play: a character's attack strength is its current Willpower instead of its Attack, attack bonuses not added; the enemy's Defense is still subtracted)",
+  attackDamageAsProgress: " (held by the table: the damage a character's attack deals to an enemy is placed as progress tokens on it instead; damage from an effect, a shadow card or archery stays damage)",
+  progressToVictory: " (held by the table: an enemy in play with progress equal to its printed hit points goes to the victory display and all its progress goes on the current quest; checked at every settle)",
   firstEnemyNoted: " (held by the table until the end of the round: an enemy was already marked firstEnemy this round)",
 };

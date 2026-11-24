@@ -1,0 +1,241 @@
+Scenario piles that place cards with no record (quest: 06042 The Pursuit; quest: 06043 An Untimely End; quest: 06044 The Passage Out; setAside: 06045 Drû-buri-Drû)
+
+## 06042 The Pursuit
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+06042:A:1 (front): Setup: Search the encounter deck for Drû-buri-Drû and set him aside, out of play. Shuffle the encounter deck.
+  06042:setup:1: Setup
+    - shuffle the encounter deck
+
+06042:B:1 (back): When Revealed: Reveal 1 card from the encounter deck per player and add it to the staging area.
+  06042:whenRevealed:1: When revealed
+    - the first player reveals the number of players encounter cards, one after the other, each in a staging of its own
+
+## 06043 An Untimely End
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+06043:B:1 (back): Archery damage must be assigned to allies, if able.
+  06043:constant:1: Constant
+    - the table: stat archeryToAllies (archery damage must be assigned to allies, if able) 1, while this card is in play
+
+## 06044 The Passage Out
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+06044:A:1 (front): When Revealed: Add Drû-buri-Drû to the staging area.
+  06044:whenRevealed:1: When revealed
+    - one set-aside card with code 06045 joins the staging area (it is not revealed)
+
+06044:B:1 (back): Siege. (Characters use their Defense instead of Willpower when questing.)
+  (the keyword part is owned by the card's keywords; the records cover: (Characters use their Defense instead of Willpower when questing.))
+  06044:constant:1: Constant
+    (no instructions: the record only names the printed keyword reminder; the keyword is the card's own and the engine reads it from the card)
+
+06044:B:2 (back): Characters use their Willpower instead of Attack when attacking enemies. If an enemy would be damaged this way, place progress tokens on it instead of damage tokens. When an enemy has progress equal to its hit points, add it to the victory display and place those progress tokens on the quest.
+  06044:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat attackWithWillpower (held by the table while the stage is in play: a character's attack strength is its current Willpower instead of its Attack, attack bonuses not added; the enemy's Defense is still subtracted) 1, while this card is in play
+    - the table: stat attackDamageAsProgress (held by the table: the damage a character's attack deals to an enemy is placed as progress tokens on it instead; damage from an effect, a shadow card or archery stays damage) 1, while this card is in play
+    - the table: stat progressToVictory (held by the table: an enemy in play with progress equal to its printed hit points goes to the victory display and all its progress goes on the current quest; checked at every settle) 1, while this card is in play
+
+06044:B:3 (back): If the players defeat this stage, they have won the game.
+  06044:constant:3: Constant
+    only if the card with code 06045 is not in the victory display
+    - the players cannot defeat this stage while this holds
+
+## 06045 Drû-buri-Drû
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+06045:A:1 (front): Allies cannot defend against Drû-buri-Drû.
+  06045:constant:1: Constant
+    - allies cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)
+
+06045:A:2 (front): While Drû-buri-Drû is in the victory display, characters get +1 Willpower and +1 Defense.
+  06045:constant:2: Constant
+    only if this card is in the victory display
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each character (any player controls): stat willpower 1, while this card is in play
+    - each character (any player controls): stat defense 1, while this card is in play
+
+06045:A:3 (front): Unless Drû-buri-Drû is in the victory display, the players cannot win.
+  06045:constant:3: Constant
+    only if the card with code 06045 is not in the victory display
+    - the players cannot defeat this stage while this holds
+
+## 06046 Drúadan Drummer
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06046:A:1 (front): Each Wose enemy in the staging area gets +2 Threat.
+  06046:constant:1: Constant
+    - each Wose enemy (any player controls) in the staging area only: stat threat 2, while this card is in play
+
+06046:A:2 (shadow): Shadow: Each Wose enemy engaged with the defending player gets +1 Attack.
+  06046:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - each Wose enemy (any player controls) engaged with you (only the cards that match now: one that arrives later does not get it): stat attack 1, until the end of the attack
+
+## 06047 Drúadan Elite
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06047:A:1 (front): Archery 2. Prowl X.
+  (the keyword part is owned by the card's keywords; the records cover: Prowl X.)
+  06047:forced:1: Forced after a card is revealed (heard about this card; only when the encounter deck revealed it) (record also names 06047:A:2)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players as a group discard the number of players resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)
+
+06047:A:2 (front): X is the number of players in the game.
+  06047:forced:1: Forced after a card is revealed (heard about this card; only when the encounter deck revealed it) (record also names 06047:A:1)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players as a group discard the number of players resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)
+
+06047:A:3 (shadow): Shadow: Return attacking enemy to the staging area after it attacks unless any player pays 1 resource.
+  06047:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player chooses one of:
+      * option "pay" (only if the living players' heroes that can pay for a card of any sphere hold at least 1 resource(s) in all):
+        - the players as a group spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
+      * option "return":
+        - when the attack in progress ends:
+          - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 06048 Drúadan Hunter
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06048:A:1 (front): Prowl 1. Archery X.
+  06048:forced:1: Forced after a card is revealed (heard about this card; only when the encounter deck revealed it)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players as a group discard 1 resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)
+  06048:constant:1: Constant (record also names 06048:A:2)
+    - this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) the number of hero (any player controls) with no resources on it, while this card is in play
+
+06048:A:2 (front): X is the number of heroes in play with no resources in their resource pool.
+  06048:constant:1: Constant (record also names 06048:A:1)
+    - this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) the number of hero (any player controls) with no resources on it, while this card is in play
+
+06048:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
+  06048:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack 2, until the end of the attack
+
+## 06049 Drúadan Thief
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06049:A:1 (front): Surge. Prowl 1.
+  (the keyword part is owned by the card's keywords; the records cover: Prowl 1.)
+  06049:forced:1: Forced after a card is revealed (heard about this card; only when the encounter deck revealed it)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players as a group discard 1 resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)
+
+06049:A:2 (shadow): Shadow: Return attacking enemy to the staging area after it attacks unless any player pays 1 resource.
+  06049:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player chooses one of:
+      * option "pay" (only if the living players' heroes that can pay for a card of any sphere hold at least 1 resource(s) in all):
+        - the players as a group spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
+      * option "return":
+        - when the attack in progress ends:
+          - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 06050 Ancestral Clearing
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06050:A:1 (front): The cost to play each player card is increased by 1.
+  06050:constant:1: Constant
+    - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) or in the staging area or the active location costs 1 more (every player's; several such cards stack)
+
+06050:A:2 (front): Travel: Exhaust a hero to travel here.
+  06050:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the line's choose step finds fewer cards than it must exhaust
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (any player controls) chosen by the first player
+    - exhaust the picked card
+
+## 06051 Garden of Poisons
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06051:A:1 (front): Heroes cannot gain resources from card effects.
+  06051:constant:1: Constant
+    - each hero (any player controls): stat noCardResources (the hero cannot gain resources from card effects; the resources it collects in the resource phase are not one) 1, while this card is in play
+
+06051:A:2 (front): Travel: Each player must pay 1 resource to travel here.
+  06051:travel:1: Travel
+    - each player, the first player first, spends 1 resource(s) from his own heroes' pools (he chooses the hero for each resource); the players cannot travel here while any player holds fewer than that in all
+
+## 06052 Glade of Cleansing
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06052:A:1 (front): Each Wose enemy gains archery 1.
+  06052:constant:1: Constant
+    - each Wose enemy (any player controls) or in the staging area: stat archery 1, while this card is in play
+
+06052:A:2 (front): X is equal to the total archery value of the highest archery Wose enemy in play.
+  06052:constant:2: Constant
+    - this card: stat threat the total archery value (printed, gained and what the card gives itself) of the card with the most among Wose enemy (any player controls) or in the staging area, 0 when none, while this card is in play
+
+## 06053 Men in the Dark
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06053:A:1 (front): When Revealed: Each hero must pay 1 resource or take 1 damage. If no hero takes damage from this effect, Men in the Dark gains surge.
+  06053:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - for each hero (you control):
+        - the acting player chooses one of:
+          * option "pay" (only if the picked card is a hero (any player controls) with resources on it):
+            - 1 resource(s) are spent from the resource pool of the picked card (nothing is spent when the pool holds fewer)
+          * option "consequence":
+            - the picked card takes 1 damage, and the effect's X is set to 1 only if the card holds more damage once the responses to it were heard (canceled or prevented damage sets nothing)
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+06053:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each hero the defending player controls with no resources.
+  06053:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the number of hero (you control) with no resources on it, until the end of the attack
+
+## 06054 Stars in Sky
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06054:A:1 (front): Prowl 2.
+  06054:forced:1: Forced after a card is revealed (heard about this card; only when the encounter deck revealed it)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players as a group discard 2 resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)
+
+06054:A:2 (front): When Revealed: Each questing hero must pay 1 resource or it is removed from the quest.
+  06054:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - for each hero (you control) committed to the quest:
+        - the acting player chooses one of:
+          * option "pay" (only if the picked card is a hero (any player controls) with resources on it):
+            - 1 resource(s) are spent from the resource pool of the picked card (nothing is spent when the pool holds fewer)
+          * option "consequence":
+            - the last picked character is removed from the quest (it stays exhausted)
+
+06054:A:3 (shadow): Shadow: Discard all resources from the defending character's resource pool.
+  06054:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (any player controls) defending
+    - all the resources come off the resource pool of the picked card (discarded, not spent)
+
+## 06055 Leaves on Tree
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06055:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+06055:A:2 (front): When Revealed: Each player must pay 1 resource for each attachment he controls or discard all attachments he controls.
+  06055:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "pay" (only if not (the resource tokens on hero (you control) is less than the number of attachment (you control))):
+          - the acting player spend the number of attachment (you control) resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
+        * option "discard" (only if there is a attachment (you control) to choose):
+          - the acting player discards each attachment (you control)
+
+06055:A:3 (shadow): Shadow: Discard an attachment from the defending character.
+  06055:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (any player controls) attached to the defending character
+    - discard the picked card
+
+(rendered pieces: 146 by template, 0 as JSON)
