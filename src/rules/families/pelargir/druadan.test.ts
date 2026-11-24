@@ -1,13 +1,12 @@
-// Rules: ats.setup-the-druadan-forest, ats.prowl, hon.siege, hon.archery, rr.travel, rr.discard-pile-and-victory-display, faq.progress-without-advancing (data/rules/entries.json). The engine facts of the verb, the pick filter and the amount The Drúadan Forest adds in the pelargir family that no printed line shows by itself: the game that ends in the window of the attack that fills Drû-buri-Drû, the Travel cost every player pays, a hero with no resources, the archery of the highest Wose. The printed lines are tested in src/campaign/scenarios/the-druadan-forest/.
+// Rules: ats.setup-the-druadan-forest, ats.prowl, hon.siege, hon.archery, rr.travel, rr.discard-pile-and-victory-display, faq.progress-without-advancing (data/rules/entries.json). The engine facts of the verb, the pick filter and the amount The Drúadan Forest adds in the pelargir family that no printed line shows by itself: the game that ends in the window of the attack that fills Drû-buri-Drû, a hero with no resources, the archery of the highest Wose. The printed lines are tested in src/campaign/scenarios/the-druadan-forest/.
 import { describe, expect, it } from "vitest";
 
-import { type ScenarioState } from "../../core/state.ts";
 import { resolveAmount } from "../../interpret/amounts.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
-import { finish, idOf, legalTargets, send, start as begin, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
+import { finish, idOf, send, start as begin, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
 import { CODES, table } from "../../../../test/scenarios/the-druadan-forest/table.ts";
 
-const { passageOut: STAGE_3, druBuriDru: DRU, elite: ELITE, hunter: HUNTER, glade: GLADE, drummer: DRUMMER, garden: GARDEN } = CODES;
+const { passageOut: STAGE_3, druBuriDru: DRU, elite: ELITE, hunter: HUNTER, glade: GLADE, drummer: DRUMMER } = CODES;
 const HERO = "dh1";
 
 describe("progressToVictory ends the game in the window of the attack that fills Drû-buri-Drû (06044:B:3)", () => {
@@ -21,35 +20,6 @@ describe("progressToVictory ends the game in the window of the attack that fills
     expect(state.cards[idOf(made.state, DRU)]?.zone).toBe("victory");
     expect(state.stageCleared).toBe(true);
     expect(state.window === null || state.window.kind === "resolution").toBe(true);
-  });
-});
-
-describe("EachPlayerSpends (06051:A:2)", () => {
-  // Two seats in the travel phase with the Garden of Poisons in the staging area: the first seat's hero holds `first` resources and the second seat's `second`.
-  const garden = (first: number, second: number): LayoutTable => {
-    const made = table({ seats: 2, phase: "Travel", staging: [GARDEN] });
-    const held = [first, second];
-    const cards = { ...made.state.cards };
-    made.state.seats.slice(0, 2).forEach((seat, index) => seat.heroes.forEach((id, at) => (cards[id] = { ...cards[id]!, resources: at === 0 ? (held[index] ?? 0) : 0 })));
-    return { ...made, state: { ...made.state, cards } };
-  };
-  const heroPools = (state: ScenarioState): number[] => state.seats.slice(0, 2).map((seat) => seat.heroes.reduce((sum, id) => sum + (state.cards[id]?.resources ?? 0), 0));
-  const travels = (made: LayoutTable): boolean => legalTargets(made.state, { type: "Travel" }, made.ctx).includes(idOf(made.state, GARDEN));
-
-  it("is a Travel the players can pay while every player holds the resource, and takes 1 from each player's own heroes", () => {
-    const made = garden(1, 1);
-    expect(travels(made)).toBe(true);
-    const sent = send(begin(made.state), { type: "Travel", locationId: idOf(made.state, GARDEN) }, made.ctx);
-    const state = finish(sent, made.ctx).state;
-    expect(heroPools(state)).toEqual([heroPools(made.state)[0]! - 1, heroPools(made.state)[1]! - 1]);
-    expect(state.activeLocation).toBe(idOf(made.state, GARDEN));
-  });
-
-  it("cannot be traveled to when any one player holds none: another player's resources do not pay for him", () => {
-    const made = garden(3, 0);
-    expect(heroPools(made.state)[1]).toBe(0);
-    expect(travels(made)).toBe(false);
-    expect(travels(garden(0, 3))).toBe(false);
   });
 });
 

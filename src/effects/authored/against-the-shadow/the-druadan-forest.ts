@@ -106,8 +106,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "06050:constant:1", cardCode: "06050", lines: ["06050:A:1"], timing: "constant", instructions: [{ verb: "IncreaseCost", amount: 1, pick: { type: "card", control: "any" } }] },
     { id: "06050:travel:1", cardCode: "06050", lines: ["06050:A:2"], timing: "travel", instructions: [{ verb: "Pick", pick: { ...ANY_HERO, state: "ready", who: "firstPlayer" } }, { verb: "Exhaust", target: { kind: "picked" } }] },
 
-    // 06051 Garden of Poisons. A:1: no hero gains resources from a card effect (the resource phase still gives them). A:2: each player pays 1 resource from his own heroes to travel here.
-    { id: "06051:constant:1", cardCode: "06051", lines: ["06051:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotGainResources", amount: 1, until: "whileSourceInPlay", target: "table" }] },
+    // 06051 Garden of Poisons. A:1: no hero gains resources from a card effect (the flag of each hero, not the table's: the resource phase still gives them). A:2: each player pays 1 resource from his own heroes to travel here.
+    { id: "06051:constant:1", cardCode: "06051", lines: ["06051:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noCardResources", amount: 1, until: "whileSourceInPlay", holders: ANY_HERO }] },
     { id: "06051:travel:1", cardCode: "06051", lines: ["06051:A:2"], timing: "travel", instructions: [{ verb: "EachPlayerSpends", amount: 1 }] },
 
     // 06052 Glade of Cleansing. A:1: each Wose in play gains archery 1 (the gains of two Glades add). A:2: its Threat X is the total archery value of the Wose with the most, the Glades' gains included.

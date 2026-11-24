@@ -80,12 +80,12 @@ Scenario piles that place cards with no record (quest: 06042 The Pursuit; quest:
   (the keyword part is owned by the card's keywords; the records cover: Prowl X.)
   06047:forced:1: Forced after a card is revealed (heard about this card; only when the encounter deck revealed it) (record also names 06047:A:2)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the players as a group discard the number of players resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest; what is left is discarded as the first player chooses (a discard, not a spend)
+    - the players as a group discard the number of players resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)
 
 06047:A:2 (front): X is the number of players in the game.
   06047:forced:1: Forced after a card is revealed (heard about this card; only when the encounter deck revealed it) (record also names 06047:A:1)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the players as a group discard the number of players resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest; what is left is discarded as the first player chooses (a discard, not a spend)
+    - the players as a group discard the number of players resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)
 
 06047:A:3 (shadow): Shadow: Return attacking enemy to the staging area after it attacks unless any player pays 1 resource.
   06047:shadow:1: Shadow
@@ -103,7 +103,7 @@ Scenario piles that place cards with no record (quest: 06042 The Pursuit; quest:
 06048:A:1 (front): Prowl 1. Archery X.
   06048:forced:1: Forced after a card is revealed (heard about this card; only when the encounter deck revealed it)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the players as a group discard 1 resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest; what is left is discarded as the first player chooses (a discard, not a spend)
+    - the players as a group discard 1 resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)
   06048:constant:1: Constant (record also names 06048:A:2)
     - this card: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) the number of hero (any player controls) with no resources on it, while this card is in play
 
@@ -123,7 +123,7 @@ Scenario piles that place cards with no record (quest: 06042 The Pursuit; quest:
   (the keyword part is owned by the card's keywords; the records cover: Prowl 1.)
   06049:forced:1: Forced after a card is revealed (heard about this card; only when the encounter deck revealed it)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the players as a group discard 1 resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest; what is left is discarded as the first player chooses (a discard, not a spend)
+    - the players as a group discard 1 resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)
 
 06049:A:2 (shadow): Shadow: Return attacking enemy to the staging area after it attacks unless any player pays 1 resource.
   06049:shadow:1: Shadow
@@ -154,7 +154,7 @@ Scenario piles that place cards with no record (quest: 06042 The Pursuit; quest:
 
 06051:A:1 (front): Heroes cannot gain resources from card effects.
   06051:constant:1: Constant
-    - the table: stat cannotGainResources 1, while this card is in play
+    - each hero (any player controls): stat noCardResources (the hero cannot gain resources from card effects; the resources it collects in the resource phase are not one) 1, while this card is in play
 
 06051:A:2 (front): Travel: Each player must pay 1 resource to travel here.
   06051:travel:1: Travel
@@ -197,7 +197,7 @@ Scenario piles that place cards with no record (quest: 06042 The Pursuit; quest:
 06054:A:1 (front): Prowl 2.
   06054:forced:1: Forced after a card is revealed (heard about this card; only when the encounter deck revealed it)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the players as a group discard 2 resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest; what is left is discarded as the first player chooses (a discard, not a spend)
+    - the players as a group discard 2 resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)
 
 06054:A:2 (front): When Revealed: Each questing hero must pay 1 resource or it is removed from the quest.
   06054:whenRevealed:1: When revealed
@@ -238,4 +238,4 @@ Scenario piles that place cards with no record (quest: 06042 The Pursuit; quest:
     - choose attachment (any player controls) attached to the defending character
     - discard the picked card
 
-(rendered pieces: 145 by template, 0 as JSON)
+(rendered pieces: 146 by template, 0 as JSON)
