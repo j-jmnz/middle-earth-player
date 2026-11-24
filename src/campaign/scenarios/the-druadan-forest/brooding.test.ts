@@ -1,4 +1,4 @@
-// Rules: rr.shadow-effects, rr.removing-from-quest, rr.cost, rr.keywords, rr.first-player (data/rules/entries.json).
+// Rules: rr.shadow-effects, rr.cost, rr.keywords, rr.first-player (data/rules/entries.json).
 // The Brooding Forest cards (05046 to 05048, tested for Into Ithilien in src/campaign/scenarios/into-ithilien/) where they act differently in The Drúadan Forest: a Wose as the attacker whose Threat the Drummer raises only in the staging area (05046:A:2, 05047:A:2), the Lost Companion on the
 // Siege stage and beside Stars in Sky (05048:A:1), and the Action of the Overgrown Trail while Ancestral Clearing is in play (05046:A:1). Each test builds its moment with the scene kit; its title starts with the line id.
 import { describe, expect, it } from "vitest";

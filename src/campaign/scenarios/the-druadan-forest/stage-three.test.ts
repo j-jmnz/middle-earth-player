@@ -1,4 +1,4 @@
-// Rules: hon.siege, rr.victory-display, rr.in-play-and-out-of-play, rr.discard-pile-and-victory-display, rr.destroy, rr.quest-advancement, faq.victory-display, faq.progress-without-advancing (data/rules/entries.json).
+// Rules: hon.siege, rr.in-play-and-out-of-play, rr.discard-pile-and-victory-display, rr.destroy, rr.quest-advancement, faq.victory-display, faq.progress-without-advancing (data/rules/entries.json).
 // The Passage Out (06044) and Drû-buri-Drû (06045), the lines a card-spec row cannot show: the Siege quest, the attack with Willpower, damage that becomes progress, an enemy that fills with its printed hit points, the win only with Drû-buri-Drû in the victory display, and his +1 Willpower and +1 Defense from there.
 // Each test builds its moment with the scene kit; its title starts with the line id. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points.
 import { describe, expect, it } from "vitest";
