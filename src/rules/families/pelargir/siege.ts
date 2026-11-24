@@ -36,20 +36,21 @@ export function undefendedBattlegrounds(state: ScenarioState, cards: ReadonlyMap
 
 /**
  * An undefended attack's damage is set after its shadow card resolved (rr.step-6-4-3), so a shadow effect that removed the Battleground location the attack was aimed at (Siege Raft on The Banks) leaves the damage to the lowest Threat Battleground location
- * then in play, or to a hero when none is left (ats.cair-andros-location-damage). The state with the attack aimed again, or with the defending player asked to name the card when it is not one location or one hero; null when the target is not a removed Battleground location.
+ * then in play, or to a character the engine's list of undefended targets holds when none is left (`heroesLeft`, ats.cair-andros-location-damage). The attack stays undefended: it is not defended again, whatever the player is asked. The state with the attack aimed
+ * again, or with the defending player asked to name the card when it is not one location or one character; null when the target is not a removed Battleground location.
  */
-export function aimAgain(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioState | null {
+export function aimAgain(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, heroesLeft: (state: ScenarioState) => readonly string[]): ScenarioState | null {
   const attack = state.pendingAttack;
   const aimed = attack?.heroId != null ? state.cards[attack.heroId] : undefined;
   const stage = state.questStage;
   if (!attack || !aimed || aimed.zone !== "removed" || !stage || !flagged(state, stage, "undefendedToBattleground") || !printedOf(cards, aimed.code).traits.includes(BATTLEGROUND)) return null;
   const left = undefendedBattlegrounds(state, cards);
-  if (left.length === 1) return { ...state, pendingAttack: { ...attack, heroId: left[0] } };
-  // No Battleground location is left: a seat with one hero names it without being asked.
-  const heroes = left.length === 0 ? (state.seats[attack.seat]?.heroes ?? []).filter((id) => state.cards[id]?.zone === "heroes") : [];
-  if (heroes.length === 1) return { ...state, pendingAttack: { ...attack, heroId: heroes[0] } };
+  if (left.length === 1) return { ...state, pendingAttack: { ...attack, undefended: true, heroId: left[0] } };
+  // No Battleground location is left: the one character who may take it does so without being asked, and none leaves the attack with no damage.
+  const heroes = left.length === 0 ? heroesLeft(state) : [];
+  if (left.length === 0 && heroes.length <= 1) return { ...state, pendingAttack: { ...attack, undefended: true, heroId: heroes[0] ?? "" } };
   const { heroId: _removed, ...rest } = attack;
-  return { ...state, pendingAttack: rest, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
+  return { ...state, pendingAttack: { ...rest, undefended: true }, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
 }
 
 /** A location that holds `removedAtDamage` and has that much damage (or more) is removed from the game: it is not explored and goes to no pile, its attachments are discarded, its damage and progress are gone. */
