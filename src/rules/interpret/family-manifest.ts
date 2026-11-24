@@ -72,7 +72,8 @@ export type AttachedHook = (state: ScenarioState, id: string, host: string, ctx:
 /** Who may attack and defend, and where an undefended attack's damage goes, for the families that change it (src/rules/combat/combat.ts, src/rules/engine/legal.ts).
  * `defense` and `attack` return why the character may not, or null; the first family with a reason wins. `undefended` returns the characters an undefended attack's
  * damage may go to instead of the heroes, or an empty list; `candidates` is the player's characters, read only when asked. The first non-empty answer wins.
- * `damaged` is told what the damage of the enemy attack in progress did (`before` and `after` the damage) and returns the state it leaves (Venom, `poison`); every family's runs, in list order. */
+ * `damaged` is told what the damage of the enemy attack in progress did (`before` and `after` the damage) and returns the state it leaves (Venom, `poison`); every family's runs, in list order.
+ * A hook that replaces the damage also takes its step out of `steps`, the intent's log, and adds its own (Protect the Villagers, `pelargir`). */
 export type CombatHooks = {
   readonly defense?: (state: ScenarioState, defender: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, defenderId: string) => string | null;
   readonly attack?: (state: ScenarioState, enemyId: string, attacker: PrintedCard, target: PrintedCard, attackerId: string) => string | null;

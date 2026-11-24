@@ -9,12 +9,13 @@ import { grantedTravel } from "../families/grapple/travel.ts";
 import { familyTravelCost } from "../interpret/family-hooks.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
+import { announceExplored } from "./stage-reveal.ts";
 import { travelTo } from "./quest.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { travelBlocked } from "../interpret/restrictions.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { areaSeats, withView } from "../families/breaking/areas.ts";
-import { markReached } from "../core/state.ts";
+import { inPlay, markReached } from "../core/state.ts";
 import { fireForced } from "../windows/triggers.ts";
 import { topFrame } from "../windows/windows.ts";
 import { pushDeep } from "../families/wilderland/deep.ts";
@@ -56,6 +57,9 @@ export function travelNow(state: ScenarioState, locationId: string, ctx: ReduceC
   if (!traveled) return null;
   // The travel opportunity is taken; the Travel phase ends after the window that follows it (rr.framework-steps, 4.2).
   const moved = traveled.mode === "travel" ? travelTaken(traveled) : traveled;
+  // A location explored on arrival (rr.explored) never became the active location: nothing hears of the travel or resolves its keywords, and the cards that answer an explored location hear that.
+  const arrived = traveled.cards[locationId];
+  if (!arrived || !inPlay(arrived.zone)) return announceExplored(moved, locationId, ctx, steps);
   // A Deep location is discarded and replaced once the Responses to the travel are done: its frame goes under them (families/wilderland/deep.ts, emce.deep); a Discover location resolves its keyword there too (families/wilderland/discover.ts, emce.discover).
   const offered = offerResponses(pushDiscover(pushDeep(moved, locationId, ctx, steps), locationId, ctx, steps), { trigger: "traveled", seat: null, cardId: locationId }, ctx, steps);
   // A Forced effect "After travelling to ~" (01107:A:1) resolves before the Responses, as every Forced effect does (rr.forced).
