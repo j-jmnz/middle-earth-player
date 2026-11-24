@@ -77,6 +77,8 @@ function targetsMissing(state: ScenarioState, ctx: ReduceContext, legal: LegalIn
     case "DeclareDefender":
       return lacks("defender", legalTargets(state, { type: "DeclareDefender" }, ctx), (id) => of("DeclareDefender").some((entry) => entry.intent.type === "DeclareDefender" && entry.intent.defenderId === id));
     case "Undefended":
+      // Before the shadow effect the sheet leaves the attack undefended and names no hero (rr.step-6-4-1): each hero is reached at the damage step (rr.step-6-4-3).
+      if (!state.pendingAttack?.shadowResolved && of("Undefended").some((entry) => entry.intent.type === "Undefended" && entry.intent.heroId == null)) return [];
       return lacks("hero", legalTargets(state, { type: "Undefended" }, ctx), (id) => of("Undefended").some((entry) => entry.intent.type === "Undefended" && entry.intent.heroId === id));
     case "Commit":
       return [...lacks("character", legalTargets(state, { type: "Commit" }, ctx), (id) => of("Commit").some((entry) => names(entry, id)))];
