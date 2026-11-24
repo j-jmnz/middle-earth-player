@@ -38,6 +38,8 @@ function turnOne(state: ScenarioState, id: string, seat: number, turn: Turn, ctx
       if (next.cards[id]?.zone !== "staging") return next;
     }
     next = engageWith(next, seat, id, steps);
+    // Lying in Wait resolves the When Revealed effects of an enemy it turns too, after the turn is done (the enemy has engaged by then, hidden.turn-enemy-not-revealed).
+    if (turn.resolve === true) pending.push({ id, seat });
     return turn.shadow === true ? dealShadowTo(next, id, steps, ctx) : next;
   }
   if (turn.resolve === true) pending.push({ id, seat });
