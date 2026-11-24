@@ -26,7 +26,9 @@ import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poiso
 import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
 import { STAT_WORD } from "../cards/card-effects.ts";
 import { progressAttack, willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
+import { deadVillagers, heldBeat, onVillagers, villagerLines } from "../readouts/against-the-shadow/amon-din.ts";
 import { stackTakes, underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
+import { NO_HERO_DAMAGE, VILLAGERS_TITLE } from "../words/scenarios/against-the-shadow/amon-din.ts";
 import { releasedWords, UNDERWORLD_TITLE } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
@@ -194,13 +196,16 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         const end = rest.findIndex((later) => later.kind === "strike" || later.kind === "attack");
         // Progress the attack placed on the enemy (stage 3 of The Drúadan Forest) is what it dealt: no "No damage" line after it.
         const placed = (end < 0 ? rest : rest.slice(0, end)).some((later) => (later.kind === "damage" || (later.kind === "progress" && progressAttack(before))) && later.amount > 0 && later.targetId === step.targetId);
-        if (!placed) line("No damage");
+        // An undefended attack on Rescued Villagers (06067:B:1) damages no hero: the villager tokens it discards come in their own beat below.
+        if (!placed) line(onVillagers(before, step.targetId) ? NO_HERO_DAMAGE : "No damage");
         // The enemy that takes no damage until he has attacked says why (The Fate of Wilderland).
         const shielded = !placed && step.side === "player" ? names.fate?.shielded(before, step.enemyId) : null;
         if (shielded) line(shielded, null, [step.enemyId]);
         return;
       }
       case "damage":
+        // The damage tokens put on Dead Villagers (06069:A:1) are told once, with the villager tokens that caused them (villagerLines).
+        if (deadVillagers(after, step.targetId)) return;
         // A heal is a damage step with a negative amount (rr.damage).
         line(step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`, "damage", [step.targetId]);
         return;
@@ -332,6 +337,12 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   // The cards an Underworld location took from the underworld deck in this intent (The Steward's Fear): no step of their own.
   const takes = stackTakes(before, after, names.card);
   if (takes.length > 0) groups.push({ rank: 9, title: UNDERWORLD_TITLE, tone: "plain", lines: takes.map((text) => ({ text, mark: null })) });
+
+  // The villager tokens of Encounter at Amon Dîn that moved or were discarded in this intent, and the defeat of stage 2B that Ghulat holds: no step of their own.
+  const villagers = villagerLines(before, after, names.card);
+  if (villagers.length > 0) groups.push({ rank: 8, title: VILLAGERS_TITLE, tone: "plain", lines: villagers.map((text) => ({ text, mark: null })) });
+  const held = heldBeat(before, after);
+  if (held) groups.push({ rank: 8, title: held.title, tone: "plain", lines: held.lines.map((text) => ({ text, mark: null })) });
 
   // A stage of Mount Gundabad's quest deck flipped to side B at the beginning of the quest phase, or bypassed (emce.bypassing): no step of its own.
   const stage = stageBeats(before, after, { card: stageNamed, ...(names.mustBypass ? { mustBypass: names.mustBypass } : {}), ...(names.atStaging ? { atStaging: names.atStaging } : {}) });

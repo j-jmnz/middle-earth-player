@@ -18,6 +18,7 @@ import type { PreviewCard } from "./card-preview.tsx";
 import { stageDetail } from "../readouts/fortress.ts";
 import { removalLimit } from "../readouts/against-the-shadow/cair-andros.ts";
 import { enemyProgress } from "../readouts/against-the-shadow/druadan.ts";
+import { amonDinStageLines, villagerUnit } from "../readouts/against-the-shadow/amon-din.ts";
 import { stewardsFearStageLines } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { advanceHold, questObjective, stagePoints } from "../readouts/objective.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
@@ -56,18 +57,18 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   const forest = forestScore(game, ctx);
   // Stages 1 and 2 of The Steward's Fear have no quest points either: their tokens against the 4 that advance them follow (06011:B:3, 06012:B:3).
   const own = objective ? `To win: ${objective}` : forest ? forestStageWords(forest) : "No quest points";
-  return { title: name, detail: [own, ...stewardsFearStageLines(game, ctx, stage.code)].join(". ") };
+  return { title: name, detail: [own, ...stewardsFearStageLines(game, ctx, stage.code), ...amonDinStageLines(game, stage.code)].join(". ") };
 }
 
 /**
  * What lies on the card now, one phrase a counter: its damage, progress and resource tokens, and whether it is exhausted or committed to the
- * quest. Empty for a card with none (a card in the hand, a fresh enemy). `progressLimit`: the progress is counted against a limit ("3 / 5 progress", Blinding Blizzard, 901307:A:2).
+ * quest. Empty for a card with none (a card in the hand, a fresh enemy). `progressLimit`: the progress is counted against a limit ("3 / 5 progress", Blinding Blizzard, 901307:A:2). `unit`: the word for a resource token ("villager token" on a card of Encounter at Amon Dîn that holds them).
  */
-export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "resources" | "exhausted" | "unconscious" | "committed">, progressLimit?: number): string[] {
+export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "resources" | "exhausted" | "unconscious" | "committed">, progressLimit?: number, unit = "resource"): string[] {
   return [
     ...(card.damage > 0 ? [`${card.damage} damage`] : []),
     ...(card.progress > 0 ? [`${card.progress}${progressLimit == null ? "" : ` / ${progressLimit}`} progress`] : []),
-    ...(card.resources > 0 ? [`${card.resources} resource${card.resources === 1 ? "" : "s"}`] : []),
+    ...(card.resources > 0 ? [`${card.resources} ${unit}${card.resources === 1 ? "" : "s"}`] : []),
     ...(isExhausted(card) ? ["Exhausted"] : []),
     ...(card.committed ? ["Committed"] : []),
   ];
@@ -130,7 +131,7 @@ export function previewCards(
     const turned = heading ? { title: headingPreviewTitle(heading), turn: headingLook(heading).turn } : {};
     const steps = heading ? { steps: headingPreviewSteps(heading).map((row) => ({ text: row.line, current: row.current })) } : {};
     // A Battleground location's preview line says its damage against its limit, and an enemy of stage 3 its progress against its hit points, so the token line does not say them a second time.
-    const tokens = tokenLines(removalLimit(game, id) > 0 ? { ...card, damage: 0 } : enemyProgress(game, ctx, id) ? { ...card, progress: 0 } : card, flagged(game, id, "progressRedirect") ? BLIZZARD_LIMIT : undefined);
+    const tokens = tokenLines(removalLimit(game, id) > 0 ? { ...card, damage: 0 } : enemyProgress(game, ctx, id) ? { ...card, progress: 0 } : card, flagged(game, id, "progressRedirect") ? BLIZZARD_LIMIT : undefined, villagerUnit(game, card) ?? "resource");
     const keywords = previewKeywords(game, ctx, id, described.text, options.ruleDoc ?? null);
     const sides = contractSides(printedOf(ctx.cards, card.code).type, described.text);
     if (sides) {

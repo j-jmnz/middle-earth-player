@@ -18,6 +18,7 @@ import { shareHint, shareValue, wordOf } from "../choice/tray-logic.ts";
 import type { OptionMark, Sheet } from "../choice/sheet-types.ts";
 import { actingSeat, hidesFace, isDead, isLooked, isPrisoner, type ZoneFacts, type ZoneId } from "../store/selectors.ts";
 import { areaRoleOf, areaSpeech } from "../store/stormcaller-table.ts";
+import { villagerUnit } from "../readouts/against-the-shadow/amon-din.ts";
 import { plural } from "./list.ts";
 import { seatTag } from "./scenarios/area.ts";
 import { REANIMATED_DEAD } from "./scenarios/angmar/dread-realm-table.ts";
@@ -155,7 +156,7 @@ function labelOf(game: ScenarioState, seat: number, card: CardInstance, deps: Ca
 
   const damage = damageWords(game, card, printed, deps, info);
   if (damage) parts.push(damage);
-  if (card.resources > 0) parts.push(plural(card.resources, "resource", "resources"));
+  if (card.resources > 0) parts.push(villagerUnit(game, card) ? plural(card.resources, "villager token") : plural(card.resources, "resource", "resources"));
   const island = islandTell(game, card);
   if (!stage) {
     if (info.questPoints != null) parts.push(`${card.progress} of ${info.questPoints} progress`);
