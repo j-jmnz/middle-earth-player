@@ -7,7 +7,7 @@ import { fetchBytesRetrying, RETRY_WAITS_MS, sha256, type SourceFile, type Sourc
 import { MIRROR_ENV, mirrorFromEnv, type Mirror } from "./client.ts";
 
 // `pnpm data mirror push [--fetch]|pull [source...]` (docs/development.md, Asset mirror). push uploads every pinned file in
-// .cache the bucket does not hold (--fetch downloads one .cache misses from its URL first); pull fills .cache with every pinned file it lacks. Only the cached sources take part: data/raw
+// .cache the bucket does not hold (--fetch downloads one .cache misses from its URL first, --strict fails when a file is still not there); pull fills .cache with every pinned file it lacks. Only the cached sources take part: data/raw
 // is committed.
 
 export type CacheDirs = { scans: string; pictures: string; pdf: string; sounds: string; music: string };
@@ -76,9 +76,8 @@ export async function pushPins(
   log.info(`pushed ${pushed} file${pushed === 1 ? "" : "s"} (${bytes(sent)}) to ${mirror.name}; ${pins.length - todo.length} already there`);
   if (absent.length > 0) {
     // A page rendered from a PDF has no URL: it is pushed only from a render at its pin, and another poppler renders other bytes.
-    const pages = new Set(pins.filter((pin) => pin.file.url.includes("#page=")).map((pin) => pin.file.path));
-    const rendered = absent.filter((name) => pages.has(name));
-    const fetchable = absent.filter((name) => !pages.has(name));
+    const fetchable = notPushed(pins, absent);
+    const rendered = absent.filter((name) => !fetchable.includes(name));
     if (rendered.length > 0) {
       log.info(`${rendered.length} PDF page${rendered.length === 1 ? "" : "s"} not pushed: this machine's render is not at the pin (another poppler version); a pack renders ${rendered.length === 1 ? "it" : "them"} from the mirrored PDF`);
       log.debug(rendered.join(", "));
@@ -90,6 +89,12 @@ export async function pushPins(
     }
   }
   return { pushed, held: pins.length - todo.length, absent };
+}
+
+/** The files a push left out that a pack cannot make again: every absent path but a page a pack renders from its mirrored PDF. */
+export function notPushed(pins: readonly { file: SourceFile }[], absent: readonly string[]): string[] {
+  const pages = new Set(pins.filter((pin) => pin.file.url.includes("#page=")).map((pin) => pin.file.path));
+  return absent.filter((name) => !pages.has(name));
 }
 
 export async function pullPins(mirror: Mirror, pins: readonly { file: SourceFile; cached: string }[], log: Log): Promise<{ pulled: number; missing: string[] }> {
@@ -167,13 +172,21 @@ async function retrying(work: () => Promise<void>, waits: readonly number[], log
 if (isDirectRun(import.meta.url)) {
   void runScript("data:mirror", async (log) => {
     const [command, ...wanted] = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
-    if (command !== "push" && command !== "pull") throw new Error("Usage: pnpm data mirror push [--fetch] | pull [source...]");
+    if (command !== "push" && command !== "pull") throw new Error("Usage: pnpm data mirror push [--fetch] [--strict] | pull [source...]");
     const mirror = mirrorFromEnv();
     if (!mirror) throw new Error(`No asset mirror: set ${MIRROR_ENV.join(", ")} (docs/development.md, Asset mirror)`);
     const { sources } = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Partial<Record<string, SourceRecord>> };
     const pins = cachedPins(sources, wanted, HERE);
     const fetchSource = process.argv.includes("--fetch") ? (url: string) => fetchBytesRetrying(url, 120_000, log) : undefined;
-    if (command === "push") await pushPins(mirror, pins, log, { fetchSource });
-    else await pullPins(mirror, pins, log);
+    if (command === "pull") {
+      await pullPins(mirror, pins, log);
+      return;
+    }
+    const { absent } = await pushPins(mirror, pins, log, { fetchSource });
+    // --strict (the mirror workflow): a pinned file the mirror still lacks fails the run, so it shows before a release needs it.
+    const left = notPushed(pins, absent);
+    if (process.argv.includes("--strict") && left.length > 0) {
+      throw new Error(`${left.length} pinned file${left.length === 1 ? " is" : "s are"} not in the mirror: ${left.slice(0, 10).join(", ")}${left.length > 10 ? ` and ${left.length - 10} more` : ""}`);
+    }
   });
 }

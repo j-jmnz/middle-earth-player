@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { createLog } from "../../log.ts";
 import { sha256, type SourceFile, type SourceRecord } from "../sources/fetch.ts";
 import type { Mirror } from "./client.ts";
-import { cachedPins, pullPins, pushPins, type CacheDirs } from "./run.ts";
+import { cachedPins, notPushed, pullPins, pushPins, type CacheDirs } from "./run.ts";
 
 const roots: string[] = [];
 const log = createLog("mirror-test");
@@ -88,6 +88,12 @@ describe("asset mirror commands", () => {
     expect(pulled).toEqual({ pulled: 2, missing: ["pdf/campaign.pdf", "scans/2.A.jpg"] });
     expect(readFileSync(path.join(fresh.scans, "1.A.jpg"), "utf8")).toBe("scan one");
     expect(readFileSync(path.join(fresh.pictures, "1.A.jpg"), "utf8")).toBe("picture one");
+  });
+
+  it("counts as not pushed every absent file but a page a pack renders from its PDF", () => {
+    const pin = (name: string, url: string) => ({ file: { path: name, url, sha256: name, bytes: 1 } });
+    const pins = [pin("pictures/1.A.jpg", "https://example.test/1.jpg"), pin("pictures/2.A.jpg", "https://example.test/book.pdf#page=2")];
+    expect(notPushed(pins, ["pictures/1.A.jpg", "pictures/2.A.jpg"])).toEqual(["pictures/1.A.jpg"]);
   });
 
   it("with --fetch, downloads a pin the cache misses from its URL, keeps it and pushes it, and skips bytes that are not the pin", async () => {
