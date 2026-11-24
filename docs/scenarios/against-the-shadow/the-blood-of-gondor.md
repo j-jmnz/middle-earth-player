@@ -159,3 +159,16 @@ The hidden cards are in the family `pelargir` (`src/catalog/families/pelargir.ts
 
 - The first player's choice of order between turning the hidden cards at the beginning of the combat phase and dealing the shadow cards (`hidden.order-vs-shadow`) is not offered: the engine turns first. An Orc Arsonist that the turn engages deals its Forced shadow cards at once, and the card the combat phase would deal to an enemy that already holds one is not dealt, so each enemy ends with 1 shadow card.
 - Faramir's hidden card is picked by the game's seed, not by the player.
+
+## Table
+
+Each piece is made by a line named here and drawn only while that line makes it; none is a control. The words, the layout and the rules of each piece are in `docs/design-system-table.md`, The Blood of Gondor's table pieces; every hook keys on this scenario's id or on its records' verbs and is empty in another. Code: `src/play/readouts/against-the-shadow/blood.ts`, `blood-steps.ts`, `src/play/words/scenarios/against-the-shadow/blood.ts`, `blood-choice.ts`, `src/play/words/asks/the-blood-of-gondor.ts`; test `src/play/scenarios/the-blood-of-gondor-table.test.ts`. Hidden information comes first: no piece names a card that is facedown or tells its type before it is turned.
+
+- **Hidden cards** (`06117:B:1`, `ats.hidden-cards`): a mark "Hidden N" on each seat's threat dial and a total dial "Hidden"; the cards are never drawn (the Set aside list counts them facedown). A near warning at 4 on stage 2 only (`06118:B:3`).
+- **Stages** (`06117:B:2`, `06118:A:1`, `06118:B:3`, `06118:B:4`): previews with the counts, what each phase does, the turn at 5, the allies held, the win and the loss; Siege and Battle chips follow the engine (`06123:A:1`). The guide and the window before combat say the choice comes before the shadow cards on stage 1.
+- **Allies** (`06132:A:1`, `06132:A:2`, `06133:A:1`, `06133:A:2`, `06132:A:3`, `06133:A:3`): whose, who may use the Action, the loss; held under Captured! they are a pill on the stage and a line in its preview; Faramir's choice names each player and his count.
+- **Locations** (`06123:A:1`, `06123:A:3`, `06124:A:1`, `06125:A:1`, `06125:A:2`, `06126:A:1`, `06127:A:1`, `06127:A:2`, `06128:A:3`, `06119:A:1`, `06119:A:2`): the Travel cost as a consequence and its refusal reason, the +5 quest points, the Dark Woods' discard, The Cross-roads' Siege, Black Númenorean's X and raise.
+- **Combat** (`06121:A:1`, `06131:A:1`): Brutal Uruk's line on the attack sheet; the engaged Orcs' Threat in the quest readout.
+- **Banner and log**: cards taken (a count and the source), cards turned (each with its type and where it went), the turn at 5, the allies placed under Captured!, control passing with the first player token.
+- **Asks**: the combat choice (`06117:B:2`), Orc Ambusher's ally discard (`06120:A:1`) and Lord Alcaron's enemy (`06133:A:2`); Faramir's choice of a player is the engine's own and has its words in `blood-choice.ts`.
+- **Not seen in a browser.** The scenario's save fixture is made by the Games task, so no screen of this table was looked at; the test reads the same states.

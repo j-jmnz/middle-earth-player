@@ -9,6 +9,7 @@ import { idOf, resolveRecords, send, start } from "../../../test/harness/scene-k
 import { CODES, drive, opened, run, table, takes } from "../../../test/scenarios/the-blood-of-gondor/table.ts";
 
 import { slotNumbers } from "../cards/card-effects.ts";
+import { cardKeywords } from "../cards/card-keywords.ts";
 import { ledgerLine } from "../cards/ledger.ts";
 import { previewCards, questTitle } from "../cards/table-preview.ts";
 import { defenseSheet } from "../choice/combat-sheets.ts";
@@ -229,6 +230,7 @@ describe("the choice at the beginning of the combat phase (06117:B:2)", () => {
 
 describe("the stage's keywords, the guide and the rail", () => {
   const keywords = (made: Made, state: ScenarioState, code: string) => previewCards(state, made.ctx, idOf(state, code), describe_(made), idName(made, state), [], ledgerLine).cards.find((card) => card.code === code)?.keywords?.map((word) => word.word);
+  const chips = (made: Made, state: ScenarioState, code: string) => cardKeywords(state, made.ctx, idOf(state, code)).map((chip) => `${chip.word}${chip.lost ? " (struck)" : ""}`);
 
   it("stage 2 shows Battle alone, and Siege (with Battle struck) while The Cross-roads is in play", () => {
     const bare = table({ stage: captured });
@@ -236,6 +238,8 @@ describe("the stage's keywords, the guide and the rail", () => {
     expect(keywords(bare, bare.state, captured)).not.toContain("Siege");
     const roads = table({ stage: captured, staging: [crossroads] });
     expect(keywords(roads, roads.state, captured)).toContain("Siege");
+    expect(chips(roads, roads.state, captured)).toEqual(["Battle (struck)", "Siege"]);
+    expect(chips(bare, bare.state, captured)).toEqual(["Battle"]);
   });
 
   it("on stage 1 the guide and the window before combat say the choice comes before the shadow cards; stage 2 keeps the plain lines", () => {
