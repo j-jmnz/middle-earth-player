@@ -7,6 +7,10 @@ import { z } from "zod";
 import type { CatalogFamily } from "../family-manifest.ts";
 import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
+import { pickSchema } from "../effect-schema-pick.ts";
+import { verbFlags } from "../verb-flags.ts";
+
+const code = z.string().min(1);
 
 const VERBS = [
   // The objective this effect names (the source by default, or the card in play with `code`) is attached to the card the reference names (`card`: the last picked card by default), an enemy in play that may have attachments, and stays a claimed objective
@@ -38,6 +42,26 @@ const VERBS = [
   // "Count the number of encounter cards in the staging area and shuffle them into the encounter deck" (05061:A:2): every card in the staging area (enemies, locations, objectives) leaves play and goes into the encounter deck, which is shuffled; the effect's X is how many there
   // were, so `RevealEncounter` with `times: { x: true }` reveals as many cards. Nothing in the staging area: X is 0.
   z.strictObject({ verb: z.literal("ShuffleStagingIntoEncounterDeck"), ...when }),
+  // The Steward's Fear: "Create the underworld deck" (06011:A:1, ats.setup-the-stewards-fear-underworld-deck). The set-aside cards with these codes (the enemies of Streets of Gondor and Brigands, the three Clue objectives) are shuffled with the game's seed and form the underworld deck, facedown,
+  // top first. The deck is the set-aside cards that hold `stackedAt`; no card of it is part of the encounter deck, a hand, the staging area or any search until the deck is shuffled into the encounter deck (ShuffleUnderworldIntoEncounterDeck).
+  verbFlags(z.strictObject({ verb: z.literal("BuildUnderworldDeck"), codes: z.array(code).min(1), ...when }), { setupRuns: "top" }),
+  // "Shuffle all Villain cards and randomly set one aside, out of play, without looking at it. Remove the others from the game" (06011:A:1): of the set-aside cards with these codes one is chosen with the game's seed and stays set aside facedown; the others leave the game, unseen (zone removed).
+  // Rolled once for each call, so one seed always hides the same card.
+  verbFlags(z.strictObject({ verb: z.literal("HideOneAside"), codes: z.array(code).min(2), ...when }), { setupRuns: "top" }),
+  // "Underworld X" (ats.underworld; 06018:A:1, 06021:A:1): the top `amount` cards of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under the host, out of play. `host: self` is the source location that entered play; `host: activeLocation` is the active location
+  // ("Place the top card of the underworld deck facedown underneath the active location, if able", 06018:A:2), and with none nothing happens. The cards are staged again when the location leaves play (ReturnUnderToStaging).
+  z.strictObject({ verb: z.literal("TakeUnderworld"), amount: positiveAmountSchema, host: z.enum(["self", "activeLocation"]), ...when }),
+  // "Reveal 1 card from the underworld deck and add it to the staging area. If it is a Clue card, discard it instead" (06023:A:2): the top card of the underworld deck is revealed by the actor in full (its When Revealed effects, Surge, Doomed and the Forced effects that hear a reveal) and added to the staging area. A card with the
+  // Trait `discardTrait` is placed in the encounter discard pile instead (ats.underworld: "placed in the encounter deck discard pile"). With the deck empty nothing happens.
+  z.strictObject({ verb: z.literal("RevealUnderworld"), discardTrait: z.string().min(1).optional(), ...when }),
+  // "Shuffle the underworld deck into the encounter deck" (06013:B:1): every card of the underworld deck joins the encounter deck, facedown, and the encounter deck is shuffled. The cards stacked under locations stay there; the deck no longer exists, so a later Underworld takes nothing.
+  z.strictObject({ verb: z.literal("ShuffleUnderworldIntoEncounterDeck"), ...when }),
+  // "Reveal the top card of the encounter deck, resolve its effects, and discard it" (06016:A:1): the top card goes faceup to the encounter discard pile and never enters play or the staging area; its Doomed threat, When Revealed effects and Surge resolve as in a reveal, and the Forced effects that hear a card revealed from the encounter deck (06016:A:2) hear it. An empty encounter deck is reset from the discard pile first.
+  z.strictObject({ verb: z.literal("RevealTopThenDiscard"), ...when }),
+  // "Randomly select 1 ally controlled by the first player, if able" (06024:A:1): one card among those the pick finds is chosen with the game's seed and becomes the picked card for the instructions after it. With none nothing is picked.
+  z.strictObject({ verb: z.literal("PickRandom"), pick: pickSchema, ...when }),
+  // "Remove 1 token from the current quest" (06014:A:2), "remove all tokens from the current quest" (06025:A:2): progress tokens (`progress`), resource tokens (`resource`) or both (`any`, progress first) are taken off the current quest card, `amount` of them (`all` by default, at most the card holds).
+  z.strictObject({ verb: z.literal("RemoveQuestTokens"), kind: z.enum(["progress", "resource", "any"]), amount: z.union([z.number().int().positive(), z.literal("all")]).optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;
@@ -80,6 +104,14 @@ const FLAGS = [
   "cannotSpendResources",
   // On the current quest stage: it does not have the Siege keyword ("The Last Battle gains battle and loses siege", 05076:B:3); read by rules/families/quest/conditions.ts currentQuestHas (src/rules/families/pelargir/stage-keyword.ts).
   "losesSiege",
+  // On the table while its source is in play: a player with no cards in his deck loses the game for the players, checked at each settle once nothing is resolving ("If any player has no cards in his deck, the players have lost the game", 06030:A:2; src/rules/families/pelargir/empty-deck.ts). A player already eliminated does not count.
+  "losesAtEmptyDeck",
 ] as const;
 
-export const manifest = { name: "pelargir", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;
+// The underworld deck lies set aside facedown, and the Villain and the Plot the Setup hides stay set aside facedown (06011:A:1): the table lists them as facedown cards without a name.
+const ASIDE_SECRETS = [
+  { verb: "BuildUnderworldDeck", codes: ["codes"] },
+  { verb: "HideOneAside", codes: ["codes"] },
+] as const;
+
+export const manifest = { name: "pelargir", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS, asideSecrets: ASIDE_SECRETS } as const satisfies CatalogFamily;

@@ -11,9 +11,14 @@ import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
 import { noteFirstEnemy, pelargirCondition } from "./first-enemy.ts";
 import { attachToHighestThreatCost } from "./host.ts";
 import { attachObjectiveTo, attackScrollHolder } from "./scroll.ts";
+import { lossesAtEmptyDeck } from "./empty-deck.ts";
+import { pickRandom } from "./pick-random.ts";
+import { removeQuestTokens } from "./quest-tokens.ts";
+import { revealTopThenDiscard } from "./reveal-discard.ts";
 import { sieges, undefendedBattlegrounds } from "./siege.ts";
 import { removeStage } from "./stage-remove.ts";
 import { resolveTopmostTreachery, shuffleStagingIntoEncounterDeck } from "./staging.ts";
+import { buildUnderworldDeck, hideOneAside, revealUnderworld, shuffleUnderworldIntoEncounterDeck, takeUnderworld } from "./underworld.ts";
 
 // The verbs src/catalog/families/pelargir.ts adds. Null when the verb is not one of them.
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -36,6 +41,22 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return resolveTopmostTreachery(state, instruction, focus, ctx, steps);
     case "ShuffleStagingIntoEncounterDeck":
       return shuffleStagingIntoEncounterDeck(state, focus, ctx, steps);
+    case "BuildUnderworldDeck":
+      return buildUnderworldDeck(state, instruction);
+    case "HideOneAside":
+      return hideOneAside(state, instruction);
+    case "TakeUnderworld":
+      return takeUnderworld(state, instruction, focus, ctx);
+    case "RevealUnderworld":
+      return revealUnderworld(state, instruction, focus, ctx, steps);
+    case "ShuffleUnderworldIntoEncounterDeck":
+      return shuffleUnderworldIntoEncounterDeck(state);
+    case "RevealTopThenDiscard":
+      return revealTopThenDiscard(state, instruction, focus, ctx, steps);
+    case "PickRandom":
+      return pickRandom(state, instruction, focus, ctx);
+    case "RemoveQuestTokens":
+      return removeQuestTokens(state, instruction);
     default:
       return null;
   }
@@ -43,10 +64,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelargir",
-  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck"],
+  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens"],
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,
-  settle: { sweep: sieges },
+  settle: { sweep: (state, ctx, steps) => lossesAtEmptyDeck(sieges(state, ctx, steps), ctx, steps) },
   combat: { undefended: (state, _candidates, cards) => undefendedBattlegrounds(state, cards) },
 };
