@@ -4,9 +4,10 @@
 import { describe, expect, it } from "vitest";
 
 import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
+import { topFrame } from "../../rules/windows/windows.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
-import { idOf, send, start, tableFromLayout } from "../../../test/harness/scene-kit.ts";
+import { idOf, revealFromTop, send, start, tableFromLayout } from "../../../test/harness/scene-kit.ts";
 import { CODES, quested, runSettled, table, undefendedAtRescued, withVillagers } from "../../../test/scenarios/encounter-at-amon-din/table.ts";
 
 import { cardKeywords } from "../cards/card-keywords.ts";
@@ -15,6 +16,7 @@ import { dungeonDetail } from "../cards/dungeon-preview.ts";
 import { ledgerLine } from "../cards/ledger.ts";
 import { previewCards, questTitle } from "../cards/table-preview.ts";
 import { defenseSheet } from "../choice/combat-sheets.ts";
+import { responseNote } from "../choice/sheet-notes.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
 import { instructionWords } from "../words/instruction.ts";
 import { turnReference } from "../phases/reference.ts";
@@ -327,6 +329,35 @@ describe("Lord Alcaron (06070:A:1, 06070:A:3)", () => {
     expect(damageOutcome(made.state, made.ctx, id, 2).loss).toBeNull();
     // Another card of a game of another scenario that leaves play loses nothing.
     expect(discardLoss({ ...made.state, scenarioId: "the-stewards-fear" }, made.ctx, id)).toBe("Lord Alcaron left play");
+  });
+});
+
+describe("Lord Alcaron's Response window (06070:A:2)", () => {
+  // The note of the open Response window, the way the sheet builds it.
+  const noteOf = (made: Made, state: ScenarioState): string => {
+    const data = topFrame(state)?.data;
+    if (data?.kind !== "responses") throw new Error("no Response window is open");
+    return responseNote(state, { card: idName(made, state), line: () => null }, data.offers, data.offers as never, made.ctx, data.event);
+  };
+
+  it("says which card discarded how many villager tokens and what Use does, after an undefended attack on Rescued Villagers", () => {
+    const made = table({ phase: "Encounter", stage: protect, engaged: [{ code: marauding, seat: 0 }], staging: [{ code: rescued, resources: 6 }, dead, hamlet], play: [alcaron], deck: ["f0", "f0"] });
+    const run = undefendedAtRescued(made, (state) => state.window?.kind === "response");
+    expect(run.state.window?.kind).toBe("response");
+    expect(noteOf(made, run.state)).toBe("Marauding Orc discarded 4 villager tokens from Rescued Villagers. Use: Lord Alcaron exhausts and puts 1 of them on a location in play. Dead Villagers keeps its damage tokens. Pass: they stay discarded.");
+  });
+
+  it("says it for one token a card discarded from itself, and for a card revealed from the encounter deck", () => {
+    const made = table({ stage: protect, active: { code: farmhouse, resources: 3 }, staging: [{ code: rescued, resources: 2 }, dead, hamlet], play: [alcaron] });
+    const steps: never[] = [];
+    const revealed = revealFromTop(made.state, made.ctx, CODES.trapped, steps).state;
+    expect(noteOf(made, revealed)).toBe("Trapped Inside discarded 1 villager token from Burning Farmhouse. Use: Lord Alcaron exhausts and puts that token on a location in play. Dead Villagers keeps its damage token. Pass: it stays discarded.");
+  });
+
+  it("keeps the plain sentence in another scenario's Response window", () => {
+    const made = table({ stage: protect, active: { code: farmhouse, resources: 3 }, staging: [{ code: rescued, resources: 2 }, dead, hamlet], play: [alcaron] });
+    const revealed = revealFromTop(made.state, made.ctx, CODES.trapped, []).state;
+    expect(noteOf(made, { ...revealed, scenarioId: "the-stewards-fear" })).toBe("A Response may be used now, or passed.");
   });
 });
 

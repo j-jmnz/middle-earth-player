@@ -59,6 +59,15 @@ export const ghulatHeldWords = "Held: the game ends when Ghulat leaves play";
 /** Lord Alcaron left play while Ghulat is in play: the loss waits for Ghulat (06070:A:3, 06071:A:3). */
 export const alcaronLeftWords = "Lord Alcaron left play. The players lose once Ghulat leaves play, because the game cannot end while he is in play.";
 
+/** The note of Lord Alcaron's Response window (06070:A:2): which card discarded how many villager tokens from which card, what Use does and what Pass does. `by`: the card whose effect or attack discarded them (null when none is known), `same`: it discarded them from itself, `count`: the tokens (null when the window does not say). Dead Villagers keeps its damage tokens: its Forced effect came first (recommended, docs/scenarios/against-the-shadow/encounter-at-amon-din.md, Readings). */
+export function alcaronResponseWords(by: string | null, holder: string, same: boolean, count: number | null): string {
+  const many = count != null && count > 1;
+  const tokens = count != null ? villagerTokens(count) : "villager tokens";
+  const from = same ? "itself" : holder;
+  const told = by ? `${by} discarded ${tokens} from ${from}.` : `${count != null ? villagerTokens(count) : "Villager tokens"} ${many || count == null ? "were" : "was"} discarded from ${holder}.`;
+  return `${told} Use: Lord Alcaron exhausts and puts ${many ? "1 of them" : "that token"} on a location in play. Dead Villagers keeps its damage token${many ? "s" : ""}. Pass: ${many ? "they stay" : "it stays"} discarded.`;
+}
+
 /** The banner's title for the villager tokens that moved or were discarded. */
 export const VILLAGERS_TITLE = "Villager tokens";
 

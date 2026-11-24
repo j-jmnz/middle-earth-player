@@ -1,6 +1,6 @@
 // Rules: ats.villagers, ats.villagers-example, ats.villager-tokens-discarded, rr.replacement-effects, rr.step-6-4-3 (data/rules/entries.json); ledger lines 06066:B:1 to B:3, 06067:B:1, 06068:A:1, 06069:A:1, 06070:A:2, 06073:A:1, 06080:A:1.
 // The villager tokens of Encounter at Amon Dîn. A villager token is a resource token on a location, on the quest card or on Rescued Villagers (the card's `resources`); it is not a resource (ats.villagers), so no payment, no Prowl and no hero's pool reads it: they read the
-// pools of heroes, and a token lies on a card that is no hero. A discarded token returns to the token bank and is announced (`villagerDiscarded`), once for each token; a moved token is announced by nothing (ats.villager-tokens-discarded).
+// pools of heroes, and a token lies on a card that is no hero. A discarded token returns to the token bank and is announced (`villagerDiscarded`, with the number discarded in the call as its `amount`, which a Response window's note reads), once for each token; a moved token is announced by nothing (ats.villager-tokens-discarded).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
@@ -35,14 +35,14 @@ function noteTokens(state: ScenarioState, by: number, replace: boolean): Scenari
   return data?.kind === "effect" ? patchTop(state, { data: { ...data, x: (replace ? 0 : (data.x ?? 0)) + by } }) : state;
 }
 
-/** Up to `amount` tokens leave the card for the bank, and each is announced (`villagerDiscarded`, about the card they left): the Forced effect of Dead Villagers and the Response of Lord Alcaron hear it. The tokens of one call are one occurrence. */
-export function discardTokens(state: ScenarioState, id: string | null, amount: number, steps: EngineStep[]): { state: ScenarioState; discarded: number } {
+/** Up to `amount` tokens leave the card for the bank, and each is announced (`villagerDiscarded`, about the card they left): the Forced effect of Dead Villagers and the Response of Lord Alcaron hear it. The tokens of one call are one occurrence. `by`: the enemy whose undefended attack discards them (the event's `other`), for the Response window's note; an effect's own card is the frame the window sits on. */
+export function discardTokens(state: ScenarioState, id: string | null, amount: number, steps: EngineStep[], by?: string): { state: ScenarioState; discarded: number } {
   const card = id ? state.cards[id] : undefined;
   const count = card ? Math.min(Math.max(0, amount), card.resources) : 0;
   if (!id || !card || count === 0) return { state, discarded: 0 };
   let next = updateCard(state, id, { resources: card.resources - count });
   const occurrence = `villagers:${id}:${steps.length}:${next.pendingEvents?.length ?? 0}`;
-  for (let each = 0; each < count; each += 1) next = queueEvent(next, { trigger: "villagerDiscarded", seat: null, subject: id, occurrence });
+  for (let each = 0; each < count; each += 1) next = queueEvent(next, { trigger: "villagerDiscarded", seat: null, subject: id, amount: count, ...(by ? { other: by } : {}), occurrence });
   return { state: next, discarded: count };
 }
 
@@ -90,5 +90,6 @@ export function villagersDamaged(before: ScenarioState, after: ScenarioState, ct
   if (!rescued || !was || rescued.damage <= was.damage) return after;
   const index = steps.findLastIndex((step) => step.kind === "damage" && step.targetId === rescued.id);
   if (index >= 0) steps.splice(index, 1);
-  return discardTokens(updateCard(after, rescued.id, { damage: was.damage }), rescued.id, rescued.damage - was.damage, steps).state;
+  const attacker = before.pendingAttack?.enemyId ?? before.pendingStrike?.enemyId;
+  return discardTokens(updateCard(after, rescued.id, { damage: was.damage }), rescued.id, rescued.damage - was.damage, steps, attacker).state;
 }

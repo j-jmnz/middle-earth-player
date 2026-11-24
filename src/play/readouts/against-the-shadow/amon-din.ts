@@ -4,13 +4,14 @@
 // Villagers with Dead Villagers, the lines of the two stages (the progress that moves tokens, the undefended attack that discards them, the held end), the readout of an undefended attack on Rescued Villagers, the quest readout of stage 1B, the preview lines of the objectives, Lord
 // Alcaron and Ghulat, and the banner's lines for tokens that moved or were discarded. Every hook keys on this scenario's id, so a card of another scenario that holds resource tokens still says resources. The engine decided every number; nothing here changes one. Pure, so a test reads it.
 import type { Effect } from "../../../catalog/boundary.ts";
+import type { GameEvent } from "../../../rules/core/state.ts";
 import { inPlay, flagged, type CardInstance, type ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { placeQuestProgress } from "../../../rules/quest/quest.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
-import { alcaronLeftWords, alcaronWords, questDialName, questDialWords, changedWords, deadChangedWords, deadDialName, deadDialWords, deadWords, endWords, ghulatWords, ghulatDialName, ghulatDialWords, ghulatHeldWords, heldLine, heldTitle, heldWords, movesWords, notWinningWords, protectWords, rescuedDialName, rescuedDialWords, rescuedWords, savageryWords, undefendedVillagersResult, undefendedVillagersWords, villagerTokens, winWords } from "../../words/scenarios/against-the-shadow/amon-din.ts";
+import { alcaronLeftWords, alcaronResponseWords, alcaronWords, questDialName, questDialWords, changedWords, deadChangedWords, deadDialName, deadDialWords, deadWords, endWords, ghulatWords, ghulatDialName, ghulatDialWords, ghulatHeldWords, heldLine, heldTitle, heldWords, movesWords, notWinningWords, protectWords, rescuedDialName, rescuedDialWords, rescuedWords, savageryWords, undefendedVillagersResult, undefendedVillagersWords, villagerTokens, winWords } from "../../words/scenarios/against-the-shadow/amon-din.ts";
 import { ownerWords } from "../../words/owner.ts";
 import type { TableDial } from "../dials.ts";
 
@@ -148,6 +149,14 @@ export function villagerChanges(before: ScenarioState, after: ScenarioState): re
     if (card.resources !== had) changes.push({ id: card.id, was: had, now: card.resources });
   }
   return changes;
+}
+
+/** The note of the Response window that follows a villager token discarded (Lord Alcaron's, 06070:A:2): the card that discarded them (the frame under the window, or the enemy whose undefended attack did), the card they left and how many. Null for any other event and in any other scenario. */
+export function villagerResponseNote(game: ScenarioState, nameOf: (id: string) => string, event: GameEvent | null): string | null {
+  if (!live(game) || event?.trigger !== "villagerDiscarded" || !event.subject) return null;
+  const response = game.stack.findLastIndex((frame) => frame.frame === "response");
+  const by = event.other ?? game.stack.slice(0, response < 0 ? game.stack.length : response).findLast((frame) => frame.cardId != null)?.cardId ?? null;
+  return alcaronResponseWords(by ? nameOf(by) : null, nameOf(event.subject), by === event.subject, event.amount ?? null);
 }
 
 /** The banner's lines for the tokens that changed in one intent: each card whose villager tokens changed, and Dead Villagers' damage tokens. Empty in any other scenario. */
