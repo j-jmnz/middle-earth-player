@@ -23,7 +23,7 @@ const HAS_ATTACHMENT: Condition = { kind: "canPick", pick: OWN_ATTACHMENTS };
 const DRU_BURI_DRU = "06045";
 const NOT_IN_VICTORY: Condition = { kind: "inVictory", code: DRU_BURI_DRU, is: false };
 
-// "Prowl X" (ats.prowl, ats.prowl-example): the players as a group discard X resources from the resource pools of their heroes, all they can when fewer remain. Each player decides for his own heroes in player order and may stop; what is left is discarded as the first player chooses (families/pelargir/group-discard.ts). A discard is not a spend.
+// "Prowl X" (ats.prowl, ats.prowl-example): the players as a group discard X resources from the resource pools of their heroes, all they can when fewer remain. Each player decides for his own heroes in player order and may stop while the players after him can discard the rest (families/pelargir/group-discard.ts). A discard is not a spend.
 const PROWL = (times: Amount): Step => ({ verb: "GroupDiscardResources", amount: times });
 // Prowl resolves when the card is revealed from the encounter deck (a card added to the staging area without a reveal has no Prowl). Its record is a Forced one of its own, so a cancel of the card's When Revealed effects does not stop it (ats.prowl: the keyword is no When Revealed effect).
 const PROWL_ON_REVEAL = (id: string, code: string, lines: string[], times: Amount): Effect => ({ id, cardCode: code, lines, timing: "forced", trigger: "revealed", subject: "self", byEncounterDeck: true, instructions: [PROWL(times)] });

@@ -72,7 +72,7 @@ export const PELARGIR_TEMPLATES: Templates = {
     read: ["amount", "value", "before"],
   }),
   GroupDiscardResources: (i, ctx) => ({
-    text: `the players as a group discard ${amt(i.amount, ctx)} resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest; what is left is discarded as the first player chooses (a discard, not a spend)`,
+    text: `the players as a group discard ${amt(i.amount, ctx)} resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)`,
     read: ["amount", "rest", "turns"],
   }),
 };
