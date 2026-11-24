@@ -11,7 +11,7 @@ import { underworldDeck } from "../../../rules/families/pelargir/underworld.ts";
 import { resolveAmount } from "../../../rules/interpret/amounts.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
-import { allianceWords, clueDialName, clueDialWords, clueStageWords, counselsWords, deckDialLists, deckDialName, deckDialWords, deckGoneWords, flamesDialName, flamesDialWords, flamesNearWords, flamesWords, stackPill, stackWords, takesWords } from "../../words/scenarios/against-the-shadow/stewards-fear.ts";
+import { allianceWords, clueDialName, clueDialWords, clueStageWords, counselsWords, deckDialFoot, deckDialLists, deckDialName, deckDialWords, deckGoneWords, flamesDialName, flamesDialWords, flamesNearWords, flamesWords, stackPill, stackWords, takesWords } from "../../words/scenarios/against-the-shadow/stewards-fear.ts";
 import { ownerWords } from "../../words/owner.ts";
 import type { TableDial } from "../dials.ts";
 
@@ -49,6 +49,12 @@ export const stackUnder = (game: ScenarioState, cardId: string): readonly string
 export function stackHost(game: ScenarioState, cardId: string): string | null {
   const card = game.cards[cardId];
   return live(game) && card?.zone === "under" && card.face === "down" && card.host != null && stackUnder(game, card.host).includes(cardId) ? card.host : null;
+}
+
+/** The card a facedown card of this scenario lay under, wherever that card is now (a location that left play still holds its stack until the cards are revealed), or null. */
+export function underHost(game: ScenarioState, cardId: string): string | null {
+  const card = game.cards[cardId];
+  return live(game) && card?.zone === "under" && card.face === "down" ? card.host : null;
 }
 
 /** The lines of the banner for the cards that went under a location in this intent, one for each location: the count and the place, never a card. */
@@ -99,7 +105,7 @@ export function stewardsFearDials(game: ScenarioState, ctx: ReduceContext, nameO
   if (!live(game)) return [];
   const dials: TableDial[] = [];
   const count = underworldCount(game);
-  if (!shuffledIn(game)) dials.push({ id: "underworld-deck", testID: "underworld-deck", label: "Underworld", name: deckDialName, value: count, note: deckDialWords(count), lists: deckDialLists(count), said: deckDialWords(count) });
+  if (!shuffledIn(game)) dials.push({ id: "underworld-deck", testID: "underworld-deck", label: "Underworld", name: deckDialName, value: count, note: deckDialWords(count), lists: deckDialLists(count), said: deckDialWords(count), foot: deckDialFoot });
   const stage = stageCard(game);
   const limit = stage ? advanceTokens(ctx, stage.code) : 0;
   if (stage && limit > 0) {

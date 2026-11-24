@@ -7,10 +7,10 @@ import { plural } from "../../list.ts";
 export const deckDialWords = (count: number): string =>
   `${plural(count, "card")} left in the underworld deck, facedown and out of play. An Underworld location that enters play takes its top cards. Stage 3B shuffles what is left into the encounter deck.`;
 
-/** The panel a tap on the Underworld dial opens: the same words, one idea to a line. */
-export const deckDialLists = (count: number): readonly { heading: string; lines: readonly string[] }[] => [
-  { heading: "The underworld deck", lines: [`${plural(count, "card")} left, facedown and out of play.`, "An Underworld location that enters play takes its top cards.", "Stage 3B shuffles what is left into the encounter deck."] },
-];
+/** The panel a tap on the Underworld dial opens: the count under a heading, and the foot says where the cards go. */
+export const deckDialLists = (count: number): readonly { heading: string; lines: readonly string[] }[] => [{ heading: "The underworld deck", lines: [`${plural(count, "card")} left, facedown and out of play`] }];
+
+export const deckDialFoot = "An Underworld location that enters play takes its top cards. Stage 3B shuffles what is left into the encounter deck.";
 
 /** The dial's name for a screen reader. */
 export const deckDialName = "Cards in the underworld deck:";

@@ -8,7 +8,7 @@ import type { EngineStep } from "../../rules/core/intents.ts";
 import { expectOk } from "../../rules/core/test-fixture.ts";
 import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
 import { reduce, startScenario, type PlayerIntent } from "../../rules/engine/reduce.ts";
-import { idOf, tableFromLayout } from "../../../test/harness/scene-kit.ts";
+import { idOf, send, tableFromLayout } from "../../../test/harness/scene-kit.ts";
 import { fearStart, fearWorld } from "../../../test/scenarios/the-stewards-fear/game.ts";
 import { CODES, DECK_CODES, PLOTS, VILLAINS, deckCodes, run, stackOne, table, underCodes, withDeck } from "../../../test/scenarios/the-stewards-fear/table.ts";
 
@@ -54,7 +54,8 @@ describe("the underworld deck (06011:A:1, 06013:B:1)", () => {
     expect(dial).toMatchObject({ value: deckCodes(state).length, label: "Underworld", name: "Cards in the underworld deck:" });
     expect(dial?.note).toBe(`${deckCodes(state).length} cards left in the underworld deck, facedown and out of play. An Underworld location that enters play takes its top cards. Stage 3B shuffles what is left into the encounter deck.`);
     // A tap on the dial opens a panel a sighted player reads: the count, and where the cards go.
-    expect(dial?.lists).toEqual([{ heading: "The underworld deck", lines: [`${deckCodes(state).length} cards left, facedown and out of play.`, "An Underworld location that enters play takes its top cards.", "Stage 3B shuffles what is left into the encounter deck."] }]);
+    expect(dial?.lists).toEqual([{ heading: "The underworld deck", lines: [`${deckCodes(state).length} cards left, facedown and out of play`] }]);
+    expect(dial?.foot).toBe("An Underworld location that enters play takes its top cards. Stage 3B shuffles what is left into the encounter deck.");
     expect(dial?.said).toBe(dial?.note);
     // One card went under The Fourth Star at stage 1B: the deck holds one fewer than it was built with.
     expect(deckCodes(state)).toHaveLength(11);
@@ -225,7 +226,7 @@ describe("Up in Flames and the other Plots (06030:A:1, 06030:A:2, 06029:A:1, 060
 });
 
 describe("a facedown card of a stack opens its location (06018:A:1)", () => {
-  it("06018:A:1 the slot of a facedown stack card has no code and names its host, so a tap, a hold and a right click open the location", () => {
+  it("06018:A:1 the slot of a facedown stack card has no code and names its host, so a tap and a right click open the location", () => {
     const made = withDeck({ active: CODES.sewers }, ["06026"]);
     const sewers = idOf(made.state, CODES.sewers);
     const state = stackOne(made, made.state, sewers);
@@ -268,6 +269,17 @@ describe("the banner of the underworld stacks (ats.underworld)", () => {
     expect(lines).toContain("Revealed Secret Map from under Sewers");
     expect(lines.some((line) => /^Revealed [^ ]/.test(line) && !line.includes("from under"))).toBe(false);
     expect(moment?.title).not.toBe("Staging");
+  });
+
+  it("the card is told as from under its location also when the location left play in an earlier intent (The Fourth Star's Response waits first)", () => {
+    const made = withDeck({ active: CODES.star }, ["06026"]);
+    const star = idOf(made.state, CODES.star);
+    const stacked = run(made, made.state, { verb: "TakeUnderworld", amount: 1, host: "self" }, star);
+    const open = settle(run(made, stacked, { verb: "PlaceProgressOn", amount: 9, target: "activeLocation" }), made.ctx, []);
+    expect(open.window?.kind).toBe("response");
+    const passed = send({ state: open, steps: [] }, { type: "Pass" }, made.ctx);
+    const moment = momentOf(open, passed.state, passed.steps, names(made, passed.state));
+    expect(moment?.lines.map((line) => line.text)).toContain("Revealed A Scrap of History from under The Fourth Star");
   });
 
   it("the cards an Underworld location takes are said as a count and the place, never a card", () => {
