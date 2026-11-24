@@ -14,7 +14,7 @@ Your phone's backup (iCloud or Google) may include these saves. That copy goes t
 
 The app plays offline and makes two kinds of connection.
 
-- **Deck import.** When you import a deck from a RingsDB link, it sends [ringsdb.com](https://ringsdb.com), over HTTPS, the deck's id and the code of any card the app doesn't recognise.
+- **Deck import.** When you import a deck from a RingsDB link, it sends [ringsdb.com](https://ringsdb.com), over HTTPS, the deck's id and the codes of up to 20 cards the app doesn't recognise.
 - **Update check.** At most once a day, a few seconds after the app opens, when you come back to it, or when you turn the check on, and whenever you tap Check now in Settings, About, it asks GitHub's public API (`api.github.com`), over HTTPS, for the latest release of this project. The request carries nothing about you or your games. The app reads only the newest version number and its release date, and keeps them in `user.db` with the time it asked and the version whose notice you closed. If a newer version is out, a notice says so and Get it opens the release page in your browser. Turn it off in Settings, About, Check for new versions; with it off the app asks only when you tap Check now. Development builds never ask.
 
 RingsDB and GitHub see your IP address and a standard user agent, and handle them under their own privacy policies ([GitHub's](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)). The app adds no identifier, cookie, account or game data to either request. With Check for new versions off, no Check now and no RingsDB import, the app never connects at all.
