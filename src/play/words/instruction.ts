@@ -140,6 +140,17 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
     }
     case "DamageCard":
       return `deal ${amountWords(instruction.amount)} damage to ${refWords(instruction.target)}`;
+    // The pelargir family (The Drúadan Forest): the damage of Men in the Dark, and Prowl's group discard.
+    case "DamageCardThenSetX":
+      return `deal ${amountWords(instruction.amount)} damage to it`;
+    case "GroupDiscardResources": {
+      const amount = amountWords(instruction.amount);
+      return `the players as a group discard ${amount} resource${amount === "1" ? "" : "s"} from their heroes' pools`;
+    }
+    case "EachPlayerSpends": {
+      const amount = amountWords(instruction.amount);
+      return `each player spends ${amount} resource${amount === "1" ? "" : "s"} from their heroes' pools`;
+    }
     case "AddResources": {
       const amount = amountWords(instruction.amount);
       return `add ${amount} resource${amount === "1" ? "" : "s"} to ${instruction.to === "host" || instruction.to == null ? "the attached hero's" : instruction.to === "self" ? "this card's" : "its"} pool`;
