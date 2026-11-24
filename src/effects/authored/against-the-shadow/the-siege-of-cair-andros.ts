@@ -107,7 +107,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "05059",
       lines: ["05059:A:1"],
       timing: "constant",
-      condition: { kind: "all", conditions: [{ kind: "sourceIn", zone: "staging" }, { kind: "count", pick: { type: "enemy", control: "any", trait: "Orc" }, min: 1 }] },
+      condition: { kind: "all", conditions: [{ kind: "sourceIn", zone: "staging" }, { kind: "count", pick: { type: "enemy", control: "any", staging: true, trait: "Orc" }, min: 1 }] },
       instructions: [{ verb: "ModifyStat", stat: "noProgressPlaced", amount: 1, until: "whileSourceInPlay", target: "self" }],
     },
     { id: "05059:shadow:1", cardCode: "05059", lines: ["05059:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: { stat: "shadowCards", of: "attacker" }, until: "endOfAttack", target: "attacker" }] },

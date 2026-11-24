@@ -42,6 +42,7 @@ export const ASIDE_SITES: Readonly<Record<string, AsideSite>> = {
   "families/misc/collection.ts": { functions: ["choose"], group: "notListed", why: "The cards a choice offers out of the collection (`collection`)." },
   "families/nightmare/dungeon.ts": { functions: ["takeMorePrisoners"], group: "public", why: "Reads a named set-aside copy, or the stage set aside when it was defeated." },
   "families/nightmare/index.ts": { functions: ["setAsideFromDeck"], group: "public", why: "SetAsideFromDeck: every copy of a named card." },
+  "families/pelargir/stage-remove.ts": { functions: ["removeStage"], group: "notListed", why: "RemoveStage: a quest stage taken out of the quest deck is set aside; quest stages are never listed." },
   "families/poison/stages.ts": { functions: ["advanceOtherPlayers"], group: "notListed", why: "The shared quest stage a lone player leaves is set aside; quest stages are never listed." },
   "families/quest/branch.ts": { functions: ["branchFrom"], group: "notListed", why: "Quest stages." },
   "families/sea/dreadnaught.ts": { functions: ["engageRandomSetAside"], group: "public", why: "EngageRandomSetAside puts its pick into play at once; the enemies left were named by the Setup." },

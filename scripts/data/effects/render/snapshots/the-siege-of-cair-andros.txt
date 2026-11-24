@@ -155,7 +155,7 @@ Scenario piles that place cards with no record (quest: 05072 The Defense; quest:
 
 05059:A:1 (front): If an Orc enemy is in play, progress tokens cannot be placed on Orc War Camp while it is in the staging area.
   05059:constant:1: Constant
-    only if all of: (this card is in the staging area) and (the number of Orc enemy (any player controls) is at least 1)
+    only if all of: (this card is in the staging area) and (the number of Orc enemy (any player controls) or in the staging area is at least 1)
     - this card: stat noProgressPlaced 1, while this card is in play
 
 05059:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each shadow card dealt to it.
