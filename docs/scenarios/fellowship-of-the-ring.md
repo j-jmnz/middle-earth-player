@@ -51,6 +51,10 @@ Stage 3 has no quest points. The win is a `questResolution` record on Bucklebury
 
 The rule is `mec109.hide-x` and `mec109.hide-tests`, with the worked example (Hide 3, 2 willpower committed, discarded threat 2 + 2 + 0, an action raises willpower to 4, the test succeeds) as the fixture. The engine runs it as a frame: the revealing seat tests before that card's When Revealed or Forced effect, an action window opens after the discarded threat is known, then the frame pops and the rest of the revealed card resolves. A treachery adds 0 threat. This is not a token the player tracks by hand.
 
+## Explored on arrival
+
+A location in the staging area can hold progress that fills its quest points once it is active (A Shadow of the Past, Pathless Country: its staging bonus drops away). The players travel to it and it is explored at once (`rr.explored`) and goes to the discard pile. It never became the active location, so its Forced effects and Responses after travel do not fire. Source: agent recommendation (`rr.explored` does not say whether a location explored on arrival counts as the active location).
+
 ## Seeded decks
 
 On first launch, insert two saved decks that match the printed starter lists. They are ordinary `user.db` decks. The parenthetical numbers below are collector numbers inside a product, not RingsDB codes, and the same number is used in the core set and in this box. Resolve each row by card name against the core set plus MEC109. Prefer the Revised Core code when the booklet's core-set card has a revised printing. The lists are data: `data/starter-decks.json` holds each row with the code chosen for it and the MEC109 span (`mec109.starter-stealth`, `mec109.starter-wisdom`) that prints the list, `pnpm data build` copies them into `data/campaigns/fellowship-of-the-ring.json` as `starterDecks`, and the seed script reads that file. A test checks each row's name, collector number and count, and each section total, against the span.

@@ -397,11 +397,26 @@ describe("quest resolution", () => {
   it("explores a location on travel when its progress already fills its quest points (rr.explored)", () => {
     const { state, cards } = atCommit({ willpower: 4, threat: 10, stages: ["stage-1"] });
     const spawned = spawn(state, "road", { zone: "staging" });
-    // 4 progress put on the location in the staging area; its printed quest points are 3 (and are higher only while it is in staging).
     const full = updateCard(spawned.state, spawned.id, { progress: 4 });
     const travel = new Map(cards).set("road", definePrinted({ code: "road", name: "Road", type: "location", threat: 0, questPoints: 3 }));
     const traveled = travelTo(full, spawned.id, travel);
     expect(traveled?.cards[spawned.id]?.zone).toBe("encounterDiscard");
     expect(traveled?.activeLocation).toBeNull();
+  });
+
+  it("keeps a location that holds less progress than its quest points active on travel", () => {
+    const { state, cards } = atCommit({ willpower: 4, threat: 10, stages: ["stage-1"] });
+    const spawned = spawn(state, "road", { zone: "staging" });
+    const part = updateCard(spawned.state, spawned.id, { progress: 2 });
+    const travel = new Map(cards).set("road", definePrinted({ code: "road", name: "Road", type: "location", threat: 0, questPoints: 3 }));
+    const traveled = travelTo(part, spawned.id, travel);
+    expect(traveled?.activeLocation).toBe(spawned.id);
+  });
+
+  it("does not explore a location with no quest points on travel", () => {
+    const { state, cards } = atCommit({ willpower: 4, threat: 10, stages: ["stage-1"] });
+    const spawned = spawn(state, "road", { zone: "staging" });
+    const traveled = travelTo(spawned.state, spawned.id, cards);
+    expect(traveled?.activeLocation).toBe(spawned.id);
   });
 });
