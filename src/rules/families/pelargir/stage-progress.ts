@@ -2,6 +2,7 @@
 // "When an enemy has progress equal to its hit points, add it to the victory display and place those progress tokens on the quest." While the table holds `progressToVictory` (the record of The Passage Out), an enemy in play with progress of at least its printed hit points
 // (the progress is never damage, so the card's hit points are the printed ones; reading of 06044:B:2) goes to the victory display faceup, and every progress token it held goes on the current quest card. The enemy leaves first, so a card that reads the victory display (Drû-buri-Drû's
 // own bar on winning) sees it there when the tokens land and the quest advance is checked. The tokens may pile above the stage's quest points when an advance is barred (faq.progress-without-advancing).
+import { inCause, ruleCause } from "../../core/cause.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { printedOf } from "../../core/printed.ts";
@@ -28,8 +29,10 @@ export function progressesToVictory(state: ScenarioState, ctx: ReduceContext, st
   for (const id of full(state, ctx)) {
     const enemy = next.cards[id];
     if (!enemy || enemy.progress <= 0) continue;
-    const moved = moveEncounter(next, id, "victory", enemy.controller ?? next.activeSeat, ctx, steps);
-    next = progressToQuest(moved, enemy.progress, ctx, steps);
+    const before = next;
+    next = inCause(steps, ruleCause("rr.discard-pile-and-victory-display"), () => progressToQuest(moveEncounter(before, id, "victory", enemy.controller ?? before.activeSeat, ctx, steps), enemy.progress, ctx, steps));
+    // The progress may defeat the last stage while a window of the attack that filled the enemy is still open: the game is won, as WinGame ends it, and the Resolution is asked for.
+    if (next.stageCleared && !before.stageCleared) next = { ...next, window: null, pendingAttack: null };
   }
   return next;
 }

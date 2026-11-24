@@ -100,6 +100,20 @@ describe("progressToVictory (06044:B:2)", () => {
   });
 });
 
+describe("progressToVictory ends the game in the window of the attack that fills Drû-buri-Drû (06044:B:3)", () => {
+  it("is won when the attack puts the last progress on the quest, and the engine offers the Resolution, not a stalled attack window", () => {
+    const made = table({ stage: STAGE_3, phase: "PlayerAttacks", progress: 12, engaged: [{ code: DRU, progress: 4 }] });
+    const hero = idOf(made.state, HERO);
+    const hero2 = idOf(made.state, "dh2");
+    const boosted = ["willpower"].flatMap(() => [hero, hero2]).reduce((state, id) => ({ ...state, modifiers: [...state.modifiers, { instanceId: id, sourceId: id, stat: "willpower" as const, amount: 3, until: "endOfPhase" as const }] }), made.state);
+    const sent = send(begin(boosted), { type: "DeclareAttackers", enemyId: idOf(made.state, DRU), attackerIds: [hero, hero2] }, made.ctx);
+    const state = finish(sent, made.ctx).state;
+    expect(state.cards[idOf(made.state, DRU)]?.zone).toBe("victory");
+    expect(state.stageCleared).toBe(true);
+    expect(state.window === null || state.window.kind === "resolution").toBe(true);
+  });
+});
+
 describe("EachPlayerSpends (06051:A:2)", () => {
   // Two seats in the travel phase with the Garden of Poisons in the staging area: the first seat's hero holds `first` resources and the second seat's `second`.
   const garden = (first: number, second: number): LayoutTable => {
