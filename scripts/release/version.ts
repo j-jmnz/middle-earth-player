@@ -46,6 +46,16 @@ function issuesOf(body: string): { closes: number[]; refs: number[] } {
   return { closes: [...closes], refs: [...refs].filter((number) => !closes.has(number)) };
 }
 
+/**
+ * A commit's own words (its summary, a `Breaking:` line) as text for the release notes and the issue comments, which GitHub
+ * renders as Markdown: anyone who lands a commit writes them. A backslash goes before the backtick, `[`, `<` and the backslash
+ * itself, so no code span, link, picture or HTML starts; a zero-width space goes after `@`, so no account is mentioned (a
+ * backslash does not stop a mention). `#123` stays an issue link.
+ */
+export function plainMarkdown(text: string): string {
+  return text.replace(/[\\`[<]/g, "\\$&").replace(/@/g, "@\u200b");
+}
+
 export function parseCommit(subject: string, body: string): Change {
   const match = TYPED.exec(subject.trim());
   const breaking = [...body.matchAll(BREAKING)].map((line) => line[1].trim());
