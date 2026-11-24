@@ -88,7 +88,7 @@ The signing secrets and the asset mirror's secrets live in an environment named 
 2. Under Deployment branches and tags, choose Selected branches and tags, and add the branch rules `main` and `release/*`.
 3. Add every secret of this section (`ANDROID_*`, `APP_STORE_CONNECT_*`, `WINDOWS_CERT_*`, `R2_*`) as an environment secret, then delete the repository secrets of the same names. The variables (`APPLE_TEAM_ID`, `ANDROID_CERT_SHA256`, `TESTFLIGHT_URL`, `TESTFLIGHT_GROUP`, `R2_BUCKET`) are not secret and can stay repository variables.
 
-Each job that reads one of those secrets names the environment when it runs on `main` or a `release/*` branch: in `release.yml` the `plan`, `assets`, `android`, `ios`, `desktop`, `testflight` and `add-desktop` jobs, in `mirror.yml` its one job, and in `showcase.yml` the `capture` job. On any other branch they name no environment, so a dry run there finds no secret: it signs the APK with the debug key, skips TestFlight and packs from the sources. A secret left among the repository secrets still reaches every branch, so step 3's delete is what closes the gap.
+Each job that reads one of those secrets names the environment when it runs on `main` or a `release/*` branch, in `release.yml`, `mirror.yml` and `showcase.yml` alike (`scripts/checks/release-trigger.test.ts` fails for a job that reads a secret without it). On any other branch they name no environment, so a dry run there finds no secret: it signs the APK with the debug key, skips TestFlight and packs from the sources. A secret left among the repository secrets still reaches every branch, so step 3's delete is what closes the gap.
 
 ### Desktop signing (optional)
 

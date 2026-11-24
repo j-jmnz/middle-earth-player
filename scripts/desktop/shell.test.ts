@@ -76,10 +76,9 @@ describe("pnpmCommand", () => {
   it("quotes for cmd every argument with a character cmd acts on, and refuses one cmd would still read", () => {
     const quoted = (arg: string) => pnpmCommand([arg], {} as Record<string, string>, "win32").args[0];
     for (const arg of ["a&calc", "a|b", "a^b", "a<b", "a>b", "(a)", "C:\\R&D\\web"]) expect(quoted(arg), arg).toBe(`"${arg}"`);
-    expect(quoted('say "hi"')).toBe('"say \\"hi\\""');
     expect(quoted("")).toBe('""');
     expect(quoted("-c.extraMetadata.version=1.2.3")).toBe("-c.extraMetadata.version=1.2.3");
-    for (const arg of ["%PATH%", "a\nb", "a\r\nwhoami"]) expect(() => quoted(arg), JSON.stringify(arg)).toThrow("cmd cannot take");
+    for (const arg of ["%PATH%", "a\nb", "a\r\nwhoami", 'say "hi"', 'a"&calc&"']) expect(() => quoted(arg), JSON.stringify(arg)).toThrow("cmd cannot take");
     // Off Windows, and under pnpm, no shell reads the arguments, so they pass as they are.
     expect(pnpmCommand(["%PATH%", "a&b"], {} as Record<string, string>, "linux").args).toEqual(["%PATH%", "a&b"]);
   });
