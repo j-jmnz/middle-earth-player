@@ -1,6 +1,7 @@
 // Test helpers for the Steward's Fear tests (src/rules/families/pelargir/underworld.test.ts, src/campaign/scenarios/the-stewards-fear/): a table of the scenario, an instruction run, the underworld deck read back.
 import type { Effect, Instruction } from "../../../src/catalog/boundary.ts";
 import type { ScenarioState } from "../../../src/rules/core/state.ts";
+import { moveCard } from "../../../src/rules/core/zones.ts";
 import { settle } from "../../../src/rules/engine/machine.ts";
 import { underworldDeck } from "../../../src/rules/families/pelargir/underworld.ts";
 import { runInstruction } from "../../../src/rules/interpret/interpret.ts";
@@ -60,3 +61,21 @@ export const underCodes = (state: ScenarioState, host: string): (string | undefi
   Object.values(state.cards)
     .filter((card) => card.zone === "under" && card.host === host)
     .map((card) => card.code);
+
+/** A table with the underworld deck built by the Setup record's verb from the set-aside cards with these codes (the whole deck by default); the window the table opened stays. */
+export function withDeck(layout: Layout, codes: readonly string[] = DECK_CODES): LayoutTable & { state: ScenarioState } {
+  const made = table({ ...layout, setAside: [...(layout.setAside ?? []), ...codes] });
+  return { ...made, state: { ...run(made, made.state, { verb: "BuildUnderworldDeck", codes: [...codes] }), window: made.state.window } };
+}
+
+/** The active location explored: all its progress at once, as a quest or Secret Map does; the stacks under it are released by the settle sweep that follows. */
+export const explored = (made: LayoutTable, state: ScenarioState): ScenarioState => settle(run(made, state, { verb: "PlaceProgressOn", amount: 9, target: "activeLocation" }), made.ctx, []);
+
+/** The card leaves play some other way (discarded by an effect), and the game settles. */
+export const discarded = (made: LayoutTable, state: ScenarioState, id: string): ScenarioState => settle({ ...moveCard(state, id, { zone: "encounterDiscard" }), window: null }, made.ctx, []);
+
+/** The codes of the staging area, in order. */
+export const stagedCodes = (state: ScenarioState): (string | undefined)[] => state.staging.map((id) => codeOf(state, id));
+
+/** The location with this id takes the top card of the underworld deck, as Underworld 1 does. */
+export const stackOne = (made: LayoutTable, state: ScenarioState, host: string): ScenarioState => run(made, state, { verb: "TakeUnderworld", amount: 1, host: "self" }, host);
