@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { settle } from "../../engine/machine.ts";
 import { moveCard } from "../../core/zones.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
-import { idOf } from "../../../../test/harness/scene-kit.ts";
+import { idOf, legalIntents, send, start } from "../../../../test/harness/scene-kit.ts";
 import { CODES, THREE, codeOf, run, table } from "../../../../test/scenarios/the-siege-of-cair-andros/table.ts";
 
 const { citadel: CITADEL, approach: APPROACH, banks: BANKS, reinforcing: REINFORCING, atApproach: AT_APPROACH, atCitadel: AT_CITADEL, lastBattle: LAST_BATTLE } = CODES;
@@ -88,3 +88,36 @@ describe("ResolveTopmostTreachery (05056:A:2)", () => {
   });
 });
 
+
+describe("the immediate advance waits for the window of the last Battleground location (05072:B:2, 05033:A:2, 05035:A:2)", () => {
+  // The quest on stage 1: The Banks, the last Battleground location, is active with 2 of its 3 progress, and the committed Defense explores it. `removed` are the stages already set aside.
+  const questing = (removed: readonly string[]) => {
+    const t = table({ phase: "Quest", active: { code: BANKS, progress: 2 }, deck: ["f0", "f0", "f0", "f0"] });
+    const prepared = removed.reduce((state, code) => run(t, state, { verb: "RemoveStage", code }), t.state);
+    const committed = send(start({ ...prepared, window: { kind: "pass" } }), { type: "Commit", cardIds: [t.hero, t.hero2] }, t.ctx);
+    return { t, run: send(committed, { type: "Pass" }, t.ctx) };
+  };
+  const answerBanks = (made: ReturnType<typeof questing>) => {
+    const banks = idOf(made.t.state, BANKS);
+    const response = legalIntents(made.run.state, made.t.ctx).find((intent) => intent.type === "Trigger" && intent.cardId === banks);
+    expect(response).toBeDefined();
+    return send(made.run, response as Parameters<typeof send>[1], made.t.ctx).state;
+  };
+
+  it("the Response of The Banks is offered while stage 1 is still current, and the advance comes after it resolved", () => {
+    const made = questing([]);
+    expect(made.run.state.cards[idOf(made.t.state, BANKS)]?.zone).toBe("victory");
+    expect(codeOf(made.run.state, made.run.state.questStage)).toBe(CODES.defense);
+    const answered = answerBanks(made);
+    expect(codeOf(answered, answered.questStage)).toBe(AT_APPROACH);
+    expect(answered.cards[idOf(made.t.state, REINFORCING)]?.zone).toBe("setAside");
+  });
+
+  it("with stages 3 and 4 removed the Response removes stage 2 and the advance after it reveals The Last Battle, whose When Revealed resolves then", () => {
+    const made = questing([AT_APPROACH, AT_CITADEL]);
+    expect(codeOf(made.run.state, made.run.state.questStage)).toBe(CODES.defense);
+    const answered = answerBanks(made);
+    expect(codeOf(answered, answered.questStage)).toBe(LAST_BATTLE);
+    expect(answered.staging.length).toBeGreaterThan(0);
+  });
+});

@@ -2,15 +2,14 @@
 // The Battleground locations of The Siege of Cair Andros: a location with enough damage is removed from the game, an undefended attack's damage goes to the lowest Threat Battleground location in play, and the quest advances at once when none is left. Damage on a location is separate from
 // its progress and only counts toward the removal (ats.cair-andros-location-damage); damage that is left when a location is removed does not carry over (ats.cair-andros-defense-carry-over).
 import type { EngineStep } from "../../core/intents.ts";
+import { gameReads } from "../../core/game-reads.ts";
 import { modifiedStat, releaseAttachments } from "../../core/keywords.ts";
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
 import { flagged, heldAmount, updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { restricted } from "../../interpret/restrictions.ts";
-import { advanceStage } from "../../quest/quest.ts";
-import { afterProgress } from "../../quest/stage-reveal.ts";
 import { activeLocations } from "../south/locations.ts";
+import { advanceNow } from "./advance.ts";
 
 const BATTLEGROUND = "Battleground";
 
@@ -35,6 +34,24 @@ export function undefendedBattlegrounds(state: ScenarioState, cards: ReadonlyMap
   return threats.filter((entry) => entry.threat === lowest).map((entry) => entry.id);
 }
 
+/**
+ * An undefended attack's damage is set after its shadow card resolved (rr.step-6-4-3), so a shadow effect that removed the Battleground location the attack was aimed at (Siege Raft on The Banks) leaves the damage to the lowest Threat Battleground location
+ * then in play, or to a hero when none is left (ats.cair-andros-location-damage). The state with the attack aimed again, or with the defending player asked to name the card when it is not one location or one hero; null when the target is not a removed Battleground location.
+ */
+export function aimAgain(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioState | null {
+  const attack = state.pendingAttack;
+  const aimed = attack?.heroId != null ? state.cards[attack.heroId] : undefined;
+  const stage = state.questStage;
+  if (!attack || !aimed || aimed.zone !== "removed" || !stage || !flagged(state, stage, "undefendedToBattleground") || !printedOf(cards, aimed.code).traits.includes(BATTLEGROUND)) return null;
+  const left = undefendedBattlegrounds(state, cards);
+  if (left.length === 1) return { ...state, pendingAttack: { ...attack, heroId: left[0] } };
+  // No Battleground location is left: a seat with one hero names it without being asked.
+  const heroes = left.length === 0 ? (state.seats[attack.seat]?.heroes ?? []).filter((id) => state.cards[id]?.zone === "heroes") : [];
+  if (heroes.length === 1) return { ...state, pendingAttack: { ...attack, heroId: heroes[0] } };
+  const { heroId: _removed, ...rest } = attack;
+  return { ...state, pendingAttack: rest, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
+}
+
 /** A location that holds `removedAtDamage` and has that much damage (or more) is removed from the game: it is not explored and goes to no pile, its attachments are discarded, its damage and progress are gone. */
 function removeFull(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): ScenarioState {
   let next = state;
@@ -49,17 +66,16 @@ function removeFull(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard
   return next;
 }
 
-/** The current stage holds `advancesWithoutBattleground` and no Battleground location is in play: the quest advances at once to the next stage still in the quest deck, and its When Revealed effects resolve. Not during the Setup (the mulligan and the opening), before the locations are in play. */
+/** The current stage holds `advancesWithoutBattleground` and no Battleground location is in play: the quest advances at once to the next stage still in the quest deck, and its When Revealed effects resolve. Not during the Setup (the mulligan and the opening), before the locations are in play, and not while a window, an effect or an attack is open (the Response of the location explored last comes first). */
 function advanceWithout(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const stage = state.questStage;
-  if (state.mode === "mulligan" || state.mode === "afterOpening" || state.lost || state.stageCleared || state.stack.length > 0 || state.pendingAttack || state.pendingStrike || !stage || !flagged(state, stage, "advancesWithoutBattleground")) return state;
+  if (state.mode === "mulligan" || state.mode === "afterOpening" || state.lost || state.stageCleared || state.stack.length > 0 || state.window || state.pendingAttack || state.pendingStrike || !stage || !flagged(state, stage, "advancesWithoutBattleground")) return state;
   if (battlegroundsInPlay(state, ctx.cards).length > 0) return state;
-  const before = steps.length;
-  return afterProgress(advanceStage(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length), before, ctx, steps);
+  return advanceNow(state, ctx, steps);
 }
 
-/** The family's settle sweep: the removals at damage first, then the immediate advance. Inert in a game with no modifier (no card holds a flag). */
+/** The family's settle sweep: the removals at damage first, then the immediate advance. Inert in a game with no modifier and in one whose records have no `removedAtDamage` (gameReads caches that per effect list). */
 export function sieges(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (state.modifiers.length === 0) return state;
+  if (state.modifiers.length === 0 || !gameReads(state, ctx, '"removedAtDamage"')) return state;
   return advanceWithout(removeFull(state, ctx.cards, steps), ctx, steps);
 }
