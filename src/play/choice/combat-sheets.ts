@@ -8,6 +8,7 @@ import { defenseAsDefender, modifiedStat } from "../../rules/core/keywords.ts";
 import { attackStatAgainst } from "../../rules/families/attack/spectral.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 
+import { undefendedRedirectWords } from "../readouts/cair-andros.ts";
 import { fateAttackNote, fateTargetNote } from "../words/scenarios/fate.ts";
 import { attackSource } from "../words/scenarios/grapple.ts";
 import { nightDefenderExcess, nightStageAttack } from "../words/scenarios/night.ts";
@@ -28,7 +29,7 @@ function foreseen(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id
 }
 
 /** The heroes an undefended attack can land on, when there is more than one to choose from. */
-function undefendedSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, title: string, note: string): Sheet | PlayerIntent {
+function undefendedSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, title: string, note: string, redirect: string | null): Sheet | PlayerIntent {
   const heroes = legalTargets(game, { type: "Undefended" }, ctx);
   if (heroes.length <= 1) return heroes[0] ? { type: "Undefended", heroId: heroes[0] } : { type: "Undefended" };
   const enemyId = game.pendingAttack?.enemyId ?? "";
@@ -38,7 +39,7 @@ function undefendedSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNa
     key: `undefended:${game.pendingAttack?.enemyId ?? ""}`,
     step: "Combat",
     title,
-    note: `${note} Undefended: a hero takes all of it.`,
+    note: `${note} ${redirect ?? "Undefended: a hero takes all of it."}`,
     verb: "Damage to",
     confirm: "Take the damage",
     options: heroes.map((id) => {
@@ -94,7 +95,9 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
   const source = shadowSource || attackSource(game, ctx, names.card) || fateAttackNote(game, ctx, names.card);
   const note = numbers ? `Attack ${numbers.attack}.${source}` : "";
   const defenders = has(legal, "DeclareDefender") ? legalTargets(game, { type: "DeclareDefender" }, ctx) : [];
-  const undefended = undefendedSheet(game, ctx, names, title, note);
+  // While stage 1B of The Siege of Cair Andros is current the damage of an undefended attack goes to a Battleground location, not a hero (05072:B:2).
+  const redirect = numbers ? undefendedRedirectWords(game, ctx, numbers.attack) : null;
+  const undefended = undefendedSheet(game, ctx, names, title, note, redirect);
   // Leave undefended with one hero to take it: the armed line says when that hero falls and the game with it.
   const lone = "kind" in undefended ? null : undefended.type === "Undefended" ? undefended.heroId : null;
   const loneCaution = lone && numbers ? foreseen(game, ctx, names, lone, numbers.attack).caution : undefined;
@@ -111,7 +114,7 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
     step: "Combat",
     title,
     stats: numbers ? statOf(game, ctx, numbers.enemyId, "attack") : [],
-    note: game.pendingAttack?.undefended ? `${note} This attack is undefended.` : (onHill?.note ?? (defenders.length === 0 ? `${note} No character can defend.` : `${note} Choose a defender, or leave it undefended.`)),
+    note: game.pendingAttack?.undefended ? `${note} This attack is undefended.${redirect ? ` ${redirect}` : ""}` : (onHill?.note ?? (defenders.length === 0 ? `${note} No character can defend.${redirect ? ` ${redirect}` : ""}` : `${note} Choose a defender, or leave it undefended.${redirect ? ` ${redirect}` : ""}`)),
     verb: "Defend with",
     options: defenders.map((id) => {
       const defense = defenseAsDefender(game, id, ctx.cards);
