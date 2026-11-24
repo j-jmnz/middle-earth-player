@@ -11,6 +11,8 @@ import { pickSchema } from "../effect-schema-pick.ts";
 import { verbFlags } from "../verb-flags.ts";
 
 const code = z.string().min(1);
+// The card a villager verb names: a reference (the source, the active location, the picked card) or the card in play with this code (Rescued Villagers).
+const villagerHolder = z.union([cardRefSchema, z.strictObject({ code })]);
 
 const VERBS = [
   // The objective this effect names (the source by default, or the card in play with `code`) is attached to the card the reference names (`card`: the last picked card by default), an enemy in play that may have attachments, and stays a claimed objective
@@ -73,9 +75,22 @@ const VERBS = [
   z.strictObject({ verb: z.literal("GroupDiscardResources"), amount: positiveAmountSchema, rest: z.number().int().optional(), turns: z.array(z.number().int()).optional(), ...when }),
   // "Deal 1 damage to that hero. If no hero takes damage, ..." (06053:A:1): the picked card takes `amount` damage as DamageCard deals it, and the effect's X becomes `value` only when the card holds more damage once the responses to it were heard (damage that was canceled or prevented is not damage taken). `before` is the engine's own field.
   z.strictObject({ verb: z.literal("DamageCardThenSetX"), amount: positiveAmountSchema, value: z.number().int().min(0), before: z.number().int().min(0).optional(), ...when }),
+  // "Discard 1 villager token from the active location" (06073:A:1, ats.villagers, ats.villager-tokens-discarded): up to `amount` villager tokens (the card's resource tokens, fewer when it holds fewer) leave the card for the token bank. Each token is announced (`villagerDiscarded`, about the card it left), and the
+  // effect's X is the number discarded ("If no villager token is discarded by this effect", read with the condition `x`). src/rules/families/pelargir/villagers.ts.
+  z.strictObject({ verb: z.literal("DiscardVillagerTokens"), from: villagerHolder, amount: positiveAmountSchema, ...when }),
+  // "Take a villager token from Rescued Villagers and place it on a location" (06080:A:1), "move all villager tokens from that location to Rescued Villagers" (06068:A:1), "move an equal number of villager tokens from this quest onto Rescued Villagers" (06066:B:2): up to `amount` tokens (`all`) move from one card
+  // to another card in play. A move is no discard: nothing hears it. The number moved is added to the effect's X.
+  z.strictObject({ verb: z.literal("MoveVillagerTokens"), from: villagerHolder, to: villagerHolder, amount: positiveAmountSchema.optional(), all: z.literal(true).optional(), ...when }),
+  // "Discard the character with the fewest remaining hit points. That character's controller may ..." (06074:A:1): the hero or ally in play (any player's, an objective ally too) with the fewest hit points left, as modified, is the picked card, the first player choosing among those tied; the player who
+  // controls it acts for the instructions after it. Nothing is picked when no character is in play. src/rules/families/pelargir/fewest.ts.
+  z.strictObject({ verb: z.literal("PickFewestHitPointsLeft"), ...when }),
 ] as const;
 
-const TRIGGERS = [] as const;
+const TRIGGERS = [
+  // About a card that held villager tokens: one of them was just discarded (the subject is the card it left; the event names no card, so every card in play hears it), once for each token ("After a villager token is discarded", 06070:A:2; "If a villager token is discarded from a location, objective, or quest stage", 06069:A:1).
+  // The tokens of one discard are one occurrence. A move is not heard (src/rules/families/pelargir/villagers.ts).
+  "villagerDiscarded",
+] as const;
 
 const FLAGS = [
   // On an enemy until the end of the attack: the combat damage of its attack goes to the hero that holds the card with `takesAttackDamage`, if one does, and not to the defender ("Any damage dealt by this attack is dealt to the hero with Alcaron's
@@ -123,6 +138,18 @@ const FLAGS = [
   // On the table: an enemy in play with progress equal to (or more than) its printed hit points is added to the victory display, and all its progress goes on the current quest ("When an enemy has progress equal to its hit points, add it to the victory display and place those progress tokens on the quest", 06044:B:2).
   // Checked at every settle (src/rules/families/pelargir/stage-progress.ts).
   "progressToVictory",
+  // On the quest stage 1B: the progress that would be placed on it is replaced (the shared list of quest/progress-replaced.ts): none is placed and its record hears `progressReplaced` with the amount, then moves that many villager tokens from the quest card to Rescued Villagers ("When progress would
+  // be placed on Savagery of the Orcs, move an equal number of villager tokens from this quest onto Rescued Villagers instead", 06066:B:2).
+  "progressToVillagers",
+  // On the quest stage 1B: while the card holds no villager token the quest advances at once to the next stage ("If there are no villager tokens on Savagery of the Orcs, advance to the next stage", 06066:B:3; families/pelargir/villagers.ts, a settle sweep).
+  "advancesWithoutVillagers",
+  // On the quest stage 2B: while it is current, an undefended attack's damage goes to Rescued Villagers and to no hero, and the damage becomes discarded villager tokens ("If an attack goes undefended, discard X villager tokens from Rescued Villagers instead of damaging a hero", 06067:B:1;
+  // families/pelargir/villagers.ts, the family's combat hooks).
+  "undefendedToVillagers",
+  // On the table until the end of the game: the game is ending ("When the players defeat this stage, end the game", 06067:B:2). The constants of Rescued Villagers and Dead Villagers compare the tokens once it is set and Ghulat is not in play.
+  "gameEnding",
+  // On the table until the end of the game: Lord Alcaron left play, so the players lose as soon as Ghulat is not in play ("If Lord Alcaron leaves play, the players have lost the game", 06070:A:3; the constant of Dead Villagers ends the game).
+  "endingLost",
 ] as const;
 
 // The underworld deck lies set aside facedown, and the Villain and the Plot the Setup hides stay set aside facedown (06011:A:1): the table lists them as facedown cards without a name.
