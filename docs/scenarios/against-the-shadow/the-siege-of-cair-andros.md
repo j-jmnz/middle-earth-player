@@ -25,7 +25,7 @@ The statuses are those of the Readings bullet of `docs/scenarios/against-the-sha
 - F3 = https://ffg-forum-archive.entropicdreams.com/topic/98788-removing-quest-stages-siege-of-cair-andros (two players who agree, no designer)
 - F4 = https://ffg-forum-archive.entropicdreams.com/topic/134285-from-siege-to-battle (one player, another quest)
 
-### 05030 Orc Scramblers, 05031 Battering Ram, 05032 Sappers, 05036 Orc Assault
+### 05030 Orc Scramblers, 05031 Battering Ram, 05032 Siege Raft, 05036 Orc Assault
 
 - `05030:A:1` (literal). Surge is the card's keyword. `05030:A:1` (span-settled): Surge resolves after the When Revealed. Not taken: before it. Basis: rr.surge.
 - `05030:A:2` (span-settled). "1 damage to each Battleground location in play" hits those in the staging area and the active location. Not taken: staging only. Basis: rr.in-play-and-out-of-play; V18.
@@ -94,7 +94,7 @@ The flags and verbs are in the family `pelargir` (`src/catalog/families/pelargir
 - `undefendedToBattleground` (a constant on stage 1): the family's `combat.undefended` hook returns the lowest Threat Battleground locations in play as the targets of an undefended attack's damage.
 - `advancesWithoutBattleground` (a constant on stage 1): the same sweep calls `advanceStage` when no Battleground location is in play, once the quest is set up.
 - `RemoveStage { code }` (`stage-remove.ts`): the stage is set aside; the current stage is set aside and the quest advances. `skippedStage` (`stage-skip.ts`) takes, in this scenario, the first later stage still in the quest deck.
-- `ResolveTopmostTreachery { uncancelable }` and `ShuffleStagingIntoEncounterDeck` (`staging.ts`): the second leaves out the revealed card and any treachery, and sets the effect's X.
+- `ResolveTopmostTreachery { uncancelable }` and `ShuffleStagingIntoEncounterDeck` (`staging.ts`): the second leaves out the card being revealed, the cards with a frame open on the stack (a Lieutenant of Mordor that copies it) and any treachery, because a revealed card lies in the staging area while its When Revealed resolves, and sets the effect's X.
 - `cannotSpendResources` (a constant on a hero) and `losesSiege` (a constant on the current stage) are read by two shared files, each with one added clause that no other record can reach: `payerOk` in `src/rules/families/costs/pay.ts` and `spendablePools` in `src/rules/families/costs/verbs.ts` (a locked pool pays nothing), and `currentQuestHas` in `src/rules/families/quest/conditions.ts` (the stage that loses Siege does not have it). The other direct spenders (`families/encounter/items.ts`, `play/leave.ts`) are not reached by a card of this cycle.
 
 ## Readings to confirm

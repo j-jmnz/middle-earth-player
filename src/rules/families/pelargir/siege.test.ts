@@ -152,6 +152,17 @@ describe("ShuffleStagingIntoEncounterDeck, the revealed card (05061:A:2)", () =>
   });
 });
 
+describe("Lieutenant of Mordor copying The Power of Mordor (05056:A:2, 05061:A:2)", () => {
+  it("does not shuffle the Lieutenant, which is being revealed, back into the deck: the reveals end", () => {
+    const t = table({ phase: "Quest", staging: [CITADEL], discard: ["05061"], deck: ["05056", "f0", "f0", "f0"] });
+    const revealed = run(t, t.state, { verb: "RevealEncounter", who: "firstPlayer", times: 1 });
+    const done = settle(revealed, t.ctx, []);
+    const lieutenant = done.cards[idOf(t.state, "05056")];
+    expect(lieutenant?.zone).toBe("staging");
+    expect(done.stack.length).toBeLessThan(5);
+  });
+});
+
 describe("ResolveTopmostTreachery (05056:A:2)", () => {
   it("resolves the When Revealed effects of the last treachery in the encounter discard pile and leaves it there", () => {
     const t = table({ discard: ["05036", "05056"], phase: "Encounter" });

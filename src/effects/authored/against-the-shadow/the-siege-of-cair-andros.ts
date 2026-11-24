@@ -50,7 +50,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
     { id: "05031:shadow:1", cardCode: "05031", lines: ["05031:A:3"], timing: "shadow", instructions: SHADOW_TO("The Approach") },
 
-    // 05032 Sappers. A:1: 2 damage to the Battleground location in play with the lowest Threat (a tie is the first player's to name; none is possible with The Banks 1, The Approach 2, The Citadel 3). A:2 (Shadow): as 05030's for The Banks.
+    // 05032 Siege Raft. A:1: 2 damage to the Battleground location in play with the lowest Threat (a tie is the first player's to name; none is possible with The Banks 1, The Approach 2, The Citadel 3). A:2 (Shadow): as 05030's for The Banks.
     {
       id: "05032:whenRevealed:1",
       cardCode: "05032",

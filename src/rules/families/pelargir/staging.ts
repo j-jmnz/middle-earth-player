@@ -25,8 +25,9 @@ export function resolveTopmostTreachery(state: ScenarioState, instruction: Extra
 
 /** ShuffleStagingIntoEncounterDeck: each card in the staging area leaves play and is shuffled into the encounter deck; the effect's X is how many there were. A location's damage and progress go with it, and it is not explored. */
 export function shuffleStagingIntoEncounterDeck(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  // The card itself is not counted (it resolves while the revealed card is still held with the staging area), nor is any treachery.
-  const ids = state.staging.filter((id) => id !== focus.sourceId && printedOf(ctx.cards, state.cards[id]?.code ?? "").type !== "treachery");
+  // A card that is being revealed is in the staging area while its When Revealed effect resolves, but it is not counted or shuffled: not the card itself, not the Lieutenant of Mordor that copies this effect (rr.step-3-3), and no card whose frame is open on the stack. Nor is any treachery.
+  const open = new Set(state.stack.map((frame) => frame.cardId));
+  const ids = state.staging.filter((id) => id !== focus.sourceId && !open.has(id) && printedOf(ctx.cards, state.cards[id]?.code ?? "").type !== "treachery");
   let next = state;
   for (const id of ids) next = moveEncounter(next, id, "shuffle", focus.seat, ctx, steps);
   const data = effectData(next);
