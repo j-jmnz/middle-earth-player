@@ -9,7 +9,7 @@ import { attackStrength } from "../../../rules/combat/combat.ts";
 import { restricted } from "../../../rules/interpret/restrictions.ts";
 import { committedWillpower } from "../../../rules/quest/quest.ts";
 import { finish, idOf, send, start, statOf, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
-import { CODES, table } from "../../../../test/scenarios/the-druadan-forest/table.ts";
+import { CODES, runSettled, table } from "../../../../test/scenarios/the-druadan-forest/table.ts";
 
 const { pursuit: STAGE_1, untimelyEnd: STAGE_2, passageOut: STAGE_3, druBuriDru: DRU, thief: THIEF, hunter: HUNTER, elite: ELITE } = CODES;
 
@@ -39,11 +39,22 @@ describe("06044:B:2 the attack, the progress and the enemy that fills", () => {
     return run.state;
   };
 
-  it("06044:B:2 characters attack with their Willpower, 2 here against the Defense of the Thief, and with their Attack on the other stages", () => {
+  // A hero whose Willpower (3) and Attack (5) differ, so a test says which stat the attack read.
+  const unlike = (made: LayoutTable): ScenarioState => ({ ...made.state, modifiers: [...made.state.modifiers, { instanceId: idOf(made.state, "dh1"), sourceId: idOf(made.state, "dh1"), stat: "willpower", amount: 1, until: "endOfPhase" }, { instanceId: idOf(made.state, "dh1"), sourceId: idOf(made.state, "dh1"), stat: "attack", amount: 3, until: "endOfPhase" }] });
+
+  it("06044:B:2 characters attack with their Willpower and not their Attack: a hero of Willpower 3 and Attack 5 strikes for 3 on this stage and for 5 on the others", () => {
     const made = table({ stage: STAGE_3, engaged: [THIEF] });
-    expect(attackStrength(buff(made.state, idOf(made.state, "dh1"), "defense", 5), [idOf(made.state, "dh1")], idOf(made.state, THIEF), made.ctx.cards)).toBe(2);
+    expect(attackStrength(unlike(made), [idOf(made.state, "dh1")], idOf(made.state, THIEF), made.ctx.cards)).toBe(3);
     const other = table({ stage: STAGE_2, engaged: [THIEF] });
-    expect(attackStrength(other.state, [idOf(other.state, "dh1")], idOf(other.state, THIEF), other.ctx.cards)).toBe(2);
+    expect(attackStrength(unlike(other), [idOf(other.state, "dh1")], idOf(other.state, THIEF), other.ctx.cards)).toBe(5);
+  });
+
+  it("06044:B:2 an Attack bonus is not added on this stage: +3 Attack leaves the strength at the Willpower, a Willpower bonus counts", () => {
+    const made = table({ stage: STAGE_3, engaged: [THIEF] });
+    const hero = idOf(made.state, "dh1");
+    const attack = (state: ScenarioState): number => attackStrength(state, [hero], idOf(made.state, THIEF), made.ctx.cards);
+    expect(attack({ ...made.state, modifiers: [...made.state.modifiers, { instanceId: hero, sourceId: hero, stat: "attack", amount: 3, until: "endOfPhase" }] })).toBe(2);
+    expect(attack(buff(made.state, hero, "willpower", 3))).toBe(5);
   });
 
   it("06044:B:2 the damage of the attack is placed as progress tokens on the enemy and not as damage, the Defense still taken off", () => {
@@ -73,7 +84,14 @@ describe("06044:B:2 the attack, the progress and the enemy that fills", () => {
     expect(settled.cards[settled.questStage ?? ""]?.progress).toBe(7);
   });
 
-  it("06044:B:2 damage from an effect stays damage, and on another stage the attack deals damage", () => {
+  it("06044:B:2 damage from an effect stays damage, on stage 3 as on the others, and on another stage the attack deals damage", () => {
+    const hurt = (stage: string) => {
+      const made = table({ stage, engaged: [HUNTER] });
+      const hunter = idOf(made.state, HUNTER);
+      return runSettled(made, made.state, { verb: "DamageCard", amount: 2, target: "self" }, hunter).cards[hunter];
+    };
+    expect(hurt(STAGE_3)).toMatchObject({ damage: 2, progress: 0 });
+    expect(hurt(STAGE_2)).toMatchObject({ damage: 2, progress: 0 });
     const made = table({ stage: STAGE_2, phase: "PlayerAttacks", engaged: [THIEF] });
     const state = strike(made, THIEF, ["dh1"]);
     expect(state.cards[idOf(state, THIEF)]).toMatchObject({ progress: 0, damage: 1 });

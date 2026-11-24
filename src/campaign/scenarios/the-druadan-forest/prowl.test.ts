@@ -6,7 +6,8 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { EFFECTS } from "../../../effects/index.ts";
-import { idOf } from "../../../../test/harness/scene-kit.ts";
+import { idOf, revealFromTop, send } from "../../../../test/harness/scene-kit.ts";
+import { isProwlWindow } from "../../../../test/scenarios/the-druadan-forest/game.ts";
 import { CODES, revealPlay as play, run as runEffect, table } from "../../../../test/scenarios/the-druadan-forest/table.ts";
 
 const { elite: ELITE, hunter: HUNTER, thief: THIEF, stars: STARS } = CODES;
@@ -101,5 +102,24 @@ describe("06054:A:1 Prowl 2 of Stars in Sky", () => {
     expect(total(run.state)).toBe(0);
     expect(run.state.cards[idOf(run.state, "dh1")]?.committed).toBe(true);
     expect(run.state.cards[idOf(run.state, STARS)]?.zone).toBe("encounterDiscard");
+  });
+});
+
+describe("06047:A:1 the Prowl window as the goldens and the fixture finder read it", () => {
+  it("06047:A:1 a Prowl's discard or stop and its hero pick are Prowl windows, and the hero pick of a payment is not", () => {
+    // Elite, Prowl 2 with two players: the choice to discard or stop, then the hero to discard from.
+    const made = table({ seats: 2, heroResources: 2, phase: "Quest", deck: ["f0", "f0"] });
+    const first = revealFromTop(made.state, made.ctx, ELITE, []).state;
+    expect(first.window?.kind === "choose" && first.window.options).toEqual(["discard", "stop"]);
+    expect(isProwlWindow(first, made.ctx)).toBe(true);
+    const picked = send({ state: first, steps: [] }, { type: "Choose", optionId: "discard" }, made.ctx).state;
+    expect(picked.window?.kind === "choose" && picked.window.options).toEqual(heroesOf(made.state, 0));
+    expect(isProwlWindow(picked, made.ctx)).toBe(true);
+    // Leaves on Tree: pay 1 resource for the attachment from one of two heroes' pools: a choice among the seat's own heroes that is no Prowl.
+    const leaves = table({ seats: 1, heroResources: 1, phase: "Quest", deck: ["f0"], attached: [{ code: "attachment", to: "dh1" }] });
+    const paying = send({ state: revealFromTop(leaves.state, leaves.ctx, CODES.leaves, []).state, steps: [] }, { type: "Choose", optionId: "pay" }, leaves.ctx).state;
+    const own = new Set(paying.seats[0]?.heroes ?? []);
+    expect(paying.window?.kind === "choose" && paying.window.options.every((option) => own.has(option))).toBe(true);
+    expect(isProwlWindow(paying, leaves.ctx)).toBe(false);
   });
 });

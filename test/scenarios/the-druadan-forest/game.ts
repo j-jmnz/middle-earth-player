@@ -1,6 +1,8 @@
 import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
+import { effectById } from "../../../src/rules/windows/listen.ts";
+import { topFrame } from "../../../src/rules/windows/windows.ts";
 import { characters } from "../../../src/rules/combat/combat.ts";
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
@@ -151,19 +153,23 @@ export const playGolden = (golden: DruadanGolden, ctx: ReduceContext): DruadanGa
 
 const resourcesOf = (state: ScenarioState, seat: number): number => (state.seats[seat]?.heroes ?? []).reduce((sum, id) => sum + (state.cards[id]?.resources ?? 0), 0);
 
+/** Whether the open window is a Prowl's: a choice of the frame of an effect whose record holds the GroupDiscardResources verb (its discard or stop, or the hero to discard from). Another payment among a seat's own heroes (Garden of Poisons' travel, a shadow's payment) is not. */
+export function isProwlWindow(state: ScenarioState, ctx: Pick<ReduceContext, "effects">): boolean {
+  if (state.window?.kind !== "choose") return false;
+  const data = topFrame(state)?.data;
+  const record = data?.kind === "effect" ? effectById(ctx, data.effectId) : undefined;
+  return record?.instructions.some((step) => step.verb === "GroupDiscardResources") ?? false;
+}
+
 /**
- * The seats whose heroes a Prowl discarded resources from, read from the trail: an intent that answers a Prowl window (the Choose of discard or stop, or of one of the acting seat's own heroes to discard from) and leaves
- * that seat's heroes with fewer resources.
+ * The seats whose heroes a Prowl discarded resources from, read from the trail: an intent that answers a Prowl window (`isProwlWindow`) and leaves that seat's heroes with fewer resources.
  */
-export function prowlSeats(played: Pick<PlayedGame, "kept" | "intents" | "trail">): number[] {
+export function prowlSeats(played: Pick<PlayedGame, "kept" | "intents" | "trail">, ctx: Pick<ReduceContext, "effects">): number[] {
   const seats = new Set<number>();
   (played.trail ?? []).forEach((after, index) => {
     const before = index === 0 ? played.kept : played.trail?.[index - 1];
-    const window = before?.window;
-    if (!before || window?.kind !== "choose") return;
-    const own = new Set(before.seats[window.seat]?.heroes ?? []);
-    const prowl = (window.options.length === 2 && window.options.includes("discard") && window.options.includes("stop")) || window.options.every((option) => own.has(option));
-    if (prowl) for (let seat = 0; seat < before.seats.length; seat += 1) if (resourcesOf(after, seat) < resourcesOf(before, seat)) seats.add(seat);
+    if (!before || !isProwlWindow(before, ctx)) return;
+    for (let seat = 0; seat < before.seats.length; seat += 1) if (resourcesOf(after, seat) < resourcesOf(before, seat)) seats.add(seat);
   });
   return [...seats].sort();
 }

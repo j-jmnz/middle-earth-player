@@ -4,8 +4,7 @@ import { describe, expect, it } from "vitest";
 import { loadAnyScenario } from "../../../../scripts/data/load-scenarios.ts";
 import { goldenState } from "../../../../test/harness/golden-state.ts";
 
-// What is The Drúadan Forest's own in the standalone game: the Normal and Easy counts of every card, the cards Easy thins or leaves out, and what each win leaves in the victory display (Drû-buri-Drû and the Woses the players
-// filled with progress). The cycle checks (a part of its cycle, no campaign card, playable, scored and recorded as a standalone run with nothing earned, a loss writing nothing, the loss reasons) are the golden suite's
+// What is The Drúadan Forest's own in the standalone game: the Normal and Easy counts of every card, the cards Easy thins or leaves out, and what each win leaves in the victory display (Drû-buri-Drû; the golden suite checks how each Wose got there). The cycle checks (a part of its cycle, no campaign card, playable, scored and recorded as a standalone run with nothing earned, a loss writing nothing, the loss reasons) are the golden suite's
 // (test/harness/golden-suite.ts, standalone: true). The scenario has no Nightmare deck.
 const druadan = loadAnyScenario("the-druadan-forest");
 const NORMAL = "solo win";
@@ -29,11 +28,7 @@ describe("The Drúadan Forest in the against-the-shadow cycle", () => {
 
   it("keeps Drû-buri-Drû out of the encounter deck until the Setup sets him aside, and leaves him in the victory display in each win", () => {
     for (const name of [NORMAL, TWO, EASY]) {
-      const state = goldenState(druadan.id, name);
       expect(cardsOf("06045", name).map((card) => card.zone), name).toEqual(["victory"]);
-      // Every Wose in the victory display went there by progress, not by damage: none of them holds damage.
-      const woses = state.victory.map((id) => state.cards[id]).filter((card) => card && card.code !== "06045");
-      for (const card of woses) expect(card?.damage ?? 0, `${name} ${card?.code}`).toBe(0);
     }
   });
 });

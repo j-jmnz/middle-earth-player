@@ -45,7 +45,7 @@ describe("The Drúadan Forest golden", () => {
       if (golden.name.endsWith("threat 50")) expect(seats.every((seat) => seat.eliminated && seat.threat >= 50), golden.name).toBe(true);
       else expect(seats.every((seat) => seat.eliminated && seat.heroes.length === 0), golden.name).toBe(true);
     },
-    checks({ game }) {
+    checks({ game, world }) {
       // What a win means here: Drû-buri-Drû reached the victory display by attacks (progress from the Willpower of a character, the cause of an attack), not by a card's damage.
       it("puts Drû-buri-Drû in the victory display by progress from attacks made with Willpower, in every win", () => {
         for (const golden of DRUADAN_GOLDENS.filter((entry) => entry.outcome === "won")) {
@@ -58,11 +58,30 @@ describe("The Drúadan Forest golden", () => {
         }
       });
 
+      it("moves every Wose to the victory display by progress from attacks, never by damage", () => {
+        let seen = 0;
+        for (const golden of DRUADAN_GOLDENS.filter((entry) => entry.outcome === "won")) {
+          const played = game(golden);
+          const woses = played.state.victory.filter((id) => played.state.cards[id]?.code !== "06045");
+          seen += woses.length;
+          for (const id of woses) {
+            const code = played.state.cards[id]?.code;
+            const progress = played.steps.flatMap((step) => (step.kind === "progress" && step.targetId === id ? [step] : []));
+            // Each token that filled it came from an attack (rr.step-6-8-3), and nothing dealt it damage on the way.
+            expect(progress.length, `${golden.name} ${code}`).toBeGreaterThan(0);
+            expect(progress.every((step) => "rule" in step.cause && step.cause.rule === "rr.step-6-8-3"), `${golden.name} ${code}`).toBe(true);
+            expect(played.steps.some((step) => step.kind === "damage" && step.targetId === id && step.amount > 0), `${golden.name} ${code}`).toBe(false);
+          }
+        }
+        // The check reads at least one Wose, so it cannot pass on empty displays.
+        expect(seen).toBeGreaterThan(0);
+      });
+
       it("has a Prowl discard resources from the heroes of both seats in the two-handed win, and from the one seat's heroes in the solo win", () => {
         const two = DRUADAN_GOLDENS.find((entry) => entry.name === "two-handed win");
         const solo = DRUADAN_GOLDENS.find((entry) => entry.name === "solo win");
-        expect(prowlSeats(game(two as DruadanGolden))).toEqual([0, 1]);
-        expect(prowlSeats(game(solo as DruadanGolden))).toEqual([0]);
+        expect(prowlSeats(game(two as DruadanGolden), world(two as DruadanGolden).ctx)).toEqual([0, 1]);
+        expect(prowlSeats(game(solo as DruadanGolden), world(solo as DruadanGolden).ctx)).toEqual([0]);
       });
     },
   });
