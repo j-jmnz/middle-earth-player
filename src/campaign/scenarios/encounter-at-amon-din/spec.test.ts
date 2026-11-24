@@ -1,7 +1,7 @@
 // Rules: ats.villagers, ats.setup-amon-din-objectives, ats.villager-tokens-discarded, rr.reveal, rr.surge, rr.travel, rr.shadow-effects, rr.forced, rr.step-6-4-1, rr.step-6-4-3 (data/rules/entries.json). The lines that need a longer game moment are the tests of the files beside this one (setup.test.ts, villagers.test.ts, stage-one.test.ts, stage-two.test.ts, alcaron.test.ts, ghulat.test.ts, encounter-cards.test.ts, shadows.test.ts).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, damageOn, deckCount, defend, endRound, handCount, lost, quest, reveal, resolve, resourcesOn, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, damageOn, deckCount, defend, endRound, handCount, lost, quest, reveal, resolve, resourcesOn, stagingThreat, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Encounter at Amon Dîn (against-the-shadow part 6): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points
@@ -62,6 +62,7 @@ const ROWS: readonly Row[] = [
   // Locations: Villagers X when the location enters play from the deck or by a search.
   { line: "06075:A:1", name: "Villagers 4: Burning Farmhouse is revealed with 4 villager tokens on it", layout: { stage: PROTECT, staging: STAGING, deck: ["f0", "f0"] }, act: reveal(FARMHOUSE), expect: resourcesOn(FARMHOUSE, 4) },
   { line: "06075:A:2", name: "At the end of the round 1 villager token is discarded from Burning Farmhouse in the staging area (Dead Villagers gets a damage token)", layout: { stage: PROTECT, staging: [{ code: FARMHOUSE, resources: 4 }, RESCUED, DEAD] }, act: endRound, expect: [resourcesOn(FARMHOUSE, 3), damageOn(DEAD, 1)] },
+  { line: "06075:A:2", name: "At the end of the round the active Burning Farmhouse discards 1 villager token too", layout: { stage: PROTECT, active: { code: FARMHOUSE, resources: 4 }, staging: STAGING }, act: endRound, expect: [resourcesOn(FARMHOUSE, 3), damageOn(DEAD, 1)] },
   { line: "06076:A:1", name: "Villagers 3: Gondorian Hamlet is revealed with 3 villager tokens on it", layout: { stage: PROTECT, staging: STAGING, deck: ["f0", "f0"] }, act: reveal(HAMLET), expect: resourcesOn(HAMLET, 3) },
   { line: "06076:A:2", name: "In the staging area it gains: after a treachery is revealed from the encounter deck, 1 villager token is discarded from it", layout: { stage: PROTECT, staging: [{ code: HAMLET, resources: 3 }, RESCUED, DEAD], deck: ["treachery", "f0"] }, act: reveal("treachery"), expect: [resourcesOn(HAMLET, 2), damageOn(DEAD, 1)] },
   { line: "06077:A:1", name: "Villagers 2: Secluded Farmhouse is revealed with 2 villager tokens on it", layout: { stage: PROTECT, staging: STAGING, deck: ["f0", "f0"] }, act: reveal(SECLUDED), expect: resourcesOn(SECLUDED, 2) },
@@ -75,6 +76,9 @@ const ROWS: readonly Row[] = [
   // Trapped Inside.
   { line: "06079:A:2", name: "When Revealed: 1 villager token for each player is discarded from the active location (2 players: 2 of 5)", layout: { stage: PROTECT, seats: 2, active: { code: FARMHOUSE, resources: 5 }, staging: STAGING, deck: ["f3", "f0"] }, act: reveal(TRAPPED), expect: [resourcesOn(FARMHOUSE, 3), damageOn(DEAD, 2), deckCount(2)] },
   { line: "06079:A:2", name: "When Revealed: with fewer tokens than players all are discarded and, with none discarded at all, it gains surge", layout: { stage: PROTECT, seats: 2, active: { code: FARMHOUSE, resources: 0 }, staging: STAGING, deck: ["f3", "f0"] }, act: reveal(TRAPPED), expect: [zone("f3", "staging"), damageOn(DEAD, 0)] },
+
+  // Scourge of Mordor (05064:A:1, a Ravaging Orcs card of The Siege of Cair Andros) with the villager objectives in play: the Threat of the staging area rises by the cost of the card each player discards.
+  { line: "05064:A:1", name: "Each player discards the top card of his deck and the Threat in the staging area is raised by its cost (2), the objectives with their tokens in play changing nothing", layout: { stage: PROTECT, staging: [RESCUED, { code: DEAD, damage: 2 }], deckOf: ["c2"], deck: ["f0"] }, act: reveal("05064"), expect: [stagingThreat(2), damageOn(DEAD, 2)] },
 
   // Panicked! is a treachery: a Gondorian Hamlet in the staging area would discard a token it has just been given (06076:A:2), so the location here is Secluded Farmhouse.
   { line: "06080:A:1", name: "When Revealed: the player takes a villager token from Rescued Villagers and places it on a location in the staging area", layout: { stage: PROTECT, staging: [{ code: RESCUED, resources: 2 }, DEAD, SECLUDED], deck: ["f3", "f0"] }, act: reveal(PANICKED), expect: [resourcesOn(RESCUED, 1), resourcesOn(SECLUDED, 1), damageOn(DEAD, 0), deckCount(2)] },
