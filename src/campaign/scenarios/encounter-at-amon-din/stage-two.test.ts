@@ -1,4 +1,4 @@
-// Rules: rr.step-6-4-3, rr.replacement-effects, rr.forced, rr.response, rr.undefended-attacks, ats.villager-tokens-discarded (data/rules/entries.json).
+// Rules: rr.step-6-4-3, rr.replacement-effects, rr.forced, rr.response, ats.villager-tokens-discarded (data/rules/entries.json).
 // Protect the Villagers (stage 2, 06067:B:1): an undefended attack is aimed at Rescued Villagers and its damage is discarded villager tokens, not damage on a hero. Each attack here is a real one (the enemy attacks the first seat, the defender is no one), through the combat steps of the engine.
 import { describe, expect, it } from "vitest";
 

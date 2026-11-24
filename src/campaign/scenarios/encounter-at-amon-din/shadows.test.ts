@@ -1,4 +1,4 @@
-// Rules: rr.shadow-effects, rr.step-6-4-1, rr.step-6-4-3, rr.undefended-attacks, ats.villager-tokens-discarded (data/rules/entries.json).
+// Rules: rr.shadow-effects, rr.step-6-4-1, rr.step-6-4-3, ats.villager-tokens-discarded (data/rules/entries.json).
 // The Shadow lines (06072:A:2, 06073:A:2, 06078:A:3, 06079:A:3, 06080:A:2) and the Ravaging Orcs of The Siege of Cair Andros (05062:A:2, 05063:A:2, 05064:A:2) that act differently here: while stage 2B is current an undefended attack is aimed at Rescued Villagers, so the Attack they add becomes discarded villager tokens. Each attack is a real one: an enemy engaged with the first seat attacks with the Shadow card dealt to it.
 import { describe, expect, it } from "vitest";
 

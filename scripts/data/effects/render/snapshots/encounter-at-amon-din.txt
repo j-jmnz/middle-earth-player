@@ -163,7 +163,7 @@ Scenario piles that place cards with no record (activeLocation: 06075 Burning Fa
     - place 4 resource tokens on this card
 
 06075:A:2 (front): Forced: At the end of the round, discard 1 villager token from Burning Farmhouse.
-  06075:forced:3: Forced at the end of the round (heard about this card)
+  06075:forced:3: Forced at the end of the round
     who acts: the acting player is the first player (a phase has no player of its own)
     - discard up to 1 villager token(s) from this card (fewer when it holds fewer; each goes back to the token bank and is announced, one by one); the effect's X is the number discarded
 
