@@ -104,6 +104,36 @@ describe("surge", () => {
     expect(revealed.state.encounterDiscard).toEqual([]);
   });
 
+  function surgeAlone(otherInDiscard: boolean) {
+    const loom = definePrinted({ code: "loom", name: "Loom", type: "treachery", threat: 0, keywords: { surge: true } });
+    const later = definePrinted({ code: "later", name: "Later", type: "enemy", threat: 0, engagementCost: 50 });
+    const cards = cardMap([loom, later, hero("aragorn", "leadership")]);
+    let state = blankScenario({ seatCount: 1, seed: 4, definition: fixtureDefinition(["stage"]) });
+    state = spawn(state, "aragorn", { zone: "heroes", seat: 0 }).state;
+    const surging = spawn(state, "loom", { zone: "encounterDeck" });
+    state = surging.state;
+    const other = otherInDiscard ? spawn(state, "later", { zone: "encounterDiscard" }) : null;
+    if (other) state = other.state;
+    state = { ...state, phase: "Quest", mode: "questCommit", window: { kind: "pass" }, activeSeat: 0, firstPlayer: 0 };
+    return { revealed: expectOk(reduce(state, { type: "Pass" }, { effects: [], cards })), loom: surging.id, later: other?.id };
+  }
+
+  it("ends the surge chain when the only card left is the surging one: it is not shuffled back to be revealed inside its own surge (rr.surge, rr.running-out-of-cards, faq.last-encounter-card)", () => {
+    const { revealed, loom } = surgeAlone(false);
+    expect(revealed.state.stack).toEqual([]);
+    expect(revealed.steps.filter((step) => step.kind === "reveal")).toHaveLength(1);
+    // The reset after the last reveal runs as usual.
+    expect(revealed.state.encounterDeck).toEqual([loom]);
+  });
+
+  it("still shuffles the discard pile in the middle of a surge chain when it holds other cards (rr.running-out-of-cards)", () => {
+    const { revealed, later } = surgeAlone(true);
+    expect(revealed.steps.some((step) => step.kind === "resetEncounterDeck" && step.count === 2)).toBe(true);
+    // The pile came back with the surging card and the other card: the chain went on until the other card was revealed, and the surging card was revealed again on the way or not.
+    expect(revealed.state.staging).toContain(later);
+    expect(revealed.state.stack).toEqual([]);
+  });
+
   it("does not surge after the revealing seat is eliminated", () => {
     const doomed = definePrinted({
       code: "doom",

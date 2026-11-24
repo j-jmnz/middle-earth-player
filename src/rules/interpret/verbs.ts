@@ -64,7 +64,16 @@ export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[], ct
   if (state.phase !== "Quest" && !refillsAnyTime(state)) return state;
   // A card in play that advances the stage on an empty deck hears it first (131024:B:1, families/sack/empty-deck.ts).
   if (hearsEmptyDeck(state, ctx)) return state;
+  if (inOwnSurgeChain(state)) return state;
   return reshuffleDiscard(returnUndeadBeforeReset(state, ctx, steps), steps, "rr.running-out-of-cards");
+}
+
+// The deck is empty and every card of the discard pile is a card whose reveal is past its staging and still open (a surge chain, rr.surge): shuffling the pile back would reveal a card inside its own surge for ever.
+// The surge finds no card, the chain ends, and the reset that follows the last reveal (faq.last-encounter-card) runs as usual.
+function inOwnSurgeChain(state: ScenarioState): boolean {
+  if (state.encounterDeck.length > 0 || state.encounterDiscard.length === 0) return false;
+  const open = new Set(state.stack.filter((frame) => frame.frame === "reveal" && frame.step >= 6).map((frame) => frame.cardId));
+  return state.encounterDiscard.every((id) => open.has(id));
 }
 
 // The encounter discard pile back into an empty encounter deck, shuffled, whatever the phase: what a rule that says "if the deck is ever empty" does (the Fortitude test, mec113.fortitude-tests).

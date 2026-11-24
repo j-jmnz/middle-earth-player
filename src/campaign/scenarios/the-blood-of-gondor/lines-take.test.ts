@@ -5,7 +5,7 @@ import { expect } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
-import { idOf, legalTargets, resolveRecords, send } from "../../../../test/harness/scene-kit.ts";
+import { idOf, legalTargets, resolveRecords, revealedTop, send } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import { CODES, drive, hiddenCodes, opened, table } from "../../../../test/scenarios/the-blood-of-gondor/table.ts";
 
@@ -121,4 +121,13 @@ lineSpec("06130:A:2", "When Revealed: each player takes 1 hidden card; with an e
   const refilled = reveal(REFILLED);
   expect([count(refilled, 0), count(refilled, 1)]).toEqual([1, 1]);
   expect(count(reveal(EMPTY))).toBe(0);
+});
+
+lineSpec("06130:A:2", "Mordor Looms revealed in the staging step with one card left: the player takes it, and the surge finds no card (Looms is not shuffled back to be revealed again), so the chain ends (rr.surge, rr.running-out-of-cards, faq.last-encounter-card)", (effects) => {
+  const made = table({ phase: "Quest", deck: ["f0"], discard: [] }, effects);
+  const done = revealedTop(made, looms);
+  expect(done.stack).toHaveLength(0);
+  expect(count(done)).toBe(1);
+  // The reset after the last reveal shuffles the pile back (faq.last-encounter-card): Looms is the one card of the deck, revealed once.
+  expect(done.encounterDeck).toEqual([idOf(done, looms)]);
 });
