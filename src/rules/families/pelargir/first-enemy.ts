@@ -7,6 +7,8 @@ import type { Scope } from "../../interpret/conditions.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import { flagged, type ScenarioState } from "../../core/state.ts";
+import { someDeckEmpty } from "./empty-deck.ts";
+import { underworldReleased } from "./underworld.ts";
 import { topFrame } from "../../windows/windows.ts";
 
 /** A card was revealed (the `revealed` hook): the first enemy the encounter deck itself reveals in a round is marked `firstEnemy` until the phase ends, and the table remembers one was revealed until the round ends. An enemy a search, a shadow card or a discard added is no reveal. */
@@ -19,7 +21,9 @@ export function noteFirstEnemy(state: ScenarioState, cardId: string, ctx: Reduce
   return { ...state, modifiers: [...state.modifiers, mark("table", "firstEnemyNoted", "endOfRound"), mark(cardId, "firstEnemy", "endOfPhase")] };
 }
 
-/** The condition `firstEnemy`: the enemy the answered reveal is about is the first the encounter deck revealed this round. Null for any other condition. */
+/** The conditions `firstEnemy`, `underworldReleased` and `deckEmpty`: the enemy the answered reveal is about is the first the encounter deck revealed this round. Null for any other condition. */
 export function pelargirCondition(state: ScenarioState, condition: Condition, scope: Scope): boolean | null {
+  if (condition.kind === "underworldReleased") return underworldReleased(state);
+  if (condition.kind === "deckEmpty") return someDeckEmpty(state);
   return condition.kind === "firstEnemy" ? scope.subject != null && flagged(state, scope.subject, "firstEnemy") : null;
 }

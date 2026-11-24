@@ -115,6 +115,8 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   searchable: (c) => ({ text: `the encounter deck or its discard pile holds ${withArticle(`${typeof c.trait === "string" ? `${c.trait} ` : ""}${typeof c.type === "string" ? (c.type === "encounter-side-quest" ? "side quest" : str(c.type)) : "card"}`)}${typeof c.code === "string" ? ` with code ${c.code}` : ""}${c.deckOnly === true ? " (the deck alone)" : ""}${c.victory === true ? " (the victory display too)" : ""}`, read: ["trait", "type", "code", "deckOnly", "victory"] }),
   attachedToHero: (c) => ({ text: c.is === false ? `the card with code ${str(c.code)} is not attached to a hero (it is in the staging area, on an enemy or out of play)` : `the card with code ${str(c.code)} is attached to a hero, any player's`, read: ["code", "is"] }),
   firstEnemy: () => ({ text: "the card the event is about is the first enemy the encounter deck revealed this round (not one a search, a shadow card or a discard added)", read: [] }),
+  underworldReleased: () => ({ text: "no facedown card lies under a location that is out of play (every stack of a location that left play is revealed)", read: [] }),
+  deckEmpty: () => ({ text: "a player still in the game has no cards in his deck", read: [] }),
   firstTreachery: () => ({ text: "the card the event is about is the first treachery the encounter deck revealed this quest phase", read: [] }),
   victoryPoints: (c) => ({ text: `the victory display holds at least ${str(c.min)} Victory points`, read: ["min"] }),
   stageProgress: (c) => ({ text: `the current quest stage holds at least ${str(c.min)} progress${c.perStartedPlayer === true ? " for each player who started the game" : ""}`, read: ["min", "perStartedPlayer"] }),

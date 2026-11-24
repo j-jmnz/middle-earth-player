@@ -59,6 +59,8 @@ describe("effects render read fields, conditions", () => {
     victoryPoints: [{ kind: "victoryPoints", min: 20 }],
     firstTreachery: [{ kind: "firstTreachery" }],
     firstEnemy: [{ kind: "firstEnemy" }],
+    underworldReleased: [{ kind: "underworldReleased" }],
+    deckEmpty: [{ kind: "deckEmpty" }],
     attachedToHero: [{ kind: "attachedToHero", code: "05019", is: true }, { kind: "attachedToHero", code: "05019", is: false }],
     hitPointsLeft: [{ kind: "hitPointsLeft", code: "09033" }],
     committedThisRound: [{ kind: "committedThisRound" }],

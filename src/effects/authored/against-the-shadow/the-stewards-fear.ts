@@ -20,7 +20,7 @@ const CAN_PICK = (pick: PickSpec) => ({ kind: "canPick", pick }) as const satisf
 const HAS_NONE = (pick: PickSpec) => ({ kind: "not", condition: CAN_PICK(pick) }) as const satisfies Condition;
 // An undefended attack, and the current quest holds a token of the kind: the option the defending player may take.
 const REMOVABLE = (what: "progress" | "resources") => ({ kind: "all", conditions: [UNDEFENDED, { kind: "less", left: 0, right: { stat: what, of: "questStage" } }] }) as const satisfies Condition;
-const TABLE_FLAG = (stat: "advanceNow" | "revealMore" | "losesAtEmptyDeck"): Instruction => ({ verb: "ModifyStat", stat, amount: 1, until: "whileSourceInPlay", target: stat === "advanceNow" ? "self" : "table" });
+const TABLE_FLAG = (stat: "advanceNow" | "revealMore"): Instruction => ({ verb: "ModifyStat", stat, amount: 1, until: "whileSourceInPlay", target: stat === "advanceNow" ? "self" : "table" });
 
 // Underworld X: the entry of the location (revealed, put into play as the active location) and the entry a search made (Lost in the City, the search of stage 1B). `amount` is the value, `line` the keyword line of the card.
 const UNDERWORLD = (code: string, lines: readonly string[], amount: 1 | 2 | { players: true }): Effect[] => [
@@ -49,8 +49,10 @@ const EXPLORED_TOKEN = (stage: string, line: string): Effect => ({
   instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "questStage" }],
 });
 
-// "If there are 4 or more resource tokens on <this quest>, advance to the next stage" (stages 1 and 2): a constant "if", checked at each settle (families/angmar/stage.ts advanceWhenFlagged), in any phase, once nothing is resolving.
-const FOUR_TOKENS = (stage: string, line: string): Effect => ({ id: `${stage}:constant:1`, cardCode: stage, lines: [line], timing: "constant", condition: { kind: "tokens", code: stage, min: 4 }, instructions: [TABLE_FLAG("advanceNow")] });
+const STACKS_RELEASED = { kind: "underworldReleased" } as const satisfies Condition;
+
+// "If there are 4 or more resource tokens on <this quest>, advance to the next stage" (stages 1 and 2): a constant "if", checked at each settle (families/angmar/stage.ts advanceWhenFlagged), in any phase, once nothing is resolving. It waits while a stack of a location that left play is not revealed yet: the location left play first (ats.underworld).
+const FOUR_TOKENS = (stage: string, line: string): Effect => ({ id: `${stage}:constant:1`, cardCode: stage, lines: [line], timing: "constant", condition: { kind: "all", conditions: [{ kind: "tokens", code: stage, min: 4 }, STACKS_RELEASED] }, instructions: [TABLE_FLAG("advanceNow")] });
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 06011 Conspiracy (stage 1). Setup: the underworld deck is built, and one Villain and one Plot are hidden; Roots of Mindolluin was set aside by the deal. B:1: The Fourth Star is found in the encounter deck (not its discard pile) and made the active location, which enters play as a search puts a card
@@ -209,7 +211,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     trigger: "endOfRound",
     instructions: [{ verb: "PlaceToken", amount: 1 }, { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "DiscardFromDeck", amount: { stat: "resources", of: "self" } }] }],
   },
-  { id: "06030:constant:1", cardCode: "06030", lines: ["06030:A:2"], timing: "constant", instructions: [TABLE_FLAG("losesAtEmptyDeck")] },
+  { id: "06030:constant:1", cardCode: "06030", lines: ["06030:A:2"], timing: "constant", condition: { kind: "deckEmpty" }, instructions: [{ verb: "LoseGame", reason: "A player has no cards in his deck" }] },
 
   // 06031 Poisoned Counsels (the hidden Plot). A:1: at the end of each round every player raises his threat by 2.
   { id: "06031:forced:1", cardCode: "06031", lines: ["06031:A:1"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "RaiseThreat", amount: 2, who: "eachSeat" }] },

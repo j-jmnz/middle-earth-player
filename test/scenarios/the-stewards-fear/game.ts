@@ -115,7 +115,7 @@ export const FEAR_GOLDENS: readonly FearGolden[] = [
   { name: "two-handed win", seatCount: 2, seed: 27, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "Easy two-handed win", seatCount: 2, seed: 40, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "solo loss: threat 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
-  { name: "two-handed loss: every hero destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed loss: every hero destroyed", seatCount: 2, seed: 21, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "solo loss: Up in Flames", seatCount: 1, seed: 6, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "A player has no cards in his deck" },
   { name: "two-handed loss: Unholy Alliance", seatCount: 2, seed: 7, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "Unholy Alliance: a hero was destroyed by an enemy attack" },
 ];

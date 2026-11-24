@@ -107,8 +107,6 @@ const FLAGS = [
   "cannotSpendResources",
   // On the current quest stage: it does not have the Siege keyword ("The Last Battle gains battle and loses siege", 05076:B:3); read by rules/families/quest/conditions.ts currentQuestHas (src/rules/families/pelargir/stage-keyword.ts).
   "losesSiege",
-  // On the table while its source is in play: a player with no cards in his deck loses the game for the players, checked at each settle once nothing is resolving ("If any player has no cards in his deck, the players have lost the game", 06030:A:2; src/rules/families/pelargir/empty-deck.ts). A player already eliminated does not count.
-  "losesAtEmptyDeck",
 ] as const;
 
 // The underworld deck lies set aside facedown, and the Villain and the Plot the Setup hides stay set aside facedown (06011:A:1): the table lists them as facedown cards without a name.

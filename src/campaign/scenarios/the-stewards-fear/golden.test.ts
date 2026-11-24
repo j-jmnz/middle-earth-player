@@ -19,7 +19,7 @@ const HIDDEN: Record<string, { villain: string; plot: string }> = {
   "two-handed win": { villain: "06016", plot: "06029" },
   "Easy two-handed win": { villain: "06017", plot: "06030" },
   "solo loss: threat 50": { villain: "06016", plot: "06030" },
-  "two-handed loss: every hero destroyed": { villain: "06016", plot: "06031" },
+  "two-handed loss: every hero destroyed": { villain: "06015", plot: "06031" },
   "solo loss: Up in Flames": { villain: "06016", plot: "06030" },
   "two-handed loss: Unholy Alliance": { villain: "06015", plot: "06029" },
 };

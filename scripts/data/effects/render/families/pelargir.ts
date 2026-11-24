@@ -100,6 +100,5 @@ export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
   advancesWithoutBattleground: " (held by the current quest stage: when no Battleground location is in play the quest advances at once to the next stage still in the quest deck)",
   cannotSpendResources: " (held by a hero: no resource can be spent from its pool, for a card, an ability or an effect; resources can still be gained and moved)",
   losesSiege: " (held by the current quest stage: it does not have the Siege keyword it prints)",
-  losesAtEmptyDeck: " (held by the table: a player with no cards in his deck makes the players lose the game, checked at each settle once nothing is resolving)",
   firstEnemyNoted: " (held by the table until the end of the round: an enemy was already marked firstEnemy this round)",
 };

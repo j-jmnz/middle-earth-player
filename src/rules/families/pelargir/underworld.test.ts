@@ -5,10 +5,9 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
-import { flagged, type ScenarioState } from "../../core/state.ts";
+import { type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { settle } from "../../engine/machine.ts";
-import { syncConstants } from "../../interpret/constants.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { idOf, idsOf, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
 import { CODES, DECK_CODES, PLOTS, VILLAINS, codeOf, deckCodes, run, runSettled, table, underCodes } from "../../../../test/scenarios/the-stewards-fear/table.ts";
@@ -189,20 +188,26 @@ describe("RemoveQuestTokens (06014:A:2, 06025:A:2)", () => {
   });
 });
 
-describe("losesAtEmptyDeck (06030:A:2)", () => {
-  const FLAG: Effect = { id: "test:constant:1", cardCode: CODES.flames, lines: [], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "losesAtEmptyDeck", amount: 1, until: "whileSourceInPlay", target: "table" }] };
+describe("deckEmpty (06030:A:2)", () => {
+  const LOSE: Effect = { id: "test:constant:1", cardCode: CODES.flames, lines: [], timing: "constant", condition: { kind: "deckEmpty" }, instructions: [{ verb: "LoseGame", reason: "A player has no cards in his deck" }] };
 
   it("loses the game for the players once a living player's deck is empty and nothing is resolving, and not while the card is out of play", () => {
-    const withFlag = table({ staging: [CODES.flames], deckOf: ["filler"] }, [FLAG]);
-    const state = syncConstants({ ...withFlag.state, window: null }, withFlag.ctx);
-    expect(flagged(state, "table", "losesAtEmptyDeck")).toBe(true);
-    expect(settle(state, withFlag.ctx, []).lost).toBe(false);
+    const withCard = table({ staging: [CODES.flames], deckOf: ["filler"] }, [LOSE]);
+    const state = { ...withCard.state, window: null };
+    expect(settle(state, withCard.ctx, []).lost).toBe(false);
     const emptied = { ...state, seats: [{ ...state.seats[0], deck: [] }, state.seats[1]] } as ScenarioState;
-    const lost = settle(emptied, withFlag.ctx, []);
+    const lost = settle(emptied, withCard.ctx, []);
     expect(lost.lost).toBe(true);
     expect(lost.lossReason).toContain("deck");
-    const off = table({ deckOf: ["filler"] }, [FLAG]);
+    const off = table({ deckOf: ["filler"] }, [LOSE]);
     expect(settle({ ...off.state, window: null, seats: [{ ...off.state.seats[0], deck: [] }, off.state.seats[1]] } as ScenarioState, off.ctx, []).lost).toBe(false);
+  });
+
+  it("does not count a player who is already eliminated", () => {
+    const made = table({ seats: 2, staging: [CODES.flames], deckOf: [{ code: "filler", seat: 0 }] }, [LOSE]);
+    const state = { ...made.state, window: null };
+    const second = { ...state.seats[1]!, deck: [], eliminated: true };
+    expect(settle({ ...state, seats: [state.seats[0]!, second] } as ScenarioState, made.ctx, []).lost).toBe(false);
   });
 });
 

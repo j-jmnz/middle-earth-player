@@ -24,7 +24,7 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 
 06011:B:3 (back): If there are 4 or more resource tokens on Conspiracy, advance to the next stage.
   06011:constant:1: Constant
-    only if the card with code 06011 in play holds at least 4 resource token(s)
+    only if all of: (the card with code 06011 in play holds at least 4 resource token(s)) and (no facedown card lies under a location that is out of play (every stack of a location that left play is revealed))
     - this card: stat advanceNow (once nothing is resolving the quest advances to the next stage at once) 1, while this card is in play
 
 ## 06012 The Grand Design
@@ -45,7 +45,7 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 
 06012:B:3 (back): If there are 4 or more resource tokens on The Grand Design, advance to the next stage.
   06012:constant:1: Constant
-    only if the card with code 06012 in play holds at least 4 resource token(s)
+    only if all of: (the card with code 06012 in play holds at least 4 resource token(s)) and (no facedown card lies under a location that is out of play (every stack of a location that left play is revealed))
     - this card: stat advanceNow (once nothing is resolving the quest advances to the next stage at once) 1, while this card is in play
 
 ## 06013 The Confrontation
@@ -316,7 +316,8 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 
 06030:A:2 (front): If any player has no cards in his deck, the players have lost the game.
   06030:constant:1: Constant
-    - the table: stat losesAtEmptyDeck (held by the table: a player with no cards in his deck makes the players lose the game, checked at each settle once nothing is resolving) 1, while this card is in play
+    only if a player still in the game has no cards in his deck
+    - the players lose the game (A player has no cards in his deck)
 
 ## 06031 Poisoned Counsels
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -326,4 +327,4 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
     who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 2 (each player)
 
-(rendered pieces: 191 by template, 0 as JSON)
+(rendered pieces: 196 by template, 0 as JSON)

@@ -14,6 +14,7 @@ import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { shuffleEncounterDeck } from "../../interpret/verbs.ts";
 import { startReveal } from "../../windows/frames.ts";
+import { pushFrame } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -96,15 +97,40 @@ export function revealSetAside(state: ScenarioState, instruction: Verb<"RevealSe
 
 /**
  * The settle sweep that ends Underworld X (ats.underworld: "When a location leaves play, any facedown cards stacked underneath that location are revealed one at a time, and added to the staging area"): the facedown cards under a location that is no longer in play, whatever location it is
- * (Sewers stacks a card under the active location, a City Street or a Market Square too) and however it left. The first player reveals one card (the staging steps, as RevealUnderworld does) and the next is revealed once that reveal is over. It waits while anything is resolving.
+ * (Sewers stacks a card under the active location, a City Street or a Market Square too) and however it left. The first player reveals one card (the staging steps, as RevealUnderworld does) and the next is revealed once that reveal is over. It waits only for what must finish first: an effect on the stack, an attack or a strike being resolved and an open response window; an open action window does not hold the cards back.
  * Inert in a game whose records do not take underworld cards.
  */
 export function releaseUnderworldStacks(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (state.lost || state.stack.length > 0 || state.window || state.pendingAttack || state.pendingStrike || !gameReads(state, ctx, '"TakeUnderworld"')) return state;
-  const orphan = Object.values(state.cards)
-    .filter((card) => card.zone === "under" && card.face === "down" && card.host != null && state.cards[card.host] != null && !inPlay(state.cards[card.host]?.zone ?? "removed"))
-    .sort((left, right) => left.id.localeCompare(right.id, undefined, { numeric: true }))[0];
+  if (state.lost || state.stack.length > 0 || state.pendingAttack || state.pendingStrike || (state.window != null && !ACTION_WINDOWS.has(state.window.kind)) || !gameReads(state, ctx, '"TakeUnderworld"')) return state;
+  const orphan = firstOrphan(state.cards);
   if (!orphan) return state;
   const seat = state.seats[state.firstPlayer]?.eliminated ? state.seats.findIndex((candidate, index) => index < state.seatCount && !candidate.eliminated) : state.firstPlayer;
-  return seat < 0 ? state : startReveal(updateCard(state, orphan.id, { host: null }), seat, ctx, steps, orphan.id);
+  if (seat < 0) return state;
+  const { window } = state;
+  // An open action window waits under the reveal and comes back when it is over, as it does under a delayed effect (attack/flow.ts).
+  const held = window ? pushFrame({ ...state, window: null }, { frame: "event", cardId: null, seat: state.activeSeat, peril: false, data: { kind: "resume", window, seat: state.activeSeat, passed: state.passed } }, steps) : state;
+  return startReveal(updateCard(held, orphan, { host: null }), seat, ctx, steps, orphan);
+}
+
+// The windows a player acts in: a stack released while one is open does not wait for the players to pass.
+const ACTION_WINDOWS: ReadonlySet<string> = new Set(["pass", "travel", "optionalEngage", "playerAttack"]);
+
+/** No facedown card lies under a location that is out of play: every stack of a location that left play is revealed (the condition `underworldReleased`). */
+export function underworldReleased(state: ScenarioState): boolean {
+  return firstOrphan(state.cards) == null;
+}
+
+// The lowest id of the facedown cards under a location that is out of play, kept for as long as the card table lives (a settle pass reads the same table many times).
+const ORPHANS = new WeakMap<ScenarioState["cards"], string | null>();
+
+function firstOrphan(cards: ScenarioState["cards"]): string | null {
+  const known = ORPHANS.get(cards);
+  if (known !== undefined) return known;
+  let found: string | null = null;
+  for (const card of Object.values(cards)) {
+    if (card.zone !== "under" || card.face !== "down" || card.host == null || cards[card.host] == null || inPlay(cards[card.host]?.zone ?? "removed")) continue;
+    if (found == null || card.id.localeCompare(found, undefined, { numeric: true }) < 0) found = card.id;
+  }
+  ORPHANS.set(cards, found);
+  return found;
 }

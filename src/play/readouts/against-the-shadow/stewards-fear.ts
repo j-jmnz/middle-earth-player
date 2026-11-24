@@ -61,7 +61,9 @@ export function underworldLine(game: ScenarioState, ctx: ReduceContext, cardId: 
 function advanceTokens(ctx: ReduceContext, code: string): number {
   for (const effect of effectsOf(ctx, code) as readonly Effect[]) {
     const condition = effect.condition;
-    if (effect.timing === "constant" && condition?.kind === "tokens" && effect.instructions.some((step) => step.verb === "ModifyStat" && step.stat === "advanceNow")) return condition.min;
+    const parts = condition?.kind === "all" ? condition.conditions : condition ? [condition] : [];
+    const tokens = parts.find((part) => part.kind === "tokens");
+    if (effect.timing === "constant" && tokens?.kind === "tokens" && effect.instructions.some((step) => step.verb === "ModifyStat" && step.stat === "advanceNow")) return tokens.min;
   }
   return 0;
 }

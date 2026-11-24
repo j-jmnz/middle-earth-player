@@ -11,7 +11,6 @@ import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
 import { noteFirstEnemy, pelargirCondition } from "./first-enemy.ts";
 import { attachToHighestThreatCost } from "./host.ts";
 import { attachObjectiveTo, attackScrollHolder } from "./scroll.ts";
-import { lossesAtEmptyDeck } from "./empty-deck.ts";
 import { pickRandom } from "./pick-random.ts";
 import { removeQuestTokens } from "./quest-tokens.ts";
 import { revealTopThenDiscard } from "./reveal-discard.ts";
@@ -70,6 +69,6 @@ export const manifest: RulesFamily = {
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,
-  settle: { sweep: (state, ctx, steps) => lossesAtEmptyDeck(releaseUnderworldStacks(sieges(state, ctx, steps), ctx, steps), ctx, steps) },
+  settle: { sweep: (state, ctx, steps) => releaseUnderworldStacks(sieges(state, ctx, steps), ctx, steps) },
   combat: { undefended: (state, _candidates, cards) => undefendedBattlegrounds(state, cards) },
 };

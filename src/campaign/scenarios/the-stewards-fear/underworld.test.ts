@@ -3,8 +3,10 @@
 // Unwelcome Discovery. The rest of the scenario's lines are in lines.test.ts and spec.test.ts. Each test builds its moment with the scene kit and its title starts with the line it proves.
 import { describe, expect, it } from "vitest";
 
+import type { EngineStep } from "../../../rules/core/intents.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
-import { fightEnemy, idOf, idsOf, resolveRecords, revealedTop, send, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { fightEnemy, finish, idOf, idsOf, legalIntents, resolveRecords, revealedTop, send, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { CODES, DECK_CODES, codeOf, deckCodes, discarded, explored, run, stackOne, stagedCodes, table, underCodes, withDeck } from "../../../../test/scenarios/the-stewards-fear/table.ts";
 
 const CITY_STREET = "05038";
@@ -52,6 +54,44 @@ describe("06018:A:1 and 06018:A:2 Sewers", () => {
       expect(underCodes(gone, sewers)).toHaveLength(0);
       expect(gone.staging.map((id) => gone.cards[id]?.code)).toContain(under[0]);
     }
+  });
+});
+
+describe("06018:A:1 Sewers explored in an action window", () => {
+  // Secret Map (06027:A:2) explores the active location in an open action window: the cards under it are revealed at once, with the window still open (ats.underworld: "when a location leaves play").
+  for (const phase of ["Planning", "Combat"] as const) {
+    it(`06018:A:1 the card under Sewers is revealed and staged the moment Secret Map explores it in the ${phase} action window, before anyone passes`, () => {
+      const t = withDeck({ phase, active: CODES.sewers, attached: [{ code: CODES.map, to: "dh1", encounter: true }] });
+      const sewers = idOf(t.state, CODES.sewers);
+      const stacked = { ...stackOne(t, t.state, sewers), window: t.state.window };
+      const under = underCodes(stacked, sewers);
+      expect(under).toHaveLength(1);
+      expect(stacked.window?.kind).toBe("pass");
+      const offered = legalIntents(stacked, t.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === "06027:action:2");
+      expect(offered).toBeDefined();
+      const done = finish(send({ state: stacked, steps: [] }, offered as Parameters<typeof send>[1], t.ctx), t.ctx).state;
+      expect(done.cards[sewers]?.zone).toBe("encounterDiscard");
+      expect(done.window?.kind).toBe("pass");
+      expect(underCodes(done, sewers)).toHaveLength(0);
+      expect(done.staging.map((id) => codeOf(done, id))).toContain(under[0]);
+      expect(done.cards[done.staging.find((id) => codeOf(done, id) === under[0]) ?? ""]?.face).toBe("up");
+    });
+  }
+});
+
+describe("06018:A:1 Sewers explored as the stage advances", () => {
+  it("06011:B:3 the card under the explored location is revealed before the stage advances: the location left play first, the stage's Forced effect is after it", () => {
+    const t = withDeck({ active: CODES.sewers, stage: CODES.conspiracy, side: "B", setAside: ["06029", CODES.roots] }, ["05042"]);
+    const sewers = idOf(t.state, CODES.sewers);
+    const stage = t.state.questStage ?? "";
+    const stacked = stackOne(t, { ...t.state, round: 1, cards: { ...t.state.cards, [stage]: { ...t.state.cards[stage]!, resources: 3 } } }, sewers);
+    expect(underCodes(stacked, sewers)).toEqual(["05042"]);
+    const steps: EngineStep[] = [];
+    const done = settle(run(t, stacked, { verb: "PlaceProgressOn", amount: 9, target: "activeLocation" }), t.ctx, steps);
+    expect(codeOf(done, done.questStage)).toBe(CODES.design);
+    const revealed = steps.filter((step) => step.kind === "reveal").map((step) => codeOf(done, step.cardId));
+    expect(revealed.slice(0, 2)).toEqual(["05042", "06029"]);
+    expect(stagedCodes(done).slice(0, 2)).toEqual(["05042", "06029"]);
   });
 });
 
