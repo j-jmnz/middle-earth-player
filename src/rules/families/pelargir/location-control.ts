@@ -83,8 +83,8 @@ function takenAgain(state: ScenarioState, id: string, held: number): ScenarioSta
   return seat === held ? taken : queueEvent(taken, { trigger: "controlLost", seat: held, subject: id });
 }
 
-/** The settle sweep: a location with a noted controller that lies in no play area has been lost. A location that was explored while controlled (progress full: it went to the discard pile or the victory display of a living player) is taken again at once, with no loss
- * (06091:B:2 hears it too, and finds it in play). A location in the discard pile of an eliminated player (core clearEliminated) or anywhere else is lost. Inert unless the game has a record that takes control. */
+/** The settle sweep: a location with a noted controller that lies in no play area has been lost. A location that was explored while controlled (progress full: it went to the discard pile or the victory display of a living player) is explored again and taken at once by the
+ * current first player (06091:B:2); the seat that held it hears `controlLost` when that is another seat. A location in the discard pile of an eliminated player (core clearEliminated) or anywhere else is lost. Inert unless the game has a record that takes control. */
 export function controlSweep(state: ScenarioState, ctx: ReduceContext, _steps: EngineStep[]): ScenarioState {
   if (state.modifiers.length === 0 || !gameReads(state, ctx, '"TakeControlOfLocation"')) return state;
   let next = state;
