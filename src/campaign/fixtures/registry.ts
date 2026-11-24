@@ -94,6 +94,7 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "the-stewards-fear", kind: "standalone", names: ["fear-lost"] },
   { scenarioId: "the-druadan-forest", kind: "standalone", names: ["druadan-lost"] },
   { scenarioId: "encounter-at-amon-din", kind: "standalone", names: ["din-lost"] },
+  { scenarioId: "assault-on-osgiliath", kind: "standalone", names: ["assault-lost"] },
   { scenarioId: "we-must-away-ere-break-of-day", kind: "standalone", names: ["day-lost"] },
   { scenarioId: "over-the-misty-mountains-grim", kind: "standalone", names: ["grim-lost"] },
   { scenarioId: "dungeons-deep-and-caverns-dim", kind: "standalone", names: ["dim-lost"] },
