@@ -7,6 +7,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import { CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, heldBy } from "../../core/holder-classes.ts";
 import { isLocationCard, printedOf, type PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { engagedOrcRaise } from "../pelargir/engaged-threat.ts";
 import { heldAmount, inPlay, modifierActive, updateCard } from "../../core/state.ts";
 
 // The cards attached to a host that an enemy's destruction or a quest card's defeat is announced to: the player cards in play
@@ -72,7 +73,7 @@ export function textBlank(state: ScenarioState, id: string, cards: ReadonlyMap<s
 export function withStagingThreat(state: ScenarioState, total: number, cards: ReadonlyMap<string, PrintedCard>): number {
   const less = heldAmount(state, "table", "lessStagingThreat");
   // "Raise the total Threat in the staging area by X" (moreStagingThreat, families/dungeon.ts); one counting the allies in a discard pile is read live (faq.lasting-effects).
-  const more = heldAmount(state, "table", "moreStagingThreat") + liveAllyRaise(state, cards) + liveScoutRaise(state, cards);
+  const more = heldAmount(state, "table", "moreStagingThreat") + liveAllyRaise(state, cards) + liveScoutRaise(state, cards) + engagedOrcRaise(state, cards);
   return less === 0 && more === 0 ? total : Math.max(0, total + more - less);
 }
 

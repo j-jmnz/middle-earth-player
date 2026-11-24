@@ -2,7 +2,7 @@
 // attaches to the hero with the highest threat cost that has none; the discards from the top of the encounter deck that Collateral Damage counts in two steps; and the first enemy revealed each round. Into Ithilien (part 2) adds the ally objectives that are
 // committed to the quest from the staging area, the stage that bypasses the next one, and the first player's taking of every Ranger objective in the staging area. Simple verbs and stat flags; effect-schema-verbs.ts,
 // effect-schema.ts and effect-schema-stats.ts compose them. Encounter at Amon Dîn (part 6) adds the villager tokens (their discard and their move, the trigger that hears a discard), the character with the fewest hit points left, and the flags that end the game or hold it. Assault on Osgiliath (part 7) adds the
-// control of locations (a location lies in the first player's play area; the verbs that take and lose control, the two triggers that hear an undefended attack and a loss of control, the table's bar on a player card's progress in the staging area). src/rules/families/pelargir/ runs them.
+// control of locations (a location lies in the first player's play area; the verbs that take and lose control, the two triggers that hear an undefended attack and a loss of control, the table's bar on a player card's progress in the staging area). src/rules/families/pelargir/ runs them. The Blood of Gondor (part 8) adds the hidden cards: taking, turning and discarding them, the two objective allies under Captured! and the first player's control of them, the amount of hidden cards and the flags of its stages.
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
@@ -94,6 +94,21 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ActForDestroyedController"), ...when }),
   // "Add it to the staging area" read as an entry the card's own Forced effect hears (05053:A:1, ats.setup-assault-on-osgiliath, 06091:A:1): the card the reference names (`picked`: the card an earlier SearchMove with `remember` put in the staging area) is announced as added to the staging area. SearchMove announces it for an ambush enemy alone, so a record opts in with this verb; a card not in the staging area is left as it is.
   z.strictObject({ verb: z.literal("AnnounceAddedToStaging"), card: cardRefSchema.optional(), ...when }),
+  // The Blood of Gondor (ats.hidden-cards): "take 1 hidden card" (06117:B:1, 06122:A:1, 06124:A:1): the acting player (`who: firstPlayer` for a Travel cost, "The first player must take 1 hidden card to travel here", 06123:A:3) sets the top `amount` cards of the encounter deck facedown in his play area, unseen and not revealed, as one
+  // instruction (the 5-card limit of Captured! is checked once it is done). An empty deck is refilled from the discard pile first; with both empty no card is taken, and a Travel cost of it cannot be paid. src/rules/families/pelargir/hidden.ts.
+  z.strictObject({ verb: z.literal("TakeHiddenCard"), who: z.enum(["actor", "firstPlayer"]).optional(), amount: z.number().int().positive().optional(), ...when }),
+  // "Turn each of his hidden cards faceup" (06117:B:2, 06118:A:1, 06121:A:1, 06129:A:1): each hidden card the player held when the turn began, one at a time (`eachPlayer`: every player in player order). An enemy engages him at once whatever its engagement cost, a treachery and a location are discarded, none is
+  // revealed. `resolve` (Lying in Wait): the When Revealed effects of each card turned resolve too and a location is added to the staging area; `shadow` (Brutal Uruk): each enemy turned is dealt a shadow card.
+  z.strictObject({ verb: z.literal("TurnHiddenCards"), who: z.enum(["actor", "firstPlayer", "eachPlayer"]), resolve: z.literal(true).optional(), shadow: z.literal(true).optional(), ...when }),
+  // "Turn a hidden card faceup. If that card is an enemy, deal 3 damage to it" (06132:A:2): one hidden card of a player the actor chooses among those who hold one, picked blind with the game's seed, turned as above; an enemy takes `damageEnemy` damage before it engages and one destroyed never engages.
+  // `seat` is the engine's own: the player chosen.
+  z.strictObject({ verb: z.literal("TurnHiddenCard"), damageEnemy: z.number().int().positive().optional(), seat: z.number().int().min(0).optional(), ...when }),
+  // "The first player discards 1 hidden card" (06128:A:3): one hidden card of the player, chosen at random, goes to the encounter discard pile unresolved: nothing engages and no When Revealed resolves.
+  z.strictObject({ verb: z.literal("DiscardHiddenCard"), who: z.enum(["actor", "firstPlayer"]), ...when }),
+  // "Place Faramir and Lord Alcaron under Captured!" (06118:A:1): each card in play with one of these codes lies under the source stage, still in play and controlled by nobody, committed to nothing.
+  z.strictObject({ verb: z.literal("HoldUnderStage"), codes: z.array(code).min(1), ...when }),
+  // "The first player gains control of Faramir" (06132:A:1, 06133:A:1): the source card passes to the first player's play area, each time the first player token passes. A card under a stage is not moved.
+  z.strictObject({ verb: z.literal("GainControlOfSelf"), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -168,12 +183,20 @@ const FLAGS = [
   "endingLost",
   // On the table while a stage is in play: progress placed by a player card's effect on a location in the staging area is not placed ("Player card effects cannot place progress tokens on locations in the staging area", 06091:B:1). Read where an effect places progress on a location (src/rules/families/pelargir/progress-bar.ts).
   "noProgressInStagingByPlayer",
+  // On the current quest stage: it does not have the Battle keyword it prints ("The current quest card gains siege (and loses battle)", 06123:A:1); read like `losesSiege` (src/rules/families/pelargir/stage-keyword.ts).
+  "losesBattle",
+  // On a quest stage that is current: a player who holds 5 hidden cards turns them faceup, one at a time, as soon as an instruction has left him with 5 ("If a player has 5 hidden cards, he must turn them faceup", 06118:B:3; a settle sweep, src/rules/families/pelargir/hidden-sweep.ts).
+  "turnsAtFiveHidden",
+  // On the table until the end of the phase: each Orc enemy engaged with a player adds its Threat to the total Threat in the staging area, read live, so an Orc that engages later in the phase counts too ("Until the end of the phase, Orc enemies engaged with players add their Threat to the staging area", 06131:A:1; src/rules/families/pelargir/engaged-threat.ts).
+  "engagedOrcThreat",
   // On a location a player controls: the seat that took control, plus 1 (no record sets it; TakeControlOfLocation writes it and a settle sweep reads it to see the control lost). Held until the control is lost.
   "controlSeat",
 ] as const;
 
 // The underworld deck lies set aside facedown, and the Villain and the Plot the Setup hides stay set aside facedown (06011:A:1): the table lists them as facedown cards without a name.
+// The Blood of Gondor: every set-aside encounter card is a hidden card (the objective allies are in play from the Setup).
 const ASIDE_SECRETS = [
+  { verb: "TakeHiddenCard", deck: true },
   { verb: "BuildUnderworldDeck", codes: ["codes"] },
   { verb: "HideOneAside", codes: ["codes"] },
 ] as const;

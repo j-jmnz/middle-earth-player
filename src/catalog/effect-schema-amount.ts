@@ -109,6 +109,8 @@ export const amountExprSchema = z.strictObject({
   // What the running effect discarded from the top of decks so far, over every player it acted for: `cost` the combined printed cost of the cards (a card with no printed cost counts 0: "X is the combined printed cost of the discarded cards", 09034:A:1), `types`
   // the number of different card types among them ("for each different card type discarded this way", 09064:A:1). Read by the deck family.
   discarded: z.enum(["cost", "types"]).optional(),
+  // The hidden cards (The Blood of Gondor, ats.hidden-cards): `own` those in the acting player's play area, `all` those in every play area ("X is the total number of hidden cards in the game", 06119:A:1). 0 in a game with none. Read by the pelargir family.
+  hidden: z.enum(["own", "all"]).optional(),
   // The total printed Threat of the cards the running effect discarded from the top of the encounter deck (DiscardEncounterTop), looked at by it: an enemy's or a location's Threat, 0 for any other card ("X is the total Threat of the discarded cards", 10107:A:1). Read by the angmar family.
   discardedThreat: z.literal(true).optional(),
   // The Willpower the character the attack destroyed had in play, kept when the attack damaged it ("raise your threat by the destroyed character's Willpower", 10107:A:2); 0 when none was kept. Read by the angmar family.
