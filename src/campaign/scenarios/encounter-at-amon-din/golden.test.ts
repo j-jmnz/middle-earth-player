@@ -11,6 +11,8 @@ const din = loadAnyScenario("encounter-at-amon-din");
 const cardOf = (state: ScenarioState, code: string) => Object.values(state.cards).find((card) => card.code === code);
 const rescued = (state: ScenarioState): number => cardOf(state, RESCUED)?.resources ?? 0;
 const dead = (state: ScenarioState): number => cardOf(state, DEAD)?.damage ?? 0;
+// The three locations that print Villagers X.
+const LOCATIONS: readonly string[] = ["06075", "06076", "06077"];
 const golden = (name: string): DinGolden => DIN_GOLDENS.find((entry) => entry.name === name) as DinGolden;
 // Stage 2B is defeated (its progress is in) while Ghulat is in play: the end is held (rr.cannot, 06067:B:2).
 const holding = (state: ScenarioState): boolean => {
@@ -121,27 +123,38 @@ describe("Encounter at Amon Dîn golden", () => {
         expect(discards.length).toBeGreaterThanOrEqual(taken);
       });
 
-      it("has Lord Alcaron save a discarded villager token in every game that uses his Response: he exhausts and the token goes back onto a card", () => {
-        // A discard moves a token from a card to a damage token on Dead Villagers (no change in the sum of both); the Response places the discarded token again, so the sum grows by at least one (the rest of the flow, a quest flip that places the Villagers 5, may add more).
-        const tokens = (state: ScenarioState): number => Object.values(state.cards).filter((card) => card.zone !== "heroes").reduce((sum, card) => sum + (card.resources ?? 0), 0) + dead(state);
-        let saved = 0;
+      it("has Lord Alcaron save a discarded villager token in every game that uses his Response: he exhausts and exactly one villager token is placed", () => {
+        // The discard (and its damage token on Dead Villagers) came first as a Forced effect. An intent goes on past the placing when more of the round ends (a second Farmhouse discards its own token) or the quest resolves, so the check is two:
+        // (1) the tokens of the cards in play when the Response opened (their villager tokens, each token that moved to Rescued Villagers with them, and the damage tokens on Dead Villagers, one for each discard) grow by exactly 1 in the intent;
+        // (2) in an intent that stops at the placing, the picked location holds exactly 1 more, and Rescued Villagers, the card the token left and Dead Villagers keep what they held.
+        const HELD = ["staging", "activeLocation", "questStage"];
+        let stopped = 0;
         for (const entry of DIN_GOLDENS.filter((item) => item.outcome === "won" || item.name.endsWith("comparison"))) {
           const played = game(entry);
           const trail = played.trail ?? [];
           played.intents.forEach((intent, index) => {
             if (intent.type !== "Trigger" || intent.effectId !== "06070:response:1") return;
             // The Response exhausts Lord Alcaron and places the token on a location: at once when one location is in play, else when the pick that follows the Trigger is answered.
+            const label = `${entry.name} #${index}`;
             const before = (index === 0 ? played.kept : trail[index - 1]) as ScenarioState;
-            const placed = trail[index]?.window?.kind === "choose" ? trail[index + 1] : trail[index];
-            expect(trail[index]?.cards[intent.cardId]?.exhausted, `${entry.name} #${index}`).toBe(true);
-            expect(tokens(placed as ScenarioState) - tokens(before), `${entry.name} #${index}`).toBeGreaterThanOrEqual(1);
-            expect(before.cards[intent.cardId]?.exhausted, `${entry.name} #${index}`).toBeFalsy();
-            // The damage token of the discard came first (a Forced effect before the Response) and stays.
-            expect(dead(placed as ScenarioState), `${entry.name} #${index}`).toBeGreaterThanOrEqual(dead(before));
-            saved += 1;
+            const placed = (trail[index]?.window?.kind === "choose" ? trail[index + 1] : trail[index]) as ScenarioState;
+            expect(placed.cards[intent.cardId]?.exhausted, label).toBe(true);
+            expect(before.cards[intent.cardId]?.exhausted, label).toBeFalsy();
+            const held = Object.keys(before.cards).filter((id) => HELD.includes(before.cards[id]?.zone ?? ""));
+            const tokens = (state: ScenarioState): number => held.reduce((sum, id) => sum + (HELD.includes(state.cards[id]?.zone ?? "") ? (state.cards[id]?.resources ?? 0) : 0), 0) + dead(state);
+            // The Setup goes on past a Response (it places the stage's Villagers 5 and the next revealed card's own), so (1) reads the rounds.
+            if (before.round > 0) expect(tokens(placed) - tokens(before), label).toBe(1);
+            const moved = held.filter((id) => before.cards[id]?.zone !== placed.cards[id]?.zone || (before.cards[id]?.resources ?? 0) !== (placed.cards[id]?.resources ?? 0));
+            const picked = moved.filter((id) => (placed.cards[id]?.resources ?? 0) - (before.cards[id]?.resources ?? 0) === 1);
+            if (moved.length !== 1 || picked.length !== 1) return;
+            // The intent stopped at the placing: one location grew by 1, nothing else moved, Rescued Villagers and Dead Villagers are as they were.
+            expect(LOCATIONS, label).toContain(placed.cards[picked[0] as string]?.code);
+            expect(rescued(placed), label).toBe(rescued(before));
+            expect(dead(placed), label).toBe(dead(before));
+            stopped += 1;
           });
         }
-        expect(saved).toBeGreaterThan(0);
+        expect(stopped).toBeGreaterThan(0);
       });
 
       it("loses when Ghulat leaves play after Lord Alcaron was discarded in his presence, not before", () => {
