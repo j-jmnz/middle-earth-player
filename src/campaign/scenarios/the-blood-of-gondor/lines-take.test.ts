@@ -25,8 +25,9 @@ function atQuest(effects: readonly Effect[], piles: Piles, stage: string = CODES
   return drive(made, opened(made), (state) => state.phase === "Quest" && state.mode !== "planning").state;
 }
 
-function quest(line: string, stage: string): void {
-  lineSpec(line, "each player takes 1 hidden card at the beginning of the quest phase; with an empty deck the discard pile is shuffled in first, and with both piles empty none is taken", (effects) => {
+const QUEST_TAKES = "each player takes 1 hidden card at the beginning of the quest phase; with an empty deck the discard pile is shuffled in first, and with both piles empty none is taken";
+const questTakes = (stage: string) =>
+  (effects: readonly Effect[]): void => {
     const full = atQuest(effects, FULL, stage);
     expect([count(full, 0), count(full, 1)]).toEqual([1, 1]);
     const refilled = atQuest(effects, REFILLED, stage);
@@ -34,10 +35,9 @@ function quest(line: string, stage: string): void {
     expect(refilled.encounterDiscard).toHaveLength(0);
     expect(refilled.encounterDeck).toHaveLength(2);
     expect(count(atQuest(effects, EMPTY, stage))).toBe(0);
-  });
-}
-quest("06117:B:1", CODES.ambush);
-quest("06118:B:2", captured);
+  };
+lineSpec("06117:B:1", QUEST_TAKES, questTakes(CODES.ambush));
+lineSpec("06118:B:2", QUEST_TAKES, questTakes(captured));
 
 lineSpec("06117:B:2", "a player who chooses to take instead of turning takes 1 hidden card, from the discard pile when the deck is empty, and none with both piles empty", (effects) => {
   const choose = (piles: Piles): ScenarioState => {
@@ -54,8 +54,9 @@ lineSpec("06117:B:2", "a player who chooses to take instead of turning takes 1 h
 });
 
 /** A Travel cost of `cost` hidden cards, taken by the first player (seat 1 of two): paid in full before the travel, and not offered when the piles hold fewer. */
-function travel(line: string, code: string, cost: number): void {
-  lineSpec(line, `Travel: the first player takes ${cost} hidden card${cost > 1 ? "s" : ""} to travel here; with an empty deck the discard pile is shuffled in, and with both piles empty the players cannot travel here`, (effects) => {
+const travelTitle = (cost: number): string => `Travel: the first player takes ${cost} hidden card${cost > 1 ? "s" : ""} to travel here; with an empty deck the discard pile is shuffled in, and with both piles empty the players cannot travel here`;
+const travels = (code: string, cost: number) =>
+  (effects: readonly Effect[]): void => {
     const at = (piles: Piles) => {
       const made = table({ seats: 2, firstPlayer: 1, phase: "Travel", staging: [code], ...piles }, effects);
       return { made, can: legalTargets(opened(made).state, { type: "Travel" }, made.ctx).includes(idOf(made.state, code)) };
@@ -72,17 +73,17 @@ function travel(line: string, code: string, cost: number): void {
     }
     expect(at(EMPTY).can).toBe(false);
     expect(at({ deck: ["f0"], discard: [] }).can).toBe(cost === 1);
-  });
-}
-travel("06123:A:3", crossroads, 1);
-travel("06124:A:1", southern, 1);
-travel("06125:A:2", western, 1);
-travel("06126:A:1", northern, 1);
-travel("06127:A:2", eastern, 2);
+  };
+lineSpec("06123:A:3", travelTitle(1), travels(crossroads, 1));
+lineSpec("06124:A:1", travelTitle(1), travels(southern, 1));
+lineSpec("06125:A:2", travelTitle(1), travels(western, 1));
+lineSpec("06126:A:1", travelTitle(1), travels(northern, 1));
+lineSpec("06127:A:2", travelTitle(2), travels(eastern, 2));
 
 /** The attack of Orc Rabble on seat 0 with `shadow` dealt to it and seat 1's Sentinel hero Aragorn defending: the defending player (seat 0) takes the card. */
-function shadowTake(line: string, shadow: string): void {
-  lineSpec(line, "Shadow: the defending player takes 1 hidden card, not the Sentinel's controller; with an empty deck the discard pile is shuffled in, and with both piles empty none is taken", (effects) => {
+const SHADOW_TAKES = "Shadow: the defending player takes 1 hidden card, not the Sentinel's controller; with an empty deck the discard pile is shuffled in, and with both piles empty none is taken";
+const shadowTakes = (shadow: string) =>
+  (effects: readonly Effect[]): void => {
     const fight = (rest: Piles): ScenarioState => {
       const made = table({ seats: 2, phase: "Encounter", heroes: [{ code: ARAGORN, seat: 1 }], engaged: [{ code: rabble, seat: 0 }], deck: [shadow, ...rest.deck], discard: rest.discard }, effects, [ARAGORN]);
       const hit = drive(made, opened(made), (state) => state.window?.kind === "defense");
@@ -94,10 +95,9 @@ function shadowTake(line: string, shadow: string): void {
     expect([count(refilled, 0), count(refilled, 1)]).toEqual([1, 0]);
     expect(refilled.encounterDeck).toHaveLength(3);
     expect(count(fight(EMPTY))).toBe(0);
-  });
-}
-shadowTake("06122:A:2", crow);
-shadowTake("06131:A:2", conflict);
+  };
+lineSpec("06122:A:2", SHADOW_TAKES, shadowTakes(crow));
+lineSpec("06131:A:2", SHADOW_TAKES, shadowTakes(conflict));
 
 lineSpec("06122:A:1", "Forced: when Evil Crow engages a player that player takes 1 hidden card; with an empty deck the discard pile is shuffled in, and with both piles empty none is taken", (effects) => {
   const engage = (piles: Piles): ScenarioState => {

@@ -5,11 +5,11 @@ import { expect } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
-import { idOf, send, type Run } from "../../../../test/harness/scene-kit.ts";
+import { idOf, send } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import { CODES, drive, engagedCodes, hiddenCodes, hurt, opened, run, table, takes, where } from "../../../../test/scenarios/the-blood-of-gondor/table.ts";
 
-const { ambusher, uruk, rabble, southern, looms, faramir, alcaron, numenorean } = CODES;
+const { ambusher, uruk, rabble, arsonist, southern, looms, faramir, alcaron, numenorean } = CODES;
 const ARAGORN = "01001";
 const fillers = (count: number): string[] => Array<string>(count).fill("f0");
 const shadowsOn = (state: ScenarioState, code: string): number => Object.values(state.cards).filter((card) => card.zone === "shadow" && state.cards[card.host ?? ""]?.code === code).length;
@@ -116,4 +116,12 @@ lineSpec("06120:A:1", "Forced: engaged in the encounter phase the ordinary way, 
   const done = send(opened(made), { type: "Engage", enemyId: idOf(made.state, ambusher) }, made.ctx);
   expect(engagedCodes(done.state)).toEqual([ambusher]);
   expect(done.state.seats[0]?.play).toEqual([]);
+});
+
+lineSpec("06117:B:2", "turning engages Orc Arsonist in the middle of the combat phase: its Forced effect deals 1 shadow card to each enemy engaged with that player, itself included, before the combat phase deals its cards, which then deal none more (the engine turns first)", (effects) => {
+  const made = table({ phase: "Encounter", engaged: [rabble], deck: [arsonist, ...fillers(8)] }, effects);
+  const at = drive(made, opened(made, takes(made, made.state, 0)), (state) => state.window?.kind === "choose");
+  const turned = send(at, { type: "Choose", optionId: "turn" }, made.ctx);
+  expect(engagedCodes(turned.state)).toEqual([rabble, arsonist]);
+  expect([shadowsOn(turned.state, rabble), shadowsOn(turned.state, arsonist)]).toEqual([1, 1]);
 });

@@ -107,49 +107,55 @@ lineSpec("06133:A:2", "is offered only while an enemy is engaged with the contro
   expect(offered(other, opened(other).state)).not.toContain(ALCARON);
 });
 
-for (const [line, code] of [["06132:A:1", faramir], ["06133:A:1", alcaron]] as const) {
-  lineSpec(line, "the first player gains control of the ally: the token passes in the refresh phase and the ally goes to the new first player's play area, unless Captured! holds it", (effects) => {
-    const passes = (held: boolean) => {
-      const made = table({ seats: 2, phase: "PlayerAttacks", ...(held ? { stage: captured, side: "A" as const } : {}), play: [faramir, alcaron] }, effects);
-      const state = held ? run(made, made.state, { verb: "HoldUnderStage", codes: [faramir, alcaron] }, { sourceId: idOf(made.state, captured) }) : made.state;
-      expect(state.cards[idOf(state, code)]).toMatchObject({ controller: held ? null : 0 });
-      return drive(made, opened(made, state), (now) => now.phase === "Planning").state;
-    };
-    const free = passes(false);
-    expect(free.firstPlayer).toBe(1);
-    expect(free.cards[idOf(free, code)]).toMatchObject({ zone: "play", controller: 1 });
-    expect(free.seats[1]?.play).toContain(idOf(free, code));
-    expect(free.seats[0]?.play).not.toContain(idOf(free, code));
-    const under = passes(true);
-    expect(under.firstPlayer).toBe(1);
-    expect(under.cards[idOf(under, code)]).toMatchObject({ zone: "captive", controller: null });
-  });
+const TOKEN = "the first player gains control of the ally: the token passes in the refresh phase and the ally goes to the new first player's play area, unless Captured! holds it";
+
+function tokenPasses(effects: readonly Effect[], code: string): void {
+  const passes = (held: boolean) => {
+    const made = table({ seats: 2, phase: "PlayerAttacks", ...(held ? { stage: captured, side: "A" as const } : {}), play: [faramir, alcaron] }, effects);
+    const state = held ? run(made, made.state, { verb: "HoldUnderStage", codes: [faramir, alcaron] }, { sourceId: idOf(made.state, captured) }) : made.state;
+    expect(state.cards[idOf(state, code)]).toMatchObject({ controller: held ? null : 0 });
+    return drive(made, opened(made, state), (now) => now.phase === "Planning").state;
+  };
+  const free = passes(false);
+  expect(free.firstPlayer).toBe(1);
+  expect(free.cards[idOf(free, code)]).toMatchObject({ zone: "play", controller: 1 });
+  expect(free.seats[1]?.play).toContain(idOf(free, code));
+  expect(free.seats[0]?.play).not.toContain(idOf(free, code));
+  const under = passes(true);
+  expect(under.firstPlayer).toBe(1);
+  expect(under.cards[idOf(under, code)]).toMatchObject({ zone: "captive", controller: null });
 }
+lineSpec("06132:A:1", TOKEN, (effects) => tokenPasses(effects, faramir));
+lineSpec("06133:A:1", TOKEN, (effects) => tokenPasses(effects, alcaron));
 
 // Black Númenorean (Attack 5) kills Lord Alcaron (Defense 2, 3 hit points) and Faramir (Defense 1, 4 hit points) when one defends.
-for (const [line, code, name] of [["06132:A:3", faramir, "Faramir"], ["06133:A:3", alcaron, "Lord Alcaron"]] as const) {
-  lineSpec(line, `the players lose when ${name} is destroyed defending: a hero that dies instead does not lose the game`, (effects) => {
-    const attack = (defender: string) => {
-      const made = table({ phase: "Combat", play: [faramir, alcaron], engaged: [numenorean], deck: ["f0", "f0", "f0", "f0"] }, effects);
-      const hit = drive(made, send(opened(made), { type: "Pass" }, made.ctx), (state) => state.window?.kind === "defense");
-      return drive(made, send(hit, { type: "DeclareDefender", defenderId: defender === "hero" ? made.hero : idOf(hit.state, defender) }, made.ctx), (state) => state.pendingAttack == null || state.lost);
-    };
-    const lost = attack(code);
-    expect(lost.state.cards[idOf(lost.state, code)]?.zone).toBe("encounterDiscard");
-    expect(lost.state.lost).toBe(true);
-    expect(attack("hero").state.lost).toBe(false);
-  });
-
-  lineSpec(line, `the players lose when the seat that controls ${name} is eliminated: he is discarded with the rest of what that player controls`, (effects) => {
-    const made = table({ seats: 2, phase: "Combat", play: [code], engaged: [uruk], deck: ["f0", "f0", "f0", "f0"] }, effects);
-    // Seat 0 has one hero left, with 3 hit points, and Brutal Uruk (Attack 4) attacks him undefended.
-    const worn = hurt(made, hurt(made, made.state, "dh2", 6), "dh1", 3);
-    expect(worn.lost).toBe(false);
-    expect(worn.seats[0]?.eliminated).toBeFalsy();
-    const hit = drive(made, send(opened(made, worn), { type: "Pass" }, made.ctx), (state) => state.window?.kind === "defense");
-    const done = drive(made, send(hit, { type: "Undefended", heroId: idOf(hit.state, "dh1") }, made.ctx), (state) => state.lost || state.pendingAttack == null);
-    expect(done.state.seats[0]?.eliminated).toBe(true);
-    expect(done.state.cards[idOf(done.state, code)]?.zone).not.toBe("play");
-    expect(done.state.lost).toBe(true);
-  });
+function destroyedDefending(effects: readonly Effect[], code: string): void {
+  const attack = (defender: string) => {
+    const made = table({ phase: "Combat", play: [faramir, alcaron], engaged: [numenorean], deck: ["f0", "f0", "f0", "f0"] }, effects);
+    const hit = drive(made, send(opened(made), { type: "Pass" }, made.ctx), (state) => state.window?.kind === "defense");
+    return drive(made, send(hit, { type: "DeclareDefender", defenderId: defender === "hero" ? made.hero : idOf(hit.state, defender) }, made.ctx), (state) => state.pendingAttack == null || state.lost);
+  };
+  const lost = attack(code);
+  expect(lost.state.cards[idOf(lost.state, code)]?.zone).toBe("encounterDiscard");
+  expect(lost.state.lost).toBe(true);
+  expect(attack("hero").state.lost).toBe(false);
 }
+
+// The seat that controls the ally has one hero left, with 3 hit points, and Brutal Uruk (Attack 4) attacks him undefended.
+function controllerEliminated(effects: readonly Effect[], code: string): void {
+  const made = table({ seats: 2, phase: "Combat", play: [code], engaged: [uruk], deck: ["f0", "f0", "f0", "f0"] }, effects);
+  const worn = hurt(made, hurt(made, made.state, "dh2", 6), "dh1", 3);
+  expect(worn.lost).toBe(false);
+  expect(worn.seats[0]?.eliminated).toBeFalsy();
+  const hit = drive(made, send(opened(made, worn), { type: "Pass" }, made.ctx), (state) => state.window?.kind === "defense");
+  const done = drive(made, send(hit, { type: "Undefended", heroId: idOf(hit.state, "dh1") }, made.ctx), (state) => state.lost || state.pendingAttack == null);
+  expect(done.state.seats[0]?.eliminated).toBe(true);
+  expect(done.state.cards[idOf(done.state, code)]?.zone).not.toBe("play");
+  expect(done.state.lost).toBe(true);
+}
+const DESTROYED = (name: string) => `the players lose when ${name} is destroyed defending: a hero that dies instead does not lose the game`;
+const ELIMINATED = (name: string) => `the players lose when the seat that controls ${name} is eliminated: he is discarded with the rest of what that player controls`;
+lineSpec("06132:A:3", DESTROYED("Faramir"), (effects) => destroyedDefending(effects, faramir));
+lineSpec("06132:A:3", ELIMINATED("Faramir"), (effects) => controllerEliminated(effects, faramir));
+lineSpec("06133:A:3", DESTROYED("Lord Alcaron"), (effects) => destroyedDefending(effects, alcaron));
+lineSpec("06133:A:3", ELIMINATED("Lord Alcaron"), (effects) => controllerEliminated(effects, alcaron));

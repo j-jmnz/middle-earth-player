@@ -1,6 +1,6 @@
 // Rules: ats.hidden-cards-turn-faceup, faq.blood-of-gondor-hidden-cards, rr.engaged, rr.damage, rr.surge (data/rules/entries.json); ledger lines 06117:B:2, 06118:A:1, 06121:A:1, 06129:A:1, 06132:A:2.
 // Turning hidden cards faceup, one card at a time. The cards held when the turn starts are the ones turned: a card taken during it (Evil Crow) stays facedown. An enemy engages the player whatever its engagement cost, a treachery goes to the encounter discard pile, a location goes there too
-// or, for Lying in Wait, to the staging area. The card is not revealed (hidden.turn-enemy-not-revealed): no When Revealed effect and no surge, but Lying in Wait names the When Revealed effects of the cards it turns, which resolve once the turn is done, the first card first.
+// or, for Lying in Wait, to the staging area when it is turned. The card is not revealed (hidden.turn-enemy-not-revealed): no When Revealed effect and no surge, but Lying in Wait names the When Revealed effects of the cards it turns, enemies included (each after it has engaged), which resolve once the turn is done, the first card first.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";

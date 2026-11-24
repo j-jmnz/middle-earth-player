@@ -188,7 +188,7 @@ Scenario piles that place cards with no record (quest: 06117 The Ambush; quest: 
 
 06129:A:1 (front): When Revealed: The first player turns each hidden card in his play area faceup. Resolve the "When Revealed" effects of each encounter card turned faceup by this effect. If a location is turned faceup, add it to the staging area.
   06129:whenRevealed:1: When revealed
-    - the first player turns each hidden card he holds faceup, one at a time, the cards held when the turn begins only (a card taken meanwhile stays facedown): an enemy engages him at once whatever its engagement cost, a treachery is discarded after its When Revealed effects resolve (no surge), and a location resolves its When Revealed effects and is added to the staging area
+    - the first player turns each hidden card he holds faceup, one at a time, the cards held when the turn begins only (a card taken meanwhile stays facedown): an enemy engages him at once whatever its engagement cost, a treachery is discarded, and a location is added to the staging area when it is turned; once every card is turned the When Revealed effects of the cards turned (an enemy after it has engaged, a treachery, a location) resolve, the first card turned first, and no surge fires
 
 ## 06130 Mordor Looms
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -232,8 +232,8 @@ Scenario piles that place cards with no record (quest: 06117 The Ambush; quest: 
 
 06132:A:2 (front): Combat Action: Exhaust Faramir to turn a hidden card faceup. If that card is an enemy, deal 3 damage to it.
   06132:action:1: Action (cost: exhaust this card)
-    only if all of: (it is the Combat phase) and (0 is less than the total number of hidden cards in every player's play area)
-    who acts: any player may trigger it; the acting player is the one who does
+    only if all of: (it is the Combat phase) and (0 is less than the total number of hidden cards in every player's play area) and (there is a ally (you control) named "Faramir" to choose)
+    who acts: only the player who controls it may trigger it, as for any ally; the acting player is that player
     - the acting player chooses a player who holds a hidden card (no choice with one) and one of that player's hidden cards, picked blind with the game's seed, is turned faceup for him: an enemy takes 3 damage first, and one destroyed never engages; otherwise it engages him at once whatever its engagement cost, a treachery or a location is discarded unresolved
 
 06132:A:3 (front): If Faramir leaves play, the players have lost the game.
@@ -251,8 +251,8 @@ Scenario piles that place cards with no record (quest: 06117 The Ambush; quest: 
 
 06133:A:2 (front): Action: Exhaust Lord Alcaron to return an enemy engaged with you to the staging area.
   06133:action:1: Action (cost: exhaust this card)
-    only if there is a enemy (any player controls) engaged with you to choose
-    who acts: any player may trigger it; the acting player is the one who does
+    only if all of: (there is a ally (you control) named "Lord Alcaron" to choose) and (there is a enemy (any player controls) engaged with you to choose)
+    who acts: only the player who controls it may trigger it, as for any ally; the acting player is that player
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) engaged with you
     - return the picked card to the staging area
@@ -262,4 +262,4 @@ Scenario piles that place cards with no record (quest: 06117 The Ambush; quest: 
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game (Lord Alcaron left play)
 
-(rendered pieces: 123 by template, 0 as JSON)
+(rendered pieces: 128 by template, 0 as JSON)

@@ -1,7 +1,7 @@
 // Rules: hon.siege, hon.battle, hon.archery, faq.errata.06123, rr.staging-area, rr.lasting-effects, rr.travel, rr.forced, rr.victory, rr.step-3-4, ats.hidden-cards, rr.end-of-round (data/rules/entries.json); ledger lines 06118:B:1, 06118:B:4, 06119:A:1, 06119:A:2, 06123:A:1, 06123:A:2, 06125:A:1, 06127:A:1, 06128:A:1, 06128:A:2, 06128:A:3, 06131:A:1.
 // The locations, the stage and the enemies of The Blood of Gondor that change a total: the quest card's Siege and Battle, the Threat of The Cross-roads and Black Númenorean, the +5 quest points of the roads, Archery X, the Dark Woods once explored, the Orcs of Conflict at the Crossroads, and the win. Every moment is a real
 // quest, round or travel; the quest total is read from the quest step the game wrote, with Boromir (Willpower 1, Attack 3, Defense 2) so the stat counted shows.
-import { expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { archeryTotal } from "../../../rules/combat/combat.ts";
@@ -41,14 +41,14 @@ lineSpec("06123:A:2", "X is the number of players in the game: its Threat in the
   expect(threat(2)).toBe(2);
 });
 
-for (const [line, code, quest] of [["06125:A:1", western, 4], ["06127:A:1", eastern, 2]] as const) {
-  lineSpec(line, `+5 quest points only while it is in the staging area: ${quest + 5} there, ${quest} once it is the active location`, (effects) => {
-    const staged = table({ staging: [code] }, effects);
-    expect(statOf(staged.state, staged.ctx.cards, code, "questPoints")).toBe(quest + 5);
-    const active = table({ active: code }, effects);
-    expect(statOf(active.state, active.ctx.cards, code, "questPoints")).toBe(quest);
-  });
+function fiveBonus(effects: readonly Effect[], code: string, quest: number): void {
+  const staged = table({ staging: [code] }, effects);
+  expect(statOf(staged.state, staged.ctx.cards, code, "questPoints")).toBe(quest + 5);
+  const active = table({ active: code }, effects);
+  expect(statOf(active.state, active.ctx.cards, code, "questPoints")).toBe(quest);
 }
+lineSpec("06125:A:1", "+5 quest points only while it is in the staging area: 9 there, 4 once it is the active location", (effects) => fiveBonus(effects, western, 4));
+lineSpec("06127:A:1", "+5 quest points only while it is in the staging area: 7 there, 2 once it is the active location", (effects) => fiveBonus(effects, eastern, 2));
 
 lineSpec("06128:A:1", "Archery X: it has Archery while it is in the staging area, and none out of play", (effects) => {
   const made = table({ staging: [darkWoods] }, effects);
@@ -76,7 +76,7 @@ lineSpec("06128:A:3", "Forced: after it is explored the first player (seat 1) di
   expect(where(done, darkWoods)).not.toBe("activeLocation");
   expect([hiddenCodes(done, 1).length, hiddenCodes(done, 0).length]).toEqual([1, 1]);
   expect(engagedCodes(done, 1)).toEqual([]);
-  expect(done.encounterDiscard.filter((id) => [ambusher, rabble].includes(done.cards[id]?.code ?? ""))).toHaveLength(1);
+  expect(done.encounterDiscard.filter((id) => [ambusher as string, rabble as string].includes(done.cards[id]?.code ?? ""))).toHaveLength(1);
   expect(hiddenCodes(explore(false))).toEqual([]);
 });
 
@@ -99,34 +99,36 @@ lineSpec("06119:A:2", "Forced: at the end of the round each player raises his th
   expect([(apart.seats[0]?.threat ?? 0) - (plain.seats[0]?.threat ?? 0), (apart.seats[1]?.threat ?? 0) - (plain.seats[1]?.threat ?? 0)]).toEqual([2, 1]);
 });
 
-lineSpec("06131:A:1", "When Revealed: until the end of the phase each Orc enemy engaged with any player adds its Threat to the staging area, an Orc that engages later in the phase too; a non-Orc adds nothing", (effects) => {
-  const made = table({ phase: "Quest", seats: 2, engaged: [arsonist, { code: uruk, seat: 1 }, "f3"], deck: [rabble, "f0", "f0", "f0"] }, effects);
-  const held = takes(made, made.state, 0);
-  const before = stagingThreat(held, made.ctx.cards);
-  const revealed = revealedTop({ state: held, ctx: made.ctx }, conflict);
-  // Orc Arsonist 3 and Brutal Uruk 3 (the second seat's too) add 6, and the stand-in enemy that is no Orc nothing; the card did not surge.
-  expect(stagingThreat(revealed, made.ctx.cards) - before).toBe(6);
-  const later = run(made, revealed, { verb: "TurnHiddenCards", who: "actor" });
-  expect(engagedCodes(later)).toContain(rabble);
-  expect(stagingThreat(later, made.ctx.cards) - before).toBe(6 + 2);
-});
+describe("06131:A:1 the lasting effect: until the end of the phase, and again for a second copy", () => {
+  lineSpec("06131:A:1", "When Revealed: until the end of the phase each Orc enemy engaged with any player adds its Threat to the staging area, an Orc that engages later in the phase too; a non-Orc adds nothing", (effects) => {
+    const made = table({ phase: "Quest", seats: 2, engaged: [arsonist, { code: uruk, seat: 1 }, "f3"], deck: [rabble, "f0", "f0", "f0"] }, effects);
+    const held = takes(made, made.state, 0);
+    const before = stagingThreat(held, made.ctx.cards);
+    const revealed = revealedTop({ state: held, ctx: made.ctx }, conflict);
+    // Orc Arsonist 3 and Brutal Uruk 3 (the second seat's too) add 6, and the stand-in enemy that is no Orc nothing; the card did not surge.
+    expect(stagingThreat(revealed, made.ctx.cards) - before).toBe(6);
+    const later = run(made, revealed, { verb: "TurnHiddenCards", who: "actor" });
+    expect(engagedCodes(later)).toContain(rabble);
+    expect(stagingThreat(later, made.ctx.cards) - before).toBe(6 + 2);
+  });
 
-lineSpec("06131:A:1", "the Threat added ends with the phase: at the end of the phase the engaged Orcs add nothing", (effects) => {
-  const made = table({ phase: "Quest", engaged: [arsonist], deck: fillers(4) }, effects);
-  const before = stagingThreat(opened(made).state, made.ctx.cards);
-  const revealed = revealedTop(made, conflict);
-  expect(stagingThreat(revealed, made.ctx.cards) - before).toBe(3);
-  const next = drive(made, opened(made, { ...revealed, mode: "questCommit", window: { kind: "pass" } as never }), (state) => state.phase !== "Quest");
-  expect(stagingThreat(next.state, made.ctx.cards) - before).toBe(0);
-});
+  lineSpec("06131:A:1", "the Threat added ends with the phase: at the end of the phase the engaged Orcs add nothing", (effects) => {
+    const made = table({ phase: "Quest", engaged: [arsonist], deck: fillers(4) }, effects);
+    const before = stagingThreat(opened(made).state, made.ctx.cards);
+    const revealed = revealedTop(made, conflict);
+    expect(stagingThreat(revealed, made.ctx.cards) - before).toBe(3);
+    const next = drive(made, opened(made, { ...revealed, mode: "questCommit", window: { kind: "pass" } as never }), (state) => state.phase !== "Quest");
+    expect(stagingThreat(next.state, made.ctx.cards) - before).toBe(0);
+  });
 
-lineSpec("06131:A:1", "a second Conflict at the Crossroads in the same phase adds the engaged Orcs' Threat again: each copy is a lasting effect of its own, so two copies add the Threat twice", (effects) => {
-  const made = table({ phase: "Quest", engaged: [arsonist, uruk], deck: fillers(6) }, effects);
-  const before = stagingThreat(made.state, made.ctx.cards);
-  const once = revealedTop(made, conflict);
-  expect(stagingThreat(once, made.ctx.cards) - before).toBe(6);
-  const twice = revealedTop({ state: once, ctx: made.ctx }, conflict);
-  expect(stagingThreat(twice, made.ctx.cards) - before).toBe(12);
+  lineSpec("06131:A:1", "a second Conflict at the Crossroads in the same phase adds the engaged Orcs' Threat again: each copy is a lasting effect of its own, so two copies add the Threat twice", (effects) => {
+    const made = table({ phase: "Quest", engaged: [arsonist, uruk], deck: fillers(6) }, effects);
+    const before = stagingThreat(made.state, made.ctx.cards);
+    const once = revealedTop(made, conflict);
+    expect(stagingThreat(once, made.ctx.cards) - before).toBe(6);
+    const twice = revealedTop({ state: once, ctx: made.ctx }, conflict);
+    expect(stagingThreat(twice, made.ctx.cards) - before).toBe(12);
+  });
 });
 
 lineSpec("06131:A:1", "When Revealed: it gains surge when no Orc enemy is engaged with a player, and none when one is: it prints no Surge keyword", (effects) => {
