@@ -73,7 +73,7 @@ describe("a location a player controls (06091:B:2, ats.controlling-locations)", 
   it("two-handed it names the player", () => {
     const two = table({ seats: 2, firstPlayer: 1, staging: [harbor] });
     const state = controlling(two, two.state, [harbor]);
-    expect(detail(two, state, harbor)).toBe("Player 2 controls it: it lies in Player 2's play area, ready, with its text working. Losing control puts it in the staging area with its progress removed. If player 2 leaves an attack undefended, it returns to the staging area with its progress removed.");
+    expect(detail(two, state, harbor)).toBe("Player 2 controls it: it lies in Player 2's play area, ready, with its text working. Losing control puts it in the staging area with its progress removed. If Player 2 leaves an attack undefended, it returns to the staging area with its progress removed.");
   });
 
   it("a unique location in the staging area says what happens once a player controls it", () => {
@@ -97,18 +97,26 @@ describe("the win and stage 1B (06091:B:1, 06091:B:2, 06091:B:3)", () => {
   const made = table({ staging: [harbor, library, tower], active: westQuarter });
   const state = controlling(made, made.state, [harbor]);
 
-  it("the stage's preview says what blocks the win now, the bar on player card progress and who takes control, with no final period on a line the join ends", () => {
-    expect(stageLine(made, state)).toBe(
-      "To win: at the end of the round, no Osgiliath location is in the staging area or active. 3 left: The King's Library, Ruined Tower and West Quarter. 1 location controlled. No player card effect can place progress on a location in the staging area. The active location, a controlled location and any card effect of the encounter deck are not barred. An Osgiliath location that leaves play explored goes to the first player's play area, ready and with no progress. The first player controls it",
-    );
+  const BAR = "Player card effects cannot place progress on a location in the staging area; an active or controlled location is not barred. An explored Osgiliath location goes to the first player, ready, with no progress.";
+
+  it("the stage's preview names what is left and what is controlled, then the bar in one sentence, and ends with a period", () => {
+    expect(stageLine(made, state)).toBe(`To win: at the end of the round, no Osgiliath location is in the staging area or active. Left: The King's Library, Ruined Tower and West Quarter. Controlled: Ancient Harbor. ${BAR}`);
+  });
+
+  it("two-handed the controlled locations name their player, and during Setup no win is announced", () => {
+    const two = table({ seats: 2, firstPlayer: 1, staging: [harbor, library, tower] });
+    const held = controlling(two, two.state, [harbor, library]);
+    expect(stageLine(two, held)).toContain("Left: Ruined Tower. Controlled: Ancient Harbor and The King's Library (Player 2).");
+    const empty = table({ staging: [] });
+    expect(stageLine(empty, { ...empty.state, phase: "Setup" })).toBe(`To win: at the end of the round, no Osgiliath location is in the staging area or active. Controlled: none. ${BAR}`);
   });
 
   it("with none left the line says the end of the round wins, and with none in play it says so", () => {
     const won = table({ staging: [] });
-    expect(stageLine(won, won.state)).toBe("To win: at the end of the round, no Osgiliath location is in the staging area or active. None is in play, so the players win at the end of this round. No player card effect can place progress on a location in the staging area. The active location, a controlled location and any card effect of the encounter deck are not barred. An Osgiliath location that leaves play explored goes to the first player's play area, ready and with no progress. The first player controls it");
+    expect(stageLine(won, won.state)).toBe(`To win: at the end of the round, no Osgiliath location is in the staging area or active. None is in play, so the players win at the end of this round. ${BAR}`);
     const all = controlling(made, made.state, [harbor, library, tower]);
     const rest = { ...all, activeLocation: null };
-    expect(stageLine(made, rest)).toContain("3 locations controlled, none is left, so the players win at the end of this round");
+    expect(stageLine(made, rest)).toContain("None is left, so the players win at the end of this round. Controlled: Ancient Harbor, The King's Library and Ruined Tower.");
   });
 
   it("the dial counts the locations controlled over every Osgiliath location in play, and a tap opens the stage", () => {
@@ -133,7 +141,28 @@ describe("Ruined Tower, Pinned Down and Southron Commander (06103:A:1, 06104:A:1
   it("Ruined Tower says it is a second active location with 1 active, and how many are active otherwise", () => {
     expect(detail(made, state, tower)).toBe("Travel here by exhausting a character: it becomes a second active location, and the first player divides progress between the two. 1 location is active now.");
     const none = table({ staging: [tower] });
-    expect(detail(none, none.state, tower)).toBe("Travel here needs exactly 1 active location. 0 locations are active now.");
+    expect(detail(none, none.state, tower)).toBe("Travel here as to any location. With 1 active location, exhaust a character to travel here as a second active location instead; the first player then divides progress between the two. No location is active now.");
+  });
+
+  it("an active Ruined Tower, in either slot, says the first player divides the quest's progress; with 2 active, a staged one says it cannot be traveled to", () => {
+    const travel = table({ phase: "Travel", active: westQuarter, staging: [tower, library] });
+    const run = drive(travel, send(opened(travel), { type: "Travel", locationId: idOf(travel.state, tower) }, travel.ctx), (state) => state.secondActiveLocation != null);
+    expect(run.state.secondActiveLocation).toBe(idOf(run.state, tower));
+    expect(detail(travel, run.state, tower)).toBe("Active, one of 2 active locations: the first player divides the quest's progress between them.");
+    const first = table({ active: tower, staging: [westQuarter] });
+    expect(detail(first, first.state, tower)).toBe("Active. If a second location becomes active, the first player divides the quest's progress between them.");
+    const full = table({ active: westQuarter, staging: [tower, library] });
+    const crowded = { ...full.state, secondActiveLocation: idOf(full.state, library), staging: [idOf(full.state, tower)] } as ScenarioState;
+    expect(detail(full, crowded, tower)).toBe("2 locations are active now, so the players cannot travel here until only 1 is.");
+  });
+
+  it("a controlled Ruined Tower and a controlled West Gate say what control does to them", () => {
+    const scene = table({ seats: 2, staging: [tower, CODES.westGate] });
+    const held = controlling(scene, scene.state, [tower, CODES.westGate]);
+    expect(detail(scene, held, tower)).toContain("If Player 1 loses control of another location, it returns to the staging area with its progress removed.");
+    expect(detail(scene, held, CODES.westGate)).toContain("Its Action, with no active location, makes it the active location: control is lost and its progress is removed.");
+    const solo = table({ staging: [tower] });
+    expect(detail(solo, controlling(solo, solo.state, [tower]), tower)).toContain("If you lose control of another location, it returns");
   });
 
   it("Pinned Down says X is the locations controlled now and its surge, and loses the surge at 4", () => {
@@ -161,6 +190,17 @@ describe("the attack sheet, the readout and the turn reference (06096:A:2, 06097
     expect(sheet.note).not.toContain("West Quarter");
   });
 
+  it("a controlled Ruined Tower is named too: it returns when another location is lost (06103:A:2), and not alone", () => {
+    const scene = table({ phase: "Encounter", engaged: [{ code: EVIL_CROW, seat: 0 }], staging: [library, tower, westQuarter], deck: ["f0", "f0"], heroes: [{ code: BOROMIR, seat: 0 }] }, undefined, [BOROMIR, EVIL_CROW]);
+    const run = atDefense(scene, controlling(scene, scene.state, [library, tower]));
+    const sheet = defenseSheet(run.state, scene.ctx, legalIntents(run.state, scene.ctx), namesOf(scene, run.state)) as PickSheet;
+    expect(sheet.note).toContain("The King's Library, which you control, returns to the staging area afterwards with its progress removed. Ruined Tower returns as well, as control of another location is lost.");
+    const pending = { ...run.state, pendingAttack: { ...run.state.pendingAttack!, undefended: true, heroId: scene.hero } };
+    expect(readoutFor(pending, scene.ctx, null, null, idName(scene, pending))?.result).toMatch(/; The King's Library and Ruined Tower return to the staging area if nothing changes$/);
+    const alone = atDefense(scene, controlling(scene, scene.state, [tower]));
+    expect((defenseSheet(alone.state, scene.ctx, legalIntents(alone.state, scene.ctx), namesOf(scene, alone.state)) as PickSheet).note ?? "").not.toContain("Ruined Tower");
+  });
+
   it("the readout of the undefended attack says the same, and says nothing with no such location controlled", () => {
     const run = atDefense(made, held);
     const state = { ...run.state, pendingAttack: { ...run.state.pendingAttack!, undefended: true, heroId: made.hero } };
@@ -179,7 +219,7 @@ describe("the attack sheet, the readout and the turn reference (06096:A:2, 06097
 
   it("the turn reference's 6.E step says the locations return, and is the ordinary step in another scenario", () => {
     const decision = (state: ScenarioState) => turnReference(state, () => null).flatMap((phase) => phase.steps).find((step) => step.id === "6.E")?.decision;
-    expect(decision(held)).toBe("Each enemy attacks: declare one defender, or leave it undefended on a hero: West Gate, The King's Library, Ancient Harbor and The Old Bridge return to the staging area if you control them.");
+    expect(decision(held)).toBe("Each enemy attacks: declare one defender, or leave it undefended on a hero: West Gate, The King's Library, Ancient Harbor and The Old Bridge return to the staging area when the player who controls them leaves the attack undefended.");
     expect(decision({ ...held, scenarioId: "the-stewards-fear" })).toBe("Each enemy attacks: declare one defender, or take it undefended on a hero.");
   });
 
@@ -194,6 +234,17 @@ describe("the attack sheet, the readout and the turn reference (06096:A:2, 06097
     expect(lines.join(" ")).not.toContain("West Quarter");
     const log = logLines(nextRoundSteps([], run.state, after.state, after.steps, made.ctx), logNames(made, after.state)).map((line) => line.text);
     expect(log).toContain("The King's Library: You lose control, back in the staging area, 2 progress tokens removed");
+  });
+});
+
+describe("progress the bar kept (06091:B:1)", () => {
+  it("the log says Retake the City kept the progress of Northern Tracker off a staged location", () => {
+    const made = table({ phase: "Quest", active: westQuarter, staging: [library], play: [{ code: "01045", seat: 0 }] }, undefined, ["01045"]);
+    const tracker = idOf(made.state, "01045");
+    const run = send(opened(made), { type: "Commit", cardIds: [made.hero, tracker] }, made.ctx);
+    const done = drive(made, send(run, { type: "Trigger", cardId: tracker, effectId: "01045:response:1" }, made.ctx), () => true);
+    const log = logLines(nextRoundSteps([], run.state, done.state, done.steps, made.ctx), logNames(made, done.state)).map((line) => line.text);
+    expect(log).toContain("No progress on The King's Library: Retake the City bars player card effects from placing progress on a location in the staging area");
   });
 });
 

@@ -22,6 +22,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "06093:forced:1 @0 Pick": { owned: true, note: `Uruk Soldier destroyed a character: ${RETURN}`, verb: "Return" },
   // 06096:A:1 (West Gate, Action): search for an Osgiliath location to reveal and add; West Gate then becomes the active location. With nothing to find it does not.
   "06096:action:1 @0 Choose": { owned: true, note: "West Gate: search the encounter deck and discard pile for an Osgiliath location. It is revealed and added to the staging area, then West Gate becomes the active location and the deck is shuffled. A controlled West Gate is no longer controlled." },
+  "06096:action:1 @0.found.0 SearchReveal": { owned: true, note: "West Gate: choose the Osgiliath location to reveal and add to the staging area. Then West Gate leaves your control and becomes the active location.", verb: "Reveal" },
   "06096:action:1 @0 found": { label: "Search, reveal the location found and make West Gate the active location" },
   "06096:action:1 @0 none": { label: "No Osgiliath location can be found: West Gate stays where it is" },
   // 06098:A:2 (Ancient Harbor, combat Action): exhaust a hero to place 1 progress on it, wherever it is.

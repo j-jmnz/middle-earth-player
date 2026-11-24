@@ -122,7 +122,11 @@ export function towerSecond(state: ScenarioState, locationId: string): boolean {
 /** AnnounceAddedToStaging: the named card, if it lies in the staging area, is announced as added there (`addedToStaging`), so its own Forced effect hears it. Opt-in: SearchMove announces only an ambush enemy, so no other record changes. */
 export function announceAddedToStaging(state: ScenarioState, instruction: Verb<"AnnounceAddedToStaging">, focus: Focus): ScenarioState {
   const id = refCard(state, instruction.card ?? "picked", frameScope(state, focus.seat, focus.sourceId));
-  return id && state.cards[id]?.zone === "staging" ? queueEvent(state, { trigger: "addedToStaging", seat: focus.seat, cardId: id }) : state;
+  if (!id || state.cards[id]?.zone !== "staging") return state;
+  // The card is announced once: the pick is cleared, so a later player's search that finds no enemy does not announce it again.
+  const announced = queueEvent(state, { trigger: "addedToStaging", seat: focus.seat, cardId: id });
+  const data = effectData(announced);
+  return data && (instruction.card ?? "picked") === "picked" ? patchTop(announced, { data: { ...data, picked: [] } }) : announced;
 }
 
 /** ActForDestroyedController: the player who controlled the character the attack destroyed (the effect's `destroyedCharacter`, which a shadow effect with this verb is given) acts for the instructions that follow, as for a Pick of "his" locations. With no destroyed character the actor stays. */

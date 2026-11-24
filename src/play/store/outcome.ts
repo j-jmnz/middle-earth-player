@@ -345,7 +345,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   if (villagers.length > 0) groups.push({ rank: 8, title: VILLAGERS_TITLE, tone: "plain", lines: villagers.map((text) => ({ text, mark: null })), early: true });
   // The locations a player took control of or lost in this intent (Assault on Osgiliath): the location is moved by the engine without a step.
   const control = controlChanges(before, after).map((change) => changeWords(change, after.seatCount, names.card(change.id)));
-  if (control.length > 0) groups.push({ rank: 8, title: "", tone: "plain", lines: control.map((text) => ({ text, mark: null })), early: true, firm: true });
+  if (control.length > 0) groups.push({ rank: 8, title: "", tone: "plain", lines: control.map((text) => ({ text, mark: null })), firm: true });
   const held = heldBeat(before, after);
   if (held) groups.push({ rank: 8, title: held.title, tone: "plain", lines: held.lines.map((text) => ({ text, mark: null })) });
 

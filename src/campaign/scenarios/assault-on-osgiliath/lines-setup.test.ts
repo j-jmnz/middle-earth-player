@@ -8,7 +8,7 @@ import { expect } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { encounterCodes, parseAnyScenarioData } from "../../../catalog/scenario-data.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
-import { idOf, resolveRecords } from "../../../../test/harness/scene-kit.ts";
+import { finish, idOf, resolveRecords, send } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import { CODES, table } from "../../../../test/scenarios/assault-on-osgiliath/table.ts";
 
@@ -52,6 +52,16 @@ lineSpec("06091:A:1", "a Haradrim Elite chosen at Setup makes its attack against
   expect(elite.run.state.pendingAttack).toMatchObject({ enemyId: idOf(elite.run.state, ELITE) });
   expect(elite.run.state.window?.kind).toBe("defense");
   expect(setup(1, [ELITE, MERCENARIES, "06096"], MERCENARIES, effects).run.state.pendingAttack).toBeNull();
+});
+
+lineSpec("06091:A:1", "an earlier player's Haradrim Elite is not announced again when a later player's search finds no enemy (one attack)", (effects) => {
+  // Two players, one enemy in the deck: the first player takes the Elite and its attack is made; the second player's search finds no enemy. The attacks of the Elite are counted against a game of one player.
+  const attacksOf = (seats: 1 | 2): number => {
+    const { made, run } = setup(seats, [ELITE, "06096", "06097"], ELITE, effects);
+    const done = finish(send(run, { type: "Undefended", heroId: made.hero }, made.ctx), made.ctx);
+    return done.steps.filter((step) => step.kind === "attack" && step.side === "enemy").length;
+  };
+  expect(attacksOf(2)).toBe(attacksOf(1));
 });
 
 lineSpec("06091:A:1", "on Easy the encounter deck holds each of the four unique locations, so the Setup has them to offer", (effects) => {

@@ -164,7 +164,10 @@ lineSpec("06091:B:2", "lets a player card place progress on a controlled locatio
 
 lineSpec("06091:B:3", "wins at the end of the round when no Osgiliath location is in the staging area or active, and not while one is", (effects) => {
   const won = table({ phase: "Quest", active: { code: CODES.harbor, progress: 4 }, committed: ["dh1", "dh2"] }, effects);
-  expect(drive(won, send(opened(won), { type: "Pass" }, won.ctx), (state) => state.stageCleared).state.stageCleared).toBe(true);
+  const cleared = drive(won, send(opened(won), { type: "Pass" }, won.ctx), (state) => state.stageCleared).state;
+  expect(cleared.stageCleared).toBe(true);
+  // The check is the end of the round (06091:B:3): the quest explored the location in the round that began the game, the win waits for the refresh phase to end, and no new round has counted yet.
+  expect({ round: cleared.round, phase: cleared.phase }).toEqual({ round: won.state.round, phase: "Beginning of round" });
   const going = table({ phase: "Quest", active: { code: CODES.harbor, progress: 4 }, committed: ["dh1", "dh2"], staging: [CODES.westQuarter] }, effects);
   const round = drive(going, send(opened(going), { type: "Pass" }, going.ctx), (state) => state.round > 1 || state.stageCleared);
   expect(controlled(round.state)).toEqual([CODES.harbor]);

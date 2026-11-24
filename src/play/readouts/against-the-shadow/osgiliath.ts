@@ -11,13 +11,14 @@ import { controllerOf, controlledLocations } from "../../../rules/families/pelar
 import { TOWER } from "../../../rules/families/pelargir/ruined-tower.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
-import { commanderWords, controlledWords, dialName, lostWords, pinnedWords, PROGRESS_BAR_WORDS, TAKE_CONTROL_WORDS, tookWords, towerWords, undefendedLocationsWords, undefendedReturnWords, winWords } from "../../words/scenarios/against-the-shadow/osgiliath.ts";
+import { commanderWords, controlledWords, dialName, gateHeldWords, lostWords, pinnedWords, PROGRESS_BAR_WORDS, TAKE_CONTROL_WORDS, tookWords, towerActiveWords, towerHeldWords, towerStagedWords, undefendedLocationsWords, undefendedReturnWords, winWords } from "../../words/scenarios/against-the-shadow/osgiliath.ts";
 import type { TableDial } from "../dials.ts";
 
 const SCENARIO = "assault-on-osgiliath";
 const STAGE = "06091";
 const PINNED_DOWN = "06104";
 const COMMANDER = "06095";
+const WEST_GATE = "06096";
 
 /** Whether the game is Assault on Osgiliath: every hook below keys on it. */
 export const live = (game: ScenarioState): boolean => game.scenarioId === SCENARIO;
@@ -52,11 +53,11 @@ export function osgiliathDials(game: ScenarioState, ctx: ReduceContext): readonl
 export function osgiliathWin(game: ScenarioState, ctx: ReduceContext, stageCode: string): string | null {
   if (!live(game) || stageCode !== STAGE) return null;
   const { controlled, left } = osgiliathNow(game, ctx);
-  return winWords(left.map((id) => nameIn(ctx, id, game)), controlled.length);
+  return winWords(left.map((id) => nameIn(ctx, id, game)), controlled.map((id) => ({ name: nameIn(ctx, id, game), seat: controllerOf(game, id) ?? 0 })), game.seatCount, game.phase === "Setup");
 }
 
 /** The other lines of stage 1B: the bar on player card progress and the taking of control. */
-export const osgiliathStageLines = (game: ScenarioState, stageCode: string): string[] => (live(game) && stageCode === STAGE ? [PROGRESS_BAR_WORDS, TAKE_CONTROL_WORDS] : []);
+export const osgiliathStageLines = (game: ScenarioState, stageCode: string): string[] => (live(game) && stageCode === STAGE ? [`${PROGRESS_BAR_WORDS}. ${TAKE_CONTROL_WORDS}.`] : []);
 
 // Whether a card has a Forced record that hears an undefended attack: the four unique locations.
 const returnsWhenUndefended = (ctx: ReduceContext, code: string): boolean => recordsOf(ctx, code).some((effect) => effect.trigger === "attackUndefended");
@@ -70,7 +71,11 @@ export function osgiliathDetail(game: ScenarioState, ctx: ReduceContext, cardId:
   const parts: string[] = [];
   if (held) parts.push(controlledWords(game.seatCount, seat));
   if (returnsWhenUndefended(ctx, card.code) && (held || card.zone === "staging" || card.zone === "activeLocation")) parts.push(undefendedReturnWords(game.seatCount, held ? seat : null));
-  if (card.code === TOWER && !held && (card.zone === "staging" || card.zone === "activeLocation")) parts.push(towerWords([game.activeLocation, game.secondActiveLocation].filter((id) => id != null).length));
+  const active = [game.activeLocation, game.secondActiveLocation].filter((id) => id != null).length;
+  if (card.code === TOWER && card.zone === "staging") parts.push(towerStagedWords(active));
+  if (card.code === TOWER && (card.zone === "activeLocation" || card.zone === "secondActiveLocation")) parts.push(towerActiveWords(active));
+  if (card.code === TOWER && held) parts.push(towerHeldWords(game.seatCount, seat));
+  if (card.code === WEST_GATE && held) parts.push(gateHeldWords());
   if (card.code === PINNED_DOWN) parts.push(pinnedWords(osgiliathControlledCount(game)));
   if (card.code === COMMANDER) parts.push(commanderWords(commanderTargets(game)));
   return parts.length > 0 ? parts.join(" ") : null;
@@ -91,24 +96,27 @@ function commanderTargets(game: ScenarioState): string[] {
   return Array.from({ length: game.seatCount }, (_, at) => (game.firstPlayer + at) % game.seatCount).filter((seat) => holders.has(seat)).map((seat) => (game.seatCount > 1 ? `Player ${seat + 1}` : "you"));
 }
 
-/** The controlled unique locations that return to the staging area when the defending seat leaves an attack undefended, by id. */
-function returning(game: ScenarioState, ctx: ReduceContext, seat: number): string[] {
-  return controlledLocations(game).filter((id) => controllerOf(game, id) === seat && returnsWhenUndefended(ctx, game.cards[id]?.code ?? ""));
+/** The controlled locations that return to the staging area when the defending seat leaves an attack undefended, by id: the unique ones, and the Ruined Towers that seat controls, which return when another location is lost (06103:A:2). */
+function returning(game: ScenarioState, ctx: ReduceContext, seat: number): { unique: string[]; towers: string[] } {
+  const mine = controlledLocations(game).filter((id) => controllerOf(game, id) === seat);
+  const unique = mine.filter((id) => returnsWhenUndefended(ctx, game.cards[id]?.code ?? ""));
+  return { unique, towers: unique.length > 0 ? mine.filter((id) => game.cards[id]?.code === TOWER) : [] };
 }
 
 /** The attack sheet's Undefended line while the defending player controls a location that returns, or null. */
 export function undefendedLocationsLine(game: ScenarioState, ctx: ReduceContext): string | null {
   const attack = game.pendingAttack;
   if (!live(game) || !attack) return null;
-  const ids = returning(game, ctx, attack.seat);
-  return ids.length > 0 ? undefendedLocationsWords(ids.map((id) => nameIn(ctx, id, game)), game.seatCount, attack.seat) : null;
+  const { unique, towers } = returning(game, ctx, attack.seat);
+  return unique.length > 0 ? undefendedLocationsWords(unique.map((id) => nameIn(ctx, id, game)), game.seatCount, attack.seat, towers.length) : null;
 }
 
 /** The dock readout's addition for an undefended attack: the locations that return, as the readout says it ("if nothing changes"). Empty when none returns. */
 export function undefendedLocationsReadout(game: ScenarioState, ctx: ReduceContext): string {
   const attack = game.pendingAttack;
   if (!live(game) || !attack) return "";
-  const ids = returning(game, ctx, attack.seat);
+  const { unique, towers } = returning(game, ctx, attack.seat);
+  const ids = [...unique, ...towers];
   return ids.length > 0 ? `; ${ids.map((id) => nameIn(ctx, id, game)).join(" and ")} return${ids.length === 1 ? "s" : ""} to the staging area if nothing changes` : "";
 }
 
