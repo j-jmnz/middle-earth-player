@@ -1,6 +1,6 @@
 // Rules: rr.damage, rr.cancel (data/rules/entries.json); ledger line 06053:A:1.
 // "Deals 1 damage to that hero ... If no hero takes damage": the effect's X is set only when the picked card's damage grew, so damage that a response canceled or a rule prevented sets nothing. The responses to the damage are heard before the next step of the effect runs, so
-// the step after the damage reads what stayed. The verb queues the damage, then itself with the damage the card held before (`before`, the engine's own field).
+// the step after the damage reads what stayed. The verb deals the damage, then queues itself with the damage the card held before (`before`, the engine's own field).
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -19,11 +19,11 @@ export function damageCardThenSetX(state: ScenarioState, instruction: Verb, focu
   if (instruction.before == null) {
     const data = topFrame(state)?.data;
     if (data?.kind !== "effect") return state;
-    const queue = [
-      { instruction: { verb: "DamageCard", amount: instruction.amount, target: "picked" } as Instruction, seat: focus.seat, chosen: null },
-      { instruction: { ...instruction, before: card.damage }, seat: focus.seat, chosen: null },
-    ];
-    return patchTop(state, { data: { ...data, queue: [...queue, ...data.queue] } });
+    // The damage is dealt here, under this step's cause; the check follows once the responses to it were heard.
+    const damaged = runInstruction(state, { verb: "DamageCard", amount: instruction.amount, target: "picked" }, focus, ctx, steps);
+    const next = topFrame(damaged)?.data;
+    if (next?.kind !== "effect") return damaged;
+    return patchTop(damaged, { data: { ...next, queue: [{ instruction: { ...instruction, before: card.damage }, seat: focus.seat, chosen: null }, ...next.queue] } });
   }
   return card.damage > instruction.before ? runInstruction(state, { verb: "SetX", value: instruction.value }, focus, ctx, steps) : state;
 }
