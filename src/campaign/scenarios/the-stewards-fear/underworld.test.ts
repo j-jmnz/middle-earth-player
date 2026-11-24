@@ -219,6 +219,13 @@ describe("06022:A:3 The Fourth Star leaving play explored", () => {
     expect(run1.state.seats[1]?.hand).toHaveLength(open.seats[1]!.hand.length + 1);
   });
 
+  it("06022:A:3 is offered when the settle sweep explores it in the staging area, its progress at its quest points (rr.explored)", () => {
+    const t = table({ seats: 2, firstPlayer: 1, staging: [{ code: CODES.star, progress: 9 }], deckOf: Array.from({ length: 6 }, (_, index) => ({ code: "filler", seat: index % 2 })) });
+    const open = settle({ ...t.state, window: null }, t.ctx, []);
+    expect(open.cards[idOf(open, CODES.star)]?.zone).not.toBe("staging");
+    expect(open.window).toMatchObject({ kind: "response", seat: 1 });
+  });
+
   it("06022:A:3 a player may decline, and it gives nothing when the location is discarded unexplored", () => {
     const { t, open } = leave(true);
     const trigger = { type: "Trigger" as const, cardId: idOf(open, CODES.star), effectId: "06022:response:1" };

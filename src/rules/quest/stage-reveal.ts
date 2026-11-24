@@ -93,8 +93,7 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
   // progress lands on a stage that is revealed (rr.quest-advancement: advancing is immediate; rr.triggering-condition).
   const early = explored.filter((cardId) => advanced.length > 0 && progressesQuest(next, cardId, ctx));
   for (const cardId of [...early].reverse()) {
-    next = runQuestResolution(next, cardId, ctx, steps);
-    next = announceLeftPlay(next, cardId, ctx, steps, true);
+    next = announceExplored(next, cardId, ctx, steps);
   }
   // The first stage reached resolves first, so it is pushed last.
   for (const cardId of [...advanced].reverse()) {
@@ -119,8 +118,7 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
     }
   }
   for (const cardId of [...explored.filter((id) => !early.includes(id))].reverse()) {
-    next = runQuestResolution(next, cardId, ctx, steps);
-    next = announceLeftPlay(next, cardId, ctx, steps, true);
+    next = announceExplored(next, cardId, ctx, steps);
   }
   // A defeated stage that looks at the next ones (LookAtStages, families/quest/order.ts) asks the first player, in a frame of the stage's own record.
   return next.stageChoice === "due" ? askStage(next, ctx, steps) : next;
@@ -153,6 +151,11 @@ export function advanceFreed(state: ScenarioState, ctx: ReduceContext, steps: En
 
 // A card left play: Responses are offered once its Forced effects have resolved, so their frame goes under the Forced ones
 // (rr.timing-of-ability-resolution). `explored`: the location left play explored (rr.explored), read by `subjectExplored`.
+// A location that was explored has left play (rr.explored): its questResolution records run in a frame of their own, then the cards that answer its leaving hear it, however it was explored (progress placed, the settle sweep, the travel to it).
+export function announceExplored(state: ScenarioState, cardId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  return announceLeftPlay(runQuestResolution(state, cardId, ctx, steps), cardId, ctx, steps, true);
+}
+
 export function announceLeftPlay(state: ScenarioState, cardId: string, ctx: ReduceContext, steps: EngineStep[], explored = false): ScenarioState {
   const event = { trigger: "leftPlay", seat: null, cardId, ...(explored ? { explored: true } : {}) } as const;
   return fireForced(offerResponses(state, event, ctx, steps), event, ctx, steps);

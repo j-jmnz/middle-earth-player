@@ -171,10 +171,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 39, scenarios: "all", note: "The loot The Burglar's Turn attaches to a location is an attachment on it for every card that counts or asks for one: Forest Road Traveler, Mirkwood Hunter, Haldan, South Away! and the other cards that read a location's attachments." },
   { version: 39, scenarios: ["breaking-of-the-fellowship", "escape-from-mount-gram", "flies-and-spiders", "fog-on-the-barrow-downs", "foundations-of-stone", "the-lonely-mountain"], note: "A payment by the group (a player card that says the players may pay, like Inspiring Presence, and Hidden Path's 2 Baggins resources) is made only by the players who share the payer's staging area once the staging areas are separate (mec108.create-staging-area, hob.staging-area-creating)." },
   { version: 39, scenarios: ["escape-from-khazad-dum", "fire-in-the-night", "journey-in-the-dark", "mount-gundabad", "shadow-and-flame", "shelobs-lair", "the-battle-of-carn-dum", "the-fate-of-wilderland", "the-hunt-for-the-dreadnaught", "the-mines-of-moria", "the-old-forest", "the-ring-goes-south", "the-road-to-isengard", "the-ruins-of-belegost", "the-tower-of-cirith-ungol", "the-withered-heath"], note: "An enemy in the staging area that is considered engaged with a player, like the Watcher in the Water, the Balrog and Dagnir, is engaged with him for the cards that count or choose enemies engaged with you and for an immediate attack of each engaged enemy, except Pursued by the Enemy, which prints \"and not in the staging area\"." },
-  { version: 39, scenarios: "all", note: "A location is explored as soon as its progress equals its quest points, whatever changed them: when the players travel to a location that took enough progress in the staging area, and when its quest points drop, like The Old Ford when an enemy leaves play." },
+  { version: 40, scenarios: "all", note: "A location is explored as soon as its progress equals its quest points, whatever changed them: when the players travel to a location that took enough progress in the staging area, and when its quest points drop, like The Old Ford when an enemy leaves play." },
 ];
 
-export const ENGINE_VERSION = 39;
+export const ENGINE_VERSION = 40;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {
