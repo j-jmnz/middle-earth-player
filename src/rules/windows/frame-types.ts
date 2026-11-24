@@ -286,7 +286,7 @@ export type PendingAttack = {
   defenderId?: string;
   // The hero an undefended attack lands on.
   heroId?: string;
-  // A shadow effect made the attack count as undefended.
+  // The attack is undefended with no hero named for its damage yet (left undefended, rr.step-6-4-1), or a shadow effect made it count as undefended.
   undefended?: boolean;
   // The Attack the enemy dealt with, noted at the damage step only in a game with a card that resolves the attack against each player (AttackOthersUndefended).
   struck?: number;

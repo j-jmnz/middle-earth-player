@@ -250,7 +250,8 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   // The card the damage was aimed at left the game during the shadow (a Battleground location, families/pelargir/siege.ts): the damage is set after the shadow, so it is aimed again.
   const aimed = next.modifiers.length > 0 ? aimAgain(next, ctx.cards, (state) => undefendedTargets(state, attack.seat, ctx.cards)) : null;
   if (aimed) return aimed.window ? aimed : resolveAttack(aimed, ctx, steps);
-  // A shadow effect made a defended attack undefended: the player still names the hero who takes it.
+  // No hero is named yet (the attack was left undefended with several heroes to take it, or a shadow effect made a defended attack undefended): the
+  // defending player names the hero now, with the shadow effect resolved (rr.step-6-4-3).
   if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
   // No hero is left to take the attack (every hero of the seat is held, 18074): it deals no damage.
   if (!next.cards[attack.heroId]) return afterDamage(next, ctx, steps);

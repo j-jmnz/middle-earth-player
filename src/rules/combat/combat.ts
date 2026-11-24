@@ -233,15 +233,17 @@ export function applyDefense(
 
 export function applyUndefended(
   state: ScenarioState,
-  heroId: string,
+  heroId: string | undefined,
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
   const attack = state.pendingAttack;
   if (!attack || !state.cards[attack.enemyId]) return state;
-  const named: ScenarioState = { ...state, pendingAttack: { ...attack, heroId }, window: null };
-  // The attack is undefended (6.4.1); an action window comes before the shadow card is turned up. A shadow effect that
-  // made a defended attack undefended has already resolved, so the attack goes straight on.
+  // No hero is named yet: the attack is left undefended, and the damage is assigned to a hero at the damage step, after the shadow
+  // effect (rr.step-6-4-3; resolveAttack asks). A hero named with the declaration stands.
+  const named: ScenarioState = { ...state, pendingAttack: heroId == null ? { ...attack, undefended: true } : { ...attack, heroId }, window: null };
+  // The attack is undefended (6.4.1); an action window comes before the shadow card is turned up. Once the shadow effects have
+  // resolved (the hero is named at the damage step, or a shadow effect made a defended attack undefended), the attack goes straight on.
   if (attack.shadowResolved) return resolveAttack(named, ctx, steps);
   return enemyAttackWindow(named, ctx, "shadow") ?? resolveAttack(named, ctx, steps);
 }
