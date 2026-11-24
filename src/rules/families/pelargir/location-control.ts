@@ -14,6 +14,8 @@ import { moveCard } from "../../core/zones.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { patchTop } from "../../windows/windows.ts";
+import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -114,4 +116,11 @@ export function towerSecond(state: ScenarioState, locationId: string): boolean {
 export function announceAddedToStaging(state: ScenarioState, instruction: Verb<"AnnounceAddedToStaging">, focus: Focus): ScenarioState {
   const id = refCard(state, instruction.card ?? "picked", frameScope(state, focus.seat, focus.sourceId));
   return id && state.cards[id]?.zone === "staging" ? queueEvent(state, { trigger: "addedToStaging", seat: focus.seat, cardId: id }) : state;
+}
+
+/** ActForDestroyedController: the player who controlled the character the attack destroyed (the effect's `destroyedCharacter`, which a shadow effect with this verb is given) acts for the instructions that follow, as for a Pick of "his" locations. With no destroyed character the actor stays. */
+export function actForDestroyedController(state: ScenarioState): ScenarioState {
+  const data = effectData(state);
+  const seat = data?.destroyedCharacter ? state.cards[data.destroyedCharacter]?.controller : null;
+  return seat == null || !data ? state : patchTop(state, { data: { ...data, queue: data.queue.map((item) => ({ ...item, seat })) } });
 }

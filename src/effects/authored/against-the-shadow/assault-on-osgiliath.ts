@@ -26,13 +26,15 @@ const I_CONTROL_THIS: Condition = { kind: "count", pick: { ...MINE, isSource: tr
 const ANOTHER_STAGED: Condition = { kind: "count", pick: { ...OSGILIATH, stagingOnly: true, other: true }, min: 1 };
 const NO_OTHER_STAGED: Condition = { kind: "count", pick: { ...OSGILIATH, stagingOnly: true, other: true }, max: 0 };
 // The location the discard stopped at is the picked card (06105:A:1); with none found nothing is offered.
+// An Osgiliath location lies in the encounter deck or its discard pile: the search of West Gate (06096:A:1) can find one.
+const SEARCH_FINDS: Condition = { kind: "searchable", type: "location", trait: "Osgiliath" };
 const FOUND_ONE: Condition = { kind: "matches", card: "picked", pick: { type: "location", control: "any" } };
 const A_LOCATION_LEFT_PLAY = { trigger: "leftPlay", subject: OSGILIATH, condition: { kind: "subjectExplored" } } as const satisfies Partial<Effect>;
 // "After X attacks and destroys a character": the character's destruction by the attack names the attacking enemy as the other card.
 const DESTROYS_A_CHARACTER = { trigger: "characterDestroyedByAttack", subject: { type: "character", control: "any" }, condition: { kind: "matches", card: "other", pick: { type: "enemy", control: "any", isSource: true } } } as const satisfies Partial<Effect>;
-// "If this attack destroys a character, that character's controller must return a location he controls with the highest Threat to the staging area" (a shadow effect: read once the attack has dealt its damage; the acting player is the defending player).
+// "If this attack destroys a character, that character's controller must return a location he controls with the highest Threat to the staging area" (a shadow effect: read once the attack has dealt its damage; the player who controls the destroyed character acts, which is not always the defending player: a Sentinel defender belongs to another player).
 const SHADOW_RETURN: Effect["instructions"] = [
-  { verb: "AfterAttack", instructions: [{ verb: "Pick", pick: HIGHEST_OF_MINE, when: { kind: "x", min: 1 } }, { verb: "LoseControlOfLocation", card: "picked", when: { kind: "x", min: 1 } }] },
+  { verb: "AfterAttack", instructions: [{ verb: "ActForDestroyedController", when: { kind: "x", min: 1 } }, { verb: "Pick", pick: HIGHEST_OF_MINE, when: { kind: "x", min: 1 } }, { verb: "LoseControlOfLocation", card: "picked", when: { kind: "x", min: 1 } }] },
 ];
 // "Forced: After the player who controls this location lets an attack go undefended, return it to the staging area."
 const RETURN_WHEN_UNDEFENDED = (code: string, line: string) =>
@@ -100,7 +102,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
 
     // 06096 West Gate. A:1: Action (any player), with no active location: search the encounter deck and discard pile for an Osgiliath location, reveal it and add it to the staging area; then West Gate becomes the active location (from the staging area or, when the first player controls it, from his area:
-    // control is lost); shuffle the encounter deck. A:2: Forced, after the player who controls it lets an attack go undefended, it returns to the staging area.
+    // control is lost first, LoseControlOfLocation); shuffle the encounter deck. A:2: Forced, after the player who controls it lets an attack go undefended, it returns to the staging area.
     {
       id: "06096:action:1",
       cardCode: "06096",
@@ -108,7 +110,18 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "action",
       anyPlayer: true,
       condition: NO_ACTIVE,
-      instructions: [{ verb: "SearchReveal", type: "location", trait: "Osgiliath", who: "actor" }, { verb: "MakeActive", target: "self" }, { verb: "ShuffleEncounterDeck" }],
+      instructions: [
+        // "Then, make West Gate the active location" needs the search before it to succeed in full (rr.then): with no Osgiliath location to find, the search fails and West Gate does not become active. The deck is shuffled as the search says, found or not.
+        {
+          verb: "Choose",
+          who: "actor",
+          options: [
+            { id: "found", requires: SEARCH_FINDS, instructions: [{ verb: "SearchReveal", type: "location", trait: "Osgiliath", who: "actor" }, { verb: "LoseControlOfLocation", card: "self" }, { verb: "MakeActive", target: "self" }] },
+            { id: "none", requires: { kind: "not", condition: SEARCH_FINDS }, instructions: [] },
+          ],
+        },
+        { verb: "ShuffleEncounterDeck" },
+      ],
     },
     RETURN_WHEN_UNDEFENDED("06096", "06096:A:2"),
 

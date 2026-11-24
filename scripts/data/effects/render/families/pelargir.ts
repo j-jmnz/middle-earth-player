@@ -96,6 +96,10 @@ export const PELARGIR_TEMPLATES: Templates = {
     text: `${cardRef(str(i.card ?? "picked"))}, if it lies in the staging area, is announced as added to the staging area, so its own Forced effect that hears it resolves (a search puts a card there without that announcement unless the record opts in with this instruction)`,
     read: ["card"],
   }),
+  ActForDestroyedController: () => ({
+    text: "the player who controlled the character the attack destroyed acts for the instructions that follow in this effect (he may not be the defending player: a Sentinel defender belongs to another player); with no character destroyed the acting player stays",
+    read: [],
+  }),
   GroupDiscardResources: (i, ctx) => ({
     text: `the players as a group discard ${amt(i.amount, ctx)} resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)`,
     read: ["amount", "rest", "turns"],
@@ -129,6 +133,7 @@ export const PELARGIR_SAMPLES: Samples = {
   PickFewestHitPointsLeft: [{ verb: "PickFewestHitPointsLeft" }],
   TakeControlOfLocation: [{ verb: "TakeControlOfLocation" }, { verb: "TakeControlOfLocation", card: "previous" }],
   LoseControlOfLocation: [{ verb: "LoseControlOfLocation", card: "self" }, { verb: "LoseControlOfLocation" }],
+  ActForDestroyedController: [{ verb: "ActForDestroyedController" }],
   AnnounceAddedToStaging: [{ verb: "AnnounceAddedToStaging" }, { verb: "AnnounceAddedToStaging", card: "previous" }],
 };
 

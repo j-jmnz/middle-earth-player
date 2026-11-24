@@ -345,8 +345,8 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   if (!attackHere(state, attack.enemyId)) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
   // Only the effect that searches the deck for another copy of a destroyed ally (DiscardCopiesFromDeck of "other", 10137:A:2) reads the ally the attack destroyed.
   const destroyedAlly = after.some((one) => one.verb === "DiscardCopiesFromDeck" && one.of === "other") ? destroyedAllyOf(state, attack, ctx) : undefined;
-  // Only an effect that reanimates the character the attack destroyed (Unholy Crypt, 101161:A:2) reads it.
-  const destroyedCharacter = after.some((one) => one.verb === "Reanimate" && one.from === "destroyed") ? destroyedByAttack(state, attack, ctx)[0] : undefined;
+  // Only an effect that reanimates the character the attack destroyed (Unholy Crypt, 101161:A:2), or one that acts for its controller (Assault on Osgiliath, 06100:A:2), reads it.
+  const destroyedCharacter = after.some((one) => (one.verb === "Reanimate" && one.from === "destroyed") || one.verb === "ActForDestroyedController") ? destroyedByAttack(state, attack, ctx)[0] : undefined;
   return pushEffectFrame(
     ended,
     {

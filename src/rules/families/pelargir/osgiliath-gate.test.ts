@@ -1,0 +1,54 @@
+// Rules: rr.then, rr.action, rr.search, faq.reveal-and-add, ats.losing-control-of-locations (data/rules/entries.json); ledger line 06096:A:1.
+// West Gate: "Action: If there is no active location, search the encounter deck and discard pile for an Osgiliath location, reveal it and add it to the staging area. Then, make West Gate the active location. Shuffle the encounter deck."
+// The text before "Then" must be resolved in full before the rest is (rr.then): a search that finds no Osgiliath location leaves West Gate where it is. Built on the real Action, in the planning phase and from a location the first player controls.
+import { describe, expect, it } from "vitest";
+
+import { idOf, legalIntents, send } from "../../../../test/harness/scene-kit.ts";
+import { CODES, cardOf, drive, opened, table, where } from "../../../../test/scenarios/assault-on-osgiliath/table.ts";
+import type { PlayerIntent } from "../../engine/reduce.ts";
+
+const ACTION = "06096:action:1";
+
+describe("06096:A:1 West Gate: the Action", () => {
+  it("reveals the Osgiliath location the search finds, adds it to the staging area, and makes West Gate the active location", () => {
+    const made = table({ phase: "Planning", staging: [CODES.westGate], deck: ["f0", CODES.harbor, "f0"] });
+    const trigger = legalIntents(made.state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === ACTION);
+    expect(trigger).toBeDefined();
+    const run = drive(made, send(opened(made), trigger as PlayerIntent, made.ctx), (state) => state.activeLocation != null);
+    expect(run.state.activeLocation).toBe(idOf(run.state, CODES.westGate));
+    expect(where(run.state, CODES.harbor)).toBe("staging");
+    expect(where(run.state, CODES.westGate)).toBe("activeLocation");
+  });
+
+  it("finds one in the discard pile as well", () => {
+    const made = table({ phase: "Planning", staging: [CODES.westGate], deck: ["f0", "f0"], discard: [CODES.harbor] });
+    const trigger = legalIntents(made.state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === ACTION);
+    const run = drive(made, send(opened(made), trigger as PlayerIntent, made.ctx), (state) => state.activeLocation != null);
+    expect(where(run.state, CODES.harbor)).toBe("staging");
+    expect(run.state.activeLocation).toBe(idOf(run.state, CODES.westGate));
+  });
+
+  it("does not make West Gate the active location when the search finds no Osgiliath location (rr.then)", () => {
+    const made = table({ phase: "Planning", staging: [CODES.westGate], deck: ["f0", "f0", "f0", "f0", "f0", "f0", "f0", "f0"] });
+    const trigger = legalIntents(made.state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === ACTION);
+    expect(trigger).toBeDefined();
+    const run = drive(made, send(opened(made), trigger as PlayerIntent, made.ctx), (state) => state.window?.kind === "pass" && state.phase !== "Planning");
+    expect(run.state.activeLocation).toBeNull();
+    expect(where(run.state, CODES.westGate)).toBe("staging");
+    // The deck is shuffled as the line says, though the search found nothing.
+    expect(run.state.encounterDeck).not.toEqual(made.state.encounterDeck);
+    expect([...run.state.encounterDeck].sort()).toEqual([...made.state.encounterDeck].sort());
+  });
+
+  it("is used from West Gate while the first player controls it: it leaves his play area, so he loses control", () => {
+    const made = table({ phase: "Quest", active: { code: CODES.westGate, progress: 4 }, committed: ["dh1", "dh2"], staging: [CODES.harbor], deck: ["f0", "f0", "f0", CODES.eastQuarter, "f0", "f0"] });
+    // The quest phase explores West Gate (Ancient Harbor stays in the staging area: with no Osgiliath location left the players would win at the end of the round);  the next planning phase is the first window where an Action is offered again.
+    const quested = drive(made, send(opened(made), { type: "Pass" }, made.ctx), (state) => state.phase === "Planning" && state.window?.kind === "pass");
+    expect(cardOf(quested.state, CODES.westGate)).toMatchObject({ zone: "play", controller: 0 });
+    const trigger = legalIntents(quested.state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === ACTION);
+    expect(trigger).toBeDefined();
+    const run = drive(made, send(quested, trigger as PlayerIntent, made.ctx), (state) => state.activeLocation != null);
+    expect(cardOf(run.state, CODES.westGate)).toMatchObject({ zone: "activeLocation", progress: 0, controller: null });
+    expect(run.state.modifiers.some((modifier) => modifier.stat === "controlledBy")).toBe(false);
+  });
+});
