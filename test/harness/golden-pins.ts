@@ -301,6 +301,11 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
     "two-handed, won, after the Grey Company, answering the Fleet with damage",
     "two-handed, won, after the Grey Company, engaging",
   ],
+  "the-stewards-fear": [
+    "Easy two-handed win",
+    "solo win",
+    "two-handed win",
+  ],
   "the-tower-of-cirith-ungol": [
     "two-handed, lost, The One Ring leaves play",
     "two-handed, won, Easy, after the earlier parts, Shagrat defeated before stage 3A",

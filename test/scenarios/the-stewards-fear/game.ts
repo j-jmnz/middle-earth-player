@@ -105,8 +105,20 @@ export type FearGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-stewards-fear/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type FearGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: FearDecks; outcome: "won" | "lost"; policy?: Partial<FearPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const FEAR_GOLDENS: readonly FearGolden[] = [];
+// The games to pin (.claude/rules/code-standards.md, Test cost): a solo and a two-handed Normal win, one Easy win and a loss for each way to lose. The seed hides one Villain and one Plot, so across the games each of the three
+// Villains and each of the three Plots is the hidden one at least once (the golden test reads the pair from each final state):
+// - solo win: Daughter of Berúthiel and Poisoned Counsels; two-handed win: The Hand of Castamir and Unholy Alliance; two-handed Easy win: Telemnar's Bane and Up in Flames;
+// - losses: threat 50 (heroes too weak to quest, solo), every hero destroyed (heroes too brittle, two-handed, with a Plot that is not Unholy Alliance), Up in Flames (solo: a deck runs out) and Unholy Alliance (two-handed: a hero
+//   destroyed by an enemy attack).
+export const FEAR_GOLDENS: readonly FearGolden[] = [
+  { name: "solo win", seatCount: 1, seed: 11, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed win", seatCount: 2, seed: 27, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "Easy two-handed win", seatCount: 2, seed: 40, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "solo loss: threat 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed loss: every hero destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+  { name: "solo loss: Up in Flames", seatCount: 1, seed: 6, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "A player has no cards in his deck" },
+  { name: "two-handed loss: Unholy Alliance", seatCount: 2, seed: 7, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "Unholy Alliance: a hero was destroyed by an enemy attack" },
+];
 
 const game = standaloneGame<FearDecks, FearPolicy>({
   campaign: cycle,
