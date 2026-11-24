@@ -100,3 +100,17 @@ The control of locations is in the family `pelargir` (`src/catalog/families/pela
 - **Ruined Square's Response** (`06102:A:2`) hears an enemy destroyed in the staging area as well as an engaged one (a test destroys one with Thalin as it is revealed).
   - The win check at the end of the round (`06091:B:3`) is a Forced record on the stage: no Osgiliath location is in the staging area or active.
 
+
+## Table
+
+Each piece is made by a line named here and drawn only while that line makes it; none is a control (no control types damage, resources, threat, progress or life). The words, the layout and the rules of each piece are in `docs/design-system-table.md`, Assault on Osgiliath's table pieces; every hook keys on this scenario's id and is empty in another. Code: `src/play/readouts/against-the-shadow/osgiliath.ts`, `src/play/readouts/against-the-shadow/osgiliath-steps.ts`, `src/play/words/scenarios/against-the-shadow/osgiliath.ts`, `src/play/words/asks/assault-on-osgiliath.ts`; test `src/play/scenarios/assault-on-osgiliath-table.test.ts`.
+
+- **A controlled location** (`06091:B:2`, `ats.controlling-locations`): lies in the first player's `play` list, drawn in that player's play row; the preview and the spoken label say whose it is and what control gives.
+- **The win** (`06091:B:3`): the dial "Controlled" (locations controlled over every Osgiliath location in play) and stage 1B's preview, which names the locations that stop the win.
+- **The bar** (`06091:B:1`): stage 1B's preview says player card effects cannot place progress on a location in the staging area, and what is not barred.
+- **Unique locations** (`06096:A:2`, `06097:A:2`, `06098:A:3`, `06099:A:3`): the preview words the undefended Forced line as a consequence; the attack sheet, the dock readout and the turn reference's 6.E step say which controlled locations return when an attack goes undefended, and that a hero still takes the damage.
+- **Ruined Tower** (`06103:A:1`, `06103:A:2`): the preview says the second active location; the table draws two actives (`widgets.secondActiveLocation`).
+- **Pinned Down** (`06104:A:1`) and **Southron Commander** (`06095:A:1`): the previews say X now and the surge, and the players it would attack.
+- **West Quarter and East Quarter** (`06100:A:1`, `06101:A:1`): the quest chip shows Siege or Battle while the location is active. Ruined Square (`06102:A:1`) and Counter-attack (`06106:A:1`) show the Surge chip.
+- **Control taken and lost**: the banner and the log say it (a location taken is "explored", never "destroyed"); the record words say it (`06091:B:2`, `06093:A:1`, `06105:A:1`).
+- **Asks**: Setup (enemy, unique location), Uruk Lieutenant's attachment, Uruk Soldier's, West Quarter's, East Quarter's and Pinned Down's location returns, West Gate's search, Ancient Harbor's and Ruined Tower's cost picks, Street Fighting's choice and hero, Counter-attack's choice and location.
