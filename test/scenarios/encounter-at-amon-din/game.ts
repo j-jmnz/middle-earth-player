@@ -1,7 +1,6 @@
 import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
-import { characters } from "../../../src/rules/combat/combat.ts";
 import { effectById } from "../../../src/rules/windows/listen.ts";
 import { topFrame } from "../../../src/rules/windows/windows.ts";
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
@@ -39,8 +38,10 @@ export type DinPolicy = {
   huntFirst: boolean;
   // The players do not use Lord Alcaron's Response.
   noAlcaron: boolean;
+  // The seats play the cards of their hands (a saved decklist's allies and events); the stand-in heroes' decks hold only free events.
+  play: boolean;
 };
-export const DEFAULT_POLICY: DinPolicy = { choose: "first", reserve: 2, engage: 3, undefended: 0, huntFirst: false, noAlcaron: false };
+export const DEFAULT_POLICY: DinPolicy = { choose: "first", reserve: 2, engage: 3, undefended: 0, huntFirst: false, noAlcaron: false, play: false };
 export const ALCARON = "06070";
 export const GHULAT = "06071";
 export const RESCUED = "06068";
@@ -117,7 +118,7 @@ export function dinIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<
   const engage = engageOneEach(state, ctx, policy.engage);
   if (engage) return engage;
   if (state.window?.kind === "playerAttack") return { type: "DeclineAttack" };
-  return nextIntent(state, ctx, DIN_POLICY, memory, legalIntents(state, ctx));
+  return nextIntent(state, ctx, policy.play ? { ...DIN_POLICY, play: true } : DIN_POLICY, memory, legalIntents(state, ctx));
 }
 
 export type DinGame = PlayedGame;
@@ -166,4 +167,3 @@ export function isWindowOf(state: ScenarioState, ctx: Pick<ReduceContext, "effec
   const record = data?.kind === "effect" ? effectById(ctx, data.effectId) : undefined;
   return record?.instructions.some((step) => step.verb === verb) ?? false;
 }
-void characters;

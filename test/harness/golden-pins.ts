@@ -33,6 +33,11 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
     "solo loss: threat 50",
     "solo win",
   ],
+  "encounter-at-amon-din": [
+    "Easy two-handed win",
+    "solo win",
+    "two-handed win, hunt first",
+  ],
   "escape-from-dol-guldur": [
     "two-handed, won",
   ],
