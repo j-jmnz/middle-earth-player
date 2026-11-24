@@ -133,10 +133,10 @@ export default function DeckImportScreen() {
         return;
       }
       const built = buildDecklist(body, pool);
-      // The first few unknown cards are looked up by name; past that, and for a code that is not a card code, the code names the card.
-      const lookups = droppedLookups(built.droppedCodes);
-      const names = await Promise.all(built.droppedCodes.map((code) => (lookups.has(code) ? droppedName(code) : droppedLabel(code, null))));
-      save(built, names);
+      // The first few unknown cards are looked up by name; the rest, and a code that is not a card code, are only counted.
+      const lookups = [...droppedLookups(built.droppedCodes)];
+      const names = await Promise.all(lookups.map((code) => droppedName(code)));
+      save(built, names, new Set(built.droppedCodes).size - lookups.length);
     });
   }
 
@@ -159,7 +159,7 @@ export default function DeckImportScreen() {
 
   // Saves an imported deck, ready to play or not, and goes back to the deck list. A hero listed twice is refused: the list
   // itself is wrong.
-  function save(built: BuiltDecklist, names: readonly string[]): void {
+  function save(built: BuiltDecklist, names: readonly string[], unnamed: number): void {
     if (built.heroLimit) {
       setMessage(formatDeckRefusal({ cardName: built.heroLimit.cardName, rule: "Deck limit is 1." }));
       return;
@@ -169,7 +169,7 @@ export default function DeckImportScreen() {
     if (!readDeck(user, id)) return;
     opening.current = true;
     // Back on the deck list, which reads the new deck on focus; the toast names what was dropped.
-    const dropped = droppedSentence(names);
+    const dropped = droppedSentence(names, unnamed);
     showToast(dropped ? `Imported ${name}. ${dropped}` : `Imported ${name}`, { carry: true });
     goBack(router, "/decks");
   }

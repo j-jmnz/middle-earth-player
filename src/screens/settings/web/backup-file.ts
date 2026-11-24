@@ -9,7 +9,7 @@ export const REFUSALS = {
   noSaves: "That file has no saves in it, so it is not a Middle-earth Player backup.",
   newer: "That backup was made by a newer version of the app. Update the app, then restore it.",
   damaged: "That backup is damaged and cannot be read.",
-  unreadable: "A campaign, game, deck or setting in that backup does not read, so nothing was changed.",
+  unreadable: "Part of that backup does not read, so nothing was changed.",
   failed: "The restore did not finish, so nothing was changed.",
 } as const;
 

@@ -224,9 +224,11 @@ export function buildDecklist(
   return { name: body.name, heroes, cards, side, droppedCodes, heroLimit };
 }
 
-export function droppedSentence(names: readonly string[]): string | null {
-  if (names.length === 0) return null;
-  return `Dropped ${names.join(", ")}.`;
+/** "Dropped A, B and 3 more cards.": the dropped cards by name, then how many more were dropped without one (`more`, none when absent). */
+export function droppedSentence(names: readonly string[], more: number = 0): string | null {
+  const rest = more > 0 ? `${more}${names.length > 0 ? " more" : ""} ${more === 1 ? "card" : "cards"}` : null;
+  if (names.length === 0) return rest ? `Dropped ${rest}.` : null;
+  return `Dropped ${names.join(", ")}${rest ? ` and ${rest}` : ""}.`;
 }
 
 let decks: readonly PrebuiltDeck[] | null = null;

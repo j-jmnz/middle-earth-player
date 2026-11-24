@@ -122,6 +122,10 @@ describe("buildDecklist", () => {
     expect(built.droppedCodes).toEqual(["99999", "01026"]);
     expect(built.heroLimit).toBeNull();
     expect(droppedSentence(["99999"])).toBe("Dropped 99999.");
+    expect(droppedSentence(["Gandalf", "Bilbo"], 3)).toBe("Dropped Gandalf, Bilbo and 3 more cards.");
+    expect(droppedSentence(["Gandalf"], 1)).toBe("Dropped Gandalf and 1 more card.");
+    expect(droppedSentence([], 2)).toBe("Dropped 2 cards.");
+    expect(droppedSentence([], 0)).toBeNull();
   });
 
   it("reads RingsDB's empty sideslots (an array) as no side deck", () => {

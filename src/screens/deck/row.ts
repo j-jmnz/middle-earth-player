@@ -32,10 +32,10 @@ const deckRow = z.object({
   updatedAt: z.number().nullable(),
 });
 
-export type DeckRow = z.infer<typeof deckRow>;
+export type SavedDeckRow = z.infer<typeof deckRow>;
 
 /** The deck a raw row holds (its JSON columns still text), or null when the row does not read as a deck. */
-export function deckOfRow(raw: unknown): DeckRow | null {
+export function deckOfRow(raw: unknown): SavedDeckRow | null {
   const read = deckRow.safeParse(raw);
   return read.success ? read.data : null;
 }
