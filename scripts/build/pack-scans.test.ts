@@ -192,9 +192,21 @@ describe("pack scans", () => {
 
   it("fails when the fetched bytes do not match the pin", async () => {
     const staged = stage();
-    await expect(packScans({ ...staged.options, fetch: () => Promise.resolve(new Uint8Array(jpeg(300))) }, log)).rejects.toThrow(
+    await expect(packScans({ ...staged.options, retryWaitsMs: [], fetch: () => Promise.resolve(new Uint8Array(jpeg(300))) }, log)).rejects.toThrow(
       /pinned .*pnpm data sync scans/,
     );
+  });
+
+  it("fetches a pin again when the source first answers other bytes", async () => {
+    const staged = stage();
+    const fetched: string[] = [];
+    // Google Drive's quota page comes back with a 200: the second request gets the picture.
+    const fetch = (url: string) => {
+      fetched.push(url);
+      return Promise.resolve(fetched.length === 1 ? new TextEncoder().encode("<html>Quota exceeded</html>") : new Uint8Array(jpeg(560)));
+    };
+    await packScans({ ...staged.options, retryWaitsMs: [0], concurrency: 1, fetch }, log);
+    expect(fetched).toEqual([THREE_URL, THREE_URL]);
   });
 
   it("bundles a card's picture in place of its scan, and renders a page of FFG's PDFs from the pinned PDF", async () => {
