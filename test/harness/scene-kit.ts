@@ -191,11 +191,13 @@ export function secondSeatHero(state: ScenarioState): string | null {
   return seat === 0 ? null : (state.seats[seat]?.heroes[0] ?? null);
 }
 
-// The card an undefended attack lands on: the one `lands` names for the attacking enemy's code, else the hero asked for.
+// The card an undefended attack lands on: the one `lands` names for the attacking enemy's code while it is in the game, else the hero asked for.
 function undefendedOn(state: ScenarioState, lands: Readonly<Record<string, string>> | undefined, hero: string): string {
   const attacker = state.pendingAttack ? state.cards[state.pendingAttack.enemyId]?.code : undefined;
   const code = attacker == null ? undefined : lands?.[attacker];
-  return code == null ? hero : idOf(state, code);
+  // A card that left the game since (a Battleground location a shadow removed) cannot be named again: the hero is.
+  const target = code == null ? undefined : idOf(state, code);
+  return target == null || state.cards[target]?.zone === "removed" ? hero : target;
 }
 
 export type FightTable = { state: ScenarioState; ctx: ReduceContext; hero: string; hero2: string };

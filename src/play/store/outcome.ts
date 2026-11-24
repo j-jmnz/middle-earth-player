@@ -24,6 +24,7 @@ import { BACK_TITLE, TRAPPED_TITLE } from "../readouts/standalone-scenarios/barr
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
 import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
 import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
+import { STAT_WORD } from "../cards/card-effects.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
 // is at that line (resolve in beats).
@@ -41,7 +42,7 @@ export const BEAT_MS = 650;
 // `revealed` gives the printed When Revealed lines of a card (the Stormcaller's stage the C side of which was just revealed), or null.
 const SIDE_QUEST_TITLE = "End of the planning phase";
 
-type Names = { card: (cardId: string) => string; passes?: (cardId: string) => boolean; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; atStaging?: (cardId: string) => boolean; fate?: FateNames; forestAdvance?: (before: ScenarioState, after: ScenarioState, stageId: string) => string | null };
+type Names = { card: (cardId: string) => string; questStat?: (before: ScenarioState) => "willpower" | "attack" | "defense"; passes?: (cardId: string) => boolean; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; atStaging?: (cardId: string) => boolean; fate?: FateNames; forestAdvance?: (before: ScenarioState, after: ScenarioState, stageId: string) => string | null };
 
 // "stage 3 of 4" for the Stormcaller's stage `cardId` (the area's current stage once it has advanced), or "its next stage" for a state that moved on.
 function stormcallerStageWords(state: ScenarioState, cardId: string): string {
@@ -96,7 +97,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
       case "quest": {
         const [title, tone]: [string, MomentTone] = step.willpower > step.threat ? ["Quest succeeded", "good"] : step.willpower < step.threat ? ["Quest failed", "bad"] : ["Quest held even", "plain"];
         const group = open(0, title, tone);
-        group.lines.push({ text: `Willpower ${step.willpower} against threat ${step.threat}`, mark: "willpower" });
+        // The stat the stage counted, read on the state before the intent: Attack under Battle, Defense under Siege (hon.battle, hon.siege). The step holds the total as `willpower` whatever the stat was.
+        const stat = names.questStat?.(before) ?? "willpower";
+        group.lines.push({ text: `${STAT_WORD[stat]} ${step.willpower} against threat ${step.threat}`, mark: stat });
         if (tone === "plain") group.lines.push({ text: "No progress, no threat", mark: null });
         return;
       }

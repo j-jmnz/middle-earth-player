@@ -7,6 +7,9 @@ import { actorNote } from "./actor.ts";
 import { barNote } from "./bars.ts";
 import { renderInstruction } from "./verbs.ts";
 
+// A printed line that is a keyword and its reminder in brackets: "Battle. (Characters quest using Attack instead of Willpower.)", "Doomed 3. (...)".
+const KEYWORD_REMINDER = /^[A-Z][A-Za-z' -]*?(?: [0-9X]+)?\.\s*\(.*\)\.?$/;
+
 const TIMING: Readonly<Record<string, string>> = {
   setup: "Setup",
   forced: "Forced",
@@ -137,7 +140,10 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   if (travel) lines.push(`  note: ${travel}`);
   // The last stage's win is the engine's own rule, not a record's: a constant on its side B that runs nothing only names the printed line.
   const winsOnDefeat = ctx.finalStage === true && effect.timing === "constant" && Array.isArray(effect.lines) && effect.lines.every((id) => typeof id === "string" && id.includes(":B:"));
-  if (instructions.length === 0) lines.push(winsOnDefeat ? "  (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)" : "  (no instructions: the record only names the printed line, and the engine runs no step for it)");
+  // On the last stage, a constant that runs nothing and names only printed keyword lines with their reminder text ("Siege. (Characters quest using Defense instead of Willpower.)") is the keyword's reminder, not the stage's defeat.
+  const keywordReminder = ctx.finalStage === true && effect.timing === "constant" && Array.isArray(effect.lines) && effect.lines.length > 0 && effect.lines.every((id) => typeof id === "string" && KEYWORD_REMINDER.test(ctx.lineTexts?.get(id) ?? ""));
+  if (instructions.length === 0 && keywordReminder) lines.push("  (no instructions: the record only names the printed keyword reminder; the keyword is the card's own and the engine reads it from the card)");
+  else if (instructions.length === 0) lines.push(winsOnDefeat ? "  (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)" : "  (no instructions: the record only names the printed line, and the engine runs no step for it)");
   if (instructions.length > 1) lines.push("  (steps run in order; a step depends on an earlier one only through its own condition)");
   const inner = effect.trigger === "engaged" ? { ...ctx, engagedSeat: true } : ctx;
   instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, inner, 1, at > 0)));

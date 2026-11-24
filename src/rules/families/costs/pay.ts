@@ -19,6 +19,7 @@ import type { GameEvent, ScenarioState } from "../../core/state.ts";
 import { heldAmount, inPlay, updateCard } from "../../core/state.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { openPool } from "../misc/guards.ts";
+import { resourcesLocked } from "../pelargir/spending.ts";
 
 const ICON_FLAGS = [
   ["leadershipIcon", "leadership"],
@@ -124,9 +125,9 @@ export function allyPools(state: ScenarioState, seat: number, cardId: string | u
 // A pool that may hold resources to pay with: a hero of the seat, or an ally pool for this card.
 export function payerOk(state: ScenarioState, payerId: string, seat: number, cardId: string | undefined, ctx: ReduceContext): boolean {
   const payer = state.cards[payerId];
-  if (payer && cardId != null && openPool(state, payerId, cardId, ctx)) return true;
+  if (payer && cardId != null && openPool(state, payerId, cardId, ctx)) return !resourcesLocked(state, payerId);
   if (!payer || payer.controller !== seat) return false;
-  return payer.zone === "heroes" || (cardId != null && isAllyPool(state, payerId, cardId, ctx));
+  return (payer.zone === "heroes" || (cardId != null && isAllyPool(state, payerId, cardId, ctx))) && !resourcesLocked(state, payerId);
 }
 
 // The cards that spent resources this round (Tighten Our Belts), and the seats that did, announced as `resourcesSpent` with the number spent in a game whose cards hear it ("After the engaged player spends any number of

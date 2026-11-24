@@ -9,6 +9,7 @@ import { legalIntents, reduce, type EngineStep, type LegalIntent, type PlayerInt
 
 import { deckTopFaceUp } from "../../rules/player/deck-play.ts";
 import { clashesOf } from "./clash.ts";
+import { stampCounted } from "./counted.ts";
 import { finishedRoundSteps } from "./outcome.ts";
 import { peekSeat } from "./peek.ts";
 import { draggableIds, dropTargets, type DropTarget } from "./selection.ts";
@@ -95,20 +96,21 @@ export type Kept = { roundSteps: readonly EngineStep[]; history: readonly Undoab
  * One more accepted intent folded into what the table keeps. The store calls it for each intent sent, and reopening a save
  * calls it for each intent replayed, so both keep the same log and the same Undo list.
  */
-export function keepIntent(kept: Kept, before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], intent: PlayerIntent): Kept {
+export function keepIntent(kept: Kept, before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], intent: PlayerIntent, ctx?: ReduceContext): Kept {
   return {
-    roundSteps: nextRoundSteps(kept.roundSteps, before, after, steps),
+    roundSteps: nextRoundSteps(kept.roundSteps, before, after, steps, ctx),
     history: nextUndoable(kept.history, after, { before, roundSteps: kept.roundSteps, intent, steps }),
   };
 }
 
 /**
  * The steps of the round the table is in. A reduce that crosses into a new round starts the list again from the steps it
- * produced, so the list never mixes two earlier rounds.
+ * produced, so the list never mixes two earlier rounds. With `ctx` each quest step also keeps the stat the quest counted (counted.ts).
  */
-export function nextRoundSteps(previous: readonly EngineStep[], before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[]): readonly EngineStep[] {
+export function nextRoundSteps(previous: readonly EngineStep[], before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], ctx?: ReduceContext): readonly EngineStep[] {
   if (steps.length === 0) return previous;
-  return after.round !== before.round ? [...steps] : [...previous, ...steps];
+  const kept = stampCounted(steps, before, ctx);
+  return after.round !== before.round ? [...kept] : [...previous, ...kept];
 }
 
 export type TableInput = {
@@ -167,7 +169,7 @@ export function createTableStore(input: TableInput): TableStore {
       const shows = result.steps.length > 0 || crossed;
       set({
         ...showing(result.state),
-        ...keepIntent(get(), before, result.state, result.steps, intent),
+        ...keepIntent(get(), before, result.state, result.steps, intent, ctx),
         moment,
         shown: shows ? moment : get().shown,
         // The attacks this moment resolved play on the canvas before its banner; a pass that shows nothing, or a moment with no attacks

@@ -13,6 +13,7 @@ import { openPools } from "../../rules/families/misc/guards.ts";
 import { exhaustSlack } from "../../rules/families/costs/play.ts";
 import { payingSlack } from "../../rules/families/deck/play.ts";
 import { chosenX } from "../../rules/families/misc/cost.ts";
+import { resourcesLocked } from "../../rules/families/pelargir/spending.ts";
 import { heroPays } from "../../rules/player/payments.ts";
 import { printedOf, type Sphere } from "../../rules/core/printed.ts";
 import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
@@ -40,6 +41,8 @@ function poolsFor(state: ScenarioState, ctx: ReduceContext, seat: number, sphere
     const hero = state.cards[heroId];
     if (!hero || hero.resources <= 0) continue;
     if (!heroPays(state, heroId, sphere, ctx, forCard)) continue;
+    // A hero whose resources cannot be spent (Orc Vanguard, 05058:A:1) offers no pool: the engine refuses a payment from it.
+    if (resourcesLocked(state, heroId)) continue;
     pools.push({ heroId, max: hero.resources });
   }
   return pools;

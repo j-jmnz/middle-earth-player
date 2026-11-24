@@ -33,6 +33,8 @@ import { announceDestroyed, charactersDestroyed, destroyedByAttack } from "../fa
 import { printedOf } from "../core/printed.ts";
 import { attackHere, attackKey, countsEachAttack, locationDamage } from "../families/south/watcher.ts";
 import { pillageAfter } from "../families/sea/pillage.ts";
+import { aimAgain } from "../families/pelargir/siege.ts";
+import { undefendedTargets } from "./combat.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
 // progress is on state.pendingAttack, so an effect can read whether it is defended and change it.
@@ -245,6 +247,9 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   // A shadow effect sent the damage to an active location (families/south/watcher.ts).
   const located = attack.toLocation || undefendedToCity(next, attack.enemyId) ? locationDamage(next, attack, ctx, steps) : null;
   if (located) return located.lost || located.window ? located : afterDamage(noteAttackDamage(next, located, ctx, steps), ctx, steps);
+  // The card the damage was aimed at left the game during the shadow (a Battleground location, families/pelargir/siege.ts): the damage is set after the shadow, so it is aimed again.
+  const aimed = next.modifiers.length > 0 ? aimAgain(next, ctx.cards, (state) => undefendedTargets(state, attack.seat, ctx.cards)) : null;
+  if (aimed) return aimed.window ? aimed : resolveAttack(aimed, ctx, steps);
   // A shadow effect made a defended attack undefended: the player still names the hero who takes it.
   if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
   // No hero is left to take the attack (every hero of the seat is held, 18074): it deals no damage.

@@ -6,6 +6,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { heroPays } from "../../player/payments.ts";
 import type { Sphere } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { resourcesLocked } from "../pelargir/spending.ts";
 
 type CombatStep = Extract<Condition, { kind: "combatStep" }>["is"];
 
@@ -27,6 +28,6 @@ export function combatStepIs(state: ScenarioState, step: CombatStep): boolean {
 // The resources the heroes of these seats hold that can pay for the sphere (any sphere when null).
 export function groupResources(state: ScenarioState, seats: readonly number[], sphere: Sphere | null, ctx: ReduceContext): number {
   let total = 0;
-  for (const seat of seats) for (const id of state.seats[seat]?.heroes ?? []) if (heroPays(state, id, sphere, ctx)) total += state.cards[id]?.resources ?? 0;
+  for (const seat of seats) for (const id of state.seats[seat]?.heroes ?? []) if (heroPays(state, id, sphere, ctx) && !resourcesLocked(state, id)) total += state.cards[id]?.resources ?? 0;
   return total;
 }

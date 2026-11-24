@@ -144,10 +144,10 @@ function ThreatSourceReading({ store, ctx, names, picture, onRead, onClose }: { 
 }
 
 function LogReading({ store, logNames, onClose }: { store: TableStore; logNames: LogNames; onClose: () => void }) {
+  // Only the round and its steps: the log does not rebuild on an intent that changes neither. The quest line names the stat the quest counted, which the table kept with the step (store/counted.ts).
   const round = useStore(store, (state) => state.game.round);
   const roundSteps = useStore(store, (state) => state.roundSteps);
-  const lines = useMemo(() => logLines(roundSteps, logNames), [roundSteps, logNames]);
-  return <LogPanel round={round} lines={lines} onClose={onClose} />;
+  return <LogPanel round={round} lines={logLines(roundSteps, logNames)} onClose={onClose} />;
 }
 
 // The Island Map: the map as the game lays it out, fitted to the room the panel has (island-table.ts); a tile shows its card large.

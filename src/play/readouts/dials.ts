@@ -2,6 +2,7 @@
 import { useMemo } from "react";
 
 import { inPlay, type ScenarioState } from "../../rules/core/state.ts";
+import type { IconName } from "../../ui/icon-map.ts";
 
 /** One dial of the top bar: its label, what a screen reader calls it, its number, and what it counts toward. `goal`: the limit is the players' way out (the ring fills in the accent, never warms). `warms`: the limit loses or discards, so the ring warms toward it as the pursuit dial does. `warn`: the dial's own level and words (a last card, one mire token from a discard). `filled`: the number the ring fills with when it is not the disc's (the gate's damage). */
 /** One headed list of names in a dial's panel. */
@@ -25,6 +26,8 @@ export type TableDial = {
   note?: string;
   // The disc says this word in place of the number (the Day and Night dial: "Day"); the number only tells the dial that it changed.
   word?: string;
+  // The icon under the number (the damage token on a Battleground location's dial): absent, none.
+  icon?: IconName;
   // The card a tap on the dial shows large (the Night objective's, Derufin's): absent, the dial does nothing.
   cardId?: string;
   // Cards a tap shows after that card, in the same preview (the staging cards of a stage no player is at): absent, the card alone.
@@ -48,7 +51,7 @@ export function dialProps(dial: TableDial) {
     label: dial.label,
     accessibilityName: dial.name,
     testID: dial.testID ?? `isengard-${dial.id}`,
-    icon: null,
+    icon: dial.icon ?? null,
     elimination: dial.warms === true,
     limit: dial.limit,
     filled: dial.filled,

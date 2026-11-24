@@ -12,6 +12,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { noteSpent } from "../costs/pay.ts";
+import { anyLocked, resourcesLocked, stopLockedSpend } from "../pelargir/spending.ts";
 import type { Focus } from "../index.ts";
 import { namedCard } from "./refs.ts";
 
@@ -73,6 +74,9 @@ export function discardSameTitle(state: ScenarioState, focus: Focus, ctx: Reduce
 export function spendFrom(state: ScenarioState, instruction: Extract<Instruction, { verb: "SpendFrom" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
   const id = namedCard(state, instruction.card ?? "picked", focus);
   const card = id ? state.cards[id] : undefined;
-  if (!id || !card || card.resources < instruction.amount) return state;
+  // The pick that feeds the spend found no pool that can pay while a hero is locked: the effect does not go on (the pick leaves a locked pool out).
+  if (!id || !card) return anyLocked(state) ? stopLockedSpend(state) : state;
+  if (card.resources < instruction.amount) return state;
+  if (resourcesLocked(state, id)) return stopLockedSpend(state);
   return noteSpent(updateCard(state, id, { resources: card.resources - instruction.amount }), [{ heroId: id, amount: instruction.amount }], ctx);
 }

@@ -47,6 +47,7 @@ import { fortitudePool } from "../families/mount-doom/pick.ts";
 import { seatPickMatches } from "../families/wilderland/seat-pick.ts";
 import { mostResources } from "../families/burgle/pick.ts";
 import { committedInStaging } from "../families/pelargir/committed.ts";
+import { resourcesLocked } from "../families/pelargir/spending.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
 // characters of the attack a Response answers. `counting` reads every card that matches, immune ones too: a count or a
@@ -63,6 +64,8 @@ export type PickContext = {
   other?: string | null;
   // The cards chosen are discarded by the effect (a DiscardPicked after the pick): the filter of a card that cannot be discarded by player card effects reads it (families/wilderland/pick.ts).
   discards?: boolean;
+  // The cards chosen pay resources for the instruction after the pick (SpendFrom, SpendFromPool): a pool Orc Vanguard locks cannot pay, so it is not offered (families/pelargir/spending.ts).
+  spends?: boolean;
 };
 
 export function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[] {
@@ -244,6 +247,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.keyword && !hasKeyword(state, id, spec.keyword, ctx.cards)) return false;
   if (spec.damaged != null && instance.damage > 0 !== spec.damaged) return false;
   if (spec.hasResources && instance.resources <= 0) return false;
+  if (at.spends && resourcesLocked(state, id)) return false;
   // The costs family's filters: a pool's size, a Valour ability, a lower threat cost, a pool that paid (families/costs/pick.ts).
   if (!costsPickMatches(state, id, spec, at.picked, ctx, at.subject)) return false;
   if (spec.on && !onHost(state, instance.host, spec.on, asking, ctx)) return false;
@@ -355,7 +359,7 @@ export function pickCandidates(
   x?: number,
   participants?: readonly string[],
   counting = false,
-  event?: { subject?: string | null; other?: string | null; discards?: boolean },
+  event?: { subject?: string | null; other?: string | null; discards?: boolean; spends?: boolean },
 ): string[] {
   const found = candidatesOf(state, spec, seat, picked, sourceId, ctx, x, participants, counting, event);
   // "The opposing team chooses" (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, reading 3): the first of the cards the ranking fields left (with `highestThreat` on enemies, the one with the highest Attack among those level on Threat), the order of seats and then of play breaking a tie, and nobody is asked. A count is not a choice.
@@ -380,7 +384,7 @@ function candidatesOf(
   participants?: readonly string[],
   counting = false,
   // The answered event's subject and other card, for a condition read about it (families/attack/pick.ts).
-  event?: { subject?: string | null; other?: string | null; discards?: boolean },
+  event?: { subject?: string | null; other?: string | null; discards?: boolean; spends?: boolean },
 ): string[] {
   const asking = spec.who === "firstPlayer" ? firstPlayerFor(state, seat) : seat;
   if (spec.type === "player") return seatsOf(state, spec, asking).filter((index) => !state.seats[index]?.eliminated && seatPickMatches(state, index, spec, ctx)).map((index) => `seat:${index}`);

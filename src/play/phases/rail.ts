@@ -122,12 +122,19 @@ const POINTS: Readonly<Record<string, Omit<WindowPoint, "id">>> = {
   "7.4": { title: "Before the next round", note: "The first player token has passed." },
 };
 
-export function windowPoint(game: ScenarioState): WindowPoint | null {
+// The note of a point that names the quest stat says the stat the stage counts instead of Willpower: Attack under Battle, Defense under Siege (hon.battle, hon.siege), as the reference's quest steps do (reference.ts).
+const STAT_NOTES: Readonly<Record<string, (stat: string) => string>> = {
+  "3.3": (stat) => `Staging is done. ${stat[0]?.toUpperCase()}${stat.slice(1)} raised now counts against its threat.`,
+};
+
+const noteOf = (id: string, point: Omit<WindowPoint, "id">, stat: string | undefined): string => (stat && stat !== "willpower" ? STAT_NOTES[id]?.(stat) : undefined) ?? point.note;
+
+export function windowPoint(game: ScenarioState, stat?: string): WindowPoint | null {
   const awaiting = game.pendingAttack?.awaiting ?? game.pendingStrike?.awaiting;
   const last = [...game.stepWindows].reverse().find((key) => key.startsWith(`${game.round}:`))?.slice(`${game.round}:`.length);
   const id = game.window?.kind === "frameAction" ? (awaiting ?? last ?? null) : game.mode === "resourceActions" ? "resourceActions" : null;
   const point = id ? POINTS[id] : undefined;
-  return id && point ? { id, ...point } : null;
+  return id && point ? { id, ...point, note: noteOf(id, point, stat) } : null;
 }
 
 /** The title of a window point by its id ("Before the quest resolves"), or null for an unknown id. */
@@ -136,6 +143,7 @@ export function pointTitle(id: string): string | null {
 }
 
 /** The note of a window point by its id, or null. */
-export function pointNote(id: string): string | null {
-  return POINTS[id]?.note ?? null;
+export function pointNote(id: string, stat?: string): string | null {
+  const point = POINTS[id];
+  return point ? noteOf(id, point, stat) : null;
 }

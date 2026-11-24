@@ -29,6 +29,15 @@ const VERBS = [
   // "Take control of all Ranger objectives in the staging area" (05070:B:1): each objective card with this Trait in the staging area (the ally objectives Celador and the Ithilien Guardians) comes into the first player's play area, faceup and ready. It is no longer
   // committed by its own text (the flag `committedInStaging` holds only in the staging area), and the player may commit it like any ally (ats.ally-objectives). Nothing happens when none is there.
   z.strictObject({ verb: z.literal("TakeControlOfStagedObjectives"), trait: z.string().min(1), ...when }),
+  // "Remove stage 4 from the quest deck, if able" (05033:A:2, 05034:A:2, 05035:A:2): the stage with this code is set aside and is no longer part of the quest; the stage that is defeated before it goes to the next stage still in the quest deck. When it is the current stage the
+  // quest advances at once to the next stage still in the quest deck, and that stage is revealed. A stage already gone: nothing happens.
+  z.strictObject({ verb: z.literal("RemoveStage"), code: z.string().min(1), ...when }),
+  // "Resolve the 'when revealed' effect on the topmost treachery card in the encounter discard pile, if able" (05056:A:2): the When Revealed effects (not Doomed, not Surge) of the last treachery placed in the encounter discard pile resolve for the actor; the card stays in the discard pile.
+  // With no treachery there nothing happens. Its effects cannot be canceled when `uncancelable` is set.
+  z.strictObject({ verb: z.literal("ResolveTopmostTreachery"), uncancelable: z.literal(true).optional(), ...when }),
+  // "Count the number of encounter cards in the staging area and shuffle them into the encounter deck" (05061:A:2): every card in the staging area (enemies, locations, objectives) leaves play and goes into the encounter deck, which is shuffled; the effect's X is how many there
+  // were, so `RevealEncounter` with `times: { x: true }` reveals as many cards. Nothing in the staging area: X is 0.
+  z.strictObject({ verb: z.literal("ShuffleStagingIntoEncounterDeck"), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;
@@ -58,6 +67,19 @@ const FLAGS = [
   // On Morgul Spider until the end of the round, set when it is revealed: its constant gives it +1 Attack for each character not committed to a quest, counted again whenever the game changes ("Until the end of the round, Morgul Spider gets +1 Attack for each
   // character not currently committed", 05049:A:1). No engine code reads it: the constant's condition does.
   "attackForUncommitted",
+  // On a Battleground location in play (staging or active), a constant holding the amount: once it has this much damage it is removed from the game ("If The Citadel has 11 or more damage, remove it from the game (do not collect its victory points)", 05033:A:1). It is not explored, goes to no
+  // pile and hears no Response, and its damage and progress go with it. Checked at every settle (src/rules/families/pelargir/siege.ts).
+  "removedAtDamage",
+  // On a quest stage: while it is current, the damage of an undefended attack goes to the Battleground location in play with the lowest Threat, and to no hero ("Players must deal damage from undefended attacks to the lowest Threat Battleground location in play", 05072:B:2;
+  // src/rules/families/pelargir/siege.ts, the family's combat hook).
+  "undefendedToBattleground",
+  // On a quest stage: while it is current and no Battleground location is in the staging area or active, the quest advances at once to the next stage still in the quest deck ("If there are no Battleground locations in play, immediately advance to the next stage", 05072:B:2).
+  "advancesWithoutBattleground",
+  // On a hero: its resources cannot be spent, for a card's cost, an ability's cost or an effect that spends resources ("While Orc Vanguard is in the staging area, resources cannot be spent from the resource pools of heroes who have a Leadership, Spirit, or Lore resource icon", 05058:A:1). Resources can still be gained and moved. Read by rules/families/costs/pay.ts payerOk and
+  // rules/families/costs/verbs.ts spendablePools (src/rules/families/pelargir/spending.ts).
+  "cannotSpendResources",
+  // On the current quest stage: it does not have the Siege keyword ("The Last Battle gains battle and loses siege", 05076:B:3); read by rules/families/quest/conditions.ts currentQuestHas (src/rules/families/pelargir/stage-keyword.ts).
+  "losesSiege",
 ] as const;
 
 export const manifest = { name: "pelargir", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

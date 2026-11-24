@@ -17,12 +17,12 @@ export type CardExtras = { rawLines?: readonly { lineId: string; line: string }[
 // `inert`: the ledger line ids marked inert (a reminder or keyword the engine applies by rule), which need no record.
 export function renderCard(card: Card, segments: readonly Segment[], effects: readonly Effect[], inert: ReadonlySet<string>, extras: CardExtras = {}): CardRender {
   const own = effects.filter((effect) => effect.cardCode === card.code);
-  const ctx = newCtx({ effects: effects as unknown as readonly Obj[], cardName: card.name, cardType: card.type, ...(extras.finalStage ? { finalStage: true } : {}) });
+  const rows = extras.rawLines ?? segments.map((segment) => ({ lineId: segment.lineId, line: segment.line }));
+  const ctx = newCtx({ effects: effects as unknown as readonly Obj[], cardName: card.name, cardType: card.type, lineTexts: new Map(rows.map((row) => [row.lineId, row.line])), ...(extras.finalStage ? { finalStage: true } : {}) });
   const known = new Set(segments.map((segment) => segment.lineId));
   const bySegment = new Map(segments.map((segment) => [segment.lineId, segment]));
   const out: string[] = [`## ${card.code} ${card.name}`];
   if (extras.pile) out.push(`(the scenario deals it into the ${extras.pile} pile; the piles place it, no record does)`);
-  const rows = extras.rawLines ?? segments.map((segment) => ({ lineId: segment.lineId, line: segment.line }));
   for (const row of rows) {
     const segment = bySegment.get(row.lineId);
     out.push("", `${row.lineId}${segment ? ` (${segment.side})` : ""}: ${row.line}`);

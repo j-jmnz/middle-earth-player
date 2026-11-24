@@ -90,6 +90,7 @@ import dimFixtures from "./fixtures/dungeons-deep-and-caverns-dim.json";
 import mountainFixtures from "./fixtures/the-lonely-mountain.json";
 import ithilienFixtures from "./fixtures/into-ithilien.json";
 import armiesFixtures from "./fixtures/the-battle-of-five-armies.json";
+import androsFixtures from "./fixtures/the-siege-of-cair-andros.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -192,6 +193,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-hunt-for-the-dreadnaught": dreadnaughtFixtures,
   "peril-in-pelargir": pelargirFixtures,
   "into-ithilien": ithilienFixtures,
+  "the-siege-of-cair-andros": androsFixtures,
   "we-must-away-ere-break-of-day": dayFixtures,
   "over-the-misty-mountains-grim": grimFixtures,
   "dungeons-deep-and-caverns-dim": dimFixtures,

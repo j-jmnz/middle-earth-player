@@ -1,6 +1,7 @@
 // The table's log: this round's engine steps in words, each with its cause from phase 8d (the rule title, or the card and
 // its printed line), so a player can check a number against its source. It is text, not a control.
 import { plural } from "../words/list.ts";
+import { countedOf } from "./counted.ts";
 import { reshuffleWords } from "./pile-ids.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
@@ -31,14 +32,16 @@ export function logLineSpeech(line: Pick<LogLine, "text" | "cause">): string {
   return line.cause ? `${line.text}. ${line.cause}` : line.text;
 }
 
-function markOf(step: EngineStep): LogMark {
+function markOf(step: EngineStep, stat: LogMark = null): LogMark {
   switch (step.kind) {
     case "threat":
       return "threat";
     case "hideTest":
     case "fortitudeTest":
-    case "quest":
       return "willpower";
+    // The quest's mark is the stat the stage counted (Attack under Battle, Defense under Siege); none for a step kept without it.
+    case "quest":
+      return stat;
     case "escapeTest":
       return step.stat ?? "willpower";
     case "strike":
@@ -79,7 +82,7 @@ export function causeText(cause: Cause, names: LogNames): string {
   return line ? `${card}: ${line}` : card;
 }
 
-function words(step: EngineStep, names: LogNames): string | null {
+function words(step: EngineStep, names: LogNames, questStat: string | null): string | null {
   switch (step.kind) {
     case "push":
     case "pop":
@@ -126,7 +129,7 @@ function words(step: EngineStep, names: LogNames): string | null {
     case "hideTest":
       return `Hide test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against threat ${step.threat}`;
     case "quest":
-      return `Quest: willpower ${step.willpower} against threat ${step.threat}`;
+      return `Quest: ${questStat ? `${questStat} ` : ""}${step.willpower} against threat ${step.threat}`;
     case "strike":
       return step.undefended ? `Attack ${step.attack}, undefended, on ${names.card(step.targetId)}` : `Attack ${step.attack} against defense ${step.defense} on ${names.card(step.targetId)}`;
     case "advance":
@@ -161,13 +164,14 @@ function words(step: EngineStep, names: LogNames): string | null {
   }
 }
 
-/** The round's steps as log lines, oldest first. Frame pushes and pops are bookkeeping and are left out. */
+/** The round's steps as log lines, oldest first. Frame pushes and pops are bookkeeping and are left out. A quest step names the stat it counted when the table kept it (counted.ts), else it names none. */
 export function logLines(steps: readonly EngineStep[], names: LogNames): LogLine[] {
   const lines: LogLine[] = [];
   steps.forEach((step, index) => {
-    const text = words(step, names);
+    const stat = countedOf(step);
+    const text = words(step, names, stat);
     if (!text) return;
-    lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : null, mark: markOf(step) });
+    lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : null, mark: markOf(step, stat) });
   });
   return lines;
 }

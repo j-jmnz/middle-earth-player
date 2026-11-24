@@ -8,7 +8,7 @@ import { setBeat, type BeatStore } from "../store/beat-store.ts";
 import { stageText } from "../readouts/objective.ts";
 import { intentWords, momentOf, roundSummary, takenBack, type Moment } from "../store/outcome.ts";
 import { guideLine } from "../phases/reference.ts";
-import type { QuestStat } from "../phases/quest-stat.ts";
+import { questStatNow, type QuestStat } from "../phases/quest-stat.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { followAnswers, passableWindow, tableAnswer, usableIds, type StopSettings } from "../phases/stops.ts";
 import { printedOf } from "../../rules/core/printed.ts";
@@ -80,7 +80,7 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
     // Whether a card prints PASS, for the locate test's lines (dwd.locate-test); whether a stage flips at the staging step (Flight from Moria) or at the beginning of the quest phase (Mount Gundabad).
     const passes = (cardId: string) => printedOf(ctx.cards, codeOf(cardId)).keywords.pass === true;
     const atStaging = (cardId: string) => flipsAtStaging(ctx, codeOf(cardId));
-    const set = { card: names.card, passes, shadow, stage, revealed, stageName: stageNamed, mustBypass, atStaging, fate, forestAdvance };
+    const set = { card: names.card, questStat: (state: ScenarioState) => questStatNow(state, ctx), passes, shadow, stage, revealed, stageName: stageNamed, mustBypass, atStaging, fate, forestAdvance };
     // After an undo the game is the state before the intent taken back, and `left` the state it had made.
     if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card, shown.after, playInto), momentOf(shown.after, shown.left, shown.steps, set));
     return momentOf(shown.before, shown.after, shown.steps, set);

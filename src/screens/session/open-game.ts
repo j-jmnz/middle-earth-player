@@ -33,12 +33,13 @@ export type ReplayedOpen = { ok: true; game: ReplayedGame; stamp: ActiveScenario
 /** Replays a game through `resume` and gathers what the table draws. Not ok when the replay fails: the caller asks for a choice. */
 export function replayForTable<TRun>(catalog: Db<TRun>, world: World, resume: (observe: ReplayObserver) => Resumed): ReplayedOpen {
   // The same fold the store runs on each intent it sends (keepIntent), so a reopened game can be undone as far as before.
+  const ctx = contextOf(world);
   let kept: Kept = { roundSteps: [], history: [] };
   const resumed = resume((before, after, steps, intent) => {
-    kept = keepIntent(kept, before, after, steps, intent);
+    kept = keepIntent(kept, before, after, steps, intent, ctx);
   });
   if (!resumed.ok) return { ok: false, at: resumed.at ?? null };
-  return { ok: true, game: { world, ctx: contextOf(world), game: resumed.state, ...kept, facts: factsOf(catalog, world.cards.keys()) }, stamp: resumed.stamp };
+  return { ok: true, game: { world, ctx, game: resumed.state, ...kept, facts: factsOf(catalog, world.cards.keys()) }, stamp: resumed.stamp };
 }
 
 /**

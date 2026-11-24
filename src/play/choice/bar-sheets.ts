@@ -126,7 +126,7 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
     };
   }
   // The window is named by what comes next, so the player knows what an action here can still change (rail.ts).
-  const point = windowPoint(game);
+  const point = windowPoint(game, questStatNow(game, ctx));
   return {
     ...base,
     title: point?.title ?? "Action window",
