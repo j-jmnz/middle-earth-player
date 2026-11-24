@@ -12,6 +12,7 @@ import { DEFENSE_STAGE, defenseFillsWords, type DefenseOutcome } from "../words/
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { cairAndrosStageLines } from "./against-the-shadow/cair-andros.ts";
+import { druadanStageLines } from "./against-the-shadow/druadan.ts";
 import { stewardsFearStageLines } from "./against-the-shadow/stewards-fear.ts";
 
 /** The tokens on The Defense of Helm's Deep, the number that ends it, the quest stage the players advance to and its name, for the top bar's Defense dial. */
@@ -53,7 +54,7 @@ export function stageDetail(game: ScenarioState, ctx: ReduceContext, code: strin
   const defense = stageHasDefense(game) && game.questStage != null && game.cards[game.questStage]?.code === code;
   const loses = stageDefeatLoses(ctx, code);
   const fills = points != null && (defense || loses) ? defenseFillsWords(points, loses) : null;
-  return [fills, hold ?? (fills ? null : plain), defense ? DEFENSE_STAGE : null, ...cairAndrosStageLines(game, ctx, code), ...stewardsFearStageLines(game, ctx, code)].filter((text) => text != null);
+  return [fills, hold ?? (fills ? null : plain), defense ? DEFENSE_STAGE : null, ...cairAndrosStageLines(game, ctx, code), ...druadanStageLines(game, ctx, code, (id) => ctx.cards.get(id)?.name ?? id), ...stewardsFearStageLines(game, ctx, code)].filter((text) => text != null);
 }
 
 /**

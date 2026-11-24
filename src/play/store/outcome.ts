@@ -25,6 +25,7 @@ import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wild
 import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
 import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
 import { STAT_WORD } from "../cards/card-effects.ts";
+import { willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
 import { stackTakes, underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { releasedWords, UNDERWORLD_TITLE } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 
@@ -184,12 +185,14 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
           if (discarded) line(discarded, null, [step.enemyId]);
         } else {
           open(2, `Attack on ${enemy}`, "plain");
-          line(`Attack ${step.attack} against defense ${step.defense}`, "attack", [step.enemyId]);
+          // Stage 3 of The Drúadan Forest: the characters attack with Willpower (06044:B:2).
+          line(`${willpowerAttack(before) ? "Willpower" : "Attack"} ${step.attack} against defense ${step.defense}`, "attack", [step.enemyId]);
         }
         // The damage the strike placed comes before the next attack: say so when there is none.
         const rest = steps.slice(index + 1);
         const end = rest.findIndex((later) => later.kind === "strike" || later.kind === "attack");
-        const placed = (end < 0 ? rest : rest.slice(0, end)).some((later) => later.kind === "damage" && later.amount > 0 && later.targetId === step.targetId);
+        // Progress the attack placed on the enemy (stage 3 of The Drúadan Forest) is what it dealt: no "No damage" line after it.
+        const placed = (end < 0 ? rest : rest.slice(0, end)).some((later) => (later.kind === "damage" || later.kind === "progress") && later.amount > 0 && later.targetId === step.targetId);
         if (!placed) line("No damage");
         // The enemy that takes no damage until he has attacked says why (The Fate of Wilderland).
         const shielded = !placed && step.side === "player" ? names.fate?.shielded(before, step.enemyId) : null;

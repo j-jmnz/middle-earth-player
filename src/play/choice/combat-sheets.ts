@@ -5,10 +5,12 @@
 // players' attack. Each option carries what the engine says it would do (foresight.ts), and a choice that loses the game
 // asks twice.
 import { defenseAsDefender, modifiedStat } from "../../rules/core/keywords.ts";
-import { attackStatAgainst } from "../../rules/families/attack/spectral.ts";
+import { attackStatOf } from "../../rules/families/pelargir/stage-attack.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { undefendedRedirectWords } from "../readouts/against-the-shadow/cair-andros.ts";
+import { alliesArchery, willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
+import { ALLIES_ARCHERY_WORDS, WILLPOWER_ATTACK_WORDS } from "../words/scenarios/against-the-shadow/druadan.ts";
 import { fateAttackNote, fateTargetNote } from "../words/scenarios/fate.ts";
 import { attackSource } from "../words/scenarios/grapple.ts";
 import { nightDefenderExcess, nightStageAttack } from "../words/scenarios/night.ts";
@@ -62,8 +64,8 @@ function attackNumbers(game: ScenarioState, ctx: ReduceContext): { attack: numbe
 function attackersSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, enemyId: string): MultiSheet {
   const enemy = game.cards[enemyId];
   const defense = enemy ? modifiedStat(game, enemy, "defense", ctx.cards) : 0;
-  // The stat each row shows is the one the attack reads: Willpower against a Spectral enemy (50312:A:1).
-  const read = attackStatAgainst(game, enemyId, ctx.cards);
+  // The stat each row shows is the one the attack reads: Willpower against a Spectral enemy (50312:A:1), and on stage 3 of The Drúadan Forest (06044:B:2).
+  const read = attackStatOf(game, enemyId, ctx.cards);
   // Another seat's ranged characters may join the attack (rr.ranged, rr.step-6-8-1); the active seat's come first.
   const seats = [game.activeSeat, ...game.seats.map((_, index) => index).filter((index) => index !== game.activeSeat && index < game.seatCount)];
   const characters = seats
@@ -74,7 +76,7 @@ function attackersSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNam
     key: `attackers:${enemyId}`,
     step: "Combat",
     title: `Attack ${names.card(enemyId)}`,
-    note: fateTargetNote(game, ctx, enemyId, defense, names.card(enemyId)) ?? `Defense ${defense}. Choose the characters that attack it.`,
+    note: fateTargetNote(game, ctx, enemyId, defense, names.card(enemyId)) ?? `Defense ${defense}. Choose the characters that attack it.${willpowerAttack(game) ? ` ${WILLPOWER_ATTACK_WORDS}` : ""}`,
     verb: "Attack",
     stats: statOf(game, ctx, enemyId, "defense"),
     options: characters.map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, read) })),
@@ -161,7 +163,7 @@ export function archerySheet(game: ScenarioState, ctx: ReduceContext, names: She
     key: `archery:${game.round}:${total}`,
     step: "Combat",
     title: `Archery ${total}`,
-    note: `Assign ${total} damage among your characters. Defense does not stop it.`,
+    note: `Assign ${total} damage among your characters. Defense does not stop it.${alliesArchery(game, ctx) ? ` ${ALLIES_ARCHERY_WORDS}` : ""}`,
     total: total,
     exact: true,
     options: recipients.map((id) => {
