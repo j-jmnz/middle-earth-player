@@ -211,6 +211,10 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
     "two-handed, ended, Normal, after the earlier parts, the first player out first",
     "two-handed, lost, Aragorn leaves play",
   ],
+  "the-blood-of-gondor": [
+    "Easy two-handed win",
+    "two-handed win",
+  ],
   "the-caves-of-nibin-dum": [
     "true solo, brittle heroes, lost",
     "true solo, steady heroes, lost",
