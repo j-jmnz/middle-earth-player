@@ -67,10 +67,10 @@ function removeFull(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard
   return next;
 }
 
-/** The current stage holds `advancesWithoutBattleground` and no Battleground location is in play: the quest advances at once to the next stage still in the quest deck, and its When Revealed effects resolve. Not during the Setup (the mulligan and the opening), before the locations are in play, and not while a window, an effect or an attack is open (the Response of the location explored last comes first). */
+/** The current stage holds `advancesWithoutBattleground` and no Battleground location is in play: the quest advances at once to the next stage still in the quest deck, and its When Revealed effects resolve. Not during the Setup (the mulligan and the opening), before the locations are in play, and not while an effect (the Response of the location explored last comes first) or an attack is open; a plain action window does not hold it. */
 function advanceWithout(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const stage = state.questStage;
-  if (state.mode === "mulligan" || state.mode === "afterOpening" || state.lost || state.stageCleared || state.stack.length > 0 || state.window || state.pendingAttack || state.pendingStrike || !stage || !flagged(state, stage, "advancesWithoutBattleground")) return state;
+  if (state.mode === "mulligan" || state.mode === "afterOpening" || state.lost || state.stageCleared || state.stack.length > 0 || state.pendingAttack || state.pendingStrike || !stage || !flagged(state, stage, "advancesWithoutBattleground")) return state;
   if (battlegroundsInPlay(state, ctx.cards).length > 0) return state;
   return advanceNow(state, ctx, steps);
 }

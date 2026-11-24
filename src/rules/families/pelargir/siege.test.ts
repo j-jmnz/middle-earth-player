@@ -7,6 +7,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { syncConstants } from "../../interpret/constants.ts";
+import type { EngineStep } from "../../core/intents.ts";
 import { settle } from "../../engine/machine.ts";
 import { moveCard } from "../../core/zones.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
@@ -172,5 +173,20 @@ describe("an undefended attack whose shadow removes its target is aimed again an
     const ally = idOf(run.state, "ally");
     const done = passUntilAsked(send(run, { type: "Undefended", heroId: ally }, made.ctx), made.ctx).state;
     expect(done.cards[ally]?.damage).toBe(1);
+  });
+});
+
+describe("the immediate advance does not wait for a plain action window (05072:B:2, ats.cair-andros-location-damage)", () => {
+  it("The Banks, the last Battleground location, explored by an action in the Planning action window: its Response is answered and the quest advances at once", () => {
+    const t = table({ phase: "Planning", active: { code: BANKS, progress: 2 } });
+    const open = { ...t.state, window: { kind: "pass" } } as ScenarioState;
+    const steps: EngineStep[] = [];
+    const explored = settle(runInstruction(open, { verb: "PlaceProgressOn", amount: 1, target: "activeLocation" }, { seat: 0, sourceId: null }, t.ctx, steps), t.ctx, steps);
+    expect(explored.cards[idOf(t.state, BANKS)]?.zone).toBe("victory");
+    const banks = idOf(t.state, BANKS);
+    const response = legalIntents(explored, t.ctx).find((intent) => intent.type === "Trigger" && intent.cardId === banks);
+    expect(response).toBeDefined();
+    const answered = send({ state: explored, steps: [] }, response as Parameters<typeof send>[1], t.ctx).state;
+    expect(codeOf(answered, answered.questStage)).toBe(AT_APPROACH);
   });
 });
