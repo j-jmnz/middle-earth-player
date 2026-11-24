@@ -12,6 +12,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { noteSpent } from "../costs/pay.ts";
+import { resourcesLocked, stopLockedSpend } from "../pelargir/spending.ts";
 import type { Focus } from "../index.ts";
 import { namedCard } from "./refs.ts";
 
@@ -74,5 +75,6 @@ export function spendFrom(state: ScenarioState, instruction: Extract<Instruction
   const id = namedCard(state, instruction.card ?? "picked", focus);
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || card.resources < instruction.amount) return state;
+  if (resourcesLocked(state, id)) return stopLockedSpend(state);
   return noteSpent(updateCard(state, id, { resources: card.resources - instruction.amount }), [{ heroId: id, amount: instruction.amount }], ctx);
 }

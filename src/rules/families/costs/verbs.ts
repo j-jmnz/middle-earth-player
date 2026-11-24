@@ -110,7 +110,7 @@ export function spendResources(state: ScenarioState, instruction: Extract<Instru
   if (instruction.target) {
     // From one card's own pool: nobody chooses, and a pool that cannot pay spends nothing.
     const id = refCard(state, instruction.target, scope) ?? "";
-    if ((state.cards[id]?.resources ?? 0) < amount) return state;
+    if ((state.cards[id]?.resources ?? 0) < amount || resourcesLocked(state, id)) return state;
     return noteSpent(updateCard(state, id, { resources: (state.cards[id]?.resources ?? 0) - amount }), [{ heroId: id, amount }], ctx);
   }
   let paid = [...(instruction.paid ?? []), ...(focus.chosen ? [focus.chosen] : [])];
