@@ -1,4 +1,4 @@
-// Rules: ats.hidden-cards, ats.hidden-cards-turn-faceup, faq.blood-of-gondor-hidden-cards, rr.reveal, rr.surge, rr.engaged, rr.first-player, rr.player-elimination, rr.undo (data/rules/entries.json); ledger lines 06129:A:1, 06117:B:1, 06132:A:2, 06130:A:2.
+// Rules: ats.hidden-cards, ats.hidden-cards-turn-faceup, faq.blood-of-gondor-hidden-cards, rr.reveal, rr.surge, rr.engaged, rr.first-player, rr.player-elimination (data/rules/entries.json); ledger lines 06129:A:1, 06117:B:1, 06132:A:2, 06130:A:2.
 // Lying in Wait turns the first player's hidden cards and resolves their When Revealed effects, and what the table must never show about a hidden card: no step, cause, window or offered intent names one before it is turned, an Undo and a replay of the save pick the same card for Faramir, and a player who
 // leaves the game has his hidden cards discarded. Seat 1 is the first player, so the cards of seat 0 show that only the first player's are turned.
 import { expect } from "vitest";
