@@ -85,6 +85,7 @@ export function ThreatRing({
   note,
   notch,
   word,
+  current,
   voiced,
   onPress,
 }: {
@@ -132,6 +133,8 @@ export function ThreatRing({
   notch?: number;
   // The disc says this word in place of the number (the Day and Night dial: "Day"); the number only makes the dial pop when it changes, and no change badge is drawn.
   word?: string;
+  // The dial of the stage the quest is at among several in play together (The Battle of Five Armies): an accent ring round it, so the mark needs no word. Its words are in `note`.
+  current?: boolean;
   // A seat's threat dial: a change plays the threat's sound (threatSound). The other dials are silent.
   voiced?: boolean;
   // A tap opens the threat panel (each enemy's cost against the threat), or peeks at the seat (a dial that is not shown).
@@ -139,7 +142,7 @@ export function ThreatRing({
 }) {
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} eliminates={eliminates} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} notch={notch} word={word} voiced={voiced} wordless={wordless} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} eliminates={eliminates} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} notch={notch} word={word} current={current} voiced={voiced} wordless={wordless} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-control">
@@ -177,6 +180,7 @@ function ThreatDial({
   note,
   notch,
   word,
+  current,
   voiced,
   wordless,
   onPress,
@@ -202,6 +206,7 @@ function ThreatDial({
   note?: string;
   notch?: number;
   word?: string;
+  current?: boolean;
   // A seat's threat dial: a change plays the threat's sound (threatSound). The other dials are silent.
   voiced?: boolean;
   wordless?: boolean;
@@ -317,6 +322,8 @@ function ThreatDial({
           ) : null}
         </View>
         <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: 999, borderWidth: 2 * s, borderColor: t.accent }, ringStyle]} />
+        {/* The current stage of several in play together: an accent ring just outside the dial, as the peeked seat's is bone. */}
+        {current === true ? <View testID={`${id}-current`} pointerEvents="none" style={{ position: "absolute", top: -2 * s, left: -3 * s, right: -3 * s, bottom: -2 * s, borderRadius: 999, borderWidth: 1.5 * s, borderColor: t.accent }} /> : null}
         {/* Peeking at this seat: a bone ring just outside the dial and an eye on its corner, clear of the label and its Ring mark. */}
         {role === "viewing" ? (
           <>

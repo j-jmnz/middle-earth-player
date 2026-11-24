@@ -139,7 +139,7 @@ export const ITEM_CHOICES = (seatCount: 1 | 2): readonly string[] => (seatCount 
 // still in play at the end) and the two ways to lose that a game of stand-ins reaches: the threat at 50 (heroes too small to quest) and the hero with The One Ring destroyed (heroes too brittle to survive the Watchers' and the Orcs' attacks).
 export const UNGOL_GOLDENS: readonly UngolGolden[] = [
   { name: "true solo, won, Normal, after the earlier parts, Shagrat defeated", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
-  { name: "true solo, won, Easy, after the earlier parts, the other options", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", after: true, policy: { choose: "last" } },
+  { name: "true solo, won, Easy, after the earlier parts, the other options", seatCount: 1, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won", after: true, policy: { choose: "last" } },
   { name: "true solo, won, Normal, with no earlier log", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, won, Normal, after the earlier parts, Shagrat left in play", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { hunt: false } },
   { name: "two-handed, won, Normal, after the earlier parts, Shagrat defeated", seatCount: 2, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won", after: true },

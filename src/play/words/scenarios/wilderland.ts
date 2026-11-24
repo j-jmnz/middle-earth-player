@@ -19,6 +19,7 @@ import { framsburgAsk, framsburgBranchNow, framsburgBranchWords, framsburgChoose
 import { fateAsk, fateBranchRows, fateBranchWords, fateChooseNote } from "./fate.ts";
 import { boonHeroAsk } from "./angmar/angmar-table.ts";
 import { dragonSicknessAsk, gundabadAsk, gundabadBranchWords, gundabadChooseNote } from "./gundabad.ts";
+import { armiesBranchRows, armiesBranchWords, armiesChooseNote } from "./the-hobbit/armies.ts";
 import { nightAsk, nightBranchWords, nightChooseNote, nightMainNow, nightQuestsNow } from "./night.ts";
 import { rhovanionAsk, rhovanionBranchWords, rhovanionChooseNote } from "./rhovanion.ts";
 import { askedSeat, seatSays } from "../seat.ts";
@@ -85,7 +86,7 @@ export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choos
     const text = `distribute ${damage} damage among characters you control? If you do, ${source ? names.card(source) : "this card"} is shuffled into the encounter deck.`;
     return game.seatCount > 1 ? `Player ${(seat ?? game.firstPlayer) + 1}: ${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
   }
-  const heath = heathChooseNote(choose, game, names) ?? rhovanionChooseNote(choose, game, ctx, names, claimed) ?? nightChooseNote(choose, game, ctx, names, source) ?? framsburgChooseNote(choose, game, ctx, names, source) ?? gundabadChooseNote(choose, game, ctx, names, source) ?? fateChooseNote(choose, game, ctx, names, source);
+  const heath = heathChooseNote(choose, game, names) ?? rhovanionChooseNote(choose, game, ctx, names, claimed) ?? nightChooseNote(choose, game, ctx, names, source) ?? framsburgChooseNote(choose, game, ctx, names, source) ?? gundabadChooseNote(choose, game, ctx, names, source) ?? fateChooseNote(choose, game, ctx, names, source) ?? armiesChooseNote(choose, game);
   if (heath) return heath;
   const offer = searchOffer(choose);
   if (!offer) return null;
@@ -128,6 +129,8 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   if (instruction.verb === "ClaimRandomTreasure") return { verb: "Choose", prompt: `Choose 1 of ${drawn} random undiscovered treasures to attach to a character.` };
   // The Shadow card of Frenzied Creature goes on the attacking enemy, whom nobody chooses (18018:A:2).
   if (instruction.verb === "AttachSelf" && instruction.to.kind === "attackingEnemy") return { verb: "Attach", prompt: `Attach ${source ? names.card(source) : "this card"} to the attacking enemy.` };
+  // Dark Bats goes on the character it damaged or on the defending character, whom nobody chooses (132036:A:1, 132036:A:2).
+  if (instruction.verb === "AttachSelf" && (instruction.to.kind === "subject" || instruction.to.kind === "defender")) return { verb: "Attach", prompt: `Attach ${source ? names.card(source) : "this card"} to ${instruction.to.kind === "subject" ? "the character it damaged" : "the defending character"}.` };
   // Players tied for the most cards in hand: the first player names who takes the card (18026:A:1).
   if (instruction.verb === "AddSourceToHandOfMost") {
     const card = source ? names.card(source) : "this card";
@@ -241,13 +244,13 @@ export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, cho
   }
   const quests = nightQuestsNow(game, ctx, choose);
   const main = nightMainNow(game, ctx, choose);
-  const rows = { ...framsburgBranchNow(game, ctx, choose, seat), ...fateBranchRows(game, ctx, choose, sourceId) };
+  const rows = { ...framsburgBranchNow(game, ctx, choose, seat), ...fateBranchRows(game, ctx, choose, sourceId), ...armiesBranchRows(game, ctx, choose) };
   return { ...(Object.keys(counted).length > 0 ? { counted } : {}), ...(quests ? { quests } : {}), ...(main ? { main } : {}), ...(Object.keys(rows).length > 0 ? { rows } : {}) };
 }
 
 /** A branch that counts cards, with the number now: "Raise your threat by 3 (1 for each ally you control)", "Deal 1 damage to each ally you control (3)". Null for any other branch. */
 export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, names: ChoiceNames, now?: BranchNow, source?: string | null, game?: ScenarioState, ctx?: ReduceContext): string | null {
-  const accolade = heathBranchWords(choose, optionId, names, game) ?? rhovanionBranchWords(choose, optionId, names, game) ?? nightBranchWords(choose, optionId, names, source, now) ?? framsburgBranchWords(choose, optionId, now?.rows) ?? gundabadBranchWords(choose, optionId, game) ?? fateBranchWords(choose, optionId, now?.rows, game, ctx);
+  const accolade = heathBranchWords(choose, optionId, names, game) ?? rhovanionBranchWords(choose, optionId, names, game) ?? nightBranchWords(choose, optionId, names, source, now) ?? framsburgBranchWords(choose, optionId, now?.rows) ?? gundabadBranchWords(choose, optionId, game) ?? fateBranchWords(choose, optionId, now?.rows, game, ctx) ?? armiesBranchWords(choose, optionId, names, now?.rows);
   if (accolade) return accolade;
   const offer = searchOffer(choose);
   if (offer) return optionId === "search" ? `Search for ${names.code(offer.code)}` : "Don't search: no treasure this scenario";

@@ -5,10 +5,9 @@
 // legalTargets list, or a number the engine computed (the Hide numbers, an attack and a defense). Nothing here writes a
 // number: a sheet names who does something, the reducer decides what happens.
 import type { Effect } from "../../catalog/boundary.ts";
-import { rejectionReason } from "../../rules/engine/legal.ts";
 import { effectById, effectsOf } from "../../rules/windows/listen.ts";
 import { endedInDefeat } from "../../rules/core/eliminate.ts";
-import { isLocationCard, isLocationId, printedOf } from "../../rules/core/printed.ts";
+import { isLocationId } from "../../rules/core/printed.ts";
 import { engagementCostOf, questPointsOf } from "../../rules/quest/quest.ts";
 import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
@@ -38,12 +37,13 @@ import { archerySheet, defenseSheet, extraDefender, playerAttackSheet } from "./
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { STEP_WORDS } from "../phases/rail.ts";
+import { travelRefusals } from "./travel-refusals.ts";
+import { armiesOptionLabel } from "../words/scenarios/the-hobbit/armies.ts";
+import { ARMIES_STAGE_FRAME } from "../../rules/families/armies/stages.ts";
 import { DEFENDERS_FRAME } from "../../rules/families/defense/defenders.ts";
 import { viewOf } from "../../rules/families/breaking/areas.ts";
 import { questSeat } from "../store/selectors.ts";
-import { freeSlot } from "../../rules/families/south/locations.ts";
 import { recordsOfFace } from "../../rules/families/dreamchaser/faces.ts";
-import { islandMayTravel } from "../../rules/families/island/travel.ts";
 import { hideCommitLimit } from "../../rules/families/nightmare/guards.ts";
 import { eyesStat, fortitudeCommitCheck, fortitudeCommitNote, fortitudeCountNote, fortitudePassCaution } from "../readouts/fortitude.ts";
 import { escapeCommitNote, escapeCountNote, escapePassCaution, escapeStat } from "./escape-notes.ts";
@@ -57,7 +57,7 @@ import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/
 import { fatePassCaution } from "../words/scenarios/fate.ts";
 import { gundabadOptionLabel, gundabadPassCaution } from "../words/scenarios/gundabad.ts";
 import { gundabadRow } from "./gundabad-sheets.ts";
-import { TIMING_WORDS, type SheetStat, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
+import { TIMING_WORDS, type SheetStat, type PickOption, type Sheet, type SheetNames, type TriggerOption } from "./sheet-types.ts";
 
 function effectOf(ctx: ReduceContext, effectId: string): Effect | undefined {
   return effectById(ctx, effectId);
@@ -100,26 +100,6 @@ export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: r
     });
   }
   return options;
-}
-
-/**
- * The locations in staging the players cannot travel to, each with the reducer's reason and the card's Travel line
- * (Weathertop while The One Ring is exhausted or gone: 141046:A:3, rr.travel). Nothing is listed while the active location slots are full.
- */
-export function travelRefusals(whole: ScenarioState, ctx: ReduceContext, names: SheetNames, targets: readonly string[]): Unavailable[] {
-  // Once stages are separate the traveler has its own active location and staging area (mec109.multiple-staging-areas).
-  const game = viewOf(whole, questSeat(whole));
-  // Under Exploration the active location stays: the refusals matter once it is full and the players may travel from it (families/island/travel.ts).
-  if (!freeSlot(game) && !islandMayTravel(game, ctx.cards)) return [];
-  return game.staging.flatMap((id): Unavailable[] => {
-    const card = game.cards[id];
-    if (!card || targets.includes(id) || !isLocationCard(printedOf(ctx.cards, card.code))) return [];
-    const reason = rejectionReason(game, { type: "Travel", locationId: id }, ctx);
-    if (!reason) return [];
-    const travel = recordsOfFace(card, effectsOf(ctx, card.code)).find((effect) => effect.timing === "travel");
-    const line = lineOf(travel, names) ?? grantedTravelWords(game, id);
-    return [{ id, label: cardLabel(game, names, id), code: pictureKey(card), reason: line ? `${reason}. ${line}` : `${reason}.` }];
-  });
 }
 
 /**
@@ -280,7 +260,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         // The claim of a freed guarded treasure is the settle sweep's, not the Setup that guarded it.
         step: isFreedTreasureClaim(game, ctx, source, data?.picked?.at(-1) ?? null) ? "Claim" : effect ? TIMING_WORDS[effect.timing] : step(game),
         // Stand Together's further defenders (families/defense/defenders.ts): the sheet names the attack it is about.
-        title: source ? names.card(source) : defending && game.pendingAttack ? `${names.card(game.pendingAttack.enemyId)} attacks` : "Choose",
+        title: data?.effectId === ARMIES_STAGE_FRAME ? "Current quest stage" : source ? names.card(source) : defending && game.pendingAttack ? `${names.card(game.pendingAttack.enemyId)} attacks` : "Choose",
         ...(defending && game.pendingAttack ? { stats: statOf(game, ctx, game.pendingAttack.enemyId, "attack") } : {}),
         primary: null,
         alternative: null,
@@ -349,7 +329,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // A Sack card's tie: the number the characters tie on (131044:A:1 to 131050:A:1).
           const tied = wait?.kind === "target" ? sackStat(wait.item.instruction, id, game, ctx) : [];
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
-          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words, ctx.cards) ?? gundabadOptionLabel(wait.item.instruction, id, game, ctx, words) ?? (isBoonCode(wait.item.instruction, id) ? words.code(id) : null)) : null;
+          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words, ctx.cards) ?? gundabadOptionLabel(wait.item.instruction, id, game, ctx, words) ?? (isBoonCode(wait.item.instruction, id) ? words.code(id) : null) ?? armiesOptionLabel(wait.item.instruction, id, game, ctx, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.
           // A pick that puts damage on a location or a character, or takes it off a location: the damage it would stand at, as a mark, with a caution when it burns the location or loses the game.
           const fire = wait?.kind === "target" ? (fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) ?? gundabadRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names.card(id))) : null;

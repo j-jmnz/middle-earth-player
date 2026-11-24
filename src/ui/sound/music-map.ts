@@ -145,6 +145,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "dungeons-deep-and-caverns-dim": UNDERGROUND,
   "flies-and-spiders": FOREST,
   "the-lonely-mountain": DRAGONS,
+  "the-battle-of-five-armies": { calm: "rohan", combat: "pelennor" },
 };
 
 /** The loop a table plays: its scenario's combat loop during the Combat phase, its calm loop otherwise, and the menu's for a scenario with no pair. */
