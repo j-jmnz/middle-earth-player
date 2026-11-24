@@ -90,7 +90,7 @@ export function turnHiddenCard(state: ScenarioState, instruction: Verb<"TurnHidd
     const data = effectData(state);
     if (!data) return state;
     const choose = { verb: "Choose", who: "actor", options: holders.map((seat) => ({ id: `seat:${seat}`, instructions: [{ ...instruction, seat }] })) } as Instruction;
-    return patchTop(state, { data: { ...data, queue: [{ instruction: choose, seat: focus.seat, chosen: null }, ...data.queue] } });
+    return patchTop(state, { data: { ...data, queue: [{ instruction: choose, seat: focus.seat, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, ...data.queue] } });
   }
   const found = randomHidden(state, instruction.seat);
   if (!found) return state;

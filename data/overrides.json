@@ -1163,6 +1163,18 @@
     },
     {
       "match": {
+        "code": "06131"
+      },
+      "set": {
+        "keywords": {
+          "surge": false
+        }
+      },
+      "reason": "Conflict at the Crossroads prints no Surge keyword: its When Revealed text says \"Conflict at the Crossroads gains surge\" only when no Orc enemies are engaged with players. Hall of Beorn lists Surge as a keyword, so the card would surge every time; the record gains it conditionally.",
+      "source": "scan 06131.A (data/printed/against-the-shadow.json, no keyword line)"
+    },
+    {
+      "match": {
         "code": "144075"
       },
       "set": {
