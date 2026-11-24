@@ -7,10 +7,10 @@ import type { ScenarioState } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { archeryRecipients, archeryTotal } from "../../../rules/combat/combat.ts";
 import { playCost } from "../../../rules/player/attach.ts";
-import { legalTargets } from "../../../rules/engine/reduce.ts";
+import { legalIntents, legalTargets, type PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { resolveAmount } from "../../../rules/interpret/amounts.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
-import { idOf, resolveRecords, statOf, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
+import { idOf, resolveRecords, send, start, statOf, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
 import { CODES, run, table } from "../../../../test/scenarios/the-druadan-forest/table.ts";
 
 const { clearing: CLEARING, garden: GARDEN, glade: GLADE, hunter: HUNTER, elite: ELITE, drummer: DRUMMER, untimelyEnd: STAGE_2 } = CODES;
@@ -144,5 +144,34 @@ describe("06043:B:1 An Untimely End", () => {
     expect(recipients.every((id) => allies.state.cards[id]?.code === "ally")).toBe(true);
     const other = table({ staging: [ELITE], play: ["ally"] });
     expect(archeryRecipients(other.state, other.ctx.cards).some((id) => other.state.cards[id]?.zone === "heroes")).toBe(true);
+  });
+});
+
+describe("06046:A:1 the case a row cannot show", () => {
+  it("06046:A:1 a Wose that is engaged keeps its printed Threat: the Drummer's bonus is for the staging area", () => {
+    const made = table({ staging: [DRUMMER], engaged: [CODES.thief] });
+    expect(statOf(made.state, made.ctx.cards, CODES.thief, "threat")).toBe(2);
+  });
+});
+
+describe("06045:A:1 allies cannot defend against Drû-buri-Drû", () => {
+  // The first seat's engaged enemy attacks in the combat phase: the passes and the choice of the enemy are answered until the defense window opens, and the characters that may defend are the legal targets.
+  const defenders = (enemy: string): string[] => {
+    const made = table({ phase: "Encounter", engaged: [{ code: enemy, seat: 0 }], play: ["ally"] });
+    let run = send(start(made.state), { type: "DeclineEngage" }, made.ctx);
+    for (let guard = 0; guard < 40 && run.state.window?.kind !== "defense"; guard += 1) {
+      const intent = run.state.window?.kind === "chooseEnemy" ? { type: "ChooseEnemy" as const, enemyId: run.state.window.options[0] ?? "" } : legalIntents(run.state, made.ctx).find((candidate) => candidate.type === "Pass" || candidate.type === "DeclineAttack");
+      if (!intent) break;
+      run = send(run, intent as PlayerIntent, made.ctx);
+    }
+    return legalTargets(run.state, { type: "DeclareDefender" }, made.ctx).map((id) => run.state.cards[id]?.code ?? "");
+  };
+
+  it("06045:A:1 the ally is not a legal defender against him, and the heroes are", () => {
+    expect(defenders(CODES.druBuriDru)).toEqual(["dh1", "dh2"]);
+  });
+
+  it("06045:A:1 the ally may defend against another enemy", () => {
+    expect(defenders(DRUMMER)).toContain("ally");
   });
 });
