@@ -29,15 +29,19 @@ export type IthilienPolicy = {
 };
 export const DEFAULT_POLICY: IthilienPolicy = { choose: "first", holdRounds: 0 };
 
+/** The archery policy of every game of this scenario (the goldens and the saved fixtures): the damage goes to the least damaged character, never to a staged ally objective (Celador, an Ithilien Guardian). Null outside an archery window. */
+export function archeryAnswer(state: ScenarioState, ctx: ReduceContext): PlayerIntent | null {
+  if (state.window?.kind !== "archery") return null;
+  const heroes = legalTargets(state, { type: "Distribute" }, ctx).filter((id) => !["05025", "05026"].includes(state.cards[id]?.code ?? ""));
+  const least = [...heroes].sort((left, right) => (state.cards[left]?.damage ?? 0) - (state.cards[right]?.damage ?? 0))[0];
+  return least ? { type: "Distribute", assignments: [{ cardId: least, amount: state.window.total }] } : null;
+}
+
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
 export function ithilienIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: IthilienPolicy = DEFAULT_POLICY): PlayerIntent {
   if (state.window?.kind === "choose") return { type: "Choose", optionId: (policy.choose === "last" ? state.window.options.at(-1) : state.window.options[0]) ?? "" };
-  // Archery damage goes to the least damaged hero, and never to a staged ally objective (Celador, an Ithilien Guardian).
-  if (state.window?.kind === "archery") {
-    const heroes = legalTargets(state, { type: "Distribute" }, ctx).filter((id) => !["05025", "05026"].includes(state.cards[id]?.code ?? ""));
-    const least = [...heroes].sort((left, right) => (state.cards[left]?.damage ?? 0) - (state.cards[right]?.damage ?? 0))[0];
-    if (least) return { type: "Distribute", assignments: [{ cardId: least, amount: state.window.total }] };
-  }
+  const archery = archeryAnswer(state, ctx);
+  if (archery) return archery;
   if (state.round <= policy.holdRounds && state.mode === "questCommit" && state.window?.kind === "pass" && state.cards[state.questStage ?? ""]?.code === "05068") return { type: "Pass" };
   const attack = attackTogether(state, ctx);
   if (attack) return attack;
@@ -51,9 +55,9 @@ export type IthilienGame = PlayedGame;
 // The goldens (src/campaign/scenarios/into-ithilien/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type IthilienGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: IthilienDecks; outcome: "won" | "lost"; policy?: Partial<IthilienPolicy>; lossReason?: string };
 
-// The games to pin (about 600 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and Easy, through both paths of stage 1B (it skips stage 2 only while Celador is in the staging area):
+// The games to pin (.claude/rules/code-standards.md, Test cost): the four Normal wins, true solo and two-handed, through both paths of stage 1B (it skips stage 2 only while Celador is in the staging area), one Easy win and one loss for each way to lose:
 // "skip" games quest with every seat at once, so Celador is in the staging area when Ambush in Ithilien is defeated and Southron Counter-attack is bypassed; "stage 2" games hold the heroes back for two rounds (`holdRounds`), so Celador is
-// destroyed in the staging area first and Southron Counter-attack is played. The losses are the two ways to lose here: the threat of every player at 50 (heroes too weak to quest) and every hero destroyed (heroes too brittle).
+// destroyed in the staging area first and Southron Counter-attack is played. The losses are the two ways to lose here: the threat of every player at 50 (heroes too weak to quest, solo) and every hero destroyed (heroes too brittle, two-handed).
 // The scenario has no Nightmare deck and no card that loses the game.
 export const ITHILIEN_GOLDENS: readonly IthilienGolden[] = [
   { name: "solo win, stage 2 bypassed", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won" },
@@ -61,10 +65,7 @@ export const ITHILIEN_GOLDENS: readonly IthilienGolden[] = [
   { name: "solo win, stage 2 played", seatCount: 1, seed: 11, difficulty: "Normal", decks: "strong", outcome: "won", policy: { holdRounds: 2 } },
   { name: "two-handed win, stage 2 played", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", policy: { holdRounds: 2 } },
   { name: "Easy solo win, stage 2 played", seatCount: 1, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won", policy: { holdRounds: 2 } },
-  { name: "Easy two-handed win, stage 2 bypassed", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "solo loss: threat 50", seatCount: 1, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
-  { name: "two-handed loss: threat 50", seatCount: 2, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
-  { name: "solo loss: every hero destroyed", seatCount: 1, seed: 5, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed loss: every hero destroyed", seatCount: 2, seed: 11, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain", policy: { holdRounds: 99 } },
 ];
 

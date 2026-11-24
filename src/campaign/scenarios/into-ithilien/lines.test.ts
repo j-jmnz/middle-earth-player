@@ -3,7 +3,9 @@
 // Each test builds its moment with the scene kit (the Setup test starts the game and plays nothing else). The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points. Celador has 2 Willpower, 2 Attack, 2 Defense and a Guardian 2, 2, 1.
 import { describe, expect, it } from "vitest";
 
-import { modifiedStat } from "../../../rules/core/keywords.ts";
+import { modifiedStat, placeDamage } from "../../../rules/core/keywords.ts";
+import { ruleCause } from "../../../rules/core/cause.ts";
+import { attachBlocked } from "../../../rules/interpret/restrictions.ts";
 import { archeryRecipients, archeryTotal } from "../../../rules/combat/combat.ts";
 import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { legalIntents, reduce, startScenario, type PlayerIntent } from "../../../rules/engine/reduce.ts";
@@ -20,6 +22,7 @@ import { ithilienStart, ithilienWorld } from "../../../../test/scenarios/into-it
 import { CODES, leaves, questPhase, table } from "../../../../test/scenarios/into-ithilien/table.ts";
 
 const BAT = "05050";
+const MUMAK = "05054";
 const { celador: CELADOR, guardian: GUARDIAN, company: COMPANY, road: ROAD, spider: SPIDER, mercenaries: MERCENARIES, battle: BATTLE, siege: SIEGE, hiddenWay: HIDDEN_WAY, approaching: APPROACHING } = CODES;
 
 const nextStage = (made: ReturnType<typeof table>): string | undefined => {
@@ -302,5 +305,26 @@ describe("05071:B:1 Approaching Cair Andros and 05071:B:3 the last stage", () =>
     const made = table({ stage: APPROACHING });
     const advanced = advanceStage(made.state, made.ctx.cards, [], () => true);
     expect(advanced.stageCleared).toBe(true);
+  });
+});
+
+describe("05054:A:1 and 05054:A:2 Mûmak", () => {
+  const hit = (made: ReturnType<typeof table>, state: ScenarioState, amount: number) => placeDamage(state, idOf(state, MUMAK), amount, made.ctx.cards, [], "framework", ruleCause("rr.damage"));
+  const damageOf = (state: ScenarioState) => state.cards[idOf(state, MUMAK)]?.damage;
+
+  it("05054:A:1 no attachment can be attached to it, though one can be attached to another enemy", () => {
+    const made = table({ staging: [MUMAK, "f0"], hand: ["attachment"], stage: BATTLE });
+    expect(attachBlocked(made.state, made.ctx, idOf(made.state, MUMAK), "attachment")).toBe(true);
+    expect(attachBlocked(made.state, made.ctx, idOf(made.state, "f0"), "attachment")).toBe(false);
+  });
+
+  it("05054:A:2 4 damage in one round places 3, a later hit the same round places none, and the next round it takes 3 again", () => {
+    const made = table({ staging: [MUMAK], stage: BATTLE });
+    const first = hit(made, made.state, 4);
+    expect(damageOf(first)).toBe(3);
+    expect(damageOf(hit(made, first, 1))).toBe(3);
+    // The cap is per round: the round's tally clears when the round ends.
+    const next = { ...first, roundDamage: {} };
+    expect(damageOf(hit(made, next, 5))).toBe(6);
   });
 });

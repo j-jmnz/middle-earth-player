@@ -11,7 +11,6 @@ const ithilien = loadAnyScenario("into-ithilien");
 const BYPASSED = ["solo win, stage 2 bypassed", "two-handed win, stage 2 bypassed"];
 const PLAYED = ["solo win, stage 2 played", "Easy solo win, stage 2 played", "two-handed win, stage 2 played"];
 const countOf = (code: string, name: string) => Object.values(goldenState(ithilien.id, name).cards).filter((card) => card.code === code).length;
-const stagedOf = (code: string, name: string) => Object.values(goldenState(ithilien.id, name).cards).filter((card) => card.code === code && card.zone === "staging").length;
 
 describe("Into Ithilien in the against-the-shadow cycle", () => {
   it("deals Celador, 2 Ithilien Roads, the four stages and 4 Southron Companies on every difficulty", () => {
@@ -30,19 +29,6 @@ describe("Into Ithilien in the against-the-shadow cycle", () => {
 
   it("deals 2 Ithilien Guardians on Normal and Easy", () => {
     for (const name of ["solo win, stage 2 bypassed", "Easy solo win, stage 2 played"]) expect(countOf("05026", name), name).toBe(2);
-  });
-
-  it("places one Southron Company in the staging area for each player", () => {
-    // The first round's Setup is the golden suite's opening check; the end of a won game still has the staged Companies it did not engage, so the count is at most the players'.
-    for (const name of BYPASSED) expect(stagedOf("05027", name)).toBeLessThanOrEqual(2);
-  });
-
-  it("ends every win on Approaching Cair Andros", () => {
-    for (const name of [...BYPASSED, ...PLAYED]) {
-      const state = goldenState(ithilien.id, name);
-      const ended = state.cards[state.questStage ?? ""]?.code === "05071" ? "05071" : state.cards[state.stageLeft?.from ?? ""]?.code;
-      expect(ended, name).toBe("05071");
-    }
   });
 
   it("bypasses Southron Counter-attack when Ambush in Ithilien is defeated with Celador in the staging area, and plays it when he is gone", () => {

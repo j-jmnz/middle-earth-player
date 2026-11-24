@@ -69,7 +69,7 @@ Scenario piles that place cards with no record (activeLocation: 05028 Ithilien R
 05028:A:1 (front): While Ithilien Road is the active location, the engagement cost of each enemy in the staging area is 0.
   05028:constant:1: Constant
     only if this card is the active location
-    - each enemy (any player controls) in the staging area only: stat engagementCost -99, while this card is in play
+    - each enemy (any player controls) in the staging area only: stat engagementCost -99, while this card is active
 
 05028:A:2 (shadow): Shadow: Return attacking enemy to the staging area after it attacks.
   05028:shadow:1: Shadow

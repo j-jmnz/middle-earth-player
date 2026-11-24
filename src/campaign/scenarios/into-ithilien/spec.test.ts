@@ -19,7 +19,6 @@ const WATCHER = "05051";
 const MERCENARIES = "05052";
 const ELITE = "05053";
 const SPIDER = "05049";
-const MUMAK = "05054";
 const SUPPORT = "05055";
 const BATTLE = "05068";
 const SIEGE = "05069";
@@ -67,9 +66,6 @@ const ROWS: readonly Row[] = [
 
   { line: "05053:A:1", name: "Forced: when it is added to the staging area it attacks the first player at once", layout: { staging: [ELITE], stage: BATTLE, deck: ["f0", "f0"] }, act: announce("addedToStaging", ELITE), expect: window("defense") },
   { line: "05053:A:2", name: "Shadow: the enemy attacks again, with a new shadow card (the shadow and a second one leave the deck)", layout: { stage: BATTLE }, act: attack("f3", { shadow: ELITE, undefended: true }), expect: deckCount(2) },
-
-  { line: "05054:A:1", name: "No attachment can be attached to it", layout: { staging: [MUMAK], stage: BATTLE }, act: [], expect: flag(MUMAK, "cannotHaveAttachments") },
-  { line: "05054:A:2", name: "It takes no more than 3 damage each round", layout: { staging: [MUMAK], stage: BATTLE }, act: [], expect: stat(MUMAK, "damageCap", 3) },
 
   { line: "05055:A:2", name: "When Revealed: each player searches the encounter deck for a Harad enemy and adds it to the staging area", layout: { stage: BATTLE, deck: [COMPANY, "f0", "f0"] }, act: reveal(SUPPORT), expect: zone(COMPANY, "staging") },
   { line: "05055:A:2", name: "The discard pile is searched too", layout: { stage: BATTLE, deck: ["f0", "f0"], discard: [COMPANY] }, act: reveal(SUPPORT), expect: zone(COMPANY, "staging") },

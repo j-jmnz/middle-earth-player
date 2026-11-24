@@ -210,8 +210,9 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
     // A card among a player's heroes is a hero: an ally that gained the hero card type sits there (heroType, families/play/sweep.ts).
     // An ally attached to another card (Wild Stallion) is an attachment while it is.
     const base = printed.type === "ally" && instance.host != null && instance.zone !== "heroes" ? "attachment" : cardTypeOf(instance, printed);
-    // An objective ally with printed combat stats (Mendor, 01135) a player controls is an ally in play (isAllyLike), and still an objective card.
-    const type = base === "objective" && instance.zone === "play" && instance.host == null && isAllyLike(printed) ? "ally" : base === "objective" && isAllyLike(printed) && committedInStaging(state, id) ? "ally" : base;
+    // An objective ally with printed combat stats (Mendor, 01135) a player controls is an ally in play (isAllyLike), and still an objective card; so is one committed from the staging area (Celador, families/pelargir/committed.ts).
+    const objectiveAlly = base === "objective" && isAllyLike(printed);
+    const type = objectiveAlly && ((instance.zone === "play" && instance.host == null) || committedInStaging(state, id)) ? "ally" : base;
     // An Objective-Location counts as a location as the active location, travelled to, explored or in the victory display, and stays an objective in the staging area (docs/scenarios/ered-mithrin/lost-in-mirkwood.md, Lost in Mirkwood): revealing one is no "revealed location".
     const typed = spec.type === "character" ? type === "hero" || type === "ally" : type === spec.type || (spec.type === "location" && printed.objectiveLocation && type === "objective" && instance.zone !== "staging") || (spec.type === "objective" && printed.type === "objective") || (spec.type === "attachment" && countsAsAttachment(state, id, ctx));
     if (!typed) return false;
