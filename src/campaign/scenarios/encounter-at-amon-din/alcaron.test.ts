@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";
+import { topFrame } from "../../../rules/windows/windows.ts";
 import { idOf, legalIntents, send } from "../../../../test/harness/scene-kit.ts";
 import { CODES, damageOn, runSettled, table, villagers } from "../../../../test/scenarios/encounter-at-amon-din/table.ts";
 
@@ -121,6 +122,9 @@ describe("06070:A:2 Lord Alcaron's Response", () => {
     const intent = offer(after, made);
     expect(intent).toBeDefined();
     expect(after.cards[idOf(after, alcaron)]?.controller).toBe(1);
+    // The window that offers the Trigger belongs to his controller (seat 1), not to seat 0.
+    expect(after.window).toMatchObject({ kind: "response", seat: 1 });
+    expect(topFrame(after)).toMatchObject({ seat: 1 });
   });
 });
 

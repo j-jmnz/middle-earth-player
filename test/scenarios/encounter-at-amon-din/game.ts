@@ -1,6 +1,7 @@
 import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
+import { inPlay } from "../../../src/rules/core/state.ts";
 import { effectById } from "../../../src/rules/windows/listen.ts";
 import { topFrame } from "../../../src/rules/windows/windows.ts";
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
@@ -50,8 +51,7 @@ export const STAGE_TWO = "06067";
 // The quest points of stage 2B.
 const QUEST_POINTS = 15;
 const codeOf = (state: ScenarioState, id: string | null | undefined): string => state.cards[id ?? ""]?.code ?? "";
-const inPlay = (card: { zone: string }) => card.zone === "staging" || card.zone === "engaged" || card.zone === "active" || card.zone === "play";
-export const ghulatInPlay = (state: ScenarioState): boolean => Object.values(state.cards).some((card) => card.code === GHULAT && inPlay(card));
+export const ghulatInPlay = (state: ScenarioState): boolean => Object.values(state.cards).some((card) => card.code === GHULAT && inPlay(card.zone));
 
 /** In a travel window: the location in the staging area with the most villager tokens. */
 function travelAnswer(state: ScenarioState, ctx: ReduceContext): PlayerIntent | null {

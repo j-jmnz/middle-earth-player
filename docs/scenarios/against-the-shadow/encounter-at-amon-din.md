@@ -41,7 +41,7 @@ The statuses are those of the Readings bullet of `docs/scenarios/against-the-sha
 - `06068:A:2` (recommended). "The end of the game" is the game's end by stage 2B (or an effect), not a check each round.
 - `06070:A:3` (span-settled). If Lord Alcaron leaves play (destroyed, discarded, removed, his controller eliminated: rr.player-elimination) the players lose, held while Ghulat is in play (rr.cannot).
 - `06070:A:3` (recommended). The loss that Ghulat held back is not forgotten: the players lose when Ghulat leaves play, because the end is blocked, not cancelled. No source speaks of it.
-- `06071:A:3` (researched). Ghulat leaves play when he is defeated to the Victory Display (Victory 2) or any other way; the held end then runs (R2, R5 above).
+- `06071:A:3` (researched). Ghulat leaves play when he is defeated to the Victory Display (Victory 2) or any other way; the held end then runs (R2; Hall of Beorn's Ghulat page, Sources read above).
 - `06071:A:3` (recommended). With every player eliminated and Ghulat in play the game ends in a loss anyway (rr.player-elimination); the hold does not keep a game with no player going. See Engine notes, Limits. Which reading the sources support: none settles it. `rr.cannot` ("absolute") read to the letter supports holding every end, and `rr.player-elimination` ("If all players are eliminated, the game ends in a loss for the players") is as unconditional; no FAQ or forum post names Ghulat with an elimination (R3, R4 and https://ffg-forum-archive.entropicdreams.com/topic/270842-encounter-at-amon-din do not). The record holds the ends the scenario writes and the engine ends the game for elimination, because no player is left to play on (recommended).
 
 ### Rescued Villagers, Dead Villagers and Lord Alcaron
@@ -54,7 +54,7 @@ The statuses are those of the Readings bullet of `docs/scenarios/against-the-sha
 ### Ghulat
 
 - `06071:A:1` (span-settled). X is the damage tokens on Dead Villagers, read each time the Attack is needed (rr.the-letter-x). Not taken: X fixed when he enters play or attacks.
-- `06071:A:2` (recommended). The Forced effect puts its damage token on Dead Villagers when he attacks, before his Attack is read, so that attack counts it; no villager token is discarded. Not taken: the token after the damage. "When" is before the attack resolves; no source says more (R2, R5 above).
+- `06071:A:2` (recommended). The Forced effect puts its damage token on Dead Villagers when he attacks, before his Attack is read, so that attack counts it; no villager token is discarded. Not taken: the token after the damage. "When" is before the attack resolves; no source says more (R2; Hall of Beorn's Ghulat page, Sources read above).
 
 ### The encounter cards
 

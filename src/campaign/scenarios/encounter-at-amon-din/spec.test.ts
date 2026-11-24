@@ -1,4 +1,4 @@
-// Rules: ats.villagers, ats.setup-amon-din-objectives, ats.villager-tokens-discarded, rr.reveal, rr.surge, rr.travel, rr.shadow-effects, rr.forced, rr.step-6-4-1, rr.step-6-4-3 (data/rules/entries.json). The lines that need a longer game moment are the tests of the files beside this one (setup.test.ts, villagers.test.ts, stage-one.test.ts, stage-two.test.ts, alcaron.test.ts, ghulat.test.ts, encounter-cards.test.ts, shadows.test.ts).
+// Rules: ats.villagers, ats.setup-amon-din-objectives, ats.villager-tokens-discarded, rr.reveal, rr.surge, rr.travel, rr.shadow-effects, rr.forced, rr.step-6-4-1, rr.step-6-4-3 (data/rules/entries.json). The lines that need a longer game moment are the tests of the files beside this one (setup.test.ts, villagers.test.ts, stage-one.test.ts, stage-two.test.ts, ending.test.ts, alcaron.test.ts, encounter-cards.test.ts, shadows.test.ts).
 import { describe, it } from "vitest";
 
 import { announce, answer, attack, cardSpecs, damageOn, deckCount, defend, endRound, handCount, lost, quest, reveal, resolve, resourcesOn, stagingThreat, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
@@ -31,7 +31,6 @@ const ROWS: readonly Row[] = [
   { line: "06066:A:1", name: "Setup, one player: Burning Farmhouse holds 4 villager tokens, Lord Alcaron is in play, Ghulat stays set aside and 1 card is revealed", layout: { stage: PROTECT, active: FARMHOUSE, staging: STAGING, setAside: [ALCARON, GHULAT], deck: ["f3", "f0", "f0"] }, act: resolve(SAVAGERY, "setup"), expect: [resourcesOn(FARMHOUSE, 4), zone(ALCARON, "play"), zone(GHULAT, "setAside"), deckCount(2)] },
   { line: "06066:A:1", name: "Setup, two players: 2 cards are revealed, 1 for each player", layout: { seats: 2, stage: PROTECT, active: FARMHOUSE, staging: STAGING, setAside: [ALCARON, GHULAT], deck: ["f0", "f0", "f0"] }, act: resolve(SAVAGERY, "setup"), expect: [resourcesOn(FARMHOUSE, 4), zone(ALCARON, "play"), deckCount(1)] },
   { line: "06066:B:1", name: "Villagers 5: the quest card is revealed with 5 villager tokens on it", layout: { stage: SAVAGERY, staging: STAGING }, act: resolve(SAVAGERY, "whenRevealed"), expect: resourcesOn(SAVAGERY, 5) },
-
 
   // Rescued Villagers: an explored location moves its tokens here, with no damage token.
   { line: "06068:A:1", name: "A location explored by a successful quest leaves play and its villager tokens move to Rescued Villagers (no damage token)", layout: { stage: PROTECT, active: { code: FARMHOUSE, progress: 4, resources: 3 }, staging: [{ code: RESCUED, resources: 1 }, DEAD] }, act: quest("success"), expect: [resourcesOn(RESCUED, 4), damageOn(DEAD, 0), zone(FARMHOUSE, "victory")] },

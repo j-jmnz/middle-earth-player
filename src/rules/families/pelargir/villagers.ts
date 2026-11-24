@@ -5,7 +5,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
 import { gameReads } from "../../core/game-reads.ts";
-import { flagged, inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay, updateCard, type CardInstance, type ScenarioState } from "../../core/state.ts";
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { restricted } from "../../interpret/restrictions.ts";
@@ -19,10 +19,13 @@ type Move = Extract<Instruction, { verb: "MoveVillagerTokens" }>;
 
 const RESCUED = "06068";
 
-/** The card in play with this code, or null. */
-function inPlayWith(state: ScenarioState, code: string): string | null {
-  return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id ?? null;
+/** The card in play with this code, or undefined. */
+export function cardInPlay(state: ScenarioState, code: string): CardInstance | undefined {
+  return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone));
 }
+
+/** The id of the card in play with this code, or null. */
+const inPlayWith = (state: ScenarioState, code: string): string | null => cardInPlay(state, code)?.id ?? null;
 
 /** The card a record names: a reference (the source, the active location, the picked card) or the card in play with a code. */
 function holder(state: ScenarioState, ref: Discard["from"], focus: Focus): string | null {
