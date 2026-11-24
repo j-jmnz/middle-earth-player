@@ -17,6 +17,7 @@ import { delayedLines, effectLines } from "./card-effects.ts";
 import type { PreviewCard } from "./card-preview.tsx";
 import { stageDetail } from "../readouts/fortress.ts";
 import { removalLimit } from "../readouts/against-the-shadow/cair-andros.ts";
+import { stewardsFearStageLines } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { advanceHold, questObjective, stagePoints } from "../readouts/objective.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { forestScore, forestStageWords } from "../readouts/standalone-scenarios/old-forest-words.ts";
@@ -52,7 +53,9 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   const objective = questObjective(game, ctx, line);
   // A stage 2 of The Old Forest has no quest points: it says what its Victory points test sends the quest to.
   const forest = forestScore(game, ctx);
-  return { title: name, detail: objective ? `To win: ${objective}` : forest ? forestStageWords(forest) : "No quest points" };
+  // Stages 1 and 2 of The Steward's Fear have no quest points either: their tokens against the 4 that advance them follow (06011:B:3, 06012:B:3).
+  const own = objective ? `To win: ${objective}` : forest ? forestStageWords(forest) : "No quest points";
+  return { title: name, detail: [own, ...stewardsFearStageLines(game, ctx, stage.code)].join(". ") };
 }
 
 /**

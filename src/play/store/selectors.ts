@@ -3,6 +3,7 @@
 // the hand slice alone (docs/architecture.md, State). The reducer keeps the references of the zones it did not touch;
 // these selectors only keep that property through the join of ids and instances.
 import { BLACK_GATE } from "../../rules/families/harad/under.ts";
+import { live as stewardsFear, stackUnder } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { isReanimatedCode } from "../../rules/core/printed.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import { flagged, type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
@@ -58,8 +59,8 @@ export function isPrisoner(card: Pick<CardInstance, "prisoner" | "zone" | "host"
   return card.prisoner === true && card.zone === "captive" && card.host == null;
 }
 
-/** Whether a staging card with more than one card under it shows one counted peek (layout.ts, `stacks`): a sea game (a grappled arm, Black Key) a game with the Harad deck (the enemies under The Black Gate, 144027:A:2) and Escape from Mount Gram (the captured cards under a host, up to 7 under a stage); every other game peeks each card. */
-export const stacksUnder = (state: { game: ScenarioState }): boolean => state.game.sea != null || state.game.piles?.haradDeck !== undefined || state.game.capture != null;
+/** Whether a staging card with more than one card under it shows one counted peek (layout.ts, `stacks`): a sea game (a grappled arm, Black Key) a game with the Harad deck (the enemies under The Black Gate, 144027:A:2) and Escape from Mount Gram (the captured cards under a host, up to 7 under a stage) and The Steward's Fear (the facedown underworld cards under a location); every other game peeks each card. */
+export const stacksUnder = (state: { game: ScenarioState }): boolean => state.game.sea != null || state.game.piles?.haradDeck !== undefined || state.game.capture != null || stewardsFear(state.game);
 
 const NONE: readonly string[] = [];
 const EMPTY: readonly CardInstance[] = [];
@@ -237,8 +238,8 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     const capturedHere = captured?.get(id) ?? NONE;
     const under = captives.length > 0 ? captives : captive ? [captive] : capturedHere;
     // The enemies grappled with a location are drawn facedown under it, as its attachments are (dcce.grapple).
-    // The enemies facedown under The Black Gate lie under it, one counted peek (144027:A:2).
-    const gated = card.code === BLACK_GATE ? cardsUnder(game, id) : NONE;
+    // The enemies facedown under The Black Gate lie under it, one counted peek (144027:A:2); the facedown underworld cards under a location of The Steward's Fear the same way (06018:A:1).
+    const gated = card.code === BLACK_GATE ? cardsUnder(game, id) : stackUnder(game, id);
     // The loot a location guards lies faceup under it, drawn as its attachments are (The Burglar's Turn, 22024:B:2); none in a game that dealt no loot deck.
     const loot = game.lootDecks ? lootUnder(game, id) : NONE;
     const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...loot, ...shadowCards(card), ...under, ...gated, ...(card.zone === "staging" ? grappledWith(game, id) : []), ...(card.zone === "activeLocation" ? guardedAllyOf(game, card) : [])]);

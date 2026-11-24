@@ -8,7 +8,7 @@ import { ruleDoc } from "./ledger.ts";
 
 export type KeywordKey =
   | "surge" | "peril" | "indestructible" | "permanent" | "sentinel" | "ranged" | "restricted" | "battle" | "siege" | "immune" | "sailing" | "uncharted"
-  | "phantom" | "dire" | "spectral" | "pass" | "ambush" | "hide" | "doomed" | "regenerate" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple" | "burn" | "pillage" | "massive";
+  | "phantom" | "dire" | "spectral" | "pass" | "ambush" | "hide" | "doomed" | "regenerate" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple" | "burn" | "pillage" | "massive" | "underworld";
 
 /** `word` is the keyword as printed, without its value; `rules` are the span ids that define it, most specific book first. `text`: a keyword no rules span defines (Burn X) says its definition itself, with the source it comes from. */
 export type RuleWord = { word: string; rules: readonly string[]; text?: { paragraphs: readonly string[]; source: string } };
@@ -39,6 +39,8 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
   uncharted: { word: "Uncharted", rules: ["dcce.uncharted"] },
   aflame: { word: "Aflame", rules: ["dcce.aflame"] },
   grapple: { word: "Grapple", rules: ["dcce.grapple"] },
+  // Underworld X (The Steward's Fear): a keyword the scenario's rules span defines (ats.underworld); the card's records carry it, so the chip reads its value from them (cards/card-keywords.ts).
+  underworld: { word: "Underworld", rules: ["ats.underworld"] },
   // Burn X (The Battle of Lake-town): printed on no rules span; the Quest Companion defines it (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town, Burn X).
   burn: {
     word: "Burn",
