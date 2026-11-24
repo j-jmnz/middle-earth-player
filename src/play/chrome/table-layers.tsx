@@ -36,6 +36,7 @@ import { WAITING, islandFit, islandPanelWidth, islandReadout, standingWords } fr
 import { foldTitle } from "../layout/row-fold.ts";
 import { areaRoleOf } from "../store/stormcaller-table.ts";
 import { AREA_LIST_TITLE } from "../words/scenarios/stormcaller.ts";
+import { facedownSplitWords } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 import { alwaysRows } from "./settings-words.ts";
 import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
 import { hidesFace, PILE_WORDS, pileIds, type PileId } from "../store/selectors.ts";
@@ -126,7 +127,7 @@ function SetAsideReading({ store, ctx, names, picture, onRead, onClose }: { stor
     const made = listCard(row.id, row.code, row.picture, names, picture, ctx.cards, setAsideWords(kindWords(ctx.cards.get(row.code)), keptWords(row.kept)));
     return { ...made, label: copiesLabel(made.label, row.count), spoken: copiesSaid(made.label, row.count) };
   });
-  return <SetAsideList title={SET_ASIDE_TITLE} head={setAsideHead(list.total)} cards={cards} facedown={list.facedown > 0 ? facedownWords(list.facedown) : null} onRead={onRead} onClose={onClose} />;
+  return <SetAsideList title={SET_ASIDE_TITLE} head={setAsideHead(list.total)} cards={cards} facedown={list.facedown === 0 ? null : list.deck ? facedownSplitWords(list.facedown, list.deck) : facedownWords(list.facedown)} onRead={onRead} onClose={onClose} />;
 }
 
 // The cards that make up the staging threat the quest meter draws (threat-sources.ts), each with the Threat it adds. A card the table hides

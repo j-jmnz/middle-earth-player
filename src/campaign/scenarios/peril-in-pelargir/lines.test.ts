@@ -1,6 +1,6 @@
 // Rules: rr.attachment-cards, rr.objective-cards, rr.ownership-and-control, rr.forced, rr.damage, rr.shadow-effects, rr.optional-engagement, rr.engagement-check, rr.travel, rr.reveal, rr.cancel, rr.quest-advancement, rr.step-3-4, hon.battle, mec109.setup (data/rules/entries.json).
 // The lines of Peril in Pelargir that a card-spec row cannot show (spec.test.ts holds the rest): the ones that need Alcaron's Scroll on a hero or on an enemy, a played Setup, a refused travel, an engagement the player chose, a held-back stage and the
-// first enemy of a round: 05019:A:1, 05019:A:2, 05020:A:1, 05020:A:2, 05021:A:1, 05024:A:2, 05037:A:2, 05038:A:2, 05039:A:2, 05040:A:1, 05042:A:1, 05043:A:1, 05044:A:2, 05065:A:1, 05065:B:1, 05066:B:1, 05066:B:2, 05066:B:3, 05067:B:1, 05067:B:2, 05067:B:3.
+// first enemy of a round: 05019:A:1, 05019:A:2, 05020:A:1, 05020:A:2, 05021:A:1, 05024:A:2, 05037:A:2, 05038:A:2, 05039:A:2, 05040:A:1, 05041:A:1, 05042:A:1, 05043:A:1, 05044:A:2, 05065:A:1, 05065:B:1, 05066:B:1, 05066:B:2, 05066:B:3, 05067:B:1, 05067:B:2, 05067:B:3.
 // Each test builds its moment with the scene kit (the Setup test starts the game and plays nothing else). The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points. The Scroll is put on a hero with `scrollTable` (test/scenarios/peril-in-pelargir/scroll.ts).
 import { describe, expect, it } from "vitest";
 
@@ -182,6 +182,30 @@ describe("05021 The Leaping Fish", () => {
   it("05021:A:1 with the Scroll on no hero nothing is discarded", () => {
     const table = tableFromLayout(SCENARIO, { phase: "Quest", staging: [FISH, SCROLL], deck: [THUG, "f0", "f0"] });
     expect(announced(table, questBegins).encounterDeck).toHaveLength(3);
+  });
+});
+
+describe("05041 Local Trouble", () => {
+  // The hero's own Action is a triggered ability: Glorfindel's pays 1 resource to heal 1 damage, exhausts nothing and readies nothing, so the one raise is the line's third event.
+  const glorfindel = (trouble: boolean) => {
+    const table = tableFromLayout(SCENARIO, { heroes: [{ code: "01011", resources: 1 }], ...(trouble ? { attached: [{ code: "05041", to: "01011" }] } : {}) }, { extra: ["01011"] });
+    const damaged = { ...table.state, cards: { ...table.state.cards, [table.hero]: { ...table.state.cards[table.hero]!, damage: 1 } } };
+    const hero = idOf(damaged, "01011");
+    const trigger = legalIntents(damaged, table.ctx).find((intent) => intent.type === "Trigger" && intent.cardId === hero);
+    expect(trigger).toBeDefined();
+    const done = finish(send({ state: damaged, steps: [] }, { ...trigger, payments: [{ heroId: hero, amount: 1 }] } as PlayerIntent, table.ctx), table.ctx);
+    return { before: damaged.seats[0]?.threat ?? 0, after: done.state.seats[0]?.threat, exhausted: done.state.cards[hero]?.exhausted };
+  };
+
+  it("05041:A:1 when the attached hero triggers an ability, his controller raises his threat by 1: Glorfindel's Action, with no exhaust or ready in it", () => {
+    const run = glorfindel(true);
+    expect(run.exhausted).toBe(false);
+    expect(run.after).toBe(run.before + 1);
+  });
+
+  it("05041:A:1 a hero without Local Trouble that triggers the same ability raises no threat", () => {
+    const run = glorfindel(false);
+    expect(run.after).toBe(run.before);
   });
 });
 

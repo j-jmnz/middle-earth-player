@@ -31,7 +31,7 @@ export const CODES = {
   alliance: "06029",
   flames: "06030",
   counsels: "06031",
-  streetThug: "05037",
+  pickpocket: "05037",
   cityStreet: "05038",
   lostInCity: "05040",
 } as const;

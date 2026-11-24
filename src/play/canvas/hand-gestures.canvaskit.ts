@@ -193,7 +193,7 @@ function useMouse({ layout, canvas, k, live, onTap, onPreview }: Args, scrub: Sc
       const slot = layout.slots[hitSlot(layout.slots, at.x, at.y)];
       if (!slot) return;
       if (slot.kind === "pile") onTap(slot.id);
-      else if (!slot.faceDown || slot.held || slot.dead) onPreview(slot.id);
+      else if (!slot.faceDown || slot.held || slot.dead || slot.opens) onPreview(slot.opens ?? slot.id);
     };
     window.addEventListener("pointermove", move, true);
     window.addEventListener("pointerdown", down, true);

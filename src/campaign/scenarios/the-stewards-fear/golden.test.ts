@@ -53,9 +53,9 @@ describe("The Steward's Fear golden", () => {
       expect(state.cards[state.questStage ?? ""]?.code === "06013" || state.cards[state.stageLeft?.from ?? ""]?.code === "06013", golden.name).toBe(true);
       // Stages 1 and 2 were advanced by their four resource tokens (Clues claimed and Underworld locations explored).
       for (const code of ["06011", "06012"]) expect(cardsOf(state, code)[0]?.resources, `${golden.name} ${code} tokens`).toBeGreaterThanOrEqual(4);
-      // No Villain in play, and the hidden one is not among those removed from the game.
+      // No Villain in play, and the hidden one was defeated: it lies in the victory display or the encounter discard pile, not in the removed zone.
       for (const code of VILLAINS) expect(cardsOf(state, code).some((card) => card.zone === "staging" || card.zone === "engaged"), `${golden.name} ${code} in play`).toBe(false);
-      expect(cardsOf(state, hidden?.villain ?? "")[0]?.zone, golden.name).not.toBe("removed");
+      expect(["victory", "encounterDiscard"], golden.name).toContain(cardsOf(state, hidden?.villain ?? "")[0]?.zone);
       expect(state.seats.slice(0, golden.seatCount).some((seat) => !seat.eliminated), golden.name).toBe(true);
     },
     lost(state, golden) {

@@ -38,7 +38,7 @@ export type FightKind = "defense" | "undefended" | "attack";
 // attackers.
 // `kind` and `ship` are what the table knows of the card's printing when it is given the facts (ZoneFacts): the fold order of staging reads the kind, and the
 // play area stands ships first (0 the Dream-chaser, 1 any other ship-objective). `area` is the card's place in the Stormcaller's area (stormcaller-table.ts): its group heads staging.
-export type ZoneEntry = { card: CardInstance; attached: readonly CardInstance[]; paired: readonly CardInstance[]; fight: FightKind | null; kind?: "enemy" | "location" | "other"; ship?: 0 | 1; area?: AreaRole };
+export type ZoneEntry = { card: CardInstance; attached: readonly CardInstance[]; stacked?: readonly string[]; paired: readonly CardInstance[]; fight: FightKind | null; kind?: "enemy" | "location" | "other"; ship?: 0 | 1; area?: AreaRole };
 
 /** What the zone selectors read of a card's printing: its type, and its place among the ships (null for a card that is no ship). Absent: nothing is known. */
 export type ZoneFacts = { typeOf: (code: string) => string | null; shipRank: (code: string) => 0 | 1 | null; pointsOf?: (game: ScenarioState, cardId: string) => number };
@@ -246,7 +246,7 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     const pair = pairs.get(id);
     const rank = facts?.shipRank(card.code) ?? null;
     const area = game.sea?.stormcaller ? areaRoleOf(game, id) : null;
-    entries.push({ card, attached, paired: pair ? cardsOf(game, pair.ids) : EMPTY, fight: pair?.kind ?? null, ...(facts ? { kind: kindOf(facts.typeOf(card.code)) } : {}), ...(rank != null ? { ship: rank } : {}), ...(area ? { area } : {}) });
+    entries.push({ card, attached, ...(card.code !== BLACK_GATE && gated.length > 0 ? { stacked: gated } : {}), paired: pair ? cardsOf(game, pair.ids) : EMPTY, fight: pair?.kind ?? null, ...(facts ? { kind: kindOf(facts.typeOf(card.code)) } : {}), ...(rank != null ? { ship: rank } : {}), ...(area ? { area } : {}) });
   }
   return entries;
 }

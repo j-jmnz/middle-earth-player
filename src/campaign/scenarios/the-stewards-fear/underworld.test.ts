@@ -125,7 +125,7 @@ describe("06020:A:1 Storehouse", () => {
     expect(Object.values(made.run.state.cards).some((card) => card.zone === "under")).toBe(false);
   });
 
-  it("06020:A:1 revealed from the encounter deck it takes 1 card, and found by Lost in the City it takes 1", () => {
+  it("06020:A:1 revealed from the encounter deck it takes 1 card", () => {
     const revealed = revealedTop(withDeck({}), CODES.storehouse);
     expect(underCodes(revealed, idOf(revealed, CODES.storehouse))).toHaveLength(1);
   });
@@ -166,7 +166,7 @@ describe("06022:A:1 and 06022:A:2 The Fourth Star", () => {
       const id = idOf(revealed, location);
       expect(revealed.cards[id]?.zone).toBe("staging");
       expect(underCodes(revealed, id), location).toHaveLength(amount);
-      expect(deckCodes(revealed), location).toHaveLength(DECK_CODES.length - amount - (location === CODES.sewers ? 0 : 0));
+      expect(deckCodes(revealed), location).toHaveLength(DECK_CODES.length - amount);
     }
   });
 

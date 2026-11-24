@@ -124,7 +124,7 @@ const game = standaloneGame<FearDecks, FearPolicy>({
   campaign: cycle,
   scenario: fear,
   stats: FEAR_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
+  // The scenario deals no Nightmare deck and no card besides its own piles, so the codes are the scenario's cards.
   codes: [...fear.cards.map((card) => card.code)],
   intent: fearIntent,
   policy: DEFAULT_POLICY,

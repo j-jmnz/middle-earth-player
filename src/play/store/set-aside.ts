@@ -20,6 +20,7 @@ import { memoOf, type StateMemo } from "../../rules/interpret/constant-records.t
 import { fromEncounterDeck, type PrintedCard } from "../../rules/core/printed.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
+import { underworldCount } from "../readouts/against-the-shadow/stewards-fear.ts";
 
 /**
  * A row of the list: the copies of one printed card that say the same, as one row. `id` is the first copy (the one a tap shows), `picture` the picture key of the side it lies on,
@@ -28,7 +29,8 @@ import { pictureKey } from "../canvas/picture-key.ts";
 export type SetAsideRow = { readonly id: string; readonly code: string; readonly picture: string; readonly kept: number; readonly count: number };
 
 /** The public set-aside cards by id, in a stable order that says nothing of when each was set aside (by name, then id); the same cards as rows; and the number of facedown ones. */
-export type SetAsideList = { readonly cards: readonly string[]; readonly rows: readonly SetAsideRow[]; readonly facedown: number };
+/** `deck`: how many of the facedown cards lie in The Steward's Fear's underworld deck (absent in any other game); the rest are the cards the Setup hides. */
+export type SetAsideList = { readonly cards: readonly string[]; readonly rows: readonly SetAsideRow[]; readonly facedown: number; readonly deck?: number };
 
 const EMPTY: SetAsideList = { cards: [], rows: [], facedown: 0 };
 
@@ -155,7 +157,8 @@ export function setAsideList(game: ScenarioState, ctx: ReduceContext): SetAsideL
       const row = rows.get(key);
       rows.set(key, row ? { ...row, count: row.count + 1 } : { id: entry.id, code: entry.code, picture: entry.picture, kept: entry.kept, count: 1 });
     }
-    return { cards: open.map((entry) => entry.id), rows: [...rows.values()], facedown };
+    const deck = Math.min(facedown, underworldCount(game));
+    return { cards: open.map((entry) => entry.id), rows: [...rows.values()], facedown, ...(deck > 0 ? { deck } : {}) };
   });
 }
 
@@ -171,15 +174,17 @@ export function setAsideCount(game: ScenarioState, ctx: ReduceContext): number {
  */
 export function setAsideKey(game: ScenarioState, ctx: ReduceContext): string {
   const list = setAsideList(game, ctx);
-  return [String(list.facedown), ...list.rows.map((row) => [row.id, row.code, row.picture, row.kept, row.count].join("\t"))].join("\n");
+  return [list.deck ? `${list.facedown}\t${list.deck}` : String(list.facedown), ...list.rows.map((row) => [row.id, row.code, row.picture, row.kept, row.count].join("\t"))].join("\n");
 }
 
-export function setAsideFromKey(key: string): { rows: readonly SetAsideRow[]; facedown: number; total: number } {
+export function setAsideFromKey(key: string): { rows: readonly SetAsideRow[]; facedown: number; deck?: number; total: number } {
   const [first = "0", ...lines] = key.split("\n");
   const rows = lines.map((line): SetAsideRow => {
     const [id = "", code = "", picture = "", kept = "0", count = "1"] = line.split("\t");
     return { id, code, picture, kept: Number(kept), count: Number(count) };
   });
-  const facedown = Number(first);
-  return { rows, facedown, total: facedown + rows.reduce((sum, row) => sum + row.count, 0) };
+  const [count = "0", inDeck = "0"] = first.split("\t");
+  const facedown = Number(count);
+  const deck = Number(inDeck);
+  return { rows, facedown, ...(deck > 0 ? { deck } : {}), total: facedown + rows.reduce((sum, row) => sum + row.count, 0) };
 }

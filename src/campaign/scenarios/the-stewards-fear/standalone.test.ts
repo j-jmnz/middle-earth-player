@@ -34,24 +34,14 @@ describe("The Steward's Fear in the against-the-shadow cycle", () => {
     expect(size(EASY)).toBe(11);
   });
 
-  it("keeps one Villain and one Plot in the game and removes the other two of each", () => {
+  it("leaves the Clues the players claimed in the victory display, and the hidden Villain in the encounter discard pile, in each win", () => {
+    // The Clues each game claimed (a claimed A Prisoner, A Scrap of History or Secret Map goes to the victory display; Secret Map may go there for its progress): the codes, not a count.
+    const claimed: Record<string, string[]> = { [NORMAL]: ["06028"], [TWO]: ["06026", "06028"], [EASY]: ["06026", "06027", "06028"] };
     for (const name of [NORMAL, TWO, EASY]) {
       const state = goldenState(fear.id, name);
-      for (const set of [["06015", "06016", "06017"], ["06029", "06030", "06031"]]) {
-        const zones = set.map((code) => cardsOf(code, name)[0]?.zone);
-        expect(zones.filter((zone) => zone === "removed"), `${name} ${set.join()}`).toHaveLength(2);
-      }
-      expect(state.lost, name).toBe(false);
-    }
-  });
-
-  it("leaves Clues the players claimed in the victory display, and the Villain out of play, in each win", () => {
-    for (const name of [NORMAL, TWO, EASY]) {
-      const state = goldenState(fear.id, name);
-      const victory = state.victory.map((id) => state.cards[id]?.code);
-      // Each stage 1 and 2 advanced on four tokens, so the players claimed or explored enough: a claimed Clue of 06026 or 06028 is a victory card, and so is a location explored.
-      expect(victory.length, name).toBeGreaterThan(0);
-      expect(["06015", "06016", "06017"].filter((code) => cardsOf(code, name).some((card) => card.zone === "staging" || card.zone === "engaged")), name).toEqual([]);
+      expect(state.victory.map((id) => state.cards[id]?.code).sort(), name).toEqual(claimed[name]);
+      const villains = ["06015", "06016", "06017"].flatMap((code) => cardsOf(code, name)).filter((card) => card.zone !== "removed");
+      expect(villains.map((card) => card.zone), name).toEqual(["encounterDiscard"]);
     }
   });
 });

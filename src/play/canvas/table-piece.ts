@@ -168,6 +168,7 @@ const SLOT_FIELDS = Object.keys({
   count: true,
   committed: true,
   held: true,
+  opens: true,
   dead: true,
   chained: true,
   stack: true,

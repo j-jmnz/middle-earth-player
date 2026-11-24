@@ -6,10 +6,12 @@
 import type { Effect } from "../../../catalog/boundary.ts";
 import type { CardInstance, ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
+import { cardsUnder } from "../../../rules/core/zones.ts";
+import { underworldDeck } from "../../../rules/families/pelargir/underworld.ts";
 import { resolveAmount } from "../../../rules/interpret/amounts.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
-import { allianceWords, clueDialName, clueDialWords, clueStageWords, counselsWords, deckDialName, deckDialWords, deckGoneWords, flamesDialName, flamesDialWords, flamesNearWords, flamesWords, stackPill, stackWords } from "../../words/scenarios/against-the-shadow/stewards-fear.ts";
+import { allianceWords, clueDialName, clueDialWords, clueStageWords, counselsWords, deckDialLists, deckDialName, deckDialWords, deckGoneWords, flamesDialName, flamesDialWords, flamesNearWords, flamesWords, stackPill, stackWords, takesWords } from "../../words/scenarios/against-the-shadow/stewards-fear.ts";
 import { ownerWords } from "../../words/owner.ts";
 import type { TableDial } from "../dials.ts";
 
@@ -25,7 +27,7 @@ const COUNSELS = "06031";
 export const live = (game: ScenarioState): boolean => game.scenarioId === SCENARIO;
 
 /** The cards of the underworld deck: the set-aside cards that hold a place in it. Only the count is ever said. */
-export const underworldCount = (game: ScenarioState): number => (live(game) ? game.setAside.filter((id) => game.cards[id]?.stackedAt != null).length : 0);
+export const underworldCount = (game: ScenarioState): number => (live(game) ? underworldDeck(game).length : 0);
 
 /** The value X of the card's Underworld X, read from its own record (a `TakeUnderworld` of the card on itself), or 0 for a card without one. */
 export function underworldValue(game: ScenarioState, ctx: ReduceContext, cardId: string): number {
@@ -40,8 +42,24 @@ export function underworldValue(game: ScenarioState, ctx: ReduceContext, cardId:
 /** The facedown cards under a card: the underworld stack a location holds in the staging area or as the active location. */
 export const stackUnder = (game: ScenarioState, cardId: string): readonly string[] => {
   const card = game.cards[cardId];
-  return live(game) && card && (card.zone === "staging" || card.zone === "activeLocation") ? Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId).map((other) => other.id) : [];
+  return live(game) && card && (card.zone === "staging" || card.zone === "activeLocation") ? cardsUnder(game, cardId) : [];
 };
+
+/** The location a facedown card lies under, when it is one of this scenario's stacks (the card a tap or a hold on the facedown card opens), or null. */
+export function stackHost(game: ScenarioState, cardId: string): string | null {
+  const card = game.cards[cardId];
+  return live(game) && card?.zone === "under" && card.face === "down" && card.host != null && stackUnder(game, card.host).includes(cardId) ? card.host : null;
+}
+
+/** The lines of the banner for the cards that went under a location in this intent, one for each location: the count and the place, never a card. */
+export function stackTakes(before: ScenarioState, after: ScenarioState, nameOf: (cardId: string) => string): string[] {
+  if (!live(after)) return [];
+  const counts = new Map<string, number>();
+  for (const card of Object.values(after.cards)) {
+    if (card.zone === "under" && card.host != null && before.cards[card.id]?.zone !== "under") counts.set(card.host, (counts.get(card.host) ?? 0) + 1);
+  }
+  return [...counts].map(([host, count]) => takesWords(count, nameOf(host)));
+}
 
 /** The pill on a location that holds an underworld stack, or null. Any location in staging or active counts: Sewers puts its card under the active location, whatever that is (06018:A:2). */
 export function stackMark(game: ScenarioState, cardId: string): ReturnType<typeof stackPill> | null {
@@ -81,16 +99,16 @@ export function stewardsFearDials(game: ScenarioState, ctx: ReduceContext, nameO
   if (!live(game)) return [];
   const dials: TableDial[] = [];
   const count = underworldCount(game);
-  if (!shuffledIn(game)) dials.push({ id: "underworld-deck", testID: "underworld-deck", label: "Deck", name: deckDialName, value: count, note: deckDialWords(count) });
+  if (!shuffledIn(game)) dials.push({ id: "underworld-deck", testID: "underworld-deck", label: "Underworld", name: deckDialName, value: count, note: deckDialWords(count), lists: deckDialLists(count), said: deckDialWords(count) });
   const stage = stageCard(game);
   const limit = stage ? advanceTokens(ctx, stage.code) : 0;
   if (stage && limit > 0) {
-    dials.push({ id: "clue-tokens", testID: "clue-tokens", label: "Clues", name: clueDialName(nameOf(stage.code)), value: stage.resources, limit, goal: true, cardId: stage.id, limitWords: `${limit} advance the stage`, note: clueDialWords(stage.resources, limit) });
+    dials.push({ id: "clue-tokens", testID: "clue-tokens", label: "Tokens", name: clueDialName(nameOf(stage.code)), value: stage.resources, limit, goal: true, cardId: stage.id, limitWords: `${limit} advance the stage`, note: clueDialWords(stage.resources, limit) });
   }
   const flames = Object.values(game.cards).find((card) => card.code === FLAMES && card.zone === "staging");
   if (flames) {
     const next = flames.resources + 1;
-    const short = game.seats.flatMap((seat, index) => (index < game.seatCount && !seat.eliminated && seat.deck.length <= next ? [{ index, cards: seat.deck.length }] : []))[0];
+    const short = game.seats.flatMap((seat, index) => (index < game.seatCount && !seat.eliminated && seat.deck.length <= next ? [{ owner: ownerWords(game.seatCount, index), cards: seat.deck.length }] : []));
     dials.push({
       id: "flames",
       testID: "flames-tokens",
@@ -98,7 +116,7 @@ export function stewardsFearDials(game: ScenarioState, ctx: ReduceContext, nameO
       name: flamesDialName(flames.resources),
       value: flames.resources,
       cardId: flames.id,
-      ...(short ? { warn: { level: "critical" as const, words: flamesNearWords(ownerWords(game.seatCount, short.index), short.cards, next) } } : {}),
+      ...(short.length > 0 ? { warn: { level: "critical" as const, words: flamesNearWords(short, next) } } : {}),
       note: flamesDialWords(flames.resources),
     });
   }

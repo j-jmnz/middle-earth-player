@@ -210,6 +210,14 @@ describe("06016:A:1 The Hand of Castamir", () => {
     expect(stagedCodes(done.state)).toEqual(["05037"]);
   });
 
+  it("06016:A:1 an enemy it reveals goes to the discard pile too: it is not added to the staging area and does not engage", () => {
+    const t = withDeck({ engaged: [{ code: CODES.castamir, seat: 0 }], deck: [CODES.pickpocket, "f0", "f0"] });
+    const done = resolveRecords(t.state, t.ctx, CODES.castamir, "forced", idOf(t.state, CODES.castamir));
+    expect(done.state.cards[idOf(done.state, CODES.pickpocket)]?.zone).toBe("encounterDiscard");
+    expect(stagedCodes(done.state)).toEqual([]);
+    expect(done.state.cards[idOf(done.state, CODES.castamir)]?.zone).toBe("engaged");
+  });
+
   it("06016:A:1 a location it reveals goes to the discard pile without entering play: no Underworld, no card in the staging area", () => {
     const t = withDeck({ active: "place", engaged: [{ code: CODES.castamir, seat: 0 }], deck: [CODES.sewers, "f0", "f0"] });
     const done = resolveRecords(t.state, t.ctx, CODES.castamir, "forced", idOf(t.state, CODES.castamir));
@@ -368,7 +376,7 @@ describe("06015:A:1 Daughter of Berúthiel", () => {
 
 describe("05037:A:2 Pickpocket's shadow here", () => {
   it("05037:A:2 with no attachment (and no Alcaron's Scroll in this scenario) nothing is discarded and nobody is asked", () => {
-    const made = fightEnemy((layout: Layout) => table(layout), CODES.streetThug, "f3", {}, { undefended: true });
+    const made = fightEnemy((layout: Layout) => table(layout), CODES.pickpocket, "f3", {}, { undefended: true });
     expect(made.run.state.window?.kind).not.toBe("choose");
     expect(made.run.state.seats[0]?.discard.filter((id) => made.run.state.cards[id]?.code === "attachment")).toHaveLength(0);
   });
