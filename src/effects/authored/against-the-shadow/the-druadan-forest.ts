@@ -8,6 +8,8 @@ import { copyLine, withCopies } from "../reprint.ts";
 // from the heroes of every player as a group (the first player chooses), the stage 3 attack and progress rules are flags of the pelargir family (families/pelargir/stage-attack.ts, stage-progress.ts), and The Passage Out and Drû-buri-Drû each hold the bar on winning.
 // Rules: ats.setup-the-druadan-forest, ats.prowl, ats.prowl-example, hon.siege, hon.archery, rr.staging, rr.surge, rr.travel, rr.cost, rr.victory, rr.destroy, rr.step-3-3, rr.step-3-4, faq.victory-display, faq.progress-without-advancing, faq.reveal-and-add (data/rules/entries.json).
 const WOSE: PickSpec = { type: "enemy", control: "any", trait: "Wose" };
+// Each Wose in play: engaged or in the staging area.
+const WOSE_IN_PLAY: PickSpec = { ...WOSE, staging: true };
 const ANY_HERO: PickSpec = { type: "hero", control: "any" };
 const OWN_HEROES: PickSpec = { type: "hero", control: "you" };
 const WITH_RESOURCES: PickSpec = { ...ANY_HERO, hasResources: true };
@@ -114,8 +116,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "06051:travel:1", cardCode: "06051", lines: ["06051:A:2"], timing: "travel", instructions: [{ verb: "EachPlayerSpends", amount: 1 }] },
 
     // 06052 Glade of Cleansing. A:1: each Wose in play gains archery 1 (the gains of two Glades add). A:2: its Threat X is the total archery value of the Wose with the most, the Glades' gains included.
-    { id: "06052:constant:1", cardCode: "06052", lines: ["06052:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "archery", amount: 1, until: "whileSourceInPlay", holders: WOSE }] },
-    { id: "06052:constant:2", cardCode: "06052", lines: ["06052:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { archeryOf: WOSE, max: true }, until: "whileSourceInPlay", target: "self" }] },
+    { id: "06052:constant:1", cardCode: "06052", lines: ["06052:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "archery", amount: 1, until: "whileSourceInPlay", holders: WOSE_IN_PLAY }] },
+    { id: "06052:constant:2", cardCode: "06052", lines: ["06052:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { archeryOf: WOSE_IN_PLAY, max: true }, until: "whileSourceInPlay", target: "self" }] },
 
     // 06053 Men in the Dark. A:1: each player, first player first, for each hero he controls pays 1 resource from that hero's pool or the hero takes 1 damage; with no damage dealt it gains surge (the X marker). A:2 (Shadow): +1 Attack for each hero the defending player controls with no resources.
     {
