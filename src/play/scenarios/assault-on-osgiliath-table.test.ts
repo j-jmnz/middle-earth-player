@@ -170,6 +170,13 @@ describe("the attack sheet, the readout and the turn reference (06096:A:2, 06097
     expect(readoutFor(plain, made.ctx, null, null, idName(made, plain))?.result).not.toMatch(/return/);
   });
 
+  it("the readout of an attack that no defender or hero answers yet says which locations return too", () => {
+    const run = atDefense(made, held);
+    expect(readoutFor(run.state, made.ctx, null, null, idName(made, run.state))?.result).toMatch(/^Undefended, a hero takes \d+; The King's Library and Ancient Harbor return to the staging area if nothing changes$/);
+    const bare = atDefense(made, controlling(made, made.state, [westQuarter]));
+    expect(readoutFor(bare.state, made.ctx, null, null, idName(made, bare.state))?.result).toMatch(/^Undefended, a hero takes \d+$/);
+  });
+
   it("the turn reference's 6.E step says the locations return, and is the ordinary step in another scenario", () => {
     const decision = (state: ScenarioState) => turnReference(state, () => null).flatMap((phase) => phase.steps).find((step) => step.id === "6.E")?.decision;
     expect(decision(held)).toBe("Each enemy attacks: declare one defender, or leave it undefended on a hero: West Gate, The King's Library, Ancient Harbor and The Old Bridge return to the staging area if you control them.");
@@ -204,6 +211,21 @@ describe("control taken by an explored location (06091:B:2)", () => {
     const other = { ...run.state, scenarioId: "the-stewards-fear" };
     const plain = logLines(nextRoundSteps([], { ...made.state, scenarioId: "the-stewards-fear" }, other, run.steps, made.ctx), logNames(made, other)).map((line) => line.text);
     expect(plain.some((line) => /control/.test(line))).toBe(false);
+  });
+});
+
+describe("the banner of an intent that takes control of several locations (06091:B:2)", () => {
+  it("never cuts a control line: the quest's own lines give way and the banner says how many it left out", () => {
+    const made = table({ phase: "Quest", active: { code: westQuarter, progress: 3 }, committed: ["dh1", "dh2"], staging: [harbor, library, CODES.bridge] });
+    const run = quested(made);
+    // Three more locations taken in the same intent (Street Fighting's, an Action): four control lines with the quest's own lines are over the banner's five.
+    const state = controlling(made, run.state, [harbor, library, CODES.bridge]);
+    const banner = momentOf(made.state, state, run.steps, { card: idName(made, state) });
+    const lines = banner?.lines.map((line) => line.text) ?? [];
+    for (const name of ["West Quarter", "Ancient Harbor", "The King's Library", "The Old Bridge"]) expect(lines, name).toContain(`${name}: You take control`);
+    expect(lines.filter((line) => /take control/.test(line))).toHaveLength(4);
+    expect(lines.at(-1)).toMatch(/^And \d+ more in the log$/);
+    expect(lines.length).toBeLessThanOrEqual(6);
   });
 });
 
