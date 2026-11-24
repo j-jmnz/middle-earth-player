@@ -3,7 +3,8 @@ import { expectOk } from "../../../src/rules/core/test-fixture.ts";
 import type { EngineStep } from "../../../src/rules/core/intents.ts";
 import { reduce, type ReduceContext } from "../../../src/rules/engine/reduce.ts";
 import type { PlayedGame } from "../../harness/game-kit.ts";
-import { controlledIds, TOWER, UNIQUE } from "./game.ts";
+import { TOWER } from "../../../src/rules/families/pelargir/ruined-tower.ts";
+import { controlledIds, UNIQUE } from "./game.ts";
 
 // Test helper. The moments of a played Assault on Osgiliath game that its goldens and its seed finder name, read from the states between the intents (`trail`): each is the index of the intent that made it, so a check asserts the
 // intent exactly and the table can be opened `--at` that many intents. `before(i)` is the state the intent i met, `trail[i]` the state it left.

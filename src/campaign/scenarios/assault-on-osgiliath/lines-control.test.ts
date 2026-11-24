@@ -9,6 +9,7 @@ import type { ScenarioState } from "../../../rules/core/state.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { finish, idOf, legalIntents, revealFromTop, send, start as begin, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
+import { sendUnledgered } from "../../../../test/harness/player-table.ts";
 import { payFor } from "../../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { BOROMIR, CODES, EVIL_CROW, cardOf, controlled, controlling, drive, opened, playOf, table, where } from "../../../../test/scenarios/assault-on-osgiliath/table.ts";
 
@@ -206,3 +207,65 @@ lineSpec("06096:A:2", "returns West Gate to the staging area when its controller
 lineSpec("06097:A:2", "returns The King's Library to the staging area when its controller lets an attack go undefended, with or without damage, and not when it is defended", (effects) => returnsWhenUndefended(CODES.library, effects));
 lineSpec("06098:A:3", "returns Ancient Harbor to the staging area when its controller lets an attack go undefended, with or without damage, and not when it is defended", (effects) => returnsWhenUndefended(CODES.harbor, effects));
 lineSpec("06099:A:3", "returns The Old Bridge to the staging area when its controller lets an attack go undefended, with or without damage, and not when it is defended", (effects) => returnsWhenUndefended(CODES.bridge, effects));
+
+/** Ravenhill Scout (04008) in the Action window of the combat phase of stage 06091, West Quarter active with 2 progress, and the locations of `staging` in the staging area; `held` are locations the first player controls. The trigger of its Action, when it is offered. */
+function scout(staging: readonly string[], held: readonly string[], effects: readonly Effect[]) {
+  const made = table({ phase: "Combat", active: { code: CODES.westQuarter, progress: 2 }, staging: [...staging, ...held], play: [{ code: "04008", seat: 0 }] }, effects, ["04008"]);
+  const state = syncConstants(controlling(made, made.state, held), made.ctx);
+  const trigger = legalIntents(state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === "04008:action:1");
+  return { made, state, trigger };
+}
+
+/** The Action of Ravenhill Scout played: West Quarter is the source, 2 progress is chosen (no ledger entry for 04008 yet, so its steps are sent unledgered). */
+function moveTwo(held: ReturnType<typeof scout>): ScenarioState {
+  const ctx = held.made.ctx;
+  let run = sendUnledgered(begin(held.state), held.trigger as PlayerIntent, ctx);
+  run = sendUnledgered(run, { type: "Choose", optionId: idOf(held.state, CODES.westQuarter) }, ctx);
+  for (let guard = 0; guard < 6 && run.state.window?.kind === "choose"; guard += 1) {
+    run = sendUnledgered(run, { type: "Choose", optionId: run.state.window.options.includes("2") ? "2" : (run.state.window.options[0] ?? "") }, ctx);
+  }
+  return run.state;
+}
+
+lineSpec("06091:B:1", "does not offer Ravenhill Scout's Action when every other location it could move progress to is in the staging area, so no progress is lost", (effects) => {
+  const made = table({ phase: "Combat", staging: [{ code: CODES.library, progress: 2 }, CODES.harbor], play: [{ code: "04008", seat: 0 }] }, effects, ["04008"]);
+  const trigger = legalIntents(syncConstants(made.state, made.ctx), made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === "04008:action:1");
+  expect(trigger).toBeUndefined();
+  expect(cardOf(made.state, "04008")?.exhausted).toBe(false);
+});
+
+lineSpec("06091:B:1", "moves Ravenhill Scout's progress to a controlled location only, never to a staged one", (effects) => {
+  const held = scout([CODES.library], [CODES.harbor], effects);
+  expect(held.trigger).toBeDefined();
+  const done = moveTwo(held);
+  expect(cardOf(done, CODES.westQuarter)?.progress).toBe(0);
+  expect(cardOf(done, CODES.harbor)?.progress).toBe(2);
+  expect(cardOf(done, CODES.library)?.progress).toBe(0);
+});
+
+lineSpec("04008:A:1", "moves Ravenhill Scout's progress to a staged location when the stage's bar is not in play", (effects) => {
+  const free = scout([CODES.library], [], effects.filter((effect) => effect.id !== "06091:constant:1"));
+  expect(free.trigger).toBeDefined();
+  const done = moveTwo(free);
+  expect(cardOf(done, CODES.westQuarter)?.progress).toBe(0);
+  expect(cardOf(done, CODES.library)?.progress).toBe(2);
+});
+
+lineSpec("06091:B:1", "moves Mirkwood Explorer's progress to the active location only, and does not offer the Action when only staged locations are left", (effects) => {
+  // Mirkwood Explorer (12037): "Exhaust Mirkwood Explorer to move all progress from it to a location in play."
+  const withProgress = (made: LayoutTable): ScenarioState => {
+    const id = idOf(made.state, "12037");
+    return syncConstants({ ...made.state, cards: { ...made.state.cards, [id]: { ...made.state.cards[id]!, progress: 1 } } } as ScenarioState, made.ctx);
+  };
+  const offered = (state: ScenarioState, made: LayoutTable) => legalIntents(state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === "12037:action:1");
+  const staged = table({ phase: "Combat", staging: [CODES.library], play: [{ code: "12037", seat: 0 }] }, effects, ["12037"]);
+  expect(offered(withProgress(staged), staged)).toBeUndefined();
+  const active = table({ phase: "Combat", active: { code: CODES.westQuarter }, staging: [CODES.library], play: [{ code: "12037", seat: 0 }] }, effects, ["12037"]);
+  const state = withProgress(active);
+  const trigger = offered(state, active);
+  expect(trigger).toBeDefined();
+  const done = sendUnledgered(begin(state), trigger as PlayerIntent, active.ctx).state;
+  expect(cardOf(done, "12037")?.progress).toBe(0);
+  expect(cardOf(done, CODES.westQuarter)?.progress).toBe(1);
+  expect(cardOf(done, CODES.library)?.progress).toBe(0);
+});

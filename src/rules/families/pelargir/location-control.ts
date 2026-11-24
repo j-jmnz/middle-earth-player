@@ -112,8 +112,6 @@ export function controlledTravelCost(state: ScenarioState, ctx: ReduceContext, l
   return { source: locationId, instructions: [{ verb: "LoseControlOfLocation", card: "self" }] };
 }
 
-export { TOWER };
-
 /** Ruined Tower may be traveled to as a second active location: exactly 1 active location is there and the second slot is free ("If there is 1 active location, exhaust a character to travel here. (There are now 2 active locations.)", 06103:A:1, faq.two-active-locations). */
 export function towerSecond(state: ScenarioState, locationId: string): boolean {
   return state.cards[locationId]?.code === TOWER && state.activeLocation != null && state.secondActiveLocation == null;
@@ -126,7 +124,7 @@ export function announceAddedToStaging(state: ScenarioState, instruction: Verb<"
   // The card is announced once: the pick is cleared, so a later player's search that finds no enemy does not announce it again.
   const announced = queueEvent(state, { trigger: "addedToStaging", seat: focus.seat, cardId: id });
   const data = effectData(announced);
-  return data && (instruction.card ?? "picked") === "picked" ? patchTop(announced, { data: { ...data, picked: [] } }) : announced;
+  return data && (instruction.card ?? "picked") === "picked" ? patchTop(announced, { data: { ...data, picked: (data.picked ?? []).filter((picked) => picked !== id) } }) : announced;
 }
 
 /** ActForDestroyedController: the player who controlled the character the attack destroyed (the effect's `destroyedCharacter`, which a shadow effect with this verb is given) acts for the instructions that follow, as for a Pick of "his" locations. With no destroyed character the actor stays. */

@@ -47,7 +47,6 @@ export const DEFAULT_POLICY: AssaultPolicy = { choose: "first", enemy: "", locat
 
 export const RETAKE = "06091";
 export const WEST_GATE = "06096";
-export { TOWER };
 /** The Osgiliath locations: the cards of the Assault on Osgiliath set that are locations (06096 to 06103). */
 export const OSGILIATH: ReadonlySet<string> = new Set(["06096", "06097", "06098", "06099", "06100", "06101", "06102", TOWER]);
 /** The unique locations the Setup offers. */

@@ -89,6 +89,10 @@ function pickedStepsIdle(state: ScenarioState, instructions: readonly Instructio
   if (second?.verb === "Pick" && steps.some((step) => step.verb === "MoveResources")) {
     return candidates.every((from) => pickCandidates(state, second.pick, seat, [from], sourceId, ctx).length === 0);
   }
+  // A second Pick that feeds a progress move (Ravenhill Scout) with no location left that a player card may place progress on (06091:B:1).
+  if (second?.verb === "Pick" && placesPicked(steps[1])) {
+    return candidates.every((from) => pickCandidates(state, second.pick, seat, [from], sourceId, ctx, undefined, undefined, false, { places: true }).length === 0);
+  }
   return false;
 }
 

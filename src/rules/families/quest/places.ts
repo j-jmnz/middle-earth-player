@@ -14,6 +14,7 @@ import { addModifier, modifiedStat } from "../../core/keywords.ts";
 import { pickedList } from "../../interpret/player-verbs.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { isLocationId } from "../../core/printed.ts";
+import { pickBarred } from "../pelargir/progress-bar.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { fireForced } from "../../windows/triggers.ts";
@@ -71,6 +72,8 @@ export function moveProgress(
   const toId = refCard(state, "picked", scope);
   const from = fromId ? state.cards[fromId] : undefined;
   if (!from || !fromId || !toId || !isLocationId(state, toId, ctx.cards) || fromId === toId) return state;
+  // Progress the destination may not take stays where it is (06091:B:1): the pick leaves such a location out, and nothing is removed here either.
+  if (pickBarred(state, toId, focus.sourceId, ctx.cards)) return state;
   const limit = instruction.amount == null ? from.progress : Math.min(from.progress, resolveAmount(state, instruction.amount, scope, ctx));
   const moved = instruction.all ? from.progress : limit;
   if (moved <= 0) return state;

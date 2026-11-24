@@ -12,9 +12,9 @@ export function playerProgressBarredOn(state: ScenarioState, id: string, byPlaye
   return byPlayerCard && state.modifiers.length > 0 && state.cards[id]?.zone === "staging" && flagged(state, "table", "noProgressInStagingByPlayer");
 }
 
-/** Whether the instruction after a Pick places progress on the card the Pick chose (PlaceProgressOn picked): the pick of a player card leaves out the locations the bar covers, so the ability is not offered with no target left (rr.triggered-ability). */
+/** Whether the instruction after a Pick places progress on the card the Pick chose (PlaceProgressOn picked, or MoveProgress, which places on the last pick): the pick of a player card leaves out the locations the bar covers, so the ability is not offered with no target left (rr.triggered-ability). */
 export function placesPicked(instruction: Instruction | undefined): boolean {
-  return instruction?.verb === "PlaceProgressOn" && instruction.target === "picked";
+  return instruction?.verb === "MoveProgress" || (instruction?.verb === "PlaceProgressOn" && instruction.target === "picked");
 }
 
 /** Whether a Pick that feeds a progress placement may not choose this location: a player card is the source and the bar holds on it. False in every game without the flag. */
