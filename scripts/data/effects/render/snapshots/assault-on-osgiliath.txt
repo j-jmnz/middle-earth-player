@@ -32,7 +32,7 @@ Scenario piles that place cards with no record (quest: 06091 Retake the City)
 
 06091:B:3 (back): If the players control all Osgiliath locations in play at the end of the round, they have won the game.
   06091:forced:2: Forced at the end of the round
-    only if the number of Osgiliath location (any player controls) is at most 0
+    only if all of: (the number of Osgiliath location (any player controls) in the staging area only is at most 0) and (the number of Osgiliath location (any player controls) that is the active location is at most 0)
     who acts: the acting player is the first player (a phase has no player of its own)
     - the players win the game
 
@@ -279,4 +279,4 @@ Scenario piles that place cards with no record (quest: 06091 Retake the City)
         * option "raise":
           - raise threat by the threat as the table shows it now of every location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) added up, read live (the acting player)
 
-(rendered pieces: 219 by template, 0 as JSON)
+(rendered pieces: 222 by template, 0 as JSON)
