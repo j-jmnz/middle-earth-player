@@ -114,6 +114,7 @@ export const PELARGIR_TEMPLATES: Templates = {
   }),
   DiscardHiddenCard: (i) => ({ text: `${i.who === "firstPlayer" ? "the first player" : "the acting player"} discards 1 hidden card chosen at random, unseen, to the encounter discard pile: it is not turned faceup, so nothing engages and no When Revealed effect resolves; with none nothing happens`, read: ["who"] }),
   HoldUnderStage: (i) => ({ text: `each card in play with code ${codeList(i.codes)} is placed under this stage: still in play, controlled by no player, committed to nothing; its text cannot be used and its leaving play is not announced`, read: ["codes"] }),
+  DiscardResolved: () => ({ text: "this card, a treachery turned faceup, goes to the encounter discard pile once its When Revealed effect is done (the engine's own last step of that frame)", read: [] }),
   GainControlOfSelf: () => ({ text: "this card passes to the first player's play area (each time the first player token passes); a card under a stage is not moved", read: [] }),
   GroupDiscardResources: (i, ctx) => ({
     text: `the players as a group discard ${amt(i.amount, ctx)} resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)`,
@@ -148,6 +149,7 @@ export const PELARGIR_SAMPLES: Samples = {
   DiscardHiddenCard: [{ verb: "DiscardHiddenCard", who: "firstPlayer" }],
   HoldUnderStage: [{ verb: "HoldUnderStage", codes: ["06132", "06133"] }],
   GainControlOfSelf: [{ verb: "GainControlOfSelf" }],
+  DiscardResolved: [{ verb: "DiscardResolved" }],
   GroupDiscardResources: [{ verb: "GroupDiscardResources", amount: 2 }],
   DiscardVillagerTokens: [{ verb: "DiscardVillagerTokens", from: "activeLocation", amount: 1 }, { verb: "DiscardVillagerTokens", from: { code: "06068" }, amount: { players: true } }],
   MoveVillagerTokens: [{ verb: "MoveVillagerTokens", from: { code: "06068" }, to: "picked", amount: 2 }, { verb: "MoveVillagerTokens", from: "subject", to: { code: "06068" }, all: true }],

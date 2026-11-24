@@ -67,7 +67,7 @@ function resolvePending(state: ScenarioState, pending: readonly Pending[], ctx: 
       continue;
     }
     // The last instruction of the frame puts the treachery in the discard pile, once its effects are done.
-    const leaves: Effect = { id: `${first.id}:discard`, cardCode: code, lines: first.lines, timing: "whenRevealed", instructions: [{ verb: "Discard", target: { kind: "self" } }] };
+    const leaves: Effect = { id: `${first.id}:discard`, cardCode: code, lines: first.lines, timing: "whenRevealed", instructions: [{ verb: "DiscardResolved" }] };
     next = pushCardEffects(next, "whenRevealed", id, seat, false, discard === true ? [...effects, leaves] : effects, ctx, steps);
   }
   return next;
@@ -113,4 +113,10 @@ export function turnHiddenCard(state: ScenarioState, instruction: Verb<"TurnHidd
   if (!found) return state;
   const pending: Pending[] = [];
   return turnOne(found.state, found.id, instruction.seat, { ...(instruction.damageEnemy != null ? { damage: instruction.damageEnemy } : {}), sourceId: focus.sourceId }, ctx, steps, pending);
+}
+
+/** DiscardResolved: the source card, a treachery turned faceup that lies in the staging area, goes to the encounter discard pile, with no step: a revealed treachery is discarded the same way once it is resolved. */
+export function discardResolved(state: ScenarioState, focus: Focus): ScenarioState {
+  const id = focus.sourceId;
+  return id != null && state.cards[id]?.zone === "staging" ? moveCard(state, id, { zone: "encounterDiscard" }) : state;
 }

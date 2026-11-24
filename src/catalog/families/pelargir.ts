@@ -109,6 +109,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("HoldUnderStage"), codes: z.array(code).min(1), ...when }),
   // "The first player gains control of Faramir" (06132:A:1, 06133:A:1): the source card passes to the first player's play area, each time the first player token passes. A card under a stage is not moved.
   z.strictObject({ verb: z.literal("GainControlOfSelf"), ...when }),
+  // The engine's own, last in the frame of a treachery that Lying in Wait turned faceup: the treachery lies in the staging area while its When Revealed effect resolves and goes to the encounter discard pile after it, as a revealed treachery does (rr.step-3-3). No record names it.
+  z.strictObject({ verb: z.literal("DiscardResolved"), ...when }),
 ] as const;
 
 const TRIGGERS = [

@@ -252,7 +252,9 @@ describe("The Blood of Gondor golden", () => {
           const steps = stepsByIntent(played, world(entry).ctx);
           steps.forEach((list, at) => {
             const text = list.map((step) => JSON.stringify(step)).join("\n");
-            for (const id of hiddenIds(played.trail?.[at] as ScenarioState)) expect(text.includes(`"${id}"`), `${entry.name} intent ${at}`).toBe(false);
+            // A card revealed or turned faceup in the intent was seen: when the deck runs out in the same staging step it is shuffled back and may be taken at once (Lying in Wait revealed, then Mordor Looms of the next seat takes it), and its own reveal steps name it.
+            const seen = new Set(list.filter((step) => step.kind === "reveal" || (step.kind === "push" && step.frame === "whenRevealed")).map((step) => (step as { cardId: string }).cardId));
+            for (const id of hiddenIds(played.trail?.[at] as ScenarioState)) if (!seen.has(id)) expect(text.includes(`"${id}"`), `${entry.name} intent ${at}`).toBe(false);
           });
         }
       });

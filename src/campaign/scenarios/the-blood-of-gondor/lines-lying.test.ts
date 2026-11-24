@@ -6,7 +6,8 @@ import { expect } from "vitest";
 import { stagingThreat } from "../../../rules/quest/quest.ts";
 import { replay } from "../../../rules/engine/undo.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
-import { idOf, legalIntents, legalTargets, revealedTop, send } from "../../../../test/harness/scene-kit.ts";
+import type { EngineStep } from "../../../rules/core/intents.ts";
+import { finish, idOf, legalIntents, legalTargets, revealedTop, revealFromTop, send } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import { CODES, drive, engagedCodes, hiddenCodes, hurt, opened, table, takes, where } from "../../../../test/scenarios/the-blood-of-gondor/table.ts";
 
@@ -48,8 +49,12 @@ lineSpec("06129:A:1", "a treachery turned by Lying in Wait stays out of the disc
   const made = table({ phase: "Quest", deck: [looms], discard: [] }, effects);
   const held = takes(made, made.state, 0);
   expect(hiddenCodes(held)).toEqual([looms]);
-  const revealed = revealedTop({ state: held, ctx: made.ctx }, lyingInWait);
+  const steps: EngineStep[] = [];
+  const done = finish({ state: revealFromTop(held, made.ctx, lyingInWait, steps).state, steps }, made.ctx);
+  const revealed = done.state;
   expect(hiddenCodes(revealed)).toEqual([]);
+  // The treachery is discarded as a revealed one is: no step calls it destroyed.
+  expect(done.steps.filter((step) => step.kind === "destroy")).toEqual([]);
   // Both treacheries are in the encounter piles; the reset that follows the reveal put the discard pile back into the empty deck.
   expect(revealed.encounterDeck.map((id) => revealed.cards[id]?.code).sort()).toEqual([lyingInWait, looms]);
 });

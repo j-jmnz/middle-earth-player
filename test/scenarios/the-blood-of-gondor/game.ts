@@ -150,7 +150,8 @@ export type BloodGolden = { name: string; seatCount: 1 | 2; seed: number; diffic
 // - solo loss, Faramir leaves play (seed 5);
 // - two-handed loss, Lord Alcaron leaves play (seed 2, weak heroes);
 // - solo loss, every hero destroyed (seed 2, brittle heroes);
-// - two-handed loss, threat 50 (seed 1, weak heroes).
+// - two-handed loss, threat 50 (seed 1, weak heroes);
+// - Easy two-handed loss (seed 1): the hidden cards drain the encounter deck until Mordor Looms surges with nothing left to reveal (the surge ends instead of revealing itself again).
 export const BLOOD_GOLDENS: readonly BloodGolden[] = [
   { name: "solo win", seatCount: 1, seed: 13, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win", seatCount: 2, seed: 10, difficulty: "Normal", decks: "strong", outcome: "won" },
@@ -159,6 +160,7 @@ export const BLOOD_GOLDENS: readonly BloodGolden[] = [
   { name: "two-handed loss: Lord Alcaron leaves play", seatCount: 2, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "Lord Alcaron left play" },
   { name: "solo loss: every hero destroyed", seatCount: 1, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed loss: threat 50", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
+  { name: "Easy two-handed loss: a surge on an empty deck, threat 50", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "lost", lossReason: "No seats remain" },
 ];
 
 const game = standaloneGame<BloodDecks, BloodPolicy>({

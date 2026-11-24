@@ -11,7 +11,7 @@ import { alcaronLoss } from "./ending.ts";
 import { actForDestroyedController, announceAddedToStaging, controlSweep, controlledTravelCost, controlledTravelReach, loseControlOfLocation, takeControlOfLocation, towerSecond } from "./location-control.ts";
 import { discardHiddenCard, hiddenAmount, takeHiddenCard, takeHiddenUnpayable } from "./hidden.ts";
 import { gainControlOfSelf, hiddenSweep, holdUnderStage } from "./hidden-sweep.ts";
-import { turnHiddenCard, turnHiddenCards } from "./hidden-turn.ts";
+import { discardResolved, turnHiddenCard, turnHiddenCards } from "./hidden-turn.ts";
 import { undefendedAnnounced } from "./undefended.ts";
 import { archeryOfAmount } from "./archery-of.ts";
 import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
@@ -104,6 +104,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return holdUnderStage(state, instruction, focus);
     case "GainControlOfSelf":
       return gainControlOfSelf(state, focus);
+    case "DiscardResolved":
+      return discardResolved(state, focus);
     default:
       return null;
   }
@@ -111,7 +113,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelargir",
-  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealSetAside", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens", "EachPlayerSpends", "GroupDiscardResources", "DamageCardThenSetX", "DiscardVillagerTokens", "MoveVillagerTokens", "PickFewestHitPointsLeft", "TakeControlOfLocation", "LoseControlOfLocation", "AnnounceAddedToStaging", "ActForDestroyedController", "TakeHiddenCard", "TurnHiddenCards", "TurnHiddenCard", "DiscardHiddenCard", "HoldUnderStage", "GainControlOfSelf"],
+  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealSetAside", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens", "EachPlayerSpends", "GroupDiscardResources", "DamageCardThenSetX", "DiscardVillagerTokens", "MoveVillagerTokens", "PickFewestHitPointsLeft", "TakeControlOfLocation", "LoseControlOfLocation", "AnnounceAddedToStaging", "ActForDestroyedController", "TakeHiddenCard", "TurnHiddenCards", "TurnHiddenCard", "DiscardHiddenCard", "HoldUnderStage", "GainControlOfSelf", "DiscardResolved"],
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,
