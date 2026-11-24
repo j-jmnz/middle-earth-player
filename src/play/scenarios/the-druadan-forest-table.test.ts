@@ -9,11 +9,14 @@ import { legalIntents } from "../../rules/engine/legal.ts";
 import { finish, idOf, send, start, tableFromLayout } from "../../../test/harness/scene-kit.ts";
 import { CODES, table } from "../../../test/scenarios/the-druadan-forest/table.ts";
 
+import { ledgerLine } from "../cards/ledger.ts";
+import { advanceWords } from "../readouts/quest-advance.ts";
 import { cardKeywords } from "../cards/card-keywords.ts";
 import { effectLines } from "../cards/card-effects.ts";
 import { dungeonDetail } from "../cards/dungeon-preview.ts";
 import { questTitle, tokenLines } from "../cards/table-preview.ts";
 import { archerySheet, playerAttackSheet } from "../choice/combat-sheets.ts";
+import { windowPoint } from "../phases/rail.ts";
 import { readoutFor } from "../readouts/readout.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
 import { momentOf } from "../store/outcome.ts";
@@ -120,12 +123,16 @@ describe("Ancestral Clearing and Garden of Poisons (06050:A:1, 06051:A:1, 06051:
 
 describe("stage 3 (06044:B:1, 06044:B:2, 06044:B:3, 06045:A:2, 06045:A:3)", () => {
   const stage3 = (extra: object = {}) => table({ seats: 1, stage: STAGE_3, phase: "PlayerAttacks", ...extra });
-  const stageLine = (made: Made, state: ScenarioState = made.state) => questTitle(state, made.ctx, state.questStage ?? "", "Stage", () => null)?.detail;
+  const stageLine = (made: Made, state: ScenarioState = made.state) => questTitle(state, made.ctx, state.questStage ?? "", "Stage", ledgerLine)?.detail;
+  const advanceDetail = (made: Made) => advanceWords(made.state, made.ctx, made.state.questStage ?? "", "Stage", ledgerLine).detail;
   const dials = (made: Made, state: ScenarioState = made.state) => scenarioDials(state, made.ctx, nameOf(made)).filter((dial) => dial.id === "dru");
 
+  // The real ledger reader: the stage's printed win line and the bar line must not repeat in the text, and no period is doubled.
+  const BAR_NOT_THERE = "The players win with 14 progress on this stage and Drû-buri-Drû in the victory display. 6 of 14 progress, and he is not there yet. Progress stays on the stage until both are true: 14 of 14 without him, nothing happens.";
   it("06044:B:3 the stage says what wins and where each half stands: Drû-buri-Drû in the staging area, in the victory display, or destroyed", () => {
     const staged = stage3({ progress: 6, staging: [DRU] });
-    expect(stageLine(staged)).toContain("The players win with 14 progress on this stage and Drû-buri-Drû in the victory display. 6 of 14 progress, and he is not there yet");
+    expect(stageLine(staged)).toBe(BAR_NOT_THERE);
+    expect(advanceDetail(staged)).toBe(BAR_NOT_THERE);
     const won = stage3({ progress: 14, victory: [DRU] });
     expect(stageLine(won)).toContain("14 of 14 progress, and he is there");
     const dead = stage3({ progress: 6, victory: [DRU] });
@@ -140,10 +147,10 @@ describe("stage 3 (06044:B:1, 06044:B:2, 06044:B:3, 06045:A:2, 06045:A:3)", () =
     expect(dial?.note).toBe("Drû-buri-Drû holds 2 of 6 progress. At 6 he goes to the victory display and his progress goes to the quest. The players win with 14 progress on the stage and Drû-buri-Drû in the victory display.");
   });
 
-  it("06044:B:3 once he is in the victory display the dial says Won and what the stage still needs", () => {
+  it("06044:B:3 once he is in the victory display the dial shows the stage's progress against its points, not a win, and what the stage still needs", () => {
     const made = stage3({ victory: [DRU], progress: 9 });
     const [dial] = dials(made);
-    expect(dial).toMatchObject({ word: "Won", value: 6, limit: 6, goal: true });
+    expect(dial).toMatchObject({ word: "9/14", value: 6, limit: 6, goal: true });
     expect(dial?.note).toBe("Drû-buri-Drû is in the victory display. The players win when the stage holds 14 progress: it holds 9.");
   });
 
@@ -158,7 +165,7 @@ describe("stage 3 (06044:B:1, 06044:B:2, 06044:B:3, 06045:A:2, 06045:A:3)", () =
     const made = stage3({ engaged: [HUNTER] });
     const sheet = playerAttackSheet(made.state, made.ctx, legalIntents(made.state, made.ctx), names);
     const next = sheet.kind === "pick" ? (sheet.options[0] as { next?: { kind: string; note?: string | null; options: { stats?: { icon: string }[] }[] } }).next : undefined;
-    expect(next?.note).toBe("Defense 3. Choose the characters that attack it. They attack with Willpower. Each point over its Defense is 1 progress on it, not damage.");
+    expect(next?.note).toBe("Willpower against Defense 3. Each point over is 1 progress, not damage. Choose the characters that attack it.");
     expect(next?.options[0]?.stats?.[0]?.icon).toBe("willpower");
     const plain = table({ seats: 1, stage: STAGE_2, phase: "PlayerAttacks", engaged: [HUNTER] });
     const other = playerAttackSheet(plain.state, plain.ctx, legalIntents(plain.state, plain.ctx), names);
@@ -172,9 +179,47 @@ describe("stage 3 (06044:B:1, 06044:B:2, 06044:B:3, 06045:A:2, 06045:A:3)", () =
     const buffed = { ...made.state, modifiers: [...made.state.modifiers, { instanceId: made.hero, sourceId: made.hero, stat: "willpower" as const, amount: 3, until: "endOfPhase" as const }] };
     const readout = readoutFor({ ...buffed, pendingStrike: { seat: 0, enemyId: idOf(made.state, HUNTER), attackerIds: [made.hero] } }, made.ctx, null, null, cardName(made, made.state));
     expect(readout?.stats.map((stat) => `${stat.icon} ${stat.value}`)).toEqual(["willpower 5", "defense 3"]);
-    expect(readout?.result).toBe("2 progress tokens on Drúadan Hunter, 3 of 3; it goes to the victory display and all 3 progress to the quest");
+    expect(readout?.result).toBe("2 progress on Drúadan Hunter, 3 of 3 progress; it goes to the victory display and all 3 progress to the quest");
     const short = readoutFor({ ...made.state, pendingStrike: { seat: 0, enemyId: idOf(made.state, HUNTER), attackerIds: [made.hero] } }, made.ctx, null, null, cardName(made, made.state));
     expect(short?.result).toBe("No progress");
+  });
+
+  // A real attack up to its "Before the attack ends" window. Blade Mastery in hand gives the table an action to take, so the windows before and after the damage open.
+  const attackToEnd = (code: string, willpower: number) => {
+    const made = table({ seats: 1, stage: STAGE_3, phase: "PlayerAttacks", engaged: [code], hand: ["01032"], heroResources: 3 }, undefined, ["01032"]);
+    const buffed = { ...made.state, modifiers: [...made.state.modifiers, { instanceId: made.hero, sourceId: made.hero, stat: "willpower" as const, amount: willpower, until: "endOfPhase" as const }] };
+    const enemy = idOf(made.state, code);
+    let run = send(start(buffed), { type: "DeclareAttackers", enemyId: enemy, attackerIds: [made.hero] }, made.ctx);
+    const said = (): string => readoutFor(run.state, made.ctx, null, null, cardName(made, run.state))?.result ?? "";
+    const before: string[] = [];
+    const rail: string[] = [];
+    for (let guard = 0; guard < 6 && run.state.pendingStrike?.awaiting !== "end"; guard += 1) {
+      const at = windowPoint(run.state);
+      if (at) rail.push(`${at.title}: ${at.note}`);
+      if (run.state.pendingStrike?.awaiting === "strike") before.push(said());
+      run = send(run, { type: "Pass" }, made.ctx);
+    }
+    expect(run.state.pendingStrike?.awaiting).toBe("end");
+    const at = windowPoint(run.state);
+    rail.push(`${at?.title}: ${at?.note}`);
+    return { before, after: said(), progress: run.state.cards[enemy]?.progress, rail };
+  };
+
+  it("06044:B:2 after the strike the readout shows what the enemy holds, not the strike added again", () => {
+    expect(attackToEnd(ELITE, 2)).toMatchObject({ before: ["2 progress on Drúadan Elite, 2 of 4 progress"], after: "2 of 4 progress on Drúadan Elite", progress: 2 });
+  });
+
+  it("06044:B:2 the rail words the windows of a stage 3 attack as progress, not damage", () => {
+    expect(attackToEnd(ELITE, 2).rail).toEqual(["Before progress: The attackers are declared. Progress is placed next.", "Before the attack ends: Progress is placed."]);
+    // A player attack on a stage without the flag keeps its words.
+    const made = table({ seats: 1, stage: STAGE_2, phase: "PlayerAttacks", engaged: [ELITE], hand: ["01032"], heroResources: 3 }, undefined, ["01032"]);
+    const run = send(start(made.state), { type: "DeclareAttackers", enemyId: idOf(made.state, ELITE), attackerIds: [made.hero] }, made.ctx);
+    expect(windowPoint(run.state)).toMatchObject({ title: "Before damage", note: "The attackers are declared. Damage is dealt next." });
+  });
+
+  it("06044:B:2 after a strike that fills the enemy the readout says it is in the victory display", () => {
+    const done = attackToEnd(HUNTER, 4);
+    expect(done.after).toBe("Drúadan Hunter is in the victory display; its progress is on the quest");
   });
 
   it("06044:B:2 the banner of an attack says Willpower and the progress it placed, and no \"No damage\" after it", () => {

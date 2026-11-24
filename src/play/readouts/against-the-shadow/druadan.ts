@@ -14,7 +14,7 @@ import { resolveAmount } from "../../../rules/interpret/amounts.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 import { questPointsOf } from "../../../rules/quest/quest.ts";
 
-import { druDialDoneNote, druDialLimit, druDialName, druDialNote, progressResultWords, winBarWords } from "../../words/scenarios/against-the-shadow/druadan.ts";
+import { druDialDoneNote, druDialLimit, druDialName, druDialNote, progressFilledWords, progressHeldWords, progressResultWords, winBarWords } from "../../words/scenarios/against-the-shadow/druadan.ts";
 import type { TableDial } from "../dials.ts";
 
 const SCENARIO = "the-druadan-forest";
@@ -96,14 +96,21 @@ export function druadanDials(game: ScenarioState, ctx: ReduceContext, nameOf: (c
   const hits = printedOf(ctx.cards, dru.code).health ?? 0;
   const name = nameOf(DRU_BURI_DRU);
   if (dru.zone === "victory") {
-    return [{ id: "dru", testID: "druadan-dru", label: "Drû", name: `${name} is in the victory display:`, value: hits, limit: hits, goal: true, word: "Won", cardId: dru.id, note: druDialDoneNote(name, stage?.progress ?? 0, points), limitWords: druDialLimit(name, hits) }];
+    return [{ id: "dru", testID: "druadan-dru", label: "Drû", name: `${name} is in the victory display:`, value: hits, limit: hits, goal: true, word: `${stage?.progress ?? 0}/${points}`, cardId: dru.id, note: druDialDoneNote(name, stage?.progress ?? 0, points), limitWords: druDialLimit(name, hits) }];
   }
   if (dru.zone !== "staging" && dru.zone !== "engaged") return [];
   return [{ id: "dru", testID: "druadan-dru", label: "Drû", name: druDialName(name), value: Math.min(dru.progress, hits), limit: hits, filled: Math.min(dru.progress, hits), goal: true, cardId: dru.id, note: druDialNote(name, dru.progress, hits, points), limitWords: druDialLimit(name, hits) }];
 }
 
-/** What the dock says of an attack that places progress: the tokens, the number they reach against the hit points, and whether that fills the enemy. Null while the damage is damage. */
-export function progressReadout(game: ScenarioState, ctx: ReduceContext, enemyId: string, strength: number, defense: number, name: string): string | null {
+/** What the dock says of an attack that places progress: before the strike the tokens it will place and the number they reach against the hit points; once it has struck (`placed`, the window before the attack ends) what the card holds. Null while the damage is damage. */
+export function progressReadout(game: ScenarioState, ctx: ReduceContext, enemyId: string, strength: number, defense: number, name: string, placed: boolean): string | null {
+  if (!progressAttack(game)) return null;
+  if (placed) {
+    const card = game.cards[enemyId];
+    if (card?.zone === "victory") return progressFilledWords(name);
+    const held = enemyProgress(game, ctx, enemyId);
+    return held ? progressHeldWords(held.progress, held.hits, name) : null;
+  }
   const held = enemyProgress(game, ctx, enemyId);
   if (!held) return null;
   const blocked = flagged(game, enemyId, "cannotTakeDamage") || flagged(game, enemyId, "combatDamageCanceled");

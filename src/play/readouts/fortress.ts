@@ -54,7 +54,10 @@ export function stageDetail(game: ScenarioState, ctx: ReduceContext, code: strin
   const defense = stageHasDefense(game) && game.questStage != null && game.cards[game.questStage]?.code === code;
   const loses = stageDefeatLoses(ctx, code);
   const fills = points != null && (defense || loses) ? defenseFillsWords(points, loses) : null;
-  return [fills, hold ?? (fills ? null : plain), defense ? DEFENSE_STAGE : null, ...cairAndrosStageLines(game, ctx, code), ...druadanStageLines(game, ctx, code, (id) => ctx.cards.get(id)?.name ?? id), ...stewardsFearStageLines(game, ctx, code)].filter((text) => text != null);
+  // Stage 3 of The Drúadan Forest says its own win bar: the printed win line that holds it back and the quest-point line would only repeat it (06044:B:3, 06045:A:3).
+  const druadan = druadanStageLines(game, ctx, code, (id) => ctx.cards.get(id)?.name ?? id);
+  const own = druadan.length > 0 ? [] : [hold ?? (fills ? null : plain)];
+  return [fills, ...own, defense ? DEFENSE_STAGE : null, ...cairAndrosStageLines(game, ctx, code), ...druadan, ...stewardsFearStageLines(game, ctx, code)].filter((text) => text != null);
 }
 
 /**

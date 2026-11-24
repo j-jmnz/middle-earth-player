@@ -10,7 +10,7 @@ import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, 
 
 import { undefendedRedirectWords } from "../readouts/against-the-shadow/cair-andros.ts";
 import { alliesArchery, willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
-import { ALLIES_ARCHERY_WORDS, WILLPOWER_ATTACK_WORDS } from "../words/scenarios/against-the-shadow/druadan.ts";
+import { ALLIES_ARCHERY_WORDS, willpowerAttackWords } from "../words/scenarios/against-the-shadow/druadan.ts";
 import { fateAttackNote, fateTargetNote } from "../words/scenarios/fate.ts";
 import { attackSource } from "../words/scenarios/grapple.ts";
 import { nightDefenderExcess, nightStageAttack } from "../words/scenarios/night.ts";
@@ -76,7 +76,7 @@ function attackersSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNam
     key: `attackers:${enemyId}`,
     step: "Combat",
     title: `Attack ${names.card(enemyId)}`,
-    note: fateTargetNote(game, ctx, enemyId, defense, names.card(enemyId)) ?? `Defense ${defense}. Choose the characters that attack it.${willpowerAttack(game) ? ` ${WILLPOWER_ATTACK_WORDS}` : ""}`,
+    note: fateTargetNote(game, ctx, enemyId, defense, names.card(enemyId)) ?? (willpowerAttack(game) ? `${willpowerAttackWords(defense)} Choose the characters that attack it.` : `Defense ${defense}. Choose the characters that attack it.`),
     verb: "Attack",
     stats: statOf(game, ctx, enemyId, "defense"),
     options: characters.map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, read) })),

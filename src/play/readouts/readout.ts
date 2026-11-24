@@ -168,7 +168,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const spectral = hasSpectral(game, enemyId, ctx.cards);
     const spectralNote = spectral ? "Willpower against a Spectral enemy. " : "";
     // Stage 3 of The Drúadan Forest: the characters attack with Willpower and the damage is progress on the enemy, against its hit points (06044:B:2), never damage and never "destroyed".
-    const progress = progressReadout(game, ctx, enemyId, total, defense, cardName(enemyId));
+    const progress = progressReadout(game, ctx, enemyId, total, defense, cardName(enemyId), strike?.awaiting === "end");
     if (progress != null) return { kind: "attack", stats: [WILL(total), DEFENSE(defense)], result: progress };
     return { kind: "attack", stats: [spectral ? WILL(total) : ATTACK(total), DEFENSE(defense)], result: `${spectralNote}${damageWords(total, defense, placed)}${after}` };
   }

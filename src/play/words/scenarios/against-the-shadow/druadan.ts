@@ -16,22 +16,29 @@ export const woseArcheryWords = (total: number, gains: readonly { name: string; 
 /** The preview of an enemy that holds progress while stage 3 turns its attack damage into progress: the tokens against its hit points, and what the full number does. */
 export const enemyProgressWords = (progress: number, hits: number): string => `${progress} of ${hits} progress. At ${hits} it goes to the victory display and its progress goes to the quest.`;
 
-/** The attack sheet's line while characters attack with Willpower and the damage is progress. */
-export const WILLPOWER_ATTACK_WORDS = "They attack with Willpower. Each point over its Defense is 1 progress on it, not damage.";
+/** The attack sheet's first sentence while characters attack with Willpower and the damage is progress: short, so the sheet does not cut it off. */
+export const willpowerAttackWords = (defense: number): string => `Willpower against Defense ${defense}. Each point over is 1 progress, not damage.`;
 
-/** The dock readout's line for an attack that places progress: how much, the tokens it will hold, and whether that fills it. */
+/** The dock readout's line for an attack that places progress: how much, the progress it will hold against the hit points, and whether that fills it. */
 export function progressResultWords(amount: number, name: string, held: number, hits: number): string {
   if (amount <= 0) return "No progress";
   const total = held + amount;
-  const text = `${plural(amount, "progress token")} on ${name}, ${Math.min(total, hits)} of ${hits}`;
+  const text = `${amount} progress on ${name}, ${Math.min(total, hits)} of ${hits} progress`;
   return total >= hits ? `${text}; it goes to the victory display and all ${total} progress to the quest` : text;
 }
 
-/** The stage 3 line: what wins the game, and where each half stands. `where`: Drû-buri-Drû's place now. */
+/** The dock readout's line once the attack has struck: the progress the enemy holds now. */
+export const progressHeldWords = (held: number, hits: number, name: string): string => `${held} of ${hits} progress on ${name}`;
+
+/** The dock readout's line once the strike filled the enemy: it is in the victory display and its progress is on the quest. */
+export const progressFilledWords = (name: string): string => `${name} is in the victory display; its progress is on the quest`;
+
+/** The stage 3 line: what wins the game, where each half stands, and that progress waits on the stage until both halves are true (06044:B:3, 06045:A:3). `where`: Drû-buri-Drû's place now. It ends with a period: it is the last line of the stage's text. */
 export function winBarWords(progress: number, points: number, where: "victory" | "play" | "gone", name: string): string {
-  if (where === "gone") return `${name} is out of play, so the players cannot win`;
+  if (where === "gone") return `${name} is out of play, so the players cannot win.`;
   const need = `The players win with ${points} progress on this stage and ${name} in the victory display`;
-  return where === "victory" ? `${need}. ${progress} of ${points} progress, and he is there` : `${need}. ${progress} of ${points} progress, and he is not there yet`;
+  const standing = where === "victory" ? `${progress} of ${points} progress, and he is there` : `${progress} of ${points} progress, and he is not there yet`;
+  return `${need}. ${standing}. Progress stays on the stage until both are true: ${points} of ${points} without him, nothing happens.`;
 }
 
 /** The dial of Drû-buri-Drû. */
