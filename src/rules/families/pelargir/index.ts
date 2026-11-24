@@ -10,6 +10,8 @@ import { takeControlOfStagedObjectives } from "./control.ts";
 import { archeryOfAmount } from "./archery-of.ts";
 import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
 import { noteFirstEnemy, pelargirCondition } from "./first-enemy.ts";
+import { damageCardThenSetX } from "./damage-noted.ts";
+import { groupDiscardResources } from "./group-discard.ts";
 import { eachPlayerSpends, eachPlayerSpendsUnpayable } from "./group-spend.ts";
 import { attachToHighestThreatCost } from "./host.ts";
 import { noResourcesMatches } from "./no-resources.ts";
@@ -64,6 +66,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return removeQuestTokens(state, instruction);
     case "EachPlayerSpends":
       return eachPlayerSpends(state, instruction);
+    case "DamageCardThenSetX":
+      return damageCardThenSetX(state, instruction, focus, ctx, steps);
+    case "GroupDiscardResources":
+      return groupDiscardResources(state, instruction, focus.seat, ctx);
     default:
       return null;
   }
@@ -71,7 +77,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelargir",
-  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealSetAside", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens", "EachPlayerSpends"],
+  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealSetAside", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens", "EachPlayerSpends", "GroupDiscardResources", "DamageCardThenSetX"],
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,

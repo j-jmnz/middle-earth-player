@@ -68,6 +68,11 @@ const VERBS = [
   // "Each player must pay 1 resource to travel here" (06051:A:2): every living player, the first player first, spends `amount` resources from his own heroes' pools, choosing the hero for each resource when more than one can pay. The players cannot travel here while any player holds fewer
   // than `amount` in all (rr.travel; src/rules/families/pelargir/group-spend.ts, the family's travel hook). A player's pools are his own: no resource of another player pays for him.
   z.strictObject({ verb: z.literal("EachPlayerSpends"), amount: positiveAmountSchema, ...when }),
+  // "Prowl X" (ats.prowl, ats.prowl-example): the players as a group discard `amount` resources from their heroes' pools, as many as they can. Each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest;
+  // what is left after every player had his turn is discarded as the first player chooses. A discard, not a spend. `rest` and `turns` are the engine's own: the resources still to discard and the players still to decide (src/rules/families/pelargir/group-discard.ts).
+  z.strictObject({ verb: z.literal("GroupDiscardResources"), amount: positiveAmountSchema, rest: z.number().int().optional(), turns: z.array(z.number().int()).optional(), ...when }),
+  // "Deal 1 damage to that hero. If no hero takes damage, ..." (06053:A:1): the picked card takes `amount` damage as DamageCard deals it, and the effect's X becomes `value` only when the card holds more damage once the responses to it were heard (damage that was canceled or prevented is not damage taken). `before` is the engine's own field.
+  z.strictObject({ verb: z.literal("DamageCardThenSetX"), amount: positiveAmountSchema, value: z.number().int().min(0), before: z.number().int().min(0).optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;

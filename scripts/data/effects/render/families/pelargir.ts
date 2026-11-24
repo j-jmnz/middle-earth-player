@@ -67,6 +67,14 @@ export const PELARGIR_TEMPLATES: Templates = {
     text: `each player, the first player first, spends ${amt(i.amount, ctx)} resource(s) from his own heroes' pools (he chooses the hero for each resource); the players cannot travel here while any player holds fewer than that in all`,
     read: ["amount"],
   }),
+  DamageCardThenSetX: (i, ctx) => ({
+    text: `the picked card takes ${amt(i.amount, ctx)} damage, and the effect's X is set to ${i.value} only if the card holds more damage once the responses to it were heard (canceled or prevented damage sets nothing)`,
+    read: ["amount", "value", "before"],
+  }),
+  GroupDiscardResources: (i, ctx) => ({
+    text: `the players as a group discard ${amt(i.amount, ctx)} resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest; what is left is discarded as the first player chooses (a discard, not a spend)`,
+    read: ["amount", "rest", "turns"],
+  }),
 };
 
 export const PELARGIR_SAMPLES: Samples = {
@@ -89,6 +97,8 @@ export const PELARGIR_SAMPLES: Samples = {
   PickRandom: [{ verb: "PickRandom", pick: { type: "ally", control: "any", controlledBy: "firstPlayer" } }],
   RemoveQuestTokens: [{ verb: "RemoveQuestTokens", kind: "any", amount: 1 }, { verb: "RemoveQuestTokens", kind: "progress" }],
   EachPlayerSpends: [{ verb: "EachPlayerSpends", amount: 1 }],
+  DamageCardThenSetX: [{ verb: "DamageCardThenSetX", amount: 1, value: 1 }],
+  GroupDiscardResources: [{ verb: "GroupDiscardResources", amount: 2 }],
 };
 
 export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {

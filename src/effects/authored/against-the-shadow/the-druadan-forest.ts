@@ -3,9 +3,9 @@ import type { Amount, Condition, Effect, PickSpec } from "../../../catalog/bound
 import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for The Drúadan Forest (Against the Shadow part 5, no campaign card). Every line is read from the scan ledger (data/printed/against-the-shadow.json); a line a template already writes (06044:A:1, 06048:A:3) or another card prints word for word needs no record here. Keywords (Surge, Siege,
-// Archery printed as a number) are the cards' own: Prowl X is not a keyword the data knows, so each card that prints it holds the record that does it, and Stars in Sky holds Prowl at the head of its When Revealed record. The Brooding Forest cards (05046 to 05048) keep their Into Ithilien records
+// Archery printed as a number) are the cards' own: Prowl X is not a keyword the data knows, so each card that prints it holds the record that does it, and Stars in Sky holds its Prowl as a Forced record apart from its When Revealed record. The Brooding Forest cards (05046 to 05048) keep their Into Ithilien records
 // (src/effects/authored/against-the-shadow/into-ithilien.ts). The piles place Drû-buri-Drû in the set-aside pile (the Setup shuffles the deck without him) and the quest stages in the quest deck. The readings are in docs/scenarios/against-the-shadow/the-druadan-forest.md (Readings): Prowl discards resources
-// from the heroes of every player as a group (the first player chooses), the stage 3 attack and progress rules are flags of the pelargir family (families/pelargir/stage-attack.ts, stage-progress.ts), and The Passage Out and Drû-buri-Drû each hold the bar on winning.
+// from the heroes of every player as a group (each player decides for his own heroes), the stage 3 attack and progress rules are flags of the pelargir family (families/pelargir/stage-attack.ts, stage-progress.ts), and The Passage Out and Drû-buri-Drû each hold the bar on winning.
 // Rules: ats.setup-the-druadan-forest, ats.prowl, ats.prowl-example, hon.siege, hon.archery, rr.staging, rr.surge, rr.travel, rr.cost, rr.victory, rr.destroy, rr.step-3-3, rr.step-3-4, faq.victory-display, faq.progress-without-advancing, faq.reveal-and-add (data/rules/entries.json).
 const WOSE: PickSpec = { type: "enemy", control: "any", trait: "Wose" };
 // Each Wose in play: engaged or in the staging area.
@@ -13,7 +13,6 @@ const WOSE_IN_PLAY: PickSpec = { ...WOSE, staging: true };
 const ANY_HERO: PickSpec = { type: "hero", control: "any" };
 const OWN_HEROES: PickSpec = { type: "hero", control: "you" };
 const WITH_RESOURCES: PickSpec = { ...ANY_HERO, hasResources: true };
-const FIRST_PLAYER_CHOOSES: PickSpec = { ...WITH_RESOURCES, who: "firstPlayer" };
 const NO_RESOURCES: PickSpec = { ...ANY_HERO, hasResources: false };
 const OWN_ATTACHMENTS: PickSpec = { type: "attachment", control: "you" };
 // The instruction type the records are written in (a Choose and its options nest inside it).
@@ -24,13 +23,9 @@ const HAS_ATTACHMENT: Condition = { kind: "canPick", pick: OWN_ATTACHMENTS };
 const DRU_BURI_DRU = "06045";
 const NOT_IN_VICTORY: Condition = { kind: "inVictory", code: DRU_BURI_DRU, is: false };
 
-// "Prowl X" (ats.prowl, ats.prowl-example): the players as a group discard X resources from the resource pools of their heroes, split as they choose and all they can when fewer remain; the first player decides a disagreement, so he picks each hero. A discard is not a spend.
-const PROWL = (times: Amount): Step => ({
-  verb: "Repeat",
-  times,
-  instructions: [{ verb: "Pick", pick: FIRST_PLAYER_CHOOSES }, { verb: "DiscardResources", amount: 1, target: "picked" }],
-});
-// Prowl resolves when the card is revealed, after any When Revealed effect it prints and before it is placed (a card added to the staging area without a reveal has no Prowl).
+// "Prowl X" (ats.prowl, ats.prowl-example): the players as a group discard X resources from the resource pools of their heroes, all they can when fewer remain. Each player decides for his own heroes in player order and may stop; what is left is discarded as the first player chooses (families/pelargir/group-discard.ts). A discard is not a spend.
+const PROWL = (times: Amount): Step => ({ verb: "GroupDiscardResources", amount: times });
+// Prowl resolves when the card is revealed from the encounter deck (a card added to the staging area without a reveal has no Prowl). Its record is a Forced one of its own, so a cancel of the card's When Revealed effects does not stop it (ats.prowl: the keyword is no When Revealed effect).
 const PROWL_ON_REVEAL = (id: string, code: string, lines: string[], times: Amount): Effect => ({ id, cardCode: code, lines, timing: "forced", trigger: "revealed", subject: "self", byEncounterDeck: true, instructions: [PROWL(times)] });
 
 // "Pay 1 resource or <consequence>" for one hero of the player (Men in the Dark, Stars in Sky): the player pays from that hero's own pool when it holds a resource, and otherwise the consequence is the only option.
@@ -129,7 +124,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         {
           verb: "ForEachPlayer",
           order: "firstFirst",
-          instructions: [{ verb: "Each", pick: OWN_HEROES, instructions: [PAY_OR([{ verb: "DamageCard", amount: 1, target: "picked" }, { verb: "SetX", value: 1 }])] }],
+          instructions: [{ verb: "Each", pick: OWN_HEROES, instructions: [PAY_OR([{ verb: "DamageCardThenSetX", amount: 1, value: 1 }])] }],
         },
         { verb: "GainSurge", when: { kind: "not", condition: { kind: "x", min: 1 } } },
       ],
@@ -137,12 +132,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "06053:shadow:1", cardCode: "06053", lines: ["06053:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: { count: { ...OWN_HEROES, hasResources: false } }, until: "endOfAttack", target: "attacker" }] },
 
     // 06054 Stars in Sky. A:1 and A:2: Prowl 2 resolves first, then each player in turn has each questing hero pay 1 resource from its own pool or be removed from the quest. A:3 (Shadow): all resources of the defending character's pool are discarded (none on an ally, nothing with no defender).
+    PROWL_ON_REVEAL("06054:forced:1", "06054", ["06054:A:1"], 2),
     {
       id: "06054:whenRevealed:1",
       cardCode: "06054",
-      lines: ["06054:A:1", "06054:A:2"],
+      lines: ["06054:A:2"],
       timing: "whenRevealed",
-      instructions: [PROWL(2), { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Each", pick: { ...OWN_HEROES, committed: true }, instructions: [PAY_OR([{ verb: "RemoveFromQuest" }])] }] }],
+      instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Each", pick: { ...OWN_HEROES, committed: true }, instructions: [PAY_OR([{ verb: "RemoveFromQuest" }])] }] }],
     },
     {
       id: "06054:shadow:1",
