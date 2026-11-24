@@ -133,4 +133,3 @@ describe("06070:A:2 the Response to a discard by another card", () => {
     expect(villagers(done, hamlet)).toBe(1);
   });
 });
-});
