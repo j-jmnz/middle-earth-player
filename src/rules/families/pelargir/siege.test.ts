@@ -3,10 +3,16 @@
 // treachery to resolve. The lines themselves (the removal at a damage total, the redirect, the locks, the keywords) are tested in src/campaign/scenarios/the-siege-of-cair-andros/lines.test.ts and spec.test.ts.
 import { describe, expect, it } from "vitest";
 
+import type { Effect } from "../../../catalog/boundary.ts";
+import { EFFECTS } from "../../../effects/index.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { syncConstants } from "../../interpret/constants.ts";
+import type { EngineStep } from "../../core/intents.ts";
 import { settle } from "../../engine/machine.ts";
 import { moveCard } from "../../core/zones.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { idOf, legalIntents, send, start } from "../../../../test/harness/scene-kit.ts";
+import type { LayoutTable } from "../../../../test/harness/scene-kit.ts";
 import { CODES, THREE, codeOf, run, table } from "../../../../test/scenarios/the-siege-of-cair-andros/table.ts";
 
 const { citadel: CITADEL, approach: APPROACH, banks: BANKS, reinforcing: REINFORCING, atApproach: AT_APPROACH, atCitadel: AT_CITADEL, lastBattle: LAST_BATTLE } = CODES;
@@ -119,5 +125,68 @@ describe("the immediate advance waits for the window of the last Battleground lo
     const answered = answerBanks(made);
     expect(codeOf(answered, answered.questStage)).toBe(LAST_BATTLE);
     expect(answered.staging.length).toBeGreaterThan(0);
+  });
+});
+
+describe("an undefended attack whose shadow removes its target is aimed again and stays undefended (rr.step-6-4-3, 05072:B:2, 05032:A:2)", () => {
+  const ALLY_FLAG: Effect = { id: "ally:constant:1", cardCode: "ally", lines: ["ally:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "takesUndefendedDamage", amount: 1, until: "whileSourceInPlay" }] };
+  // Stage 1, The Banks (1 damage) the last Battleground location, f3 attacks with Siege Raft dealt as its shadow; the player declares the attack undefended, aimed at The Banks. `tweak` changes the table first.
+  const attacked = (made = table({ phase: "Encounter", staging: [{ code: BANKS, damage: 1 }], engaged: [{ code: "f3", seat: 0 }], deck: ["05032", "f0", "f0", "f0"], hand: ["filler", "filler"] }, [...EFFECTS, ALLY_FLAG]), tweak?: (state: ScenarioState) => ScenarioState) => {
+    let run = send(start(syncConstants(tweak ? tweak(made.state) : made.state, made.ctx)), { type: "DeclineEngage" }, made.ctx);
+    for (let guard = 0; guard < 30 && run.state.window?.kind !== "defense"; guard += 1) {
+      const pass = legalIntents(run.state, made.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack" || intent.type === "DeclineEngage");
+      if (!pass) break;
+      run = send(run, pass as Parameters<typeof send>[1], made.ctx);
+    }
+    expect(run.state.window?.kind).toBe("defense");
+    return { made, run: passUntilAsked(send(run, { type: "Undefended", heroId: idOf(run.state, BANKS) }, made.ctx), made.ctx) };
+  };
+  // The windows between the steps of the attack are passed; the walk stops at the defense window asked again or when the attack is over.
+  const passUntilAsked = (from: ReturnType<typeof send>, ctx: LayoutTable["ctx"]) => {
+    let run = from;
+    for (let guard = 0; guard < 30 && run.state.pendingAttack != null && run.state.window?.kind !== "defense"; guard += 1) run = send(run, { type: "Pass" }, ctx);
+    return run;
+  };
+
+  it("keeps the attack undefended: no defender is offered and the player names the hero who takes the damage once", () => {
+    const { made, run } = attacked();
+    expect(run.state.window?.kind).toBe("defense");
+    expect(run.state.pendingAttack?.undefended).toBe(true);
+    expect(legalIntents(run.state, made.ctx).some((intent) => intent.type === "DeclareDefender")).toBe(false);
+    const done = passUntilAsked(send(run, { type: "Undefended", heroId: made.hero2 }, made.ctx), made.ctx).state;
+    expect(done.cards[made.hero2]?.damage).toBe(1);
+    expect(done.cards[made.hero]?.damage).toBe(0);
+  });
+
+  it("names the one legal target silently: a seat with one hero takes it at once", () => {
+    const made = table({ phase: "Encounter", staging: [{ code: BANKS, damage: 1 }], engaged: [{ code: "f3", seat: 0 }], deck: ["05032", "f0", "f0", "f0"], hand: ["filler", "filler"] }, [...EFFECTS, ALLY_FLAG]);
+    const { run } = attacked(made, (state) => moveCard(state, made.hero2, { zone: "discard", seat: 0 }));
+    expect(run.state.window?.kind).not.toBe("defense");
+    expect(run.state.cards[made.hero]?.damage).toBe(1);
+  });
+
+  it("asks when a character that may take undefended damage stands beside the one hero", () => {
+    const made = table({ phase: "Encounter", staging: [{ code: BANKS, damage: 1 }], engaged: [{ code: "f3", seat: 0 }], play: ["ally"], deck: ["05032", "f0", "f0", "f0"], hand: ["filler", "filler"] }, [...EFFECTS, ALLY_FLAG]);
+    const { run } = attacked(made, (state) => moveCard(state, made.hero2, { zone: "discard", seat: 0 }));
+    expect(run.state.window?.kind).toBe("defense");
+    expect(run.state.pendingAttack?.undefended).toBe(true);
+    const ally = idOf(run.state, "ally");
+    const done = passUntilAsked(send(run, { type: "Undefended", heroId: ally }, made.ctx), made.ctx).state;
+    expect(done.cards[ally]?.damage).toBe(1);
+  });
+});
+
+describe("the immediate advance does not wait for a plain action window (05072:B:2, ats.cair-andros-location-damage)", () => {
+  it("The Banks, the last Battleground location, explored by an action in the Planning action window: its Response is answered and the quest advances at once", () => {
+    const t = table({ phase: "Planning", active: { code: BANKS, progress: 2 } });
+    const open = { ...t.state, window: { kind: "pass" } } as ScenarioState;
+    const steps: EngineStep[] = [];
+    const explored = settle(runInstruction(open, { verb: "PlaceProgressOn", amount: 1, target: "activeLocation" }, { seat: 0, sourceId: null }, t.ctx, steps), t.ctx, steps);
+    expect(explored.cards[idOf(t.state, BANKS)]?.zone).toBe("victory");
+    const banks = idOf(t.state, BANKS);
+    const response = legalIntents(explored, t.ctx).find((intent) => intent.type === "Trigger" && intent.cardId === banks);
+    expect(response).toBeDefined();
+    const answered = send({ state: explored, steps: [] }, response as Parameters<typeof send>[1], t.ctx).state;
+    expect(codeOf(answered, answered.questStage)).toBe(AT_APPROACH);
   });
 });

@@ -29,10 +29,11 @@ import { inPlay, type GameEvent, type ScenarioState } from "../core/state.ts";
 import { printedOf } from "../core/printed.ts";
 import { targetCandidates } from "../interpret/effect-verbs.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
-import type { AmountScope } from "../interpret/amounts.ts";
+import { hostOf, type AmountScope } from "../interpret/amounts.ts";
 import { pickCandidates, seatsOf } from "../interpret/pick.ts";
 import { deckPool } from "../families/uncharted/pick.ts";
 import { aboutCard } from "../windows/listen.ts";
+import { spendsLockedHost, spendsPicked } from "../families/pelargir/spending.ts";
 import { allIdle } from "./idle.ts";
 import { readsEffect } from "./idle-reads.ts";
 
@@ -60,14 +61,14 @@ export function idleEventReason(state: ScenarioState, instructions: readonly Ins
  * search) with no candidate is "no valid target" (rr.the-word-choose); a search finds what it finds, and a later or conditional choice is made as the effect resolves (rr.search).
  */
 export function noTargetReason(state: ScenarioState, instructions: readonly Instruction[], cardId: string, seat: number, ctx: ReduceContext): string | null {
-  for (const instruction of instructions) {
+  for (const [index, instruction] of instructions.entries()) {
     // "Choose an enemy engaged with a player" with none engaged (Feint): there is no valid target (rr.the-word-choose).
     if ((instruction.verb === "BarAttack" || instruction.verb === "PlaceProgressOnLocation") && !instruction.when) {
       if (targetCandidates(state, instruction, seat, ctx).length === 0) return NO_TARGET;
       continue;
     }
     if (instruction.verb !== "Pick" || searchOrLaterPick(instruction.pick, instruction.when)) continue;
-    if (pickCandidates(state, instruction.pick, seat, [], cardId, ctx).length === 0) return NO_TARGET;
+    if (pickCandidates(state, instruction.pick, seat, [], cardId, ctx, undefined, undefined, false, { spends: spendsPicked(instructions[index + 1]) }).length === 0) return NO_TARGET;
   }
   return null;
 }
@@ -115,12 +116,14 @@ export function noChangeReason(state: ScenarioState, effect: Effect, sourceId: s
   if (!first || !source || ("when" in first && first.when != null)) return null;
   const about = event ? aboutCard(event) : undefined;
   const scope: AmountScope = { actor: seat, sourceId, subject: about ?? null, other: event?.other ?? null, ...(event?.participants ? { participants: event.participants } : {}) };
+  // A spend from a locked host (Livery of the Tower) cannot pay: the effect is not offered (families/pelargir/spending.ts).
+  if (spendsLockedHost(state, steps, hostOf(state, sourceId))) return NO_TARGET;
   if (first.verb !== "Pick") return allIdle(state, steps, sourceId, seat, ctx, scope, { eventSeat: event?.seat ?? undefined }) ? IDLE : null;
   const pick = first.pick;
   // A search of a deck with no card in it finds nothing and shuffles nothing; with cards in it, it may find none and still shuffle (rr.search).
   if (pick.from === "deck" && !pick.looked) return seatsOf(state, pick, seat).every((index) => deckPool(state, index, pick).length === 0) ? NO_TARGET : null;
   if (searchOrLaterPick(pick, first.when)) return null;
-  const found = pickCandidates(state, pick, seat, [], sourceId, ctx, event?.amount, event?.participants, false, event ? { subject: about ?? null, other: event.other ?? null } : undefined);
+  const found = pickCandidates(state, pick, seat, [], sourceId, ctx, event?.amount, event?.participants, false, { ...(event ? { subject: about ?? null, other: event.other ?? null } : {}), spends: spendsPicked(steps[1]) });
   if (found.length === 0) return NO_TARGET;
   const idle = pickedStepsIdle(state, steps, found, sourceId, seat, ctx) || allIdle(state, steps, sourceId, seat, ctx, scope, { eventSeat: event?.seat ?? undefined });
   return idle ? IDLE : null;

@@ -14,7 +14,7 @@ import { askTarget, openBranch } from "../../windows/choices.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { heroPays } from "../../player/payments.ts";
-import { resourcesLocked } from "../pelargir/spending.ts";
+import { anyLocked, resourcesLocked, stopLockedSpend } from "../pelargir/spending.ts";
 import { mayGainResources } from "../misc/guards.ts";
 import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import { printedOf, type Sphere } from "../../core/printed.ts";
@@ -101,6 +101,12 @@ export function spendablePools(state: ScenarioState, actor: number, spec: { sphe
   return { pools, total: pools.reduce((sum, id) => sum + (state.cards[id]?.resources ?? 0), 0) };
 }
 
+/** Whether a PayResources in the instructions cannot be paid while a hero is locked: the pools that can pay do not hold what it names (Rumour from the Earth's return). False in a game with no lock. */
+export function unpayableUnderLock(state: ScenarioState, instructions: readonly Instruction[], actor: number, ctx: ReduceContext): boolean {
+  if (!anyLocked(state)) return false;
+  return instructions.some((instruction) => instruction.verb === "PayResources" && spendablePools(state, actor, { sphere: instruction.sphere }, ctx).total < instruction.amount);
+}
+
 // SpendResources: a hero for each resource, chosen by the actor unless every resource left must pay.
 export function spendResources(state: ScenarioState, instruction: Extract<Instruction, { verb: "SpendResources" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
   // The amount is a number or an expression ("spend X resources", 131028:B:2), read once here.
@@ -110,7 +116,9 @@ export function spendResources(state: ScenarioState, instruction: Extract<Instru
   if (instruction.target) {
     // From one card's own pool: nobody chooses, and a pool that cannot pay spends nothing.
     const id = refCard(state, instruction.target, scope) ?? "";
-    if ((state.cards[id]?.resources ?? 0) < amount || resourcesLocked(state, id)) return state;
+    if ((state.cards[id]?.resources ?? 0) < amount) return state;
+    // A locked pool pays nothing and the effect it paid for does not go on, as for every spender (families/pelargir/spending.ts).
+    if (resourcesLocked(state, id)) return stopLockedSpend(state);
     return noteSpent(updateCard(state, id, { resources: (state.cards[id]?.resources ?? 0) - amount }), [{ heroId: id, amount }], ctx);
   }
   let paid = [...(instruction.paid ?? []), ...(focus.chosen ? [focus.chosen] : [])];

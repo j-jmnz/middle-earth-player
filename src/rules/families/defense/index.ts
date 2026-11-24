@@ -20,7 +20,7 @@ import { redirectDamage } from "./damage.ts";
 import { addDefender, addEndReady, assignAttackDamage, cancelAttack, readyUnharmed } from "./defenders.ts";
 import { dealShadowTo, discardShadowOf, lookAtShadow, redirectAttack } from "./shadow.ts";
 import { shadowAttacks, startShadowAttack } from "./shadow-attack.ts";
-import { resourcesLocked, stopLockedSpend } from "../pelargir/spending.ts";
+import { anyLocked, resourcesLocked, stopLockedSpend } from "../pelargir/spending.ts";
 import type { Focus } from "../index.ts";
 
 function ref(state: ScenarioState, card: CardRef, focus: Focus): string {
@@ -78,7 +78,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "SpendFromPool": {
       const id = ref(state, instruction.from ?? "picked", focus);
       const card = state.cards[id];
-      if (card && resourcesLocked(state, id)) return stopLockedSpend(state);
+      if (card ? resourcesLocked(state, id) : anyLocked(state)) return stopLockedSpend(state);
       const amount = Math.min(card?.resources ?? 0, resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx));
       return card && amount > 0 ? updateCard(state, id, { resources: card.resources - amount }) : state;
     }
