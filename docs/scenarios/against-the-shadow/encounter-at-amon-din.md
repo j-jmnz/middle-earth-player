@@ -105,13 +105,14 @@ The verbs, the trigger and the flags are in the family `pelargir` (`src/catalog/
 
 ## Table
 
-Pointers for the Table step (`docs/agents/agent-brief.md`, Scenario procedure); each piece is drawn only in this scenario and read from the records and the table, never a control.
+Each piece is made by a line named here and drawn only while that line makes it; none is a control (no control types damage, resources, threat, progress or life). The words, the layout and the rules of each piece are in `docs/design-system-table.md`, Encounter at Amon Dîn's table pieces; every hook keys on this scenario's id and is empty in another. Code: `src/play/readouts/against-the-shadow/amon-din.ts`, `src/play/words/scenarios/against-the-shadow/amon-din.ts`, `src/play/words/asks/encounter-at-amon-din.ts`; test `src/play/scenarios/encounter-at-amon-din-table.test.ts`.
 
-- **Villager tokens**: a count on a location (staging and active), on the quest card (stage 1B) and on Rescued Villagers, read from `resources` (`src/play/canvas/token-spots.ts`, `src/play/cards/table-preview.ts`), and the Villagers chip on the preview (`src/play/cards/card-keywords.ts`).
-- **The two objectives**: a readout that compares Rescued Villagers (tokens) and Dead Villagers (damage tokens) with the verdict wording (more rescued than dead wins; a tie loses), from stage 1 (`src/play/readouts/scenario-dials.ts`).
-- **Lord Alcaron**: the ally row from the Setup, the choice sheet of his Response (the location to place the token on), and a note on his preview that the players lose if he leaves play.
-- **Ghulat**: Attack X as the current damage tokens on Dead Villagers, the line "the game cannot end while he is in play", and a banner on the stage when the game waits for him to leave play (also when Alcaron has left play).
-- **The undefended attack** in stage 2B: the defender sheet shows "N villager tokens from Rescued Villagers" in place of a hero (`src/play/choice/combat-sheets.ts`).
-- **Asks**: Alcaron's Response and its location, Craven Eagle's prevention, Panicked!'s location for each player.
-- **Savagery of the Orcs**: the quest readout shows the tokens left on the card in place of quest points while stage 1B is current (`src/play/phases/quest-stat.ts`).
-- **The Resolution**: won with more rescued than dead; lost with a tie or fewer, or when Alcaron left play.
+- **Villager tokens** (`06066:B:1`, `06075:A:1`, `06076:A:1`, `06077:A:1`, `ats.villagers`): the engine keeps them as the `resources` of the card, and every word says villager tokens (the preview's token line, the spoken label, the record words, the banner). The Villagers X chip on each of the three locations and on stage 1B reads its value from the card's own record and opens `ats.villagers`. The token art on a card is still the resource token picture (`pieces.native.tsx` and its web twin are not touched).
+- **The comparison** (`06068:A:2`, `06069:A:2`): the top-bar dials "Rescued" (villager tokens) and "Dead" (damage tokens), a tap on either opens its card, whose preview says its win or loss line with the other count and that a tie loses; the dial "Stage" counts the tokens left on stage 1B.
+- **Stage 1B** (`06066:B:2`, `06066:B:3`): the stage's preview, the quest readout and the banner say that progress moves tokens to Rescued Villagers, with the surplus lost and the advance at the last token.
+- **Stage 2B** (`06067:B:1`, `06067:B:2`): the attack sheet's Undefended line, the dock readout and the banner say the tokens discarded and that no hero is damaged; the stage's preview says the end, or, once it is defeated with Ghulat in play, that the game goes on and what the counts decide.
+- **Lord Alcaron** (`06070:A:1`, `06070:A:3`): a preview line for whose he is and the loss on his leaving; the dock's warning before a move that takes him out of play reads his own record (`src/play/store/foresight.ts`).
+- **Ghulat** (`06071:A:1`, `06071:A:3`): the preview line for Attack X and the held end; his chip shows the modified Attack.
+- **Burning Farmhouse's end-of-round discard** (`06075:A:2`) and **Secluded Farmhouse's Travel** (`06077:A:2`): no line; the card's token count and the travel cost line show all the printed text needs.
+- **Asks**: Alcaron's Response location, Craven Eagle's tie pick and prevent or allow Choose, Panicked!'s location for each player. The Ravaging Orcs cards (`05062` to `05064`) hold no Pick or Choose.
+- **The Resolution**: the loss reasons are the records' (`LoseGame` of Dead Villagers, Alcaron's loss); a win carries no reason.

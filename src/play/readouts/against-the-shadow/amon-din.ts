@@ -9,7 +9,7 @@ import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { placeQuestProgress } from "../../../rules/quest/quest.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
-import { alcaronLeftWords, alcaronWords, changedWords, deadChangedWords, deadDialName, deadDialWords, deadWords, endWords, ghulatWords, heldTitle, heldWords, movesWords, protectWords, rescuedDialName, rescuedDialWords, rescuedWords, savageryWords, undefendedVillagersResult, undefendedVillagersWords, villagerTokens } from "../../words/scenarios/against-the-shadow/amon-din.ts";
+import { alcaronLeftWords, alcaronWords, questDialName, questDialWords, changedWords, deadChangedWords, deadDialName, deadDialWords, deadWords, endWords, ghulatWords, heldTitle, heldWords, movesWords, protectWords, rescuedDialName, rescuedDialWords, rescuedWords, savageryWords, undefendedVillagersResult, undefendedVillagersWords, villagerTokens } from "../../words/scenarios/against-the-shadow/amon-din.ts";
 import { ownerWords } from "../../words/owner.ts";
 import type { TableDial } from "../dials.ts";
 
@@ -55,7 +55,11 @@ export function amonDinDials(game: ScenarioState): readonly TableDial[] {
   const dead = cardWith(game, DEAD);
   if (!live(game) || !rescued || !dead) return [];
   const { rescued: saved, dead: lost } = counts(game);
+  const stage = game.questStage ? game.cards[game.questStage] : undefined;
+  // Stage 1B has no quest points: the villager tokens left on its card are what the progress uses up (06066:B:2).
+  const quest: TableDial[] = stage?.code === STAGE_ONE ? [{ id: "quest-villagers", testID: "din-quest", label: "Stage", name: questDialName, value: stage.resources, cardId: stage.id, note: questDialWords(stage.resources) }] : [];
   return [
+    ...quest,
     { id: "rescued", testID: "din-rescued", label: "Rescued", name: rescuedDialName, value: saved, cardId: rescued.id, note: rescuedDialWords(saved, lost) },
     { id: "dead", testID: "din-dead", label: "Dead", name: deadDialName, value: lost, icon: "damage", cardId: dead.id, note: deadDialWords(lost, saved) },
   ];

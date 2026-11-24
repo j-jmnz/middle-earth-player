@@ -103,7 +103,7 @@ describe("Villagers X (06066:B:1, 06075:A:1, 06076:A:1, 06077:A:1)", () => {
 });
 
 describe("the comparison that decides the game (06068:A:2, 06069:A:2)", () => {
-  const made = table({ staging: [{ code: rescued, resources: 4 }, { code: dead, damage: 3 }] });
+  const made = table({ stage: protect, staging: [{ code: rescued, resources: 4 }, { code: dead, damage: 3 }] });
 
   it("two dials in the top bar, Rescued and Dead, read the villager tokens and the damage tokens and open their cards", () => {
     const dials = dialsOf(made, made.state);
@@ -128,6 +128,13 @@ describe("the comparison that decides the game (06068:A:2, 06069:A:2)", () => {
 describe("stage 1B moves villager tokens (06066:B:2, 06066:B:3)", () => {
   const made = table({ staging: [rescued, dead] });
   const state = withVillagers(made.state, savagery, 5);
+
+  it("a dial reads the villager tokens left on the quest card, and is gone once stage 2B is current", () => {
+    const dial = dialsOf(made, state).find((one) => one.id === "quest-villagers");
+    expect(dial).toMatchObject({ label: "Stage", value: 5, cardId: idOf(state, savagery), note: "5 villager tokens left on the quest card. Each point of progress moves 1 to Rescued Villagers, and the stage advances when the last one leaves." });
+    const two = table({ stage: protect, staging: [rescued, dead] });
+    expect(dialsOf(two, two.state).some((one) => one.id === "quest-villagers")).toBe(false);
+  });
 
   it("the stage's preview says progress moves tokens to Rescued Villagers, the surplus is lost and the last token advances it", () => {
     expect(stageLine(made, state)).toBe("No quest points. Progress is not placed on this stage: each point moves 1 villager token from here to Rescued Villagers, and progress beyond the tokens it holds is lost. The stage advances when its last token leaves.");

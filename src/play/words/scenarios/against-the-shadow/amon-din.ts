@@ -16,6 +16,10 @@ export const deadWords = (rescued: number): string => `Each villager token disca
 export const rescuedDialName = "Villager tokens on Rescued Villagers:";
 export const rescuedDialWords = (rescued: number, dead: number): string => `${villagerTokens(rescued)} on Rescued Villagers, against ${plural(dead, "damage token")} on Dead Villagers. The players win at the end of the game with more villager tokens than damage tokens. A tie loses.`;
 
+/** The top-bar dial of stage 1B: the villager tokens left on its card. */
+export const questDialName = "Villager tokens left on the quest card:";
+export const questDialWords = (held: number): string => `${villagerTokens(held)} left on the quest card. Each point of progress moves 1 to Rescued Villagers, and the stage advances when the last one leaves.`;
+
 /** The top-bar dial of Dead Villagers. */
 export const deadDialName = "Damage tokens on Dead Villagers:";
 export const deadDialWords = (dead: number, rescued: number): string => `${plural(dead, "damage token")} on Dead Villagers, against ${villagerTokens(rescued)} on Rescued Villagers. Each villager token discarded adds 1, and none comes off. The players lose at the end of the game with as many or more damage tokens than villager tokens. A tie loses.`;
