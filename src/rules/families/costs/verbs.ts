@@ -14,6 +14,7 @@ import { askTarget, openBranch } from "../../windows/choices.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { heroPays } from "../../player/payments.ts";
+import { resourcesLocked } from "../pelargir/spending.ts";
 import { mayGainResources } from "../misc/guards.ts";
 import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import { printedOf, type Sphere } from "../../core/printed.ts";
@@ -96,7 +97,7 @@ export function discardResources(state: ScenarioState, instruction: Extract<Inst
 export function spendablePools(state: ScenarioState, actor: number, spec: { sphere?: Sphere | undefined; group?: boolean | undefined }, ctx: ReduceContext): { pools: string[]; total: number } {
   // `group`: the players who share the actor's staging area, all of them while the area is shared (mec108.create-staging-area, hob.staging-area-creating: only players that share a staging area can interact).
   const seats = spec.group ? sharing(state, actor) : [actor];
-  const pools = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, spec.sphere ?? null, ctx));
+  const pools = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, spec.sphere ?? null, ctx) && !resourcesLocked(state, id));
   return { pools, total: pools.reduce((sum, id) => sum + (state.cards[id]?.resources ?? 0), 0) };
 }
 

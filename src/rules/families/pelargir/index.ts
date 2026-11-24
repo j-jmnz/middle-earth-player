@@ -1,4 +1,4 @@
-// Rules: rr.attachment-cards, rr.objective-cards, rr.first-player, rr.damage, rr.reveal, rr.optional-engagement, rr.running-out-of-cards, rr.quest-advancement, ats.ally-objectives (data/rules/entries.json); the cards of Peril in Pelargir (05019 to 05024, 05037 to 05045, 05065 to 05067) and Into Ithilien (05025 to 05029, 05046 to 05055, 05068 to 05071; committed.ts, stage-skip.ts and control.ts).
+// Rules: ats.cair-andros-location-damage, ats.cair-andros-remove-stage, rr.attachment-cards, rr.objective-cards, rr.first-player, rr.damage, rr.reveal, rr.optional-engagement, rr.running-out-of-cards, rr.quest-advancement, ats.ally-objectives (data/rules/entries.json); the cards of Peril in Pelargir (05019 to 05024, 05037 to 05045, 05065 to 05067) and Into Ithilien (05025 to 05029, 05046 to 05055, 05068 to 05071; committed.ts, stage-skip.ts and control.ts), The Siege of Cair Andros (05030 to 05036, 05056 to 05064, 05072 to 05076; siege.ts, stage-remove.ts, staging.ts, spending.ts, stage-keyword.ts).
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 
@@ -11,6 +11,9 @@ import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
 import { noteFirstEnemy, pelargirCondition } from "./first-enemy.ts";
 import { attachToHighestThreatCost } from "./host.ts";
 import { attachObjectiveTo, attackScrollHolder } from "./scroll.ts";
+import { sieges, undefendedBattlegrounds } from "./siege.ts";
+import { removeStage } from "./stage-remove.ts";
+import { resolveTopmostTreachery, shuffleStagingIntoEncounterDeck } from "./staging.ts";
 
 // The verbs src/catalog/families/pelargir.ts adds. Null when the verb is not one of them.
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -27,6 +30,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return raiseThreatPerDiscarded(state, instruction, focus, ctx, steps);
     case "TakeControlOfStagedObjectives":
       return takeControlOfStagedObjectives(state, instruction, ctx);
+    case "RemoveStage":
+      return removeStage(state, instruction, ctx, steps);
+    case "ResolveTopmostTreachery":
+      return resolveTopmostTreachery(state, instruction, focus, ctx, steps);
+    case "ShuffleStagingIntoEncounterDeck":
+      return shuffleStagingIntoEncounterDeck(state, focus, ctx, steps);
     default:
       return null;
   }
@@ -34,8 +43,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelargir",
-  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives"],
+  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck"],
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,
+  settle: { sweep: sieges },
+  combat: { undefended: (state, _candidates, cards) => undefendedBattlegrounds(state, cards) },
 };

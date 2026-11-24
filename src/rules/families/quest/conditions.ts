@@ -8,6 +8,7 @@ import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, reached } from "../../core/state.ts";
 import { currentQuestId } from "../wilderland/night-quest.ts";
+import { losesKeyword } from "../pelargir/stage-keyword.ts";
 
 type Step = Extract<Condition, { kind: "step" }>["is"];
 
@@ -49,7 +50,7 @@ export function currentQuestHas(state: ScenarioState, keyword: "battle" | "siege
   const id = currentQuestId(state);
   const stage = id ? state.cards[id] : undefined;
   if (!stage) return false;
-  return printedOf(cards, stage.code).keywords[keyword] || flagged(state, stage.id, keyword);
+  return (printedOf(cards, stage.code).keywords[keyword] || flagged(state, stage.id, keyword)) && !losesKeyword(state, stage.id, keyword);
 }
 
 /**

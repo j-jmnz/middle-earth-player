@@ -1,4 +1,4 @@
-// The pelargir family's pieces (src/catalog/families/pelargir.ts): Alcaron's Scroll, the treachery that attaches to the hero with the highest threat cost, the discards Collateral Damage counts in two steps, Into Ithilien's ally objectives committed from the staging area and the first player's taking of them, and the flags those cards read: templates, samples and stat notes.
+// The pelargir family's pieces (src/catalog/families/pelargir.ts): Alcaron's Scroll, the treachery that attaches to the hero with the highest threat cost, the discards Collateral Damage counts in two steps, Into Ithilien's ally objectives committed from the staging area and the first player's taking of them, The Siege of Cair Andros's stage removal, copied treachery and staging shuffle, and the flags those cards read: templates, samples and stat notes.
 import { cardRef } from "../amounts.ts";
 import { amt, type Samples, type Templates } from "../family-kit.ts";
 import { str } from "../kit.ts";
@@ -25,6 +25,15 @@ export const PELARGIR_TEMPLATES: Templates = {
     text: `the first player takes control of each ${str(i.trait)} objective in the staging area: it comes into his play area, faceup and ready, and is no longer committed by its own text; with none there nothing happens`,
     read: ["trait"],
   }),
+  RemoveStage: (i) => ({
+    text: `the stage with code ${str(i.code)} is set aside and no longer part of the quest deck: the stage that is defeated before it goes to the next stage still in the quest deck; if it is the current stage, the quest advances at once to the next stage still in the quest deck and that stage is revealed; a stage already gone is not an error`,
+    read: ["code"],
+  }),
+  ResolveTopmostTreachery: (i) => ({
+    text: `resolve the When Revealed effects (not Doomed, not Surge) of the last treachery card placed in the encounter discard pile; the card stays in the discard pile; with no treachery there nothing happens${i.uncancelable === true ? "; these effects cannot be canceled" : ""}`,
+    read: ["uncancelable"],
+  }),
+  ShuffleStagingIntoEncounterDeck: () => ({ text: "every card in the staging area (enemies, locations, objectives) leaves play and is shuffled into the encounter deck; X is how many cards there were (0 when there were none)", read: [] }),
 };
 
 export const PELARGIR_SAMPLES: Samples = {
@@ -34,6 +43,9 @@ export const PELARGIR_SAMPLES: Samples = {
   DiscardEncounterTopMore: [{ verb: "DiscardEncounterTopMore", count: 2, reset: true }],
   RaiseThreatPerDiscarded: [{ verb: "RaiseThreatPerDiscarded", type: "location", amount: 2 }],
   TakeControlOfStagedObjectives: [{ verb: "TakeControlOfStagedObjectives", trait: "Ranger" }],
+  RemoveStage: [{ verb: "RemoveStage", code: "05075" }],
+  ResolveTopmostTreachery: [{ verb: "ResolveTopmostTreachery", uncancelable: true }],
+  ShuffleStagingIntoEncounterDeck: [{ verb: "ShuffleStagingIntoEncounterDeck" }],
 };
 
 export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
@@ -45,5 +57,10 @@ export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
   committedInStaging: " (an ally objective in the staging area: it counts in the quest total with the stat the quest uses, is a character committed to the quest for every effect that picks or counts one, and takes archery damage)",
   skipsNextStage: " (held by a quest stage: once it is completed the quest goes to the stage after the next one, which is bypassed)",
   attackForUncommitted: " (marker: the constant that gives the Attack for each character not committed to a quest holds while this flag does)",
+  removedAtDamage: " (held by a Battleground location in play, the amount is the damage at which it is removed from the game: not explored, to no pile, no Response, its damage and progress gone; checked at every settle)",
+  undefendedToBattleground: " (held by the current quest stage: the damage of an undefended attack goes to the Battleground location in play with the lowest Threat, none to a hero; on a tie the defending player names it)",
+  advancesWithoutBattleground: " (held by the current quest stage: when no Battleground location is in play the quest advances at once to the next stage still in the quest deck)",
+  cannotSpendResources: " (held by a hero: no resource can be spent from its pool, for a card, an ability or an effect; resources can still be gained and moved)",
+  losesSiege: " (held by the current quest stage: it does not have the Siege keyword it prints)",
   firstEnemyNoted: " (held by the table until the end of the round: an enemy was already marked firstEnemy this round)",
 };
